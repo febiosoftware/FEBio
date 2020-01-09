@@ -759,6 +759,9 @@ public:
 	// shape functions at (r,s)
 	void shape_fnc(int order, double* H, double r, double s);
 
+	// shape function derivatives at (r,s)
+	void shape_deriv(int order, double* Gr, double* Gs, double r, double s);
+
 public:
 	// gauss-point coordinates and weights
 	vector<double> gr;

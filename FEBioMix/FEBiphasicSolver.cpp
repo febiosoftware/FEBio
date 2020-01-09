@@ -79,6 +79,9 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem), m_dofP
 }
 
 //-----------------------------------------------------------------------------
+FEBiphasicSolver::~FEBiphasicSolver() {}
+
+//-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures.
 //
 bool FEBiphasicSolver::Init()

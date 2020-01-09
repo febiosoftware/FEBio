@@ -88,6 +88,9 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
+	//! unpack dofs
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
+
 public:
     void GetVectorGap      (int nface, vec3d& pg) override;
     void GetContactTraction(int nface, vec3d& pt) override;
@@ -108,6 +111,8 @@ protected:
     
 public:
     bool	m_bporo;	//!< set poro-mode
+
+	int	m_varU, m_varP;
     
     vector<bool>		m_poro;	//!< surface element poro status
     vector<vec3d>		m_nn;	//!< node normals
@@ -182,7 +187,13 @@ protected:
     
     void CalcAutoPressurePenalty(FESlidingSurfaceBiphasicMixed& s);
     double AutoPressurePenalty(FESurfaceElement& el, FESlidingSurfaceBiphasicMixed& s);
-    
+
+	//! calculate contact forces
+	void LoadVector(FESlidingSurfaceBiphasicMixed& ss, FESlidingSurfaceBiphasicMixed& ms, FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESlidingSurfaceBiphasicMixed& ss, FESlidingSurfaceBiphasicMixed& ms, FELinearSystem& LS, const FETimeInfo& tp);
+
 public:
 	FESlidingSurfaceBiphasicMixed	m_ms;	//!< master surface
 	FESlidingSurfaceBiphasicMixed	m_ss;	//!< slave surface

@@ -1577,6 +1577,13 @@ void FESurfaceElementTraits::shape_fnc(int order, double* H, double r, double s)
 	else m_shapeP[order]->shape_fnc(H, r, s);
 }
 
+// shape function derivatives at (r,s)
+void FESurfaceElementTraits::shape_deriv(int order, double* Gr, double* Gs, double r, double s)
+{
+	if (order == -1) shape_deriv(Gr, Gs, r, s);
+	else m_shapeP[order]->shape_deriv(Gr, Gs, r, s);
+}
+
 //=============================================================================
 //                          F E Q U A D 4
 //=============================================================================

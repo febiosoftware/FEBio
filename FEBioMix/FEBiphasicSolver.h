@@ -40,7 +40,7 @@ class FEBIOMIX_API FEBiphasicSolver : public FESolidSolver2
 public:
 	//! constructor
 	FEBiphasicSolver(FEModel* pfem);
-	virtual ~FEBiphasicSolver() {}
+	virtual ~FEBiphasicSolver();
 
 	//! Initialize data structures
 	bool Init() override;

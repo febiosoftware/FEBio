@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include "FECore/FENormalProjection.h"
 #include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
+#include <FEBioMech/FEBioMech.h>
+#include "FEBioMix.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -117,6 +119,11 @@ FEMaterialPoint* FESlidingSurfaceBiphasicMixed::CreateMaterialPoint()
 //-----------------------------------------------------------------------------
 bool FESlidingSurfaceBiphasicMixed::Init()
 {
+	// get the displacement and fluid pressure variable indices.
+	FEModel* fem = GetFEModel();
+	m_varU = fem->GetDOFS().GetVariableIndex(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT)); assert(m_varU >= 0);
+	m_varP = fem->GetDOFS().GetVariableIndex(FEBioMix::GetVariableName(FEBioMix::FLUID_PRESSURE)); assert(m_varP >= 0);
+
     // initialize surface data first
     if (FEBiphasicContactSurface::Init() == false) return false;
     
@@ -333,7 +340,10 @@ double FESlidingSurfaceBiphasicMixed::GetContactArea()
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurfaceBiphasicMixed::GetFluidForce()
 {
-    int n, i;
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
     const int MN = FEElement::MAX_NODES;
     double pn[MN];
     
@@ -341,18 +351,19 @@ vec3d FESlidingSurfaceBiphasicMixed::GetFluidForce()
     vec3d f(0,0,0);
     
     // loop over all elements of the surface
-    for (n=0; n<Elements(); ++n)
+    for (int n=0; n<Elements(); ++n)
     {
         FESurfaceElement& el = Element(n);
         int nseln = el.Nodes();
         
         // nodal pressures
-        for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).get(m_dofP);
+		int npdof = el.ShapeFunctions(degree_p);
+        for (int i=0; i<npdof; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).get(m_dofP);
         
-        int nint = el.GaussPoints();
-        
+       
         // evaluate the fluid force for that element
-        for (i=0; i<nint; ++i)
+		int nint = el.GaussPoints();
+		for (int i=0; i<nint; ++i)
         {
             // get the base vectors
             vec3d g[2];
@@ -362,7 +373,7 @@ vec3d FESlidingSurfaceBiphasicMixed::GetFluidForce()
             // gauss weight
             double w = el.GaussWeights()[i];
             // fluid pressure
-            double p = el.eval(pn, i);
+            double p = el.eval(degree_p, pn, i);
             // contact force
             f += n*(w*p);
         }
@@ -469,8 +480,12 @@ void FESlidingSurfaceBiphasicMixed::GetNodalVectorGap(int nface, vec3d* pg)
 //-----------------------------------------------------------------------------
 void FESlidingSurfaceBiphasicMixed::GetNodalContactPressure(int nface, double* pg)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
     FESurfaceElement& el = Element(nface);
-    for (int k=0; k<el.Nodes(); ++k)
+	int npdof = el.ShapeFunctions(degree_p);
+    for (int k=0; k<npdof; ++k)
         pg[k] = m_pn[el.m_lnode[k]];
 }
 
@@ -494,6 +509,38 @@ void FESlidingSurfaceBiphasicMixed::GetNodalContactTraction(int nface, vec3d* tn
     FESurfaceElement& el = Element(nface);
     for (int k=0; k<el.Nodes(); ++k)
         tn[k] = m_tn[el.m_lnode[k]];
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasicMixed::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
+	// We should allocate the number of shapefunctions for each variable,
+	// but for now, we allocate assuming the shape functions equals the nodes.
+	// We can do this, because the nodes that don't have a pressure dof,
+	// will have their id set to -1. 
+	int N = el.Nodes();
+	lm.assign(N * 4, -1);
+
+	// pack the equation numbers
+	for (int i = 0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+
+		FENode& node = m_pMesh->Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3 * i    ] = id[m_dofX];
+		lm[3 * i + 1] = id[m_dofY];
+		lm[3 * i + 2] = id[m_dofZ];
+
+		// now the pressure dofs
+		if (m_dofP >= 0) lm[3 * N + i] = id[m_dofP];
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -745,6 +792,10 @@ double FESlidingInterfaceBiphasicMixed::AutoPressurePenalty(FESurfaceElement& el
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMixed& ss, FESlidingSurfaceBiphasicMixed& ms, bool bupseg, bool bmove)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(ss.m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(ss.m_varP);
+
     FEMesh& mesh = GetFEModel()->GetMesh();
     double R = m_srad*mesh.GetBoundingBox().radius();
     
@@ -890,8 +941,9 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
                     double p2 = 0;
                     if (mporo) {
                         double pm[FEElement::MAX_NODES];
-                        for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
-                        p2 = pme->eval(pm, rs[0], rs[1]);
+						int npdof = pme->ShapeFunctions(degree_p);
+                        for (int k=0; k<npdof; ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
+                        p2 = pme->eval(degree_p, pm, rs[0], rs[1]);
                     }
                     if (sporo) {
                         pt.m_p1 = p1;
@@ -1146,6 +1198,10 @@ vec3d FESlidingInterfaceBiphasicMixed::SlipTangent(FESlidingSurfaceBiphasicMixed
 //-----------------------------------------------------------------------------
 vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicMixed& ss, const int nel, const int n, FESlidingSurfaceBiphasicMixed& ms, double& pn)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(ss.m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(ss.m_varP);
+
     vec3d s1(0,0,0);
     vec3d dr(0,0,0);
     vec3d t(0,0,0);
@@ -1225,8 +1281,9 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
             if (sporo && mporo)
             {
                 double pm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m.Node(pme->m_node[k]).get(m_dofP);
-                double p2 = pme->eval(pm, data.m_rs[0], data.m_rs[1]);
+				int npdof = pme->ShapeFunctions(degree_p);
+                for (int k=0; k<npdof; ++k) pm[k] = m.Node(pme->m_node[k]).get(m_dofP);
+                double p2 = pme->eval(degree_p, pm, data.m_rs[0], data.m_rs[1]);
                 data.m_pg = p - p2;
             }
             
@@ -1386,177 +1443,200 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasicMixed::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
+	// we will also calculate net contact forces, so zero them here
+	m_ss.m_Ft = vec3d(0, 0, 0);
+	m_ms.m_Ft = vec3d(0, 0, 0);
+
+	// loop over the nr of passes
+	int npass = (m_btwo_pass ? 2 : 1);
+	for (int np = 0; np < npass; ++np)
+	{
+		// get slave and master surface
+		FESlidingSurfaceBiphasicMixed& ss = (np == 0 ? m_ss : m_ms);
+		FESlidingSurfaceBiphasicMixed& ms = (np == 0 ? m_ms : m_ss);
+
+		// assemble the load vector for this pass
+		LoadVector(ss, ms, R, tp);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingInterfaceBiphasicMixed::LoadVector(FESlidingSurfaceBiphasicMixed& ss, FESlidingSurfaceBiphasicMixed& ms, FEGlobalVector& R, const FETimeInfo& tp)
+{
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(ss.m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(ss.m_varP);
+
     const int MN = FEElement::MAX_NODES;
     
     vector<int> sLM, mLM, LM, en;
     vector<double> fe;
-    double detJ[MN], w[MN], *Hs, Hm[MN];
+    double detJ[MN], w[MN], *Hs, Hm[MN], Hmp[MN];
     double N[4*MN*2];
     
-    m_ss.m_Ft = vec3d(0,0,0);
-    m_ms.m_Ft = vec3d(0,0,0);
+    // need to multiply biphasic force entries by the timestep
+    double dt = tp.timeIncrement;
     
-    FEModel& fem = *GetFEModel();
-    
-    // need to multiply biphasic stiffness entries by the timestep
-    double dt = fem.GetTime().timeIncrement;
-    
-    // loop over the nr of passes
-    int npass = (m_btwo_pass?2:1);
-    for (int np=0; np<npass; ++np)
+    // loop over all slave elements
+    for (int i=0; i<ss.Elements(); ++i)
     {
-        // get slave and master surface
-		FESlidingSurfaceBiphasicMixed& ss = (np == 0? m_ss : m_ms);
-		FESlidingSurfaceBiphasicMixed& ms = (np == 0? m_ms : m_ss);
-        
-        // loop over all slave elements
-        for (int i=0; i<ss.Elements(); ++i)
+        // get the surface element
+        FESurfaceElement& se = ss.Element(i);
+            
+		// flag indicating that slave element is poro
+        bool sporo = ss.m_poro[i];
+            
+        // get the nr of nodes and integration points
+        int nseln = se.Nodes();
+        int nint = se.GaussPoints();
+            
+        // copy the LM vector; we'll need it later
+        ss.UnpackLM(se, sLM);
+            
+        // we calculate all the metrics we need before we
+        // calculate the nodal forces
+        for (int j=0; j<nint; ++j)
         {
-            // get the surface element
-            FESurfaceElement& se = ss.Element(i);
-            
-            bool sporo = ss.m_poro[i];
-            
-            // get the nr of nodes and integration points
-            int nseln = se.Nodes();
-            int nint = se.GaussPoints();
-            
-            // copy the LM vector; we'll need it later
-            ss.UnpackLM(se, sLM);
-            
-            // we calculate all the metrics we need before we
-            // calculate the nodal forces
-            for (int j=0; j<nint; ++j)
-            {
-                // get the base vectors
-                vec3d g[2];
-                ss.CoBaseVectors(se, j, g);
+            // get the base vectors
+            vec3d g[2];
+            ss.CoBaseVectors(se, j, g);
                 
-                // jacobians: J = |g0xg1|
-                detJ[j] = (g[0] ^ g[1]).norm();
+            // jacobians: J = |g0xg1|
+            detJ[j] = (g[0] ^ g[1]).norm();
                 
-                // integration weights
-                w[j] = se.GaussWeights()[j];
-            }
+            // integration weights
+            w[j] = se.GaussWeights()[j];
+        }
             
-            // loop over all integration points
-            // note that we are integrating over the current surface
-            for (int j=0; j<nint; ++j)
-            {
-                // get the integration point data
-				FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(j));
+        // loop over all integration points
+        // note that we are integrating over the current surface
+        for (int j=0; j<nint; ++j)
+        {
+            // get the integration point data
+			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(j));
 
-                // calculate contact pressure and account for stick
-                double pn;
-                vec3d t = ContactTraction(ss, i, j, ms, pn);
+            // calculate contact pressure and account for stick
+            double pn;
+            vec3d t = ContactTraction(ss, i, j, ms, pn);
                 
+            // get the master element
+            FESurfaceElement* pme = pt.m_pme;
+                
+            if (pme)
+            {
                 // get the master element
-                FESurfaceElement* pme = pt.m_pme;
-                
-                if (pme)
+                FESurfaceElement& me = *pme;
+                    
+				// get the master element poro status
+                bool mporo = ms.m_poro[pme->m_lid];
+                    
+                // get the nr of master element nodes
+                int nmeln = me.Nodes();
+                    
+                // copy LM vector
+                ms.UnpackLM(me, mLM);
+                    
+                // calculate degrees of freedom
+                int ndof = 3*(nseln + nmeln);
+                    
+                // build the LM vector
+                LM.resize(ndof);
+                for (int k=0; k<nseln; ++k)
                 {
-                    // get the master element
-                    FESurfaceElement& me = *pme;
+                    LM[3*k  ] = sLM[3*k  ];
+                    LM[3*k+1] = sLM[3*k+1];
+                    LM[3*k+2] = sLM[3*k+2];
+                }
                     
-                    bool mporo = ms.m_poro[pme->m_lid];
+                for (int k=0; k<nmeln; ++k)
+                {
+                    LM[3*(k+nseln)  ] = mLM[3*k  ];
+                    LM[3*(k+nseln)+1] = mLM[3*k+1];
+                    LM[3*(k+nseln)+2] = mLM[3*k+2];
+                }
                     
-                    // get the nr of master element nodes
-                    int nmeln = me.Nodes();
+                // build the en vector
+                en.resize(nseln+nmeln);
+                for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
+                for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                    // copy LM vector
-                    ms.UnpackLM(me, mLM);
+                // get slave element shape functions
+                Hs = se.H(j);
                     
-                    // calculate degrees of freedom
-                    int ndof = 3*(nseln + nmeln);
+                // get master element shape functions
+                double r = pt.m_rs[0];
+                double s = pt.m_rs[1];
+                me.shape_fnc(Hm, r, s);
                     
-                    // build the LM vector
-                    LM.resize(ndof);
+                if (pn > 0) {
+                        
+                    // calculate the force vector
+                    fe.resize(ndof);
+                    zero(fe);
+                        
                     for (int k=0; k<nseln; ++k)
                     {
-                        LM[3*k  ] = sLM[3*k  ];
-                        LM[3*k+1] = sLM[3*k+1];
-                        LM[3*k+2] = sLM[3*k+2];
+                        N[3*k  ] = Hs[k]*t.x;
+                        N[3*k+1] = Hs[k]*t.y;
+                        N[3*k+2] = Hs[k]*t.z;
                     }
-                    
+                        
                     for (int k=0; k<nmeln; ++k)
                     {
-                        LM[3*(k+nseln)  ] = mLM[3*k  ];
-                        LM[3*(k+nseln)+1] = mLM[3*k+1];
-                        LM[3*(k+nseln)+2] = mLM[3*k+2];
+                        N[3*(k+nseln)  ] = -Hm[k]*t.x;
+                        N[3*(k+nseln)+1] = -Hm[k]*t.y;
+                        N[3*(k+nseln)+2] = -Hm[k]*t.z;
                     }
-                    
-                    // build the en vector
-                    en.resize(nseln+nmeln);
-                    for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
-                    
-                    // get slave element shape functions
-                    Hs = se.H(j);
-                    
-                    // get master element shape functions
-                    double r = pt.m_rs[0];
-                    double s = pt.m_rs[1];
-                    me.shape_fnc(Hm, r, s);
-                    
-                    if (pn > 0) {
                         
-                        // calculate the force vector
-                        fe.resize(ndof);
+                    for (int k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
+                        
+                    // calculate contact forces
+                    for (int k=0; k<nseln; ++k)
+                        ss.m_Ft += vec3d(fe[3*k], fe[3*k+1], fe[3*k+2]);
+                        
+                    for (int k = 0; k<nmeln; ++k)
+                        ms.m_Ft += vec3d(fe[3*(k+nseln)], fe[3*(k+nseln)+1], fe[3*(k+nseln)+2]);
+                        
+                    // assemble the global residual
+                    R.Assemble(en, LM, fe);
+                        
+                    // do the biphasic stuff
+                    if (sporo && mporo)
+                    {
+						// get the pressure dofs for each element
+						int nspdof = se.ShapeFunctions(degree_p);
+						int nmpdof = me.ShapeFunctions(degree_p);
+						int npdof = nspdof + nmpdof;
+
+						// evaluate shape functions
+						double* Hsp = se.H(degree_p, j);
+						me.shape_fnc(degree_p, Hmp, pt.m_rs[0], pt.m_rs[1]);
+                            
+                        // calculate the flow rate
+                        double epsp = m_epsp*pt.m_epsp;
+                            
+                        double wn = pt.m_Lmp + epsp*pt.m_pg;
+                            
+                        // fill the LM
+                        LM.resize(npdof, -1);
+                        for (int k=0; k<nspdof; ++k) LM[k         ] = sLM[3*nseln+k];
+                        for (int k=0; k<nmpdof; ++k) LM[k + nspdof] = mLM[3*nmeln+k];
+                            
+                        // fill the force array
+                        fe.resize(npdof);
                         zero(fe);
-                        
-                        for (int k=0; k<nseln; ++k)
-                        {
-                            N[3*k  ] = Hs[k]*t.x;
-                            N[3*k+1] = Hs[k]*t.y;
-                            N[3*k+2] = Hs[k]*t.z;
-                        }
-                        
-                        for (int k=0; k<nmeln; ++k)
-                        {
-                            N[3*(k+nseln)  ] = -Hm[k]*t.x;
-                            N[3*(k+nseln)+1] = -Hm[k]*t.y;
-                            N[3*(k+nseln)+2] = -Hm[k]*t.z;
-                        }
-                        
-                        for (int k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
-                        
-                        // calculate contact forces
-                        for (int k=0; k<nseln; ++k)
-                            ss.m_Ft += vec3d(fe[3*k], fe[3*k+1], fe[3*k+2]);
-                        
-                        for (int k = 0; k<nmeln; ++k)
-                            ms.m_Ft += vec3d(fe[3*(k+nseln)], fe[3*(k+nseln)+1], fe[3*(k+nseln)+2]);
-                        
-                        // assemble the global residual
+                        for (int k=0; k<nspdof; ++k) N[k         ] =  Hsp[k];
+                        for (int k=0; k<nmpdof; ++k) N[k + nspdof] = -Hmp[k];
+                            
+                        for (int k=0; k<npdof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
+                            
+						// build the en vector
+						en.resize(npdof);
+						for (int k = 0; k<nspdof; ++k) en[k         ] = se.m_node[k];
+						for (int k = 0; k<nmpdof; ++k) en[k + nspdof] = me.m_node[k];
+
+                        // assemble residual
                         R.Assemble(en, LM, fe);
-                        
-                        // do the biphasic stuff
-                        if (sporo && mporo)
-                        {
-                            // calculate nr of pressure dofs
-                            int ndof = nseln + nmeln;
-                            
-                            // calculate the flow rate
-                            double epsp = m_epsp*pt.m_epsp;
-                            
-                            double wn = pt.m_Lmp + epsp*pt.m_pg;
-                            
-                            // fill the LM
-                            LM.resize(ndof);
-                            for (int k=0; k<nseln; ++k) LM[k        ] = sLM[3*nseln+k];
-                            for (int k=0; k<nmeln; ++k) LM[k + nseln] = mLM[3*nmeln+k];
-                            
-                            // fill the force array
-                            fe.resize(ndof);
-                            zero(fe);
-                            for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-                            for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-                            
-                            for (int k=0; k<ndof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
-                            
-                            // assemble residual
-                            R.Assemble(en, LM, fe);
-                        }
                     }
                 }
             }
@@ -1567,13 +1647,34 @@ void FESlidingInterfaceBiphasicMixed::LoadVector(FEGlobalVector& R, const FETime
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
+	// do single- or two-pass
+	int npass = (m_btwo_pass ? 2 : 1);
+	for (int np = 0; np < npass; ++np)
+	{
+		// get the slave and master surface
+		FESlidingSurfaceBiphasicMixed& ss = (np == 0 ? m_ss : m_ms);
+		FESlidingSurfaceBiphasicMixed& ms = (np == 0 ? m_ms : m_ss);
+
+		// assemble stiffness matrix for this pass
+		StiffnessMatrix(ss, ms, LS, tp);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculate contact stiffness
+void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMixed& ss, FESlidingSurfaceBiphasicMixed& ms, FELinearSystem& LS, const FETimeInfo& tp)
+{
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(ss.m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(ss.m_varP);
+
     // see how many reformations we've had to do so far
     int nref = LS.GetSolver()->m_nref;
     
     const int MN = FEElement::MAX_NODES;
     
-    double detJ[MN], w[MN], *Hs, Hm[MN];
-    double N[4*MN*2];
+    double detJ[MN], w[MN], *Hs, Hm[MN], Hmp[MN];
+    double N[4*MN*2], H[4*MN*2];
     vector<int> sLM, mLM, LM, en;
     FEElementMatrix ke;
     
@@ -1581,627 +1682,638 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FELinearSystem& LS, const 
     
     double psf = GetPenaltyScaleFactor();
     
-    // do single- or two-pass
-    int npass = (m_btwo_pass?2:1);
-    for (int np=0; np < npass; ++np)
+    FEMesh& mesh = *ms.GetMesh();
+        
+    // loop over all slave elements
+    for (int i=0; i<ss.Elements(); ++i)
     {
-        // get the slave and master surface
-		FESlidingSurfaceBiphasicMixed& ss = (np == 0? m_ss : m_ms);
-		FESlidingSurfaceBiphasicMixed& ms = (np == 0? m_ms : m_ss);
-        
-        FEMesh& mesh = *ms.GetMesh();
-        
-        // loop over all slave elements
-        for (int i=0; i<ss.Elements(); ++i)
+        // get the slave element
+        FESurfaceElement& se = ss.Element(i);
+            
+		// slave element's poro status
+        bool sporo = ss.m_poro[i];
+            
+        // get nr of nodes, integration points, pressure dofs
+        int nseln = se.Nodes();
+        int nint = se.GaussPoints();
+		int nspdof = se.ShapeFunctions(degree_p);
+
+        // nodal pressures of slave element
+        double pn[MN] = {0};
+        if (sporo) {
+            for (int j=0; j<nspdof; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
+        }
+            
+        // copy the LM vector
+        ss.UnpackLM(se, sLM);
+
+        // we calculate all the metrics we need before we
+        // calculate the nodal forces
+        for (int j=0; j<nint; ++j)
         {
-            // get the slave element
-            FESurfaceElement& se = ss.Element(i);
-            
-            bool sporo = ss.m_poro[i];
-            
-            // get nr of nodes and integration points
-            int nseln = se.Nodes();
-            int nint = se.GaussPoints();
-            
-            // nodal pressures
-            double pn[MN] = {0};
-            if (sporo) {
-                for (int j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
-            }
-            
-            // copy the LM vector
-            ss.UnpackLM(se, sLM);
-            
-            // we calculate all the metrics we need before we
-            // calculate the nodal forces
-            for (int j=0; j<nint; ++j)
-            {
-                // get the base vectors
-                vec3d g[2];
-                ss.CoBaseVectors(se, j, g);
+            // get the base vectors
+            vec3d g[2];
+            ss.CoBaseVectors(se, j, g);
                 
-                // jacobians: J = |g0xg1|
-                detJ[j] = (g[0] ^ g[1]).norm();
+            // jacobians: J = |g0xg1|
+            detJ[j] = (g[0] ^ g[1]).norm();
                 
-                // integration weights
-                w[j] = se.GaussWeights()[j];
-            }
+            // integration weights
+            w[j] = se.GaussWeights()[j];
+        }
             
-            // loop over all integration points
-            for (int j=0; j<nint; ++j)
-            {
-                // get integration point data
-				FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(j));
+        // loop over all integration points
+        for (int j=0; j<nint; ++j)
+        {
+            // get integration point data
+			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(j));
 
-                // calculate contact pressure and account for stick
-                double pn;
-                vec3d t = ContactTraction(ss, i, j, ms, pn);
+            // calculate contact pressure and account for stick
+            double pn;
+            vec3d t = ContactTraction(ss, i, j, ms, pn);
                 
-                // get the master element
-                FESurfaceElement* pme = pt.m_pme;
+            // get the master element
+            FESurfaceElement* pme = pt.m_pme;
                 
-                if (pme)
-                {
-                    FESurfaceElement& me = *pme;
+            if (pme)
+            {
+				// get master element
+                FESurfaceElement& me = *pme;
                     
-                    bool mporo = ms.m_poro[pme->m_lid];
+				// get master element's poro status
+                bool mporo = ms.m_poro[pme->m_lid];
                     
-                    // get the nr of master nodes
-                    int nmeln = me.Nodes();
-                    
-                    // nodal pressure
-                    double pm[MN] = {0};
-                    for (int k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
-                    
-                    // copy the LM vector
-                    ms.UnpackLM(me, mLM);
-                    
-                    // calculate degrees of freedom
-                    int ndpn;	// number of dofs per node
-                    int ndof;	// number of dofs in stiffness matrix
-                    
-                    if (sporo && mporo) {
-                        // calculate degrees of freedom for biphasic-on-biphasic contact
-                        ndpn = 4;
-                        ndof = ndpn*(nseln+nmeln);
-                        
-                        // build the LM vector
-                        LM.resize(ndof);
-                        
-                        for (int k=0; k<nseln; ++k)
-                        {
-                            LM[4*k  ] = sLM[3*k  ];			// x-dof
-                            LM[4*k+1] = sLM[3*k+1];			// y-dof
-                            LM[4*k+2] = sLM[3*k+2];			// z-dof
-                            LM[4*k+3] = sLM[3*nseln+k];		// p-dof
-                        }
-                        for (int k=0; k<nmeln; ++k)
-                        {
-                            LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
-                            LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
-                            LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
-                            LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
-                        }
-                    }
-                    
-                    else {
-                        // calculate degrees of freedom for biphasic-on-elastic or elastic-on-elastic contact
-                        ndpn = 3;
-                        ndof = ndpn*(nseln + nmeln);
-                        
-                        // build the LM vector
-                        LM.resize(ndof);
-                        
-                        for (int k=0; k<nseln; ++k)
-                        {
-                            LM[3*k  ] = sLM[3*k  ];
-                            LM[3*k+1] = sLM[3*k+1];
-                            LM[3*k+2] = sLM[3*k+2];
-                        }
-                        
-                        for (int k=0; k<nmeln; ++k)
-                        {
-                            LM[3*(k+nseln)  ] = mLM[3*k  ];
-                            LM[3*(k+nseln)+1] = mLM[3*k+1];
-                            LM[3*(k+nseln)+2] = mLM[3*k+2];
-                        }
-                    }
-                    
-                    // build the en vector
-                    en.resize(nseln+nmeln);
-                    for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
-                    
-                    // slave shape functions
-                    Hs = se.H(j);
-                    
-                    // master shape functions
-                    double r = pt.m_rs[0];
-                    double s = pt.m_rs[1];
-                    me.shape_fnc(Hm, r, s);
-                    
-                    // get slave normal vector
-                    vec3d nu = pt.m_nu;
-                    
-                    // gap function
-                    double g = pt.m_gap;
-                    
-                    // penalty
-                    double eps = m_epsn*pt.m_epsn*psf;
+                // get the nr of master nodes
+                int nmeln = me.Nodes();
 
-                    // only evaluate stiffness matrix if contact traction is non-zero
-                    if (pn > 0)
+				// get master pressure dofs
+				int nmpdof = me.ShapeFunctions(degree_p);
+                    
+                // nodal pressures of master nodes
+                double pm[MN] = {0};
+                for (int k=0; k<nmpdof; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
+                    
+                // copy the LM vector
+                ms.UnpackLM(me, mLM);
+                    
+                // calculate degrees of freedom
+                int ndpn;	// number of dofs per node
+                int ndof;	// number of dofs in stiffness matrix
+                    
+                if (sporo && mporo) {
+                    // calculate degrees of freedom for biphasic-on-biphasic contact
+                    ndpn = 4;
+                    ndof = ndpn*(nseln+nmeln);
+                        
+                    // build the LM vector
+                    LM.resize(ndof);
+                        
+                    for (int k=0; k<nseln; ++k)
                     {
-                        // if stick
-                        if (pt.m_bstick)
+                        LM[4*k  ] = sLM[3*k  ];			// x-dof
+                        LM[4*k+1] = sLM[3*k+1];			// y-dof
+                        LM[4*k+2] = sLM[3*k+2];			// z-dof
+                        LM[4*k+3] = sLM[3*nseln+k];		// p-dof
+                    }
+                    for (int k=0; k<nmeln; ++k)
+                    {
+                        LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
+                        LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
+                        LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
+                        LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
+                    }
+                }
+                else {
+                    // calculate degrees of freedom for biphasic-on-elastic or elastic-on-elastic contact
+                    ndpn = 3;
+                    ndof = ndpn*(nseln + nmeln);
+                        
+                    // build the LM vector
+                    LM.resize(ndof);
+                        
+                    for (int k=0; k<nseln; ++k)
+                    {
+                        LM[3*k  ] = sLM[3*k  ];
+                        LM[3*k+1] = sLM[3*k+1];
+                        LM[3*k+2] = sLM[3*k+2];
+                    }
+                        
+                    for (int k=0; k<nmeln; ++k)
+                    {
+                        LM[3*(k+nseln)  ] = mLM[3*k  ];
+                        LM[3*(k+nseln)+1] = mLM[3*k+1];
+                        LM[3*(k+nseln)+2] = mLM[3*k+2];
+                    }
+                }
+                    
+                // build the en vector
+                en.resize(nseln+nmeln);
+                for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
+                for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+                    
+                // slave shape functions
+                Hs = se.H(j);
+
+				// get slave pressure shape functions
+				double* Hsp = se.H(degree_p, j);
+
+                // master shape functions
+                double r = pt.m_rs[0];
+                double s = pt.m_rs[1];
+                me.shape_fnc(Hm, r, s);
+
+				// get master pressure shape functions
+				me.shape_fnc(degree_p, Hmp, r, s);
+                    
+                // get slave normal vector
+                vec3d nu = pt.m_nu;
+                    
+                // gap function
+                double g = pt.m_gap;
+                    
+                // penalty
+                double eps = m_epsn*pt.m_epsn*psf;
+
+                // only evaluate stiffness matrix if contact traction is non-zero
+                if (pn > 0)
+                {
+                    // if stick
+                    if (pt.m_bstick)
+                    {
+                        double dtn = eps;
+                            
+                        // create the stiffness matrix
+                        ke.resize(ndof, ndof); ke.zero();
+                            
+                        // evaluate basis vectors on primary surface
+                        vec3d gscov[2];
+                        ss.CoBaseVectors(se, j, gscov);
+                            
+                        // identity tensor
+                        mat3d I = mat3dd(1);
+                            
+                        // evaluate Mc and Ac and combine them into As
+                        double* Gsr = se.Gr(j);
+                        double* Gss = se.Gs(j);
+                        mat3d Ac[MN], As[MN];
+                        mat3d gscovh[2];
+                        gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
+                        for (int k=0; k<nseln; ++k) {
+                            Ac[k] = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
+                            As[k] = t & (Ac[k]*nu);
+                        }
+                            
+                        // --- S O L I D - S O L I D   C O N T A C T ---
+                            
+                        // a. I-term
+                        //------------------------------------
+                            
+                        for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+                        for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+                            
+                        double tmp = dtn*detJ[j]*w[j];
+                        for (int l=0; l<nseln+nmeln; ++l)
                         {
-                            double dtn = eps;
-                            
-                            // create the stiffness matrix
-                            ke.resize(ndof, ndof); ke.zero();
-                            
-                            // evaluate basis vectors on primary surface
-                            vec3d gscov[2];
-                            ss.CoBaseVectors(se, j, gscov);
-                            
-                            // identity tensor
-                            mat3d I = mat3dd(1);
-                            
-                            // evaluate Mc and Ac and combine them into As
-                            double* Gsr = se.Gr(j);
-                            double* Gss = se.Gs(j);
-                            mat3d Ac[MN], As[MN];
-                            mat3d gscovh[2];
-                            gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
-                            for (int k=0; k<nseln; ++k) {
-                                Ac[k] = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
-                                As[k] = t & (Ac[k]*nu);
-                            }
-                            
-                            // --- S O L I D - S O L I D   C O N T A C T ---
-                            
-                            // a. I-term
-                            //------------------------------------
-                            
-                            for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-                            for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-                            
-                            double tmp = dtn*detJ[j]*w[j];
-                            for (int l=0; l<nseln+nmeln; ++l)
+                            for (int k=0; k<nseln+nmeln; ++k)
                             {
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*N[l]*I[0][0];
-                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*N[l]*I[0][1];
-                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*N[l]*I[0][2];
+                                ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*N[l]*I[0][0];
+                                ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*N[l]*I[0][1];
+                                ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*N[l]*I[0][2];
                                     
-                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*N[l]*I[1][0];
-                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*N[l]*I[1][1];
-                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*N[l]*I[1][2];
+                                ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*N[l]*I[1][0];
+                                ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*N[l]*I[1][1];
+                                ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*N[l]*I[1][2];
                                     
-                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*N[l]*I[2][0];
-                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*N[l]*I[2][1];
-                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*N[l]*I[2][2];
-                                }
+                                ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*N[l]*I[2][0];
+                                ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*N[l]*I[2][1];
+                                ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*N[l]*I[2][2];
                             }
+                        }
                             
+                        // b. A-term
+                        //-------------------------------------
+                            
+                        tmp = detJ[j]*w[j];
+                        // non-symmetric
+                        for (int l=0; l<nseln; ++l)
+                        {
+                            for (int k=0; k<nseln+nmeln; ++k)
+                            {
+                                ke[k*ndpn  ][l*ndpn  ] -= tmp*N[k]*As[l][0][0];
+                                ke[k*ndpn  ][l*ndpn+1] -= tmp*N[k]*As[l][0][1];
+                                ke[k*ndpn  ][l*ndpn+2] -= tmp*N[k]*As[l][0][2];
+                                    
+                                ke[k*ndpn+1][l*ndpn  ] -= tmp*N[k]*As[l][1][0];
+                                ke[k*ndpn+1][l*ndpn+1] -= tmp*N[k]*As[l][1][1];
+                                ke[k*ndpn+1][l*ndpn+2] -= tmp*N[k]*As[l][1][2];
+                                    
+                                ke[k*ndpn+2][l*ndpn  ] -= tmp*N[k]*As[l][2][0];
+                                ke[k*ndpn+2][l*ndpn+1] -= tmp*N[k]*As[l][2][1];
+                                ke[k*ndpn+2][l*ndpn+2] -= tmp*N[k]*As[l][2][2];
+                            }
+                        }
+                            
+                        // --- B I P H A S I C   S T I F F N E S S ---
+                        if (sporo && mporo)
+                        {
+                            // need to multiply biphasic stiffness entries by the timestep
+                            double dt = fem.GetTime().timeIncrement;
+                                
+                            double tmp = dt*w[j]*detJ[j];
+                                
+                            double epsp = m_epsp*pt.m_epsp*psf;
+                                
+                            double wn = pt.m_Lmp + epsp*pt.m_pg;
+                                
+                            // --- S O L I D - P R E S S U R E   C O N T A C T ---
+                                
                             // b. A-term
                             //-------------------------------------
-                            
-                            tmp = detJ[j]*w[j];
-                            // non-symmetric
-                            for (int l=0; l<nseln; ++l)
-                            {
+                                
+                            for (int l=0; l<nseln; ++l) {
+                                vec3d Acn = Ac[l]*nu;
                                 for (int k=0; k<nseln+nmeln; ++k)
                                 {
-                                    ke[k*ndpn  ][l*ndpn  ] -= tmp*N[k]*As[l][0][0];
-                                    ke[k*ndpn  ][l*ndpn+1] -= tmp*N[k]*As[l][0][1];
-                                    ke[k*ndpn  ][l*ndpn+2] -= tmp*N[k]*As[l][0][2];
-                                    
-                                    ke[k*ndpn+1][l*ndpn  ] -= tmp*N[k]*As[l][1][0];
-                                    ke[k*ndpn+1][l*ndpn+1] -= tmp*N[k]*As[l][1][1];
-                                    ke[k*ndpn+1][l*ndpn+2] -= tmp*N[k]*As[l][1][2];
-                                    
-                                    ke[k*ndpn+2][l*ndpn  ] -= tmp*N[k]*As[l][2][0];
-                                    ke[k*ndpn+2][l*ndpn+1] -= tmp*N[k]*As[l][2][1];
-                                    ke[k*ndpn+2][l*ndpn+2] -= tmp*N[k]*As[l][2][2];
+                                    ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
+                                    ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
+                                    ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
                                 }
                             }
-                            
-                            // --- B I P H A S I C   S T I F F N E S S ---
-                            if (sporo && mporo)
+                                
+                            // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
+                                
+                            // calculate the N-vector
+                            for (int k=0; k<nseln; ++k)
                             {
-                                // need to multiply biphasic stiffness entries by the timestep
-                                double dt = fem.GetTime().timeIncrement;
-                                
-                                double tmp = dt*w[j]*detJ[j];
-                                
-                                double epsp = m_epsp*pt.m_epsp*psf;
-                                
-                                double wn = pt.m_Lmp + epsp*pt.m_pg;
-                                
-                                // --- S O L I D - P R E S S U R E   C O N T A C T ---
-                                
-                                // b. A-term
-                                //-------------------------------------
-                                
-                                for (int l=0; l<nseln; ++l) {
-                                    vec3d Acn = Ac[l]*nu;
-                                    for (int k=0; k<nseln+nmeln; ++k)
-                                    {
-                                        ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
-                                        ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
-                                        ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
-                                    }
-                                }
-                                
-                                // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
-                                
-                                // calculate the N-vector
-                                for (int k=0; k<nseln; ++k)
-                                {
-                                    N[ndpn*k  ] = 0;
-                                    N[ndpn*k+1] = 0;
-                                    N[ndpn*k+2] = 0;
-                                    N[ndpn*k+3] = Hs[k];
-                                }
-                                
-                                for (int k=0; k<nmeln; ++k)
-                                {
-                                    N[ndpn*(k+nseln)  ] = 0;
-                                    N[ndpn*(k+nseln)+1] = 0;
-                                    N[ndpn*(k+nseln)+2] = 0;
-                                    N[ndpn*(k+nseln)+3] = -Hm[k];
-                                }
-                                
-                                for (int k=0; k<ndof; ++k)
-                                    for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
-                                
+                                N[ndpn*k  ] = 0;
+                                N[ndpn*k+1] = 0;
+                                N[ndpn*k+2] = 0;
+                                N[ndpn*k+3] = Hs[k];
                             }
-                            // assemble the global stiffness
-							ke.SetNodes(en);
-							ke.SetIndices(LM);
-							LS.Assemble(ke);
+                                
+                            for (int k=0; k<nmeln; ++k)
+                            {
+                                N[ndpn*(k+nseln)  ] = 0;
+                                N[ndpn*(k+nseln)+1] = 0;
+                                N[ndpn*(k+nseln)+2] = 0;
+                                N[ndpn*(k+nseln)+3] = -Hm[k];
+                            }
+                                
+                            for (int k=0; k<ndof; ++k)
+                                for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
+                                
                         }
-                        // if slip
-                        else
+                        // assemble the global stiffness
+						ke.SetNodes(en);
+						ke.SetIndices(LM);
+						LS.Assemble(ke);
+                    }
+                    // if slip
+                    else
+                    {
+                        // create the stiffness matrix
+                        ke.resize(ndof, ndof); ke.zero();
+                            
+                        double tn = -pn;
+                            
+                        // obtain the slip direction s1 and inverse of spatial increment dh
+                        double dh = 0, hd = 0;
+                        vec3d dr(0,0,0);
+                        vec3d s1 = SlipTangent(ss, i, j, ms, dh, dr);
+                            
+                        if (dh != 0)
                         {
-                            // create the stiffness matrix
-                            ke.resize(ndof, ndof); ke.zero();
+                            hd = 1.0 / dh;
+                        }
                             
-                            double tn = -pn;
+                        // evaluate basis vectors on both surfaces
+                        vec3d gscov[2], gmcov[2];
+                        ss.CoBaseVectors(se, j, gscov);
+                        ms.CoBaseVectors(me, r, s, gmcov);
+                        mat2d A;
+                        A[0][0] = gscov[0]*gmcov[0]; A[0][1] = gscov[0]*gmcov[1];
+                        A[1][0] = gscov[1]*gmcov[0]; A[1][1] = gscov[1]*gmcov[1];
+                        mat2d a = A.inverse();
                             
-                            // obtain the slip direction s1 and inverse of spatial increment dh
-                            double dh = 0, hd = 0;
-                            vec3d dr(0,0,0);
-                            vec3d s1 = SlipTangent(ss, i, j, ms, dh, dr);
+                        // evaluate covariant basis vectors on primary surface at previous time step
+                        vec3d gscovp[2];
+                        ss.CoBaseVectorsP(se, j, gscovp);
                             
-                            if (dh != 0)
-                            {
-                                hd = 1.0 / dh;
+                        // calculate delta gscov
+                        vec3d dgscov[2];
+                        dgscov[0] = gscov[0] - gscovp[0];
+                        dgscov[1] = gscov[1] - gscovp[1];
+                            
+                        // evaluate approximate contravariant basis vectors when gap != 0
+                        vec3d gscnt[2], gmcnt[2];
+                        gmcnt[0] = gscov[0]*a[0][0] + gscov[1]*a[0][1];
+                        gmcnt[1] = gscov[0]*a[1][0] + gscov[1]*a[1][1];
+                        gscnt[0] = gmcov[0]*a[0][0] + gmcov[1]*a[1][0];
+                        gscnt[1] = gmcov[0]*a[0][1] + gmcov[1]*a[1][1];
+                            
+                        // evaluate N and S tensors and approximations when gap != 0
+                        mat3ds N1 = dyad(nu);
+                        mat3d Nh1 = mat3dd(1) - (nu & nu);
+                        mat3d Nb1 = mat3dd(1) - (gscov[0] & gscnt[0]) - (gscov[1] & gscnt[1]);
+                        mat3d Nt1 = nu & (Nb1*nu);
+                        mat3d S1 = s1 & nu;
+                        mat3d Sh1 = (mat3dd(1) - (s1 & s1))*hd;
+                        mat3d Sb1 = s1 & (Nb1*nu);
+                            
+                        // evaluate m, c, Mg, and R
+                        // evaluate L1 from Mg and R
+                        // NOTE: Mg has the 1/detJ included in its definition
+                        vec3d m = ((dgscov[0] ^ gscov[1]) + (gscov[0] ^ dgscov[1]));
+                        vec3d c = Sh1*Nh1*m*(1/detJ[j]);
+                        mat3d Mg = (mat3dd(1)*(nu * m) + (nu & m))*(1/detJ[j]);
+                        mat3d B = (c & (Nb1*nu)) - Sh1*Nh1;
+                        mat3d R = mat3dd(1)*(nu * dr) + (nu & dr);
+                        mat3d L1 = Sh1*((Nh1*Mg - mat3dd(1))*(-g) + R)*Nh1;
+                            
+                        // evaluate Mc and Ac and combine them into As
+                        // evaluate Fc from Ac_bar (Ab)
+                        // evaluate Jc as L1*Ac-Fc
+                        double* Gsr = se.Gr(j);
+                        double* Gss = se.Gs(j);
+                        mat3d Ac[MN], As[MN], Pc[MN], Jc[MN];
+                        mat3d gscovh[2];
+                        mat3d dgscovh[2];
+                        gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
+                        dgscovh[0].skew(dgscov[0]); dgscovh[1].skew(dgscov[1]);
+                        for (int k=0; k<nseln; ++k) {
+                            vec3d mc = gscnt[0]*Gsr[k] + gscnt[1]*Gss[k];
+                            mat3d Mc = nu & mc;
+                            Ac[k]    = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
+                            mat3d Ab = (dgscovh[1]*Gsr[k] - dgscovh[0]*Gss[k])/detJ[j];
+                            vec3d hcp = (N1*mc + Ac[k]*nu)*pt.m_mueff*(-g);
+                            vec3d hcm = (N1*mc*m_mu - Ac[k]*nu*pt.m_mueff);
+                            As[k] = (Ac[k] + Mc*N1);
+                            mat3d Jc = (L1*Ac[k]) - Sh1*Nh1*Ab*(-g);
+                            Pc[k] = (s1 & hcm) + (c & hcp) - Jc*pt.m_mueff;
+                        }
+                            
+                        // evaluate mb and Mb
+                        // evaluate s1 dyad mb and combine as Pb
+                        double Gmr[MN], Gms[MN];
+                        me.shape_deriv(Gmr, Gms, r, s);
+                        vec3d mb[MN];
+                        mat3d Pb[MN];
+                        for (int k=0; k<nmeln; ++k) {
+                            mb[k] = gmcnt[0]*Gmr[k] + gmcnt[1]*Gms[k];
+                            Pb[k] = ((-nu) & mb[k]) - (s1 & mb[k])*pt.m_mueff;
+                        }
+                            
+                        // evaluate Gbc
+                        matrix Gbc(nmeln,nseln);
+                        for (int b=0; b<nmeln; ++b) {
+                            for (int c=0; c<nseln; ++c) {
+                                Gbc(b,c)
+                                = (a[0][0]*Gmr[b]*Gsr[c]
+                                    + a[0][1]*Gmr[b]*Gss[c]
+                                    + a[1][0]*Gms[b]*Gsr[c]
+                                    + a[1][1]*Gms[b]*Gss[c])*(-g);
                             }
+                        }
                             
-                            // evaluate basis vectors on both surfaces
-                            vec3d gscov[2], gmcov[2];
-                            ss.CoBaseVectors(se, j, gscov);
-                            ms.CoBaseVectors(me, r, s, gmcov);
-                            mat2d A;
-                            A[0][0] = gscov[0]*gmcov[0]; A[0][1] = gscov[0]*gmcov[1];
-                            A[1][0] = gscov[1]*gmcov[0]; A[1][1] = gscov[1]*gmcov[1];
-                            mat2d a = A.inverse();
-                            
-                            // evaluate covariant basis vectors on primary surface at previous time step
-                            vec3d gscovp[2];
-                            ss.CoBaseVectorsP(se, j, gscovp);
-                            
-                            // calculate delta gscov
-                            vec3d dgscov[2];
-                            dgscov[0] = gscov[0] - gscovp[0];
-                            dgscov[1] = gscov[1] - gscovp[1];
-                            
-                            // evaluate approximate contravariant basis vectors when gap != 0
-                            vec3d gscnt[2], gmcnt[2];
-                            gmcnt[0] = gscov[0]*a[0][0] + gscov[1]*a[0][1];
-                            gmcnt[1] = gscov[0]*a[1][0] + gscov[1]*a[1][1];
-                            gscnt[0] = gmcov[0]*a[0][0] + gmcov[1]*a[1][0];
-                            gscnt[1] = gmcov[0]*a[0][1] + gmcov[1]*a[1][1];
-                            
-                            // evaluate N and S tensors and approximations when gap != 0
-                            mat3ds N1 = dyad(nu);
-                            mat3d Nh1 = mat3dd(1) - (nu & nu);
-                            mat3d Nb1 = mat3dd(1) - (gscov[0] & gscnt[0]) - (gscov[1] & gscnt[1]);
-                            mat3d Nt1 = nu & (Nb1*nu);
-                            mat3d S1 = s1 & nu;
-                            mat3d Sh1 = (mat3dd(1) - (s1 & s1))*hd;
-                            mat3d Sb1 = s1 & (Nb1*nu);
-                            
-                            // evaluate m, c, Mg, and R
-                            // evaluate L1 from Mg and R
-                            // NOTE: Mg has the 1/detJ included in its definition
-                            vec3d m = ((dgscov[0] ^ gscov[1]) + (gscov[0] ^ dgscov[1]));
-                            vec3d c = Sh1*Nh1*m*(1/detJ[j]);
-                            mat3d Mg = (mat3dd(1)*(nu * m) + (nu & m))*(1/detJ[j]);
-                            mat3d B = (c & (Nb1*nu)) - Sh1*Nh1;
-                            mat3d R = mat3dd(1)*(nu * dr) + (nu & dr);
-                            mat3d L1 = Sh1*((Nh1*Mg - mat3dd(1))*(-g) + R)*Nh1;
-                            
-                            // evaluate Mc and Ac and combine them into As
-                            // evaluate Fc from Ac_bar (Ab)
-                            // evaluate Jc as L1*Ac-Fc
-                            double* Gsr = se.Gr(j);
-                            double* Gss = se.Gs(j);
-                            mat3d Ac[MN], As[MN], Pc[MN], Jc[MN];
-                            mat3d gscovh[2];
-                            mat3d dgscovh[2];
-                            gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
-                            dgscovh[0].skew(dgscov[0]); dgscovh[1].skew(dgscov[1]);
-                            for (int k=0; k<nseln; ++k) {
-                                vec3d mc = gscnt[0]*Gsr[k] + gscnt[1]*Gss[k];
-                                mat3d Mc = nu & mc;
-                                Ac[k]    = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
-                                mat3d Ab = (dgscovh[1]*Gsr[k] - dgscovh[0]*Gss[k])/detJ[j];
-                                vec3d hcp = (N1*mc + Ac[k]*nu)*pt.m_mueff*(-g);
-                                vec3d hcm = (N1*mc*m_mu - Ac[k]*nu*pt.m_mueff);
-                                As[k] = (Ac[k] + Mc*N1);
-                                mat3d Jc = (L1*Ac[k]) - Sh1*Nh1*Ab*(-g);
-                                Pc[k] = (s1 & hcm) + (c & hcp) - Jc*pt.m_mueff;
-                            }
-                            
-                            // evaluate mb and Mb
-                            // evaluate s1 dyad mb and combine as Pb
-                            double Gmr[MN], Gms[MN];
-                            me.shape_deriv(Gmr, Gms, r, s);
-                            vec3d mb[MN];
-                            mat3d Pb[MN];
-                            for (int k=0; k<nmeln; ++k) {
-                                mb[k] = gmcnt[0]*Gmr[k] + gmcnt[1]*Gms[k];
-                                Pb[k] = ((-nu) & mb[k]) - (s1 & mb[k])*pt.m_mueff;
-                            }
-                            
-                            // evaluate Gbc
-                            matrix Gbc(nmeln,nseln);
-                            for (int b=0; b<nmeln; ++b) {
-                                for (int c=0; c<nseln; ++c) {
-                                    Gbc(b,c)
-                                    = (a[0][0]*Gmr[b]*Gsr[c]
-                                       + a[0][1]*Gmr[b]*Gss[c]
-                                       + a[1][0]*Gms[b]*Gsr[c]
-                                       + a[1][1]*Gms[b]*Gss[c])*(-g);
-                                }
-                            }
-                            
-                            // define T, Ttb
-                            mat3d T = N1 + S1*pt.m_mueff;
-                            mat3d Ttb = Nt1 + Sb1*m_mu;
+                        // define T, Ttb
+                        mat3d T = N1 + S1*pt.m_mueff;
+                        mat3d Ttb = Nt1 + Sb1*m_mu;
 
-                            // --- S O L I D - S O L I D   C O N T A C T ---
+                        // --- S O L I D - S O L I D   C O N T A C T ---
                             
-                            // a. NxN-term
-                            //------------------------------------
+                        // a. NxN-term
+                        //------------------------------------
                             
-                            for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-                            for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+                        for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+                        for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
                             
-                            double tmp = detJ[j]*w[j];
+                        double tmp = detJ[j]*w[j];
+                        for (int l=0; l<nseln+nmeln; ++l)
+                        {
+                            for (int k=0; k<nseln+nmeln; ++k)
+                            {
+                                ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[0][0] + pt.m_mueff*tn*B[0][0]);
+                                ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[0][1] + pt.m_mueff*tn*B[0][1]);
+                                ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[0][2] + pt.m_mueff*tn*B[0][2]);
+                                    
+                                ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[1][0] + pt.m_mueff*tn*B[1][0]);
+                                ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[1][1] + pt.m_mueff*tn*B[1][1]);
+                                ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[1][2] + pt.m_mueff*tn*B[1][2]);
+                                    
+                                ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[2][0] + pt.m_mueff*tn*B[2][0]);
+                                ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[2][1] + pt.m_mueff*tn*B[2][1]);
+                                ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[2][2] + pt.m_mueff*tn*B[2][2]);
+                            }
+                        }
+                            
+                        // b. Na,Nb-term
+                        //-------------------------------------
+                            
+                        tmp = detJ[j]*w[j];
+                        // non-symmetric
+                        for (int l=0; l<nseln; ++l)
+                        {
+                            for (int k=0; k<nseln+nmeln; ++k)
+                            {
+                                ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*(tn*(As[l][0][0] + Pc[l][0][0]));
+                                ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*(tn*(As[l][0][1] + Pc[l][0][1]));
+                                ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*(tn*(As[l][0][2] + Pc[l][0][2]));
+                                    
+                                ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*(tn*(As[l][1][0] + Pc[l][1][0]));
+                                ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*(tn*(As[l][1][1] + Pc[l][1][1]));
+                                ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*(tn*(As[l][1][2] + Pc[l][1][2]));
+                                    
+                                ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*(tn*(As[l][2][0] + Pc[l][2][0]));
+                                ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*(tn*(As[l][2][1] + Pc[l][2][1]));
+                                ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*(tn*(As[l][2][2] + Pc[l][2][2]));
+                            }
+                        }
+                            
+                        // c. Nc,Nd-term
+                        //---------------------------------------
+                            
+                        tmp = detJ[j]*w[j];
+                        // non-symmetric
+                        for (int k=0; k<nmeln; ++k)
+                        {
                             for (int l=0; l<nseln+nmeln; ++l)
                             {
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[0][0] + pt.m_mueff*tn*B[0][0]);
-                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[0][1] + pt.m_mueff*tn*B[0][1]);
-                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[0][2] + pt.m_mueff*tn*B[0][2]);
+                                ke[(k+nseln)*ndpn  ][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][0][0];
+                                ke[(k+nseln)*ndpn  ][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][0][1];
+                                ke[(k+nseln)*ndpn  ][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][0][2];
                                     
-                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[1][0] + pt.m_mueff*tn*B[1][0]);
-                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[1][1] + pt.m_mueff*tn*B[1][1]);
-                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[1][2] + pt.m_mueff*tn*B[1][2]);
+                                ke[(k+nseln)*ndpn+1][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][1][0];
+                                ke[(k+nseln)*ndpn+1][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][1][1];
+                                ke[(k+nseln)*ndpn+1][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][1][2];
                                     
-                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[2][0] + pt.m_mueff*tn*B[2][0]);
-                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[2][1] + pt.m_mueff*tn*B[2][1]);
-                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[2][2] + pt.m_mueff*tn*B[2][2]);
-                                }
+                                ke[(k+nseln)*ndpn+2][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][2][0];
+                                ke[(k+nseln)*ndpn+2][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][2][1];
+                                ke[(k+nseln)*ndpn+2][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][2][2];
                             }
+                        }
+
+                        // c. Gbc-term
+                        //---------------------------------------
                             
-                            // b. Na,Nb-term
-                            //-------------------------------------
-                            
-                            tmp = detJ[j]*w[j];
-                            // non-symmetric
+                        tmp = tn*detJ[j]*w[j];
+                        for (int k=0; k<nmeln; ++k)
+                        {
                             for (int l=0; l<nseln; ++l)
                             {
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*(tn*(As[l][0][0] + Pc[l][0][0]));
-                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*(tn*(As[l][0][1] + Pc[l][0][1]));
-                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*(tn*(As[l][0][2] + Pc[l][0][2]));
+                                mat3d gT = T*(Gbc[k][l]*tmp);
+                                ke[(k+nseln)*ndpn  ][l*ndpn  ] -= gT[0][0];
+                                ke[(k+nseln)*ndpn  ][l*ndpn+1] -= gT[0][1];
+                                ke[(k+nseln)*ndpn  ][l*ndpn+2] -= gT[0][2];
                                     
-                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*(tn*(As[l][1][0] + Pc[l][1][0]));
-                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*(tn*(As[l][1][1] + Pc[l][1][1]));
-                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*(tn*(As[l][1][2] + Pc[l][1][2]));
+                                ke[(k+nseln)*ndpn+1][l*ndpn  ] -= gT[1][0];
+                                ke[(k+nseln)*ndpn+1][l*ndpn+1] -= gT[1][1];
+                                ke[(k+nseln)*ndpn+1][l*ndpn+2] -= gT[1][2];
                                     
-                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*(tn*(As[l][2][0] + Pc[l][2][0]));
-                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*(tn*(As[l][2][1] + Pc[l][2][1]));
-                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*(tn*(As[l][2][2] + Pc[l][2][2]));
-                                }
+                                ke[(k+nseln)*ndpn+2][l*ndpn  ] -= gT[2][0];
+                                ke[(k+nseln)*ndpn+2][l*ndpn+1] -= gT[2][1];
+                                ke[(k+nseln)*ndpn+2][l*ndpn+2] -= gT[2][2];
                             }
-                            
-                            // c. Nc,Nd-term
-                            //---------------------------------------
-                            
-                            tmp = detJ[j]*w[j];
-                            // non-symmetric
-                            for (int k=0; k<nmeln; ++k)
-                            {
+                        }
+
+                        // --- B I P H A S I C   S T I F F N E S S ---
+                        if (sporo && mporo)
+                        {
+                            // need to multiply biphasic stiffness entries by the timestep
+                            double dt = fem.GetTime().timeIncrement;
+                                
+                            double dpr = 0, dps = 0;
+                            dpr = me.eval_deriv1(degree_p, pm, r, s);
+                            dps = me.eval_deriv2(degree_p, pm, r, s);
+                                
+                            vec3d q2 = gmcnt[0]*dpr + gmcnt[1]*dps;
+                                
+                            // evaluate gc
+                            vector<double> gc(nseln);
+                            for (int k=0; k<nseln; ++k) {
+                                gc[k]
+                                = (a[0][0]*dpr*Gsr[k]
+                                    + a[0][1]*dpr*Gss[k]
+                                    + a[1][0]*dps*Gsr[k]
+                                    + a[1][1]*dps*Gss[k])*(-g);
+                            }
+                                
+                            tmp = dt*w[j]*detJ[j];
+                                
+                            double epsp = m_epsp*pt.m_epsp*psf;
+                                
+							// pressure shape functions
+							double* Hsp = se.H(degree_p, j);
+							me.shape_fnc(degree_p, Hmp, r, s);
+							for (int i = 0; i < nseln + nmeln; ++i) H[i] = 0;
+							for (int i = 0; i < nspdof; ++i) H[i        ] = Hsp[i];
+							for (int i = 0; i < nmpdof; ++i) H[i + nseln] = Hmp[i];
+                                
+                            // --- S O L I D - P R E S S U R E   C O N T A C T ---
+                                
+                            // a. q-term
+                            //-------------------------------------
+                            for (int k=0; k<nseln+nmeln; ++k)
                                 for (int l=0; l<nseln+nmeln; ++l)
                                 {
-                                    ke[(k+nseln)*ndpn  ][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][0][0];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][0][1];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][0][2];
-                                    
-                                    ke[(k+nseln)*ndpn+1][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][1][0];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][1][1];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][1][2];
-                                    
-                                    ke[(k+nseln)*ndpn+2][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][2][0];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][2][1];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][2][2];
+                                    ke[4*k + 3][4*l  ] += tmp*epsp*H[k]*N[l]*q2.x;
+                                    ke[4*k + 3][4*l+1] += tmp*epsp*H[k]*N[l]*q2.y;
+                                    ke[4*k + 3][4*l+2] += tmp*epsp*H[k]*N[l]*q2.z;
+                                }
+                                
+                            double wn = pt.m_Lmp + epsp*pt.m_pg;
+                                
+                            // b. A-term
+                            //-------------------------------------
+                                
+                            for (int l=0; l<nseln; ++l) {
+                                vec3d Acn = Ac[l]*nu;
+                                for (int k=0; k<nseln+nmeln; ++k)
+                                {
+                                    ke[4*k + 3][4*l  ] -= tmp*wn*H[k]*Acn.x;
+                                    ke[4*k + 3][4*l+1] -= tmp*wn*H[k]*Acn.y;
+                                    ke[4*k + 3][4*l+2] -= tmp*wn*H[k]*Acn.z;
                                 }
                             }
 
-                            // c. Gbc-term
+                            // c. s-term (Frictional term)
+                            //-------------------------------------
+                                
+							vec3d q = s1*m_mu*(1.0 - m_phi);
+
+                            for (int l=0; l<nseln; ++l) {
+                                for (int k=0; k<nseln+nmeln; ++k)
+                                {
+                                    ke[4*k    ][4*l+3] -= tmp*H[k]*N[l]*q.x;
+                                    ke[4*k + 1][4*l+3] -= tmp*H[k]*N[l]*q.y;
+                                    ke[4*k + 2][4*l+3] -= tmp*H[k]*N[l]*q.z;
+                                }
+                            }
+
+                            // d. m-term
                             //---------------------------------------
-                            
-                            tmp = tn*detJ[j]*w[j];
-                            for (int k=0; k<nmeln; ++k)
-                            {
+                                
+							vec3d mbp[MN];
+							double Gpr[MN], Gps[MN];
+							me.shape_deriv(degree_p, Gpr, Gps, r, s);
+							for (int k = 0; k < nmeln; ++k) mbp[k] = vec3d(0, 0, 0);
+							for (int k = 0; k<nmpdof; ++k)
+							{
+								mbp[k] = gmcnt[0] * Gpr[k] + gmcnt[1] * Gps[k];
+							}
+
+                            for (int k=0; k<nmpdof; ++k) {
+                                for (int l=0; l<nseln+nmeln; ++l)
+                                {
+                                    ke[4*(k+nseln) + 3][4*l  ] += tmp*wn*N[l]*mbp[k].x;
+                                    ke[4*(k+nseln) + 3][4*l+1] += tmp*wn*N[l]*mbp[k].y;
+                                    ke[4*(k+nseln) + 3][4*l+2] += tmp*wn*N[l]*mbp[k].z;
+                                }
+                            }
+
+                            // e. gc-term
+                            //-------------------------------------
+                            for (int k=0; k<nseln+nmeln; ++k)
                                 for (int l=0; l<nseln; ++l)
                                 {
-                                    mat3d gT = T*(Gbc[k][l]*tmp);
-                                    ke[(k+nseln)*ndpn  ][l*ndpn  ] -= gT[0][0];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+1] -= gT[0][1];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+2] -= gT[0][2];
-                                    
-                                    ke[(k+nseln)*ndpn+1][l*ndpn  ] -= gT[1][0];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+1] -= gT[1][1];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+2] -= gT[1][2];
-                                    
-                                    ke[(k+nseln)*ndpn+2][l*ndpn  ] -= gT[2][0];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+1] -= gT[2][1];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+2] -= gT[2][2];
+                                    ke[4*k + 3][4*l  ] -= tmp*epsp*H[k]*gc[l]*nu.x;
+                                    ke[4*k + 3][4*l+1] -= tmp*epsp*H[k]*gc[l]*nu.y;
+                                    ke[4*k + 3][4*l+2] -= tmp*epsp*H[k]*gc[l]*nu.z;
+                                }
+                                
+                            // f. Gbc-term (CONVERT!)
+                            //---------------------------------------
+/*                                
+                            for (int k=0; k<nmeln; ++k) {
+                                for (int l=0; l<nseln; ++l)
+                                {
+                                    ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
+                                    ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
+                                    ke[4*(k+nseln) + 3][4*l+2] -= tmp*wn*Gbc[k][l]*nu.z;
                                 }
                             }
-
-                            // --- B I P H A S I C   S T I F F N E S S ---
-                            if (sporo && mporo)
+*/
+                            // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
+                                
+                            // calculate the N-vector
+							for (int k = 0; k < ndof; ++k) N[k] = 0.0;
+                            for (int k=0; k<nspdof; ++k)
                             {
-                                // need to multiply biphasic stiffness entries by the timestep
-                                double dt = fem.GetTime().timeIncrement;
-                                
-                                double dpr = 0, dps = 0;
-                                dpr = me.eval_deriv1(pm, r, s);
-                                dps = me.eval_deriv2(pm, r, s);
-                                
-                                vec3d q2 = gmcnt[0]*dpr + gmcnt[1]*dps;
-                                
-                                // evaluate gc
-                                vector<double> gc(nseln);
-                                for (int k=0; k<nseln; ++k) {
-                                    gc[k]
-                                    = (a[0][0]*dpr*Gsr[k]
-                                       + a[0][1]*dpr*Gss[k]
-                                       + a[1][0]*dps*Gsr[k]
-                                       + a[1][1]*dps*Gss[k])*(-g);
-                                }
-                                
-                                tmp = dt*w[j]*detJ[j];
-                                
-                                double epsp = m_epsp*pt.m_epsp*psf;
-                                
-                                vec3d r = s1*m_mu*(1.0 - m_phi);
-                                
-                                
-                                // --- S O L I D - P R E S S U R E   C O N T A C T ---
-                                
-                                // a. q-term
-                                //-------------------------------------
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                    for (int l=0; l<nseln+nmeln; ++l)
-                                    {
-                                        ke[4*k + 3][4*l  ] += tmp*epsp*N[k]*N[l]*q2.x;
-                                        ke[4*k + 3][4*l+1] += tmp*epsp*N[k]*N[l]*q2.y;
-                                        ke[4*k + 3][4*l+2] += tmp*epsp*N[k]*N[l]*q2.z;
-                                    }
-                                
-                                double wn = pt.m_Lmp + epsp*pt.m_pg;
-                                
-                                // b. A-term
-                                //-------------------------------------
-                                
-                                for (int l=0; l<nseln; ++l) {
-                                    vec3d Acn = Ac[l]*nu;
-                                    for (int k=0; k<nseln+nmeln; ++k)
-                                    {
-                                        ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
-                                        ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
-                                        ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
-                                    }
-                                }
-
-                                // c. s-term
-                                //-------------------------------------
-                                
-                                for (int l=0; l<nseln; ++l) {
-                                    for (int k=0; k<nseln+nmeln; ++k)
-                                    {
-                                        ke[4*k    ][4*l+3] -= tmp*N[k]*N[l]*r.x;
-                                        ke[4*k + 1][4*l+3] -= tmp*N[k]*N[l]*r.y;
-                                        ke[4*k + 2][4*l+3] -= tmp*N[k]*N[l]*r.z;
-                                    }
-                                }
-
-                                // d. m-term
-                                //---------------------------------------
-                                
-                                for (int k=0; k<nmeln; ++k) {
-                                    for (int l=0; l<nseln+nmeln; ++l)
-                                    {
-                                        ke[4*(k+nseln) + 3][4*l  ] += tmp*wn*N[l]*mb[k].x;
-                                        ke[4*(k+nseln) + 3][4*l+1] += tmp*wn*N[l]*mb[k].y;
-                                        ke[4*(k+nseln) + 3][4*l+2] += tmp*wn*N[l]*mb[k].z;
-                                    }
-                                }
-
-                                // e. gc-term
-                                //-------------------------------------
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                    for (int l=0; l<nseln; ++l)
-                                    {
-                                        ke[4*k + 3][4*l  ] -= tmp*epsp*N[k]*gc[l]*nu.x;
-                                        ke[4*k + 3][4*l+1] -= tmp*epsp*N[k]*gc[l]*nu.y;
-                                        ke[4*k + 3][4*l+2] -= tmp*epsp*N[k]*gc[l]*nu.z;
-                                    }
-                                
-                                // f. Gbc-term
-                                //---------------------------------------
-                                
-                                for (int k=0; k<nmeln; ++k) {
-                                    for (int l=0; l<nseln; ++l)
-                                    {
-                                        ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
-                                        ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
-                                        ke[4*(k+nseln) + 3][4*l+2] -= tmp*wn*Gbc[k][l]*nu.z;
-                                    }
-                                }
-
-                                // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
-                                
-                                // calculate the N-vector
-                                for (int k=0; k<nseln; ++k)
-                                {
-                                    N[ndpn*k  ] = 0;
-                                    N[ndpn*k+1] = 0;
-                                    N[ndpn*k+2] = 0;
-                                    N[ndpn*k+3] = Hs[k];
-                                }
-                                
-                                for (int k=0; k<nmeln; ++k)
-                                {
-                                    N[ndpn*(k+nseln)  ] = 0;
-                                    N[ndpn*(k+nseln)+1] = 0;
-                                    N[ndpn*(k+nseln)+2] = 0;
-                                    N[ndpn*(k+nseln)+3] = -Hm[k];
-                                }
-                                
-                                for (int k=0; k<ndof; ++k)
-                                    for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
-                                
-                                
+                                N[ndpn*k+3] = Hsp[k];
                             }
-                            
-                            // assemble the global stiffness
-							ke.SetNodes(en);
-							ke.SetIndices(LM);
-							LS.Assemble(ke);
+                                
+                            for (int k=0; k<nmpdof; ++k)
+                            {
+                                N[ndpn*(k+nseln)+3] = -Hmp[k];
+                            }
+                                
+                            for (int k=0; k<ndof; ++k)
+                                for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
                         }
+                            
+                        // assemble the global stiffness
+						ke.SetNodes(en);
+						ke.SetIndices(LM);
+						LS.Assemble(ke);
                     }
                 }
             }
@@ -2532,15 +2644,13 @@ void FESlidingInterfaceBiphasicMixed::Serialize(DumpStream &ar)
 
 void FESlidingInterfaceBiphasicMixed::MarkFreeDraining()
 {
-    int i, id, np;
-    
     // Mark all nodes as free-draining.  This needs to be done for ALL
     // contact interfaces prior to executing Update(), where nodes that are
     // in contact are subsequently marked as non free-draining.  This ensures
     // that for surfaces involved in more than one contact interface, nodes
     // that have been marked as non free-draining are not reset to
     // free-draining.
-    for (np=0; np<2; ++np)
+    for (int np=0; np<2; ++np)
     {
 		FESlidingSurfaceBiphasicMixed& s = (np == 0? m_ss : m_ms);
         
@@ -2548,12 +2658,12 @@ void FESlidingInterfaceBiphasicMixed::MarkFreeDraining()
             // first, mark all nodes as free-draining (= neg. ID)
             // this is done by setting the dof's equation number
             // to a negative number
-            for (i=0; i<s.Nodes(); ++i)
+            for (int i=0; i<s.Nodes(); ++i)
             {
-                id = s.Node(i).m_ID[m_dofP];
+				FENode& node = s.Node(i);
+				int id = node.m_ID[m_dofP];
                 if (id >= 0)
                 {
-                    FENode& node = s.Node(i);
                     // mark node as free-draining
                     node.m_ID[m_dofP] = -id-2;
                 }
@@ -2565,20 +2675,18 @@ void FESlidingInterfaceBiphasicMixed::MarkFreeDraining()
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasicMixed::SetFreeDraining()
 {
-    int i, np;
-    
     // Set the pressure to zero for the free-draining nodes
-    for (np=0; np<2; ++np)
+    for (int np=0; np<2; ++np)
     {
         FESlidingSurfaceBiphasicMixed& s = (np == 0? m_ss : m_ms);
         
         if (s.m_bporo) {
             // loop over all nodes
-            for (i=0; i<s.Nodes(); ++i)
+            for (int i=0; i<s.Nodes(); ++i)
             {
-                if (s.Node(i).m_ID[m_dofP] < -1)
+				FENode& node = s.Node(i);
+				if (node.m_ID[m_dofP] < -1)
                 {
-                    FENode& node = s.Node(i);
                     // set the fluid pressure to zero
                     node.set(m_dofP, 0);
                 }

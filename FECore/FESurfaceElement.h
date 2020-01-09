@@ -57,6 +57,15 @@ public:
 		return a;
 	}
 
+	double eval(int order, double* d, int n)
+	{
+		double* N = H(order, n);
+		int ne = ShapeFunctions(order);
+		double a = 0;
+		for (int i = 0; i<ne; ++i) a += N[i] * d[i];
+		return a;
+	}
+
 	double eval(double* d, double r, double s)
 	{
 		int n = Nodes();
@@ -64,6 +73,16 @@ public:
 		shape_fnc(H, r, s);
 		double a = 0;
 		for (int i=0; i<n; ++i) a += H[i]*d[i];
+		return a;
+	}
+
+	double eval(int order, double* d, double r, double s)
+	{
+		int n = ShapeFunctions(order);
+		double H[FEElement::MAX_NODES];
+		shape_fnc(order, H, r, s);
+		double a = 0;
+		for (int i = 0; i<n; ++i) a += H[i] * d[i];
 		return a;
 	}
 
@@ -92,6 +111,15 @@ public:
 		int n = Nodes();
 		double s = 0;
 		for (int i=0; i<n; ++i) s +=  Hr[i]*d[i];
+		return s;
+	}
+
+	double eval_deriv1(int order, double* d, int j)
+	{
+		double* Hr = Gr(order, j);
+		int n = ShapeFunctions(order);
+		double s = 0;
+		for (int i = 0; i<n; ++i) s += Hr[i] * d[i];
 		return s;
 	}
 
@@ -128,6 +156,16 @@ public:
 		shape_deriv(Hr, Hs, r, s);
 		int n = Nodes();
 		double a = 0;
+		for (int i = 0; i<n; ++i) a += Hr[i] * d[i];
+		return a;
+	}
+
+	double eval_deriv1(int order, double* d, double r, double s)
+	{
+		double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+		shape_deriv(order, Hr, Hs, r, s);
+		int n = ShapeFunctions(order);
+		double a = 0;
 		for (int i=0; i<n; ++i) a +=  Hr[i]*d[i];
 		return a;
 	}
@@ -142,6 +180,16 @@ public:
 		return a;
 	}
 
+	double eval_deriv2(int order, double* d, double r, double s)
+	{
+		double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+		shape_deriv(order, Hr, Hs, r, s);
+		int n = ShapeFunctions(order);
+		double a = 0;
+		for (int i = 0; i<n; ++i) a += Hs[i] * d[i];
+		return a;
+	}
+
 	void shape_fnc(double* H, double r, double s)
 	{
 		((FESurfaceElementTraits*)m_pT)->shape_fnc(H, r, s);
@@ -150,6 +198,11 @@ public:
 	void shape_deriv(double* Gr, double* Gs, double r, double s)
 	{
 		((FESurfaceElementTraits*)m_pT)->shape_deriv(Gr, Gs, r, s);
+	}
+
+	void shape_deriv(int order, double* Gr, double* Gs, double r, double s)
+	{
+		((FESurfaceElementTraits*)m_pT)->shape_deriv(order, Gr, Gs, r, s);
 	}
 
 	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
