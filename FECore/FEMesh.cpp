@@ -381,8 +381,6 @@ void FEMesh::Reset()
 		node.m_vp = vec3d(0,0,0);
 		node.m_ap = node.m_at = vec3d(0,0,0);
 
-        node.m_Fr = vec3d(0,0,0);
-
 		// reset ID arrays
 		int ndof = (int)node.dofs();
 		for (int i=0; i<ndof; ++i) 
@@ -390,6 +388,7 @@ void FEMesh::Reset()
 			node.set_inactive(i);
 			node.set_bc(i, DOF_OPEN);
 			node.set(i, 0.0);
+			node.set_load(i, 0.0);
 		}
 	}
 

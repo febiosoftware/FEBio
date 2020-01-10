@@ -109,8 +109,6 @@ public: // geometry data
 	vec3d	m_vp;	//!< previous velocity
 	vec3d	m_ap;	//!< previous acceleration
 
-	vec3d	m_Fr;	//!< nodal reaction forces
-
 	vec3d   m_d0;   //!< initial director
 	vec3d	m_dt;	//!< current director
 
@@ -133,6 +131,11 @@ public:
 	double get_prev(int n) const { return m_val_p[n]; }
 	vec3d get_vec3d_prev(int i, int j, int k) const { return vec3d(m_val_p[i], m_val_p[j], m_val_p[k]); }
 
+	double get_load(int n) const { return m_Fr[n]; }
+	vec3d get_load3(int i, int j, int k) const { return vec3d(m_Fr[i], m_Fr[j], m_Fr[k]); }
+
+	void set_load(int n, double v) { m_Fr[n] = v; }
+
 public:
 	// dof functions
 	void set_bc(int ndof, int bcflag) { m_BC[ndof] = ((m_BC[ndof] & 0xF0) | bcflag); }
@@ -148,6 +151,7 @@ private:
 	std::vector<int>		m_BC;		//!< boundary condition array
 	std::vector<double>		m_val_t;	//!< current nodal DOF values
 	std::vector<double>		m_val_p;	//!< previous nodal DOF values
+	std::vector<double>		m_Fr;		//!< equivalent nodal forces
 
 public:
 	std::vector<int>		m_ID;	//!< nodal equation numbers

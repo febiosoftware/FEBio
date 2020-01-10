@@ -1349,18 +1349,20 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		node.m_Fr = vec3d(0, 0, 0);
+		node.set_load(m_dofU[0], 0);
+		node.set_load(m_dofU[1], 0);
+		node.set_load(m_dofU[2], 0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
 
 		// add nodal loads
 		double s = (m_arcLength>0 ? m_al_lam : 1.0);
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_Fr.x -= m_Fn[n]*s;
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_Fr.y -= m_Fn[n]*s;
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_Fr.z -= m_Fn[n]*s;
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fn[n]*s);
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fn[n]*s);
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fn[n]*s);
 	}
 }
 

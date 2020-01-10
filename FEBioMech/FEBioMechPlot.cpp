@@ -57,6 +57,7 @@ SOFTWARE.*/
 #include "FEPreStrainElastic.h"
 #include <FECore/writeplot.h>
 #include <FECore/FEDomainParameter.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -89,8 +90,12 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, FEDataStream& a)
 //! Store nodal reaction forces
 bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 {
-	writeNodalValues<vec3d>(m, a, [](const FENode& node) {
-		return node.m_Fr;
+	FEModel& fem = *GetFEModel();
+	int dofX = fem.GetDOFIndex("x");
+	int dofY = fem.GetDOFIndex("y");
+	int dofZ = fem.GetDOFIndex("z");
+	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+		return node.get_load3(dofX, dofY, dofZ);
 	});
 	return true;
 }

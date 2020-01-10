@@ -53,6 +53,7 @@ void FENode::SetDOFS(int n)
 	m_BC.assign(n, 0);
 	m_val_t.assign(n, 0.0);
 	m_val_p.assign(n, 0.0);
+	m_Fr.assign(n, 0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +65,6 @@ FENode::FENode(const FENode& n)
 	m_rp = n.m_rp;
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
-	m_Fr = n.m_Fr;
 	m_d0 = n.m_d0;
 
 	m_nID = n.m_nID;
@@ -75,6 +75,7 @@ FENode::FENode(const FENode& n)
 	m_BC = n.m_BC;
 	m_val_t = n.m_val_t;
 	m_val_p = n.m_val_p;
+	m_Fr = n.m_Fr;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,7 +87,6 @@ FENode& FENode::operator = (const FENode& n)
 	m_rp = n.m_rp;
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
-	m_Fr = n.m_Fr;
 	m_d0 = n.m_d0;
 
 	m_nID = n.m_nID;
@@ -97,6 +97,7 @@ FENode& FENode::operator = (const FENode& n)
 	m_BC = n.m_BC;
 	m_val_t = n.m_val_t;
 	m_val_p = n.m_val_p;
+	m_Fr = n.m_Fr;
 
 	return (*this);
 }

@@ -47,6 +47,9 @@ public:
 	//! initialization
 	bool Init() override;
 
+	//! activation
+	void Activate() override;
+
 	//! Get the DOF list
 	const FEDofList& GetDOFList() const;
 
@@ -79,6 +82,8 @@ public:
 private:
 	FEDofList	m_dofs;
 	FENodeSet*	m_nodeSet;
+	bool		m_brelative;
+	vector<vector<double> >	m_rval;
 
 	DECLARE_FECORE_CLASS();
 };

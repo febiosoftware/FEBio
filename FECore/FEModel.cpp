@@ -1175,7 +1175,9 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 		{
 			ParamString paramString = next.next();
 			if      (paramString == "position"      ) return GetComponent(node->m_rt, paramString.next());
-			else if (paramString == "reaction_force") return GetComponent(node->m_Fr, paramString.next());
+			// TODO: the m_Fr is not a vec3d any more, so not sure what to do here.
+			//       In any case, this should probably be handled by the FEMechModel
+//			else if (paramString == "reaction_force") return GetComponent(node->m_Fr, paramString.next());
 			else
 			{
 				// see if it corresponds to a solution variable

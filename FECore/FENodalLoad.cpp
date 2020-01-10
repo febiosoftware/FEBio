@@ -30,17 +30,20 @@ SOFTWARE.*/
 #include "FENodalLoad.h"
 #include "FENodeSet.h"
 #include "DumpStream.h"
+#include "FENode.h"
 
 REGISTER_SUPER_CLASS(FENodalLoad, FENODALLOAD_ID);
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalLoad, FEModelLoad)
+	ADD_PARAMETER(m_brelative, "relative");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FENodalLoad::FENodalLoad(FEModel* pfem) : FEModelLoad(pfem), m_dofs(pfem)
 {
+	m_brelative = false;
 	m_nodeSet = nullptr;
 }
 
@@ -67,6 +70,33 @@ bool FENodalLoad::Init()
 
 	// so far so good.
 	return FEModelLoad::Init();
+}
+
+//-----------------------------------------------------------------------------
+//! activation
+void FENodalLoad::Activate()
+{
+	FEModelLoad::Activate();
+
+	if (m_brelative)
+	{
+		int nodes = m_nodeSet->Size();
+		int dofs = m_dofs.Size();
+		if ((dofs == 0) || (nodes == 0)) return;
+
+		m_rval.resize(nodes, vector<double>(dofs, 0.0));
+
+		// get the current nodal loads
+		for (int i = 0; i < nodes; ++i)
+		{
+			FENode& node = *m_nodeSet->Node(i);
+
+			for (int j = 0; j < dofs; ++j)
+			{
+				m_rval[i][j] = -node.get_load(m_dofs[j]);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -102,6 +132,12 @@ void FENodalLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		// get the nodal values
 		GetNodalValues(i, val);
+
+		// add relative values
+		if (m_brelative)
+		{
+			for (int j = 0; j < dofs; ++j) val[j] += m_rval[i][j];
+		}
 
 		// assemble into residual
 		for (int j=0; j<dofs; ++j)
