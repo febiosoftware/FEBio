@@ -870,7 +870,8 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
         // get the nodal pressures
         if (sporo)
         {
-            for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).get(m_dofP);
+			int npd = el.ShapeFunctions(degree_p);
+            for (int j=0; j<npd; ++j) ps[j] = mesh.Node(el.m_node[j]).get(m_dofP);
         }
         
         for (int j=0; j<nint; ++j)
@@ -883,7 +884,7 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
             
             // get the pressure at the integration point
             double p1 = 0;
-            if (sporo) p1 = el.eval(ps, j);
+            if (sporo) p1 = el.eval(degree_p, ps, j);
 
             // calculate the normal at this integration point
             vec3d nu = ss.SurfaceNormal(el, j);
@@ -988,6 +989,10 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
 
 void FESlidingInterfaceBiphasicMixed::Update()
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_ss.m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_ss.m_varP);
+
     double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
     
     static int naug = 0;
@@ -1114,11 +1119,12 @@ void FESlidingInterfaceBiphasicMixed::Update()
                         // get the normal tractions at the nodes
                         
                         double tn[FEElement::MAX_NODES];
-                        for (int i=0; i<pse->Nodes(); ++i)
+						int N = pse->ShapeFunctions(degree_p);
+                        for (int i=0; i<N; ++i)
                             tn[i] = ss.m_pn[pse->m_lnode[i]];
                         
                         // now evaluate the traction at the intersection point
-                        double tp = pse->eval(tn, rs[0], rs[1]);
+                        double tp = pse->eval(degree_p, tn, rs[0], rs[1]);
                         
                         // if tp > 0, mark node as non-free-draining. (= pos ID)
                         int id = node.m_ID[m_dofP];
@@ -2324,6 +2330,10 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_ss.m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_ss.m_varP);
+
     int npass = (m_btwo_pass?2:1);
     const int MN = FEElement::MAX_NODES;
     const int MI = FEElement::MAX_INTPOINTS;
@@ -2397,7 +2407,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
                     pme->FEElement::project_to_nodes(pi, pn);
                     pme->project_to_nodes(ti, tn);
                     // now evaluate the traction at the intersection point
-                    double Ln = pme->eval(pn, sd.m_rs[0], sd.m_rs[1]);
+                    double Ln = pme->eval(degree_p, pn, sd.m_rs[0], sd.m_rs[1]);
                     vec3d trac = pme->eval(tn, sd.m_rs[0], sd.m_rs[1]);
                     sd.m_Ln += MBRACKET(Ln);
                     // tractions on master-slave are opposite, so subtract

@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceMP.h"
 #include "FESlidingInterfaceBiphasic.h"
+#include "FESlidingInterfaceBiphasicMixed.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
 #include <FEBioMech/FESolidLinearSystem.h>
@@ -856,6 +857,8 @@ void FEMultiphasicSolver::UpdateModel()
 		if (psiMP) psiMP->MarkAmbient();
         FESlidingInterfaceBiphasic* psib = dynamic_cast<FESlidingInterfaceBiphasic*>(pci);
         if (psib) psib->MarkFreeDraining();
+		FESlidingInterfaceBiphasicMixed* psbm = dynamic_cast<FESlidingInterfaceBiphasicMixed*>(pci);
+		if (psbm) psbm->MarkFreeDraining();
 	}
 
 	// Update all contact interfaces
@@ -874,6 +877,8 @@ void FEMultiphasicSolver::UpdateModel()
 		if (psiMP) psiMP->SetAmbient();
         FESlidingInterfaceBiphasic* psib = dynamic_cast<FESlidingInterfaceBiphasic*>(pci);
         if (psib) psib->SetFreeDraining();
+		FESlidingInterfaceBiphasicMixed* psbm = dynamic_cast<FESlidingInterfaceBiphasicMixed*>(pci);
+		if (psbm) psbm->SetFreeDraining();
 	}
     
     // make sure the prescribed BCs (fluid and solutes) are fullfilled
