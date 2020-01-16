@@ -868,7 +868,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 
 		int kd = dofs.GetVariableInterpolationOrder(varU);
 		int kp = dofs.GetVariableInterpolationOrder(varP);
-		if ((kd == 2) && (kp == 1))
+		if ((kd != 1) && (kp == 1))
 		{
 			int N = dom.Nodes();
 			vector<double> p(N, 0.0);

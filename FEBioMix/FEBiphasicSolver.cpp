@@ -50,8 +50,7 @@ SOFTWARE.*/
 // define the parameter list
 BEGIN_FECORE_CLASS(FEBiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol, "ptol"        );
-	ADD_PARAMETER(m_displacementOrder, "displacement_formulation");
-	ADD_PARAMETER(m_pressureOrder, "pressure_formulation");
+	ADD_PARAMETER(m_biphasicFormulation, "mixed_formulation");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -63,9 +62,8 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem), m_dofP
 
     m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
-	// order of interpolation
-	m_displacementOrder = -1;
-	m_pressureOrder = -1;
+	// set default formulation (full shape functions)
+	m_biphasicFormulation = 0;
     
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -117,17 +115,18 @@ bool FEBiphasicSolver::InitEquations()
 	// define the solution variables for the Newton solver
 	// Do this before calling base class!
 	// TODO: Maybe I can get default values from the domains?
-	AddSolutionVariable(&m_dofU, m_displacementOrder, "displacement", m_Dtol);
-	AddSolutionVariable(&m_dofSU, m_displacementOrder, "shell displacement", m_Dtol);
-	AddSolutionVariable(&m_dofP, m_pressureOrder, "pressure", m_Ptol);
-	AddSolutionVariable(&m_dofQ, m_pressureOrder, "shell fluid pressure", m_Ptol);
+	int pressureOrder = (m_biphasicFormulation == 1 ? 1 : -1);
+	AddSolutionVariable(&m_dofU, -1, "displacement", m_Dtol);
+	AddSolutionVariable(&m_dofSU, -1, "shell displacement", m_Dtol);
+	AddSolutionVariable(&m_dofP, pressureOrder, "pressure", m_Ptol);
+	AddSolutionVariable(&m_dofQ, pressureOrder, "shell fluid pressure", m_Ptol);
 
 	// set the interpolation orders
 	DOFS& dofs = GetFEModel()->GetDOFS();
 	int var_u = dofs.GetVariableIndex("displacement");
 	int var_p = dofs.GetVariableIndex("fluid pressure");
-	dofs.SetVariableInterpolationOrder(var_u, m_displacementOrder);
-	dofs.SetVariableInterpolationOrder(var_p, m_pressureOrder);
+	dofs.SetVariableInterpolationOrder(var_u, -1);
+	dofs.SetVariableInterpolationOrder(var_p, pressureOrder);
 
 	// base class does most of the work
 	FESolidSolver2::InitEquations2();

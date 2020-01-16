@@ -87,9 +87,8 @@ public:
 	// additional convergence norms
 	double	m_Ptol;			//!< pressure tolerance
 
-	// pressure interpolation order
-	int		m_displacementOrder;	//!< interpolation order for displacement
-	int		m_pressureOrder;		//!< order of pressure interpolation
+	// biphasic formulation
+	int		m_biphasicFormulation;	// = 0: standard, =1: mixed (linear pressure)
 
 	// equation numbers
 	int		m_ndeq;				//!< number of equations related to displacement dofs
