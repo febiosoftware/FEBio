@@ -338,8 +338,11 @@ inline tens4d dyad4(const mat3dd& as, const mat3dd& bs) { mat3d a(as); mat3d b(b
 // other common operations
 mat3d vdotTdotv(const vec3d& a, const tens4d& T, const vec3d& b);
 tens4d ddot(const tens4d& a, const tens4d& b);
+tens4d ddot(const tens4d& a, const tens4ds& b);
+inline mat3d ddot(const tens4d& a, const mat3d& m) { return a.dot(m); }
+inline mat3d ddot(const tens4d& a, const mat3ds& m) { return a.dot(m); }
+inline mat3d ddot(const tens4d& a, const mat3dd& m) { return a.dot(m); }
 inline tens4d operator * (const double g, const tens4d& a) { return a*g; }
-mat3d ddot(const tens4d& a, const mat3d& b);
 
 // The following file contains the actual definition of the class functions
 #include "tens4d.hpp"
