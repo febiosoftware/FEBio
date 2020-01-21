@@ -303,7 +303,7 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	double FfDl = Fp/lat;
 	double FfD4  = 0.5*FfDl/lat;
 
-	double FfDll = FpDl/lat - FpDl/(lat*lat);
+	double FfDll = FpDl/lat - Fp/(lat*lat);
 	double FfD44 = 0.25*(FfDll - FfDl / lat)/I4;
 
 	// add all derivatives
