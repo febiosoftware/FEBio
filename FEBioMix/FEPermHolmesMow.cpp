@@ -63,7 +63,7 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of permeability
-tens4ds FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
+tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
@@ -79,5 +79,5 @@ tens4ds FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double K0prime = (J*J*m_M+(J*(m_alpha+1)-phi0)/(J-phi0))*k0;
 	mat3ds k0hat = I*K0prime;
 	
-	return dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0;
+	return dyad1mm(I,k0hat)-dyad4s(I)*(2*k0);
 }

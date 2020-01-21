@@ -94,7 +94,7 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of permeability
-tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
+tens4dmm FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
@@ -121,9 +121,9 @@ tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds k1hat = I*K1prime;
 	mat3ds k2hat = I*K2prime;
 	
-	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0
-	+ dyad1s(b,k1hat)/2.0
-	+ dyad1s(b*b,k2hat)+dyad4s(b)*(4*k2);
+	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0)
+	+ dyad1mm(b,k1hat)
+	+ dyad1mm(b*b,k2hat)*2+dyad4s(b)*(4*k2);
 	
 	return K4;
 }

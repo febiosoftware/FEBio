@@ -45,7 +45,7 @@ public:
 	virtual mat3ds Permeability(FEMaterialPoint& pt) = 0;
     
 	//! tangent of hydraulic permeability with respect to strain
-	virtual tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) = 0;
+	virtual tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) = 0;
     
 	//! tangent of hydraulic permeability with respect to concentration
 	mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp, const int isol);

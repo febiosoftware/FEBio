@@ -45,7 +45,7 @@ public:
 	mat3ds Permeability(FEMaterialPoint& pt) override;
 		
 	//! Tangent of permeability
-	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
+	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
 		
 	//! data initialization and checking
 	bool Validate() override;

@@ -123,6 +123,7 @@
 		D5709DAC22833034007CAB0A /* FETetgenRefine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709DA622833034007CAB0A /* FETetgenRefine.cpp */; };
 		D5A37D2A2286167300867D77 /* FEOctreeSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A37D282286167300867D77 /* FEOctreeSearch.h */; };
 		D5A37D2B2286167300867D77 /* FEOctreeSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A37D292286167300867D77 /* FEOctreeSearch.cpp */; };
+		D5A56F8323D4FBFE002F28CA /* tens4dmm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */; };
 		D5AB623B220289B400AAF141 /* FERefineMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB6239220289B400AAF141 /* FERefineMesh.cpp */; };
 		D5AB623C220289B400AAF141 /* FERefineMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB623A220289B400AAF141 /* FERefineMesh.h */; };
 		D5AB623F220289E200AAF141 /* FEEdgeList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB623D220289E200AAF141 /* FEEdgeList.h */; };
@@ -147,7 +148,7 @@
 		D5B9E50B213F67DE0008B38A /* FENodeDataMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E3F8213F67DE0008B38A /* FENodeDataMap.cpp */; };
 		D5B9E50C213F67DE0008B38A /* tens6d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E3F9213F67DE0008B38A /* tens6d.cpp */; };
 		D5B9E50D213F67DE0008B38A /* FEFunction1D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E3FA213F67DE0008B38A /* FEFunction1D.cpp */; };
-		D5B9E50E213F67DE0008B38A /* tens4dMs.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FB213F67DE0008B38A /* tens4dMs.hpp */; };
+		D5B9E50E213F67DE0008B38A /* tens4dms.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FB213F67DE0008B38A /* tens4dms.hpp */; };
 		D5B9E50F213F67DE0008B38A /* FEClosestPointProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FC213F67DE0008B38A /* FEClosestPointProjection.h */; };
 		D5B9E510213F67DE0008B38A /* FEMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FD213F67DE0008B38A /* FEMaterial.h */; };
 		D5B9E511213F67DE0008B38A /* Archive.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FE213F67DE0008B38A /* Archive.h */; };
@@ -520,6 +521,7 @@
 		D5709DA622833034007CAB0A /* FETetgenRefine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETetgenRefine.cpp; sourceTree = "<group>"; };
 		D5A37D282286167300867D77 /* FEOctreeSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctreeSearch.h; sourceTree = "<group>"; };
 		D5A37D292286167300867D77 /* FEOctreeSearch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOctreeSearch.cpp; sourceTree = "<group>"; };
+		D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tens4dmm.hpp; sourceTree = "<group>"; };
 		D5AB6239220289B400AAF141 /* FERefineMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERefineMesh.cpp; sourceTree = "<group>"; };
 		D5AB623A220289B400AAF141 /* FERefineMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERefineMesh.h; sourceTree = "<group>"; };
 		D5AB623D220289E200AAF141 /* FEEdgeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEEdgeList.h; sourceTree = "<group>"; };
@@ -545,7 +547,7 @@
 		D5B9E3F8213F67DE0008B38A /* FENodeDataMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeDataMap.cpp; sourceTree = "<group>"; };
 		D5B9E3F9213F67DE0008B38A /* tens6d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens6d.cpp; sourceTree = "<group>"; };
 		D5B9E3FA213F67DE0008B38A /* FEFunction1D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFunction1D.cpp; sourceTree = "<group>"; };
-		D5B9E3FB213F67DE0008B38A /* tens4dMs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4dMs.hpp; sourceTree = "<group>"; };
+		D5B9E3FB213F67DE0008B38A /* tens4dms.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4dms.hpp; sourceTree = "<group>"; };
 		D5B9E3FC213F67DE0008B38A /* FEClosestPointProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEClosestPointProjection.h; sourceTree = "<group>"; };
 		D5B9E3FD213F67DE0008B38A /* FEMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaterial.h; sourceTree = "<group>"; };
 		D5B9E3FE213F67DE0008B38A /* Archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Archive.h; sourceTree = "<group>"; };
@@ -1204,7 +1206,8 @@
 				D5B9E4D6213F67DE0008B38A /* tens4d.cpp */,
 				D5B9E431213F67DE0008B38A /* tens4d.h */,
 				D5B9E403213F67DE0008B38A /* tens4d.hpp */,
-				D5B9E3FB213F67DE0008B38A /* tens4dMs.hpp */,
+				D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */,
+				D5B9E3FB213F67DE0008B38A /* tens4dms.hpp */,
 				D5B9E498213F67DE0008B38A /* tens4ds.hpp */,
 				D5B9E4DA213F67DE0008B38A /* tens5d.cpp */,
 				D5B9E443213F67DE0008B38A /* tens5d.h */,
@@ -1288,6 +1291,7 @@
 				D5B9E5A8213F67DE0008B38A /* FEShellDomain.h in Headers */,
 				D5F1947921908646000F738D /* DenseMatrix.h in Headers */,
 				D52D83FC21CE89A200472620 /* FEDomainParameter.h in Headers */,
+				D5A56F8323D4FBFE002F28CA /* tens4dmm.hpp in Headers */,
 				D5B9E595213F67DE0008B38A /* MatrixProfile.h in Headers */,
 				D5B9E540213F67DE0008B38A /* FELevelStructure.h in Headers */,
 				D5B9E4FF213F67DE0008B38A /* FELinearConstraint.h in Headers */,
@@ -1372,7 +1376,7 @@
 				D5613D65217B604F007CAB89 /* FELoadCurve.h in Headers */,
 				D5B9E5BF213F67DE0008B38A /* JFNKMatrix.h in Headers */,
 				D51E6155224440030049F545 /* FEHexRefine2D.h in Headers */,
-				D5B9E50E213F67DE0008B38A /* tens4dMs.hpp in Headers */,
+				D5B9E50E213F67DE0008B38A /* tens4dms.hpp in Headers */,
 				D5B9E5D2213F67DE0008B38A /* DOFS.h in Headers */,
 				D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */,
 				D5B9E55A213F67DE0008B38A /* matrix.h in Headers */,

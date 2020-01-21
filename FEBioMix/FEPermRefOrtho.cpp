@@ -105,7 +105,7 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of permeability
-tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
+tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	int a;
 	vec3d V;			// orthonormal material directions in reference configuration
@@ -142,7 +142,7 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
 	K0prime = (1+J*(m_alpha0/(J-m_phi0)+m_M0*J))*k0;
 	k0hat = mat3dd(K0prime);
-	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*(2*k0);
+	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0);
 	for (a=0; a<3; a++) {
 		f = pow((J-phi0)/(1-phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
 		k1 = m_perm1[a]/(J*J)*f;
@@ -151,7 +151,7 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 		K2prime = (J*J*m_M[a]+(J*(m_alpha[a]-3)+3*phi0)/(J-phi0))*k2;
 		k1hat = mat3dd(K1prime);
 		k2hat = mat3dd(K2prime);
-		K4 += (dyad1s(m[a],k1hat) + dyad1s(m[a]*b+b*m[a],k2hat))/2.0
+		K4 += dyad1mm(m[a],k1hat) + dyad1mm(m[a]*b+b*m[a],k2hat)
 		+dyad4s(m[a],b)*(2.0*k2);
 	}
 	

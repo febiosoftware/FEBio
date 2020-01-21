@@ -32,8 +32,8 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 class tens4ds;
-class tens4dMs;
 class tens4dms;
+class tens4dmm;
 class tens4d;
 
 //-----------------------------------------------------------------------------
@@ -119,8 +119,6 @@ tens4ds dyad1s(const mat3dd& a, const mat3dd& b);
 tens4ds dyad1s(const mat3ds& a, const mat3dd& b);
 tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
 inline tens4ds dyad1s(const mat3dd& a, const mat3ds& b) { return dyad1s(b, a); }
-tens4ds dyad2s(const mat3ds& a);
-tens4ds dyad2s(const mat3ds& a, const mat3ds& b);
 tens4ds dyad4s(const mat3dd& a);
 tens4ds dyad4s(const mat3ds& a);
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
@@ -153,15 +151,15 @@ inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }
 //
 
 
-class tens4dMs
+class tens4dms
 {
 public:
 	enum { NNZ = 45 };
 
 	// Default constructor
-	tens4dMs() {}
-	tens4dMs(const double g);
-	tens4dMs(double m[9][9]);
+	tens4dms() {}
+	tens4dms(const double g);
+	tens4dms(double m[9][9]);
 
 	// access operators
 	double& operator () (int i, int j, int k, int l);
@@ -170,19 +168,19 @@ public:
 	double operator () (int i, int j) const;
 
 	// arithmetic operators
-	tens4dMs operator + (const tens4dMs& t) const;
-	tens4dMs operator - (const tens4dMs& t) const;
-	tens4dMs operator * (double g) const;
-	tens4dMs operator / (double g) const;
+	tens4dms operator + (const tens4dms& t) const;
+	tens4dms operator - (const tens4dms& t) const;
+	tens4dms operator * (double g) const;
+	tens4dms operator / (double g) const;
 
 	// arithmetic assignment operators
-	tens4dMs& operator += (const tens4dMs& t);
-	tens4dMs& operator -= (const tens4dMs& t);
-	tens4dMs& operator *= (double g);
-	tens4dMs& operator /= (double g);
+	tens4dms& operator += (const tens4dms& t);
+	tens4dms& operator -= (const tens4dms& t);
+	tens4dms& operator *= (double g);
+	tens4dms& operator /= (double g);
 
 	// unary operators
-	tens4dMs operator - () const;
+	tens4dms operator - () const;
 	
 	// trace
 	double tr() const;
@@ -197,18 +195,118 @@ public:
 	tens4ds supersymm() const;
 
 	//// calculates the inverse
-	//tens4dMs inverse() const;
+	//tens4dms inverse() const;
 
 public:
 	double d[NNZ];	// stored in column major order
 };
 
 // outer (dyadic) products for symmetric and non-symmetric matrices
-tens4dMs dyad1ms(const mat3d& a);
-tens4dMs dyad1ms(const mat3ds& a, const mat3ds& b);
+tens4dms dyad1ms(const mat3d& a);
+tens4dms dyad1ms(const mat3ds& a, const mat3ds& b);
 
 // The following file contains the actual definition of the class functions
-#include "tens4dMs.hpp"
+#include "tens4dms.hpp"
+
+//-----------------------------------------------------------------------------
+//! Class for 4th order tensors without both minor symmetries
+
+// We store components of this tensor as a 6x6 matrix.
+// The tensor is stored in column major order:
+//
+//       00  11  22   01   12   20    |
+//       --------------------------------------------+---
+//     / 0    6  12   18   24   30  \ | 00
+//     | 1    7  13   19   25   31  | | 11
+//     | 2    8  14   20   26   32  | | 22
+// A = | 3    9  15   21   27   33  | | 01
+//     | 4   10  16   22   28   34  | | 12
+//     \ 5   11  17   23   29   35  / | 20
+//
+
+template <> class tensor_traits<tens4dmm> {public: enum { NNZ = 36}; };
+
+class tens4dmm : public tensor_base<tens4dmm>
+{
+public:
+    // constructors
+    tens4dmm() {}
+    explicit tens4dmm(const double g);
+    tens4dmm(tens4ds t);
+    tens4dmm(double m[6][6]);
+
+public:
+    // access operators
+    double& operator () (int i, int j, int k, int l);
+    double operator () (int i, int j, int k, int l) const;
+
+private:
+    double& operator () (int i, int j);
+    double operator () (int i, int j) const;
+    
+public:
+    // arithmetic operators
+    tens4dmm operator + (const tens4dmm& t) const;
+    tens4dmm operator - (const tens4dmm& t) const;
+    tens4dmm operator + (const tens4ds& t) const;
+    tens4dmm operator - (const tens4ds& t) const;
+    tens4dmm operator * (double g) const;
+    tens4dmm operator / (double g) const;
+
+    // arithmetic assignment operators
+    tens4dmm& operator += (const tens4dmm& t);
+    tens4dmm& operator -= (const tens4dmm& t);
+    tens4dmm& operator += (const tens4ds& t);
+    tens4dmm& operator -= (const tens4ds& t);
+    tens4dmm& operator *= (double g);
+    tens4dmm& operator /= (double g);
+
+    // unary operators
+    tens4dmm operator - () const;
+    
+    // double dot product with 2nd order tensor
+    mat3ds dot(const mat3ds& m) const;
+    mat3ds dot(const mat3dd& m) const { return dot(mat3ds(m)); }
+
+    // trace
+    double tr() const;
+    
+    // initialize to zero
+    void zero();
+
+    // extract 9x9 matrix
+    void extract(double d[6][6]);
+
+    // compute the super-symmetric (major and minor symmetric) component of the tensor
+    tens4ds supersymm() const;
+
+    // compute the major transpose (Sijkl -> Sklij)
+    tens4dmm transpose() const;
+
+    // calculates the inverse
+//    tens4d inverse() const;
+    
+    // evaluate push/pull operation
+//    tens4d pp(const mat3d& F);
+
+};
+
+// dyadic products of second-order tensors
+tens4dmm dyad1mm(const mat3ds& a, const mat3ds& b);
+
+inline tens4dmm dyad1mm(const mat3dd& as, const mat3ds& b) { mat3ds a(as); return dyad1mm(a,b); }
+inline tens4dmm dyad1mm(const mat3ds& a, const mat3dd& bs) { mat3ds b(bs); return dyad1mm(a,b); }
+inline tens4dmm dyad1mm(const mat3dd& as, const mat3dd& bs) { mat3ds a(as); mat3ds b(bs); return dyad1mm(a,b); }
+
+// other common operations
+tens4dmm ddot(const tens4dmm& a, const tens4dmm& b);
+tens4dmm ddot(const tens4dmm& a, const tens4ds& b);
+inline mat3ds ddot(const tens4dmm& a, const mat3ds& m) { return a.dot(m); }
+inline mat3ds ddot(const tens4dmm& a, const mat3dd& m) { return a.dot(m); }
+inline tens4dmm operator * (const double g, const tens4dmm& a) { return a*g; }
+
+// The following file contains the actual definition of the class functions
+#include "tens4dmm.hpp"
 
 //-----------------------------------------------------------------------------
 //! Class for 4th order tensors without symmetry
@@ -238,6 +336,7 @@ public:
 	tens4d() {}
     explicit tens4d(const double g);
     tens4d(tens4ds t);
+    tens4d(tens4dmm t);
     tens4d(double m[9][9]);
 
 public:
@@ -335,8 +434,17 @@ inline tens4d dyad4(const mat3dd& as, const mat3d& b) { mat3d a(as); return dyad
 inline tens4d dyad4(const mat3d& a, const mat3dd& bs) { mat3d b(bs); return dyad4(a,b); }
 inline tens4d dyad4(const mat3dd& as, const mat3dd& bs) { mat3d a(as); mat3d b(bs); return dyad4(a,b); }
 
+inline tens4d dyad1(const mat3dd& ad, const mat3ds& bs) { mat3d a(ad); mat3d b(bs); return dyad1(a,b); }
+inline tens4d dyad1(const mat3ds& as, const mat3dd& bd) { mat3d a(as); mat3d b(bd); return dyad1(a,b); }
+inline tens4d dyad2(const mat3dd& ad, const mat3ds& bs) { mat3d a(ad); mat3d b(bs); return dyad2(a,b); }
+inline tens4d dyad2(const mat3ds& as, const mat3dd& bd) { mat3d a(as); mat3d b(bd); return dyad2(a,b); }
+inline tens4d dyad3(const mat3dd& ad, const mat3ds& bs) { mat3d a(ad); mat3d b(bs); return dyad3(a,b); }
+inline tens4d dyad3(const mat3ds& as, const mat3dd& bd) { mat3d a(as); mat3d b(bd); return dyad3(a,b); }
+inline tens4d dyad4(const mat3dd& ad, const mat3ds& bs) { mat3d a(ad); mat3d b(bs); return dyad4(a,b); }
+inline tens4d dyad4(const mat3ds& as, const mat3dd& bd) { mat3d a(as); mat3d b(bd); return dyad4(a,b); }
 // other common operations
 mat3d vdotTdotv(const vec3d& a, const tens4d& T, const vec3d& b);
+inline mat3d vdotTdotv(const vec3d& a, const tens4dmm& Tm, const vec3d& b) { tens4d T(Tm); return vdotTdotv(a, T, b); }
 tens4d ddot(const tens4d& a, const tens4d& b);
 tens4d ddot(const tens4d& a, const tens4ds& b);
 inline mat3d ddot(const tens4d& a, const mat3d& m) { return a.dot(m); }

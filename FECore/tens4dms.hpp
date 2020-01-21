@@ -32,13 +32,13 @@ SOFTWARE.*/
 
 #include "matrix.h"
 
-inline tens4dMs::tens4dMs(const double g)
+inline tens4dms::tens4dms(const double g)
 {
 	for (int i = 0; i < NNZ; i++)
 		d[i] = g;
 }
 
-inline tens4dMs::tens4dMs(double m[9][9])
+inline tens4dms::tens4dms(double m[9][9])
 {
 	d[ 0] = m[0][0];
 	d[ 1] = m[0][1]; d[ 2] = m[1][1];
@@ -51,36 +51,36 @@ inline tens4dMs::tens4dMs(double m[9][9])
 	d[36] = m[0][8]; d[37] = m[1][8]; d[38] = m[2][8]; d[39] = m[3][8]; d[40] = m[4][8]; d[41] = m[5][8]; d[42] = m[6][8]; d[43] = m[7][8]; d[44] = m[8][8];
 }
 
-inline double& tens4dMs::operator () (int i, int j, int k, int l)
+inline double& tens4dms::operator () (int i, int j, int k, int l)
 {
 	const int m[3][3] = {{0,3,5},{6,1,4},{8,7,2}};
-	tens4dMs& T = (*this);
+	tens4dms& T = (*this);
 	return T(m[i][j], m[k][l]);
 }
 
-inline double tens4dMs::operator () (int i, int j, int k, int l) const
+inline double tens4dms::operator () (int i, int j, int k, int l) const
 {
 	const int m[3][3] = {{0,3,5},{6,1,4},{8,7,2}};
-	const tens4dMs& T = (*this);
+	const tens4dms& T = (*this);
 	return T(m[i][j], m[k][l]);
 }
 
-inline double& tens4dMs::operator () (int i, int j)
+inline double& tens4dms::operator () (int i, int j)
 {
 	const int m[9] = {0, 1, 3, 6, 10, 15, 21, 28, 36};
 	if (i<=j) return d[m[j]+i]; else return d[m[i]+j];
 }
 
-inline double tens4dMs::operator () (int i, int j) const
+inline double tens4dms::operator () (int i, int j) const
 {
 	const int m[9] = {0, 1, 3, 6, 10, 15, 21, 28, 36};
 	if (i<=j) return d[m[j]+i]; else return d[m[i]+j];
 }
 
 // operator +
-inline tens4dMs tens4dMs::operator + (const tens4dMs& t) const
+inline tens4dms tens4dms::operator + (const tens4dms& t) const
 {
-	tens4dMs s;
+	tens4dms s;
 	for (int i=0; i<NNZ; i++)
 		s.d[i] = d[i] + t.d[i];
 	
@@ -88,9 +88,9 @@ inline tens4dMs tens4dMs::operator + (const tens4dMs& t) const
 }
 
 // operator -
-inline tens4dMs tens4dMs::operator - (const tens4dMs& t) const
+inline tens4dms tens4dms::operator - (const tens4dms& t) const
 {
-	tens4dMs s;
+	tens4dms s;
 	for (int i=0; i<NNZ; i++)
 		s.d[i] = d[i] - t.d[i];
 
@@ -98,9 +98,9 @@ inline tens4dMs tens4dMs::operator - (const tens4dMs& t) const
 }
 
 // operator *
-inline tens4dMs tens4dMs::operator * (double g) const
+inline tens4dms tens4dms::operator * (double g) const
 {
-	tens4dMs s;
+	tens4dms s;
 	for (int i=0; i<NNZ; i++)
 		s.d[i] = g*d[i];
 	
@@ -108,9 +108,9 @@ inline tens4dMs tens4dMs::operator * (double g) const
 }
 
 // operator /
-inline tens4dMs tens4dMs::operator / (double g) const
+inline tens4dms tens4dms::operator / (double g) const
 {
-	tens4dMs s;
+	tens4dms s;
 	for (int i=0; i<NNZ; i++)
 		s.d[i] = d[i]/g;
 	
@@ -118,7 +118,7 @@ inline tens4dMs tens4dMs::operator / (double g) const
 }
 
 // assignment operator +=
-inline tens4dMs& tens4dMs::operator += (const tens4dMs& t)
+inline tens4dms& tens4dms::operator += (const tens4dms& t)
 {
 	for (int i=0; i<NNZ; i++)
 		d[i] += t.d[i];
@@ -127,7 +127,7 @@ inline tens4dMs& tens4dMs::operator += (const tens4dMs& t)
 }
 
 // assignment operator -=
-inline tens4dMs& tens4dMs::operator -= (const tens4dMs& t)
+inline tens4dms& tens4dms::operator -= (const tens4dms& t)
 {
 	for (int i=0; i<NNZ; i++)
 		d[i] -= t.d[i];
@@ -136,7 +136,7 @@ inline tens4dMs& tens4dMs::operator -= (const tens4dMs& t)
 }
 
 // assignment operator *=
-inline tens4dMs& tens4dMs::operator *= (double g)
+inline tens4dms& tens4dms::operator *= (double g)
 {
 	for (int i=0; i<NNZ; i++)
 		d[i] *= g;
@@ -145,7 +145,7 @@ inline tens4dMs& tens4dMs::operator *= (double g)
 }
 
 // assignment operator /=
-inline tens4dMs& tens4dMs::operator /= (double g)
+inline tens4dms& tens4dms::operator /= (double g)
 {
 	for (int i=0; i<NNZ; i++)
 		d[i] /= g;
@@ -154,9 +154,9 @@ inline tens4dMs& tens4dMs::operator /= (double g)
 }
 
 // unary operator -
-inline tens4dMs tens4dMs::operator - () const
+inline tens4dms tens4dms::operator - () const
 {
-	tens4dMs s;
+	tens4dms s;
 	for (int i = 0; i < NNZ; i++)
 		s.d[i] = -d[i];
 
@@ -166,20 +166,20 @@ inline tens4dMs tens4dMs::operator - () const
 // trace
 // C.tr() = I:C:I
 // No need to change the trace operation because major symmetry still applies
-inline double tens4dMs::tr() const
+inline double tens4dms::tr() const
 {
 	return (d[0]+d[2]+d[5]+2*(d[1]+d[3]+d[4]));
 }
 
 // intialize to zero
-inline void tens4dMs::zero()
+inline void tens4dms::zero()
 {
 	for (int i = 0; i < NNZ; i++)
 		d[i] = 0;
 }
 
 // extract 9x9 matrix
-inline void tens4dMs::extract(double D[9][9])
+inline void tens4dms::extract(double D[9][9])
 {
 	D[0][0] = d[0];  D[0][1] = d[1];  D[0][2] = d[3];  D[0][3] = d[6];  D[0][4] = d[10]; D[0][5] = d[15]; D[0][6] = d[21]; D[0][7] = d[28]; D[0][8] = d[36];
 	D[1][0] = d[1];  D[1][1] = d[2];  D[1][2] = d[4];  D[1][3] = d[7];  D[1][4] = d[11]; D[1][5] = d[16]; D[1][6] = d[22]; D[1][7] = d[29]; D[1][8] = d[37];
@@ -194,7 +194,7 @@ inline void tens4dMs::extract(double D[9][9])
 
 // compute the super symmetric (major and minor symmetric) component of the tensor
 // Sijkl = (1/4)*(Cijkl + Cijlk + Cjikl + Cjilk)
-inline tens4ds tens4dMs::supersymm() const
+inline tens4ds tens4dms::supersymm() const
 {
 	tens4ds s;
 
@@ -210,9 +210,9 @@ inline tens4ds tens4dMs::supersymm() const
 
 //-----------------------------------------------------------------------------
 // (a dyad1s a)_ijkl = a_ij a_kl
-inline tens4dMs dyad1ms(const mat3d& a)
+inline tens4dms dyad1ms(const mat3d& a)
 {
-	tens4dMs c;
+	tens4dms c;
 	
 	c.d[ 0] = a(0,0)*a(0,0);
 	c.d[ 1] = a(0,0)*a(1,1);
@@ -273,9 +273,9 @@ inline tens4dMs dyad1ms(const mat3d& a)
 
 //-----------------------------------------------------------------------------
 // (a dyad1s b)_ijkl = a_ij b_kl + b_ij a_kl
-inline tens4dMs dyad1ms(const mat3d& a, const mat3d& b)
+inline tens4dms dyad1ms(const mat3d& a, const mat3d& b)
 {
-	tens4dMs c;
+	tens4dms c;
 	
 	c.d[0] = 2*a(0,0)*b(0,0);
 	c.d[1] = a(0,0)*b(1,1) + b(0,0)*a(1,1);

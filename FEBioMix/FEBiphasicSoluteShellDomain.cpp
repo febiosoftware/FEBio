@@ -689,7 +689,7 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->GetPermeability()->Permeability(mp);
-        tens4ds dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
+        tens4dmm dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
         mat3ds dKdc = m_pMat->GetPermeability()->Tangent_Permeability_Concentration(mp, 0);
         
         // next we get the determinant
@@ -737,10 +737,14 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
         mat3ds Ki = K.inverse();
         mat3ds ImD = I-D/D0;
         mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
-        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
-        +dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
+//        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
+//        +dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
+//        +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
+//        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
+        tens4d G = dyad1(Ki,I) - dyad4(Ki,I)*2 - ddot(dyad2(Ki,Ki),dKdE)
+        +dyad1(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
         +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
+        tens4d dKedE = dyad1(Ke,I) - 2*dyad4(Ke,I) - ddot(dyad2(Ke,Ke),G);
         mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
         mat3ds dKedc = -Ke*Gc*Ke;
@@ -989,7 +993,7 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffnessSS(FEShellElemen
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->GetPermeability()->Permeability(mp);
-        tens4ds dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
+        tens4dmm dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
         mat3ds dKdc = m_pMat->GetPermeability()->Tangent_Permeability_Concentration(mp, 0);
         
         // next we get the determinant
@@ -1037,10 +1041,14 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffnessSS(FEShellElemen
         mat3ds Ki = K.inverse();
         mat3ds ImD = I-D/D0;
         mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
-        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
-        +dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
+//        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
+//        +dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
+//        +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
+//        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
+        tens4d G = dyad1(Ki,I) - dyad4(Ki,I)*2 - ddot(dyad2(Ki,Ki),dKdE)*0.5
+        +dyad1(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
         +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
+        tens4d dKedE = dyad1(Ke,I) - 2*dyad4(Ke,I) - ddot(dyad2(Ke,Ke),G)*0.5;
         mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
         mat3ds dKedc = -Ke*Gc*Ke;

@@ -107,7 +107,7 @@ mat3ds FEPermRefTransIso::Permeability(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of permeability
-tens4ds FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
+tens4dmm FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	vec3d V;			// axial material directions in reference configuration
 	mat3ds m;			// axial texture tensor in current configuration
@@ -141,7 +141,7 @@ tens4ds FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
 	K0prime = (1+J*(m_alpha0/(J-phi0)+m_M0*J))*k0;
 	k0hat = mat3dd(K0prime);
-	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0;
+	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0);
 	// Transverse direction
 	f = pow((J-phi0)/(1-phi0),m_alphaT)*exp(m_MT*(J*J-1.0)/2.0);
 	double k1T = m_perm1T/(J*J)*f;
@@ -155,8 +155,8 @@ tens4ds FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds k1hatA = mat3dd((J*J*m_MA+(J*(m_alphaA-1)+phi0)/(J-phi0))*k1A);
 	mat3ds k2hatA = mat3dd((J*J*m_MA+(J*(m_alphaA-3)+3*phi0)/(J-phi0))*k2A);
 	//  Tangent
-	K4 += dyad1s(b*b,k2hatT) + dyad4s(b)*(4*k2T) + dyad4s(m,b)*(2*(k2A-k2T))
-	+ (dyad1s(b,k1hatT) + dyad1s(m,k1hatA-k1hatT) + dyad1s(m*b+b*m,k2hatA-k2hatT))/2.0;
+	K4 += dyad1mm(b*b,k2hatT)*2 + dyad4s(b)*(4*k2T) + dyad4s(m,b)*(2*(k2A-k2T))
+	+ dyad1mm(b,k1hatT) + dyad1mm(m,k1hatA-k1hatT) + dyad1mm(m*b+b*m,k2hatA-k2hatT);
 	
 	return K4;
 }

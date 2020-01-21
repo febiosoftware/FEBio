@@ -52,9 +52,9 @@ mat3ds FEPermConstIso::Permeability(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of permeability
-tens4ds FEPermConstIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
+tens4dmm FEPermConstIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
-	tens4ds K;
+	tens4dmm K;
 	K.zero();
 	return K;
 }
