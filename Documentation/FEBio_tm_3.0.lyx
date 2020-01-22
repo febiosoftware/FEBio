@@ -11136,7 +11136,7 @@ reference "eq231"
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\boldsymbol{\mathcal{G}} & =2\left(\mathbf{k}^{-1}\otimes\mathbf{I}-2\mathbf{k}^{-1}\,\overline{\underline{\otimes}}\,\mathbf{I}\right)-\left(\mathbf{k}^{-1}\,\underline{\otimes}\,\mathbf{k}^{-1}\right):\mathbf{k}\\
+\begin{aligned}\boldsymbol{\mathcal{G}} & =2\left(\mathbf{k}^{-1}\otimes\mathbf{I}-2\mathbf{k}^{-1}\,\overline{\underline{\otimes}}\,\mathbf{I}\right)-\left(\mathbf{k}^{-1}\,\underline{\otimes}\,\mathbf{k}^{-1}\right):\boldsymbol{\mathcal{K}}\\
  & +R\theta\sum\limits _{\beta}\frac{\tilde{c}^{\beta}}{d_{0}^{\beta}}J\frac{\partial}{\partial J}\left(\frac{\tilde{\kappa}^{\beta}}{\varphi^{w}}\right)\left(\mathbf{I}-\frac{\mathbf{d}^{\beta}}{d_{0}^{\beta}}\right)\otimes\mathbf{I}\\
  & +R\theta\sum\limits _{\beta}\frac{\tilde{c}^{\beta}}{d_{0}}\frac{\tilde{\kappa}^{\beta}}{\varphi^{w}}\left(\mathbf{I}\otimes\mathbf{I}-2\mathbf{I}\,\underline{\otimes}\,\mathbf{I}-\frac{1}{d_{0}^{\beta}}\boldsymbol{\mathcal{D}}^{\beta}\right)
 \end{aligned}
