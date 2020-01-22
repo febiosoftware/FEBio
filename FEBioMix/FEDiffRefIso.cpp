@@ -96,7 +96,7 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of diffusivity with respect to strain
-tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
+tens4dmm FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
@@ -124,9 +124,9 @@ tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	mat3ds d1hat = I*D1prime;
 	mat3ds d2hat = I*D2prime;
 	
-	tens4ds D4 = dyad1s(I,d0hat)/2.0-dyad4s(I)*2*d0
-	+ dyad1s(b,d1hat)/2.0
-	+ dyad1s(b*b,d2hat)+dyad4s(b)*4*d2;
+	tens4dmm D4 = dyad1mm(I,d0hat)-dyad4s(I)*(2*d0)
+	+ dyad1mm(b,d1hat)
+	+ dyad1mm(b*b,d2hat)*2+dyad4s(b)*(4*d2);
 	
 	return D4;
 }

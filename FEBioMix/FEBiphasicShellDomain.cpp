@@ -629,10 +629,10 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
         for (i=0; i<neln; ++i)
             for (j=0; j<neln; ++j)
             {
-                vec3d kpu = (vdotTdotv(gradMu[i], dKdE, gradMu[j]).transpose()*gradp + Q*(gradMu[j]*Mu[i]))*(detJt*dt);
-                vec3d kpd = (vdotTdotv(gradMu[i], dKdE, gradMd[j]).transpose()*gradp + Q*(gradMd[j]*Mu[i]))*(detJt*dt);
-                vec3d kqu = (vdotTdotv(gradMd[i], dKdE, gradMu[j]).transpose()*gradp + Q*(gradMu[j]*Md[i]))*(detJt*dt);
-                vec3d kqd = (vdotTdotv(gradMd[i], dKdE, gradMd[j]).transpose()*gradp + Q*(gradMd[j]*Md[i]))*(detJt*dt);
+                vec3d kpu = (vdotTdotv(gradMu[i], dKdE, gradMu[j])*gradp + Q*(gradMu[j]*Mu[i]))*(detJt*dt);
+                vec3d kpd = (vdotTdotv(gradMu[i], dKdE, gradMd[j])*gradp + Q*(gradMd[j]*Mu[i]))*(detJt*dt);
+                vec3d kqu = (vdotTdotv(gradMd[i], dKdE, gradMu[j])*gradp + Q*(gradMu[j]*Md[i]))*(detJt*dt);
+                vec3d kqd = (vdotTdotv(gradMd[i], dKdE, gradMd[j])*gradp + Q*(gradMd[j]*Md[i]))*(detJt*dt);
                 
                 ke[8*i+6][8*j  ] -= kpu.x; ke[8*i+6][8*j+1] -= kpu.y; ke[8*i+6][8*j+2] -= kpu.z;
                 
@@ -812,10 +812,10 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffnessSS(FEShellElement& el, matri
         for (i=0; i<neln; ++i)
             for (j=0; j<neln; ++j)
             {
-                vec3d kpu = (vdotTdotv(gradMu[i], dKdE, gradMu[j]).transpose()*gradp + Q*(gradMu[j]*Mu[i]))*(detJt*dt);
-                vec3d kpd = (vdotTdotv(gradMu[i], dKdE, gradMd[j]).transpose()*gradp + Q*(gradMd[j]*Mu[i]))*(detJt*dt);
-                vec3d kqu = (vdotTdotv(gradMd[i], dKdE, gradMu[j]).transpose()*gradp + Q*(gradMu[j]*Md[i]))*(detJt*dt);
-                vec3d kqd = (vdotTdotv(gradMd[i], dKdE, gradMd[j]).transpose()*gradp + Q*(gradMd[j]*Md[i]))*(detJt*dt);
+                vec3d kpu = (vdotTdotv(gradMu[i], dKdE, gradMu[j])*gradp + Q*(gradMu[j]*Mu[i]))*(detJt*dt);
+                vec3d kpd = (vdotTdotv(gradMu[i], dKdE, gradMd[j])*gradp + Q*(gradMd[j]*Mu[i]))*(detJt*dt);
+                vec3d kqu = (vdotTdotv(gradMd[i], dKdE, gradMu[j])*gradp + Q*(gradMu[j]*Md[i]))*(detJt*dt);
+                vec3d kqd = (vdotTdotv(gradMd[i], dKdE, gradMd[j])*gradp + Q*(gradMd[j]*Md[i]))*(detJt*dt);
                 
                 ke[8*i+6][8*j  ] -= kpu.x; ke[8*i+6][8*j+1] -= kpu.y; ke[8*i+6][8*j+2] -= kpu.z;
                 
@@ -1170,13 +1170,13 @@ void FEBiphasicShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEl
                 ke[8*i+4][8*j+3] += Kdd(1,0); ke[8*i+4][8*j+4] += Kdd(1,1); ke[8*i+4][8*j+5] += Kdd(1,2);
                 ke[8*i+5][8*j+3] += Kdd(2,0); ke[8*i+5][8*j+4] += Kdd(2,1); ke[8*i+5][8*j+5] += Kdd(2,2);
                 
-                kpu = (vdotTdotv(gradMu[i], dKdE, gradMu[j]).transpose()*b
+                kpu = (vdotTdotv(gradMu[i], dKdE, gradMu[j])*b
                        + ((b & gradMu[j]) + gradb*Mu[j])*K*gradMu[i])*(rhoTw*detJt*dt);
-                kpd = (vdotTdotv(gradMu[i], dKdE, gradMd[j]).transpose()*b
+                kpd = (vdotTdotv(gradMu[i], dKdE, gradMd[j])*b
                        + ((b & gradMd[j]) + gradb*Md[j])*K*gradMu[i])*(rhoTw*detJt*dt);
-                kqu = (vdotTdotv(gradMd[i], dKdE, gradMu[j]).transpose()*b
+                kqu = (vdotTdotv(gradMd[i], dKdE, gradMu[j])*b
                        + ((b & gradMu[j]) + gradb*Mu[j])*K*gradMd[i])*(rhoTw*detJt*dt);
-                kqd = (vdotTdotv(gradMd[i], dKdE, gradMd[j]).transpose()*b
+                kqd = (vdotTdotv(gradMd[i], dKdE, gradMd[j])*b
                        + ((b & gradMd[j]) + gradb*Md[j])*K*gradMd[i])*(rhoTw*detJt*dt);
                 
                 ke[8*i+6][8*j  ] -= kpu.x; ke[8*i+6][8*j+1] -= kpu.y; ke[8*i+6][8*j+2] -= kpu.z;

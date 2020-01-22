@@ -95,9 +95,9 @@ mat3ds FEDiffConstOrtho::Diffusivity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of diffusivity with respect to strain
-tens4ds FEDiffConstOrtho::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
+tens4dmm FEDiffConstOrtho::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
-	tens4ds D;
+	tens4dmm D;
 	D.zero();
 	return D;
 }

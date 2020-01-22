@@ -714,7 +714,7 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
         // evaluate the diffusivity tensor and its derivatives
         mat3ds D = m_pMat->GetSolute()->m_pDiff->Diffusivity(mp);
         mat3ds dDdc = m_pMat->GetSolute()->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
-        tens4ds dDdE = m_pMat->GetSolute()->m_pDiff->Tangent_Diffusivity_Strain(mp);
+        tens4dmm dDdE = m_pMat->GetSolute()->m_pDiff->Tangent_Diffusivity_Strain(mp);
         
         // evaluate the solute free diffusivity
         double D0 = m_pMat->GetSolute()->m_pDiff->Free_Diffusivity(mp);
@@ -737,14 +737,10 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
         mat3ds Ki = K.inverse();
         mat3ds ImD = I-D/D0;
         mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
-//        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
-//        +dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
-//        +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-//        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
-        tens4d G = dyad1(Ki,I) - dyad4(Ki,I)*2 - ddot(dyad2(Ki,Ki),dKdE)
-        +dyad1(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
-        +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-        tens4d dKedE = dyad1(Ke,I) - 2*dyad4(Ke,I) - ddot(dyad2(Ke,Ke),G);
+        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE)
+        +dyad1(ImD,I)*(R*T*c*J/D0/phiw*(dkdJ-kappa/phiw*dpdJ))
+        +(dyad1(I,I) - dyad2(I,I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
+        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
         mat3ds dKedc = -Ke*Gc*Ke;
@@ -1018,7 +1014,7 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffnessSS(FEShellElemen
         // evaluate the diffusivity tensor and its derivatives
         mat3ds D = m_pMat->GetSolute()->m_pDiff->Diffusivity(mp);
         mat3ds dDdc = m_pMat->GetSolute()->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
-        tens4ds dDdE = m_pMat->GetSolute()->m_pDiff->Tangent_Diffusivity_Strain(mp);
+        tens4dmm dDdE = m_pMat->GetSolute()->m_pDiff->Tangent_Diffusivity_Strain(mp);
         
         // evaluate the solute free diffusivity
         double D0 = m_pMat->GetSolute()->m_pDiff->Free_Diffusivity(mp);
@@ -1041,14 +1037,10 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffnessSS(FEShellElemen
         mat3ds Ki = K.inverse();
         mat3ds ImD = I-D/D0;
         mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
-//        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
-//        +dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
-//        +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-//        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
-        tens4d G = dyad1(Ki,I) - dyad4(Ki,I)*2 - ddot(dyad2(Ki,Ki),dKdE)*0.5
-        +dyad1(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
-        +(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-        tens4d dKedE = dyad1(Ke,I) - 2*dyad4(Ke,I) - ddot(dyad2(Ke,Ke),G)*0.5;
+        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE)
+        +dyad1(ImD,I)*(R*T*c*J/D0/phiw*(dkdJ-kappa/phiw*dpdJ))
+        +(dyad1(I,I) - dyad2(I,I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
+        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
         mat3ds dKedc = -Ke*Gc*Ke;

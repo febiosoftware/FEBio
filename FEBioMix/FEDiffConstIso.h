@@ -48,7 +48,7 @@ public:
 	mat3ds Diffusivity(FEMaterialPoint& pt) override;
 	
 	//! Tangent of diffusivity with respect to strain
-	tens4ds Tangent_Diffusivity_Strain(FEMaterialPoint& mp) override;
+	tens4dmm Tangent_Diffusivity_Strain(FEMaterialPoint& mp) override;
 	
 	//! Tangent of diffusivity with respect to concentration
 	mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol) override;

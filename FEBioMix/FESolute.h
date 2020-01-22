@@ -46,7 +46,7 @@ public:
 	virtual mat3ds Diffusivity(FEMaterialPoint& pt) = 0;
 	
 	//! tangent of diffusivity with respect to strain
-	virtual tens4ds Tangent_Diffusivity_Strain(FEMaterialPoint& mp) = 0;
+	virtual tens4dmm Tangent_Diffusivity_Strain(FEMaterialPoint& mp) = 0;
 	
 	//! tangent of diffusivity with respect to solute concentration
 	virtual mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol) = 0;

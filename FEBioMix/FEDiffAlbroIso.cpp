@@ -137,7 +137,7 @@ mat3ds FEDiffAlbroIso::Diffusivity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of diffusivity with respect to strain
-tens4ds FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
+tens4dmm FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
@@ -164,7 +164,7 @@ tens4ds FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
     // derivative of (J d) w.r.t. J
     double dJ = d*(1+J*(m_alphad*phi0/(J-phi0)/(J-phi0) - m_cdinv*c*dkdJ));
 		
-	tens4ds D4 = dyad1s(I)*dJ-dyad4s(I)*(2*d);
+	tens4dmm D4 = dyad1s(I)*dJ-dyad4s(I)*(2*d);
 	
 	return D4;
 }

@@ -938,7 +938,7 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
         
         vector<mat3ds> dKdc(nsol);
         vector<mat3ds> D(nsol);
-        vector<tens4ds> dDdE(nsol);
+        vector<tens4dmm> dDdE(nsol);
         vector< vector<mat3ds> > dDdc(nsol, vector<mat3ds>(nsol));
         vector<double> D0(nsol);
         vector< vector<double> > dD0dc(nsol, vector<double>(nsol));
@@ -1009,14 +1009,13 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
         // evaluate the effective permeability and its derivatives
         mat3ds Ki = K.inverse();
         mat3ds Ke(0,0,0,0,0,0);
-//        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5;
-        tens4d G = dyad1(Ki,I) - dyad4(Ki,I)*2 - ddot(dyad2(Ki,Ki),dKdE);
+        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE);
         vector<mat3ds> Gc(nsol);
         vector<mat3ds> dKedc(nsol);
         for (isol=0; isol<nsol; ++isol) {
             Ke += ImD[isol]*(kappa[isol]*c[isol]/D0[isol]);
-            G += dyad1s(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/2/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
-            +(dyad1s(I) - dyad4s(I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
+            G += dyad1(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
+            +(dyad1(I,I) - dyad2(I,I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
             Gc[isol] = ImD[isol]*(kappa[isol]/D0[isol]);
             for (jsol=0; jsol<nsol; ++jsol) {
                 Gc[isol] += ImD[jsol]*(c[jsol]/D0[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol]))
@@ -1025,8 +1024,7 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
             Gc[isol] *= R*T/phiw;
         }
         Ke = (Ki + Ke*(R*T/phiw)).inverse();
-//        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
-        tens4d dKedE = dyad1(Ke,I) - 2*dyad4(Ke,I) - ddot(dyad2(Ke,Ke),G);
+        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         for (isol=0; isol<nsol; ++isol)
             dKedc[isol] = -Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke;
         
@@ -1313,7 +1311,7 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffnessSS(FESolidElement& el,
         
         vector<mat3ds> dKdc(nsol);
         vector<mat3ds> D(nsol);
-        vector<tens4ds> dDdE(nsol);
+        vector<tens4dmm> dDdE(nsol);
         vector< vector<mat3ds> > dDdc(nsol, vector<mat3ds>(nsol));
         vector<double> D0(nsol);
         vector< vector<double> > dD0dc(nsol, vector<double>(nsol));
@@ -1376,14 +1374,13 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffnessSS(FESolidElement& el,
         // evaluate the effective permeability and its derivatives
         mat3ds Ki = K.inverse();
         mat3ds Ke(0,0,0,0,0,0);
-//        tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5;
-        tens4d G = dyad1(Ki,I) - dyad4(Ki,I)*2 - ddot(dyad2(Ki,Ki),dKdE)*0.5;
+        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE);
         vector<mat3ds> Gc(nsol);
         vector<mat3ds> dKedc(nsol);
         for (isol=0; isol<nsol; ++isol) {
             Ke += ImD[isol]*(kappa[isol]*c[isol]/D0[isol]);
-            G += dyad1s(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/2/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
-            +(dyad1s(I) - dyad4s(I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
+            G += dyad1(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
+            +(dyad1(I,I) - dyad2(I,I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
             Gc[isol] = ImD[isol]*(kappa[isol]/D0[isol]);
             for (jsol=0; jsol<nsol; ++jsol) {
                 Gc[isol] += ImD[jsol]*(c[jsol]/D0[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol]))
@@ -1392,8 +1389,7 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffnessSS(FESolidElement& el,
             Gc[isol] *= R*T/phiw;
         }
         Ke = (Ki + Ke*(R*T/phiw)).inverse();
-//        tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
-        tens4d dKedE = dyad1(Ke,I) - 2*dyad4(Ke,I) - ddot(dyad2(Ke,Ke),G)*0.5;
+        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         for (isol=0; isol<nsol; ++isol)
             dKedc[isol] = -Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke;
         

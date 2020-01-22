@@ -677,7 +677,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
             for (int i=0; i<nel_p; ++i) {
                 for (int j=0; j<nel_d; ++j)
                 {
-                    vec3d vt = ((vdotTdotv(-gradNp[i], dKdE, gradNu[j]).transpose()*gradp)
+                    vec3d vt = ((vdotTdotv(-gradNp[i], dKdE, gradNu[j])*gradp)
                                 +(Q*gradNu[j])*Hp[i])*(Jw*dt);
                     ke[4*i+3][4*j  ] += vt.x;
                     ke[4*i+3][4*j+1] += vt.y;
@@ -834,7 +834,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
             for (int i=0; i<nel_p; ++i) {
                 for (int j=0; j<nel_d; ++j)
                 {
-                    vec3d vt = ((vdotTdotv(-gradp, dKdE, gradNu[j]).transpose()*(gradNp[i]))
+                    vec3d vt = ((vdotTdotv(-gradp, dKdE, gradNu[j])*(gradNp[i]))
                                 +(mat3dd(phiwhat) + Phie*ept.m_J)*gradNu[j]*Hp[i])*tmp;
                     ke[4*i+3][4*j  ] += vt.x;
                     ke[4*i+3][4*j+1] += vt.y;
@@ -1116,7 +1116,7 @@ void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
                 ke[4*i+1][4*j  ] += Kuu(1,0); ke[4*i+1][4*j+1] += Kuu(1,1); ke[4*i+1][4*j+2] += Kuu(1,2);
                 ke[4*i+2][4*j  ] += Kuu(2,0); ke[4*i+2][4*j+1] += Kuu(2,1); ke[4*i+2][4*j+2] += Kuu(2,2);
                 
-                kpu = (vdotTdotv(gradN[i], dKdE, gradN[j]).transpose()*b
+                kpu = (vdotTdotv(gradN[i], dKdE, gradN[j])*b
                        + (Kw + gradb*N[j])*K*gradN[i])*(rhoTw*detJt*dt);
                 ke[4*i+3][4*j  ] -= kpu.x; ke[4*i+3][4*j+1] -= kpu.y; ke[4*i+3][4*j+2] -= kpu.z;
             }
