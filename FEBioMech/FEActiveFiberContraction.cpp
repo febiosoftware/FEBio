@@ -88,8 +88,6 @@ mat3ds FEActiveFiberContraction::FiberStress(const vec3d& a0, FEMaterialPoint& m
 	double saf = 0.0;
 	if (m_ascl > 0)
 	{
-		double ctenslm = m_ascl;
-
 		// current sarcomere length
 		double strl = m_refl*lamd;
 
@@ -105,7 +103,7 @@ mat3ds FEActiveFiberContraction::FiberStress(const vec3d& a0, FEMaterialPoint& m
 			double rca = m_camax / m_ca0;
 
 			// active fiber stress
-			saf = m_Tmax*(eca50i / (eca50i + rca*rca))*ctenslm;
+			saf = m_Tmax*(eca50i / (eca50i + rca*rca))*m_ascl;
 		}
 	}
 	return AxA*saf;
@@ -114,18 +112,54 @@ mat3ds FEActiveFiberContraction::FiberStress(const vec3d& a0, FEMaterialPoint& m
 //-----------------------------------------------------------------------------
 tens4ds FEActiveFiberContraction::FiberStiffness(const vec3d& a0, FEMaterialPoint& mp)
 {
-	/*	if (lcna >= 0)
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	double Jm13 = pow(J, -1.0 / 3.0);
+
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F*a0;
+
+	// normalize material axis and store fiber stretch
+	double lam, lamd;
+	lam = a.unit();
+	lamd = lam*Jm13; // i.e. lambda tilde
+
+	// calculate dyad of a: AxA = (a x a)
+	mat3ds AxA = dyad(a);
+	tens4ds AxAxAxA = dyad1s(AxA);
+
+	double c = 0;
+	if (m_ascl > 0)
 	{
-	double ctenslm = m_plc->Value();
+		// current sarcomere length
+		double strl = m_refl*lamd;
 
-	// current sarcomere length
-	double strl = refl*lamd;
+		// sarcomere length change
+		double dl = strl - m_l0;
 
-	// sarcomere length change
-	double dl = strl - l0;
+		if (dl >= 0)
+		{
+			// calcium sensitivity
+			double eca50i = (exp(m_beta*dl) - 1);
 
-	if (dl >= 0) W44 += J*2*beta*refl*exp(-beta*dl);
+			double decl = m_beta*m_refl*exp(m_beta*dl);
+
+			// ratio of Camax/Ca0
+			double rca = m_camax / m_ca0;
+
+			double d = eca50i + rca*rca;
+
+			// active fiber stress
+			double saf = m_Tmax*(eca50i / d)*m_ascl;
+
+			double dsf = m_Tmax*m_ascl*decl*(1.0/ d - eca50i / (d*d));
+
+			c = (lamd*dsf - 2.0*saf);
+		}
 	}
-	*/
-	return tens4ds(0.0);
+
+	return AxAxAxA*c;
 }

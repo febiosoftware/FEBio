@@ -139,7 +139,13 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	return c + m_fib.DevTangent(mp); // + m_pafc->FiberTangent(mp);
+	// add the passive fiber stiffness
+	c += m_fib.DevTangent(mp);
+
+	// add the active fiber stiffness
+	if (m_ac) c += m_ac->FiberStiffness(m_fib.FiberVector(mp), mp);
+
+	return c;
 }
 
 //-----------------------------------------------------------------------------
