@@ -48,6 +48,8 @@ FEJFNKTangentDiagnostic::FEJFNKTangentDiagnostic(FEModel* fem) : FECoreTask(fem)
 	m_jfnk_eps = 1e-7;
 	m_small_val = 1e-9;
 	m_nstep = -1;
+
+	m_nprint = 0;
 }
 
 bool FEJFNKTangentDiagnostic::Init(const char* szfile)
@@ -72,6 +74,7 @@ bool FEJFNKTangentDiagnostic::Init(const char* szfile)
 		if      (tag == "jfnk_eps" ) tag.value(m_jfnk_eps);
 		else if (tag == "small_value") tag.value(m_small_val);
 		else if (tag == "time_step") tag.value(m_nstep);
+		else if (tag == "print_level") tag.value(m_nprint);
 		else
 		{
 			fprintf(stderr, "ERROR: Failed to read %s\n\n", szfile);
@@ -102,7 +105,7 @@ bool FEJFNKTangentDiagnostic::Run()
 	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
 	fem.AddCallback(cb_diagnose, CB_MAJOR_ITERS, this);
 
-	fem.GetLogFile().SetMode(Logfile::LOG_FILE);
+//	fem.GetLogFile().SetMode(Logfile::LOG_FILE);
 	printf("Running model ...");
 	bool ret = fem.Solve();
 	printf("done!\n");
@@ -150,6 +153,29 @@ bool FEJFNKTangentDiagnostic::Diagnose()
 	vector<double> ej(neq, 0.0), aj(neq, 0.0), kj(neq, 0.0);
 	vector<bool> cj(neq, false);
 
+	if (m_nprint)
+	{
+		FILE* fp = fopen("out_exact.txt", "wt");
+		// print the transpose of the matrix 
+		for (int j = 0; j < neq; ++j)
+		{
+			for (int i = 0; i < neq; ++i)
+			{
+				double kij = K->get(i, j);
+				fprintf(fp, "%13.7lg", kij);
+				if (i != neq - 1) fprintf(fp, ",");
+			}
+			fprintf(fp, "\n");
+		}
+		fclose(fp);
+	}
+
+	FILE* out = NULL;
+	if (m_nprint)
+	{
+		out = fopen("out_jfnk.txt", "wt");
+	}
+
 	// re-evaluate residual
 	vector<double> R(neq, 0.0);
 	fesolver->Residual(R);
@@ -178,6 +204,13 @@ bool FEJFNKTangentDiagnostic::Diagnose()
 		{
 			double aij = aj[i];
 			double kij = kj[i];
+
+			if (m_nprint)
+			{
+				fprintf(out, "%13.7lg", aij);
+				if (i != neq - 1) fprintf(out, ",");
+			}
+
 			double eij = 0;
 			if (fabs(kij) <= m_small_val)
 			{
@@ -207,10 +240,17 @@ bool FEJFNKTangentDiagnostic::Diagnose()
 				}
 			}
 		}
+
+		if (m_nprint)
+		{
+			fprintf(out, "\n");
+		}
 		
 		// reset e_j vector
 		ej[j] = 0.0;
 	}
+
+	if (m_nprint) fclose(out);
 
 	return true;
 }

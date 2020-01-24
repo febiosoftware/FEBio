@@ -49,4 +49,6 @@ private:
 	double	m_jfnk_eps;
 	double	m_small_val;
 	int		m_nstep;
+
+	int		m_nprint;
 };

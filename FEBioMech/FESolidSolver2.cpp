@@ -885,7 +885,14 @@ bool FESolidSolver2::Quasin()
 	{
         UpdateIncrementsEAS(m_Ui, false);
         UpdateIncrements(m_Ut, m_Ui, true);
-//		zero(m_Ui);
+
+		// TODO: To zero or not to zero. That is the question!
+		//       The arc-length method requires that we do NOT zero
+		//       here, so that m_Uip gets initialized properly.
+		//       However, the "jfnk-tangent test" requires that we zero this
+		//       Otherwise the displacement increment can get counted twice in
+		//       Update2 (from m_Ui and m_Ut since we just added it)
+		zero(m_Ui);
 	}
 
 	return bconv;
