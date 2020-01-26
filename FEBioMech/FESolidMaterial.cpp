@@ -138,7 +138,7 @@ tens4dmm FESolidMaterial::SecantTangent(FEMaterialPoint& mp)
     mat3ds E = pt.Strain();
     mat3dd I(1);
 
-    // calculate the Cauchy stress at the current deformation gradient
+    // calculate the 2nd P-K stress at the current deformation gradient
     mat3ds S = PK2Stress(mp,E);
     
     // create deformation gradient increment
