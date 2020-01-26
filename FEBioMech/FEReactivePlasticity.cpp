@@ -46,6 +46,7 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
     ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
+    ADD_PARAMETER(m_itmax  , FE_RANGE_GREATER_OR_EQUAL(0)  , "maxiter");
     ADD_PARAMETER(m_isochrc, "isochoric"   );
 
 END_FECORE_CLASS();
@@ -58,7 +59,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_wmin = 1;
     m_Ymin = m_Ymax = 0;
     m_isochrc = true;
-    
+    m_itmax = 10;
     m_pBase = 0;
     m_pCrit = 0;
 }
@@ -151,7 +152,6 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         bool conv = false;
         double eps = 1e-4;
         int iter = 0;
-        int itmax = 500;
         double lam = 0;
         double f = 0;
         mat3ds Ue = Us*pp.m_Uusi[i];
@@ -169,9 +169,9 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             Uv = Ue*(mat3dd(1) - Nv*lam);
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
             if (fabs(f) <= eps*eps*Ky[i]) conv = true;
-            if (iter > itmax) conv = true;
+            if (iter > m_itmax) conv = true;
         }
-        if (iter > itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
+        if (iter > m_itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
         pe.m_F = Ftmp;
         if (m_isochrc) Uv = Uv*pow(Us.det()/Uv.det(),1./3.);
         pp.m_Uvsi[i] = Us.inverse()*Uv;

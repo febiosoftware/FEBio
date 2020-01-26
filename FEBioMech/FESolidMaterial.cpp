@@ -33,9 +33,13 @@ SOFTWARE.*/
 // Material parameters for FEElasticMaterial
 BEGIN_FECORE_CLASS(FESolidMaterial, FEMaterial)
 	ADD_PARAMETER(m_density, "density");
+    ADD_PARAMETER(m_secant , "secant");
 END_FECORE_CLASS();
 
-FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem)
+{
+    m_secant = false;
+}
 
 //! set the material density
 void FESolidMaterial::SetDensity(const double d)
@@ -121,4 +125,46 @@ tens4ds FESolidMaterial::MaterialTangent(FEMaterialPoint& mp, const mat3ds E)
     tens4ds Cm = c.pp(Ui)*J;
     
     return Cm;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate spatial tangent stiffness at material point, using secant method
+tens4dmm FESolidMaterial::SecantTangent(FEMaterialPoint& mp)
+{
+    // extract the deformation gradient
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3d F = pt.m_F;
+    double J = pt.m_J;
+    mat3ds E = pt.Strain();
+    mat3dd I(1);
+
+    // calculate the Cauchy stress at the current deformation gradient
+    mat3ds S = PK2Stress(mp,E);
+    
+    // create deformation gradient increment
+    double eps = 1e-9;
+    vec3d e[3];
+    e[0] = vec3d(1,0,0); e[1] = vec3d(0,1,0); e[2] = vec3d(0,0,1);
+    tens4dmm C;
+    for (int k=0; k<3; ++k) {
+        for (int l=k; l<3; ++l) {
+            // evaluate incremental stress
+            mat3ds dE = dyads(e[k], e[l])*(eps/2);
+            mat3ds dS = (PK2Stress(mp,E+dE) - S)/eps;
+            
+            // evaluate the secant modulus
+            C(0,0,k,l) = C(0,0,l,k) = dS.xx();
+            C(1,1,k,l) = C(1,1,l,k) = dS.yy();
+            C(2,2,k,l) = C(2,2,l,k) = dS.zz();
+            C(0,1,k,l) = C(1,0,k,l) = C(0,1,l,k) = C(1,0,l,k) = dS.xy();
+            C(1,2,k,l) = C(2,1,k,l) = C(1,2,l,k) = C(2,1,l,k) = dS.yz();
+            C(2,0,k,l) = C(0,2,k,l) = C(2,0,l,k) = C(0,2,l,k) = dS.xz();
+        }
+    }
+    
+    // push from material to spatial frame
+    tens4dmm c = C.pp(F)/J;
+    
+    // return secant tangent
+    return c;
 }

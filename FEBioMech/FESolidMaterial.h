@@ -53,6 +53,9 @@ public:
 	//! calculate material tangent stiffness at material point
 	virtual tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
 
+    //! calculate secant tangent stiffness at material point
+    virtual tens4dmm SecantTangent(FEMaterialPoint& pt);
+
 	//! return the material density
 	void SetDensity(const double d);
 
@@ -64,6 +67,9 @@ public:
 
 protected:
 	FEParamDouble	m_density;	//!< material density
+    
+public:
+    bool            m_secant;   //!< flag for using secant tangent
 
 	DECLARE_FECORE_CLASS();
 };

@@ -287,7 +287,7 @@ public:
 //    tens4d inverse() const;
     
     // evaluate push/pull operation
-//    tens4d pp(const mat3d& F);
+    tens4dmm pp(const mat3d& F);
 
 };
 
