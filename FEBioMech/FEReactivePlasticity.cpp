@@ -122,6 +122,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // store safe copy of total deformation gradient
         mat3d Ftmp = pe.m_F;
+        double Jtmp = pe.m_J;
         pe.m_F = R*Uu;
         
         // evaluate yield measure
@@ -146,7 +147,8 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // interpolate to approximate Fu on yield surface
         Fu = Fu*alpha + Fup*(1-alpha);  // Fu(v) is on yield surface
-        Ftmp = pe.m_F; pe.m_F = Fu; Uu = pe.RightStretch(); pe.m_F = Ftmp;
+        Ftmp = pe.m_F; Jtmp = pe.m_J;
+        pe.m_F = Fu; pe.m_J = Fu.det(); Uu = pe.RightStretch(); pe.m_F = Ftmp; pe.m_J = Jtmp;
         
         // find Uv
         bool conv = false;
@@ -157,22 +159,24 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         mat3ds Ue = Us*pp.m_Uusi[i];
         mat3ds Uv = Ue;
         Ftmp = pe.m_F;  // store safe copy
+        Jtmp = pe.m_J;
         while (!conv) {
             ++iter;
-            pe.m_F = Uv;
+            pe.m_F = Uv; pe.m_J = Uv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             mat3ds Nv = YieldSurfaceNormal(pe);
+            double Nvmag = Nv.norm();
             double phi = pp.m_Kv[i] - Ky[i];
             f = phi;                        // f = 0 => stay on yield surface
-            double dlam = phi/(Nv*Ue*Nv).tr();
+            double dlam = phi*Nvmag/(Nv*Ue*Nv).tr();
             lam += dlam;
-            Uv = Ue*(mat3dd(1) - Nv*lam);
+            Uv = Ue*(mat3dd(1) - Nv*(lam/Nvmag));
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
             if (fabs(f) <= eps*eps*Ky[i]) conv = true;
             if (iter > m_itmax) conv = true;
         }
         if (iter > m_itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
-        pe.m_F = Ftmp;
+        pe.m_F = Ftmp; pe.m_J = Jtmp;
         if (m_isochrc) Uv = Uv*pow(Us.det()/Uv.det(),1./3.);
         pp.m_Uvsi[i] = Us.inverse()*Uv;
         
