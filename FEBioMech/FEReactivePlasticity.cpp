@@ -161,8 +161,8 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
         while (!conv) {
-            ++iter;
-            pe.m_F = Uv; pe.m_J = Uv.det();
+            if (++iter > m_itmax) break;
+            pe.m_F = R*Uv; pe.m_J = Uv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             mat3ds Nv = YieldSurfaceNormal(pe);
             double Nvmag = Nv.norm();
@@ -173,13 +173,12 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             Uv = Ue*(mat3dd(1) - Nv*(lam/Nvmag));
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
             if (fabs(f) <= eps*eps*Ky[i]) conv = true;
-            if (iter > m_itmax) conv = true;
         }
-        if (iter > m_itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
         pe.m_F = Ftmp; pe.m_J = Jtmp;
         if (m_isochrc) Uv = Uv*pow(Us.det()/Uv.det(),1./3.);
-        pp.m_Uvsi[i] = Us.inverse()*Uv;
-        
+        if (iter > m_itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
+        else pp.m_Uvsi[i] = Us.inverse()*Uv;
+
         // evaluate octahedral plastic shear strain
         double ev[3];
         pp.m_Uvsi[i].eigen2(ev);
