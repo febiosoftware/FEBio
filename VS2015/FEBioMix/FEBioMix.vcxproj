@@ -459,6 +459,7 @@
     <ClInclude Include="..\..\FEBioMix\FESolute.h" />
     <ClInclude Include="..\..\FEBioMix\FESoluteFlux.h" />
     <ClInclude Include="..\..\FEBioMix\FESoluteInterface.h" />
+    <ClInclude Include="..\..\FEBioMix\FESolutePointSource.h" />
     <ClInclude Include="..\..\FEBioMix\FESolutesMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMix\FESolventSupply.h" />
     <ClInclude Include="..\..\FEBioMix\FESolventSupplyStarling.h" />
@@ -548,6 +549,7 @@
     <ClCompile Include="..\..\FEBioMix\FESolute.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESoluteFlux.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESoluteInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESolutePointSource.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolutesMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolventSupply.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolventSupplyStarling.cpp" />

@@ -242,15 +242,21 @@ inline mat3ds mat3ds::operator -(const mat3ds& t) const
 }
 
 // operator *
-inline mat3ds mat3ds::operator *(const mat3ds& t) const
+inline mat3d mat3ds::operator *(const mat3ds& t) const
 {
-	return mat3ds(
-		m[XX]*t.m[XX]+m[XY]*t.m[XY]+m[XZ]*t.m[XZ],
-		m[XY]*t.m[XY]+m[YY]*t.m[YY]+m[YZ]*t.m[YZ],
-		m[XZ]*t.m[XZ]+m[YZ]*t.m[YZ]+m[ZZ]*t.m[ZZ],
-		m[XX]*t.m[XY]+m[XY]*t.m[YY]+m[XZ]*t.m[YZ],
-		m[XY]*t.m[XZ]+m[YY]*t.m[YZ]+m[YZ]*t.m[ZZ],
-		m[XX]*t.m[XZ]+m[XY]*t.m[YZ]+m[XZ]*t.m[ZZ]);
+	return mat3d(
+		m[XX] * t.m[XX] + m[XY] * t.m[XY] + m[XZ] * t.m[XZ],
+		m[XX] * t.m[XY] + m[XY] * t.m[YY] + m[XZ] * t.m[YZ],
+		m[XX] * t.m[XZ] + m[XY] * t.m[YZ] + m[XZ] * t.m[ZZ],
+
+		m[XY] * t.m[XX] + m[YY] * t.m[XY] + m[YZ] * t.m[XZ],
+		m[XY] * t.m[XY] + m[YY] * t.m[YY] + m[YZ] * t.m[YZ],
+		m[XY] * t.m[XZ] + m[YY] * t.m[YZ] + m[YZ] * t.m[ZZ],
+
+		m[XZ] * t.m[XX] + m[YZ] * t.m[XY] + m[ZZ] * t.m[XZ],
+		m[XZ] * t.m[XY] + m[YZ] * t.m[YY] + m[ZZ] * t.m[YZ],
+		m[XZ] * t.m[XZ] + m[YZ] * t.m[YZ] + m[ZZ] * t.m[ZZ]
+	);
 }
 
 // operator *
@@ -418,6 +424,19 @@ inline mat3ds mat3ds::iso() const
 {
 	double t = (m[XX]+m[YY]+m[ZZ])/3.0;
 	return mat3ds(t, t, t, 0, 0, 0);
+}
+
+// return the square 
+inline mat3ds mat3ds::sqr() const
+{
+	return mat3ds(
+		m[XX] * m[XX] + m[XY] * m[XY] + m[XZ] * m[XZ],
+		m[XY] * m[XY] + m[YY] * m[YY] + m[YZ] * m[YZ],
+		m[XZ] * m[XZ] + m[YZ] * m[YZ] + m[ZZ] * m[ZZ],
+		m[XX] * m[XY] + m[XY] * m[YY] + m[XZ] * m[YZ], 
+		m[XY] * m[XZ] + m[YY] * m[YZ] + m[YZ] * m[ZZ],
+		m[XX] * m[XZ] + m[XY] * m[YZ] + m[XZ] * m[ZZ]
+	);
 }
 
 // inverse

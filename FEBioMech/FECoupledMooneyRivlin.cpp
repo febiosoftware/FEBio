@@ -51,7 +51,7 @@ mat3ds FECoupledMooneyRivlin::Stress(FEMaterialPoint& mp)
 	mat3ds B = pt.LeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();
@@ -107,7 +107,7 @@ double FECoupledMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B = pt.LeftCauchyGreen();
     
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
     
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();

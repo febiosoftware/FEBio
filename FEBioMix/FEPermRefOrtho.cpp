@@ -104,7 +104,7 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	}
 	mat3ds kt = k0*I
 	+k1[0]*m[0]+k1[1]*m[1]+k1[2]*m[2]
-	+k2[0]*(m[0]*b+b*m[0])+k2[1]*(m[1]*b+b*m[1])+k2[2]*(m[2]*b+b*m[2]);
+	+(2.0*k2[0])*(m[0]*b).sym()+(2.0*k2[1])*(m[1]*b).sym()+(2.0*k2[2])*(m[2]*b).sym();
 	
 	return kt;
 }
@@ -157,7 +157,7 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 		K2prime = (J*J*m_M[a]+(J*(m_alpha[a]-3)+3*phi0)/(J-phi0))*k2;
 		k1hat = mat3dd(K1prime);
 		k2hat = mat3dd(K2prime);
-		K4 += dyad1mm(m[a],k1hat) + dyad1mm(m[a]*b+b*m[a],k2hat)
+		K4 += dyad1mm(m[a],k1hat) + dyad1mm((m[a]*b).sym()*2.0,k2hat)
 		+dyad4s(m[a],b)*(2.0*k2);
 	}
 	

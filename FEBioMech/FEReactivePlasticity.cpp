@@ -117,7 +117,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
     for (int i=0; i<m_n; ++i) {
         mat3d Fu = pe.m_F*pp.m_Uusi[i];
         mat3ds Us = pe.RightStretch();
-        mat3ds Uu = Us*pp.m_Uusi[i];
+        mat3d Uu = Us*pp.m_Uusi[i];
         mat3d R = pe.m_F*Us.inverse();
         
         // store safe copy of total deformation gradient
@@ -156,8 +156,8 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         int iter = 0;
         double lam = 0;
         double f = 0;
-        mat3ds Ue = Us*pp.m_Uusi[i];
-        mat3ds Uv = Ue;
+        mat3d Ue = Us*pp.m_Uusi[i];
+        mat3d Uv = Ue;
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
         while (!conv) {
@@ -168,7 +168,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             double Nvmag = Nv.norm();
             double phi = pp.m_Kv[i] - Ky[i];
             f = phi;                        // f = 0 => stay on yield surface
-            double dlam = phi*Nvmag/(Nv*Ue*Nv).tr();
+            double dlam = phi*Nvmag/(Nv*Ue*Nv).trace();
             lam += dlam;
             Uv = Ue*(mat3dd(1) - Nv*(lam/Nvmag));
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
@@ -177,7 +177,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         pe.m_F = Ftmp; pe.m_J = Jtmp;
         if (m_isochrc) Uv = Uv*pow(Us.det()/Uv.det(),1./3.);
         if (iter > m_itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
-        else pp.m_Uvsi[i] = Us.inverse()*Uv;
+        else pp.m_Uvsi[i] = (Us.inverse()*Uv).sym();
 
         // evaluate octahedral plastic shear strain
         double ev[3];
@@ -292,7 +292,7 @@ mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEElasticMaterialPoint& pe)
     mat3ds s = m_pBase->Stress(pe);
     tens4ds c = m_pBase->Tangent(pe);
     mat3ds dPhi = m_pCrit->CriterionStressTangent(pe);
-    mat3d M = dPhi*s*2 - mat3dd((dPhi*s).tr()) + c.dot(dPhi);
+    mat3d M = dPhi*s*2 - mat3dd((dPhi*s).trace()) + c.dot(dPhi);
     mat3ds Ui = pe.RightStretchInverse();
     mat3d R = pe.m_F*Ui;
     mat3ds N = (R.transpose()*M*R*Ui).sym();

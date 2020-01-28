@@ -131,7 +131,7 @@ mat3ds FEOrthotropicCLE::Stress(FEMaterialPoint& mp)
 	s.zero();
     
     for (i=0; i<3; ++i) {
-        s += (A[i]*BmI+BmI*A[i])*(mu[i]/2);
+        s += (A[i]*BmI).sym()*(mu[i]);
         for (j=0; j<3; ++j) {
             s += A[j]*(lam[i][j]*K[i]);
         }
@@ -223,8 +223,8 @@ double FEOrthotropicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
         // Copy the texture direction in the reference configuration to a0
         a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
         A0 = dyad(a0);
-        K[i] = (A0*E).tr();
-        L[i] = (A0*E*E).tr();
+        K[i] = (A0*E).trace();
+        L[i] = (A0*E*E).trace();
     }
     
     lam[0][0] = (K[0] >= 0) ? lp11 : lm11;

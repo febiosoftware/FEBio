@@ -89,7 +89,7 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// calculate B*a
 	vec3d Ba = B*a;
@@ -217,7 +217,7 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// calculate B*a
 	vec3d Ba = B*a;

@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "FEElasticDomain.h"
 #include "FEDiscreteElementMaterial.h"
 
-class FECORE_API FEDiscreteElementDomain : public FEDiscreteDomain, public FEElasticDomain
+class FEBIOMECH_API FEDiscreteElementDomain : public FEDiscreteDomain, public FEElasticDomain
 {
 public:
 	FEDiscreteElementDomain(FEModel* fem);

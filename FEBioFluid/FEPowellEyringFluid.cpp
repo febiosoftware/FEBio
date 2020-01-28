@@ -73,7 +73,7 @@ tens4ds FEPowellEyringFluid::Tangent_RateOfDeformation(FEMaterialPoint& pt)
 {
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
     mat3ds D = vt.RateOfDeformation();
-    double gdot = sqrt(2*(D*D).tr());
+    double gdot = sqrt(2*(D.sqr()).tr());
     double lamg = m_lam*gdot;
     
     double mu = ShearViscosity(pt);
@@ -90,7 +90,7 @@ double FEPowellEyringFluid::ShearViscosity(FEMaterialPoint& pt)
 {
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
     mat3ds D = vt.RateOfDeformation();
-    double gdot = sqrt(2*(D*D).tr());
+    double gdot = sqrt(2*(D.sqr()).tr());
     double lamg = m_lam*gdot;
     double mu = (lamg < 1e-3) ? m_mu0 : m_mui + (m_mu0 - m_mui)*asinh(lamg)/lamg;
     return mu;

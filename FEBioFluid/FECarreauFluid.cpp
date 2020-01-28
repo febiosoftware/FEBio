@@ -74,7 +74,7 @@ tens4ds FECarreauFluid::Tangent_RateOfDeformation(FEMaterialPoint& pt)
 {
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
     mat3ds D = vt.RateOfDeformation();
-    double gdot = sqrt(2*(D*D).tr());
+    double gdot = sqrt(2*(D.sqr()).tr());
     double lamg2 = m_lam*m_lam*gdot*gdot;
     
     double mu = m_mui + (m_mu0 - m_mui)*pow(1+lamg2, (m_n-1)*0.5);
@@ -90,7 +90,7 @@ double FECarreauFluid::ShearViscosity(FEMaterialPoint& pt)
 {
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
     mat3ds D = vt.RateOfDeformation();
-    double gdot = sqrt(2*(D*D).tr());
+    double gdot = sqrt(2*(D.sqr()).tr());
     double mu = m_mui + (m_mu0 - m_mui)*pow(1+m_lam*m_lam*gdot*gdot, (m_n-1)*0.5);
     return mu;
 }

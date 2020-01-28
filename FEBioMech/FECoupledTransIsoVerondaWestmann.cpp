@@ -62,7 +62,7 @@ mat3ds FECoupledTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	mat3ds B = pt.LeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// get the material fiber axis
 	vec3d a0 = m_fiber(mp);
@@ -198,7 +198,7 @@ double FECoupledTransIsoVerondaWestmann::StrainEnergyDensity(FEMaterialPoint& mp
 	mat3ds B = pt.LeftCauchyGreen();
     
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
     
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);

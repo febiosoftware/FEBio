@@ -223,7 +223,7 @@ mat3ds FEFiberExponentialPower::FiberStress(FEMaterialPoint& mp, const vec3d& n0
         
         // add the contribution from shear
         mat3ds BmI = pt.LeftCauchyGreen() - mat3dd(1);
-        s += (N*BmI + BmI*N)*(m_mu/2/J);
+        s += (N*BmI).sym()*(m_mu/J);
 	}
 	else
 	{
@@ -288,7 +288,7 @@ double FEFiberExponentialPower::FiberStrainEnergyDensity(FEMaterialPoint& mp, co
 	
 	// loop over all integration points
 	mat3ds C = pt.RightCauchyGreen();
-    mat3ds C2 = C*C;
+    mat3ds C2 = C.sqr();
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;

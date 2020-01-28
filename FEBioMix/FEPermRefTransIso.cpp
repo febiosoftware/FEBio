@@ -100,7 +100,7 @@ mat3ds FEPermRefTransIso::Permeability(FEMaterialPoint& mp)
 	k1A = m_perm1A/(J*J)*f;
 	k2A = 0.5*m_perm2A/pow(J,4)*f;
 	// Permeability
-	mat3ds kt = k0*I + k1T*b + (k1A-k1T)*m + 2*k2T*b*b + (k2A-k2T)*(m*b+b*m);
+	mat3ds kt = k0*I + k1T*b + (k1A-k1T)*m + 2*k2T*b.sqr() + (m*b).sym()*(2.0*(k2A-k2T));
 	
 	return kt;
 }
@@ -155,8 +155,8 @@ tens4dmm FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds k1hatA = mat3dd((J*J*m_MA+(J*(m_alphaA-1)+phi0)/(J-phi0))*k1A);
 	mat3ds k2hatA = mat3dd((J*J*m_MA+(J*(m_alphaA-3)+3*phi0)/(J-phi0))*k2A);
 	//  Tangent
-	K4 += dyad1mm(b*b,k2hatT)*2 + dyad4s(b)*(4*k2T) + dyad4s(m,b)*(2*(k2A-k2T))
-	+ dyad1mm(b,k1hatT) + dyad1mm(m,k1hatA-k1hatT) + dyad1mm(m*b+b*m,k2hatA-k2hatT);
+	K4 += dyad1mm(b.sqr(),k2hatT)*2 + dyad4s(b)*(4*k2T) + dyad4s(m,b)*(2*(k2A-k2T))
+	+ dyad1mm(b,k1hatT) + dyad1mm(m,k1hatA-k1hatT) + dyad1mm((m*b).sym()*2.0,k2hatA-k2hatT);
 	
 	return K4;
 }

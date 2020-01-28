@@ -524,6 +524,17 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
 
+	// calculate body forces
+	// NOTE: I'm putting this here because there is no 
+	// mechanism yet for calling body forces and I need it 
+	// for calling solute point sources
+	int nbl = fem.BodyLoads();
+	for (int i = 0; i < nbl; ++i)
+	{
+		FEBodyLoad* pbl = fem.GetBodyLoad(i);
+		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
+	}
+
 	// calculate contact forces
 	ContactForces(RHS);
 
@@ -630,6 +641,17 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 		{
 			psl->StiffnessMatrix(LS, tp);
 		}
+	}
+
+	// calculate body forces
+	// NOTE: I'm putting this here because there is no 
+	// mechanism yet for calling body forces and I need it 
+	// for calling solute point sources
+	int nbl = fem.BodyLoads();
+	for (int i = 0; i < nbl; ++i)
+	{
+		FEBodyLoad* pbl = fem.GetBodyLoad(i);
+		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
 	}
 
 	// calculate nonlinear constraint stiffness

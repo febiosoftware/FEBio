@@ -170,7 +170,7 @@ public:
 	// arithmetic operators
 	mat3ds operator + (const mat3ds& t) const;
 	mat3ds operator - (const mat3ds& t) const;
-	mat3ds operator * (const mat3ds& t) const;
+	mat3d  operator * (const mat3ds& t) const;
 	mat3ds operator * (double g) const;
 	mat3ds operator / (double g) const;
 
@@ -213,6 +213,9 @@ public:
 
 	// isotropic part
 	mat3ds iso() const;
+
+	// return the square 
+	mat3ds sqr() const;
 
 	// calculates the inverse
 	mat3ds inverse() const;

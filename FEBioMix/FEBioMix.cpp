@@ -105,6 +105,7 @@ SOFTWARE.*/
 #include "FEMultiphasicShellDomain.h"
 
 #include "FESBMPointSource.h"
+#include "FESolutePointSource.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -207,7 +208,8 @@ REGISTER_FECORE_CLASS(FEPressureStabilization, "pressure_stabilization");
 
 //-----------------------------------------------------------------------------
 // Body loads
-REGISTER_FECORE_CLASS(FESBMPointSource, "sbm point source");
+REGISTER_FECORE_CLASS(FESBMPointSource   , "sbm point source");
+REGISTER_FECORE_CLASS(FESolutePointSource, "solute point source");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

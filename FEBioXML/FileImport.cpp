@@ -945,11 +945,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 		else
 		{
 			// backward compatibility hack for older formats (< v 3.0)
-			if (strcmp(tag.Name(), "fiber") == 0)
+/*			if (strcmp(tag.Name(), "fiber") == 0)
 			{
 				return ReadParameter(tag, pc, "mat_axis", parseAttributes);
 			}
 			else return false;
+*/			return false;
 		}
 	}
 	return true;

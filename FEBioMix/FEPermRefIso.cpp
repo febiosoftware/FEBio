@@ -87,7 +87,7 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 	double k0 = m_perm0*f;
 	double k1 = m_perm1/(J*J)*f;
 	double k2 = 0.5*m_perm2/pow(J,4)*f;
-	mat3ds kt = k0*I+k1*b+2*k2*b*b;
+	mat3ds kt = k0*I+k1*b+2*k2*b.sqr();
 	
 	return kt;
 }
@@ -123,7 +123,7 @@ tens4dmm FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	
 	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0)
 	+ dyad1mm(b,k1hat)
-	+ dyad1mm(b*b,k2hat)*2+dyad4s(b)*(4*k2);
+	+ dyad1mm(b.sqr(),k2hat)*2+dyad4s(b)*(4*k2);
 	
 	return K4;
 }

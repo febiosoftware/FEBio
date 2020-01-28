@@ -89,7 +89,7 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 	double d0 = m_diff0*f;
 	double d1 = m_diff1/(J*J)*f;
 	double d2 = 0.5*m_diff2/pow(J,4)*f;
-	mat3ds dt = d0*I+d1*b+2*d2*b*b;
+	mat3ds dt = d0*I+d1*b+2*d2*b.sqr();
 	
 	return dt;
 }
@@ -126,7 +126,7 @@ tens4dmm FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	
 	tens4dmm D4 = dyad1mm(I,d0hat)-dyad4s(I)*(2*d0)
 	+ dyad1mm(b,d1hat)
-	+ dyad1mm(b*b,d2hat)*2+dyad4s(b)*(4*d2);
+	+ dyad1mm(b.sqr(),d2hat)*2+dyad4s(b)*(4*d2);
 	
 	return D4;
 }

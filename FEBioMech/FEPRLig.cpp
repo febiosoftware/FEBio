@@ -63,8 +63,8 @@ mat3ds FEPRLig::Stress(FEMaterialPoint& mp)
 	// calculate left and right Cauchy-Green tensors and their squares
 	mat3ds b  =  pt.LeftCauchyGreen();
 	mat3ds c  =  pt.RightCauchyGreen();				
-	mat3ds b2 =  b*b;
-	mat3ds c2 =  c*c;
+	mat3ds b2 =  b.sqr();
+	mat3ds c2 =  c.sqr();
 
 	// Define the 2nd order identity tensor 
 	mat3dd I(1);
@@ -156,8 +156,8 @@ tens4ds FEPRLig::Tangent(FEMaterialPoint& mp)
 	// calculate left and right Cauchy-Green tensors, and their squares
 	mat3ds b  =  pt.LeftCauchyGreen();
 	mat3ds c  =  pt.RightCauchyGreen();				
-	mat3ds b2 =  b*b;
-	mat3ds c2 =  c*c;
+	mat3ds b2 =  b.sqr();
+	mat3ds c2 =  c.sqr();
 
 	// define the 2nd order identity tensor 
 	mat3dd I(1);

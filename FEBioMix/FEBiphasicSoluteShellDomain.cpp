@@ -741,9 +741,9 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
         +dyad1(ImD,I)*(R*T*c*J/D0/phiw*(dkdJ-kappa/phiw*dpdJ))
         +(dyad1(I,I) - dyad2(I,I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
         tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
-        mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
+        mat3ds Gc = -(Ki*dKdc*Ki).sym() + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
-        mat3ds dKedc = -Ke*Gc*Ke;
+        mat3ds dKedc = -(Ke*Gc*Ke).sym();
         
         // evaluate the tangents of solute supply
         double dcrhatdJ = 0;
@@ -1041,9 +1041,9 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffnessSS(FEShellElemen
         +dyad1(ImD,I)*(R*T*c*J/D0/phiw*(dkdJ-kappa/phiw*dpdJ))
         +(dyad1(I,I) - dyad2(I,I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
         tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
-        mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
+        mat3ds Gc = -(Ki*dKdc*Ki).sym() + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
-        mat3ds dKedc = -Ke*Gc*Ke;
+        mat3ds dKedc = -(Ke*Gc*Ke).sym();
         
         // evaluate the tangents of solute supply
         double dcrhatdJ = 0;

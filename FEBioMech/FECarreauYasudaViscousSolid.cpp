@@ -54,7 +54,7 @@ mat3ds FECarreauYasudaViscousSolid::Stress(FEMaterialPoint& mp)
     double lam = m_lam(mp);
     double n = m_n(mp);
     double a = m_a(mp);
-    double gdot = sqrt(2*(D*D).tr());
+    double gdot = sqrt(2*(D.sqr()).tr());
 //    double gdot = max(fabs(d[2]-d[1]),max(fabs(d[0]-d[2]),fabs(d[1]-d[0])));
     double lamga = pow(lam*gdot,a);
     double mu = mui + (mu0 - mui)*pow(1+lamga, (n-1)/a);
@@ -79,7 +79,7 @@ tens4ds FECarreauYasudaViscousSolid::Tangent(FEMaterialPoint& mp)
         double lam = m_lam(mp);
         double n = m_n(mp);
         double a = m_a(mp);
-        double gdot = sqrt(2*(D*D).tr());
+        double gdot = sqrt(2*(D.sqr()).tr());
         double lamga = pow(lam*gdot,a);
         double mu = mui + (mu0 - mui)*pow(1+lamga, (n-1)/a);
         double dmu = 2*(mu0 - mui)*(n-1)*pow(lam,a)*pow(gdot,a-2)*pow(1+lamga, (n-a-1)/a);

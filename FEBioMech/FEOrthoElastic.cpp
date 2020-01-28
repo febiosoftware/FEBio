@@ -104,7 +104,7 @@ mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 	// calculate left and right Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
 	mat3ds c = pt.RightCauchyGreen();
-	mat3ds c2 = c*c;
+	mat3ds c2 = c.sqr();
 	mat3dd I(1.);
 	
 	// get the local coordinate systems
@@ -124,7 +124,7 @@ mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 	s.zero();		// Initialize for summation
 	bmi = b - I;
 	for (i=0; i<3; i++) {
-		s += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
+		s += (A[i]*bmi).sym()*(2.0*mu[i] * K[i]);
 		for (j=0; j<3; j++)
 			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 	}
@@ -182,7 +182,7 @@ double FEOrthoElastic::StrainEnergyDensity(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     mat3ds E = (pt.RightCauchyGreen() - mat3dd(1))/2;
-    mat3ds E2 = E*E;
+    mat3ds E2 = E.sqr();
     
 	vec3d a0[3];		// texture direction in reference configuration
 	mat3ds A0[3];		// texture tensor in current configuration

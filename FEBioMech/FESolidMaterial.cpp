@@ -85,7 +85,7 @@ mat3ds FESolidMaterial::PK2Stress(FEMaterialPoint& mp, const mat3ds E)
     
     // Convert Cauchy stress to 2nd P-K stress
     mat3ds Ui = dyad(v[0])/lam[0] + dyad(v[1])/lam[1] + dyad(v[2])/lam[2];
-    mat3ds S = Ui*s*Ui*J;
+    mat3ds S = (Ui*s*Ui).sym()*J;
     
     return S;
 }

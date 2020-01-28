@@ -88,7 +88,7 @@ mat3ds FE2DTransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
@@ -196,7 +196,7 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	mat3ds C = pt.DevRightCauchyGreen();
 
 	// square of C
-	mat3ds C2 = C*C;
+	mat3ds C2 = C.sqr();
 
 	// Invariants of C
 	double I1 = C.tr();
@@ -206,8 +206,7 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	// (we commented out the components we don't need)
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
 

@@ -267,7 +267,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 	{
 		TRACK_TIME(TimerID::Timer_Reform);
 		// clean up the solver
-		if (m_pK->NonZeroes()) m_plinsolve->Destroy();
+		m_plinsolve->Destroy();
 
 		// clean up the stiffness matrix
 		m_pK->Clear();

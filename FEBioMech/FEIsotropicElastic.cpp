@@ -58,7 +58,7 @@ mat3ds FEIsotropicElastic::Stress(FEMaterialPoint& mp)
 
 	// calculate square of b-matrix
 	// (we commented out the matrix components we do not need)
-	mat3ds b2 = b*b;
+	mat3ds b2 = b.sqr();
 
 	// calculate stress
 	mat3ds s = b*(lam*trE - mu) + b2*mu;

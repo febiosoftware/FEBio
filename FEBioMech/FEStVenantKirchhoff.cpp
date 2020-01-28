@@ -50,7 +50,7 @@ mat3ds FEStVenantKirchhoff::Stress(FEMaterialPoint& mp)
 
 	// calculate left Cauchy-Green tensor (ie. b-matrix)
 	mat3ds b = pt.LeftCauchyGreen();
-	mat3ds b2 = b*b;
+	mat3ds b2 = b.sqr();
 
 	// calculate trace of Green-Lagrance strain tensor
 	double trE = 0.5*(b.tr()-3);
@@ -97,7 +97,7 @@ double FEStVenantKirchhoff::StrainEnergyDensity(FEMaterialPoint& mp)
     
 	// calculate right Cauchy-Green tensor
 	mat3ds C = pt.RightCauchyGreen();
-	mat3ds C2 = C*C;
+	mat3ds C2 = C.sqr();
     
 	double trE = 0.5*(C.tr()-3);
     double trE2 = 0.25*(C2.tr() - 2*C.tr() + 3);

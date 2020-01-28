@@ -105,7 +105,7 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of deviatoric B, not of B!
@@ -221,7 +221,7 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	mat3ds C = pt.DevRightCauchyGreen();
 
 	// square of C
-	mat3ds C2 = C*C;
+	mat3ds C2 = C.sqr();
 
 	// Invariants of C
 	double I1 = C.tr();
@@ -231,8 +231,7 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	// (we commented out the components we don't need)
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// strain energy derivatives
 	double W1 = m_c1;

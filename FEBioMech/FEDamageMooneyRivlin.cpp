@@ -69,7 +69,7 @@ mat3ds FEDamageMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
@@ -109,7 +109,7 @@ tens4ds FEDamageMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
 
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();
@@ -162,7 +162,7 @@ double FEDamageMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
     
 	// calculate square of B
-	mat3ds B2 = B*B;
+	mat3ds B2 = B.sqr();
     
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
@@ -189,7 +189,7 @@ double FEDamageMooneyRivlin::Damage(FEMaterialPoint &mp)
 
 	// calculate right Cauchy-Green tensor
 	mat3ds C = pt.DevRightCauchyGreen();
-	mat3ds C2 = C*C;
+	mat3ds C2 = C.sqr();
 
 	// Invariants
 	double I1 = C.tr();
