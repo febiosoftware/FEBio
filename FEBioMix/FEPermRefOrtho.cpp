@@ -46,8 +46,14 @@ END_FECORE_CLASS();
 FEPermRefOrtho::FEPermRefOrtho(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm0 = 1;
-	m_perm1[0] = m_perm1[1] = m_perm1[2] = 0;
-	m_perm2[0] = m_perm2[1] = m_perm2[2] = 0;
+	m_perm1[0] = 0;
+	m_perm1[1] = 0;
+	m_perm1[2] = 0;
+
+	m_perm2[0] = 0;
+	m_perm2[1] = 0;
+	m_perm2[2] = 0;
+
 	m_M0 = m_alpha0 = 0;
 	m_M[0] = m_M[1] = m_M[2] = 0;
 	m_alpha[0] = m_alpha[1] =m_alpha[2] = 0;
@@ -90,11 +96,11 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// --- strain-dependent permeability ---
 	
 	double f, k1[3], k2[3];
-	double k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
+	double k0 = m_perm0(mp)*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
 	for (a=0; a<3; a++) {
 		f = pow((J-phi0)/(1-phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
-		k1[a] = m_perm1[a]/(J*J)*f;
-		k2[a] = 0.5*m_perm2[a]/pow(J,4)*f;
+		k1[a] = m_perm1[a](mp)/(J*J)*f;
+		k2[a] = 0.5*m_perm2[a](mp)/pow(J,4)*f;
 	}
 	mat3ds kt = k0*I
 	+k1[0]*m[0]+k1[1]*m[1]+k1[2]*m[2]
@@ -139,14 +145,14 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	
 	double f, k0, k1, k2, K0prime, K1prime, K2prime;
 	mat3ds k0hat, k1hat, k2hat;
-	k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
+	k0 = m_perm0(mp)*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
 	K0prime = (1+J*(m_alpha0/(J-m_phi0)+m_M0*J))*k0;
 	k0hat = mat3dd(K0prime);
 	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0);
 	for (a=0; a<3; a++) {
 		f = pow((J-phi0)/(1-phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
-		k1 = m_perm1[a]/(J*J)*f;
-		k2 = 0.5*m_perm2[a]/pow(J,4)*f;
+		k1 = m_perm1[a](mp)/(J*J)*f;
+		k2 = 0.5*m_perm2[a](mp)/pow(J,4)*f;
 		K1prime = (J*J*m_M[a]+(J*(m_alpha[a]-1)+phi0)/(J-phi0))*k1;
 		K2prime = (J*J*m_M[a]+(J*(m_alpha[a]-3)+3*phi0)/(J-phi0))*k2;
 		k1hat = mat3dd(K1prime);
