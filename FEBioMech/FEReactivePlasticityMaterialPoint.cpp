@@ -45,8 +45,12 @@ void FEReactivePlasticityMaterialPoint::Init()
     int n = m_pMat->m_n;
     
     // intialize data
-    m_Uusi.resize(n, mat3ds(1,1,1,0,0,0));
-    m_Uvsi.resize(n, mat3ds(1,1,1,0,0,0));
+    m_Fusi.resize(n, mat3d(1,0,0,
+                           0,1,0,
+                           0,0,1));
+    m_Fvsi.resize(n, mat3d(1,0,0,
+                           0,1,0,
+                           0,0,1));
     m_Fp = mat3dd(1);
     m_Ku.resize(n);
     m_Kv.resize(n);
@@ -61,8 +65,8 @@ void FEReactivePlasticityMaterialPoint::Init()
 void FEReactivePlasticityMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
     FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-    for (int i=0; i<m_Uusi.size(); ++i) {
-        m_Uusi[i] = m_Uvsi[i];
+    for (int i=0; i<m_Fusi.size(); ++i) {
+        m_Fusi[i] = m_Fvsi[i];
         m_Ku[i] = m_Kv[i];
     }
     m_Fp = pt.m_F;
@@ -80,14 +84,14 @@ void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
     {
         ar << m_Fp;
         for (int i=0; i<m_pMat->m_n; ++i) {
-            ar << m_Uusi[i] << m_Uvsi[i] << m_Ku[i] << m_Kv[i];
+            ar << m_Fusi[i] << m_Fvsi[i] << m_Ku[i] << m_Kv[i];
         }
     }
     else
     {
         ar >> m_Fp;
         for (int i=0; i<m_pMat->m_n; ++i) {
-            ar >> m_Uusi[i] >> m_Uvsi[i] >> m_Ku[i] >> m_Kv[i];
+            ar >> m_Fusi[i] >> m_Fvsi[i] >> m_Ku[i] >> m_Kv[i];
         }
     }
 }

@@ -55,12 +55,12 @@ public:
     double YieldedBonds();
     
 public:
-    vector<mat3ds>          m_Uusi;     //!< inverse of plastic stretch tensor at previous yield
-    vector<mat3ds>          m_Uvsi;     //!< trial value of plastic stretch tensor at current yield
+    vector<mat3d>           m_Fusi;     //!< inverse of plastic deformation gradient at previous yield
+    vector<mat3d>           m_Fvsi;     //!< trial value of plastic deformation gradient at current yield
     vector<double>          m_w;        //!< mass fraction of yielded bonds
     vector<double>          m_Kv;       //!< value of yield measure at current yield
     vector<double>          m_Ku;       //!< value of yield measure at previous yield
     vector<double>          m_gp;       //!< current value of octahedral plastic shear strain
     mat3d                   m_Fp;       //!< deformation gradient at previous time
-    FEReactivePlasticity*   m_pMat; //!< parent material
+    FEReactivePlasticity*   m_pMat;     //!< parent material
 };
