@@ -284,7 +284,7 @@ public:
     tens4dmm transpose() const;
 
     // calculates the inverse
-//    tens4d inverse() const;
+    tens4dmm inverse() const;
     
     // evaluate push/pull operation
     tens4dmm pp(const mat3d& F);
@@ -395,7 +395,7 @@ public:
     tens4d right_transpose() const;
 
     // calculates the inverse
-//    tens4d inverse() const;
+    tens4d inverse() const;
     
     // evaluate push/pull operation
 //    tens4d pp(const mat3d& F);

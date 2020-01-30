@@ -181,6 +181,8 @@
 		D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9522021E4B00F5DF83 /* febiomix_api.h */; };
 		D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */; };
 		D5E85D9A22021E4C00F5DF83 /* FEPorousNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */; };
+		D5F50DC823E1205300B21A30 /* FESolutePointSource.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F50DC623E1205200B21A30 /* FESolutePointSource.h */; };
+		D5F50DC923E1205300B21A30 /* FESolutePointSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F50DC723E1205300B21A30 /* FESolutePointSource.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -359,6 +361,8 @@
 		D5E85D9522021E4B00F5DF83 /* febiomix_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiomix_api.h; sourceTree = "<group>"; };
 		D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPorousNeoHookean.cpp; sourceTree = "<group>"; };
 		D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPorousNeoHookean.h; sourceTree = "<group>"; };
+		D5F50DC623E1205200B21A30 /* FESolutePointSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolutePointSource.h; sourceTree = "<group>"; };
+		D5F50DC723E1205300B21A30 /* FESolutePointSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolutePointSource.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -542,6 +546,8 @@
 				D5322D3F2142ABA0008DE511 /* FESoluteFlux.h */,
 				D5322D092142ABA0008DE511 /* FESoluteInterface.cpp */,
 				D5322D3C2142ABA0008DE511 /* FESoluteInterface.h */,
+				D5F50DC723E1205300B21A30 /* FESolutePointSource.cpp */,
+				D5F50DC623E1205200B21A30 /* FESolutePointSource.h */,
 				D5322D6E2142ABA0008DE511 /* FESolutesMaterialPoint.cpp */,
 				D5322D0C2142ABA0008DE511 /* FESolutesMaterialPoint.h */,
 				D5322D232142ABA0008DE511 /* FESolventSupply.cpp */,
@@ -644,6 +650,7 @@
 				D5322D882142ABA0008DE511 /* FESupplyMichaelisMenten.h in Headers */,
 				D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */,
 				D5322D8C2142ABA0008DE511 /* FESlidingInterfaceBiphasic.h in Headers */,
+				D5F50DC823E1205300B21A30 /* FESolutePointSource.h in Headers */,
 				D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */,
 				D5322D992142ABA0008DE511 /* stdafx.h in Headers */,
 				D5C5B79C239F0BA400D29EE0 /* FESBMPointSource.h in Headers */,
@@ -781,6 +788,7 @@
 				D5322DE42142ABA1008DE511 /* FEOsmCoefManning.cpp in Sources */,
 				D5322DFD2142ABA1008DE511 /* FEFiberPowLinearSBM.cpp in Sources */,
 				D5322E062142ABA1008DE511 /* FEBioMixPlot.cpp in Sources */,
+				D5F50DC923E1205300B21A30 /* FESolutePointSource.cpp in Sources */,
 				D5322DBE2142ABA1008DE511 /* FESoluteFlux.cpp in Sources */,
 				D5322E242142ABA1008DE511 /* FESupplyMichaelisMenten.cpp in Sources */,
 				D5322E1E2142ABA1008DE511 /* FESupplySynthesisBinding.cpp in Sources */,
