@@ -136,8 +136,8 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // if there is no yielding, we're done
         double phi = pp.m_Kv[i] - Ky[i];
-        if (phi <= 0) return;
-        
+        if (phi < 0) continue;
+
         if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i])) {
             alpha = (Ky[i] - pp.m_Ku[i])/(pp.m_Kv[i] - pp.m_Ku[i]);
             pp.m_w[i] = w[i];
