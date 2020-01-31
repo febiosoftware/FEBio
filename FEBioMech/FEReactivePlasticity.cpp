@@ -165,7 +165,9 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - Ky[i];    // phi = 0 => stay on yield surface
-            double dlam = phi*Nvmag/(Nv*Fe*Nv).trace();
+            mat3ds Uv = pe.RightStretch();
+            mat3d Rv = Fv*Uv.inverse();
+            double dlam = phi*Nvmag/(Rv*Nv*Fe*Nv).trace();
             lam += dlam;
             Fv = Fe*(mat3dd(1) - Nv*(lam/Nvmag));
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
