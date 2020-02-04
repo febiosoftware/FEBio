@@ -47,7 +47,8 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
     ADD_PARAMETER(m_itmax  , FE_RANGE_GREATER_OR_EQUAL(0)  , "maxiter");
-    ADD_PARAMETER(m_isochrc, "isochoric"   );
+    ADD_PARAMETER(m_isochrc, "isochoric");
+    ADD_PARAMETER(m_blog   , "log"      );
 
 END_FECORE_CLASS();
 
@@ -59,6 +60,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_wmin = 1;
     m_Ymin = m_Ymax = 0;
     m_isochrc = true;
+    m_blog = true;
     m_itmax = 10;
     m_pBase = 0;
     m_pCrit = 0;
@@ -158,24 +160,26 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
         pe.m_F = Fv; pe.m_J = Fv.det();
-        mat3ds Nv = YieldSurfaceNormal(pe);
-        double Nvmag = Nv.norm();
+        mat3dd I(1);
         while (!conv) {
             if (++iter > m_itmax) break;
             pe.m_F = Fv; pe.m_J = Fv.det();
+            mat3ds Nv = YieldSurfaceNormal(pe);
+            double Nvmag = Nv.norm();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - Ky[i];    // phi = 0 => stay on yield surface
-            mat3ds Uv = pe.RightStretch();
-            mat3d Rv = Fv*Uv.inverse();
-            double dlam = phi*Nvmag/(Rv*Nv*Fe*Nv).trace();
+            mat3d Rv = Fv*pe.RightStretchInverse();
+            double dlam = phi*Nvmag/(Rv*Nv*Nv*Fe.transpose()).trace();
             lam += dlam;
-            Fv = Fe*(mat3dd(1) - Nv*(lam/Nvmag));
+            Fv = Fe*(I - Nv*(lam/Nvmag));
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
             if (fabs(phi) <= eps*eps*Ky[i]) conv = true;
         }
         pe.m_F = Ftmp; pe.m_J = Jtmp;
         if (m_isochrc) Fv = Fv*pow(Fs.det()/Fv.det(),1./3.);
-        if (iter > m_itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
+        if (iter > m_itmax) {
+            if (m_blog) feLogWarning("Max number of iterations exceeded in reactive plasticity solver.");
+        }
         else pp.m_Fvsi[i] = Fs.inverse()*Fv;
 
         // evaluate octahedral plastic shear strain
@@ -204,17 +208,17 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
     
     for (int i=0; i<m_n; ++i) {
         // get the elastic deformation gradient
-        mat3d Fe = pe.m_F*pp.m_Fvsi[i];
+        mat3d Fv = pe.m_F*pp.m_Fvsi[i];
         
         // store safe copy of total deformation gradient
-        mat3d Ftmp = pe.m_F;
-        pe.m_F = Fe;
+        mat3d Fs = pe.m_F; double Js = pe.m_J;
+        pe.m_F = Fv; pe.m_J = Fv.det();
         
         // evaluate the stress using the elastic deformation gradient
         s += m_pBase->Stress(pt)*pp.m_w[i];
         
         // restore the original deformation gradient
-        pe.m_F = Ftmp;
+        pe.m_F = Fs; pe.m_J = Js;
     }
     
     // return the stress
@@ -236,17 +240,17 @@ tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
     
     for (int i=0; i<m_n; ++i) {
         // get the elastic deformation gradient
-        mat3d Fe = pe.m_F*pp.m_Fvsi[i];
+        mat3d Fv = pe.m_F*pp.m_Fvsi[i];
         
         // store safe copy of total deformation gradient
-        mat3d Ftmp = pe.m_F;
-        pe.m_F = Fe;
+        mat3d Fs = pe.m_F; double Js = pe.m_J;
+        pe.m_F = Fv; pe.m_J = Fv.det();
         
         // evaluate the tangent using the elastic deformation gradient
         c += m_pBase->Tangent(pt)*pp.m_w[i];
         
         // restore the original deformation gradient
-        pe.m_F = Ftmp;
+        pe.m_F = Fs; pe.m_J = Js;
     }
     
     // return the tangent
@@ -268,17 +272,17 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
     
     for (int i=0; i<m_n; ++i) {
         // get the elastic deformation gradient
-        mat3d Fe = pe.m_F*pp.m_Fvsi[i];
+        mat3d Fv = pe.m_F*pp.m_Fvsi[i];
         
         // store safe copy of total deformation gradient
-        mat3d Ftmp = pe.m_F;
-        pe.m_F = Fe;
-        
+        mat3d Fs = pe.m_F; double Js = pe.m_J;
+        pe.m_F = Fv; pe.m_J = Fv.det();
+
         // evaluate the tangent using the elastic deformation gradient
         sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i];
         
         // restore the original deformation gradient
-        pe.m_F = Ftmp;
+        pe.m_F = Fs; pe.m_J = Js;
     }
     
     // return the sed

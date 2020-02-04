@@ -373,6 +373,11 @@ public:
     mat3d dot(const mat3ds& m) const { return dot(mat3d(m)); }
     mat3d dot(const mat3dd& m) const { return dot(mat3d(m)); }
 
+    // single dot product with 2nd order tensor
+    tens4d sdot(const mat3d& m) const;
+    tens4d sdot(const mat3ds& m) const { return sdot(mat3d(m)); };
+    tens4d sdot(const mat3dd& m) const { return sdot(mat3d(m)); };
+
     // trace
     double tr() const;
     
