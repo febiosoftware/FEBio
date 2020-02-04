@@ -98,6 +98,7 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 	m_print_cn = false;
 	m_mtype = -2;
 	m_iparm3 = false;
+	m_isFactored = false;
 
 	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
@@ -147,6 +148,7 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 //-----------------------------------------------------------------------------
 bool PardisoSolver::SetSparseMatrix(SparseMatrix* pA)
 {
+	if (m_pA && m_isFactored) Destroy();
 	m_pA = dynamic_cast<CompactMatrix*>(pA);
 	m_mtype = -2;
 	if (dynamic_cast<CRSSparseMatrix*>(pA)) m_mtype = 11;
@@ -159,7 +161,7 @@ bool PardisoSolver::PreProcess()
 	m_iparm[0] = 0; /* Use default values for parameters */
 
 	//fprintf(stderr, "In PreProcess\n");
-
+	assert(m_isFactored == false);
 	pardisoinit(m_pt, &m_mtype, m_iparm);
 
 	m_n = m_pA->Rows();
@@ -226,6 +228,8 @@ bool PardisoSolver::Factor()
 		double c = condition_number();
 		feLog("\tcondition number (est.) ................... : %lg\n\n", c);
 	}
+
+	m_isFactored = true;
 
 	return true;
 }
@@ -308,11 +312,12 @@ void PardisoSolver::Destroy()
 
 	int error = 0;
 
-	if (m_pA && m_pA->Pointers())
+	if (m_pA && m_pA->Pointers() && m_isFactored)
 	{
 		pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
 			NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 	}
+	m_isFactored = false;
 }
 
 #endif
