@@ -892,7 +892,8 @@ bool FESolidSolver2::Quasin()
 		//       However, the "jfnk-tangent test" requires that we zero this
 		//       Otherwise the displacement increment can get counted twice in
 		//       Update2 (from m_Ui and m_Ut since we just added it)
-		zero(m_Ui);
+		if (m_arcLength == 0)
+			zero(m_Ui);
 	}
 
 	return bconv;
@@ -952,11 +953,11 @@ void FESolidSolver2::DoArcLength()
 				// The first time we get here, we simply pick the arc-length step size
 				// from the solution 
 				m_al_gamma = tp.timeIncrement;
-				m_al_ds = m_al_gamma*sqrt(uF*uF);
+				m_al_ds = m_al_gamma*sqrt(uF*uF + psi*(m_Fext*m_Fext));
 			}
 			else
 			{
-				m_al_gamma = m_al_ds / sqrt(uF*uF);
+				m_al_gamma = m_al_ds / sqrt(uF*uF + psi*(m_Fext*m_Fext));
 				double uFdx = uF*m_Uip;
 				if (uFdx < 0.0) m_al_gamma = -m_al_gamma;
 			}
@@ -1031,16 +1032,10 @@ void FESolidSolver2::DoArcLength()
 	// evaluate the arc-length equation. 
 	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + (psi*psi)*m_al_inc*m_al_inc*(m_Fext*m_Fext);
 	double sk = sqrt(sk2);
+	double serr = fabs((sk - m_al_ds) / m_al_ds);
 	feLog("\tarc-length increment : %lg (%lg)\n", m_al_inc, m_al_gamma);
 	feLog("\tarc-length factor    : %lg\n", m_al_lam);
-	feLog("\tarc-length constraint: %lg (%lg)\n", sk, m_al_ds);
-
-	// make sure it is satisfied
-	double serr = fabs((sk - m_al_ds) / m_al_ds);
-	if (serr > 1e-5)
-	{
-//		throw ArcLengthFailed();
-	}
+	feLog("\tarc-length constraint: %lg (%lg, err = %lg)\n", sk, m_al_ds, serr);
 }
 
 //-----------------------------------------------------------------------------
