@@ -120,12 +120,12 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
 
     for (int i=0; i<m_n; ++i) {
         mat3d Fs = pe.m_F;
-        mat3d Fu = Fs*pp.m_Fusi[i];
-        
+        mat3d Fe = Fs*pp.m_Fusi[i];
+
         // store safe copy of total deformation gradient
         mat3d Ftmp = pe.m_F;
         double Jtmp = pe.m_J;
-        pe.m_F = Fu; pe.m_J = Fu.det();
+        pe.m_F = Fe; pe.m_J = Fe.det();
         
         // evaluate yield measure
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
@@ -133,34 +133,27 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         // restore total deformation gradient
         pe.m_F = Ftmp; pe.m_J = Jtmp;
         
-        // interpolate to approximate Fe on yield surface
-        double alpha = 0;
-        
         // if there is no yielding, we're done
         double phi = pp.m_Kv[i] - Ky[i];
-        if (phi < 0) continue;
-
-        if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i])) {
-            alpha = (Ky[i] - pp.m_Ku[i])/(pp.m_Kv[i] - pp.m_Ku[i]);
-            pp.m_w[i] = w[i];
+        if (phi <= eps*Ky[i]) {
+            pp.m_Fvsi[i] = pp.m_Fusi[i];
+            continue;
         }
-        
-        // evaluate elastic deformation gradient at previous time
-        mat3d Fup = pp.m_Fp*pp.m_Fusi[i];
-        
-        // interpolate to approximate Fu on yield surface
-        Fu = Fu*alpha + Fup*(1-alpha);  // Fu(v) is on yield surface
+
+        if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+eps)))
+            pp.m_w[i] = w[i];
         
         // find Fv
         bool conv = false;
         int iter = 0;
         double lam = 0;
-        mat3d Fe = Fs*pp.m_Fusi[i];
         mat3d Fv = Fe;
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
         pe.m_F = Fv; pe.m_J = Fv.det();
         mat3dd I(1);
+        double beta = 1;
+        mat3ds ImN = I;
         while (!conv) {
             if (++iter > m_itmax) break;
             pe.m_F = Fv; pe.m_J = Fv.det();
@@ -169,27 +162,33 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - Ky[i];    // phi = 0 => stay on yield surface
             mat3d Rv = Fv*pe.RightStretchInverse();
-            double dlam = phi*Nvmag/(Rv*Nv*Nv*Fe.transpose()).trace();
+            mat3d dFvdlam = -Fe*Nv*(beta/Nvmag);
+            if (m_isochrc)
+                dFvdlam += Fe*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
+            double dlam = -phi/(Rv*Nv*dFvdlam.transpose()).trace();
             lam += dlam;
-            Fv = Fe*(I - Nv*(lam/Nvmag));
+            ImN = I - Nv*(lam/Nvmag);
+            if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
+            Fv = Fe*ImN*beta;
             if (fabs(dlam) <= eps*fabs(lam)) conv = true;
             if (fabs(phi) <= eps*eps*Ky[i]) conv = true;
         }
+        pe.m_F = Fv; pe.m_J = Fv.det();
+        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
         pe.m_F = Ftmp; pe.m_J = Jtmp;
-        if (m_isochrc) Fv = Fv*pow(Fs.det()/Fv.det(),1./3.);
         if (iter > m_itmax) {
             if (m_blog) feLogWarning("Max number of iterations exceeded in reactive plasticity solver.");
+            pp.m_Fvsi[i] = pp.m_Fusi[i];
         }
-        else pp.m_Fvsi[i] = Fs.inverse()*Fv;
-
-        // evaluate octahedral plastic shear strain
-        double ev[3];
-        mat3ds Cvsi = (pp.m_Fvsi[i].transpose()*pp.m_Fvsi[i]).sym();
-        Cvsi.eigen2(ev);
-        for (int j=0; j<3; ++j) ev[j] = 1./sqrt(ev[j]);
-        pp.m_gp[i] = sqrt(2.)/3.*sqrt(pow(ev[0] - ev[1],2) + pow(ev[1] - ev[2],2) + pow(ev[2] - ev[0],2));
+        else {
+            pp.m_Fvsi[i] = Fs.inverse()*Fv;
+            pp.m_Kv[i] = Ky[i];
+        }
     }
-    
+
+    // evaluate octahedral plastic strain
+    OctahedralPlasticStrain(pt);
+
     return;
 }
 
@@ -303,3 +302,18 @@ mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEElasticMaterialPoint& pe)
     return N;
 }
 
+//-----------------------------------------------------------------------------
+//! calculate stress at material point
+void FEReactivePlasticity::OctahedralPlasticStrain(FEMaterialPoint& pt)
+{
+    // extract plastic material point
+    FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
+    
+    double ev[3];
+    for (int i=0; i<m_n; ++i) {
+        mat3ds Cvsi = (pp.m_Fvsi[i].transpose()*pp.m_Fvsi[i]).sym();
+        Cvsi.eigen2(ev);
+        for (int j=0; j<3; ++j) ev[j] = 1./sqrt(ev[j]);
+        pp.m_gp[i] = sqrt(2.)/3.*sqrt(pow(ev[0] - ev[1],2) + pow(ev[1] - ev[2],2) + pow(ev[2] - ev[0],2));
+    }
+}

@@ -64,6 +64,9 @@ public:
     // get the yield surface normal
     mat3ds YieldSurfaceNormal(FEElasticMaterialPoint& pe);
     
+    // evaluate octahedral plastic strain
+    void OctahedralPlasticStrain(FEMaterialPoint& pt);
+    
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion
