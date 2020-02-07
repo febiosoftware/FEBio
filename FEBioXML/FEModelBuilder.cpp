@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FEModelLoad.h>
+#include <FECore/FELoadCurve.h>
 #include <FEBioMech/FERigidSystem.h>
 #include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEUDGHexDomain.h>
@@ -712,4 +713,33 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 		return ps;
 	}
 	else return mesh.FindNodeSet(setName);
+}
+
+void FEModelBuilder::MapLoadCurveToFunction(FEPointFunction* pf, int lc)
+{
+	MapLCToFunction m = { lc, pf };
+	m_lc2fnc.push_back(m);
+}
+
+void FEModelBuilder::ApplyLoadcurvesToFunctions()
+{
+	FEModel& fem = m_fem;
+	for (int i = 0; i < m_lc2fnc.size(); ++i)
+	{
+		MapLCToFunction& m = m_lc2fnc[i];
+
+		FELoadController* plc = fem.GetLoadController(m.lc); assert(plc);
+		FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
+
+		FEPointFunction& f = lc->GetFunction();
+
+		m.pf->CopyFrom(f);
+	}
+}
+
+// finish the build process
+void FEModelBuilder::Finish()
+{
+	ApplyParameterMaps();
+	ApplyLoadcurvesToFunctions();
 }

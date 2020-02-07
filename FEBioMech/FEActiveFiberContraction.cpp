@@ -163,3 +163,87 @@ tens4ds FEActiveFiberContraction::FiberStiffness(const vec3d& a0, FEMaterialPoin
 
 	return AxAxAxA*c;
 }
+
+//=====================================================================================
+
+BEGIN_FECORE_CLASS(FEActiveFiberStress, FEMaterial);
+	ADD_PARAMETER(m_smax, "smax");
+	ADD_PARAMETER(m_ac  , "activation");
+
+	ADD_PROPERTY(m_stl, "stl", FEProperty::Optional);
+	ADD_PROPERTY(m_stv, "stv", FEProperty::Optional);
+END_FECORE_CLASS();
+
+FEActiveFiberStress::FEActiveFiberStress(FEModel* fem) : FEElasticMaterial(fem)
+{
+	m_smax = 0.0;
+	m_ac   = 0.0;
+
+	m_stl = nullptr;
+	m_stv = nullptr;
+}
+
+mat3ds FEActiveFiberStress::Stress(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	double dt = 0.0;
+
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
+
+	mat3d Q = GetLocalCS(mp);
+
+	vec3d a0 = Q.col(0);
+
+	vec3d a = F*a0;
+	double lam = a.unit();
+
+	double stl = (m_stl ? m_stl->value(lam) : 1.0);
+	double v = 0;// (lam - lamp) / dt;
+	double stv = (m_stv ? m_stl->value(v) : 1.0);
+
+	mat3ds A = dyad(a);
+
+	double sf = m_ac*m_smax*stl*stv;
+
+	return A*(sf / J);
+}
+
+tens4ds FEActiveFiberStress::Tangent(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	double dt = 1.0;
+
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
+
+	mat3d Q = GetLocalCS(mp);
+
+	vec3d a0 = Q.col(0);
+
+	vec3d a = F*a0;
+	double lam = a.unit();
+
+	mat3ds A = dyad(a);
+
+	mat3dd I(1.0);
+
+	tens4ds AA = dyad1s(A);
+	tens4ds AI = dyad1s(A, I)*0.5;
+
+	double stl = (m_stl ? m_stl->value(lam) : 1.0);
+	double v = 0;// (lam - lamp) / dt;
+	double stv = (m_stv ? m_stl->value(v) : 1.0);
+
+	double dstl = (m_stl ? m_stl->derive(lam) : 0.0);
+	double dstv = (m_stv ? m_stv->derive(v) / dt : 0.0);
+
+	double sf = m_ac*m_smax*stl*stv;
+	double sf_l = m_ac*m_smax*(dstl*stv + stl*dstv);
+
+	tens4ds c = AA*((lam*sf_l - 2.0*sf) / J);
+
+	return c;
+}

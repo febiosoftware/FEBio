@@ -102,6 +102,7 @@ REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");
 // load curves
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
 REGISTER_FECORE_CLASS(FELinearFunction, "linear ramp");
+REGISTER_FECORE_CLASS(FEMathFunction  , "math");
 
 // data generators
 REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");

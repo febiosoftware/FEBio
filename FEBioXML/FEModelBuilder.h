@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <string>
 
 class FESolver;
+class FEPointFunction;
 
 // This is a helper class for building the FEModel from file input. 
 class FEBIOXML_API FEModelBuilder
@@ -68,6 +69,12 @@ public:
 		FEParam*	pp;
 		FECoreBase*	pc;
 		const char*	szname;
+	};
+
+	struct FEBIOXML_API MapLCToFunction
+	{
+		int	lc;
+		FEPointFunction*	pf;
 	};
 
 public:
@@ -133,6 +140,9 @@ public:
 
 	FENodeSet* FindNodeSet(const string& setName);
 
+public:
+	void MapLoadCurveToFunction(FEPointFunction* pf, int lc);
+
 protected:
 	FESolver* BuildSolver(FEModel& fem);
 
@@ -151,6 +161,11 @@ public:
 
 	// This will associate all mapped parameters to their assigned maps.
 	void ApplyParameterMaps();
+
+	void ApplyLoadcurvesToFunctions();
+
+	// finish the build process
+	void Finish();
 
 private:
 	FEModel&		m_fem;				//!< model that is being constructed
@@ -188,6 +203,7 @@ protected:
 	vector<NodeSetPair>		m_nsetPair;
 	vector<NodeSetSet>		m_nsetSet;
 	vector<MappedParameter>	m_mappedParams;
+	vector<MapLCToFunction>	m_lc2fnc;
 
 protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)

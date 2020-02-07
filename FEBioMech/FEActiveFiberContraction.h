@@ -28,7 +28,9 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEMaterial.h>
+#include "FEElasticMaterial.h"
 #include <FECore/tens4d.h>
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! A material class describing the active fiber contraction
@@ -54,6 +56,38 @@ protected:
 	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
 	double	m_l0;		//!< unloaded length
 	double	m_refl;		//!< sarcomere length
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+class FEActiveFiberStress : public FEElasticMaterial
+{
+public:
+	class Data : public FEMaterialPoint
+	{
+	public:
+		double	m_lamp;
+
+	public:
+		void Update()
+		{
+			// TODO:
+		}
+	};
+
+public:
+	FEActiveFiberStress(FEModel* fem);
+
+	mat3ds Stress(FEMaterialPoint& mp) override;
+
+	tens4ds Tangent(FEMaterialPoint& mp) override;
+
+private:
+	double	m_smax;		//!< peak stress
+	double	m_ac;		//!< activation level
+	FEFunction1D*	m_stl;	//!< stress from tension-length 
+	FEFunction1D*	m_stv;	//!< stress from tension-velocity
 
 	DECLARE_FECORE_CLASS();
 };

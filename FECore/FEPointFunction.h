@@ -62,7 +62,7 @@ public:
 	FEPointFunction(FEModel* fem);
 
 	//! destructor
-	virtual ~FEPointFunction() {}
+	virtual ~FEPointFunction();
 
 	//! adds a point to the point curve
 	void Add(double x, double y);
@@ -96,6 +96,9 @@ public:
 
 	// copy data from other curve
 	FEFunction1D* copy() override;
+
+	// copy from another function
+	void CopyFrom(const FEPointFunction& f);
 
 public: // implement from base class
 

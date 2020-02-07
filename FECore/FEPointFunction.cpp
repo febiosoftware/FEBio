@@ -44,6 +44,12 @@ FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR
 }
 
 //-----------------------------------------------------------------------------
+FEPointFunction::~FEPointFunction()
+{
+
+}
+
+//-----------------------------------------------------------------------------
 //! Clears the loadcurve data
 void FEPointFunction::Clear()
 { 
@@ -403,4 +409,12 @@ FEFunction1D* FEPointFunction::copy()
 	}
 
 	return f;
+}
+
+//-----------------------------------------------------------------------------
+void FEPointFunction::CopyFrom(const FEPointFunction& f)
+{
+	m_fnc = f.m_fnc;
+	m_ext = f.m_ext;
+	m_points = f.m_points;
 }

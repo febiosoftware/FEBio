@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "fecore_api.h"
 #include "FECoreBase.h"
+#include "MathObject.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -75,12 +76,12 @@ public:
 	FELinearFunction(FEModel* fem, double m, double y0) : FEFunction1D(fem), m_slope(m), m_intercept(y0) {}
 	FEFunction1D* copy() { return new FELinearFunction(GetFEModel(), m_slope, m_intercept); }
 
-	double value(double t) const
+	double value(double t) const override
 	{
 		return m_slope*t + m_intercept;
 	}
 
-	double deriv(double t) const
+	double derive(double t) const override
 	{
 		return m_slope;
 	}
@@ -88,4 +89,29 @@ public:
 private:
 	double	m_slope;
 	double	m_intercept;
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+//! function defined via math expression
+class FECORE_API FEMathFunction : public FEFunction1D
+{
+public:
+	FEMathFunction(FEModel* fem);
+
+	bool Init() override;
+
+	FEFunction1D* copy() override;
+
+	double value(double t) const override;
+
+	double derive(double t) const override;
+
+private:
+	std::string			m_s;
+	MSimpleExpression	m_exp;
+	MSimpleExpression	m_dexp;
+
+	DECLARE_FECORE_CLASS();
 };

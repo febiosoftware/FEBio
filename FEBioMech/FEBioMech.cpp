@@ -396,6 +396,8 @@ REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC , "uncoupled presc
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic  , "prescribed isotropic active contraction");
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, "uncoupled prescribed isotropic active contraction");
 
+REGISTER_FECORE_CLASS(FEActiveFiberStress, "active fiber stress");
+
 // discrete materials
 REGISTER_FECORE_CLASS(FELinearSpring           , "linear spring"             );
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, "tension-only linear spring");

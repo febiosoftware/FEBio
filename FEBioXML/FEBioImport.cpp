@@ -289,8 +289,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	// read the file
 	if (ReadFile(szfile) == false) return false;
 
-	// we still need to apply the data maps
-	m_builder->ApplyParameterMaps();
+	// finish building
+	m_builder->Finish();
 
 	return true;
 }

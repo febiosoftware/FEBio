@@ -85,13 +85,13 @@ public:
 
 	// These functions are not thread safe since variable values can be overridden by different threads
 	// In multithreaded applications, use the thread safe functions below.
-	double value() { return value(m_item.ItemPtr());  }
+	double value() const { return value(m_item.ItemPtr());  }
 
 	// This is a thread safe function to evaluate the expression
 	// The values of the variables are passed as an argument. This function
 	// does not call MVariable->value, but uses these passed values insteads.
 	// Make sure that the var array has the same size as the variable array of the expression
-	double value_s(const std::vector<double>& var)
+	double value_s(const std::vector<double>& var) const
 	{ 
 		assert(var.size() == m_Var.size());
 		return value(m_item.ItemPtr(), var); 
@@ -100,8 +100,8 @@ public:
 	int Items();
 
 protected:
-	double value(const MItem* pi);
-	double value(const MItem* pi, const std::vector<double>& var);
+	double value(const MItem* pi) const;
+	double value(const MItem* pi, const std::vector<double>& var) const;
 
 protected:
 	void fixVariableRefs(MItem* pi);

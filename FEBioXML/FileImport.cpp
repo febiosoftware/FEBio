@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEDomainMap.h>
+#include <FECore/FEPointFunction.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -922,22 +923,35 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				// If the type attribute is omitted we assume the tag's name is the type
 				if (sztype == 0) sztype = tag.Name();
 
-				// try to allocate the class
-				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
-				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-				prop->SetProperty(pp);
-
-				// read the property data
-				if (tag.isleaf() == false)
+				// HACK for mapping load curves to FEFunction1D
+				const char* szlc = tag.AttributeValue("lc", true);
+				if (szlc && (tag.m_natt == 1) && (tag == "force"))
 				{
-					ReadParameterList(tag, pp);
+					FEPointFunction* f = fecore_alloc(FEPointFunction, GetFEModel()); assert(f);
+					prop->SetProperty(f);
+
+					int lc = atoi(szlc) - 1;
+					GetBuilder()->MapLoadCurveToFunction(f, lc);
 				}
-				else if (tag.isempty() == false)
+				else
 				{
-					// There should be a parameter with the same name as the type
-					if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
-						throw XMLReader::InvalidValue(tag);
+					// try to allocate the class
+					FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+					if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+					prop->SetProperty(pp);
+
+					// read the property data
+					if (tag.isleaf() == false)
+					{
+						ReadParameterList(tag, pp);
+					}
+					else if (tag.isempty() == false)
+					{
+						// There should be a parameter with the same name as the type
+						if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+							throw XMLReader::InvalidValue(tag);
+					}
 				}
 				return true;
 			}
@@ -1109,6 +1123,11 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 	catch (XMLReader::Error& e)
 	{
 		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.what(), tag.m_ncurrent_line);
+		return false;
+	}
+	catch (FEBioImport::MissingProperty e)
+	{
+		fprintf(stderr, "FATAL ERROR: %s\n\n", e.GetErrorString());
 		return false;
 	}
 	catch (...)
