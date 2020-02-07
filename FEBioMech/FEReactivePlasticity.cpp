@@ -46,9 +46,8 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
     ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
-    ADD_PARAMETER(m_itmax  , FE_RANGE_GREATER_OR_EQUAL(0)  , "maxiter");
+    ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"  );
     ADD_PARAMETER(m_isochrc, "isochoric");
-    ADD_PARAMETER(m_blog   , "log"      );
 
 END_FECORE_CLASS();
 
@@ -60,8 +59,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_wmin = 1;
     m_Ymin = m_Ymax = 0;
     m_isochrc = true;
-    m_blog = true;
-    m_itmax = 10;
+    m_rtol = 1e-4;
     m_pBase = 0;
     m_pCrit = 0;
 }
@@ -116,8 +114,6 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
     // extract inverse of plastic deformation gradient and evaluate elastic deformation gradient
     FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
 
-    double eps = 1e-4;  // convergence criterion for iterative solution of lambda
-
     for (int i=0; i<m_n; ++i) {
         mat3d Fs = pe.m_F;
         mat3d Fe = Fs*pp.m_Fusi[i];
@@ -135,12 +131,12 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // if there is no yielding, we're done
         double phi = pp.m_Kv[i] - Ky[i];
-        if (phi <= eps*Ky[i]) {
+        if (phi <= m_rtol*Ky[i]) {
             pp.m_Fvsi[i] = pp.m_Fusi[i];
             continue;
         }
-
-        if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+eps)))
+        
+        if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+m_rtol)))
             pp.m_w[i] = w[i];
         
         // find Fv
@@ -151,39 +147,69 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
         pe.m_F = Fv; pe.m_J = Fv.det();
+        mat3ds Nv = YieldSurfaceNormal(pe);
+        double Nvmag = Nv.norm();
         mat3dd I(1);
         double beta = 1;
         mat3ds ImN = I;
+        double phi0=0, phi1=0, phi2=0, lam1=0, lam2=0, a, b, c=0, d;
         while (!conv) {
-            if (++iter > m_itmax) break;
+            ++iter;
             pe.m_F = Fv; pe.m_J = Fv.det();
-            mat3ds Nv = YieldSurfaceNormal(pe);
-            double Nvmag = Nv.norm();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - Ky[i];    // phi = 0 => stay on yield surface
+            if (iter == 1) {
+                phi0 = phi;
+                c = phi0;
+            }
+            else if (iter == 2) {
+                phi1 = phi;
+                lam1 = lam;
+            }
+            else if (iter == 3) {
+                phi2 = phi;
+                lam2 = lam;
+            }
             mat3d Rv = Fv*pe.RightStretchInverse();
             mat3d dFvdlam = -Fe*Nv*(beta/Nvmag);
             if (m_isochrc)
                 dFvdlam += Fe*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
             double dlam = -phi/(Rv*Nv*dFvdlam.transpose()).trace();
             lam += dlam;
+            if (iter == 4) {
+                d = lam1*lam2*(lam1-lam2);
+                if (d == 0) {
+                    lam = (lam1*lam2 == 0) ? 0 : lam2;
+                }
+                else {
+                    a = (lam2*(phi1-phi0)-lam1*(phi2-phi0))/d;
+                    b = ((phi2-phi0)*lam1*lam1-(phi1-phi0)*lam2*lam2)/d;
+                    d = b*b - 4*a*c;
+                    if (d >= 0) {
+                        if (a != 0) {
+                            lam1 = (-b+sqrt(d))/(2*a);
+                            lam2 = (-b-sqrt(d))/(2*a);
+                            lam = min(lam1,lam2);
+                        }
+                        else if (b != 0) lam = -c/b;
+                        else lam = 0;
+                    }
+                    else {
+                        lam = -b/(2*a);
+                    }
+                }
+                conv = true;
+            }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Fv = Fe*ImN*beta;
-            if (fabs(dlam) <= eps*fabs(lam)) conv = true;
-            if (fabs(phi) <= eps*eps*Ky[i]) conv = true;
+            if (fabs(dlam) <= m_rtol*fabs(lam)) conv = true;
+            if (fabs(lam) <= m_rtol*m_rtol) conv = true;
         }
         pe.m_F = Fv; pe.m_J = Fv.det();
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
         pe.m_F = Ftmp; pe.m_J = Jtmp;
-        if (iter > m_itmax) {
-            if (m_blog) feLogWarning("Max number of iterations exceeded in reactive plasticity solver.");
-            pp.m_Fvsi[i] = pp.m_Fusi[i];
-        }
-        else {
-            pp.m_Fvsi[i] = Fs.inverse()*Fv;
-            pp.m_Kv[i] = Ky[i];
-        }
+        pp.m_Fvsi[i] = Fs.inverse()*Fv;
     }
 
     // evaluate octahedral plastic strain

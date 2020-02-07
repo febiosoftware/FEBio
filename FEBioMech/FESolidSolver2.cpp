@@ -507,6 +507,10 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 //! Updates the current state of the model
 void FESolidSolver2::Update(vector<double>& ui)
 {
+    FEModel& fem = *GetFEModel();
+    FETimeInfo& tp = fem.GetTime();
+    tp.currentIteration = m_niter;
+    
     // update EAS
     UpdateEAS(ui);
     UpdateIncrementsEAS(ui, true);

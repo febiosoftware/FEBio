@@ -81,8 +81,7 @@ public:
     double      m_Ymax;     // yield measure when all bonds have yielded
     int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
-    int         m_itmax;    // maximum number of iterations for iterative solution
-    bool        m_blog;     // flag for printing warning when max iterations exceeded
+    double      m_rtol;     // user-defined relative tolerance
 
     DECLARE_FECORE_CLASS();
 };
