@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterial.h"
+#include <algorithm>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -106,14 +107,11 @@ double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
 	mat3ds s = m_pBase->Stress(pt);
     
     // evaluate principal normal stresses
-    double ps[3], ms[3];
-    s.eigen2(ps);
-    ms[0] = fabs(ps[1] - ps[2])/2;
-    ms[1] = fabs(ps[2] - ps[0])/2;
-    ms[2] = fabs(ps[0] - ps[1])/2;
+    double ps[3];
+    s.eigen2(ps);   // sorted in ascending order
     
-    // evaluate max shear stresses and use largest of three
-    double mss = max(max(ms[0],ms[1]),ms[2]);
+    // evaluate max shear stresses
+    double mss = (ps[2] - ps[0])/2;
     
     return mss;
 }
@@ -128,15 +126,25 @@ mat3ds FEDamageCriterionMSS::CriterionStressTangent(FEMaterialPoint& pt)
     // evaluate principal normal stresses
     double ps[3];
     vec3d v[3];
-    s.eigen2(ps,v);
-    // sort normal stresses
-    int imin = 0, imax = 0;
-    if (ps[1] < ps[imin]) imin = 1;
-    if (ps[2] < ps[imin]) imin = 2;
-    if (ps[1] > ps[imax]) imax = 1;
-    if (ps[2] > ps[imax]) imax = 2;
+    s.eigen2(ps,v); // sorted in ascending order
+    // clean up small differences
+    const double eps = 1e-6;
+    if (fabs(ps[2] - ps[0]) <= eps*fabs(ps[2])) ps[0] = ps[2];
+    if (fabs(ps[2] - ps[1]) <= eps*fabs(ps[2])) ps[1] = ps[2];
     
-    return (dyad(v[imax]) - dyad(v[imin]))/2;
+    // return tangent
+    mat3ds N;
+    if (ps[2] > ps[1]) {
+        if (ps[1] > ps[0])
+            N = (dyad(v[2])-dyad(v[0]))/2;
+        else
+            N = (dyad(v[2])-(dyad(v[1]) + dyad(v[0]))/2)/2;
+    }
+    else if (ps[1] > ps[0])
+        N = ((dyad(v[2]) + dyad(v[1]))/2 - dyad(v[0]))/2;
+    else N.zero();
+    
+    return N;
 }
 
 //-----------------------------------------------------------------------------
@@ -150,12 +158,9 @@ double FEDamageCriterionMNS::DamageCriterion(FEMaterialPoint& pt)
     
     // evaluate principal normal stresses
     double ps[3];
-    s.eigen2(ps);
+    s.eigen2(ps);   // sorted in ascending order
     
-    // evaluate max normal stress
-    double mns = max(max(ps[0],ps[1]),ps[2]);
-    
-    return mns;
+    return ps[2];
 }
 
 //-----------------------------------------------------------------------------
@@ -168,13 +173,20 @@ mat3ds FEDamageCriterionMNS::CriterionStressTangent(FEMaterialPoint& pt)
     // evaluate principal normal stresses
     double ps[3];
     vec3d v[3];
-    s.eigen2(ps,v);
-    // sort normal stresses
-    int imax = 0;
-    if (ps[1] > ps[imax]) imax = 1;
-    if (ps[2] > ps[imax]) imax = 2;
+    s.eigen2(ps,v); // sorted in ascending order
     
-    return dyad(v[imax]);
+    // clean up small differences
+    const double eps = 1e-6;
+    if (fabs(ps[2] - ps[0]) <= eps*fabs(ps[2])) ps[0] = ps[2];
+    if (fabs(ps[2] - ps[1]) <= eps*fabs(ps[2])) ps[1] = ps[2];
+    
+    // return tangent
+    mat3ds N;
+    if (ps[2] > ps[1]) N = dyad(v[2]);
+    else if (ps[2] > ps[0]) N = dyad(v[2]) + dyad(v[1]);
+    else N = mat3dd(1);
+    
+    return N;
 }
 
 //-----------------------------------------------------------------------------

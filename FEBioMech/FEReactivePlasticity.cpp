@@ -176,7 +176,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                 dFvdlam += Fe*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
             double dlam = -phi/(Rv*Nv*dFvdlam.transpose()).trace();
             lam += dlam;
-            if (iter == 4) {
+            if (iter == 3) {
                 d = lam1*lam2*(lam1-lam2);
                 if (d == 0) {
                     lam = (lam1*lam2 == 0) ? 0 : lam2;
@@ -189,14 +189,16 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                         if (a != 0) {
                             lam1 = (-b+sqrt(d))/(2*a);
                             lam2 = (-b-sqrt(d))/(2*a);
-                            lam = min(lam1,lam2);
+                            lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
                         }
                         else if (b != 0) lam = -c/b;
                         else lam = 0;
                     }
-                    else {
+                    else if (a != 0) {
                         lam = -b/(2*a);
                     }
+                    else
+                        lam = 0;
                 }
                 conv = true;
             }
