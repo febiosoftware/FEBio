@@ -80,8 +80,10 @@ bool FEMathFunction::Init()
 	if (m_exp.Variables() < 1) m_exp.AddVariable("x");
 
 	m_dexp.AddVariable(m_exp.Variable(0)->Name());
-	if (m_exp.Variables() == 1)
-		m_dexp.SetExpression(MDerive(m_exp.GetExpression(), *m_exp.Variable(0)));
+    if (m_exp.Variables() == 1) {
+        MITEM mi = MDerive(m_exp.GetExpression(), *m_exp.Variable(0));
+		m_dexp.SetExpression(mi);
+    }
 	else
 		m_dexp.Create("0");
 
