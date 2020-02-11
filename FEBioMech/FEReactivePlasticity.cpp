@@ -234,24 +234,23 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
     
     mat3ds s = m_pBase->Stress(pt)*(1 - pp.YieldedBonds());
     
-    // store safe copy of total deformation gradient
-    mat3d Fs = pe.m_F; double Js = pe.m_J;
-
     for (int i=0; i<m_n; ++i) {
         if (pp.m_w[i] > 0) {
             // get the elastic deformation gradient
             mat3d Fv = pe.m_F*pp.m_Fvsi[i];
             
+            // store safe copy of total deformation gradient
+            mat3d Fs = pe.m_F; double Js = pe.m_J;
             pe.m_F = Fv; pe.m_J = Fv.det();
             
             // evaluate the stress using the elastic deformation gradient
             s += m_pBase->Stress(pt)*pp.m_w[i];
+            
+            // restore the original deformation gradient
+            pe.m_F = Fs; pe.m_J = Js;
         }
     }
     
-    // restore the original deformation gradient
-    pe.m_F = Fs; pe.m_J = Js;
-
     // return the stress
     return s;
 }
@@ -269,24 +268,23 @@ tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
     
     tens4ds c = m_pBase->Tangent(pt)*(1 - pp.YieldedBonds());
     
-    // store safe copy of total deformation gradient
-    mat3d Fs = pe.m_F; double Js = pe.m_J;
-    
     for (int i=0; i<m_n; ++i) {
         if (pp.m_w[i] > 0) {
             // get the elastic deformation gradient
             mat3d Fv = pe.m_F*pp.m_Fvsi[i];
             
+            // store safe copy of total deformation gradient
+            mat3d Fs = pe.m_F; double Js = pe.m_J;
             pe.m_F = Fv; pe.m_J = Fv.det();
             
             // evaluate the tangent using the elastic deformation gradient
             c += m_pBase->Tangent(pt)*pp.m_w[i];
+            
+            // restore the original deformation gradient
+            pe.m_F = Fs; pe.m_J = Js;
         }
     }
     
-    // restore the original deformation gradient
-    pe.m_F = Fs; pe.m_J = Js;
-
     // return the tangent
     return c;
 }
@@ -304,24 +302,23 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
     
     double sed = m_pBase->StrainEnergyDensity(pt)*(1 - pp.YieldedBonds());
     
-    // store safe copy of total deformation gradient
-    mat3d Fs = pe.m_F; double Js = pe.m_J;
-    
     for (int i=0; i<m_n; ++i) {
         if (pp.m_w[i] > 0) {
             // get the elastic deformation gradient
             mat3d Fv = pe.m_F*pp.m_Fvsi[i];
             
+            // store safe copy of total deformation gradient
+            mat3d Fs = pe.m_F; double Js = pe.m_J;
             pe.m_F = Fv; pe.m_J = Fv.det();
 
             // evaluate the tangent using the elastic deformation gradient
             sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i];
+            
+            // restore the original deformation gradient
+            pe.m_F = Fs; pe.m_J = Js;
         }
     }
     
-    // restore the original deformation gradient
-    pe.m_F = Fs; pe.m_J = Js;
-
     // return the sed
     return sed;
 }
