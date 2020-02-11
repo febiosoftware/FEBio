@@ -56,6 +56,7 @@ void FEReactivePlasticityMaterialPoint::Init()
     m_Kv.resize(n);
     m_w.resize(n,0);
     m_gp.resize(n, 0);
+    m_Rhat = 0;
 
     // don't forget to initialize the base class
     FEMaterialPoint::Init();

@@ -560,7 +560,7 @@ public:
 class FEPlotNestedDamage : public FEPlotDomainData
 {
 public:
-    FEPlotNestedDamage(FEModel* pfem);
+    FEPlotNestedDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& m, FEDataStream& a);
     bool SetFilter(int nsol);
 protected:
@@ -572,7 +572,7 @@ protected:
 class FEPlotIntactBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotIntactBondFraction(FEModel* pfem);
+    FEPlotIntactBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& m, FEDataStream& a);
 };
 
@@ -581,8 +581,17 @@ public:
 class FEPlotOctahedralPlasticStrain : public FEPlotDomainData
 {
 public:
-    FEPlotOctahedralPlasticStrain(FEModel* pfem);
+    FEPlotOctahedralPlasticStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Reactive plasticity heat supply
+class FEPlotReactivePlasticityHeatSupply : public FEPlotDomainData
+{
+public:
+    FEPlotReactivePlasticityHeatSupply(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------

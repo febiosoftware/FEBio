@@ -67,6 +67,9 @@ public:
     // evaluate octahedral plastic strain
     void OctahedralPlasticStrain(FEMaterialPoint& pt);
     
+    // evaluate reactive heat supply
+    void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
+    
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion

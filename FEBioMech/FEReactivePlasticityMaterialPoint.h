@@ -62,5 +62,6 @@ public:
     vector<double>          m_Ku;       //!< value of yield measure at previous yield
     vector<double>          m_gp;       //!< current value of octahedral plastic shear strain
     mat3d                   m_Fp;       //!< deformation gradient at previous time
+    double                  m_Rhat;     //!< reactive heat supply density
     FEReactivePlasticity*   m_pMat;     //!< parent material
 };

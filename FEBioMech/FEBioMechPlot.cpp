@@ -1819,12 +1819,6 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotNestedDamage::FEPlotNestedDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
-{
-    m_nmat = -1;
-}
-
-//-----------------------------------------------------------------------------
 // Resolve nested damage material by number
 bool FEPlotNestedDamage::SetFilter(int nmat)
 {
@@ -1898,11 +1892,6 @@ bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
 		});
     }
     return true;
-}
-
-//-----------------------------------------------------------------------------
-FEPlotIntactBondFraction::FEPlotIntactBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
-{
 }
 
 //-----------------------------------------------------------------------------
@@ -2003,8 +1992,84 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotOctahedralPlasticStrain::FEPlotOctahedralPlasticStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+bool FEPlotReactivePlasticityHeatSupply::Save(FEDomain &dom, FEDataStream& a)
 {
+    int N = dom.Elements();
+    FEElasticMaterial* pmat = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat))
+    {
+        int NC = pmat->Properties();
+        for (int i=0; i<N; ++i)
+        {
+            FEElement& el = dom.ElementRef(i);
+            
+            float R = 0.f;
+            int nint = el.GaussPoints();
+            for (int j=0; j<nint; ++j)
+            {
+                FEElasticMixtureMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMixtureMaterialPoint>();
+                for (int k=0; k<NC; ++k)
+                {
+                    FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                    if (prp) R += (float) prp->m_Rhat;
+                }
+            }
+            R /= (float) nint;
+            a.push_back(R);
+        }
+    }
+    else if (dynamic_cast<FEElasticMultigeneration*>(pmat))
+    {
+        FEElasticMultigeneration* pmg = dynamic_cast<FEElasticMultigeneration*>(pmat);
+        int NC = pmg->Properties();
+        for (int i=0; i<N; ++i)
+        {
+            FEElement& el = dom.ElementRef(i);
+            
+            float R = 0.f;
+            int nint = el.GaussPoints();
+            for (int j=0; j<nint; ++j)
+            {
+                FEMultigenerationMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEMultigenerationMaterialPoint>();
+                for (int k=0; k<NC; ++k)
+                {
+                    FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                    FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                    if (prp) R += (float) prp->m_Rhat;
+                    else if (pem)
+                    {
+                        int NE = (int)pem->m_w.size();
+                        for (int l=0; l<NE; ++l)
+                        {
+                            FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                            if (prp) R += (float) prp->m_Rhat;
+                        }
+                    }
+                }
+            }
+            R /= (float) nint;
+            a.push_back(R);
+        }
+    }
+    else
+    {
+        for (int i=0; i<N; ++i)
+        {
+            FEElement& el = dom.ElementRef(i);
+            
+            float R = 0.f;
+            int nint = el.GaussPoints();
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+                FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
+                if (prp) R += (float) prp->m_Rhat;
+            }
+            R /= (float) nint;
+            a.push_back(R);
+        }
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------

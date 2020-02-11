@@ -579,6 +579,7 @@ REGISTER_FECORE_CLASS(FEPlotDamage                       , "damage"             
 REGISTER_FECORE_CLASS(FEPlotNestedDamage                 , "nested damage"                   );
 REGISTER_FECORE_CLASS(FEPlotIntactBondFraction           , "intact bond fraction"            );
 REGISTER_FECORE_CLASS(FEPlotOctahedralPlasticStrain      , "octahedral plastic strain"       );
+REGISTER_FECORE_CLASS(FEPlotReactivePlasticityHeatSupply , "plasticity heat supply density"  );
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction        , "volume fraction"                 );
 REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses             , "ut4 nodal stress"                );
 REGISTER_FECORE_CLASS(FEPlotShellStrain                  , "shell strain"                    );
