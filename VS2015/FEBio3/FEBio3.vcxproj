@@ -434,6 +434,7 @@
     <ClInclude Include="..\..\FEBio3\febio_cb.h" />
     <ClInclude Include="..\..\FEBio3\Interrupt.h" />
     <ClInclude Include="..\..\FEBio3\stdafx.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBio3\breakpoint.cpp" />

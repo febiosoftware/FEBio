@@ -61,6 +61,16 @@ FEDiagnostic::~FEDiagnostic()
 
 }
 
+void FEDiagnostic::SetFileName(const std::string& fileName)
+{
+	m_file = fileName;
+}
+
+const std::string& FEDiagnostic::GetFileName()
+{
+	return m_file;
+}
+
 //-----------------------------------------------------------------------------
 FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 {
@@ -135,6 +145,8 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 
 	// close the XML file
 	xml.Close();
+
+	if (m_pdia) m_pdia->SetFileName(szfile);
 
 	// we're done!
 	return m_pdia;

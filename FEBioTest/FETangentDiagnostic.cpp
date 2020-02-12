@@ -35,29 +35,30 @@ SOFTWARE.*/
 #include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
 #include <FECore/FECoreKernel.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix
-void FETangentDiagnostic::print_matrix(matrix& m)
+void print_matrix(FILE* fp, matrix& m)
 {
 	int i, j;
 	int N = m.rows();
 	int M = m.columns();
 
-	feLog("\n    ");
-	for (i=0; i<N; ++i) feLog("%15d ", i);
-	feLog("\n----");
-	for (i=0; i<N; ++i) feLog("----------------", i);
+	fprintf(fp, "\n    ");
+	for (i=0; i<N; ++i) fprintf(fp, "%15d ", i);
+	fprintf(fp, "\n----");
+	for (i=0; i<N; ++i) fprintf(fp, "----------------");
 
 	for (i=0; i<N; ++i)
 	{
-		feLog("\n%2d: ", i);
+		fprintf(fp, "\n%2d: ", i);
 		for (j=0; j<M; ++j)
 		{
-			feLog("%15lg ", m[i][j]);
+			fprintf(fp, "%15lg ", m[i][j]);
 		}
 	}
-	feLog("\n");
+	fprintf(fp, "\n");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -317,20 +318,33 @@ bool FETangentDiagnostic::Run()
 	k0.zero();
 	bd.ElementStiffness(fem.GetTime(), 0, k0);
 
+	// create a file name for the tangent log file
+	std::string febFile = GetFileName();
+	string fileName = febFile;
+	size_t n = fileName.rfind('.');
+	if (n != string::npos) fileName.erase(n);
+	fileName.append("_out.log");
+
+	FILE* fp = fopen(fileName.c_str(), "wt");
+
+	fprintf(fp, "FEBio Tangent Diagnostics Results:\n");
+	fprintf(fp, "==================================\n");
+	fprintf(fp, "Diagnostics file: %s\n\n", febFile.c_str());
+
 	// print the element stiffness matrix
-	feLog("\nActual stiffness matrix:\n");
-	print_matrix(k0);
+	fprintf(fp, "\nActual stiffness matrix:\n");
+	print_matrix(fp, k0);
 
 	// now calculate the derivative of the residual
 	matrix k1;
 	deriv_residual(k1);
 
 	// print the approximate element stiffness matrix
-	feLog("\nApproximate stiffness matrix:\n");
-	print_matrix(k1);
+	fprintf(fp, "\nApproximate stiffness matrix:\n");
+	print_matrix(fp, k1);
 
 	// finally calculate the difference matrix
-	feLog("\n");
+	fprintf(fp, "\n");
 	matrix kd(24, 24);
 	double kmax = 0, kij;
 	int i0 = -1, j0 = -1, i, j;
@@ -348,10 +362,13 @@ bool FETangentDiagnostic::Run()
 		}
 
 	// print the difference
-	feLog("\ndifference matrix:\n");
-	print_matrix(kd);
+	fprintf(fp, "\ndifference matrix:\n");
+	print_matrix(fp, kd);
 
-	feLog("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	fprintf(fp, "\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	fprintf(stderr, "\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+
+	fclose(fp);
 
 	return (kmax < 1e-4);
 }

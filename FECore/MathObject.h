@@ -49,6 +49,7 @@ public:
 	int Dim() { return (int)m_Var.size(); }
 
 	MVariable* AddVariable(const std::string& var);
+	void AddVariables(const std::vector<std::string>& varList);
 
 	void AddVariable(MVariable* pv);
 	MVariable* FindVariable(const std::string& s);

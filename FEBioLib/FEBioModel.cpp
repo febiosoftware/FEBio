@@ -968,7 +968,7 @@ bool FEBioModel::InitLogFile()
 	{
 		// see if a valid log file name is defined.
 		const std::string& slog = GetLogfileName();
-		if (slog.empty() == 0)
+		if (slog.empty())
 		{
 			// if not, we take the input file name and set the extension to .log
 			char sz[1024] = {0};

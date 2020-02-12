@@ -73,8 +73,12 @@ public:
 
 	FEModel* GetFEModel() { return &m_fem; }
 
+	void SetFileName(const std::string& fileName);
+	const std::string& GetFileName();
+
 private:
 	FEModel&	m_fem;	//!< the FEModel object the diagnostic is performed on
+	std::string	m_file;	//!< the input file used
 };
 
 //-----------------------------------------------------------------------------

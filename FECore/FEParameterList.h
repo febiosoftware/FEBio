@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEParam.h"
 #include "FEParamValidator.h"
 #include "ParamString.h"
+#include "MathObject.h"
 #include "fecore_api.h"
 #include <stdio.h>
 using namespace std;
@@ -171,6 +172,7 @@ public:
 	void AddParameter(std::vector<vec2d>&  v, const char* sz);
 	void AddParameter(std::vector<std::string>& v, const char* sz);
 	void AddParameter(FEMaterialPointProperty& v, const char* sz);
+	void AddParameter(MSimpleExpression& m, const char* sz);
 
 	void AddParameter(int&           v, RANGE rng, const char* sz);
 	void AddParameter(double&        v, RANGE rng, const char* sz);

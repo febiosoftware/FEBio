@@ -93,6 +93,14 @@ void MathObject::AddVariable(MVariable* pv)
 	m_Var.push_back(pv);
 }
 
+void MathObject::AddVariables(const vector<std::string>& varList)
+{
+	for (const std::string& s : varList)
+	{
+		AddVariable(s);
+	}
+}
+
 //-----------------------------------------------------------------------------
 MVariable* MathObject::FindVariable(const string& s)
 {

@@ -45,6 +45,9 @@
     <ClInclude Include="..\..\FEBio3\febio_cb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBio3\CommandManager.cpp">

@@ -136,6 +136,8 @@ SOFTWARE.*/
 #include "FEGentMaterial.h"
 #include "FEWrinkleOgdenMaterial.h"
 #include "FEMindlinElastic2O.h"
+#include "FEGenericHyperelastic.h"
+#include "FEGenericHyperelasticUC.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -305,6 +307,7 @@ REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin    , "coupled trans-iso Moon
 REGISTER_FECORE_CLASS(FEMicroMaterial                  , "micro-material"                      );
 REGISTER_FECORE_CLASS(FEMicroMaterial2O                , "micro-material2O"                    );
 REGISTER_FECORE_CLASS(FEMindlinElastic2O               , "mindlin elastic"                     );
+REGISTER_FECORE_CLASS(FEGenericHyperelastic            , "hyperelastic"                        );
 
 // These materials are derived from FEElasticMaterial and use FEElasticMaterials
 REGISTER_FECORE_CLASS(FEElasticMixture                 , "solid mixture"                       );
@@ -345,6 +348,7 @@ REGISTER_FECORE_CLASS(FEContinuousFiberDistributionUC        , "continuous fiber
 REGISTER_FECORE_CLASS(FEPRLig					             , "PRLig"                                  );
 REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, "uncoupled reactive viscoelastic"        );
 REGISTER_FECORE_CLASS(FEDamageMaterialUC                     , "uncoupled elastic damage"               );
+REGISTER_FECORE_CLASS(FEGenericHyperelasticUC                , "uncoupled hyperelastic"                 );
 
 // Fiber materials
 REGISTER_FECORE_CLASS(FEFiberExpPow                  , "fiber-exp-pow"                        );
