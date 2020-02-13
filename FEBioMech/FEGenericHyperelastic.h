@@ -34,15 +34,18 @@ public:
 
 	bool Init() override;
 
-	mat3ds Stress(FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
-	tens4ds Tangent(FEMaterialPoint& mp);
+	tens4ds Tangent(FEMaterialPoint& mp) override;
+
+	double StrainEnergyDensity(FEMaterialPoint& mp) override;
 
 private:
 	std::string			m_exp;
 
 private:
 	MSimpleExpression	m_W;	// strain-energy function
+	vector<double*>		m_param;	// user parameters
 
 	// strain energy derivatives
 	MSimpleExpression	m_W1;

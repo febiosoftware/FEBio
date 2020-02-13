@@ -40,9 +40,26 @@ FEGenericHyperelastic::FEGenericHyperelastic(FEModel* fem) : FEElasticMaterial(f
 bool FEGenericHyperelastic::Init()
 {
 	vector<string> vars = { "I1", "I2", "J" };
+
+	// add all user parameters
+	FEParameterList& pl = GetParameterList();
+	FEParamIterator pi = pl.first();
+	m_param.clear();
+	for (int i = 0; i < pl.Parameters(); ++i, ++pi)
+	{
+		FEParam& p = *pi;
+		if (p.GetFlags() & FEParamFlag::FE_PARAM_USER)
+		{
+			vars.push_back(p.name());
+			m_param.push_back((double*)p.data_ptr());
+		}
+	}
+
+	// create math object
 	m_W.AddVariables(vars);
 	if (m_W.Create(m_exp) == false) return false;
 
+	// calculate all derivatives
 	m_W1.AddVariables(vars); m_W1.SetExpression(MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(0), 1)));
 	m_W2.AddVariables(vars); m_W2.SetExpression(MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(1), 1)));
 	m_WJ.AddVariables(vars); m_WJ.SetExpression(MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(2), 1)));
@@ -77,6 +94,7 @@ mat3ds FEGenericHyperelastic::Stress(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	vector<double> v = { I1, I2, J };
+	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W1 = m_W1.value_s(v);
 	double W2 = m_W2.value_s(v);
@@ -103,6 +121,7 @@ tens4ds FEGenericHyperelastic::Tangent(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	vector<double> v = { I1, I2, J };
+	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W1 = m_W1.value_s(v);
 	double W2 = m_W2.value_s(v);
@@ -132,4 +151,25 @@ tens4ds FEGenericHyperelastic::Tangent(FEMaterialPoint& mp)
 	tens4ds c = cp + cw*(4.0 / J);
 
 	return c;
+}
+
+double FEGenericHyperelastic::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
+
+	mat3ds B = pt.LeftCauchyGreen();
+	mat3ds B2 = B.sqr();
+
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
+
+	vector<double> v = { I1, I2, J };
+	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
+
+	double W = m_W.value_s(v);
+
+	return W;
 }

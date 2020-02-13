@@ -48,6 +48,7 @@ private:
 
 private:
 	MSimpleExpression	m_W;	// deviatoric strain-energy function
+	vector<double*>		m_param;	// user parameters
 
 	// strain energy derivatives
 	MSimpleExpression	m_W1;

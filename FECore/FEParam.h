@@ -68,7 +68,8 @@ enum FEParamType {
 //-----------------------------------------------------------------------------
 // Parameter flags
 enum FEParamFlag {
-	FE_PARAM_ATTRIBUTE = 0x01		// parameter will be read as attribute
+	FE_PARAM_ATTRIBUTE = 0x01,		// parameter will be read as attribute
+	FE_PARAM_USER      = 0x02		// user parameter (owned by parameter list)	
 };
 
 class FEParam;
@@ -139,6 +140,7 @@ public:
 	// constructor
 	FEParam(void* pdata, FEParamType itype, int ndim, const char* szname);
 	FEParam(const FEParam& p);
+	~FEParam();
 	FEParam& operator = (const FEParam& p);
 
 	// set the parameter's validator

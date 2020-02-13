@@ -346,11 +346,29 @@ std::vector<std::string> split_string(const std::string& s, char delim)
 }
 
 //-----------------------------------------------------------------------------
-//! This function parese a parameter list
+//! This function parses a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
 {
-	// see if we can find this parameter
-	FEParam* pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
+	FEParam* pp = nullptr;
+	if (tag == "add_param")
+	{
+		// get the name and value
+		double v = 0.0; tag.value(v);
+		const char* szname = tag.AttributeValue("name");
+
+		// make sure this parameter does not exist yet
+		pp = pl.FindFromName(szname);
+		if (pp) throw XMLReader::InvalidTag(tag);
+
+		// add a new user parameter
+		pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, strdup(szname));
+		pp->SetFlags(FEParamFlag::FE_PARAM_USER);
+	}
+	else
+	{
+		// see if we can find this parameter
+		pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
+	}
 	if (pp == 0) return false;
 
 	if (pp->dim() == 1)

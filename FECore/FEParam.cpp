@@ -110,6 +110,17 @@ FEParam::FEParam(const FEParam& p)
 }
 
 //-----------------------------------------------------------------------------
+FEParam::~FEParam()
+{
+	if (m_flag & FEParamFlag::FE_PARAM_USER)
+	{
+		free((void*)m_szname);
+		assert(m_type == FE_PARAM_DOUBLE);
+		delete (double*)m_pv;
+	}
+}
+
+//-----------------------------------------------------------------------------
 FEParam& FEParam::operator=(const FEParam& p)
 {
 	m_pv = p.m_pv;
@@ -296,7 +307,14 @@ void FEParam::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << (int) m_type;
+		ar << (int) m_type << m_flag;
+
+		if ((ar.IsShallow() == false) && (m_flag & FEParamFlag::FE_PARAM_USER))
+		{
+			assert(m_type == FE_PARAM_DOUBLE);
+			ar << m_szname;
+		}
+
 		if (m_dim == 1)
 		{
 			switch (m_type)
@@ -385,8 +403,18 @@ void FEParam::Serialize(DumpStream& ar)
 	else
 	{
 		int ntype;
-		ar >> ntype;
+		ar >> ntype >> m_flag;
 		if (ntype != (int) m_type) throw DumpStream::ReadError();
+
+		if ((ar.IsShallow() == false) && (m_flag & FEParamFlag::FE_PARAM_USER))
+		{
+			assert(m_type == FE_PARAM_DOUBLE);
+			char sz[512] = { 0 };
+			ar >> sz;
+			m_szname = strdup(sz);
+			m_pv = new double(0);
+		}
+
 		if (m_dim == 1)
 		{
 			switch (m_type)
