@@ -72,9 +72,13 @@ bool FEGenericHyperelastic::Init()
 
 #ifdef _DEBUG
 	MObj2String o2s;
-	string sW1 = o2s.Convert(m_W1); feLog("W1 = %s\n", sW1.c_str());
-	string sW2 = o2s.Convert(m_W2); feLog("W2 = %s\n", sW2.c_str());
-	string sWJ = o2s.Convert(m_WJ); feLog("WJ = %s\n", sWJ.c_str());
+	string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
+	string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());
+	string sWJ = o2s.Convert(m_WJ); feLog("WJ  = %s\n", sWJ.c_str());
+	string sW11 = o2s.Convert(m_W11); feLog("W11 = %s\n", sW11.c_str());
+	string sW12 = o2s.Convert(m_W12); feLog("W12 = %s\n", sW12.c_str());
+	string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
+	string sWJJ = o2s.Convert(m_WJJ); feLog("WJJ = %s\n", sWJJ.c_str());
 #endif
 
 	return FEElasticMaterial::Init();
