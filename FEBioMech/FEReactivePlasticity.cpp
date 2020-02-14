@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
     ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"  );
+    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "bias"  );
     ADD_PARAMETER(m_isochrc, "isochoric");
 
 END_FECORE_CLASS();
@@ -62,6 +63,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_rtol = 1e-4;
     m_pBase = 0;
     m_pCrit = 0;
+    m_bias = 0.7;
 }
 
 //-----------------------------------------------------------------------------
@@ -83,15 +85,37 @@ bool FEReactivePlasticity::Init()
         w[0] = m_wmin;
     }
     else {
-        w[0] = m_wmin;
-        Kp[0] = m_Ymin;
-        Ky[0] = Kp[0];
-        double sw = w[0];
-        for (int i=1; i<m_n; ++i) {
-            w[i] = (1 - m_wmin)/(m_n-1);
-            Kp[i] = m_Ymin + (m_Ymax - m_Ymin)*i/(m_n-1);
-            Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
-            sw += w[i];
+        // use bias r to reduce intervals in Ky and w as they increase proportionally
+        double r = m_bias;
+        // r= 1 uses uniform intervals
+        if (r == 1) {
+            w[0] = m_wmin;
+            Kp[0] = m_Ymin;
+            Ky[0] = Kp[0];
+            double sw = w[0];
+            for (int i=1; i<m_n; ++i) {
+                w[i] = (1 - m_wmin)/(m_n-1);
+                Kp[i] = m_Ymin + (m_Ymax - m_Ymin)*i/(m_n-1);
+                Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
+                sw += w[i];
+            }
+        }
+        else {
+            double c = (1-r)/(1-pow(r, m_n-1));
+            w[0] = m_wmin;
+            w[1] = c*(1-m_wmin);
+            Kp[0] = m_Ymin;
+            Kp[1] = Kp[0] + c*(m_Ymax - m_Ymin);
+            double sw = w[0];
+            Ky[0] = Kp[0];
+            Ky[1] = Ky[0] + (Kp[1]-Kp[0])/(1-sw);
+            sw += w[1];
+            for (int i=2; i<m_n; ++i) {
+                w[i] = w[i-1]*r;
+                Kp[i] = Kp[i-1] + (Kp[i-1]-Kp[i-2])*r;
+                Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
+                sw += w[i];
+            }
         }
     }
     

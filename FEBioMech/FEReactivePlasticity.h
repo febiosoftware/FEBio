@@ -85,6 +85,7 @@ public:
     int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
+    double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
 
     DECLARE_FECORE_CLASS();
 };
