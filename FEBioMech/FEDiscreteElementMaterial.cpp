@@ -110,7 +110,7 @@ double FEDiscreteContractileMaterial::force_deriv_L(FEDiscreteMaterialPoint& mp)
 	double Sv = (m_Sv ? m_Sv->value(m_ac) : 1.0);
 	double V = Vm / (m_Vmax * Sv);
 
-	return passive_force_deriv_L(L, V) + active_force_deriv_L(L, V);
+	return passive_force_deriv_L(L, V)/L0 + active_force_deriv_L(L, V)/L0;
 }
 
 double FEDiscreteContractileMaterial::force_deriv_V(FEDiscreteMaterialPoint& mp)
@@ -127,7 +127,7 @@ double FEDiscreteContractileMaterial::force_deriv_V(FEDiscreteMaterialPoint& mp)
 	double Sv = (m_Sv ? m_Sv->value(m_ac) : 1.0);
 	double V = Vm / (m_Vmax * Sv);
 
-	return passive_force_deriv_V(L, V) + active_force_deriv_V(L, V);
+	return passive_force_deriv_V(L, V) / (m_Vmax * Sv) + active_force_deriv_V(L, V) / (m_Vmax * Sv);
 }
 
 double FEDiscreteContractileMaterial::force(FEDiscreteMaterialPoint& mp)
@@ -176,7 +176,7 @@ mat3d FEDiscreteContractileMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 	mat3ds exe = dyad(e);
 	mat3dd I(1.0);
 
-	mat3ds E = I / L + exe*L;
+	mat3ds E = (I - exe)/L;
 
 	vec3d v = mp.m_vt;
 	double V = mp.m_vt * e;
