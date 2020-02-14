@@ -28,9 +28,8 @@
 #pragma once
 #include "FECore/FEMaterialPoint.h"
 #include "FEReactivePlasticity.h"
+#include "FEReactivePlasticityHardening.h"
 #include <vector>
-
-class FEReactivePlasticity;
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the plasticity variables.
@@ -38,8 +37,8 @@ class FEReactivePlasticityMaterialPoint : public FEMaterialPoint
 {
 public:
     //! constructor
-    FEReactivePlasticityMaterialPoint(FEMaterialPoint *pt, FEReactivePlasticity* pmat) : FEMaterialPoint(pt) { m_pMat = pmat; }
-    
+    FEReactivePlasticityMaterialPoint(FEMaterialPoint *pt, FEElasticMaterial* pmat) : FEMaterialPoint(pt) { m_pMat = pmat; }
+
     FEMaterialPoint* Copy();
     
     //! Initialize material point data
@@ -61,7 +60,9 @@ public:
     vector<double>          m_Kv;       //!< value of yield measure at current yield
     vector<double>          m_Ku;       //!< value of yield measure at previous yield
     vector<double>          m_gp;       //!< current value of octahedral plastic shear strain
+    vector<double>          m_gpp;      //!< previous value of octahedral plastic shear strain
+    vector<double>          m_gc;       //!< cumulative value of octahedral plastic shear strain
     mat3d                   m_Fp;       //!< deformation gradient at previous time
     double                  m_Rhat;     //!< reactive heat supply density
-    FEReactivePlasticity*   m_pMat;     //!< parent material
+    FEElasticMaterial*      m_pMat;     //!< parent material
 };

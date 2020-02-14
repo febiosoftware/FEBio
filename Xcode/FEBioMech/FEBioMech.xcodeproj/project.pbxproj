@@ -467,6 +467,8 @@
 		D5EBB7A22328231800EED2BE /* FECarreauYasudaViscousSolid.h in Headers */ = {isa = PBXBuildFile; fileRef = D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */; };
 		D5F72FA021601E6300271806 /* FEFatigueMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F72F9E21601E6300271806 /* FEFatigueMaterial.cpp */; };
 		D5F72FA121601E6300271806 /* FEFatigueMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F72F9F21601E6300271806 /* FEFatigueMaterial.h */; };
+		D5F8F06A23F71D6500E93B67 /* FEReactivePlasticityHardening.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F8F06823F71D6500E93B67 /* FEReactivePlasticityHardening.cpp */; };
+		D5F8F06B23F71D6500E93B67 /* FEReactivePlasticityHardening.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F8F06923F71D6500E93B67 /* FEReactivePlasticityHardening.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -931,6 +933,8 @@
 		D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FECarreauYasudaViscousSolid.h; sourceTree = "<group>"; };
 		D5F72F9E21601E6300271806 /* FEFatigueMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFatigueMaterial.cpp; sourceTree = "<group>"; };
 		D5F72F9F21601E6300271806 /* FEFatigueMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFatigueMaterial.h; sourceTree = "<group>"; };
+		D5F8F06823F71D6500E93B67 /* FEReactivePlasticityHardening.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactivePlasticityHardening.cpp; sourceTree = "<group>"; };
+		D5F8F06923F71D6500E93B67 /* FEReactivePlasticityHardening.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEReactivePlasticityHardening.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1274,6 +1278,8 @@
 				D5322EAD2142ACD7008DE511 /* FEPRLig.h */,
 				D5B939A722D23D4700E495BA /* FEReactivePlasticity.cpp */,
 				D5B939A822D23D4700E495BA /* FEReactivePlasticity.h */,
+				D5F8F06823F71D6500E93B67 /* FEReactivePlasticityHardening.cpp */,
+				D5F8F06923F71D6500E93B67 /* FEReactivePlasticityHardening.h */,
 				D5B939AB22D23E8100E495BA /* FEReactivePlasticityMaterialPoint.cpp */,
 				D5B939AC22D23E8100E495BA /* FEReactivePlasticityMaterialPoint.h */,
 				D5322F7C2142ACD8008DE511 /* FEReactiveVEMaterialPoint.cpp */,
@@ -1547,6 +1553,7 @@
 				D5709D8D22832FD2007CAB0A /* FENodalForce.h in Headers */,
 				D565CDD1215D28A500E08ED6 /* FERigidSurface.h in Headers */,
 				D532309A2142ACD9008DE511 /* FENewtonianViscousSolidUC.h in Headers */,
+				D5F8F06B23F71D6500E93B67 /* FEReactivePlasticityHardening.h in Headers */,
 				D53231442142ACD9008DE511 /* FE3FieldElasticShellDomain.h in Headers */,
 				D53230142142ACD9008DE511 /* FEFiberIntegrationGaussKronrod.h in Headers */,
 				D5322FEC2142ACD9008DE511 /* FEMortarTiedContact.h in Headers */,
@@ -1886,6 +1893,7 @@
 				D5BD65AA2333E32000EB9FD1 /* FEInitialPreStrain.cpp in Sources */,
 				D53230CF2142ACD9008DE511 /* FEOrthoElastic.cpp in Sources */,
 				D51E614C22443FDB0049F545 /* FEMaxStressCriterion.cpp in Sources */,
+				D5F8F06A23F71D6500E93B67 /* FEReactivePlasticityHardening.cpp in Sources */,
 				D53230432142ACD9008DE511 /* FESlidingInterfaceBW.cpp in Sources */,
 				D5613D33217B5FD0007CAB89 /* FEFiberExponentialPowerUC.cpp in Sources */,
 				D5C071F52151A978003321F9 /* FEGenericBodyForce.cpp in Sources */,

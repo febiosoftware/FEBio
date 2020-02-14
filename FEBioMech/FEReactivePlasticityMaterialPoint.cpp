@@ -41,8 +41,10 @@ FEMaterialPoint* FEReactivePlasticityMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEReactivePlasticityMaterialPoint::Init()
 {
+    FEReactivePlasticity* prp = dynamic_cast<FEReactivePlasticity*>(m_pMat);
+    
     // get size of vectors
-    int n = m_pMat->m_n;
+    int n = prp ? prp->m_n : 1;
     
     // intialize data
     m_Fusi.resize(n, mat3d(1,0,0,
@@ -56,6 +58,8 @@ void FEReactivePlasticityMaterialPoint::Init()
     m_Kv.resize(n);
     m_w.resize(n,0);
     m_gp.resize(n, 0);
+    m_gpp.resize(n, 0);
+    m_gc.resize(n, 0);
     m_Rhat = 0;
 
     // don't forget to initialize the base class
@@ -69,6 +73,8 @@ void FEReactivePlasticityMaterialPoint::Update(const FETimeInfo& timeInfo)
     for (int i=0; i<m_Fusi.size(); ++i) {
         m_Fusi[i] = m_Fvsi[i];
         m_Ku[i] = m_Kv[i];
+        m_gc[i] += fabs(m_gp[i] - m_gpp[i]);
+        m_gpp[i] = m_gp[i];
     }
     m_Fp = pt.m_F;
     
@@ -80,19 +86,21 @@ void FEReactivePlasticityMaterialPoint::Update(const FETimeInfo& timeInfo)
 void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPoint::Serialize(ar);
-    
+    FEReactivePlasticity* prp = dynamic_cast<FEReactivePlasticity*>(m_pMat);
+    int n = prp ? prp->m_n : 1;
+
     if (ar.IsSaving())
     {
         ar << m_Fp;
-        for (int i=0; i<m_pMat->m_n; ++i) {
-            ar << m_Fusi[i] << m_Fvsi[i] << m_Ku[i] << m_Kv[i];
+        for (int i=0; i<n; ++i) {
+            ar << m_Fusi[i] << m_Fvsi[i] << m_Ku[i] << m_Kv[i] << m_gp[i] << m_gpp[i];
         }
     }
     else
     {
         ar >> m_Fp;
-        for (int i=0; i<m_pMat->m_n; ++i) {
-            ar >> m_Fusi[i] >> m_Fvsi[i] >> m_Ku[i] >> m_Kv[i];
+        for (int i=0; i<n; ++i) {
+            ar >> m_Fusi[i] >> m_Fvsi[i] >> m_Ku[i] >> m_Kv[i] >> m_gp[i] >> m_gpp[i];
         }
     }
 }

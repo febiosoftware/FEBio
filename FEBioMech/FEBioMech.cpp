@@ -117,6 +117,7 @@ SOFTWARE.*/
 #include "FECoupledMooneyRivlin.h"
 #include "FECoupledVerondaWestmann.h"
 #include "FEReactivePlasticity.h"
+#include "FEReactivePlasticityHardening.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEUncoupledReactiveViscoelastic.h"
 #include "FEBondRelaxation.h"
@@ -317,6 +318,7 @@ REGISTER_FECORE_CLASS(FEDamageMaterial                 , "elastic damage"       
 REGISTER_FECORE_CLASS(FERVEDamageMaterial              , "reactive viscoelastic damage"        );
 REGISTER_FECORE_CLASS(FEFatigueMaterial                , "reactive fatigue"                    );
 REGISTER_FECORE_CLASS(FEReactivePlasticity             , "reactive plasticity"                 );
+REGISTER_FECORE_CLASS(FEReactivePlasticityHardening    , "reactive plasticity hardening"       );
 
 // Uncoupled elastic materials (derived from FEUncoupledMaterial)
 REGISTER_FECORE_CLASS(FEArrudaBoyce                          , "Arruda-Boyce"                           );
