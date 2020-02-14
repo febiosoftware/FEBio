@@ -60,12 +60,17 @@ bool FEGenericHyperelasticUC::Init()
 	m_W.AddVariables(vars);
 	if (m_W.Create(m_exp) == false) return false;
 
-	m_W1.AddVariables(vars); m_W1.SetExpression(MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(0), 1)));
-	m_W2.AddVariables(vars); m_W2.SetExpression(MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(1), 1)));
+    MITEM W1 = MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(0), 1));
+    MITEM W2 = MSimplify(MDerive(m_W.GetExpression(), *m_W.Variable(1), 1));
+	m_W1.AddVariables(vars); m_W1.SetExpression(W1);
+	m_W2.AddVariables(vars); m_W2.SetExpression(W2);
 
-	m_W11.AddVariables(vars); m_W11.SetExpression(MDerive(m_W1.GetExpression(), *m_W1.Variable(0), 1));
-	m_W12.AddVariables(vars); m_W12.SetExpression(MDerive(m_W1.GetExpression(), *m_W1.Variable(1), 1));
-	m_W22.AddVariables(vars); m_W22.SetExpression(MDerive(m_W2.GetExpression(), *m_W2.Variable(1), 1));
+    MITEM W11 = MDerive(m_W1.GetExpression(), *m_W1.Variable(0), 1);
+    MITEM W12 = MDerive(m_W1.GetExpression(), *m_W1.Variable(1), 1);
+    MITEM W22 = MDerive(m_W2.GetExpression(), *m_W2.Variable(1), 1);
+	m_W11.AddVariables(vars); m_W11.SetExpression(W11);
+	m_W12.AddVariables(vars); m_W12.SetExpression(W12);
+	m_W22.AddVariables(vars); m_W22.SetExpression(W22);
 
 #ifdef _DEBUG
 	MObj2String o2s;

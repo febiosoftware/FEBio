@@ -428,6 +428,10 @@
 		D5709D9022832FD2007CAB0A /* FEInitialVelocity.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D8822832FD1007CAB0A /* FEInitialVelocity.h */; };
 		D5709D9122832FD2007CAB0A /* FEMaxDamageCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D8922832FD1007CAB0A /* FEMaxDamageCriterion.h */; };
 		D5709D9222832FD2007CAB0A /* FESolidLinearSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D8A22832FD1007CAB0A /* FESolidLinearSystem.h */; };
+		D57DD3DF23F6EF2C001347CB /* FEGenericHyperelasticUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57DD3DB23F6EF2B001347CB /* FEGenericHyperelasticUC.cpp */; };
+		D57DD3E023F6EF2C001347CB /* FEGenericHyperelastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57DD3DC23F6EF2B001347CB /* FEGenericHyperelastic.cpp */; };
+		D57DD3E123F6EF2C001347CB /* FEGenericHyperelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D57DD3DD23F6EF2B001347CB /* FEGenericHyperelastic.h */; };
+		D57DD3E223F6EF2C001347CB /* FEGenericHyperelasticUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D57DD3DE23F6EF2B001347CB /* FEGenericHyperelasticUC.h */; };
 		D5A6DA4F2370E4B50094E948 /* FEGenericRigidConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A6DA4D2370E4B50094E948 /* FEGenericRigidConstraint.cpp */; };
 		D5A6DA502370E4B50094E948 /* FEGenericRigidConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A6DA4E2370E4B50094E948 /* FEGenericRigidConstraint.h */; };
 		D5B805BC223BED2900198805 /* febiomech_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B805B9223BED2800198805 /* febiomech_api.h */; };
@@ -888,6 +892,10 @@
 		D5709D8822832FD1007CAB0A /* FEInitialVelocity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEInitialVelocity.h; sourceTree = "<group>"; };
 		D5709D8922832FD1007CAB0A /* FEMaxDamageCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaxDamageCriterion.h; sourceTree = "<group>"; };
 		D5709D8A22832FD1007CAB0A /* FESolidLinearSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolidLinearSystem.h; sourceTree = "<group>"; };
+		D57DD3DB23F6EF2B001347CB /* FEGenericHyperelasticUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGenericHyperelasticUC.cpp; sourceTree = "<group>"; };
+		D57DD3DC23F6EF2B001347CB /* FEGenericHyperelastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGenericHyperelastic.cpp; sourceTree = "<group>"; };
+		D57DD3DD23F6EF2B001347CB /* FEGenericHyperelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericHyperelastic.h; sourceTree = "<group>"; };
+		D57DD3DE23F6EF2B001347CB /* FEGenericHyperelasticUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericHyperelasticUC.h; sourceTree = "<group>"; };
 		D5A6DA4D2370E4B50094E948 /* FEGenericRigidConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGenericRigidConstraint.cpp; sourceTree = "<group>"; };
 		D5A6DA4E2370E4B50094E948 /* FEGenericRigidConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericRigidConstraint.h; sourceTree = "<group>"; };
 		D5B805B9223BED2800198805 /* febiomech_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiomech_api.h; sourceTree = "<group>"; };
@@ -1146,6 +1154,10 @@
 				D5322E932142ACD7008DE511 /* FEGasserOgdenHolzapfelUC.h */,
 				D5C071F32151A977003321F9 /* FEGenericBodyForce.cpp */,
 				D5C071F42151A978003321F9 /* FEGenericBodyForce.h */,
+				D57DD3DC23F6EF2B001347CB /* FEGenericHyperelastic.cpp */,
+				D57DD3DD23F6EF2B001347CB /* FEGenericHyperelastic.h */,
+				D57DD3DB23F6EF2B001347CB /* FEGenericHyperelasticUC.cpp */,
+				D57DD3DE23F6EF2B001347CB /* FEGenericHyperelasticUC.h */,
 				D5A6DA4D2370E4B50094E948 /* FEGenericRigidConstraint.cpp */,
 				D5A6DA4E2370E4B50094E948 /* FEGenericRigidConstraint.h */,
 				D5322EED2142ACD7008DE511 /* FEGentMaterial.cpp */,
@@ -1540,6 +1552,7 @@
 				D5322FEC2142ACD9008DE511 /* FEMortarTiedContact.h in Headers */,
 				D5BD65AD2333E32000EB9FD1 /* FEPreStrainElastic.h in Headers */,
 				D53230042142ACD9008DE511 /* FEFiberIntegrationGeodesic.h in Headers */,
+				D57DD3E223F6EF2C001347CB /* FEGenericHyperelasticUC.h in Headers */,
 				D53230B02142ACD9008DE511 /* FEStickyInterface.h in Headers */,
 				D532312E2142ACD9008DE511 /* FEPrescribedActiveContractionIsotropic.h in Headers */,
 				D53231832142ACD9008DE511 /* FESpringMaterial.h in Headers */,
@@ -1659,6 +1672,7 @@
 				D53231382142ACD9008DE511 /* FEElasticSolidDomain2O.h in Headers */,
 				D53231002142ACD9008DE511 /* FERigidAngularDamper.h in Headers */,
 				D53230752142ACD9008DE511 /* FE2DFiberNeoHookean.h in Headers */,
+				D57DD3E123F6EF2C001347CB /* FEGenericHyperelastic.h in Headers */,
 				D5322FF22142ACD9008DE511 /* FEUncoupledFiberExpLinear.h in Headers */,
 				D53231642142ACD9008DE511 /* FEDamageMaterial.h in Headers */,
 				D53230162142ACD9008DE511 /* FERigidRevoluteJoint.h in Headers */,
@@ -1898,6 +1912,7 @@
 				D53231782142ACD9008DE511 /* FEFiberIntegrationGeodesic.cpp in Sources */,
 				D53231052142ACD9008DE511 /* FE3FieldElasticSolidDomain.cpp in Sources */,
 				D53231822142ACD9008DE511 /* FEFiberIntegrationGauss.cpp in Sources */,
+				D57DD3E023F6EF2C001347CB /* FEGenericHyperelastic.cpp in Sources */,
 				D53230C22142ACD9008DE511 /* FEContactSurface.cpp in Sources */,
 				D53231672142ACD9008DE511 /* FEOsmoticVirialExpansion.cpp in Sources */,
 				D532304F2142ACD9008DE511 /* FEElasticMultigeneration.cpp in Sources */,
@@ -1929,6 +1944,7 @@
 				D53231622142ACD9008DE511 /* FECubicCLE.cpp in Sources */,
 				D5709D8C22832FD2007CAB0A /* FESolidLinearSystem.cpp in Sources */,
 				D53230952142ACD9008DE511 /* FERVEModel2O.cpp in Sources */,
+				D57DD3DF23F6EF2C001347CB /* FEGenericHyperelasticUC.cpp in Sources */,
 				D53231152142ACD9008DE511 /* FEUncoupledViscoElasticMaterial.cpp in Sources */,
 				D53230572142ACD9008DE511 /* FEPrescribedActiveContractionUniaxial.cpp in Sources */,
 				D53230092142ACD9008DE511 /* FESphericalFiberDistribution.cpp in Sources */,
