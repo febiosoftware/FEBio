@@ -44,8 +44,9 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
 
     ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymin"  );
     ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
-    ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
-    ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
+    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)       , "wmin"  );
+    ADD_PARAMETER(m_wmax   , FE_RANGE_CLOSED(0.0, 1.0)       , "wmax"  );
+    ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "n"     );
     ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"  );
     ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "bias"  );
     ADD_PARAMETER(m_isochrc, "isochoric");
@@ -57,13 +58,13 @@ END_FECORE_CLASS();
 FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_n = 1;
-    m_wmin = 1;
+    m_wmin = m_wmax = 1;
     m_Ymin = m_Ymax = 0;
     m_isochrc = true;
     m_rtol = 1e-4;
     m_pBase = 0;
     m_pCrit = 0;
-    m_bias = 0.7;
+    m_bias = 0.9;
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +76,11 @@ bool FEReactivePlasticity::Init()
         feLogError("Elastic material should not be of type uncoupled");
         return false;
     }
-    
+    if (m_wmax < m_wmin) {
+        feLogError("wmax must be ≥ wmin");
+        return false;
+    }
+
     Ky.resize(m_n);
     w.resize(m_n);
     vector<double> Kp(m_n,0);
@@ -94,7 +99,7 @@ bool FEReactivePlasticity::Init()
             Ky[0] = Kp[0];
             double sw = w[0];
             for (int i=1; i<m_n; ++i) {
-                w[i] = (1 - m_wmin)/(m_n-1);
+                w[i] = (m_wmax - m_wmin)/(m_n-1);
                 Kp[i] = m_Ymin + (m_Ymax - m_Ymin)*i/(m_n-1);
                 Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
                 sw += w[i];
@@ -103,7 +108,7 @@ bool FEReactivePlasticity::Init()
         else {
             double c = (1-r)/(1-pow(r, m_n-1));
             w[0] = m_wmin;
-            w[1] = c*(1-m_wmin);
+            w[1] = c*(m_wmax-m_wmin);
             Kp[0] = m_Ymin;
             Kp[1] = Kp[0] + c*(m_Ymax - m_Ymin);
             double sw = w[0];
