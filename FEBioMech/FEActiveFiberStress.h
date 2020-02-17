@@ -1,9 +1,10 @@
+#pragma once
 /*This file is part of the FEBio source code and is licensed under the MIT license
 listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,36 +25,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #pragma once
 #include <FECore/FEMaterial.h>
 #include "FEElasticMaterial.h"
+#include <FECore/tens4d.h>
+#include <FECore/FEFunction1D.h>
+
 
 //-----------------------------------------------------------------------------
-//! A material class describing the active fiber contraction
-class FEActiveFiberContraction : public FEMaterial
+class FEActiveFiberStress : public FEElasticMaterial
 {
 public:
-	FEActiveFiberContraction(FEModel* pfem);
+	class Data : public FEMaterialPoint
+	{
+	public:
+		double	m_lamp;
 
-	//! initialization
-	bool Init() override;
+	public:
+		void Update()
+		{
+			// TODO:
+		}
+	};
 
-	//! calculate the fiber stress
-	mat3ds FiberStress(const vec3d& a0, FEMaterialPoint& mp);
+public:
+	FEActiveFiberStress(FEModel* fem);
 
-	//! active contraction stiffness contribution
-	tens4ds FiberStiffness(const vec3d& a0, FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
-protected:
-	double	m_ascl;		//!< activation scale factor
-	double	m_Tmax;		//!< activation scale factor
-	double	m_ca0;		//!< intracellular calcium concentration
-	double	m_camax;	//!< peak calcium concentration
-	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
-	double	m_l0;		//!< unloaded length
-	double	m_refl;		//!< sarcomere length
+	tens4ds Tangent(FEMaterialPoint& mp) override;
+
+private:
+	double	m_smax;		//!< peak stress
+	double	m_ac;		//!< activation level
+	FEFunction1D*	m_stl;	//!< stress from tension-length 
+	FEFunction1D*	m_stv;	//!< stress from tension-velocity
 
 	DECLARE_FECORE_CLASS();
 };

@@ -388,6 +388,8 @@
     <ClInclude Include="..\..\FEBioMech\FE3FieldElasticShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEActiveFiberContraction.h" />
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberStress.h" />
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberStressUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEBCPrescribedDeformation.h" />
@@ -621,6 +623,8 @@
     <ClCompile Include="..\..\FEBioMech\FE3FieldElasticShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEActiveFiberContraction.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberStress.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberStressUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp" />

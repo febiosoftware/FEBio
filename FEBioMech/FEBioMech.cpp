@@ -139,6 +139,8 @@ SOFTWARE.*/
 #include "FEMindlinElastic2O.h"
 #include "FEGenericHyperelastic.h"
 #include "FEGenericHyperelasticUC.h"
+#include "FEActiveFiberStress.h"
+#include "FEActiveFiberStressUC.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -403,6 +405,7 @@ REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic  , "prescribed isot
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, "uncoupled prescribed isotropic active contraction");
 
 REGISTER_FECORE_CLASS(FEActiveFiberStress, "active fiber stress");
+REGISTER_FECORE_CLASS(FEActiveFiberStressUC, "uncoupled active fiber stress");
 
 // discrete materials
 REGISTER_FECORE_CLASS(FELinearSpring           , "linear spring"             );
