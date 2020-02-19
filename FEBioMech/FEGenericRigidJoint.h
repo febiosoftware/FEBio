@@ -29,10 +29,10 @@ SOFTWARE.*/
 #include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
-class FEGenericRigidConstraint : public FERigidConnector
+class FEGenericRigidJoint : public FERigidConnector
 {
 public:
-	FEGenericRigidConstraint(FEModel* fem);
+	FEGenericRigidJoint(FEModel* fem);
 
 	//! initialization
 	bool Init() override;

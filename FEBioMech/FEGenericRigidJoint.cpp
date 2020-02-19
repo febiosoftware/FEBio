@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #include "stdafx.h"
-#include "FEGenericRigidConstraint.h"
+#include "FEGenericRigidJoint.h"
 #include "FERigidBody.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include <FECore/fecore_debug.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEGenericRigidConstraint, FERigidConnector);
+BEGIN_FECORE_CLASS(FEGenericRigidJoint, FERigidConnector);
 	ADD_PARAMETER(m_laugon , "laugon" );
 	ADD_PARAMETER(m_eps    , "penalty");
 	ADD_PARAMETER(m_tol    , "tolerance");
@@ -57,7 +57,7 @@ BEGIN_FECORE_CLASS(FEGenericRigidConstraint, FERigidConnector);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEGenericRigidConstraint::FEGenericRigidConstraint(FEModel* pfem) : FERigidConnector(pfem)
+FEGenericRigidJoint::FEGenericRigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
 	static int count = 1;
 	m_nID = count++;
@@ -103,7 +103,7 @@ FEGenericRigidConstraint::FEGenericRigidConstraint(FEModel* pfem) : FERigidConne
 }
 
 //-----------------------------------------------------------------------------
-bool FEGenericRigidConstraint::Init()
+bool FEGenericRigidJoint::Init()
 {
 	// base class first
 	if (FERigidConnector::Init() == false) return false;
@@ -117,7 +117,7 @@ bool FEGenericRigidConstraint::Init()
 
 //-----------------------------------------------------------------------------
 // allocate equations
-int FEGenericRigidConstraint::InitEquations(int neq)
+int FEGenericRigidJoint::InitEquations(int neq)
 {
 	if (m_laugon == 2)
 	{
@@ -133,7 +133,7 @@ int FEGenericRigidConstraint::InitEquations(int neq)
 
 //-----------------------------------------------------------------------------
 // Build the matrix profile
-void FEGenericRigidConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
+void FEGenericRigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
 {
 	vector<int> lm;
 	UnpackLM(lm);
@@ -143,7 +143,7 @@ void FEGenericRigidConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
@@ -260,14 +260,14 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEGenericRigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	if (m_laugon == 2) StiffnessMatrixLM(LS, tp);
 	else StiffnessMatrixAL(LS, tp);
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::StiffnessMatrixLM(FELinearSystem& LS, const FETimeInfo& tp)
+void FEGenericRigidJoint::StiffnessMatrixLM(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
@@ -362,7 +362,7 @@ void FEGenericRigidConstraint::StiffnessMatrixLM(FELinearSystem& LS, const FETim
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::StiffnessMatrixAL(FELinearSystem& LS, const FETimeInfo& tp)
+void FEGenericRigidJoint::StiffnessMatrixAL(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
@@ -482,7 +482,7 @@ void FEGenericRigidConstraint::StiffnessMatrixAL(FELinearSystem& LS, const FETim
 }
 
 //-----------------------------------------------------------------------------
-bool FEGenericRigidConstraint::Augment(int naug, const FETimeInfo& tp)
+bool FEGenericRigidJoint::Augment(int naug, const FETimeInfo& tp)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -587,7 +587,7 @@ bool FEGenericRigidConstraint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::Serialize(DumpStream& ar)
+void FEGenericRigidJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
 	ar & m_nID;
@@ -596,19 +596,19 @@ void FEGenericRigidConstraint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::Update()
+void FEGenericRigidJoint::Update()
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::Reset()
+void FEGenericRigidJoint::Reset()
 {
 	assert(false);
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::UnpackLM(vector<int>& lm)
+void FEGenericRigidJoint::UnpackLM(vector<int>& lm)
 {
 	int ndof = (m_laugon == 2 ? 18 : 12);
 
@@ -637,7 +637,7 @@ void FEGenericRigidConstraint::UnpackLM(vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEGenericRigidConstraint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+void FEGenericRigidJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == 2)
 	{
@@ -648,7 +648,7 @@ void FEGenericRigidConstraint::Update(const std::vector<double>& Ui, const std::
 	}
 }
 
-void FEGenericRigidConstraint::PrepStep()
+void FEGenericRigidJoint::PrepStep()
 {
 	if (m_laugon == 2)
 	{
@@ -659,7 +659,7 @@ void FEGenericRigidConstraint::PrepStep()
 	}
 }
 
-void FEGenericRigidConstraint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+void FEGenericRigidJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == 2)
 	{

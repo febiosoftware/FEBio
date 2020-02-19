@@ -170,7 +170,7 @@ SOFTWARE.*/
 #include "FEAugLagLinearConstraint.h"
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
-#include "FEGenericRigidConstraint.h"
+#include "FEGenericRigidJoint.h"
 #include "FERigidSphericalJoint.h"
 #include "FERigidRevoluteJoint.h"
 #include "FERigidPrismaticJoint.h"
@@ -508,7 +508,7 @@ REGISTER_FECORE_CLASS(FEPointConstraint      , "point"                  );
 REGISTER_FECORE_CLASS(FELinearConstraintSet  , "linear constraint"      );
 REGISTER_FECORE_CLASS(FESymmetryPlane        , "symmetry plane"         );
 REGISTER_FECORE_CLASS(FERigidJoint           , "rigid joint"            );
-REGISTER_FECORE_CLASS(FEGenericRigidConstraint, "rigid constraint"      );
+REGISTER_FECORE_CLASS(FEGenericRigidJoint    , "generic rigid joint"    );
 REGISTER_FECORE_CLASS(FERigidSphericalJoint  , "rigid spherical joint"  );
 REGISTER_FECORE_CLASS(FERigidRevoluteJoint   , "rigid revolute joint"   );
 REGISTER_FECORE_CLASS(FERigidPrismaticJoint  , "rigid prismatic joint"  );
