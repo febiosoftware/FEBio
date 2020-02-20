@@ -90,14 +90,14 @@ void FEParameterList::operator = (FEParameterList& l)
 
 //-----------------------------------------------------------------------------
 // This function adds a parameter to the parameter list
-FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const char *sz)
+FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const char *sz, bool* watch)
 {
 	// sanity checks
 	assert(pv);
 	assert(sz);
 
 	// create a new parameter object
-	FEParam p(pv, itype, ndim, sz);
+	FEParam p(pv, itype, ndim, sz, watch);
 
 	// add the parameter to the list
 	m_pl.push_back(p);
@@ -256,10 +256,10 @@ void FEParamContainer::BuildParamList()
 
 //-----------------------------------------------------------------------------
 // Add a parameter to the parameter list
-FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz)
+FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz, bool* watch)
 {
 	assert(m_pParam);
-	FEParam* p = m_pParam->AddParameter(pv, itype, ndim, sz);
+	FEParam* p = m_pParam->AddParameter(pv, itype, ndim, sz, watch);
 	p->setParent(this);
 	return p;
 }
@@ -297,6 +297,8 @@ void FEParamContainer::AddParameter(FEMaterialPointProperty& v, const char* sz) 
 void FEParamContainer::AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT, 1, rng, sz); }
 void FEParamContainer::AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE, 1, rng, sz); }
 void FEParamContainer::AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
+
+void FEParamContainer::AddParameter(double&        v, const char* sz, bool& watch) { AddParameter(&v, FE_PARAM_DOUBLE, 1, sz, &watch); }
 
 void FEParamContainer::AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT, ndim, sz); }
 void FEParamContainer::AddParameter(double*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE, ndim, sz); }

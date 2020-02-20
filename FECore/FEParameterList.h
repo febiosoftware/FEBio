@@ -67,7 +67,7 @@ public:
 	void operator = (FEParameterList& l);
 
 	//! Add a parameter to the list
-	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
+	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz, bool* watch = nullptr);
 
 	//! Add a parameter to the list
 	FEParam* AddParameter(void* pv, FEParamType type, int ndim, FEParamRange rng, double fmin, double fmax, const char* sz);
@@ -148,7 +148,7 @@ public:
 	virtual void BuildParamList();
 
 	//! Add a parameter to the list
-	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
+	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz, bool* watch = nullptr);
 
 	//! Add a parameter to the list
 	FEParam* AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
@@ -177,6 +177,8 @@ public:
 	void AddParameter(int&           v, RANGE rng, const char* sz);
 	void AddParameter(double&        v, RANGE rng, const char* sz);
 	void AddParameter(FEParamDouble& v, RANGE rng, const char* sz);
+
+	void AddParameter(double& v, const char* sz, bool& watch);
 
 	void AddParameter(int*           v, int ndim, const char* sz);
 	void AddParameter(double*        v, int ndim, const char* sz);

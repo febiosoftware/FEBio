@@ -825,6 +825,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 	// give the parameter container a chance to do additional processing
 	pl.GetContainer()->SetParameter(*pp);
 
+	// Set the watch flag since the parameter was read in successfully
+	// (This requires that the parameter was declared with a watch variable)
+	pp->SetWatch(true);
+
 	return true;
 }
 

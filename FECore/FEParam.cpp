@@ -72,11 +72,13 @@ FEParamValue FEParamValue::component(int n)
 
 
 //-----------------------------------------------------------------------------
-FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
+FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, bool* watch)
 {
 	m_pv = pdata;
 	m_type = itype;
 	m_dim = ndim;
+	m_watch = watch;
+	if (m_watch) *m_watch = false;
 
 	m_flag = 0;
 
@@ -99,6 +101,7 @@ FEParam::FEParam(const FEParam& p)
 	m_pv = p.m_pv;
 	m_type = p.m_type;
 	m_dim = p.m_dim;
+	m_watch = p.m_watch;
 
 	m_flag = p.m_flag;
 
@@ -126,6 +129,7 @@ FEParam& FEParam::operator=(const FEParam& p)
 	m_pv = p.m_pv;
 	m_type = p.m_type;
 	m_dim = p.m_dim;
+	m_watch = p.m_watch;
 
 	m_flag = p.m_flag;
 
@@ -309,6 +313,9 @@ void FEParam::Serialize(DumpStream& ar)
 	{
 		ar << (int) m_type << m_flag;
 
+		bool b = (m_watch ? *m_watch : false);
+		ar << (b ? 1 : 0);
+
 		if ((ar.IsShallow() == false) && (m_flag & FEParamFlag::FE_PARAM_USER))
 		{
 			assert(m_type == FE_PARAM_DOUBLE);
@@ -405,6 +412,10 @@ void FEParam::Serialize(DumpStream& ar)
 		int ntype;
 		ar >> ntype >> m_flag;
 		if (ntype != (int) m_type) throw DumpStream::ReadError();
+
+		int watch = 0;
+		ar >> watch;
+		if (m_watch) *m_watch = (watch == 1);
 
 		if ((ar.IsShallow() == false) && (m_flag & FEParamFlag::FE_PARAM_USER))
 		{
@@ -529,6 +540,12 @@ bool FEParam::CopyState(const FEParam& p)
 //-----------------------------------------------------------------------------
 void FEParam::setParent(FEParamContainer* pc) { m_parent = pc; }
 FEParamContainer* FEParam::parent() { return m_parent; }
+
+//-----------------------------------------------------------------------------
+void FEParam::SetWatch(bool b)
+{
+	if (m_watch) *m_watch = b;
+}
 
 //-----------------------------------------------------------------------------
 void FEParam::SetFlags(unsigned int flags) { m_flag = flags; }

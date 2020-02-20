@@ -127,6 +127,7 @@ private:
 	int				m_dim;		// dimension (in case data is array)
 	FEParamType		m_type;		// type of variable
 	unsigned int	m_flag;		// parameter flags
+	bool*			m_watch;	// parameter watch (set to true if read in)
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
@@ -138,7 +139,7 @@ private:
 
 public:
 	// constructor
-	FEParam(void* pdata, FEParamType itype, int ndim, const char* szname);
+	FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, bool* watch = nullptr);
 	FEParam(const FEParam& p);
 	~FEParam();
 	FEParam& operator = (const FEParam& p);
@@ -179,6 +180,8 @@ public:
 
 	void SetFlags(unsigned int flags);
 	unsigned int GetFlags() const;
+
+	void SetWatch(bool b);
 
 public:
 	void Serialize(DumpStream& ar);
