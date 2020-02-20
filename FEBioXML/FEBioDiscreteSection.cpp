@@ -144,6 +144,8 @@ void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioDiscreteSection25::Parse(XMLTag& tag)
 {
+	if (tag.isleaf()) return;
+
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -172,12 +174,15 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 
 			// add it to the model
 			fem.AddMaterial(pm);
-			pm->SetID(fem.Materials());
 
 			dmat.push_back(pm);
 
 			// read the parameter list
 			ReadParameterList(tag, pm);
+
+			// The id in the file is one-based for discrete materials, but we want to have 
+			// a global material ID here.
+			pm->SetID(fem.Materials());
 		}
 		else if (tag == "discrete")
 		{
