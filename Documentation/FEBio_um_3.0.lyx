@@ -69611,6 +69611,416 @@ Isotropic contraction in a mixture containing a Mooney-Rivlin solid.
 </material>
 \end_layout
 
+\begin_layout Subsubsection
+Prescribed Fiber Stress
+\end_layout
+
+\begin_layout Standard
+An active fiber stress, based on a Hill formulation, can be added via the
+ material 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+uncoupled active fiber stress
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This material must be combined with a stable compressible material that
+ acts as a passive matrix, using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+uncoupled solid mixture
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Solid-Mixture"
+
+\end_inset
+
+.
+ The stress is given by,
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}^{a}=J^{-1}T\left(\tilde{\lambda}\right)\mathbf{\mathrm{dev}A}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\mathbf{A=a\otimes a},$
+\end_inset
+
+with 
+\series bold
+a
+\series default
+ the unit vector describing the fiber direction in the spatial frame, 
+\emph on
+
+\begin_inset Formula $\tilde{\lambda}$
+\end_inset
+
+
+\emph default
+is the deviatoric fiber stretch, 
+\emph on
+J 
+\emph default
+is the jacobian of the deformation, and 
+\begin_inset Formula 
+\[
+T\left(\tilde{\lambda}\right)=s_{max}a\left(t\right)s_{TL}\left(\tilde{\lambda}\right)s_{TV}\left(\dot{\tilde{\lambda}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The parameters are defined below.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+smax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scale factor for defining maximum stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+activation level
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stl
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function defining the stress-stretch relatioship for the material
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stv
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function defining the stress-stretch rate relatioship for the material.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The parameters
+\begin_inset Formula $s_{TL}$
+\end_inset
+
+and 
+\begin_inset Formula $s_{TV}$
+\end_inset
+
+are functions that need to be defined in place.
+ There are currently two ways of defining these functions, either via a
+ mathematical expression or a list of sample points.
+ An example is given below.
+ If these parametes are omitted, they are replaced by the constant 1 in
+ the equation for the stress above.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+An example defining the stl parameter via a mathematical expression.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="uncoupled solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <k>100.0</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+    <c1>1.0</c1>
+\end_layout
+
+\begin_layout LyX-Code
+    <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="uncoupled active fiber stress">
+\end_layout
+
+\begin_layout LyX-Code
+    <smax>1.5</smax>
+\end_layout
+
+\begin_layout LyX-Code
+    <a lc="1">0.1</a>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl type="math">
+\end_layout
+
+\begin_layout LyX-Code
+      <math>(l-1)^2</math>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+An example defining the stl parameter via a point list.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="uncoupled solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <k>100.0</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+    <c1>1.0</c1>
+\end_layout
+
+\begin_layout LyX-Code
+    <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="uncoupled active fiber stress">
+\end_layout
+
+\begin_layout LyX-Code
+    <smax>1.5</smax>
+\end_layout
+
+\begin_layout LyX-Code
+    <a lc="1">0.1</a>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl type="point">
+\end_layout
+
+\begin_layout LyX-Code
+      <interpolate>linear</interpolate>
+\end_layout
+
+\begin_layout LyX-Code
+      <points>
+\end_layout
+
+\begin_layout LyX-Code
+        <pt>0,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+        <pt>1,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+        <pt>2,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      </points>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -70517,6 +70927,408 @@ Isotropic contraction in a mixture containing a neo-Hookean solid.
 
 \begin_layout LyX-Code
     <T0 lc="2">1</T0>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Subsubsection
+Prescribed Fiber Stress
+\end_layout
+
+\begin_layout Standard
+An active fiber stress, based on a Hill formulation, can be added via the
+ material 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+active fiber stress
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This material must be combined with a stable compressible material that
+ acts as a passive matrix, using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+solid mixture
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+
+\end_inset
+
+.
+ The stress is given by,
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}^{a}=J^{-1}T\left(\lambda\right)\mathbf{A}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\mathbf{A=a\otimes a},$
+\end_inset
+
+with 
+\series bold
+a
+\series default
+ the unit vector describing the fiber direction in the spatial frame, 
+\emph on
+
+\begin_inset Formula $\lambda$
+\end_inset
+
+
+\emph default
+is the fiber stretch, 
+\emph on
+J 
+\emph default
+is the jacobian of the deformation, and 
+\begin_inset Formula 
+\[
+T\left(\lambda\right)=s_{max}a\left(t\right)s_{TL}\left(\lambda\right)s_{TV}\left(\dot{\lambda}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The parameters are defined below.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+smax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scale factor for defining maximum stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+activation level
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stl
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function defining the stress-stretch relatioship for the material
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stv
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function defining the stress-stretch rate relatioship for the material.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The parameters
+\begin_inset Formula $s_{TL}$
+\end_inset
+
+and 
+\begin_inset Formula $s_{TV}$
+\end_inset
+
+are functions that need to be defined in place.
+ There are currently two ways of defining these functions, either via a
+ mathematical expression or a list of sample points.
+ An example is given below.
+ If these parametes are omitted, they are replaced by the constant 1 in
+ the equation for the stress above.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+An example defining the stl parameter via a mathematical expression.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="active fiber stress">
+\end_layout
+
+\begin_layout LyX-Code
+    <smax>150</smax>
+\end_layout
+
+\begin_layout LyX-Code
+    <a lc="1">0.1</a>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl type="math">
+\end_layout
+
+\begin_layout LyX-Code
+      <math>(l-1)^2</math>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+An example defining the stl parameter via a point list.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="active fiber stress">
+\end_layout
+
+\begin_layout LyX-Code
+    <smax>150</smax>
+\end_layout
+
+\begin_layout LyX-Code
+    <a lc="1">0.1</a>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl type="point">
+\end_layout
+
+\begin_layout LyX-Code
+      <interpolate>linear</interpolate>
+\end_layout
+
+\begin_layout LyX-Code
+      <points>
+\end_layout
+
+\begin_layout LyX-Code
+        <pt>0,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+        <pt>1,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+        <pt>2,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      </points>
+\end_layout
+
+\begin_layout LyX-Code
+    <stl>
 \end_layout
 
 \begin_layout LyX-Code
