@@ -215,6 +215,7 @@ SOFTWARE.*/
 #include "FEDeformableSpringDomain.h"
 #include "RigidBC.h"
 #include "FEBCPrescribedDeformation.h"
+#include "FEBCRigidDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
@@ -478,6 +479,7 @@ REGISTER_FECORE_CLASS(FEDiscreteElementDomain    , "discrete");
 REGISTER_FECORE_CLASS(FEBCPrescribedDeformation     , "prescribed deformation"   );
 REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O   , "prescribed deformation 2O");
 REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement"      );
+REGISTER_FECORE_CLASS(FEBCRigidDeformation          , "rigid deformation"        );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEInitialCondition
