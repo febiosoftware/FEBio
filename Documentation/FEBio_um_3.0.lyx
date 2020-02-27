@@ -31417,9 +31417,16 @@ fiber
  Other materials are orthotropic, requiring the specification of initial
  material axes that define the three planes of symmetry for those materials.
  Only one of these specifications should be provided.
- When specifying material axes, the first axis corresponds to the fiber
- direction.
- The fiber or material axes orientation may be specified in several ways.
+ By default, material axes are aligned with the global Cartesian basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ and the fiber direction is along 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+.
+ Local fiber or material axes orientation may be specified in several ways.
  FEBio gives the option to automatically generate the orientation, based
  on some user-specified parameters.
  However, the user can override this feature and specify the fiber or axes
@@ -51686,7 +51693,25 @@ where
 \begin_inset Formula $\mathbf{n}$
 \end_inset
 
- and 
+ in the local Cartesian basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ of each element, when specified (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Specifying-Fiber-Orientation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) or the global basis by default; and 
 \begin_inset Formula $C$
 \end_inset
 
@@ -51841,7 +51866,15 @@ von-Mises-3d
 \begin_inset Quotes erd
 \end_inset
 
- models a transversely isotropic 3D distribution.
+ models a transversely isotropic 3D distribution 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Gasser06"
+literal "false"
+
+\end_inset
+
+.
  It corresponds to 
 \begin_inset Formula 
 \[
@@ -51858,7 +51891,25 @@ where
 \begin_inset Formula $\mathbf{n}$
 \end_inset
 
- and 
+ in the local Cartesian basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ of each element, when specified (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Specifying-Fiber-Orientation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) or the global basis by default; and 
 \begin_inset Formula $b$
 \end_inset
 
@@ -52067,7 +52118,30 @@ where
 \begin_inset Formula $\mathbf{n}$
 \end_inset
 
- and 
+ in the local Cartesian basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ of each element, when specified (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Specifying-Fiber-Orientation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) or the global basis by default, implying that the elliptical distribution
+ lies in the 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} $
+\end_inset
+
+ plane; and 
 \begin_inset Formula $\left(a,b\right)$
 \end_inset
 
@@ -52267,7 +52341,29 @@ where
 \begin_inset Formula $\mathbf{n}$
 \end_inset
 
- and 
+ in the local Cartesian basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ of each element, when specified (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Specifying-Fiber-Orientation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) or the global basis by default, with the distribution lying in the 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} $
+\end_inset
+
+ plane; and 
 \begin_inset Formula $b$
 \end_inset
 
