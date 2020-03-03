@@ -466,6 +466,7 @@ void FEFluidSolver::PrepStep()
     {
         FENode& ni = mesh.Node(i);
         ni.m_rp = ni.m_rt = ni.m_r0;
+        ni.m_dp = ni.m_dt = ni.m_d0;
 		ni.UpdateValues();
         
         switch (m_pred) {

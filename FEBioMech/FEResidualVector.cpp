@@ -127,7 +127,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 						if (bdom)
 						{
 							if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
-								vec3d d = node.m_d0 + node.get_vec3d(dofX, dofY, dofZ) - node.get_vec3d(dofSX, dofSY, dofSZ);
+								vec3d d = node.m_dt;
 								vec3d b = a - d;
 								vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
 								f += Fd;

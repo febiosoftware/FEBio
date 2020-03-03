@@ -111,6 +111,7 @@ public: // geometry data
 
 	vec3d   m_d0;   //!< initial director
 	vec3d	m_dt;	//!< current director
+    vec3d   m_dp;   //!< director at previous time step
 
 public:	// rigid body data
 	unsigned int	m_nstate;	//!< node state flags
@@ -146,6 +147,11 @@ public:
 	bool is_active(int ndof) const { return ((m_BC[ndof] & 0xF0) != 0); }
 
 	int dofs() const { return (int) m_ID.size(); }
+    
+public:
+    vec3d   m_s0() { return m_r0 - m_d0; }
+    vec3d   m_st() { return m_rt - m_dt; }
+    vec3d   m_sp() { return m_rp - m_dp; }
 
 private:
 	std::vector<int>		m_BC;		//!< boundary condition array

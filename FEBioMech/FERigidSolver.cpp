@@ -609,7 +609,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
             Aj.skew(aj);
             
             // get the shell director
-            bj = aj - (nodej.m_d0 + nodej.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodej.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
+            bj = aj - nodej.m_dt;
             Bj.skew(bj);
             
             // loop over rows
@@ -651,7 +651,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     Ai.skew(ai);
                     
                     // get the shell director
-                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
+                    bi = ai - nodei.m_dt;
                     Bi.skew(bi);
                     
                     mat3d M;
@@ -798,7 +798,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     Ai.skew(ai);
                     
                     // get the shell director
-                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
+                    bi = ai - nodei.m_dt;
                     Bi.skew(bi);
                     
                     // get the element sub-matrix
@@ -877,7 +877,7 @@ void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<doub
         }
 		if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
             // get the shell director
-            vec3d d = node.m_d0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) - node.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
+            vec3d d = node.m_dt;
             vec3d b = a - d;
             if (dof == m_dofSX)
             {

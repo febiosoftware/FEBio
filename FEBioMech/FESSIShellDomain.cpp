@@ -1066,7 +1066,7 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 		for (int j = 0; j<n; ++j)
 		{
 			FENode& nj = mesh.Node(e.m_node[j]);
-			vec3d D = nj.m_d0 + nj.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - nj.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+			vec3d D = nj.m_dt;
 			double h = D.norm();
 
 			e.m_ht[j] = h;

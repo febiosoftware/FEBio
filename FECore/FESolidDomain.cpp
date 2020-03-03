@@ -359,7 +359,7 @@ void FESolidDomain::GetCurrentNodalCoordinates(const FESolidElement& el, vec3d* 
 			if (el.m_bitfc[i])
 			{
 				FENode& nd = m_pMesh->Node(el.m_node[i]);
-				rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - nd.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+				rt[i] -= nd.m_dt;
 			}
 		}
 	}
@@ -427,8 +427,7 @@ void FESolidDomain::GetPreviousNodalCoordinates(const FESolidElement& el, vec3d*
 			if (el.m_bitfc[i])
 			{
 				FENode& nd = m_pMesh->Node(el.m_node[i]);
-				rp[i] -= nd.m_d0 + nd.m_rp - nd.m_r0
-					- nd.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+				rp[i] -= nd.m_dp;
 			}
 		}
 	}

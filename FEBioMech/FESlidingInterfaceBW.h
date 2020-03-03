@@ -177,6 +177,8 @@ public:
     bool            m_bfreeze;      //!< freeze stick/slip status
     bool            m_bflipm;       //!< flip master normal
     bool            m_bflips;       //!< flip slave normal
+    bool            m_bshellbm;     //!< flag for prescribing pressure on shell bottom for master surface
+    bool            m_bshellbs;     //!< flag for prescribing pressure on shell bottom for slave surface
 
     DECLARE_FECORE_CLASS();
 };

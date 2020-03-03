@@ -764,9 +764,9 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
 		{
             FENode& node = m_pMesh->Node(el.m_node[j]);
             r0[j] = node.m_r0;
-            s0[j] = node.m_r0 - node.m_d0;
+            s0[j] = node.m_s0();
             r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
-            s[j] = s0[j] + node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2])*m_alphaf + node.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2])*(1-m_alphaf);
+            s[j] = node.m_st()*m_alphaf + node.m_sp()*(1-m_alphaf);
             v[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*m_alphaf + node.m_vp*(1-m_alphaf);
             w[j] = node.get_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2])*m_alphaf + node.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2])*(1-m_alphaf);
             a[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);

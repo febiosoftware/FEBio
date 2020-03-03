@@ -415,8 +415,11 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		if (node.m_rid == -1)
+        if (node.m_rid == -1) {
 			node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
+        }
+        node.m_dt = node.m_d0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2])
+        - node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 	}
 
 	// update velocity and accelerations
@@ -525,7 +528,7 @@ void FESolidSolver2::Update(vector<double>& ui)
 //-----------------------------------------------------------------------------
 //! Updates the current state of the model
 //! NOTE: The ui vector also contains prescribed displacement increments. Also note that this
-//!       only works for a limited set of FEBio features (no rigid bodies or shells!).
+//!       only works for a limited set of FEBio features (no rigid bodies!).
 void FESolidSolver2::Update2(const vector<double>& ui)
 {
 	// get the mesh
@@ -543,16 +546,24 @@ void FESolidSolver2::Update2(const vector<double>& ui)
 	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
+        vec3d du(0, 0, 0);
+        int nx = -node.m_ID[m_dofU[0]] - 2; if (nx >= 0) du.x = ui[nx];
+        int ny = -node.m_ID[m_dofU[1]] - 2; if (ny >= 0) du.y = ui[ny];
+        int nz = -node.m_ID[m_dofU[2]] - 2; if (nz >= 0) du.z = ui[nz];
+        
 		if (node.m_rid == -1)
 		{
-			vec3d du(0, 0, 0);
-			int nx = -node.m_ID[m_dofU[0]] - 2; if (nx >= 0) du.x = ui[nx];
-			int ny = -node.m_ID[m_dofU[1]] - 2; if (ny >= 0) du.y = ui[ny];
-			int nz = -node.m_ID[m_dofU[2]] - 2; if (nz >= 0) du.z = ui[nz];
-
 			vec3d rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) + du;
 			node.m_rt = rt;
 		}
+        vec3d db(0, 0, 0);
+        int nbx = -node.m_ID[m_dofSU[0]] - 2; if (nbx >= 0) db.x = ui[nbx];
+        int nby = -node.m_ID[m_dofSU[1]] - 2; if (nby >= 0) db.y = ui[nby];
+        int nbz = -node.m_ID[m_dofSU[2]] - 2; if (nbz >= 0) db.z = ui[nbz];
+
+        vec3d dt = node.m_d0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) + du
+        - (node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]) + db);
+        node.m_dt = dt;
 	}
 
 	// update model state
@@ -631,6 +642,7 @@ void FESolidSolver2::PrepStep()
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
+        ni.m_dp = ni.m_dt;
 		ni.UpdateValues();
 
         // initial guess at start of new time step

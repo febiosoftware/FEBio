@@ -535,8 +535,11 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     for (int i = 0; i<mesh.Nodes(); ++i)
     {
         FENode& node = mesh.Node(i);
-        if (node.m_rid == -1)
+        if (node.m_rid == -1) {
             node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
+            node.m_dt = node.m_d0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2])
+            - node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+        }
     }
     
     // update time derivatives of velocity and dilatation
@@ -789,6 +792,7 @@ void FEFluidFSISolver::PrepStep()
         ni.m_rp = ni.m_rt;
         ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
         ni.m_ap = ni.m_at;
+        ni.m_dp = ni.m_dt = ni.m_d0;
 		ni.UpdateValues();
         
         switch (m_pred) {

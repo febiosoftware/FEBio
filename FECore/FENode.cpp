@@ -66,6 +66,8 @@ FENode::FENode(const FENode& n)
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
 	m_d0 = n.m_d0;
+    m_dt = n.m_dt;
+    m_dp = n.m_dp;
 
 	m_nID = n.m_nID;
 	m_rid = n.m_rid;
@@ -88,6 +90,8 @@ FENode& FENode::operator = (const FENode& n)
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
 	m_d0 = n.m_d0;
+    m_dt = n.m_dt;
+    m_dp = n.m_dp;
 
 	m_nID = n.m_nID;
 	m_rid = n.m_rid;
@@ -111,6 +115,7 @@ void FENode::Serialize(DumpStream& ar)
 	ar & m_rp & m_vp & m_ap;
 	ar & m_Fr;
 	ar & m_val_t & m_val_p;
+    ar & m_dt & m_dp;
 	if (ar.IsShallow() == false)
 	{
 		ar & m_nstate;

@@ -55,6 +55,8 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceBW, FEContactInterface)
 	ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
 	ADD_PARAMETER(m_bflipm   , "flip_master"        );
 	ADD_PARAMETER(m_bflips   , "flip_slave"         );
+    ADD_PARAMETER(m_bshellbm , "shell_bottom_master");
+    ADD_PARAMETER(m_bshellbs , "shell_bottom_slave" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -286,6 +288,7 @@ FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(p
     
     m_bfreeze = false;
     m_bflipm = m_bflips = false;
+    m_bshellbm = m_bshellbs = false;
 
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
@@ -321,6 +324,8 @@ bool FESlidingInterfaceBW::Init()
 	//       look into that. 
 	if (m_bflips) { m_ss.Invert(); m_bflips = false; }
 	if (m_bflipm) { m_ms.Invert(); m_bflipm = false; }
+    if (m_bshellbs) { m_ss.SetShellBottom(m_bshellbs); m_bshellbs = false; }
+    if (m_bshellbm) { m_ms.SetShellBottom(m_bshellbm); m_bshellbm = false; }
 
     return true;
 }
@@ -468,14 +473,23 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
             int ne = el.Nodes();
             for (int j=0; j<ne; ++j)
             {
-                vec3d r0 = ss.Node(el.m_lnode[ j         ]).m_rt;
-                vec3d rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_rt;
-                vec3d rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
+                vec3d r0, rp, rm;
+                if (!ss.IsShellBottom()) {
+                    r0 = ss.Node(el.m_lnode[ j         ]).m_rt;
+                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_rt;
+                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
+                }
+                else {
+                    r0 = ss.Node(el.m_lnode[ j         ]).m_st();
+                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_st();
+                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_st();
+                }
                 vec3d n = (rp - r0)^(rm - r0);
                 normal[el.m_lnode[j]] += n;
             }
         }
         for (int i=0; i<NN; ++i) normal[i].unit();
+        if (ss.IsShellBottom()) for (int i=0; i<NN; ++i) normal[i] = -normal[i];
         
         // loop over all nodes
         for (int i=0; i<NN; ++i)
@@ -483,7 +497,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
             FENode& node = ss.Node(i);
             
             // get the spatial nodal coordinates
-            vec3d rt = node.m_rt;
+            vec3d rt = ss.IsShellBottom() ? node.m_st() : node.m_rt;
             vec3d nu = normal[i];
             
             // project onto the master surface
@@ -501,7 +515,14 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
                 // to Gerard's notes.
                 double gap = nu*(rt - q);
                 
-                if (gap>0) node.m_r0 = node.m_rt = q;
+                if (gap>0) {
+                    if (!ss.IsShellBottom()) {
+                        node.m_r0 = node.m_rt = q;
+                    }
+                    else {
+                        node.m_r0 = node.m_rt = q + node.m_d0;
+                    }
+                }
                 
             }
         }

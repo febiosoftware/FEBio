@@ -69,7 +69,7 @@ bool FEEASShellTangentUnloaded::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.m_d0 = D[i];
+        n.m_dt = n.m_d0 = D[i];
         n.m_rid = -1;
     }
     
