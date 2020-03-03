@@ -461,6 +461,8 @@
 		D5C13ED7240477A3005897E1 /* FEGenericRigidJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C13ED1240477A3005897E1 /* FEGenericRigidJoint.h */; };
 		D5D56E80235523790078BCC4 /* FENodeToNodeConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D56E7E235523790078BCC4 /* FENodeToNodeConstraint.cpp */; };
 		D5D56E81235523790078BCC4 /* FENodeToNodeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E7F235523790078BCC4 /* FENodeToNodeConstraint.h */; };
+		D5D84F02240F21B600DF3D67 /* FEGenericTransIsoHyperelastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D84F00240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.cpp */; };
+		D5D84F03240F21B600DF3D67 /* FEGenericTransIsoHyperelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D84F01240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.h */; };
 		D5DA959E23D3540200D38BF2 /* FEDiscreteElementDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DA959A23D3540200D38BF2 /* FEDiscreteElementDomain.cpp */; };
 		D5DA959F23D3540200D38BF2 /* FEDiscreteElementDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DA959B23D3540200D38BF2 /* FEDiscreteElementDomain.h */; };
 		D5DA95A023D3540200D38BF2 /* FEDiscreteElementMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DA959C23D3540200D38BF2 /* FEDiscreteElementMaterial.cpp */; };
@@ -933,6 +935,8 @@
 		D5C13ED1240477A3005897E1 /* FEGenericRigidJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericRigidJoint.h; sourceTree = "<group>"; };
 		D5D56E7E235523790078BCC4 /* FENodeToNodeConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeToNodeConstraint.cpp; sourceTree = "<group>"; };
 		D5D56E7F235523790078BCC4 /* FENodeToNodeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeToNodeConstraint.h; sourceTree = "<group>"; };
+		D5D84F00240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGenericTransIsoHyperelastic.cpp; sourceTree = "<group>"; };
+		D5D84F01240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericTransIsoHyperelastic.h; sourceTree = "<group>"; };
 		D5DA959A23D3540200D38BF2 /* FEDiscreteElementDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiscreteElementDomain.cpp; sourceTree = "<group>"; };
 		D5DA959B23D3540200D38BF2 /* FEDiscreteElementDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiscreteElementDomain.h; sourceTree = "<group>"; };
 		D5DA959C23D3540200D38BF2 /* FEDiscreteElementMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiscreteElementMaterial.cpp; sourceTree = "<group>"; };
@@ -1182,6 +1186,8 @@
 				D57DD3DE23F6EF2B001347CB /* FEGenericHyperelasticUC.h */,
 				D5C13ED0240477A3005897E1 /* FEGenericRigidJoint.cpp */,
 				D5C13ED1240477A3005897E1 /* FEGenericRigidJoint.h */,
+				D5D84F00240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.cpp */,
+				D5D84F01240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.h */,
 				D5322EED2142ACD7008DE511 /* FEGentMaterial.cpp */,
 				D5322F512142ACD8008DE511 /* FEGentMaterial.h */,
 				D5322F082142ACD8008DE511 /* FEHolmesMow.cpp */,
@@ -1644,6 +1650,7 @@
 				D53230C52142ACD9008DE511 /* FEBioMechData.h in Headers */,
 				D532306B2142ACD9008DE511 /* FEDiscreteSpringDomain.h in Headers */,
 				D53230672142ACD9008DE511 /* FEFacet2FacetSliding.h in Headers */,
+				D5D84F03240F21B600DF3D67 /* FEGenericTransIsoHyperelastic.h in Headers */,
 				D5BD65A52333E32000EB9FD1 /* FEInSituStretchGradient.h in Headers */,
 				D53230422142ACD9008DE511 /* FESolidSolver2.h in Headers */,
 				D532313B2142ACD9008DE511 /* FEPrescribedActiveContractionTransIso.h in Headers */,
@@ -1834,6 +1841,7 @@
 				D53230AF2142ACD9008DE511 /* FEUncoupledReactiveViscoelastic.cpp in Sources */,
 				D532307F2142ACD9008DE511 /* FEFacet2FacetSliding.cpp in Sources */,
 				D532316A2142ACD9008DE511 /* FERigidCylindricalJoint.cpp in Sources */,
+				D5D84F02240F21B600DF3D67 /* FEGenericTransIsoHyperelastic.cpp in Sources */,
 				D53230F72142ACD9008DE511 /* FEGasserOgdenHolzapfel.cpp in Sources */,
 				D5322FEA2142ACD9008DE511 /* FESRIElasticSolidDomain.cpp in Sources */,
 				D53230552142ACD9008DE511 /* FEIsotropicElastic.cpp in Sources */,
