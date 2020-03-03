@@ -480,6 +480,7 @@
     <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelasticUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericRigidJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
@@ -716,6 +717,7 @@
     <ClCompile Include="..\..\FEBioMech\FEGenericHyperelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGenericHyperelasticUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGenericRigidJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />

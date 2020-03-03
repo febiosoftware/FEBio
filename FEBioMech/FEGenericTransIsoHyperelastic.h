@@ -27,15 +27,15 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include <FECore/MathObject.h>
 
-//! Hyperelastic material, defined by strain energy function. 
-//! This case only considers the strain energy function to be a function of
-//! the invariants: I1, I2, J. Furthermore, it assumes that the 
-//! strain energy function is defined by W(C) = W1(I1,I2) + WJ(J), where
-//! W1 only depends on I1 and I2, and WJ only depends on J. 
-class FEGenericHyperelastic : public FEElasticMaterial
+//! Transversely isotropic Hyperelastic material, defined by strain energy function. 
+//! This case assumes the strain energy function to be a function of
+//! the invariants: I1, I2, I4, I5, and J. Furthermore, it assumes that the 
+//! strain energy function is defined by W(C) = W1(I1,I2, I4, I5) + WJ(J), where
+//! W1 only depends on I1, I2, I4, and I5, and WJ only depends on J. 
+class FEGenericTransIsoHyperelastic : public FEElasticMaterial
 {
 public:
-	FEGenericHyperelastic(FEModel* fem);
+	FEGenericTransIsoHyperelastic(FEModel* fem);
 
 	bool Init() override;
 
@@ -47,19 +47,29 @@ public:
 
 private:
 	std::string			m_exp;
+	FEParamVec3			m_fiber;
 
 private:
-	MSimpleExpression	m_W;	// strain-energy function
+	MSimpleExpression	m_W;		// strain-energy function
 	vector<double*>		m_param;	// user parameters
 
 	// strain energy derivatives
 	MSimpleExpression	m_W1;
 	MSimpleExpression	m_W2;
+	MSimpleExpression	m_W4;
+	MSimpleExpression	m_W5;
 	MSimpleExpression	m_WJ;
 
 	MSimpleExpression	m_W11;
 	MSimpleExpression	m_W12;
+	MSimpleExpression	m_W14;
+	MSimpleExpression	m_W15;
 	MSimpleExpression	m_W22;
+	MSimpleExpression	m_W24;
+	MSimpleExpression	m_W25;
+	MSimpleExpression	m_W44;
+	MSimpleExpression	m_W45;
+	MSimpleExpression	m_W55;
 	MSimpleExpression	m_WJJ;
 
 	DECLARE_FECORE_CLASS();

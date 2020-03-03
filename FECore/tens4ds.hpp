@@ -656,6 +656,29 @@ inline tens4ds dyad4s(const mat3ds& a, const mat3dd& b)
 }
 
 //-----------------------------------------------------------------------------
+// (a dyad5s b)_ijkl = (a_ik b_jl + a_il b_jk)/2 +  (a_jl b_ik + a_jk b_il)/2
+inline tens4ds dyad5s(const mat3ds& a, const mat3ds& b)
+{
+	int L[21][4] = { { 0, 0, 0, 0},
+	{ 0, 0, 1, 1},{ 1, 1, 1, 1},
+	{ 0, 0, 2, 2},{ 1, 1, 2, 2},{ 2, 2, 2, 2},
+	{ 0, 0, 0, 1},{ 1, 1, 0, 1},{ 2, 2, 0, 1},{ 0, 1, 0, 1},
+	{ 0, 0, 1, 2},{ 1, 1, 1, 2},{ 2, 2, 1, 2},{ 0, 1, 1, 2},{ 1, 2, 1, 2 },
+	{ 0, 0, 0, 2},{ 1, 1, 0, 2},{ 2, 2, 0, 2},{ 0, 1, 0, 2},{ 1, 2, 0, 2 },{ 0, 2, 0, 2 }};
+
+	tens4ds c;
+	for (int n = 0; n < 21; ++n)
+	{
+		int i = L[n][0];
+		int j = L[n][1];
+		int k = L[n][2];
+		int l = L[n][3];
+		c.d[n] = 0.5*(a(i, k)*b(j, l) + a(i, l)*b(j, k)) + 0.5*(a(j, l)*b(i, k) + a(j, k)*b(i, l));
+	}
+	return c;
+}
+
+//-----------------------------------------------------------------------------
 // (a dyad4s b)_ijkl = (a_ik b_jl + a_il b_jk)/2 +  (b_ik a_jl + b_il a_jk)/2
 inline tens4ds dyad4s(const mat3ds& a, const mat3ds& b)
 {

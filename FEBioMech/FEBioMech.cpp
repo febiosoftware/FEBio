@@ -139,6 +139,7 @@ SOFTWARE.*/
 #include "FEMindlinElastic2O.h"
 #include "FEGenericHyperelastic.h"
 #include "FEGenericHyperelasticUC.h"
+#include "FEGenericTransIsoHyperelastic.h"
 #include "FEActiveFiberStress.h"
 #include "FEActiveFiberStressUC.h"
 
@@ -312,6 +313,7 @@ REGISTER_FECORE_CLASS(FEMicroMaterial                  , "micro-material"       
 REGISTER_FECORE_CLASS(FEMicroMaterial2O                , "micro-material2O"                    );
 REGISTER_FECORE_CLASS(FEMindlinElastic2O               , "mindlin elastic"                     );
 REGISTER_FECORE_CLASS(FEGenericHyperelastic            , "hyperelastic"                        );
+REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelastic    , "trans-iso hyperelastic"              );
 
 // These materials are derived from FEElasticMaterial and use FEElasticMaterials
 REGISTER_FECORE_CLASS(FEElasticMixture                 , "solid mixture"                       );
