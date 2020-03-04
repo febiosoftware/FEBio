@@ -2324,6 +2324,10 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         spt.m_Ie = pmb->CurrentDensity(mp);
         pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
                                            spt.m_dkdr, spt.m_dkdJr, spt.m_dkdrc);
+
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
+        
         // evaluate the stress
         pt.m_s = pmb->Stress(mp);
         

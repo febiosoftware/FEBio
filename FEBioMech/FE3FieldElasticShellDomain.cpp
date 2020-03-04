@@ -451,6 +451,9 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
         
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
+        
         // calculate the stress at this material point
         // Note that we don't call the material's Stress member function.
         // The reason is that we need to use the averaged pressure for the element

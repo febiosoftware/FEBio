@@ -858,6 +858,9 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		// fluid acceleration
 		pt.m_aft = ept.m_a + ft.m_aw + pt.m_Lf*ft.m_w;
 
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
+        
 		// calculate the stress at this material point
 		pt.m_sf = m_pMat->Fluid()->Stress(mp);
 

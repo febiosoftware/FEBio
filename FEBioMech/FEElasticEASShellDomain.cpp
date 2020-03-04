@@ -1047,6 +1047,9 @@ void FEElasticEASShellDomain::Update(const FETimeInfo& tp)
             // get the deformation gradient and determinant
             pt.m_J = defgrad(el, pt.m_F, n);
             
+            // update specialized material points
+            m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
+            
             // calculate the stress at this material point
             mat3ds S = m_pMat->PK2Stress(mp, el.m_E[n]);
             pt.m_s = (pt.m_F*S*pt.m_F.transpose()).sym()/pt.m_J;

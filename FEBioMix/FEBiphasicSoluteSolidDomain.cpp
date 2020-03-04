@@ -1151,6 +1151,10 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
         }
         
         m_pMat->PartitionCoefficientFunctions(mp, spt.m_k[0], spt.m_dkdJ[0], spt.m_dkdc[0][0]);
+        
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
+        
         // calculate the stress at this material point (must be done after evaluating m_pa)
         pt.m_s = m_pMat->Stress(mp);
     }

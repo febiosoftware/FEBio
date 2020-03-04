@@ -535,6 +535,9 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
         // store total strain energy density at current time
         pt.m_Wt = Wt + eUt;
 
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
+        
 		// calculate the stress at this material point
 		// Note that we don't call the material's Stress member function.
 		// The reason is that we need to use the averaged pressure for the element

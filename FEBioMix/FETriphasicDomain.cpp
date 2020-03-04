@@ -1289,6 +1289,9 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		spt.m_Ie = m_pMat->CurrentDensity(mp);
         m_pMat->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc);
 			
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
+        
 		pt.m_s = m_pMat->Stress(mp);
 	}
 }

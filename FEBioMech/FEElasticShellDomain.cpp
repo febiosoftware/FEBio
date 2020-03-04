@@ -804,6 +804,9 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
             et.m_J = Jt;
             pt.m_Wt = pme->StrainEnergyDensity(et);
             
+            // update specialized material points
+            m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
+            
             // calculate the stress at this material point
             pt.m_s = m_pMat->Stress(mp);
             

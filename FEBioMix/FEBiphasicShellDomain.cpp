@@ -943,6 +943,9 @@ void FEBiphasicShellDomain::UpdateElementStress(int iel)
         ppt.m_w = FluidFlux(mp);
         ppt.m_pa = m_pMat->Pressure(mp);
         
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
+        
         // calculate the stress at this material point
         pt.m_s = m_pMat->Stress(mp);
     }
