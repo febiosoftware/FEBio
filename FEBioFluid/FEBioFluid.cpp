@@ -171,6 +171,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidElementAngularMomentum, "fluid element angular 
 REGISTER_FECORE_CLASS(FEPlotFluidElementCenterOfMass   , "fluid element center of mass");
 REGISTER_FECORE_CLASS(FEPlotFluidFlowRate              , "fluid flow rate");
 REGISTER_FECORE_CLASS(FEPlotFluidPressure              , "fluid pressure");
+REGISTER_FECORE_CLASS(FEPlotFluidHeatFlux              , "fluid heat flux");
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");

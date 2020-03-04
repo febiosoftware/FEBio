@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,39 +27,31 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEViscousFluid.h"
+#include "FEFluidThermalConductivity.h"
 
 //-----------------------------------------------------------------------------
-// This class evaluates the viscous stress in a Newtonian fluid
+//! Base class for fluid thermal conductivity materials.
 
-class FEBIOFLUID_API FENewtonianFluid :	public FEViscousFluid
+class FEBIOFLUID_API FEFluidConstantConductivity : public FEFluidThermalConductivity
 {
 public:
-    //! constructor
-    FENewtonianFluid(FEModel* pfem);
-    
-    //! viscous stress
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! tangent of stress with respect to strain J
-    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to rate of deformation tensor D
-    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to temperature
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override { return mat3ds(0); };
-    
-    //! dynamic viscosity
-    double ShearViscosity(FEMaterialPoint& mp) override;
-    
-    //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp) override;
+    FEFluidConstantConductivity(FEModel* pfem) : FEFluidThermalConductivity(pfem) {}
+    virtual ~FEFluidConstantConductivity() {}
     
 public:
-    double	m_kappa;	//!< bulk viscosity
-    double	m_mu;		//!< shear viscosity
+    //! calculate thermal conductivity at material point
+    double ThermalConductivity(FEMaterialPoint& pt) override { return m_K; }
+    
+    //! tangent of thermal conductivity with respect to strain J
+    double Tangent_Strain(FEMaterialPoint& mp) override { return 0; }
+    
+    //! tangent of thermal conductivity with respect to temperature T
+    double Tangent_Temperature(FEMaterialPoint& mp) override { return 0; };
+
+public:
+    double   m_K;    //!< thermal conductivity
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
+
 };

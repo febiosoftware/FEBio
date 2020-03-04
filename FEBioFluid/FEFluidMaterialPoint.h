@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,42 +24,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #pragma once
-#include "FEViscousFluid.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEMaterial.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-// This class evaluates the viscous stress in a Newtonian fluid
-
-class FEBIOFLUID_API FENewtonianFluid :	public FEViscousFluid
+//! Fluid material point class.
+//
+class FEBIOFLUID_API FEFluidMaterialPoint : public FEMaterialPoint
 {
 public:
     //! constructor
-    FENewtonianFluid(FEModel* pfem);
-    
-    //! viscous stress
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! tangent of stress with respect to strain J
-    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to rate of deformation tensor D
-    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to temperature
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override { return mat3ds(0); };
-    
-    //! dynamic viscosity
-    double ShearViscosity(FEMaterialPoint& mp) override;
-    
-    //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp) override;
+    FEFluidMaterialPoint(FEMaterialPoint* pt = 0);
+
+    //! create a shallow copy
+    FEMaterialPoint* Copy();
+
+    //! data serialization
+    void Serialize(DumpStream& ar);
+
+    //! Data initialization
+    void Init();
+
+public:
+    mat3ds RateOfDeformation() const { return m_Lf.sym(); }
+    mat3da Spin() { return m_Lf.skew(); }
+    vec3d  Vorticity() const { return vec3d(m_Lf(2,1)-m_Lf(1,2), m_Lf(0,2)-m_Lf(2,0), m_Lf(1,0)-m_Lf(0,1)); }
     
 public:
-    double	m_kappa;	//!< bulk viscosity
-    double	m_mu;		//!< shear viscosity
-    
-    // declare parameter list
-    DECLARE_FECORE_CLASS();
+    // fluid data
+    vec3d       m_r0;       //!< material position
+    vec3d       m_vft;      //!< fluid velocity
+    vec3d       m_aft;      //!< fluid acceleration
+    mat3d       m_Lf;       //!< fluid velocity gradient
+    double      m_Jf;       //!< determinant of fluid deformation gradient
+    double      m_Jfdot;    //!< material time derivative of Jf
+    vec3d       m_gradJf;   //!< gradient of Jf
+    double      m_pf;       //!< elastic fluid pressure
+    mat3ds      m_sf;       //!< fluid stress
 };

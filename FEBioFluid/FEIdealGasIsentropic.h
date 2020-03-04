@@ -61,8 +61,8 @@ public:
     
 public:
     double      m_gamma;    //!< ratio of specific heats (constant pressure/constant volume)
-    double      m_M;        //!< moral mass
-    double      m_pr;       //!< ambient pressure
+    double      m_M;        //!< molar mass
+    double      m_Pr;       //!< ambient pressure
     double      m_Tr;       //!< ambient temperature
     double      m_R;        //!< universal gas constant
     

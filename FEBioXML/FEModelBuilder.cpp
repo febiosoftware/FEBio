@@ -498,6 +498,8 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varQA, 0, "sax");
 	dofs.SetDOFName(varQA, 1, "say");
 	dofs.SetDOFName(varQA, 2, "saz");
+    int varT = dofs.AddVariable("temperature");
+    dofs.SetDOFName(varT, 0, "T");
 	// must be last variable definition!!
 	int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
 															 // must be last variable definition!!

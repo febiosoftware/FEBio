@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,40 +26,23 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "FEViscousFluid.h"
+#include "FEFluidHeatSupplyConst.h"
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEFluidHeatSupplyConst, FEFluidHeatSupply)
+    ADD_PARAMETER(m_r, FE_RANGE_DONT_CARE(), "r");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-// This class evaluates the viscous stress in a Newtonian fluid
-
-class FEBIOFLUID_API FENewtonianFluid :	public FEViscousFluid
+//! Constructor.
+FEFluidHeatSupplyConst::FEFluidHeatSupplyConst(FEModel* pfem) : FEFluidHeatSupply(pfem)
 {
-public:
-    //! constructor
-    FENewtonianFluid(FEModel* pfem);
-    
-    //! viscous stress
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! tangent of stress with respect to strain J
-    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to rate of deformation tensor D
-    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to temperature
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override { return mat3ds(0); };
-    
-    //! dynamic viscosity
-    double ShearViscosity(FEMaterialPoint& mp) override;
-    
-    //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp) override;
-    
-public:
-    double	m_kappa;	//!< bulk viscosity
-    double	m_mu;		//!< shear viscosity
-    
-    // declare parameter list
-    DECLARE_FECORE_CLASS();
-};
+    m_r = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the body force at a material point
+double FEFluidHeatSupplyConst::heat(FEMaterialPoint& pt)
+{
+    return m_r;
+}

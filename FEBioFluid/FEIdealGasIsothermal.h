@@ -61,7 +61,7 @@ public:
     
 public:
     double      m_M;        //!< moral mass
-    double      m_pr;       //!< ambient pressure
+    double      m_Pr;       //!< ambient pressure
     double      m_Tr;       //!< ambient temperature
     double      m_R;        //!< universal gas constant
     

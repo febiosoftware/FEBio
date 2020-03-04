@@ -57,12 +57,12 @@ bool FEIdealGasIsothermal::Init()
 {
     m_R  = GetFEModel()->GetGlobalConstant("R");
     m_Tr = GetFEModel()->GetGlobalConstant("T");
-    m_pr = GetFEModel()->GetGlobalConstant("p");
+    m_Pr = GetFEModel()->GetGlobalConstant("P");
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
-    if (m_pr <= 0) { feLogError("A positive ambient absolute pressure p must be defined in Globals section"); return false; }
+    if (m_Pr <= 0) { feLogError("A positive ambient absolute pressure P must be defined in Globals section"); return false; }
     
-    m_rhor = m_M*m_pr/(m_R*m_Tr);
+    m_rhor = m_M*m_Pr/(m_R*m_Tr);
     
     return true;
 }
@@ -72,7 +72,7 @@ bool FEIdealGasIsothermal::Init()
 double FEIdealGasIsothermal::Pressure(const double e)
 {
     double J = 1 + e;
-    return m_pr*(1./J - 1);
+    return m_Pr*(1./J - 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ double FEIdealGasIsothermal::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = fp.m_Jf;
-    double dp = -m_pr/J;
+    double dp = -m_Pr/J;
     return dp;
 }
 
@@ -91,7 +91,7 @@ double FEIdealGasIsothermal::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = fp.m_Jf;
-    double d2p = 2*m_pr/(J*J);
+    double d2p = 2*m_Pr/(J*J);
     return d2p;
 }
 
@@ -108,7 +108,7 @@ double FEIdealGasIsothermal::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = fp.m_Jf;
-    double sed = m_pr*(J-1-log(J));
+    double sed = m_Pr*(J-1-log(J));
     return sed;
 }
 
@@ -116,7 +116,7 @@ double FEIdealGasIsothermal::StrainEnergyDensity(FEMaterialPoint& mp)
 //! invert pressure-dilatation relation
 double FEIdealGasIsothermal::Dilatation(const double p)
 {
-    double J = m_pr/(p+m_pr);
+    double J = m_Pr/(p+m_Pr);
     return J - 1;
 }
 

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,59 +27,43 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FECore/FECore.h"
-#include "NumCore/NumCore.h"
-#include "FEBioMech/FEBioMech.h"
-#ifndef MECH_ONLY
-#include "FEBioMix/FEBioMix.h"
-#include "FEBioOpt/FEBioOpt.h"
-#include "FEBioFluid/FEBioFluid.h"
-#include "FEBioFluid/FEBioFluidP.h"
-#include <FEBioFluid/FEBioFSI.h>
-#include <FEBioFluid/FEBioFluidSolutes.h>
-#include <FEBioFluid/FEBioThermoFluid.h>
-#include <FEBioTest/FEBioTest.h>
-#endif
-#include "febio.h"
-#include "plugin.h"
-#include "FEBioStdSolver.h"
-
-namespace febio {
+#include "FEFluidHeatSupply.h"
+#include "FEThermoFluid.h"
+#include "FEThermoFluidDomain.h"
 
 //-----------------------------------------------------------------------------
-FECoreKernel* GetFECoreKernel()
+FEFluidHeatSupply::FEFluidHeatSupply(FEModel* pfem) : FEBodyLoad(pfem)
 {
-	return &FECoreKernel::GetInstance();
 }
 
 //-----------------------------------------------------------------------------
-// import all modules
-void InitLibrary()
+// NOTE: Work in progress! Working on integrating body loads as model loads
+void FEFluidHeatSupply::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
-	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
-
-	FECore::InitModule();
-	NumCore::InitModule();
-	FEBioMech::InitModule();
-
-#ifndef MECH_ONLY
-	FEBioMix::InitModule();
-	FEBioOpt::InitModule();
-	FEBioFluid::InitModule();
-    FEBioFluidP::InitModule();
-	FEBioFSI::InitModule();
-    FEBioFluidSolutes::InitModule();
-    FEBioThermoFluid::InitModule();
-	FEBioTest::InitModule();
-#endif
+    for (int i = 0; i<Domains(); ++i)
+    {
+        FEDomain* dom = Domain(i);
+        FEThermoFluid* mat = dynamic_cast<FEThermoFluid*>(dom->GetMaterial());
+        if (mat == nullptr)
+        {
+            FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
+            if (edom) edom->HeatSupply(R, tp, *this);
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
-void FinishLibrary()
+// NOTE: Work in progress! Working on integrating body loads as model loads
+void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-	pPM->DeleteThis();
+    for (int i = 0; i<Domains(); ++i)
+    {
+        FEDomain* dom = Domain(i);
+        FEThermoFluid* mat = dynamic_cast<FEThermoFluid*>(dom->GetMaterial());
+        if (mat==nullptr)
+        {
+            FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
+            if (edom) edom->HeatSupplyStiffness(LS, tp, *this);
+        }
+    }
 }
-
-} // namespace febio

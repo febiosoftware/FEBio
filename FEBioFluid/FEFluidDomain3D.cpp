@@ -316,7 +316,7 @@ void FEFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement 
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
 
         // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
+        detJ = detJ0(el, n)*gw[n]*tp.alphaf;
         
         H = el.H(n);
         
@@ -354,7 +354,7 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FET
     vector<vec3d> gradN(neln);
 
 	double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
     
     double *H, *Gr, *Gs, *Gt;
     
@@ -368,7 +368,7 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FET
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjac0(el, Ji, n)*gw[n];
+        detJ = invjac0(el, Ji, n)*gw[n]*tp.alphaf;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -404,7 +404,6 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FET
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
                 vec3d kJv = (pt.m_gradJf*(H[i]/pt.m_Jf) + gradN[i])*H[j];
                 vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dp+pt.m_gradJf*(H[j]*d2p))*H[i];
-//                double kJJ = (H[j]*((ksi*m_btrans)/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/pt.m_Jf;
                 double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/pt.m_Jf;
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
@@ -548,13 +547,13 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FE
     const double *gw = el.GaussWeights();
 
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjac0(el, Ji, n)*gw[n];
+        detJ = invjac0(el, Ji, n)*gw[n]*tp.alphaf;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -582,7 +581,7 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FE
         {
             for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
             {
-                mat3d Mv = ((mat3dd(ksi*m_btrans/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
+                mat3d Mv = ((mat3dd(ksi/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
                 vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
                 
                 ke[i4  ][j4  ] += Mv(0,0);

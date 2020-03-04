@@ -236,6 +236,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element fluid heat flux
+class FEPlotFluidHeatFlux : public FEPlotDomainData
+{
+public:
+    FEPlotFluidHeatFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid stresses
 class FEPlotElementFluidStress : public FEPlotDomainData
 {

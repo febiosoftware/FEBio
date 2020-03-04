@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,59 +27,54 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FECore/FECore.h"
-#include "NumCore/NumCore.h"
-#include "FEBioMech/FEBioMech.h"
-#ifndef MECH_ONLY
-#include "FEBioMix/FEBioMix.h"
-#include "FEBioOpt/FEBioOpt.h"
-#include "FEBioFluid/FEBioFluid.h"
-#include "FEBioFluid/FEBioFluidP.h"
-#include <FEBioFluid/FEBioFSI.h>
-#include <FEBioFluid/FEBioFluidSolutes.h>
-#include <FEBioFluid/FEBioThermoFluid.h>
-#include <FEBioTest/FEBioTest.h>
-#endif
-#include "febio.h"
-#include "plugin.h"
-#include "FEBioStdSolver.h"
+#include "FEFluidNormalHeatFlux.h"
+#include <FECore/FEElemElemList.h>
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/FEGlobalVector.h>
+#include <FECore/log.h>
+#include <FECore/LinearSolver.h>
+#include "FEBioThermoFluid.h"
 
-namespace febio {
+//=============================================================================
+BEGIN_FECORE_CLASS(FEFluidNormalHeatFlux, FESurfaceLoad)
+    ADD_PARAMETER(m_flux    , "flux");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FECoreKernel* GetFECoreKernel()
+//! constructor
+FEFluidNormalHeatFlux::FEFluidNormalHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 {
-	return &FECoreKernel::GetInstance();
+    m_flux = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-// import all modules
-void InitLibrary()
+//! initialize
+bool FEFluidNormalHeatFlux::Init()
 {
-	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
-	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
+    // get the degrees of freedom
+    m_dof.Clear();
+    m_dof.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
+    if (m_dof.IsEmpty()) return false;
 
-	FECore::InitModule();
-	NumCore::InitModule();
-	FEBioMech::InitModule();
-
-#ifndef MECH_ONLY
-	FEBioMix::InitModule();
-	FEBioOpt::InitModule();
-	FEBioFluid::InitModule();
-    FEBioFluidP::InitModule();
-	FEBioFSI::InitModule();
-    FEBioFluidSolutes::InitModule();
-    FEBioThermoFluid::InitModule();
-	FEBioTest::InitModule();
-#endif
+    return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
-void FinishLibrary()
+//! Calculate the residual for the prescribed normal velocity
+void FEFluidNormalHeatFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-	pPM->DeleteThis();
-}
+    FESurface& surf = GetSurface();
 
-} // namespace febio
+    // evaluate the integral
+    surf.LoadVector(R, m_dof, false, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
+        
+        // evaluate pressure at this material point
+        double q = m_flux(pt);
+
+        double J = (pt.dxr ^ pt.dxs).norm();
+
+        double H = dof_a.shape;
+
+        val[0] = H*q*J;
+    });
+}

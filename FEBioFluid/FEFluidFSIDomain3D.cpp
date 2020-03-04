@@ -465,7 +465,7 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const 
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjact(el, Ji, n)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);

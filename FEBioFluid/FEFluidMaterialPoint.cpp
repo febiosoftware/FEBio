@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,62 +24,47 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#include "FEFluidMaterialPoint.h"
 
-
-#include "stdafx.h"
-#include "FECore/FECore.h"
-#include "NumCore/NumCore.h"
-#include "FEBioMech/FEBioMech.h"
-#ifndef MECH_ONLY
-#include "FEBioMix/FEBioMix.h"
-#include "FEBioOpt/FEBioOpt.h"
-#include "FEBioFluid/FEBioFluid.h"
-#include "FEBioFluid/FEBioFluidP.h"
-#include <FEBioFluid/FEBioFSI.h>
-#include <FEBioFluid/FEBioFluidSolutes.h>
-#include <FEBioFluid/FEBioThermoFluid.h>
-#include <FEBioTest/FEBioTest.h>
-#endif
-#include "febio.h"
-#include "plugin.h"
-#include "FEBioStdSolver.h"
-
-namespace febio {
-
+//============================================================================
+// FEFluidMaterialPoint
+//============================================================================
 //-----------------------------------------------------------------------------
-FECoreKernel* GetFECoreKernel()
+FEFluidMaterialPoint::FEFluidMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt)
 {
-	return &FECoreKernel::GetInstance();
+    m_pf = 0;
+    m_Lf.zero();
+    m_Jf = 1;
+    m_Jfdot = 0;
+    m_vft = m_aft = m_gradJf = vec3d(0,0,0);
+    m_sf.zero();
 }
 
 //-----------------------------------------------------------------------------
-// import all modules
-void InitLibrary()
+FEMaterialPoint* FEFluidMaterialPoint::Copy()
 {
-	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
-	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
-
-	FECore::InitModule();
-	NumCore::InitModule();
-	FEBioMech::InitModule();
-
-#ifndef MECH_ONLY
-	FEBioMix::InitModule();
-	FEBioOpt::InitModule();
-	FEBioFluid::InitModule();
-    FEBioFluidP::InitModule();
-	FEBioFSI::InitModule();
-    FEBioFluidSolutes::InitModule();
-    FEBioThermoFluid::InitModule();
-	FEBioTest::InitModule();
-#endif
+    FEFluidMaterialPoint* pt = new FEFluidMaterialPoint(*this);
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
 }
 
 //-----------------------------------------------------------------------------
-void FinishLibrary()
+void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-	pPM->DeleteThis();
+    FEMaterialPoint::Serialize(ar);
+    ar & m_pf & m_Lf & m_Jf & m_Jfdot & m_gradJf & m_vft & m_aft & m_sf;
 }
 
-} // namespace febio
+//-----------------------------------------------------------------------------
+void FEFluidMaterialPoint::Init()
+{
+    m_pf = 0;
+    m_Lf.zero();
+    m_Jf = 1;
+    m_Jfdot = 0;
+    m_vft = m_aft = m_gradJf = vec3d(0,0,0);
+    m_sf.zero();
+    
+    // don't forget to initialize the base class
+    FEMaterialPoint::Init();
+}

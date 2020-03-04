@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,42 +24,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#include "FEThermoFluidMaterialPoint.h"
 
-
-#pragma once
-#include "FEViscousFluid.h"
+//============================================================================
+// FEThermoFluidMaterialPoint
+//============================================================================
 
 //-----------------------------------------------------------------------------
-// This class evaluates the viscous stress in a Newtonian fluid
-
-class FEBIOFLUID_API FENewtonianFluid :	public FEViscousFluid
+FEMaterialPoint* FEThermoFluidMaterialPoint::Copy()
 {
-public:
-    //! constructor
-    FENewtonianFluid(FEModel* pfem);
+    FEThermoFluidMaterialPoint* pt = new FEThermoFluidMaterialPoint(*this);
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEThermoFluidMaterialPoint::Serialize(DumpStream& ar)
+{
+    FEMaterialPoint::Serialize(ar);
+    ar & m_T & m_Tdot & m_gradT & m_k & m_K & m_dKJ & m_dKT & m_cv & m_dcvJ & m_dcvT & m_cp & m_q;
+}
+
+//-----------------------------------------------------------------------------
+void FEThermoFluidMaterialPoint::Init()
+{
+    m_T = m_Tdot = 0;
+    m_gradT = vec3d(0);
+    m_k = 0;
+    m_K = m_dKJ = m_dKT = 0;
+    m_cv = m_dcvJ = m_dcvT = 0;
+    m_cp = 0;
+    m_q = vec3d(0);
     
-    //! viscous stress
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! tangent of stress with respect to strain J
-    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to rate of deformation tensor D
-    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to temperature
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override { return mat3ds(0); };
-    
-    //! dynamic viscosity
-    double ShearViscosity(FEMaterialPoint& mp) override;
-    
-    //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp) override;
-    
-public:
-    double	m_kappa;	//!< bulk viscosity
-    double	m_mu;		//!< shear viscosity
-    
-    // declare parameter list
-    DECLARE_FECORE_CLASS();
-};
+    // don't forget to initialize the base class
+    FEMaterialPoint::Init();
+}
+
