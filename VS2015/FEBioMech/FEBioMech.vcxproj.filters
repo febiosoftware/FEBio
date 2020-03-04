@@ -723,6 +723,9 @@
     <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1416,6 +1419,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

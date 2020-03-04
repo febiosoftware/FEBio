@@ -140,6 +140,7 @@ SOFTWARE.*/
 #include "FEGenericHyperelastic.h"
 #include "FEGenericHyperelasticUC.h"
 #include "FEGenericTransIsoHyperelastic.h"
+#include "FEGenericTransIsoHyperelasticUC.h"
 #include "FEActiveFiberStress.h"
 #include "FEActiveFiberStressUC.h"
 
@@ -356,6 +357,7 @@ REGISTER_FECORE_CLASS(FEPRLig					             , "PRLig"                        
 REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, "uncoupled reactive viscoelastic"        );
 REGISTER_FECORE_CLASS(FEDamageMaterialUC                     , "uncoupled elastic damage"               );
 REGISTER_FECORE_CLASS(FEGenericHyperelasticUC                , "uncoupled hyperelastic"                 );
+REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC        , "uncoupled trans-iso hyperelastic"       );
 
 // Fiber materials
 REGISTER_FECORE_CLASS(FEFiberExpPow                  , "fiber-exp-pow"                        );

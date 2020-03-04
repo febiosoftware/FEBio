@@ -869,6 +869,20 @@ inline mat3ds tens4ds::dot2(const mat3d &m) const
     return a;
 }
 
+// contraction
+// Aij = c_qqij = c_ijqq
+inline mat3ds tens4ds::contract() const
+{
+	mat3ds a;
+	a.xx() = d[ 0] + d[ 1] + d[ 3];
+	a.yy() = d[ 1] + d[ 2] + d[ 4];
+	a.zz() = d[ 3] + d[ 4] + d[ 5];
+	a.xy() = d[ 6] + d[ 7] + d[ 8];
+	a.yz() = d[10] + d[11] + d[12];
+	a.xz() = d[15] + d[16] + d[17];
+	return a;
+}
+
 //-----------------------------------------------------------------------------
 // vdotTdotv_jk = a_i T_ijkl b_l
 inline mat3d vdotTdotv(const vec3d& a, const tens4ds& T, const vec3d& b)

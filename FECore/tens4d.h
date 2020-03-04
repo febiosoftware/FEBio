@@ -90,6 +90,9 @@ public:
     mat3ds dot(const mat3d& m) const;
     mat3ds dot2(const mat3d& m) const;
 
+	// contractions
+	mat3ds contract() const;
+
 	// trace
 	double tr() const;
 	

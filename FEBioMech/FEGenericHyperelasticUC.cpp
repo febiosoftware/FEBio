@@ -155,25 +155,20 @@ tens4ds FEGenericHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 	tens4ds BoB2 = dyad1s(B, B2);
 	tens4ds BoI = dyad1s(B, I);
 	tens4ds B2oI = dyad1s(B2, I);
-	tens4ds B4 = dyad4s(B);
+	tens4ds Ib = dyad4s(B);
 
 	// put the elasticity tangent together
 	mat3ds T = (B*(W1 + W2*I1) - B2*W2)*(2.0/J);
 	mat3ds devT = T.dev();
 
-	tens4ds c1 = (I4 - IxI / 3.0)*(2.0*T.tr() / 3.0);
-	tens4ds c2 = dyad1s(devT, I)*(2.0 / 3.0);
+	tens4ds dw = (BxB*(W11 + 2 * W12*I1 + W22*I1*I1 + W2) - BoB2*(W12 + W22*I1) + B2xB2*W22 - Ib*W2)*(4. / J);
+	mat3ds dw_ = dw.contract();
+	double trD = dw.tr();
 
-	tens4ds cw = BxB*(W11 + 2.0*W12 *I1 + W22*I1*I1 + W2);
-	cw -= B4*W2;
-	cw += IxI*((I1*(W11*I1 + W12*I1*I1 + W2*I1 + 2.0*W12*I2 +2.0*I1*I2*W22) - (2.0*W22*I2+W2+W12*I1)*(I1*I1 - 2.0*I2)) / 9.0);
-	cw -= BoI*((W11*I1 + W12 *I1*I1 + W2*I1 + 2.0*W12*I2 + 2.0*I1*I2*W22) / 3.0);
-	cw += B2oI*((2.0*W22*I2 + W2 + W12 *I1)/3.0);
-	cw -= BoB2*(W12 + W22);
-	cw += B2xB2*W22;
-	cw *= 4.0 / J;
+	tens4ds cw = dw - dyad1s(dw_, I)*(1. / 3.) - dyad1s(I, dw_)*(1. / 3.) + IxI*(2.* trD / 9.);
 
-	tens4ds c = c1 - c2 + cw;
+	// put it all together
+	tens4ds c = dyad1s(devT, I)*(-2. / 3.) + (I4 - IxI*(1. / 3.))*(2. / 3.*T.tr()) + cw;
 
 	return c;
 }
