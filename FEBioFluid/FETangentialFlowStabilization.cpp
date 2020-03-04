@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETangentialFlowStabilization.h"
-#include "FEFluid.h"
+#include "FEFluidMaterial.h"
 #include "FEBioFluid.h"
 #include <FECore/FELinearSystem.h>
 
@@ -77,11 +77,11 @@ bool FETangentialFlowStabilization::Init()
 
 	// get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    FEFluid* fluid = pm->ExtractProperty<FEFluid>();
+    FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
 	if (fluid == nullptr) return false;
 
 	// get the density and bulk modulus
-    m_rho = fluid->m_rhor;
+    m_rho = fluid->ReferentialDensity();
     
     return true;
 }
