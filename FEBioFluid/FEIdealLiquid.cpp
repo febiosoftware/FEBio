@@ -65,7 +65,7 @@ bool FEIdealLiquid::Init()
     if (m_Pr <= 0) { feLogError("A positive referential absolute pressure P must be defined in Globals section"); return false; }
     
     m_pMat = dynamic_cast<FEThermoFluid*>(GetParent());
-    m_rhor = m_pMat->m_rhor;
+    m_rhor = m_pMat->ReferentialDensity();
     
     return true;
 }
@@ -215,4 +215,15 @@ double FEIdealLiquid::Tangent_cv_Strain(FEMaterialPoint& mp)
 double FEIdealLiquid::Tangent_cv_Temperature(FEMaterialPoint& mp)
 {
     return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! isobaric specific heat capacity
+double FEIdealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
+{
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    
+    double cp = IsochoricSpecificHeatCapacity(mp) + m_beta*m_beta/(m_k*m_rhor)*tf.m_T;
+    
+    return cp;
 }

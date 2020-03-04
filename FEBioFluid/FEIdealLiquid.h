@@ -87,6 +87,9 @@ public:
     
     //! tangent of isochoric specific heat capacity with respect to temperature T
     double Tangent_cv_Temperature(FEMaterialPoint& mp) override;
+    
+    //! isobaric specific heat capacity
+    double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
 
 public:
     double      m_R;        //!< universal gas constant

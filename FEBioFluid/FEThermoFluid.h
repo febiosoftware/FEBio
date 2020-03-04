@@ -102,9 +102,6 @@ private: // material properties
     FEElasticFluid*             m_pElastic;     //!< pointer to elastic part of fluid material
     FEFluidThermalConductivity* m_pConduct;     //!< pointer to fluid thermal conductivity material
     
-public:
-    double              m_rhor;         //!< referential fluid density
-    
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };

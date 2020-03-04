@@ -86,4 +86,7 @@ public:
     //! tangent of isochoric specific heat capacity with respect to temperature T
     virtual double Tangent_cv_Temperature(FEMaterialPoint& mp) = 0;
 
+    //! isobaric specific heat capacity
+    virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
+            
 };

@@ -361,3 +361,75 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Specific free energy
+class FEPlotFluidSpecificFreeEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificFreeEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific entropy
+class FEPlotFluidSpecificEntropy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificEntropy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific internal energy
+class FEPlotFluidSpecificInternalEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificInternalEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific gage enthalpy
+class FEPlotFluidSpecificGageEnthalpy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificGageEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific free enthalpy
+class FEPlotFluidSpecificFreeEnthalpy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificFreeEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific strain energy
+class FEPlotFluidSpecificStrainEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificStrainEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific isochoric heat capacity
+class FEPlotFluidIsochoricSpecificHeatCapacity : public FEPlotDomainData
+{
+public:
+    FEPlotFluidIsochoricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific isobaric heat capacity
+class FEPlotFluidIsobaricSpecificHeatCapacity : public FEPlotDomainData
+{
+public:
+    FEPlotFluidIsobaricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

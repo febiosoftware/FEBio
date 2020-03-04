@@ -942,3 +942,147 @@ bool FEPlotFluidElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     }
     return false;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificFreeEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->SpecificFreeEnergy(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificEntropy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->SpecificEntropy(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificInternalEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->SpecificInternalEnergy(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificGageEnthalpy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->SpecificGageEnthalpy(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificFreeEnthalpy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->SpecificFreeEnthalpy(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->SpecificStrainEnergy(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidIsochoricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->IsochoricSpecificHeatCapacity(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->IsobaricSpecificHeatCapacity(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}

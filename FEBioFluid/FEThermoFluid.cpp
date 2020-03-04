@@ -48,8 +48,6 @@ END_FECORE_CLASS();
 
 FEThermoFluid::FEThermoFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 {
-    m_rhor = 0;
-
     m_pElastic = 0;
     m_pConduct = 0;
 }
