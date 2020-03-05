@@ -47,8 +47,9 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
 
 private:
-	std::string			m_exp;
-	FEParamVec3			m_fiber;
+	std::string			m_exp;		// the string with the strain energy expression
+	FEParamVec3			m_fiber;	// fiber direction
+	bool				m_printDerivs;	// option to print out derivatives
 
 private:
 	MSimpleExpression	m_W;		// strain-energy function

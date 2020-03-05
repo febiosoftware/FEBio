@@ -32,11 +32,13 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_exp, "W");
 	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PARAMETER(m_printDerivs, "print_derivs");
 END_FECORE_CLASS();
 
 FEGenericTransIsoHyperelasticUC::FEGenericTransIsoHyperelasticUC(FEModel* fem) : FEUncoupledMaterial(fem)
 {
 	m_fiber = vec3d(1, 0, 0);
+	m_printDerivs = false;
 }
 
 bool FEGenericTransIsoHyperelasticUC::Init()
@@ -93,23 +95,25 @@ bool FEGenericTransIsoHyperelasticUC::Init()
 	m_W45.AddVariables(vars); m_W45.SetExpression(W45);
 	m_W55.AddVariables(vars); m_W55.SetExpression(W55);
 
-#ifdef _DEBUG
-	MObj2String o2s;
-	string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
-	string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());
-	string sW4 = o2s.Convert(m_W4); feLog("W4  = %s\n", sW4.c_str());
-	string sW5 = o2s.Convert(m_W5); feLog("W5  = %s\n", sW5.c_str());
-	string sW11 = o2s.Convert(m_W11); feLog("W11 = %s\n", sW11.c_str());
-	string sW12 = o2s.Convert(m_W12); feLog("W12 = %s\n", sW12.c_str());
-	string sW14 = o2s.Convert(m_W14); feLog("W14 = %s\n", sW14.c_str());
-	string sW15 = o2s.Convert(m_W15); feLog("W15 = %s\n", sW15.c_str());
-	string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
-	string sW24 = o2s.Convert(m_W24); feLog("W24 = %s\n", sW24.c_str());
-	string sW25 = o2s.Convert(m_W25); feLog("W25 = %s\n", sW25.c_str());
-	string sW44 = o2s.Convert(m_W44); feLog("W44 = %s\n", sW44.c_str());
-	string sW45 = o2s.Convert(m_W45); feLog("W45 = %s\n", sW45.c_str());
-	string sW55 = o2s.Convert(m_W55); feLog("W55 = %s\n", sW55.c_str());
-#endif
+	if (m_printDerivs)
+	{
+		feLog("\nStrain energy derivatives for material %d (%s):\n", GetID(), GetName().c_str());
+		MObj2String o2s;
+		string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
+		string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());
+		string sW4 = o2s.Convert(m_W4); feLog("W4  = %s\n", sW4.c_str());
+		string sW5 = o2s.Convert(m_W5); feLog("W5  = %s\n", sW5.c_str());
+		string sW11 = o2s.Convert(m_W11); feLog("W11 = %s\n", sW11.c_str());
+		string sW12 = o2s.Convert(m_W12); feLog("W12 = %s\n", sW12.c_str());
+		string sW14 = o2s.Convert(m_W14); feLog("W14 = %s\n", sW14.c_str());
+		string sW15 = o2s.Convert(m_W15); feLog("W15 = %s\n", sW15.c_str());
+		string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
+		string sW24 = o2s.Convert(m_W24); feLog("W24 = %s\n", sW24.c_str());
+		string sW25 = o2s.Convert(m_W25); feLog("W25 = %s\n", sW25.c_str());
+		string sW44 = o2s.Convert(m_W44); feLog("W44 = %s\n", sW44.c_str());
+		string sW45 = o2s.Convert(m_W45); feLog("W45 = %s\n", sW45.c_str());
+		string sW55 = o2s.Convert(m_W55); feLog("W55 = %s\n", sW55.c_str());
+	}
 
 	return FEElasticMaterial::Init();
 }
@@ -203,20 +207,16 @@ tens4ds FEGenericTransIsoHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 	double W45 = m_W45.value_s(v);
 	double W55 = m_W55.value_s(v);
 
+	// a few tensors we'll need
 	mat3dd I(1.0);
 	tens4ds IxI = dyad1s(I);
-
 	tens4ds BxB = dyad1s(B);
 	tens4ds B2xB2 = dyad1s(B2);
-
 	tens4ds BoB2 = dyad1s(B, B2);
-
 	tens4ds Ib = dyad4s(B);
 	tens4ds II = dyad4s(I);
-
 	mat3ds A = dyad(a);
 	mat3ds aBa = dyads(a, B*a);
-
 	tens4ds Baa = dyad1s(B, A);
 	tens4ds BaBa = dyad1s(B, aBa);
 	tens4ds B2A = dyad1s(B2, A);
@@ -226,12 +226,12 @@ tens4ds FEGenericTransIsoHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 	tens4ds aBaaBa = dyad1s(aBa, aBa);
 	tens4ds AB = dyad5s(A, B);
 
+	// evaluate deviatoric stress
 	mat3ds T = (B*(W1 + W2*I1) - B2*W2 + A*(W4*I4) + aBa*(W5*I4))*(2./J);
-
 	mat3ds devT = T.dev();
 
-	// isochoric stiffness contribution
-	tens4ds dw_iso = BxB*(W11 + 2 * W12*I1 + W22*I1*I1 + W2) - BoB2*(W12 + W22*I1) + B2xB2*W22 - Ib*W2;
+	// stiffness contribution from isotropic terms
+	tens4ds dw_iso = BxB*(W11 + 2.0*W12*I1 + W22*I1*I1 + W2) - BoB2*(W12 + W22*I1) + B2xB2*W22 - Ib*W2;
 
 	// stiffness constribution from anisotropic terms 
 	tens4ds dw_ani = Baa*(I4*(W14 + W24*I1)) \
@@ -243,15 +243,14 @@ tens4ds FEGenericTransIsoHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 		+ aBaaBa*(I4*I4*W55) \
 		+ AB*(I4*W5);
 
-	// let's sum them up
-	tens4ds dw = (dw_iso + dw_ani)*(4./J);
-	mat3ds dw_ = dw.contract();
-	double trD = dw.tr();
-
-	tens4ds cw = dw - dyad1s(dw_, I)*(1. / 3.) - dyad1s(I, dw_)*(1. / 3.) + IxI*(2.* trD / 9.);
+	// isochoric contribution
+	tens4ds dw = dw_iso + dw_ani;
+	mat3ds dwoI = dw.contract();
+	double trDw = dw.tr();
+	tens4ds cw = dw - dyad1s(dwoI, I) / 3.0 + IxI*(trDw / 9.0);
 
 	// put it all together
-	tens4ds c = dyad1s(devT, I)*(-2./3.) + (II - IxI*(1./3.))*(2./3.*T.tr()) + cw;
+	tens4ds c = (II - IxI/3.0)*(2.0/3.0*T.tr()) - dyad1s(devT, I)*(2.0/3.0) + cw*(4. / J);
 
 	// all done
 	return c;

@@ -31,11 +31,12 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEGenericHyperelasticUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_exp, "W");
+	ADD_PARAMETER(m_printDerivs, "print_derivs");
 END_FECORE_CLASS();
 
 FEGenericHyperelasticUC::FEGenericHyperelasticUC(FEModel* fem) : FEUncoupledMaterial(fem)
 {
-
+	m_printDerivs = false;
 }
 
 // initialization
@@ -72,14 +73,16 @@ bool FEGenericHyperelasticUC::Init()
 	m_W12.AddVariables(vars); m_W12.SetExpression(W12);
 	m_W22.AddVariables(vars); m_W22.SetExpression(W22);
 
-#ifdef _DEBUG
-	MObj2String o2s;
-	string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
-	string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());
-	string sW11 = o2s.Convert(m_W11); feLog("W11 = %s\n", sW11.c_str());
-	string sW12 = o2s.Convert(m_W12); feLog("W12 = %s\n", sW12.c_str());
-	string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
-#endif
+	if (m_printDerivs)
+	{
+		feLog("\nStrain energy derivatives for material %d (%s):\n", GetID(), GetName().c_str());
+		MObj2String o2s;
+		string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
+		string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());
+		string sW11 = o2s.Convert(m_W11); feLog("W11 = %s\n", sW11.c_str());
+		string sW12 = o2s.Convert(m_W12); feLog("W12 = %s\n", sW12.c_str());
+		string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
+	}
 
 	return FEUncoupledMaterial::Init();
 }
@@ -153,23 +156,22 @@ tens4ds FEGenericHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 	tens4ds BxB = dyad1s(B);
 	tens4ds B2xB2 = dyad1s(B2);
 	tens4ds BoB2 = dyad1s(B, B2);
-	tens4ds BoI = dyad1s(B, I);
-	tens4ds B2oI = dyad1s(B2, I);
 	tens4ds Ib = dyad4s(B);
 
-	// put the elasticity tangent together
+	// deviatoric stress
 	mat3ds T = (B*(W1 + W2*I1) - B2*W2)*(2.0/J);
 	mat3ds devT = T.dev();
 
-	tens4ds dw = (BxB*(W11 + 2 * W12*I1 + W22*I1*I1 + W2) - BoB2*(W12 + W22*I1) + B2xB2*W22 - Ib*W2)*(4. / J);
-	mat3ds dw_ = dw.contract();
-	double trD = dw.tr();
-
-	tens4ds cw = dw - dyad1s(dw_, I)*(1. / 3.) - dyad1s(I, dw_)*(1. / 3.) + IxI*(2.* trD / 9.);
+	// isochoric stiffness contribution
+	tens4ds dw = BxB*(W11 + 2.0*W12*I1 + W22*I1*I1 + W2) - BoB2*(W12 + W22*I1) + B2xB2*W22 - Ib*W2;
+	double trDw = dw.tr();
+	mat3ds dwoI = dw.contract();
+	tens4ds cw = dw - dyad1s(dwoI, I) / 3.0 + IxI*(trDw / 9.0);
 
 	// put it all together
-	tens4ds c = dyad1s(devT, I)*(-2. / 3.) + (I4 - IxI*(1. / 3.))*(2. / 3.*T.tr()) + cw;
+	tens4ds c = (I4 - IxI/3.0)*(2.0*T.tr()/3.0) - dyad1s(devT, I)*(2.0/3.0) + cw*(4.0/J);
 
+	// all done
 	return c;
 }
 

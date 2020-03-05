@@ -44,7 +44,8 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
 
 private:
-	std::string			m_exp;
+	std::string			m_exp;			// the string with the strain energy expression
+	bool				m_printDerivs;	// option to print out derivatives
 
 private:
 	MSimpleExpression	m_W;	// deviatoric strain-energy function
