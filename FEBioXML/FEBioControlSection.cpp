@@ -324,6 +324,7 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 		else if (att == "transient"   ) pstep->m_nanalysis = FE_DYNAMIC;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
 	}
+	else if (tag == "shell_normal_nodal") tag.value(feb->m_shell_norm_nodal);
 	else if (ReadParameter(tag, modelParams) == false)
 	{
 		if (ReadParameter(tag, stepParams) == false)
