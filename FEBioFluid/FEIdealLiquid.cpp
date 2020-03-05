@@ -222,8 +222,9 @@ double FEIdealLiquid::Tangent_cv_Temperature(FEMaterialPoint& mp)
 double FEIdealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    double T = tf.m_T + m_Tr;
     
-    double cp = IsochoricSpecificHeatCapacity(mp) + m_beta*m_beta/(m_k*m_rhor)*tf.m_T;
+    double cp = IsochoricSpecificHeatCapacity(mp) + m_beta*m_beta/(m_k*m_rhor)*T;
     
     return cp;
 }

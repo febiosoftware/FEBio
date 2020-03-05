@@ -453,6 +453,8 @@
 		D5BD65AD2333E32000EB9FD1 /* FEPreStrainElastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BD65A12333E32000EB9FD1 /* FEPreStrainElastic.h */; };
 		D5C071F52151A978003321F9 /* FEGenericBodyForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C071F32151A977003321F9 /* FEGenericBodyForce.cpp */; };
 		D5C071F62151A978003321F9 /* FEGenericBodyForce.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C071F42151A978003321F9 /* FEGenericBodyForce.h */; };
+		D5C123E42411845500657663 /* FEGenericTransIsoHyperelasticUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C123E22411845500657663 /* FEGenericTransIsoHyperelasticUC.cpp */; };
+		D5C123E52411845500657663 /* FEGenericTransIsoHyperelasticUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C123E32411845500657663 /* FEGenericTransIsoHyperelasticUC.h */; };
 		D5C13ED2240477A3005897E1 /* FEActiveFiberStressUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C13ECC240477A3005897E1 /* FEActiveFiberStressUC.h */; };
 		D5C13ED3240477A3005897E1 /* FEActiveFiberStress.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C13ECD240477A3005897E1 /* FEActiveFiberStress.h */; };
 		D5C13ED4240477A3005897E1 /* FEActiveFiberStress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C13ECE240477A3005897E1 /* FEActiveFiberStress.cpp */; };
@@ -927,6 +929,8 @@
 		D5BD65A12333E32000EB9FD1 /* FEPreStrainElastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPreStrainElastic.h; sourceTree = "<group>"; };
 		D5C071F32151A977003321F9 /* FEGenericBodyForce.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGenericBodyForce.cpp; sourceTree = "<group>"; };
 		D5C071F42151A978003321F9 /* FEGenericBodyForce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericBodyForce.h; sourceTree = "<group>"; };
+		D5C123E22411845500657663 /* FEGenericTransIsoHyperelasticUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGenericTransIsoHyperelasticUC.cpp; sourceTree = "<group>"; };
+		D5C123E32411845500657663 /* FEGenericTransIsoHyperelasticUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericTransIsoHyperelasticUC.h; sourceTree = "<group>"; };
 		D5C13ECC240477A3005897E1 /* FEActiveFiberStressUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEActiveFiberStressUC.h; sourceTree = "<group>"; };
 		D5C13ECD240477A3005897E1 /* FEActiveFiberStress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEActiveFiberStress.h; sourceTree = "<group>"; };
 		D5C13ECE240477A3005897E1 /* FEActiveFiberStress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEActiveFiberStress.cpp; sourceTree = "<group>"; };
@@ -1188,6 +1192,8 @@
 				D5C13ED1240477A3005897E1 /* FEGenericRigidJoint.h */,
 				D5D84F00240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.cpp */,
 				D5D84F01240F21B500DF3D67 /* FEGenericTransIsoHyperelastic.h */,
+				D5C123E22411845500657663 /* FEGenericTransIsoHyperelasticUC.cpp */,
+				D5C123E32411845500657663 /* FEGenericTransIsoHyperelasticUC.h */,
 				D5322EED2142ACD7008DE511 /* FEGentMaterial.cpp */,
 				D5322F512142ACD8008DE511 /* FEGentMaterial.h */,
 				D5322F082142ACD8008DE511 /* FEHolmesMow.cpp */,
@@ -1675,6 +1681,7 @@
 				D53231032142ACD9008DE511 /* FEFiberIntegrationTrapezoidal.h in Headers */,
 				D5322FFD2142ACD9008DE511 /* FEMergedConstraint.h in Headers */,
 				D53230A42142ACD9008DE511 /* FERigidSpring.h in Headers */,
+				D5C123E52411845500657663 /* FEGenericTransIsoHyperelasticUC.h in Headers */,
 				D53230232142ACD9008DE511 /* FEBioMechPlot.h in Headers */,
 				D532300B2142ACD9008DE511 /* FEAugLagLinearConstraint.h in Headers */,
 				D53230E12142ACD9008DE511 /* FETransIsoMooneyRivlin.h in Headers */,
@@ -1845,6 +1852,7 @@
 				D53230F72142ACD9008DE511 /* FEGasserOgdenHolzapfel.cpp in Sources */,
 				D5322FEA2142ACD9008DE511 /* FESRIElasticSolidDomain.cpp in Sources */,
 				D53230552142ACD9008DE511 /* FEIsotropicElastic.cpp in Sources */,
+				D5C123E42411845500657663 /* FEGenericTransIsoHyperelasticUC.cpp in Sources */,
 				D532303F2142ACD9008DE511 /* FEFiberIntegrationScheme.cpp in Sources */,
 				D53231632142ACD9008DE511 /* FENewtonianViscousSolidUC.cpp in Sources */,
 				D532313F2142ACD9008DE511 /* FEDiscreteSpringDomain.cpp in Sources */,

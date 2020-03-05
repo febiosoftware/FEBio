@@ -64,4 +64,9 @@ protected:
     // degrees of freedom
 	FEDofList	m_dofU, m_dofSU, m_dofW;
     int		m_dofEF;
+    
+protected:
+    bool                m_bshellb;  //!< flag for prescribing traction on shell bottom
+    
+    DECLARE_FECORE_CLASS();
 };

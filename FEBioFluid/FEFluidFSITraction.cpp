@@ -34,6 +34,12 @@ SOFTWARE.*/
 #include "FEBioFSI.h"
 
 //-----------------------------------------------------------------------------
+// Parameter block for pressure loads
+BEGIN_FECORE_CLASS(FEFluidFSITraction, FESurfaceLoad)
+    ADD_PARAMETER(m_bshellb , "shell_bottom");
+END_FECORE_CLASS()
+
+//-----------------------------------------------------------------------------
 //! constructor
 FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofW(pfem)
 {
@@ -42,6 +48,7 @@ FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_d
 	m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
 	m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
     m_dofEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    m_bshellb = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,12 +56,12 @@ FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_d
 bool FEFluidFSITraction::Init()
 {
 	FESurface& surf = GetSurface();
+    surf.SetShellBottom(m_bshellb);
 	surf.SetInterfaceStatus(true);
 	if (FESurfaceLoad::Init() == false) return false;
 
 	// get the list of fluid-FSI elements connected to this interface
 	FEModel* fem = GetFEModel();
-	FEMesh* mesh = surf.GetMesh();
 	int NF = surf.Elements();
 	m_elem.resize(NF);
 	m_K.resize(NF, 0);
@@ -87,6 +94,8 @@ bool FEFluidFSITraction::Init()
 
     // TODO: Deal with the case when the surface is a shell domain separating two FSI domains
     // that use different fluid bulk moduli
+    // (for now, users have to define two FEFluidFSITraction loads, one on front shell
+    // face and the other on back shell face)
     
     return true;
 }
@@ -130,11 +139,9 @@ mat3ds FEFluidFSITraction::GetFluidStress(FESurfaceMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEModel* fem = GetFEModel();
-	FEMesh* mesh = m_psurf->GetMesh();
-
-	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
-	m_psurf->LoadVector(R, m_dofU, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
+	// If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
+    FEDofList dof = m_bshellb ? m_dofSU : m_dofU;
+	m_psurf->LoadVector(R, dof, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// get the surface element
 		FESurfaceElement& el = *mp.SurfaceElement();
@@ -174,7 +181,7 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	// build dof list
 	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
 	FEDofList dofs(fem);
-	dofs.AddDofs(m_dofU);
+    if (!m_bshellb) dofs.AddDofs(m_dofU); else dofs.AddDofs(m_dofSU);
 	dofs.AddDofs(m_dofW);
 	dofs.AddDof(m_dofEF);
 
