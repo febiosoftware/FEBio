@@ -105,6 +105,7 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 			if (s.compare("cosh") == 0) return (dp*Sinh(p));
 			if (s.compare("sinh") == 0) return (dp*Cosh(p));
 			if (s.compare("sqrt") == 0) return (dp/(2.0*Sqrt(p)));
+			if (s.compare("acosh") == 0) return (dp/Sqrt((p^2) - 1.0));
 #ifdef WIN32
 			if (s.compare("J0"  ) == 0) return (-J1(p))*dp;
 			if (s.compare("J1"  ) == 0) return dp*(J0(p) - Jn(2, p))/2.0;

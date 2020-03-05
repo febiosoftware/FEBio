@@ -75,8 +75,9 @@ bool FEGenericHyperelasticUC::Init()
 
 	if (m_printDerivs)
 	{
-		feLog("\nStrain energy derivatives for material %d (%s):\n", GetID(), GetName().c_str());
+		feLog("\nStrain energy and derivatives for material %d (%s):\n", GetID(), GetName().c_str());
 		MObj2String o2s;
+		string sW = o2s.Convert(m_W); feLog("W = %s\n", sW.c_str());
 		string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
 		string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());
 		string sW11 = o2s.Convert(m_W11); feLog("W11 = %s\n", sW11.c_str());

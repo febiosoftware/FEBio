@@ -1410,7 +1410,7 @@ void FEModel::Logf(int ntag, const char* msg, ...)
 	va_list	args;
 
 	// make the message
-	char sztxt[256] = { 0 };
+	char sztxt[2048] = { 0 };
 	va_start(args, msg);
 	vsprintf(sztxt, msg, args);
 	va_end(args);

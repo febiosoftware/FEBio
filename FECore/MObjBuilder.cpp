@@ -58,6 +58,7 @@ void init_function_lists()
 	FNC["cosh" ] = cosh;
 	FNC["sinh" ] = sinh;
 	FNC["tanh" ] = tanh;
+	FNC["acosh"] = acosh;
 	FNC["ln"   ] = log;
 	FNC["log"  ] = log10;
 	FNC["exp"  ] = exp;
@@ -135,8 +136,77 @@ char* find_next(char* sz)
 }
 
 //-----------------------------------------------------------------------------
-bool MObjBuilder::Create(MSimpleExpression* mo, const std::string& ex, bool beval)
+bool string_replace(string& s, const std::string& in, const std::string& out)
 {
+	size_t n = s.find(in);
+	if (n != string::npos)
+	{
+		s.replace(n, in.size(), out);
+		return true;
+	}
+	else return false;
+}
+
+//-----------------------------------------------------------------------------
+// process string substitutions
+// Math expressions can be defined with string literals, which will be substituted
+// in the last statement.
+// e.g.
+// s = a + b; 2*s
+// will be replaced by: s*(a+b)
+
+std::string MObjBuilder::processStrings(const std::string& ex)
+{
+	// remove white space
+	string tmp;
+	for (size_t i = 0; i < ex.size(); ++i)
+	{
+		char c = ex[i];
+		if (isspace(c) == 0) tmp.push_back(c);
+	}
+
+	// keep track of string subs
+	std::map<string, string> subs;
+
+	// build string sub list
+	size_t lp = 0;
+	size_t l1 = tmp.find(';', lp);
+	while (l1 != std::string::npos)
+	{
+		size_t equalSign = tmp.find('=', lp);
+		string leftVal = tmp.substr(lp, equalSign - lp);
+		string rightVal = tmp.substr(equalSign + 1, l1 - equalSign - 1);
+		subs[leftVal] = rightVal;
+
+		lp = l1 + 1;
+		l1 = tmp.find(';', lp);
+	}
+
+	string out = tmp.substr(lp);
+
+	bool b = true;
+	while (b)
+	{
+		std::map<string, string>::iterator it = subs.begin();
+		b = false;
+		for (; it != subs.end(); ++it)
+		{
+			string rep = "(" + it->second + ")";
+			bool ret = string_replace(out, it->first, rep);
+			if (ret) b = true;
+		}
+	}
+
+	return out;
+}
+
+
+//-----------------------------------------------------------------------------
+bool MObjBuilder::Create(MSimpleExpression* mo, const std::string& expression, bool beval)
+{
+	// process the strins for string substitutions
+	std::string ex = processStrings(expression);
+
 	// make a copy of the original string
 	char szcopy[512] = { 0 };
 	strcpy(szcopy, ex.c_str());

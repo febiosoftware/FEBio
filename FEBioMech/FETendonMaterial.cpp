@@ -42,14 +42,6 @@ BEGIN_FECORE_CLASS(FETendonMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_lam1, "lam_max");
 END_FECORE_CLASS();
 
-//-----------------------------------------------------------------------------
-#ifdef WIN32
-inline double acosh(double x)
-{
-	if (x <= 1) return 0;
-	return log(x + sqrt(x*x - 1));
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // FETendonMaterial

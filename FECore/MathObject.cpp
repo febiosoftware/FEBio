@@ -251,6 +251,6 @@ bool MSimpleExpression::Create(const std::string& expr, bool autoVars)
 {
 	MObjBuilder mob;
 	mob.setAutoVars(autoVars);
-	if (mob.Create(this, expr, true) == false) return false;
+	if (mob.Create(this, expr, false) == false) return false;
 	return true;
 }

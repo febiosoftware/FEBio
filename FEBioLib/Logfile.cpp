@@ -99,7 +99,7 @@ void Logfile::printf(const char* sz, ...)
 	va_list	args;
 
 	// make the message
-	char sztxt[1024] = {0};
+	char sztxt[2048] = {0};
 	va_start(args, sz);
 	vsprintf(sztxt, sz, args);
 	va_end(args);

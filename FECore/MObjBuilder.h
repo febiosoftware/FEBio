@@ -116,6 +116,10 @@ protected:
 	// read a double
 	double read_double();
 
+	// process string substitutions
+	std::string processStrings(const std::string& ex);
+
+
 protected:
 	const char*	m_szexpr, *m_szorg;
 	double		number_value;
