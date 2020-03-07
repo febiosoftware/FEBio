@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include "FEFluidMaterialPoint.h"
+#include "FEThermoFluid.h"
 #include "FEThermoFluidMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
@@ -56,7 +57,12 @@ bool FEIdealGas::Init()
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
-    if (m_Pr <= 0) { feLogError("A positive referential absolute pressure P must be defined in Globals section"); return false; }
+    if (m_Pr == 0) {
+        FEThermoFluid* pMat = dynamic_cast<FEThermoFluid*>(GetParent());
+        double rhor = pMat->ReferentialDensity();
+        m_Pr = m_R*m_Tr/m_M*rhor;
+        feLogWarning("The referential absolute pressure P is calculated internally as %g\n",m_Pr);
+    }
     
     return true;
 }
