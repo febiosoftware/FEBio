@@ -102,7 +102,26 @@ void FESurface::Create(const FEFacetSet& set)
 	// copy the name
 	SetName(set.GetName());
 
-	Init();
+	// allocate surface material points
+	CreateMaterialPointData();
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::CreateMaterialPointData()
+{
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = m_el[i];
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		el.ClearData();
+		for (int n = 0; n < nint; ++n)
+		{
+			FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(CreateMaterialPoint());
+			assert(pt);
+			el.SetMaterialPointData(pt, n);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -249,7 +268,7 @@ bool FESurface::Init()
 	}
 
 	vec3d re[FEElement::MAX_NODES];
-	// assign material points to surface elements
+	// initialize material points of surface elements
 	for (int i = 0; i < Elements(); ++i)
 	{
 		FESurfaceElement& el = m_el[i];
@@ -260,9 +279,8 @@ bool FESurface::Init()
 		int neln = el.Nodes();
 		for (int n = 0; n < nint; ++n)
 		{
-			FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(CreateMaterialPoint());
+			FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(el.GetMaterialPoint(n));
 			if (pt == nullptr) return false;
-			el.SetMaterialPointData(pt, n);
 
 			// initialize some material point data
 			double* H = el.H(n);

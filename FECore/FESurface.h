@@ -271,6 +271,9 @@ public:
 		const FEDofList& dofList_b,	// The degree of freedom list of node b
 		FESurfaceMatrixIntegrand f	// the matrix function to evaluate
 	);
+
+public:
+	void CreateMaterialPointData();
     
 protected:
 	FEFacetSet*					m_surf;		//!< the facet set from which this surface is built

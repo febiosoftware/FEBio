@@ -336,7 +336,8 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
     // copy the name
     s.SetName(fs.GetName());
 
-	s.Init();
+	// allocate material point data
+	s.CreateMaterialPointData();
     
 	return true;
 }

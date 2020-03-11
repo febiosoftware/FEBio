@@ -113,6 +113,9 @@ public:
 	//! Get the local ID
 	int GetLocalID() const { return m_lid; }
 
+	//! clear material point data
+	void ClearData();
+
 public:
 	//! Set the type of the element
 	void SetType(int ntype) { FEElementLibrary::SetElementTraits(*this, ntype); }

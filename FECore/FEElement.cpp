@@ -53,6 +53,19 @@ FEElementState& FEElementState::operator = (const FEElementState& s)
 }
 
 //-----------------------------------------------------------------------------
+//! clear material point data
+void FEElement::ClearData()
+{
+	int nint = GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint* mp = GetMaterialPoint(i);
+		delete mp;
+		m_State[i] = nullptr;
+	}
+}
+
+//-----------------------------------------------------------------------------
 double FEElement::Evaluate(double* fn, int n)
 {
 	double* Hn = H(n);
