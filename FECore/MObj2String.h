@@ -32,7 +32,7 @@ SOFTWARE.*/
 using namespace std;
 
 // this class converts a MathObject to a string
-class MObj2String
+class FECORE_API MObj2String
 {
 public:
 	string Convert(const MathObject& o);
