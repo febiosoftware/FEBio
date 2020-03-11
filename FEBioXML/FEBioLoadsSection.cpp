@@ -629,7 +629,7 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 		psl->SetSurface(psurf);
 
 		// read the parameters
-		ReadParameterList(tag, psl);
+		if (!tag.isleaf()) ReadParameterList(tag, psl);
 
 		// add it to the model
 		GetBuilder()->AddSurfaceLoad(psl);
