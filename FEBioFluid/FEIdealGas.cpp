@@ -186,42 +186,6 @@ double FEIdealGas::SpecificEntropy(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! specific internal energy
-double FEIdealGas::SpecificInternalEnergy(FEMaterialPoint& mp)
-{
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = m_Tr + tf.m_T;
-
-    double u = SpecificFreeEnergy(mp) + T*SpecificEntropy(mp);
-    
-    return u;
-}
-
-//-----------------------------------------------------------------------------
-//! specific gage enthalpy
-double FEIdealGas::SpecificGageEnthalpy(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-
-    double h = SpecificInternalEnergy(mp) + m_R/m_M*(tf.m_T - fp.m_Jf*m_Tr);
-    
-    return h;
-}
-
-//-----------------------------------------------------------------------------
-//! specific free enthalpy
-double FEIdealGas::SpecificFreeEnthalpy(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-
-    double g = SpecificFreeEnergy(mp) + m_R/m_M*(tf.m_T - fp.m_Jf*m_Tr);
-    
-    return g;
-}
-
-//-----------------------------------------------------------------------------
 //! specific strain energy
 double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
 {
@@ -278,4 +242,13 @@ double FEIdealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
     dcv *= m_R/m_M;
     
     return dcv;
+}
+
+//-----------------------------------------------------------------------------
+//! dilatation from temperature and pressure
+double FEIdealGas::Dilatation(const double T, const double p)
+{
+    double J = (T+m_Tr)/m_Tr/(1+p/m_Pr);
+    
+    return J - 1;
 }

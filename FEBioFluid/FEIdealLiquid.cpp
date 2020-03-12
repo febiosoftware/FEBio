@@ -62,7 +62,6 @@ bool FEIdealLiquid::Init()
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
-    if (m_Pr <= 0) { feLogError("A positive referential absolute pressure P must be defined in Globals section"); return false; }
     
     m_pMat = dynamic_cast<FEThermoFluid*>(GetParent());
     m_rhor = m_pMat->ReferentialDensity();
@@ -152,36 +151,6 @@ double FEIdealLiquid::SpecificEntropy(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! specific internal energy
-double FEIdealLiquid::SpecificInternalEnergy(FEMaterialPoint& mp)
-{
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T + m_Tr;
-
-    double u = SpecificFreeEnergy(mp) + T*SpecificEntropy(mp);
-    
-    return u;
-}
-
-//-----------------------------------------------------------------------------
-//! specific gage enthalpy
-double FEIdealLiquid::SpecificGageEnthalpy(FEMaterialPoint& mp)
-{
-    double h = SpecificInternalEnergy(mp) + Pressure(mp)/m_pMat->Density(mp);
-    
-    return h;
-}
-
-//-----------------------------------------------------------------------------
-//! specific free enthalpy
-double FEIdealLiquid::SpecificFreeEnthalpy(FEMaterialPoint& mp)
-{
-    double g = SpecificFreeEnergy(mp) + Pressure(mp)/m_pMat->Density(mp);
-    
-    return g;
-}
-
-//-----------------------------------------------------------------------------
 //! specific strain energy
 double FEIdealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
 {
@@ -227,4 +196,13 @@ double FEIdealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
     double cp = IsochoricSpecificHeatCapacity(mp) + m_beta*m_beta/(m_k*m_rhor)*T;
     
     return cp;
+}
+
+//-----------------------------------------------------------------------------
+//! dilatation from temperature and pressure
+double FEIdealLiquid::Dilatation(const double T, const double p)
+{
+    double e = (m_beta*T - p)/m_k;
+    
+    return e;
 }

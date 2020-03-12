@@ -26,43 +26,48 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
-#include "FEElasticFluid.h"
-#include "FEThermoFluidMaterialPoint.h"
+#pragma once
+#include <FECore/FESurfaceLoad.h>
 #include "FEThermoFluid.h"
 
 //-----------------------------------------------------------------------------
-//! specific internal energy
-double FEElasticFluid::SpecificInternalEnergy(FEMaterialPoint& mp)
+//! FEThermoFluidPressureLoad is a fluid surface that adjusts the pressure based on the value of the
+//! temperature.
+//!
+class FEBIOFLUID_API FEThermoFluidPressureLoad : public FESurfaceLoad
 {
-    double Tr =  GetFEModel()->GetGlobalConstant("T");
+public:
+    //! constructor
+    FEThermoFluidPressureLoad(FEModel* pfem);
+    
+    //! calculate traction stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    
+    //! set the dilatation
+    void Update() override;
+    
+    //! initialize
+    bool Init() override;
+    
+    //! activate
+    void Activate() override;
 
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T + Tr;
+    //! serialization
+    void Serialize(DumpStream& ar) override;
 
-    double u = SpecificFreeEnergy(mp) + T*SpecificEntropy(mp);
-    
-    return u;
-}
+private:
+    double          m_p0;       //!< fluid pressure offset
 
-//-----------------------------------------------------------------------------
-//! specific gage enthalpy
-double FEElasticFluid::SpecificGageEnthalpy(FEMaterialPoint& mp)
-{
-    FEThermoFluid* pMat = dynamic_cast<FEThermoFluid*>(GetParent());
-    
-    double h = SpecificInternalEnergy(mp) + Pressure(mp)/pMat->Density(mp);
-    
-    return h;
-}
+private:
+    double          m_alpha;
+    double          m_alphaf;
+    FEThermoFluid*  m_pfluid;   //!< pointer to thermo-fluid material
 
-//-----------------------------------------------------------------------------
-//! specific free enthalpy
-double FEElasticFluid::SpecificFreeEnthalpy(FEMaterialPoint& mp)
-{
-    FEThermoFluid* pMat = dynamic_cast<FEThermoFluid*>(GetParent());
-    
-    double g = SpecificFreeEnergy(mp) + Pressure(mp)/pMat->Density(mp);
-    
-    return g;
-}
+    int        m_dofEF;
+    int        m_dofT;
+
+    DECLARE_FECORE_CLASS();
+};

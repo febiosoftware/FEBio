@@ -59,7 +59,7 @@ public:
     
     //! elastic pressure
     double Pressure(FEMaterialPoint& mp) override;
-    virtual double Pressure(const double e) override;
+    virtual double Pressure(const double e);
 
     //! tangent of elastic pressure with respect to strain J
     double Tangent_Pressure_Strain(FEMaterialPoint& mp) override { return -m_k; }
@@ -73,11 +73,11 @@ public:
     //! strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
-    //! invert pressure-dilatation relation
-    double Dilatation(const double p) override;
-    
     //! evaluate temperature
     double Temperature(FEMaterialPoint& mp) override { return m_Tr; }
+
+    //! evaluate dilatation from pressure
+    double Dilatation(const double T, const double p) override;
     
 public:
     double      m_k;        //!< bulk modulus at J=1

@@ -114,7 +114,7 @@ double FEIdealGasIsothermal::StrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! invert pressure-dilatation relation
-double FEIdealGasIsothermal::Dilatation(const double p)
+double FEIdealGasIsothermal::Dilatation(const double T, const double p)
 {
     double J = m_Pr/(p+m_Pr);
     return J - 1;

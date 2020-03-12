@@ -67,15 +67,6 @@ public:
     //! specific entropy
     double SpecificEntropy(FEMaterialPoint& mp) override;
     
-    //! specific internal energy
-    double SpecificInternalEnergy(FEMaterialPoint& mp) override;
-    
-    //! specific gage enthalpy
-    double SpecificGageEnthalpy(FEMaterialPoint& mp) override;
-    
-    //! specific free enthalpy
-    double SpecificFreeEnthalpy(FEMaterialPoint& mp) override;
-    
     //! specific strain energy
     double SpecificStrainEnergy(FEMaterialPoint& mp) override;
     
@@ -90,6 +81,9 @@ public:
     
     //! isobaric specific heat capacity
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
+    
+    //! dilatation from temperature and pressure
+    double Dilatation(const double T, const double p) override;
 
 public:
     double      m_R;        //!< universal gas constant

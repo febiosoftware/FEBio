@@ -65,15 +65,6 @@ public:
     //! specific entropy
     virtual double SpecificEntropy(FEMaterialPoint& mp) = 0;
     
-    //! specific internal energy
-    virtual double SpecificInternalEnergy(FEMaterialPoint& mp) = 0;
-    
-    //! specific gage enthalpy
-    virtual double SpecificGageEnthalpy(FEMaterialPoint& mp) = 0;
-    
-    //! specific free enthalpy
-    virtual double SpecificFreeEnthalpy(FEMaterialPoint& mp) = 0;
-    
     //! specific strain energy
     virtual double SpecificStrainEnergy(FEMaterialPoint& mp) = 0;
     
@@ -89,4 +80,17 @@ public:
     //! isobaric specific heat capacity
     virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
             
+    //! calculate dilatation for given pressure and temperature
+    virtual double Dilatation(const double T, const double p) = 0;
+    
+public:
+    //! specific internal energy
+    double SpecificInternalEnergy(FEMaterialPoint& mp);
+    
+    //! specific gage enthalpy
+    double SpecificGageEnthalpy(FEMaterialPoint& mp);
+    
+    //! specific free enthalpy
+    double SpecificFreeEnthalpy(FEMaterialPoint& mp);
+    
 };

@@ -96,7 +96,7 @@ void FEFluidResistanceBC::Update()
     double p = m_R*Q;
     
     // calculate the dilatation
-    double e = m_pfluid->Dilatation(p+m_p0);
+    double e = m_pfluid->Dilatation(0,p+m_p0);
     
     // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();

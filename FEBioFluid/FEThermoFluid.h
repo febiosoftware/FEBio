@@ -58,8 +58,7 @@ public:
     
     //! Elastic pressure
     double Pressure(FEMaterialPoint& mp) override { return m_pElastic->Pressure(mp); }
-    double Pressure(const double e) override { return 0; }
-    
+
     //! tangent of elastic pressure with respect to strain J
     double Tangent_Pressure_Strain(FEMaterialPoint& mp) override { return m_pElastic->Tangent_Strain(mp); }
     
@@ -86,7 +85,7 @@ public:
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     //! invert pressure-dilatation relation
-    double Dilatation(const double p) override { return 0; }
+    double Dilatation(const double T, const double p) override { return GetElastic()->Dilatation(T,p); }
     
     //! evaluate temperature
     double Temperature(FEMaterialPoint& mp) override;

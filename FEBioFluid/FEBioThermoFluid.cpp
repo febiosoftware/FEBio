@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEIdealGas.h"
 #include "FEIdealLiquid.h"
 #include "FEFluidConstantConductivity.h"
+#include "FEThermoFluidPressureLoad.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
@@ -77,6 +78,7 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FEIdealLiquid, "ideal liquid");
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
+    REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "thermo-fluid pressure load");
 
     febio.SetActiveModule(0);
 }

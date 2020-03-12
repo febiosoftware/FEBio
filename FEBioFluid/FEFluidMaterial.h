@@ -51,7 +51,6 @@ public:
     
     //! elastic fluid pressure
     virtual double Pressure(FEMaterialPoint& mp) = 0;
-    virtual double Pressure(const double e) = 0;
 
     //! tangent of elastic pressure with respect to strain J
     virtual double Tangent_Pressure_Strain(FEMaterialPoint& mp) = 0;
@@ -66,7 +65,7 @@ public:
     virtual double StrainEnergyDensity(FEMaterialPoint& mp) = 0;
     
     //! invert pressure-dilatation relation
-    virtual double Dilatation(const double p) = 0;
+    virtual double Dilatation(const double T, const double p) = 0;
     
     //! evaluate temperature
     virtual double Temperature(FEMaterialPoint& mp) = 0;
