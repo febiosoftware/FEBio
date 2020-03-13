@@ -196,7 +196,8 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         // get the viscous stress tensor for this integration point
         sv = m_pMat->GetViscous()->Stress(mp);
         // get the gradient of the elastic pressure
-        gradp = pt.m_gradJf*m_pMat->Tangent_Pressure_Strain(mp);
+        gradp = tf.m_gradT*m_pMat->Tangent_Pressure_Temperature(mp) +
+                pt.m_gradJf*m_pMat->Tangent_Pressure_Strain(mp);
         // get the heat flux
         q = m_pMat->HeatFlux(mp);
         // get the derivative of the elastic pressure with respect to temperature
@@ -490,7 +491,7 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
     vector<vec3d> gradN(neln);
 
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;    // optionally multiply this by m_btrans
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf);    // optionally multiply this by m_btrans
 
     double *H, *Gr, *Gs, *Gt;
     
