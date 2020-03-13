@@ -31718,6 +31718,63 @@ local
 
 \end_deeper
 \begin_layout Enumerate
+The fiber orientation is specified by a vector.
+ The value is the direction of the fiber.
+ The following defines all element fiber directions in the direction of
+ the vector [1,0,0]: 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<fiber type="vector">1,0,0</fiber>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigVectorFiberDirectionOption.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+
+\series bold
+\emph on
+vector
+\emph default
+ fiber direction option
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
 The fiber orientation is determined by a point in space and the global location
  of each element integration point.
  The value is the location of the point.
@@ -31765,63 +31822,6 @@ status open
 \series bold
 \emph on
 spherical
-\emph default
- fiber direction option
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The fiber orientation is specified by a vector.
- The value is the direction of the fiber.
- The following defines all element fiber directions in the direction of
- the vector [1,0,0]: 
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<fiber type="vector">1,0,0</fiber>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigVectorFiberDirectionOption.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-\emph on
-vector
 \emph default
  fiber direction option
 \end_layout
