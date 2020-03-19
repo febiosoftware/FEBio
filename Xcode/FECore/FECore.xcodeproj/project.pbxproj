@@ -383,6 +383,8 @@
 		D5B9E60F213F67DE0008B38A /* ElementDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */; };
 		D5B9E610213F67DE0008B38A /* tens5ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */; };
 		D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FE213F67DE0008B38A /* FEOctree.h */; };
+		D5BE6F812423B4FB009AE76F /* FENodeSetConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5BE6F7F2423B4FB009AE76F /* FENodeSetConstraint.cpp */; };
+		D5BE6F822423B4FB009AE76F /* FENodeSetConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BE6F802423B4FB009AE76F /* FENodeSetConstraint.h */; };
 		D5D56E872355239E0078BCC4 /* ClassDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E842355239E0078BCC4 /* ClassDescriptor.h */; };
 		D5E1B59A22B3E06600E7939E /* FEMMGRemesh.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */; };
 		D5E1B59B22B3E06600E7939E /* FEMMGRemesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */; };
@@ -782,6 +784,8 @@
 		D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementDataRecord.h; sourceTree = "<group>"; };
 		D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5ds.hpp; sourceTree = "<group>"; };
 		D5B9E4FE213F67DE0008B38A /* FEOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctree.h; sourceTree = "<group>"; };
+		D5BE6F7F2423B4FB009AE76F /* FENodeSetConstraint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeSetConstraint.cpp; sourceTree = "<group>"; };
+		D5BE6F802423B4FB009AE76F /* FENodeSetConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FENodeSetConstraint.h; sourceTree = "<group>"; };
 		D5D56E842355239E0078BCC4 /* ClassDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassDescriptor.h; sourceTree = "<group>"; };
 		D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMMGRemesh.h; sourceTree = "<group>"; };
 		D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMMGRemesh.cpp; sourceTree = "<group>"; };
@@ -1048,6 +1052,8 @@
 				D5B9E4D7213F67DE0008B38A /* FENodeReorder.h */,
 				D54E21AA2149BB55008A9DD3 /* FENodeSet.cpp */,
 				D54E21A92149BB55008A9DD3 /* FENodeSet.h */,
+				D5BE6F7F2423B4FB009AE76F /* FENodeSetConstraint.cpp */,
+				D5BE6F802423B4FB009AE76F /* FENodeSetConstraint.h */,
 				D5B9E432213F67DE0008B38A /* FENormalProjection.cpp */,
 				D5B9E47E213F67DE0008B38A /* FENormalProjection.h */,
 				D5B9E4ED213F67DE0008B38A /* FEOctree.cpp */,
@@ -1398,6 +1404,7 @@
 				D54E21FC21517EEE008A9DD3 /* MFunctions.h in Headers */,
 				D5B9E560213F67DE0008B38A /* vec3d.h in Headers */,
 				D56B208D23AD5F94000AE9C2 /* FESolidElementShape.h in Headers */,
+				D5BE6F822423B4FB009AE76F /* FENodeSetConstraint.h in Headers */,
 				D5B9E50F213F67DE0008B38A /* FEClosestPointProjection.h in Headers */,
 				D56B209123AD5F94000AE9C2 /* FEShellElement.h in Headers */,
 				D5AB623F220289E200AAF141 /* FEEdgeList.h in Headers */,
@@ -1568,6 +1575,7 @@
 				D5AB623B220289B400AAF141 /* FERefineMesh.cpp in Sources */,
 				D5613D52217B604F007CAB89 /* FESPRProjection.cpp in Sources */,
 				D54E21B42149BB56008A9DD3 /* FENode.cpp in Sources */,
+				D5BE6F812423B4FB009AE76F /* FENodeSetConstraint.cpp in Sources */,
 				D5B9E5B8213F67DE0008B38A /* FECoreFactory.cpp in Sources */,
 				D5B9E54A213F67DE0008B38A /* FEException.cpp in Sources */,
 				D5B9E5F5213F67DE0008B38A /* FEDataMathGenerator.cpp in Sources */,

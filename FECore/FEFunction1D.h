@@ -74,7 +74,7 @@ class FECORE_API FELinearFunction : public FEFunction1D
 public:
 	FELinearFunction(FEModel* fem) : FEFunction1D(fem), m_slope(0.0), m_intercept(0.0) {}
 	FELinearFunction(FEModel* fem, double m, double y0) : FEFunction1D(fem), m_slope(m), m_intercept(y0) {}
-	FEFunction1D* copy() { return new FELinearFunction(GetFEModel(), m_slope, m_intercept); }
+	FEFunction1D* copy() override { return new FELinearFunction(GetFEModel(), m_slope, m_intercept); }
 
 	double value(double t) const override
 	{

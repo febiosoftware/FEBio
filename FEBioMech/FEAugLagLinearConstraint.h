@@ -28,9 +28,10 @@ SOFTWARE.*/
 
 #pragma once
 
-#include "FECore/vector.h"
-#include "FECore/matrix.h"
-#include "FECore/FESurfaceConstraint.h"
+#include <FECore/vector.h>
+#include <FECore/matrix.h>
+#include <FECore/FESurfaceConstraint.h>
+#include <FECore/FENodeSetConstraint.h>
 #include "febiomech_api.h"
 #include <list>
 using namespace std;
@@ -113,4 +114,52 @@ public:
 	int	m_nID;		//!< ID of manager
 
 	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+//! This class manages a group of linear constraints
+
+class FEBIOMECH_API FENodeConstraintSet : public FENodeSetConstraint
+{
+public:
+    //! constructor
+    FENodeConstraintSet(FEModel* pfem);
+
+    //! add a linear constraint to the list
+    void add(FEAugLagLinearConstraint* plc) { m_LC.push_back(plc); }
+
+public:
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
+    //! add the linear constraint contributions to the residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+    //! add the linear constraint contributions to the stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+
+    //! do the augmentation
+    bool Augment(int naug, const FETimeInfo& tp) override;
+
+    //! build connectivity for matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
+protected:
+    //! calculate the constraint value
+    virtual double constraint(FEAugLagLinearConstraint& LC);
+
+public:
+    list<FEAugLagLinearConstraint*>    m_LC;    //!< list of linear constraints
+
+public:
+    bool        m_laugon;   //!< augmentation flag
+    double      m_tol;      //!< augmentation tolerance
+    double      m_eps;      //!< penalty factor
+    double      m_rhs;      //!< right-hand-side of linear constraint equation
+    int         m_naugmax;  //!< max nr of augmentations
+    int         m_naugmin;  //!< min nf of augmentations
+
+    int         m_nID;      //!< ID of manager
+
+    DECLARE_FECORE_CLASS();
 };

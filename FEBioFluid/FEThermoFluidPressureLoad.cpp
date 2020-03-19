@@ -28,93 +28,109 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEThermoFluidPressureLoad.h"
-#include "FEFluid.h"
-#include "FEBioThermoFluid.h"
+#include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FEThermoFluidPressureLoad, FESurfaceLoad)
-    ADD_PARAMETER(m_p0, "pressure");
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEThermoFluidPressureLoad, FENodeConstraintSet)
+    ADD_PARAMETER(m_matID , "material");
+    ADD_PARAMETER(m_p0    , "pressure");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-//! constructor
-FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
+FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FENodeConstraintSet(pfem), m_nset(pfem)
 {
-    m_alpha = 1.0;
-    m_p0 = 0;
-    
-    m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
-    m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
 }
 
 //-----------------------------------------------------------------------------
-//! initialize
+//! Initializes data structures.
+void FEThermoFluidPressureLoad::Activate()
+{
+    // don't forget to call base class
+    FENLConstraint::Activate();
+}
+
+//-----------------------------------------------------------------------------
 bool FEThermoFluidPressureLoad::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
+    FEModel& fem = *GetFEModel();
+    DOFS& dofs = fem.GetDOFS();
+    FEMaterial* pm = fem.GetMaterial(m_matID-1);
+    m_tfluid = pm->ExtractProperty<FEThermoFluid>();
+    if (m_tfluid == nullptr) return false;
+    FEThermoFluidMaterialPoint tp = m_tfluid->CreateMaterialPointData();
+    FEFluidMaterialPoint& fp = *tp.ExtractData<FEFluidMaterialPoint>();
+    m_dofT = dofs.GetDOF("T");
+    m_dofEF = dofs.GetDOF("ef");
+    m_alpha = fem.GetTime().alphaf;
+    m_rhs = m_p0;
 
-    // get fluid from first surface element
-    // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
-    if (pe == nullptr) return false;
+    // initialize surface
+    m_nset.Init();
+    
+    int N = m_nset.Size();
 
-    // get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    m_pfluid = pm->ExtractProperty<FEThermoFluid>();
-    if (m_pfluid == nullptr) return false;
+    // create pressure constraints. For the nonlinear constraint c = p - p0,
+    // dc = (∂p/∂T) dT + (∂p/∂J) dJ = 0
+    // Constraint on T is (lam + eps*c)(∂p/∂T)
+    // Constraint on J is (lam + eps*c)(∂p/∂J)
+    for (int i=0; i<N; ++i) {
+
+        FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
+        FEAugLagLinearConstraint::DOF dofT;
+        FENode* node = m_nset.Node(i);
+        double T = node->get(m_dofT)*m_alpha + node->get_prev(m_dofT)*(1-m_alpha);
+        double J = 1 + node->get(m_dofEF)*m_alpha + node->get_prev(m_dofEF)*(1-m_alpha);
+        tp.m_T = T;
+        fp.m_Jf = J;
+        double dpT = m_tfluid->Tangent_Pressure_Temperature(tp);
+        dofT.node = node->GetID() - 1;    // zero-based
+        dofT.bc = m_dofT;
+        dofT.val = dpT;
+        pLC->m_dof.push_back(dofT);
+        FEAugLagLinearConstraint::DOF dofJ;
+        double dpJ = m_tfluid->Tangent_Pressure_Strain(tp);
+        dofJ.node = node->GetID() - 1;    // zero-based
+        dofJ.bc = m_dofEF;
+        dofJ.val = dpJ;
+        pLC->m_dof.push_back(dofJ);
+        // add the linear constraint to the system
+        add(pLC);
+    }
     
     return true;
 }
 
 //-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEThermoFluidPressureLoad::Activate()
+double FEThermoFluidPressureLoad::constraint(FEAugLagLinearConstraint& LC)
 {
-    FESurface* ps = &GetSurface();
+    FEThermoFluidMaterialPoint tp = m_tfluid->CreateMaterialPointData();
+    FEFluidMaterialPoint& fp = *tp.ExtractData<FEFluidMaterialPoint>();
     
-    for (int i=0; i<ps->Nodes(); ++i)
+    int n = (int)LC.m_dof.size();
+    double c = 0;
+    list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
+    FEMesh& mesh = GetFEModel()->GetMesh();
+    for (int i=0; i<n; ++i, ++it)
     {
-        FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        node.set_bc(m_dofEF, DOF_PRESCRIBED);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! Evaluate and prescribe the resistance pressure
-void FEThermoFluidPressureLoad::Update()
-{
-    // prescribe this dilatation at the nodes
-    FESurface* ps = &GetSurface();
-
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        if (ps->Node(i).m_ID[m_dofEF] < -1)
-        {
-            FENode& node = ps->Node(i);
-            double T = node.get(m_dofT);
-            // calculate the dilatation
-            double e = m_pfluid->Dilatation(T,m_p0);
-            
-            // set node as having prescribed DOF
-            node.set(m_dofEF, e);
+        FENode& node = mesh.Node(it->node);
+        double T = node.get(m_dofT)*m_alpha + node.get_prev(m_dofT)*(1-m_alpha);
+        double J = 1 + node.get(m_dofEF)*m_alpha + node.get_prev(m_dofEF)*(1-m_alpha);
+        tp.m_T = T;
+        fp.m_Jf = J;
+        // calculate pressure
+        c = m_tfluid->Pressure(tp);
+        // update tangents
+        if (it->bc == m_dofT) {
+            double dpT = m_tfluid->Tangent_Pressure_Temperature(tp);
+            it->val = dpT;
+        }
+        else {
+            double dpJ = m_tfluid->Tangent_Pressure_Strain(tp);
+            it->val = dpJ;
         }
     }
+
+    return c;
 }
 
-//-----------------------------------------------------------------------------
-//! calculate residual
-void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
-{
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
-}
-
-//-----------------------------------------------------------------------------
-//! serialization
-void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
-{
-    FESurfaceLoad::Serialize(ar);
-    ar & m_alpha & m_alphaf;
-    ar & m_pfluid;
-}

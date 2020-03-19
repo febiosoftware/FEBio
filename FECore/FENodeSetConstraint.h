@@ -27,45 +27,16 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEThermoFluid.h"
-#include <FEBioMech/FEAugLagLinearConstraint.h>
-#include <FECore/FENodeSet.h>
-#include "febiofluid_api.h"
+#include "FENLConstraint.h"
 
-//-----------------------------------------------------------------------------
-//! The FEConstraintNormalFlow class implements a fluid surface with zero
-//! tangential velocity as a linear constraint.
+class FENodeSet;
 
-class FEBIOFLUID_API FEThermoFluidPressureLoad : public FENodeConstraintSet
+// Base class for nonlinear constraints that are defined using a node set.
+class FECORE_API FENodeSetConstraint : public FENLConstraint
 {
 public:
-    //! constructor
-    FEThermoFluidPressureLoad(FEModel* pfem);
-    
-    //! destructor
-    ~FEThermoFluidPressureLoad() {}
-    
-    //! Activation
-    void Activate() override;
-    
-    //! initialization
-    bool Init() override;
-    
-    //! Get the surface
-    FENodeSet* GetNodeSet() override { return &m_nset; }
-    
-protected:
-    FENodeSet       m_nset;
-    int             m_dofT;
-    int             m_dofEF;
-    double          m_alpha;
-    FEThermoFluid*  m_tfluid;
-    
-    double constraint(FEAugLagLinearConstraint& LC) override;
+    FENodeSetConstraint(FEModel* fem);
 
-public:
-    double  m_p0;       // prescribed pressure
-    int     m_matID;    // material associated with node set
-    
-    DECLARE_FECORE_CLASS();
+    // return the surface
+    virtual FENodeSet* GetNodeSet() { return 0; }
 };

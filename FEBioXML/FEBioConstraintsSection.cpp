@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEDiscreteContact.h>
 #include <FECore/FESurfaceConstraint.h>
+#include <FECore/FENodeSetConstraint.h>
 
 void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 {
@@ -316,6 +317,19 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 					if (pdom == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szdset);
 					pdc->SetDiscreteDomain(pdom);
 				}
+
+                // get the nodeset for other constraints
+                // Note that not all constraints define a nodeset
+                FENodeSetConstraint* pns = dynamic_cast<FENodeSetConstraint*>(plc);
+                if (pns && pns->GetNodeSet())
+                {
+                    FENodeSet* pnset = pns->GetNodeSet();
+                    const char* sznset = tag.AttributeValue("node_set");
+                    FENodeSet* pset = mesh.FindNodeSet(sznset);
+                    if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sznset);
+                    pnset->Add(pset->GetNodeList());
+                    mesh.AddNodeSet(pnset);
+                }
 
 				// read the parameter list
 				ReadParameterList(tag, plc);

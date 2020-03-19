@@ -67,7 +67,7 @@ protected:
 	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
 	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
-	void PrepStep();
+	void PrepStep() override;
 
 protected:
 	//! stiffness matrix for penalty and augmented Lagrangian

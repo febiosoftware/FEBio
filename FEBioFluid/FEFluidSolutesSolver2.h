@@ -58,7 +58,7 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! rewind
-	void Rewind();
+	void Rewind() override;
 
 protected:
 	void MapVelocitySolution();
