@@ -451,6 +451,7 @@
     <ClInclude Include="..\..\FECore\FEMeshTopo.h" />
     <ClInclude Include="..\..\FECore\FEMMGRemesh.h" />
     <ClInclude Include="..\..\FECore\FENodeList.h" />
+    <ClInclude Include="..\..\FECore\FENodeSetConstraint.h" />
     <ClInclude Include="..\..\FECore\FEOctreeSearch.h" />
     <ClInclude Include="..\..\FECore\FEParabolicMap.h" />
     <ClInclude Include="..\..\FECore\FEPIDController.h" />
@@ -655,6 +656,7 @@
     <ClCompile Include="..\..\FECore\FEMeshTopo.cpp" />
     <ClCompile Include="..\..\FECore\FEMMGRemesh.cpp" />
     <ClCompile Include="..\..\FECore\FENodeList.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeSetConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FEOctreeSearch.cpp" />
     <ClCompile Include="..\..\FECore\FEParabolicMap.cpp" />
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />

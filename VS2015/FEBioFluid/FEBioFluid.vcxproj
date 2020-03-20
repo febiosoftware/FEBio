@@ -459,6 +459,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluidMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidPressureLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FETiedFluidInterface.h" />
     <ClInclude Include="..\..\FEBioFluid\FEViscousFluid.h" />
@@ -537,6 +538,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluidMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETiedFluidInterface.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp" />

@@ -328,7 +328,6 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
                     FENodeSet* pset = mesh.FindNodeSet(sznset);
                     if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sznset);
                     pnset->Add(pset->GetNodeList());
-                    mesh.AddNodeSet(pnset);
                 }
 
 				// read the parameter list
