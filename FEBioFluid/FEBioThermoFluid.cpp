@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include "FEIdealLiquid.h"
 #include "FEFluidConstantConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
+#include "FETemperatureBackFlowStabilization.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
@@ -74,7 +75,8 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FEThermoFluidDomain3D, "thermo-fluid-3D");
 
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
-    
+    REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
+
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FEIdealLiquid, "ideal liquid");
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
