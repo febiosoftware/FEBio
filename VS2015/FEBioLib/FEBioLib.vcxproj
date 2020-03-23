@@ -382,6 +382,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioLib\febio.h" />
+    <ClInclude Include="..\..\FEBioLib\FEBioConfig.h" />
     <ClInclude Include="..\..\FEBioLib\febiolib_api.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioStdSolver.h" />
@@ -396,6 +397,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\config.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEBioConfig.cpp" />
     <ClCompile Include="..\..\FEBioLib\febiolib.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioStdSolver.cpp" />

@@ -100,6 +100,8 @@ public:
 
 		m_block_log = false;
 
+		m_printParams = true;
+
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
 
@@ -138,6 +140,7 @@ public:
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
 	int				m_nStep;	//!< current index of analysis step
+	bool			m_printParams;	//!< print parameters
 
 public:
 	// The model
@@ -1289,6 +1292,13 @@ void FEModel::EvaluateLoadControllers(double time)
 }
 
 //-----------------------------------------------------------------------------
+//! Set the print parameters flag
+void FEModel::SetPrintParametersFlag(bool b)
+{
+	m_imp->m_printParams = b;
+}
+
+//-----------------------------------------------------------------------------
 bool FEModel::EvaluateLoadParameters()
 {
 	feLog("\n");
@@ -1305,29 +1315,34 @@ bool FEModel::EvaluateLoadParameters()
 			{
 			case FE_PARAM_INT: {
 				p->value<int>() = (int)s;
-				feLog("Setting parameter \"%s\" to : %d\n", p->name(), p->value<int>());
+				if (m_imp->m_printParams)
+					feLog("Setting parameter \"%s\" to : %d\n", p->name(), p->value<int>());
 			}
 			break;
 			case FE_PARAM_DOUBLE: {
 				p->value<double>() = pi.m_scl*s;
-				feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<double>());
+				if (m_imp->m_printParams)
+					feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<double>());
 			}
 			break;
 			case FE_PARAM_BOOL: {
 				p->value<bool>() = (s > 0 ? true : false); 
-				feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "false" : "true"));
+				if (m_imp->m_printParams)
+					feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "false" : "true"));
 			}
 			break;
 			case FE_PARAM_VEC3D: {
 				vec3d& v = p->value<vec3d>();
 				p->value<vec3d>() = pi.m_vscl*s;
-				feLog("Setting parameter \"%s\" to : %lg, %lg, %lg\n", p->name(), v.x, v.y, v.z);
+				if (m_imp->m_printParams)
+					feLog("Setting parameter \"%s\" to : %lg, %lg, %lg\n", p->name(), v.x, v.y, v.z);
 			}
 			break;
 			case FE_PARAM_DOUBLE_MAPPED: 
 			{
 				p->value<FEParamDouble>().SetScaleFactor(s * pi.m_scl);
-				feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<FEParamDouble>().GetScaleFactor());
+				if (m_imp->m_printParams)
+					feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<FEParamDouble>().GetScaleFactor());
 			}
 			break;
 			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(s* pi.m_scl); break;

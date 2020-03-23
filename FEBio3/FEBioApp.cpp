@@ -76,7 +76,7 @@ bool FEBioApp::Init(int argc, char* argv[])
 
 	// read the configration file if specified
 	if (m_ops.szcnf[0])
-		if (febio::Configure(m_ops.szcnf) == false)
+		if (febio::Configure(m_ops.szcnf, m_config) == false)
 		{
 			fprintf(stderr, "FATAL ERROR: An error occurred reading the configuration file.\n");
 			return false;
@@ -89,6 +89,12 @@ bool FEBioApp::Init(int argc, char* argv[])
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioApp::Configure(const char* szconfig)
+{
+	return febio::Configure(szconfig, m_config);
 }
 
 //-----------------------------------------------------------------------------
@@ -160,6 +166,11 @@ int FEBioApp::RunModel()
 	{
 		// read the input file
 		if (fem.Input(m_ops.szfile) == false) nret = 1;
+		else
+		{
+			// apply configuration overrides
+			ApplyConfig(fem);
+		}
 	}
 
 	// solve the model with the task and control file
@@ -174,6 +185,16 @@ int FEBioApp::RunModel()
 	SetCurrentModel(nullptr);
 
 	return nret;
+}
+
+//-----------------------------------------------------------------------------
+// apply configuration changes to model
+void FEBioApp::ApplyConfig(FEBioModel& fem)
+{
+	if (m_config.m_printParams != -1)
+	{
+		fem.SetPrintParametersFlag(m_config.m_printParams != 0);
+	}
 }
 
 //-----------------------------------------------------------------------------

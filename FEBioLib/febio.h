@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <cstddef>
 #include "febiolib_api.h"
 #include "FEBioModel.h"
+#include "FEBioConfig.h"
 #include <ostream>
 
 class CompactMatrix;
@@ -46,7 +47,7 @@ namespace febio
 	FEBIOLIB_API void InitLibrary();
 
 	// read the configuration file
-	FEBIOLIB_API bool Configure(const char* szfile);
+	FEBIOLIB_API bool Configure(const char* szfile, FEBioConfig& config);
 
 	// load a plugin
 	FEBIOLIB_API bool ImportPlugin(const char* szfile);

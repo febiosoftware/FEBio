@@ -291,17 +291,17 @@ int FEBioCmd_Config::run(int nargs, char* argv[])
 	FEBioModel* fem = GetFEM();
 	if (fem) return model_already_running();
 
-	FEBioApp* febio = FEBioApp::GetInstance();
-	CMDOPTIONS& ops = febio->CommandOptions();
+	FEBioApp* feApp = FEBioApp::GetInstance();
+	CMDOPTIONS& ops = feApp->CommandOptions();
 
 	if (nargs == 1)
 	{
-		febio::Configure(ops.szcnf);
+		feApp->Configure(ops.szcnf);
 	}
 	else if (nargs == 2)
 	{
 		sprintf(ops.szcnf, "%s", argv[1]);
-		febio::Configure(ops.szcnf);
+		feApp->Configure(ops.szcnf);
 	}
 	else return invalid_nr_args();
 

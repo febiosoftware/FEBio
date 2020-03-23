@@ -340,6 +340,9 @@ public: // --- parameter functions ---
 	//! Note: Can't call this FindProperty, since this is already defined in base class
 	FECoreBase* FindComponent(const ParamString& prop);
 
+	//! Set the print parameters flag
+	void SetPrintParametersFlag(bool b);
+
 public:	// --- Miscellaneous routines ---
 
 	//! call the callback function

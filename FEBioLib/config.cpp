@@ -68,9 +68,11 @@ namespace febio {
 
 	//-----------------------------------------------------------------------------
 	// configure FEBio
-	bool Configure(const char* szfile)
+	bool Configure(const char* szfile, FEBioConfig& config)
 	{
 		vars.clear();
+
+		config.Defaults();
 
 		// open the configuration file
 		XMLReader xml;
@@ -119,6 +121,11 @@ namespace febio {
 #else
 							xml.SkipTag(tag);
 #endif // !_DEBUG
+						}
+						else if (tag == "print_model_params")
+						{
+							tag.value(config.m_printParams);
+							++tag;
 						}
 						else
 						{
