@@ -66,6 +66,7 @@ public:
 	int		m_maxiter;
 	double	m_tol;
 	int		m_print_level;
+	double	m_amg_tol;
 
 public:
 	Implementation() : A(0)
@@ -73,8 +74,18 @@ public:
 		m_print_level = 0;
 		m_maxiter = 1000;
 		m_tol = 1e-7;
+		m_amg_tol = 1e-7;
 
 		m_iters = 0;
+
+		ij_A = nullptr;
+		ij_b = nullptr;
+		ij_x = nullptr;
+		solver = nullptr;
+		precond = nullptr;
+		par_A = nullptr;
+		par_b = nullptr;
+		par_x = nullptr;
 	}
 
 	bool isValid() const
@@ -100,7 +111,8 @@ public:
 	// destroy stiffness matrix
 	void destroyMatrix()
 	{
-		HYPRE_IJMatrixDestroy(ij_A);
+		if (ij_A) HYPRE_IJMatrixDestroy(ij_A);
+		ij_A = nullptr;
 	}
 
 	// Allocate vectors for rhs and solution
@@ -122,8 +134,8 @@ public:
 	// destroy vectors
 	void destroyVectors()
 	{
-		HYPRE_IJVectorDestroy(ij_b);
-		HYPRE_IJVectorDestroy(ij_x);
+		if (ij_b) HYPRE_IJVectorDestroy(ij_b); ij_b = nullptr;
+		if (ij_x) HYPRE_IJVectorDestroy(ij_x); ij_x = nullptr;
 	}
 
 	// update vectors 
@@ -179,6 +191,7 @@ public:
 	{
 		// Now set up the AMG preconditioner and specify any parameters
 		HYPRE_BoomerAMGCreate(&precond);
+//		HYPRE_BoomerAMGSetPrintLevel(precond, 2);			// print solve info
 		HYPRE_BoomerAMGSetCoarsenType(precond, 10);			// HMIS-coarsening
 		HYPRE_BoomerAMGSetStrongThreshold(precond, 0.5);	// Threshold for choosing weak/strong connections
 		HYPRE_BoomerAMGSetMaxRowSum(precond, 1.0);			// Disable dependency weakening based on maximum row sum.
@@ -189,6 +202,7 @@ public:
 		HYPRE_BoomerAMGSetNumPaths(precond, 1);				// Number of paths of length 2 for aggressive coarsening
 		HYPRE_BoomerAMGSetInterpType(precond, 6);			// Extended+i interpolation
 		HYPRE_BoomerAMGSetMaxIter(precond, m_maxiter);      // Set maximum iterations
+		HYPRE_BoomerAMGSetTol(precond, m_amg_tol);			// conv. tolerance
 
 		FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
@@ -217,7 +231,8 @@ public:
 	// destroy preconditioner
 	void destroyPrecond()
 	{
-		HYPRE_BoomerAMGDestroy(precond);
+		if (precond) HYPRE_BoomerAMGDestroy(precond);
+		precond = nullptr;
 	}
 
 	// allocate solver
@@ -238,7 +253,8 @@ public:
 	// destroy the solver
 	void destroySolver()
 	{
-		HYPRE_ParCSRPCGDestroy(solver);
+		if (solver) HYPRE_ParCSRPCGDestroy(solver);
+		solver = nullptr;
 	}
 
 	// calculate the preconditioner
@@ -274,6 +290,7 @@ BEGIN_FECORE_CLASS(Hypre_PCG_AMG, LinearSolver)
 	ADD_PARAMETER(imp->m_print_level, "print_level");
 	ADD_PARAMETER(imp->m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(imp->m_tol        , "tol"        );
+	ADD_PARAMETER(imp->m_amg_tol    , "amg_tol"    );
 END_FECORE_CLASS();
 
 Hypre_PCG_AMG::Hypre_PCG_AMG(FEModel* fem) : LinearSolver(fem), imp(new Hypre_PCG_AMG::Implementation)

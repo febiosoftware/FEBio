@@ -99,6 +99,10 @@ public:
 		m_failMaxIters = true;
 
 		m_A = nullptr;
+		m_solver = nullptr;
+		ij_A = nullptr;
+		ij_b = nullptr;
+		ij_x = nullptr;
 	}
 
 	int equations() const { return (m_A ? m_A->Rows() : 0); }
@@ -121,7 +125,8 @@ public:
 	// destroy stiffness matrix
 	void destroyMatrix()
 	{
-		HYPRE_IJMatrixDestroy(ij_A);
+		if (ij_A) HYPRE_IJMatrixDestroy(ij_A);
+		ij_A = nullptr;
 	}
 
 	// update coefficient matrix
@@ -188,8 +193,8 @@ public:
 	// destroy vectors
 	void destroyVectors()
 	{
-		HYPRE_IJVectorDestroy(ij_b);
-		HYPRE_IJVectorDestroy(ij_x);
+		if (ij_b) HYPRE_IJVectorDestroy(ij_b); ij_b = nullptr;
+		if (ij_x) HYPRE_IJVectorDestroy(ij_x); ij_x = nullptr;
 	}
 
 	// update vectors 
@@ -275,7 +280,8 @@ public:
 
 	void destroySolver()
 	{
-		HYPRE_BoomerAMGDestroy(m_solver);
+		if (m_solver) HYPRE_BoomerAMGDestroy(m_solver);
+		m_solver = nullptr;
 	}
 
 	void doSetup()
