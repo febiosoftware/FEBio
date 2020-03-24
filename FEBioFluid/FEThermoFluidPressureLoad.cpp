@@ -40,6 +40,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FENodeConstraintSet(pfem), m_nset(pfem)
 {
+    m_laugon = false;
+    m_p0 = 0;
 }
 
 //-----------------------------------------------------------------------------
