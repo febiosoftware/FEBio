@@ -866,3 +866,11 @@ public:
 	FEPlotPreStrainCompatibility(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotDiscreteElementStretch : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementStretch(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

@@ -454,6 +454,7 @@
     <ClInclude Include="..\..\FEBioFluid\FESolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomain.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomain3D.h" />
@@ -533,6 +534,7 @@
     <ClCompile Include="..\..\FEBioFluid\FESolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomain.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomain3D.cpp" />

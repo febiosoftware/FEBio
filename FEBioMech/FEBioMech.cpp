@@ -660,6 +660,7 @@ REGISTER_FECORE_CLASS(FEPlotPreStrainStretchError        , "prestrain stretch er
 REGISTER_FECORE_CLASS(FEPlotPreStrainCorrection          , "prestrain correction"            );
 REGISTER_FECORE_CLASS(FEPlotSPRPreStrainCorrection       , "SPR prestrain correction"        );
 REGISTER_FECORE_CLASS(FEPlotPreStrainCompatibility       , "prestrain compatibility"         );
+REGISTER_FECORE_CLASS(FEPlotDiscreteElementStretch       , "discrete element stretch"        );
 
 // 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm      , "G norm"      );

@@ -2962,3 +2962,30 @@ bool FEPlotPreStrainCompatibility::Save(FEDomain& dom, FEDataStream& a)
 
 	return true;
 }
+
+bool FEPlotDiscreteElementStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteDomain* pdiscreteDomain = dynamic_cast<FEDiscreteDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteDomain& discreteDomain = *pdiscreteDomain;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+		
+		vec3d ra0 = mesh.Node(el.m_node[0]).m_r0;
+		vec3d ra1 = mesh.Node(el.m_node[0]).m_rt;
+		vec3d rb0 = mesh.Node(el.m_node[1]).m_r0;
+		vec3d rb1 = mesh.Node(el.m_node[1]).m_rt;
+
+		double L0 = (rb0 - ra0).norm();
+		double Lt = (rb1 - ra1).norm();
+
+		double l = Lt / L0;
+		a << l;
+	}
+
+	return true;
+}
