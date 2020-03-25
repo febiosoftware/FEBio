@@ -815,6 +815,11 @@ bool FEModel::InitMesh()
 			if (dom.Init() == false) return false;
 	}
 
+	// initialize surfaces
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		if (mesh.Surface(i).Init() == false) return false;
+	}
 
 	// All done
 	return true;
