@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidResistanceBC.h"
-#include "FEFluid.h"
 #include "FEBioFluid.h"
 
 //=============================================================================
@@ -65,7 +64,7 @@ bool FEFluidResistanceBC::Init()
 
 	// get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-	m_pfluid = pm->ExtractProperty<FEFluid>();
+	m_pfluid = pm->ExtractProperty<FEFluidMaterial>();
 	if (m_pfluid == nullptr) return false;
     
     return true;

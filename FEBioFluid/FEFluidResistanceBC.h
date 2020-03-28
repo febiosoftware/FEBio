@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESurfaceLoad.h>
-#include "FEFluid.h"
+#include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidResistanceBC is a fluid surface that has a normal
@@ -68,7 +68,8 @@ private:
 private:
 	double          m_alpha;
     double          m_alphaf;
-    FEFluid*        m_pfluid;   //!< pointer to fluid
+    
+    FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
     
 	FEDofList	m_dofW;
     int		m_dofEF;
