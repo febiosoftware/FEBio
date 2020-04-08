@@ -142,6 +142,20 @@ void FEModelBuilder::NextStep()
 }
 
 //-----------------------------------------------------------------------------
+//! Get the mesh
+FEMesh& FEModelBuilder::GetMesh()
+{
+	return m_fem.GetMesh();
+}
+
+//-----------------------------------------------------------------------------
+//! get the FE model
+FEModel& FEModelBuilder::GetFEModel()
+{
+	return m_fem;
+}
+
+//-----------------------------------------------------------------------------
 //! Create a domain
 FEDomain* FEModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat)
 {

@@ -1107,12 +1107,12 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		for (int i=0; i<nrn; ++i)
 		{
 			id = atoi(tag.AttributeValue("id"))-1;
-			rb = atoi(tag.AttributeValue("rb"))-1;
+			rb = atoi(tag.AttributeValue("rb"));
 
 			if ((prn == 0) || (rb != rbp))
 			{
 				prn = fecore_alloc(FERigidNodeSet, &fem);
-				prn->SetRigidID(rb);
+				prn->SetRigidMaterialID(rb);
 
 				// the default shell bc depends on the shell formulation
 				prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
@@ -1221,10 +1221,9 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	// get the rigid body material ID
 	int rb = -1;
 	tag.AttributeValue("rb", rb);
-	rb -= 1;
 
 	// make sure we have a valid rigid body reference
-	if ((rb < 0)||(rb>=NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
+	if ((rb <= 0)||(rb>NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
 
 	// get the nodeset
 	const char* szset = tag.AttributeValue("node_set");
@@ -1237,7 +1236,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	// the default shell bc depends on the shell formulation
 	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
 
-	prn->SetRigidID(rb);
+	prn->SetRigidMaterialID(rb);
 	prn->SetNodeSet(*nodeSet);
 
 	rigid.AddRigidNodeSet(prn);
@@ -1357,8 +1356,8 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			// create the rigid body force
 			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
 			pFC->SetType(ntype);
-			pFC->SetID(nmat);
-			pFC->SetBC(bc);
+			pFC->SetRigidMaterialID(nmat);
+			pFC->SetDOF(bc);
 			pFC->SetFollowFlag(bfollow);
 
 			double val = 0.0;
@@ -1390,8 +1389,8 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 
 			// create the fixed dof
 			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
-			pBC->id = nmat;
-			pBC->bc = bc;
+			pBC->m_rigidMat = nmat;
+			pBC->m_dofs.push_back(bc);
 			rigid.AddFixedBC(pBC);
 
 			// add this boundary condition to the current step

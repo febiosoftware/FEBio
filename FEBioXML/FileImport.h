@@ -211,7 +211,6 @@ protected:
 
 protected:
 	FEFileSectionMap	m_map;
-	FEModel*			m_fem;
 	FEModelBuilder*		m_builder;
 	vector<FEFileParam>	m_Param;	// parameter list
 	bool				m_stopOnUnknownAttribute;

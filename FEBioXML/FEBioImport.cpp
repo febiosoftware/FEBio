@@ -258,11 +258,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 //-----------------------------------------------------------------------------
 bool FEBioImport::Load(FEModel& fem, const char* szfile)
 {
-	m_fem = &fem;
 	m_builder = new FEModelBuilder(fem);
-
-	// keep a pointer to the mesh
-	m_pMesh = &fem.GetMesh();
 
 	// intialize some variables
 	m_szdmp[0] = 0;

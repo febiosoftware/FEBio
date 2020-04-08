@@ -167,9 +167,6 @@ public:
 	bool ReadFile(const char* szfile, bool broot = true);
 
 public:
-	FEMesh* GetFEMesh() { return m_pMesh; }
-
-public:
 	void SetDumpfileName(const char* sz);
 	void SetLogfileName (const char* sz);
 	void SetPlotfileName(const char* sz);
@@ -189,9 +186,6 @@ protected:
 	void ParseVersion(XMLTag& tag);
 
 	void BuildFileSectionMap(int nversion);
-
-public:
-	FEMesh*			m_pMesh;	//!< pointer to the mesh class
 
 public:
 	char	m_szdmp[512];

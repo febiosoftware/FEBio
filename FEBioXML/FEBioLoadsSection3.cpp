@@ -169,9 +169,9 @@ void FEBioLoadsSection3::ParseEdgeLoad(XMLTag& tag)
 	if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "edge", szedge);
 	if (GetBuilder()->BuildEdge(*pedge, *pset) == false) throw XMLReader::InvalidTag(tag);
 
-	// read the parameters
-	ReadParameterList(tag, pel);
-
 	// add edge load to model
 	GetBuilder()->AddEdgeLoad(pel);
+
+	// read the parameters
+	ReadParameterList(tag, pel);
 }

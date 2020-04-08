@@ -168,43 +168,53 @@ void FEBioGeometrySection3::ParseInstanceSection(XMLTag& tag)
 		++tag;
 		do
 		{
-			if (tag == "translate")
+			if (tag == "transform")
 			{
-				double r[3];
-				tag.value(r, 3);
-				transform.SetTranslation(vec3d(r[0], r[1], r[2]));
-			}
-			else if (tag == "rotate")
-			{
-				const char* sztype = tag.AttributeValue("type", true);
-				if (sztype == 0) sztype = "quaternion";
+				++tag;
+				do
+				{
+					if (tag == "translate")
+					{
+						double r[3];
+						tag.value(r, 3);
+						transform.SetTranslation(vec3d(r[0], r[1], r[2]));
+					}
+					else if (tag == "rotate")
+					{
+						const char* sztype = tag.AttributeValue("type", true);
+						if (sztype == 0) sztype = "quaternion";
 
-				if (strcmp(sztype, "quaternion") == 0)
-				{
-					double v[4];
-					tag.value(v, 4);
-					quatd q(v[0], v[1], v[2], v[3]);
-					transform.SetRotation(q);
+						if (strcmp(sztype, "quaternion") == 0)
+						{
+							double v[4];
+							tag.value(v, 4);
+							quatd q(v[0], v[1], v[2], v[3]);
+							transform.SetRotation(q);
+						}
+						else if (strcmp(sztype, "vector") == 0)
+						{
+							double v[3];
+							tag.value(v, 3);
+							transform.SetRotation(vec3d(v[0], v[1], v[2]));
+						}
+						else if (strcmp(sztype, "Euler") == 0)
+						{
+							double v[3];
+							tag.value(v, 3);
+							transform.SetRotation(v[0], v[1], v[2]);
+						}
+						else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+					}
+					else if (tag == "scale")
+					{
+						double s[3];
+						tag.value(s, 3);
+						transform.SetScale(s[0], s[1], s[2]);
+					}
+
+					++tag;
 				}
-				else if (strcmp(sztype, "vector") == 0)
-				{
-					double v[3];
-					tag.value(v, 3);
-					transform.SetRotation(vec3d(v[0], v[1], v[2]));
-				}
-				else if (strcmp(sztype, "Euler") == 0)
-				{
-					double v[3];
-					tag.value(v, 3);
-					transform.SetRotation(v[0], v[1], v[2]);
-				}
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-			}
-			else if (tag == "scale")
-			{
-				double s[3];
-				tag.value(s, 3);
-				transform.SetScale(s[0], s[1], s[2]);
+				while (!tag.isend());
 			}
 			else if (tag == "Elements")
 			{
@@ -220,6 +230,23 @@ void FEBioGeometrySection3::ParseInstanceSection(XMLTag& tag)
 				if (mat == 0) throw FEBioImport::InvalidDomainMaterial();
 
 				dom->SetMaterialName(szmat);
+
+				// any additional parameters?
+				if (tag.isleaf() == false)
+				{
+					++tag;
+					do
+					{
+						if (tag == "shell_thickness")
+						{
+							double h = 0.0;
+							tag.value(h);
+							dom->m_defaultShellThickness = h;
+						}
+						++tag;
+					} 
+					while (!tag.isend());
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;

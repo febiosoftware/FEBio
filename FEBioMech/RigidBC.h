@@ -63,8 +63,7 @@ public:
 	void Activate() override;
 	void Deactivate() override;
 
-	int GetRigidID() const { return m_rid; }
-	void SetRigidID(int rid) { m_rid = rid; }
+	void SetRigidMaterialID(int rid);
 
 	void SetNodeSet(FENodeSet& ns);
 
@@ -72,12 +71,12 @@ public:
 
 	void SetShellBC(SHELL_BC bc);
 
-public:
-	vector<int>		m_node;	// node number
-	int				m_rid;	// rigid body number
-
 private: // parameters
-	int	m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
+	int			m_rigidMat;		//!< rigid body's material
+	int			m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
+
+private:
+	vector<int>		m_node;	// node number
 
 	DECLARE_FECORE_CLASS();
 };
@@ -98,11 +97,14 @@ public:
 	void Deactivate();
 
 public:
-	int		id;	//!< rigid body ID
-	int		bc;	//!< constrained dof
+	int				m_rigidMat;	//!< rigid body material ID
+	vector<int>		m_dofs;		//!< constrained dof list
 
 private:
 	bool	m_binit;
+	int		m_rb;		//!< rigid body's ID
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -123,18 +125,18 @@ public:
 
 	void Deactivate() override;
 
-	void SetID(int id) { m_id = id; }
-	int GetID() const { return m_id; }
+	void SetID(int id) { m_rigidMat = id; }
+	int GetID() const { return m_rigidMat; }
 
-	void SetBC(int bc) { m_bc = bc; }
-	int GetBC() const { return m_bc; }
+	void SetBC(int bc) { m_dof = bc; }
+	int GetBC() const { return m_dof; }
 
 	void SetRelativeFlag(bool b) { m_brel = b; }
 	void SetValue(double v) { m_val = v; }
 
 private:
-	int		m_id;		//!< rigid body id
-	int		m_bc;		//!< displacement direction
+	int		m_rigidMat;		//!< rigid body material id
+	int		m_dof;		//!< displacement direction
 	double	m_val;	//!< displacement value
 	double	m_ref;	//!< reference value for relative displacement
 	bool	m_brel;	//!< relative displacement flag

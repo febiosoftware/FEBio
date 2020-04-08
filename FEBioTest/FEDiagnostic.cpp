@@ -76,7 +76,6 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 {
 	m_pdia = 0;
 
-	m_fem = &fem;
 	m_builder = new FEModelBuilder(fem);
 
 	// Open the XML file

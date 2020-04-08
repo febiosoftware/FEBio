@@ -92,6 +92,9 @@ public:
 		string				m_name;
 		string				m_matName;
 		vector<ELEMENT>		m_Elem;
+
+	public:
+		double	m_defaultShellThickness;
 	};
 
 	class Surface

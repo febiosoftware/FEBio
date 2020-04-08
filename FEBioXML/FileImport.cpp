@@ -77,7 +77,7 @@ void FEFileException::SetErrorString(const char* sz, ...)
 }
 
 //-----------------------------------------------------------------------------
-FEModel* FEFileSection::GetFEModel() { return m_pim->GetFEModel(); }
+FEModel* FEFileSection::GetFEModel() { return &GetBuilder()->GetFEModel(); }
 
 //-----------------------------------------------------------------------------
 FEModelBuilder* FEFileSection::GetBuilder() { return m_pim->GetBuilder(); }
@@ -317,19 +317,43 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		return false;
 	}
 
-	int n = enumValue(val, ch);
-	if (n != -1) pp->value<int>() = n;
-	else
+	switch (pp->type())
 	{
-		// see if the value is an actual number
-		if (is_number(val))
+	case FE_PARAM_INT:
+	{
+		int n = enumValue(val, ch);
+		if (n != -1) pp->value<int>() = n;
+		else
 		{
-			n = atoi(val);
-			pp->value<int>() = n;
+			// see if the value is an actual number
+			if (is_number(val))
+			{
+				n = atoi(val);
+				pp->value<int>() = n;
+			}
 		}
+		return (n != -1);
 	}
-	
-	return (n != -1);
+	break;
+	case FE_PARAM_STD_VECTOR_INT:
+	{
+		std::vector<int>& v = pp->value<std::vector<int> >();
+		v.clear();
+		const char* tmp = val;
+		while (tmp)
+		{
+			int n = enumValue(tmp, ch);
+			v.push_back(n);
+			tmp = strchr(tmp, ',');
+			if (tmp) tmp++;
+		}
+
+		return true;
+	}
+	break;
+	};
+
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1091,7 +1115,6 @@ FEFileImport::FEFileImport()
 {
 	m_fp = 0;
 	m_szerr[0] = 0;
-	m_fem = 0;
 	m_builder = 0;
 	m_nversion = 0;
 
@@ -1128,9 +1151,8 @@ void FEFileImport::Close()
 		m_fp = 0;
 	}
 
-	m_fem = 0;
 	delete m_builder;
-	m_builder = 0;
+	m_builder = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1162,10 +1184,9 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-//! Get the FEModel that is being processed. This is the model that was passed in the Load function
 FEModel* FEFileImport::GetFEModel()
 {
-	return m_fem;
+	return &m_builder->GetFEModel();
 }
 
 //-----------------------------------------------------------------------------

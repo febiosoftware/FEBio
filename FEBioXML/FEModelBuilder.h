@@ -105,6 +105,12 @@ public:
 	//! Create a domain
 	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat);
 
+	//! Get the mesh
+	FEMesh& GetMesh();
+
+	//! get the FE model
+	FEModel& GetFEModel();
+
 public:
 	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal = false);
 

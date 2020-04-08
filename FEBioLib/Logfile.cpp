@@ -129,7 +129,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	// print the box
 	char szmsg[1024] = {0};
 	char* ch = szmsg;
-	sprintf(szmsg," *************************************************************************\n"); ch += strlen(ch);
+	sprintf(szmsg,"\n *************************************************************************\n"); ch += strlen(ch);
 	// print the title
 	if (sztitle)
 	{

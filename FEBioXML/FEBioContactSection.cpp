@@ -336,10 +336,10 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 	for (int i=0; i<nrn; ++i)
 	{
 		id = atoi(tag.AttributeValue("id"))-1;
-		rb = atoi(tag.AttributeValue("rb"))-1;
+		rb = atoi(tag.AttributeValue("rb"));
 
 		// make sure we have a valid rigid body reference
-		if ((rb < 0)||(rb>=NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
+		if ((rb <= 0)||(rb>NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
 
 		if ((prn == 0) || (rb != rbp))
 		{
@@ -348,7 +348,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 			// the default shell bc depends on the shell formulation
 			prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
 
-			prn->SetRigidID(rb);
+			prn->SetRigidMaterialID(rb);
 
 			GetBuilder()->AddRigidNodeSet(prn);
 			rbp = rb;

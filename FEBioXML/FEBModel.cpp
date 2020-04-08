@@ -32,6 +32,8 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FEDomain.h>
+#include <FECore/FEShellDomain.h>
+#include <FECore/log.h>
 
 //=============================================================================
 FEBModel::NodeSet::NodeSet() {}
@@ -72,7 +74,10 @@ void FEBModel::ElementSet::SetElementList(const vector<int>& elem) { m_elem = el
 const vector<int>& FEBModel::ElementSet::ElementList() const { return m_elem; }
 
 //=============================================================================
-FEBModel::Domain::Domain() {}
+FEBModel::Domain::Domain()
+{
+	m_defaultShellThickness = 0.0;
+}
 
 FEBModel::Domain::Domain(const FEBModel::Domain& dom)
 {
@@ -80,9 +85,13 @@ FEBModel::Domain::Domain(const FEBModel::Domain& dom)
 	m_name = dom.m_name;
 	m_matName = dom.m_matName;
 	m_Elem = dom.m_Elem;
+	m_defaultShellThickness = dom.m_defaultShellThickness;
 }
 
-FEBModel::Domain::Domain(const FE_Element_Spec& spec) : m_spec(spec) {}
+FEBModel::Domain::Domain(const FE_Element_Spec& spec) : m_spec(spec) 
+{
+	m_defaultShellThickness = 0.0;
+}
 
 const string& FEBModel::Domain::Name() const { return m_name; }
 
@@ -314,6 +323,26 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 			for (int n = 0; n<ne; ++n) el.m_node[n] = NLT[domElement.node[n] - noff];
 		}
 
+		if (partDomain.m_defaultShellThickness != 0.0)
+		{
+			double h0 = partDomain.m_defaultShellThickness;
+			FEShellDomain* shellDomain = dynamic_cast<FEShellDomain*>(dom);
+			if (shellDomain)
+			{
+				int ne = shellDomain->Elements();
+				for (int n = 0; n < ne; ++n)
+				{
+					FEShellElement& el = shellDomain->Element(n);
+					for (int k = 0; k < el.Nodes(); ++k) el.m_h0[k] = h0;
+				}
+			}
+			else
+			{
+				FEModel* pfem = &fem;
+				feLogWarningEx(pfem, "Shell thickness assigned on non-shell part %s", partDomain.Name().c_str());
+			}
+		}
+
 		// add the domain to the mesh
 		mesh.AddDomain(dom);
 
@@ -368,10 +397,8 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 			for (int n=0; n<nf; ++n) face.node[n] = NLT[srcFacet.node[n] - noff];
 		}
 
-		// TODO: Fix this! Facet sets are moved to the FEModelBuilder
 		// add it to the mesh
-		assert(false);
-//		GetBuilder()->AddFacetSet(fset);
+		mesh.AddFacetSet(fset);
 	}
 
 	// create element sets

@@ -134,26 +134,6 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	// the default shell bc depends on the shell formulation
 	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
 
-	++tag;
-	do
-	{
-		if (tag == "rb")
-		{
-			// get the rigid body material ID
-			int rb = -1;
-			value(tag, rb);
-			rb -= 1;
-
-			// make sure we have a valid rigid body reference
-			if ((rb < 0) || (rb >= NMAT)) throw XMLReader::InvalidValue(tag);
-			prn->SetRigidID(rb);
-		}
-		else ReadParameter(tag, prn);
-		++tag;
-	}
-	while (!tag.isend());
-
-
 	// add it to the current step
 	GetBuilder()->AddComponent(prn);
 

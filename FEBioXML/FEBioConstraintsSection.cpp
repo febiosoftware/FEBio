@@ -412,8 +412,8 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				int lc = atoi(szlc) - 1;
 
 				FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-				pFC->SetID(nmat);
-				pFC->SetBC(bc);
+				pFC->SetRigidMaterialID(nmat);
+				pFC->SetDOF(bc);
 
 				double val = 0.0;
 				value(tag, val);
@@ -432,8 +432,8 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			else if (strcmp(szt, "fixed") == 0)
 			{
 				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
-				pBC->id = nmat;
-				pBC->bc = bc;
+				pBC->m_rigidMat = nmat;
+				pBC->m_dofs.push_back(bc);
 
 				// add this boundary condition to the current step
 				GetBuilder()->AddRigidFixedBC(pBC);
@@ -480,8 +480,8 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				int lc = atoi(szlc) - 1;
 
 				FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-				pFC->SetID(nmat);
-				pFC->SetBC(bc);
+				pFC->SetRigidMaterialID(nmat);
+				pFC->SetDOF(bc);
 
 				double val = 0.0;
 				value(tag, val);
@@ -500,8 +500,8 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			else if (strcmp(szt, "fixed") == 0)
 			{
 				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
-				pBC->id = nmat;
-				pBC->bc = bc;
+				pBC->m_rigidMat = nmat;
+				pBC->m_dofs.push_back(bc);
 
 				// add this boundary condition to the current step
 				GetBuilder()->AddRigidFixedBC(pBC);
@@ -616,8 +616,8 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			// create the rigid body force
 			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
 			pFC->SetType(ntype);
-			pFC->SetID(nmat);
-			pFC->SetBC(bc);
+			pFC->SetRigidMaterialID(nmat);
+			pFC->SetDOF(bc);
 			pFC->SetFollowFlag(bfollow);
 
 			double val = 0.0;
@@ -649,8 +649,8 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 
 			// create the fixed dof
 			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
-			pBC->id = nmat;
-			pBC->bc = bc;
+			pBC->m_rigidMat = nmat;
+			pBC->m_dofs.push_back(bc);
 
 			// add this boundary condition to the current step
 			GetBuilder()->AddRigidFixedBC(pBC);
