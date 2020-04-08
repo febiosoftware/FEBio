@@ -729,6 +729,27 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		return ps;
 	}
+	else if (setName.compare(0, 10, "@elem_set:") == 0)
+	{
+		// see if we can find an element set
+		string esetName = setName.substr(10);
+		FEElementSet* part = mesh.FindElementSet(esetName);
+		if (part == nullptr) return nullptr;
+
+		// we might have been here before. If so, we already create a nodeset
+		// with the same name as the surface, so look for that first.
+		FENodeSet* ps = mesh.FindNodeSet(esetName);
+		if (ps) return ps;
+
+		// okay, first time here, so let's create a node set from this element set
+		FENodeList nodeList = part->GetNodeList();
+		ps = fecore_alloc(FENodeSet, &m_fem);
+		ps->Add(nodeList);
+		ps->SetName(esetName);
+		mesh.AddNodeSet(ps);
+
+		return ps;
+	}
 	else return mesh.FindNodeSet(setName);
 }
 

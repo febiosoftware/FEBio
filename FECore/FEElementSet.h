@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEItemList.h"
 #include "FEElement.h"
 #include "FEDomainList.h"
+#include "FENodeList.h"
 #include <vector>
 #include <string>
 
@@ -74,6 +75,9 @@ public:
 	// Get an element
 	FEElement& Element(int i);
 	const FEElement& Element(int i) const;
+
+	// create node list from this element set
+	FENodeList GetNodeList() const;
 
 public:
 	void Serialize(DumpStream& ar);

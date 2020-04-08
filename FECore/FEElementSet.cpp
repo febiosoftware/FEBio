@@ -143,3 +143,26 @@ void FEElementSet::Serialize(DumpStream& ar)
 	ar & m_LUT;
 	ar & m_minID & m_maxID;
 }
+
+//-----------------------------------------------------------------------------
+// create node list from this element set
+FENodeList FEElementSet::GetNodeList() const
+{
+	FEMesh* mesh = GetMesh();
+	FENodeList set(mesh);
+	vector<int> tag(mesh->Nodes(), 0);
+	for (int i = 0; i<Elements(); ++i)
+	{
+		const FEElement& el = Element(i);
+		int ne = el.Nodes();
+		for (int j = 0; j<ne; ++j)
+		{
+			if (tag[el.m_node[j]] == 0)
+			{
+				set.Add(el.m_node[j]);
+				tag[el.m_node[j]] = 1;
+			}
+		}
+	}
+	return set;
+}

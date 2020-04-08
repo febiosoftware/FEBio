@@ -489,6 +489,21 @@ bool FEModel::Init()
 	// activate all permanent dofs
 	Activate();
 
+	// check if all load curves are being used
+	int NLC = LoadControllers();
+	vector<int> tag(NLC, 0);
+	for (int i = 0; i < m_imp->m_Param.size(); ++i)
+	{
+		int lc = m_imp->m_Param[i].lc;
+		tag[lc]++;
+	}
+	int unused = 0;
+	for (int i = 0; i < NLC; ++i) if (tag[i] == 0) unused++;
+	if (unused != 0)
+	{
+		feLogWarning("Model has %d unreferenced load controllers.", unused);
+	}
+
 	// do the callback
 	DoCallback(CB_INIT);
 

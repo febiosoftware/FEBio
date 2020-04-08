@@ -309,7 +309,10 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		if (dom == 0) return false;
 
 		dom->Create(elems, spec.etype);
-		dom->SetMatID(mat->GetID());
+		dom->SetMatID(mat->GetID() - 1);
+
+		string domName = part.Name() + "." + partDomain.Name();
+		dom->SetName(domName);
 
 		// process element data
 		for (int j = 0; j<elems; ++j)
