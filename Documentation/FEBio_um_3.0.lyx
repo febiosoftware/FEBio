@@ -511,7 +511,7 @@ FEBio is a nonlinear finite element solver that is specifically designed
  executables for Windows, OS-X and Linux platforms are available for download
  at 
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -626,15 +626,15 @@ status open
 
 
 \backslash
-href{http://febio.org/preview}{
+href{https://febio.org/febio-studio/}{
 \backslash
-emph{PreView}}
+emph{FEBioStudio}}
 \end_layout
 
 \end_inset
 
 .
- PreView can convert some other formats to the FEBio input specification.
+ FEBioStudio can convert some other formats to the FEBio input specification.
  For instance, NIKE3D 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -643,24 +643,9 @@ literal "true"
 
 \end_inset
 
- and Abaqus input files can be imported in PreView and can be exported from
- PreView as a FEBio input file.
- See the PreView 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
-\backslash
-emph{User's Manual}}
-\end_layout
-
-\end_inset
-
- for more information.
+ and Abaqus input files can be imported in FEBioStudio and can be exported
+ from as a FEBio input file.
+ 
 \end_layout
 
 \begin_layout Section
@@ -4371,7 +4356,7 @@ Discrete
 LoadData
 \shape default
 \emph default
- Defines the load curve data.
+ Defines the load controllers.
  
 \end_layout
 
@@ -4408,7 +4393,7 @@ The current format specification expects the different sections of the input
  The rest of this chapter describes each of these sections in more detail.
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Format Specification Versions
 \begin_inset CommandInset label
 LatexCommand label
@@ -4433,12 +4418,25 @@ Version 3.0
 \series default
 : The latest and recommended version of the FEBio input specification described
  in this document.
- The major focus of this revsion was adding support for FEBio 3.0's features
+ The major focus of this revision was adding support for FEBio 3.0's features
  for modeling heterogeneous parameters.
  Heterogeneous parameters can be created via mathematical expressions or
  via the MeshData section.
  The MeshData section was completely revised.
  It also introduces a more consistent way for referencing model parameters.
+ The 
+\emph on
+Geometry 
+\emph default
+section was revised and the 
+\emph on
+Part 
+\emph default
+and 
+\emph on
+Instance 
+\emph default
+subsections were added.
  
 \end_layout
 
@@ -4471,7 +4469,7 @@ Boundary
 \series bold
 still supported
 \series default
-.
+ but considered obsolete.
  
 \end_layout
 
@@ -4601,14 +4599,43 @@ no longer supported
 \end_layout
 
 \begin_layout Standard
-As of FEBio 2.5, only versions 1.2, 2.0, 2.5 are supported.
+As of FEBio 3.0, only versions 1.2, 2.0, 2.5 are supported.
  Versions 1.2 and 2.0 are considered obsolete and it is highly recommended
- to convert older files to the new 2.5 specification for use with newer versions
+ to convert older files to the new 3.0 specification for use with newer versions
  of FEBio.
- This can be done for instance using PreView.
+ This can be done for instance using FEBioStudio.
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
+
+\series bold
+Notes on backward compatibility
+\end_layout
+
+\begin_layout Standard
+Some features that were available in versions prior to 3.0 are no longer
+ supported or require a different syntax.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+Parameters 
+\emph default
+section is no longer supported.
+ This section allowed users to define file parameters that could be used
+ as parameter values.
+ This section was removed since it was difficult to support in FEBio Studio
+ and a better mechanism was implemented for defining model-level parameters.
+ (See the 
+\emph on
+Globals 
+\emph default
+section.) 
+\end_layout
+
+\begin_layout Subsection
 Multiple Input Files
 \begin_inset CommandInset label
 LatexCommand label
@@ -4624,12 +4651,23 @@ FEBio supports distributing the model definition across multiple input files.
  This can greatly facilitate defining large, complex models and allows the
  re-use of model input files without the need to create the entire model
  input file from scratch.
- When using multiple input files to define a model, you must create a master
- input file that will reference all the other input files.
- This master file will be used to run the model in FEBio.
+ When using multiple input files to define a model, you must create a control
+ input file that may reference other input files.
+ This control file will be used to run the model in FEBio.
+ There are two ways of including a file into the control file: The 
+\emph on
+Include 
+\emph default
+section, and the 
+\emph on
+from 
+\emph default
+attribute
+\emph on
+.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Include Keyword
 \begin_inset CommandInset label
 LatexCommand label
@@ -4688,7 +4726,7 @@ attribute discussed below, which can be used to include only certain sections
  from files.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 The `from' Attribute
 \begin_inset CommandInset label
 LatexCommand label
@@ -4729,7 +4767,7 @@ Material
 \shape italic
 Material
 \shape default
- section in the master input file as follows.
+ section in the control input file as follows.
 \end_layout
 
 \begin_layout LyX-Code
@@ -4750,7 +4788,7 @@ febio_spec
  root section, but does not have to be complete.
  For example, the file mat.feb only needs to define the Material section.
  However, the child file may contain other sections.
- In that case, only the section referenced in the master file will be read
+ In that case, only the section referenced in the control file will be read
  from the child file.
  For example, if the file 
 \shape italic
@@ -4764,7 +4802,7 @@ Material
 \shape italic
 Geometry
 \shape default
- section, the master file can read both these sections as follows.
+ section, the control file can read both these sections as follows.
 \end_layout
 
 \begin_layout LyX-Code
@@ -4801,7 +4839,7 @@ geom.feb
 bc.feb
 \shape default
  respectively.
- The master input file could then look like the following.
+ The control input file could then look like the following.
 \end_layout
 
 \begin_layout LyX-Code
@@ -4845,15 +4883,15 @@ Notice that the
 \shape italic
 Control 
 \shape default
-section is still defined in the master file.
- The master file can contain a combination of explicit section definitions
+section is still defined in the control file.
+ The control file can contain a combination of explicit section definitions
  and referenced sections using the 
 \shape italic
 from 
 \shape default
 attribute.
- As mentioned above, the master file is used to run the model in FEBio.
- So, if the master file is called 
+ As mentioned above, the control file is used to run the model in FEBio.
+ So, if the control file is called 
 \shape italic
 model.feb
 \shape default
@@ -4865,8 +4903,8 @@ model.feb
 \end_layout
 
 \begin_layout Standard
-When FEBio parses the master file it will automatically parse the referenced
- child files it encounters in the master input file.
+When FEBio parses the control file it will automatically parse the referenced
+ child files it encounters in the control input file.
 \end_layout
 
 \begin_layout Standard
@@ -9856,20 +9894,14 @@ The geometry section contains all the geometry data, including nodal coordinates
 
 \shape italic
 \emph on
-Nodes
+Part
 \shape default
 \emph default
- contains nodal coordinates 
+ defines a part
 \end_layout
 
 \begin_layout Description
-
-\shape italic
-\emph on
-Elements
-\shape default
-\emph default
- contains element connectivity 
+Instance creates an instance of a part
 \end_layout
 
 \begin_layout Description
@@ -9939,15 +9971,23 @@ define a surface pair that can be used by a contact definition.
 \end_layout
 
 \begin_layout Standard
-The 
-\shape italic
-Nodes 
-\shape default
-and 
-\shape italic
-Elements 
-\shape default
-sections are required.
+At least one 
+\emph on
+Part 
+\emph default
+must be defined and one 
+\emph on
+Instance 
+\emph default
+section.
+ The purpose of the 
+\emph on
+Instance
+\emph default
+ section is to instantiate a part (i.e.
+ add it to the global mesh assembly), assign materials to element sets,
+ and set other domain parameters, such as default shell thicknesses, and
+ quadrature rules.
  The other sections are optional.
  The 
 \shape italic
@@ -9981,6 +10021,42 @@ sections define sets of nodes, edges, facets, discrete elements, elements,
 \end_layout
 
 \begin_layout Subsection
+Part Section
+\end_layout
+
+\begin_layout Standard
+A 
+\emph on
+Part 
+\emph default
+section defines the mesh for a part (or object) and includes nodal coordinates,
+ element connectivity, and (optionally) nodesets, surfaces, segments, element
+ sets.
+ It consists of the following subsections.
+\end_layout
+
+\begin_layout Description
+Nodes Defines the nodal coordinates of the nodes
+\end_layout
+
+\begin_layout Description
+Elements Defines an element set on the part and the element connectivity.
+ 
+\end_layout
+
+\begin_layout Description
+NodeSet Defines a node set on the part
+\end_layout
+
+\begin_layout Description
+Edge Defines an edge list
+\end_layout
+
+\begin_layout Description
+Surface Defines a surface on the part
+\end_layout
+
+\begin_layout Subsubsection
 Nodes Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -10093,7 +10169,7 @@ sections can be defined, but each node can only be defined once.
 </Nodes>
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Elements Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -10119,7 +10195,7 @@ sections can be defined.
 \shape italic
 Elements 
 \shape default
-section can have the following attributes.
+section has the following attributes.
 \end_layout
 
 \begin_layout Standard
@@ -10129,7 +10205,7 @@ section can have the following attributes.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="3" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -10154,26 +10230,6 @@ Attribute
 Description
 \series default
  
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-mat
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-material identifier 
 \end_layout
 
 \end_inset
@@ -10213,7 +10269,7 @@ name
 \begin_inset Text
 
 \begin_layout Plain Layout
-unique name that identifies this domain (optional) 
+unique name that identifies this domain 
 \end_layout
 
 \end_inset
@@ -10257,7 +10313,7 @@ Elements
 \end_layout
 
 \begin_layout LyX-Code
-<Elements type="hex8" mat="1" name="part1">
+<Elements type="hex8" name="part1">
 \end_layout
 
 \begin_layout LyX-Code
@@ -10608,7 +10664,7 @@ Node numbering for shell elements
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 NodeSet Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -10697,11 +10753,11 @@ Node sets can also be nested.
 \end_layout
 
 \begin_layout LyX-Code
-<NodeSet node_set="set1"/>
+  <NodeSet node_set="set1"/>
 \end_layout
 
 \begin_layout LyX-Code
-<NodeSet node_set="set2"/>
+  <NodeSet node_set="set2"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10712,7 +10768,7 @@ Node sets can also be nested.
 This is useful for defining larger nodesets without repeating node numbers.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Edge Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -10783,7 +10839,7 @@ line3
  3-node line element 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Surface Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -10900,44 +10956,7 @@ Surface elements cannot overlap element boundaries.
  They are also not to be confused with shell elements.
 \end_layout
 
-\begin_layout Subsection
-DiscreteSet Section
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:DiscreteSet-Section"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-DiscreteSet 
-\shape default
-section defines sets of discrete elements.
- These sets can then be used to define e.g.
- springs.
-\end_layout
-
-\begin_layout LyX-Code
-<DiscreteSet name="springs">
-\end_layout
-
-\begin_layout LyX-Code
-  <delem>1,2</delem>
-\end_layout
-
-\begin_layout LyX-Code
-  <delem>3,4</delem>
-\end_layout
-
-\begin_layout LyX-Code
-</DiscreteSet>
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Subsubsection
 ElementSet Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -10993,6 +11012,176 @@ tag is defined which takes the element id as an attribute.
 \end_layout
 
 \begin_layout Subsection
+Instance Section
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+Instance 
+\emph default
+section is used to instantiate a part.
+ During instantiation the part's mesh is added to the global mesh assembly.
+ In addition, the part's nodal coordinates can be transformed, and materials
+ are assigned to the part's element sets.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<Instance part="part01" name="part1">
+\end_layout
+
+\begin_layout LyX-Code
+  <transform>
+\end_layout
+
+\begin_layout LyX-Code
+    <scale>1,1,1</scale>
+\end_layout
+
+\begin_layout LyX-Code
+    <rotate>0,0,0,1</rotate>
+\end_layout
+
+\begin_layout LyX-Code
+    <translate>0,0,0</translate>
+\end_layout
+
+\begin_layout LyX-Code
+  </transform>
+\end_layout
+
+\begin_layout LyX-Code
+  <domain elem_set="set1" mat="material01"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <domain elem_set="shell_set1" mat="material02">
+\end_layout
+
+\begin_layout LyX-Code
+    <shell_thickness>0.015</shell_thickness>
+\end_layout
+
+\begin_layout LyX-Code
+  </domain>
+\end_layout
+
+\begin_layout LyX-Code
+</ElementSet>
+\end_layout
+
+\begin_layout Standard
+The name attribute is optional and if omitted the instance will have the
+ same name as the part.
+ A single part can be instantiated multiple times.
+ In that case, you need to make sure that each instance is given a unique
+ name.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+transform
+\emph default
+ item is optional, but can be used to position, rotate, or scale a part
+ during instantiation.
+ The transform operations are applied in the order scale, rotate, and translate.
+ 
+\end_layout
+
+\begin_layout Subsection
+NodeSet Section
+\end_layout
+
+\begin_layout Standard
+Node sets from parts can be combined to create global node sets.
+ Global node sets can be used by boundary conditions.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<NodeSet name="set01">
+\end_layout
+
+\begin_layout LyX-Code
+  <node_set>part1.set1</node_set>
+\end_layout
+
+\begin_layout LyX-Code
+  <node_set>part2.set3</node_set>
+\end_layout
+
+\begin_layout LyX-Code
+</NodeSet>
+\end_layout
+
+\begin_layout Subsection
+Surface Section
+\end_layout
+
+\begin_layout Standard
+Surfaces from parts can be combined to create global surfaces.
+ Global surfaces can be used by boundary conditions and loads, and are used
+ to define surface pairs.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<Surface name="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <surface>part1.top_surface</surface>
+\end_layout
+
+\begin_layout LyX-Code
+  <surface>part2.left_surface</surface>
+\end_layout
+
+\begin_layout LyX-Code
+</Surface>
+\end_layout
+
+\begin_layout Subsection
+DiscreteSet Section
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:DiscreteSet-Section"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+DiscreteSet 
+\shape default
+section defines sets of discrete elements.
+ These sets can then be used to define e.g.
+ springs.
+\end_layout
+
+\begin_layout LyX-Code
+<DiscreteSet name="springs">
+\end_layout
+
+\begin_layout LyX-Code
+  <delem>1,2</delem>
+\end_layout
+
+\begin_layout LyX-Code
+  <delem>3,4</delem>
+\end_layout
+
+\begin_layout LyX-Code
+</DiscreteSet>
+\end_layout
+
+\begin_layout Subsection
 SurfacePair Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11018,11 +11207,11 @@ section defines a pair of surfaces that can be used to define surface-to-surface
 \end_layout
 
 \begin_layout LyX-Code
-  <master surface="surface1"/>
+  <primary surface="surface1"/>
 \end_layout
 
 \begin_layout LyX-Code
-  <slave surface="surface2"/>
+  <secondary surface="surface2"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11083,120 +11272,72 @@ The
 \shape italic
 MeshData 
 \shape default
-section is where data can be specified that will be mapped to the primitives
- of the model (i.e.
- nodes, edges, facets, and elements).
- The data is applied to a parameter of the model, e.g.
+section is where data is specified that can be mapped to the geometry of
+ the model.
+ The data can be applied to a parameter of the model, e.g.
  a material parameter, or a pressure load.
  
 \end_layout
 
 \begin_layout Standard
-To define a mesh data section add the 
+To define a mesh data section add one of the following tags.
+\end_layout
+
+\begin_layout Description
+node_data Define data on a node set
+\end_layout
+
+\begin_layout Description
+surface_data Define data on a surface
+\end_layout
+
+\begin_layout Description
+element_data Define data on an element set
+\end_layout
+
+\begin_layout Standard
+The following attributes can be added.
+\end_layout
+
+\begin_layout Description
+name All mesh data require a name, which can be specified with the 
 \emph on
-mesh_data
+name 
 \emph default
- tag.
- This section requires a 
+attribute.
+ This name will be used by model parameters to reference the particular
+ mesh data.
+ 
+\end_layout
+
+\begin_layout Description
+datatype The 
 \emph on
-param
+datatype
 \emph default
- attribute, and an optional 
+ attribute is used to specify the type of data defined on the geometry.
+ By default, the assumed data type is a scalar.
+ 
+\end_layout
+
+\begin_layout Description
+node_set/surface/elem_set Specifies the set for which to define the data.
+ 
+\end_layout
+
+\begin_layout Standard
+There are two mechanisms to define mesh data: The values can be tabulated,
+ or can be generated via data generators.
+ To use a data generator, specify the 
 \emph on
 generator 
 \emph default
 attribute.
-\end_layout
-
-\begin_layout Standard
-In general, the mesh data will be scaled by the model parameter, it will
- not simply override it.
- However, there are exceptions.
- For example, the 
-\emph on
-fiber
-\emph default
- property of transverselely isotropic materials is overwritten when defined
- in a mesh data section.
- For other exceptions, consult the manual entry of the particular model
- component.
  
 \end_layout
 
 \begin_layout Subsection
-param Attribute
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:param"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The param attributes defines the parameter to which the data map will be
- applied.
- This can be any model parameter that supports maps.
- For example
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data 
-\series bold
-param="fem.material[0].E"
-\series default
->
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="1">1.0, 1.0, 1.0, 1.0</elem>
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="2">1.0, 1.0, 1.0, 1.0</elem>
-\end_layout
-
-\begin_layout LyX-Code
-  </mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-The parameter must be referenced via the referencing scheme as described
- in Appendix A.
- 
-\end_layout
-
-\begin_layout Standard
-The values for the items (e.g.
- elements, faces, nodes) is lised as child tags.
- Each child tag must reference an item via the correct tag name and local
- id.
- For element data, the tag is 
-\emph on
-elem
-\emph default
-, for surface data it is 
-\emph on
-face
-\emph default
-, and for node data it is 
-\emph on
-node
-\emph default
-.
-\end_layout
-
-\begin_layout Subsection
-generator Attribute
+Data Generators
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:generator"
@@ -11223,7 +11364,7 @@ generator
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data param="fem.material[0].E" 
+  <node_data name="E_map" 
 \series bold
 generator="math"
 \series default
@@ -11246,16 +11387,16 @@ generator="math"
 The following generators are currently suppored.
 \end_layout
 
-\begin_layout Subsubsection
-const
-\end_layout
+\begin_layout Description
 
-\begin_layout Standard
-The 
+\series bold
+const
+\series default
+ The 
 \emph on
 const
 \emph default
- generator takes a constant value and assigns it to the parameter.
+ generator takes a constant value and assigns it to the set.
  
 \end_layout
 
@@ -11264,9 +11405,17 @@ const
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data param="fem.material[0].rotation" 
+  <mesh_data name="rotation" type="mat3"
 \series bold
-generator="const"
+ generator="const"
+\series default
+ elem_set=
+\series bold
+"
+\series default
+Part1
+\series bold
+"
 \series default
 >
 \end_layout
@@ -11283,12 +11432,12 @@ generator="const"
 </MeshData>
 \end_layout
 
-\begin_layout Subsubsection
-math
-\end_layout
+\begin_layout Description
 
-\begin_layout Standard
-The 
+\series bold
+math
+\series default
+ The 
 \emph on
 math 
 \emph default
@@ -11301,9 +11450,17 @@ generator generates the data based on a mathematical expression.
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data param="fem.material[0].fiber" 
+  <mesh_data name="fiber" type="vec3" 
 \series bold
 generator="math"
+\series default
+ elem_set=
+\series bold
+"
+\series default
+Part1
+\series bold
+"
 \series default
 >
 \end_layout
@@ -11324,6 +11481,100 @@ generator="math"
 Note that in math expressions, only the variables X, Y, and Z can be used,
  which refer to reference coordinates.
  
+\end_layout
+
+\begin_layout Description
+parabolic_map The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+parabolic map
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ defines a scalar data field with a parabolic profile on a surface.
+ The data is determined by solving a heat-type problem with a constant source
+ and homogeneous boundary conditions on the edge of the surface.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data name="pressure" 
+\series bold
+generator="parabolic map"
+\series default
+ surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+    <value>1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
+\begin_layout Description
+surface-to-surface_map The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+surface-to-surface map
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ generator defines a data field on the domain bounded by two surfaces.
+ The data values are interpolated using a user-defined function between
+ the surfaces.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data name="E" 
+\series bold
+generator="surface-to-surface map"
+\series default
+ elem_set="Part1">
+\end_layout
+
+\begin_layout LyX-Code
+    <function type="math">x*x+1</function>
+\end_layout
+
+\begin_layout LyX-Code
+    <bottom_surface surface="surface1"/>
+\end_layout
+
+\begin_layout LyX-Code
+    <top_surface surface="surface2"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
 \end_layout
 
 \begin_layout Standard
@@ -11585,6 +11836,38 @@ Boundary
 \shape default
  section defines all fixed and prescribed boundary conditions that may be
  applied to the geometry.
+ Individual boundary conditions are defined via the 
+\emph on
+bc 
+\emph default
+tag and the particular boundary condition is defined via the 
+\emph on
+type 
+\emph default
+attribute.
+ The following boundary condition types are currently supported.
+ 
+\end_layout
+
+\begin_layout Description
+fix Define a fixed boundary condition.
+ A fixed boundary condition is usually identical to a zero prescribed boundary
+ condition.
+ 
+\end_layout
+
+\begin_layout Description
+prescribe Define a prescribed boundary condition.
+ The nodal values of a prescribed boundary condition are define by the user
+ and can vary as a function of time and position.
+ 
+\end_layout
+
+\begin_layout Description
+rigid Define a rigid node set.
+ The nodes in a rigid node set move with the rigid body to which they are
+ assigned.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -11603,35 +11886,52 @@ Nodal degrees of freedom (dof) can be prescribed using the
 \shape italic
 prescribe
 \shape default
- sub-element.
- This element has two required attributes (
-\shape italic
-bc
-\shape default
- and 
+ boundary condition.
+ This element has two required attributes: the 
+\emph on
+type 
+\emph default
+is set to 
+\begin_inset Quotes eld
+\end_inset
+
+prescribe
+\begin_inset Quotes erd
+\end_inset
+
+ and the node set to which this boundary condition applies is defined vua
+ 
 \shape italic
 node_set
 \shape default
-).
+.
+ The optional 
+\emph on
+name 
+\emph default
+attribute can be used to give the boundary condition a name.
  The value is defined via the 
-\shape italic
-value 
-\shape default
+\emph on
+scale 
+\emph default
 parameter.
  (If omitted the default value is 1.0).
- A scale parameter can also be defined using 
-\shape italic
-scale
-\shape default
-.
- A loadcurve can be associated with the scale parameter and a data map can
- be associated with the value parameter.
+ The degree of freedom is defined via the 
+\emph on
+dof 
+\emph default
+parameter.
+ A loadcurve can be associated with the scale parameter.
  The relative parameter defines wheter the values are absolute or relative
  to the current displacement.
 \end_layout
 
 \begin_layout LyX-Code
-<prescribe bc="x" node_set="nodeset1">
+<bc type="prescribe" node_set="nodeset1">
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>x</dof>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11643,7 +11943,7 @@ scale
 \end_layout
 
 \begin_layout LyX-Code
-</prescribe>
+</bc>
 \end_layout
 
 \begin_layout Standard
@@ -11660,18 +11960,40 @@ is the name of a node set defined in the Geometry section.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:NodeSet-Section"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
  for more information on how to define node sets.
+ Node sets can also be defined via surfaces or element sets.
+ To define a node set via a surface, use the following syntax.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+node_set="@surface:surface1"
+\end_layout
+
+\begin_layout Standard
+Here, 
+\emph on
+surface1 
+\emph default
+is a surface defined in the Geometry section.
+ Similarly, defining a node set via an element set is done using 
+\emph on
+@elem_set:.
+ 
 \end_layout
 
 \begin_layout Standard
 The 
-\shape italic
-bc
-\shape default
- attribute specifies the particular degree of freedom.
+\emph on
+dof
+\emph default
+ parameter specifies the particular degree of freedom.
  The following values are allowed:
 \end_layout
 
@@ -11884,7 +12206,11 @@ mesh_data
 \end_layout
 
 \begin_layout LyX-Code
-  <prescribe bc="x" node_set="set1">
+  <bc type="prescribe" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+    <dof>x</dof>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11896,7 +12222,7 @@ mesh_data
 \end_layout
 
 \begin_layout LyX-Code
-  </prescribe>
+  </bc>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11957,15 +12283,23 @@ Degrees of freedom that are fixed (in other words, constrained, or are always
 \shape italic
 fix
 \shape default
- element:
+ boundary condition:
 \end_layout
 
 \begin_layout LyX-Code
-<fix bc="x" set="
+<bc type="fix" set="
 \shape italic
 nodeset
 \shape default
-"/>
+">
+\end_layout
+
+\begin_layout LyX-Code
+  <dofs>x,y,z</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
 \end_layout
 
 \begin_layout Standard
@@ -11974,6 +12308,18 @@ The node set must be defined in the
 Geometry 
 \shape default
 section.
+ 
+\end_layout
+
+\begin_layout Standard
+The fix boundary condition can be assigned to multiple degrees of freedom
+ of the node set and the list of degrees of freedom is defined via the 
+\emph on
+dofs 
+\emph default
+parameter
+\emph on
+.
 \end_layout
 
 \begin_layout Standard
@@ -12018,7 +12364,15 @@ boundary condition.
 \end_layout
 
 \begin_layout LyX-Code
-<rigid rb="2" set="set1"/>
+<bc type="rigid" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>2</rb>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
 \end_layout
 
 \begin_layout Standard
@@ -12026,8 +12380,15 @@ The
 \shape italic
 rb 
 \shape default
-attribute defines the material (which must be a rigid material) that in
- turn defines the rigid body.
+parameter defines the material (which must be a 
+\begin_inset Quotes eld
+\end_inset
+
+rigid body
+\begin_inset Quotes erd
+\end_inset
+
+ material) that in turn defines the rigid body.
  The node set must be defined in the 
 \shape italic
 Geometry 
@@ -12040,6 +12401,20 @@ section.
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Rigid Section
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+Rigid
+\emph default
+ section is used to define all rigid constraints, rigid body initial kinematics,
+ and rigid connectors, and rigid joints.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -12790,60 +13165,8 @@ element with the type attribute set to
 \shape italic
 pressure
 \shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="pressure" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <pressure [lc="1"]>1.0</pressure>
-\end_layout
-
-\begin_layout LyX-Code
-  <value surface_data="pressure_value"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <symmetric_stiffness>0</symmetric_stiffness>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Standard
-The surface must be defined in the 
-\shape italic
-Geometry 
-\shape default
-section.
- If the pressure value differs per facet, it must be defined (as in the
- example) using the 
-\shape italic
-value 
-\shape default
-parameter and the 
-\shape italic
-surface_data 
-\shape default
-attribute (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:generator"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-These pressure forces are also known as 
+.
+ These pressure forces are also known as 
 \shape italic
 follower forces
 \shape default
@@ -12851,7 +13174,204 @@ follower forces
  oriented along the local surface normal.
  The sign convention is so that a positive pressure will act opposite to
  the normal, so it will compress the material.
- The 
+ The surface that the load is applied to is specified with the 
+\emph on
+surface 
+\emph default
+attribute.The surface must be defined in the 
+\shape italic
+Geometry 
+\shape default
+section.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\series default
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The applied pressure values (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+symmetric_stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+symmetric stiffness flag (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear flag (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell_bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell bottom flag (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The 
 \shape italic
 pressure 
 \shape default
@@ -12872,7 +13392,7 @@ lc
  is not defined a constant pressure is applied.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
 The optional 
 \emph on
 symmetric_stiffness
@@ -12893,6 +13413,51 @@ reference "subsec:Parameters-Solid-Analysis"
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Enumerate
+If the optional 
+\emph on
+linear 
+\emph default
+parameter is set to 1, a constant, deformation independent pressure load
+ is applied.
+ This is not recommend for large deformations.
+ 
+\end_layout
+
+\begin_layout Enumerate
+When the 
+\emph on
+shell_bottom
+\emph default
+ flag is set to 1, the surface is assumed to be a shell surface and the
+ pressure is applied to the bottom part of the shell surface.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="pressure" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure lc="1">1.0</pressure>
+\end_layout
+
+\begin_layout LyX-Code
+  <symmetric_stiffness>0</symmetric_stiffness>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
 \end_layout
 
 \begin_layout Subsubsection
@@ -14967,7 +15532,7 @@ rigid_wall
 \begin_inset Text
 
 \begin_layout Plain Layout
-A sliding interface with rigid wall as master surface 
+A sliding interface with rigid wall as secondary surface 
 \end_layout
 
 \end_inset
@@ -17134,32 +17699,40 @@ parameter serves as a scale factor for the automatically-calculated penalty
 
 \end_deeper
 \begin_layout Enumerate
-Each sliding interface consists of a master surface and a slave surface.
- The slave surface is the surface over which the contact equations are integrate
-d and on which the contact tractions are calculated.
- The master surface is used to measure the gap function and to define the
- necessary kinematic quantities such as surface normals and tangents.
+Each sliding interface consists of a 
+\emph on
+primary
+\emph default
+ surface and a 
+\emph on
+secondary 
+\emph default
+surface.
+ The primary surface is the surface over which the contact equations are
+ integrated and on which the contact tractions are calculated.
+ The secondar surface is used to measure the gap function and to define
+ the necessary kinematic quantities such as surface normals and tangents.
  This approach is usually referred to as the 
 \shape italic
 single-pass 
 \shape default
 method.
  When using the single-pass algorithm, the results can be influenced by
- the choice of slave and master surfaces.
- It is best to use the most tessellated surface as the slave and the coarsest
- as the master surface.
+ the choice of primary and secondary surfaces.
+ It is best to use the most tessellated surface as the primary and the coarsest
+ as the secondary surface.
  To resolve the bias issue, one can also use a 
 \shape italic
 two-pass
 \shape default
  algorithm for enforcement of the contact constraint.
- In this case, a single pass is performed first, after which the slave and
- master surfaces are swapped and another pass is performed.
- When using the two-pass method, the definition of master and slave surfaces
- is arbitrary.
+ In this case, a single pass is performed first, after which the primary
+ and secondary surfaces are swapped and another pass is performed.
+ When using the two-pass method, the definition of primary and secondary
+ surfaces is arbitrary.
  In most problems, the single pass is sufficient to enforce contact; with
- a judicious choice of slave-master pair and contact parameters, good results
- can be obtained.
+ a judicious choice of primary-secondary pair and contact parameters, good
+ results can be obtained.
  If however, the single pass does not give good answers, for example, when
  due to the geometry's curvature the gap cannot be small enough with a single
  pass, the two-pass method can be used, although at the expense of more
@@ -17171,25 +17744,13 @@ two-pass
 \begin_layout Standard
 If one of the contacting surfaces is rigid, a slightly different approach
  is recommended.
- In this case, it is best to pick the rigid surface as the master surface
+ In this case, it is best to pick the rigid surface as the secondary surface
  and to use a single pass algorithm.
  The reason is that the nodal degrees of freedom on the rigid surface are
  condensed to the rigid degrees of freedom and if the rigid surface is the
- slave surface, the reaction forces may not propagate correctly to the master
- surface.
+ primary surface, the reaction forces may not propagate correctly to the
+ secondary surface.
  This is especially true if the rigid degrees of freedom are fixed.
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
- In future versions of FEBio rigid surfaces will be automatically picked
- to be the master.
- 
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \end_deeper
@@ -17393,11 +17954,11 @@ laugon
 \end_layout
 
 \begin_layout Enumerate
-In a contact problem, FEBio calculates the projection of each slave node
- on the master surface.
- As a slave node slides across the master surface, the corresponding master
- segment can change.
- However, in some cases, switching segments is undesirable since it might
+In a contact problem, FEBio calculates the projection of each node of the
+ primary surface onto the secondary surface.
+ As a node slides across the secondary surface, the corresponding surface
+ facet can change.
+ However, in some cases, switching facets is undesirable since it might
  cause instabilities in the solution process or a state in which the node
  oscillates continuously between two adjacent facets and thus prevents FEBio
  from meeting the displacement convergence tolerance.
@@ -17409,7 +17970,7 @@ allows the user to control the number of segment updates FEBio will perform
  during each time step.
  For example, a value of 4 tells FEBio it can do the segment updates during
  the first four iterations.
- After that, slave nodes will not be allowed to switch to new master segments.
+ After that, nodes will not be allowed to switch to new segments.
  The default value is 0, which means that FEBio will do a segment update
  each iteration of each timestep.
  
@@ -17475,13 +18036,12 @@ The
 \shape italic
 search_tol
 \shape default
- parameter defines the search tolerance of the algorithm that projects slave
- nodes onto master facets.
+ parameter defines the search tolerance of the algorithm that projects nodes
+ of the primary surface onto facets of the secondary syrface.
  A node that falls outside an element, but whose distance to the closest
  element's edge is less than the search tolerance is still considered inside.
  This can alleviate convergence problems when nodes are projected onto edges
- of master elements and due to numerical error may be projected outside
- the master surface.
+ of elements and due to numerical error may be projected outside the surface.
  
 \end_layout
 
@@ -17490,13 +18050,13 @@ The
 \shape italic
 search_radius
 \shape default
- parameter defines the search radius for the algorithm that projects slave
- points onto master facets.
- When the distance between the slave point and the master facet exceeds
- the search_radius, that projection is ignored.
- This can alleviate convergence problems when master surfaces have multiple
- folds and the projection produces multiple solutions, only one of which
- (the closest distance) is valid.
+ parameter defines the search radius for the algorithm that projects points
+ onto facets.
+ When the distance between the point and the facet exceeds the search_radius,
+ that projection is ignored.
+ This can alleviate convergence problems when surfaces have multiple folds
+ and the projection produces multiple solutions, only one of which (the
+ closest distance) is valid.
  
 \end_layout
 
@@ -17607,7 +18167,7 @@ When either contact surface is biphasic, the surface outside the contact
 
 \begin_layout Standard
 When performing biphasic-solute-on-rigid contact, a two-pass analysis should
- not be used; the biphasic-solute surface should be the slave surface.
+ not be used; the biphasic-solute surface should be the primary surface.
 \end_layout
 
 \begin_layout Subsection
@@ -17670,15 +18230,8 @@ or
 \end_layout
 
 \begin_layout LyX-Code
-<ambient_concentration sol=
-\begin_inset Quotes erd
-\end_inset
-
-id
-\begin_inset Quotes erd
-\end_inset
-
->0</ambient_concentration> (for sliding-multiphasic)
+<ambient_concentration sol="id">0</ambient_concentration> (for sliding-multiphas
+ic)
 \end_layout
 
 \begin_layout Standard
@@ -17749,7 +18302,7 @@ When either contact surface is biphasic-solute or multiphasic, the surface
 \begin_layout Standard
 When performing biphasic-solute-on-rigid or multiphasic-on-rigid contact,
  a two-pass analysis should not be used; the rigid surface should be the
- master surface.
+ secondary surface.
 \end_layout
 
 \begin_layout Subsection
@@ -17765,7 +18318,7 @@ name "subsec:Rigid-Wall-Interfaces"
 
 \begin_layout Standard
 A rigid wall interface is similar to a sliding interface, except that the
- master surface is a rigid wall.
+ secondary surface is a rigid wall.
  The following properties are defined for rigid wall interfaces:
 \end_layout
 
@@ -18042,9 +18595,10 @@ literal "false"
 \end_inset
 
 .
- A tied interface requires the definition of both a slave and a master surface.
- It is assumed that the nodes of the slave surface are connected to the
- faces of the master surface.
+ A tied interface requires the definition of both a primary and a secondary
+ surface.
+ It is assumed that the nodes of the primary surface are connected to the
+ faces of the secondary surface.
  The following control parameters need to be defined:
 \end_layout
 
@@ -18486,7 +19040,7 @@ A tied multiphasic interface is similar to the tied biphasic interface.
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18497,7 +19051,7 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18508,7 +19062,7 @@ Description
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18855,7 +19409,7 @@ A sticky interface is similar to a tied interface except that it allows
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18866,7 +19420,7 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18994,7 +19548,7 @@ search_tolerance
 \begin_inset Text
 
 \begin_layout Plain Layout
-tolerance for nodal projection onto master facet 
+tolerance for nodal projection onto secondary surface facet 
 \end_layout
 
 \end_inset
@@ -19093,11 +19647,11 @@ The
 \shape italic
 snap_tol 
 \shape default
-parameter is used in determining the minimum distance that a slave node
- must have approached the master facet in order to snap onto the master
- surface.
- The initial value is zero, meaning a slave node must have penetrated the
- master surface before it will be tied to it.
+parameter is used in determining the minimum distance that a primary surface
+ node must have approached the secondary surface facet in order to snap
+ onto the secondary surface.
+ The initial value is zero, meaning a node must have penetrated the secondary
+ surface before it will be tied to it.
  
 \end_layout
 
@@ -31230,110 +31784,6 @@ reference "sec:Geometry-Section"
 \end_inset
 
 
-\end_layout
-
-\begin_layout Section
-Parameters Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Parameters-Section"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-Parameters 
-\shape default
-section
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
- Supported from FEBio version 2.3 and up.
-\end_layout
-
-\end_inset
-
- can be used to define parameters for the input file.
- These parameters can then be used to define material parameters, loads,
- contact parameters, etc.
- Combined with the capability to split the model definition across multiple
- files, this provides an easy and efficient mechanism for parameterizing
- a model definition.
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-Parameters 
-\shape default
-section can be placed anywhere in the input file at top level.
- However, parameters can only be referenced after this section is defined
- and therefore is most conventiently placed at the top of the file.
-\end_layout
-
-\begin_layout Standard
-Individual parameters are defined using the 
-\shape italic
-param 
-\shape default
-keyword, which takes a 
-\shape italic
-name 
-\shape default
-attribute that defines the parameter name, and a value.
- For example,
-\end_layout
-
-\begin_layout LyX-Code
-<Parameters>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="E0">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="v0">0.3</param>
-\end_layout
-
-\begin_layout LyX-Code
-</Parameters>
-\end_layout
-
-\begin_layout Standard
-Parameters are referenced in xml-values by prefixing the parameter's name
- with the 
-\begin_inset Quotes eld
-\end_inset
-
-at
-\begin_inset Quotes erd
-\end_inset
-
- (@) symbol.
- For instance, if the previously defined parameters are used in a material
- definition, then it will look something like this.
-\end_layout
-
-\begin_layout LyX-Code
-<Material id="1" type="neo-Hookean">
-\end_layout
-
-\begin_layout LyX-Code
-  <E>@E0</E>
-\end_layout
-
-\begin_layout LyX-Code
-  <v>@v0</v>
-\end_layout
-
-\begin_layout LyX-Code
-</Material>
 \end_layout
 
 \begin_layout Chapter
@@ -76113,7 +76563,7 @@ print_level
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sets the amount of output generated by the optimization module
+Sets the amount of output generated by the optimization module (5)
 \end_layout
 
 \end_inset
@@ -76432,6 +76882,108 @@ tau
  
 \end_layout
 
+\begin_layout Enumerate
+The 
+\emph on
+print_level 
+\emph default
+sets how much output is generated during the optimizations.
+ In particular, it controls if the objective function values are printed
+ are not.
+ The following values are allowed:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\series default
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PRINT_ITERATIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Print minimal iterations info
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PRINT_VERBOSE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Print a lot of information, incl.
+ objective function values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Objective Section
 \begin_inset CommandInset label
@@ -79077,7 +79629,7 @@ In fluid analyses, boundary layers will form in the vicinity of no-slip
  This is done most conveniently by using mesh biasing tools, available in
  various meshing software programs, or post-hoc boundary-layer meshing tool
  that modify an existing mesh.
- Both of these options are available in PreView.
+ Both of these options are available in FEBioStudio.
  Boundary layer meshing should always be used in fluid analyses in FEBio.
  Whereas other finite element codes employ numerical stabilization techniques
  that partially alleviate the need for biased meshes, FEBio does not employ
@@ -79897,7 +80449,7 @@ status open
 
 
 \backslash
-url{http://mrl.sci.utah.edu}
+url{https://forums.febio.org/}
 \end_layout
 
 \end_inset
@@ -80191,7 +80743,7 @@ if_debug/if_release
 \emph default
  tags allow users to customize settings based on whether a debug or release
  version of FEBio is processing the configuration file.
- )Note that the debug version refers to how FEBio was compiled.
+ (Note that the debug version refers to how FEBio was compiled.
  It does not refer to the -g command line option.) The versions of FEBio
  distributed through the website are release versions.
  A debug version of FEBio can only be obtained by building FEBio with the
@@ -82593,14 +83145,6 @@ Appendix A - Referencing Parameters
 This appendix details how that model parameters can be referenced in the
  FEBio input files.
  This is used to
-\end_layout
-
-\begin_layout Itemize
-reference model parameters in the 
-\emph on
-mesh_data
-\emph default
- sections.
 \end_layout
 
 \begin_layout Itemize
