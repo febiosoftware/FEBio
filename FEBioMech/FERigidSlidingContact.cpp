@@ -23,15 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidSlidingContact.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/log.h>
-#include "FERigidSystem.h"
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
 
@@ -183,10 +179,7 @@ bool FERigidSlidingContact::Init()
 	if (m_rigid == 0)
 	{
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidSystem* rs = fem.GetRigidSystem();
-		if (rs == 0) return false;
-
-		m_rigid = rs->FindRigidSurface(m_rigidName);
+		m_rigid = fem.FindRigidSurface(m_rigidName);
 		if (m_rigid == 0) return false;
 	}
 

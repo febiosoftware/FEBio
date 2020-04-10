@@ -101,7 +101,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			if (tag == "time_stepper")
 			{
 				pstep->m_bautostep = true;
-				FETimeStepController& tc = pstep->m_timeController;
+				FETimeStepController& tc = *pstep->m_timeController;
 				FEParameterList& pl = tc.GetParameterList();
 				ReadParameterList(tag, pl);
 			}
@@ -145,7 +145,7 @@ void FEBioControlSection::ParseIntegrationRules(XMLTag& tag)
 		if (tag == "rule")
 		{
 			XMLAtt& elem = tag.Attribute("elem");
-			const char* szv = get_value_string(tag);
+			const char* szv = tag.szvalue();
 
 			if (elem == "hex8")
 			{
@@ -332,7 +332,7 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 			if (tag == "time_stepper")
 			{
 				pstep->m_bautostep = true;
-				FETimeStepController& tc = pstep->m_timeController;
+				FETimeStepController& tc = *pstep->m_timeController;
 				FEParameterList& pl = tc.GetParameterList();
 				ReadParameterList(tag, pl);
 			}

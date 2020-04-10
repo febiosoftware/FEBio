@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FEBioLoadsSection.h"
 #include "FEBioConstraintsSection.h"
 #include "FEBioContactSection.h"
+#include "FEBioRigidSection.h"
 
 //-----------------------------------------------------------------------------
 FEBioStepSection3::FEBioStepSection3(FEFileImport* pim) : FEFileSection(pim) {}
@@ -50,6 +51,7 @@ void FEBioStepSection3::Parse(XMLTag& tag)
 	Map["Loads"      ] = new FEBioLoadsSection3(imp);
 	Map["Constraints"] = new FEBioConstraintsSection25(imp);
 	Map["Contact"    ] = new FEBioContactSection25(imp);
+	Map["Rigid"      ] = new FEBioRigidSection(imp);
 
 	++tag;
 	do

@@ -119,6 +119,8 @@ public:
 
 	double Value();
 
+	void InitTimeStep();
+
 	void Serialize(DumpStream& ar) override;
 
 	void Activate() override;
@@ -148,8 +150,16 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+// rigid body initial conditions
+class FEBIOMECH_API FERigidIC : public FERigidBC
+{
+public:
+	FERigidIC(FEModel* fem);
+};
+
+//-----------------------------------------------------------------------------
 //! rigid body initial velocity
-class FEBIOMECH_API FERigidBodyVelocity : public FERigidBC
+class FEBIOMECH_API FERigidBodyVelocity : public FERigidIC
 {
 public:
 	FERigidBodyVelocity(FEModel* pfem);
@@ -167,7 +177,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial angular velocity
-class FEBIOMECH_API FERigidBodyAngularVelocity : public FERigidBC
+class FEBIOMECH_API FERigidBodyAngularVelocity : public FERigidIC
 {
 public:
 	FERigidBodyAngularVelocity(FEModel* pfem);

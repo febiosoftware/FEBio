@@ -23,15 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <FECore/FEModel.h>
 #include "febiomech_api.h"
 
 //---------------------------------------------------------------------------------------
 class FERigidSystem;
+class FERigidBody;
+class FERigidBodyDisplacement;
+class FERigidBodyFixedBC;
+class FERigidIC;
+class FERigidSurface;
+class FERigidNodeSet;
 
 //---------------------------------------------------------------------------------------
 // This class extends the basic FEModel class by adding a rigid body system
@@ -40,14 +43,8 @@ class FEBIOMECH_API FEMechModel : public FEModel
 public:
 	FEMechModel();
 
-	// get the rigid system
-	FERigidSystem* GetRigidSystem();
-
 	// clear all model data
 	void Clear() override;
-
-	// initialize the rigid system
-	bool InitRigidSystem() override;
 
 	// model activation
 	void Activate() override;
@@ -66,6 +63,46 @@ public:
 
 	//! Build the matrix profile for this model
 	void BuildMatrixProfile(FEGlobalMatrix& G, bool breset) override;
+
+	// update rigid part of mesh
+	void UpdateRigidMesh();
+
+public:
+	// get the rigid system
+	FERigidSystem* GetRigidSystem();
+
+	// initialize the rigid system
+	bool InitRigidSystem() override;
+
+	// number of rigid bodies
+	int RigidBodies() const;
+
+	// get a rigid body
+	FERigidBody* GetRigidBody(int n);
+
+	// find a rigid surface
+	FERigidSurface* FindRigidSurface(const std::string& name);
+
+	// find a rigid body from a material ID
+	int FindRigidbodyFromMaterialID(int matId);
+
+	// return number or rigid prescribed BCs
+	int RigidPrescribedBCs() const;
+
+	// return the rigid prescribed displacement
+	FERigidBodyDisplacement* GetRigidPrescribedBC(int i);
+
+	// add a rigid presribed BC
+	void AddRigidPrescribedBC(FERigidBodyDisplacement* pDC);
+
+	// add a rigid fixed BC
+	void AddRigidFixedBC(FERigidBodyFixedBC* pBC);
+
+	// add a rigid initial condition
+	void AddRigidInitialCondition(FERigidIC* pIC);
+
+	// add a rigid nodeset
+	void AddRigidNodeSet(FERigidNodeSet* rns);
 
 private:
 	FERigidSystem*	m_prs;

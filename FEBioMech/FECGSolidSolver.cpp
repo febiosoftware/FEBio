@@ -37,7 +37,6 @@ SOFTWARE.*/
 #include "FEResidualVector.h"
 #include "FEElasticDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
-#include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "RigidBC.h"
 #include <FECore/FEBoundaryCondition.h>
@@ -193,11 +192,10 @@ bool FECGSolidSolver::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = neq;
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	int nrb = rigid.Objects();
+	int nrb = fem.RigidBodies();
 	for (int i = 0; i<nrb; ++i)
 	{
-		FERigidBody& RB = *rigid.Object(i);
+		FERigidBody& RB = *fem.GetRigidBody(i);
 		for (int j = 0; j<6; ++j)
 		{
 			int bcj = RB.m_BC[j];
@@ -219,7 +217,7 @@ bool FECGSolidSolver::InitEquations()
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& RB = *rigid.Object(node.m_rid);
+			FERigidBody& RB = *fem.GetRigidBody(node.m_rid);
 			node.m_ID[m_dofU[0] ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
 			node.m_ID[m_dofU[1] ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
 			node.m_ID[m_dofU[2] ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
@@ -282,26 +280,20 @@ void FECGSolidSolver::PrepStep()
 	}
 
 	// initialize rigid bodies
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	int NO = rigid.Objects();
-	for (int i = 0; i<NO; ++i) rigid.Object(i)->Init();
+	int NO = fem.RigidBodies();
+	for (int i = 0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
 	// calculate local rigid displacements
-	for (int i = 0; i<(int)rigid.PrescribedBCs(); ++i)
+	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *rigid.PrescribedBC(i);
-		FERigidBody& RB = *rigid.Object(DC.GetID());
-		if (DC.IsActive())
-		{
-			int I = DC.GetBC();
-			RB.m_dul[I] = DC.Value() - RB.m_Ut[I];
-		}
+		FERigidBodyDisplacement& DC = *fem.GetRigidPrescribedBC(i);
+		if (DC.IsActive()) DC.InitTimeStep();
 	}
 
 	// calculate global rigid displacements
 	for (int i = 0; i<NO; ++i)
 	{
-		FERigidBody* prb = rigid.Object(i);
+		FERigidBody* prb = fem.GetRigidBody(i);
 		if (prb)
 		{
 			FERigidBody& RB = *prb;
@@ -372,7 +364,7 @@ void FECGSolidSolver::PrepStep()
 	// store rigid displacements in Ui vector
 	for (int i = 0; i<NO; ++i)
 	{
-		FERigidBody& RB = *rigid.Object(i);
+		FERigidBody& RB = *fem.GetRigidBody(i);
 		for (int j = 0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j] - 2;
@@ -384,7 +376,6 @@ void FECGSolidSolver::PrepStep()
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		FEMesh& mesh = fem.GetMesh();
-		FERigidSystem& rigid = *fem.GetRigidSystem();
 
 		// set the initial velocities of all rigid nodes
 		for (int i = 0; i<mesh.Nodes(); ++i)
@@ -392,7 +383,7 @@ void FECGSolidSolver::PrepStep()
 			FENode& n = mesh.Node(i);
 			if (n.m_rid >= 0)
 			{
-				FERigidBody& rb = *rigid.Object(n.m_rid);
+				FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
 				vec3d V = rb.m_vt;
 				vec3d W = rb.m_wt;
 				vec3d r = n.m_rt - rb.m_rt;
@@ -408,9 +399,9 @@ void FECGSolidSolver::PrepStep()
 	}
 
 	// store the current rigid body reaction forces
-	for (int i = 0; i<rigid.Objects(); ++i)
+	for (int i = 0; i<fem.RigidBodies(); ++i)
 	{
-		FERigidBody& RB = *rigid.Object(i);
+		FERigidBody& RB = *fem.GetRigidBody(i);
 		RB.m_Fp = RB.m_Fr;
 		RB.m_Mp = RB.m_Mr;
 	}
@@ -927,11 +918,10 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	int NRB = rigid.Objects();
+	int NRB = fem.RigidBodies();
 	for (int i = 0; i<NRB; ++i)
 	{
-		FERigidBody& RB = *rigid.Object(i);
+		FERigidBody& RB = *fem.GetRigidBody(i);
 		RB.m_Fr = RB.m_Mr = vec3d(0, 0, 0);
 	}
 
@@ -1093,7 +1083,6 @@ void FECGSolidSolver::AssembleResidual(int node_id, int dof, double f, vector<do
 	// get the mesh
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FEMesh& mesh = fem.GetMesh();
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// get the equation number
 	FENode& node = mesh.Node(node_id);
@@ -1104,7 +1093,7 @@ void FECGSolidSolver::AssembleResidual(int node_id, int dof, double f, vector<do
 	else if (node.m_rid >= 0)
 	{
 		// this is a rigid body node
-		FERigidBody& RB = *rigid.Object(node.m_rid);
+		FERigidBody& RB = *fem.GetRigidBody(node.m_rid);
 
 		// get the relative position
 		vec3d a = node.m_rt - RB.m_rt;
@@ -1137,14 +1126,13 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
 	// get the number of rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	const int NRB = rigid.Objects();
+	const int NRB = fem.RigidBodies();
 
 	// first calculate the rigid body displacement increments
 	for (int i = 0; i<NRB; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = *rigid.Object(i);
+		FERigidBody& RB = *fem.GetRigidBody(i);
 		int *lm = RB.m_LM;
 		double* du = RB.m_du;
 
@@ -1159,13 +1147,13 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = rigid.PrescribedBCs();
+	const int NRD = fem.RigidPrescribedBCs();
 	for (int i = 0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *rigid.PrescribedBC(i);
+		FERigidBodyDisplacement& dc = *fem.GetRigidPrescribedBC(i);
 		if (dc.IsActive())
 		{
-			FERigidBody& RB = *rigid.Object(dc.GetID());
+			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
 			if (RB.m_prb == 0)
 			{
 				int I = dc.GetBC();
@@ -1178,7 +1166,7 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i = 0; i<NRB; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = *rigid.Object(i);
+		FERigidBody& RB = *fem.GetRigidBody(i);
 		double* du = RB.m_du;
 
 		// This is the "new" update algorithm which addressesses a couple issues
@@ -1200,7 +1188,7 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	}
 
 	// we need to update the position of rigid nodes
-	rigid.UpdateMesh();
+	fem.UpdateRigidMesh();
 
 	// Since the rigid nodes are repositioned we need to update the displacement DOFS
 	FEMesh& mesh = fem.GetMesh();

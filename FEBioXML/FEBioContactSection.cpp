@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include "FEBioMech/FERigidWallInterface.h"
@@ -33,7 +30,6 @@ SOFTWARE.*/
 #include <FEBioMech/FERigidSlidingContact.h>
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
-#include <FEBioMech/FERigidSystem.h>
 #include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEMechModel.h>
 
@@ -320,7 +316,6 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FEModelBuilder* feb = GetBuilder();
 
 	int NMAT = fem.Materials();

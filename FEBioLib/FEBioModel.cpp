@@ -556,7 +556,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
 					case CB_MAJOR_ITERS  : 
 						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true; 
-						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController.m_nmust >= 0)) bout = true;
+						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
 					case CB_AUGMENT: 
@@ -620,7 +620,7 @@ void FEBioModel::Write(unsigned int nwhen)
 		case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
 		case CB_MAJOR_ITERS:
 			if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
-			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController.m_nmust >= 0)) bout = true;
+			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
 			break;
 		case CB_SOLVED:
 			if (nout == FE_OUTPUT_FINAL) bout = true;

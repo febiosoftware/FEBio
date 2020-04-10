@@ -23,12 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidForce.h"
-#include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
@@ -72,9 +68,8 @@ bool FERigidAxialForce::Init()
 	m_idb = pm->GetRigidBodyID(); if (m_idb < 0) return false;
 
 	// get the actual rigid bodies
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& bodyA = *rigid.Object(m_ida);
-	FERigidBody& bodyB = *rigid.Object(m_idb);
+	FERigidBody& bodyA = *fem.GetRigidBody(m_ida);
+	FERigidBody& bodyB = *fem.GetRigidBody(m_idb);
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
@@ -110,9 +105,8 @@ void FERigidAxialForce::Serialize(DumpStream& ar)
 void FERigidAxialForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& bodyA = *rigid.Object(m_ida);
-	FERigidBody& bodyB = *rigid.Object(m_idb);
+	FERigidBody& bodyA = *fem.GetRigidBody(m_ida);
+	FERigidBody& bodyB = *fem.GetRigidBody(m_idb);
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
@@ -166,9 +160,8 @@ void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 {
 	// Get the rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& bodyA = *rigid.Object(m_ida);
-	FERigidBody& bodyB = *rigid.Object(m_idb);
+	FERigidBody& bodyA = *fem.GetRigidBody(m_ida);
+	FERigidBody& bodyB = *fem.GetRigidBody(m_idb);
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
@@ -283,8 +276,7 @@ void FERigidBodyForce::Activate()
 
 	m_rid = pm->GetRigidBodyID(); assert(m_rid >= 0);
 
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(m_rid);
+	FERigidBody& rb = *fem.GetRigidBody(m_rid);
 	if (m_ntype == TARGET)
 	{
 		switch (m_dof)
@@ -317,8 +309,7 @@ double FERigidBodyForce::Value()
 void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(m_rid);
+	FERigidBody& rb = *fem.GetRigidBody(m_rid);
 
 	if (m_bfollow == false)
 	{

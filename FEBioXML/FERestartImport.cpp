@@ -49,7 +49,7 @@ void FERestartControlSection::Parse(XMLTag& tag)
 		else if (tag == "time_stepper")
 		{
 			pstep->m_bautostep = true;
-			FETimeStepController& tc = pstep->m_timeController;
+			FETimeStepController& tc = *pstep->m_timeController;
 			++tag;
 			do
 			{

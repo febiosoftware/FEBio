@@ -216,7 +216,7 @@ void FEBioGeometrySection3::ParseInstanceSection(XMLTag& tag)
 				}
 				while (!tag.isend());
 			}
-			else if (tag == "Elements")
+			else if (tag == "domain")
 			{
 				const char* szdom = tag.AttributeValue("name");
 				const char* szmat = tag.AttributeValue("mat");

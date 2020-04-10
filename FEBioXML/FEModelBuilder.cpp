@@ -37,7 +37,6 @@ SOFTWARE.*/
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELoadCurve.h>
-#include <FEBioMech/FERigidSystem.h>
 #include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEUDGHexDomain.h>
 #include <FEBioMech/FEUT4Domain.h>
@@ -269,35 +268,28 @@ void FEModelBuilder::AddNonlinearConstraint(FENLConstraint* pnc)
 //-----------------------------------------------------------------------------
 void FEModelBuilder::AddRigidFixedBC(FERigidBodyFixedBC* prc)
 {
-	static_cast<FEMechModel&>(m_fem).GetRigidSystem()->AddFixedBC(prc);
+	static_cast<FEMechModel&>(m_fem).AddRigidFixedBC(prc);
 	AddComponent(prc);
 }
 
 //-----------------------------------------------------------------------------
 void FEModelBuilder::AddRigidPrescribedBC(FERigidBodyDisplacement* prc)
 {
-	static_cast<FEMechModel&>(m_fem).GetRigidSystem()->AddPrescribedBC(prc);
+	static_cast<FEMechModel&>(m_fem).AddRigidPrescribedBC(prc);
 	AddComponent(prc);	
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidBodyVelocity(FERigidBodyVelocity* prv)
+void FEModelBuilder::AddRigidIC(FERigidIC* ric)
 {
-	static_cast<FEMechModel&>(m_fem).GetRigidSystem()->AddInitialVelocity(prv);
-	AddComponent(prv);
-}
-
-//-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidBodyAngularVelocity(FERigidBodyAngularVelocity* prv)
-{
-	static_cast<FEMechModel&>(m_fem).GetRigidSystem()->AddInitialAngularVelocity(prv);
-	AddComponent(prv);
+	static_cast<FEMechModel&>(m_fem).AddRigidInitialCondition(ric);
+	AddComponent(ric);
 }
 
 //-----------------------------------------------------------------------------
 void FEModelBuilder::AddRigidNodeSet(FERigidNodeSet* rs)
 {
-	static_cast<FEMechModel&>(m_fem).GetRigidSystem()->AddRigidNodeSet(rs);
+	static_cast<FEMechModel&>(m_fem).AddRigidNodeSet(rs);
 	AddComponent(rs);
 }
 

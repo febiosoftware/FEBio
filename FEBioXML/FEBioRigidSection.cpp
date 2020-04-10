@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioRigidSection.h"
 #include <FECore/FEModel.h>
-#include <FEBioMech/FERigidSystem.h>
 #include <FECore/FECoreKernel.h>
 #include <FEBioMech/FERigidSurface.h>
 #include <FEBioMech/FEMechModel.h>
@@ -41,7 +40,6 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 	if (tag.isleaf()) return;
 
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	++tag;
 	do
@@ -64,7 +62,7 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
 			pic->m_rid = nmat;
 			pic->m_vel = v;
-			rigid.AddInitialVelocity(pic);
+			fem.AddRigidInitialCondition(pic);
 
 			// add this initial condition to the current step
 			GetBuilder()->AddComponent(pic);
@@ -86,7 +84,7 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
 			pic->m_rid = nmat;
 			pic->m_w = w;
-			rigid.AddInitialAngularVelocity(pic);
+			fem.AddRigidInitialCondition(pic);
 
 			// add this initial condition to the current step
 			GetBuilder()->AddComponent(pic);
@@ -136,7 +134,6 @@ bool parseRigidDofs(const char* sz, vector<int>& bc)
 void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// get the type
 	const char* sztype = tag.AttributeValue("type");
@@ -145,7 +142,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	{
 		// create the fixed dof
 		FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed", &fem));
-		rigid.AddFixedBC(pBC);
+		fem.AddRigidFixedBC(pBC);
 
 		// add this boundary condition to the current step
 		GetBuilder()->AddComponent(pBC);
@@ -157,7 +154,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	{
 		// create the rigid displacement constraint
 		FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
-		rigid.AddPrescribedBC(pDC);
+		fem.AddRigidPrescribedBC(pDC);
 
 		GetBuilder()->AddComponent(pDC);
 
@@ -178,14 +175,14 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	else if (tag == "rigid_velocity")
 	{
 		FERigidBodyVelocity* rc = fecore_alloc(FERigidBodyVelocity, &fem);
-		GetBuilder()->AddRigidBodyVelocity(rc);
+		GetBuilder()->AddRigidIC(rc);
 
 		ReadParameterList(tag, rc);
 	}
 	else if (tag == "rigid_angular_velocity")
 	{
 		FERigidBodyAngularVelocity* rc = fecore_alloc(FERigidBodyAngularVelocity, &fem);
-		GetBuilder()->AddRigidBodyAngularVelocity(rc);
+		GetBuilder()->AddRigidIC(rc);
 
 		ReadParameterList(tag, rc);
 	}

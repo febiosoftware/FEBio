@@ -38,6 +38,8 @@ SOFTWARE.*/
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
+REGISTER_SUPER_CLASS(FETimeStepController, FETIMECONTROLLER_ID);
+
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_maxretries, "max_retries");
@@ -49,7 +51,7 @@ BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step)
+FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step), FECoreBase(step ? step->GetFEModel() : nullptr)
 {
 	m_nretries = 0;
 	m_maxretries = 5;

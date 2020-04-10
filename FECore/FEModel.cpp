@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include <map>
 #include "DumpStream.h"
 #include "LinearSolver.h"
+#include "FETimeStepController.h"
 #include "Timer.h"
 #include <stdarg.h>
 using namespace std;
@@ -496,6 +497,12 @@ bool FEModel::Init()
 	{
 		int lc = m_imp->m_Param[i].lc;
 		tag[lc]++;
+	}
+	for (int i = 0; i < m_imp->m_Step.size(); ++i)
+	{
+		FEAnalysis* step = m_imp->m_Step[i];
+		int lc = step->m_timeController->m_nmplc;
+		if (lc >= 0) tag[lc]++;
 	}
 	int unused = 0;
 	for (int i = 0; i < NLC; ++i) if (tag[i] == 0) unused++;

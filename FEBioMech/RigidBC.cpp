@@ -23,15 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "RigidBC.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEMesh.h>
 #include "FERigidBody.h"
-#include "FERigidSystem.h"
 #include <FECore/FEMaterial.h>
 #include <FECore/FELoadCurve.h>
 #include "FEMechModel.h"
@@ -202,8 +198,7 @@ void FERigidBodyFixedBC::Activate()
 	if (m_binit)
 	{
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidSystem& rs = *fem.GetRigidSystem();
-		FERigidBody& RB = *rs.Object(m_rb);
+		FERigidBody& RB = *fem.GetRigidBody(m_rb);
 
 		// we only fix the open dofs. If a user accidentally applied a fixed and prescribed
 		// rigid degree of freedom, then we make sure the prescribed takes precedence.
@@ -221,8 +216,7 @@ void FERigidBodyFixedBC::Deactivate()
 	if (m_binit)
 	{
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidSystem& rs = *fem.GetRigidSystem();
-		FERigidBody& RB = *rs.Object(m_rb);
+		FERigidBody& RB = *fem.GetRigidBody(m_rb);
 
 		// Since fixed rigid dofs can be overwritten by prescribed dofs, 
 		// we have to make sure that this dof is actually a fixed dof.
@@ -286,8 +280,7 @@ void FERigidBodyDisplacement::Activate()
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rs = *fem.GetRigidSystem();
-	FERigidBody& RB = *rs.Object(m_rigidMat);
+	FERigidBody& RB = *fem.GetRigidBody(m_rigidMat);
 
 	// set some stuff
 	RB.m_pDC[m_dof] = this;
@@ -319,8 +312,7 @@ void FERigidBodyDisplacement::Deactivate()
 	if (m_binit)
 	{
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidSystem& rs = *fem.GetRigidSystem();
-		FERigidBody& RB = *rs.Object(m_rigidMat);
+		FERigidBody& RB = *fem.GetRigidBody(m_rigidMat);
 
 		// turn off the prescribed displacement
 		RB.m_pDC[m_dof] = 0;
@@ -342,6 +334,21 @@ double FERigidBodyDisplacement::Value()
 	return m_val + m_ref;
 }
 
+//-----------------------------------------------------------------------------
+void FERigidBodyDisplacement::InitTimeStep()
+{
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidBody& RB = *fem.GetRigidBody(GetID());
+	int I = GetBC();
+	RB.m_dul[I] = Value() - RB.m_Ut[I];
+}
+
+//=============================================================================
+FERigidIC::FERigidIC(FEModel* fem) : FERigidBC(fem)
+{
+
+}
+
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidBodyVelocity, FERigidBC)
 	ADD_PARAMETER(m_rid, "rb");
@@ -349,7 +356,7 @@ BEGIN_FECORE_CLASS(FERigidBodyVelocity, FERigidBC)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidBodyVelocity::FERigidBodyVelocity(FEModel* pfem) : FERigidBC(pfem) 
+FERigidBodyVelocity::FERigidBodyVelocity(FEModel* pfem) : FERigidIC(pfem) 
 {
 	m_rid = -1;
 	m_vel = vec3d(0, 0, 0);
@@ -369,8 +376,7 @@ bool FERigidBodyVelocity::Init()
 void FERigidBodyVelocity::Activate()
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rs = *fem.GetRigidSystem();
-	FERigidBody& RB = *rs.Object(m_rid);
+	FERigidBody& RB = *fem.GetRigidBody(m_rid);
 
 	RB.m_vp = RB.m_vt = m_vel;
 }
@@ -382,7 +388,7 @@ BEGIN_FECORE_CLASS(FERigidBodyAngularVelocity, FERigidBC)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidBodyAngularVelocity::FERigidBodyAngularVelocity(FEModel* pfem) : FERigidBC(pfem) 
+FERigidBodyAngularVelocity::FERigidBodyAngularVelocity(FEModel* pfem) : FERigidIC(pfem)
 {
 	m_rid = -1;
 	m_w = vec3d(0, 0, 0);
@@ -402,7 +408,6 @@ bool FERigidBodyAngularVelocity::Init()
 void FERigidBodyAngularVelocity::Activate()
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rs = *fem.GetRigidSystem();
-	FERigidBody& RB = *rs.Object(m_rid);
+	FERigidBody& RB = *fem.GetRigidBody(m_rid);
 	RB.m_wp = RB.m_wt = m_w;
 }

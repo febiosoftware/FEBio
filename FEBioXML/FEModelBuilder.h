@@ -133,8 +133,7 @@ public:
 
 	void AddRigidFixedBC            (FERigidBodyFixedBC* prc);
 	void AddRigidPrescribedBC       (FERigidBodyDisplacement* prc);
-	void AddRigidBodyVelocity       (FERigidBodyVelocity* prv);
-	void AddRigidBodyAngularVelocity(FERigidBodyAngularVelocity* prv);
+	void AddRigidIC					(FERigidIC* prv);
 	void AddRigidNodeSet            (FERigidNodeSet* rs);
 
 public:

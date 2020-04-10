@@ -52,7 +52,6 @@ SOFTWARE.*/
 #include "FEMicroMaterial2O.h"
 #include "FEFacet2FacetSliding.h"
 #include "FEMortarSlidingContact.h"
-#include "FERigidSystem.h"
 #include "FEMechModel.h"
 #include "FEPreStrainElastic.h"
 #include <FECore/writeplot.h>
@@ -1916,9 +1915,9 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
                     FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
                     FEFatigueMaterialPoint* ppf = pt.GetPointData(k)->ExtractData<FEFatigueMaterialPoint>();
                     FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
-                    if (ppd) D += (float) 1 - ppd->m_D;
+                    if (ppd) D += (float) (1.0 - ppd->m_D);
                     else if (ppf) D += (float) ppf->m_wit;
-                    else if (prp) D += (float) (1 - prp->YieldedBonds());
+                    else if (prp) D += (float) (1.0 - prp->YieldedBonds());
                 }
             }
             D /= (float) nint;
@@ -2257,8 +2256,7 @@ bool FEPlotRigidDisplacement::Save(FEDomain& dom, FEDataStream& a)
     
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
 
 	// store the rigid body position
 	// TODO: why do we not store displacement?
@@ -2277,8 +2275,7 @@ bool FEPlotRigidVelocity::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     
 	// store the rigid velocity
 	a << rb.m_vt;
@@ -2296,8 +2293,7 @@ bool FEPlotRigidAcceleration::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     
 	// store rigid body acceleration
 	a << rb.m_at;
@@ -2315,8 +2311,7 @@ bool FEPlotRigidRotation::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
 	vec3d q = rb.GetRotation().GetRotationVector();
     
 	// store rotation vector
@@ -2335,8 +2330,7 @@ bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     
 	// store rigid angular velocity
 	a << rb.m_wt;
@@ -2354,8 +2348,7 @@ bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     
 	// store angular acceleration
 	a << rb.m_alt;
@@ -2373,8 +2366,7 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     vec3d v = rb.m_vt;
     double m = rb.m_mass;
     vec3d w = rb.m_wt;
@@ -2398,8 +2390,7 @@ bool FEPlotRigidLinearMomentum::Save(FEDomain& dom, FEDataStream& a)
 
     // get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-    FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+    FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     
     // store linear momentum (mass x velocity)
     a << rb.m_vt*rb.m_mass;
@@ -2417,8 +2408,7 @@ bool FEPlotRigidAngularMomentum::Save(FEDomain& dom, FEDataStream& a)
 
     // get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-    FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+    FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
     
     // store angular momentum (mass moment of inertia x angular velocity)
 	mat3d Rt = rb.GetRotation().RotationMatrix();
@@ -2439,8 +2429,7 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
 
 	// get the Euler angles
 	double E[3];
@@ -2463,8 +2452,7 @@ bool FEPlotRigidRotationVector::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+	FERigidBody& rb = *fem.GetRigidBody(prm->GetRigidBodyID());
 
 	// get the rotation vector and angle
 	vec3d r = rb.GetRotation().GetRotationVector();
@@ -2489,8 +2477,7 @@ bool FEPlotRigidReactionForce::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-    FERigidBody& rb = *rigid.Object(nrid);
+    FERigidBody& rb = *fem.GetRigidBody(nrid);
 
 	a << rb.m_Fr;
 
@@ -2511,8 +2498,7 @@ bool FEPlotRigidReactionTorque::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-    FERigidBody& rb = *rigid.Object(nrid);
+    FERigidBody& rb = *fem.GetRigidBody(nrid);
 
 	a << rb.m_Mr;
 

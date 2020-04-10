@@ -83,37 +83,21 @@ FEModel* FEFileSection::GetFEModel() { return &GetBuilder()->GetFEModel(); }
 FEModelBuilder* FEFileSection::GetBuilder() { return m_pim->GetBuilder(); }
 
 //-----------------------------------------------------------------------------
-const char* FEFileSection::get_value_string(XMLTag& tag)
-{
-	const char* sz = tag.szvalue();
-	if (sz[0] == '@')
-	{
-		FEFileParam* p = m_pim->FindFileParameter(sz + 1);
-		if (p == 0) throw XMLReader::InvalidValue(tag);
-		sz = p->m_szval;
-	}
-	return sz;
-}
-
-
-//-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, int& n)
 {
-	const char* sz = get_value_string(tag);
-	n = atoi(sz);
+	n = atoi(tag.szvalue());
 }
 
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, double& g)
 {
-	const char* sz = get_value_string(tag);
-	g = atof(sz);
+	g = atof(tag.szvalue());
 }
 
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, bool& b)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	int n = 0;
 	sscanf(sz, "%d", &n);
 	b = (n != 0);
@@ -122,7 +106,7 @@ void FEFileSection::value(XMLTag& tag, bool& b)
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, vec3d& v)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	int n = sscanf(sz, "%lg,%lg,%lg", &v.x, &v.y, &v.z);
 	if (n != 3) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
 }
@@ -130,7 +114,7 @@ void FEFileSection::value(XMLTag& tag, vec3d& v)
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, mat3d& m)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
 	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
 	if (n != 9) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
@@ -140,7 +124,7 @@ void FEFileSection::value(XMLTag& tag, mat3d& m)
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, mat3ds& m)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	double x, y, z, xy, yz, xz;
 	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
 	if (n != 6) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
@@ -159,21 +143,21 @@ void FEFileSection::value(XMLTag& tag, tens3drs& m)
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, char* szstr)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	strcpy(szstr, sz);
 }
 
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, std::string& v)
 {
-	v = get_value_string(tag);
+	v = tag.szvalue();
 }
 
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, std::vector<int>& v)
 {
 	v.clear();
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	do
 	{
 		const char* sze = strchr(sz, ',');
@@ -191,7 +175,7 @@ void FEFileSection::value(XMLTag& tag, std::vector<int>& v)
 //-----------------------------------------------------------------------------
 int FEFileSection::value(XMLTag& tag, int* pi, int n)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	int nr = 0;
 	for (int i = 0; i<n; ++i)
 	{
@@ -209,7 +193,7 @@ else break;
 //-----------------------------------------------------------------------------
 int FEFileSection::value(XMLTag& tag, double* pf, int n)
 {
-	const char* sz = get_value_string(tag);
+	const char* sz = tag.szvalue();
 	int nr = 0;
 	for (int i = 0; i < n; ++i)
 	{
@@ -419,7 +403,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				}
 				else
 				{
-					bool bfound = parseEnumParam(pp, get_value_string(tag));
+					bool bfound = parseEnumParam(pp, tag.szvalue());
 					if (bfound == false) throw XMLReader::InvalidValue(tag);
 				}
 			}
@@ -434,7 +418,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				}
 				else
 				{
-					bool bfound = parseEnumParam(pp, get_value_string(tag));
+					bool bfound = parseEnumParam(pp, tag.szvalue());
 					if (bfound == false) throw XMLReader::InvalidValue(tag);
 				}
 			}
@@ -964,39 +948,49 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 			}
 			else
 			{
-				const char* sztype = tag.AttributeValue("type", true);
-
-				// If the type attribute is omitted we assume the tag's name is the type
-				if (sztype == 0) sztype = tag.Name();
-
-				// HACK for mapping load curves to FEFunction1D
-				const char* szlc = tag.AttributeValue("lc", true);
-				if (szlc && (tag.m_natt == 1) && (tag == "force"))
+				// see if the property is already allocated
+				if ((prop->IsArray() == false) && (prop->get(0)))
 				{
-					FEPointFunction* f = fecore_alloc(FEPointFunction, GetFEModel()); assert(f);
-					prop->SetProperty(f);
-
-					int lc = atoi(szlc) - 1;
-					GetBuilder()->MapLoadCurveToFunction(f, lc);
+					// If so, let's just read the parameters
+					FECoreBase* pc = prop->get(0);
+					if (tag.isleaf() == false) ReadParameterList(tag, pc);
 				}
 				else
 				{
-					// try to allocate the class
-					FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
-					if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+					const char* sztype = tag.AttributeValue("type", true);
 
-					prop->SetProperty(pp);
+					// If the type attribute is omitted we assume the tag's name is the type
+					if (sztype == 0) sztype = tag.Name();
 
-					// read the property data
-					if (tag.isleaf() == false)
+					// HACK for mapping load curves to FEFunction1D
+					const char* szlc = tag.AttributeValue("lc", true);
+					if (szlc && (tag.m_natt == 1) && (tag == "force"))
 					{
-						ReadParameterList(tag, pp);
+						FEPointFunction* f = fecore_alloc(FEPointFunction, GetFEModel()); assert(f);
+						prop->SetProperty(f);
+
+						int lc = atoi(szlc) - 1;
+						GetBuilder()->MapLoadCurveToFunction(f, lc);
 					}
-					else if (tag.isempty() == false)
+					else
 					{
-						// There should be a parameter with the same name as the type
-						if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
-							throw XMLReader::InvalidValue(tag);
+						// try to allocate the class
+						FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+						if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+						prop->SetProperty(pp);
+
+						// read the property data
+						if (tag.isleaf() == false)
+						{
+							ReadParameterList(tag, pp);
+						}
+						else if (tag.isempty() == false)
+						{
+							// There should be a parameter with the same name as the type
+							if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+								throw XMLReader::InvalidValue(tag);
+						}
 					}
 				}
 				return true;
@@ -1253,30 +1247,4 @@ bool FEFileImport::errf(const char* szerr, ...)
 	Close();
 
 	return false;
-}
-
-//-----------------------------------------------------------------------------
-void FEFileImport::ClearFileParams()
-{
-	m_Param.clear();
-}
-
-//-----------------------------------------------------------------------------
-FEFileParam* FEFileImport::FindFileParameter(const char* sz)
-{
-	for (size_t i = 0; i<m_Param.size(); ++i)
-	{
-		FEFileParam& p = m_Param[i];
-		if (strcmp(p.m_szname, sz) == 0) return &p;
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEFileImport::AddFileParameter(const char* szname, const char* szval)
-{
-	FEFileParam p;
-	strcpy(p.m_szname, szname);
-	strcpy(p.m_szval, szval);
-	m_Param.push_back(p);
 }

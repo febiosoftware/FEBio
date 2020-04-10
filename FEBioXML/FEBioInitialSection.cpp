@@ -261,7 +261,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					pic->m_vel = v;
 
 					// add this initial condition to the current step
-					GetBuilder()->AddRigidBodyVelocity(pic);
+					GetBuilder()->AddRigidIC(pic);
 				}
 				else if (tag == "initial_angular_velocity")
 				{
@@ -275,7 +275,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					pic->m_w = w;
 
 					// add this initial condition to the current step
-					GetBuilder()->AddRigidBodyAngularVelocity(pic);
+					GetBuilder()->AddRigidIC(pic);
 				}
 
 				++tag;

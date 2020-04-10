@@ -27,14 +27,16 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 class FEAnalysis;
 class DumpStream;
 
 //-------------------------------------------------------------------
 // Class to control the time step
-class FECORE_API FETimeStepController : public FEParamContainer
+class FECORE_API FETimeStepController : public FECoreBase
 {
+	FECORE_SUPER_CLASS
+
 public:
 	FETimeStepController(FEAnalysis* step);
 

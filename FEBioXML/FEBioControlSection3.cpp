@@ -40,7 +40,7 @@ FEBioControlSection3::FEBioControlSection3(FEFileImport* pim) : FEFileSection(pi
 //-----------------------------------------------------------------------------
 void FEBioControlSection3::Parse(XMLTag& tag)
 {
-	FEModel& fem = *GetFEModel();
+	// get the step
 	FEAnalysis* pstep = GetBuilder()->GetStep();
 	if (pstep == 0)
 	{
@@ -55,32 +55,6 @@ void FEBioControlSection3::Parse(XMLTag& tag)
 		throw FEBioImport::FailedAllocatingSolver(m.c_str());
 	}
 
-	FEModelBuilder* feb = GetBuilder();
-
-	FEParameterList& modelParams = fem.GetParameterList();
-	FEParameterList& stepParams = pstep->GetParameterList();
-
-	++tag;
-	do 
-	{
-		if (ReadParameter(tag, modelParams) == false)
-		{
-			if (ReadParameter(tag, stepParams) == false)
-			{
-				if (tag == "time_stepper")
-				{
-					pstep->m_bautostep = true;
-					FETimeStepController& tc = pstep->m_timeController;
-					FEParameterList& pl = tc.GetParameterList();
-					ReadParameterList(tag, pl);
-				}
-				else if (tag == "solver")
-				{
-					ReadParameterList(tag, psolver);
-				}
-				else throw XMLReader::InvalidTag(tag);
-			}
-		}
-		++tag;
-	} while (!tag.isend());
+	// read the step parameters
+	ReadParameterList(tag, pstep);
 }

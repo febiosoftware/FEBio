@@ -29,10 +29,10 @@ SOFTWARE.*/
 #pragma once
 #include "FEBioImport.h"
 
-class FEBioRigidSection : public FEBioFileSection
+class FEBioRigidSection : public FEFileSection
 {
 public:
-	FEBioRigidSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioRigidSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

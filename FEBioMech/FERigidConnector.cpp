@@ -23,12 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidConnector.h"
-#include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
@@ -79,9 +75,8 @@ bool FERigidConnector::Init()
 	m_nRBb = pm->GetRigidBodyID();
 
 	// get the actual rigid bodies
-	FERigidSystem& rs = *fem.GetRigidSystem();
-	m_rbA = rs.Object(m_nRBa);
-	m_rbB = rs.Object(m_nRBb);
+	m_rbA = fem.GetRigidBody(m_nRBa);
+	m_rbB = fem.GetRigidBody(m_nRBb);
 
 	return true;
 }
@@ -111,8 +106,7 @@ void FERigidConnector::Serialize(DumpStream& ar)
 	{
 		// get the actual rigid bodies
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidSystem& rs = *fem.GetRigidSystem();
-		m_rbA = rs.Object(m_nRBa);
-		m_rbB = rs.Object(m_nRBb);
+		m_rbA = fem.GetRigidBody(m_nRBa);
+		m_rbB = fem.GetRigidBody(m_nRBb);
 	}
 }

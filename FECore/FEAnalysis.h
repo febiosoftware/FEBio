@@ -156,7 +156,7 @@ public:
 		double	m_tend;			//!< end time
 		bool	m_bautostep;	//!< use auto stepper?
 
-		FETimeStepController m_timeController;
+		FETimeStepController* m_timeController;
 	//}
 
 	// --- Quasi-Newton Solver Variables ---

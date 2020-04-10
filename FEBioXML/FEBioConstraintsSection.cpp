@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEBioConstraintsSection.h"
 #include "FEBioMech/FERigidMaterial.h"
@@ -33,7 +30,6 @@ SOFTWARE.*/
 #include "FEBioMech/FERigidForce.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FEBioMech/FERigidSystem.h>
 #include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEDiscreteContact.h>
 #include <FECore/FESurfaceConstraint.h>
@@ -421,7 +417,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 
 				if (lc >= 0)
 				{
-					FEParam* p = pFC->GetParameter("force");
+					FEParam* p = pFC->GetParameter("value");
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
 					GetFEModel()->AttachLoadController(p, lc);
 				}
@@ -489,7 +485,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 
 				if (lc >= 0)
 				{
-					FEParam* p = pFC->GetParameter("force");
+					FEParam* p = pFC->GetParameter("value");
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
 					GetFEModel()->AttachLoadController(p, lc);
 				}
@@ -626,7 +622,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 
 			if (lc >= 0)
 			{
-				FEParam* p = pFC->GetParameter("force");
+				FEParam* p = pFC->GetParameter("value");
 				if (p == nullptr) throw XMLReader::InvalidTag(tag);
 				GetFEModel()->AttachLoadController(p, lc);
 			}
@@ -667,7 +663,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			pic->m_vel = v;
 
 			// add this initial condition to the current step
-			GetBuilder()->AddRigidBodyVelocity(pic);
+			GetBuilder()->AddRigidIC(pic);
 		}
 		else if (tag == "initial_angular_velocity")
 		{
@@ -681,7 +677,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			pic->m_w = w;
 
 			// add this initial condition to the current step
-			GetBuilder()->AddRigidBodyAngularVelocity(pic);
+			GetBuilder()->AddRigidIC(pic);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

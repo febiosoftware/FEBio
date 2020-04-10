@@ -23,12 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidCable.h"
-#include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
@@ -83,12 +79,11 @@ bool FERigidCable::Init()
 
 	// get the rigid system
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// correct the rigid body indices
 	for (int i=0; i<m_points.size(); ++i)
 	{
-		m_points[i]->m_rb = rigid.FindRigidbodyFromMaterialID(m_points[i]->m_rb - 1);
+		m_points[i]->m_rb = fem.FindRigidbodyFromMaterialID(m_points[i]->m_rb - 1);
 		if (m_points[i]->m_rb == -1) return false;
 	}
 
@@ -120,11 +115,10 @@ void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// get the rigid system
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// get the last rigid body
 	int rb0 = m_points[npoints - 1]->m_rb;
-	FERigidBody& bodyZ = *rigid.Object(rb0);
+	FERigidBody& bodyZ = *fem.GetRigidBody(rb0);
 	vec3d p0 = m_points[npoints - 1]->m_pos;
 
 	// apply the force to the last attachment point
@@ -137,8 +131,8 @@ void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		int rbA = m_points[i  ]->m_rb;
 		int rbB = m_points[i+1]->m_rb;
 
-		FERigidBody& bodyA = *rigid.Object(rbA);
-		FERigidBody& bodyB = *rigid.Object(rbB);
+		FERigidBody& bodyA = *fem.GetRigidBody(rbA);
+		FERigidBody& bodyB = *fem.GetRigidBody(rbB);
 
 		vec3d r0A = m_points[i    ]->m_pos;
 		vec3d r0B = m_points[i + 1]->m_pos;
@@ -175,15 +169,14 @@ void FERigidCable::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	if (npoints < 2) return;
 
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 	for (int i=0; i<npoints-1; ++i)
 	{
 		int idA = m_points[i  ]->m_rb;
 		int idB = m_points[i+1]->m_rb;
 
 		// Get the rigid bodies
-		FERigidBody& bodyA = *rigid.Object(idA);
-		FERigidBody& bodyB = *rigid.Object(idB);
+		FERigidBody& bodyA = *fem.GetRigidBody(idA);
+		FERigidBody& bodyB = *fem.GetRigidBody(idB);
 
 		// get the force positions
 		vec3d ra0 = m_points[i]->m_pos;

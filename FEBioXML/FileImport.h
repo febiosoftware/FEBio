@@ -67,19 +67,6 @@ protected:
 	char	m_szerr[MAX_ERR_STRING];
 };
 
-//-------------------------------------------------------------------------
-class FEBIOXML_API FEFileParam
-{
-	enum { MAX_TAG = 128 };
-
-public:
-	FEFileParam() { m_szname[0] = 0; m_szval[0] = 0; }
-
-public:
-	char	m_szname[MAX_TAG];	// parameter name
-	char	m_szval[MAX_TAG];	// parameter value
-};
-
 //-----------------------------------------------------------------------------
 // Base class for XML sections parsers
 class FEBIOXML_API FEFileSection
@@ -109,7 +96,6 @@ public:
 	void ReadAttributes(XMLTag& tag, FECoreBase* pc);
 
 public:
-	const char* get_value_string(XMLTag& tag);
 	void value(XMLTag& tag, int&    n);
 	void value(XMLTag& tag, double& g);
 	void value(XMLTag& tag, bool&   b);
@@ -180,16 +166,6 @@ public:
 	void SetStopOnUnknownAttribute(bool b);
 	bool StopOnUnknownAttribute() const;
 
-public:
-	// Add a file parameter
-	void AddFileParameter(const char* szname, const char* szval);
-
-	// find a file parameter
-	FEFileParam* FindFileParameter(const char* sz);
-
-	// clear all file parameters
-	void ClearFileParams();
-
 protected:
 	//! open a file
 	bool Open(const char* szfile, const char* szmode);
@@ -212,7 +188,6 @@ protected:
 protected:
 	FEFileSectionMap	m_map;
 	FEModelBuilder*		m_builder;
-	vector<FEFileParam>	m_Param;	// parameter list
 	bool				m_stopOnUnknownAttribute;
 
 private:

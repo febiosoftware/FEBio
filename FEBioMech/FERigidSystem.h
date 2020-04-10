@@ -39,8 +39,7 @@ class FEModelComponent;
 class FERigidNodeSet;
 class FERigidBodyFixedBC;
 class FERigidBodyDisplacement;
-class FERigidBodyVelocity;
-class FERigidBodyAngularVelocity;
+class FERigidIC;
 class FERigidSurface;
 class FEGlobalMatrix;
 
@@ -90,9 +89,6 @@ public:
 	// build the matrix profile for the rigid system
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
-	// find a rigid body from a material ID
-	int FindRigidbodyFromMaterialID(int matId);
-
 public:
 	int RigidNodeSets() { return (int) m_RN.size(); }
 	FERigidNodeSet* RigidNodeSet(int i) { return m_RN[i]; }
@@ -106,13 +102,7 @@ public:
 	FERigidBodyDisplacement* PrescribedBC(int i) { return m_RDC[i]; }
 	void AddPrescribedBC(FERigidBodyDisplacement* pdc) { m_RDC.push_back(pdc); }
 
-	int InitialVelocities() { return (int) m_RBV.size(); }
-	FERigidBodyVelocity* InitialVelocity(int i) { return m_RBV[i]; }
-	void AddInitialVelocity(FERigidBodyVelocity* pbv) { m_RBV.push_back(pbv); }
-
-	int InitialAngularVelocities() { return (int) m_RBW.size(); }
-	FERigidBodyAngularVelocity* InitialAngularVelocity(int i) { return m_RBW[i]; }
-	void AddInitialAngularVelocity(FERigidBodyAngularVelocity* pbw) { m_RBW.push_back(pbw); }
+	void AddInitialCondition(FERigidIC* ric) { m_RIC.push_back(ric); }
 
 	std::vector<FERigidBody*>& RigidBodyList();
 
@@ -130,8 +120,7 @@ protected:
 	vector<FERigidNodeSet*>				m_RN;	//!< rigid node sets
 	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
-	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities
-	vector<FERigidBodyAngularVelocity*>	m_RBW;	//!< rigid body initial angular velocities
+	vector<FERigidIC*>					m_RIC;	//!< rigid body initial conditions
 
 private:
 	FEModel&					m_fem;	//!< the FE model this system is attached to

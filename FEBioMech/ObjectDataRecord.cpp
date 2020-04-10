@@ -23,14 +23,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "ObjectDataRecord.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
-#include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include <FECore/FEMaterial.h>
 #include "FEMechModel.h"
@@ -70,11 +66,10 @@ double ObjectDataRecord::Evaluate(int item, int ndata)
 	double val = 0;
 
 	// find the rigid body that has this material
-	FERigidSystem& rs = *fem->GetRigidSystem();
-	int NRB = rs.Objects();
+	int NRB = fem->RigidBodies();
 	for (int i=0; i<NRB; ++i)
 	{
-		FERigidBody& obj = *rs.Object(i);
+		FERigidBody& obj = *fem->GetRigidBody(i);
 		if (obj.GetMaterialID() == nrb) return m_Data[ndata]->value(obj);
 	}
 

@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioImport.h"
-#include "FEBioParametersSection.h"
 #include "FEBioIncludeSection.h"
 #include "FEBioModuleSection.h"
 #include "FEBioControlSection.h"
@@ -196,7 +195,6 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	// version 2.0
 	if (nversion == 0x0200)
 	{
-		m_map["Parameters" ] = new FEBioParametersSection  (this);
 		m_map["Control"    ] = new FEBioControlSection    (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection2   (this);
 		m_map["Initial"    ] = new FEBioInitialSection     (this);
@@ -214,8 +212,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	// version 2.5
 	if (nversion == 0x0205)
 	{
-		m_map["Parameters" ] = new FEBioParametersSection   (this);
-		m_map["Control"    ] = new FEBioControlSection    (this);
+		m_map["Control"    ] = new FEBioControlSection      (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
@@ -225,7 +222,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
-		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection     (this);
 		m_map["MeshData"   ] = new FEBioMeshDataSection     (this);
 		m_map["Step"       ] = new FEBioStepSection25       (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection(this);	// added in FEBio 3.0
@@ -237,7 +234,6 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		// we no longer allow unknown attributes
 		SetStopOnUnknownAttribute(true);
 
-		m_map["Parameters" ] = new FEBioParametersSection   (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
@@ -279,7 +275,6 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	if (ch==0) m_szpath[0] = 0; else *(ch+1)=0;
 
 	// clean up
-	ClearFileParams();
 	fem.GetMesh().ClearDataMaps();
 
 	// read the file

@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include <FEBioMech/FERigidJoint.h>
 #include <FEBioMech/FERigidSphericalJoint.h>
 #include <FEBioPlot/FEBioPlotFile.h>
-#include <FEBioMech/FERigidSystem.h>
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidBody.h>
 #include <FECore/FEBodyLoad.h>
@@ -224,7 +223,7 @@ void FEBioModel::echo_input()
 	feLog("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
 	if (step.m_bautostep)
 	{
-		FETimeStepController& tc = step.m_timeController;
+		FETimeStepController& tc = *step.m_timeController;
 		feLog("\t  Optimal nr of iterations ..................... : %d\n", tc.m_iteopt);
 		feLog("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
 		feLog("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
@@ -337,14 +336,13 @@ void FEBioModel::echo_input()
 	}
 	feLog("\n\n");
 
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-	if (rigid.Objects())
+	if (fem.RigidBodies())
 	{
 		feLog(" RIGID BODY DATA\n");
 		feLog("===========================================================================\n");
-		for (int i=0; i<rigid.Objects(); ++i)
+		for (int i=0; i<fem.RigidBodies(); ++i)
 		{
-			FERigidBody& rb = *rigid.Object(i);
+			FERigidBody& rb = *fem.GetRigidBody(i);
 			if (i>0) feLog("---------------------------------------------------------------------------\n");
 			feLog("Rigid Body %d:\n", rb.m_nID+1);
 			feLog("\tmaterial id    : %d\n", rb.m_mat+1);
@@ -410,8 +408,8 @@ void FEBioModel::echo_input()
 			if (dynamic_cast<FERigidJoint*>(plc))
 			{
 				FERigidJoint& rj = static_cast<FERigidJoint&>(*plc);
-				FERigidBody& ra = *rigid.Object(rj.m_nRBa);
-				FERigidBody& rb = *rigid.Object(rj.m_nRBb);
+				FERigidBody& ra = *fem.GetRigidBody(rj.m_nRBa);
+				FERigidBody& rb = *fem.GetRigidBody(rj.m_nRBb);
 				feLog("rigid joint %d:\n", i+1);
 				feLog("\tRigid body A                   : %d\n", ra.m_mat + 1);
 				feLog("\tRigid body B                   : %d\n", rb.m_mat + 1);

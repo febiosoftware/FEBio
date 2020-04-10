@@ -83,8 +83,7 @@ void FERigidSystem::Clear()
 	for (int i=0; i<(int)m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
 	for (int i=0; i<(int)m_RBC.size(); ++i) delete m_RBC[i]; m_RBC.clear();
 	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
-	for (int i=0; i<(int)m_RBV.size(); ++i) delete m_RBV[i]; m_RBV.clear();
-	for (int i=0; i<(int)m_RBW.size(); ++i) delete m_RBW[i]; m_RBW.clear();
+	for (int i=0; i<(int)m_RIC.size(); ++i) delete m_RIC[i]; m_RIC.clear();
 	for (int i=0; i<(int)m_RS.size (); ++i) delete m_RS [i]; m_RS.clear ();
 }
 
@@ -113,11 +112,8 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			// rigid body displacements
 			ar & m_RDC;
 
-			// rigid body velocities
-			ar & m_RBV;
-
-			// rigid body angular velocities
-			ar & m_RBW;
+			// rigid body initial conditions
+			ar & m_RIC;
 		}
 		else
 		{
@@ -142,11 +138,8 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			// rigid body displacements
 			ar & m_RDC;
 
-			// rigid body velocities
-			ar & m_RBV;
-
-			// rigid body angular velocities
-			ar & m_RBW;
+			// rigid body initial conditions
+			ar & m_RIC;
 		}
 	}
 }
@@ -175,18 +168,11 @@ void FERigidSystem::Activate()
 		if (rc.IsActive()) rc.Activate();
 	}
 
-	// initial rigid velocity
-	for (int i=0; i<(int) m_RBV.size(); ++i)
+	// initial rigid conditions
+	for (int i=0; i<(int) m_RIC.size(); ++i)
 	{
-		FERigidBodyVelocity& RV = *m_RBV[i];
-		if (RV.IsActive()) RV.Activate();
-	}
-
-	// initial rigid angular velocity
-	for (int i=0; i<(int) m_RBW.size(); ++i)
-	{
-		FERigidBodyAngularVelocity& RW = *m_RBW[i];
-		if (RW.IsActive()) RW.Activate();
+		FERigidIC& ric = *m_RIC[i];
+		if (ric.IsActive()) ric.Activate();
 	}
 }
 
@@ -210,15 +196,10 @@ bool FERigidSystem::Init()
 		FERigidBodyDisplacement& DC = *m_RDC[i];
 		if (DC.Init() == false) return false;
 	}
-	for (int i=0; i<(int) m_RBV.size(); ++i)
+	for (int i=0; i<(int) m_RIC.size(); ++i)
 	{
-		FERigidBodyVelocity& RV = *m_RBV[i];
-		if (RV.Init() == false) return false;
-	}
-	for (int i=0; i<(int) m_RBW.size(); ++i)
-	{
-		FERigidBodyAngularVelocity& RW = *m_RBW[i];
-		if (RW.Init() == false) return false;
+		FERigidIC& IC = *m_RIC[i];
+		if (IC.Init() == false) return false;
 	}
 	// assign correct rigid body ID's to rigid nodes
 	for (int i = 0; i<(int)m_RN.size(); ++i)
@@ -525,15 +506,4 @@ FERigidSurface* FERigidSystem::FindRigidSurface(const std::string& name)
 		if (name == rs->GetName()) return rs;
 	}
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-int FERigidSystem::FindRigidbodyFromMaterialID(int matId)
-{
-	for (int i=0; i<m_RB.size(); ++i)
-	{
-		FERigidBody& rb = *m_RB[i];
-		if (rb.GetMaterialID() == matId) return i;
-	}
-	return -1;
 }

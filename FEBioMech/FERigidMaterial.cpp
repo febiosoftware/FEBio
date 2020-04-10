@@ -23,13 +23,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidMaterial.h"
 #include "FECore/FEModel.h"
-#include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
 #include <FECore/log.h>
@@ -74,8 +70,7 @@ bool FERigidMaterial::Init()
 	{
 		// get this rigid body's ID
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidSystem& rigid = *fem.GetRigidSystem();
-		FERigidBody& rb = *rigid.Object(GetRigidBodyID());
+		FERigidBody& rb = *fem.GetRigidBody(GetRigidBodyID());
 
 		// only set the rigid body com if this is the main rigid body material
 		if (rb.GetMaterialID() == GetID()-1)
@@ -105,7 +100,7 @@ bool FERigidMaterial::Init()
 				return false;
 			}
 
-			FERigidBody& prb = *rigid.Object(ppm->GetRigidBodyID());
+			FERigidBody& prb = *fem.GetRigidBody(ppm->GetRigidBodyID());
 			rb.m_prb = &prb;
 
 			// mark all degrees of freedom as prescribed
