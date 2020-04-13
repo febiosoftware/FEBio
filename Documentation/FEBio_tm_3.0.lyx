@@ -29560,7 +29560,7 @@ The determination of the penalty factor
  
 \begin_inset Formula 
 \begin{equation}
-\varepsilon_{i}=\frac{f_{SI}E_{i}A_{i}^{2}}{V_{i}}\,.\label{eq595}
+\varepsilon_{i}=\frac{f_{SI}E_{i}A_{i}}{V_{i}}\,.\label{eq595}
 \end{equation}
 
 \end_inset
