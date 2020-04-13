@@ -41,7 +41,7 @@ public:
 	FETimeStepController(FEAnalysis* step);
 
 	// initialization
-	bool Init();
+	bool Init() override;
 
 	//! reset
 	void Reset();

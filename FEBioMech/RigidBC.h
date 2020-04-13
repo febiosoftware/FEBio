@@ -88,13 +88,13 @@ class FEBIOMECH_API FERigidBodyFixedBC : public FERigidBC
 public:
 	FERigidBodyFixedBC(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
-	void Activate();
+	void Activate() override;
 
-	void Deactivate();
+	void Deactivate() override;
 
 public:
 	int				m_rigidMat;	//!< rigid body material ID
