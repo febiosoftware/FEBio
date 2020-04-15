@@ -136,6 +136,7 @@ void FEBioGeometrySection3::ParsePart(XMLTag& tag, FEBModel::Part* part)
 		else if (tag == "Elements"   ) ParsePartElementSection(tag, part);
 		else if (tag == "NodeSet"    ) ParsePartNodeSetSection(tag, part);
 		else if (tag == "Surface"    ) ParsePartSurfaceSection(tag, part);
+		else if (tag == "ElementSet" ) ParsePartElementSetSection(tag, part);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
@@ -533,9 +534,33 @@ void FEBioGeometrySection3::ParsePartElementSection(XMLTag& tag, FEBModel::Part*
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection3::ParseNodeSetSection(XMLTag& tag)
 {
-	// read the node set
-	FENodeSet* pns = GetFEBioImport()->ParseNodeSet(tag, "node_set");
-	if (pns == 0) throw XMLReader::InvalidTag(tag);
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	const char* szname = tag.AttributeValue("name");
+
+	// create a new node set
+	FENodeSet* pns = fecore_alloc(FENodeSet, GetFEModel());
+	pns->SetName(szname);
+
+	// add the nodeset to the mesh
+	mesh.AddNodeSet(pns);
+
+	++tag;
+	do
+	{
+		if (tag == "node_set")
+		{
+			const char* szset = tag.szvalue();
+
+			// find the node set
+			FENodeSet* ps = mesh.FindNodeSet(szset);
+			if (ps == 0) throw XMLReader::InvalidValue(tag);
+
+			// add the node set
+			pns->Add(ps->GetNodeList());
+		}
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
@@ -902,6 +927,37 @@ void FEBioGeometrySection3::ParsePartSurfaceSection(XMLTag& tag, FEBModel::Part*
 
 		++tag;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection3::ParsePartElementSetSection(XMLTag& tag, FEBModel::Part* part)
+{
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the required name attribute
+	const char* szname = tag.AttributeValue("name");
+
+	// allocate storage for faces
+	FEBModel::ElementSet* ps = new FEBModel::ElementSet(szname);
+	part->AddElementSet(ps);
+
+	// read elements
+	vector<int> elemList;
+	++tag;
+	do
+	{
+		// get the ID
+		int id;
+		tag.AttributeValue("id", id);
+		elemList.push_back(id);
+
+		++tag;
+	} 
+	while (!tag.isend());
+
+	ps->SetElementList(elemList);
 }
 
 //-----------------------------------------------------------------------------

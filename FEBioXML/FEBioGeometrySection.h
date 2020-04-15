@@ -141,6 +141,7 @@ protected:
 	void ParsePartElementSection(XMLTag& tag, FEBModel::Part* part);
 	void ParsePartNodeSetSection(XMLTag& tag, FEBModel::Part* part);
 	void ParsePartSurfaceSection(XMLTag& tag, FEBModel::Part* part);
+	void ParsePartElementSetSection(XMLTag& tag, FEBModel::Part* part);
 
 protected:
 	FEBModel			m_feb;

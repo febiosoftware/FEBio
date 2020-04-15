@@ -98,16 +98,19 @@ void FENodeDataMap::fillValue(const mat3d& v)
 
 double FENodeDataMap::value(const FEMaterialPoint& mp)
 {
+	assert(mp.m_elem == nullptr);
 	return get<double>(mp.m_index);
 }
 
 vec3d FENodeDataMap::valueVec3d(const FEMaterialPoint& mp)
 {
+	assert(mp.m_elem == nullptr);
 	return get<vec3d>(mp.m_index);
 }
 
 mat3d FENodeDataMap::valueMat3d(const FEMaterialPoint& mp)
 {
+	assert(mp.m_elem == nullptr);
 	return get<mat3d>(mp.m_index);
 }
 
