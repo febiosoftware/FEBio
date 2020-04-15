@@ -35950,6 +35950,314 @@ D\delta G=-\alpha\left[\begin{array}{cc}
 
 \end_layout
 
+\begin_layout Chapter
+Optimization
+\end_layout
+
+\begin_layout Standard
+This chapter describes the theoretical framework of FEBio's optimization
+ module.
+ This module can be used to optimize model parameters (like material parameters,
+ or load values) in order to achieve an objective.
+ The objective is generally the minimization of the 
+\emph on
+objective function
+\emph default
+, to be introduced below.
+ 
+\end_layout
+
+\begin_layout Section
+The Objective Function
+\end_layout
+
+\begin_layout Standard
+The objective function, which is to be minimized, can be defined as follows,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\varphi\left(\mathbf{a}\right)=\sum\limits _{i=1}^{n}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, the 
+\begin_inset Formula $\left(x_{i},y_{i}\right)$
+\end_inset
+
+ are user-defined data pairs and 
+\begin_inset Formula $f\left(x;\mathbf{a}\right)$
+\end_inset
+
+ is the function that extracts the corresponding data from the model.
+ The optimization module tries to find the model parameters 
+\series bold
+a
+\series default
+ that minimize the function 
+\begin_inset Formula $\varphi$
+\end_inset
+
+.
+ It does this by repeatedly evaluating the function 
+\begin_inset Formula $y$
+\end_inset
+
+, which will usually call FEBio to solve a forward FE problem.
+ 
+\end_layout
+
+\begin_layout Section
+The Levenberg-Marquardt Method
+\end_layout
+
+\begin_layout Standard
+One of the methods that is currently implemented in FEBio's optimization
+ method is the constrained Levenberg-Marquardt method via the 
+\emph on
+levmar 
+\emph default
+library.
+ (see 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{http://users.ics.forth.gr/~lourakis/levmar/}
+\end_layout
+
+\end_inset
+
+ for more information on this library.)
+\end_layout
+
+\begin_layout Standard
+The Levenberg-Marquardt method is a numerical algorithm that minimizes a
+ function that is defined as a sum of squares of nonlinear functions, i.e.
+ the objective function as defined above.
+ It combines the steepest-descent method with a Gauss-Newton method to find
+ the parameters that minimize the objective function.
+ 
+\end_layout
+
+\begin_layout Standard
+The LM method requires a set of measured values 
+\begin_inset Formula $(x_{i},y_{i})$
+\end_inset
+
+ and an initial guess for the 
+\series bold
+a
+\series default
+ vector.
+ It then tries to find a better estimate for 
+\series bold
+a 
+\series default
+by replacing it with 
+\begin_inset Formula $\mathbf{a}+\delta$
+\end_inset
+
+.
+ The function 
+\begin_inset Formula $f(x_{i};\mathbf{a}+\delta)$
+\end_inset
+
+ is linearly approximated.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f\left(x_{i};\mathbf{a}+\delta\right)\approx f\left(x_{i};\mathbf{a}\right)+\mathbf{J}_{i}\delta
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathbf{J}_{i}$
+\end_inset
+
+is the Jacobian of 
+\emph on
+
+\begin_inset Formula $f$
+\end_inset
+
+
+\emph default
+ with respect to 
+\begin_inset Formula $\delta$
+\end_inset
+
+.
+ Substituting this in the objective function and minimizing with respect
+ to 
+\begin_inset Formula $\delta$
+\end_inset
+
+ leads to,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+(\mathbf{J^{\mathrm{T}}J\mathrm{)\delta=}J^{\mathrm{T}}\mathrm{(\mathbf{y}-\mathbf{f}(\boldsymbol{a}))}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\series bold
+y
+\series default
+ is the vector of 
+\begin_inset Formula $y_{i},$
+\end_inset
+
+and 
+\series bold
+f
+\series default
+ is the vector of 
+\begin_inset Formula $f(x_{i};\boldsymbol{a})$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The main idea of the LM method is to replace this linear equation with the
+ following.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+(\mathbf{J^{\mathrm{T}}J\mathrm{+\mu(\mathbf{J}^{\mathrm{T}}\mathbf{J})_{\mathit{ii}})\delta=}J^{\mathrm{T}}\mathrm{(\mathbf{y}-\mathbf{f}(\boldsymbol{a}))}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\mu$
+\end_inset
+
+is a damping parameter that is controlled by the algorithm.
+ When 
+\begin_inset Formula $\mu$
+\end_inset
+
+is small, the method approximates Gauss-Newton, when 
+\begin_inset Formula $\mu$
+\end_inset
+
+is large it is closer to a steepdest-descent method.
+ The algorithm will modify try to modify 
+\begin_inset Formula $\mu$
+\end_inset
+
+such that an improvement to the parameter vector 
+\series bold
+a
+\series default
+ can be found in each iteration.
+ The method will terminate when the value of the objective function falls
+ below a user-specified tolerance (the 
+\emph on
+obj_tol
+\emph default
+ parameter in FEBio).
+ 
+\end_layout
+
+\begin_layout Standard
+The evaluation of the Jacobian requires evaluating the derivatives of 
+\begin_inset Formula $f$
+\end_inset
+
+ with respect to 
+\series bold
+a
+\series default
+.
+ These derivatives are approximated via forward difference formulas.
+ For example, the 
+\begin_inset Formula $k$
+\end_inset
+
+-th component of the gradient is approximated as follows.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial f}{\partial a_{k}}\approx\frac{1}{\delta a_{k}}\left[f\left(a_{1},\cdots,a_{k}+\delta a_{k},\cdots,a_{m}\right)-f\left(a_{1},\cdots,a_{k},\cdots,a_{m}\right)\right]
+\]
+
+\end_inset
+
+The value for 
+\begin_inset Formula $\delta a_{k}$
+\end_inset
+
+is determined from the following formula.
+ 
+\begin_inset Formula 
+\[
+\delta a_{k}=\varepsilon\left(1+a_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where, 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the forward difference scale factor (the 
+\shape italic
+fdiff_scale 
+\shape default
+option in FEBio).
+ In FEBio, the initial value for the damping parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+can be set with the 
+\emph on
+tau 
+\emph default
+parameter.
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex

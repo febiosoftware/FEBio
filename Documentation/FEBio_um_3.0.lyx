@@ -76174,7 +76174,7 @@ In any case, the opimization module tries to minimize an objective function
 \begin_layout Standard
 \begin_inset Formula 
 \[
-f\left(\mathbf{a}\right)=\sum\limits _{i=1}^{n}\left[y_{i}-y\left(x_{i};\mathbf{a}\right)\right]^{2}.
+\varphi\left(\mathbf{a}\right)=\sum\limits _{i=1}^{n}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
 \]
 
 \end_inset
@@ -76188,7 +76188,7 @@ Here, the
 \end_inset
 
  are user-defined data pairs and 
-\begin_inset Formula $y\left(x;\mathbf{a}\right)$
+\begin_inset Formula $f\left(x;\mathbf{a}\right)$
 \end_inset
 
 is the function that extracts the corresponding data from the model.
@@ -76197,12 +76197,12 @@ is the function that extracts the corresponding data from the model.
 a
 \series default
  that minimize the function 
-\begin_inset Formula $f$
+\begin_inset Formula $\varphi$
 \end_inset
 
 .
  It does this by repeatedly evaluating the function 
-\begin_inset Formula $y$
+\begin_inset Formula $f$
 \end_inset
 
 , which will usually call FEBio to solve a forward FE problem.
@@ -76628,13 +76628,13 @@ The objective function that is to be minimized is a function of the form:
 \begin_layout Standard
 \begin_inset Formula 
 \[
-f\left(\mathbf{a}\right)=\sum\limits _{i=1}^{n}\left[y_{i}-y\left(x_{i};\mathbf{a}\right)\right]^{2}.
+\varphi\left(\mathbf{a}\right)=\sum\limits _{i=1}^{n}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
 \]
 
 \end_inset
 
 Here, 
-\begin_inset Formula $y\left(x;\mathbf{a}\right)$
+\begin_inset Formula $f\left(x;\mathbf{a}\right)$
 \end_inset
 
  is the function that describes the model, 
@@ -76656,10 +76656,10 @@ is a vector with the (unknown) model parameters and the
 \begin_layout Enumerate
 The optimization method currently implemented requires the calculation of
  the gradient of the model function 
-\begin_inset Formula $y$
+\begin_inset Formula $f$
 \end_inset
 
-with respect to the model parameters 
+ with respect to the model parameters 
 \series bold
 
 \begin_inset Formula $\mathbf{a}$
@@ -76668,7 +76668,7 @@ with respect to the model parameters
 
 \series default
 .
- Since this gradient is not known, FEBio will approximate it using forward
+ Since this gradient is not known, it will be approximated using forward
  differences.
  For example, the 
 \begin_inset Formula $k$
@@ -76682,7 +76682,7 @@ with respect to the model parameters
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\frac{\partial y}{\partial a_{k}}\approx\frac{1}{\delta a_{k}}\left[y\left(a_{1},\cdots,a_{k}+\delta a_{k},\cdots,a_{m}\right)-y\left(a_{1},\cdots,a_{k},\cdots,a_{m}\right)\right]
+\frac{\partial f}{\partial a_{k}}\approx\frac{1}{\delta a_{k}}\left[f\left(a_{1},\cdots,a_{k}+\delta a_{k},\cdots,a_{m}\right)-f\left(a_{1},\cdots,a_{k},\cdots,a_{m}\right)\right]
 \]
 
 \end_inset
@@ -76879,6 +76879,7 @@ The step size scale factor
 tau
 \shape default
  can be set as an input only for the Constrained Levenberg-Marquardt method.
+ It scales the initial guess for the damping parameter.
  
 \end_layout
 
@@ -76985,6 +76986,99 @@ Print a lot of information, incl.
 
 \end_deeper
 \begin_layout Subsection
+Parameters Section
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Parameters-Section"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section defines the material parameters that are to be determined.
+ Each parameter is defined using the 
+\shape italic
+param 
+\shape default
+element:
+\end_layout
+
+\begin_layout LyX-Code
+<Parameters>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="[name]">[guess], [min], [max], [scale]</param>
+\end_layout
+
+\begin_layout LyX-Code
+</Parameters>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+name 
+\shape default
+attribute gives the name of the parameter that is to be determined.
+ The following section describes the format to reference a model parameter.
+ Each parameter takes four values: [guess] is the initial guess for this
+ parameter, [min] and [max] are the minimum and maximum values respectively
+ for this parameter, and [scale] is a representative scale (magnitude) for
+ this parameter (although the precise interpretation of this parameter depends
+ on the particular solver).
+ This value is used to normalize the optimization parameter and improve
+ convergence.
+ If not specified by the user, it defaults to the initial guess.
+\end_layout
+
+\begin_layout Standard
+For example, to optimize the material parameters of a neo-Hookean solid,
+ named 
+\shape italic
+mat1, 
+\emph on
+use the following syntax.
+\end_layout
+
+\begin_layout LyX-Code
+<Parameters>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="fem.material('mat1').E">1.0, 0.0, 5.0, 1.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="fem.material('mat1').v">0.1, 0.0, 0.5, 1.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+</Parameters>
+\end_layout
+
+\begin_layout Standard
+This example defines two material parameters.
+ The first component of the name (here 
+\shape italic
+mat1
+\shape default
+) is the name of the material as defined in the model input file.
+ The second component (here 
+\emph on
+E
+\emph default
+ and 
+\emph on
+v
+\emph default
+) are the names of the material parameters.
+ See Appendix A for more information how to reference model parameters.
+\end_layout
+
+\begin_layout Subsection
 Objective Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -76999,7 +77093,7 @@ name "subsec:Function-Section"
 This section defines the functional model that is used to evaluate the objective
  function (i.e.
  the function 
-\begin_inset Formula $y$
+\begin_inset Formula $f$
 \end_inset
 
  above).
@@ -77166,99 +77260,6 @@ This defines the data function as a function of time.
 \end_layout
 
 \begin_layout Subsection
-Parameters Section
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Parameters-Section"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section defines the material parameters that are to be determined.
- Each parameter is defined using the 
-\shape italic
-param 
-\shape default
-element:
-\end_layout
-
-\begin_layout LyX-Code
-<Parameters>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="[name]">[guess], [min], [max], [scale]</param>
-\end_layout
-
-\begin_layout LyX-Code
-</Parameters>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-name 
-\shape default
-attribute gives the name of the parameter that is to be determined.
- The following section describes the format to reference a model parameter.
- Each parameter takes four values: [guess] is the initial guess for this
- parameter, [min] and [max] are the minimum and maximum values respectively
- for this parameter, and [scale] is a representative scale (magnitude) for
- this parameter (although the precise interpretation of this parameter depends
- on the particular solver).
- This value is used to normalize the optimization parameter and improve
- convergence.
- If not specified by the user, it defaults to the initial guess.
-\end_layout
-
-\begin_layout Standard
-For example, to optimize the material parameters of a neo-Hookean solid,
- named 
-\shape italic
-mat1, 
-\emph on
-use the following syntax.
-\end_layout
-
-\begin_layout LyX-Code
-<Parameters>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="fem.material('mat1').E">1.0, 0.0, 5.0, 1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="fem.material('mat1').v">0.1, 0.0, 0.5, 1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-</Parameters>
-\end_layout
-
-\begin_layout Standard
-This example defines two material parameters.
- The first component of the name (here 
-\shape italic
-mat1
-\shape default
-) is the name of the material as defined in the model input file.
- The second component (here 
-\emph on
-E
-\emph default
- and 
-\emph on
-v
-\emph default
-) are the names of the material parameters.
- See Appendix A for more information how to reference model parameters.
-\end_layout
-
-\begin_layout Subsection
 Constraints Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -77311,52 +77312,6 @@ The coefficients
 
 \begin_layout LyX-Code
 </Constraints>
-\end_layout
-
-\begin_layout Subsection
-Load Data Section
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Load-Data-Section"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section serves the same purpose as in the regular FEBio input file:
- it defines all the load curves that are used in the parameter optimization.
- Currently, only one load curve needs to be defined, namely the experimental
- data to which the model will be fitted.
- The format is identical to that of the usual FEBio input file (see Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:LoadData-Section"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-Each load curve is defined through an array of value pairs 
-\begin_inset Formula $\left(x_{i},y_{i}\right)$
-\end_inset
-
-, where the 
-\begin_inset Formula $x$
-\end_inset
-
-component refers to the (simulation) time and the 
-\begin_inset Formula $y$
-\end_inset
-
-component to is the function value.
 \end_layout
 
 \begin_layout Section
@@ -77504,7 +77459,7 @@ Notice that the xml root element is
 febio_optimize
 \shape default
  for the optimization input file.
- The version number has to 2.0 (the 1.0 version is no longer supported).
+ The version number has to be 2.0 (the 1.0 version is no longer supported).
 \end_layout
 
 \begin_layout Enumerate
@@ -77512,6 +77467,13 @@ The FEBio input file that contains the actual FE model data has to defined
  on the command line using the -i command option.
  This file is a standard FEBio input file that defines all geometry, materials,
  boundary conditions and more.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The initial values of the parameters are defined in the optimization input
+ file.
+ The values in the model input file are ignored.
  
 \end_layout
 
