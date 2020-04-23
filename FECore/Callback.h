@@ -49,6 +49,7 @@ class FEModel;
 #define CB_REMESH			0x00000200		//!< Called after remesh
 #define CB_PRE_MATRIX_SOLVE	0x00000400		//!< Called right before matrix solve
 #define CB_RESET            0x00000800		//!< Called after FEModel::Reset
+#define CB_MODEL_UPDATE		0x00001000		//!< Called at the end of FEModel::Update
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef bool(*FECORE_CB_FNC)(FEModel*, unsigned int, void*);

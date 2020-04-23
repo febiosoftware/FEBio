@@ -207,6 +207,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Contact status 
+class FEPlotContactStatus : public FEPlotSurfaceData
+{
+public:
+	FEPlotContactStatus(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Mortar gap
 class FEPlotMortarContactGap : public FEPlotSurfaceData
 {

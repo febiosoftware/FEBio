@@ -1181,11 +1181,60 @@ FETet20G15::FETet20G15() : FETet20_(NINT, FE_TET20G15)
 	gr[14] = 0.433449846426336; gs[14] = 0.433449846426336; gt[14] = 0.066550153573664; gw[14] = 0.010949141561386;
 
 	init();
+
+	// setup the shape function matrix
+	N.resize(15, 4);
+	for (int i = 0; i<15; ++i)
+	{
+		N[i][0] = 1.0 - gr[i] - gs[i] - gt[i];
+		N[i][1] = gr[i];
+		N[i][2] = gs[i];
+		N[i][3] = gt[i];
+	}
+
+	matrix A(4, 4);
+	A = N.transpose()*N;
+
+	// calculate inverse matrix
+	Ai.resize(4, 4);
+	Ai = A.inverse();
 }
 
 void FETet20G15::project_to_nodes(double* ai, double* ao) const
 {
-	// do this
+	vector<double> b(4);
+	for (int i = 0; i<4; ++i)
+	{
+		b[i] = 0;
+		for (int j = 0; j<NINT; ++j) b[i] += N[j][i] * ai[j];
+	}
+
+	for (int i = 0; i<4; ++i)
+	{
+		ao[i] = 0.0;
+		for (int j = 0; j<4; ++j) ao[i] += Ai[i][j] * b[j];
+	}
+
+	const double w1 = 1.0 / 3.0;
+	const double w2 = 2.0 / 3.0;
+
+	ao[ 4] = ao[0] * w2 + ao[1] * w1;
+	ao[ 5] = ao[0] * w1 + ao[1] * w2;
+	ao[ 6] = ao[1] * w2 + ao[2] * w1;
+	ao[ 7] = ao[1] * w1 + ao[2] * w2;
+	ao[ 8] = ao[0] * w2 + ao[2] * w1;
+	ao[ 9] = ao[0] * w1 + ao[2] * w2;
+	ao[10] = ao[0] * w2 + ao[3] * w1;
+	ao[11] = ao[0] * w1 + ao[3] * w2;
+	ao[12] = ao[1] * w2 + ao[3] * w1;
+	ao[13] = ao[1] * w1 + ao[3] * w2;
+	ao[14] = ao[2] * w2 + ao[3] * w1;
+	ao[15] = ao[2] * w1 + ao[3] * w2;
+
+	ao[16] = (ao[0] + ao[1] + ao[3]) / 3.0;
+	ao[17] = (ao[1] + ao[2] + ao[3]) / 3.0;
+	ao[18] = (ao[2] + ao[0] + ao[3]) / 3.0;
+	ao[19] = (ao[0] + ao[1] + ao[2]) / 3.0;
 }
 
 //=============================================================================

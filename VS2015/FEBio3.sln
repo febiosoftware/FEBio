@@ -66,6 +66,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FEBio Modules", "FEBio Modules", "{03B514BE-189C-4CD2-87B9-83974D3B37BB}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug DLL|Any CPU = Debug DLL|Any CPU
 		Debug DLL|x64 = Debug DLL|x64

@@ -487,7 +487,7 @@ void FEBioModel::Write(unsigned int nwhen)
 		if (nplt != FE_PLOT_NEVER)
 		{
 			// try to open the plot file
-			if (nwhen == CB_STEP_ACTIVE)
+			if ((nwhen == CB_INIT) || (nwhen == CB_STEP_ACTIVE))
 			{
 				if (m_plot->IsValid() == false)
 				{
@@ -531,9 +531,13 @@ void FEBioModel::Write(unsigned int nwhen)
 					m_writeMesh = true;
 				}
 
-				// when debugging we always output
-				// (this could mean we may end up writing the same state multiple times)
-				if (bdebug) bout = true;
+				if (bdebug)
+				{
+					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_SOLVED))
+					{
+						bout = true;
+					}
+				}
 				else
 				{
 					int currentStep = pstep->m_ntimesteps;

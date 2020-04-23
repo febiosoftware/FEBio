@@ -611,6 +611,7 @@ REGISTER_FECORE_CLASS(FEPlotStickStatus			         , "contact stick"            
 REGISTER_FECORE_CLASS(FEPlotContactForce 		         , "contact force"                   );
 REGISTER_FECORE_CLASS(FEPlotContactArea 		         , "contact area"                    );
 REGISTER_FECORE_CLASS(FEPlotContactPenalty 		         , "contact penalty"                 );
+REGISTER_FECORE_CLASS(FEPlotContactStatus				 , "contact status"                  );
 REGISTER_FECORE_CLASS(FEPlotSPRStresses                  , "SPR stress"                      );
 REGISTER_FECORE_CLASS(FEPlotSPRLinearStresses            , "SPR-P1 stress"                   );
 REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses             , "SPR principal stress"            );

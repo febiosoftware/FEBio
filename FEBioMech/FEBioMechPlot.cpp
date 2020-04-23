@@ -331,6 +331,32 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotContactStatus::Save(FESurface& surf, FEDataStream& a)
+{
+	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+	if (ps == nullptr) return false;
+
+	int NF = ps->Elements();
+	for (int i = 0; i < NF; ++i)
+	{
+		FESurfaceElement& el = ps->Element(i);
+		double nc = 0.0;
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
+
+			if (pt.m_pme) nc++;
+		}
+
+		a << nc;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotMortarContactGap::Save(FESurface& S, FEDataStream& a)
 {
 	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
@@ -423,12 +449,9 @@ class FEStress
 public:
 	mat3ds operator()(const FEMaterialPoint& mp)
 	{
-		f();
 		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 		return (pt ? pt->m_s : mat3ds(0));
 	}
-
-	virtual void f() {}
 };
 
 //-----------------------------------------------------------------------------

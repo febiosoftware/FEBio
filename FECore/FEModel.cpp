@@ -566,6 +566,9 @@ void FEModel::Update()
 		FENLConstraint* pc = NonlinearConstraint(i);
 		if (pc && pc->IsActive()) pc->Update();
 	}
+
+	// do the callback
+	DoCallback(CB_MODEL_UPDATE);
 }
 
 //-----------------------------------------------------------------------------
