@@ -255,6 +255,9 @@
     <ClInclude Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidRCRBC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">
@@ -486,6 +489,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidRCRBC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
