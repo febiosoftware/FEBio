@@ -35,7 +35,7 @@ BEGIN_FECORE_CLASS(FEFluidRCRBC, FESurfaceLoad)
 ADD_PARAMETER(m_R , "R");
 ADD_PARAMETER(m_Rd , "Rd");
 ADD_PARAMETER(m_p0, "initial_pressure");
-ADD_PARAMETER(m_pd, "downstream_pressure");
+ADD_PARAMETER(m_pd, "pressure_offset");
 ADD_PARAMETER(m_C, "capacitance");
 ADD_PARAMETER(m_Bern, "Bernoulli");
 END_FECORE_CLASS();
