@@ -18050,14 +18050,14 @@ The
 \shape italic
 search_radius
 \shape default
- parameter defines the search radius for the algorithm that projects points
- onto facets.
- When the distance between the point and the facet exceeds the search_radius,
- that projection is ignored.
+ is a scale factor which multiplies the diagonal length of the model's bounding
+ box to produce a dimensional search radius used by the algorithm that projects
+ points onto facets.
+ When the distance between the point and the facet exceeds the dimensional
+ search radius, that projection is ignored.
  This can alleviate convergence problems when surfaces have multiple folds
  and the projection produces multiple solutions, only one of which (the
  closest distance) is valid.
- 
 \end_layout
 
 \begin_layout Enumerate
