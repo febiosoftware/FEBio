@@ -22743,6 +22743,142 @@ The two material properties that need to be provided are
 .
 \end_layout
 
+\begin_layout Subsection
+Cell Growth
+\end_layout
+
+\begin_layout Standard
+The cell growth material implements a swelling pressure 
+\begin_inset Formula $\pi$
+\end_inset
+
+ such that the Cauchy stress is given by
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=-\pi\mathbf{I}\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\pi=RT\left(\frac{c_{r}}{J-\varphi_{r}^{s}}-c_{e}\right)\,.
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $c_{r}$
+\end_inset
+
+ represents the referential molar concentration of intracellular solutes
+ (moles of solutes per mixture volume in the reference configuration), 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential intracellular solid volume fraction, and 
+\begin_inset Formula $J=\det\mathbf{F}$
+\end_inset
+
+ is the determinant of the deformation gradient, representing the volume
+ ratio in the current configuration.
+ The extracellular osmolarity is 
+\begin_inset Formula $c_{e}$
+\end_inset
+
+.
+ This model assumes that neither intracellular solutes nor extracellular
+ solutes may transport across the cell membrane passively.
+ When a cell divides, it must use active transport mechanisms to bring in
+ membrane-impermeant extracellular solutes inside, some of which are converted
+ into intracellular solid matrix (e.g., cytoskeletal structures).
+ As the intracellular osmolarity increases, water is transported into the
+ cell, thus causing it to swell.
+ The process of cell division is not modeled explicitly in this continuum
+ representation, though the net effect is that cell proliferation leads
+ to an increase in intracellular osmotic pressure, which generally translates
+ into an increase in volume (unless the cell growth is constrained significantly
+).
+ In a cell growth model, the initial condition (when 
+\begin_inset Formula $J=1$
+\end_inset
+
+) should be selected for 
+\begin_inset Formula $c_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ such that 
+\begin_inset Formula $\pi=0$
+\end_inset
+
+, thus
+\begin_inset Formula 
+\[
+\frac{c_{r}}{1-\varphi_{r}^{s}}=c_{e}\quad\text{initial condition}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The spatial elasticity tensor associated with this osmotic pressure is
+\begin_inset Formula 
+\[
+\boldsymbol{\Pi}=-\left(\pi+J\frac{\partial\pi}{\partial J}\right)\mathbf{I}\otimes\mathbf{I}+2\pi\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+J\frac{\partial\pi}{\partial J}=-RT\frac{J}{\left(J-\varphi_{r}^{s}\right)^{2}}c_{r}\,.
+\]
+
+\end_inset
+
+This elasticity tensor has the same form as that of an isotropic elastic
+ material whose effective Young's modulus 
+\begin_inset Formula $E_{Y}$
+\end_inset
+
+ and Poisson's ratio 
+\begin_inset Formula $\nu$
+\end_inset
+
+ are given by
+\begin_inset Formula 
+\[
+\begin{aligned}E_{Y} & =\pi\frac{\left(\pi+3J\frac{\partial\pi}{\partial J}\right)}{J\frac{\partial\pi}{\partial J}}\\
+\nu & =\frac{\pi+J\frac{\partial\pi}{\partial J}}{2J\frac{\partial\pi}{\partial J}}
+\end{aligned}
+\,.
+\]
+
+\end_inset
+
+In the reference configuration, when 
+\begin_inset Formula $\pi=0$
+\end_inset
+
+, it follows that 
+\begin_inset Formula $E_{Y}=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu=\frac{1}{2}$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 Nearly-Incompressible Materials
 \begin_inset CommandInset label
