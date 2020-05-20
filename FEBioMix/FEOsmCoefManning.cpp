@@ -72,7 +72,7 @@ bool FEOsmCoefManning::Init()
 		return false;
 	}
     
-    return true;
+    return FEOsmoticCoefficient::Init();
 }
 
 //-----------------------------------------------------------------------------
