@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include "BoomerAMGSolver.h"
 #include "BlockSolver.h"
 #include "BiCGStabSolver.h"
+#include "StrategySolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -51,12 +52,10 @@ SOFTWARE.*/
 // Call this to initialize the NumCore module
 void NumCore::InitModule()
 {
-	// register direct linear solvers
+	// register linear solvers
 	REGISTER_FECORE_CLASS(PardisoSolver  , "pardiso");
 	REGISTER_FECORE_CLASS(SkylineSolver  , "skyline");
 	REGISTER_FECORE_CLASS(LUSolver       , "LU"     );
-
-	// register iterative linear solvers
 	REGISTER_FECORE_CLASS(FGMRESSolver        , "fgmres"   );
 	REGISTER_FECORE_CLASS(BoomerAMGSolver     , "boomeramg");
 	REGISTER_FECORE_CLASS(RCICGSolver         , "cg"    );
@@ -66,6 +65,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(BlockIterativeSolver, "block");
 	REGISTER_FECORE_CLASS(BIPNSolver          , "bipn");
 	REGISTER_FECORE_CLASS(BiCGStabSolver      , "bicgstab");
+	REGISTER_FECORE_CLASS(StrategySolver      , "strategy");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");

@@ -401,6 +401,7 @@
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
     <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
+    <ClInclude Include="..\..\NumCore\StrategySolver.h" />
     <ClInclude Include="..\..\NumCore\targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -426,6 +427,7 @@
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
     <ClCompile Include="..\..\NumCore\MatrixTools.cpp" />
+    <ClCompile Include="..\..\NumCore\StrategySolver.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
