@@ -87,6 +87,7 @@ public:
 
 	//! initialize surface data structure
 	bool Init() override;
+	void InitSurface();
     
 	//! creates surface
 	void Create(int nsize, int elemType = -1) override;

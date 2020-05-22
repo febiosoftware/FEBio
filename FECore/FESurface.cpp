@@ -208,15 +208,8 @@ void FESurface::Update(const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-//! Initialize surface node data structure
-//! Note that it is assumed that the element array is already created
-//! and initialized.
-
-bool FESurface::Init()
+void FESurface::InitSurface()
 {
-	// make sure that there is a surface defined
-	if (Elements() == 0) return false;
-
 	// get the mesh to which this surface belongs
 	FEMesh& mesh = *GetMesh();
 
@@ -226,16 +219,16 @@ bool FESurface::Init()
 	// let's find all nodes the surface needs
 	int nn = 0;
 	int ne = Elements();
-	for (int i=0; i<ne; ++i)
+	for (int i = 0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
 		el.m_lid = i;
 
-		for (int j=0; j<el.Nodes(); ++j)
+		for (int j = 0; j<el.Nodes(); ++j)
 		{
 			// get the global node number
 			int m = el.m_node[j];
-		
+
 			// create a local node number
 			if (tag[m] == -1) tag[m] = nn++;
 
@@ -248,15 +241,30 @@ bool FESurface::Init()
 	m_Node.resize(nn);
 
 	// fill the node index table
-	for (int i=0; i<mesh.Nodes(); ++i)
+	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		if (tag[i] >= 0)
 		{
 			m_Node[tag[i]] = i;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize surface node data structure
+//! Note that it is assumed that the element array is already created
+//! and initialized.
+
+bool FESurface::Init()
+{
+	// make sure that there is a surface defined
+	if (Elements() == 0) return false;
+
+	// initialize the surface data
+	InitSurface();
 
 	// see if we can find all elements that the faces belong to
+	int ne = Elements();
 	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
