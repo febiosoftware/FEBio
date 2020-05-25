@@ -15200,6 +15200,32 @@ name "subsec:Body-Loads"
 A body load can be used to define a source term to the model.
  The following sections define the different type of body loads that can
  be applied.
+ In the case of body forces, these body loads represent the body force per
+ mass, 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+, which appears in the momentum balance as
+\begin_inset Formula 
+\[
+\rho\mathbf{a}=\divg\boldsymbol{\sigma}+\rho\mathbf{b}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is the mass density, 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ is the acceleration (set to zero in quasi-static analyses), and 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is the Cauchy stress tensor.
 \end_layout
 
 \begin_layout Subsubsection
@@ -15214,7 +15240,11 @@ name "subsec:Constant-Body-Force"
 \end_layout
 
 \begin_layout Standard
-The body force is defined as a 3D vector.
+This constant body force per mass 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ is defined as a 3D vector.
  Each component can be associated with a load curve to define a time dependent
  body force.
  Only the non-zero components need to be defined.
@@ -15264,7 +15294,11 @@ name "subsec:Non-Constant-Body-Force"
 \end_layout
 
 \begin_layout Standard
-This type of body force may be spatially inhomogeneous.
+This body force per mass 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ may be spatially inhomogeneous.
  The spatial inhomogeneity may be specified using a formula with variables
  x, y, z.
  For example:
@@ -15275,15 +15309,7 @@ This type of body force may be spatially inhomogeneous.
 \end_layout
 
 \begin_layout LyX-Code
-  <x>x
-\begin_inset Formula $+$
-\end_inset
-
-y
-\begin_inset Formula $+$
-\end_inset
-
-z</x>
+  <x>x+y+z</x>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15291,11 +15317,7 @@ z</x>
 \end_layout
 
 \begin_layout LyX-Code
-  <z>x*x
-\begin_inset Formula $+$
-\end_inset
-
-z</z>
+  <z>x*x+z</z>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15303,7 +15325,7 @@ z</z>
 \end_layout
 
 \begin_layout Subsubsection
-Centrifugal Force
+Centrifugal Body Force
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Centrifugal-Force"
@@ -15314,8 +15336,12 @@ name "subsec:Centrifugal-Force"
 \end_layout
 
 \begin_layout Standard
-A centrifugal body force may be used for bodies undergoing steady-state
- rotation with angular speed 
+A centrifugal body force per mass 
+\begin_inset Formula $\mathbf{b}=\omega^{2}r\mathbf{e}_{r}$
+\end_inset
+
+ may be used for bodies undergoing steady-state rotation with angular speed
+ 
 \begin_inset Formula $\omega$
 \end_inset
 
@@ -15324,6 +15350,25 @@ A centrifugal body force may be used for bodies undergoing steady-state
 \end_inset
 
  and passing through the rotation center 
+\begin_inset Formula $\mathbf{c}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $r$
+\end_inset
+
+ represents the distance of each material point from the axis of rotation,
+ and 
+\begin_inset Formula $\mathbf{e}_{r}$
+\end_inset
+
+ is the radial unit vector from the axis of rotation, both of which are
+ calculated internally from the knowledge of 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ and 
 \begin_inset Formula $\mathbf{c}$
 \end_inset
 
