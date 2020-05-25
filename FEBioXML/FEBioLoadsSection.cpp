@@ -543,6 +543,7 @@ void FEBioLoadsSection25::Parse(XMLTag& tag)
 void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
 	const char* sztype = tag.AttributeValue("type");
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
@@ -555,12 +556,24 @@ void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 	const char* szpart = tag.AttributeValue("elem_set", true);
 	if (szpart)
 	{
-		FEMesh& mesh = fem.GetMesh();
 		FEElementSet* elset = mesh.FindElementSet(szpart);
 		if (elset == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
 
 		pbl->SetDomainList(elset);
 	}
+    
+    // see if a specific surface domain was referenced
+    const char* szset = tag.AttributeValue("surface");
+    if (szset) {
+        FEFacetSet* pface = mesh.FindFacetSet(szset);
+        if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
+
+        FESurface* psurf = fecore_alloc(FESurface, &fem);
+        GetBuilder()->BuildSurface(*psurf, *pface);
+
+        mesh.AddSurface(psurf);
+        pbl->SetSurface(psurf);
+    }
 
 	ReadParameterList(tag, pbl);
 	fem.AddBodyLoad(pbl);

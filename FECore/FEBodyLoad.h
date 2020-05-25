@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEModelLoad.h"
 #include "FEDomain.h"
 #include "FEDomainList.h"
+#include "FESurface.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of FEModel class
@@ -64,6 +65,9 @@ public:
 
 	//! get the domain list
 	FEDomainList& GetDomainList();
+    
+    //! add a surface if needed
+    virtual void SetSurface(FESurface* ps) {}
 
 public: // This should be overridden by derived classes
 

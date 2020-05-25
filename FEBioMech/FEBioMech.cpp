@@ -149,6 +149,7 @@ SOFTWARE.*/
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
+#include "FESurfaceAttractionBodyForce.h"
 
 #include "FEFacet2FacetSliding.h"
 #include "FEPeriodicBoundary.h"
@@ -507,6 +508,7 @@ REGISTER_FECORE_CLASS(FENonConstBodyForceOld, "non-const", 0x0205);	// obsolete 
 REGISTER_FECORE_CLASS(FEGenericBodyForce    , "body force" );
 REGISTER_FECORE_CLASS(FECentrifugalBodyForce, "centrifugal");
 REGISTER_FECORE_CLASS(FEPointBodyForce      , "point"      );
+REGISTER_FECORE_CLASS(FESurfaceAttractionBodyForce, "surface attraction");
 
 //-----------------------------------------------------------------------------
 // constraint classes
