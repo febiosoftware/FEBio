@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D50D45D0247C6B1C0085C759 /* StrategySolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50D45CE247C6B1C0085C759 /* StrategySolver.cpp */; };
+		D50D45D1247C6B1C0085C759 /* StrategySolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D50D45CF247C6B1C0085C759 /* StrategySolver.h */; };
 		D50EC3862217AD75006F6A57 /* CompactUnSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */; };
 		D50EC3872217AD75006F6A57 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3812217AD74006F6A57 /* BlockMatrix.cpp */; };
 		D50EC3882217AD75006F6A57 /* CompactSymmMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */; };
@@ -55,6 +57,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D50D45CE247C6B1C0085C759 /* StrategySolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrategySolver.cpp; sourceTree = "<group>"; };
+		D50D45CF247C6B1C0085C759 /* StrategySolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StrategySolver.h; sourceTree = "<group>"; };
 		D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactUnSymmMatrix.cpp; sourceTree = "<group>"; };
 		D50EC3812217AD74006F6A57 /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
 		D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactSymmMatrix.h; sourceTree = "<group>"; };
@@ -177,6 +181,8 @@
 				D5F6DC6C213F63B7001E96CB /* SkylineSolver.h */,
 				D5F6DC92213F63B7001E96CB /* stdafx.cpp */,
 				D5F6DC69213F63B7001E96CB /* stdafx.h */,
+				D50D45CE247C6B1C0085C759 /* StrategySolver.cpp */,
+				D50D45CF247C6B1C0085C759 /* StrategySolver.h */,
 				D5F6DC81213F63B7001E96CB /* targetver.h */,
 			);
 			name = NumCore;
@@ -210,6 +216,7 @@
 				D5F6DCA0213F63B7001E96CB /* SkylineMatrix.h in Headers */,
 				D5F6DCBB213F63B7001E96CB /* RCICGSolver.h in Headers */,
 				D50EC38A2217AD75006F6A57 /* CompactUnSymmMatrix.h in Headers */,
+				D50D45D1247C6B1C0085C759 /* StrategySolver.h in Headers */,
 				D5F1945C21908513000F738D /* ILU0_Preconditioner.h in Headers */,
 				D5FA08992238205C0074FD50 /* BoomerAMGSolver.h in Headers */,
 				D5F6DCDC213F63B7001E96CB /* HypreGMRESsolver.h in Headers */,
@@ -291,6 +298,7 @@
 				D50EC3862217AD75006F6A57 /* CompactUnSymmMatrix.cpp in Sources */,
 				D5FA08982238205C0074FD50 /* BoomerAMGSolver.cpp in Sources */,
 				D5F6DCAF213F63B7001E96CB /* BlockSolver.cpp in Sources */,
+				D50D45D0247C6B1C0085C759 /* StrategySolver.cpp in Sources */,
 				D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */,
 				D5F6DCBD213F63B7001E96CB /* FGMRESSolver.cpp in Sources */,
 				D5F6DCCA213F63B7001E96CB /* SkylineMatrix.cpp in Sources */,
