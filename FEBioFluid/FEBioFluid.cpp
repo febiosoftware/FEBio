@@ -53,6 +53,7 @@ SOFTWARE.*/
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidRCRBC.h"
+#include "FEFluidRCBC.h"
 
 #include "FETiedFluidInterface.h"
 
@@ -129,6 +130,7 @@ REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping")
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
 REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
+REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

@@ -29,14 +29,13 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidResistanceBC is a fluid surface that has a normal
-//! pressure proportional to the flow rate (resistance).
+//! FEFluidRCBC is a fluid surface that has an RC-equivalent circuit for outflow conditions
 //!
-class FEBIOFLUID_API FEFluidRCRBC : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidRCBC : public FESurfaceLoad
 {
 public:
     //! constructor
-    FEFluidRCRBC(FEModel* pfem);
+    FEFluidRCBC(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
@@ -61,19 +60,21 @@ public:
     
 private:
     double          m_R;        //!< flow resistance
-    double          m_Rd;       //!< distal resistance
     double          m_p0;       //!< initial fluid pressure
     double          m_C;        //!< capacitance
-    double          m_pd;       //!< downstream pressure
     bool            m_Bern;     //!< Use Bernoulli's Relation (Q*|Q|)
-    
-    vector<double> m_stepHist;  //!< history of time step size (recorded each step)
-    vector<double> m_timeHist;  //!< history of time at each step
-    vector<double> m_flowHist;  //!< history of flow rate at each step
+
+    double          m_qt;       //!< flow rate at current time step
+    double          m_dqt;      //!< flow rate time derivative at current time step
+    double          m_pt;       //!< pressure at current time step
+    double          m_dpt;      //!< pressure derivative at current time step
+    double          m_qp;       //!< flow rate at previous time step
+    double          m_dqp;      //!< flow rate time derivative at previous time step
+    double          m_pp;       //!< pressure at previoust time step
+    double          m_dpp;      //!< pressure derivative at previoust time step
     
 private:
-    double              m_alpha;
-    double              m_alphaf;
+    double              m_gamma;
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
     
     FEDofList   m_dofW;
