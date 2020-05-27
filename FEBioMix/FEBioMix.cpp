@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FEDiffAlbroIso.h"
 #include "FEPermConstIso.h"
 #include "FEPermHolmesMow.h"
+#include "FEPermExpIso.h"
 #include "FEPermRefIso.h"
 #include "FEPermRefOrtho.h"
 #include "FEPermRefTransIso.h"
@@ -155,6 +156,7 @@ REGISTER_FECORE_CLASS(FEDiffRefIso                        , "diff-ref-iso"      
 REGISTER_FECORE_CLASS(FEDiffAlbroIso                      , "diff-Albro-iso"    );
 REGISTER_FECORE_CLASS(FEPermConstIso                      , "perm-const-iso"    );
 REGISTER_FECORE_CLASS(FEPermHolmesMow                     , "perm-Holmes-Mow"   );
+REGISTER_FECORE_CLASS(FEPermExpIso                        , "perm-exp-iso"      );
 REGISTER_FECORE_CLASS(FEPermRefIso                        , "perm-ref-iso"      );
 REGISTER_FECORE_CLASS(FEPermRefOrtho                      , "perm-ref-ortho"    );
 REGISTER_FECORE_CLASS(FEPermRefTransIso                   , "perm-ref-trans-iso");
