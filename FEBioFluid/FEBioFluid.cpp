@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEPowellEyringFluid.h"
 #include "FECrossFluid.h"
 #include "FEFluidFSI.h"
+#include "FEBiphasicFSI.h"
 #include "FEIdealGasIsentropic.h"
 #include "FEIdealGasIsothermal.h"
 
@@ -44,15 +45,18 @@ SOFTWARE.*/
 #include "FEFluidDomain2D.h"
 
 #include "FEFluidTractionLoad.h"
+#include "FEFluidMixtureTractionLoad.h"
 #include "FEFluidNormalTraction.h"
 #include "FEFluidNormalVelocity.h"
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FEFluidResistanceBC.h"
+#include "FEFluidRCRBC.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
+#include "FETangentialFlowBiphasicStabilization.h"
 #include "FEBackFlowStabilization.h"
-#include "FEFluidRCRBC.h"
+#include "FEBackFlowBiphasicStabilization.h"
 #include "FEFluidRCBC.h"
 
 #include "FETiedFluidInterface.h"
@@ -121,17 +125,20 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D, "fluid-2D");
 //-----------------------------------------------------------------------------
 // Surface loads
 REGISTER_FECORE_CLASS(FEFluidTractionLoad          , "fluid viscous traction");
+REGISTER_FECORE_CLASS(FEFluidMixtureTractionLoad   , "fluid mixture viscous traction");
 REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction");
 REGISTER_FECORE_CLASS(FEFluidNormalVelocity        , "fluid normal velocity");
 REGISTER_FECORE_CLASS(FEFluidVelocity              , "fluid velocity");
 REGISTER_FECORE_CLASS(FEFluidRotationalVelocity    , "fluid rotational velocity");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC          , "fluid resistance");
+REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
 REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
+REGISTER_FECORE_CLASS(FETangentialFlowBiphasicStabilization, "fluid tangential biphasic stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
-REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
+REGISTER_FECORE_CLASS(FEBackFlowBiphasicStabilization, "fluid backflow biphasic stabilization");
 REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
-
+    
 //-----------------------------------------------------------------------------
 // Contact interfaces
 REGISTER_FECORE_CLASS(FETiedFluidInterface, "tied-fluid");
@@ -152,8 +159,12 @@ REGISTER_FECORE_CLASS(FEPlotFluidVolumeRatio		   , "fluid volume ratio"       );
 REGISTER_FECORE_CLASS(FEPlotFluidDensity               , "fluid density"            );
 REGISTER_FECORE_CLASS(FEPlotFluidDensityRate           , "fluid density rate"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVelocity              , "fluid velocity"           );
+REGISTER_FECORE_CLASS(FEPlotRelativeSolidVolume        , "solid volume fraction"    );
+REGISTER_FECORE_CLASS(FEPlotRelativeFluidVolume        , "fluid volume fraction"    );
 REGISTER_FECORE_CLASS(FEPlotFluidTemperature           , "fluid temperature"        );
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVelocity      , "relative fluid velocity"  );
+REGISTER_FECORE_CLASS(FEPlotGradJ                      , "dilatation gradient"      );
+REGISTER_FECORE_CLASS(FEPlotGradPhiF                   , "fluid volume ratio gradient");
 REGISTER_FECORE_CLASS(FEPlotFluidAcceleration          , "fluid acceleration"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVorticity             , "fluid vorticity"          );
 REGISTER_FECORE_CLASS(FEPlotElementFluidStress         , "fluid stress"             );

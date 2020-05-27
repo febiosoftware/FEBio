@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "tensor_base.h"
 #include "mat3d.h"
+#include "tens3d.h"
 
 //-----------------------------------------------------------------------------
 class tens4ds;
@@ -88,6 +89,7 @@ public:
 	mat3ds dot(const mat3ds& m) const;
     mat3ds dot(const mat3dd& m) const { return dot(mat3ds(m)); }
     mat3ds dot(const mat3d& m) const;
+    tens3dls dot(const vec3d& m) const;
     mat3ds dot2(const mat3d& m) const;
 
 	// contractions

@@ -487,6 +487,386 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate the gradJ of element el at integration point n.
+//! Mult GradJ by F-1
+vec3d FESolidDomain::GradJ(FESolidElement &el, int n)
+{
+    // nodal points
+    vec3d r[FEElement::MAX_NODES];
+    GetCurrentNodalCoordinates(el, r);
+    mat3d F;
+    
+    vec3d g[3], dg[3][3];
+    
+    // calculate inverse jacobian
+    //    double Ji[3][3];
+    //    invjac0(el, Ji, n);
+    //Ji for Grad
+    mat3d& Ji = el.m_J0i[n];
+    
+    ContraBaseVectors0(el, n, g);
+    ContraBaseVectorDerivatives0(el, n, dg);
+    
+    // shape function derivatives
+    double *Grn = el.Gr(n);
+    double *Gsn = el.Gs(n);
+    double *Gtn = el.Gt(n);
+    
+    // get the shape function derivatives
+    double* Grr = el.Grr(n); double* Grs = el.Grs(n); double* Grt = el.Grt(n);
+    double* Gsr = el.Gsr(n); double* Gss = el.Gss(n); double* Gst = el.Gst(n);
+    double* Gtr = el.Gtr(n); double* Gts = el.Gts(n); double* Gtt = el.Gtt(n);
+    
+    // calculate deformation gradient
+    F[0][0] = F[0][1] = F[0][2] = 0;
+    F[1][0] = F[1][1] = F[1][2] = 0;
+    F[2][0] = F[2][1] = F[2][2] = 0;
+    
+    //Initialize gradTF tens3d (gradiFjk)
+    tens3d gradTF;
+    mat3d gradTF1, gradTF2, gradTF3;
+    gradTF.d[ 0] = gradTF.d[ 1] = gradTF.d[ 2] = gradTF.d[ 3] = gradTF.d[ 4] = gradTF.d[ 5] = gradTF.d[ 6] = gradTF.d[ 7] = gradTF.d[ 8] = gradTF.d[ 9] = gradTF.d[10] = gradTF.d[11] = gradTF.d[12] = gradTF.d[13] = gradTF.d[14] = gradTF.d[15] = gradTF.d[16] = gradTF.d[17] = gradTF.d[18] = gradTF.d[19] = gradTF.d[20] = gradTF.d[21] = gradTF.d[22] = gradTF.d[23] = gradTF.d[24] = gradTF.d[25] = gradTF.d[26] = 0.0;
+    
+    int neln = el.Nodes();
+    for (int i = 0; i<neln; ++i)
+    {
+        double Gri = Grn[i];
+        double Gsi = Gsn[i];
+        double Gti = Gtn[i];
+        
+        double Grri = Grr[i]; double Grsi = Grs[i]; double Grti = Grt[i];
+        double Gsri = Gsr[i]; double Gssi = Gss[i]; double Gsti = Gst[i];
+        double Gtri = Gtr[i]; double Gtsi = Gts[i]; double Gtti = Gtt[i];
+        
+        double x = r[i].x;
+        double y = r[i].y;
+        double z = r[i].z;
+        
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        double GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
+        double GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
+        double GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
+        
+        // calculate deformation gradient F
+        F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
+        F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
+        F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
+        
+        // calculate GradTF
+        
+        mat3d gradgrad = (((dg[0][0] & g[0]) + (dg[0][1] & g[1]) + (dg[0][2] & g[2]))*Gri
+                          + ((dg[1][0] & g[0]) + (dg[1][1] & g[1]) + (dg[1][2] & g[2]))*Gsi
+                          + ((dg[2][0] & g[0]) + (dg[2][1] & g[1]) + (dg[2][2] & g[2]))*Gti
+                          + (g[0] & g[0])*Grri + (g[0] & g[1])*Gsri + (g[0] & g[2])*Gtri
+                          + (g[1] & g[0])*Grsi + (g[1] & g[1])*Gssi + (g[1] & g[2] )*Gtsi
+                          + (g[2] & g[0])*Grti + (g[2] & g[1])*Gsti + (g[2] & g[2])*Gtti);
+        
+        gradTF1 = gradgrad*x;
+        gradTF2 = gradgrad*y;
+        gradTF3 = gradgrad*z;
+        
+        gradTF.d[0] += gradTF1[0][0]; gradTF.d[1] += gradTF1[1][0]; gradTF.d[2] += gradTF1[2][0];
+        gradTF.d[3] += gradTF2[0][0]; gradTF.d[4] += gradTF2[1][0]; gradTF.d[5] += gradTF2[2][0];
+        gradTF.d[6] += gradTF3[0][0]; gradTF.d[7] += gradTF3[1][0]; gradTF.d[8] += gradTF3[2][0];
+        gradTF.d[9] += gradTF1[0][1]; gradTF.d[10] += gradTF1[1][1]; gradTF.d[11] += gradTF1[2][1];
+        gradTF.d[12] += gradTF2[0][1]; gradTF.d[13] += gradTF2[1][1]; gradTF.d[14] += gradTF2[2][1];
+        gradTF.d[15] += gradTF3[0][1]; gradTF.d[16] += gradTF3[1][1]; gradTF.d[17] += gradTF3[2][1];
+        gradTF.d[18] += gradTF1[0][2]; gradTF.d[19] += gradTF1[1][2]; gradTF.d[20] += gradTF1[2][2];
+        gradTF.d[21] += gradTF2[0][2]; gradTF.d[22] += gradTF2[1][2]; gradTF.d[23] += gradTF2[2][2];
+        gradTF.d[24] += gradTF3[0][2]; gradTF.d[25] += gradTF3[1][2]; gradTF.d[26] += gradTF3[2][2];
+    }
+    
+    double D = F.det();
+    if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
+    mat3d FinvT = F.transinv();
+    vec3d gJ = gradTF.contract2(FinvT)*D;
+    
+    return gJ;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the gradJ of element el at integration point n prev time.
+vec3d FESolidDomain::GradJp(FESolidElement &el, int n)
+{
+    // nodal points
+    vec3d r[FEElement::MAX_NODES];
+    GetPreviousNodalCoordinates(el, r);
+    mat3d F;
+    
+    vec3d g[3], dg[3][3];
+    
+    // calculate inverse jacobian
+    //    double Ji[3][3];
+    //    invjac0(el, Ji, n);
+    //Ji for Grad
+    mat3d& Ji = el.m_J0i[n];
+    
+    ContraBaseVectors0(el, n, g);
+    ContraBaseVectorDerivatives0(el, n, dg);
+    
+    // shape function derivatives
+    double *Grn = el.Gr(n);
+    double *Gsn = el.Gs(n);
+    double *Gtn = el.Gt(n);
+    
+    // get the shape function derivatives
+    double* Grr = el.Grr(n); double* Grs = el.Grs(n); double* Grt = el.Grt(n);
+    double* Gsr = el.Gsr(n); double* Gss = el.Gss(n); double* Gst = el.Gst(n);
+    double* Gtr = el.Gtr(n); double* Gts = el.Gts(n); double* Gtt = el.Gtt(n);
+    
+    // calculate deformation gradient
+    F[0][0] = F[0][1] = F[0][2] = 0;
+    F[1][0] = F[1][1] = F[1][2] = 0;
+    F[2][0] = F[2][1] = F[2][2] = 0;
+    
+    //Initialize gradTF tens3d (gradiFjk)
+    tens3d gradTF;
+    mat3d gradTF1, gradTF2, gradTF3;
+    gradTF.d[ 0] = gradTF.d[ 1] = gradTF.d[ 2] = gradTF.d[ 3] = gradTF.d[ 4] = gradTF.d[ 5] = gradTF.d[ 6] = gradTF.d[ 7] = gradTF.d[ 8] = gradTF.d[ 9] = gradTF.d[10] = gradTF.d[11] = gradTF.d[12] = gradTF.d[13] = gradTF.d[14] = gradTF.d[15] = gradTF.d[16] = gradTF.d[17] = gradTF.d[18] = gradTF.d[19] = gradTF.d[20] = gradTF.d[21] = gradTF.d[22] = gradTF.d[23] = gradTF.d[24] = gradTF.d[25] = gradTF.d[26] = 0.0;
+    
+    int neln = el.Nodes();
+    for (int i = 0; i<neln; ++i)
+    {
+        double Gri = Grn[i];
+        double Gsi = Gsn[i];
+        double Gti = Gtn[i];
+        
+        double Grri = Grr[i]; double Grsi = Grs[i]; double Grti = Grt[i];
+        double Gsri = Gsr[i]; double Gssi = Gss[i]; double Gsti = Gst[i];
+        double Gtri = Gtr[i]; double Gtsi = Gts[i]; double Gtti = Gtt[i];
+        
+        double x = r[i].x;
+        double y = r[i].y;
+        double z = r[i].z;
+        
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        double GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
+        double GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
+        double GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
+        
+        // calculate deformation gradient F
+        F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
+        F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
+        F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
+        
+        // calculate gradTF
+        
+        mat3d gradgrad = (((dg[0][0] & g[0]) + (dg[0][1] & g[1]) + (dg[0][2] & g[2]))*Gri
+                          + ((dg[1][0] & g[0]) + (dg[1][1] & g[1]) + (dg[1][2] & g[2]))*Gsi
+                          + ((dg[2][0] & g[0]) + (dg[2][1] & g[1]) + (dg[2][2] & g[2]))*Gti
+                          + (g[0] & g[0])*Grri + (g[0] & g[1])*Gsri + (g[0] & g[2])*Gtri
+                          + (g[1] & g[0])*Grsi + (g[1] & g[1])*Gssi + (g[1] & g[2] )*Gtsi
+                          + (g[2] & g[0])*Grti + (g[2] & g[1])*Gsti + (g[2] & g[2])*Gtti);
+        
+        gradTF1 = gradgrad*x;
+        gradTF2 = gradgrad*y;
+        gradTF3 = gradgrad*z;
+        
+        gradTF.d[0] += gradTF1[0][0]; gradTF.d[1] += gradTF1[1][0]; gradTF.d[2] += gradTF1[2][0];
+        gradTF.d[3] += gradTF2[0][0]; gradTF.d[4] += gradTF2[1][0]; gradTF.d[5] += gradTF2[2][0];
+        gradTF.d[6] += gradTF3[0][0]; gradTF.d[7] += gradTF3[1][0]; gradTF.d[8] += gradTF3[2][0];
+        gradTF.d[9] += gradTF1[0][1]; gradTF.d[10] += gradTF1[1][1]; gradTF.d[11] += gradTF1[2][1];
+        gradTF.d[12] += gradTF2[0][1]; gradTF.d[13] += gradTF2[1][1]; gradTF.d[14] += gradTF2[2][1];
+        gradTF.d[15] += gradTF3[0][1]; gradTF.d[16] += gradTF3[1][1]; gradTF.d[17] += gradTF3[2][1];
+        gradTF.d[18] += gradTF1[0][2]; gradTF.d[19] += gradTF1[1][2]; gradTF.d[20] += gradTF1[2][2];
+        gradTF.d[21] += gradTF2[0][2]; gradTF.d[22] += gradTF2[1][2]; gradTF.d[23] += gradTF2[2][2];
+        gradTF.d[24] += gradTF3[0][2]; gradTF.d[25] += gradTF3[1][2]; gradTF.d[26] += gradTF3[2][2];
+    }
+    
+    double D = F.det();
+    if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
+    mat3d FinvT = F.transinv();
+    vec3d gJ = gradTF.contract2(FinvT)*D;
+    
+    return gJ;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the Gradb of element el at integration point n.
+//! Mult Gradb by F-1 later
+tens3dls FESolidDomain::Gradb(FESolidElement &el, int n)
+{
+    // nodal points
+    vec3d r[FEElement::MAX_NODES];
+    GetCurrentNodalCoordinates(el, r);
+    mat3d F, b;
+    
+    vec3d g[3], dg[3][3];
+    
+    // calculate inverse jacobian
+    //    double Ji[3][3];
+    //    invjac0(el, Ji, n);
+    //Ji for Grad
+    mat3d& Ji = el.m_J0i[n];
+    
+    ContraBaseVectors0(el, n, g);
+    ContraBaseVectorDerivatives0(el, n, dg);
+    
+    // shape function derivatives
+    double *Grn = el.Gr(n);
+    double *Gsn = el.Gs(n);
+    double *Gtn = el.Gt(n);
+    
+    // calculate deformation gradient
+    F[0][0] = F[0][1] = F[0][2] = 0;
+    F[1][0] = F[1][1] = F[1][2] = 0;
+    F[2][0] = F[2][1] = F[2][2] = 0;
+    
+    b[0][0] = b[0][1] = b[0][2] = 0;
+    b[1][0] = b[1][1] = b[1][2] = 0;
+    b[2][0] = b[2][1] = b[2][2] = 0;
+    
+    //Initialize gradTF tens3d (gradiFjk)
+    tens3dls GB;
+    GB.zero();
+    
+    int neln = el.Nodes();
+    for (int i = 0; i<neln; ++i)
+    {
+        double Gri = Grn[i];
+        double Gsi = Gsn[i];
+        double Gti = Gtn[i];
+        
+        double x = r[i].x;
+        double y = r[i].y;
+        double z = r[i].z;
+        
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        double GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
+        double GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
+        double GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
+        
+        // calculate deformation gradient F
+        F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
+        F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
+        F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
+        
+        // calculate GB Grad(FikFjk)l
+        // [G] = [G111 G112 G113 G121 G122 G123 G131 G132 G133 G221 G222 G223 G231 G232 G233 G331 G332 G333]
+        //     =    G0   G1   G2   G3   G4   G5   G6   G7   G8   G9  G10  G11  G12  G13  G14  G15  G16  G17
+        GB.d[ 0] += (x*GX*GX*x + x*GY*GY*x + x*GZ*GZ*x)*GX;
+        GB.d[ 1] += (x*GX*GX*x + x*GY*GY*x + x*GZ*GZ*x)*GY;
+        GB.d[ 2] += (x*GX*GX*x + x*GY*GY*x + x*GZ*GZ*x)*GZ;
+        GB.d[ 3] += (x*GX*GX*y + x*GY*GY*y + x*GZ*GZ*y)*GX;
+        GB.d[ 4] += (x*GX*GX*y + x*GY*GY*y + x*GZ*GZ*y)*GY;
+        GB.d[ 5] += (x*GX*GX*y + x*GY*GY*y + x*GZ*GZ*y)*GZ;
+        GB.d[ 6] += (x*GX*GX*z + x*GY*GY*z + x*GZ*GZ*z)*GX;
+        GB.d[ 7] += (x*GX*GX*z + x*GY*GY*z + x*GZ*GZ*z)*GY;
+        GB.d[ 8] += (x*GX*GX*z + x*GY*GY*z + x*GZ*GZ*z)*GZ;
+        GB.d[ 9] += (y*GX*GX*y + y*GY*GY*y + y*GZ*GZ*y)*GX;
+        GB.d[10] += (y*GX*GX*y + y*GY*GY*y + y*GZ*GZ*y)*GY;
+        GB.d[11] += (y*GX*GX*y + y*GY*GY*y + y*GZ*GZ*y)*GZ;
+        GB.d[12] += (y*GX*GX*z + y*GY*GY*z + y*GZ*GZ*z)*GX;
+        GB.d[13] += (y*GX*GX*z + y*GY*GY*z + y*GZ*GZ*z)*GY;
+        GB.d[14] += (y*GX*GX*z + y*GY*GY*z + y*GZ*GZ*z)*GZ;
+        GB.d[15] += (z*GX*GX*z + z*GY*GY*z + z*GZ*GZ*z)*GX;
+        GB.d[16] += (z*GX*GX*z + z*GY*GY*z + z*GZ*GZ*z)*GY;
+        GB.d[17] += (z*GX*GX*z + z*GY*GY*z + z*GZ*GZ*z)*GZ;
+    }
+    
+    double D = F.det();
+    if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
+    b = F*F.transpose();
+    
+    return GB;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the Gradb of element el at integration point n.
+//! Mult Gradb by F-1 later
+tens3dls FESolidDomain::Gradbp(FESolidElement &el, int n)
+{
+    // nodal points
+    vec3d r[FEElement::MAX_NODES];
+    GetPreviousNodalCoordinates(el, r);
+    mat3d F, b;
+    
+    vec3d g[3], dg[3][3];
+    
+    // calculate inverse jacobian
+    //    double Ji[3][3];
+    //    invjac0(el, Ji, n);
+    //Ji for Grad
+    mat3d& Ji = el.m_J0i[n];
+    
+    ContraBaseVectors0(el, n, g);
+    ContraBaseVectorDerivatives0(el, n, dg);
+    
+    // shape function derivatives
+    double *Grn = el.Gr(n);
+    double *Gsn = el.Gs(n);
+    double *Gtn = el.Gt(n);
+    
+    // calculate deformation gradient
+    F[0][0] = F[0][1] = F[0][2] = 0;
+    F[1][0] = F[1][1] = F[1][2] = 0;
+    F[2][0] = F[2][1] = F[2][2] = 0;
+    
+    b[0][0] = b[0][1] = b[0][2] = 0;
+    b[1][0] = b[1][1] = b[1][2] = 0;
+    b[2][0] = b[2][1] = b[2][2] = 0;
+    
+    //Initialize gradTF tens3d (gradiFjk)
+    tens3dls GB;
+    GB.zero();
+    
+    int neln = el.Nodes();
+    for (int i = 0; i<neln; ++i)
+    {
+        double Gri = Grn[i];
+        double Gsi = Gsn[i];
+        double Gti = Gtn[i];
+        
+        double x = r[i].x;
+        double y = r[i].y;
+        double z = r[i].z;
+        
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        double GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
+        double GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
+        double GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
+        
+        // calculate deformation gradient F
+        F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
+        F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
+        F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
+        
+        // calculate GB
+        // [G] = [G111 G112 G113 G121 G122 G123 G131 G132 G133 G221 G222 G223 G231 G232 G233 G331 G332 G333]
+        //     =    G0   G1   G2   G3   G4   G5   G6   G7   G8   G9  G10  G11  G12  G13  G14  G15  G16  G17
+        GB.d[ 0] += (x*GX*GX*x + x*GY*GY*x + x*GZ*GZ*x)*GX;
+        GB.d[ 1] += (x*GX*GX*x + x*GY*GY*x + x*GZ*GZ*x)*GY;
+        GB.d[ 2] += (x*GX*GX*x + x*GY*GY*x + x*GZ*GZ*x)*GZ;
+        GB.d[ 3] += (x*GX*GX*y + x*GY*GY*y + x*GZ*GZ*y)*GX;
+        GB.d[ 4] += (x*GX*GX*y + x*GY*GY*y + x*GZ*GZ*y)*GY;
+        GB.d[ 5] += (x*GX*GX*y + x*GY*GY*y + x*GZ*GZ*y)*GZ;
+        GB.d[ 6] += (x*GX*GX*z + x*GY*GY*z + x*GZ*GZ*z)*GX;
+        GB.d[ 7] += (x*GX*GX*z + x*GY*GY*z + x*GZ*GZ*z)*GY;
+        GB.d[ 8] += (x*GX*GX*z + x*GY*GY*z + x*GZ*GZ*z)*GZ;
+        GB.d[ 9] += (y*GX*GX*y + y*GY*GY*y + y*GZ*GZ*y)*GX;
+        GB.d[10] += (y*GX*GX*y + y*GY*GY*y + y*GZ*GZ*y)*GY;
+        GB.d[11] += (y*GX*GX*y + y*GY*GY*y + y*GZ*GZ*y)*GZ;
+        GB.d[12] += (y*GX*GX*z + y*GY*GY*z + y*GZ*GZ*z)*GX;
+        GB.d[13] += (y*GX*GX*z + y*GY*GY*z + y*GZ*GZ*z)*GY;
+        GB.d[14] += (y*GX*GX*z + y*GY*GY*z + y*GZ*GZ*z)*GZ;
+        GB.d[15] += (z*GX*GX*z + z*GY*GY*z + z*GZ*GZ*z)*GX;
+        GB.d[16] += (z*GX*GX*z + z*GY*GY*z + z*GZ*GZ*z)*GY;
+        GB.d[17] += (z*GX*GX*z + z*GY*GY*z + z*GZ*GZ*z)*GZ;
+    }
+    
+    double D = F.det();
+    if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
+    b = F*F.transpose();
+    
+    return GB;
+}
+
+
+//-----------------------------------------------------------------------------
 //! Calculate the deformation gradient of element el at integration point n.
 //! The deformation gradient is returned in F and its determinant is the return
 //! value of the function
@@ -1176,6 +1556,55 @@ mat3d FESolidDomain::gradientp(FESolidElement& el, vec3d* fn, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate spatial gradient of function at integration points
+tens3dls FESolidDomain::gradient(FESolidElement& el, mat3ds* fn, int n)
+{
+    double Ji[3][3];
+    invjact(el, Ji, n);
+    
+    vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+    vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+    vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+    
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    tens3dls gradf;
+    gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        gradf += dyad3ls(fn[i], (g1*Gr[i] + g2*Gs[i] + g3*Gt[i]));
+    
+    return gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate spatial gradient of function at integration points
+//! at previous time
+tens3dls FESolidDomain::gradientp(FESolidElement& el, mat3ds* fn, int n)
+{
+    double Ji[3][3];
+    invjactp(el, Ji, n);
+    
+    vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+    vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+    vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+    
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    tens3dls gradf;
+    gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        gradf += dyad3ls(fn[i], (g1*Gr[i] + g2*Gs[i] + g3*Gt[i]));
+    
+    return gradf;
+}
+
+//-----------------------------------------------------------------------------
 //! calculate material gradient of function at integration points
 vec3d FESolidDomain::Gradient(FESolidElement& el, double* fn, int n)
 {
@@ -1222,6 +1651,25 @@ mat3d FESolidDomain::Gradient(FESolidElement& el, vec3d* fn, int n)
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
         Gradf += fn[i] & (Gcnt[0]*Gr[i] + Gcnt[1]*Gs[i] + Gcnt[2]*Gt[i]);
+    
+    return Gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate material gradient of function at integration points
+tens3dls FESolidDomain::Gradient(FESolidElement& el, mat3ds* fn, int n)
+{
+    vec3d Gcnt[3];
+    ContraBaseVectors0(el, n, Gcnt);
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    tens3dls Gradf;
+    Gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        Gradf += dyad3ls(fn[i], (Gcnt[0]*Gr[i] + Gcnt[1]*Gs[i] + Gcnt[2]*Gt[i]));
     
     return Gradf;
 }
@@ -1394,6 +1842,31 @@ void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
 }
 
 //-----------------------------------------------------------------------------
+//! This function calculates the covariant basis vectors of a solid element
+//! at an integration point
+
+void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3], const double alpha)
+{
+    // get the shape function derivatives
+    double* Hr = el.Gr(j);
+    double* Hs = el.Gs(j);
+    double* Ht = el.Gt(j);
+    
+    // nodal coordinates
+    vec3d rt[FEElement::MAX_NODES];
+    GetCurrentNodalCoordinates(el, rt, alpha);
+    
+    g[0] = g[1] = g[2] = vec3d(0,0,0);
+    int n = el.Nodes();
+    for (int i = 0; i<n; ++i)
+    {
+        g[0] += rt[i]*Hr[i];
+        g[1] += rt[i]*Hs[i];
+        g[2] += rt[i]*Ht[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the contravariant basis vectors in ref config
 //! of a solid element at an integration point
 
@@ -1420,6 +1893,25 @@ void FESolidDomain::ContraBaseVectors(FESolidElement& el, int j, vec3d gcnt[3])
 {
     vec3d gcov[3];
     CoBaseVectors(el, j, gcov);
+    
+    mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
+                    gcov[0].y, gcov[1].y, gcov[2].y,
+                    gcov[0].z, gcov[1].z, gcov[2].z);
+    mat3d Ji = J.inverse();
+    
+    gcnt[0] = vec3d(Ji(0,0),Ji(0,1),Ji(0,2));
+    gcnt[1] = vec3d(Ji(1,0),Ji(1,1),Ji(1,2));
+    gcnt[2] = vec3d(Ji(2,0),Ji(2,1),Ji(2,2));
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the contravariant basis vectors of a solid element
+//! at an integration point
+
+void FESolidDomain::ContraBaseVectors(FESolidElement& el, int j, vec3d gcnt[3], const double alpha)
+{
+    vec3d gcov[3];
+    CoBaseVectors(el, j, gcov, alpha);
     
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
                     gcov[0].y, gcov[1].y, gcov[2].y,
@@ -1461,6 +1953,64 @@ void FESolidDomain::CoBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[
 }
 
 //-----------------------------------------------------------------------------
+//! This function calculates the parametric derivatives of covariant basis
+//! vectors of a solid element at an integration point
+
+void FESolidDomain::CoBaseVectorDerivatives0(FESolidElement& el, int j, vec3d dg[3][3])
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the nr of nodes
+    int n = el.Nodes();
+    
+    // get the shape function derivatives
+    double* Hrr = el.Grr(j); double* Hrs = el.Grs(j); double* Hrt = el.Grt(j);
+    double* Hsr = el.Gsr(j); double* Hss = el.Gss(j); double* Hst = el.Gst(j);
+    double* Htr = el.Gtr(j); double* Hts = el.Gts(j); double* Htt = el.Gtt(j);
+    
+    dg[0][0] = dg[0][1] = dg[0][2] = vec3d(0,0,0);  // derivatives of g[0]
+    dg[1][0] = dg[1][1] = dg[1][2] = vec3d(0,0,0);  // derivatives of g[1]
+    dg[2][0] = dg[2][1] = dg[2][2] = vec3d(0,0,0);  // derivatives of g[2]
+    
+    for (int i=0; i<n; ++i)
+    {
+        vec3d rt = m.Node(el.m_node[i]).m_r0;
+        dg[0][0] += rt*Hrr[i]; dg[0][1] += rt*Hsr[i]; dg[0][2] += rt*Htr[i];
+        dg[1][0] += rt*Hrs[i]; dg[1][1] += rt*Hss[i]; dg[1][2] += rt*Hts[i];
+        dg[2][0] += rt*Hrt[i]; dg[2][1] += rt*Hst[i]; dg[2][2] += rt*Htt[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the parametric derivatives of covariant basis
+//! vectors of a solid element at an integration point
+
+void FESolidDomain::CoBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3], const double alpha)
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the nr of nodes
+    int n = el.Nodes();
+    
+    // get the shape function derivatives
+    double* Hrr = el.Grr(j); double* Hrs = el.Grs(j); double* Hrt = el.Grt(j);
+    double* Hsr = el.Gsr(j); double* Hss = el.Gss(j); double* Hst = el.Gst(j);
+    double* Htr = el.Gtr(j); double* Hts = el.Gts(j); double* Htt = el.Gtt(j);
+    
+    dg[0][0] = dg[0][1] = dg[0][2] = vec3d(0,0,0);  // derivatives of g[0]
+    dg[1][0] = dg[1][1] = dg[1][2] = vec3d(0,0,0);  // derivatives of g[1]
+    dg[2][0] = dg[2][1] = dg[2][2] = vec3d(0,0,0);  // derivatives of g[2]
+    
+    for (int i=0; i<n; ++i)
+    {
+        vec3d rt = m.Node(el.m_node[i]).m_rt*alpha + m.Node(el.m_node[i]).m_rp*(1.0-alpha);
+        dg[0][0] += rt*Hrr[i]; dg[0][1] += rt*Hsr[i]; dg[0][2] += rt*Htr[i];
+        dg[1][0] += rt*Hrs[i]; dg[1][1] += rt*Hss[i]; dg[1][2] += rt*Hts[i];
+        dg[2][0] += rt*Hrt[i]; dg[2][1] += rt*Hst[i]; dg[2][2] += rt*Htt[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the parametric derivatives of contravariant basis
 //! vectors of a solid element at an integration point
 
@@ -1470,6 +2020,60 @@ void FESolidDomain::ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d
     vec3d dgcov[3][3];
     ContraBaseVectors(el, j, gcnt);
     CoBaseVectorDerivatives(el, j, dgcov);
+    
+    // derivatives of gcnt[0]
+    dgcnt[0][0] = -gcnt[0]*(gcnt[0]*dgcov[0][0])-gcnt[1]*(gcnt[0]*dgcov[1][0])-gcnt[2]*(gcnt[0]*dgcov[2][0]);
+    dgcnt[0][1] = -gcnt[0]*(gcnt[0]*dgcov[0][1])-gcnt[1]*(gcnt[0]*dgcov[1][1])-gcnt[2]*(gcnt[0]*dgcov[2][1]);
+    dgcnt[0][2] = -gcnt[0]*(gcnt[0]*dgcov[0][2])-gcnt[1]*(gcnt[0]*dgcov[1][2])-gcnt[2]*(gcnt[0]*dgcov[2][2]);
+    
+    // derivatives of gcnt[1]
+    dgcnt[1][0] = -gcnt[0]*(gcnt[1]*dgcov[0][0])-gcnt[1]*(gcnt[1]*dgcov[1][0])-gcnt[2]*(gcnt[1]*dgcov[2][0]);
+    dgcnt[1][1] = -gcnt[0]*(gcnt[1]*dgcov[0][1])-gcnt[1]*(gcnt[1]*dgcov[1][1])-gcnt[2]*(gcnt[1]*dgcov[2][1]);
+    dgcnt[1][2] = -gcnt[0]*(gcnt[1]*dgcov[0][2])-gcnt[1]*(gcnt[1]*dgcov[1][2])-gcnt[2]*(gcnt[1]*dgcov[2][2]);
+    
+    // derivatives of gcnt[2]
+    dgcnt[2][0] = -gcnt[0]*(gcnt[2]*dgcov[0][0])-gcnt[1]*(gcnt[2]*dgcov[1][0])-gcnt[2]*(gcnt[2]*dgcov[2][0]);
+    dgcnt[2][1] = -gcnt[0]*(gcnt[2]*dgcov[0][1])-gcnt[1]*(gcnt[2]*dgcov[1][1])-gcnt[2]*(gcnt[2]*dgcov[2][1]);
+    dgcnt[2][2] = -gcnt[0]*(gcnt[2]*dgcov[0][2])-gcnt[1]*(gcnt[2]*dgcov[1][2])-gcnt[2]*(gcnt[2]*dgcov[2][2]);
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the parametric derivatives of contravariant basis
+//! vectors of a solid element at an integration point
+
+void FESolidDomain::ContraBaseVectorDerivatives0(FESolidElement& el, int j, vec3d dgcnt[3][3])
+{
+    vec3d gcnt[3];
+    vec3d dgcov[3][3];
+    ContraBaseVectors0(el, j, gcnt);
+    CoBaseVectorDerivatives0(el, j, dgcov);
+    
+    // derivatives of gcnt[0]
+    dgcnt[0][0] = -gcnt[0]*(gcnt[0]*dgcov[0][0])-gcnt[1]*(gcnt[0]*dgcov[1][0])-gcnt[2]*(gcnt[0]*dgcov[2][0]);
+    dgcnt[0][1] = -gcnt[0]*(gcnt[0]*dgcov[0][1])-gcnt[1]*(gcnt[0]*dgcov[1][1])-gcnt[2]*(gcnt[0]*dgcov[2][1]);
+    dgcnt[0][2] = -gcnt[0]*(gcnt[0]*dgcov[0][2])-gcnt[1]*(gcnt[0]*dgcov[1][2])-gcnt[2]*(gcnt[0]*dgcov[2][2]);
+    
+    // derivatives of gcnt[1]
+    dgcnt[1][0] = -gcnt[0]*(gcnt[1]*dgcov[0][0])-gcnt[1]*(gcnt[1]*dgcov[1][0])-gcnt[2]*(gcnt[1]*dgcov[2][0]);
+    dgcnt[1][1] = -gcnt[0]*(gcnt[1]*dgcov[0][1])-gcnt[1]*(gcnt[1]*dgcov[1][1])-gcnt[2]*(gcnt[1]*dgcov[2][1]);
+    dgcnt[1][2] = -gcnt[0]*(gcnt[1]*dgcov[0][2])-gcnt[1]*(gcnt[1]*dgcov[1][2])-gcnt[2]*(gcnt[1]*dgcov[2][2]);
+    
+    // derivatives of gcnt[2]
+    dgcnt[2][0] = -gcnt[0]*(gcnt[2]*dgcov[0][0])-gcnt[1]*(gcnt[2]*dgcov[1][0])-gcnt[2]*(gcnt[2]*dgcov[2][0]);
+    dgcnt[2][1] = -gcnt[0]*(gcnt[2]*dgcov[0][1])-gcnt[1]*(gcnt[2]*dgcov[1][1])-gcnt[2]*(gcnt[2]*dgcov[2][1]);
+    dgcnt[2][2] = -gcnt[0]*(gcnt[2]*dgcov[0][2])-gcnt[1]*(gcnt[2]*dgcov[1][2])-gcnt[2]*(gcnt[2]*dgcov[2][2]);
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the parametric derivatives of contravariant basis
+//! vectors of a solid element at an integration point
+
+void FESolidDomain::ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d dgcnt[3][3], const double alpha)
+{
+    vec3d gcnt[3];
+    vec3d dgcov[3][3];
+    ContraBaseVectors(el, j, gcnt, alpha);
+    CoBaseVectorDerivatives(el, j, dgcov, alpha);
     
     // derivatives of gcnt[0]
     dgcnt[0][0] = -gcnt[0]*(gcnt[0]*dgcov[0][0])-gcnt[1]*(gcnt[0]*dgcov[1][0])-gcnt[2]*(gcnt[0]*dgcov[2][0]);

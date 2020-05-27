@@ -111,10 +111,15 @@ public:
 	tens3dls(){}
 
 	tens3dls operator * (const mat3d& F) const;
+    tens3dls operator * (const double& f) const;
 
 	// transpose
 	tens3drs transpose();
+    vec3d trace();
+    tens3d generalize();
 };
+
+tens3dls dyad3ls(const mat3ds& L, const vec3d& r);
 
 //-----------------------------------------------------------------------------
 //! Class for 3rd order tensor with no symmetry (27 components)
@@ -128,6 +133,7 @@ class tens3d : public tensor_base<tens3d>
 public:
 	// constructors
 	tens3d(){}
+    explicit tens3d(double a);
 
 	// access operators
 	double operator () (int i, int j, int k) const;
@@ -135,6 +141,15 @@ public:
 
 	// return symmetric tens3ds
 	tens3ds symm();
+    
+    // right transpose
+    tens3d transposer();
+    
+    //Contract by 2nd order tensor
+    vec3d contract2(const mat3d& s) const;
+
+    //Contract on right by vector
+    mat3d contract1(const vec3d& v) const;
 };
 
 tens3d operator + (const tens3dls& l, const tens3drs& r);

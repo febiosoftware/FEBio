@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FENewtonianFluid.h"
 #include "FEFluid.h"
+#include "FEBiphasicFSI.h"
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)
@@ -48,11 +49,18 @@ FENewtonianFluid::FENewtonianFluid(FEModel* pfem) : FEViscousFluid(pfem)
 //! viscous stress
 mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
 {
+    FEMaterial* pm = GetFEModel()->GetMaterial(pt.m_elem->GetMatID());
+    FEBiphasicFSI* bfsi = dynamic_cast<FEBiphasicFSI*> (pm);
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
+    FEBiphasicFSIMaterialPoint& bt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
+    
     mat3ds D = vt.RateOfDeformation();
     
     mat3ds s = mat3dd(1.0)*(D.tr()*(m_kappa - 2.*m_mu/3.)) + D*(2*m_mu);
     
+    if (bfsi)
+        s = s/bt.m_phif;
+        
     return s;
 }
 
@@ -67,8 +75,16 @@ mat3ds FENewtonianFluid::Tangent_Strain(FEMaterialPoint& mp)
 //! tangent of stress with respect to rate of deformation tensor D
 tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 {
+    FEMaterial* pm = GetFEModel()->GetMaterial(mp.m_elem->GetMatID());
+    FEBiphasicFSI* bfsi = dynamic_cast<FEBiphasicFSI*> (pm);
+    FEBiphasicFSIMaterialPoint& bt = *mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+    
     mat3dd I(1.0);
     tens4ds c = dyad1s(I)*(m_kappa - 2.*m_mu/3.) + dyad4s(I)*(2*m_mu);
+    
+    if (bfsi)
+        c = c/bt.m_phif;
+    
     return c;
 }
 

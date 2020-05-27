@@ -36,6 +36,8 @@ SOFTWARE.*/
 #include "FEFluidDomain.h"
 #include "FEFluidFSIDomain.h"
 #include "FEFluidFSI.h"
+#include "FEBiphasicFSIDomain.h"
+#include "FEBiphasicFSI.h"
 #include "FEThermoFluid.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/FEModel.h>
@@ -339,11 +341,13 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
             FEFluidP* fluidP = dynamic_cast<FEFluidP*> (pm);
             FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-            if (fluid || fluidP || fsi) {
+            FEBiphasicFSI* bfsi = dynamic_cast<FEBiphasicFSI*> (pm);
+            if (fluid || fluidP || fsi || bfsi) {
                 double rhor;
                 if (fluid) rhor = fluid->m_rhor;
                 else if (fluidP) rhor = fluidP->Fluid()->m_rhor;
-                else rhor = fsi->Fluid()->m_rhor;
+                else if (fsi) rhor = fsi->Fluid()->m_rhor;
+                else rhor = bfsi->Fluid()->m_rhor;
                 // get the surface element
                 FESurfaceElement& el = pcs->Element(j);
                 // extract nodal velocities and dilatation
@@ -653,6 +657,36 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotRelativeFluidVolume::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+    if (pfluid == 0) return false;
+    
+    // write solid element data
+    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEBiphasicFSIMaterialPoint* ppt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+        return (ppt ? ppt->m_phif : 0.0);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRelativeSolidVolume::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+    if (pfluid == 0) return false;
+    
+    // write solid element data
+    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEBiphasicFSIMaterialPoint* ppt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+        return (ppt ? ppt->m_phis : 0.0);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
@@ -660,8 +694,37 @@ bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 
 	writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFSIMaterialPoint* ppt = mp.ExtractData<FEFSIMaterialPoint>();
-		return (ppt ? ppt->m_w : vec3d(0.));
+        const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+        return (ppt ? ppt->m_w : bpt? bpt->m_w : vec3d(0.0));
 	});
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotGradJ::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+        return (bpt ? bpt->m_gradJ : vec3d(0.0));
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotGradPhiF::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+        return (bpt ? bpt->m_gradphif : vec3d(0.0));
+    });
     
     return true;
 }

@@ -218,6 +218,12 @@ public:
     //! calculates the contravariant base vectors of a surface at an integration point at previoust time step
     void ContraBaseVectorsP(FESurfaceElement& el, int j, vec3d t[2]);
     
+    //! calculates the parametric derivatives of covariant basis of a surface  at an integration point
+    void CoBaseVectorDerivatives(const FESurfaceElement& el, int j, vec3d dg[2][2]) const;
+    
+    //! calculates the the parametric derivatives of covariant basis of a surface at an integration point at previoust time step
+    void CoBaseVectorDerivativesP(FESurfaceElement& el, int j, vec3d dg[2][2]);
+    
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 

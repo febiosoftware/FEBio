@@ -855,6 +855,43 @@ inline mat3ds tens4ds::dot(const mat3d &m) const
 }
 
 //-----------------------------------------------------------------------------
+// contraction of symmetric 4th-order tensor with a vector
+// Aijk = Dijkl Ml
+//
+//     / 0   1   3   6   10   15  \   / C0000  C0011  C0022  C0001  C0012  C0002 \
+//     |     2   4   7   11   16  |   |        C1111  C1122  C1101  C1112  C1102 |
+//     |         5   8   12   17  |   |               C2222  C2201  C2212  C2202 |
+// A = |             9   13   18  | = |                      C0101  C0112  C0102 |
+//     |                 14   19  |   |                             C1212  C1202 |
+//     \                      20  /   \                                    C0202 /
+//
+// [G] = [G111 G112 G113 G121 G122 G123 G131 G132 G133 G221 G222 G223 G231 G232 G233 G331 G332 G333]
+//     =    G0   G1   G2   G3   G4   G5   G6   G7   G8   G9  G10  G11  G12  G13  G14  G15  G16  G17
+inline tens3dls tens4ds::dot(const vec3d &m) const
+{
+    tens3dls a;
+    a.d[0] = d[0]*m.x + d[6]*m.y + d[15]*m.z;
+    a.d[1] = d[6]*m.x + d[1]*m.y + d[10]*m.z;
+    a.d[2] = d[15]*m.x + d[10]*m.y + d[3]*m.z;
+    a.d[3] = d[6]*m.x + d[9]*m.y + d[18]*m.z;
+    a.d[4] = d[9]*m.x + d[7]*m.y + d[13]*m.z;
+    a.d[5] = d[18]*m.x + d[13]*m.y + d[8]*m.z;
+    a.d[6] = d[15]*m.x + d[18]*m.y + d[20]*m.z;
+    a.d[7] = d[18]*m.x + d[16]*m.y + d[19]*m.z;
+    a.d[8] = d[20]*m.x + d[19]*m.y + d[17]*m.z;
+    a.d[9] = d[1]*m.x + d[7]*m.y + d[16]*m.z;
+    a.d[10] = d[7]*m.x + d[2]*m.y + d[11]*m.z;
+    a.d[11] = d[16]*m.x + d[11]*m.y + d[4]*m.z;
+    a.d[12] = d[10]*m.x + d[13]*m.y + d[19]*m.z;
+    a.d[13] = d[13]*m.x + d[11]*m.y + d[14]*m.z;
+    a.d[14] = d[19]*m.x + d[14]*m.y + d[12]*m.z;
+    a.d[15] = d[3]*m.x + d[8]*m.y + d[17]*m.z;
+    a.d[16] = d[8]*m.x + d[4]*m.y + d[12]*m.z;
+    a.d[17] = d[17]*m.x + d[12]*m.y + d[5]*m.z;
+    return a;
+}
+
+//-----------------------------------------------------------------------------
 // double contraction of symmetric 4th-order tensor with a general 2nd-order tensor (2nd kind)
 // Aij = Dikjl Mkl
 inline mat3ds tens4ds::dot2(const mat3d &m) const

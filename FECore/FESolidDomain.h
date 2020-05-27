@@ -97,6 +97,18 @@ public:
     //! Calculate deformation gradient at integration point n at previous time
     double defgradp(FESolidElement& el, mat3d& F, int n);
     
+    //! Calculate GradJ at integration point n at current time
+    vec3d GradJ(FESolidElement& el, int n);
+    
+    //! Calculate GradJ at integration point n at prev time
+    vec3d GradJp(FESolidElement& el, int n);
+    
+    //! Calculate GradJ at integration point n at current time
+    tens3dls Gradb(FESolidElement& el, int n);
+    
+    //! Calculate GradJ at integration point n at prev time
+    tens3dls Gradbp(FESolidElement& el, int n);
+    
     //! calculate inverse jacobian matrix w.r.t. reference frame
     double invjac0(const FESolidElement& el, double J[3][3], int n);
     
@@ -133,11 +145,21 @@ public:
     //! at previous time
     mat3d gradientp(FESolidElement& el, vec3d* fn, int n);
     
+    //! calculate spatial gradient of vector function at integration points
+    tens3dls gradient(FESolidElement& el, mat3ds* fn, int n);
+    
+    //! calculate spatial gradient of vector function at integration points
+    //! at previous time
+    tens3dls gradientp(FESolidElement& el, mat3ds* fn, int n);
+    
     //! calculate material gradient of scalar function at integration points
     vec3d Gradient(FESolidElement& el, double* fn, int n);
     
     //! calculate material gradient of vector function at integration points
     mat3d Gradient(FESolidElement& el, vec3d* fn, int n);
+    
+    //! calculate material gradient of vector function at integration points
+    tens3dls Gradient(FESolidElement& el, mat3ds* fn, int n);
     
     //! calculate jacobian in reference frame
     double detJ0(FESolidElement& el, int n);
@@ -154,17 +176,35 @@ public:
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FESolidElement& el, int j, vec3d g[3]);
     
+    //! calculates covariant basis vectors at an integration point
+    void CoBaseVectors(FESolidElement& el, int j, vec3d g[3], const double alpha);
+    
     //! calculates contravariant basis vectors in reference configuration at an integration point
     void ContraBaseVectors0(FESolidElement& el, int j, vec3d g[3]);
     
     //! calculates contravariant basis vectors at an integration point
     void ContraBaseVectors(FESolidElement& el, int j, vec3d g[3]);
     
+    //! calculates contravariant basis vectors at an integration point
+    void ContraBaseVectors(FESolidElement& el, int j, vec3d g[3], const double alpha);
+    
     //! calculates parametric derivatives of covariant basis vectors at an integration point
     void CoBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3]);
     
+    //! calculates parametric derivatives of covariant basis vectors at an integration point
+    void CoBaseVectorDerivatives0(FESolidElement& el, int j, vec3d dg[3][3]);
+    
+    //! calculates parametric derivatives of covariant basis vectors at an integration point
+    void CoBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3], const double alpha);
+    
     //! calculates parametric derivatives of contravariant basis vectors at an integration point
     void ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3]);
+    
+    //! calculates parametric derivatives of contravariant basis vectors at an integration point
+    void ContraBaseVectorDerivatives0(FESolidElement& el, int j, vec3d dg[3][3]);
+    
+    //! calculates parametric derivatives of contravariant basis vectors at an integration point
+    void ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3], const double alpha);
     
     //! calculate the laplacian of a vector function at an integration point
     vec3d lapvec(FESolidElement& el, vec3d* fn, int n);

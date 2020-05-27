@@ -1,0 +1,152 @@
+//
+//  FEBiphasicFSISolver.hpp
+//  FEBioFluid
+//
+//  Created by Jay Shim on 12/30/19.
+//  Copyright © 2019 febio.org. All rights reserved.
+//
+
+#pragma once
+#include <FECore/FENewtonSolver.h>
+#include <FECore/FETimeInfo.h>
+#include <FECore/FEGlobalVector.h>
+#include <FEBioMech/FERigidSolver.h>
+#include <FECore/FEDofList.h>
+#include "febiofluid_api.h"
+
+//-----------------------------------------------------------------------------
+//! The FEFluidFSISolver class solves fluid-FSI problems
+//! It can deal with quasi-static and dynamic problems
+//!
+class FEBIOFLUID_API FEBiphasicFSISolver : public FENewtonSolver
+{
+public:
+    //! constructor
+    FEBiphasicFSISolver(FEModel* pfem);
+    
+    //! destructor
+    ~FEBiphasicFSISolver();
+    
+    //! serialize data to/from dump file
+    void Serialize(DumpStream& ar) override;
+    
+    //! Initializes data structures
+    bool Init() override;
+    
+    //! initialize the step
+    bool InitStep(double time) override;
+    
+    //! Initialize linear equation system
+    bool InitEquations() override;
+    
+    //! Generate warnings if needed
+    void SolverWarnings();
+    
+public:
+    //{ --- evaluation and update ---
+    //! Perform an update
+    void Update(vector<double>& ui) override;
+    
+    //! update nodal positions, velocities, accelerations, etc.
+    void UpdateKinematics(vector<double>& ui);
+    
+    void UpdateModel() override;
+    void UpdateContact();
+    void UpdateConstraints();
+    
+    //! Update EAS
+    void UpdateEAS(vector<double>& ui);
+    void UpdateIncrementsEAS(vector<double>& ui, const bool binc);
+    
+    //! update DOF increments
+    virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
+    //}
+    
+    //{ --- Solution functions ---
+    
+    //! prepares the data for the first QN iteration
+    void PrepStep() override;
+    
+    //! Performs a Newton-Raphson iteration
+    bool Quasin() override;
+    
+    //{ --- Stiffness matrix routines ---
+    
+    //! calculates the global stiffness matrix
+    bool StiffnessMatrix() override;
+    
+    //! contact stiffness
+    void ContactStiffness(FELinearSystem& LS);
+    
+    //! calculates stiffness contributon of nonlinear constraints
+    void NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp);
+    
+    //{ --- Residual routines ---
+    
+    //! Calculate the contact forces
+    void ContactForces(FEGlobalVector& R);
+    
+    //! Calculates residual
+    bool Residual(vector<double>& R) override;
+    
+    //! Calculate nonlinear constraint forces
+    void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
+    
+protected:
+    void GetDisplacementData(vector<double>& xi, vector<double>& ui);
+    void GetVelocityData(vector<double>& vi, vector<double>& ui);
+    void GetDilatationData(vector<double>& ei, vector<double>& ui);
+    
+public:
+    // convergence tolerances
+    double    m_Dtol;            //!< displacement tolerance
+    double    m_Vtol;            //!< velocity tolerance
+    double    m_Ftol;            //!< dilatation tolerance
+    
+public:
+    // equation numbers
+    int     m_nreq;         //!< start of rigid body equations
+    int        m_ndeq;            //!< number of equations related to displacement dofs
+    int        m_nveq;            //!< number of equations related to velocity dofs
+    int        m_nfeq;            //!< number of equations related to dilatation dofs
+    
+public:
+    vector<double> m_Fn;    //!< concentrated nodal force vector
+    vector<double> m_Fr;    //!< nodal reaction forces
+    vector<double> m_di;    //!< displacement increment vector
+    vector<double> m_Di;    //!< Total displacement vector for iteration
+    vector<double> m_vi;    //!< velocity increment vector
+    vector<double> m_Vi;    //!< Total velocity vector for iteration
+    vector<double> m_fi;    //!< dilatation increment vector
+    vector<double> m_Fi;    //!< Total dilatation vector for iteration
+    
+    // generalized alpha method
+    double  m_rhoi;         //!< spectral radius (rho infinity)
+    double  m_alphaf;       //!< alpha step for Y={v,e}
+    double  m_alpham;       //!< alpha step for Ydot={∂v/∂t,∂e/∂t}
+    double  m_alpha;        //!< alpha
+    double  m_beta;         //!< beta
+    double  m_gamma;        //!< gamma
+    int     m_pred;         //!< predictor method
+    double  m_QS;           //!< Quasistatic
+    
+protected:
+    FEDofList    m_dofU;        // solid displacement
+    FEDofList    m_dofV;        // solid velocity
+    FEDofList    m_dofSU;    // shell displacement
+    FEDofList    m_dofSV;    // shell velocity
+    FEDofList    m_dofSA;    // shell acceleration
+    FEDofList    m_dofR;        // rigid body rotations
+    FEDofList    m_dofVF;    // fluid velocity
+    FEDofList    m_dofAF;    // material time derivative of fluid velocity
+    FEDofList    m_dofW;        // fluid velocity relative to solid
+    FEDofList    m_dofAW;    // material time derivative of fluid velocity relative to solid
+    int            m_dofEF;    // fluid dilatation
+    int            m_dofAEF;    // material time derivative of fluid dilatation
+    
+protected:
+    FERigidSolverNew    m_rigidSolver;
+    
+    // declare the parameter list
+    DECLARE_FECORE_CLASS();
+};

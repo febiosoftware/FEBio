@@ -218,6 +218,42 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element GradJ
+class FEPlotGradJ : public FEPlotDomainData
+{
+public:
+    FEPlotGradJ(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element gradphif
+class FEPlotGradPhiF : public FEPlotDomainData
+{
+public:
+    FEPlotGradPhiF(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element relative fluid velocity
+class FEPlotRelativeFluidVolume : public FEPlotDomainData
+{
+public:
+    FEPlotRelativeFluidVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element relative fluid velocity
+class FEPlotRelativeSolidVolume : public FEPlotDomainData
+{
+public:
+    FEPlotRelativeSolidVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid acceleration
 class FEPlotFluidAcceleration : public FEPlotDomainData
 {
