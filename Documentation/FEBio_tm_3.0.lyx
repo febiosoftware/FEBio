@@ -24414,8 +24414,8 @@ name "sec:Hydraulic-Permeability"
 \end_layout
 
 \begin_layout Standard
-Hydraulic permeability is a material function needed for biphasic and biphasic-s
-olute materials.
+Hydraulic permeability is a material function needed for biphasic and multiphasi
+c materials.
 \end_layout
 
 \begin_layout Subsection
@@ -24447,6 +24447,106 @@ For this material model,
 \end_layout
 
 \begin_layout Subsection
+Exponential Isotropic Permeability
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Exponential-Isotropic-Permeability"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This isotropic material has a permeability that varies as a function of
+ the determinant 
+\begin_inset Formula $J$
+\end_inset
+
+ of the deformation gradient.
+ Its general form is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{k}=k\left(J\right)\mathbf{I}\,,\label{eq:isotropic-permeability}
+\end{equation}
+
+\end_inset
+
+where, 
+\begin_inset Formula 
+\begin{equation}
+k\left(J\right)=k_{0}\exp\left(M\frac{J-1}{J-\varphi_{0}}\right)\,.\label{eq:perm-exp-iso}
+\end{equation}
+
+\end_inset
+
+Pore closure occurs as 
+\begin_inset Formula $J$
+\end_inset
+
+ approaches 
+\begin_inset Formula $\varphi_{0}$
+\end_inset
+
+ from above, in which case the permeability reduces to zero,
+\begin_inset Formula 
+\begin{equation}
+\lim_{J\to\varphi_{0}}k\left(J\right)=0\,.\label{eq:perm-pore-closure}
+\end{equation}
+
+\end_inset
+
+In the special case when 
+\begin_inset Formula $M=0$
+\end_inset
+
+, the permeability becomes constant.
+ In the limit of infinitesimal strains, the permeability has the form
+\begin_inset Formula 
+\begin{equation}
+k\left(J\right)=k_{0}\left(1+\frac{M}{1-\varphi_{0}}\left(J-1\right)+\mathcal{O}\left(\left(J-1\right)^{2}\right)\right)\,.\label{eq:perm-expiso-Taylor}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the type of isotropic permeability given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:isotropic-permeability"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the spatial permeability tangent 
+\begin_inset Formula $\boldsymbol{\mathcal{K}}$
+\end_inset
+
+ with respect to the solid matrix strain has the general form
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{K}}=\left(k+Jk^{\prime}\right)\mathbf{I}\otimes\mathbf{I}-2k\mathbf{I}\odot\mathbf{I}\,,\label{eq:isotropic-perm-tangent}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+k^{\prime}\left(J\right)=M\frac{1-\varphi_{0}}{\left(J-\varphi_{0}\right)^{2}}k\left(J\right)\label{eq:perm-exp-iso-tangent}
+\end{equation}
+
+\end_inset
+
+in this case.
+\end_layout
+
+\begin_layout Subsection
 Holmes-Mow
 \begin_inset CommandInset label
 LatexCommand label
@@ -24458,9 +24558,8 @@ name "subsec:Holmes-Mow-permeability"
 \end_layout
 
 \begin_layout Standard
-This isotropic material is similar to the constant isotropic permeability
- material described above, except that it uses a strain-dependent permeability
- tensor 
+This isotropic material uses a strain-dependent permeability tensor as formulate
+d by 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
@@ -24480,6 +24579,63 @@ where,
 \begin_inset Formula 
 \begin{equation}
 k\left(J\right)=k_{0}\left(\frac{J-\varphi_{0}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,.\label{eq503}
+\end{equation}
+
+\end_inset
+
+When 
+\begin_inset Formula $\alpha>0$
+\end_inset
+
+, pore closure occurs as 
+\begin_inset Formula $J\to\varphi_{0}$
+\end_inset
+
+ from above, in which case 
+\begin_inset Formula $k$
+\end_inset
+
+ reduces to 
+\begin_inset Formula $0$
+\end_inset
+
+.
+ Setting 
+\begin_inset Formula $\alpha=0$
+\end_inset
+
+ and 
+\begin_inset Formula $M=0$
+\end_inset
+
+ produces a constant permeability.
+ In the limit of infinitesimal strains,
+\begin_inset Formula 
+\begin{equation}
+k\left(J\right)=k_{0}\left(1+\left(M+\frac{\alpha}{1-\varphi_{0}}\right)\left(J-1\right)+\mathcal{O}\left(\left(J-1\right)^{2}\right)\right)\,.\label{eq:perm-HM-Taylor}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The spatial tangent of the permeability tensor with respect to strain may
+ be evaluated from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:isotropic-perm-tangent"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ using
+\begin_inset Formula 
+\begin{equation}
+k^{\prime}\left(J\right)=\left(J\,M+\frac{\alpha}{J-\varphi_{0}}\right)k\left(J\right)\,.\label{eq:perm-HM-tangent}
 \end{equation}
 
 \end_inset

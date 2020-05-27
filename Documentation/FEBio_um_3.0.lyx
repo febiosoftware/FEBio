@@ -59119,6 +59119,312 @@ Example:
 \end_layout
 
 \begin_layout Subsubsection
+Exponential Isotropic Permeability
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Exponential-Isotropic-Permeability"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for exponential isotropic permeability is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+perm-exp-iso
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<perm>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+isotropic hydraulic permeability 
+\begin_inset Formula $k_{0}$
+\end_inset
+
+ in the reference state
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+L
+\series default
+
+\begin_inset Formula $^{\mathrm{4}}$
+\end_inset
+
+/
+\series bold
+F
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<M>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+exponential strain-dependence coefficient 
+\begin_inset Formula $M$
+\end_inset
+
+ (
+\begin_inset Formula $M\ge0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This isotropic material model has the general form
+\begin_inset Formula 
+\[
+\mathbf{k}=k\left(J\right)\,\mathbf{I}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $J=\det\mathbf{F}$
+\end_inset
+
+ is the determinant of the deformation gradient.
+ For this material model,
+\begin_inset Formula 
+\[
+k\left(J\right)=k_{0}\exp\left(M\frac{J-1}{J-\varphi_{0}}\right)\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\varphi_{0}$
+\end_inset
+
+ is the referential solid volume fraction of the porous solid matrix.
+ Pore closure occurs as 
+\begin_inset Formula $J$
+\end_inset
+
+ approaches 
+\begin_inset Formula $\varphi_{0}$
+\end_inset
+
+ from above, in which case the permeability reduces to zero,
+\begin_inset Formula 
+\[
+\lim_{J\to\varphi_{0}}k\left(J\right)=0\,.
+\]
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigPermExpIso.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Exponential isotropic permeability, showing dependence of 
+\begin_inset Formula $k\left(J\right)/k_{0}$
+\end_inset
+
+ on material parameter 
+\begin_inset Formula $M$
+\end_inset
+
+, when 
+\begin_inset Formula $\varphi_{0}=0.2$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi_{0}<J\le1.2$
+\end_inset
+
+.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:perm-exp-iso"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Representative variations of 
+\begin_inset Formula $k\left(J\right)/k_{0}$
+\end_inset
+
+ are shown in 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+figurename
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:perm-exp-iso"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<permeability name="Permeability" type="perm-exp-iso ">
+\end_layout
+
+\begin_layout LyX-Code
+  <perm>0.001</perm>
+\end_layout
+
+\begin_layout LyX-Code
+  <M>1.5</M>
+\end_layout
+
+\begin_layout LyX-Code
+</permeability>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Holmes-Mow
 \begin_inset CommandInset label
 LatexCommand label
@@ -59327,7 +59633,7 @@ and
 \begin_inset Formula $J$
 \end_inset
 
-is the Jacobian of the deformation, i.e.
+ is the Jacobian of the deformation, i.e.
  
 \begin_inset Formula $J=\det\mathbf{F}$
 \end_inset
@@ -59670,7 +59976,7 @@ This material uses a strain-dependent permeability tensor that accommodates
  strain-induced anisotropy: 
 \begin_inset Formula 
 \[
-\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)e^{M\left(J^{2}-1\right)/2},
+\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
 \]
 
 \end_inset
