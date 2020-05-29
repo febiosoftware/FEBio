@@ -39,8 +39,6 @@ BEGIN_FECORE_CLASS(FEFiberExpPowSBM, FEElasticMaterial)
 	ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" );
 	ADD_PARAMETER(m_g    , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
 	ADD_PARAMETER(m_sbm  , "sbm"  );
-	ADD_PARAMETER(m_thd  , "theta");
-	ADD_PARAMETER(m_phd  , "phi"  );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -65,14 +63,10 @@ bool FEFiberExpPowSBM::Init()
 		return false;
 	}
     
-    // convert angles from degrees to radians
-    double pi = 4*atan(1.0);
-    double the = m_thd*pi/180.;
-    double phi = m_phd*pi/180.;
     // fiber direction in local coordinate system (reference configuration)
-    m_n0.x = cos(the)*sin(phi);
-    m_n0.y = sin(the)*sin(phi);
-    m_n0.z = cos(phi);
+    m_n0.x = 1;
+    m_n0.y = 0;
+    m_n0.z = 0;
 
 	return true;
 }

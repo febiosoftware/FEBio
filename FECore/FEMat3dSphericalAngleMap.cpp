@@ -55,34 +55,32 @@ void FEMat3dSphericalAngleMap::SetAngles(double theta, double phi)
 mat3d FEMat3dSphericalAngleMap::operator () (const FEMaterialPoint& mp)
 {
 	// convert from degress to radians
-	const double pi = 4 * atan(1.0);
-	const double the = m_theta(mp)*pi / 180.;
-	const double phi = m_phi(mp)*pi / 180.;
+	const double the = m_theta(mp)*PI / 180.;
+	const double phi = m_phi(mp)*PI / 180.;
 
 	// define the first axis (i.e. the fiber vector)
 	vec3d a;
 	a.x = cos(the)*sin(phi);
 	a.y = sin(the)*sin(phi);
 	a.z = cos(phi);
+    
+    vec3d b;
+    b.x = -sin(the);
+    b.y = cos(the);
+    b.z = 0;
 
-	// define the second axis
-	// and make sure it is not colinear with the first
-	vec3d d(0, 0, 1);
-	if (fabs(a*d) > 0.9) d = vec3d(0, 1, 0);
-
-	// calculate the orthonormal axes
-	vec3d c = a^d;
-	vec3d b = c^a;
-	a.unit();
-	b.unit();
-	c.unit();
+	vec3d c;
+    c.x = -cos(the)*cos(phi);
+    c.y = -sin(the)*cos(phi);
+    c.z = sin(phi);
 
 	// setup the rotation matrix
 	mat3d Q;
 	Q[0][0] = a.x; Q[0][1] = b.x; Q[0][2] = c.x;
 	Q[1][0] = a.y; Q[1][1] = b.y; Q[1][2] = c.y;
 	Q[2][0] = a.z; Q[2][1] = b.z; Q[2][2] = c.z;
-	return Q;
+
+    return Q;
 }
 
 //-----------------------------------------------------------------------------

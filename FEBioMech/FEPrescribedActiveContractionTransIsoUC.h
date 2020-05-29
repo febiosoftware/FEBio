@@ -51,8 +51,6 @@ public:
     tens4ds DevTangent(FEMaterialPoint& pt) override;
     
 public: // material parameters
-    double	m_thd;		// theta angle for fiber orientation (local coordinates system)
-    double	m_phd;		// phi angle for fiber orientation (local coordinates system)
 	double	m_T0;       // prescribed active stress
 
 private:

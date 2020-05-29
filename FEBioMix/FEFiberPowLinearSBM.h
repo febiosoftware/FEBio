@@ -38,7 +38,7 @@ SOFTWARE.*/
 class FEBIOMIX_API FEFiberPowLinearSBM : public FEElasticMaterial
 {
 public:
-    FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; m_sbm = 0; }
+    FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = 0; }
     
     //! Initialization
     bool Init() override;
@@ -66,7 +66,5 @@ public:
     double  m_g;        // gamma
     int		m_sbm;      //!< global id of solid-bound molecule
     int		m_lsbm;     //!< local id of solid-bound molecule
-    double	m_thd;		// theta angle for fiber orientation (local coordinates system)
-    double	m_phd;		// phi angle for fiber orientation (local coordinates system)
     vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)
 };
