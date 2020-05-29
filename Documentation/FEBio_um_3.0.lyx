@@ -32445,7 +32445,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
+	filename Figures/FigSCS.png
 
 \end_inset
 
@@ -32468,13 +32468,13 @@ Spherical angles
 The fiber is oriented along 
 \begin_inset Formula 
 \[
-\sin\varphi\cos\theta\,\mathbf{e}_{1}+\sin\varphi\sin\theta\,\mathbf{e}_{2}+\cos\varphi\,\mathbf{e}_{3},0\leqslant\theta<2\pi,\;0\leqslant\varphi\leqslant\pi,
+\mathbf{e}_{r}=\cos\theta\sin\phi\,\mathbf{e}_{1}+\sin\theta\sin\phi\,\mathbf{e}_{2}+\cos\phi\,\mathbf{e}_{3},0\leqslant\theta<2\pi,\;0\leqslant\phi\leqslant\pi,
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $\left(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right)$
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
  are orthonormal vectors representing the local element coordinate system
@@ -32621,8 +32621,8 @@ For orthotropic materials, the user needs to specify two fiber directions
 \end_inset
 
 .
- From these FEBio will generate an orthonormal set of fiber vectors as follows:
- 
+ From these FEBio will generate an orthonormal set of material axes vectors
+ as follows: 
 \begin_inset Formula 
 \[
 \mathbf{e}_{1}=\frac{\mathbf{a}}{\left\Vert \mathbf{a}\right\Vert },\quad\mathbf{e}_{2}=\mathbf{e}_{3}\times\mathbf{e}_{1},\quad\mathbf{e}_{3}=\frac{\mathbf{a}\times\mathbf{d}}{\left\Vert \mathbf{a}\times\mathbf{d}\right\Vert }\,.
@@ -32665,7 +32665,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
+<lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
 <column alignment="none" valignment="top" width="68pt">
 <column alignment="left" valignment="top">
@@ -32716,7 +32716,7 @@ Use local element numbering (1)
 </cell>
 </row>
 <row>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -32725,7 +32725,7 @@ vector
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -32747,6 +32747,35 @@ Specify the vectors
 \series default
  directly.
  (2) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+angles
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify the angles 
+\begin_inset Formula $\theta$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi$
+\end_inset
+
+ [deg].
+ (3)
 \end_layout
 
 \end_inset
@@ -32824,6 +32853,69 @@ element:
 
 \begin_layout LyX-Code
 </mat_axis>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+When using the 
+\shape italic
+angle 
+\shape default
+type, you need to define the two angles 
+\begin_inset Formula $\theta$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi$
+\end_inset
+
+ in degrees.
+ These are specified as child elements of the 
+\shape italic
+mat_axis 
+\shape default
+element: 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+  <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+  <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+</mat_axis>
+\end_layout
+
+\begin_layout Standard
+The material axes 
+\begin_inset Formula $\left\{ \mathbf{e}_{r},\mathbf{e}_{\theta},\mathbf{e}_{\varphi}\right\} $
+\end_inset
+
+ are related to the global Cartesian basis (or local element axes) 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ via
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{e}_{r} & =\cos\theta\sin\phi\,\mathbf{e}_{1}+\sin\theta\sin\phi\,\mathbf{e}_{2}+\cos\phi\,\mathbf{e}_{3}\\
+\mathbf{e}_{\theta} & =-\sin\theta\,\mathbf{e}_{1}+\cos\theta\,\mathbf{e}_{2}\\
+\mathbf{e}_{\varphi} & =-\cos\theta\cos\phi\,\mathbf{e}_{1}-\sin\theta\cos\phi\,\mathbf{e}_{2}+\sin\phi\,\mathbf{e}_{3}
+\end{aligned}
+\,.
+\]
+
+\end_inset
+
+
 \end_layout
 
 \end_deeper
@@ -34446,7 +34538,7 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -34520,7 +34612,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -34529,7 +34621,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -34541,83 +34633,11 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<theta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\theta,$
-\end_inset
-
- spherical angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\varphi,$
-\end_inset
-
- spherical angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
 \end_layout
 
 \end_inset
@@ -34635,61 +34655,16 @@ deg
 \end_layout
 
 \begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
-
+The fiber is oriented along the unit vector 
+\begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-Spherical angles
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber is oriented along 
-\begin_inset Formula 
-\[
-\mathbf{N}=\sin\varphi\cos\theta\,\mathbf{e}_{1}+\sin\varphi\sin\theta\,\mathbf{e}_{2}+\cos\varphi\,\mathbf{e}_{3}\,,
-\]
-
-\end_inset
-
-where 
+, where 
 \begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
- are orthonormal vectors representing the local element coordinate system
- (Section
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
 \begin_inset space ~
 \end_inset
 
@@ -34700,20 +34675,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 
 \end_inset
 
-).
- The parameters <theta> and <phi> are optional, with default values of 
-\begin_inset Formula $\theta=$
-\end_inset
-
-0° and 
-\begin_inset Formula $\varphi=$
-\end_inset
-
-90°, such that 
-\begin_inset Formula $\mathbf{N}=\mathbf{e}_{1}$
-\end_inset
-
-.
+), or else the global Cartesian coordinate system.
  The stress 
 \begin_inset Formula $\tilde{\boldsymbol{\sigma}}$
 \end_inset
@@ -34852,15 +34814,23 @@ Single fiber oriented along
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>0</theta>
-\end_layout
-
-\begin_layout LyX-Code
-    <phi>90</phi>
-\end_layout
-
-\begin_layout LyX-Code
     <k>5e3</k>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -34936,15 +34906,23 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>90</theta>
-\end_layout
-
-\begin_layout LyX-Code
-    <phi>25</phi>
-\end_layout
-
-\begin_layout LyX-Code
     <k>5e3</k>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -34968,15 +34946,23 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>-90</theta>
-\end_layout
-
-\begin_layout LyX-Code
-    <phi>25</phi>
-\end_layout
-
-\begin_layout LyX-Code
     <k>5e3</k>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>-90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -43010,7 +42996,7 @@ reference "subsec:Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -43084,7 +43070,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -43093,7 +43079,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -43105,83 +43091,11 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<theta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\theta,$
-\end_inset
-
- spherical angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\varphi,$
-\end_inset
-
- spherical angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
 \end_layout
 
 \end_inset
@@ -43199,61 +43113,16 @@ deg
 \end_layout
 
 \begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
-
+The fiber is oriented along the unit vector 
+\begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-Spherical angles
-\end_layout
-
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-The fiber is oriented along 
-\begin_inset Formula 
-\[
-\mathbf{N}=\sin\varphi\cos\theta\,\mathbf{e}_{1}+\sin\varphi\sin\theta\,\mathbf{e}_{2}+\cos\varphi\,\mathbf{e}_{3},\quad0\leqslant\theta<2\pi,\;0\leqslant\varphi\leqslant\pi,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\left(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right)$
-\end_inset
-
- are orthonormal vectors representing the local element coordinate system
- (Section
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
 \begin_inset space ~
 \end_inset
 
@@ -43264,20 +43133,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 
 \end_inset
 
-).
- The parameters <theta> and <phi> are optional, with default values of 
-\begin_inset Formula $\theta=$
-\end_inset
-
-0°and 
-\begin_inset Formula $\varphi=$
-\end_inset
-
-90°, such that 
-\begin_inset Formula $\mathbf{N}=\mathbf{e}_{1}$
-\end_inset
-
-.
+), or else the global Cartesian coordinate system.
  The Cauchy stress for this fibrous material is given by 
 \begin_inset Formula 
 \[
@@ -43408,11 +43264,19 @@ Single fiber oriented along
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>0</theta>
+    <mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-    <phi>90</phi>
+        <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -43484,11 +43348,19 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
-<theta>90</theta>
+<mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-<phi>25</phi>
+  <theta>90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+  <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+</mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -43512,11 +43384,19 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
-  <theta>-90</theta>
+  <mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-  <phi>25</phi>
+    <theta>-90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+    <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+  </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -69665,13 +69545,13 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="1" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -69680,7 +69560,7 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -69692,85 +69572,13 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [
 \series bold
 P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<theta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\theta,$
-\end_inset
-
- azimuthal angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\varphi,$
-\end_inset
-
- declination angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
 \series default
 ]
 \end_layout
@@ -69790,65 +69598,17 @@ deg
 \end_layout
 
 \begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
-
+In the reference configuration, the fiber is oriented along the unit vector
+ 
+\begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-Spherical angles
-\end_layout
-
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In the reference configuration, the fiber is oriented along 
-\begin_inset Formula 
-\[
-\mathbf{n}_{r}=\sin\varphi\cos\theta\mathbf{e}_{1}+\sin\varphi\sin\theta\mathbf{e}_{2}+\cos\varphi\mathbf{e}_{3}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\left(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right)$
-\end_inset
-
- are orthonormal vectors representing the local element coordinate system
- (Section
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
 \begin_inset space ~
 \end_inset
 
@@ -69859,20 +69619,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 
 \end_inset
 
-).
- The parameters <theta> and <phi> are optional, with default values of 
-\begin_inset Formula $\theta=$
-\end_inset
-
-0° and 
-\begin_inset Formula $\varphi=$
-\end_inset
-
-90°, such that 
-\begin_inset Formula $\mathbf{n}_{r}=\mathbf{e}_{1}$
-\end_inset
-
-.
+), or else the global Cartesian coordinate system.
  The active stress 
 \begin_inset Formula $\boldsymbol{\sigma}^{a}$
 \end_inset
@@ -69945,11 +69692,19 @@ Uniaxial contraction along
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>0</theta>
+    <mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-    <phi>90</phi>
+      <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+      <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -70022,13 +69777,13 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="1" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -70037,7 +69792,7 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -70049,85 +69804,13 @@ reference "subsec:Uncoupled-Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [
 \series bold
 P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<theta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\theta,$
-\end_inset
-
- azimuthal angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\varphi,$
-\end_inset
-
- declination angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
 \series default
 ]
 \end_layout
@@ -70147,65 +69830,17 @@ deg
 \end_layout
 
 \begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
-
+In the reference configuration, the fiber is oriented along the unit vector
+ 
+\begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-Spherical angles
-\end_layout
-
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In the reference configuration, the fiber is oriented along 
-\begin_inset Formula 
-\[
-\mathbf{n}_{r}=\sin\varphi\cos\theta\mathbf{e}_{1}+\sin\varphi\sin\theta\mathbf{e}_{2}+\cos\varphi\mathbf{e}_{3}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\left(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right)$
-\end_inset
-
- are orthonormal vectors representing the local element coordinate system
- (Section
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
 \begin_inset space ~
 \end_inset
 
@@ -70216,20 +69851,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 
 \end_inset
 
-).
- The parameters <theta> and <phi> are optional, with default values of 
-\begin_inset Formula $\theta=$
-\end_inset
-
-0° and 
-\begin_inset Formula $\varphi=$
-\end_inset
-
-90°, such that 
-\begin_inset Formula $\mathbf{n}_{r}=\mathbf{e}_{1}$
-\end_inset
-
-.
+), or else the global Cartesian coordinate system.
  The active stress 
 \begin_inset Formula $\boldsymbol{\sigma}^{a}$
 \end_inset
@@ -70243,7 +69865,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}$
+\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{e}_{1}$
 \end_inset
 
  is the stretched fiber orientation in the current (deformed) configuration
@@ -70307,11 +69929,19 @@ Isotropic contraction in plane transverse to
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>0</theta>
+    <mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-    <phi>90</phi>
+      <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+      <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -71008,13 +70638,13 @@ reference "subsec:Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="1" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -71023,7 +70653,7 @@ reference "subsec:Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -71035,85 +70665,13 @@ reference "subsec:Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [
 \series bold
 P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<theta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\theta,$
-\end_inset
-
- azimuthal angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\varphi,$
-\end_inset
-
- declination angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
 \series default
 ]
 \end_layout
@@ -71133,65 +70691,17 @@ deg
 \end_layout
 
 \begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
-
+In the reference configuration, the fiber is oriented along the unit vector
+ 
+\begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-Spherical angles
-\end_layout
-
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In the reference configuration, the fiber is oriented along 
-\begin_inset Formula 
-\[
-\mathbf{n}_{r}=\sin\varphi\cos\theta\mathbf{e}_{1}+\sin\varphi\sin\theta\mathbf{e}_{2}+\cos\varphi\mathbf{e}_{3}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\left(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right)$
-\end_inset
-
- are orthonormal vectors representing the local element coordinate system
- (Section
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
 \begin_inset space ~
 \end_inset
 
@@ -71202,20 +70712,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 
 \end_inset
 
-).
- The parameters <theta> and <phi> are optional, with default values of 
-\begin_inset Formula $\theta=$
-\end_inset
-
-0° and 
-\begin_inset Formula $\varphi=$
-\end_inset
-
-90°, such that 
-\begin_inset Formula $\mathbf{n}_{r}=\mathbf{e}_{1}$
-\end_inset
-
-.
+), or else the global Cartesian coordinate system.
  The active stress 
 \begin_inset Formula $\boldsymbol{\sigma}^{a}$
 \end_inset
@@ -71229,7 +70726,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}$
+\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{e}_{1}$
 \end_inset
 
  is the stretched fiber orientation in the current (deformed) configuration.
@@ -71284,11 +70781,19 @@ Uniaxial contraction along
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>0</theta>
+    <mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-    <phi>90</phi>
+      <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+      <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -71361,13 +70866,13 @@ reference "subsec:Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="1" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -71376,7 +70881,7 @@ reference "subsec:Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -71388,85 +70893,13 @@ reference "subsec:Solid-Mixture"
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [
 \series bold
 P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<theta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\theta,$
-\end_inset
-
- azimuthal angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\varphi,$
-\end_inset
-
- declination angle for fiber orientation in local coordinate system
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-deg
 \series default
 ]
 \end_layout
@@ -71486,65 +70919,17 @@ deg
 \end_layout
 
 \begin_layout Standard
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigSphericalAngles.png
-
+In the reference configuration, the fiber is oriented along the unit vector
+ 
+\begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-Spherical angles
-\end_layout
-
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In the reference configuration, the fiber is oriented along 
-\begin_inset Formula 
-\[
-\mathbf{n}_{r}=\sin\varphi\cos\theta\mathbf{e}_{1}+\sin\varphi\sin\theta\mathbf{e}_{2}+\cos\varphi\mathbf{e}_{3}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\left(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right)$
-\end_inset
-
- are orthonormal vectors representing the local element coordinate system
- (Section
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
 \begin_inset space ~
 \end_inset
 
@@ -71555,20 +70940,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 
 \end_inset
 
-).
- The parameters <theta> and <phi> are optional, with default values of 
-\begin_inset Formula $\theta=$
-\end_inset
-
-0°and 
-\begin_inset Formula $\varphi=$
-\end_inset
-
-90°, such that 
-\begin_inset Formula $\mathbf{n}_{r}=\mathbf{e}_{1}$
-\end_inset
-
-.
+), or else the global Cartesian coordinate system.
  The active stress 
 \begin_inset Formula $\boldsymbol{\sigma}^{a}$
 \end_inset
@@ -71582,7 +70954,7 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}$
+\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{e}_{1}$
 \end_inset
 
  is the stretched fiber orientation in the current (deformed) configuration
@@ -71642,11 +71014,19 @@ Isotropic contraction in plane transverse to
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>0</theta>
+    <mat_axis type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-    <phi>90</phi>
+      <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+      <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
 \end_layout
 
 \begin_layout LyX-Code
