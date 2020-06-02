@@ -33589,7 +33589,7 @@ A
 \emph on
 rigid connector
 \emph default
- is connects two rigid bodies denoted by 
+ connects two rigid bodies denoted by 
 \begin_inset Formula $\left(1\right)$
 \end_inset
 
@@ -33662,7 +33662,6 @@ Rigid body joints, such as spherical, revolute, prismatic, cylindrical and
  Similarly, a large stiffness torsional spring connects the rigid bodies
  in a manner that only allows relative rotation along the joint rotational
  degree(s) of freedom.
- 
 \end_layout
 
 \begin_layout Standard
@@ -33956,6 +33955,91 @@ which shows a dependence only on
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Relative Joint Motion
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Relative-Joint-Motion"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The position of a joint in each rigid body 
+\begin_inset Formula $i$
+\end_inset
+
+ is given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rc-origin-positions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The relative motion across a joint is given by the relative translation
+\begin_inset Formula 
+\begin{equation}
+\mathbf{x}=\mathbf{x}^{\left(2\right)}-\mathbf{x}^{\left(1\right)}\,,\label{eq:rjm-relative-translation}
+\end{equation}
+
+\end_inset
+
+and the relative rotation
+\begin_inset Formula 
+\begin{equation}
+\mathbf{Q}=\boldsymbol{\Lambda}^{\left(2\right)}\cdot\left(\boldsymbol{\Lambda}^{\left(1\right)}\right)^{T}\equiv\exp\left[\hat{\boldsymbol{\theta}}\right]\,,\label{eq:rjm-relative-rotation}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\boldsymbol{\theta}}=-\boldsymbol{\mathcal{E}}\cdot\boldsymbol{\theta}$
+\end_inset
+
+ is the skew-symmetric tensor with dual vector 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+.
+ As usual, 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ is a vector whose direction represents the axis of rotation and whose magnitude
+ is the angle of (counter-clockwise) rotation about that axis.
+ To report the relative motion of a joint, we may project 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ along the basis vectors 
+\begin_inset Formula $\mathbf{e}_{j}^{\left(1\right)}=\boldsymbol{\Lambda}^{\left(1\right)}\cdot\mathbf{E}_{j}$
+\end_inset
+
+ of the first rigid body.
+ Thus,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}x_{j} & =\mathbf{x}\cdot\mathbf{e}_{j}^{\left(1\right)}\\
+\theta_{j} & =\boldsymbol{\theta}\cdot\mathbf{e}_{j}^{\left(1\right)}
+\end{aligned}
+\,.\label{eq:rjm-projected-motion}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection

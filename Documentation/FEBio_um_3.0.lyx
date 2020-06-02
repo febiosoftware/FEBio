@@ -27236,7 +27236,7 @@ element or for all rigid connectors if no list is defined.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="13" columns="2">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -27367,7 +27367,7 @@ y-component of rigid connector moment
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -27376,11 +27376,131 @@ RCMz
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 z-component of rigid connector moment 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RCx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x-component of rigid connector translation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RCy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y-component of rigid connector translation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RCz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+z-component of rigid connector translation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RCthx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x-component of rigid connector rotation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RCthy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y-component of rigid connector rotation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RCthz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+z-component of rigid connector rotation
 \end_layout
 
 \end_inset
@@ -27405,6 +27525,100 @@ For example, to store the reaction forces and moments at rigid joints 2
 \begin_layout LyX-Code
 <rigid_connector_data data="RCFx;RCFy;RCFz;RCMx;RCMy;RCMz">2,4</rigid_connector_
 data>
+\end_layout
+
+\begin_layout Standard
+The rigid connector translation and rotation variables return relative motions
+ of the rigid bodies connected by rigid joints (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Rigid-Joints"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and other rigid connectors (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Rigid-Connectors"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The rotation components represent the components of a vector whose direction
+ is along the axis of rotation, and whose magnitude is the (counter-clockwise)
+ angle of rotation.
+ These relative motions are calculated as the motion of 
+\emph on
+body_b
+\emph default
+ relative to 
+\emph on
+body_a
+\emph default
+, expressed in the local Cartesian basis of 
+\emph on
+body_a
+\emph default
+, whose initial origin is at 
+\emph on
+joint_origin
+\emph default
+.
+ This Cartesian basis (which generally moves with 
+\emph on
+body_a
+\emph default
+) has its first axis along 
+\emph on
+rotation_axis
+\emph default
+ (for revolute and planar joints) or 
+\emph on
+translation_axis
+\emph default
+ (for prismatic joints) or 
+\emph on
+joint_axis
+\emph default
+ (for cylindrical joints); the second axis is along the 
+\emph on
+transverse_axis
+\emph default
+ (for revolute, prismatic and cylindrical joints) or 
+\emph on
+translation_axis_1
+\emph default
+ (for planar joints).
+ For spherical joints, springs, dampers, angular dampers and contractile
+ forces, the axes are always aligned with the global Cartesian basis.
+\end_layout
+
+\begin_layout Standard
+For springs, dampers and contractile forces, the returned translation components
+ represent the relative position vector between insertion points on 
+\emph on
+body_b
+\emph default
+ and 
+\emph on
+body_a
+\emph default
+.
+ The magnitude of this vector represents the distance between those points.
 \end_layout
 
 \begin_layout Subsection
