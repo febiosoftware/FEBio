@@ -905,6 +905,54 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogRigidConnectorTranslationX : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorTranslationX(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorTranslationY : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorTranslationY(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorTranslationZ : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorTranslationZ(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorRotationX : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorRotationX(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorRotationY : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorRotationY(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorRotationZ : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorRotationZ(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
 class FELogVolumeConstraint : public FELogNLConstraintData
 {
 public:

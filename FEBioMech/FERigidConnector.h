@@ -55,6 +55,12 @@ public:
 	//! serialization
 	void Serialize(DumpStream& ar) override;
     
+    //! evaluate relative translation
+    virtual vec3d RelativeTranslation() { return vec3d(0,0,0); }
+    
+    //! evaluate relative rotation
+    virtual vec3d RelativeRotation() { return vec3d(0,0,0); }
+    
 public:
     int	m_nRBa;		//!< rigid body A that the connector connects
     int	m_nRBb;		//!< rigid body B that the connector connects

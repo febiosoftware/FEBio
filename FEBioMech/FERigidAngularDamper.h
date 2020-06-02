@@ -63,6 +63,12 @@ public:
     //! Reset data
     void Reset() override;
     
+    //! evaluate relative translation
+    vec3d RelativeTranslation() override;
+    
+    //! evaluate relative rotation
+    vec3d RelativeRotation() override;
+
 public: // parameters
     double	m_c;        //! damping constant
     

@@ -1029,6 +1029,44 @@ double FELogRigidConnectorMomentZ::value(FENLConstraint& rc)
 }
 
 //-----------------------------------------------------------------------------
+double FELogRigidConnectorTranslationX::value(FENLConstraint& rc)
+{
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    return (prc ? prc->RelativeTranslation().x : 0);
+}
+
+double FELogRigidConnectorTranslationY::value(FENLConstraint& rc)
+{
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    return (prc ? prc->RelativeTranslation().y : 0);
+}
+
+double FELogRigidConnectorTranslationZ::value(FENLConstraint& rc)
+{
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    return (prc ? prc->RelativeTranslation().z : 0);
+}
+
+//-----------------------------------------------------------------------------
+double FELogRigidConnectorRotationX::value(FENLConstraint& rc)
+{
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    return (prc ? prc->RelativeRotation().x : 0);
+}
+
+double FELogRigidConnectorRotationY::value(FENLConstraint& rc)
+{
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    return (prc ? prc->RelativeRotation().y : 0);
+}
+
+double FELogRigidConnectorRotationZ::value(FENLConstraint& rc)
+{
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    return (prc ? prc->RelativeRotation().z : 0);
+}
+
+//-----------------------------------------------------------------------------
 double FELogVolumeConstraint::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);

@@ -803,12 +803,18 @@ REGISTER_FECORE_CLASS(FELogRigidBodyKineticEnergy, "KE");
 
 //-----------------------------------------------------------------------------
     // Derived from FELogConnectorData
-REGISTER_FECORE_CLASS(FELogRigidConnectorForceX , "RCFx");
-REGISTER_FECORE_CLASS(FELogRigidConnectorForceY , "RCFy");
-REGISTER_FECORE_CLASS(FELogRigidConnectorForceZ , "RCFz");
-REGISTER_FECORE_CLASS(FELogRigidConnectorMomentX, "RCMx");
-REGISTER_FECORE_CLASS(FELogRigidConnectorMomentY, "RCMy");
-REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, "RCMz");
+REGISTER_FECORE_CLASS(FELogRigidConnectorForceX      , "RCFx");
+REGISTER_FECORE_CLASS(FELogRigidConnectorForceY      , "RCFy");
+REGISTER_FECORE_CLASS(FELogRigidConnectorForceZ      , "RCFz");
+REGISTER_FECORE_CLASS(FELogRigidConnectorMomentX     , "RCMx");
+REGISTER_FECORE_CLASS(FELogRigidConnectorMomentY     , "RCMy");
+REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ     , "RCMz");
+REGISTER_FECORE_CLASS(FELogRigidConnectorTranslationX, "RCx");
+REGISTER_FECORE_CLASS(FELogRigidConnectorTranslationY, "RCy");
+REGISTER_FECORE_CLASS(FELogRigidConnectorTranslationZ, "RCz");
+REGISTER_FECORE_CLASS(FELogRigidConnectorRotationX   , "RCthx");
+REGISTER_FECORE_CLASS(FELogRigidConnectorRotationY   , "RCthy");
+REGISTER_FECORE_CLASS(FELogRigidConnectorRotationZ   , "RCthz");
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptorCriterion

@@ -220,3 +220,24 @@ void FERigidAngularDamper::Reset()
     m_F = vec3d(0,0,0);
     m_M = vec3d(0,0,0);
 }
+
+//-----------------------------------------------------------------------------
+vec3d FERigidAngularDamper::RelativeTranslation()
+{
+    return vec3d(0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+vec3d FERigidAngularDamper::RelativeRotation()
+{
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
+    
+    // get relative rotation
+    quatd Q = RBb.GetRotation()*RBa.GetRotation().Inverse(); Q.MakeUnit();
+    
+    // relative rotation vector
+    vec3d q = Q.GetRotationVector();
+    
+    return q;
+}

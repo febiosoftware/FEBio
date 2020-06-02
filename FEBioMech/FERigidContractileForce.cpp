@@ -318,3 +318,38 @@ void FERigidContractileForce::Reset()
     m_qa0 = m_a0 - RBa.m_r0;
     m_qb0 = m_b0 - RBb.m_r0;
 }
+
+//-----------------------------------------------------------------------------
+vec3d FERigidContractileForce::RelativeTranslation()
+{
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
+    
+    // body A
+    vec3d ra = RBa.m_rt;
+    vec3d za = m_qa0; RBa.GetRotation().RotateVector(za);
+    
+    // body B
+    vec3d rb = RBb.m_rt;
+    vec3d zb = m_qb0; RBb.GetRotation().RotateVector(zb);
+
+    // relative translation in global coordinate system
+    vec3d x = rb + zb - ra - za;
+
+    return x;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FERigidContractileForce::RelativeRotation()
+{
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
+    
+    // get relative rotation
+    quatd Q = RBb.GetRotation()*RBa.GetRotation().Inverse(); Q.MakeUnit();
+    
+    // relative rotation vector
+    vec3d q = Q.GetRotationVector();
+    
+    return q;
+}

@@ -869,3 +869,56 @@ void FERigidCylindricalJoint::Reset()
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
 }
+
+//-----------------------------------------------------------------------------
+vec3d FERigidCylindricalJoint::RelativeTranslation()
+{
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
+    
+    // body A
+    vec3d ra = RBa.m_rt;
+    vec3d za = m_qa0; RBa.GetRotation().RotateVector(za);
+    
+    // body B
+    vec3d rb = RBb.m_rt;
+    vec3d zb = m_qb0; RBb.GetRotation().RotateVector(zb);
+
+    // relative translation in global coordinate system
+    vec3d x = rb + zb - ra - za;
+
+    // evaluate local basis for body A
+    vec3d ea[3];
+    ea[0] = m_ea0[0]; RBa.GetRotation().RotateVector(ea[0]);
+    ea[1] = m_ea0[1]; RBa.GetRotation().RotateVector(ea[1]);
+    ea[2] = m_ea0[2]; RBa.GetRotation().RotateVector(ea[2]);
+
+    // project relative translation onto local basis
+    vec3d y(x*ea[0], x*ea[1], x*ea[2]);
+    
+    return y;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FERigidCylindricalJoint::RelativeRotation()
+{
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
+    
+    // get relative rotation
+    quatd Q = RBb.GetRotation()*RBa.GetRotation().Inverse(); Q.MakeUnit();
+    
+    // relative rotation vector
+    vec3d q = Q.GetRotationVector();
+    
+    // evaluate local basis for body A
+    vec3d ea[3];
+    ea[0] = m_ea0[0]; RBa.GetRotation().RotateVector(ea[0]);
+    ea[1] = m_ea0[1]; RBa.GetRotation().RotateVector(ea[1]);
+    ea[2] = m_ea0[2]; RBa.GetRotation().RotateVector(ea[2]);
+
+    // project relative rotation onto local basis
+    vec3d y(q*ea[0], q*ea[1], q*ea[2]);
+    
+    return y;
+}
