@@ -21,7 +21,7 @@ LEV_LIB = -llevmar
 
 #GSL library
 GSL_PATH = /usr/local/opt/gsl
-GSL_LIB = -lgsl
+GSL_LIB = $(GSL_PATH)/lib/libgsl.a
 
 #HYPRE library
 HYPRE_LIB = -lHYPRE

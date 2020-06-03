@@ -260,8 +260,8 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 		vec3d kuJ = svJ*gt*(-N[i] * N[j] * m_s[iel]) + f*(N[i] * N[j]); kuJ *= alpha;
 
 		Kab.zero();
-		Kab.sub(0, 0, -Kuu);
-		Kab.sub(0, 3, -Kuw);
+		Kab.sub(0, 0, Kuu);
+		Kab.sub(0, 3, Kuw);
 
 		Kab[0][6] -= kuJ.x;
 		Kab[1][6] -= kuJ.y;
