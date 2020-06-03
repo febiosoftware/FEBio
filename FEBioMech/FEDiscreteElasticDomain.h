@@ -24,15 +24,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-
+#include "FEDiscreteElasticMaterial.h"
 #include <FECore/FEDiscreteDomain.h>
 #include "FEElasticDomain.h"
-#include "FEDiscreteElementMaterial.h"
 
-class FEBIOMECH_API FEDiscreteElementDomain : public FEDiscreteDomain, public FEElasticDomain
+class FEDiscreteElasticDomain : public FEDiscreteDomain, public FEElasticDomain
 {
 public:
-	FEDiscreteElementDomain(FEModel* fem);
+	FEDiscreteElasticDomain(FEModel* fem);
 
 	//! Unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
@@ -70,6 +69,6 @@ public: // overridden from FEElasticDomain
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override {}
 
 protected:
-	FEDiscreteElementMaterial*	m_pMat;
+	FEDiscreteElasticMaterial*	m_pMat;
 	FEDofList	m_dofU, m_dofR, m_dof;
 };

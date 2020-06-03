@@ -557,6 +557,7 @@
     <ClInclude Include="..\..\FEBioMix\FEOsmCoefManning.h" />
     <ClInclude Include="..\..\FEBioMix\FEOsmoticCoefficient.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermConstIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPermExpIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermRefIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermRefOrtho.h" />
@@ -647,6 +648,7 @@
     <ClCompile Include="..\..\FEBioMix\FEOsmCoefManning.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEOsmoticCoefficient.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermConstIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPermExpIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermRefIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermRefOrtho.cpp" />

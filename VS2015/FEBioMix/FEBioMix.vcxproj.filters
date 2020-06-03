@@ -285,6 +285,9 @@
     <ClInclude Include="..\..\FEBioMix\FESolutePointSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEPermExpIso.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEActiveConstantSupply.cpp">
@@ -546,6 +549,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FESolutePointSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEPermExpIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -508,7 +508,9 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidP.h" />
@@ -517,6 +519,12 @@
     <ClInclude Include="..\..\FEBioFluid\febiofluid_api.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioThermoFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSISolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSITraction.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauYasudaFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.h" />
@@ -539,6 +547,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidHeatSupplyConst.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidMaterial.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidMixtureTractionLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidNormalHeatFlux.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidNormalTraction.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidNormalVelocity.h" />
@@ -546,6 +555,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidPDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidPDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidPResistanceBC.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidRCBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidRCRBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidResidualVector.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidResistanceBC.h" />
@@ -576,6 +586,7 @@
     <ClInclude Include="..\..\FEBioFluid\FESolutesMaterial.h" />
     <ClInclude Include="..\..\FEBioFluid\FESolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluid.h" />
@@ -590,7 +601,9 @@
     <ClInclude Include="..\..\FEBioFluid\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidP.cpp" />
@@ -598,6 +611,12 @@
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidSolutes.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioThermoFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSISolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSITraction.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.cpp" />
@@ -620,6 +639,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidHeatSupplyConst.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidMaterial.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidMixtureTractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidNormalHeatFlux.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidNormalTraction.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidNormalVelocity.cpp" />
@@ -627,6 +647,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidPDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidPDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidPResistanceBC.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidRCBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidRCRBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidResidualVector.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidResistanceBC.cpp" />
@@ -657,6 +678,7 @@
     <ClCompile Include="..\..\FEBioFluid\FESolutesMaterial.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FESolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluid.cpp" />

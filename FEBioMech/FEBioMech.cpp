@@ -213,8 +213,7 @@ SOFTWARE.*/
 #include "FESRIElasticSolidDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FE3FieldElasticShellDomain.h"
-#include "FEDiscreteSpringDomain.h"
-#include "FEDiscreteElementDomain.h"
+#include "FEDiscreteElasticDomain.h"
 #include "FEDeformableSpringDomain.h"
 #include "RigidBC.h"
 #include "FEBCPrescribedDeformation.h"
@@ -474,10 +473,9 @@ REGISTER_FECORE_CLASS(FEElasticShellDomainOld    , "elastic-shell-old" );
 REGISTER_FECORE_CLASS(FEElasticEASShellDomain    , "elastic-shell-eas" );
 REGISTER_FECORE_CLASS(FEElasticANSShellDomain    , "elastic-shell-ans" );
 REGISTER_FECORE_CLASS(FEElasticTrussDomain       , "elastic-truss"     );
-REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , "discrete-spring"   );
+REGISTER_FECORE_CLASS(FEDiscreteElasticDomain    , "discrete"          );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain   , "deformable-spring" );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain2  , "deformable-spring2");
-REGISTER_FECORE_CLASS(FEDiscreteElementDomain    , "discrete");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBoundaryCondition
@@ -664,6 +662,7 @@ REGISTER_FECORE_CLASS(FEPlotPreStrainCorrection          , "prestrain correction
 REGISTER_FECORE_CLASS(FEPlotSPRPreStrainCorrection       , "SPR prestrain correction"        );
 REGISTER_FECORE_CLASS(FEPlotPreStrainCompatibility       , "prestrain compatibility"         );
 REGISTER_FECORE_CLASS(FEPlotDiscreteElementStretch       , "discrete element stretch"        );
+REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce         , "discrete element force"          );
 
 // 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm      , "G norm"      );

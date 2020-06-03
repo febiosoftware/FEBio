@@ -23,18 +23,56 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FESpringMaterial.h"
+#include <FECore/FEElement.h>
+
+vec3d FESpringMaterial::Force(FEDiscreteMaterialPoint& mp)
+{
+	vec3d e = mp.m_drt; e.unit();
+
+	// calculate spring lengths
+	double L0 = mp.m_dr0.norm();
+	double Lt = mp.m_drt.norm();
+	double DL = Lt - L0;
+
+	// evaluate the spring force
+	return e*force(DL);
+}
+
+mat3d FESpringMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
+{
+	vec3d e = mp.m_drt; e.unit();
+
+	// calculate spring lengths
+	double L0 = mp.m_dr0.norm();
+	double Lt = mp.m_drt.norm();
+	double DL = Lt - L0;
+
+	// evaluate the stiffness
+	double F = force(DL);
+	double E = stiffness(DL);
+
+	if (Lt == 0) { F = 0; Lt = 1; e = vec3d(1, 1, 1); }
+
+	mat3d A; A.zero();
+	A[0][0] = ((E - F / Lt)*e.x*e.x + F / Lt);
+	A[1][1] = ((E - F / Lt)*e.y*e.y + F / Lt);
+	A[2][2] = ((E - F / Lt)*e.z*e.z + F / Lt);
+
+	A[0][1] = A[1][0] = (E - F / Lt)*e.x*e.y;
+	A[1][2] = A[2][1] = (E - F / Lt)*e.y*e.z;
+	A[0][2] = A[2][0] = (E - F / Lt)*e.x*e.z;
+
+	return A;
+}
 
 //-----------------------------------------------------------------------------
 // FELinearSpring
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FELinearSpring, FEDiscreteMaterial)
+BEGIN_FECORE_CLASS(FELinearSpring, FESpringMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 END_FECORE_CLASS();
 
@@ -53,7 +91,7 @@ double FELinearSpring::stiffness(double dl)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FETensionOnlyLinearSpring, FEDiscreteMaterial)
+BEGIN_FECORE_CLASS(FETensionOnlyLinearSpring, FESpringMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 END_FECORE_CLASS();
 
@@ -72,7 +110,7 @@ double FETensionOnlyLinearSpring::stiffness(double dl)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FENonLinearSpring, FEDiscreteMaterial)
+BEGIN_FECORE_CLASS(FENonLinearSpring, FESpringMaterial)
 	ADD_PROPERTY(m_F, "force");
 END_FECORE_CLASS();
 

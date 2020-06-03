@@ -57,6 +57,8 @@ SOFTWARE.*/
 #include <FECore/writeplot.h>
 #include <FECore/FEDomainParameter.h>
 #include <FECore/FEModel.h>
+#include "FEDiscreteElasticMaterial.h"
+#include "FEDiscreteElasticDomain.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -2994,6 +2996,28 @@ bool FEPlotDiscreteElementStretch::Save(FEDomain& dom, FEDataStream& a)
 
 		double l = Lt / L0;
 		a << l;
+	}
+
+	return true;
+}
+
+bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteElasticDomain* pdiscreteDomain = dynamic_cast<FEDiscreteElasticDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteElasticDomain& discreteDomain = *pdiscreteDomain;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+
+		// get the (one) material point data
+		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+
+		// write the force
+		a << mp.m_Ft;
 	}
 
 	return true;

@@ -24,43 +24,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEDiscreteElementDomain.h"
+#include "FEDiscreteElasticDomain.h"
 #include "FEBioMech.h"
-#include <FECore/FELinearSystem.h>
 #include <FECore/FEMesh.h>
+#include <FECore/FELinearSystem.h>
 
-//-----------------------------------------------------------------------------
-FEDiscreteElementDomain::FEDiscreteElementDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
+FEDiscreteElasticDomain::FEDiscreteElasticDomain(FEModel* fem) : FEDiscreteDomain(fem), FEElasticDomain(fem), m_dofU(fem), m_dofR(fem), m_dof(fem)
 {
-	m_pMat = 0;
+	m_pMat = nullptr;
+
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
+//! get the material (overridden from FEDomain)
+FEMaterial* FEDiscreteElasticDomain::GetMaterial()
+{
+	return m_pMat;
+}
+
+//-----------------------------------------------------------------------------
+//! set the material
+void FEDiscreteElasticDomain::SetMaterial(FEMaterial* pmat)
+{
+	m_pMat = dynamic_cast<FEDiscreteElasticMaterial*>(pmat);
+	assert(m_pMat);
+}
+
+//-----------------------------------------------------------------------------
 // get the total dofs
-const FEDofList& FEDiscreteElementDomain::GetDOFList() const
+const FEDofList& FEDiscreteElasticDomain::GetDOFList() const
 {
 	return m_dof;
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteElementDomain::SetMaterial(FEMaterial* pmat)
-{
-	FEDomain::SetMaterial(pmat);
-	m_pMat = dynamic_cast<FEDiscreteElementMaterial*>(pmat);
-	assert(m_pMat);
-}
-
-//-----------------------------------------------------------------------------
-//! get the material (overridden from FEDomain)
-FEMaterial* FEDiscreteElementDomain::GetMaterial()
-{ 
-	return m_pMat; 
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteElementDomain::UnpackLM(FEElement &el, vector<int>& lm)
+void FEDiscreteElasticDomain::UnpackLM(FEElement &el, vector<int>& lm)
 {
 	int N = el.Nodes();
 	lm.resize(N * 6);
@@ -70,19 +70,19 @@ void FEDiscreteElementDomain::UnpackLM(FEElement &el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3 * i    ] = id[m_dofU[0]];
+		lm[3 * i] = id[m_dofU[0]];
 		lm[3 * i + 1] = id[m_dofU[1]];
 		lm[3 * i + 2] = id[m_dofU[2]];
 
 		// rigid rotational dofs
-		lm[3 * N + 3 * i    ] = id[m_dofR[0]];
+		lm[3 * N + 3 * i] = id[m_dofR[0]];
 		lm[3 * N + 3 * i + 1] = id[m_dofR[1]];
 		lm[3 * N + 3 * i + 2] = id[m_dofR[2]];
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteElementDomain::Activate()
+void FEDiscreteElasticDomain::Activate()
 {
 	for (int i = 0; i<Nodes(); ++i)
 	{
@@ -100,7 +100,7 @@ void FEDiscreteElementDomain::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteElementDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+void FEDiscreteElasticDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	FEDiscreteDomain::PreSolveUpdate(timeInfo);
 	Update(timeInfo);
@@ -109,7 +109,7 @@ void FEDiscreteElementDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
 
-void FEDiscreteElementDomain::InternalForces(FEGlobalVector& R)
+void FEDiscreteElasticDomain::InternalForces(FEGlobalVector& R)
 {
 	FEMesh& mesh = *m_pMesh;
 
@@ -130,9 +130,9 @@ void FEDiscreteElementDomain::InternalForces(FEGlobalVector& R)
 		vec3d F = m_pMat->Force(mp);
 
 		// set up the force vector
-		fe[0] =  F.x;
-		fe[1] =  F.y;
-		fe[2] =  F.z;
+		fe[0] = F.x;
+		fe[1] = F.y;
+		fe[2] = F.z;
 		fe[3] = -F.x;
 		fe[4] = -F.y;
 		fe[5] = -F.z;
@@ -152,7 +152,7 @@ void FEDiscreteElementDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FEDiscreteElementDomain::StiffnessMatrix(FELinearSystem& LS)
+void FEDiscreteElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEMesh& mesh = *m_pMesh;
 
@@ -172,10 +172,10 @@ void FEDiscreteElementDomain::StiffnessMatrix(FELinearSystem& LS)
 		FEDiscreteMaterialPoint& mp = dynamic_cast<FEDiscreteMaterialPoint&>(*el.GetMaterialPoint(0));
 
 		// evaluate the stiffness
-		mat3d A = -m_pMat->Stiffness(mp);
+		mat3d A = m_pMat->Stiffness(mp);
 
-		ke.add(0, 0,  A); ke.add(0, 3, -A);
-		ke.add(3, 0, -A); ke.add(3, 3,  A);
+		ke.add(0, 0, A); ke.add(0, 3, -A);
+		ke.add(3, 0, -A); ke.add(3, 3, A);
 
 		// setup the node vector
 		en[0] = el.m_node[0];
@@ -193,7 +193,7 @@ void FEDiscreteElementDomain::StiffnessMatrix(FELinearSystem& LS)
 
 //-----------------------------------------------------------------------------
 //! update domain data
-void FEDiscreteElementDomain::Update(const FETimeInfo& tp)
+void FEDiscreteElasticDomain::Update(const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_pMesh;
 
@@ -206,7 +206,7 @@ void FEDiscreteElementDomain::Update(const FETimeInfo& tp)
 		FEDiscreteElement& el = m_Elem[i];
 
 		// get the material point data
-		FEDiscreteMaterialPoint& mp = dynamic_cast<FEDiscreteMaterialPoint&>(*el.GetMaterialPoint(0));
+		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
 
 		// get the nodes of the element
 		FENode& n1 = mesh.Node(el.m_node[0]);
@@ -224,10 +224,13 @@ void FEDiscreteElementDomain::Update(const FETimeInfo& tp)
 		vec3d ri1 = n1.m_r0;
 		vec3d ri2 = n2.m_r0;
 
-		mp.m_rt = rt2 - rt1;
-		mp.m_rp = rp2 - rp1;
-		mp.m_r0 = ri2 - ri1;
+		mp.m_drt = rt2 - rt1;
+		mp.m_drp = rp2 - rp1;
+		mp.m_dr0 = ri2 - ri1;
 
-		mp.m_vt = (mp.m_rt - mp.m_rp) / dt;
+		mp.m_dvt = (mp.m_drt - mp.m_drp) / dt;
+
+		// evaluate the force
+		mp.m_Ft = m_pMat->Force(mp);
 	}
 }

@@ -132,9 +132,6 @@
     <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -696,9 +693,6 @@
     <ClInclude Include="..\..\FEBioMech\FENodeToNodeConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEDiscreteElementDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEDiscreteElementMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -724,6 +718,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticDomain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -840,9 +843,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEDiscreteSpringDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEDistanceConstraint.cpp">
@@ -1394,9 +1394,6 @@
     <ClCompile Include="..\..\FEBioMech\FEDiscreteElementMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEDiscreteElementDomain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEGenericHyperelastic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1422,6 +1419,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

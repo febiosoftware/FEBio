@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include "FEUDGHexDomain.h"
 #include "FEUT4Domain.h"
 #include "FE3FieldElasticSolidDomain.h"
-#include "FEDiscreteSpringDomain.h"
+#include "FEDiscreteElasticDomain.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FECore/FEDiscreteMaterial.h"
 #include "FEDiscreteElementMaterial.h"
@@ -160,8 +160,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring2";
 		else if (eclass == FE_ELEM_DISCRETE)
 		{
-			if (dynamic_cast<FESpringMaterial*>(pmat)) sztype = "discrete-spring";
-			else if (dynamic_cast<FEDiscreteElementMaterial*>(pmat)) sztype = "discrete";
+			if (dynamic_cast<FEDiscreteElasticMaterial*>(pmat)) sztype = "discrete";
 		}
 		else return 0;
 	}

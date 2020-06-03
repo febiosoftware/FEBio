@@ -27,15 +27,18 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEDiscreteMaterial.h>
+#include "FEDiscreteElasticMaterial.h"
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements
-class FESpringMaterial : public FEDiscreteMaterial
+class FESpringMaterial : public FEDiscreteElasticMaterial
 {
 public:
-	FESpringMaterial(FEModel* pfem) : FEDiscreteMaterial(pfem) {}
+	FESpringMaterial(FEModel* pfem) : FEDiscreteElasticMaterial(pfem) {}
+
+	vec3d Force(FEDiscreteMaterialPoint& mp) override;
+	mat3d Stiffness(FEDiscreteMaterialPoint& mp) override;
 
 	virtual double force    (double dl) = 0;
 	virtual double stiffness(double dl) = 0;

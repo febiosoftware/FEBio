@@ -25,23 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 
-#include <FECore/FEDiscreteMaterial.h>
+#include "FEDiscreteElasticMaterial.h"
 #include <FECore/FEFunction1D.h>
 
-class FEDiscreteElementMaterial : public FEDiscreteMaterial 
-{
-public:
-	FEDiscreteElementMaterial(FEModel* fem);
-
-	// evaluate the force at a discrete element
-	virtual vec3d Force(FEDiscreteMaterialPoint& mp) = 0;
-
-	// evaluate the stiffness at a discrete element (= dF / dr)
-	virtual mat3d Stiffness(FEDiscreteMaterialPoint& mp) = 0;
-};
-
-
-class FEDiscreteContractileMaterial : public FEDiscreteElementMaterial
+class FEDiscreteContractileMaterial : public FEDiscreteElasticMaterial
 {
 public:
 	FEDiscreteContractileMaterial(FEModel* fem);

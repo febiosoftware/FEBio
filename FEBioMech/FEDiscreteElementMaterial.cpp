@@ -27,12 +27,7 @@ SOFTWARE.*/
 #include "FEDiscreteElementMaterial.h"
 #include <FECore/FEModel.h>
 
-FEDiscreteElementMaterial::FEDiscreteElementMaterial(FEModel* fem) : FEDiscreteMaterial(fem)
-{
-
-}
-
-BEGIN_FECORE_CLASS(FEDiscreteContractileMaterial, FEDiscreteElementMaterial)
+BEGIN_FECORE_CLASS(FEDiscreteContractileMaterial, FEDiscreteElasticMaterial)
 	ADD_PARAMETER(m_Vmax, "Vmax"  );
 	ADD_PARAMETER(m_ac  , "ac"  );
 	ADD_PARAMETER(m_Fmax, "Fmax");
@@ -45,7 +40,7 @@ BEGIN_FECORE_CLASS(FEDiscreteContractileMaterial, FEDiscreteElementMaterial)
 	ADD_PROPERTY(m_Ftv, "Fvl", FEProperty::Optional);
 END_FECORE_CLASS();
 
-FEDiscreteContractileMaterial::FEDiscreteContractileMaterial(FEModel* fem) : FEDiscreteElementMaterial(fem)
+FEDiscreteContractileMaterial::FEDiscreteContractileMaterial(FEModel* fem) : FEDiscreteElasticMaterial(fem)
 {
 	m_Vmax = 1.0;
 	m_ac   = 0.0;
@@ -98,15 +93,15 @@ double FEDiscreteContractileMaterial::active_force_deriv_V(double L, double V)
 
 double FEDiscreteContractileMaterial::force_deriv_L(FEDiscreteMaterialPoint& mp)
 {
-	vec3d e0 = mp.m_r0; double L0 = e0.unit();
-	vec3d et = mp.m_rt; double Lm = et.unit();
+	vec3d e0 = mp.m_dr0; double L0 = e0.unit();
+	vec3d et = mp.m_drt; double Lm = et.unit();
 	if (m_L0 != 0.0) L0 = m_L0;
 
 	// stretch
 	double L = Lm / L0;
 
 	// normalized velocity
-	double Vm = mp.m_vt*et;
+	double Vm = mp.m_dvt*et;
 	double Sv = (m_Sv ? m_Sv->value(m_ac) : 1.0);
 	double V = Vm / (m_Vmax * Sv);
 
@@ -115,15 +110,15 @@ double FEDiscreteContractileMaterial::force_deriv_L(FEDiscreteMaterialPoint& mp)
 
 double FEDiscreteContractileMaterial::force_deriv_V(FEDiscreteMaterialPoint& mp)
 {
-	vec3d e0 = mp.m_r0; double L0 = e0.unit();
-	vec3d et = mp.m_rt; double Lm = et.unit();
+	vec3d e0 = mp.m_dr0; double L0 = e0.unit();
+	vec3d et = mp.m_drt; double Lm = et.unit();
 	if (m_L0 != 0.0) L0 = m_L0;
 
 	// stretch
 	double L = Lm / L0;
 
 	// normalized velocity
-	double Vm = mp.m_vt*et;
+	double Vm = mp.m_dvt*et;
 	double Sv = (m_Sv ? m_Sv->value(m_ac) : 1.0);
 	double V = Vm / (m_Vmax * Sv);
 
@@ -132,15 +127,15 @@ double FEDiscreteContractileMaterial::force_deriv_V(FEDiscreteMaterialPoint& mp)
 
 double FEDiscreteContractileMaterial::force(FEDiscreteMaterialPoint& mp)
 {
-	vec3d e0 = mp.m_r0; double L0 = e0.unit();
-	vec3d et = mp.m_rt; double Lm = et.unit();
+	vec3d e0 = mp.m_dr0; double L0 = e0.unit();
+	vec3d et = mp.m_drt; double Lm = et.unit();
 	if (m_L0 != 0.0) L0 = m_L0;
 
 	// stretch
 	double L = Lm / L0;
 
 	// normalized velocity
-	double Vm = mp.m_vt*et;
+	double Vm = mp.m_dvt*et;
 	double Sv = (m_Sv ? m_Sv->value(m_ac) : 1.0);
 	double V = Vm / (m_Vmax * Sv);
 
@@ -160,7 +155,7 @@ double FEDiscreteContractileMaterial::force(FEDiscreteMaterialPoint& mp)
 // evaluate the force at a discrete element
 vec3d FEDiscreteContractileMaterial::Force(FEDiscreteMaterialPoint& mp)
 {
-	vec3d e = mp.m_rt; e.unit();
+	vec3d e = mp.m_drt; e.unit();
 	double F = force(mp);
 	return e*F;
 }
@@ -170,7 +165,7 @@ mat3d FEDiscreteContractileMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 {
 	double F = force(mp);
 
-	vec3d e = mp.m_rt;
+	vec3d e = mp.m_drt;
 	double L = e.unit();
 
 	mat3ds exe = dyad(e);
@@ -178,8 +173,8 @@ mat3d FEDiscreteContractileMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 
 	mat3ds E = (I - exe)/L;
 
-	vec3d v = mp.m_vt;
-	double V = mp.m_vt * e;
+	vec3d v = mp.m_dvt;
+	double V = mp.m_dvt * e;
 
 	double Fl = force_deriv_L(mp);
 	double Fv = force_deriv_V(mp);
@@ -188,5 +183,5 @@ mat3d FEDiscreteContractileMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 
 	vec3d f = e*(-Fl) - (e/dt + v/L + e*(L*V))*Fv;
 
-	return (e & f) - E*F;
+	return E*F - (e & f);
 }

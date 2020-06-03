@@ -546,9 +546,9 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h" />
-    <ClInclude Include="..\..\FEBioMech\FEDiscreteElementDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteElementMaterial.h" />
-    <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEDonnanEquilibrium.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.h" />
@@ -707,6 +707,7 @@
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEStressErrorCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
+    <ClInclude Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FESymmetryPlane.h" />
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FETendonMaterial.h" />
@@ -783,9 +784,9 @@
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEDiscreteElementDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteElementMaterial.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEDiscreteSpringDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDistanceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDonnanEquilibrium.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.cpp" />
@@ -945,6 +946,7 @@
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStressErrorCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESymmetryPlane.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETendonMaterial.cpp" />
