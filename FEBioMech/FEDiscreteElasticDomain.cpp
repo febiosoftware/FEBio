@@ -124,10 +124,11 @@ void FEDiscreteElasticDomain::InternalForces(FEGlobalVector& R)
 		FEDiscreteElement& el = m_Elem[i];
 
 		// get the material point data
-		FEDiscreteMaterialPoint& mp = dynamic_cast<FEDiscreteMaterialPoint&>(*el.GetMaterialPoint(0));
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+		FEDiscreteElasticMaterialPoint& ep = *mp.ExtractData<FEDiscreteElasticMaterialPoint>();
 
 		// evaluate the force
-		vec3d F = m_pMat->Force(mp);
+		vec3d F = ep.m_Ft;
 
 		// set up the force vector
 		fe[0] = F.x;
@@ -174,6 +175,7 @@ void FEDiscreteElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 		// evaluate the stiffness
 		mat3d A = m_pMat->Stiffness(mp);
 
+		ke.zero();
 		ke.add(0, 0, A); ke.add(0, 3, -A);
 		ke.add(3, 0, -A); ke.add(3, 3, A);
 
