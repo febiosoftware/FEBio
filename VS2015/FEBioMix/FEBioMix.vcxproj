@@ -537,6 +537,7 @@
     <ClInclude Include="..\..\FEBioMix\FEMassActionForwardEffective.h" />
     <ClInclude Include="..\..\FEBioMix\FEMassActionReversible.h" />
     <ClInclude Include="..\..\FEBioMix\FEMassActionReversibleEffective.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMatchingOsmoticCoefficientBC.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneMassActionForward.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneMassActionReversible.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneReaction.h" />
@@ -628,6 +629,7 @@
     <ClCompile Include="..\..\FEBioMix\FEMassActionForwardEffective.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMassActionReversible.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMassActionReversibleEffective.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMatchingOsmoticCoefficientBC.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneMassActionForward.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneMassActionReversible.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneReaction.cpp" />
