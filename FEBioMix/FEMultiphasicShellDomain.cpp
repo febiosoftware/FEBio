@@ -199,7 +199,8 @@ bool FEMultiphasicShellDomain::Init()
             ps.m_sbmrhat.assign(nsbm, 0);
             ps.m_sbmrhatp.assign(nsbm, 0);
             pb.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
-            
+            ps.m_cF = m_pMat->FixedChargeDensity(mp);
+
             // evaluate reaction rates at initial time
             // check if this mixture includes chemical reactions
             int nreact = (int)m_pMat->Reactions();

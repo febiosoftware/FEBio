@@ -1203,3 +1203,70 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
     
     return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotOsmoticCoefficient::Save(FEDomain &dom, FEDataStream& a)
+{
+    double c;
+    
+    if ((dom.Class() != FE_DOMAIN_SOLID)
+        && (dom.Class() != FE_DOMAIN_SHELL)) return false;
+    FESolidDomain* pbd = static_cast<FESolidDomain*>(&dom);
+    FEShellDomain* psd = static_cast<FEShellDomain*>(&dom);
+    
+    FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
+    if (pmp == 0) return false;
+
+    if (pbd) {
+        for (int i=0; i<pbd->Elements(); ++i)
+        {
+            FESolidElement& el = pbd->Element(i);
+            
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average stress values of the gauss points
+            double s = 0;
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
+                c = pmp->GetOsmoticCoefficient()->OsmoticCoefficient(pt);
+                
+                s += c;
+            }
+            s *= f;
+            
+            // store average osmotic coefficient
+            a << s;
+        }
+    }
+    else if (psd) {
+        for (int i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average stress values of the gauss points
+            double s = 0;
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
+                c = pmp->GetOsmoticCoefficient()->OsmoticCoefficient(pt);
+                
+                s += c;
+            }
+            s *= f;
+            
+            // store average osmotic coefficient
+            a << s;
+        }
+    }
+    
+    return true;
+}

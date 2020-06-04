@@ -160,6 +160,7 @@ bool FEMultiphasicSolidDomain::Init()
             ps.m_sbmrhat.assign(nsbm, 0);
             ps.m_sbmrhatp.assign(nsbm, 0);
             pb.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
+            ps.m_cF = m_pMat->FixedChargeDensity(mp);
             
             // evaluate reaction rates at initial time
             // check if this mixture includes chemical reactions
@@ -1667,8 +1668,8 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
             spt.m_ca[k] = pmb->Concentration(mp,k);
             spt.m_j[k] = pmb->SoluteFlux(mp,k);
         }
-        ppt.m_pa = pmb->Pressure(mp);
         spt.m_cF = pmb->FixedChargeDensity(mp);
+        ppt.m_pa = pmb->Pressure(mp);
         spt.m_Ie = pmb->CurrentDensity(mp);
         pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
                                            spt.m_dkdr, spt.m_dkdJr, spt.m_dkdrc);

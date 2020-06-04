@@ -80,6 +80,7 @@ SOFTWARE.*/
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
 #include "FEPressureStabilization.h"
+#include "FEMatchingOsmoticCoefficientBC.h"
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterfaceBiphasic.h"
@@ -203,10 +204,11 @@ REGISTER_FECORE_CLASS(FEMultiphasicShellDomain   , "multiphasic-shell"    );
     
 //-----------------------------------------------------------------------------
 // Surface loads
-REGISTER_FECORE_CLASS(FEPoroNormalTraction   , "normal_traction");
-REGISTER_FECORE_CLASS(FEFluidFlux            , "fluidflux"      );
-REGISTER_FECORE_CLASS(FESoluteFlux           , "soluteflux"     );
-REGISTER_FECORE_CLASS(FEPressureStabilization, "pressure_stabilization");
+REGISTER_FECORE_CLASS(FEPoroNormalTraction          , "normal_traction"       );
+REGISTER_FECORE_CLASS(FEFluidFlux                   , "fluidflux"             );
+REGISTER_FECORE_CLASS(FESoluteFlux                  , "soluteflux"            );
+REGISTER_FECORE_CLASS(FEPressureStabilization       , "pressure_stabilization");
+REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, "matching_osm_coef"     );
 
 //-----------------------------------------------------------------------------
 // Body loads
@@ -250,6 +252,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidForce2                      , "fluid force2"   
 REGISTER_FECORE_CLASS(FEPlotFluidLoadSupport                 , "fluid load support"  );
 REGISTER_FECORE_CLASS(FEPlotMixtureFluidFlowRate             , "fluid flow rate"     );
 REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density");
+REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient" );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeConcentration, "c");

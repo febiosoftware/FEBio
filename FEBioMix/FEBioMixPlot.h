@@ -246,6 +246,15 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Osmotic coefficient
+class FEPlotOsmoticCoefficient : public FEPlotDomainData
+{
+public:
+    FEPlotOsmoticCoefficient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================

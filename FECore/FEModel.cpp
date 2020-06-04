@@ -567,6 +567,9 @@ void FEModel::Update()
 		if (pc && pc->IsActive()) pc->Update();
 	}
 
+    // some of the loads may alter the prescribed dofs, so we update the mesh again
+    mesh.Update(tp);
+    
 	// do the callback
 	DoCallback(CB_MODEL_UPDATE);
 }

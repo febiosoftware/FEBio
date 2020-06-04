@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D507640E2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D507640C2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.cpp */; };
+		D507640F2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.h in Headers */ = {isa = PBXBuildFile; fileRef = D507640D2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.h */; };
 		D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CDE2142ABA0008DE511 /* FEBiphasicDomain.h */; };
 		D5322D862142ABA0008DE511 /* FEMultiphasicSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CDF2142ABA0008DE511 /* FEMultiphasicSolver.h */; };
 		D5322D872142ABA0008DE511 /* FEMultiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CE02142ABA0008DE511 /* FEMultiphasic.cpp */; };
@@ -188,6 +190,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D507640C2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEMatchingOsmoticCoefficientBC.cpp; sourceTree = "<group>"; };
+		D507640D2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMatchingOsmoticCoefficientBC.h; sourceTree = "<group>"; };
 		D5322CCF2142AB8D008DE511 /* libFEBioMix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5322CDE2142ABA0008DE511 /* FEBiphasicDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicDomain.h; sourceTree = "<group>"; };
 		D5322CDF2142ABA0008DE511 /* FEMultiphasicSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicSolver.h; sourceTree = "<group>"; };
@@ -462,6 +466,8 @@
 				D5322D1D2142ABA0008DE511 /* FEMassActionReversible.h */,
 				D5322D0F2142ABA0008DE511 /* FEMassActionReversibleEffective.cpp */,
 				D5322CE32142ABA0008DE511 /* FEMassActionReversibleEffective.h */,
+				D507640C2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.cpp */,
+				D507640D2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.h */,
 				D5322CFD2142ABA0008DE511 /* FEMembraneMassActionForward.cpp */,
 				D5322D302142ABA0008DE511 /* FEMembraneMassActionForward.h */,
 				D5322CF42142ABA0008DE511 /* FEMembraneMassActionReversible.cpp */,
@@ -657,6 +663,7 @@
 				D5322D882142ABA0008DE511 /* FESupplyMichaelisMenten.h in Headers */,
 				D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */,
 				D5322D8C2142ABA0008DE511 /* FESlidingInterfaceBiphasic.h in Headers */,
+				D507640F2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.h in Headers */,
 				D5F50DC823E1205300B21A30 /* FESolutePointSource.h in Headers */,
 				D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */,
 				D5322D992142ABA0008DE511 /* stdafx.h in Headers */,
@@ -801,6 +808,7 @@
 				D5322E1E2142ABA1008DE511 /* FESupplySynthesisBinding.cpp in Sources */,
 				D5322E282142ABA1008DE511 /* FESupplyBinding.cpp in Sources */,
 				D5322D9F2142ABA0008DE511 /* FEOsmCoefConst.cpp in Sources */,
+				D507640E2488113100D34EBB /* FEMatchingOsmoticCoefficientBC.cpp in Sources */,
 				D5322DF92142ABA1008DE511 /* FESolubManning.cpp in Sources */,
 				D5322DC72142ABA1008DE511 /* FEMixDomainFactory.cpp in Sources */,
 				D5322E032142ABA1008DE511 /* FEReactionRateNims.cpp in Sources */,
