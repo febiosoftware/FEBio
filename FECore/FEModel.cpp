@@ -103,6 +103,8 @@ public:
 
 		m_printParams = true;
 
+		m_meshUpdate = false;
+
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
 
@@ -142,6 +144,7 @@ public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
 	int				m_nStep;	//!< current index of analysis step
 	bool			m_printParams;	//!< print parameters
+	bool			m_meshUpdate;	//!< mesh update flag
 
 public:
 	// The model
@@ -222,6 +225,13 @@ DataStore& FEModel::GetDataStore()
 bool FEModel::IsSolved() const
 {
 	return m_imp->m_bsolved;
+}
+
+//-----------------------------------------------------------------------------
+// call this function to set the mesh's update flag
+void FEModel::SetMeshUpdateFlag(bool b)
+{
+	m_imp->m_meshUpdate = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -525,6 +535,11 @@ void FEModel::Update()
 	const FETimeInfo& tp = GetTime();
 	mesh.Update(tp);
 
+	// set the mesh update flag to false
+	// If any load sets this to true, the
+	// mesh will also be update after the loads are updated
+	m_imp->m_meshUpdate = false;
+
 	// update all edge loads
 	for (int i = 0; i < EdgeLoads(); ++i)
 	{
@@ -568,7 +583,11 @@ void FEModel::Update()
 	}
 
     // some of the loads may alter the prescribed dofs, so we update the mesh again
-    mesh.Update(tp);
+	if (m_imp->m_meshUpdate)
+	{
+		mesh.Update(tp);
+		m_imp->m_meshUpdate = false;
+	}
     
 	// do the callback
 	DoCallback(CB_MODEL_UPDATE);

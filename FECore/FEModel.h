@@ -141,6 +141,9 @@ public:
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
 
+	// call this function to set the mesh's update flag
+	void SetMeshUpdateFlag(bool b);
+
 public:	// --- Load controller functions ----
 
 	//! Add a load controller to the model
