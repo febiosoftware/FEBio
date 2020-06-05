@@ -56,7 +56,13 @@ bool FESurfaceAttractionBodyForce::Init()
 {
     if (!m_s->Init()) return false;
     FEBodyLoad::Init();
-    
+
+	FEClosestPointProjection cpp(*m_s);
+	cpp.SetTolerance(m_stol);
+	cpp.SetSearchRadius(m_sradius);
+	cpp.HandleSpecialCases(true);
+	cpp.Init();
+
     // allocate projection point vector array
     int nel = GetFEModel()->GetMesh().Elements();
     m_q.resize(nel);
@@ -80,12 +86,17 @@ bool FESurfaceAttractionBodyForce::Init()
             }
             FEElement& el = dom->ElementRef(j);
             int nint = el.GaussPoints();
-            int eid = el.GetID();
+            int eid = el.GetID() - 1;
             m_q[eid].resize(nint);
             for (int k=0; k<nint; ++k) {
                 FEMaterialPoint* mp = el.GetMaterialPoint(k);
                 vec3d x = mp->m_r0;
-                if (!ProjectSurface(x, m_q[eid][k]))
+
+				vec2d rs(0, 0);
+				FESurfaceElement* pme = nullptr;
+				pme = cpp.Project(x, m_q[eid][k], rs);
+
+                if (pme == nullptr)
                     m_q[eid][k] = x + vec3d(100*m_blt,100*m_blt,100*m_blt);
             }
         }
@@ -95,30 +106,10 @@ bool FESurfaceAttractionBodyForce::Init()
 }
 
 //-----------------------------------------------------------------------------
-// surface projection
-bool FESurfaceAttractionBodyForce::ProjectSurface(vec3d& x, vec3d& q)
-{
-    FEClosestPointProjection cpp(*m_s);
-    cpp.SetTolerance(m_stol);
-    cpp.SetSearchRadius(m_sradius);
-    cpp.HandleSpecialCases(true);
-    cpp.Init();
-    
-    vec2d rs(0,0);
-    FESurfaceElement* pme = nullptr;
-    pme = cpp.Project(x, q, rs);
-
-    if (pme) return true;
-    
-    return false;
-}
-
-
-//-----------------------------------------------------------------------------
 vec3d FESurfaceAttractionBodyForce::force(FEMaterialPoint& mp)
 {
     // get element number for this material point
-    int eid = mp.m_elem->GetID();
+    int eid = mp.m_elem->GetID() - 1;
     
     vec3d q = m_q[eid][mp.m_index];
     

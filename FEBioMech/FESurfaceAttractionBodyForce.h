@@ -48,9 +48,7 @@ public:
     // initialize
     bool Init() override;
     
-    // surface projection
-    bool ProjectSurface(vec3d& x, vec3d& q);
-    
+   
 private:
     vector< vector<vec3d> > m_q;    //!<  projection points
 
