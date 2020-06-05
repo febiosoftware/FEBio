@@ -192,9 +192,9 @@ void FEFluidNormalVelocity::Activate()
     {
         FENode& node = ps->Node(i);
         // mark node as having prescribed DOF
-        if (node.get_bc(m_dofWE[0] != DOF_FIXED)) node.set_bc(m_dofWE[0], DOF_PRESCRIBED);
-        if (node.get_bc(m_dofWE[1] != DOF_FIXED)) node.set_bc(m_dofWE[1], DOF_PRESCRIBED);
-        if (node.get_bc(m_dofWE[2] != DOF_FIXED)) node.set_bc(m_dofWE[2], DOF_PRESCRIBED);
+        if (node.get_bc(m_dofWE[0]) != DOF_FIXED) node.set_bc(m_dofWE[0], DOF_PRESCRIBED);
+        if (node.get_bc(m_dofWE[1]) != DOF_FIXED) node.set_bc(m_dofWE[1], DOF_PRESCRIBED);
+        if (node.get_bc(m_dofWE[2]) != DOF_FIXED) node.set_bc(m_dofWE[2], DOF_PRESCRIBED);
     }
 }
 
@@ -210,10 +210,12 @@ void FEFluidNormalVelocity::Update()
         // evaluate the velocity
         vec3d v = m_nu[i]*(m_velocity*m_VN[i]);
         FENode& node = ps->Node(i);
-        if (node.m_ID[m_dofWE[0]] < -1) node.set(m_dofWE[0], v.x);
-        if (node.m_ID[m_dofWE[1]] < -1) node.set(m_dofWE[1], v.y);
-        if (node.m_ID[m_dofWE[2]] < -1) node.set(m_dofWE[2], v.z);
+        if (node.get_bc(m_dofWE[0]) == DOF_PRESCRIBED) node.set(m_dofWE[0], v.x);
+        if (node.get_bc(m_dofWE[1]) == DOF_PRESCRIBED) node.set(m_dofWE[1], v.y);
+        if (node.get_bc(m_dofWE[2]) == DOF_PRESCRIBED) node.set(m_dofWE[2], v.z);
     }
+    
+    GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -254,7 +256,6 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     // create a linear solver
     LinearSolver*		plinsolve;	//!< the linear solver
     FEGlobalMatrix*		pK;			//!< stiffness matrix
-    FECoreKernel& fecore = FECoreKernel::GetInstance();
     plinsolve = fecore_new<LinearSolver>("skyline", nullptr);
     if (plinsolve == 0)
     {
