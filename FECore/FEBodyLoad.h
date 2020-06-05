@@ -66,9 +66,6 @@ public:
 	//! get the domain list
 	FEDomainList& GetDomainList();
     
-    //! add a surface if needed
-    virtual void SetSurface(FESurface* ps) {}
-
 public: // This should be overridden by derived classes
 
 	//! Evaluate force vector

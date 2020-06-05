@@ -38,6 +38,8 @@ BEGIN_FECORE_CLASS(FESurfaceAttractionBodyForce, FEBodyForce);
     ADD_PARAMETER(m_bsf     , "bsf"          );
     ADD_PARAMETER(m_stol    , "search_tol"   );
     ADD_PARAMETER(m_sradius , "search_radius");
+
+	ADD_PROPERTY(m_s, "surface", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -48,12 +50,16 @@ FESurfaceAttractionBodyForce::FESurfaceAttractionBodyForce(FEModel* pfem) : FEBo
     m_bsf = 0;
     m_stol = 0.01;
     m_sradius = 0;      // no search radius limitation
+
+	m_s = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FESurfaceAttractionBodyForce::Init()
 {
+	if (m_s == nullptr) return false;
+
     if (!m_s->Init()) return false;
     FEBodyLoad::Init();
 

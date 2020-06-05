@@ -77,19 +77,6 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 		if (elset == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
 		pbl->SetDomainList(elset);
 	}
-    
-    // see if a specific surface domain was referenced
-    const char* szset = tag.AttributeValue("surface", true);
-    if (szset) {
-        FEFacetSet* pface = mesh.FindFacetSet(szset);
-        if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
-
-        FESurface* psurf = fecore_alloc(FESurface, &fem);
-        GetBuilder()->BuildSurface(*psurf, *pface);
-
-        mesh.AddSurface(psurf);
-        pbl->SetSurface(psurf);
-    }
 
 	ReadParameterList(tag, pbl);
 	fem.AddBodyLoad(pbl);

@@ -42,12 +42,8 @@ public:
 
     mat3ds stiffness(FEMaterialPoint& mp) override;
     
-    // set the surface
-    void SetSurface(FESurface* ps) override { m_s = ps; }
-    
     // initialize
     bool Init() override;
-    
    
 private:
     vector< vector<vec3d> > m_q;    //!<  projection points
