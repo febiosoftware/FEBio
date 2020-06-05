@@ -135,6 +135,8 @@ void FEMatchingOsmoticCoefficientBC::Update()
             else node.set(m_dofQ, pe);
         }
     }
+    
+    fem->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------

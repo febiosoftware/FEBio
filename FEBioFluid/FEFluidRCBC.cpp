@@ -134,6 +134,8 @@ void FEFluidRCBC::Update()
             node.set(m_dofEF, e);
         }
     }
+    
+    GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------

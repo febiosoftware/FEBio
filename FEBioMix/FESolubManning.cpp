@@ -73,7 +73,7 @@ bool FESolubManning::Init()
 	}
     
     // extract the local id of the solute from the global id
-    m_lsol = m_pMP->FindLocalSoluteID(m_sol-1); // m_sol must be zero-based
+    m_lsol = m_pMP->FindLocalSoluteID(m_sol); // m_sol must be zero-based
 	if (m_lsol == -1) {
 		feLogError("Invalid value for sol");
 		return false;

@@ -109,6 +109,8 @@ void FEFluidResistanceBC::Update()
             node.set(m_dofEF, e);
         }
     }
+    
+    GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------

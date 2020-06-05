@@ -1,10 +1,28 @@
-//
-//  FEBiphasicFSITraction.cpp
-//  FEBioFluid
-//
-//  Created by Jay Shim on 2/3/20.
-//  Copyright © 2020 febio.org. All rights reserved.
-//
+/*This file is part of the FEBio source code and is licensed under the MIT license
+listed below.
+
+See Copyright-FEBio.txt for details.
+
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
+the City of New York, and others.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBiphasicFSITraction.h"
@@ -12,6 +30,12 @@
 #include "FEFluid.h"
 #include "FEBiphasicFSI.h"
 #include "FEBioBiphasicFSI.h"
+
+//-----------------------------------------------------------------------------
+// Parameter block for pressure loads
+BEGIN_FECORE_CLASS(FEBiphasicFSITraction, FESurfaceLoad)
+    ADD_PARAMETER(m_bshellb , "shell_bottom");
+END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -22,6 +46,7 @@ FEBiphasicFSITraction::FEBiphasicFSITraction(FEModel* pfem) : FESurfaceLoad(pfem
     m_dofSU.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::SHELL_DISPLACEMENT));
     m_dofW.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::RELATIVE_FLUID_VELOCITY));
     m_dofEF = pfem->GetDOFIndex(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::FLUID_DILATATION), 0);
+    m_bshellb = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -29,12 +54,12 @@ FEBiphasicFSITraction::FEBiphasicFSITraction(FEModel* pfem) : FESurfaceLoad(pfem
 bool FEBiphasicFSITraction::Init()
 {
     FESurface& surf = GetSurface();
+    surf.SetShellBottom(m_bshellb);
     surf.SetInterfaceStatus(true);
     if (FESurfaceLoad::Init() == false) return false;
     
     // get the list of fluid-FSI elements connected to this interface
     FEModel* fem = GetFEModel();
-    FEMesh* mesh = surf.GetMesh();
     int NF = surf.Elements();
     m_elem.resize(NF);
     m_K.resize(NF, 0);
@@ -110,11 +135,9 @@ mat3ds FEBiphasicFSITraction::GetFluidStress(FESurfaceMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 void FEBiphasicFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    FEModel* fem = GetFEModel();
-    FEMesh* mesh = m_psurf->GetMesh();
-    
-    // TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
-    m_psurf->LoadVector(R, m_dofU, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
+    // If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
+    FEDofList dof = m_bshellb ? m_dofSU : m_dofU;
+    m_psurf->LoadVector(R, dof, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
         
         // get the surface element
         FESurfaceElement& el = *mp.SurfaceElement();
@@ -154,7 +177,7 @@ void FEBiphasicFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
     // build dof list
     // TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
     FEDofList dofs(fem);
-    dofs.AddDofs(m_dofU);
+    if (!m_bshellb) dofs.AddDofs(m_dofU); else dofs.AddDofs(m_dofSU);
     dofs.AddDofs(m_dofW);
     dofs.AddDof(m_dofEF);
     
