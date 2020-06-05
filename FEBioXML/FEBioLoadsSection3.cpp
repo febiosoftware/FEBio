@@ -79,7 +79,7 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 	}
     
     // see if a specific surface domain was referenced
-    const char* szset = tag.AttributeValue("surface");
+    const char* szset = tag.AttributeValue("surface", true);
     if (szset) {
         FEFacetSet* pface = mesh.FindFacetSet(szset);
         if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
