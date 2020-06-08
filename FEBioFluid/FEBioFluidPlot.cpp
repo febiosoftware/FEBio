@@ -702,6 +702,18 @@ bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotPermeability::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasicFSI* bp = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
+    if (bp == 0) return false;
+    
+    writeAverageElementValue<mat3ds>(dom, a, [=](const FEMaterialPoint& mp) {
+        return bp->Permeability(const_cast<FEMaterialPoint&>(mp));
+    });
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotGradJ::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();

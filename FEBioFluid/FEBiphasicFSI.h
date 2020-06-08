@@ -58,6 +58,7 @@ public:
     double      m_phif;   //!< fluid volume fraction
     vec3d       m_gradphif;   //!< gradient of fluid volume fraction
     vec3d       m_gradJ;      //!< gradient of J
+    double      m_phi0;       //!< solid volume fraction in reference configuration
 };
 
 //-----------------------------------------------------------------------------

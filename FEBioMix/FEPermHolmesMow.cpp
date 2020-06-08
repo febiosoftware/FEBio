@@ -49,12 +49,17 @@ FEPermHolmesMow::FEPermHolmesMow(FEModel* pfem) : FEHydraulicPermeability(pfem)
 mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	
+	FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+    
 	// relative volume
 	double J = et.m_J;
-	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+	// referential solid volume fraction also check if bfsi
+    double phi0 = 0.0;
+    if (pt)
+        phi0 = pt->m_phi0;
+    else if (bpt)
+        phi0 = bpt->m_phi0;
 	
 	// --- strain-dependent isotropic permeability ---
 	
@@ -66,12 +71,17 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
+	FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
 	
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+    double phi0 = 0.0;
+    if (pt)
+        phi0 = pt->m_phi0;
+    else if (bpt)
+        phi0 = bpt->m_phi0;
 	
 	mat3dd I(1);	// Identity
 	

@@ -240,6 +240,7 @@ REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration      , "receptor-ligand 
 REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"			    );
 REGISTER_FECORE_CLASS(FEPlotReferentialSolidVolumeFraction   , "referential solid volume fraction");
 REGISTER_FECORE_CLASS(FEPlotPorosity                         , "porosity"            );
+REGISTER_FECORE_CLASS(FEPlotPerm                             , "permeability"        );
 REGISTER_FECORE_CLASS(FEPlotElectricPotential                , "electric potential"  );
 REGISTER_FECORE_CLASS(FEPlotCurrentDensity                   , "current density"     );
 REGISTER_FECORE_CLASS(FEPlotFixedChargeDensity               , "fixed charge density");

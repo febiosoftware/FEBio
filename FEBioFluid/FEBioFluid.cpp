@@ -163,6 +163,7 @@ REGISTER_FECORE_CLASS(FEPlotRelativeSolidVolume        , "solid volume fraction"
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVolume        , "fluid volume fraction"    );
 REGISTER_FECORE_CLASS(FEPlotFluidTemperature           , "fluid temperature"        );
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVelocity      , "relative fluid velocity"  );
+REGISTER_FECORE_CLASS(FEPlotPermeability               , "bfsi permeability"  );
 REGISTER_FECORE_CLASS(FEPlotGradJ                      , "dilatation gradient"      );
 REGISTER_FECORE_CLASS(FEPlotGradPhiF                   , "fluid volume ratio gradient");
 REGISTER_FECORE_CLASS(FEPlotFluidAcceleration          , "fluid acceleration"       );

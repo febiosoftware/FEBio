@@ -158,6 +158,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Permeability
+class FEPlotPerm : public FEPlotDomainData
+{
+public:
+    FEPlotPerm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Fixed charge density
 class FEPlotFixedChargeDensity : public FEPlotDomainData
 {

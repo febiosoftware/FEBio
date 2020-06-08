@@ -58,14 +58,14 @@ FEMaterialPoint* FEBiphasicFSIMaterialPoint::Copy()
 void FEBiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPoint::Serialize(ar);
-    ar & m_w & m_aw & m_Jdot & m_phis & m_phif & m_gradphif & m_gradJ & m_Lw;
+    ar & m_w & m_aw & m_Jdot & m_phis & m_phif & m_phi0 & m_gradphif & m_gradJ & m_Lw;
 }
 
 //-----------------------------------------------------------------------------
 void FEBiphasicFSIMaterialPoint::Init()
 {
     m_w = m_aw = m_gradphif = m_gradJ = vec3d(0,0,0);
-    m_Jdot = m_phis = m_phif = 0;
+    m_Jdot = m_phis = m_phif = m_phi0 = 0;
     m_Lw = mat3d(0.0);
     
     FEMaterialPoint::Init();
@@ -93,7 +93,11 @@ FEBiphasicFSI::FEBiphasicFSI(FEModel* pfem) : FEMaterial(pfem)
 FEMaterialPoint* FEBiphasicFSI::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint(m_pSolid->CreateMaterialPointData());
-    return new FEBiphasicFSIMaterialPoint(fpt);
+    FEBiphasicFSIMaterialPoint* bfpt = new FEBiphasicFSIMaterialPoint(fpt);
+    
+    bfpt->m_phi0 = m_phi0;
+    
+    return bfpt;
 }
 
 //-----------------------------------------------------------------------------
@@ -193,7 +197,11 @@ mat3ds FEBiphasicFSI::Permeability(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4dmm FEBiphasicFSI::Permeability_Tangent(FEMaterialPoint& mp)
 {
-    return m_pPerm->Tangent_Permeability_Strain(mp);
+    //Return 0 if permeability is 0 to avoid NAN
+    if (m_pPerm->Permeability(mp).xx() == 0.0 && m_pPerm->Permeability(mp).xy() == 0.0 && m_pPerm->Permeability(mp).xz() == 0.0 && m_pPerm->Permeability(mp).yy() == 0.0 && m_pPerm->Permeability(mp).yz() == 0.0 && m_pPerm->Permeability(mp).zz() == 0.0)
+        return tens4dmm(0.0);
+    else
+        return m_pPerm->Tangent_Permeability_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------

@@ -218,6 +218,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Permeability
+class FEPlotPermeability : public FEPlotDomainData
+{
+public:
+    FEPlotPermeability(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element GradJ
 class FEPlotGradJ : public FEPlotDomainData
 {

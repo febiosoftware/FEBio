@@ -755,6 +755,18 @@ bool FEPlotPorosity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotPerm::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasic* bp = dom.GetMaterial()->ExtractProperty<FEBiphasic>();
+    if (bp == 0) return false;
+
+    writeAverageElementValue<mat3ds>(dom, a, [=](const FEMaterialPoint& mp) {
+            return bp->Permeability(const_cast<FEMaterialPoint&>(mp));
+        });
+        return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
