@@ -155,8 +155,8 @@ double NumCore::estimateConditionNumber(SparseMatrix* K)
 		double normx = infNorm(x);
 		if (normx > normAi) normAi = normx;
 
-		int pct = (100 * i) / (iters - 1);
-		fprintf(stderr, "calculating condition number: %d%%\r", pct);
+//		int pct = (100 * i) / (iters - 1);
+//		fprintf(stderr, "calculating condition number: %d%%\r", pct);
 	}
 
 	return normA*normAi;

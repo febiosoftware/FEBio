@@ -26,11 +26,14 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "StrategySolver.h"
+#include "MatrixTools.h"
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(StrategySolver, LinearSolver)
 	ADD_PARAMETER(m_strategy, "strategy");
+	ADD_PARAMETER(m_ctol, "max_condition_number");
+	ADD_PARAMETER(m_print_cn, "print_condition_number");
 	ADD_PROPERTY(m_solver1, "solver1");
 	ADD_PROPERTY(m_solver2, "solver2");
 END_FECORE_CLASS();
@@ -38,9 +41,14 @@ END_FECORE_CLASS();
 StrategySolver::StrategySolver(FEModel* fem) : LinearSolver(fem)
 {
 	m_strategy = DONT_PERSIST;
+	m_print_cn = false;
+	m_ctol = 0;
+
 	m_solver1 = nullptr;
 	m_solver2 = nullptr;
 	m_activeSolver = nullptr;
+
+	m_pA = nullptr;
 }
 
 StrategySolver::~StrategySolver()
@@ -62,6 +70,19 @@ bool StrategySolver::PreProcess()
 bool StrategySolver::Factor()
 {
 	if ((m_activeSolver == nullptr) || (m_strategy != PERSIST_FOREVER)) m_activeSolver = m_solver1;
+
+	if (m_pA && (m_print_cn || ((m_ctol > 0.0) && (m_activeSolver == m_solver1))))
+	{
+		double c = NumCore::estimateConditionNumber(m_pA);
+
+		if (m_print_cn) feLog("\nEst. condition number: %lg\n\n", c);
+		if ((m_ctol > 0.0) && (c >= m_ctol))
+		{
+			feLogWarning("Condition number too large: %lg\nSwitching to secondary solver.", c);
+			m_activeSolver = m_solver2;
+		}
+	}
+
 	return m_activeSolver->Factor();
 }
 
@@ -107,6 +128,8 @@ SparseMatrix* StrategySolver::CreateSparseMatrix(Matrix_Type ntype)
 		delete A;
 		return nullptr;
 	}
+
+	m_pA = A;
 
 	return A;
 }

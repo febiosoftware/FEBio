@@ -30,12 +30,12 @@ SOFTWARE.*/
 // This class implements a linear solver that can switch between linear solvers
 class StrategySolver : public LinearSolver
 {
-	// the strategy determines when to switch back from solver2 to solver1
+	// the persist strategy determines when to switch back from solver2 to solver1
 	// after solver1 fails. 
 	// DONT_PERSIST (0) = switch back immediately.
 	// PERSIST          = switch back on the next Destroy()
 	// PERSIST_FOREVER  = switch to solver2 permanently
-	enum Strategy
+	enum PersistStrategy
 	{
 		DONT_PERSIST,
 		PERSIST,
@@ -68,9 +68,14 @@ public:
 
 private:
 	int				m_strategy;
+	double			m_ctol;
+
+	bool			m_print_cn;	// print the condition number
 	LinearSolver*	m_solver1;	// the primary solver
 	LinearSolver*	m_solver2;	// the seoncdary solver
 	LinearSolver*	m_activeSolver;
+
+	SparseMatrix*	m_pA;
 
 	DECLARE_FECORE_CLASS();
 };
