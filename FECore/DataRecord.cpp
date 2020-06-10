@@ -102,6 +102,7 @@ bool DataRecord::Initialize()
 std::string DataRecord::printToString(int i)
 {
 	std::stringstream ss;
+	ss.precision(12);
 
 	ss << m_item[i] << m_szdelim;
 	int nd = Size();
