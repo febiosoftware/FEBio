@@ -127,7 +127,7 @@ bool parseRigidDofs(const char* sz, vector<int>& bc)
 		ch = ch2;
 	}
 	while (ch);
-	delete buf;
+    delete[] buf;
 	return ok;
 }
 
