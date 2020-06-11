@@ -1,0 +1,73 @@
+1. Introduction to FEBio licenses
+=================================
+Prior to FEBio 2.9, FEBio (including the source code, SDK, and binaries) were distributed under a custom license that limited the use of FEBio and its derived products to academic users only. Commercial users were required to obtain a separate commercial license. 
+
+As of FEBio version 2.9 the FEBio source code and SDK are licensed under the MIT license, listed below. The binaries and installers available from febio.org are still distributed under the custom license, but the restrictions for commercial users were removed.
+
+
+2. FEBio AUTHORS
+================
+The following people are considered AUTHORS of the FEBio software. 
+
+- Steve Maas
+- Gerard A. Ateshian
+- Jeffrey A. Weiss
+
+The following people have also contributed to the FEBio software.
+
+- David R. Rawlins
+- Benjamin J. Ellis
+- Alex A. Veress
+- Sam Evans
+- Shawn Reese
+- Aaron Swedberg 
+- Jocelyn Todd
+- Lowell Edgar
+- Jay J. Shim
+- Marsh Paulson
+- Klevis Aliaj
+- Brandon Zimmerman
+- Jay C. Hou
+
+
+3. Copyright HOLDERS
+===================
+The following lists the Copyright HOLDERS: 
+
+- University of Utah
+- The Trustees of Columbia University in the City of New York
+- The AUTHORS as defined above
+
+
+4. FEBIO license
+=================
+
+The following text shall appear in all source code files that are part of the FEBio software. 
+
+-->
+This file is part of the FEBio source code and is licensed under the MIT license
+listed below.
+
+See Copyright-FEBio.txt for details.
+
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+the City of New York, and others.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
