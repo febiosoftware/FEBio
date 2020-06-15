@@ -1,0 +1,985 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug DLL|Win32">
+      <Configuration>Debug DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug DLL|x64">
+      <Configuration>Debug DLL</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug MPI|Win32">
+      <Configuration>Debug MPI</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug MPI|x64">
+      <Configuration>Debug MPI</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Vanilla|Win32">
+      <Configuration>Debug Vanilla</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Vanilla|x64">
+      <Configuration>Debug Vanilla</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mech Debug|Win32">
+      <Configuration>Mech Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mech Debug|x64">
+      <Configuration>Mech Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release DLL|Win32">
+      <Configuration>Release DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release DLL|x64">
+      <Configuration>Release DLL</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Vanilla|Win32">
+      <Configuration>Release Vanilla</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Vanilla|x64">
+      <Configuration>Release Vanilla</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{377D2771-3EE6-4CAE-A2F4-9EC0599B8B68}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FEBioMech</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FECORE_DLL;FEBIOMECH_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>fecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FECORE_DLL;FEBIOMECH_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>fecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FE2OMicroConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FE3FieldElasticShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberContraction.h" />
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberStress.h" />
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberStressUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBCPrescribedDeformation.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBCRigidDeformation.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
+    <ClInclude Include="..\..\FEBioMech\febiomech_api.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBondRelaxation.h" />
+    <ClInclude Include="..\..\FEBioMech\FECarreauYasudaViscousSolid.h" />
+    <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
+    <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
+    <ClInclude Include="..\..\FEBioMech\FECentrifugalBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FECGSolidSolver.h" />
+    <ClInclude Include="..\..\FEBioMech\FEConstPrestrain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistributionUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FECoupledMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FECoupledVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FECubicCLE.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageCDF.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageCriterion.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMaterialUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteElementMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDonnanEquilibrium.h" />
+    <ClInclude Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.h" />
+    <ClInclude Include="..\..\FEBioMech\FEEFDMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEEFDNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEEFDUncoupled.h" />
+    <ClInclude Include="..\..\FEBioMech\FEEFDVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticANSShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticEASShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterialUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMaterial2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMixture.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMultigeneration.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain1O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticShellDomainOld.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticSolidDomain2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticTrussDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEEllipsoidalFiberDistribution.h" />
+    <ClInclude Include="..\..\FEBioMech\FEExplicitSolidSolver.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFacet2FacetSliding.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFacet2FacetTied.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFatigueMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberDensityDistribution.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberEFDNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberExpLinear.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberExponentialPowerUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberExpPow.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberExpPowUncoupled.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGauss.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGaussKronrod.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGeodesic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationScheme.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangle.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberNHUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberPowLinear.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFungOrthoCompressible.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericHyperelasticUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericRigidJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
+    <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
+    <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEInitialPreStrain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEInitialVelocity.h" />
+    <ClInclude Include="..\..\FEBioMech\FEInSituStretchGradient.h" />
+    <ClInclude Include="..\..\FEBioMech\FEIsotropicElastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMaxDamageCriterion.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMaxStressCriterion.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMechModel.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMembraneMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMergedConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMicroMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMindlinElastic2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMortarContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMortarInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMortarSlidingContact.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMortarTiedContact.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMRVonMisesFibers.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMuscleMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FENaturalNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FENeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FENeoHookeanTransIso.h" />
+    <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolid.h" />
+    <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolidUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FENodalForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FENodeToNodeConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEOgdenMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEOgdenUnconstrained.h" />
+    <ClInclude Include="..\..\FEBioMech\FEOrthoElastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEOrthotropicCLE.h" />
+    <ClInclude Include="..\..\FEBioMech\FEOsmoticVirialExpansion.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPerfectOsmometer.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary1O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropicUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIso.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIsoUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainElastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainUncoupledElastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticity.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityHardening.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactiveViscoelastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FERemodelingElasticDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEResidualVector.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidAngularDamper.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidBody.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidCable.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidConnector.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidContractileForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidCylindricalJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidDamper.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidLock.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidPlanarJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidPrismaticJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidRevoluteJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSlidingContact.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSolver.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSphericalJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSpring.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSystem.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEDamageMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEModel2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
+    <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioMech\FESolidLinearSystem.h" />
+    <ClInclude Include="..\..\FEBioMech\FESolidMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FESolidSolver.h" />
+    <ClInclude Include="..\..\FEBioMech\FESolidSolver2.h" />
+    <ClInclude Include="..\..\FEBioMech\FESphericalFiberDistribution.h" />
+    <ClInclude Include="..\..\FEBioMech\FESpringMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEStressErrorCriterion.h" />
+    <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
+    <ClInclude Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FESymmetryPlane.h" />
+    <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />
+    <ClInclude Include="..\..\FEBioMech\FETendonMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FETiedContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FETiedElasticInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FETiedInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FETractionLoad.h" />
+    <ClInclude Include="..\..\FEBioMech\FETransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FETransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FETrussMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUDGHexDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledActiveContraction.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledElasticMixture.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledFiberExpLinear.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledViscoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUT4Domain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEViscousMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEVolumeConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
+    <ClInclude Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\gauss.h" />
+    <ClInclude Include="..\..\FEBioMech\gausskronrod.h" />
+    <ClInclude Include="..\..\FEBioMech\geodesic.h" />
+    <ClInclude Include="..\..\FEBioMech\ObjectDataRecord.h" />
+    <ClInclude Include="..\..\FEBioMech\RigidBC.h" />
+    <ClInclude Include="..\..\FEBioMech\stdafx.h" />
+    <ClInclude Include="..\..\FEBioMech\triangle_sphere.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FE2OMicroConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FE3FieldElasticShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberContraction.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberStress.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberStressUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEArrudaBoyce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBCRigidDeformation.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBioMech.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBioMechData.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBondRelaxation.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECarreauYasudaViscousSolid.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECarterHayesOld.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECentrifugalBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECGSolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEConstPrestrain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistributionUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECoupledMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECoupledVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECubicCLE.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageCDF.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageCriterion.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMaterialUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteElementMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDistanceConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDonnanEquilibrium.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEEFDMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEEFDNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEEFDUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticANSShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticEASShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterialUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMaterial2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMixture.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMultigeneration.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain1O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticShellDomainOld.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticSolidDomain2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticTrussDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEEllipsoidalFiberDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEExplicitSolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFacet2FacetSliding.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFacet2FacetTied.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFatigueMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberDensityDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberEFDNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberExpLinear.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberExponentialPowerUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberExpPow.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGauss.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGaussKronrod.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGeodesic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationScheme.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangle.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberNHUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberPowLinear.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFungOrthoCompressible.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericHyperelastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericHyperelasticUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericRigidJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEInitialPreStrain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEInitialVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEInSituStretchGradient.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEIsotropicElastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMaxDamageCriterion.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMaxStressCriterion.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMechModel.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMembraneMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMergedConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMicroMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMindlinElastic2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMortarContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMortarInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMortarSlidingContact.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMortarTiedContact.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMRVonMisesFibers.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMuscleMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENaturalNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENeoHookeanTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolid.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolidUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENodalForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENodeToNodeConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEOgdenMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEOgdenUnconstrained.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEOrthoElastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEOrthotropicCLE.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEOsmoticVirialExpansion.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPerfectOsmometer.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary1O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropicUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIsoUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainElastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainUncoupledElastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticity.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityHardening.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactiveViscoelastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERemodelingElasticDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEResidualVector.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidAngularDamper.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidBody.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidCable.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidConnector.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidContractileForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidCylindricalJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidDamper.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidLock.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidPlanarJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidPrismaticJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidRevoluteJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSlidingContact.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSystem.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEDamageMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESolidLinearSystem.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESolidMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESolidSolver2.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESphericalFiberDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESpringMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEStressErrorCriterion.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESymmetryPlane.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETendonMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETiedContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETiedElasticInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETiedInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETractionLoad.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETrussMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUDGHexDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledActiveContraction.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledElasticMixture.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledFiberExpLinear.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledViscoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUT4Domain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEViscoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEViscousMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEVolumeConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\ObjectDataRecord.cpp" />
+    <ClCompile Include="..\..\FEBioMech\RigidBC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,697 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug DLL|Win32">
+      <Configuration>Debug DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug DLL|x64">
+      <Configuration>Debug DLL</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug MPI|Win32">
+      <Configuration>Debug MPI</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug MPI|x64">
+      <Configuration>Debug MPI</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Vanilla|Win32">
+      <Configuration>Debug Vanilla</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Vanilla|x64">
+      <Configuration>Debug Vanilla</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mech Debug|Win32">
+      <Configuration>Mech Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mech Debug|x64">
+      <Configuration>Mech Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release DLL|Win32">
+      <Configuration>Release DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release DLL|x64">
+      <Configuration>Release DLL</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Vanilla|Win32">
+      <Configuration>Release Vanilla</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Vanilla|x64">
+      <Configuration>Release Vanilla</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9CB4B724-1591-4AEB-8C63-E7613C3A30B5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FEBioFluid</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FECORE_DLL;FEBIOFLUID_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>fecore.lib;febiomech.lib;febiomix.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FECORE_DLL;FEBIOFLUID_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>fecore.lib;febiomech.lib;febiomix.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioBiphasicFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidP.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidPlot.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidSolutes.h" />
+    <ClInclude Include="..\..\FEBioFluid\febiofluid_api.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioThermoFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSISolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSITraction.h" />
+    <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FECarreauYasudaFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEConstraintNormalFlow.h" />
+    <ClInclude Include="..\..\FEBioFluid\FECrossFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEElasticFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidConstantConductivity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidDomain2D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidFSIDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidFSIDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidFSIDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidFSISolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidFSITraction.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidHeatSupply.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidHeatSupplyConst.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidMaterial.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidMixtureTractionLoad.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidNormalHeatFlux.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidNormalTraction.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidNormalVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidP.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPResistanceBC.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidRCBC.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidRCRBC.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidResidualVector.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidResistanceBC.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidRotationalVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutes.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver2.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidStressCriterion.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidThermalConductivity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEIdealGas.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsentropic.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsothermal.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEIdealLiquid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEPowellEyringFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESoluteBackflowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESoluteConvectiveFlow.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESolutesDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain2.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESolutesDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESolutesMaterial.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESolutesSolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidPressureLoad.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEThermoFluidSolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETiedFluidInterface.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEViscousFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioBiphasicFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidP.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidPlot.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidSolutes.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioThermoFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSISolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSITraction.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEConstraintNormalFlow.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FECrossFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEElasticFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidConstantConductivity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidDomain2D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidFSIDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidFSIDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidFSIDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidFSISolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidFSITraction.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidHeatSupply.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidHeatSupplyConst.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidMixtureTractionLoad.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidNormalHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidNormalTraction.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidNormalVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidP.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPResistanceBC.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidRCBC.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidRCRBC.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidResidualVector.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidResistanceBC.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidRotationalVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutes.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver2.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidThermalConductivity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEIdealGas.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsentropic.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsothermal.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEIdealLiquid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESoluteBackflowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESoluteConvectiveFlow.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESolutesDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain2.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESolutesDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESolutesMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESolutesSolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidPressureLoad.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEThermoFluidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETiedFluidInterface.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
