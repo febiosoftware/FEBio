@@ -216,6 +216,9 @@ double FEContinuousFiberDistribution::IntegratedFiberDensity(FEMaterialPoint& mp
 		while (it->Next());
 	}
 	else IFD = 1.0;
+    
+    // don't forget to delete the iterator
+    delete it;
 
 	return IFD;
 }
