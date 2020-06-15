@@ -385,6 +385,7 @@ REGISTER_FECORE_CLASS(FEVonMises3DTwoFDDAxisymmetric       , "von-Mises-3d-two-a
 REGISTER_FECORE_CLASS(FECircularFiberDensityDistribution   , "circular"               );
 REGISTER_FECORE_CLASS(FEEllipticalFiberDensityDistribution , "elliptical"             );
 REGISTER_FECORE_CLASS(FEVonMises2DFiberDensityDistribution , "von-Mises-2d"           );
+REGISTER_FECORE_CLASS(FEStructureTensorDistribution        , "structure-tensor"       );
 
 // Fiber distribution integration schemes for CFD materials
 REGISTER_FECORE_CLASS(FEFiberIntegrationGauss              , "fibers-3d-gauss"      );

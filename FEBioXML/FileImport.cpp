@@ -704,7 +704,41 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
 		}
 		break;
-		default:
+		case FE_PARAM_MAT3DS_MAPPED:
+		{
+			// get the model parameter
+			FEParamMat3ds& p = pp->value<FEParamMat3ds>();
+
+			// get the type
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == 0) sztype = "const";
+
+			// allocate valuator
+			FEMat3dsValuator* val = fecore_new<FEMat3dsValuator>(sztype, GetFEModel());
+			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			// mapped values require special treatment
+			// The value is just the name of the map, but the problem is that 
+			// these maps may not be defined yet.
+			// So, we add them to the FEBioModel, which will process mapped 
+			// parameters after the rest of the file is processed
+			if (strcmp(sztype, "map") == 0)
+			{
+				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+			}
+			else {
+				// read the parameter list
+				ReadParameterList(tag, val);
+			}
+
+			// assign the valuator to the parameter
+			p.setValuator(val);
+
+			// do the initialization.
+			// TODO: Is this a good place to do this?
+			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
+		}
+		break;		default:
 			assert(false);
 			return false;
 		}
