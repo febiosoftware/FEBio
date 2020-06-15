@@ -166,3 +166,38 @@ void FEParamMat3d::Serialize(DumpStream& ar)
 	FEModelParam::Serialize(ar);
 	ar & m_val;
 }
+
+//==========================================================================
+FEParamMat3ds::FEParamMat3ds()
+{
+	m_val = fecore_new<FEMat3dsValuator>("const", nullptr);
+}
+
+FEParamMat3ds::FEParamMat3ds(const FEParamMat3ds& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+	m_dom = p.m_dom;
+}
+
+// set the value
+void FEParamMat3ds::operator = (const mat3ds& v)
+{
+	FEConstValueMat3ds* val = fecore_new<FEConstValueMat3ds>("const", nullptr);
+	val->value() = v;
+	setValuator(val);
+}
+
+// set the valuator
+void FEParamMat3ds::setValuator(FEMat3dsValuator* val)
+{
+	if (m_val) delete m_val;
+	m_val = val;
+	if (val) val->SetModelParam(this);
+}
+
+void FEParamMat3ds::Serialize(DumpStream& ar)
+{
+	FEModelParam::Serialize(ar);
+	ar & m_val;
+}

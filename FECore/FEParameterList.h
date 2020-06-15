@@ -47,6 +47,7 @@ class FEParamContainer;
 class FEParamDouble;
 class FEParamVec3;
 class FEParamMat3d;
+class FEParamMat3ds;
 class FEDataArray;
 class tens3drs;
 class FEMaterialPointProperty;
@@ -164,6 +165,7 @@ public:
 	void AddParameter(FEParamDouble&       v, const char* sz);
 	void AddParameter(FEParamVec3&         v, const char* sz);
 	void AddParameter(FEParamMat3d&        v, const char* sz);
+	void AddParameter(FEParamMat3ds&       v, const char* sz);
 	void AddParameter(FEDataArray&         v, const char* sz);
 	void AddParameter(tens3drs& 		   v, const char* sz);
 	void AddParameter(std::string&         v, const char* sz);

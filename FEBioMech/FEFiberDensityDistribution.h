@@ -149,3 +149,17 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
+
+//---------------------------------------------------------------------------
+class FEStructureTensorDistribution : public FEFiberDensityDistribution
+{
+public:
+	FEStructureTensorDistribution(FEModel* fem);
+
+	double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) override;
+
+public:
+	FEParamMat3ds	m_SPD;
+
+	DECLARE_FECORE_CLASS();
+};

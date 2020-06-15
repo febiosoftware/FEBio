@@ -285,6 +285,7 @@ void FEParamContainer::AddParameter(mat3ds&              v, const char* sz) { Ad
 void FEParamContainer::AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, sz); }
 void FEParamContainer::AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED, 1, sz); }
 void FEParamContainer::AddParameter(FEParamMat3d&        v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D_MAPPED, 1, sz); }
+void FEParamContainer::AddParameter(FEParamMat3ds&       v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS_MAPPED, 1, sz); }
 void FEParamContainer::AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY, 1, sz); }
 void FEParamContainer::AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS, 1, sz); }
 void FEParamContainer::AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING, 1, sz); }

@@ -132,6 +132,9 @@ REGISTER_FECORE_CLASS(FEMat3dSphericalAngleMap, "angles"     );
 REGISTER_FECORE_CLASS(FEMat3dPolarMap         , "polar"      );
 REGISTER_FECORE_CLASS(FEMappedValueMat3d      , "map"        );
 
+// mat3ds generators
+REGISTER_FECORE_CLASS(FEConstValueMat3ds, "const");
+
 // load controllers
 REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController, "math");

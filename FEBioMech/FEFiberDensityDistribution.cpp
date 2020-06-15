@@ -116,3 +116,19 @@ double FEVonMises2DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
     double R = exp(m_b*(2*SQR(n0.x)-1));
     return R;
 }
+
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEStructureTensorDistribution, FEFiberDensityDistribution)
+	ADD_PARAMETER(m_SPD, "spd");
+END_FECORE_CLASS();
+
+FEStructureTensorDistribution::FEStructureTensorDistribution(FEModel* fem) : FEFiberDensityDistribution(fem)
+{
+	m_SPD = mat3dd(1.0);
+}
+
+double FEStructureTensorDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
+{
+	return n0 * (m_SPD(mp)*n0);
+}

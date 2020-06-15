@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEScalarValuator.h"
 #include "FEVec3dValuator.h"
 #include "FEMat3dValuator.h"
+#include "FEMat3dsValuator.h"
 #include "FEItemList.h"
 
 //---------------------------------------------------------------------------------------
@@ -155,4 +156,34 @@ public:
 
 private:
 	FEMat3dValuator*	m_val;
+};
+
+
+//---------------------------------------------------------------------------------------
+class FECORE_API FEParamMat3ds : public FEModelParam
+{
+public:
+	FEParamMat3ds();
+
+	FEParamMat3ds(const FEParamMat3ds& p);
+
+	// set the value
+	void operator = (const mat3ds& v);
+
+	// set the valuator
+	void setValuator(FEMat3dsValuator* val);
+
+	// evaluate the parameter at a material point
+	mat3ds operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
+
+	// is this a const
+	bool isConst() const { return m_val->isConst(); }
+
+	// (return value undefined if not constant)
+	mat3ds& constValue() { assert(isConst()); return *m_val->constValue(); };
+
+	void Serialize(DumpStream& ar) override;
+
+private:
+	FEMat3dsValuator*	m_val;
 };
