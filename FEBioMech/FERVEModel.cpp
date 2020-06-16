@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FEPeriodicLinearConstraint.h"
 #include <FECore/FECube.h>
 #include <FECore/FEPointFunction.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -71,7 +72,8 @@ void FERVEModel::CopyFrom(FERVEModel& rve)
 bool FERVEModel::InitRVE(int rveType, const char* szbc)
 {
 	// make sure the RVE problem doesn't output anything to a plot file
-	GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+	for (int i=0; i<Steps(); ++i)
+		GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
 
 	// Center the RVE about the origin.
 	// This also calculates the bounding box
@@ -282,7 +284,7 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 bool FERVEModel::PrepDisplacementBC(FENodeSet* ns)
 {
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve(this);
+	FELoadCurve* plc = fecore_alloc(FELoadCurve, this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
 	AddLoadController(plc);
@@ -326,7 +328,7 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve(this);
+	FELoadCurve* plc = fecore_alloc(FELoadCurve, this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
 	AddLoadController(plc);

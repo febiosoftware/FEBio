@@ -41,8 +41,10 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
 
-FERigidSolver::FERigidSolver(FEModel* fem) : m_fem(fem)
+FERigidSolver::FERigidSolver(FEModel* fem)
 {
+	m_fem = dynamic_cast<FEMechModel*>(fem);
+
 	m_dofX = m_dofY = m_dofZ = -1;
 
 	m_bAllowMixedBCs = false;
@@ -51,11 +53,12 @@ FERigidSolver::FERigidSolver(FEModel* fem) : m_fem(fem)
 int FERigidSolver::InitEquations(int neq)
 {
 	// Next, we assign equation numbers to the rigid body degrees of freedom
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
-	int nrb = fem.RigidBodies();
+	if (m_fem == nullptr) return neq;
+
+	int nrb = m_fem->RigidBodies();
 	for (int i = 0; i<nrb; ++i)
 	{
-		FERigidBody& RB = *fem.GetRigidBody(i);
+		FERigidBody& RB = *m_fem->GetRigidBody(i);
 		for (int j = 0; j<6; ++j)
 		{
 			int bcj = RB.m_BC[j];
@@ -95,7 +98,7 @@ int FERigidSolver::InitEquations(int neq)
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& RB = *fem.GetRigidBody(node.m_rid);
+			FERigidBody& RB = *m_fem->GetRigidBody(node.m_rid);
 			node.m_ID[m_dofX] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
 			node.m_ID[m_dofY] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
 			node.m_ID[m_dofZ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
@@ -140,7 +143,9 @@ FEModel* FERigidSolver::GetFEModel()
 // \todo: eliminate need for ui parameter
 void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	int NO = fem.RigidBodies();
 	for (int i = 0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
@@ -288,6 +293,8 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 //! This function calculates the rigid stiffness matrices
 void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, const FEElementMatrix& ke, double alpha)
 {
+	if (m_fem == nullptr) return;
+
 	const vector<int>& en = ke.Nodes();
     int n = (int)en.size();
     FEMesh& mesh = m_fem->GetMesh();
@@ -315,7 +322,9 @@ void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<d
 //! correct stiffness matrix for rigid-solid interfaces
 void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vector<double>& F, const vector<int>& en, const vector<int>& elmi, const std::vector<int>& elmj, const matrix& ke, double alpha)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	if (fem.RigidBodies() == 0) return;
 	if (en.empty()) return;
     
@@ -561,7 +570,9 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 //! correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
 void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vector<double>& F, const vector<int>& en, const vector<int>& elmi, const vector<int>& elmj, const matrix& ke, double alpha)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	if (fem.RigidBodies() == 0) return;
     
     int i, j, k, l, n = (int)en.size();
@@ -833,7 +844,9 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
 //-----------------------------------------------------------------------------
 void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	FEMesh& mesh = m_fem->GetMesh();
 	
     // get the equation number
@@ -898,7 +911,9 @@ void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<doub
 //-----------------------------------------------------------------------------
 void FERigidSolver::Residual()
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	int NRB = fem.RigidBodies();
 	for (int i = 0; i<NRB; ++i)
 	{
@@ -910,7 +925,8 @@ void FERigidSolver::Residual()
 //-----------------------------------------------------------------------------
 void FERigidSolver::StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -931,7 +947,8 @@ void FERigidSolver::StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp)
 //! This function calculates the contribution to the mass matrix from the rigid bodies
 void FERigidSolver::RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeInfo)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
 
 	// element stiffness matrix
 	vector<int> lm;
@@ -1004,7 +1021,9 @@ void FERigidSolver::RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeIn
 void FERigidSolverOld::UpdateRigidKinematics()
 {
 	// get the model and mesh
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	FEMesh& mesh = fem.GetMesh();
 
 	// loop over all rigid bodies
@@ -1081,8 +1100,9 @@ void FERigidSolverOld::UpdateRigidKinematics()
 //! Updates the rigid body data
 void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui, bool bnewUpdate)
 {
-	// get the number of rigid bodies
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	const int NRB = fem.RigidBodies();
 
 	// first calculate the rigid body displacement increments
@@ -1195,7 +1215,9 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 //-----------------------------------------------------------------------------
 void FERigidSolverNew::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	int nrb = fem.RigidBodies();
 	for (int i = 0; i<nrb; ++i)
 	{
@@ -1238,7 +1260,9 @@ void FERigidSolverNew::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
 void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 {
 	// update rigid bodies
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	int nrb = fem.RigidBodies();
 	for (int i = 0; i<nrb; ++i)
 	{
@@ -1359,7 +1383,9 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 //! evaluate body forces
 void FERigidSolverNew::BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo, FEBodyForce& pbf)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	int nrb = fem.RigidBodies();
     
     // calculate body forces on rigid bodies
@@ -1408,7 +1434,9 @@ void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeI
 	double b = a / dt;
 	double c = 1.0 - 0.5 / beta;
 
-	FEMechModel& fem = static_cast<FEMechModel&>(*m_fem);
+	if (m_fem == nullptr) return;
+	FEMechModel& fem = *m_fem;
+
 	int nrb = fem.RigidBodies();
 	for (int i = 0; i<nrb; ++i)
 	{

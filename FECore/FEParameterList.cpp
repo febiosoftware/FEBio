@@ -63,6 +63,20 @@ void FEParameterList::operator = (FEParameterList& l)
 			case FE_PARAM_MAT3D : d.value<mat3d >() = s.value<mat3d >(); break;
 			case FE_PARAM_MAT3DS: d.value<mat3ds>() = s.value<mat3ds>(); break;
 			case FE_PARAM_TENS3DRS: d.value<tens3drs>() = s.value<tens3drs>(); break;
+			case FE_PARAM_DOUBLE_MAPPED:
+			{
+				FEParamDouble& mat3d = d.value<FEParamDouble>();
+				FEParamDouble& src = s.value<FEParamDouble>();
+				mat3d.setValuator(src.valuator()->copy());
+			}
+			break;
+			case FE_PARAM_MAT3D_MAPPED:
+			{
+				FEParamMat3d& mat3d = d.value<FEParamMat3d>();
+				FEParamMat3d& src = s.value<FEParamMat3d>();
+				mat3d.setValuator(src.valuator()->copy());
+			}
+			break;
 			default:
 				assert(false);
 			}

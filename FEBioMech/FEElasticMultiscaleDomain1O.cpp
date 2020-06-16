@@ -67,7 +67,7 @@ bool FEElasticMultiscaleDomain1O::Init()
 			// create the material point RVEs
 			mmpt.m_F_prev = pt.m_F;	// TODO: I think I can remove this line
 			mmpt.m_rve.CopyFrom(rve);
-			mmpt.m_rve.Init();
+			if (mmpt.m_rve.Init() == false) return false;
 		}
 	}
 

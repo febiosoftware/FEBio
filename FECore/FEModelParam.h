@@ -75,6 +75,9 @@ public:
 	// set the valuator
 	void setValuator(FEScalarValuator* val);
 
+	// get the valuator
+	FEScalarValuator* valuator();
+
 	// evaluate the parameter at a material point
 	double operator () (const FEMaterialPoint& pt) { return m_scl*(*m_val)(pt); }
 
@@ -142,6 +145,9 @@ public:
 
 	// set the valuator
 	void setValuator(FEMat3dValuator* val);
+
+	// get the valuator
+	FEMat3dValuator* valuator();
 
 	// evaluate the parameter at a material point
 	mat3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }

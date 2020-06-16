@@ -55,6 +55,20 @@ void FEBCPrescribedDeformation::CopyFrom(FEBoundaryCondition* pbc)
 	FEBCPrescribedDeformation* ps = dynamic_cast<FEBCPrescribedDeformation*>(pbc); assert(ps);
 	m_scale = ps->m_scale;
 	m_F = ps->m_F;
+
+	// copy the node set
+	const FENodeSet* src = ps->GetNodeSet();
+	FENodeList nodeList = src->GetNodeList();
+	
+	vector<int> nodes;
+	for (int i = 0; i < nodeList.Size(); ++i) nodes.push_back(nodeList[i]);
+
+	FENodeSet* ns = new FENodeSet(GetFEModel());
+	ns->Add(nodes);
+
+	SetNodeSet(ns);
+	
+	// copy parameter list
 	CopyParameterListState(ps->GetParameterList());
 }
 

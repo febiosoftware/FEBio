@@ -78,6 +78,12 @@ void FEParamDouble::setValuator(FEScalarValuator* val)
 	if (val) val->SetModelParam(this);
 }
 
+// get the valuator
+FEScalarValuator* FEParamDouble::valuator()
+{
+	return m_val;
+}
+
 // is this a const value
 bool FEParamDouble::isConst() const { return m_val->isConst(); };
 
@@ -159,6 +165,12 @@ void FEParamMat3d::setValuator(FEMat3dValuator* val)
 	if (m_val) delete m_val;
 	m_val = val;
 	if (val) val->SetModelParam(this);
+}
+
+// get the valuator
+FEMat3dValuator* FEParamMat3d::valuator()
+{
+	return m_val;
 }
 
 void FEParamMat3d::Serialize(DumpStream& ar)

@@ -33,8 +33,8 @@ SOFTWARE.*/
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
-//#include "FEBioXML/FEBioImport.h"
-//#include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioXML/FEBioImport.h"
+#include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
 #include "FEBCPrescribedDeformation.h"
 #include <sstream>
@@ -50,13 +50,13 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 	if (nwhen == CB_INIT)	// initialize the plot file
 	{
 		// create a plot file
-/*		m_xplt = new FEBioPlotFile(m_rve);
+		m_xplt = new FEBioPlotFile(m_rve);
 		if (m_xplt->Open(m_rve, m_file.c_str()) == false)
 		{
 			feLog("Failed creating probe.\n\n");
 			delete m_xplt; m_xplt = 0;
 		}
-*/
+
 		// write the initial state
 		Save();
 	}
@@ -79,7 +79,7 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 
 void FERVEProbe::Save()
 {
-//	if (m_xplt) m_xplt->Write(m_rve, (float) m_rve.GetCurrentTime());
+	if (m_xplt) m_xplt->Write(m_rve, (float) m_rve.GetCurrentTime());
 }
 
 //=============================================================================
@@ -195,12 +195,12 @@ bool FEMicroMaterial::Init()
 	if (FEElasticMaterial::Init() == false) return false;
 
 	// load the RVE model
-/*	FEBioImport fim;
+	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
 		return false;
 	}
-*/
+
 	// We don't want to output anything from the RVE
 	m_mrve.BlockLog();
 

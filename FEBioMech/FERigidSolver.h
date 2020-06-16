@@ -41,6 +41,7 @@ class FERigidBody;
 class FESolidSolver2;
 class DumpStream;
 class FEElementMatrix;
+class FEMechModel;
 
 //-----------------------------------------------------------------------------
 //! This is a helper class that helps the solid deformables solvers update the 
@@ -93,7 +94,7 @@ public:
 	void AllowMixedBCs(bool b) { m_bAllowMixedBCs = b; }
 
 protected:
-	FEModel*	m_fem;
+	FEMechModel*	m_fem;
 	int			m_dofX, m_dofY, m_dofZ;
 	int			m_dofVX, m_dofVY, m_dofVZ;
     int			m_dofU, m_dofV, m_dofW;

@@ -94,8 +94,8 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 		}
         
         // If there are rigid bodies we need to look for rigid dofs
-		FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
-        if (fem.RigidBodies() > 0)
+		FEMechModel* fem = dynamic_cast<FEMechModel*>(&m_fem);
+        if (fem && (fem->RigidBodies() > 0))
         {
             int *lm;
             for (i=0; i<ndof; i+=ndn)
@@ -109,7 +109,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         
                         // this is an interface dof
                         // get the rigid body this node is connected to
-                        FERigidBody& RB = *fem.GetRigidBody(node.m_rid);
+                        FERigidBody& RB = *fem->GetRigidBody(node.m_rid);
                         lm = RB.m_LM;
                         
                         // add to total torque of this body
