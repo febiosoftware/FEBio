@@ -138,6 +138,30 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		SetVarType(PLT_MAT3F);
 	}
 	break;
+	case FE_PARAM_MAT3DS_MAPPED:
+	{
+		FEParamMat3ds& p = m_param.value<FEParamMat3ds>();
+
+		FEItemList* itemList = p.GetItemList();
+		if (itemList == 0)
+		{
+			// for material parameters, the item list can be empty
+			if      (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
+			else if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
+			else return false;
+		}
+		else
+		{
+			if      (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+			else if (dynamic_cast<FEFacetSet*>(itemList)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FEFacetSet*>(itemList); }
+			else if (dynamic_cast<FEElementSet*>(itemList)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEElementSet*>(itemList))->GetDomainList(); }
+			else return false;
+		}
+
+		SetStorageFormat(FMT_ITEM);
+		SetVarType(PLT_MAT3FS);
+	}
+	break;
 	case FE_PARAM_DOUBLE:
 	{
 		if (dynamic_cast<FEMaterial*>(pc))
@@ -219,7 +243,8 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 
 	if ((m_param.type() == FE_PARAM_DOUBLE_MAPPED) ||
 		(m_param.type() == FE_PARAM_VEC3D_MAPPED ) ||
-		(m_param.type() == FE_PARAM_MAT3D_MAPPED))
+		(m_param.type() == FE_PARAM_MAT3D_MAPPED ) ||
+		(m_param.type() == FE_PARAM_MAT3DS_MAPPED))
 	{
 		FEModelParam& map = m_param.value<FEModelParam>();
 
@@ -246,6 +271,11 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		{
 			FEParamMat3d& mapMat3 = dynamic_cast<FEParamMat3d&>(map);
 			writeElementValue<mat3d>(sd, a, mapMat3);
+		}
+		else if (m_param.type() == FE_PARAM_MAT3DS_MAPPED)
+		{
+			FEParamMat3ds& mapMat3 = dynamic_cast<FEParamMat3ds&>(map);
+			writeElementValue<mat3ds>(sd, a, mapMat3);
 		}
 		else return false;
 

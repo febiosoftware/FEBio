@@ -1303,11 +1303,14 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 	// make sure it starts with the name of this model
 	if (paramString != GetName()) return FEParamValue();
 
+	ParamString paramComp = paramString.last();
 	FEParam* param = FindParameter(paramString);
 	if (param)
 	{
-		ParamString paramComp = paramString.last();
-		return GetParameterComponent(paramComp, param);
+		if (strcmp(param->name(), paramComp.c_str()) != 0)
+			return GetParameterComponent(paramComp, param);
+		else
+			return FEParamValue(param, param->data_ptr(), param->type());
 	}
 
 	// see what the next reference is
