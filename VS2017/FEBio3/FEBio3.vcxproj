@@ -281,7 +281,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(TetgenDir)\vs2015\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Release;$(LEVMAR_VS15)\x64\Release;$(MMGLIB)\lib\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(TetgenDir)\x64\Release;$(ZLIBDIR)\lib64;$(HYPRELIB)\lib;$(LEVMARDIR)\vs2017\Release;$(MMGLIB)\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
     <LinkIncremental>false</LinkIncremental>

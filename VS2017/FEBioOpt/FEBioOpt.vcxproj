@@ -245,7 +245,7 @@
     <IncludePath>$(SolutionDir)..;$(LEVMARDIR)\levmar-2.6;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..;$(LEVMAR_VS15)\levmar-2.6;$(ZLIBDIR);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(LEVMARDIR);$(ZLIBDIR);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
