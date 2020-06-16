@@ -25,6 +25,8 @@
 		D52D840321CE89A200472620 /* FEMat3dValuator.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D83F821CE89A200472620 /* FEMat3dValuator.h */; };
 		D52D840421CE89A200472620 /* FEMat3dValuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D83F921CE89A200472620 /* FEMat3dValuator.cpp */; };
 		D52D840521CE89A200472620 /* FEDomainParameter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D83FA21CE89A200472620 /* FEDomainParameter.cpp */; };
+		D5400D44249922C200570A47 /* FEMat3dsValuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5400D42249922C200570A47 /* FEMat3dsValuator.cpp */; };
+		D5400D45249922C200570A47 /* FEMat3dsValuator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5400D43249922C200570A47 /* FEMat3dsValuator.h */; };
 		D54E21AC2149BB56008A9DD3 /* FEElementSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E219E2149BB54008A9DD3 /* FEElementSet.cpp */; };
 		D54E21AD2149BB56008A9DD3 /* FENode.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E219F2149BB54008A9DD3 /* FENode.h */; };
 		D54E21AE2149BB56008A9DD3 /* FEFacetSet.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21A02149BB54008A9DD3 /* FEFacetSet.h */; };
@@ -425,6 +427,8 @@
 		D52D83F821CE89A200472620 /* FEMat3dValuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMat3dValuator.h; sourceTree = "<group>"; };
 		D52D83F921CE89A200472620 /* FEMat3dValuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMat3dValuator.cpp; sourceTree = "<group>"; };
 		D52D83FA21CE89A200472620 /* FEDomainParameter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDomainParameter.cpp; sourceTree = "<group>"; };
+		D5400D42249922C200570A47 /* FEMat3dsValuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMat3dsValuator.cpp; sourceTree = "<group>"; };
+		D5400D43249922C200570A47 /* FEMat3dsValuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMat3dsValuator.h; sourceTree = "<group>"; };
 		D54E219E2149BB54008A9DD3 /* FEElementSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElementSet.cpp; sourceTree = "<group>"; };
 		D54E219F2149BB54008A9DD3 /* FENode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENode.h; sourceTree = "<group>"; };
 		D54E21A02149BB54008A9DD3 /* FEFacetSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFacetSet.h; sourceTree = "<group>"; };
@@ -999,6 +1003,8 @@
 				D5613D4F217B604F007CAB89 /* FELoadCurve.h */,
 				D559C4C722D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp */,
 				D559C4C522D9169D00CDC2BD /* FEMat3dSphericalAngleMap.h */,
+				D5400D42249922C200570A47 /* FEMat3dsValuator.cpp */,
+				D5400D43249922C200570A47 /* FEMat3dsValuator.h */,
 				D52D83F921CE89A200472620 /* FEMat3dValuator.cpp */,
 				D52D83F821CE89A200472620 /* FEMat3dValuator.h */,
 				D5B9E4E9213F67DE0008B38A /* FEMaterial.cpp */,
@@ -1396,6 +1402,7 @@
 				D5B9E5C5213F67DE0008B38A /* FELineSearch.h in Headers */,
 				D5B9E589213F67DE0008B38A /* FEModelComponent.h in Headers */,
 				D5B9E52E213F67DE0008B38A /* FEFunction1D.h in Headers */,
+				D5400D45249922C200570A47 /* FEMat3dsValuator.h in Headers */,
 				D5B9E5B0213F67DE0008B38A /* FECallBack.h in Headers */,
 				D5709DA822833034007CAB0A /* FENodeList.h in Headers */,
 				D5B9E5DD213F67DE0008B38A /* mat6d.h in Headers */,
@@ -1634,6 +1641,7 @@
 				D52D840521CE89A200472620 /* FEDomainParameter.cpp in Sources */,
 				D5F1947A21908646000F738D /* SchurComplement.cpp in Sources */,
 				D5B9E525213F67DE0008B38A /* svd.cpp in Sources */,
+				D5400D44249922C200570A47 /* FEMat3dsValuator.cpp in Sources */,
 				D56B209423AD5F94000AE9C2 /* FEShellElement.cpp in Sources */,
 				D5B9E570213F67DE0008B38A /* FESurfacePairConstraint.cpp in Sources */,
 				D5B9E57D213F67DE0008B38A /* FELinearConstraint.cpp in Sources */,
