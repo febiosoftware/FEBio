@@ -1875,8 +1875,19 @@ void FEBioGeometrySection25::ParseElementSetSection(XMLTag& tag)
 	// only add non-empty element sets
 	if (l.empty() == false)
 	{
+		// see if all elements belong to the same domain
+		FEElement* el = mesh.FindElementFromID(l[0]); assert(el);
+		FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
+		for (int i = 1; i < l.size(); ++i)
+		{
+			FEElement* el_i = mesh.FindElementFromID(l[i]); assert(el);
+			FEDomain* dom_i = dynamic_cast<FEDomain*>(el_i->GetMeshPartition());
+
+			if (dom != dom_i) throw XMLReader::Error("Elements in an ElementSet must belong to the same part.");
+		}
+
 		// assign indices to element set
-		pg->Create(l);
+		pg->Create(dom, l);
 
 		// add the element set to the mesh
 		mesh.AddElementSet(pg);

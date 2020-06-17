@@ -49,6 +49,10 @@ public:
 
 	// Create the element set
 	void Create(const std::vector<int>& elemList);
+	void Create(FEDomain* dom, const std::vector<int>& elemList);
+
+	// add another element set
+	void Add(const FEElementSet& set);
 
 	// Create the element set from a domain
 	void Create(FEDomain* dom);

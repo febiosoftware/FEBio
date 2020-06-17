@@ -286,18 +286,11 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 	const FEElementSet* set2 = map.GetElementSet();
 	assert(set1->GetFEModel() == set2->GetFEModel());
 
-	// merge the domain lists
-	FEDomainList& domList1 = set1->GetDomainList();
-	const FEDomainList& domList2 = set2->GetDomainList();
-
-	FEDomainList newDomainList;
-	newDomainList.AddDomainList(domList1);
-	newDomainList.AddDomainList(domList2);
-
-	// create a new element set from the merged domain lists
+	// create a new element set
 	// TODO: should we add it to the mesh? I think we probably have to for remeshing
 	FEElementSet* elset = new FEElementSet(set1->GetFEModel());
-	elset->Create(newDomainList);
+	elset->Add(*set1);
+	elset->Add(*set2);
 
 	// reallocate the data array
 	int oldElems = set1->Elements();
