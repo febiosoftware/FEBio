@@ -55,6 +55,17 @@ public:
 	virtual void InitShells();
 
 public:
+    //! get the current nodal coordinates
+    void GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* rt, const bool back = false);
+    void GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* rt, double alpha, const bool back = false);
+    
+    //! get the reference nodal coordinates
+    void GetReferenceNodalCoordinates(const FEShellElement& el, vec3d* r0, const bool back = false);
+    
+    //! get the nodal coordinates at previous state
+    void GetPreviousNodalCoordinates(const FEShellElement& el, vec3d* rp, const bool back = false);
+    
+public:
 	void ForEachShellElement(std::function<void(FEShellElement& el)> f);
 };
 

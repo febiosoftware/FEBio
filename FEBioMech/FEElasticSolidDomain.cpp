@@ -579,7 +579,7 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 //! \todo Remove the remodeling solid stuff
 void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt =tp.timeIncrement;
     
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
@@ -593,7 +593,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 	// nodal coordinates
     const int NELN = FEElement::MAX_NODES;
     vec3d r[NELN], v[NELN], a[NELN];
-	GetCurrentNodalCoordinates(el, r);
+	GetCurrentNodalCoordinates(el, r, m_alphaf);
 
 	// update dynamic quantities
 	if (m_update_dynamic)
@@ -619,17 +619,18 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		// get the deformation gradient and determinant at intermediate time
         double Jt;
         mat3d Ft, Fp;
-        Jt = defgrad(el, Ft, n, r);
-		pt.m_J = Jt;
+        Jt = defgrad(el, Ft, n);
         defgradp(el, Fp, n);
 
 		if (m_alphaf == 1.0)
 		{
 			pt.m_F = Ft;
+            pt.m_J = Jt;
 		}
 		else
 		{
 			pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+            pt.m_J = pt.m_F.det();
 		}
 
         mat3d Fi = pt.m_F.inverse();

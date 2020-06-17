@@ -50,6 +50,12 @@ public:
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
+    //! Set flag for update for dynamic quantities
+    void SetDynamicUpdateFlag(bool b);
+
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() override { return m_pMat; }
 
@@ -75,6 +81,9 @@ public: // overrides from FEElasticDomain
 
 	// update stresses
 	void Update(const FETimeInfo& tp) override;
+    
+    // update the element stress
+    void UpdateElementStress(int iel, const FETimeInfo& tp);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FELinearSystem& LS) override;
@@ -117,6 +126,7 @@ protected:
     double              m_alphaf;
     double              m_alpham;
     double              m_beta;
+    bool                m_update_dynamic;    //!< flag for updating quantities only used in dynamic analysis
 
 protected:
 	FEDofList	m_dofV;
