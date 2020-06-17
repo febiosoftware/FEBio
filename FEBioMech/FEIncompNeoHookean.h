@@ -35,10 +35,10 @@ SOFTWARE.*/
 class FEIncompNeoHookean : public FEUncoupledMaterial
 {
 public:
-	FEIncompNeoHookean(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+	FEIncompNeoHookean(FEModel* pfem);
 
 public:
-	double	m_G;	//!< Shear modulus
+	FEParamDouble	m_G;	//!< Shear modulus
 
 public:
 	//! calculate deviatoric stress at material point

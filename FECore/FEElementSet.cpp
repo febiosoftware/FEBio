@@ -50,6 +50,15 @@ void FEElementSet::Create(const std::vector<int>& elemList)
 }
 
 //-----------------------------------------------------------------------------
+void FEElementSet::Create(FEDomain* dom, const std::vector<int>& elemList)
+{
+	m_dom.Clear();
+	m_dom.AddDomain(dom);
+	m_Elem = elemList;
+	BuildLUT();
+}
+
+//-----------------------------------------------------------------------------
 void FEElementSet::Create(FEDomain* dom)
 {
 	m_dom.Clear();
@@ -62,6 +71,19 @@ void FEElementSet::Create(FEDomain* dom)
 		FEElement& el = dom->ElementRef(i);
 		m_Elem[i] = el.GetID();
 	}
+
+	BuildLUT();
+}
+
+//-----------------------------------------------------------------------------
+// add another element set
+void FEElementSet::Add(const FEElementSet& set)
+{
+	// add the domain list
+	m_dom.AddDomainList(set.GetDomainList());
+
+	// add the elements
+	m_Elem.insert(m_Elem.end(), set.m_Elem.begin(), set.m_Elem.end());
 
 	BuildLUT();
 }

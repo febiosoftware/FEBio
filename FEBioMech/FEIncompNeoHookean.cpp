@@ -36,20 +36,28 @@ BEGIN_FECORE_CLASS(FEIncompNeoHookean, FEUncoupledMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEIncompNeoHookean::FEIncompNeoHookean(FEModel* pfem) : FEUncoupledMaterial(pfem) 
+{
+	m_G = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate deviatoric stress
 mat3ds FEIncompNeoHookean::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
+	// shear modulus
+	double G = m_G(mp);
+
 	// deformation gradient
-	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 
 	// calculate left Cauchy-Green tensor
 	mat3ds B = pt.LeftCauchyGreen();
 
 	// calculate deviatoric stress
-	return (B - mat3dd(B.tr()/3.))*(m_G/pow(J, 5.0/3.0));
+	return (B - mat3dd(B.tr()/3.))*(G/pow(J, 5.0/3.0));
 }
 
 //-----------------------------------------------------------------------------
@@ -58,8 +66,10 @@ tens4ds FEIncompNeoHookean::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
+	// shear modulus
+	double G = m_G(mp);
+
 	// deformation gradient
-	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 
 	// left cauchy-green matrix (i.e. the 'b' matrix)
@@ -68,7 +78,7 @@ tens4ds FEIncompNeoHookean::DevTangent(FEMaterialPoint& mp)
 	// trace of b
 	double Ib = B.tr();
 
-	double muJ = m_G/pow(J, 5.0/3.0);
+	double muJ = G/pow(J, 5.0/3.0);
 
 	mat3ds I(1,1,1,0,0,0);	// Identity
 

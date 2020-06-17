@@ -516,22 +516,29 @@ void FEBioMeshDataSection::ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 {
-	// find the domain with the same name
-	string name = set.GetName();
+	// get the set's name
+	const char* szname = set.GetName().c_str();
 
-	FEMesh* mesh = const_cast<FEMesh*>(set.GetMesh());
-	FEDomain* dom = mesh->FindDomain(name);
-	if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	// get the domain list
+	const FEDomainList& domList = set.GetDomainList();
+
+	// NOTE For now, this only works for single domains
+	if (domList.Domains() != 1) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
+
+	FEDomain* dom = const_cast<FEDomain*>(domList.GetDomain(0));
+	if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
+
+	FEMesh* mesh = dom->GetMesh();
 
 	// get the material
 	FEMaterial* mat = dom->GetMaterial();
-	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
 	// get the mat_axis parameter
 	ParamString s("mat_axis");
 	FEParam* param = mat->FindParameter(s);
-	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
-	if (param->type() != FE_PARAM_MAT3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
+	if (param->type() != FE_PARAM_MAT3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
 	// get the parameter
 	FEParamMat3d& p = param->value<FEParamMat3d>();
