@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModelParam.h"
 #include "log.h"
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 //! The constructor takes one argument, namely the SUPER_CLASS_ID which
@@ -247,8 +248,22 @@ FECoreBase* FECoreBase::LoadClass(DumpStream& ar, FECoreBase* a)
 //-----------------------------------------------------------------------------
 bool FECoreBase::Validate()
 {
-	// call base class first
-	if (FEParamContainer::Validate() == false) return false;
+	// validate parameters
+	FEParameterList& pl = GetParameterList();
+	int N = pl.Parameters();
+	list<FEParam>::iterator pi = pl.first();
+	for (int i = 0; i < N; ++i, pi++)
+	{
+		FEParam& p = *pi;
+		if (p.is_valid() == false)
+		{
+			stringstream ss;
+			ss << GetName() << "." << p.name();
+			string paramName = ss.str();
+			feLogError("Invalid value for parameter: %s", paramName.c_str());
+			return false;
+		}
+	}
 
 	// check properties
 	const int nprop = (int)m_Prop.size();

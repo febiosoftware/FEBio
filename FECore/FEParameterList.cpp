@@ -132,8 +132,9 @@ FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FE
 	// (range checking is only supported for int and double params)
 	if (rng != FE_DONT_CARE)
 	{
-		if (itype == FE_PARAM_INT) p.SetValidator(new FEIntValidator(rng, (int) fmin, (int) fmax));
+		if      (itype == FE_PARAM_INT) p.SetValidator(new FEIntValidator(rng, (int) fmin, (int) fmax));
 		else if (itype == FE_PARAM_DOUBLE) p.SetValidator(new FEDoubleValidator(rng, fmin, fmax));
+		else if (itype == FE_PARAM_DOUBLE_MAPPED) p.SetValidator(new FEParamDoubleValidator(rng, fmin, fmax));
 	}
 
 	// add the parameter to the list
