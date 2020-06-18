@@ -245,7 +245,9 @@ bool FESolidSolver2::Init()
 	for (int i = 0; i < mesh.Domains(); ++i)
 	{
 		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+        FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
 		if (d) d->SetDynamicUpdateFlag(b);
+        if (s) s->SetDynamicUpdateFlag(b);
 	}
 
 	return true;

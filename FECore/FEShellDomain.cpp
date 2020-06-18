@@ -67,6 +67,58 @@ void FEShellDomain::InitShells()
 }
 
 //-----------------------------------------------------------------------------
+//! get the current nodal coordinates
+void FEShellDomain::GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* rt, const bool back)
+{
+    int neln = el.Nodes();
+    if (!back)
+        for (int i = 0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+    else
+        for (int i = 0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_st();
+}
+
+//-----------------------------------------------------------------------------
+//! get the current nodal coordinates
+void FEShellDomain::GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* rt, double alpha, const bool back)
+{
+    int neln = el.Nodes();
+    if (!back) {
+        for (int i = 0; i<neln; ++i) {
+            FENode& nd = m_pMesh->Node(el.m_node[i]);
+            rt[i] = nd.m_rt*alpha + nd.m_rp*(1 - alpha);
+        }
+    }
+    else {
+        for (int i = 0; i<neln; ++i) {
+            FENode& nd = m_pMesh->Node(el.m_node[i]);
+            rt[i] = nd.m_st()*alpha + nd.m_sp()*(1 - alpha);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! get the reference nodal coordinates
+void FEShellDomain::GetReferenceNodalCoordinates(const FEShellElement& el, vec3d* r0, const bool back)
+{
+    int neln = el.Nodes();
+    if (!back)
+        for (int i = 0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    else
+        for (int i = 0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_s0();
+}
+
+//-----------------------------------------------------------------------------
+//! get the previous nodal coordinates
+void FEShellDomain::GetPreviousNodalCoordinates(const FEShellElement& el, vec3d* rp, const bool back)
+{
+    int neln = el.Nodes();
+    if (!back)
+        for (int i = 0; i<neln; ++i) rp[i] = m_pMesh->Node(el.m_node[i]).m_rp;
+    else
+        for (int i = 0; i<neln; ++i) rp[i] = m_pMesh->Node(el.m_node[i]).m_sp();
+}
+
+//-----------------------------------------------------------------------------
 void FEShellDomain::ForEachShellElement(std::function<void(FEShellElement& el)> f)
 {
 	int NE = Elements();
