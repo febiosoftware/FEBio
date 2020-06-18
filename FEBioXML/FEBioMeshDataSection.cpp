@@ -637,32 +637,62 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 		throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
 	}
 
-	if (p->type() != FE_PARAM_DOUBLE_MAPPED)
+	if (p->type() == FE_PARAM_DOUBLE_MAPPED)
+	{
+		vector<ELEMENT_DATA> data;
+		ParseElementData(tag, set, data, 1);
+
+		FEParamDouble& param = p->value<FEParamDouble>();
+		param.SetItemList(&set);
+
+		FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+		if (val == nullptr)
+		{
+			printf("Something went horribly wrong.");
+			return;
+		}
+
+		FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, FMT_ITEM);
+		map->Create(&set);
+		val->setDataMap(map);
+
+		for (int i = 0; i < data.size(); ++i) map->set<double>(i, data[i].val[0] * scale);
+
+		param.setValuator(val);
+	}
+	else if (p->type() == FE_PARAM_MAT3DS_MAPPED)
+	{
+		vector<ELEMENT_DATA> data;
+		ParseElementData(tag, set, data, 6);
+
+		FEParamMat3ds& param = p->value<FEParamMat3ds>();
+		param.SetItemList(&set);
+
+		FEMappedValueMat3ds* val = fecore_alloc(FEMappedValueMat3ds, &fem);
+		if (val == nullptr)
+		{
+			printf("Something went horribly wrong.");
+			return;
+		}
+
+		FEDomainMap* map = new FEDomainMap(FEDataType::FE_MAT3DS, FMT_ITEM);
+		map->Create(&set);
+		val->setDataMap(map);
+
+		for (int i = 0; i < data.size(); ++i)
+		{
+			double* d = data[i].val;
+			mat3ds m(d[0], d[1], d[2], d[3], d[4], d[5]);
+			map->set<mat3ds>(i, m * scale);
+		}
+
+		param.setValuator(val);
+	}
+	else
 	{
 		printf("A mesh data map cannot be assigned to this parameter.");
 		throw XMLReader::InvalidAttribute(tag, "var");
 	}
-
-	vector<ELEMENT_DATA> data;
-	ParseElementData(tag, set, data, 1);
-
-	FEParamDouble& param = p->value<FEParamDouble>();
-	param.SetItemList(&set);
-
-	FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
-	if (val == nullptr)
-	{
-		printf("Something went horribly wrong.");
-		return;
-	}
-
-	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, FMT_ITEM);
-	map->Create(&set);
-	val->setDataMap(map);
-
-	for (int i = 0; i < data.size(); ++i) map->set<double>(i, data[i].val[0]*scale);
-
-	param.setValuator(val);
 }
 
 //-----------------------------------------------------------------------------

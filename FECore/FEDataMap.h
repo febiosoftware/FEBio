@@ -54,6 +54,7 @@ public:
 	virtual double value(const FEMaterialPoint& mp) = 0;
 	virtual vec3d valueVec3d(const FEMaterialPoint& mp) = 0;
 	virtual mat3d valueMat3d(const FEMaterialPoint& mp) = 0;
+	virtual mat3ds valueMat3ds(const FEMaterialPoint& mp) = 0;
 
 	// return the item list associated with this map
 	virtual FEItemList* GetItemList() = 0;

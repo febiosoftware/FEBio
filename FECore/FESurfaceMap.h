@@ -74,63 +74,33 @@ public: // from FEDataMap
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& mp) override;
 	mat3d valueMat3d(const FEMaterialPoint& mp) override;
+	mat3ds valueMat3ds(const FEMaterialPoint& mp) override;
 
 public:
-	template <typename T> T value(int nface, int node);
-	template <typename T> void setValue(int nface, int node, const T& v);
+	template <typename T> T value(int nface, int node)
+	{
+		return get<T>(nface*m_maxFaceNodes + node);
+	}
+
+	template <typename T> void setValue(int nface, int node, const T& v)
+	{
+		set<T>(nface*m_maxFaceNodes + node, v);
+	}
 
 	void setValue(int n, double v) override;
 	void setValue(int n, const vec2d& v) override;
 	void setValue(int n, const vec3d& v) override;
 	void setValue(int n, const mat3d& v) override;
+	void setValue(int n, const mat3ds& v) override;
 
 	void fillValue(double v) override;
 	void fillValue(const vec2d& v) override;
 	void fillValue(const vec3d& v) override;
 	void fillValue(const mat3d& v) override;
+	void fillValue(const mat3ds& v) override;
 
 private:
 	const FEFacetSet*	m_surf;		// the surface for which this data set is defined
 	int					m_format;	// the storage format
 	int	m_maxFaceNodes;				// number of nodes for each face
 };
-
-template <> inline double FESurfaceMap::value(int nface, int node)
-{
-	return get<double>(nface*m_maxFaceNodes + node);
-}
-
-template <> inline vec2d FESurfaceMap::value(int nface, int node)
-{
-	return get<vec2d>(nface*m_maxFaceNodes + node);
-}
-
-template <> inline vec3d FESurfaceMap::value(int nface, int node)
-{
-	return get<vec3d>(nface*m_maxFaceNodes + node);
-}
-
-template <> inline mat3d FESurfaceMap::value(int nface, int node)
-{
-	return get<mat3d>(nface*m_maxFaceNodes + node);
-}
-
-template <> inline void FESurfaceMap::setValue(int nface, int node, const double& v)
-{
-	set<double>(nface*m_maxFaceNodes + node, v);
-}
-
-template <> inline void FESurfaceMap::setValue(int nface, int node, const vec2d& v)
-{
-	set<vec2d>(nface*m_maxFaceNodes + node, v);
-}
-
-template <> inline void FESurfaceMap::setValue(int nface, int node, const vec3d& v)
-{
-	set<vec3d>(nface*m_maxFaceNodes + node, v);
-}
-
-template <> inline void FESurfaceMap::setValue(int nface, int node, const mat3d& v)
-{
-	set<mat3d>(nface*m_maxFaceNodes + node, v);
-}

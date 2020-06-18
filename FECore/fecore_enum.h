@@ -349,7 +349,8 @@ enum FEDataType {
 	FE_DOUBLE,
 	FE_VEC2D,
 	FE_VEC3D,
-	FE_MAT3D
+	FE_MAT3D,
+	FE_MAT3DS
 };
 
 //-----------------------------------------------------------------------------

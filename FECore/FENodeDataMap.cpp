@@ -76,6 +76,11 @@ void FENodeDataMap::setValue(int n, const mat3d& v)
 	set<mat3d>(n, v);
 }
 
+void FENodeDataMap::setValue(int n, const mat3ds& v)
+{
+	set<mat3ds>(n, v);
+}
+
 void FENodeDataMap::fillValue(double v)
 {
 	set<double>(v);
@@ -96,6 +101,11 @@ void FENodeDataMap::fillValue(const mat3d& v)
 	set<mat3d>(v);
 }
 
+void FENodeDataMap::fillValue(const mat3ds& v)
+{
+	set<mat3ds>(v);
+}
+
 double FENodeDataMap::value(const FEMaterialPoint& mp)
 {
 	assert(mp.m_elem == nullptr);
@@ -112,6 +122,12 @@ mat3d FENodeDataMap::valueMat3d(const FEMaterialPoint& mp)
 {
 	assert(mp.m_elem == nullptr);
 	return get<mat3d>(mp.m_index);
+}
+
+mat3ds FENodeDataMap::valueMat3ds(const FEMaterialPoint& mp)
+{
+	assert(mp.m_elem == nullptr);
+	return get<mat3ds>(mp.m_index);
 }
 
 // return the item list associated with this map

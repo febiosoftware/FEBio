@@ -73,3 +73,21 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//---------------------------------------------------------------------------------------
+class FECORE_API FEMappedValueMat3ds : public FEMat3dsValuator
+{
+public:
+	FEMappedValueMat3ds(FEModel* fem);
+
+	void setDataMap(FEDataMap* val);
+
+	mat3ds operator()(const FEMaterialPoint& pt) override;
+
+	FEMat3dsValuator* copy() override;
+
+	void Serialize(DumpStream& ar) override;
+
+private:
+	FEDataMap*	m_val;
+};

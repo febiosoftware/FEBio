@@ -55,6 +55,7 @@ public:
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& pt) override;
 	mat3d valueMat3d(const FEMaterialPoint& pt) override;
+	mat3ds valueMat3ds(const FEMaterialPoint& pt) override;
 
 	//! Get the element set
 	const FEElementSet* GetElementSet() const { return m_elset; }
@@ -72,61 +73,30 @@ public:
 	bool Merge(FEDomainMap& map);
 
 public:
-	template <typename T> T value(int nface, int node);
-	template <typename T> void setValue(int nface, int node, const T& v);
+	template <typename T> T value(int nelem, int node)
+	{
+		return get<T>(nelem*m_maxElemNodes + node);
+	}
+
+	template <typename T> void setValue(int nelem, int node, const T& v)
+	{
+		set<T>(nelem*m_maxElemNodes + node, v);
+	}
 
 	void setValue(int n, double v) override;
 	void setValue(int n, const vec2d& v) override;
 	void setValue(int n, const vec3d& v) override;
 	void setValue(int n, const mat3d& v) override;
+	void setValue(int n, const mat3ds& v) override;
 
 	void fillValue(double v) override;
 	void fillValue(const vec2d& v) override;
 	void fillValue(const vec3d& v) override;
 	void fillValue(const mat3d& v) override;
+	void fillValue(const mat3ds& v) override;
 
 private:
 	int					m_fmt;				//!< storage format
 	int					m_maxElemNodes;		//!< max number of nodes for each element
 	FEElementSet*		m_elset;			//!< the element set on which this map is defined
 };
-
-template <> inline double FEDomainMap::value(int nelem, int node)
-{
-	return get<double>(nelem*m_maxElemNodes + node);
-}
-
-template <> inline vec2d FEDomainMap::value(int nelem, int node)
-{
-	return get<vec2d>(nelem*m_maxElemNodes + node);
-}
-
-template <> inline vec3d FEDomainMap::value(int nelem, int node)
-{
-	return get<vec3d>(nelem*m_maxElemNodes + node);
-}
-
-template <> inline mat3d FEDomainMap::value(int nelem, int node)
-{
-	return get<mat3d>(nelem*m_maxElemNodes + node);
-}
-
-template <> inline void FEDomainMap::setValue(int nelem, int node, const double& v)
-{
-	set<double>(nelem*m_maxElemNodes + node, v);
-}
-
-template <> inline void FEDomainMap::setValue(int nelem, int node, const vec2d& v)
-{
-	set<vec2d>(nelem*m_maxElemNodes + node, v);
-}
-
-template <> inline void FEDomainMap::setValue(int nelem, int node, const vec3d& v)
-{
-	set<vec3d>(nelem*m_maxElemNodes + node, v);
-}
-
-template <> inline void FEDomainMap::setValue(int nelem, int node, const mat3d& v)
-{
-	set<mat3d>(nelem*m_maxElemNodes + node, v);
-}

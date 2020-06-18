@@ -54,3 +54,35 @@ FEMat3dsValuator* FEConstValueMat3ds::copy()
 	map->m_val = m_val;
 	return map;
 }
+
+//=============================================================================
+// FEMappedValueMat3ds
+//-----------------------------------------------------------------------------
+
+FEMappedValueMat3ds::FEMappedValueMat3ds(FEModel* fem) : FEMat3dsValuator(fem)
+{
+	m_val = nullptr;
+}
+
+void FEMappedValueMat3ds::setDataMap(FEDataMap* val)
+{
+	m_val = val;
+}
+
+mat3ds FEMappedValueMat3ds::operator()(const FEMaterialPoint& pt)
+{
+	return m_val->valueMat3ds(pt);
+}
+
+FEMat3dsValuator* FEMappedValueMat3ds::copy()
+{
+	FEMappedValueMat3ds* map = new FEMappedValueMat3ds(GetFEModel());
+	map->m_val = m_val;
+	return map;
+}
+
+void FEMappedValueMat3ds::Serialize(DumpStream& ar)
+{
+	FEMat3dsValuator::Serialize(ar);
+	ar & m_val;
+}

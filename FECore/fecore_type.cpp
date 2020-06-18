@@ -39,6 +39,7 @@ int fecore_data_size(FEDataType type)
 	case FE_VEC2D : return fecoreType<vec2d >::size(); break;
 	case FE_VEC3D : return fecoreType<vec3d >::size(); break;
 	case FE_MAT3D : return fecoreType<mat3d >::size(); break;
+	case FE_MAT3DS: return fecoreType<mat3ds>::size(); break;
 	default:
 		assert(false);
 	}

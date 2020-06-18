@@ -33,6 +33,7 @@ SOFTWARE.*/
 class vec2d;
 class vec3d;
 class mat3d;
+class mat3ds;
 
 template <typename T> struct fecoreType {};
 
@@ -58,6 +59,12 @@ template <> struct fecoreType<mat3d>
 {
 	static FEDataType type() { return FE_MAT3D; }
 	static int size() { return 9; }
+};
+
+template <> struct fecoreType<mat3ds>
+{
+	static FEDataType type() { return FE_MAT3DS; }
+	static int size() { return 6; }
 };
 
 FECORE_API int fecore_data_size(FEDataType type);

@@ -126,6 +126,13 @@ void FESurfaceMap::setValue(int n, const mat3d& v)
 }
 
 //-----------------------------------------------------------------------------
+void FESurfaceMap::setValue(int n, const mat3ds& v)
+{
+	int index = n * m_maxFaceNodes;
+	for (int i = 0; i < m_maxFaceNodes; ++i) set<mat3ds>(index + i, v);
+}
+
+//-----------------------------------------------------------------------------
 void FESurfaceMap::fillValue(double v)
 {
 	set<double>(v);
@@ -147,6 +154,12 @@ void FESurfaceMap::fillValue(const vec3d& v)
 void FESurfaceMap::fillValue(const mat3d& v)
 {
 	set<mat3d>(v);
+}
+
+//-----------------------------------------------------------------------------
+void FESurfaceMap::fillValue(const mat3ds& v)
+{
+	set<mat3ds>(v);
 }
 
 //-----------------------------------------------------------------------------
@@ -255,3 +268,31 @@ mat3d FESurfaceMap::valueMat3d(const FEMaterialPoint& pt)
 	return v;
 }
 
+
+//-----------------------------------------------------------------------------
+mat3ds FESurfaceMap::valueMat3ds(const FEMaterialPoint& pt)
+{
+	// get the element this material point is in
+	FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+	assert(pe);
+
+	// make sure this element belongs to this domain
+	// TODO: Can't check this if map was created through FEFacetSet
+	//	assert(pe->GetMeshPartition() == m_dom);
+
+	// get its local ID
+	int lid = pe->GetLocalID();
+
+	// get shape functions
+	double* H = pe->H(pt.m_index);
+
+	mat3ds v; v.zero();
+	int ne = pe->Nodes();
+	for (int i = 0; i < ne; ++i)
+	{
+		mat3ds vi = value<mat3ds>(lid, i);
+		v += vi * H[i];
+	}
+
+	return v;
+}

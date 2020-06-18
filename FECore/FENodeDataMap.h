@@ -49,6 +49,7 @@ public:
 	void setValue(int n, const vec2d& v) override;
 	void setValue(int n, const vec3d& v) override;
 	void setValue(int n, const mat3d& v) override;
+	void setValue(int n, const mat3ds& v) override;
 
 	double getValue(int n) const;
 
@@ -56,10 +57,12 @@ public:
 	void fillValue(const vec2d& v) override;
 	void fillValue(const vec3d& v) override;
 	void fillValue(const mat3d& v) override;
+	void fillValue(const mat3ds& v) override;
 
 	double value(const FEMaterialPoint& mp) override;
 	vec3d valueVec3d(const FEMaterialPoint& mp) override;
 	mat3d valueMat3d(const FEMaterialPoint& mp) override;
+	mat3ds valueMat3ds(const FEMaterialPoint& mp) override;
 
 private:
 	const FENodeSet*	m_nodeSet;

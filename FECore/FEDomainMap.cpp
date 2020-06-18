@@ -149,6 +149,20 @@ void FEDomainMap::setValue(int n, const mat3d& v)
 }
 
 //-----------------------------------------------------------------------------
+void FEDomainMap::setValue(int n, const mat3ds& v)
+{
+	if (m_fmt == FMT_MULT)
+	{
+		int index = n * m_maxElemNodes;
+		for (int i = 0; i < m_maxElemNodes; ++i) set<mat3ds>(index + i, v);
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		set<mat3ds>(n, v);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEDomainMap::fillValue(double v)
 {
 	set<double>(v);
@@ -170,6 +184,12 @@ void FEDomainMap::fillValue(const vec3d& v)
 void FEDomainMap::fillValue(const mat3d& v)
 {
 	set<mat3d>(v);
+}
+
+//-----------------------------------------------------------------------------
+void FEDomainMap::fillValue(const mat3ds& v)
+{
+	set<mat3ds>(v);
 }
 
 //-----------------------------------------------------------------------------
@@ -268,6 +288,29 @@ mat3d FEDomainMap::valueMat3d(const FEMaterialPoint& pt)
 	if (m_fmt == FMT_ITEM)
 	{
 		Q = get<mat3d>(lid);
+	}
+
+	return Q;
+}
+
+//-----------------------------------------------------------------------------
+//! get the value at a material point
+mat3ds FEDomainMap::valueMat3ds(const FEMaterialPoint& pt)
+{
+	assert(DataType() == FEDataType::FE_MAT3DS);
+	// get the element this material point is in
+	FEElement* pe = pt.m_elem;
+	assert(pe);
+
+	// see if this element belongs to the element set
+	assert(m_elset);
+	int lid = m_elset->GetLocalIndex(*pe);
+	assert((lid >= 0));
+
+	mat3ds Q;
+	if (m_fmt == FMT_ITEM)
+	{
+		Q = get<mat3ds>(lid);
 	}
 
 	return Q;
