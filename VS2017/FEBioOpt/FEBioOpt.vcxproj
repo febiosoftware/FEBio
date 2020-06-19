@@ -251,7 +251,7 @@
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
-    <IncludePath>$(SolutionDir)..;$(LEVMAR_VS15)\levmar-2.6;$(ZLIBDIR);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(LEVMARDIR);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
