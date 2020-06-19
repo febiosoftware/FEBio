@@ -239,7 +239,7 @@
     <IncludePath>$(SolutionDir)..;$(LEVMAR_VS15)\levmar-2.6;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
-    <IncludePath>$(SolutionDir)..;$(LEVMAR_VS15)\levmar-2.6;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(LEVMARDIR);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
     <IncludePath>$(SolutionDir)..;$(LEVMARDIR)\levmar-2.6;$(IncludePath)</IncludePath>

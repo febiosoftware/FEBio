@@ -25,8 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEDiscreteMaterial.h>
+#include "febiomech_api.h"
 
-class FEDiscreteElasticMaterialPoint : public FEDiscreteMaterialPoint
+class FEBIOMECH_API FEDiscreteElasticMaterialPoint : public FEDiscreteMaterialPoint
 {
 public:
 	vec3d	m_Ft;	// current force	
@@ -34,7 +35,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements
-class FECORE_API FEDiscreteElasticMaterial : public FEDiscreteMaterial
+class FEBIOMECH_API FEDiscreteElasticMaterial : public FEDiscreteMaterial
 {
 public:
 	FEDiscreteElasticMaterial(FEModel* pfem);

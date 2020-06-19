@@ -31,6 +31,11 @@ SOFTWARE.*/
 #include "FEFiberMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEElasticFiberMaterial, FEElasticMaterial)
+	ADD_PARAMETER(m_fiber, "fiber");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 FEElasticFiberMaterial::FEElasticFiberMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	// initialize the fiber vector
