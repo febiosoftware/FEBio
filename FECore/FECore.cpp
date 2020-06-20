@@ -57,6 +57,7 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "FETetgenRefine.h"
 #include "FEMMGRemesh.h"
+#include "FEConstValueVec3.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -115,12 +116,13 @@ REGISTER_FECORE_CLASS(FEMathValue  , "math" );
 REGISTER_FECORE_CLASS(FEMappedValue, "map"  );
 
 //  vector generators
-REGISTER_FECORE_CLASS(FELocalVectorGenerator      , "local");
-REGISTER_FECORE_CLASS(FEConstValueVec3            , "vector");
-REGISTER_FECORE_CLASS(FEMathValueVec3             , "math");
-REGISTER_FECORE_CLASS(FESphericalVectorGenerator  , "spherical");
-REGISTER_FECORE_CLASS(FECylindricalVectorGenerator, "cylindrical");
-REGISTER_FECORE_CLASS(FEMappedValueVec3           , "map");
+REGISTER_FECORE_CLASS(FELocalVectorGenerator          , "local");
+REGISTER_FECORE_CLASS(FEConstValueVec3                , "vector");
+REGISTER_FECORE_CLASS(FEMathValueVec3                 , "math");
+REGISTER_FECORE_CLASS(FESphericalVectorGenerator      , "spherical");
+REGISTER_FECORE_CLASS(FECylindricalVectorGenerator    , "cylindrical");
+REGISTER_FECORE_CLASS(FESphericalAnglesVectorGenerator, "angles");
+REGISTER_FECORE_CLASS(FEMappedValueVec3               , "map");
 
 // mat3d generators
 REGISTER_FECORE_CLASS(FEConstValueMat3d       , "const"      );

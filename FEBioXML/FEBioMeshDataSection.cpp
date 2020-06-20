@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FEDomainMap.h>
+#include <FECore/FEConstValueVec3.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------

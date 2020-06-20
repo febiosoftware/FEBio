@@ -651,6 +651,9 @@
     <ClInclude Include="..\..\FECore\FEMat3dsValuator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\FEConstValueVec3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp">
@@ -1209,6 +1212,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEMat3dsValuator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FEConstValueVec3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

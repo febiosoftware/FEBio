@@ -519,6 +519,7 @@
     <ClInclude Include="..\..\FECore\FECallBack.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
     <ClInclude Include="..\..\FECore\FEConstDataGenerator.h" />
+    <ClInclude Include="..\..\FECore\FEConstValueVec3.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FECoreBase.h" />
     <ClInclude Include="..\..\FECore\FECoreFactory.h" />
@@ -730,6 +731,7 @@
     <ClCompile Include="..\..\FECore\FEBroydenStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FECallback.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
+    <ClCompile Include="..\..\FECore\FEConstValueVec3.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
     <ClCompile Include="..\..\FECore\FECoreFactory.cpp" />
