@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "MObjBuilder.h"
 #include "FEDataArray.h"
 #include "DumpStream.h"
+#include "FEConstValueVec3.h"
 
 //---------------------------------------------------------------------------------------
 FEModelParam::FEModelParam()

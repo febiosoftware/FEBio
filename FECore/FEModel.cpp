@@ -1307,7 +1307,7 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 	FEParam* param = FindParameter(paramString);
 	if (param)
 	{
-		if (strcmp(param->name(), paramComp.c_str()) != 0)
+		if ((strcmp(param->name(), paramComp.c_str()) != 0) || (paramComp.Index() != -1))
 			return GetParameterComponent(paramComp, param);
 		else
 			return FEParamValue(param, param->data_ptr(), param->type());
