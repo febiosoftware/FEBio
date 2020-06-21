@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEEdge.h>
+#include <FECore/FEConstValueVec3.h>
 #include <FEBioMech/FESSIShellDomain.h>
 
 //-----------------------------------------------------------------------------
