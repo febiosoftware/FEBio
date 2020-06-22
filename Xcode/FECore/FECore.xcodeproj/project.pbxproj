@@ -123,6 +123,8 @@
 		D5709DAA22833034007CAB0A /* FETetgenRefine.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709DA422833034007CAB0A /* FETetgenRefine.h */; };
 		D5709DAB22833034007CAB0A /* FEDofList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709DA522833034007CAB0A /* FEDofList.h */; };
 		D5709DAC22833034007CAB0A /* FETetgenRefine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709DA622833034007CAB0A /* FETetgenRefine.cpp */; };
+		D58FA88224A1631400FC768B /* FEConstValueVec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58FA88024A1631400FC768B /* FEConstValueVec3.cpp */; };
+		D58FA88324A1631400FC768B /* FEConstValueVec3.h in Headers */ = {isa = PBXBuildFile; fileRef = D58FA88124A1631400FC768B /* FEConstValueVec3.h */; };
 		D5A37D2A2286167300867D77 /* FEOctreeSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A37D282286167300867D77 /* FEOctreeSearch.h */; };
 		D5A37D2B2286167300867D77 /* FEOctreeSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A37D292286167300867D77 /* FEOctreeSearch.cpp */; };
 		D5A56F8323D4FBFE002F28CA /* tens4dmm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */; };
@@ -525,6 +527,8 @@
 		D5709DA422833034007CAB0A /* FETetgenRefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETetgenRefine.h; sourceTree = "<group>"; };
 		D5709DA522833034007CAB0A /* FEDofList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDofList.h; sourceTree = "<group>"; };
 		D5709DA622833034007CAB0A /* FETetgenRefine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETetgenRefine.cpp; sourceTree = "<group>"; };
+		D58FA88024A1631400FC768B /* FEConstValueVec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEConstValueVec3.cpp; sourceTree = "<group>"; };
+		D58FA88124A1631400FC768B /* FEConstValueVec3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConstValueVec3.h; sourceTree = "<group>"; };
 		D5A37D282286167300867D77 /* FEOctreeSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctreeSearch.h; sourceTree = "<group>"; };
 		D5A37D292286167300867D77 /* FEOctreeSearch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOctreeSearch.cpp; sourceTree = "<group>"; };
 		D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tens4dmm.hpp; sourceTree = "<group>"; };
@@ -889,6 +893,8 @@
 				D5B9E48F213F67DE0008B38A /* FEClosestPointProjection.cpp */,
 				D5B9E3FC213F67DE0008B38A /* FEClosestPointProjection.h */,
 				D5613D48217B604E007CAB89 /* FEConstDataGenerator.h */,
+				D58FA88024A1631400FC768B /* FEConstValueVec3.cpp */,
+				D58FA88124A1631400FC768B /* FEConstValueVec3.h */,
 				D5B9E460213F67DE0008B38A /* fecore_api.h */,
 				D5B9E4F0213F67DE0008B38A /* fecore_debug_t.h */,
 				D5B9E4CE213F67DE0008B38A /* fecore_debug.cpp */,
@@ -1429,6 +1435,7 @@
 				D5B9E562213F67DE0008B38A /* FECoreKernel.h in Headers */,
 				D5B9E58A213F67DE0008B38A /* FEElementLibrary.h in Headers */,
 				D5B9E609213F67DE0008B38A /* FEMesh.h in Headers */,
+				D58FA88324A1631400FC768B /* FEConstValueVec3.h in Headers */,
 				D5709DAA22833034007CAB0A /* FETetgenRefine.h in Headers */,
 				D5B9E58B213F67DE0008B38A /* FEException.h in Headers */,
 				D51EBFA0217E3AED006F73C4 /* FEPIDController.h in Headers */,
@@ -1552,6 +1559,7 @@
 				D5B9E5FC213F67DE0008B38A /* FEMaterial.cpp in Sources */,
 				D5B9E5CE213F67DE0008B38A /* FETrussDomain.cpp in Sources */,
 				D5B9E56D213F67DE0008B38A /* SparseMatrix.cpp in Sources */,
+				D58FA88224A1631400FC768B /* FEConstValueVec3.cpp in Sources */,
 				D54E21E821517EEE008A9DD3 /* MathObject.cpp in Sources */,
 				D5B9E53D213F67DE0008B38A /* FEBroydenStrategy.cpp in Sources */,
 				D52D840421CE89A200472620 /* FEMat3dValuator.cpp in Sources */,
