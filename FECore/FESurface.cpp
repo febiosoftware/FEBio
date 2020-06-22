@@ -63,7 +63,10 @@ void FESurface::Create(int nsize, int elemType)
 	}
 
 	if (elemType != -1)
-		for (int i=0; i<nsize; ++i) m_el[i].SetType(elemType);
+	{
+		for (int i = 0; i < nsize; ++i) m_el[i].SetType(elemType);
+		CreateMaterialPointData();
+	}
 }
 
 //-----------------------------------------------------------------------------

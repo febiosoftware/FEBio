@@ -429,6 +429,8 @@ void FEBioLoadsSection2::ParseSurfaceLoadSurface(XMLTag& tag, FESurface* psurf)
 
 					++tag2;
 				}
+
+				psurf->CreateMaterialPointData();
 			}
 
 			++tag2;
