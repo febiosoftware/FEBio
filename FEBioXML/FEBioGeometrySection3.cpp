@@ -504,7 +504,7 @@ void FEBioGeometrySection3::ParsePartElementSection(XMLTag& tag, FEBModel::Part*
 	FEBModel::ElementSet* pg = 0;
 	if (szname)
 	{
-		FEBModel::ElementSet* pg = new FEBModel::ElementSet(szname);
+		pg = new FEBModel::ElementSet(szname);
 		part->AddElementSet(pg);
 	}
 
