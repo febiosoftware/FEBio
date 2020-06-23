@@ -154,7 +154,6 @@ public:
 		double	m_dt0;			//!< initial time step size
 		double	m_tstart;		//!< start time
 		double	m_tend;			//!< end time
-		bool	m_bautostep;	//!< use auto stepper?
 
 		FETimeStepController* m_timeController;
 	//}

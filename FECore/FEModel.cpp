@@ -511,8 +511,11 @@ bool FEModel::Init()
 	for (int i = 0; i < m_imp->m_Step.size(); ++i)
 	{
 		FEAnalysis* step = m_imp->m_Step[i];
-		int lc = step->m_timeController->m_nmplc;
-		if (lc >= 0) tag[lc]++;
+		if (step->m_timeController)
+		{
+			int lc = step->m_timeController->m_nmplc;
+			if (lc >= 0) tag[lc]++;
+		}
 	}
 	int unused = 0;
 	for (int i = 0; i < NLC; ++i) if (tag[i] == 0) unused++;

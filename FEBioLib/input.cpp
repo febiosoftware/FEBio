@@ -220,8 +220,8 @@ void FEBioModel::echo_input()
 		feLog("\tFinal time ..................................... : %lg\n", step.m_final_time);
 
 	feLog("\tTime step size ................................. : %lg\n", step.m_dt0);
-	feLog("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
-	if (step.m_bautostep)
+	feLog("\tAuto time stepper activated .................... : %s\n", (step.m_timeController ? "yes" : "no"));
+	if (step.m_timeController)
 	{
 		FETimeStepController& tc = *step.m_timeController;
 		feLog("\t  Optimal nr of iterations ..................... : %d\n", tc.m_iteopt);

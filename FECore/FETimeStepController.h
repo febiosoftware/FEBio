@@ -38,7 +38,9 @@ class FECORE_API FETimeStepController : public FECoreBase
 	FECORE_SUPER_CLASS
 
 public:
-	FETimeStepController(FEAnalysis* step);
+	FETimeStepController(FEModel* fem);
+
+	void SetAnalysis(FEAnalysis* step);
 
 	// initialization
 	bool Init() override;

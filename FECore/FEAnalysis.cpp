@@ -53,15 +53,17 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY_STATE\0TRANSIENT=1\0");
 
 	ADD_PROPERTY(m_psolver, "solver");
-	ADD_PROPERTY(m_timeController, "time_stepper");
+	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional);
 
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem), m_timeController(new FETimeStepController(this))
+FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 {
 	m_psolver = nullptr;
 	m_tend = 0.0;
+
+	m_timeController = nullptr;
 
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
@@ -71,7 +73,6 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem), m_timeController(new FET
 	m_final_time = 0.0;
 	m_dt0 = 0;
 	m_dt = 0;
-	m_bautostep = false;
 
 	// initialize counters
 	m_ntotref    = 0;		// total nr of stiffness reformations
@@ -109,9 +110,13 @@ void FEAnalysis::CopyFrom(FEAnalysis* step)
 	m_dt0        = step->m_dt0;
 	m_tstart     = step->m_tstart;
 	m_tend       = step->m_tend;
-	m_bautostep  = step->m_bautostep;
 
-	m_timeController->CopyFrom(step->m_timeController);
+	if (step->m_timeController)
+	{
+		m_timeController = new FETimeStepController(GetFEModel());
+		m_timeController->SetAnalysis(this);
+		m_timeController->CopyFrom(step->m_timeController);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -190,7 +195,7 @@ void FEAnalysis::Reset()
 
 	m_dt = m_dt0;
 
-	m_timeController->Reset();
+	if (m_timeController) m_timeController->Reset();
 
 	// Deactivate the step
 	Deactivate();
@@ -215,7 +220,11 @@ bool FEAnalysis::Init()
 {
 	m_dt = m_dt0;
 
-	if (m_timeController->Init() == false) return false;
+	if (m_timeController)
+	{
+		m_timeController->SetAnalysis(this);
+		if (m_timeController->Init() == false) return false;
+	}
 	if (m_nplot_stride <= 0) return false;
 	return Validate();
 }
@@ -352,24 +361,24 @@ bool FEAnalysis::Solve()
 	if (m_ntimesteps != 0)
 	{
 		// update time step
-		if (m_bautostep && (fem.GetCurrentTime() + eps < endtime)) m_timeController->AutoTimeStep(GetFESolver()->m_niter);
+		if (m_timeController && (fem.GetCurrentTime() + eps < endtime)) m_timeController->AutoTimeStep(GetFESolver()->m_niter);
 	}
 	else
 	{
 		// make sure that the timestep is at least the min time step size
-		if (m_bautostep) m_timeController->AutoTimeStep(0);
+		if (m_timeController) m_timeController->AutoTimeStep(0);
 	}
 
 	// dump stream for running restarts
 	DumpMemStream dmp(fem);
 
 	// repeat for all timesteps
-	m_timeController->m_nretries = 0;
+	if (m_timeController) m_timeController->m_nretries = 0;
 	while (endtime - fem.GetCurrentTime() > eps)
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep && (m_timeController->m_maxretries > 0))
+		if (m_timeController && (m_timeController->m_maxretries > 0))
 		{ 
 			dmp.clear();
 			fem.Serialize(dmp); 
@@ -434,10 +443,10 @@ bool FEAnalysis::Solve()
 			}
 
 			// reset retry counter
-			m_timeController->m_nretries = 0;
+			if (m_timeController) m_timeController->m_nretries = 0;
 
 			// update time step
-			if (m_bautostep && (fem.GetCurrentTime() + eps < endtime)) m_timeController->AutoTimeStep(psolver->m_niter);
+			if (m_timeController && (fem.GetCurrentTime() + eps < endtime)) m_timeController->AutoTimeStep(psolver->m_niter);
 		}
 		else 
 		{
@@ -451,7 +460,7 @@ bool FEAnalysis::Solve()
 			feLog("\n\n------- failed to converge at time : %lg\n\n", fem.GetCurrentTime());
 
 			// If we have auto time stepping, decrease time step and let's retry
-			if (m_bautostep && (m_timeController->m_nretries < m_timeController->m_maxretries))
+			if (m_timeController && (m_timeController->m_nretries < m_timeController->m_maxretries))
 			{
 				// restore the previous state
 				dmp.Open(false, true);
@@ -466,7 +475,7 @@ bool FEAnalysis::Solve()
 			else 
 			{
 				// can't retry, so abort
-				if (m_timeController->m_nretries >= m_timeController->m_maxretries)
+				if (m_timeController && (m_timeController->m_nretries >= m_timeController->m_maxretries))
 					feLog("Max. nr of retries reached.\n\n");
 
 				break;
@@ -580,7 +589,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	ar & m_final_time;
 	ar & m_dt0 & m_dt;
 	ar & m_tstart & m_tend;
-	ar & m_bautostep;
 	ar & m_ntotrhs;
 	ar & m_ntotref;
 	ar & m_ntotiter;
@@ -612,5 +620,5 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	}
 
 	// serialize time controller
-	m_timeController->Serialize(ar);
+	if (m_timeController) m_timeController->Serialize(ar);
 }

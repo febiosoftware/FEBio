@@ -48,7 +48,7 @@ void FERestartControlSection::Parse(XMLTag& tag)
 		else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
 		else if (tag == "time_stepper")
 		{
-			pstep->m_bautostep = true;
+			if (pstep->m_timeController == nullptr) pstep->m_timeController = fecore_alloc(FETimeStepController, &fem);
 			FETimeStepController& tc = *pstep->m_timeController;
 			++tag;
 			do

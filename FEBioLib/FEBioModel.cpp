@@ -509,7 +509,7 @@ void FEBioModel::Write(unsigned int nwhen)
 						bool bout = true;
 
 						// if we're using the fixed time stepper, we check the plot range and zero state flag
-						if (pstep->m_bautostep == false) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
+						if (pstep->m_timeController == nullptr) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
 
 						// store initial time step (i.e. time step zero)
 						double time = GetTime().currentTime;
@@ -547,7 +547,7 @@ void FEBioModel::Write(unsigned int nwhen)
 
 					bool inRange = true;
 					bool isStride = true;
-					if (pstep->m_bautostep == false)
+					if (pstep->m_timeController == nullptr)
 					{
 						inRange = false;
 						if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
@@ -560,7 +560,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
 					case CB_MAJOR_ITERS  : 
 						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true; 
-						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
+						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
 					case CB_AUGMENT: 
@@ -624,7 +624,7 @@ void FEBioModel::Write(unsigned int nwhen)
 		case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
 		case CB_MAJOR_ITERS:
 			if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
-			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
+			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
 			break;
 		case CB_SOLVED:
 			if (nout == FE_OUTPUT_FINAL) bout = true;

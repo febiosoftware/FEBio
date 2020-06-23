@@ -51,8 +51,9 @@ BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step), FECoreBase(step ? step->GetFEModel() : nullptr)
+FETimeStepController::FETimeStepController(FEModel* fem) : FECoreBase(fem)
 {
+	m_step = nullptr; // must be set with SetAnalysis
 	m_nretries = 0;
 	m_maxretries = 5;
 	m_naggr = 0;
@@ -69,9 +70,17 @@ FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step), FEC
 }
 
 //-----------------------------------------------------------------------------
+void FETimeStepController::SetAnalysis(FEAnalysis* step)
+{
+	m_step = step;
+}
+
+//-----------------------------------------------------------------------------
 //! copy from
 void FETimeStepController::CopyFrom(FETimeStepController* tc)
 {
+	assert(m_step);
+
 	m_naggr = tc->m_naggr;
 	m_nmplc = tc->m_nmplc;
 	m_iteopt = tc->m_iteopt;
@@ -91,7 +100,7 @@ bool FETimeStepController::Init()
 
 	// steal the load curve param from the dtmax parameter
 	FEParam* p = FindParameterFromData((void*) &m_dtmax); assert(p);
-	FEModel* fem = m_step->GetFEModel();
+	FEModel* fem = GetFEModel();
 	FELoadController* plc = fem->GetLoadController(p);
 	if (plc)
 	{

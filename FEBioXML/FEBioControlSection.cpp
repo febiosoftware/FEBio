@@ -100,7 +100,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		{
 			if (tag == "time_stepper")
 			{
-				pstep->m_bautostep = true;
+				if (pstep->m_timeController == nullptr) pstep->m_timeController = fecore_alloc(FETimeStepController, &fem);
 				FETimeStepController& tc = *pstep->m_timeController;
 				FEParameterList& pl = tc.GetParameterList();
 				ReadParameterList(tag, pl);
@@ -331,7 +331,7 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 		{
 			if (tag == "time_stepper")
 			{
-				pstep->m_bautostep = true;
+				if (pstep->m_timeController == nullptr) pstep->m_timeController = fecore_alloc(FETimeStepController, &fem);
 				FETimeStepController& tc = *pstep->m_timeController;
 				FEParameterList& pl = tc.GetParameterList();
 				ReadParameterList(tag, pl);
