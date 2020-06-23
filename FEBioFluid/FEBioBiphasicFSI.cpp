@@ -65,6 +65,7 @@ void FEBioBiphasicFSI::InitModule()
     
     // define the fsi module
     febio.CreateModule("biphasic-FSI");
+    febio.SetModuleDependency("fluid-FSI");
     febio.SetModuleDependency("fluid");
     
     REGISTER_FECORE_CLASS(FEBiphasicFSISolver, "biphasic-FSI");
