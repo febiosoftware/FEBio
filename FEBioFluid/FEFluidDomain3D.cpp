@@ -49,13 +49,8 @@ FEFluidDomain3D::FEFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDo
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 	m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
 
-	m_dofEF = pfem->GetDOFIndex("ef");
-	m_dofAEF = pfem->GetDOFIndex("aef");
-
-	// list the degrees of freedom
-	// (This allows the FEBomain base class to handle several tasks such as UnpackLM)
-	m_dof.AddDofs(m_dofW);
-	m_dof.AddDof(m_dofEF);
+	m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+	m_dofAEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION_TDERIV), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +83,22 @@ void FEFluidDomain3D::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidDomain3D::Activate()
+{
+    for (int i=0; i<Nodes(); ++i)
+    {
+        FENode& node = Node(i);
+        if (node.HasFlags(FENode::EXCLUDE) == false)
+        {
+            node.set_active(m_dofW[0]);
+            node.set_active(m_dofW[1]);
+            node.set_active(m_dofW[2]);
+            node.set_active(m_dofEF);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize element data
 void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
@@ -117,6 +128,24 @@ void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             
             mp.Update(timeInfo);
         }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Unpack the element LM data.
+void FEFluidDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
+{
+    int N = el.Nodes();
+    lm.resize(N*10);
+    for (int i=0; i<N; ++i)
+    {
+        FENode& node = m_pMesh->Node(el.m_node[i]);
+        vector<int>& id = node.m_ID;
+        
+        lm[4*i  ] = id[m_dofW[0]];
+        lm[4*i+1] = id[m_dofW[1]];
+        lm[4*i+2] = id[m_dofW[2]];
+        lm[4*i+3] = id[m_dofEF];
     }
 }
 
