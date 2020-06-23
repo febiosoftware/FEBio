@@ -64,9 +64,9 @@ void FEBioMeshDataSection3::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if      (tag == "node_data"   ) ParseNodalData  (tag);
-		else if (tag == "surface_data") ParseSurfaceData(tag);
-		else if (tag == "element_data") ParseElementData(tag);
+		if      (tag == "NodeData"   ) ParseNodalData  (tag);
+		else if (tag == "SurfaceData") ParseSurfaceData(tag);
+		else if (tag == "ElementData") ParseElementData(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
@@ -218,8 +218,15 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	FEDataType dataType = str2datatype(szdataType);
 	if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
 
-	// get the name (required!)
-	const char* szname = tag.AttributeValue("name");
+	// get the name or var (required!)
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname == nullptr)
+	{
+		const char* szvar = tag.AttributeValue("var");
+		if (strcmp(szvar, "shell thickness") == 0) ParseShellThickness(tag, *elset);
+		else throw XMLReader::InvalidAttributeValue(tag, "var");
+		return;
+	}
 
 	// create the data map
 	FEDomainMap* map = new FEDomainMap(dataType, (dataType==FE_MAT3D? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT));
@@ -618,7 +625,7 @@ void FEBioMeshDataSection3::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 
 		for (int i=0; i<set.Elements(); ++i)
 		{
-			FEShellElement* pel = dynamic_cast<FEShellElement*>(m_pelem[set[i]-1]);
+			FEShellElement* pel = dynamic_cast<FEShellElement*>(&set.Element(i));
 			if (pel == 0) throw XMLReader::InvalidValue(tag);
 
 			if (pel->Nodes() != nval) throw XMLReader::InvalidValue(tag);
@@ -634,7 +641,7 @@ void FEBioMeshDataSection3::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 			ELEMENT_DATA& di = data[i];
 			if (di.nval > 0)
 			{
-				FEElement& el = *m_pelem[set[i]-1];
+				FEElement& el = set.Element(i);
 
 				if (el.Class() != FE_ELEM_SHELL) throw XMLReader::InvalidTag(tag);
 				FEShellElement& shell = static_cast<FEShellElement&> (el);

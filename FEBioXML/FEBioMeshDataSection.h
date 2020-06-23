@@ -98,7 +98,4 @@ private:
 	void ParseElementData(XMLTag& tag, FEDomainMap& map);
 	void ParseSurfaceData(XMLTag& tag, FESurfaceMap& map);
 	void ParseNodeData   (XMLTag& tag, FENodeDataMap& map);
-
-private:
-	vector<FEElement*> m_pelem;
 };
