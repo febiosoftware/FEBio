@@ -405,16 +405,20 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 	}
 
 	// create element sets
-/*	int ESets = part.ElementSets();
+	int ESets = part.ElementSets();
 	for (int i=0; i<ESets; ++i)
 	{
 		ElementSet& eset = *part.GetElementSet(i);
 		vector<int> elist = eset.ElementList();
 
 		int ne = (int) elist.size();
-		FEElementSet* feset = new FEElementSet(&mesh);
-		feset->create(ne);
+		FEElementSet* feset = new FEElementSet(&fem);
+		string name = partName + "." + eset.Name();
+		feset->SetName(name);
+		feset->Create(elist);
+
+		mesh.AddElementSet(feset);
 	}
-*/
+
 	return true;
 }

@@ -973,28 +973,57 @@ void FEBioGeometrySection3::ParseElementSetSection(XMLTag& tag)
 	FEElementSet* pg = fecore_alloc(FEElementSet, &fem);
 	pg->SetName(szname);
 
-	FEDomainList domList;
 	++tag;
-	do
+	if (tag == "elem_set")
 	{
-		if (tag == "elem_set")
+		do
 		{
-			const char* sz = tag.szvalue();
-			FEDomain* dom = mesh.FindDomain(sz);
-			if (dom == 0) throw XMLReader::InvalidValue(tag);
+			if (tag == "elem_set")
+			{
+				const char* sz = tag.szvalue();
+				FEElementSet* eset = mesh.FindElementSet(sz);
+				if (eset == 0) throw XMLReader::InvalidValue(tag);
 
-			domList.AddDomain(dom);
+				pg->Add(*eset);
+			}
+			else { delete pg; throw XMLReader::InvalidTag(tag); }
+			++tag;
+		} while (!tag.isend());
+	}
+	else
+	{
+		vector<int> l;
+		do
+		{
+			int nid = -1;
+			tag.AttributeValue("id", nid);
+			l.push_back(nid);
+
+			++tag;
 		}
-		else { delete pg; throw XMLReader::InvalidTag(tag); }
-		++tag;
-	} while (!tag.isend());
+		while (!tag.isend());
+
+		// see if all elements belong to the same domain
+		FEElement* el = mesh.FindElementFromID(l[0]); assert(el);
+		FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
+		for (int i = 1; i < l.size(); ++i)
+		{
+			FEElement* el_i = mesh.FindElementFromID(l[i]); assert(el);
+			FEDomain* dom_i = dynamic_cast<FEDomain*>(el_i->GetMeshPartition());
+
+			if (dom != dom_i) throw XMLReader::Error("Elements in an ElementSet must belong to the same part.");
+		}
+
+		// assign indices to element set
+		pg->Create(dom, l);
+
+		// add the element set to the mesh
+		mesh.AddElementSet(pg);
+	}
 
 	// only add non-empty element sets
-	if (domList.IsEmpty() == false)
+	if (pg->Elements())
 	{
-		// assign indices to element set
-		pg->Create(domList);
-
 		// add the element set to the mesh
 		mesh.AddElementSet(pg);
 	}
