@@ -30,6 +30,12 @@ SOFTWARE.*/
 #include "FEElasticFiberMaterialUC.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEElasticFiberMaterialUC, FEUncoupledMaterial)
+	ADD_PARAMETER(m_fiber, "fiber");
+END_FECORE_CLASS();
+
+
+//-----------------------------------------------------------------------------
 FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	// initialize the fiber vector

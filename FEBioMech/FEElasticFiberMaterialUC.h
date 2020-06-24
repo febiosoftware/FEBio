@@ -59,4 +59,6 @@ public:
 
 public:
 	FEParamVec3		m_fiber;	//!< fiber orientation
+
+	DECLARE_FECORE_CLASS();
 };

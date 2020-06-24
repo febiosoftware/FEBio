@@ -257,6 +257,9 @@ void FEBioGeometrySection3::ParseInstanceSection(XMLTag& tag)
 
 	// build this part
 	if (m_feb.BuildPart(*GetFEModel(), *newPart, transform) == false) throw FEBioImport::FailedBuildingPart(newPart->Name());
+
+	// tell the file reader to rebuild the node ID table
+	GetBuilder()->BuildNodeList();
 }
 
 //-----------------------------------------------------------------------------
