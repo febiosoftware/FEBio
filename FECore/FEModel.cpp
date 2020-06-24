@@ -1313,7 +1313,14 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 		if ((strcmp(param->name(), paramComp.c_str()) != 0) || (paramComp.Index() != -1))
 			return GetParameterComponent(paramComp, param);
 		else
+		{
+			if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+			{
+				FEParamDouble& v = param->value<FEParamDouble>();
+				if (v.isConst()) return FEParamValue(param, &v.constValue(), FE_PARAM_DOUBLE);
+			}
 			return FEParamValue(param, param->data_ptr(), param->type());
+		}
 	}
 
 	// see what the next reference is
