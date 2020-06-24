@@ -126,7 +126,7 @@ bool FESolidDomain::Init()
 	}
 	catch (NegativeJacobian e)
 	{
-		feLogError("Negative jacobian detected during domain initialization\nDomain: %s\n", GetName().c_str());
+		feLogError("Negative jacobian detected during domain initialization\nDomain: %s\nElement %d, vol = %lg\n", GetName().c_str(), e.m_iel, e.m_vol);
 		return false;
 	}
 
