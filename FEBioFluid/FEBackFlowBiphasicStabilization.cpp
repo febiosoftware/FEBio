@@ -47,7 +47,13 @@ FEBackFlowBiphasicStabilization::FEBackFlowBiphasicStabilization(FEModel* pfem) 
     m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
     m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     
-    m_dof = m_dofW;
+    m_dof.Clear();
+    m_dof.AddDof(m_dofU[0]);
+    m_dof.AddDof(m_dofU[1]);
+    m_dof.AddDof(m_dofU[2]);
+    m_dof.AddDof(m_dofW[0]);
+    m_dof.AddDof(m_dofW[1]);
+    m_dof.AddDof(m_dofW[2]);
 }
 
 //-----------------------------------------------------------------------------
