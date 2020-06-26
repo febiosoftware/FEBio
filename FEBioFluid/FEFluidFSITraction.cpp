@@ -149,7 +149,7 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		// nodal coordinates
 		vec3d rt[FEElement::MAX_NODES];
-		m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
 
 		// evaluate covariant basis vectors at integration point
 		vec3d gr = el.eval_deriv1(rt, mp.m_index);
@@ -193,14 +193,14 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 		int neln = el.Nodes();
 
 		double dt = tp.timeIncrement;
-		double alpha = tp.alpha;
+		double alpha = tp.alphaf;
 		double a = tp.gamma / (tp.beta*dt);
 
 		vector<vec3d> gradN(neln);
 
 		// nodal coordinates
 		vec3d rt[FEElement::MAX_NODES];
-		ps->GetNodalCoordinates(el, tp.alpha, rt);
+		ps->GetNodalCoordinates(el, tp.alphaf, rt);
 
 		// Get the fluid stress and its tangents from the fluid-FSI element
 		mat3ds sv(mat3dd(0)), svJ(mat3dd(0));

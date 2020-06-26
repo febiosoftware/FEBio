@@ -58,11 +58,8 @@ FEFluidPResistanceBC::FEFluidPResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem),
 //! initialize
 bool FEFluidPResistanceBC::Init()
 {
-    FEModelComponent::Init();
-    
-    FESurface* ps = &GetSurface();
-    ps->Init();
-    
+    if (FESurfaceLoad::Init() == false) return false;
+
     return true;
 }
 

@@ -251,7 +251,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         FEBiphasicFSIMaterialPoint& ft = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
         
         // calculate the jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n];
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n];
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -360,7 +360,7 @@ void FEBiphasicFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el
         double denss = m_pMat->SolidDensity(mp);
         double densTf = m_pMat->TrueFluidDensity(mp);
         
-        detJ = detJt(el, n, tp.alpha)*gw[n];
+        detJ = detJt(el, n, tp.alphaf)*gw[n];
         
         // get the force
         f = BF.force(mp)*((-densTf+densTs)*ft.m_phis*detJ);
@@ -407,7 +407,7 @@ void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
         FEBiphasicFSIMaterialPoint& ft = *mp.ExtractData<FEBiphasicFSIMaterialPoint>();
         
         // calculate the jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -496,10 +496,10 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
         
-        ContraBaseVectors(el, n, g, tp.alpha);
-        ContraBaseVectorDerivatives(el, n, dg, tp.alpha);
+        ContraBaseVectors(el, n, g, tp.alphaf);
+        ContraBaseVectorDerivatives(el, n, dg, tp.alphaf);
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -755,10 +755,10 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
         
-        ContraBaseVectors(el, n, g, tp.alpha);
-        ContraBaseVectorDerivatives(el, n, dg, tp.alpha);
+        ContraBaseVectors(el, n, g, tp.alphaf);
+        ContraBaseVectorDerivatives(el, n, dg, tp.alphaf);
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -1044,13 +1044,11 @@ void FEBiphasicFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<doub
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
         FEBiphasicFSIMaterialPoint& ft = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
-        double densf = m_pMat->FluidDensity(mp);
         double densTf = m_pMat->TrueFluidDensity(mp);
-        double denss = m_pMat->SolidDensity(mp);
         double densTs = m_pMat->TrueSolidDensity(mp);
         
         // calculate the jacobian
-        detJ = detJt(el, n, tp.alpha)*gw[n];
+        detJ = detJt(el, n, tp.alphaf)*gw[n];
         
         H = el.H(n);
         

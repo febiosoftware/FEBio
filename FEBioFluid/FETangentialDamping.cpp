@@ -74,7 +74,7 @@ void FETangentialDamping::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// fluid velocity
-		vec3d v = FluidVelocity(mp, tp.alpha);
+		vec3d v = FluidVelocity(mp, tp.alphaf);
 
 		vec3d n = mp.dxr ^ mp.dxs;
 		double da = n.unit();

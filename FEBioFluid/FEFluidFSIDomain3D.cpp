@@ -253,7 +253,7 @@ void FEFluidFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>
         FEFSIMaterialPoint& ft = *(mp.ExtractData<FEFSIMaterialPoint>());
         
         // calculate the jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n];
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n];
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -352,7 +352,7 @@ void FEFluidFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, v
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         double dens = m_pMat->Fluid()->Density(mp);
         
-        detJ = detJt(el, n, tp.alpha)*gw[n];
+        detJ = detJt(el, n, tp.alphaf)*gw[n];
         
         // get the force
         f = BF.force(mp)*(dens*detJ);
@@ -394,7 +394,7 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
         
         // calculate the jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -465,7 +465,7 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const 
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -688,7 +688,7 @@ void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjact(el, Ji, n, tp.alpha)*gw[n]*tp.alpha;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -922,7 +922,7 @@ void FEFluidFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>
         double dens = m_pMat->Fluid()->Density(mp);
         
         // calculate the jacobian
-        detJ = detJt(el, n, tp.alpha)*gw[n];
+        detJ = detJt(el, n, tp.alphaf)*gw[n];
         
         H = el.H(n);
         

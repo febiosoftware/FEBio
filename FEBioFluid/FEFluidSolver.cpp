@@ -390,7 +390,7 @@ void FEFluidSolver::Update2(const vector<double>& ui)
 	scatter(U, mesh, m_dofW[0]);
 	scatter(U, mesh, m_dofW[1]);
 	scatter(U, mesh, m_dofW[2]);
-	scatter(U, mesh, m_dofEF);
+	scatter(U, mesh, m_dofEF[0]);
 
 	// Update the prescribed nodes
 	for (int i = 0; i<mesh.Nodes(); ++i)
@@ -576,9 +576,6 @@ bool FEFluidSolver::Quasin()
     double	normDi = 0;	// initial dilatation norm
     double	normD;		// current dilatation norm
     double	normd;		// incremement dilatation norm
-    
-    // Get the current step
-    FEAnalysis* pstep = fem.GetCurrentStep();
     
     // prepare for the first iteration
 	const FETimeInfo& tp = fem.GetTime();

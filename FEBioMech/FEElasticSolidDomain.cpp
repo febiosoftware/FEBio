@@ -197,10 +197,6 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 
 	double*	gw = el.GaussWeights();
 
-	// nodal coordinates
-	vec3d rt[FEElement::MAX_NODES];
-	GetCurrentNodalCoordinates(el, rt);
-
 	// repeat for all integration points
 	for (int n=0; n<nint; ++n)
 	{
@@ -208,7 +204,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		double detJt = (m_update_dynamic ? invjact(el, Ji, n, m_alphaf) : invjact(el, Ji, n, rt));
+		double detJt = (m_update_dynamic ? invjact(el, Ji, n, m_alphaf) : invjact(el, Ji, n));
 
 		detJt *= gw[n];
 

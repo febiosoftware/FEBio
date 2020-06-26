@@ -83,7 +83,7 @@ void FERigidContractileForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -130,7 +130,7 @@ void FERigidContractileForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidContractileForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
- 	double alpha = tp.alpha;
+ 	double alpha = tp.alphaf;
      
     vector<int> LM(12);
 	FEElementMatrix ke; ke.resize(12, 12);
@@ -289,7 +289,7 @@ void FERigidContractileForce::Update()
 	FERigidBody& RBb = *m_rbB;
 
 	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);

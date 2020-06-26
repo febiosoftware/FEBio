@@ -212,7 +212,7 @@ void FERigidCylindricalJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 		vec3d eat[3], eap[3], ea[3];
 		vec3d ebt[3], ebp[3], eb[3];
 
-		double alpha = tp.alpha;
+		double alpha = tp.alphaf;
 
 		// body A
 		vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1 - alpha);
@@ -387,7 +387,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 
 	if (m_laugon != 2)
 	{
-		double alpha = tp.alpha;
+		double alpha = tp.alphaf;
 
 		vec3d eat[3], eap[3], ea[3];
 		vec3d ebt[3], ebp[3], eb[3];
@@ -685,7 +685,7 @@ bool FERigidCylindricalJoint::Augment(int naug, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
@@ -804,7 +804,7 @@ void FERigidCylindricalJoint::Update()
 	FERigidBody& RBb = *m_rbB;
 
 	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);

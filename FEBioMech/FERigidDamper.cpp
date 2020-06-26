@@ -83,7 +83,7 @@ void FERigidDamper::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     // body A
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
@@ -132,7 +132,7 @@ void FERigidDamper::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidDamper::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
 	double beta  = tp.beta;
 	double gamma = tp.gamma;
     
@@ -303,7 +303,7 @@ void FERigidDamper::Update()
 	FERigidBody& RBb = *m_rbB;
 
 	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
 
     // body A
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);

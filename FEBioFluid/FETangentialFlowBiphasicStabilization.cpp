@@ -113,7 +113,7 @@ void FETangentialFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const 
         double da = n.unit();
         
         // fluid velocity
-        vec3d v = FluidVelocity(mp, tp.alpha);
+        vec3d v = FluidVelocity(mp, tp.alphaf);
         
         // tangential traction = -beta*density*|tangential velocity|*(tangential velocity)
         mat3dd I(1.0);
@@ -139,7 +139,7 @@ void FETangentialFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, 
     m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
         
         FESurfaceElement& el = *mp.SurfaceElement();
-        double alpha = tp.alpha;
+        double alpha = tp.alphaf;
         
         // fluid velocity
         vec3d v = FluidVelocity(mp, alpha);
@@ -162,8 +162,6 @@ void FETangentialFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, 
         
         // shape functions and derivatives
         double H_i  = dof_a.shape;
-        double Gr_i = dof_a.shape_deriv_r;
-        double Gs_i = dof_a.shape_deriv_s;
         
         double H_j  = dof_b.shape;
         double Gr_j = dof_b.shape_deriv_r;

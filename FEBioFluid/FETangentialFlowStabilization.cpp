@@ -71,7 +71,6 @@ bool FETangentialFlowStabilization::Init()
     // get fluid density from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);
-    FEMesh* mesh = m_psurf->GetMesh();
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
 
@@ -115,7 +114,7 @@ void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 		double da = n.unit();
 
 		// fluid velocity
-		vec3d v = FluidVelocity(mp, tp.alpha);
+		vec3d v = FluidVelocity(mp, tp.alphaf);
 
 		// tangential traction = -beta*density*|tangential velocity|*(tangential velocity)
 		mat3dd I(1.0);
@@ -141,7 +140,7 @@ void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FE
 	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
 		FESurfaceElement& el = *mp.SurfaceElement();
-		double alpha = tp.alpha;
+		double alpha = tp.alphaf;
 
 		// fluid velocity
 		vec3d v = FluidVelocity(mp, alpha);
@@ -164,8 +163,6 @@ void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FE
 
 		// shape functions and derivatives
 		double H_i  = dof_a.shape;
-		double Gr_i = dof_a.shape_deriv_r;
-		double Gs_i = dof_a.shape_deriv_s;
 
 		double H_j  = dof_b.shape;
 		double Gr_j = dof_b.shape_deriv_r;

@@ -111,7 +111,7 @@ void FERigidLock::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-    double alpha = tp.alpha;
+    double alpha = tp.alphaf;
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -181,7 +181,7 @@ void FERigidLock::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidLock::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    double alpha = tp.alpha;
+    double alpha = tp.alphaf;
     
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
@@ -371,7 +371,7 @@ bool FERigidLock::Augment(int naug, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-    double alpha = tp.alpha;
+    double alpha = tp.alphaf;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
@@ -482,7 +482,7 @@ void FERigidLock::Update()
 	FERigidBody& RBb = *m_rbB;
 
 	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);

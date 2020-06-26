@@ -54,12 +54,11 @@ FEBackFlowBiphasicStabilization::FEBackFlowBiphasicStabilization(FEModel* pfem) 
 //! initialize
 bool FEBackFlowBiphasicStabilization::Init()
 {
-    FESurfaceLoad::Init();
-    
+    if (FESurfaceLoad::Init() == false) return false;
+
     // get fluid density from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);
-    FEMesh* mesh = m_psurf->GetMesh();
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
     
@@ -94,7 +93,7 @@ void FEBackFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, const 
         
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
-        m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+        m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
         vec3d dxr = el.eval_deriv1(rt, mp.m_index);
         vec3d dxs = el.eval_deriv2(rt, mp.m_index);
         
@@ -154,7 +153,7 @@ void FEBackFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const FETime
         
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
-        m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+        m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
         vec3d dxr = el.eval_deriv1(rt, mp.m_index);
         vec3d dxs = el.eval_deriv2(rt, mp.m_index);
         

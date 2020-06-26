@@ -111,10 +111,7 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! initialize
 bool FEFluidNormalVelocity::Init()
 {
-    FEModelComponent::Init();
-    
-    FESurface* ps = &GetSurface();
-    ps->Init();
+    if (FESurfaceLoad::Init() == false) return false;
 
     return true;
 }

@@ -136,7 +136,7 @@ void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 void FEFluidDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
 {
     int N = el.Nodes();
-    lm.resize(N*10);
+    lm.resize(N*4);
     for (int i=0; i<N; ++i)
     {
         FENode& node = m_pMesh->Node(el.m_node[i]);

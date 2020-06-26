@@ -118,7 +118,7 @@ void FERigidSphericalJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -174,7 +174,7 @@ void FERigidSphericalJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidSphericalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     vector<int> LM(12);
     FEElementMatrix ke(12,12);
@@ -350,7 +350,7 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
@@ -442,7 +442,7 @@ void FERigidSphericalJoint::Update()
     vec3d za, zb;
 
 	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alpha;
+	double alpha = tp.alphaf;
     
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;

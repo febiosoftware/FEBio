@@ -56,12 +56,11 @@ FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(
 //! initialize
 bool FEBackFlowStabilization::Init()
 {
-	FESurfaceLoad::Init();
+    if (FESurfaceLoad::Init() == false) return false;
 
 	// get fluid density from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);
-    FEMesh* mesh = m_psurf->GetMesh();
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
 
@@ -96,7 +95,7 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 
 		// tangent vectors
 		vec3d rt[FEElement::MAX_NODES];
-		m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
 		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
 		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
 
@@ -112,8 +111,6 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 
 			// shape functions and derivatives
 			double H_i  = dof_a.shape;
-			double Gr_i = dof_a.shape_deriv_r;
-			double Gs_i = dof_a.shape_deriv_s;
 
 			double H_j  = dof_b.shape;
 			double Gr_j = dof_b.shape_deriv_r;
@@ -156,7 +153,7 @@ void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 
 		// tangent vectors
 		vec3d rt[FEElement::MAX_NODES];
-		m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
 		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
 		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
 
