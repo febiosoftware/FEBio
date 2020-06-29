@@ -71,15 +71,24 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "material")
 		{
-			// create a material from this tag
-			FEMaterial* pmat = CreateMaterial(tag); assert(pmat);
-
 			// check that the ID attribute is defined and that it 
 			// equals the number of materials + 1.
 			int nid = -1;
 			tag.AttributeValue("id", nid);
 			int nmat = fem.Materials();
 			if (nid != nmat+1) throw XMLReader::InvalidAttributeValue(tag, "id");
+
+			// make sure that the name is unique
+			const char* szname = tag.AttributeValue("name");
+			FEMaterial* mat = fem.FindMaterial(szname);
+			if (mat)
+			{
+				throw XMLReader::InvalidAttributeValue(tag, "name");
+			}
+
+			// create a material from this tag
+			FEMaterial* pmat = CreateMaterial(tag); assert(pmat);
+			pmat->SetName(szname);
 
 			// add the material
 			fem.AddMaterial(pmat);

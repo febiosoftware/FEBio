@@ -501,8 +501,8 @@ REGISTER_FECORE_CLASS(FETractionLoad, "traction");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce
-REGISTER_FECORE_CLASS(FEConstBodyForceOld   , "const"    , 0x0205);	// obsolete in 3.0
-REGISTER_FECORE_CLASS(FENonConstBodyForceOld, "non-const", 0x0205);	// obsolete in 3.0
+REGISTER_FECORE_CLASS(FEConstBodyForceOld   , "const"    );	// obsolete in 3.0
+REGISTER_FECORE_CLASS(FENonConstBodyForceOld, "non-const");	// obsolete in 3.0
 
 REGISTER_FECORE_CLASS(FEGenericBodyForce    , "body force" );
 REGISTER_FECORE_CLASS(FECentrifugalBodyForce, "centrifugal");

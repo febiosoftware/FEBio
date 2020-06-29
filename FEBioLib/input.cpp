@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidBody.h>
 #include <FECore/FEBodyLoad.h>
+#include <FECore/FEModelParam.h>
 #include <FECore/FELoadCurve.h>
 #include <FECore/log.h>
 #include <string.h>
@@ -81,7 +82,30 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 				feLog("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[17]);
 			}
 			break;
+		case FE_PARAM_DOUBLE_MAPPED:
+			{
+				FEParamDouble& v = p.value<FEParamDouble>();
+				if (v.isConst())
+				{
+					double a = v.constValue();
+					feLog("%s : %lg\n", sz, a);
+				}
+				else feLog("%s : (not constant)\n", sz);
+			}
+			break;
+		case FE_PARAM_VEC3D_MAPPED:
+		{
+			FEParamVec3& v = p.value<FEParamVec3>();
+			if (v.isConst())
+			{
+				vec3d a = v.constValue();
+				feLog("%s : %lg, %lg, %lg\n", sz, a.x, a.y, a.z);
+			}
+			else feLog("%s : (not constant)\n", sz);
+		}
+		break;
 		default:
+			feLog("%s : (can't display value)\n", sz);
 			break;
 		}
 	}
@@ -404,20 +428,12 @@ void FEBioModel::echo_input()
 		int NC = fem.NonlinearConstraints();
 		for (int i = 0; i<NC; ++i)
 		{
-			FENLConstraint* plc = fem.NonlinearConstraint(i);
-			if (dynamic_cast<FERigidJoint*>(plc))
-			{
-				FERigidJoint& rj = static_cast<FERigidJoint&>(*plc);
-				FERigidBody& ra = *fem.GetRigidBody(rj.m_nRBa);
-				FERigidBody& rb = *fem.GetRigidBody(rj.m_nRBb);
-				feLog("rigid joint %d:\n", i+1);
-				feLog("\tRigid body A                   : %d\n", ra.m_mat + 1);
-				feLog("\tRigid body B                   : %d\n", rb.m_mat + 1);
-				feLog("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
-				feLog("\tPenalty factor                 : %lg\n", rj.m_eps );
-				feLog("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
-				feLog("---------------------------------------------------------------------------\n");
-			}
+			FENLConstraint* plc = fem.NonlinearConstraint(i); assert(plc);
+			const char* sztype = plc->GetTypeStr();
+			if (sztype == 0) sztype = "unknown";
+			feLog("\nnonlinear constraint %d - Type: %s\n", i + 1, sztype);
+			FEParameterList& pl = plc->GetParameterList();
+			print_parameter_list(pl);
 		}
 		feLog("\n\n");
 	}
