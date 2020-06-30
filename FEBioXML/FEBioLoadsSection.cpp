@@ -481,7 +481,6 @@ void FEBioLoadsSection2::ParseEdgeLoad(XMLTag& tag)
 					if (ps)
 					{
 						if (GetBuilder()->BuildEdge(*pedge, *ps) == false) throw XMLReader::InvalidTag(tag);
-						pel->Create(pedge->Elements());
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 				}
@@ -490,7 +489,6 @@ void FEBioLoadsSection2::ParseEdgeLoad(XMLTag& tag)
 					// count how many load cards there are
 					int npr = tag.children();
 					pedge->Create(npr);
-					pel->Create(npr);
 
 					++tag;
 					int nf[FEElement::MAX_NODES], N;

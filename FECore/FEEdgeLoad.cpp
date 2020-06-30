@@ -33,18 +33,30 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEEdgeLoad, FEEDGELOAD_ID);
 
 //-----------------------------------------------------------------------------
-FEEdgeLoad::FEEdgeLoad(FEModel* pfem) : FEModelComponent(pfem)
+FEEdgeLoad::FEEdgeLoad(FEModel* pfem) : FEModelLoad(pfem)
 {
-	m_pedge = 0;
+	m_pedge = nullptr;
 }
 
 FEEdgeLoad::~FEEdgeLoad(void)
 {
 }
 
+//! Set the edge to apply the load to
+void FEEdgeLoad::SetEdge(FEEdge* pe) 
+{ 
+	m_pedge = pe; 
+}
+
+//! Get the edge
+FEEdge& FEEdgeLoad::Edge() 
+{ 
+	return *m_pedge; 
+}
 
 void FEEdgeLoad::Serialize(DumpStream& ar)
 {
+	FEModelLoad::Serialize(ar);
 	FEEdge& e = Edge();
 	e.Serialize(ar);
 }

@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEModelLoad.h"
 
 //-----------------------------------------------------------------------------
 class FEEdge;
@@ -36,7 +36,7 @@ class FELinearSystem;
 class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEEdgeLoad : public FEModelComponent
+class FECORE_API FEEdgeLoad : public FEModelLoad
 {
 	FECORE_SUPER_CLASS
 
@@ -44,22 +44,13 @@ public:
 	FEEdgeLoad(FEModel* pfem);
 	virtual ~FEEdgeLoad(void);
 
-	virtual void Create(int nsegs) = 0;
-
 	//! Set the edge to apply the load to
-	void SetEdge(FEEdge* pe) { m_pedge = pe; }
+	void SetEdge(FEEdge* pe);
 
 	//! Get the edge
-	FEEdge& Edge() { return *m_pedge; }
+	FEEdge& Edge();
 
 	void Serialize(DumpStream& ar) override;
-
-public:
-	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(FELinearSystem& LS) = 0;
-
-	//! calculate residual
-	virtual void LoadVector(FEGlobalVector& R) = 0;
 
 protected:
 	FEEdge*	m_pedge;
