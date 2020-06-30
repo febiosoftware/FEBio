@@ -723,14 +723,14 @@ void FEBioGeometrySection3::ParseSurfacePairSection(XMLTag& tag)
 		if (tag == "primary")
 		{
 			const char* sz = tag.szvalue();
-			p->SetSlaveSurface(mesh.FindFacetSet(sz));
-			if (p->GetSlaveSurface() == 0) throw XMLReader::InvalidValue(tag);
+			p->SetPrimarySurface(mesh.FindFacetSet(sz));
+			if (p->GetPrimarySurface() == 0) throw XMLReader::InvalidValue(tag);
 		}
 		else if (tag == "secondary")
 		{
 			const char* sz = tag.szvalue();
-			p->SetMasterSurface(mesh.FindFacetSet(sz));
-			if (p->GetMasterSurface() == 0) throw XMLReader::InvalidValue(tag);
+			p->SetSecondarySurface(mesh.FindFacetSet(sz));
+			if (p->GetSecondarySurface() == 0) throw XMLReader::InvalidValue(tag);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
@@ -754,17 +754,17 @@ void FEBioGeometrySection3::ParseNodeSetPairSection(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "master")
+		if (tag == "primary")
 		{
 			const char* sz = tag.AttributeValue("node_set");
-			p.pmaster = mesh.FindNodeSet(sz);
-			if (p.pmaster == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+			p.set1 = mesh.FindNodeSet(sz);
+			if (p.set1 == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
 		}
-		else if (tag == "slave")
+		else if (tag == "secondary")
 		{
 			const char* sz = tag.AttributeValue("node_set");
-			p.pslave = mesh.FindNodeSet(sz);
-			if (p.pslave == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+			p.set2 = mesh.FindNodeSet(sz);
+			if (p.set2 == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

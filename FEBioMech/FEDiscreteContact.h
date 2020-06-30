@@ -51,10 +51,10 @@ class FEBIOMECH_API FEDiscreteContact : public FESurfaceConstraint
 	struct NODE
 	{
 		int					nid;	//!< (local) node ID
-		FESurfaceElement*	pe;		//!< master surface element
+		FESurfaceElement*	pe;		//!< secondary surface element
 		double				gap;	//!< gap distance
 		double				Lm;		//!< Lagrange multiplier
-		vec3d				nu;		//!< normal at master projection
+		vec3d				nu;		//!< normal at secondary surface projection
 		vec3d				q;		//!< projection point
 		double				proj[2];	//!< iso-parametric coordinates of projection point
 	};
@@ -105,9 +105,9 @@ class FEBIOMECH_API FEDiscreteContact2 : public FESurfaceConstraint
 	struct NODE
 	{
 		int		node;				// node index (local ID into discrete domain)
-		FESurfaceElement*	pe;		// master element
+		FESurfaceElement*	pe;		// secondary surface element
 		double	proj[2];			// natural coordinates of projection
-		vec3d	nu;					// normal on master surface
+		vec3d	nu;					// normal on secondary surface
 		vec3d	q;					// new position
 	};
 

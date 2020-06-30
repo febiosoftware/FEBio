@@ -44,15 +44,15 @@ public:
 	void SetName(const std::string& name);
 	const std::string& GetName() const;
 
-	FEFacetSet* GetMasterSurface();
-	void SetMasterSurface(FEFacetSet* pf);
+	FEFacetSet* GetPrimarySurface();
+	void SetPrimarySurface(FEFacetSet* pf);
 
-	FEFacetSet* GetSlaveSurface();
-	void SetSlaveSurface(FEFacetSet* pf);
+	FEFacetSet* GetSecondarySurface();
+	void SetSecondarySurface(FEFacetSet* pf);
 
 private:
 	std::string		m_name;
-	FEFacetSet*		m_master;
-	FEFacetSet*		m_slave;
+	FEFacetSet*		m_surface1;	// the primary surface
+	FEFacetSet*		m_surface2;	// the secondary surface
 	FEMesh*			m_mesh;
 };

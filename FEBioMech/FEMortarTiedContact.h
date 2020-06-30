@@ -52,9 +52,9 @@ public:
 	//! constructor
 	FEMortarTiedContact(FEModel* pfem);
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface () override { return &m_ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
 
 public:
 	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)

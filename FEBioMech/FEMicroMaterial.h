@@ -90,7 +90,7 @@ public:
 	double	   m_macro_energy_inc;	// Macroscopic strain energy increment
 	double	   m_micro_energy_inc;	// Microscopic strain energy increment
 
-	FERVEModel	m_rve;				// Local copy of the master rve
+	FERVEModel	m_rve;				// Local copy of the parent rve
 };
 
 //-----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ public:
 	std::string	m_szbc;		//!< name of nodeset defining boundary
 	int			m_bctype;		//!< periodic bc flag
 	double		m_scale;		//!< RVE scale factor
-	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
+	FERVEModel	m_mrve;			//!< the parent RVE (Representive Volume Element)
 
 public:
 	//! calculate stress at material point

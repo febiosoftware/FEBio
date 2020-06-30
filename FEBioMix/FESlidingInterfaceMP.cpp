@@ -715,7 +715,7 @@ void FESlidingInterfaceMP::CalcAutoPressurePenalty(FESlidingSurfaceMP& s)
 
 //-----------------------------------------------------------------------------
 //! This function calculates a contact penalty parameter based on the
-//! material and geometrical properties of the slave and master surfaces
+//! material and geometrical properties of the primary and secondary surfaces
 //!
 double FESlidingInterfaceMP::AutoPenalty(FESurfaceElement& el, FESurface &s)
 {
@@ -935,7 +935,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 	np.SetSearchRadius(m_srad);
 	np.Init();
 	
-    // if we need to project the nodes onto the master surface,
+    // if we need to project the nodes onto the secondary surface,
     // let's do this first
     if (bmove)
     {
@@ -967,7 +967,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
             vec3d rt = node.m_rt;
             vec3d nu = normal[i];
             
-            // project onto the master surface
+            // project onto the secondary surface
             vec3d q;
             double rs[2] = {0,0};
             FESurfaceElement* pme = np.Project(rt, nu, rs);
@@ -1043,7 +1043,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 				}
 			}
 			
-			// find the intersection point with the master surface
+			// find the intersection point with the secondary surface
 			if (pme == 0 && bupseg) pme = np.Project(r, nu, rs);
 			
 			pt.m_pme = pme;
@@ -1308,12 +1308,12 @@ void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
 	{
-		// get slave and master surface
+		// get primary and secondary surface
 		FESlidingSurfaceMP& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurfaceMP& ms = (np == 0? m_ms : m_ss);
 		vector<int>& sl = (np == 0? m_ssl : m_msl);
 		
-		// loop over all slave elements
+		// loop over all primary surface elements
 		for (int i=0; i<ss.Elements(); ++i)
 		{
 			// get the surface element
@@ -1368,16 +1368,16 @@ void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			for (int j=0; j<nint; ++j)
 			{
 				FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(j));
-				// get the master element
+				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
-					// get the master element
+					// get the secondary surface element
 					FESurfaceElement& me = *pme;
 					
 					bool mporo = ms.m_bporo;
 					
-					// get the nr of master element nodes
+					// get the nr of secondary element nodes
 					int nmeln = me.Nodes();
 					
 					// copy LM vector
@@ -1407,10 +1407,10 @@ void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 					
-					// get slave element shape functions
+					// get element shape functions
 					Hs = se.H(j);
 					
-					// get master element shape functions
+					// get secondary element shape functions
 					double r = pt.m_rs[0];
 					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
@@ -1548,15 +1548,15 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np < npass; ++np)
 	{
-		// get the slave and master surface
+		// get the primary and secondary surface
 		FESlidingSurfaceMP& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurfaceMP& ms = (np == 0? m_ms : m_ss);
 		vector<int>& sl = (np == 0? m_ssl : m_msl);
 		
-		// loop over all slave elements
+		// loop over all primary surface elements
 		for (i=0; i<ss.Elements(); ++i)
 		{
-			// get ths slave element
+			// get the next element
 			FESurfaceElement& se = ss.Element(i);
 			
 			bool sporo = ss.m_bporo;
@@ -1611,11 +1611,11 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     jn[isol][j] = pd.m_Lmc[l] + epsc*pd.m_cg[l];
                 }
                 
-                // contravariant basis vectors of slave surface
+                // contravariant basis vectors of primary surface
                 vec3d Gs[2];
                 ss.ContraBaseVectors(se, j, Gs);
                 
-				// p vector (gradient of effective fluid pressure on slave surface)
+				// p vector (gradient of effective fluid pressure on primary surface)
 				if (sporo)
 				{
 					double dpr = se.eval_deriv1(pn, j);
@@ -1623,7 +1623,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     pv[j] = Gs[0]*dpr + Gs[1]*dps;
 				}
                 
-				// q vectors (gradients of effective solute concentrations on slave surface)
+				// q vectors (gradients of effective solute concentrations on primary surface)
 				for (int isol=0; isol<nsol; ++isol) {
 					double dcr = se.eval_deriv1(&cn[isol][0], j);
 					double dcs = se.eval_deriv2(&cn[isol][0], j);
@@ -1635,7 +1635,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 			for (j=0; j<nint; ++j)
 			{
 				FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(j));
-				// get the master element
+				// get the secondary element
 				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
@@ -1643,7 +1643,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 					
 					bool mporo = ms.m_bporo;
 					
-					// get the nr of master nodes
+					// get the nr of secondary nodes
 					int nmeln = me.Nodes();
 					
 					// nodal data
@@ -1743,15 +1743,15 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 					
-					// slave shape functions
+					// shape functions
 					Hs = se.H(j);
 					
-					// master shape functions
+					// secondary shape functions
 					double r = pt.m_rs[0];
 					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
 					
-					// get slave normal vector
+					// get normal vector
 					vec3d nu = pt.m_nu;
 					
 					// penalty
@@ -2044,7 +2044,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
 			FESlidingSurfaceMP::Data& data = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
-			// update Lagrange multipliers on slave surface
+			// update Lagrange multipliers on primary surface
             if (m_bsmaug) {
                 // replace this multiplier with a smoother version
                 Ln = -(tn[j]*data.m_nu);
@@ -2089,7 +2089,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
 			FESlidingSurfaceMP::Data& data = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
-			// update Lagrange multipliers on master surface
+			// update Lagrange multipliers on secondary surface
             if (m_bsmaug) {
                 // replace this multiplier with a smoother version
                 Ln = -(tn[j]*data.m_nu);

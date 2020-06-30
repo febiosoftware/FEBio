@@ -50,11 +50,11 @@ public:
 	FESurfacePairConstraint(FEModel* pfem);
 
 public:
-	//! return the master surface
-	virtual FESurface* GetMasterSurface() = 0;
+	//! return the primary surface
+	virtual FESurface* GetPrimarySurface() = 0;
 
-	//! return the slave surface
-	virtual FESurface* GetSlaveSurface () = 0;
+	//! return the secondary surface
+	virtual FESurface* GetSecondarySurface () = 0;
 
 	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
 	virtual bool UseNodalIntegration() = 0;

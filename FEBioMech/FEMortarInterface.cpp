@@ -64,7 +64,7 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 	CalculateMortarSurface(ss, ms, mortar);
 
 	// These arrays will store the shape function values of the projection points 
-	// on the slave and master side when evaluating the integral over a pallet
+	// on the primary and secondary side when evaluating the integral over a pallet
 	double Ns[MAX_INT][4], Nm[MAX_INT][4];
 
 	// loop over the mortar patches
@@ -75,8 +75,8 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 		Patch& pi = mortar.GetPatch(i);
 
 		// get the facet ID's that generated this patch
-		int k = pi.GetSlaveFacetID();
-		int l = pi.GetMasterFacetID();
+		int k = pi.GetPrimaryFacetID();
+		int l = pi.GetSecondaryFacetID();
 
 		// get the non-mortar surface element
 		FESurfaceElement& se = ss.Element(k);
@@ -102,7 +102,7 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 					// evaluate the spatial position of the integration point on the patch
 					vec3d xp = fj.Position(gr[n], gs[n]);
 
-					// evaluate the integration points on the slave and master surfaces
+					// evaluate the integration points on the primary and secondary surfaces
 					// i.e. determine rs, rm
 					double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
 					vec3d xs = ss.ProjectToSurface(se, xp, r1, s1);
@@ -123,7 +123,7 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 				{
 					int a = se.m_lnode[A];
 
-					// loop over all the nodes on the slave facet
+					// loop over all the nodes on the primary facet
 					for (int B=0; B<ns; ++B)
 					{
 						double n1 = 0;
@@ -137,7 +137,7 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 						m_n1[a][b] += n1;
 					}
 
-					// loop over all the nodes on the master facet
+					// loop over all the nodes on the secondary facet
 					for (int C = 0; C<nm; ++C)
 					{
 						double n2 = 0;
@@ -182,10 +182,10 @@ void FEMortarInterface::UpdateNodalGaps(FEMortarContactSurface& ss, FEMortarCont
 	int NS = ss.Nodes();
 	int NM = ms.Nodes();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (int A=0; A<NS; ++A)
 	{
-		// loop over all slave nodes
+		// loop over all primary nodes
 		for (int B=0; B<NS; ++B)
 		{
 			FENode& nodeB = ss.Node(B);
@@ -194,7 +194,7 @@ void FEMortarInterface::UpdateNodalGaps(FEMortarContactSurface& ss, FEMortarCont
 			gap[A] += xB*nAB;
 		}
 
-		// loop over master side
+		// loop over secondary side
 		for (int C=0; C<NM; ++C)
 		{
 			FENode& nodeC = ms.Node(C);

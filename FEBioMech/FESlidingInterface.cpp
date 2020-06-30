@@ -469,12 +469,12 @@ void FESlidingInterface::Activate()
 	// don't forget to call the base class
 	FEContactInterface::Activate();
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms, true, m_breloc);
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// for two-pass algorithms we repeat the previous
-	// two steps with master and slave switched
+	// two steps with primary and secondary surface switched
 	if (m_btwo_pass && (m_bself_contact == false))
 	{
 		ProjectSurface(m_ms, m_ss, true);
@@ -483,20 +483,20 @@ void FESlidingInterface::Activate()
 }
 
 //-----------------------------------------------------------------------------
-//!  Projects the slave surface onto the master surface.
-//!  That is for each slave node we determine the closest
-//!  master element and the projection of the slave node onto
-//!  this master element.
+//!  Projects the primary surface onto the secondary surface.
+//!  That is, for each primary surface node we determine the closest
+//!  secondary surface element and the projection of that node onto
+//!  this element.
 
-//! \todo this function needs to identify the different types of node-slave contact:
+//! \todo this function needs to identify the different types of contact:
 //!   1/ first contact
 //!   2/ crossing of element boundary
 //!	  3/ contact termination 
-//!			either by failure to find master segment or when g < tolerance
+//!			either by failure to find projection or when g < tolerance
 
 void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove)
 {
-	// slave node projection
+	// node projection data
 	double r, s;
 	vec3d q;
 
@@ -506,7 +506,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 	cpp.HandleSpecialCases(true);
 	cpp.Init();
 
-	// loop over all slave nodes
+	// loop over all primary surface nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		// get the node
@@ -518,11 +518,11 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 		// get the global node number
 		int m = ss.NodeIndex(i);
 
-		// get the previous master element (if any)
+		// get the previous secondary surface element (if any)
 		FESurfaceElement* pme = ss.m_data[i].m_pme;
 
 		// If the node is in contact, let's see if the node still is 
-		// on the same master element
+		// on the same element
 		if (pme != 0)
 		{
 			FESurfaceElement& mel = *pme;
@@ -541,7 +541,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			{
 				if (!ms.IsInsideElement(mel, r, s, m_stol) && bupseg)
 				{
-					// see if the node might have moved to another master element
+					// see if the node might have moved to another element
 					FESurfaceElement* pold = pme; 
 					ss.m_data[i].m_rs = vec2d(0,0);
 
@@ -558,9 +558,9 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 					}
 					else if (m_mu*m_epsf > 0)
 					{
-						// the node has moved to another master segment.
+						// the node has moved to another segment.
 						// If friction is active we need to translate the frictional
-						// data to the new master segment.
+						// data to the new segment.
 						FESurfaceElement& eo = *pold;
 						FESurfaceElement& en = *pme;
 						MapFrictionData(i, ss, ms, en, eo, q);
@@ -570,7 +570,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 		}
 		else if (bupseg)
 		{
-			// get the master element
+			// get the secondary surface element
 			// don't forget to initialize the search for the first node!
 			ss.m_data[i].m_rs = vec2d(0,0);
 			if (m_bself_contact)
@@ -585,7 +585,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			}
 		}
 
-		// if we found a master element, update the gap and normal data
+		// if we found a secondary surface element, update the gap and normal data
 		ss.m_data[i].m_pme = pme;
 		if (pme != 0)
 		{
@@ -598,7 +598,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			// to the previous ones
 			ss.m_data[i].m_M = ss.Metric0(mel, r, s);
 
-			// the slave normal is set to the master element normal
+			// the normal is set to the secondary surface element normal
 			ss.m_data[i].m_nu = ss.SurfaceNormal(mel, r, s);
 
 			// calculate gap
@@ -646,7 +646,7 @@ void FESlidingInterface::Update()
 	// one pass!
 	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	// this also calculates the nodal gap functions
 	ProjectSurface(m_ss, m_ms, bupdate);
 	if (m_btwo_pass && (m_bself_contact == false)) ProjectSurface(m_ms, m_ss, bupdate);
@@ -687,15 +687,15 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	if (m_bself_contact) npass = 1;
 	for (int np=0; np<npass; ++np)
 	{
-		// pick the slave and master surfaces
+		// pick the primary and secondary surfaces
 		FESlidingSurface& ss = (np==0? m_ss : m_ms);
 		FESlidingSurface& ms = (np==0? m_ms : m_ss);
 
-		// loop over all slave facets
+		// loop over all primary surface facets
 		int ne = ss.Elements();
 		for (int j=0; j<ne; ++j)
 		{
-			// get the slave element
+			// get the next element
 			FESurfaceElement& sel = ss.Element(j);
 			int nseln = sel.Nodes();
 
@@ -733,7 +733,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				w[n] = sel.GaussWeights()[n];
 			}
 
-			// loop over slave element nodes (which are the integration points as well)
+			// loop over primary surface element nodes (which are the integration points as well)
 			// and calculate the contact nodal force
 			for (int n=0; n<nseln; ++n)
 			{
@@ -741,14 +741,14 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				int m = sel.m_lnode[n];
 
 				// see if this node's constraint is active
-				// that is, if it has a master element associated with it
+				// that is, if it has an element associated with it
 				// TODO: is this a good way to test for an active constraint
 				// The rigid wall criteria seems to work much better.
 				if (ss.m_data[m].m_pme != 0)
 				{
 					// This node is active and could lead to a non-zero
 					// contact force.
-					// get the master element
+					// get the secondary surface element
 					FESurfaceElement& mel = *ss.m_data[m].m_pme;
 					ms.UnpackLM(mel, mLM);
 
@@ -790,7 +790,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the contact force on a slave node.
+//! Calculates the contact force on a node.
 //! \param[in] m local node number
 //! \param[out] fe force vector
 
@@ -807,10 +807,10 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	// tangents
 	vec3d tau1, tau2;
 
-	// max nr of master element nodes
+	// max nr of element nodes
 	const int MAXMN = FEElement::MAX_NODES;
 
-	// master element nodes
+	// secondary surface element nodes
 	vec3d rtm[MAXMN];
 
 	// shape function values
@@ -839,12 +839,12 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	// normal penalty
 	eps = ss.m_data[m].m_eps*scale;
 
-	// get slave node normal force
+	// get primary surface node normal force
 	Ln = ss.m_data[m].m_Lm;
 	tn = Ln + eps*gap;
 	tn = MBRACKET(tn);
 
-	// get the slave node normal
+	// get the primary surface  node normal
 	vec3d& nu = ss.m_data[m].m_nu;
 
 	nmeln = mel.Nodes();
@@ -854,11 +854,11 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	mat2d Mk = ss.m_data[m].m_M;
 	mat2d Mki = Mk.inverse();
 
-	// get the master element node positions
+	// get the secondary surface element node positions
 	for (int k=0; k<nmeln; ++k) rtm[k] = mesh.Node(mel.m_node[k]).m_rt;
 
-	// isoparametric coordinates of the projected slave node
-	// onto the master element
+	// isoparametric coordinates of the projected node
+	// onto the secondary surface element
 	double r = ss.m_data[m].m_rs[0];
 	double s = ss.m_data[m].m_rs[1];
 
@@ -866,7 +866,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	double rp = ss.m_data[m].m_rsp[0];
 	double sp = ss.m_data[m].m_rsp[1];
 
-	// get the master shape function values at this slave node
+	// get the secondary surface element shape function values at this node
 	mel.shape_fnc(H, r, s);
 
 	// --- N O R M A L   T R A C T I O N ---
@@ -897,7 +897,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		// only if both the friction coefficient and friction
 		// penalty factor are non-zero
 
-		// get the master shape function derivative values at this slave node
+		// get the secondary surface shape function derivative values at this node
 		mel.shape_deriv(Hr, Hs, r, s);
 
 		// get the tangent vectors
@@ -1026,15 +1026,15 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	if (m_bself_contact) npass = 1;
 	for (int np=0; np<npass; ++np)
 	{
-		// get the master and slave surface
+		// get the primary and secondary surface
 		FESlidingSurface& ss = (np==0?m_ss:m_ms);	
 		FESlidingSurface& ms = (np==0?m_ms:m_ss);	
 
-		// loop over all slave elements
+		// loop over all primary surface elements
 		int ne = ss.Elements();
 		for (int j=0; j<ne; ++j)
 		{
-			// unpack the slave element
+			// unpack the next element
 			FESurfaceElement& se = ss.Element(j);
 			int nseln = se.Nodes();
 
@@ -1073,13 +1073,13 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 				int m = se.m_lnode[n];
 
 				// see if this node's constraint is active
-				// that is, if it has a master element associated with it
+				// that is, if it has an element associated with it
 				if (ss.m_data[m].m_pme != 0)
 				{
-					// get the master element
+					// get the secondary surface element
 					FESurfaceElement& me = *ss.m_data[m].m_pme;
 
-					// get the masters element's LM array
+					// get the secondary surface element's LM array
 					ms.UnpackLM(me, mLM);
 
 					int nmeln = me.Nodes();
@@ -1151,24 +1151,24 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	vec3d rt[MAXMN];
 	for (int j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
 
-	// slave node natural coordinates in master element
+	// node natural coordinates in secondary surface element
 	double r = ss.m_data[m].m_rs[0];
 	double s = ss.m_data[m].m_rs[1];
 
-	// slave gap
+	// gap
 	double gap = ss.m_data[m].m_gap;
 
 	// lagrange multiplier
 	double Lm = ss.m_data[m].m_Lm;
 
-	// get slave node normal force
+	// get node normal force
 	double tn = Lm + eps*gap;
 	tn = MBRACKET(tn);
 
-	// get the slave node normal
+	// get the node normal
 	vec3d& nu = ss.m_data[m].m_nu;
 
-	// get the master shape function values and the derivatives at this slave node
+	// get the secondary surface element shape function values and the derivatives at this node
 	mel.shape_fnc(H, r, s);
 	mel.shape_deriv(Hr, Hs, r, s);
 
@@ -1765,7 +1765,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-//! This function transforms friction data between two master segments
+//! This function transforms friction data between two segments
 
 void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlidingSurface& ms, FESurfaceElement &en, FESurfaceElement &eo, vec3d &q)
 {
@@ -1856,7 +1856,7 @@ void FESlidingInterface::Serialize(DumpStream& ar)
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
 
-	// restore master element pointers
+	// restore element pointers
 	SerializePointers(m_ss, m_ms, ar);
 	SerializePointers(m_ms, m_ss, ar);
 

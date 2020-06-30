@@ -54,7 +54,7 @@ FERVEModel::~FERVEModel()
 }
 
 //-----------------------------------------------------------------------------
-// copy from the master RVE
+// copy from the parent RVE
 void FERVEModel::CopyFrom(FERVEModel& rve)
 {
 	// base class does most work
@@ -507,9 +507,9 @@ mat3ds FERVEModel::StressAverage(FEMaterialPoint& mp)
 				FENode& node = ss.Node(i);
 				vec3d f = ss.m_Fr[i];
 
-				// We multiply by two since the reaction forces are only stored at the slave surface 
-				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-				// store the reaction forces on the master nodes as well?)
+				// We multiply by two since the reaction forces are only stored at the primary surface 
+				// and we also need to sum over the secondary nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the secondary nodes as well?)
 				T += (f & node.m_rt)*2.0;
 			}
 		}

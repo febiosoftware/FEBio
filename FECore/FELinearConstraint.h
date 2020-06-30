@@ -48,7 +48,7 @@ public:
 	public:
 		int		node;	// node number
 		int		dof;	// degree of freedom
-		double	val;	// coefficient value (ignored for master)
+		double	val;	// coefficient value (ignored for parent dof)
 	};
 
 public:
@@ -70,14 +70,17 @@ public:
 	void Activate();
 	void Deactivate();
 
-	void SetMasterDOF(int dof, int node);
+	// set the parent degree of freedom
+	void SetParentDof(int dof, int node);
 
-	void AddSlaveDof(int dof, int node, double v);
+	// add a child degree of freedom
+	void AddChildDof(int dof, int node, double v);
 
+	// set the linear constraint offset
 	void SetOffset(double d) { m_off = d; }
 
 public:
-	DOF			master;	// master degree of freedom
-	vector<DOF>	slave;	// list of slave nodes
-	double		m_off;	// offset value
+	DOF			m_parentDof;	// parent degree of freedom
+	vector<DOF>	m_childDof;		// list of child dofs
+	double		m_off;			// offset value
 };

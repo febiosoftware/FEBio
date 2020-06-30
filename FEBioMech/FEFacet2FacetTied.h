@@ -44,7 +44,7 @@ public:
 	public:
 		vec3d	m_vgap;	//!< gap function
 		vec3d	m_Lm;	//!< Lagrange multiplier
-		vec2d	m_rs;	//!< natural coordinates on master element
+		vec2d	m_rs;	//!< natural coordinates on secondary surface element
 	};
 
 public:
@@ -78,9 +78,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface () override { return &m_ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return false; }
@@ -103,12 +103,12 @@ public:
 
 protected:
 
-	//! projects slave nodes onto master nodes
+	//! projects primary nodes onto secondary nodes
 	void ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurface& ms);
 
 private:
-	FEFacetTiedSurface	m_ss;	//!< slave surface
-	FEFacetTiedSurface	m_ms;	//!< master surface
+	FEFacetTiedSurface	m_ms;	//!< secondary surface
+	FEFacetTiedSurface	m_ss;	//!< primary surface
 
 public:
 	double		m_atol;		//!< augmentation tolerance

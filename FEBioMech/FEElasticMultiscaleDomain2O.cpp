@@ -80,7 +80,7 @@ bool FEElasticMultiscaleDomain2O::Init()
 			mmpt2O.m_gpt_id = j;
 
 			// initialize the material point RVE
-			// This essentially copies the master RVE to the material point RVE
+			// This essentially copies the parent RVE to the material point RVE
 			if (mmpt2O.m_rve.Init(rve) == false) return false;
 		}
 	}
@@ -102,7 +102,7 @@ bool FEElasticMultiscaleDomain2O::Init()
 				mmpt2O.m_gpt_id = n + k*nint;
 
 				// Initialize the material point RVE
-				// This essentially copies the master RVE model to the material points
+				// This essentially copies the parent RVE model to the material points
 				mmpt2O.m_rve.Init(rve);
 			}
 		}

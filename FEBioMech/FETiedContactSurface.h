@@ -30,8 +30,7 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-//! This class describes a contact slave or master surface used for 
-//! tied contact
+//! This class describes a contact surface used for tied contact.
 
 //!	this class is used in contact analyses to describe a contacting
 //! surface in a tied contact interface.
@@ -47,7 +46,7 @@ public:
 
 	public:
 		vec3d				m_vgap;	//!< gap function at nodes
-		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
+		vec2d				m_rs;	//!< natural coordinates of projection on secondary surface element
 		vec3d				m_Lm;	//!< Lagrange multipliers
 		vec3d				m_Tc;	//!< contact forces
 		double				m_off;	//!< offset values (used for shells)

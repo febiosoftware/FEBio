@@ -55,7 +55,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! This class describes a contact slave or master surface
+//! This class describes a contact surface
 
 //!	this class is used in contact analyses to describe a contacting
 //! surface in a contact interface.

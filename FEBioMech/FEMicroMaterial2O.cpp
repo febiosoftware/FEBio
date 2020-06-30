@@ -100,7 +100,7 @@ bool FEMicroMaterial2O::Init()
 	// initialize base class first
 	if (FEElasticMaterial::Init() == false) return false;
 
-	// load the master RVE model
+	// load the parent RVE model
 /*	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
@@ -113,7 +113,7 @@ bool FEMicroMaterial2O::Init()
 	// scale geometry
 	m_mrve.ScaleGeometry(m_scale);
 
-	// initialize master RVE
+	// initialize parent RVE
 	if (m_mrve.InitRVE(m_rveType, m_szbc.c_str()) == false) {
 		feLogError("An error occurred preparing RVE model"); return false;
 	}

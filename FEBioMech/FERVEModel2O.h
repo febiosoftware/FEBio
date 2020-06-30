@@ -97,7 +97,7 @@ public:
 	~FEMicroModel2O();
 
 public:
-	//! Initialize the micro model from the "master" RVE model
+	//! Initialize the micro model from the parent RVE model
 	bool Init(FERVEModel2O& rve);
 
 	//! Solve the RVE model

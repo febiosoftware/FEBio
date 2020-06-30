@@ -1728,8 +1728,8 @@ void FEModel::CopyFrom(FEModel& fem)
         AddSurfacePairConstraint(pnew);
 
 		// add the surfaces to the surface list
-		mesh.AddSurface(pnew->GetMasterSurface());
-		mesh.AddSurface(pnew->GetSlaveSurface ());
+		mesh.AddSurface(pnew->GetSecondarySurface());
+		mesh.AddSurface(pnew->GetPrimarySurface ());
 	}
 
 	// --- nonlinear constraints ---

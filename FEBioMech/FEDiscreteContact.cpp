@@ -123,7 +123,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 	cpp.HandleSpecialCases(true);
 	cpp.Init();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	FEMesh& mesh = *m_surf.GetMesh();
 	for (int i=0; i<(int)m_Node.size(); ++i)
 	{
@@ -136,7 +136,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 		vec3d x = node.m_rt;
 
 		// If the node is in contact, let's see if the node still is 
-		// on the same master element
+		// on the same secondary element
 		if (nodeData.pe != 0)
 		{
 			FESurfaceElement& mel = *nodeData.pe;
@@ -151,7 +151,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 
 			if (bsegup && (!m_surf.IsInsideElement(mel, r, s, 0.01)))
 			{
-				// see if the node might have moved to another master element
+				// see if the node might have moved to another secondary element
 				vec2d rs(0,0);
 				nodeData.pe = cpp.Project(x, q, rs);
 				nodeData.proj[0] = rs.x();
@@ -168,7 +168,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 			nodeData.q = q;
 		}
 
-		// if we found a master element, update the gap and normal data
+		// if we found a secondary element, update the gap and normal data
 		if (nodeData.pe != 0)
 		{
 			FESurfaceElement& mel =  *nodeData.pe;
@@ -176,7 +176,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 			double r = nodeData.proj[0];
 			double s = nodeData.proj[1];
 
-			// the slave normal is set to the master element normal
+			// the primary normal is set to the secondary element normal
 			nodeData.nu = m_surf.SurfaceNormal(mel, r, s);
 
 			// calculate gap
@@ -208,7 +208,7 @@ void FEDiscreteContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	// the elements LM vectors
 	vector<int> mLM;
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	FEMesh& mesh = *m_surf.GetMesh();
 	int nodes = (int) m_Node.size();
 	for (int i=0; i<nodes; ++i)
@@ -221,14 +221,14 @@ void FEDiscreteContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		FESurfaceElement* pe = nodeData.pe;
 
 		// see if this node's constraint is active
-		// that is, if it has a master element associated with it
+		// that is, if it has a secondary element associated with it
 		// TODO: is this a good way to test for an active constraint
 		// The rigid wall criteria seems to work much better.
 		if (pe != 0)
 		{
 			// This node is active and could lead to a non-zero
 			// contact force.
-			// get the master element
+			// get the secondary element
 			FESurfaceElement& mel = *pe;
 			m_surf.UnpackLM(mel, mLM);
 
@@ -266,13 +266,13 @@ void FEDiscreteContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 void FEDiscreteContact::ContactNodalForce(FEDiscreteContact::NODE& nodeData, FESurfaceElement& mel, vector<double>& fe)
 {
-	// max nr of master element nodes
+	// max nr of secondary element nodes
 	const int MAXMN = FEElement::MAX_NODES;
 
-	// master element nodes
+	// secondary element nodes
 	vec3d rtm[MAXMN];
 
-	// master shape function values at projection point
+	// secondary shape function values at projection point
 	double H[MAXMN];
 
 	// contact forces
@@ -287,26 +287,26 @@ void FEDiscreteContact::ContactNodalForce(FEDiscreteContact::NODE& nodeData, FES
 	// penalty
 	double eps = m_penalty;
 
-	// get slave node normal force
+	// get primary node normal force
 	double Ln = nodeData.Lm;
 	double tn = Ln + eps*gap;
 	tn = MBRACKET(tn);
 
-	// get the slave node normal
+	// get the primary node normal
 	vec3d nu = nodeData.nu;
 
 	int nmeln = mel.Nodes();
 	int ndof = 3*(1 + nmeln);
 
-	// get the master element node positions
+	// get the secondary element node positions
 	for (int k=0; k<nmeln; ++k) rtm[k] = mesh.Node(mel.m_node[k]).m_rt;
 
-	// isoparametric coordinates of the projected slave node
-	// onto the master element
+	// isoparametric coordinates of the projected primary node
+	// onto the secondary element
 	double r = nodeData.proj[0];
 	double s = nodeData.proj[1];
 
-	// get the master shape function values at this slave node
+	// get the secondary shape function values at this primary node
 	mel.shape_fnc(H, r, s);
 
 	// calculate contact vectors for normal traction
@@ -345,13 +345,13 @@ void FEDiscreteContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 		vector<int>& sLM = mesh.Node(nodeData.nid).m_ID;
 
 		// see if this node's constraint is active
-		// that is, if it has a master element associated with it
+		// that is, if it has a secondary element associated with it
 		if (nodeData.pe != 0)
 		{
-			// get the master element
+			// get the secondary element
 			FESurfaceElement& me = *nodeData.pe;
 
-			// get the masters element's LM array
+			// get the secondary surface element's LM array
 			m_surf.UnpackLM(me, mLM);
 
 			int nmeln = me.Nodes();
@@ -411,24 +411,24 @@ void FEDiscreteContact::ContactNodalStiffness(FEDiscreteContact::NODE& nodeData,
 	vec3d rt[MAXMN];
 	for (int j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
 
-	// slave node natural coordinates in master element
+	// primary node natural coordinates in secondary element
 	double r = nodeData.proj[0];
 	double s = nodeData.proj[1];
 
-	// slave gap
+	// primary gap
 	double gap = nodeData.gap;
 
 	// lagrange multiplier
 	double Lm = nodeData.Lm;
 
-	// get slave node normal force
+	// get primary node normal force
 	double tn = Lm + eps*gap;
 	tn = MBRACKET(tn);
 
-	// get the slave node normal
+	// get the primary node normal
 	vec3d nu = nodeData.nu;
 
-	// get the master shape function values and the derivatives at this slave node
+	// get the secondary shape function values and the derivatives at this primary node
 	mel.shape_fnc(H, r, s);
 	mel.shape_deriv(Hr, Hs, r, s);
 
@@ -648,7 +648,7 @@ void FEDiscreteContact::BuildMatrixProfile(FEGlobalMatrix& K)
 		// get the FE node
 		FENode& node = mesh.Node(nodeData.nid);
 
-		// get the master surface element
+		// get the secondary surface element
 		FESurfaceElement* pe = nodeData.pe;
 
 		if (pe != 0)

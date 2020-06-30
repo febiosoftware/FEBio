@@ -404,7 +404,7 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
             // calculate the normal at this integration point
             nu = ss.SurfaceNormal(el, j);
             
-            // find the intersection point with the master surface
+            // find the intersection point with the secondary surface
             pme = np.Project2(r, nu, rs);
             
 			FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
@@ -517,11 +517,11 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
     {
-        // get slave and master surface
+        // get primary and secondary surfaces
         FETiedFluidSurface& ss = (np == 0? m_ss : m_ms);
         FETiedFluidSurface& ms = (np == 0? m_ms : m_ss);
         
-        // loop over all slave elements
+        // loop over all elements of primary surface
         for (i=0; i<ss.Elements(); ++i)
         {
             // get the surface element
@@ -555,14 +555,14 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             {
 				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
 
-                // get the master element
+                // get the secondary surface element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
-                    // get the master element
+                    // get the secondary surface element
                     FESurfaceElement& me = *pme;
                     
-                    // get the nr of master element nodes
+                    // get the nr of secondary element nodes
                     int nmeln = me.Nodes();
                     
                     // copy LM vector
@@ -592,10 +592,10 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
                     for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                    // get slave element shape functions
+                    // get primary element shape functions
                     Hs = se.H(j);
                     
-                    // get master element shape functions
+                    // get secondary element shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
                     me.shape_fnc(Hm, r, s);
@@ -680,14 +680,14 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
     {
-        // get the slave and master surface
-        FETiedFluidSurface& ss = (np == 0? m_ss : m_ms);
+		// get primary and secondary surfaces
+		FETiedFluidSurface& ss = (np == 0? m_ss : m_ms);
         FETiedFluidSurface& ms = (np == 0? m_ms : m_ss);
         
-        // loop over all slave elements
+        // loop over all elements of primary surface
         for (i=0; i<ss.Elements(); ++i)
         {
-            // get ths slave element
+            // get the next element
             FESurfaceElement& se = ss.Element(i);
             
             // get nr of nodes and integration points
@@ -730,13 +730,13 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
             {
 				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
 
-                // get the master element
+                // get the secondary element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
                     FESurfaceElement& me = *pme;
                     
-                    // get the nr of master nodes
+                    // get the nr of secondary nodes
                     int nmeln = me.Nodes();
                     
                     // nodal pressure
@@ -780,10 +780,10 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
                     for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                    // slave shape functions
+                    // primary element shape functions
                     Hs = se.H(j);
                     
-                    // master shape functions
+                    // secondary element shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
                     me.shape_fnc(Hm, r, s);
@@ -915,7 +915,7 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
 
             if (ds.m_pme) {
-                // update Lagrange multipliers on slave surface
+                // update Lagrange multipliers on primary surface
                 eps = m_epst*ds.m_epst;
                 ds.m_Lmd = ds.m_Lmd + ds.m_vg*eps;
                 maxgap = max(maxgap,sqrt(ds.m_vg*ds.m_vg));
@@ -937,7 +937,7 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
 
             if (dm.m_pme) {
-                // update Lagrange multipliers on master surface
+                // update Lagrange multipliers on secondary surface
                 eps = m_epst*dm.m_epst;
                 dm.m_Lmd = dm.m_Lmd + dm.m_vg*eps;
                 maxgap = max(maxgap,sqrt(dm.m_vg*dm.m_vg));

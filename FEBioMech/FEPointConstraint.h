@@ -62,7 +62,7 @@ public:
 
 public:
 	double		m_eps;		//!< penalty parameter
-	int			m_node_id;	//!< id of master node
+	int			m_node_id;	//!< id of node
 
 public:
 	int					m_node;		//!< node to which the constraint is applied

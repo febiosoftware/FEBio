@@ -48,15 +48,15 @@ public:
 	//! interface activation
 	void Activate() override;
 
-	//! projects slave nodes onto master nodes
+	//! projects nodes onto secondary surface
 	void ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove = false);
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &ms; }
-	FESurface* GetSlaveSurface () override { return &ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &ss; }
+	FESurface* GetSecondarySurface() override { return &ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return true; }
@@ -84,8 +84,8 @@ public:
 	void Update(vector<double>& ui) override;
 
 public:
-	FETiedContactSurface	ss;	//!< slave surface
-	FETiedContactSurface	ms;	//!< master surface
+	FETiedContactSurface	ss;	//!< primary surface
+	FETiedContactSurface	ms;	//!< secondary surface
 
 public:
 	double		m_atol;		//!< augmentation tolerance
@@ -93,7 +93,7 @@ public:
 	double		m_stol;		//!< search tolerance
 	int			m_naugmax;	//!< maximum nr of augmentations
 	int			m_naugmin;	//!< minimum nr of augmentations
-	bool		m_boffset;	//!< offset slave surface for shells
+	bool		m_boffset;	//!< offset primary surface for shells
 	double		m_Dmax;		//!< max distance for contact
 	bool		m_bspecial;	//!< handle special cases in projection
 	bool		m_breloc;	//!< node relocation on initialization

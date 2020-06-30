@@ -288,7 +288,7 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 
 //-----------------------------------------------------------------------------
 // This function parses the XML input file. The broot parameter is used to indicate
-// if this is the master file or an included file. 
+// if this is the main control file or an included file. 
 bool FEBioImport::ReadFile(const char* szfile, bool broot)
 {
 	// Open the XML file
@@ -338,7 +338,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		// parse the file
 		++tag;
 
-		// From version 2.5 and up the first tag of the master file has to be the Module tag.
+		// From version 2.5 and up the first tag of the (main control) file has to be the Module tag.
 		if (broot && (nversion >= 0x0205))
 		{
 			if (tag != "Module")

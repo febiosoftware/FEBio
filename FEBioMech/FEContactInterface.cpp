@@ -58,7 +58,7 @@ FEContactInterface::~FEContactInterface()
 
 //-----------------------------------------------------------------------------
 //! This function calculates a contact penalty parameter based on the 
-//! material and geometrical properties of the slave and master surfaces
+//! material and geometrical properties of the primary and secondary surfaces
 //!
 double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 {
@@ -117,8 +117,8 @@ void FEContactInterface::Serialize(DumpStream& ar)
 	if ((ar.IsShallow() == false) && (ar.IsSaving() == false))
 	{
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		FESurface* ss = GetSlaveSurface();
-		FESurface* ms = GetMasterSurface();
+		FESurface* ss = GetPrimarySurface();
+		FESurface* ms = GetSecondarySurface();
 		if (ss) mesh.AddSurface(ss);
 		if (ms) mesh.AddSurface(ms);
 	}

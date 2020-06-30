@@ -83,7 +83,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 	// get the mesh
 	FEMesh& mesh = *m_surf.GetMesh();
 
-	// let's find the closest master node
+	// let's find the closest node
 	int mn = m_SNQ.Find(x);
 
 	// mn is a local index, so get the global node number too
@@ -92,14 +92,14 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 	// get the nodal position
 	vec3d rm = mesh.Node(m).m_rt;
 
-	// now that we found the closest master node, lets see if we can find 
-	// the best master element
+	// now that we found the closest node, lets see if we can find 
+	// the best element
 	int nval = m_NEL.Valence(mn);
 	FEElement** pe = m_NEL.ElementList(mn);
 	int* eil = m_NEL.ElementIndexList(mn);
 	for (int j=0; j<nval; ++j)
 	{
-		// get the master element
+		// get the element
 		FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 		int N = el.Nodes();
 
@@ -123,7 +123,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 		// NOTE: This is highly inefficient since multiple nodes and faces are visited multiple times
 		for (int i=0; i<nval; ++i)
 		{
-			// get the master element
+			// get the element
 			FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[i]);
 			int N = el.Nodes();
 			for (int j=0; j<N; ++j)
@@ -149,7 +149,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 		// First we try to find an edge this point projects on
 		for (int j=0; j<nval; ++j)
 		{
-			// get a master element
+			// get an element
 			FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 
 			// only consider triangles (for now)
@@ -213,7 +213,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 		{
 			for (int j = 0; j < nval; ++j)
 			{
-				// get a master element
+				// get an element
 				FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 
 				// only consider triangles (for now)
@@ -238,7 +238,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 		// and make sure the element actually contains the closest point.
 		for (int j=0; j<nval; ++j)
 		{
-			// get a master element
+			// get an element
 			FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 
 			// only consider triangles (for now)
@@ -303,7 +303,7 @@ FESurfaceElement* FEClosestPointProjection::Project(int n, vec3d& q, vec2d& r)
 	// see if we need to initialize the NQ structure
 //	if (binit_nq) m_SNQ.Init();
 	
-	// let's find the closest master node
+	// let's find the closest node
 //	int mn = m_SNQ.Find(x);
 
 	// do it the hard way
@@ -339,17 +339,17 @@ FESurfaceElement* FEClosestPointProjection::Project(int n, vec3d& q, vec2d& r)
 	FEElement** pe = m_NEL.ElementList(mn);
 	for (int j=0; j<nval; ++j)
 	{
-		// get the master element
+		// get the element
 		FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 		// make sure the node is not contained in this surface element
 		if (el.HasNode(n)) return 0;
 	}
 	
-	// now that we found the closest master node, lets see if we can find 
-	// the best master element
+	// now that we found the closest node, lets see if we can find 
+	// the best element
 	for (int j=0; j<nval; ++j)
 	{
-		// get the master element
+		// get the element
 		FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 		int N = el.Nodes();
 

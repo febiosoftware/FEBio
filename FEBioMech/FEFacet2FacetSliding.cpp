@@ -354,7 +354,7 @@ void FEFacet2FacetSliding::Activate()
 	// calculate penalty factors
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms, true, m_breloc);
 
 	if (m_btwo_pass) 
@@ -399,7 +399,7 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 }
 
 //-----------------------------------------------------------------------------
-//! In this function we project the integration points to the master surface,
+//! In this function we project the integration points to the secondary surface,
 //! calculate the projection's natural coordinates and normal vector
 //
 void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup, bool bmove)
@@ -409,7 +409,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 
-	// if we need to project the nodes onto the master surface,
+	// if we need to project the nodes onto the secondary surface,
 	// let's do this first
 	if (bmove)
 	{
@@ -441,7 +441,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			vec3d rt = node.m_rt;
 			vec3d nu = normal[i];
 
-			// project onto the master surface
+			// project onto the secondary surface
 			vec3d q;
 			vec2d rs(0,0);
 			FESurfaceElement* pme = cpp.Project(rt, q, rs);
@@ -453,13 +453,13 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 		}
 	}
 
-	// loop over all slave elements
+	// loop over all primary surface elements
 	int NE = ss.Elements();
 
 #pragma omp parallel for shared(cpp) schedule(dynamic)
 	for (int i=0; i<NE; ++i)
 	{
-		// get the slave element
+		// get the next element
 		FESurfaceElement& se = ss.Element(i);
 		int nn = se.Nodes();
 
@@ -483,7 +483,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			// see if the point still projects to the same element
 			if (pt.m_pme)
 			{
-				// update projection to master element
+				// update projection to secondary surface element
 				FESurfaceElement& mel = *pt.m_pme;
 				q = ms.ProjectToSurface(mel, x, pt.m_rs[0], pt.m_rs[1]);
 
@@ -499,7 +499,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			}
 			if (bsegup)
 			{
-				// find the master segment this element belongs to
+				// find the secondary surface segment this element belongs to
 				pt.m_rs = vec2d(0,0);
 				FESurfaceElement* pme = 0;
 				pme = cpp.Project(x, q, pt.m_rs);
@@ -512,7 +512,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				double r = pt.m_rs[0];
 				double s = pt.m_rs[1];
 
-				// the slave normal is set to the master element normal
+				// the normal is set to the secondary surface element normal
 				pt.m_nu = ms.SurfaceNormal(*pt.m_pme, r, s);
 
 				// calculate gap
@@ -540,7 +540,7 @@ void FEFacet2FacetSliding::Update()
 	// one pass!
 	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
 
-	// project slave surface to master surface
+	// project primary surface to secondary surface
 	ProjectSurface(m_ss, m_ms, bupdate);
 	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupdate);
 
@@ -569,7 +569,7 @@ void FEFacet2FacetSliding::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
-		// loop over all slave elements
+		// loop over all primary surface elements
 		for (int i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
@@ -616,7 +616,7 @@ void FEFacet2FacetSliding::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				// get integration point data
 				FEFacetSlidingSurface::Data& pt = static_cast<FEFacetSlidingSurface::Data&>(*se.GetMaterialPoint(j));
 
-				// get the master element
+				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
@@ -745,7 +745,7 @@ void FEFacet2FacetSliding::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
-		// loop over all slave elements
+		// loop over all primary surface elements
 		for (int i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
@@ -792,7 +792,7 @@ void FEFacet2FacetSliding::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				// get integration point data
 				FEFacetSlidingSurface::Data& pt = static_cast<FEFacetSlidingSurface::Data&>(*se.GetMaterialPoint(j));
 
-				// get the master element
+				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
@@ -888,10 +888,10 @@ void FEFacet2FacetSliding::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 					// add the higher order terms (= tn*D(dg) )
 					if (knmult > 0)
 					{
-						// calculate the master shape fncs derivatives
+						// calculate the secondary surface shape fncs derivatives
 						me.shape_deriv(Hmr, Hms, r, s);
 
-						// get the master nodes
+						// get the secondary surface nodes
 						vec3d rt[MN];
 						for (int k=0; k<nmeln; ++k) rt[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
@@ -1037,7 +1037,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 				FESurfaceElement* pme = pt.m_pme;
 				if (m_btwo_pass && pme)
 				{
-					// get master element data
+					// get secondary surface element data
 					int mint = pme->GaussPoints();
 					double ti[FEElement::MAX_NODES];
 					for (int j=0; j<mint; ++j) 
@@ -1108,7 +1108,7 @@ bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
 			FEFacetSlidingSurface::Data& data = static_cast<FEFacetSlidingSurface::Data&>(*el.GetMaterialPoint(j));
-			// update Lagrange multipliers on slave surface
+			// update Lagrange multipliers on primary surface
             if (m_bsmaug) {
                 // replace this multiplier with a smoother version
                 Ln = -(tn[j]*data.m_nu);
@@ -1137,7 +1137,7 @@ bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
 			FEFacetSlidingSurface::Data& data = static_cast<FEFacetSlidingSurface::Data&>(*el.GetMaterialPoint(j));
-			// update Lagrange multipliers on master surface
+			// update Lagrange multipliers on secondary surface
             if (m_bsmaug) {
                 // replace this multiplier with a smoother version
                 Ln = -(tn[j]*data.m_nu);

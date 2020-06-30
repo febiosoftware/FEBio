@@ -50,7 +50,7 @@ bool FEElasticMultiscaleDomain1O::Init()
 	FEMicroMaterial* pmat = dynamic_cast<FEMicroMaterial*>(m_pMat);
 	if (m_pMat == 0) return false;
 
-	// get the master RVE
+	// get the parent RVE
 	FERVEModel& rve = pmat->m_mrve;
 
 	// loop over all elements

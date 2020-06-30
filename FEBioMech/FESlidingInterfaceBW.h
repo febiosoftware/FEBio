@@ -121,10 +121,10 @@ public:
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;
     
-    //! return the master and slave surface
-    FESurface* GetMasterSurface() override { return &m_ms; }
-    FESurface* GetSlaveSurface () override { return &m_ss; }
-    
+    //! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
+
     //! return integration rule class
     bool UseNodalIntegration() override { return false; }
     
@@ -151,9 +151,9 @@ protected:
     void CalcAutoPenalty(FESlidingSurfaceBW& s);
 
 public:
-    FESlidingSurfaceBW	m_ms;	//!< master surface
-    FESlidingSurfaceBW	m_ss;	//!< slave surface
-    
+    FESlidingSurfaceBW	m_ss;	//!< primary surface
+	FESlidingSurfaceBW	m_ms;	//!< secondary surface
+
     int				m_knmult;		//!< higher order stiffness multiplier
     bool			m_btwo_pass;	//!< two-pass flag
     double			m_atol;			//!< augmentation tolerance
@@ -175,10 +175,10 @@ public:
     double          m_mu;           //!< friction coefficient
     
     bool            m_bfreeze;      //!< freeze stick/slip status
-    bool            m_bflipm;       //!< flip master normal
-    bool            m_bflips;       //!< flip slave normal
-    bool            m_bshellbm;     //!< flag for prescribing pressure on shell bottom for master surface
-    bool            m_bshellbs;     //!< flag for prescribing pressure on shell bottom for slave surface
+	bool            m_bflips;       //!< flip primary surface normal
+	bool            m_bflipm;       //!< flip secondary surface normal
+	bool            m_bshellbs;     //!< flag for prescribing pressure on shell bottom for primary surface
+	bool            m_bshellbm;     //!< flag for prescribing pressure on shell bottom for secondary surface
 
     DECLARE_FECORE_CLASS();
 };

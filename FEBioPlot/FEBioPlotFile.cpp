@@ -1315,7 +1315,7 @@ void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 void FEBioPlotFile::WriteNodeDataField(FEModel &fem, FEPlotData* pd)
 {
 	// loop over all node sets
-	// write now there is only one, namely the master node set
+	// right now there is only one, namely the node set of all mesh nodes
 	// so we just pass the mesh
 	int ndata = pd->VarSize(pd->DataType());
 

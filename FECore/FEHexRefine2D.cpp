@@ -513,7 +513,7 @@ void FEHexRefine2D::FindHangingNodes(FEModel& fem)
 	for (int i = 0; i < LCM.LinearConstraints();)
 	{
 		FELinearConstraint& lc = LCM.LinearConstraint(i);
-		int nodeID = lc.master.node;
+		int nodeID = lc.m_parentDof.node;
 		if (mesh.Node(nodeID).HasFlags(FENode::HANGING) == false)
 		{
 			LCM.RemoveLinearConstraint(i);
@@ -552,9 +552,9 @@ void FEHexRefine2D::FindHangingNodes(FEModel& fem)
 					for (int k = 0; k < MAX_DOFS; ++k)
 					{
 						FELinearConstraint lc(&fem);
-						lc.SetMasterDOF(k, nodeId);
-						lc.AddSlaveDof(k, edge.node[0], 0.5);
-						lc.AddSlaveDof(k, edge.node[1], 0.5);
+						lc.SetParentDof(k, nodeId);
+						lc.AddChildDof(k, edge.node[0], 0.5);
+						lc.AddChildDof(k, edge.node[1], 0.5);
 
 						LCM.AddLinearConstraint(lc);
 						nadded++;

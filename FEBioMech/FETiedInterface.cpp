@@ -72,7 +72,7 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(p
 
 //-----------------------------------------------------------------------------
 //! Initialization. This function intializes the surfaces data and projects the
-//! slave surface onto the master surface.
+//! primary surface onto the secondary surface.
 //! 
 bool FETiedInterface::Init()
 {
@@ -182,7 +182,7 @@ void FETiedInterface::Activate()
 	// Don't forget to call base member!
 	FEContactInterface::Activate();
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(ss, ms, m_breloc);
 }
 
@@ -193,7 +193,7 @@ int FETiedInterface::InitEquations(int neq)
 	// make sure we want to use Lagrange Multiplier method
 	if (m_laugon != 2) return 0;
 
-	// allocate three equations per slave node
+	// allocate three equations per primary node
 	int NN = ss.Nodes();
 
 	m_LM.resize(3 * NN);
@@ -204,24 +204,24 @@ int FETiedInterface::InitEquations(int neq)
 
 //-----------------------------------------------------------------------------
 //! Update tied interface data. This function re-evaluates the gaps between
-//! the slave node and their projections onto the master surface.
+//! the primary node and their projections onto the secondary surface.
 //!
 void FETiedInterface::Update()
 {
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		FESurfaceElement* pme = ss.m_data[i].m_pme;
 		if (pme)
 		{
-			// get the current slave nodal position
+			// get the current primary nodal position
 			vec3d rt = ss.Node(i).m_rt;
 
-			// get the natural coordinates of the slave projection
-			// onto the master element
+			// get the natural coordinates of the primary projection
+			// onto the secondary element
 			double r = ss.m_data[i].m_rs[0];
 			double s = ss.m_data[i].m_rs[1];
 
@@ -230,10 +230,10 @@ void FETiedInterface::Update()
 			vec3d y[FEElement::MAX_NODES];
 			for (int l=0; l<ne; ++l) y[l] = mesh.Node( pme->m_node[l] ).m_rt;
 
-			// calculate the slave node projection
+			// calculate the primary node projection
 			vec3d q = pme->eval(y, r, s);
 
-			// calculate the master normal
+			// calculate the secondary normal
 			vec3d nu = ss.SurfaceNormal(*pme, r, s);
 
 			// calculate the gap function
@@ -257,17 +257,17 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 	cpp.HandleSpecialCases(m_bspecial);
 	cpp.Init();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		// get the next node
 		FENode& node = ss.Node(i);
 		ss.m_data[i].m_pme = nullptr;
 
-		// get the nodal position of this slave node
+		// get the nodal position of this primary node
 		vec3d x = node.m_rt;
 
-		// find the master element
+		// find the secondary element
 		vec3d q; vec2d rs;
 		FESurfaceElement* pme = cpp.Project(x, q, rs);
 		if (pme)
@@ -276,13 +276,13 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			double D = (x - q).norm();
 			if ((m_Dmax == 0.0) || (D <= m_Dmax))
 			{
-				// store the master element
+				// store the secondary element
 				ss.m_data[i].m_pme = pme;
 
-				// store the natural coordinates of the projection on the master element
+				// store the natural coordinates of the projection on the secondary element
 				ss.m_data[i].m_rs = rs;
 
-				// calculate the master normal
+				// calculate the secondary normal
 				vec3d nu = ms.SurfaceNormal(*pme, rs[0], rs[1]);
 
 				// calculate gap
@@ -322,11 +322,11 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	vector<int> sLM;
 	vector<int> mLM;
 
-	// loop over all slave facets
+	// loop over all primary facets
 	const int NE = ss.Elements();
 	for (int j = 0; j < NE; ++j)
 	{
-		// get the slave element
+		// get the primary element
 		FESurfaceElement& sel = ss.Element(j);
 
 		// get the element's LM vector
@@ -336,13 +336,13 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		double* w = sel.GaussWeights();
 
-		// loop over slave element nodes (which are the integration points as well)
+		// loop over primary element nodes (which are the integration points as well)
 		for (int n = 0; n < nseln; ++n)
 		{
 			int m = sel.m_lnode[n];
 
 			// see if this node's constraint is active
-			// that is, if it has a master element associated with it
+			// that is, if it has a secondary element associated with it
 			// TODO: is this a good way to test for an active constraint
 			// The rigid wall criteria seems to work much better.
 			if (ss.m_data[m].m_pme != 0)
@@ -356,17 +356,17 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				// add penalty contribution for penalty and aug lag method
 				if (m_laugon != 2) tc += ss.m_data[m].m_vgap*m_eps;
 
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& mel = *ss.m_data[m].m_pme;
 				ms.UnpackLM(mel, mLM);
 				int nmeln = mel.Nodes();
 
-				// isoparametric coordinates of the projected slave node
-				// onto the master element
+				// isoparametric coordinates of the projected primary node
+				// onto the secondary element
 				double r = ss.m_data[m].m_rs[0];
 				double s = ss.m_data[m].m_rs[1];
 
-				// get the master shape function values at this slave node
+				// get the secondary shape function values at this primary node
 				mel.shape_fnc(N, r, s);
 
 				// allocate "element" force vector
@@ -443,7 +443,7 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	// shape functions
 	double H[MN];
 
-	// loop over all slave elements
+	// loop over all primary elements
 	const int NE = ss.Elements();
 	for (int i = 0; i < NE; ++i)
 	{
@@ -461,11 +461,11 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		{
 			int m = se.m_lnode[n];
 
-			// get the master element
+			// get the secondary element
 			FESurfaceElement* pme = ss.m_data[m].m_pme;
 			if (pme)
 			{
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& me = *pme;
 				int nmeln = me.Nodes();
 				ms.UnpackLM(me, mLM);
@@ -473,11 +473,11 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 				// calculate jacobian
 				double Jw = ss.jac0(se, n)*w[n];
 
-				// slave node natural coordinates in master element
+				// primary node natural coordinates in secondary element
 				double r = ss.m_data[m].m_rs[0];
 				double s = ss.m_data[m].m_rs[1];
 
-				// get the master shape function values at this slave node
+				// get the secondary shape function values at this primary node
 				me.shape_fnc(H, r, s);
 
 				if (m_laugon != 2)

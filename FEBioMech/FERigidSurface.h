@@ -36,7 +36,7 @@ class FEModel;
 //! This class is the base class for rigid surfaces
 
 //! Rigid surfaces are used in the rigid sliding contact interface, where the
-//! master surface is defined by an implicit surface
+//! secondary surface is defined by an implicit surface
 
 class FEBIOMECH_API FERigidSurface : public FECoreBase
 {

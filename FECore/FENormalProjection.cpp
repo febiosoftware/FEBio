@@ -84,7 +84,7 @@ FESurfaceElement* FENormalProjection::Project(vec3d r, vec3d n, double rs[2])
 	}
 	if (found) return pei;
 	
-	// we did not find a master surface
+	// we did not find a surface
 	return 0;
 }
 
@@ -128,7 +128,7 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 	}
 	if (found) return pei;
 	
-	// we did not find a master surface
+	// we did not find a surface
 	return 0;
 }
 

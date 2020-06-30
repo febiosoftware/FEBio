@@ -485,7 +485,7 @@ void FETiedMultiphasicInterface::CalcAutoPenalty(FETiedMultiphasicSurface& s)
 
 //-----------------------------------------------------------------------------
 //! This function calculates a contact penalty parameter based on the
-//! material and geometrical properties of the slave and master surfaces
+//! material and geometrical properties of the primary and secondary surfaces
 //!
 double FETiedMultiphasicInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 {
@@ -735,7 +735,7 @@ void FETiedMultiphasicInterface::InitialProjection(FETiedMultiphasicSurface& ss,
             // calculate the normal at this integration point
             nu = ss.SurfaceNormal(el, j);
             
-            // find the intersection point with the master surface
+            // find the intersection point with the secondary surface
             pme = np.Project2(r, nu, rs);
             
 			FETiedMultiphasicSurface::Data& pt = static_cast<FETiedMultiphasicSurface::Data&>(*el.GetMaterialPoint(j));
@@ -889,12 +889,12 @@ void FETiedMultiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo&
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
     {
-        // get slave and master surface
+        // get primary and seconary surface
         FETiedMultiphasicSurface& ss = (np == 0? m_ss : m_ms);
         FETiedMultiphasicSurface& ms = (np == 0? m_ms : m_ss);
         vector<int>& sl = (np == 0? m_ssl : m_msl);
         
-        // loop over all slave elements
+        // loop over all primary surface elements
         for (i=0; i<ss.Elements(); ++i)
         {
             // get the surface element
@@ -947,16 +947,16 @@ void FETiedMultiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo&
             for (j=0; j<nint; ++j)
             {
 				FETiedMultiphasicSurface::Data& pt = static_cast<FETiedMultiphasicSurface::Data&>(*se.GetMaterialPoint(j));
-				// get the master element
+				// get the secondary surface element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
-                    // get the master element
+                    // get the secondary surface element
                     FESurfaceElement& me = *pme;
                     
                     bool mporo = ms.m_bporo;
                     
-                    // get the nr of master element nodes
+                    // get the nr of secondary surface element nodes
                     int nmeln = me.Nodes();
                     
                     // copy LM vector
@@ -986,10 +986,10 @@ void FETiedMultiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo&
                     for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
                     for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                    // get slave element shape functions
+                    // get element shape functions
                     Hs = se.H(j);
                     
-                    // get master element shape functions
+                    // get secondary surface element shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
                     me.shape_fnc(Hm, r, s);
@@ -1106,15 +1106,15 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
     {
-        // get the slave and master surface
+        // get the primary and secondary surface
         FETiedMultiphasicSurface& ss = (np == 0? m_ss : m_ms);
         FETiedMultiphasicSurface& ms = (np == 0? m_ms : m_ss);
         vector<int>& sl = (np == 0? m_ssl : m_msl);
         
-        // loop over all slave elements
+        // loop over all primary surface elements
         for (i=0; i<ss.Elements(); ++i)
         {
-            // get ths slave element
+            // get the next element
             FESurfaceElement& se = ss.Element(i);
             
             bool sporo = ss.m_bporo;
@@ -1168,7 +1168,7 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
                     jn[isol][j] = pd.m_Lmc[l] + epsc*pd.m_cg[l];
                 }
                 
-                // contravariant basis vectors of slave surface
+                // contravariant basis vectors of primary surface
                 vec3d Gs[2];
                 ss.ContraBaseVectors(se, j, Gs);
             }
@@ -1178,7 +1178,7 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
             {
 				FETiedMultiphasicSurface::Data& pt = static_cast<FETiedMultiphasicSurface::Data&>(*se.GetMaterialPoint(j));
 
-				// get the master element
+				// get the secondary surface element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
@@ -1186,7 +1186,7 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
                     
                     bool mporo = ms.m_bporo;
                     
-                    // get the nr of master nodes
+                    // get the nr of secondary surface nodes
                     int nmeln = me.Nodes();
                     
                     // nodal data
@@ -1286,15 +1286,15 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
                     for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
                     for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                    // slave shape functions
+                    // shape functions
                     Hs = se.H(j);
                     
-                    // master shape functions
+                    // secondary surface element shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
                     me.shape_fnc(Hm, r, s);
                     
-                    // get slave normal vector
+                    // get normal vector
                     vec3d nu = pt.m_nu;
                     
                     // penalty
@@ -1505,7 +1505,7 @@ bool FETiedMultiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		{
 			FETiedMultiphasicSurface::Data& ds = static_cast<FETiedMultiphasicSurface::Data&>(*el.GetMaterialPoint(j));
 
-            // update Lagrange multipliers on slave surface
+            // update Lagrange multipliers on primary surface
             eps = m_epsn*ds.m_epsn;
             ds.m_Lmd = ds.m_Lmd + ds.m_dg*eps;
             
@@ -1543,7 +1543,7 @@ bool FETiedMultiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		{
 			FETiedMultiphasicSurface::Data& dm = static_cast<FETiedMultiphasicSurface::Data&>(*el.GetMaterialPoint(j));
 
-            // update Lagrange multipliers on master surface
+            // update Lagrange multipliers on secondary surface
             eps = m_epsn*dm.m_epsn;
             dm.m_Lmd = dm.m_Lmd + dm.m_dg*eps;
             

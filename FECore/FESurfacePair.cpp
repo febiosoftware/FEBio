@@ -35,8 +35,8 @@ SOFTWARE.*/
 //--------------------------------------------------------
 FESurfacePair::FESurfacePair(FEMesh* pm) : m_mesh(pm)
 {
-	m_master = 0;
-	m_slave = 0;
+	m_surface1 = 0;
+	m_surface2 = 0;
 }
 
 void FESurfacePair::SetName(const std::string& name)
@@ -49,22 +49,22 @@ const std::string& FESurfacePair::GetName() const
 	return m_name;
 }
 
-FEFacetSet* FESurfacePair::GetMasterSurface()
+FEFacetSet* FESurfacePair::GetPrimarySurface()
 {
-	return m_master;
+	return m_surface1;
 }
 
-void FESurfacePair::SetMasterSurface(FEFacetSet* pf)
+void FESurfacePair::SetPrimarySurface(FEFacetSet* pf)
 {
-	m_master = pf;
+	m_surface1 = pf;
 }
 
-FEFacetSet* FESurfacePair::GetSlaveSurface()
+FEFacetSet* FESurfacePair::GetSecondarySurface()
 {
-	return m_slave;
+	return m_surface2;
 }
 
-void FESurfacePair::SetSlaveSurface(FEFacetSet* pf)
+void FESurfacePair::SetSecondarySurface(FEFacetSet* pf)
 {
-	m_slave = pf;
+	m_surface2 = pf;
 }

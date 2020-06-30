@@ -77,8 +77,8 @@ bool FERigidWallSurface::Init()
 	// allocate other surface data
 	m_gap.assign(nn, 0);		// gap funtion
 	m_nu.resize(nn);		// node normal 
-	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
-	m_rs.resize(nn);		// natural coords of projected slave node on master element
+	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated secondary surface element
+	m_rs.resize(nn);		// natural coords of projected primary node on secondary element
 	m_rsp.resize(nn);
 	m_Lm.assign(nn, 0);
 	m_M.resize(nn);
@@ -267,36 +267,31 @@ void FERigidWallInterface::Activate()
 	// don't forget to call the base class
 	FEContactInterface::Activate();
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss);
 }
 
 //-----------------------------------------------------------------------------
-//!  Projects the slave surface onto the master plane
+//!  Projects the primary surface onto the plane
 
 void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 {
-	vec3d r, q;
-
-	// surface normal
-	vec3d np;
-
-	// loop over all slave nodes
+	// loop over all primary surface nodes
 	for (int i=0; i<m_ss.Nodes(); ++i)
 	{
 		// get the nodal position
-		r = m_ss.Node(i).m_rt;
+		vec3d r = m_ss.Node(i).m_rt;
 
 		// project this node onto the plane
-		q = m_plane.Project(r);
+		vec3d q = m_plane.Project(r);
 
 		// get the local surface normal
-		np = m_plane.Normal(q);
+		vec3d np = m_plane.Normal(q);
 
 		// calculate offset
 		q += np*m_d;
 
-		// the slave normal is set to the master element normal
+		// the normal is set to the secondary surface element normal
 		m_ss.m_nu[i] = np;
 	
 		// calculate initial gap
@@ -309,7 +304,7 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 
 void FERigidWallInterface::Update()
 {
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss);
 }
 
@@ -348,11 +343,11 @@ void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	// penalty value
 	double pen = m_eps, eps;
 	
-	// loop over all slave facets
+	// loop over all primary surface facets
 	int ne = m_ss.Elements();
 	for (j=0; j<ne; ++j)
 	{
-		// get the slave element
+		// get the next element
 		FESurfaceElement& sel = m_ss.Element(j);
 
 		// get the element's LM vector
@@ -367,7 +362,7 @@ void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		}
 		w = sel.GaussWeights();
 
-		// loop over slave element nodes (which are the integration points as well)
+		// loop over element nodes (which are the integration points as well)
 		for (n=0; n<nseln; ++n)
 		{
 			Gr = sel.Gr(n);
@@ -376,7 +371,7 @@ void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			m = sel.m_lnode[n];
 
 			// see if this node's constraint is active
-			// that is, if it has a master element associated with it
+			// that is, if it has a secondary surface element associated with it
 //			if (ss.Lm[m] >= 0)
 			{
 				// calculate jacobian
@@ -394,12 +389,12 @@ void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 				detJ = (dxr ^ dxs).norm();
 
-				// get slave node normal force
+				// get node normal force
 				eps = pen*m_ss.m_eps[m];
 				tn = m_ss.m_Lm[m] + eps*m_ss.m_gap[m];
 				tn = MBRACKET(tn);
 
-				// get the slave node normal
+				// get the node normal
 				vec3d& nu = m_ss.m_nu[m];
 
 				// calculate force vector
@@ -452,7 +447,7 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	// penalty value
 	double pen = m_eps, eps;
 
-	// loop over all slave elements
+	// loop over all primary surface elements
 	int ne = m_ss.Elements();
 	for (j=0; j<ne; ++j)
 	{
@@ -480,7 +475,7 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 			m = se.m_lnode[n];
 
 			// see if this node's constraint is active
-			// that is, if it has a master element associated with it
+			// that is, if it has a secondary surface element associated with it
 //			if (ss.Lm[m] >= 0)
 			{
 				// calculate jacobian
@@ -498,19 +493,19 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 				detJ = (dxr ^ dxs).norm();
 
-				// slave gap
+				// gap
 				gap = m_ss.m_gap[m];
 
 				// lagrange multiplier
 				Lm = m_ss.m_Lm[m];
 
-				// get slave node normal force
+				// get node normal force
 				eps = pen*m_ss.m_eps[m];
 
 				tn = m_ss.m_Lm[m] + eps*m_ss.m_gap[m];
 				tn = MBRACKET(tn);
 
-				// get the slave node normal
+				// get the node normal
 				vec3d& nu = m_ss.m_nu[m];
 
 				// set up the N vector

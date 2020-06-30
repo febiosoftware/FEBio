@@ -805,7 +805,7 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
     np.SetSearchRadius(R);
     np.Init();
     
-    // if we need to project the nodes onto the master surface,
+    // if we need to project the nodes onto the secondary surface,
     // let's do this first
     if (bmove)
     {
@@ -837,7 +837,7 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
             vec3d rt = node.m_rt;
             vec3d nu = normal[i];
             
-            // project onto the master surface
+            // project onto the secondary surface
             vec3d q;
             double rs[2] = {0,0};
             FESurfaceElement* pme = np.Project(rt, nu, rs);
@@ -908,7 +908,7 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
                 }
             }
             
-            // find the intersection point with the master surface
+            // find the intersection point with the secondary surface
             if (pme == 0 && bupseg) pme = np.Project(r, nu, rs);
             
             pt.m_pme = pme;
@@ -1457,7 +1457,7 @@ void FESlidingInterfaceBiphasicMixed::LoadVector(FEGlobalVector& R, const FETime
 	int npass = (m_btwo_pass ? 2 : 1);
 	for (int np = 0; np < npass; ++np)
 	{
-		// get slave and master surface
+		// get primary and secondary surface
 		FESlidingSurfaceBiphasicMixed& ss = (np == 0 ? m_ss : m_ms);
 		FESlidingSurfaceBiphasicMixed& ms = (np == 0 ? m_ms : m_ss);
 
@@ -1483,13 +1483,13 @@ void FESlidingInterfaceBiphasicMixed::LoadVector(FESlidingSurfaceBiphasicMixed& 
     // need to multiply biphasic force entries by the timestep
     double dt = tp.timeIncrement;
     
-    // loop over all slave elements
+    // loop over all primary surface elements
     for (int i=0; i<ss.Elements(); ++i)
     {
         // get the surface element
         FESurfaceElement& se = ss.Element(i);
             
-		// flag indicating that slave element is poro
+		// flag indicating that primary element is poro
         bool sporo = ss.m_poro[i];
             
         // get the nr of nodes and integration points
@@ -1525,18 +1525,18 @@ void FESlidingInterfaceBiphasicMixed::LoadVector(FESlidingSurfaceBiphasicMixed& 
             double pn;
             vec3d t = ContactTraction(ss, i, j, ms, pn);
                 
-            // get the master element
+            // get the secondary element
             FESurfaceElement* pme = pt.m_pme;
                 
             if (pme)
             {
-                // get the master element
+                // get the secondary element
                 FESurfaceElement& me = *pme;
                     
-				// get the master element poro status
+				// get the secondary element poro status
                 bool mporo = ms.m_poro[pme->m_lid];
                     
-                // get the nr of master element nodes
+                // get the nr of secondary element nodes
                 int nmeln = me.Nodes();
                     
                 // copy LM vector
@@ -1566,10 +1566,10 @@ void FESlidingInterfaceBiphasicMixed::LoadVector(FESlidingSurfaceBiphasicMixed& 
                 for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
                 for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                // get slave element shape functions
+                // get primary element shape functions
                 Hs = se.H(j);
                     
-                // get master element shape functions
+                // get secondary element shape functions
                 double r = pt.m_rs[0];
                 double s = pt.m_rs[1];
                 me.shape_fnc(Hm, r, s);
@@ -1657,7 +1657,7 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FELinearSystem& LS, const 
 	int npass = (m_btwo_pass ? 2 : 1);
 	for (int np = 0; np < npass; ++np)
 	{
-		// get the slave and master surface
+		// get the primary and secondary surface
 		FESlidingSurfaceBiphasicMixed& ss = (np == 0 ? m_ss : m_ms);
 		FESlidingSurfaceBiphasicMixed& ms = (np == 0 ? m_ms : m_ss);
 
@@ -1690,13 +1690,13 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
     
     FEMesh& mesh = *ms.GetMesh();
         
-    // loop over all slave elements
+    // loop over all primary surface elements
     for (int i=0; i<ss.Elements(); ++i)
     {
-        // get the slave element
+        // get the next element
         FESurfaceElement& se = ss.Element(i);
             
-		// slave element's poro status
+		// primary element's poro status
         bool sporo = ss.m_poro[i];
             
         // get nr of nodes, integration points, pressure dofs
@@ -1704,7 +1704,7 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
         int nint = se.GaussPoints();
 		int nspdof = se.ShapeFunctions(degree_p);
 
-        // nodal pressures of slave element
+        // nodal pressures of primary element
         double pn[MN] = {0};
         if (sporo) {
             for (int j=0; j<nspdof; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
@@ -1738,24 +1738,24 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
             double pn;
             vec3d t = ContactTraction(ss, i, j, ms, pn);
                 
-            // get the master element
+            // get the secondary element
             FESurfaceElement* pme = pt.m_pme;
                 
             if (pme)
             {
-				// get master element
+				// get secondary element
                 FESurfaceElement& me = *pme;
                     
-				// get master element's poro status
+				// get secondary element's poro status
                 bool mporo = ms.m_poro[pme->m_lid];
                     
-                // get the nr of master nodes
+                // get the nr of secondary nodes
                 int nmeln = me.Nodes();
 
-				// get master pressure dofs
+				// get secondary pressure dofs
 				int nmpdof = me.ShapeFunctions(degree_p);
                     
-                // nodal pressures of master nodes
+                // nodal pressures of secondary nodes
                 double pm[MN] = {0};
                 for (int k=0; k<nmpdof; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
                     
@@ -1817,21 +1817,21 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
                 for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
                 for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
-                // slave shape functions
+                // primary shape functions
                 Hs = se.H(j);
 
-				// get slave pressure shape functions
+				// get primary pressure shape functions
 				double* Hsp = se.H(degree_p, j);
 
-                // master shape functions
+                // secondary shape functions
                 double r = pt.m_rs[0];
                 double s = pt.m_rs[1];
                 me.shape_fnc(Hm, r, s);
 
-				// get master pressure shape functions
+				// get secondary pressure shape functions
 				me.shape_fnc(degree_p, Hmp, r, s);
                     
-                // get slave normal vector
+                // get primary normal vector
                 vec3d nu = pt.m_nu;
                     
                 // gap function
@@ -2356,7 +2356,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
             {
                 // get integration point data
 				FESlidingSurfaceBiphasicMixed::Data& sd = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(i));
-				// evaluate traction on slave surface
+				// evaluate traction on primary surface
                 double eps = m_epsn*sd.m_epsn*psf;
                 if (sd.m_bstick) {
                     // if stick, evaluate total traction
@@ -2377,7 +2377,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
                 
                 if (m_btwo_pass && pme)
                 {
-                    // get master element data
+                    // get secondary element data
                     int mint = pme->GaussPoints();
                     double pi[MI];
                     vec3d ti[MI];
@@ -2385,7 +2385,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
                     {
 						FESlidingSurfaceBiphasicMixed::Data& md = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*pme->GetMaterialPoint(j));
 
-                        // evaluate traction on master surface
+                        // evaluate traction on secondary surface
                         double eps = m_epsn*md.m_epsn*psf;
                         if (md.m_bstick) {
                             // if stick, evaluate total traction
@@ -2410,7 +2410,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
                     double Ln = pme->eval(degree_p, pn, sd.m_rs[0], sd.m_rs[1]);
                     vec3d trac = pme->eval(tn, sd.m_rs[0], sd.m_rs[1]);
                     sd.m_Ln += MBRACKET(Ln);
-                    // tractions on master-slave are opposite, so subtract
+                    // tractions on primary-secondary are opposite, so subtract
                     sd.m_tr -= trac;
                 }
             }
@@ -2480,7 +2480,7 @@ bool FESlidingInterfaceBiphasicMixed::Augment(int naug, const FETimeInfo& tp)
         {
 			FESlidingSurfaceBiphasicMixed::Data& ds = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
 
-            // update Lagrange multipliers on slave surface
+            // update Lagrange multipliers on primary surface
             double eps = m_epsn*ds.m_epsn*psf;
             if (ds.m_bstick) {
                 // if stick, augment total traction
@@ -2542,7 +2542,7 @@ bool FESlidingInterfaceBiphasicMixed::Augment(int naug, const FETimeInfo& tp)
         {
 			FESlidingSurfaceBiphasicMixed::Data& dm = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
 
-            // update Lagrange multipliers on master surface
+            // update Lagrange multipliers on secondary surface
             double eps = m_epsn*dm.m_epsn*psf;
             if (dm.m_bstick) {
                 // if stick, augment total traction

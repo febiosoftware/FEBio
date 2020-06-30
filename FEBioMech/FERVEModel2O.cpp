@@ -397,13 +397,13 @@ FEMicroModel2O::~FEMicroModel2O()
 //-----------------------------------------------------------------------------
 bool FEMicroModel2O::Init(FERVEModel2O& rve)
 {
-	// copy the master RVE
+	// copy the parent RVE
 	CopyFrom(rve);
 
 	// initialize model
 	if (FEModel::Init() == false) return false;
 
-	// copy some stuff from the master RVE model
+	// copy some stuff from the parent RVE model
 	m_V0 = rve.InitialVolume();
 	m_rveType = rve.RVEType();
 	m_BN = &rve.BoundaryList();
@@ -465,18 +465,18 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 		{
 			FELinearConstraint& lc = LM.LinearConstraint(i);
 
-			FENode& slaveNode = m.Node(lc.master.node);
-			FENode& masterNode = m.Node(lc.slave[0].node);
+			FENode& parentNode = m.Node(lc.m_parentDof.node);
+			FENode& childNode = m.Node(lc.m_childDof[0].node);
 
-			vec3d Xp = slaveNode.m_r0;
-			vec3d Xm = masterNode.m_r0;
+			vec3d Xp = parentNode.m_r0;
+			vec3d Xm = childNode.m_r0;
 
 			mat3ds XXp = dyad(Xp);
 			mat3ds XXm = dyad(Xm);
 
 			vec3d d = U*(Xp - Xm) + (G.contract2s(XXp - XXm))*0.5;
 
-			switch (lc.master.dof)
+			switch (lc.m_parentDof.dof)
 			{
 			case 0: lc.m_off = d.x; break;
 			case 1: lc.m_off = d.y; break;
@@ -514,9 +514,9 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 				FENode& node = ss.Node(i);
 				vec3d f = ss.m_data[i].m_Fr;
 
-				// We multiply by two since the reaction forces are only stored at the slave surface 
-				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-				// store the reaction forces on the master nodes as well?)
+				// We multiply by two since the reaction forces are only stored at the primary surface 
+				// and we also need to sum over the secondary nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the secondary nodes as well?)
 				PK1 += (f & node.m_r0)*2.0;
 			}
 		}
@@ -631,9 +631,9 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 				vec3d f = ss.m_Fr[i];
 				const vec3d& X = node.m_r0;
 				
-				// We multiply by two since the reaction forces are only stored at the slave surface 
-				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-				// store the reaction forces on the master nodes as well?)
+				// We multiply by two since the reaction forces are only stored at the primary surface 
+				// and we also need to sum over the secondary nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the secondary nodes as well?)
 				Pa += (f & X)*2.0;
 
 				Qa += dyad3rs(f, X)*2.0;
@@ -706,9 +706,9 @@ void FEMicroModel2O::AveragedStress2OPK1(FEMaterialPoint &mp, mat3d &PK1a, tens3
 				FENode& node = ss.Node(i);
 				vec3d f = ss.m_Fr[i];
 
-				// We multiply by two since the reaction forces are only stored at the slave surface 
-				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-				// store the reaction forces on the master nodes as well?)
+				// We multiply by two since the reaction forces are only stored at the primary surface 
+				// and we also need to sum over the secondary nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the secondary nodes as well?)
 				PK1 += (f & node.m_r0)*2.0;
 
 				vec3d X = node.m_r0;
@@ -782,9 +782,9 @@ void FEMicroModel2O::AveragedStress2OPK2(FEMaterialPoint &mp, mat3ds &Sa, tens3d
 				vec3d f = ss.m_Fr[i];
 				vec3d f0 = Finv*f;
 
-				// We multiply by two since the reaction forces are only stored at the slave surface 
-				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-				// store the reaction forces on the master nodes as well?)
+				// We multiply by two since the reaction forces are only stored at the primary surface 
+				// and we also need to sum over the secondary nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the secondary nodes as well?)
 				S += (f0 & node.m_r0)*2.0;
 
 				vec3d X = node.m_r0;

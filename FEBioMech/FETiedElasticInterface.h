@@ -96,10 +96,10 @@ public:
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;
     
-    //! return the master and slave surface
-    FESurface* GetMasterSurface() override { return &m_ms; }
-    FESurface* GetSlaveSurface () override { return &m_ss; }
-    
+    //! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
+
     //! return integration rule class
     bool UseNodalIntegration() override { return false; }
     
@@ -127,9 +127,9 @@ protected:
     void CalcAutoPenalty(FETiedElasticSurface& s);
     
 public:
-    FETiedElasticSurface    m_ms;    //!< master surface
-    FETiedElasticSurface    m_ss;    //!< slave surface
-    
+    FETiedElasticSurface    m_ss;    //!< primary surface
+	FETiedElasticSurface    m_ms;    //!< secondary surface
+
     int         m_knmult;       //!< higher order stiffness multiplier
     bool        m_btwo_pass;    //!< two-pass flag
     double      m_atol;         //!< augmentation tolerance

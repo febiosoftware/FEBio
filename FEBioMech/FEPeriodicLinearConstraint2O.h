@@ -43,8 +43,8 @@ class FEBIOMECH_API FEPeriodicLinearConstraint2O
 		void operator = (const NodeSetSet& nns);
 
 	public:
-		FENodeList	master;
-		FENodeList	slave;
+		FENodeList	primary;
+		FENodeList	secondary;
 	};
 
 public:
@@ -57,7 +57,7 @@ public:
 
 private:
 	int closestNode(FEMesh& mesh, const FENodeList& set, const vec3d& r);
-	void addLinearConstraint(FEModel& fem, int master, int slave);
+	void addLinearConstraint(FEModel& fem, int parent, int child);
 
 private:
 	std::vector<NodeSetSet>	m_set;	// list of node set pairs

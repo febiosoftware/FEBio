@@ -144,10 +144,10 @@ public:
 	//! set ambient condition 
 	void SetAmbient();
 	
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface () override { return &m_ss; }
-    
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
+
 	//! return integration rule class
 	bool UseNodalIntegration() override { return false; }
     
@@ -191,8 +191,8 @@ protected:
     double AutoPenalty(FESurfaceElement& el, FESurface &s);
 	
 public:
-	FESlidingSurfaceMP	m_ms;	//!< master surface
-	FESlidingSurfaceMP	m_ss;	//!< slave surface
+	FESlidingSurfaceMP	m_ss;	//!< primary surface
+	FESlidingSurfaceMP	m_ms;	//!< secondary surface
 	
 	int				m_knmult;		//!< higher order stiffness multiplier
 	bool			m_btwo_pass;	//!< two-pass flag
@@ -223,8 +223,8 @@ public:
     double  m_ambctmp;              //!< helper variable for reading in ambient concentrations of solutes
     idmap	m_ambcinp;                 //!< ambient concentration of solute (input)
 	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
-	vector<int> m_ssl;				//!< list of slave surface solutes common to both contact surfaces
-	vector<int> m_msl;				//!< list of master surface solutes common to both contact surfaces
+	vector<int> m_ssl;				//!< list of primary surface solutes common to both contact surfaces
+	vector<int> m_msl;				//!< list of secondary surface solutes common to both contact surfaces
     vector<int> m_sz;               //!< charge number of solutes common to both contact surfaces
 
 protected:

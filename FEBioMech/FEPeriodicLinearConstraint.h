@@ -37,8 +37,8 @@ class FEBIOMECH_API FEPeriodicLinearConstraint
 {
 	struct NodeSetPair
 	{
-		FENodeList master;
-		FENodeList slave;
+		FENodeList primary;
+		FENodeList secondary;
 	};
 
 public:
@@ -58,5 +58,5 @@ public:
 private:
 	std::vector<NodeSetPair>	m_set;	// list of node set pairs
 	FENodeSet	m_exclude;		// nodes to exclude
-	int			m_refNode;		// reference slave node
+	int			m_refNode;		// reference node
 };

@@ -821,10 +821,10 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 
 	FEModelBuilder* feb = GetBuilder();
 
-	// read the master node
+	// read the parent node
 	int nodeID;
 	tag.AttributeValue("node", nodeID);
-	int masterNode = feb->FindNodeFromID(nodeID);
+	int parentNode = feb->FindNodeFromID(nodeID);
 
 	// get the dofs
 	const char* szbc = tag.AttributeValue("bc");
@@ -838,11 +838,11 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	{
 		int dof = dofList[i];
 		if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-		LC[i].master.dof = dof;
-		LC[i].master.node = masterNode;
+		LC[i].m_parentDof.dof = dof;
+		LC[i].m_parentDof.node = parentNode;
 	}
 
-	// read the slave nodes
+	// read the child nodes
 	++tag;
 	do
 	{
@@ -850,16 +850,16 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 		if (tag == "node")
 		{
 			// get the node
-			int slaveNode = ReadNodeID(tag);
+			int childNode = ReadNodeID(tag);
 
 			// get the dof
-			// (if ommitted we take the master dof)
-			int slaveDOF = -1;
+			// (if ommitted we take the parent dof)
+			int childDOF = -1;
 			const char* szbc = tag.AttributeValue("bc", true);
 			if (szbc)
 			{
-				slaveDOF = dofs.GetDOF(szbc);
-				if (slaveDOF < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+				childDOF = dofs.GetDOF(szbc);
+				if (childDOF < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 			}
 
 			// get the coefficient
@@ -869,10 +869,10 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 			// add it to the list
 			for (int i=0; i<ndofs; ++i)
 			{
-				dof.node = slaveNode;
-				dof.dof  = (slaveDOF < 0 ? LC[i].master.dof : slaveDOF);
+				dof.node = childNode;
+				dof.dof  = (childDOF < 0 ? LC[i].m_parentDof.dof : childDOF);
 				dof.val  = val;
-				LC[i].slave.push_back(dof);
+				LC[i].m_childDof.push_back(dof);
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -914,7 +914,7 @@ void FEBioBoundarySection25::ParseMergeConstraint(XMLTag& tag)
 
 	// merge the interfaces
 	FEMergedConstraint merge(fem);
-	if (merge.Merge(sp->GetMasterSurface(), sp->GetSlaveSurface(), dofs) == false)
+	if (merge.Merge(sp->GetSecondarySurface(), sp->GetPrimarySurface(), dofs) == false)
 		throw XMLReader::InvalidTag(tag);
 }
 
@@ -937,9 +937,9 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = fecore_alloc(FESurface, fem); feb->BuildSurface(*ms, *spair->GetMasterSurface());
-				FESurface* ss = fecore_alloc(FESurface, fem); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
-				plc.AddNodeSetPair(ms->GetNodeList(), ss->GetNodeList());
+				FESurface* surf2 = fecore_alloc(FESurface, fem); feb->BuildSurface(*surf2, *spair->GetSecondarySurface());
+				FESurface* surf1 = fecore_alloc(FESurface, fem); feb->BuildSurface(*surf1, *spair->GetPrimarySurface());
+				plc.AddNodeSetPair(surf2->GetNodeList(), surf1->GetNodeList());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");
 		}
@@ -974,9 +974,9 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = fecore_alloc(FESurface, fem); feb->BuildSurface(*ms, *spair->GetMasterSurface());
-				FESurface* ss = fecore_alloc(FESurface, fem); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
-				plc.AddNodeSetPair(ms->GetNodeList(), ss->GetNodeList());
+				FESurface* surf2 = fecore_alloc(FESurface, fem); feb->BuildSurface(*surf2, *spair->GetSecondarySurface());
+				FESurface* surf1 = fecore_alloc(FESurface, fem); feb->BuildSurface(*surf1, *spair->GetPrimarySurface());
+				plc.AddNodeSetPair(surf2->GetNodeList(), surf1->GetNodeList());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");
 		}
@@ -1014,7 +1014,7 @@ void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
-				FESurface& s = *(ntype == 1? pci->GetMasterSurface() : pci->GetSlaveSurface());
+				FESurface& s = *(ntype == 1? pci->GetSecondarySurface() : pci->GetPrimarySurface());
 				m.AddSurface(&s);
 
 				int nfmt = 0;

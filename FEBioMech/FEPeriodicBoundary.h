@@ -40,7 +40,7 @@ public:
 
 	public:
 		vec3d				m_gap;	//!< gap function at nodes
-		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
+		vec2d				m_rs;	//!< natural coordinates of projection on secondary surface element
 		vec3d				m_Lm;	//!< Lagrange multipliers
 		vec3d				m_Tn;	//!< nodal traction forces
 		vec3d				m_Fr;	//!< reaction forces
@@ -90,9 +90,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface () override { return &m_ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return true; }
@@ -120,8 +120,8 @@ protected:
 	void ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove);
 
 public:
-	FEPeriodicSurface	m_ss;	//!< slave surface
-	FEPeriodicSurface	m_ms;	//!< master surface
+	FEPeriodicSurface	m_ss;	//!< primary surface
+	FEPeriodicSurface	m_ms;	//!< secondary surface
 
 	double	m_atol;			//!< augmentation tolerance
 	double	m_eps;			//!< penalty scale factor

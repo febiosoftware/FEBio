@@ -72,7 +72,7 @@ public:
 	std::string		m_szbc;			//!< name of nodeset defining boundary
 	int				m_rveType;		//!< RVE type
 	double			m_scale;		//!< geometry scale factor
-	FERVEModel2O	m_mrve;			//!< the master RVE (Representive Volume Element)
+	FERVEModel2O	m_mrve;			//!< the parent RVE (Representive Volume Element)
 
 public:
 	//! calculate stress at material point

@@ -49,8 +49,8 @@ public:
 	struct FEBIOXML_API NodeSetPair
 	{
 		char		szname[256];
-		FENodeSet*	pmaster;
-		FENodeSet*	pslave;
+		FENodeSet*	set1;
+		FENodeSet*	set2;
 	};
 
 	struct FEBIOXML_API NodeSetSet

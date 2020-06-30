@@ -263,21 +263,18 @@ void FERigidSlidingContact::Activate()
 	// calculate penalty factors
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss);
 }
 
 //-----------------------------------------------------------------------------
-//!  Projects the slave surface onto the master plane
+//!  Projects the primary surface onto the plane
 
 void FERigidSlidingContact::ProjectSurface(FERigidSlidingSurface& ss)
 {
 	vec3d rt[FEElement::MAX_NODES];
 
-	// surface normal
-	vec3d np;
-
-	// loop over all slave elements
+	// loop over all primary surface elements
 	int c = 0;
 	for (int i=0; i<m_ss.Elements(); ++i)
 	{
@@ -303,7 +300,7 @@ void FERigidSlidingContact::ProjectSurface(FERigidSlidingSurface& ss)
 			// get the local surface normal
 			vec3d np = m_rigid->Normal(q);
 
-			// the slave normal is set to the master element normal
+			// the normal is set to the secondary surface element normal
 			d.nu = np;
 	
 			// calculate initial gap
@@ -317,7 +314,7 @@ void FERigidSlidingContact::ProjectSurface(FERigidSlidingSurface& ss)
 
 void FERigidSlidingContact::Update()
 {
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss);
 }
 
@@ -334,7 +331,7 @@ void FERigidSlidingContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	// zero total force
 	m_ss.m_Fc = vec3d(0,0,0);
 
-	// loop over all slave elements
+	// loop over all primary surface elements
 	int c = 0;
 	for (int i = 0; i<m_ss.Elements(); ++i)
 	{
@@ -438,7 +435,7 @@ void FERigidSlidingContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 	double N[3*MELN];
 	FEElementMatrix ke;
 
-	// loop over all slave elements
+	// loop over all primary surface elements
 	int c = 0;
 	for (int i = 0; i<m_ss.Elements(); ++i)
 	{

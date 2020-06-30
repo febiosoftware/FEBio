@@ -59,8 +59,8 @@ bool FEPeriodicSurfaceConstraintSurface::Init()
 
 	// allocate other surface data
 	m_gap.resize(nn);		// gap funtion
-	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated master element
-	m_rs.resize(nn);		// natural coords of projected slave node on master element
+	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated secondary element
+	m_rs.resize(nn);		// natural coords of projected primary node on secondary element
 	m_Lm.resize(nn);		// Lagrangian multipliers
 
 	// set initial values
@@ -229,7 +229,7 @@ void FEPeriodicSurfaceConstraint::Activate()
 	// don't forget to call the base class
 	FEContactInterface::Activate();
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms, false);
 	ProjectSurface(m_ms, m_ss, false);
 }
@@ -250,10 +250,10 @@ void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurf
 	int i;
 	double rs[2];
 
-	// get the slave's center of mass
+	// get the primary's center of mass
 	vec3d cs = ss.CenterOfMass();
 
-	// get the master's center of mass
+	// get the secondary's center of mass
 	vec3d cm = ms.CenterOfMass();
 
 	// get the relative distance
@@ -263,7 +263,7 @@ void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurf
 	// this will serve as the projection distance
 	vec3d cn(cr); cn.unit();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (i = 0; i<ss.Nodes(); ++i)
 	{
 		FENode& node = ss.Node(i);
@@ -271,7 +271,7 @@ void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurf
 		// get the nodal position
 		vec3d r0 = node.m_r0;
 
-		// find the intersection with the master surface
+		// find the intersection with the secondary surface
 		ss.m_pme[i] = np.Project(r0, cn, rs);
 		assert(ss.m_pme[i]);
 
@@ -323,10 +323,10 @@ void FEPeriodicSurfaceConstraint::Update()
 		FENode& node = ss.Node(n0);
 		us = node.m_rt - node.m_r0;
 
-		// get the master element
+		// get the secondary element
 		pme = ss.m_pme[n0];
 
-		// calculate the master displacement
+		// calculate the secondary displacement
 		ne = pme->Nodes();
 		for (j = 0; j<ne; ++j)
 		{
@@ -340,14 +340,14 @@ void FEPeriodicSurfaceConstraint::Update()
 
 		for (i = 0; i<N; ++i)
 		{
-			// calculate the slave displacement
+			// calculate the primary displacement
 			FENode& node = ss.Node(i);
 			us = node.m_rt - node.m_r0;
 
-			// get the master element
+			// get the secondary element
 			pme = ss.m_pme[i];
 
-			// calculate the master displacement
+			// calculate the secondary displacement
 			ne = pme->Nodes();
 			for (j = 0; j<ne; ++j)
 			{
@@ -378,7 +378,7 @@ void FEPeriodicSurfaceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo
 	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
 	double* w;
 
-	// natural coordinates of slave node in master element
+	// natural coordinates of primary node in secondary element
 	double r, s;
 
 	// contact force
@@ -410,11 +410,11 @@ void FEPeriodicSurfaceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo
 		int nref = ss.m_nref;
 		FESurfaceElement* pref = ss.m_pme[nref];
 
-		// loop over all slave facets
+		// loop over all primary facets
 		int ne = ss.Elements();
 		for (j = 0; j<ne; ++j)
 		{
-			// get the slave element
+			// get the primary element
 			FESurfaceElement& sel = ss.Element(j);
 
 			// get the element's LM vector
@@ -430,7 +430,7 @@ void FEPeriodicSurfaceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo
 
 			w = sel.GaussWeights();
 
-			// loop over slave element nodes (which are the integration points as well)
+			// loop over primary element nodes (which are the integration points as well)
 			for (n = 0; n<nseln; ++n)
 			{
 				Gr = sel.Gr(n);
@@ -453,21 +453,21 @@ void FEPeriodicSurfaceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo
 
 				detJ = (dxr ^ dxs).norm();
 
-				// get slave node contact force
+				// get primary node contact force
 				tc = ss.m_Lm[m] + ss.m_gap[m] * m_eps;
 
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& mel = *ss.m_pme[m];
 				ms.UnpackLM(mel, mLM);
 
 				nmeln = mel.Nodes();
 
-				// isoparametric coordinates of the projected slave node
-				// onto the master element
+				// isoparametric coordinates of the projected primary node
+				// onto the secondary element
 				r = ss.m_rs[m][0];
 				s = ss.m_rs[m][1];
 
-				// get the master shape function values at this slave node
+				// get the secondary shape function values at this primary node
 				if (nmeln == 4)
 				{
 					// quadrilateral
@@ -609,7 +609,7 @@ void FEPeriodicSurfaceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETi
 		// assemble stiffness matrix
 		//		psolver->AssembleStiffness(en, lm, ke);
 
-		// loop over all slave elements
+		// loop over all primary elements
 		int ne = ss.Elements();
 		for (j = 0; j<ne; ++j)
 		{
@@ -651,23 +651,23 @@ void FEPeriodicSurfaceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETi
 
 				detJ = (dxr ^ dxs).norm();
 
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& me = *ss.m_pme[m];
 				ms.UnpackLM(me, mLM);
 
 				nmeln = me.Nodes();
 
-				// get the master element node positions
+				// get the secondary element node positions
 				for (k = 0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
-				// slave node natural coordinates in master element
+				// primary node natural coordinates in secondary element
 				r = ss.m_rs[m][0];
 				s = ss.m_rs[m][1];
 
-				// get slave node normal force
+				// get primary node normal force
 				tc = ss.m_Lm[m] + ss.m_gap[m] * m_eps; //ss.T[m];
 
-				// get the master shape function values at this slave node
+				// get the secondary shape function values at this primary node
 				if (nmeln == 4)
 				{
 					// quadrilateral

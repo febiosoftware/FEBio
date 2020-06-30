@@ -211,8 +211,8 @@ private:
 	int		m_ntotalReforms;	//!< total nr of stiffness reformations
 
 protected: // file names
-	std::string		m_sfile_title;		//!< master input file title 
-	std::string		m_sfile;			//!< master input file name (= path + title)
+	std::string		m_sfile_title;		//!< input file title 
+	std::string		m_sfile;			//!< input file name (= path + title)
 	std::string		m_splot;			//!< plot output file name
 	std::string		m_slog ;			//!< log output file name
 	std::string		m_sdump;			//!< dump file name

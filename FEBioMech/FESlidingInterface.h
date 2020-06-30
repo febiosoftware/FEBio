@@ -43,8 +43,8 @@ class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 		void Serialize(DumpStream& ar) override;
 
 	public:
-		vec3d				m_nu;	  //!< master normal at slave node
-		vec2d				m_rs;	  //!< natural coordinates of slave projection on master element
+		vec3d				m_nu;	  //!< secondary surface normal at primary surface node
+		vec2d				m_rs;	  //!< natural coordinates of primary surface projection on secondary surface element
 		vec2d				m_rsp;  //!< natural coordinates at previous time step
 		double				m_Lm;	  //!< Lagrange multipliers for contact pressure
 		mat2d				m_M;	  //!< surface metric tensor
@@ -85,8 +85,6 @@ public:
 //! This class implements a sliding interface
 
 //! The FESlidingInterface class defines an interface between two surfaces.
-//! These surfaces define the slave and master surfaces of the contact
-//! interface. 
 
 class FEBIOMECH_API FESlidingInterface : public FEContactInterface
 {
@@ -103,7 +101,7 @@ public:
 	//! interface activation
 	void Activate() override;
 
-	//! projects slave nodes onto master nodes
+	//! projects primary surface nodes onto secondary surface nodes
 	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);
 
 	//! calculate penalty value
@@ -115,9 +113,9 @@ public:
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface () override { return &m_ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return true; }
@@ -142,10 +140,10 @@ protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FESlidingSurface& s);
 
-	//! calculate the nodal force of a slave node
+	//! calculate the nodal force of a primary surface node
 	void ContactNodalForce(int m, FESlidingSurface& ss, FESurfaceElement& mel, vector<double>& fe);
 
-	//! calculate the stiffness contribution of a single slave node
+	//! calculate the stiffness contribution of a single primary surface node
 	void ContactNodalStiffness(int m, FESlidingSurface& ss, FESurfaceElement& mel, matrix& ke);
 
 	//! map the frictional data from the old element to the new element
@@ -155,8 +153,8 @@ private:
 	void SerializePointers(FESlidingSurface& ss, FESlidingSurface& ms, DumpStream& ar);
 
 public:
-	FESlidingSurface	m_ss;	//!< slave surface
-	FESlidingSurface	m_ms;	//!< master surface
+	FESlidingSurface	m_ss;	//!< primary surface
+	FESlidingSurface	m_ms;	//!< secondary surface
 
 	bool			m_btwo_pass;	//!< two pass algorithm flag
 

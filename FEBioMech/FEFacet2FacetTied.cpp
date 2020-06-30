@@ -245,13 +245,13 @@ bool FEFacet2FacetTied::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Interface activation. Also projects slave surface onto master surface
+//! Interface activation. Also projects primary surface onto secondary surface
 void FEFacet2FacetTied::Activate()
 {
 	// Don't forget to call base member!
 	FEContactInterface::Activate();
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms);
 }
 
@@ -267,10 +267,10 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 
-	// loop over all slave elements
+	// loop over all primary elements
 	for (int i=0; i<ss.Elements(); ++i)
 	{
-		// get the slave element
+		// get the primary element
 		FESurfaceElement& se = ss.Element(i);
 
 		// get nodal coordinates
@@ -288,12 +288,12 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 			// calculate the global coordinates of this integration point
 			vec3d x = se.eval(re, j);
 
-			// find the master element
+			// find the secondary element
 			vec3d q; vec2d rs;
 			FESurfaceElement* pme = cpp.Project(x, q, rs);
 			if (pme)
 			{
-				// store the master element
+				// store the secondary element
 				pt.m_pme = pme;
 				pt.m_rs[0] = rs[0];
 				pt.m_rs[1] = rs[1];
@@ -308,14 +308,14 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 
 //-----------------------------------------------------------------------------
 //! Update tied interface data. This function re-evaluates the gaps between
-//! the slave node and their projections onto the master surface.
+//! the primary node and their projections onto the secondary surface.
 //!
 void FEFacet2FacetTied::Update()
 {
 	// get the mesh
 	FEMesh& mesh = *m_ss.GetMesh();
 
-	// loop over all slave elements
+	// loop over all primary elements
 	const int NE = m_ss.Elements();
 	for (int i=0; i<NE; ++i)
 	{
@@ -339,19 +339,19 @@ void FEFacet2FacetTied::Update()
 			{
 				FESurfaceElement& me = static_cast<FESurfaceElement&>(*pme);
 
-				// get the current slave nodal position
+				// get the current primary nodal position
 				vec3d rn = se.eval(rs, n);
 
-				// get the natural coordinates of the slave projection
+				// get the natural coordinates of the primary projection
 				double r = pt.m_rs[0];
 				double s = pt.m_rs[1];
 
-				// get the master nodal coordinates
+				// get the secondary nodal coordinates
 				int nmeln = me.Nodes();
 				vec3d y[FEElement::MAX_NODES];
 				for (int l=0; l<nmeln; ++l) y[l] = mesh.Node( me.m_node[l] ).m_rt;
 
-				// calculate the slave node projection
+				// calculate the primary node projection
 				vec3d q = me.eval(y, r, s);
 
 				// calculate the gap function
@@ -396,26 +396,26 @@ void FEFacet2FacetTied::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			// get integration point data
 			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(n));
 
-			// get the master element
+			// get the secondary element
 			FESurfaceElement* pme = pt.m_pme;
 			if (pme)
 			{
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& me = *pme;
 				m_ms.UnpackLM(me, mLM);
 				int nmeln = me.Nodes();
 
-				// get slave contact force
+				// get primary contact force
 				vec3d tc = pt.m_Lm + pt.m_vgap*m_eps;
 
 				// calculate jacobian
 				// note that we are integrating over the reference surface
 				double detJ = m_ss.jac0(se, n);
 
-				// slave shape functions
+				// primary shape functions
 				double* Hs = se.H(n);
 
-				// master shape functions
+				// secondary shape functions
 				double r = pt.m_rs[0];
 				double s = pt.m_rs[1];
 				me.shape_fnc(Hm, r, s);
@@ -476,7 +476,7 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 	// shape functions
 	double Hm[FEElement::MAX_NODES];
 
-	// loop over all slave elements
+	// loop over all primary elements
 	const int NE = m_ss.Elements();
 	for (int i=0; i<NE; ++i)
 	{
@@ -497,11 +497,11 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 			// get intgration point data
 			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(n));
 
-			// get the master element
+			// get the secondary element
 			FESurfaceElement* pme = pt.m_pme;
 			if (pme)
 			{
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& me = *pme;
 				int nmeln = me.Nodes();
 				m_ms.UnpackLM(me, mLM);
@@ -509,10 +509,10 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 				// calculate jacobian
 				double detJ = m_ss.jac0(se, n);
 
-				// slave shape functions
+				// primary shape functions
 				double* Hs = se.H(n);
 
-				// master shape functions
+				// secondary shape functions
 				double r = pt.m_rs[0];
 				double s = pt.m_rs[1];
 				me.shape_fnc(Hm, r, s);

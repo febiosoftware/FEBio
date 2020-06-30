@@ -83,7 +83,7 @@ void FEPeriodicBoundary1O::Activate()
 	// don't forget to call the base class
 	FEContactInterface::Activate();
 
-	// project slave surface onto master surface
+	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms, false);
 	ProjectSurface(m_ms, m_ss, false);
 }
@@ -165,10 +165,10 @@ void FEPeriodicBoundary1O::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurfa
 	int i;
 	double rs[2];
 
-	// get the slave's center of mass
+	// get the primary's center of mass
 	vec3d cs = ss.CenterOfMass();
 
-	// get the master's center of mass
+	// get the secondary's center of mass
 	vec3d cm = ms.CenterOfMass();
 
 	// get the relative distance
@@ -184,7 +184,7 @@ void FEPeriodicBoundary1O::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurfa
 	np.SetSearchRadius(m_srad);
 	np.Init();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (i=0; i<ss.Nodes(); ++i)
 	{
 		FENode& node = ss.Node(i);
@@ -192,7 +192,7 @@ void FEPeriodicBoundary1O::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurfa
 		// get the nodal position
 		vec3d r0 = node.m_r0;
 
-		// find the intersection with the master surface
+		// find the intersection with the secondary surface
 		ss.m_data[i].m_pme = np.Project3(r0, cn, rs);
 		assert(ss.m_data[i].m_pme);
 
@@ -228,14 +228,14 @@ void FEPeriodicBoundary1O::Update()
 
 		for (i=0; i<N; ++i)
 		{
-			// calculate the slave displacement
+			// calculate the primary displacement
 			FENode& node = ss.Node(i);
 			ws = node.m_rt - m_Fmacro*node.m_r0;
 
-			// get the master element
+			// get the secondary element
 			pme = ss.m_data[i].m_pme;
 
-			// calculate the master displacement
+			// calculate the secondary displacement
 			ne = pme->Nodes();
 			for (j=0; j<ne; ++j)
 			{
@@ -265,7 +265,7 @@ void FEPeriodicBoundary1O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	vec3d dxr, dxs;
 	double* w;
 
-	// natural coordinates of slave node in master element
+	// natural coordinates of primary node in secondary element
 	double r, s;
 
 	// contact force
@@ -296,11 +296,11 @@ void FEPeriodicBoundary1O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		for (int i=0; i<ss.m_data.size(); ++i) ss.m_data[i].m_Fr = vec3d(0,0,0);
 
-		// loop over all slave facets
+		// loop over all primary facets
 		int ne = ss.Elements();
 		for (j=0; j<ne; ++j)
 		{
-			// get the slave element
+			// get the primary element
 			FESurfaceElement& sel = ss.Element(j);
 			
 			// get the elements LM vector
@@ -315,7 +315,7 @@ void FEPeriodicBoundary1O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			}
 			w = sel.GaussWeights();
 
-			// loop over slave element nodes (which are the integration points as well)
+			// loop over primary element nodes (which are the integration points as well)
 			for (n=0; n<nseln; ++n)
 			{
 				Gr = sel.Gr(n);
@@ -338,22 +338,22 @@ void FEPeriodicBoundary1O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 				detJ = (dxr ^ dxs).norm();
 
-				// get slave node contact force
+				// get primary node contact force
 				tc = ss.m_data[m].m_Lm + ss.m_data[m].m_gap*m_eps;
 				ss.m_data[m].m_Tn = tc;
 
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& mel = *ss.m_data[m].m_pme;
 				ms.UnpackLM(mel, mLM);
 
 				nmeln = mel.Nodes();
 
-				// isoparametric coordinates of the projected slave node
-				// onto the master element
+				// isoparametric coordinates of the projected primary node
+				// onto the secondary element
 				r = ss.m_data[m].m_rs[0];
 				s = ss.m_data[m].m_rs[1];
 
-				// get the master shape function values at this slave node
+				// get the secondary shape function values at this primary node
 				if (nmeln == 4)
 				{
 					// quadrilateral
@@ -454,7 +454,7 @@ void FEPeriodicBoundary1O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
 		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
 
-		// loop over all slave elements
+		// loop over all primary elements
 		int ne = ss.Elements();
 		for (j=0; j<ne; ++j)
 		{
@@ -496,23 +496,23 @@ void FEPeriodicBoundary1O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 				detJ = (dxr ^ dxs).norm();
 
-				// get the master element
+				// get the secondary element
 				FESurfaceElement& me = *ss.m_data[m].m_pme;
 				ms.UnpackLM(me, mLM);
 
 				nmeln = me.Nodes();
 
-				// get the master element node positions
+				// get the secondary element node positions
 				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
-				// slave node natural coordinates in master element
+				// primary node natural coordinates in secondary element
 				r = ss.m_data[m].m_rs[0];
 				s = ss.m_data[m].m_rs[1];
 
-				// get slave node normal force
+				// get primary node normal force
 				tc = ss.m_data[m].m_Lm + ss.m_data[m].m_gap*m_eps; //ss.T[m];
 
-				// get the master shape function values at this slave node
+				// get the secondary shape function values at this primary node
 				if (nmeln == 4)
 				{
 					// quadrilateral

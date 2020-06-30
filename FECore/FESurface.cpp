@@ -866,7 +866,7 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 	// shape function derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
 	
-	// get the shape function values at this slave node
+	// get the shape function values at this node
 	el.shape_deriv(Hr, Hs, r, s);
 	
 	// get the tangent vectors
@@ -899,7 +899,7 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 	// shape function derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
 	
-	// get the shape function values at this slave node
+	// get the shape function values at this node
 	el.shape_deriv(Hr, Hs, r, s);
 	
 	// get the tangent vectors

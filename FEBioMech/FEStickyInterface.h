@@ -31,8 +31,7 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-//! This class describes a contact slave or master surface used for 
-//! sticky contact
+//! This class describes a contact surface used for sticky contact.
 
 //!	this class is used in contact analyses to describe a contacting
 //! surface in a sticky contact interface.
@@ -49,10 +48,10 @@ public:
 
 	public:
 		vec3d				gap;	//!< "gap" function
-		vec2d				rs;		//!< natural coordinates of slave projection on master element
+		vec2d				rs;		//!< natural coordinates of projection on secondary surface element
 		vec3d				Lm;		//!< Lagrange multiplier
 		vec3d				tn;		//!< traction vector
-		FESurfaceElement*	pme;	//!< master element a slave node penetrates
+		FESurfaceElement*	pme;	//!< secondary surface element a node penetrates
 	};
 
 public:
@@ -94,15 +93,15 @@ public:
 	//! interface activation
 	void Activate() override;
 
-	//! projects slave nodes onto master nodes
+	//! projects nodes onto secondary surface
 	void ProjectSurface(FEStickySurface& ss, FEStickySurface& ms, bool bmove = false);
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &ms; }
-	FESurface* GetSlaveSurface () override { return &ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &ss; }
+	FESurface* GetSecondarySurface() override { return &ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return true; }
@@ -127,8 +126,8 @@ private:
 	void SerializePointers(FEStickySurface& ss, FEStickySurface& ms, DumpStream& ar);
 
 public:
-	FEStickySurface	ss;	//!< slave surface
-	FEStickySurface	ms;	//!< master surface
+	FEStickySurface	ss;	//!< primary surface
+	FEStickySurface	ms;	//!< secondary surface
 
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor

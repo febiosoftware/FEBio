@@ -68,23 +68,23 @@ public:
 	};
 
 public:
-	Patch(int k, int l) : m_nslave_facet_id(k), m_nmaster_facet_id(l) {}
+	Patch(int k, int l) : m_primary_facet_id(k), m_secondary_facet_id(l) {}
 
 	Patch(const Patch& p) { 
 		m_tri = p.m_tri; 
-		m_nslave_facet_id = p.m_nslave_facet_id; 
-		m_nmaster_facet_id = p.m_nmaster_facet_id; 
+		m_primary_facet_id = p.m_primary_facet_id;
+		m_secondary_facet_id = p.m_secondary_facet_id;
 	}
 
 	Patch& operator = (const Patch& p) { 
 		m_tri = p.m_tri; 
-		m_nslave_facet_id = p.m_nslave_facet_id; 
-		m_nmaster_facet_id = p.m_nmaster_facet_id; 
+		m_primary_facet_id = p.m_primary_facet_id;
+		m_secondary_facet_id = p.m_secondary_facet_id;
 		return *this; 
 	}
 
-	int GetSlaveFacetID() const { return m_nslave_facet_id; }
-	int GetMasterFacetID() const { return m_nmaster_facet_id; }
+	int GetPrimaryFacetID() const { return m_primary_facet_id; }
+	int GetSecondaryFacetID() const { return m_secondary_facet_id; }
 
 public:
 	//! Clear the patch
@@ -103,8 +103,8 @@ public:
 	bool Empty() { return m_tri.empty(); }
 
 private:
-	int		m_nslave_facet_id;		//!< index of slave facet
-	int		m_nmaster_facet_id;		//!< index of master facet
+	int		m_primary_facet_id;		//!< index of primary facet
+	int		m_secondary_facet_id;	//!< index of secondary facet
 
 	vector<FACET>	m_tri;	//!< triangular patches
 };

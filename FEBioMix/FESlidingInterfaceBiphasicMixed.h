@@ -156,10 +156,10 @@ public:
     //! set free-draining condition
     void SetFreeDraining();
     
-    //! return the master and slave surface
-    FESurface* GetMasterSurface() override { return &m_ms; }
-    FESurface* GetSlaveSurface () override { return &m_ss; }
-    
+    //! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
+
     //! return integration rule class
     bool UseNodalIntegration() override { return false; }
     
@@ -195,8 +195,8 @@ protected:
 	void StiffnessMatrix(FESlidingSurfaceBiphasicMixed& ss, FESlidingSurfaceBiphasicMixed& ms, FELinearSystem& LS, const FETimeInfo& tp);
 
 public:
-	FESlidingSurfaceBiphasicMixed	m_ms;	//!< master surface
-	FESlidingSurfaceBiphasicMixed	m_ss;	//!< slave surface
+	FESlidingSurfaceBiphasicMixed	m_ss;	//!< primary surface
+	FESlidingSurfaceBiphasicMixed	m_ms;	//!< secondary surface
     
     int				m_knmult;		//!< higher order stiffness multiplier
     bool			m_btwo_pass;	//!< two-pass flag

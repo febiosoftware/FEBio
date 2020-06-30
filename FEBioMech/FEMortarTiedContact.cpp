@@ -108,7 +108,7 @@ void FEMortarTiedContact::Activate()
 //! build the matrix profile for use in the stiffness matrix
 void FEMortarTiedContact::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-	// For now we'll assume that each node on the slave side is connected to the master side
+	// For now we'll assume that each node on the primary side is connected to the secondary side
 	// This is obviously too much, but we'll worry about improving this later
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
@@ -137,14 +137,14 @@ void FEMortarTiedContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
 
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (int A=0; A<NS; ++A)
 	{
 		double eps = m_eps*m_ss.m_A[A];
 		vec3d gA = m_ss.m_gap[A];
 		vec3d tA = m_ss.m_L[A] + gA*eps;
 
-		// loop over all slave nodes
+		// loop over all primary nodes
 		vector<int> en(1);
 		vector<int> lm(3);
 		vector<double> fe(3);
@@ -167,7 +167,7 @@ void FEMortarTiedContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			}
 		}
 
-		// loop over master side
+		// loop over secondary side
 		for (int C=0; C<NM; ++C)
 		{
 			FENode& nodeC = m_ms.Node(C);
@@ -204,7 +204,7 @@ void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 	{
 		double eps = m_eps*m_ss.m_A[A];
 
-		// loop over all slave nodes
+		// loop over all primary nodes
 		for (int B=0; B<NS; ++B)
 		{
 			FENode& nodeB = m_ss.Node(B);
@@ -215,7 +215,7 @@ void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 			double nAB = m_n1[A][B]*eps;
 			if (nAB != 0.0)
 			{
-				// loop over slave nodes
+				// loop over primary nodes
 				for (int C=0; C<NS; ++C)
 				{
 					FENode& nodeC = m_ss.Node(C);
@@ -235,7 +235,7 @@ void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 					}
 				}
 
-				// loop over master nodes
+				// loop over secondary nodes
 				for (int C=0; C<NM; ++C)
 				{
 					FENode& nodeC = m_ms.Node(C);
@@ -257,7 +257,7 @@ void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 			}
 		}
 
-		// loop over all master nodes
+		// loop over all secondary nodes
 		for (int B=0; B<NM; ++B)
 		{
 			FENode& nodeB = m_ms.Node(B);
@@ -268,7 +268,7 @@ void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 			double nAB = -m_n2[A][B]*eps;
 			if (nAB != 0.0)
 			{
-				// loop over slave nodes
+				// loop over primary nodes
 				for (int C=0; C<NS; ++C)
 				{
 					FENode& nodeC = m_ss.Node(C);
@@ -288,7 +288,7 @@ void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 					}
 				}
 
-				// loop over master nodes
+				// loop over secondary nodes
 				for (int C=0; C<NM; ++C)
 				{
 					FENode& nodeC = m_ms.Node(C);
@@ -320,7 +320,7 @@ bool FEMortarTiedContact::Augment(int naug, const FETimeInfo& tp)
 
 	double max_err = 0.0;
 	int NS = m_ss.Nodes();
-	// loop over all slave nodes
+	// loop over all primary nodes
 	for (int A=0; A<NS; ++A)
 	{
 		double eps = m_eps*m_ss.m_A[A];
@@ -347,7 +347,7 @@ bool FEMortarTiedContact::Augment(int naug, const FETimeInfo& tp)
 
 	if (bconv == false)
 	{
-		// loop over all slave nodes
+		// loop over all primary nodes
 		for (int A=0; A<NS; ++A)
 		{
 			double eps = m_eps*m_ss.m_A[A];

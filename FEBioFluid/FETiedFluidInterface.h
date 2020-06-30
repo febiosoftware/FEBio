@@ -101,9 +101,9 @@ public:
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;
     
-    //! return the master and slave surface
-    FESurface* GetMasterSurface() override { return &m_ms; }
-    FESurface* GetSlaveSurface () override { return &m_ss; }
+    //! return the primary and secondary surfaces
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
     
     //! return integration rule class
     bool UseNodalIntegration() override { return false; }
@@ -133,8 +133,8 @@ protected:
     double AutoPressurePenalty(FESurfaceElement& el, FETiedFluidSurface& s);
     
 public:
-    FETiedFluidSurface    m_ms;    //!< master surface
-    FETiedFluidSurface    m_ss;    //!< slave surface
+	FETiedFluidSurface    m_ss;    //!< primary surface
+	FETiedFluidSurface    m_ms;    //!< secondary surface
     
     bool            m_btwo_pass;    //!< two-pass flag
     double          m_atol;         //!< augmentation tolerance

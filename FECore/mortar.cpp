@@ -447,7 +447,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 	FESurfaceElement& es = ss.Element(k);
 	FESurfaceElement& em = ms.Element(l);
 
-	// get the slave nodal coordinates
+	// get the nodal coordinates
 	const int M = FEElement::MAX_NODES;
 	vec3d rs[M], rm[M];
 	int ns = es.Nodes(), nm = em.Nodes();
@@ -471,8 +471,8 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 		P[i].y = q*e2;
 	}
 
-	// now we do the master nodes
-	// Note that we loop backwards since the master element will
+	// now we do the nodes
+	// Note that we loop backwards since the element will
 	// in general have opposite winding
 	for (int i=0; i<nm; ++i)
 	{

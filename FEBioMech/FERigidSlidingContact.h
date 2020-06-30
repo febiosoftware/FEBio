@@ -43,7 +43,7 @@ public:
 	struct DATA
 	{
 		double	gap;	//!< gap function
-		vec3d	nu;		//!< master normal at slave point
+		vec3d	nu;		//!< secondary surface normal at primary surface point
 		double	Lm;		//!< Lagrange multiplier
 		double	eps;	//!< penalty parameter
 
@@ -79,7 +79,7 @@ public:
 	vec3d	m_Fc;	//!< total contact force
 
 	vector<DATA>	m_data;		//!< integration point data
-	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
+	FENNQuery		m_NQ;		//!< this structure is used in finding the secondary surface element that corresponds to a primary surface node
 };
 
 //-----------------------------------------------------------------------------
@@ -101,15 +101,15 @@ public:
 	//! interface activation
 	void Activate() override;
 
-	//! project slave nodes onto master plane
+	//! project nodes onto plane
 	void ProjectSurface(FERigidSlidingSurface& s);
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return 0; }
-	FESurface* GetSlaveSurface() override { return &m_ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return nullptr; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return false; }
@@ -134,8 +134,8 @@ public:
 	void Update() override;
 
 private:
-	FERigidSlidingSurface	m_ss;		//!< slave surface
-	FERigidSurface*			m_rigid;	//!< master surface
+	FERigidSlidingSurface	m_ss;		//!< primary surface
+	FERigidSurface*			m_rigid;	//!< secondary surface
 
 
 public: // parameters

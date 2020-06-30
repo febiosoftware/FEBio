@@ -48,8 +48,8 @@ public:
 
 public:
 	vector<vec3d>				m_gap;	//!< gap function at nodes
-	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
+	vector<FESurfaceElement*>	m_pme;	//!< secondary surface element a node penetrates
+	vector<vec2d>				m_rs;	//!< natural coordinates of projection on secondary surface element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
 
 	int		m_nref;	//!< reference node
@@ -75,9 +75,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface() override { return &m_ss; }
+	//! return the primary and secondary surface
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return true; }
@@ -102,8 +102,8 @@ protected:
 	void ProjectSurface(FEPeriodicSurfaceConstraintSurface& ss, FEPeriodicSurfaceConstraintSurface& ms, bool bmove);
 
 public:
-	FEPeriodicSurfaceConstraintSurface	m_ss;	//!< slave surface
-	FEPeriodicSurfaceConstraintSurface	m_ms;	//!< master surface
+	FEPeriodicSurfaceConstraintSurface	m_ss;	//!< primary surface
+	FEPeriodicSurfaceConstraintSurface	m_ms;	//!< secondary surface
 
 	double	m_atol;			//!< augmentation tolerance
 	double	m_eps;			//!< penalty scale factor

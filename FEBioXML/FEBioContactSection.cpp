@@ -34,15 +34,15 @@ SOFTWARE.*/
 #include <FEBioMech/FEMechModel.h>
 
 //-----------------------------------------------------------------------------
-FEBioContactSection::MissingSlaveSurface::MissingSlaveSurface()
+FEBioContactSection::MissingPrimarySurface::MissingPrimarySurface()
 {
-	SetErrorString("Missing contact slave surface");
+	SetErrorString("Missing contact primary surface");
 }
 
 //-----------------------------------------------------------------------------
-FEBioContactSection::MissingMasterSurface::MissingMasterSurface()
+FEBioContactSection::MissingSecondarySurface::MissingSecondarySurface()
 {
-	SetErrorString("Missing contact master surface");
+	SetErrorString("Missing contact secondary surface");
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +164,7 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
-				FESurface& s = *(ntype == 1? pci->GetMasterSurface() : pci->GetSlaveSurface());
+				FESurface& s = *(ntype == 1? pci->GetSecondarySurface() : pci->GetPrimarySurface());
 				m.AddSurface(&s);
 
 				int nfmt = 0;
@@ -205,9 +205,9 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 	}
 	while (!tag.isend());
 
-	// Make sure we have a master and a slave interface
-	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingSlaveSurface ();
-	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw MissingMasterSurface();
+	// Make sure we have a primary and secondary interface
+	FESurface* pss = pci->GetPrimarySurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingPrimarySurface ();
+	FESurface* pms = pci->GetSecondarySurface(); if ((pms == 0) || (pms->Elements()==0)) throw MissingSecondarySurface();
 }
 
 //-----------------------------------------------------------------------------
@@ -222,17 +222,17 @@ void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairCons
 	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// build the surfaces
-	if (GetBuilder()->BuildSurface(*pci->GetMasterSurface(), *surfacePair->GetMasterSurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
-	if (GetBuilder()->BuildSurface(*pci->GetSlaveSurface(), *surfacePair->GetSlaveSurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (GetBuilder()->BuildSurface(*pci->GetSecondarySurface(), *surfacePair->GetSecondarySurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (GetBuilder()->BuildSurface(*pci->GetPrimarySurface(), *surfacePair->GetPrimarySurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// get the parameter list
 	FEParameterList& pl = pci->GetParameterList();
 	ReadParameterList(tag, pl);
 
-	// Make sure we have a master and a slave interface
-	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingSlaveSurface ();
+	// Make sure we have both surfaces
+	FESurface* pss = pci->GetPrimarySurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingPrimarySurface ();
 	m.AddSurface(pss);
-	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw MissingMasterSurface();
+	FESurface* pms = pci->GetSecondarySurface(); if ((pms == 0) || (pms->Elements()==0)) throw MissingSecondarySurface();
 	m.AddSurface(pms);
 }
 
@@ -305,8 +305,8 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 	const char* sz = tag.AttributeValue("surface");
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	if (GetBuilder()->BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	mesh.AddSurface(ps->GetSlaveSurface());
+	if (GetBuilder()->BuildSurface(*ps->GetPrimarySurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	mesh.AddSurface(ps->GetPrimarySurface());
 
 	ReadParameterList(tag, ps);
 }

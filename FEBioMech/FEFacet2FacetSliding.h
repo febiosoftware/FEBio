@@ -47,7 +47,7 @@ public:
 	public:
 		double	m_Lm;	//!< Lagrange multipliers
 		double	m_eps;	//!< penalty value at integration point
-		vec3d	m_nu;	//!< master normal at integration points
+		vec3d	m_nu;	//!< secondary surface normal at integration points
 		vec2d	m_rs;	//!< natural coordinates of projection of integration point
 	};
 
@@ -101,9 +101,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! return the master and slave surface
-	FESurface* GetMasterSurface() override { return &m_ms; }
-	FESurface* GetSlaveSurface () override { return &m_ss; }
+	//! get primary and secondary surfaces
+	FESurface* GetPrimarySurface() override { return &m_ss; }
+	FESurface* GetSecondarySurface() override { return &m_ms; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() override { return false; }
@@ -125,7 +125,7 @@ public:
 	void Update() override;
 
 protected:
-	//! project slave surface onto master
+	//! project primary surface onto secondary
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup, bool bmove = false);
 
 	//! calculate auto-penalty
@@ -152,8 +152,8 @@ public:
 
 	double	m_dxtol;		//!< penalty insertion distance
 
-	FEFacetSlidingSurface	m_ms;	//!< master surface
-	FEFacetSlidingSurface	m_ss;	//!< slave surface
+	FEFacetSlidingSurface	m_ss;	//!< primary surface
+	FEFacetSlidingSurface	m_ms;	//!< secondary surface
 
 private:
 	bool	m_bfirst;

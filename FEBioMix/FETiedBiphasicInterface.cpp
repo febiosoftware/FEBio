@@ -485,7 +485,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 			// calculate the normal at this integration point
 			nu = ss.SurfaceNormal(el, j);
 			
-			// find the intersection point with the master surface
+			// find the intersection point with the secondary surface
 			pme = np.Project2(r, nu, rs);
 			
 			FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
@@ -611,11 +611,11 @@ void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
 	{
-		// get slave and master surface
+		// get primary and secondary surface
 		FETiedBiphasicSurface& ss = (np == 0? m_ss : m_ms);
 		FETiedBiphasicSurface& ms = (np == 0? m_ms : m_ss);
 		
-		// loop over all slave elements
+		// loop over all primary surface elements
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			// get the surface element
@@ -651,16 +651,16 @@ void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 			{
 				FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*se.GetMaterialPoint(j));
 
-				// get the master element
+				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
-					// get the master element
+					// get the secondary surface element
 					FESurfaceElement& me = *pme;
 					
 					bool mporo = ms.m_poro[pme->m_lid];
 					
-					// get the nr of master element nodes
+					// get the nr of secondary surface element nodes
 					int nmeln = me.Nodes();
 					
 					// copy LM vector
@@ -690,10 +690,10 @@ void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 					
-					// get slave element shape functions
+					// get element shape functions
 					Hs = se.H(j);
 					
-					// get master element shape functions
+					// get secondary surface element shape functions
 					double r = pt.m_rs[0];
 					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
@@ -809,14 +809,14 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np < npass; ++np)
 	{
-		// get the slave and master surface
+		// get the primary and secondary surface
 		FETiedBiphasicSurface& ss = (np == 0? m_ss : m_ms);
 		FETiedBiphasicSurface& ms = (np == 0? m_ms : m_ss);
 		
-		// loop over all slave elements
+		// loop over all primary surface elements
 		for (i=0; i<ss.Elements(); ++i)
 		{
-			// get ths slave element
+			// get the next element
 			FESurfaceElement& se = ss.Element(i);
 			
 			bool sporo = ss.m_poro[i];
@@ -860,7 +860,7 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 			{
 				FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*se.GetMaterialPoint(j));
 
-				// get the master element
+				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
@@ -868,7 +868,7 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 					
 					bool mporo = ms.m_poro[pme->m_lid];
 					
-					// get the nr of master nodes
+					// get the nr of secondary surface nodes
 					int nmeln = me.Nodes();
 					
 					// nodal pressure
@@ -933,15 +933,15 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 					
-					// slave shape functions
+					// shape functions
 					Hs = se.H(j);
 					
-					// master shape functions
+					// secondary surface element shape functions
 					double r = pt.m_rs[0];
 					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
 					
-					// get slave normal vector
+					// get normal vector
 					vec3d nu = pt.m_nu;
 					
 					// gap function
@@ -1244,7 +1244,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		{
 			FETiedBiphasicSurface::Data& ds = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
 
-            // update Lagrange multipliers on slave surface
+            // update Lagrange multipliers on primary surface
             eps = m_epsn*ds.m_epsn;
             ds.m_Lmd = ds.m_Lmd + ds.m_dg*eps;
             
@@ -1272,7 +1272,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		{
 			FETiedBiphasicSurface::Data& dm = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
 
-            // update Lagrange multipliers on master surface
+            // update Lagrange multipliers on secondary surface
             eps = m_epsn*dm.m_epsn;
             dm.m_Lmd = dm.m_Lmd + dm.m_dg*eps;
             

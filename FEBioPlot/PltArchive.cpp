@@ -260,7 +260,7 @@ bool PltArchive::Create(const char* szfile)
 	m_fp = new FileStream();
 	if (m_fp->Create(szfile) == false) return false;
 
-	// write the master tag 
+	// write the root tag 
 	unsigned int ntag = 0x00464542;
 	m_fp->Write(&ntag, sizeof(int), 1);
 
@@ -310,7 +310,7 @@ bool PltArchive::Open(const char* szfile)
 	m_fp = new FileStream();
 	if (m_fp->Open(szfile) == false) return false;
 
-	// read the master tag
+	// read the root tag
 	unsigned int ntag;
 	m_fp->read(&ntag, sizeof(int), 1);
 	if (ntag != 0x00464542) { Close(); return false; }
@@ -386,7 +386,7 @@ void PltArchive::CloseChunk()
 	// take a peek at the parent
 	if (m_Chunk.empty())
 	{
-		// we just deleted the master chunk
+		// we just deleted the root chunk
 		m_bend = true;
 	}
 	else

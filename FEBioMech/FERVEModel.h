@@ -67,7 +67,7 @@ public:
 	//! Update the RVE (before it is solved)
 	void Update(const mat3d& F);
 
-	// copy from the master RVE
+	// copy from the parent RVE
 	void CopyFrom(FERVEModel& rve);
 
 	//! Calculate the stress average

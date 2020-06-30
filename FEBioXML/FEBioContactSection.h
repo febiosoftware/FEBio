@@ -35,18 +35,18 @@ SOFTWARE.*/
 class FEBioContactSection : public FEFileSection
 {
 protected:
-	//! missing slave surface
-	class MissingSlaveSurface : public FEFileException
+	//! missing primary surface
+	class MissingPrimarySurface : public FEFileException
 	{
 	public:
-		MissingSlaveSurface();
+		MissingPrimarySurface();
 	};
 
-	//! missing master surface
-	class MissingMasterSurface : public FEFileException
+	//! missing secondary surface
+	class MissingSecondarySurface : public FEFileException
 	{
 	public:
-		MissingMasterSurface();
+		MissingSecondarySurface();
 	};
 
 public:
