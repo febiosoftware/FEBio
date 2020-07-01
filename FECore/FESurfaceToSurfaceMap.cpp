@@ -40,8 +40,8 @@ END_FECORE_CLASS();
 
 FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem)
 {
-	m_ccp = 0;
-	m_npr = 0;
+	m_ccp1 = 0;
+	m_ccp2 = 0;
 	m_func = 0;
 
 	m_surf1 = nullptr;
@@ -52,8 +52,8 @@ FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem
 
 FESurfaceToSurfaceMap::~FESurfaceToSurfaceMap()
 {
-	if (m_ccp) delete m_ccp;
-	if (m_npr) delete m_npr;
+	if (m_ccp1) delete m_ccp1;
+	if (m_ccp2) delete m_ccp2;
 }
 
 bool FESurfaceToSurfaceMap::Init()
@@ -71,23 +71,22 @@ bool FESurfaceToSurfaceMap::Init()
 	}
 
 	// initialize projections
-	if (m_ccp == nullptr)
+	if (m_ccp1 == nullptr)
 	{
-		m_ccp = new FEClosestPointProjection(*m_surf1);
-		m_ccp->HandleSpecialCases(true);
-		m_ccp->AllowBoundaryProjections(true);
-		m_ccp->HandleQuads(true);
-		if (m_ccp->Init() == false) return false;
+		m_ccp1 = new FEClosestPointProjection(*m_surf1);
+		m_ccp1->HandleSpecialCases(true);
+		m_ccp1->AllowBoundaryProjections(true);
+		m_ccp1->HandleQuads(true);
+		if (m_ccp1->Init() == false) return false;
 	}
 
-	if (m_npr == nullptr)
+	if (m_ccp2 == nullptr)
 	{
-		FEMesh& mesh = fem->GetMesh();
-		double R = mesh.GetBoundingBox().radius();
-		m_npr = new FENormalProjection(*m_surf2);
-		m_npr->SetSearchRadius(R);
-		m_npr->SetTolerance(0.001);
-		m_npr->Init();
+		m_ccp2 = new FEClosestPointProjection(*m_surf2);
+		m_ccp2->HandleSpecialCases(true);
+		m_ccp2->AllowBoundaryProjections(true);
+		m_ccp2->HandleQuads(true);
+		if (m_ccp2->Init() == false) return false;
 	}
 
 	return true;
@@ -97,25 +96,34 @@ void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)
 {
 	vec3d r(x);
 
-	// project x onto surface 1 using CCP
-	vec3d q1(0,0,0);
-	vec2d r1;
-	FESurfaceElement* pe = m_ccp->Project(r, q1, r1);
-	if (pe == nullptr)
+	// project x onto surface 1
+	vec3d q1(0,0,0), q2(0,0,0);
+	vec2d r1, r2;
+	FESurfaceElement* pe1 = m_ccp1->Project(r, q1, r1);
+	if (pe1 == nullptr)
 	{
 		assert(false);
 		data = 0;
 		return;
 	}
 
-	// project x onto surface 2 using ray-intersection
-	vec3d N = r - q1; N.unit();
-	vec3d q2 = m_npr->Project(q1, N);
-	double L2 = (q2 - q1)*(q2 - q1);
-	if (L2 == 0.0) L2 = 1.0;
+	// project x onto surface 2
+	FESurfaceElement* pe2 = m_ccp2->Project(r, q2, r2);
+	if (pe2 == nullptr)
+	{
+		assert(false);
+		data = 0;
+		return;
+	}
+
+	double L1 = (x - q1).norm();
+	double L2 = (q2 - x).norm();
+
+	double D = L1 + L2;
+	if (D == 0.0) D = 1.0;
 
 	// find the fractional distance
-	double w = ((x - q1)*(q2 - q1))/L2;
+	double w = L2 / D;
 
 	// evaluate the function
 	data = m_func->value(w);

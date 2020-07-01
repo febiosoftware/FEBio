@@ -53,8 +53,8 @@ private:
 private:
 	FESurface*	m_surf1;
 	FESurface*	m_surf2;
-	FEClosestPointProjection*	m_ccp;
-	FENormalProjection*			m_npr;
+	FEClosestPointProjection*	m_ccp1;
+	FEClosestPointProjection*	m_ccp2;
 	bool			m_binverted;
 
 	DECLARE_FECORE_CLASS();
