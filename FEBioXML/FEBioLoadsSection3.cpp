@@ -145,7 +145,7 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	GetBuilder()->AddSurfaceLoad(psl);
 
 	// read the parameters
-	ReadParameterList(tag, psl);
+	if (!tag.isleaf()) ReadParameterList(tag, psl);
 }
 
 //-----------------------------------------------------------------------------

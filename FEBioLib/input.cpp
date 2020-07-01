@@ -35,6 +35,10 @@ SOFTWARE.*/
 #include <FEBioPlot/FEBioPlotFile.h>
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidBody.h>
+#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FEInitialCondition.h>
+#include <FECore/FENodalLoad.h>
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FELoadCurve.h>
@@ -102,6 +106,21 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 				feLog("%s : %lg, %lg, %lg\n", sz, a.x, a.y, a.z);
 			}
 			else feLog("%s : (not constant)\n", sz);
+		}
+		break;
+		case FE_PARAM_STD_VECTOR_INT:
+		{
+			std::vector<int>& v = p.value<std::vector<int> >();
+			int nsize = (int)v.size();
+			int n = (nsize <= 5 ? nsize : 5);
+			feLog("%s : ", sz);
+			for (int i = 0; i < n; ++i)
+			{
+				feLog("%d", v[i]);
+				if (i != n - 1) feLog(", ");
+			}
+			if (nsize > n) feLog(", ...\n");
+			else feLog("\n");
 		}
 		break;
 		default:
@@ -375,6 +394,102 @@ void FEBioModel::echo_input()
             feLog("\tIxx Ixy Ixz    : %lg, %lg, %lg\n", rb.m_moi.xx(), rb.m_moi.xy(), rb.m_moi.xz());
             feLog("\tIxy Iyy Iyz    : %lg, %lg, %lg\n", rb.m_moi.xy(), rb.m_moi.yy(), rb.m_moi.yz());
             feLog("\tIxz Iyz Izz    : %lg, %lg, %lg\n", rb.m_moi.xz(), rb.m_moi.yz(), rb.m_moi.zz());
+		}
+		feLog("\n\n");
+	}
+
+	if (fem.InitialConditions())
+	{
+		feLog(" INITIAL CONDITION DATA\n");
+		feLog("===========================================================================\n");
+		for (int i = 0; i < fem.InitialConditions(); ++i)
+		{
+			if (i > 0) feLog("---------------------------------------------------------------------------\n");
+			feLog("%3d - ", i + 1);
+
+			// get the initial condition
+			FEInitialCondition* pic = fem.InitialCondition(i);
+
+			// get the type string
+			const char* sztype = pic->GetTypeStr();
+			if (sztype == 0) sztype = "unknown";
+			feLog(" Type: %s\n", sztype);
+
+			// print the parameter list
+			FEParameterList& pl = pic->GetParameterList();
+			print_parameter_list(pl);
+		}
+		feLog("\n\n");
+	}
+
+	if (fem.BoundaryConditions())
+	{
+		feLog(" BOUNDARY CONDITION DATA\n");
+		feLog("===========================================================================\n");
+		for (int i = 0; i < fem.BoundaryConditions(); ++i)
+		{
+			if (i > 0) feLog("---------------------------------------------------------------------------\n");
+			feLog("%3d - ", i + 1);
+
+			// get the bc
+			FEBoundaryCondition* pbc = fem.BoundaryCondition(i);
+
+			// get the type string
+			const char* sztype = pbc->GetTypeStr();
+			if (sztype == 0) sztype = "unknown";
+			feLog(" Type: %s\n", sztype);
+
+			// print the parameter list
+			FEParameterList& pl = pbc->GetParameterList();
+			print_parameter_list(pl);
+		}
+		feLog("\n\n");
+	}
+
+	if (fem.NodalLoads())
+	{
+		feLog(" NODAL LOAD DATA\n");
+		feLog("===========================================================================\n");
+		for (int i = 0; i < fem.NodalLoads(); ++i)
+		{
+			if (i > 0) feLog("---------------------------------------------------------------------------\n");
+			feLog("%3d - ", i + 1);
+
+			// get the nodal load
+			FENodalLoad* pnl = fem.NodalLoad(i);
+
+			// get the type string
+			const char* sztype = pnl->GetTypeStr();
+			if (sztype == 0) sztype = "unknown";
+			feLog(" Type: %s\n", sztype);
+
+			// print the parameter list
+			FEParameterList& pl = pnl->GetParameterList();
+			print_parameter_list(pl);
+		}
+		feLog("\n\n");
+	}
+
+	if (fem.SurfaceLoads())
+	{
+		feLog(" SURFACE LOAD DATA\n");
+		feLog("===========================================================================\n");
+		for (int i = 0; i < fem.SurfaceLoads(); ++i)
+		{
+			if (i > 0) feLog("---------------------------------------------------------------------------\n");
+			feLog("%3d - ", i + 1);
+
+			// get the surface load
+			FESurfaceLoad* psl = fem.SurfaceLoad(i);
+
+			// get the type string
+			const char* sztype = psl->GetTypeStr();
+			if (sztype == 0) sztype = "unknown";
+			feLog(" Type: %s\n", sztype);
+
+			// print the parameter list
+			FEParameterList& pl = psl->GetParameterList();
+			print_parameter_list(pl);
 		}
 		feLog("\n\n");
 	}
