@@ -45,90 +45,10 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 	do
 	{
 		if (tag == "rigid_constraint") ParseRigidBC(tag);
-		else if (tag == "initial_velocity")
-		{
-			const char* szm = tag.AttributeValue("mat");
-			assert(szm);
-
-			// get the material ID
-			int nmat = atoi(szm);
-			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
-			// get the initial velocity
-			vec3d v;
-			value(tag, v);
-
-			// create the initial condition
-			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
-			pic->m_rid = nmat;
-			pic->m_vel = v;
-			fem.AddRigidInitialCondition(pic);
-
-			// add this initial condition to the current step
-			GetBuilder()->AddComponent(pic);
-		}
-		else if (tag == "initial_angular_velocity")
-		{
-			const char* szm = tag.AttributeValue("mat");
-			assert(szm);
-
-			// get the material ID
-			int nmat = atoi(szm);
-			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
-			// get the initial angular velocity
-			vec3d w;
-			value(tag, w);
-
-			// create the initial condition
-			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
-			pic->m_rid = nmat;
-			pic->m_w = w;
-			fem.AddRigidInitialCondition(pic);
-
-			// add this initial condition to the current step
-			GetBuilder()->AddComponent(pic);
-		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} 
 	while (!tag.isend());
-}
-
-bool parseRigidDofs(const char* sz, vector<int>& bc)
-{
-	bc.clear();
-	int l = strlen(sz);
-	if (l < 1) return false;
-
-	char* buf = new char[l + 1];
-	strcpy(buf, sz);
-	buf[l] = 0;
-
-	char *ch = buf;
-	bool ok = true;
-	do
-	{
-		char* ch2 = strchr(ch, ',');
-		if (ch2) *ch2++ = 0;
-
-		if      (strcmp(ch, "Rx") == 0) bc.push_back(0);
-		else if (strcmp(ch, "Ry") == 0) bc.push_back(1);
-		else if (strcmp(ch, "Rz") == 0) bc.push_back(2);
-		else if (strcmp(ch, "Ru") == 0) bc.push_back(3);
-		else if (strcmp(ch, "Rv") == 0) bc.push_back(4);
-		else if (strcmp(ch, "Rw") == 0) bc.push_back(5);
-		else
-		{
-			ok = false;
-			break;
-		}
-
-		ch = ch2;
-	}
-	while (ch);
-    delete[] buf;
-	return ok;
 }
 
 void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
@@ -172,14 +92,14 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 		// read the parameterlist
 		ReadParameterList(tag, pFC);
 	}
-	else if (tag == "rigid_velocity")
+	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{
 		FERigidBodyVelocity* rc = fecore_alloc(FERigidBodyVelocity, &fem);
 		GetBuilder()->AddRigidIC(rc);
 
 		ReadParameterList(tag, rc);
 	}
-	else if (tag == "rigid_angular_velocity")
+	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
 	{
 		FERigidBodyAngularVelocity* rc = fecore_alloc(FERigidBodyAngularVelocity, &fem);
 		GetBuilder()->AddRigidIC(rc);

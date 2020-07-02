@@ -69,7 +69,10 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
 bool FEUncoupledReactiveViscoelasticMaterial::Init()
 {
     // set the mixture's bulk modulus based on the base and bond materials
-    m_K = m_pBase->m_K + m_pBond->m_K;
+	if (m_K == 0.0)
+	{
+		m_K = m_pBase->m_K + m_pBond->m_K;
+	}
 
     return FEUncoupledMaterial::Init();
 }
