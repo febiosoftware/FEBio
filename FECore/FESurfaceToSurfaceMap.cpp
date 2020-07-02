@@ -123,7 +123,7 @@ void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)
 	if (D == 0.0) D = 1.0;
 
 	// find the fractional distance
-	double w = L2 / D;
+	double w = L1 / D;
 
 	// evaluate the function
 	data = m_func->value(w);

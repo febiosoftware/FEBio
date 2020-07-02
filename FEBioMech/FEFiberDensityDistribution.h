@@ -59,12 +59,12 @@ public:
 class FEEllipsodialFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
-    FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = m_spa[2] = 1; }
+	FEEllipsodialFiberDensityDistribution(FEModel* pfem);
     
     double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
-    double m_spa[3];    // semi-principal axes of ellipsoid
+    FEParamDouble m_spa[3];    // semi-principal axes of ellipsoid
     
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

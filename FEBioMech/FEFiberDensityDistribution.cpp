@@ -39,9 +39,20 @@ BEGIN_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, FEFiberDensityDistribu
 	ADD_PARAMETER(m_spa , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa" );
 END_FECORE_CLASS();
 
+FEEllipsodialFiberDensityDistribution::FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) 
+{ 
+	m_spa[0] = 1.0;
+	m_spa[1] = 1.0;
+	m_spa[2] = 1.0;
+}
+
 double FEEllipsodialFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
-    double R = 1.0/sqrt(SQR(n0.x/m_spa[0])+SQR(n0.y/m_spa[1])+SQR(n0.z/m_spa[2]));
+	double a0 = m_spa[0](mp);
+	double a1 = m_spa[1](mp);
+	double a2 = m_spa[2](mp);
+
+    double R = 1.0/sqrt(SQR(n0.x/a0)+SQR(n0.y/a1)+SQR(n0.z/a2));
     return R;
 }
 
