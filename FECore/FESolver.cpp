@@ -165,20 +165,16 @@ bool FESolver::HasActiveDofs(const FEDofList& dof)
 	{
 		int dof_i = dof[i];
 
-		bool bfound = false;
 		for (int i = 0; i < m_Var.size(); ++i)
 		{
 			FESolutionVariable& vi = m_Var[i];
 			if (vi.m_dofs->Contains(dof_i))
 			{
-				bfound = true;
-				break;
+				return true;
 			}
 		}
-
-		if (bfound == false) return false;
 	}
-	return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
