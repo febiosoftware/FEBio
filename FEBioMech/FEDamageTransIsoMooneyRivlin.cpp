@@ -42,8 +42,6 @@ void FETIMRDamageMaterialPoint::Init()
 {
 	FEMaterialPoint::Init();
 
-	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-
 	// intialize data to zero
 	m_MEmax = 0;
 	m_MEtrial = 0;
@@ -126,7 +124,6 @@ mat3ds FEDamageTransIsoMooneyRivlin::MatrixStress(FEMaterialPoint& mp)
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
-	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// --- TODO: put strain energy derivatives here ---
 	//
@@ -269,7 +266,6 @@ tens4ds FEDamageTransIsoMooneyRivlin::FiberTangent(FEMaterialPoint &mp)
 	mat3d& F = pt.m_F;
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
-	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// get the local coordinate systems

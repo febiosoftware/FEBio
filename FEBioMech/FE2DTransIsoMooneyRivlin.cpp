@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FE2DTransIsoMooneyRivlin.h"
 
 // define the material parameters
@@ -293,7 +294,7 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 		In = lamd*lamd;
 
 		// Wi = dW/dIi
-		if (lamd >= 1)
+		if (lamd >= 1 - std::numeric_limits<double>::epsilon())
 		{
 			double lamdi = 1.0/lamd;
 			double W4, W44;

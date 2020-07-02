@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEFiberPowLinear.h"
 
 // define the material parameters
@@ -106,7 +107,7 @@ tens4ds FEFiberPowLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
     double J = pt.m_J;
     
     // loop over all integration points
-    const double eps = 0;
+    const double eps = std::numeric_limits<double>::epsilon();
     mat3ds C = pt.RightCauchyGreen();
     tens4ds c;
     
@@ -114,7 +115,7 @@ tens4ds FEFiberPowLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
     double In = n0*(C*n0);
     
     // only take fibers in tension into consideration
-    if (In - 1 >= eps)
+    if (In >= 1 - eps)
     {
         // get the global spatial fiber direction in current configuration
         vec3d nt = F*n0/sqrt(In);
@@ -260,8 +261,8 @@ tens4ds FEFiberPowerLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	double In = n0*(C*n0);
 
 	// only take fibers in tension into consideration
-	const double eps = 0;
-	if (In - 1 >= eps)
+	const double eps = std::numeric_limits<double>::epsilon();
+	if (In >= 1 - eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0 / sqrt(In);

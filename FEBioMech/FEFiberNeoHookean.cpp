@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEFiberNeoHookean.h"
 
 //-----------------------------------------------------------------------------
@@ -98,7 +99,7 @@ tens4ds FEFiberNH::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	
 	// only take fibers in tension into consideration
 	tens4ds c;
-	const double eps = 0;
+	const double eps = -std::numeric_limits<double>::epsilon();
 	if (In_1 > eps)
 	{
 		// get the global spatial fiber direction in current configuration

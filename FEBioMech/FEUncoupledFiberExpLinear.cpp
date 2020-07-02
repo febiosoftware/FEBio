@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include <stdlib.h>
+#include <limits>
 #ifdef HAVE_GSL
 #include "gsl/gsl_sf_expint.h"
 #endif
@@ -131,7 +132,7 @@ tens4ds FEUncoupledFiberExpLinear::DevFiberTangent(FEMaterialPoint &mp, const ve
 	double I4 = lamd*lamd;
 
 	double W4, W44;
-	if (lamd >= 1)
+	if (lamd >= 1 - std::numeric_limits<double>::epsilon())
 	{
 		double lamdi = 1.0 / lamd;
 		double Wl, Wll;

@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FETCNonlinearOrthotropic.h"
 
 // define the material parameters
@@ -300,7 +301,7 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	W2 = m_c2;
 
 	// fiber a
-	if (lat >= 1)
+	if (lat >= 1 - std::numeric_limits<double>::epsilon())
 	{
 		double lati = 1.0/lat;
 
@@ -317,7 +318,7 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	}
 
 	// fiber b
-	if (lbt >= 1)
+	if (lbt >= 1 - std::numeric_limits<double>::epsilon())
 	{
 		double lbti = 1.0/lbt;
 
@@ -334,7 +335,7 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	}
 
 	// fiber c
-	if (lct >= 1)
+	if (lct >= 1 - std::numeric_limits<double>::epsilon())
 	{
 		double lcti = 1.0/lct;
 

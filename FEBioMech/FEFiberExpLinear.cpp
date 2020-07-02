@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEFiberExpLinear.h"
 
 //-----------------------------------------------------------------------------
@@ -103,13 +104,11 @@ tens4ds FEFiberExpLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	// some useful tensors
 	mat3dd I(1.0);
 	mat3ds A = dyad(a);
-	tens4ds IxI = dyad1s(I);
-	tens4ds IoI = dyad4s(I);
 	tens4ds AxA = dyad1s(A);
 
 	// fiber tangent
 	tens4ds c(0.0);
-	if (l >= 1.0)
+	if (l >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		double Fl = 0.0, Fll = 0.0;
 		if (l < m_lam1)

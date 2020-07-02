@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFiberExpPow.h"
+#include <limits>
 #include <FECore/log.h>
 
 // define the material parameters
@@ -102,7 +103,7 @@ tens4ds FEFiberExpPow::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	const double eps = 0;
+	const double eps = -std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -249,7 +250,7 @@ tens4ds FEFiberExponentialPower::FiberTangent(FEMaterialPoint& mp, const vec3d& 
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	const double eps = 0;
+	const double eps = -std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
