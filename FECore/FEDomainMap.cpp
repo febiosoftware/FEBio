@@ -24,12 +24,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #include "stdafx.h"
 #include "FEDomainMap.h"
 #include "FEMesh.h"
 #include "DumpStream.h"
+#include "mathalg.h"
 
 //-----------------------------------------------------------------------------
 FEDomainMap::FEDomainMap() : FEDataMap(FE_DOMAIN_MAP)
@@ -343,7 +342,9 @@ mat3ds FEDomainMap::valueMat3ds(const FEMaterialPoint& pt)
 	}
 	else if (m_fmt == FMT_NODE)
 	{
-		Q.zero();
+		// calculate shape function values
+		double* w = pe->H(pt.m_index);
+		mat3ds Qi[FEElement::MAX_NODES];
 		int ne = pe->Nodes();
 		for (int i = 0; i < ne; ++i)
 		{
@@ -352,11 +353,11 @@ mat3ds FEDomainMap::valueMat3ds(const FEMaterialPoint& pt)
 			int lid = m_NLT[nid] - m_imin; 
 			assert((lid >= 0) && (lid < DataCount()));
 
-			mat3ds Qi = get<mat3ds>(lid);
-
-			Q += Qi;
+			Qi[i] = get<mat3ds>(lid);
 		}
-		Q /= (double)ne;
+
+		// weighted average
+		Q = weightedAverageStructureTensor(Qi, w, ne);
 	}
 
 	return Q;

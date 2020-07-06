@@ -33,7 +33,7 @@ SOFTWARE.*/
 
 #define ROTATE(a, i, j, k, l) g=a[i][j]; h=a[k][l];a[i][j]=g-s*(h+g*tau); a[k][l] = h + s*(g - h*tau);
 
-void mat3ds::eigen(double l[3], vec3d r[3])
+void mat3ds::eigen(double l[3], vec3d r[3]) const
 {
 	const int NMAX = 50;
 	double sm, tresh, g, h, t, c, tau, s, th;
