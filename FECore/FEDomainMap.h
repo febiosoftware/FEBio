@@ -99,4 +99,7 @@ private:
 	int					m_fmt;				//!< storage format
 	int					m_maxElemNodes;		//!< max number of nodes for each element
 	FEElementSet*		m_elset;			//!< the element set on which this map is defined
+
+	vector<int>		m_NLT;		//!< node index lookup table for FMT_NODE
+	int				m_imin;		//!< min index for lookup for FMT_NODE
 };

@@ -59,6 +59,10 @@ public:
 
 	FEMesh* GetMesh() { return m_mesh; }
 
+	// returns the local index from a global (mesh based) node index, 
+	// or -1 if the node is not part of the set.
+	int GlobalToLocalID(int globalId) const;
+
 private:
 	FEMesh*				m_mesh;
 	std::vector<int>	m_nodes;
