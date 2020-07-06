@@ -414,6 +414,8 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 	ar & m_bporo;
 	ar & m_poro;
 	ar & m_nn;
+	ar & m_pn;
+	ar & m_Ft;
 }
 
 //-----------------------------------------------------------------------------

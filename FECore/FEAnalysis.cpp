@@ -620,5 +620,5 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	}
 
 	// serialize time controller
-	if (m_timeController) m_timeController->Serialize(ar);
+	ar & m_timeController;
 }

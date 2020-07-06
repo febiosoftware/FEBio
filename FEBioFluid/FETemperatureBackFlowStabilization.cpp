@@ -178,4 +178,9 @@ void FETemperatureBackFlowStabilization::LoadVector(FEGlobalVector& R, const FET
 void FETemperatureBackFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+	ar & m_dofW;
+	ar & m_dofT;
+	ar & m_backflow;
+	ar & m_alpha;
+	ar & m_alphaf;
 }

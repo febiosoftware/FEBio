@@ -87,6 +87,7 @@ void FEBackFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
 	ar & m_rho;
+	ar & m_dofU & m_dofW;
 }
 
 //-----------------------------------------------------------------------------

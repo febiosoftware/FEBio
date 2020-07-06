@@ -365,11 +365,14 @@ vec3d FESlidingSurface3::GetFluidForce()
 void FESlidingSurface3::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_dofC;
+	ar & m_dofP;
 	ar & m_bporo;
 	ar & m_bsolu;
 	ar & m_nn;
 	ar & m_poro;
 	ar & m_solu;
+	ar & m_pn;
 }
 
 //-----------------------------------------------------------------------------

@@ -301,13 +301,11 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 //! serialize
 void FETimeStepController::Serialize(DumpStream& ar)
 {
-	ar & m_naggr;
+	FECoreBase::Serialize(ar);
 	ar & m_nretries;
-	ar & m_maxretries;
 	ar & m_nmplc;
 	ar & m_nmust;
 	ar & m_next_must;
-	ar & m_iteopt;
-	ar & m_dtmin & m_dtmax;
 	ar & m_ddt & m_dtp;
+	ar & m_step;
 }
