@@ -94,6 +94,9 @@ bool FEFluidVelocity::Init()
 	m_dofEF.Clear();
 	if (m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
 
+	m_dof.AddDofs(m_dofW);
+	m_dof.AddDofs(m_dofEF);
+
     FESurfaceLoad::Init();
     
     // evaluate nodal velocities from boundary cards
