@@ -160,6 +160,9 @@ double FESolver::ExtractSolutionNorm(const vector<double>& v, const FEDofList& d
 // see if the dofs in the dof list are active in this solver
 bool FESolver::HasActiveDofs(const FEDofList& dof)
 {
+	assert(dof.IsEmpty() == false);
+	if (dof.IsEmpty()) return true;
+
 	assert(m_Var.size());
 	for (int i = 0; i < dof.Size(); ++i)
 	{

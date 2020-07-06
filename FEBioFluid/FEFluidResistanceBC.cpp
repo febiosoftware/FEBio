@@ -47,6 +47,9 @@ FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem), m
     
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 	m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+
+	m_dof.AddDofs(m_dofW);
+	m_dof.AddDof(m_dofEF);
 }
 
 //-----------------------------------------------------------------------------
