@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEBioIncludeSection.h"
 #include "FEBioModuleSection.h"
 #include "FEBioControlSection.h"
+#include "FEBioControlSection3.h"
 #include "FEBioGlobalsSection.h"
 #include "FEBioMaterialSection.h"
 #include "FEBioGeometrySection.h"
@@ -234,7 +235,8 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		// we no longer allow unknown attributes
 		SetStopOnUnknownAttribute(true);
 
-	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
+		m_map["Control"    ] = new FEBioControlSection3     (this);
+		m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
