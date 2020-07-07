@@ -63,7 +63,6 @@ protected:
     double          m_rho;      //!< fluid density
     
     // degrees of freedom
-	FEDofList	m_dofU;
 	FEDofList	m_dofW;
     
     DECLARE_FECORE_CLASS();

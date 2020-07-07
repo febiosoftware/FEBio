@@ -52,6 +52,10 @@ FEFluidPResistanceBC::FEFluidPResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem),
     
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     m_dofEF  = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofEF);
 }
 
 //-----------------------------------------------------------------------------
@@ -73,7 +77,7 @@ void FEFluidPResistanceBC::Activate()
     {
         FENode& node = ps->Node(i);
         // mark node as having prescribed DOF
-        node.set_bc(m_dofEF, DOF_PRESCRIBED);
+        if (node.get_bc(m_dofEF) != DOF_FIXED) node.set_bc(m_dofEF, DOF_PRESCRIBED);
     }
 }
 
@@ -92,12 +96,8 @@ void FEFluidPResistanceBC::Update()
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
-        if (ps->Node(i).m_ID[m_dofEF] < -1)
-        {
-            FENode& node = ps->Node(i);
-            // set node as having prescribed DOF
-            node.set(m_dofEF, p);
-        }
+        FENode& node = ps->Node(i);
+        if (node.get_bc(m_dofEF) == DOF_PRESCRIBED) node.set(m_dofEF, p);
     }
     
     GetFEModel()->SetMeshUpdateFlag(true);

@@ -40,22 +40,16 @@ END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofW(pfem)
+FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_beta = 1.0;
     m_rho = 1.0;
     
     // get the degrees of freedom
-	m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 
     m_dof.Clear();
-    m_dof.AddDof(m_dofU[0]);
-    m_dof.AddDof(m_dofU[1]);
-    m_dof.AddDof(m_dofU[2]);
-    m_dof.AddDof(m_dofW[0]);
-    m_dof.AddDof(m_dofW[1]);
-    m_dof.AddDof(m_dofW[2]);
+    m_dof.AddDofs(m_dofW);
 }
 
 //-----------------------------------------------------------------------------
@@ -92,10 +86,7 @@ void FEBackFlowStabilization::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEDofList dofs(GetFEModel());
-	dofs.AddDofs(m_dofU);
-	dofs.AddDofs(m_dofW);
-	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -119,20 +110,14 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 			double H_i  = dof_a.shape;
 
 			double H_j  = dof_b.shape;
-			double Gr_j = dof_b.shape_deriv_r;
-			double Gs_j = dof_b.shape_deriv_s;
 
 			mat3d K = dyad(n)*(m_beta*m_rho * 2 * vn*da);
-			double tnt = m_beta*m_rho*vn*vn;
 
 			// calculate stiffness component
 			mat3d Kww = K*(H_i * H_j)*tp.alphaf;
-			vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i * tnt*tp.alphaf);
-			mat3d Kwu; Kwu.skew(g);
 
 			Kab.zero();
-			Kab.sub(3, 0, Kwu);
-			Kab.sub(3, 3, Kww);
+			Kab.sub(0, 0, Kww);
 		}
 	});
 }

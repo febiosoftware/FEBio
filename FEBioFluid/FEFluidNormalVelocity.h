@@ -78,7 +78,8 @@ private:
 	vector<double>  m_VN;       //!< nodal scale factors
     vector<vec3d>   m_nu;       //!< nodal normals
 
-	FEDofList	m_dofWE;
+	FEDofList	m_dofW;
+    int         m_dofEF;
     
     DECLARE_FECORE_CLASS();
 };

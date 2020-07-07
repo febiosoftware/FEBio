@@ -85,8 +85,6 @@ bool FESoluteConvectiveFlow::Init()
 //! Activate the degrees of freedom for this BC
 void FESoluteConvectiveFlow::Activate()
 {
-    FESurface* ps = &GetSurface();
-    
     int dofc = m_dofC + m_sol - 1;
     
     FEModel& fem = *GetFEModel();
@@ -110,7 +108,6 @@ void FESoluteConvectiveFlow::Activate()
 void FESoluteConvectiveFlow::Update()
 {
     FEModel& fem = *GetFEModel();
-    FESurface* ps = &GetSurface();
     FEMesh& mesh = fem.GetMesh();
     
     for (int i=0; i<mesh.Nodes(); ++i)

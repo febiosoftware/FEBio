@@ -47,6 +47,12 @@ FEBiphasicFSITraction::FEBiphasicFSITraction(FEModel* pfem) : FESurfaceLoad(pfem
     m_dofW.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::RELATIVE_FLUID_VELOCITY));
     m_dofEF = pfem->GetDOFIndex(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::FLUID_DILATATION), 0);
     m_bshellb = false;
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofSU);
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofEF);
 }
 
 //-----------------------------------------------------------------------------

@@ -34,6 +34,8 @@ SOFTWARE.*/
 #include "FEFluidFSIDomain3D.h"
 #include "FEFluidFSITraction.h"
 #include "FEFluidFSIDomainFactory.h"
+#include "FEBackFlowFSIStabilization.h"
+#include "FETangentialFlowFSIStabilization.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
@@ -76,6 +78,10 @@ void FEBioFSI::InitModule()
 	REGISTER_FECORE_CLASS(FEFluidFSIDomain3D, "fluid-FSI-3D");
 
 	REGISTER_FECORE_CLASS(FEFluidFSITraction, "fluid-FSI traction");
+    
+    REGISTER_FECORE_CLASS(FEBackFlowFSIStabilization, "fluid backflow stabilization");
+    
+    REGISTER_FECORE_CLASS(FETangentialFlowFSIStabilization, "fluid tangential stabilization");
 
 	febio.SetActiveModule(0);
 }

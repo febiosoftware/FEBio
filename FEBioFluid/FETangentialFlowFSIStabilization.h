@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,35 +31,40 @@ SOFTWARE.*/
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! Backflow stabilization prescribes a normal traction that opposes
-//! backflow on a boundary surface.
-class FEBIOFLUID_API FEBackFlowStabilization : public FESurfaceLoad
+//! Tangential flow stabilization prescribes a shear traction that opposes
+//! tangential fluid velocity on a boundary surface, in the presence of normal
+//! flow.  This can help stabilize inflow/outflow conditions.
+class FEBIOFLUID_API FETangentialFlowFSIStabilization : public FESurfaceLoad
 {
 public:
     //! constructor
-    FEBackFlowStabilization(FEModel* pfem);
+    FETangentialFlowFSIStabilization(FEModel* pfem);
+
+    //! Initialization
+    bool Init() override;
+    
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
     
     //! calculate pressure stiffness
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
     
-    //! calculate residual
+    //! calculate load vector
     void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! serialize data
     void Serialize(DumpStream& ar) override;
     
-    //! initialization
-    bool Init() override;
+protected:
+    vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
     
 protected:
-	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
-    
-protected:
-    double			m_beta;     //!< backflow stabilization coefficient
+    double            m_beta;     //!< damping coefficient
     double          m_rho;      //!< fluid density
     
     // degrees of freedom
-	FEDofList	m_dofW;
+    FEDofList    m_dofU;
+    FEDofList    m_dofW;
     
     DECLARE_FECORE_CLASS();
 };

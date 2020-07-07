@@ -43,9 +43,22 @@ END_FECORE_CLASS()
 FETangentialDamping::FETangentialDamping(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_eps = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+//! initialize
+bool FETangentialDamping::Init()
+{
     
-    // get the degrees of freedom
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofW.Clear();
+    if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofW);
+
+    if (FESurfaceLoad::Init() == false) return false;
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
