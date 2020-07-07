@@ -94,3 +94,12 @@ void FENodeList::Serialize(DumpStream& ar)
 	if (ar.IsShallow() == false) ar & m_mesh;
 	ar & m_nodes;
 }
+
+int FENodeList::GlobalToLocalID(int globalId) const
+{
+	for (int i = 0; i < m_nodes.size(); ++i)
+	{
+		if (m_nodes[i] == globalId) return i;
+	}
+	return -1;
+}

@@ -24,12 +24,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #include "stdafx.h"
 #include "FEDomainMap.h"
 #include "FEMesh.h"
 #include "DumpStream.h"
+#include "mathalg.h"
 
 //-----------------------------------------------------------------------------
 FEDomainMap::FEDomainMap() : FEDataMap(FE_DOMAIN_MAP)
@@ -89,6 +88,31 @@ bool FEDomainMap::Create(FEElementSet* ps, double val)
 	{
 		return resize(NE, val);
 	}
+	else if (m_fmt == FMT_NODE)
+	{
+		FENodeList nodeList = ps->GetNodeList();
+		int nodes = nodeList.Size();
+
+		// find min, max index
+		m_imin = mesh->Nodes();
+		int imax = -1;
+		for (int i = 0; i < nodes; ++i)
+		{
+			int nid = nodeList[i];
+			if (nid < m_imin) m_imin = nid;
+			if (nid > imax) imax = nid;
+		}
+
+		// build lookup table
+		m_NLT.resize(imax - m_imin + 1, -1);
+		for (int i = 0; i < nodes; ++i)
+		{
+			int nid = nodeList[i];
+			m_NLT[nid - m_imin] = i;
+		}
+		
+		return resize(nodes, val);
+	}
 	else return false;
 }
 
@@ -101,6 +125,10 @@ void FEDomainMap::setValue(int n, double v)
 		for (int i = 0; i < m_maxElemNodes; ++i) set<double>(index + i, v);
 	}
 	else if (m_fmt == FMT_ITEM)
+	{
+		set<double>(n, v);
+	}
+	else if (m_fmt == FMT_NODE)
 	{
 		set<double>(n, v);
 	}
@@ -311,6 +339,25 @@ mat3ds FEDomainMap::valueMat3ds(const FEMaterialPoint& pt)
 	if (m_fmt == FMT_ITEM)
 	{
 		Q = get<mat3ds>(lid);
+	}
+	else if (m_fmt == FMT_NODE)
+	{
+		// calculate shape function values
+		double* w = pe->H(pt.m_index);
+		mat3ds Qi[FEElement::MAX_NODES];
+		int ne = pe->Nodes();
+		for (int i = 0; i < ne; ++i)
+		{
+			int nid = pe->m_node[i];
+
+			int lid = m_NLT[nid] - m_imin; 
+			assert((lid >= 0) && (lid < DataCount()));
+
+			Qi[i] = get<mat3ds>(lid);
+		}
+
+		// weighted average
+		Q = weightedAverageStructureTensor(Qi, w, ne);
 	}
 
 	return Q;

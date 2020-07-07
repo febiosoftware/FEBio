@@ -658,6 +658,7 @@
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
     <ClInclude Include="..\..\FECore\mat6d.h" />
+    <ClInclude Include="..\..\FECore\mathalg.h" />
     <ClInclude Include="..\..\FECore\MathObject.h" />
     <ClInclude Include="..\..\FECore\matrix.h" />
     <ClInclude Include="..\..\FECore\MatrixOperator.h" />
@@ -859,6 +860,7 @@
     <ClCompile Include="..\..\FECore\JFNKStrategy.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
+    <ClCompile Include="..\..\FECore\mathalg.cpp" />
     <ClCompile Include="..\..\FECore\MathObject.cpp" />
     <ClCompile Include="..\..\FECore\matrix.cpp" />
     <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />

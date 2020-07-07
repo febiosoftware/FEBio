@@ -397,10 +397,12 @@ vec3d FESlidingSurfaceMP::GetFluidForce()
 void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_dofP & m_dofC;
 	ar & m_bporo;
 	ar & m_bsolu;
 	ar & m_nn;
 	ar & m_sid;
+	ar & m_pn;
 }
 
 //-----------------------------------------------------------------------------

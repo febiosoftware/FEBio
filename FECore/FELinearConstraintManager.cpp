@@ -117,9 +117,9 @@ void FELinearConstraintManager::Serialize(DumpStream& ar)
 
 		int nr, nc;
 		ar >> nr >> nc;
-		m_LCT.resize(nr, nc);
 		if (nr*nc > 0)
 		{
+			m_LCT.resize(nr, nc);
 			ar.read(&m_LCT(0,0), sizeof(int), nr*nc);
 		}
 	}

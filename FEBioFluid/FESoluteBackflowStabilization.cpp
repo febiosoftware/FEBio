@@ -195,4 +195,9 @@ void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 void FESoluteBackflowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+	ar & m_dofW;
+	ar & m_dofC;
+	ar & m_backflow;
+	ar & m_alpha;
+	ar & m_alphaf;
 }

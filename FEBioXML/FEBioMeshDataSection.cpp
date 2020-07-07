@@ -638,6 +638,16 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 		throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
 	}
 
+	// get the format
+	Storage_Fmt fmt = FMT_ITEM;
+	const char* szfmt = tag.AttributeValue("data_format", true);
+	if (szfmt == nullptr) fmt = FMT_ITEM;
+	else if (strcmp(szfmt, "node") == 0) fmt = FMT_NODE;
+	else if (strcmp(szfmt, "item") == 0) fmt = FMT_ITEM;
+	else if (strcmp(szfmt, "mult") == 0) fmt = FMT_MULT;
+	else if (strcmp(szfmt, "region") == 0) fmt = FMT_REGION;
+	else throw XMLReader::InvalidAttributeValue(tag, "data_format", szfmt);
+
 	if (p->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		vector<ELEMENT_DATA> data;
@@ -653,6 +663,8 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 			return;
 		}
 
+		if (fmt != FMT_ITEM) throw XMLReader::InvalidAttributeValue(tag, "data_format", szfmt);
+
 		FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, FMT_ITEM);
 		map->Create(&set);
 		val->setDataMap(map);
@@ -663,9 +675,6 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 	}
 	else if (p->type() == FE_PARAM_MAT3DS_MAPPED)
 	{
-		vector<ELEMENT_DATA> data;
-		ParseElementData(tag, set, data, 6);
-
 		FEParamMat3ds& param = p->value<FEParamMat3ds>();
 		param.SetItemList(&set);
 
@@ -676,18 +685,60 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 			return;
 		}
 
-		FEDomainMap* map = new FEDomainMap(FEDataType::FE_MAT3DS, FMT_ITEM);
-		map->Create(&set);
-		val->setDataMap(map);
-
-		for (int i = 0; i < data.size(); ++i)
+		if (fmt == FMT_ITEM)
 		{
-			double* d = data[i].val;
-			mat3ds m(d[0], d[1], d[2], d[3], d[4], d[5]);
-			map->set<mat3ds>(i, m * scale);
-		}
+			vector<ELEMENT_DATA> data;
+			ParseElementData(tag, set, data, 6);
 
-		param.setValuator(val);
+			FEDomainMap* map = new FEDomainMap(FEDataType::FE_MAT3DS, FMT_ITEM);
+			map->Create(&set);
+			val->setDataMap(map);
+
+			for (int i = 0; i < data.size(); ++i)
+			{
+				double* d = data[i].val;
+				mat3ds m(d[0], d[1], d[2], d[3], d[4], d[5]);
+				map->set<mat3ds>(i, m * scale);
+			}
+
+			param.setValuator(val);
+		}
+		else if (fmt == FMT_NODE)
+		{
+			// create a node set from an element set
+			FENodeList nodeList = set.GetNodeList();
+
+			// create domain map
+			FEDomainMap* map = new FEDomainMap(FEDataType::FE_MAT3DS, FMT_NODE);
+			map->Create(&set);
+			val->setDataMap(map);
+
+			// read values
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					const char* szid = tag.AttributeValue("id");
+					int nid = atoi(szid) - 1;
+
+					// convert global ID into local one
+					int lid = nodeList.GlobalToLocalID(nid);
+					if (lid < 0) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
+
+					// read the value
+					double d[6];
+					tag.value(d, 6);
+					mat3ds m(d[0], d[1], d[2], d[3], d[4], d[5]);
+					map->set<mat3ds>(lid, m*scale);
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			} 
+			while (!tag.isend());
+
+			param.setValuator(val);
+		}
 	}
 	else
 	{

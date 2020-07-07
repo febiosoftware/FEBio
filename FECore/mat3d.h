@@ -222,7 +222,7 @@ public:
     double invert(mat3ds& Ai);
 	
 	// determine eigen values and vectors
-	FECORE_API void eigen(double d[3], vec3d r[3] = 0);
+	FECORE_API void eigen(double d[3], vec3d r[3] = 0) const;
 	FECORE_API void exact_eigen(double l[3]) const;
 	FECORE_API void eigen2(double d[3], vec3d r[3] = 0);
 
