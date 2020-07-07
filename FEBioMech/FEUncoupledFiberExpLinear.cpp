@@ -41,6 +41,7 @@ BEGIN_FECORE_CLASS(FEUncoupledFiberExpLinear, FEElasticFiberMaterialUC);
 	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
 	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -48,6 +49,8 @@ FEUncoupledFiberExpLinear::FEUncoupledFiberExpLinear(FEModel* pfem) : FEElasticF
 {
 	m_c3 = m_c4 = m_c5 = 0;
 	m_lam1 = 1;
+
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -131,8 +134,10 @@ tens4ds FEUncoupledFiberExpLinear::DevFiberTangent(FEMaterialPoint &mp, const ve
 
 	double I4 = lamd*lamd;
 
+	const double eps = m_epsf*std::numeric_limits<double>::epsilon();
+
 	double W4, W44;
-	if (lamd >= 1 - std::numeric_limits<double>::epsilon())
+	if (lamd >= 1 + eps)
 	{
 		double lamdi = 1.0 / lamd;
 		double Wl, Wll;

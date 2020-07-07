@@ -39,6 +39,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c4, "c4");
 	ADD_PARAMETER(m_c5, "c5");
 	ADD_PARAMETER(m_lam1, "lam_max");
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 double FE2DTransIsoVerondaWestmann::m_cth[FE2DTransIsoVerondaWestmann::NSTEPS];
@@ -65,6 +66,7 @@ FE2DTransIsoVerondaWestmann::FE2DTransIsoVerondaWestmann(FEModel* pfem) : FEUnco
 	}
 
 	m_w[0] = m_w[1] = 1;
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -180,6 +182,8 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
+	double eps = m_epsf * std::numeric_limits<double>::epsilon();
+
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
 
@@ -275,7 +279,7 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 		In = lamd*lamd;
 
 		// Wi = dW/dIi
-		if (lamd >= 1 - std::numeric_limits<double>::epsilon())
+		if (lamd >= 1 + eps)
 		{
 			double lamdi = 1.0/lamd;
 			double W4, W44;

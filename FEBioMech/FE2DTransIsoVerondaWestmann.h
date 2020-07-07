@@ -51,6 +51,7 @@ public:
 	double	m_c4;
 	double	m_c5;
 	double	m_lam1;
+	double	m_epsf;
 
 public:
 	//! constructor

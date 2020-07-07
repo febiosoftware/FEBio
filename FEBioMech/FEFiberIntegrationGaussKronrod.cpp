@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEFiberIntegrationGaussKronrod.h"
 #include "gausskronrod.h"
 #include <FECore/log.h>
-#include <limits>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

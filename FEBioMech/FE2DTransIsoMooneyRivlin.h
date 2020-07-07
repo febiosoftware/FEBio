@@ -52,6 +52,7 @@ public:
 	double	m_c5;
 	double	m_lam1;
 	double	m_w[2];
+	double	m_epsf;
 	FEParamVec3	m_fiber;
 
 	//--- active contraction stuff ---

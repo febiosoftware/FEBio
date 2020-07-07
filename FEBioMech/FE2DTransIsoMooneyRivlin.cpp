@@ -42,6 +42,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
 	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];
@@ -80,6 +81,8 @@ FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledM
 	m_w[0] = m_w[1] = 1;
 
 	m_fiber = vec3d(1, 0, 0);
+
+	m_epsf = 0.;
 }
 
 //-----------------------------------------------------------------------------
@@ -260,6 +263,8 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
+	double eps = m_epsf * std::numeric_limits<double>::epsilon();
+
 	// --- F I B E R   C O N T R I B U T I O N ---
 
 	// Next, we add the fiber contribution. Since the fibers lie
@@ -294,7 +299,7 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 		In = lamd*lamd;
 
 		// Wi = dW/dIi
-		if (lamd >= 1 - std::numeric_limits<double>::epsilon())
+		if (lamd >= 1 + eps)
 		{
 			double lamdi = 1.0/lamd;
 			double W4, W44;

@@ -54,6 +54,7 @@ public:
     double	m_E;		// fiber modulus
     double  m_lam0;     // stretch ratio at end of toe region
     double  m_beta;     // power law exponent in toe region
+	double	m_epsf;
 };
 
 //-----------------------------------------------------------------------------
@@ -80,6 +81,7 @@ public:
 	double	m_E;		// fiber modulus
 	double  m_lam0;     // stretch ratio at end of toe region
 	double  m_beta;     // power law exponent in toe region
+	double	m_epsf;
 
 private:
 	double  m_I0;       // m_lam0^2
