@@ -35,6 +35,7 @@ BEGIN_FECORE_CLASS(FEFiberPowLinear, FEElasticFiberMaterial)
     ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    );
     ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
     ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -43,7 +44,7 @@ END_FECORE_CLASS();
 
 FEFiberPowLinear::FEFiberPowLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 {
-
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,7 +108,6 @@ tens4ds FEFiberPowLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
     double J = pt.m_J;
     
     // loop over all integration points
-    const double eps = std::numeric_limits<double>::epsilon();
     mat3ds C = pt.RightCauchyGreen();
     tens4ds c;
     
@@ -115,7 +115,8 @@ tens4ds FEFiberPowLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
     double In = n0*(C*n0);
     
     // only take fibers in tension into consideration
-    if (In >= 1 - eps)
+	const double eps = m_epsf * std::numeric_limits<double>::epsilon();
+    if (In >= 1 + eps)
     {
         // get the global spatial fiber direction in current configuration
         vec3d nt = F*n0/sqrt(In);
@@ -180,6 +181,7 @@ BEGIN_FECORE_CLASS(FEFiberPowerLinear, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_E   , FE_RANGE_GREATER_OR_EQUAL(0.0), "E");
 	ADD_PARAMETER(m_beta, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_lam0, FE_RANGE_GREATER(1.0), "lam0");
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -188,6 +190,7 @@ FEFiberPowerLinear::FEFiberPowerLinear(FEModel* pfem) : FEElasticFiberMaterial(p
 	m_E = 0;
 	m_lam0 = 1;
 	m_beta = 3;
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -261,8 +264,8 @@ tens4ds FEFiberPowerLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	double In = n0*(C*n0);
 
 	// only take fibers in tension into consideration
-	const double eps = std::numeric_limits<double>::epsilon();
-	if (In >= 1 - eps)
+	const double eps = m_epsf * std::numeric_limits<double>::epsilon();
+	if (In >= 1 + eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0 / sqrt(In);

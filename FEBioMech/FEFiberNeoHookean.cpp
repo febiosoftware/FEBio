@@ -37,12 +37,14 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberNH, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFiberNH::FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem) 
 { 
 	m_mu = 0; 
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -62,8 +64,7 @@ mat3ds FEFiberNH::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 	
 	// only take fibers in tension into consideration
 	mat3ds s;
-	const double eps = 0;
-	if (In_1 > eps)
+	if (In_1 > 0.0)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -99,7 +100,7 @@ tens4ds FEFiberNH::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	
 	// only take fibers in tension into consideration
 	tens4ds c;
-	const double eps = -std::numeric_limits<double>::epsilon();
+	const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	if (In_1 > eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -135,8 +136,7 @@ double FEFiberNH::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 	
 	// only take fibers in tension into consideration
 	double sed = 0.0;
-	const double eps = 0;
-	if (In_1 > eps)
+	if (In_1 > 0.0)
         sed = 0.25*m_mu*In_1*In_1;
     
     return sed;

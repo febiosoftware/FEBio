@@ -39,7 +39,7 @@ SOFTWARE.*/
 class FETCNonlinearOrthotropic : public FEUncoupledMaterial
 {
 public:
-	FETCNonlinearOrthotropic(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+	FETCNonlinearOrthotropic(FEModel* pfem);
 
 public:
 	//! calculate deviatoric stress at material point
@@ -56,7 +56,9 @@ public:
 	double	m_ksi[3];
 
 	double m_c1;	//!< Mooney-Rivlin coefficient c1
-	double m_c2;	//!< Mooney-Rivlin coefficient c2	
+	double m_c2;	//!< Mooney-Rivlin coefficient c2
+
+	double m_epsf;
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

@@ -52,6 +52,7 @@ public:
 	double	m_c4;		//!< Fiber uncrimping coefficient
 	double	m_c5;		//!< Modulus of straightened fibers
 	double	m_lam1;		//!< fiber stretch for straightened fibers
+	double	m_epsf;
 
 	DECLARE_FECORE_CLASS();
 };

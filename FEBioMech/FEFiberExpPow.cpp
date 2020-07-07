@@ -36,6 +36,7 @@ BEGIN_FECORE_CLASS(FEFiberExpPow, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
+	ADD_PARAMETER(m_epsf , "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -44,6 +45,7 @@ END_FECORE_CLASS();
 
 FEFiberExpPow::FEFiberExpPow(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 { 
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +65,7 @@ mat3ds FEFiberExpPow::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	const double eps = 0;
+	const double eps = m_epsf* std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -103,7 +105,7 @@ tens4ds FEFiberExpPow::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	const double eps = -std::numeric_limits<double>::epsilon();
+	const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -167,6 +169,7 @@ BEGIN_FECORE_CLASS(FEFiberExponentialPower, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
 	ADD_PARAMETER(m_ksi  , "ksi"  );
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
+	ADD_PARAMETER(m_epsf , "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -176,6 +179,8 @@ FEFiberExponentialPower::FEFiberExponentialPower(FEModel* pfem) : FEElasticFiber
 	m_beta = 2; 
 	m_ksi = 0; 
 	m_mu = 0;
+
+	m_epsf = 1.0;	// set to 1 for compatibility with febio 2.10
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +255,7 @@ tens4ds FEFiberExponentialPower::FiberTangent(FEMaterialPoint& mp, const vec3d& 
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	const double eps = -std::numeric_limits<double>::epsilon();
+	const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration

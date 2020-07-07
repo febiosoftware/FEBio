@@ -48,6 +48,7 @@ public:
 
 public:
 	double	m_mu;       // shear modulus
+	double	m_epsf;
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

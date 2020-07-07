@@ -36,11 +36,22 @@ BEGIN_FECORE_CLASS(FETCNonlinearOrthotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c2, "c2");
 	ADD_PARAMETER(m_beta, 3, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // FETCNonlinearOrthotropic
 //////////////////////////////////////////////////////////////////////
+
+FETCNonlinearOrthotropic::FETCNonlinearOrthotropic(FEModel* pfem) : FEUncoupledMaterial(pfem) 
+{
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+	m_beta[0] = m_beta[1] = m_beta[2] = 0.0;
+	m_ksi[0] = m_ksi[1] = m_ksi[2] = 0.0;
+
+	m_epsf = 0.0;
+}
 
 //-----------------------------------------------------------------------------
 // Calculate the deviatoric Cauchy stress
@@ -300,8 +311,10 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	W1 = m_c1;
 	W2 = m_c2;
 
+	const double eps = m_epsf*std::numeric_limits<double>::epsilon();
+
 	// fiber a
-	if (lat >= 1 - std::numeric_limits<double>::epsilon())
+	if (lat >= 1 + eps)
 	{
 		double lati = 1.0/lat;
 
@@ -318,7 +331,7 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	}
 
 	// fiber b
-	if (lbt >= 1 - std::numeric_limits<double>::epsilon())
+	if (lbt >= 1 + eps)
 	{
 		double lbti = 1.0/lbt;
 
@@ -335,7 +348,7 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	}
 
 	// fiber c
-	if (lct >= 1 - std::numeric_limits<double>::epsilon())
+	if (lct >= 1 + eps)
 	{
 		double lcti = 1.0/lct;
 

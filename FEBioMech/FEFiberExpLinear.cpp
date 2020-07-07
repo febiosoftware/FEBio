@@ -37,6 +37,7 @@ BEGIN_FECORE_CLASS(FEFiberExpLinear, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_c4  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
 	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
+	ADD_PARAMETER(m_epsf, "espilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -47,6 +48,7 @@ FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 	m_c4 = 0;
 	m_c5 = 0;
 	m_lam1 = 1.0;
+	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,6 +92,8 @@ mat3ds FEFiberExpLinear::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 //! Calculate the fiber tangent
 tens4ds FEFiberExpLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 {
+	double eps = m_epsf * std::numeric_limits<double>::epsilon();
+
 	// get material point data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -108,7 +112,7 @@ tens4ds FEFiberExpLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 
 	// fiber tangent
 	tens4ds c(0.0);
-	if (l >= 1.0 - std::numeric_limits<double>::epsilon())
+	if (l >= 1.0 + eps)
 	{
 		double Fl = 0.0, Fll = 0.0;
 		if (l < m_lam1)
