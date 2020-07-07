@@ -2303,7 +2303,7 @@ name2
 \end_layout
 
 \begin_layout Description
--g debug flag (does not require a file name) 
+-g debug flag 
 \end_layout
 
 \begin_layout Description
@@ -2327,7 +2327,7 @@ name2
 \end_layout
 
 \begin_layout Description
--restart Set restart option and optional dump file name
+-dump Set restart option and optional dump file name
 \end_layout
 
 \begin_layout Description
@@ -2598,7 +2598,7 @@ Example:
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Common-Parameters"
+reference "subsec:Control-Parameters"
 
 \end_inset
 
@@ -2768,7 +2768,7 @@ Example:
 \begin_layout Description
 
 \series bold
--restart
+-dump
 \series default
  It is possible to restart a previous run using the restart capability in
  FEBio.
@@ -2783,7 +2783,10 @@ dump file
 .
  This file will store all the information that FEBio will need to restart
  the analysis.
- FEBio will usually provide a default name for the dump file, but the –restart
+ FEBio will usually provide a default name for the dump file, but the 
+\emph on
+–dump
+\emph default
  command line option allows the user to override the default name for the
  dump file.
  See Section
@@ -2818,7 +2821,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –restart out.dmp
+> febio -i input.feb –dump out.dmp
 \end_layout
 
 \begin_layout Description
@@ -3926,29 +3929,38 @@ name "subsec:Restarting-a-Run"
 \end_layout
 
 \begin_layout Standard
-When the creation of a restart file is requested, the analysis can be restarted
- from the last converged timestep.
+When the creation of a restart dump file is requested, the analysis can
+ be restarted from the last converged timestep.
  This is useful when the run terminated unexpectedly or when the user wishes
  to modify some parameters during the analysis.
- To request a restart file, simply add the -restart flag on the command
- line.
+ To request the creation of a dump file, simply add the -dump flag on the
+ command line.
  This will generate a 
 \shape italic
 dump 
 \shape default
 file which then can be used to restart the analysis.
- See Chapter
-\begin_inset space ~
-\end_inset
+ You can specify an optional dump level, which sets how often the dump file
+ is created, and an optional dump file name.
+ 
+\end_layout
 
+\begin_layout LyX-Code
+> febio -i input.feb -dump
+\end_layout
 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Restart-Input-file"
+\begin_layout Standard
+With the optional arguments, the complete syntax would be:
+\end_layout
 
-\end_inset
+\begin_layout LyX-Code
+>febio -i input.feb -dump=1 out.dmp
+\end_layout
 
- for more details.
+\begin_layout Standard
+The dump level can set to 1 (= write dump file after each converged time
+ step), or 2 (= write dump file after each completed step).
+ 
 \end_layout
 
 \begin_layout Standard
@@ -4169,13 +4181,13 @@ febio_spec
 .
  This root element also defines the format version number (Note that FEBio
  and the input format specification follow different version numberings).
- This document describes version 2.5 of the FEBio specification
+ This document describes version 3.0 of the FEBio specification
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
- FEBio continues to read some older formats, but they are considered to
- be obsolete.
+FEBio continues to read some older formats, but they are considered to be
+ obsolete.
 \end_layout
 
 \end_inset
@@ -4196,7 +4208,7 @@ reference "sec:Format-Specification-Versions"
 \end_layout
 
 \begin_layout LyX-Code
-<febio_spec version="2.5">
+<febio_spec version="3.0">
 \end_layout
 
 \begin_layout LyX-Code
@@ -4635,6 +4647,51 @@ Globals
 section.) 
 \end_layout
 
+\begin_layout Enumerate
+Some fiber materials defined the 
+\emph on
+theta
+\emph default
+ and 
+\emph on
+phi
+\emph default
+ parameters for setting the fiber orientation.
+ These parameters are no longer supported.
+ Instead, the fiber direction should be specified via the 
+\emph on
+fiber
+\emph default
+ property, or if the 
+\emph on
+fiber 
+\emph default
+property is not available, the 
+\emph on
+mat_axis 
+\emph default
+property.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<fiber type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+  <theta>90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+  <phi>0</phi>
+\end_layout
+
+\begin_layout LyX-Code
+</fiber>
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Multiple Input Files
 \begin_inset CommandInset label
@@ -5072,7 +5129,7 @@ heat
 \begin_inset Text
 
 \begin_layout Plain Layout
-Heat transfer analysis: steady-state or transient
+Heat transfer analysis: steady-state or transient (1)
 \end_layout
 
 \end_inset
@@ -5151,9 +5208,26 @@ For example:
 
 \begin_layout Standard
 
-\series bold
-Note 1: 
-\series default
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+The heat module requires a plugin.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Notes
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
 In version 1.2 the Module section was optional.
  If omitted it was assumed that the 
 \shape italic
@@ -5164,11 +5238,7 @@ module was used.
  in the file.
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Note 2: 
-\series default
+\begin_layout Enumerate
 Older versions of FEBio (format specification 1.2 and before) allowed you
  to run a poroelastic (now called biphasic) problem by simply defining a
  poroelastic material.
@@ -5225,21 +5295,123 @@ element.
 \shape italic
 Control
 \shape default
- element.
- The parameters depend somewhat on the analysis as defined by the 
+ element and depend somewhat on the analysis as defined by the 
 \shape italic
 Module
 \shape default
  section.
- Many parameters are common to all types of analysis, so they are listed
- first.
+ The control section defines the control parameters, the solver parameters,
+ and optionally, the time_stepper parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<Control>
+\end_layout
+
+\begin_layout LyX-Code
+    <analysis>STATIC</analysis>
+\end_layout
+
+\begin_layout LyX-Code
+    <time_steps>50</time_steps>
+\end_layout
+
+\begin_layout LyX-Code
+    <step_size>0.02</step_size>
+\end_layout
+
+\begin_layout LyX-Code
+    <solver>
+\end_layout
+
+\begin_layout LyX-Code
+        <max_refs>25</max_refs>
+\end_layout
+
+\begin_layout LyX-Code
+        <max_ups>0</max_ups>
+\end_layout
+
+\begin_layout LyX-Code
+        <diverge_reform>1</diverge_reform>
+\end_layout
+
+\begin_layout LyX-Code
+        <reform_each_time_step>1</reform_each_time_step>
+\end_layout
+
+\begin_layout LyX-Code
+        <dtol>0.001</dtol>
+\end_layout
+
+\begin_layout LyX-Code
+        <etol>0.01</etol>
+\end_layout
+
+\begin_layout LyX-Code
+        <rtol>0</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+        <lstol>0.9</lstol>
+\end_layout
+
+\begin_layout LyX-Code
+        <min_residual>1e-20</min_residual>
+\end_layout
+
+\begin_layout LyX-Code
+        <qnmethod>BFGS</qnmethod>
+\end_layout
+
+\begin_layout LyX-Code
+        <rhoi>-2</rhoi>
+\end_layout
+
+\begin_layout LyX-Code
+    </solver>
+\end_layout
+
+\begin_layout LyX-Code
+    <time_stepper>
+\end_layout
+
+\begin_layout LyX-Code
+        <dtmin>0.0002</dtmin>
+\end_layout
+
+\begin_layout LyX-Code
+        <dtmax>0.02</dtmax>
+\end_layout
+
+\begin_layout LyX-Code
+        <max_retries>5</max_retries>
+\end_layout
+
+\begin_layout LyX-Code
+        <opt_iter>6</opt_iter>
+\end_layout
+
+\begin_layout LyX-Code
+    </time_stepper>
+\end_layout
+
+\begin_layout LyX-Code
+</Control>
 \end_layout
 
 \begin_layout Subsection
-Common Parameters
+Control Parameters
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Common-Parameters"
+name "subsec:Control-Parameters"
 
 \end_inset
 
@@ -5262,7 +5434,7 @@ The following parameters are common for all analysis.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="24" columns="3">
+<lyxtabular version="3" rows="11" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -5309,7 +5481,7 @@ Default
 \begin_inset Text
 
 \begin_layout Plain Layout
-title
+analysis
 \end_layout
 
 \end_inset
@@ -5318,7 +5490,7 @@ title
 \begin_inset Text
 
 \begin_layout Plain Layout
-Title of problem
+Sets the analysis type (1)
 \end_layout
 
 \end_inset
@@ -5327,7 +5499,7 @@ Title of problem
 \begin_inset Text
 
 \begin_layout Plain Layout
-(none) 
+static 
 \end_layout
 
 \end_inset
@@ -5352,7 +5524,7 @@ Total number of time steps.
 \shape italic
 ntime
 \shape default
-)(1)
+)(2)
 \end_layout
 
 \end_inset
@@ -5386,7 +5558,7 @@ The initial time step size.
 \shape italic
 dt
 \shape default
-) (1)
+) (2)
 \end_layout
 
 \end_inset
@@ -5406,296 +5578,6 @@ dt
 \begin_inset Text
 
 \begin_layout Plain Layout
-etol
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Convergence tolerance on energy (2)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.01 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-rtol
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Convergence tolerance on residual (2)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 (disabled) 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-lstol
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Convergence tolerance on line search (3)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.9 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-time_stepper
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Enable the auto time stepper (4)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-(off) 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max_refs
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Max number of stiffness reformations (5)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-15 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-qnmethod
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Quasi-Newton update method (5)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 (BFGS)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max_ups
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Max number of BFGS/Broyden stiffness updates (5)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-10 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-diverge_reform
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Flag for reforming stiffness matrix when the solution diverges (5)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-optimize_bw
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Optimize bandwidth of stiffness matrix (6)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-restart
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Generate restart flag (7)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 plot_level
 \end_layout
 
@@ -5705,7 +5587,7 @@ plot_level
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sets the level of state dumps to the plot file (8)
+Sets the level of state dumps to the plot file (3)
 \end_layout
 
 \end_inset
@@ -5734,7 +5616,7 @@ plot_range
 \begin_inset Text
 
 \begin_layout Plain Layout
-Set the range of the states that will be stored to the plot file (9)
+Set the range of the states that will be stored to the plot file (4)
 \end_layout
 
 \end_inset
@@ -5763,7 +5645,7 @@ plot_stride
 \begin_inset Text
 
 \begin_layout Plain Layout
-Set the stride of the states that will be stored to the plot file (9)
+Set the stride of the states that will be stored to the plot file (4)
 \end_layout
 
 \end_inset
@@ -5801,7 +5683,7 @@ zero
 \end_inset
 
  state will be written to the plot file, even if it is not defined in the
- range (9)
+ range (4)
 \end_layout
 
 \end_inset
@@ -5821,68 +5703,6 @@ zero
 \begin_inset Text
 
 \begin_layout Plain Layout
-cmax
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the max condition number for the stiffness matrix (10)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1e
-\begin_inset Formula $+$
-\end_inset
-
-5 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-analysis
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Sets the analysis type (11)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-static 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 print_level
 \end_layout
 
@@ -5892,7 +5712,7 @@ print_level
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sets the amount of output that is generated on screen (12)
+Sets the amount of output that is generated on screen (5)
 \end_layout
 
 \end_inset
@@ -5912,7 +5732,7 @@ PRINT_MINOR_ITRS
 \begin_inset Text
 
 \begin_layout Plain Layout
-min_residual
+output_level
 \end_layout
 
 \end_inset
@@ -5921,7 +5741,7 @@ min_residual
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sets minimal value for residual tolerance (13)
+Controls when to output data to file (6)
 \end_layout
 
 \end_inset
@@ -5930,36 +5750,7 @@ Sets minimal value for residual tolerance (13)
 \begin_inset Text
 
 \begin_layout Plain Layout
-1e-20 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-integration
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the integration rule for a particular element (14)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-N/A 
+OUTPUT_MAJOR_ITRS 
 \end_layout
 
 \end_inset
@@ -5970,7 +5761,7 @@ N/A
 \begin_inset Text
 
 \begin_layout Plain Layout
-output_level
+integration
 \end_layout
 
 \end_inset
@@ -5979,7 +5770,7 @@ output_level
 \begin_inset Text
 
 \begin_layout Plain Layout
-Controls when to output data to file (15)
+Set the integration rule for a particular element (7)
 \end_layout
 
 \end_inset
@@ -5988,7 +5779,7 @@ Controls when to output data to file (15)
 \begin_inset Text
 
 \begin_layout Plain Layout
-OUTPUT_MAJOR_ITRS 
+N/A 
 \end_layout
 
 \end_inset
@@ -6014,6 +5805,126 @@ Comments
 \end_layout
 
 \begin_layout Enumerate
+The 
+\shape italic
+analysis 
+\shape default
+element sets the analysis type.
+ Currently, FEBio defines three analysis types: (quasi-)static, steady-state,
+ and dynamic.
+ In a quasi-static analysis, inertial effects are ignored and an equilibrium
+ solution is sought.
+ Note that in this analysis mode it is still possible to simulate time dependant
+ effects such as viscoelasticity.
+ In a dynamic analysis the inertial effects are included.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+static
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(quasi-) static analysis
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+steady-state
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+steady-state response of a transient (quasi-static) biphasic, biphasic-solute,
+ multiphasic, fluid or fluid-FSI analysis
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dynamic
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dynamic analysis for solid, fluid and fluid-FSI analyses
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
 The total running time of the analysis is determined by 
 \shape italic
 ntime 
@@ -6033,554 +5944,8 @@ ntime
 * 
 \shape italic
 dt.
-
-\shape default
- 
 \end_layout
 
-\begin_layout Enumerate
-FEBio determines convergence of a time step based on three convergence criteria:
- displacement, residual and energy (that is, residual multiplied by displacement
-).
- Each of these criteria requires a tolerance value that will determine convergen
-ce when the relative change will drop below this value.
- For example, a displacement tolerance of 
-\begin_inset Formula $\varepsilon$
-\end_inset
-
- means that the ratio of the displacement increment (i.e.
- the solution of the linearized FE equations, 
-\begin_inset Formula $\Delta\mathbf{U}=-\mathbf{K}_{k}^{-1}\mathbf{R}_{k})$
-\end_inset
-
- norm at the current iteration 
-\begin_inset Formula $k+$
-\end_inset
-
-
-\shape italic
-1
-\shape default
- to the norm of the total displacement (
-\begin_inset Formula $\mathbf{U}_{k+1}=\mathbf{U}_{k}+\Delta\mathbf{U})$
-\end_inset
-
- must be less than 
-\begin_inset Formula $\varepsilon$
-\end_inset
-
-:
-\begin_inset Formula 
-\[
-\frac{\left\Vert \Delta\mathbf{U}\right\Vert }{\left\Vert \mathbf{U}_{k+1}\right\Vert }<\varepsilon
-\]
-
-\end_inset
-
-For the residual and energy norms, it is the ratio of the current residual
- norm (resp.
- energy norm) to the initial one that needs to be less than the specified
- convergence tolerance.
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-To disable a specific convergence criterion, set the corresponding tolerance
- to zero.
- For example, by default, the residual tolerance is zero, so that this convergen
-ce criterion is not used.
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The 
-\shape italic
-lstol
-\shape default
- parameter controls the scaling of the vector direction obtained from the
- line search.
- A line search method is used to improve the convergence of the nonlinear
- (quasi-) Newton solution algorithm.
- After each BFGS or Newton iteration, this algorithm searches in the direction
- of the displacement increment for a solution that has less energy (that
- is, residual multiplied with the displacement increment) than the previous
- iteration.
- In many problems this will automatically be the case.
- However, in some problems that are very nonlinear (e.g.
- contact), the line search can improve convergence significantly.
- The line search can be disabled by setting the 
-\shape italic
-lstol
-\shape default
- parameter to zero, although this is not recommended.
- 
-\end_layout
-
-\begin_layout Enumerate
-If the 
-\shape italic
-time_stepper
-\shape default
- parameter is defined it will enable the auto time-stepper, which will adjust
- the new time step size based on convergence information from the previous
- time step.
- The following sub-elements may also be defined, although all are optional.
- Note that these are sub-elements of the 
-\shape italic
-time_stepper 
-\shape default
-element and not of the 
-\shape italic
-Control 
-\shape default
-element.
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Parameter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Default
-\series default
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dtmin
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Minimum time step size
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dt/3 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dtmax
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Maximum time step size
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dt*3 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max_retries
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Maximum nr.
- of retries allowed per time step
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-5 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-opt_iter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Optimal number of iterations
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-10 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-dtmin 
-\shape default
-and 
-\shape italic
-dtmax
-\shape default
- values are used to constrain the range of possible time step values.
- The 
-\shape italic
-opt_iter 
-\shape default
-defines the estimated optimal number of quasi-Newton iterations.
- If the actual number of iterations is less than or equal to this value
- the time step size is increased, otherwise it is decreased.
-\end_layout
-
-\begin_layout Standard
-When a time step fails (e.g.
- due to a negative jacobian), FEBio will retry the time step with a smaller
- time step size.
- The 
-\shape italic
-max_retries 
-\shape default
-parameter determines the maximum number of times a timestep may be retried
- before FEBio error terminates.
- The new time step size is determined by the ratio of the previous time
- step size and the 
-\shape italic
-max_retries
-\shape default
- parameter.
- For example, if the last time step size is 0.1 and 
-\shape italic
-max_retries 
-\shape default
-is set to 5, then the time step size is adjusted by 0.02: The first retry
- will have a step size of 0.08; the next will be 0.06, and so on.
-\end_layout
-
-\begin_layout Standard
-The user can specify a load curve for the 
-\shape italic
-dtmax 
-\shape default
-parameter.
- This load curve is referred to as the 
-\shape italic
-must-point 
-\shape default
-curve and serves two purposes.
- Firstly, it defines the value of the 
-\shape italic
-dtmax 
-\shape default
-parameter as a function of time.
- This can be useful, for instance, to enforce smaller time steps during
- rapid loading or larger time steps when approaching steady-state in a transient
- analysis.
- Secondly, the time points of the 
-\shape italic
-dtmax 
-\shape default
-loadcurve define so-called 
-\shape italic
-must-points
-\shape default
-.
- A must-point is a time point where FEBio must pass through.
- This is useful for synchronizing the auto-time stepper with the loading
- scenario.
- For instance, when loading starts at time 0.5, adding a must-point at this
- time will guarantee that the timestepper evaluates the model at that time.
- In conjunction with the PLOT_MUST_POINT value of the 
-\shape italic
-plot_level 
-\shape default
-parameter, this option can also be used to only write results to the plotfile
- at the specified time points.
- Consider the following example.
-\end_layout
-
-\begin_layout LyX-Code
-<dtmax lc="1">0.1</dtmax>
-\end_layout
-
-\begin_layout LyX-Code
-...
-\end_layout
-
-\begin_layout LyX-Code
-<loadcurve id="1" type="step">
-\end_layout
-
-\begin_layout LyX-Code
-  <loadpoint>0,0</loadpoint>
-\end_layout
-
-\begin_layout LyX-Code
-  <loadpoint>0.5, 0.1</loadpoint>
-\end_layout
-
-\begin_layout LyX-Code
-  <loadpoint>1.0, 0.2</loadpoint>
-\end_layout
-
-\begin_layout LyX-Code
-</loadcurve>
-\end_layout
-
-\begin_layout Standard
-This example defines load curve 1 as the 
-\shape italic
-must-point 
-\shape default
-curve.
- This curve defines three points where FEBio will pass through (namely 0,
- 0.5 and 1.0).
- The values of each time point is the value of the maximum time-step size
- (
-\shape italic
-dtmax
-\shape default
-).
- Since the curve is defined as a step-function, each value is valid up to
- the corresponding time-point.
- Thus, between time 0 and time 0.5, the maximum time step value is 0.1.
- Between 0.5 and 1.0 the maximum time step value is 0.2.
- If the 
-\shape italic
-plot_level 
-\shape default
-parameter is set to PLOT_MUST_POINTS, then only the three defined time points
- will be stored to the plotfile.
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The 
-\emph on
-qnmethod
-\emph default
- parameter determines the quasi-Newton update method.
- For the BFGS method set 
-\emph on
-qnmethod
-\emph default
- to 0 (default); for Broyden's method set 
-\emph on
-qnmethod
-\emph default
- to 1.
- The 
-\shape italic
-max_ups 
-\shape default
-and 
-\shape italic
-max_refs 
-\shape default
-parameters control the BFGS/Broyden method that FEBio uses to solve the
- nonlinear FE equations.
- In this method the global stiffness matrix is only calculated at the beginning
- of each time step.
- For each iteration, a matrix update is then done.
- The maximum number of such updates is set with 
-\shape italic
-max_ups
-\shape default
-.
- When FEBio reaches this number, or if the solution diverges and 
-\emph on
-diverge_reform
-\emph default
- is set to 1, it reforms the global stiffness matrix (that is, it recalculates
- it) and factorizes it, essentially taking a "full Newton" iteration.
- Then FEBio continues with BFGS/Broyden iterations.
- The 
-\shape italic
-max_refs 
-\shape default
-parameter is used to set the maximum of such reformations FEBio can do,
- before it fails the timestep.
- In that case, FEBio will either terminate or, if the auto-time stepper
- is enabled, retry with a smaller time step size.
- 
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-Note that when max_ups is set to 0, FEBio will use the Full-Newton method
- instead of the BFGS method.
- In other words, the stiffness matrix is reformed for every iteration.
- In this case it is recommended to increase the number of 
-\shape italic
-max_refs 
-\shape default
-(to e.g.
- 50), since the default value might cause FEBio to terminate prematurely
- when convergence is slow.
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The 
-\shape italic
-optimize_bw
-\shape default
- parameter enables bandwidth minimization for the global stiffness matrix.
- This can drastically decrease the memory requirements and running times
- when using the skyline solver.
- It is highly recommended when using the skyline solver.
- 
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<optimize_bw>1</optimize_bw>
-\end_layout
-
-\begin_layout Standard
-When using a different linear solver (e.g., pardiso or SuperLU), the bandwidth
- optimization can still be performed if so desired.
- However, for these solvers there will be little or no effect since these
- solvers are not as sensitive to the bandwidth as the skyline solver.
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The 
-\shape italic
-restart
-\shape default
- parameter can be used to generate a restart dump file.
- To activate it, specify a non-zero value.
- A filename may be specified as an option.
- If the filename is omitted, a default name will be provided.
- Note that this will only generate the binary dump file that is needed to
- restart the analysis.
- To override certain parameters before restarting, create a restart input
- file.
- FEBio does not generate this file automatically so the user needs to create
- that file manually.
- See Chapter
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Restart-Input-file"
-
-\end_inset
-
- on the format of the restart input file.
- 
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<restart file="out.dmp">1</restart>
-\end_layout
-
-\end_deeper
 \begin_layout Enumerate
 The 
 \shape italic
@@ -6860,152 +6225,6 @@ plot_zero_state
 
 \end_deeper
 \begin_layout Enumerate
-When the condition number of the stiffness matrix becomes too large, inversions
- of the stiffness matrix become inaccurate.
- This will negatively affect the convergence of the quasi-Newton or Newton
- solution algorithm.
- FEBio monitors the condition number of the BFGS stiffness update and when
- it exceeds 
-\shape italic
-cmax 
-\shape default
-it reforms the stiffness matrix.
- 
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<cmax>1e5</cmax>
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The 
-\shape italic
-analysis 
-\shape default
-element sets the analysis type.
- Currently, FEBio defines three analysis types: (quasi-)static, steady-state,
- and dynamic.
- In a quasi-static analysis, inertial effects are ignored and an equilibrium
- solution is sought.
- Note that in this analysis mode it is still possible to simulate time dependant
- effects such as viscoelasticity.
- In a dynamic analysis the inertial effects are included.
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="3in">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Value
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\series default
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-static
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-(quasi-) static analysis 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-steady-state
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-steady-state response of a transient (quasi-static) biphasic, biphasic-solute,
- multiphasic, fluid or fluid-FSI analysis 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dynamic
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dynamic analysis for solid, fluid and fluid-FSI analyses
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
 The 
 \shape italic
 print_level 
@@ -7166,20 +6385,162 @@ Print additional convergence info during equilib.
 
 \end_deeper
 \begin_layout Enumerate
-If no force is acting on the model, then convergence might be problematic
- due to numerical noise in the calculations.
- For example, this can happen in a displacement driven contact problem where
- one of the contacting bodies is moved before initial contact is made.
- When this happens, the residual norm will be very small.
- When it drops below the tolerance set by 
+The 
 \shape italic
-min_residual
+output_level
 \shape default
-, FEBio will assume that there is no force acting on the system and will
- converge the time step.
- 
+ can be used to control when FEBio outputs the data files.
+ The following values are supported.
 \end_layout
 
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OUTPUT_NEVER
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Don't generate any output
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OUTPUT_MUST_POINTS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Only output at must points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PRINT_MAJOR_ITRS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Output at end of each time step
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PRINT_MINOR_ITRS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Output at each iteration
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OUTPUT_FINAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Only output the data at the last converged time step.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Enumerate
 You can override FEBio's default integration rule for specific element classes.
  For each element class, define a 
@@ -8458,16 +7819,22 @@ The GAUSS6 rule has only nonzero weights at the edge nodes, which effectively
 \end_layout
 
 \end_deeper
-\begin_layout Enumerate
-The 
-\shape italic
-output_level
-\shape default
- can be used to control when FEBio outputs the data files.
- The following values are supported.
+\begin_layout Subsection
+Time Stepper parameters
 \end_layout
 
-\begin_deeper
+\begin_layout Standard
+The optional 
+\emph on
+time_stepper 
+\emph default
+element sets the parameters that control the FEBio auto-time stepper.
+ This auto-time stepper will adjust the time step size depending on the
+ convergence stats of the previous time step.
+ It defines the following parameters.
+ 
+\end_layout
+
 \begin_layout Standard
 \align center
 \begin_inset VSpace defskip
@@ -8475,9 +7842,10 @@ output_level
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="6" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -8491,15 +7859,24 @@ Value
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \series bold
 Description
-\series default
- 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
 \end_layout
 
 \end_inset
@@ -8510,36 +7887,25 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-OUTPUT_NEVER
+dtmin
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Don't generate any output 
+Minimum time step size (1)
 \end_layout
 
 \end_inset
 </cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-OUTPUT_MUST_POINTS
-\end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Only output at must points 
 \end_layout
 
 \end_inset
@@ -8550,16 +7916,25 @@ Only output at must points
 \begin_inset Text
 
 \begin_layout Plain Layout
-PRINT_MAJOR_ITRS
+dtmax
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Output at end of each time step 
+Maximum time step size (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -8570,16 +7945,55 @@ Output at end of each time step
 \begin_inset Text
 
 \begin_layout Plain Layout
-PRINT_MINOR_ITRS
+opt_iter
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Output at each iteration 
+Optimal, or desired, number of iterations per time step (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_retries
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum number of times a time step is restarted.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
 \end_layout
 
 \end_inset
@@ -8590,17 +8004,25 @@ Output at each iteration
 \begin_inset Text
 
 \begin_layout Plain Layout
-OUTPUT_FINAL
+aggressiveness
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Only output the data at the last converged time step.
- 
+Algorithm for cutting the time step size after a failed time step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -8617,9 +8039,902 @@ Only output the data at the last converged time step.
 
 \end_layout
 
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+The 
+\shape italic
+dtmin 
+\shape default
+and 
+\shape italic
+dtmax
+\shape default
+ values are used to constrain the range of possible time step values.
+ The 
+\shape italic
+opt_iter 
+\shape default
+defines the estimated optimal number of quasi-Newton iterations.
+ If the actual number of iterations is less than or equal to this value
+ the time step size is increased, otherwise it is decreased.
+\end_layout
+
+\begin_layout Enumerate
+When a time step fails (e.g.
+ due to a negative jacobian), FEBio will retry the time step with a smaller
+ time step size.
+ The 
+\shape italic
+max_retries 
+\shape default
+parameter determines the maximum number of times a timestep may be retried
+ before FEBio error terminates.
+ The new time step size is determined by the ratio of the previous time
+ step size and the 
+\shape italic
+max_retries
+\shape default
+ parameter.
+ For example, if the last time step size is 0.1 and 
+\shape italic
+max_retries 
+\shape default
+is set to 5, then the time step size is adjusted by 0.02: The first retry
+ will have a step size of 0.08; the next will be 0.06, and so on.
+\end_layout
+
+\begin_layout Enumerate
+The user can specify a load curve for the 
+\shape italic
+dtmax 
+\shape default
+parameter.
+ This load curve is referred to as the 
+\shape italic
+must-point 
+\shape default
+curve and serves two purposes.
+ Firstly, it defines the value of the 
+\shape italic
+dtmax 
+\shape default
+parameter as a function of time.
+ This can be useful, for instance, to enforce smaller time steps during
+ rapid loading or larger time steps when approaching steady-state in a transient
+ analysis.
+ Secondly, the time points of the 
+\shape italic
+dtmax 
+\shape default
+loadcurve define so-called 
+\shape italic
+must-points
+\shape default
+.
+ A must-point is a time point where FEBio must pass through.
+ This is useful for synchronizing the auto-time stepper with the loading
+ scenario.
+ For instance, when loading starts at time 0.5, adding a must-point at this
+ time will guarantee that the timestepper evaluates the model at that time.
+ In conjunction with the PLOT_MUST_POINT value of the 
+\shape italic
+plot_level 
+\shape default
+parameter, this option can also be used to only write results to the plotfile
+ at the specified time points.
+ Consider the following example.
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<dtmax lc="1">0.1</dtmax>
+\end_layout
+
+\begin_layout LyX-Code
+...
+\end_layout
+
+\begin_layout LyX-Code
+<loadcurve id="1" type="step">
+\end_layout
+
+\begin_layout LyX-Code
+  <loadpoint>0,0</loadpoint>
+\end_layout
+
+\begin_layout LyX-Code
+  <loadpoint>0.5, 0.1</loadpoint>
+\end_layout
+
+\begin_layout LyX-Code
+  <loadpoint>1.0, 0.2</loadpoint>
+\end_layout
+
+\begin_layout LyX-Code
+</loadcurve>
+\end_layout
+
+\begin_layout Standard
+This example defines load curve 1 as the 
+\shape italic
+must-point 
+\shape default
+curve.
+ This curve defines three points where FEBio will pass through (namely 0,
+ 0.5 and 1.0).
+ The values of each time point is the value of the maximum time-step size
+ (
+\shape italic
+dtmax
+\shape default
+).
+ Since the curve is defined as a step-function, each value is valid up to
+ the corresponding time-point.
+ Thus, between time 0 and time 0.5, the maximum time step value is 0.1.
+ Between 0.5 and 1.0 the maximum time step value is 0.2.
+ If the 
+\shape italic
+plot_level 
+\shape default
+parameter is set to PLOT_MUST_POINTS, then only the three defined time points
+ will be stored to the plotfile.
+\end_layout
+
 \end_deeper
 \begin_layout Subsection
-Parameters for a Structural Mechanics Analysis
+Common Solver Parameters
+\end_layout
+
+\begin_layout Standard
+Many of the solvers define the same parameters.
+ They are listed in the table below.
+ Additional parameters that are only defined for a specific type of analysis
+ are listed in the following sections.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="16" columns="3">
+<features islongtable="true" longtabularalignment="center">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+etol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Convergence tolerance on energy (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Convergence tolerance on residual (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lstol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Convergence tolerance on line search (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.9
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lsmin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+minimum line search step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lsiter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum number of line search iterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_refs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Max number of stiffness reformations (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+qnmethod
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Quasi-Newton update method (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (BFGS)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_ups
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Max number of BFGS/Broyden stiffness updates (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cmax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the max condition number for the stiffness matrix (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1e
+\begin_inset Formula $+$
+\end_inset
+
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+diverge_reform
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag for reforming stiffness matrix when the solution diverges (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min_residual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets minimal value for residual tolerance (6)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1e-20
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+symmetric_stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Use symmetric stiffness matrix flag (7)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+equation_scheme
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the equation allocation scheme
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+equation_order
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the equation allocation ordering
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+optimize_bw
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Optimize bandwidth of stiffness matrix (5)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+FEBio determines convergence of a time step based on three convergence criteria:
+ displacement, residual and energy (that is, residual multiplied by displacement
+).
+ Each of these criteria requires a tolerance value that will determine convergen
+ce when the relative change will drop below this value.
+ For example, a displacement tolerance of 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ means that the ratio of the displacement increment (i.e.
+ the solution of the linearized FE equations, 
+\begin_inset Formula $\Delta\mathbf{U}=-\mathbf{K}_{k}^{-1}\mathbf{R}_{k})$
+\end_inset
+
+ norm at the current iteration 
+\begin_inset Formula $k+$
+\end_inset
+
+
+\shape italic
+1
+\shape default
+ to the norm of the total displacement (
+\begin_inset Formula $\mathbf{U}_{k+1}=\mathbf{U}_{k}+\Delta\mathbf{U})$
+\end_inset
+
+ must be less than 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\frac{\left\Vert \Delta\mathbf{U}\right\Vert }{\left\Vert \mathbf{U}_{k+1}\right\Vert }<\varepsilon
+\]
+
+\end_inset
+
+For the residual and energy norms, it is the ratio of the current residual
+ norm (resp.
+ energy norm) to the initial one that needs to be less than the specified
+ convergence tolerance.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+To disable a specific convergence criterion, set the corresponding tolerance
+ to zero.
+ For example, by default, the residual tolerance is zero, so that this convergen
+ce criterion is not used.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The 
+\shape italic
+lstol
+\shape default
+ parameter controls the scaling of the vector direction obtained from the
+ line search.
+ A line search method is used to improve the convergence of the nonlinear
+ (quasi-) Newton solution algorithm.
+ After each BFGS or Newton iteration, this algorithm searches in the direction
+ of the displacement increment for a solution that has less energy (that
+ is, residual multiplied with the displacement increment) than the previous
+ iteration.
+ In many problems this will automatically be the case.
+ However, in some problems that are very nonlinear (e.g.
+ contact), the line search can improve convergence significantly.
+ The line search can be disabled by setting the 
+\shape italic
+lstol
+\shape default
+ parameter to zero, although this is not recommended.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+qnmethod
+\emph default
+ parameter determines the quasi-Newton update method.
+ For the BFGS method set 
+\emph on
+qnmethod
+\emph default
+ to 0 (default); for Broyden's method set 
+\emph on
+qnmethod
+\emph default
+ to 1.
+ The 
+\shape italic
+max_ups 
+\shape default
+and 
+\shape italic
+max_refs 
+\shape default
+parameters control the BFGS/Broyden method that FEBio uses to solve the
+ nonlinear FE equations.
+ In this method the global stiffness matrix is only calculated at the beginning
+ of each time step.
+ For each iteration, a matrix update is then done.
+ The maximum number of such updates is set with 
+\shape italic
+max_ups
+\shape default
+.
+ When FEBio reaches this number, or if the solution diverges and 
+\emph on
+diverge_reform
+\emph default
+ is set to 1, it reforms the global stiffness matrix (that is, it recalculates
+ it) and factorizes it, essentially taking a "full Newton" iteration.
+ Then FEBio continues with BFGS/Broyden iterations.
+ The 
+\shape italic
+max_refs 
+\shape default
+parameter is used to set the maximum of such reformations FEBio can do,
+ before it fails the timestep.
+ In that case, FEBio will either terminate or, if the auto-time stepper
+ is enabled, retry with a smaller time step size.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+Note that when max_ups is set to 0, FEBio will use the Full-Newton method
+ instead of the BFGS method.
+ In other words, the stiffness matrix is reformed for every iteration.
+ In this case it is recommended to increase the number of 
+\shape italic
+max_refs 
+\shape default
+(to e.g.
+ 50), since the default value might cause FEBio to terminate prematurely
+ when convergence is slow.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+When the condition number of the stiffness matrix becomes too large, inversions
+ of the stiffness matrix become inaccurate.
+ This will negatively affect the convergence of the quasi-Newton or Newton
+ solution algorithm.
+ FEBio monitors the condition number of the BFGS stiffness update and when
+ it exceeds 
+\shape italic
+cmax 
+\shape default
+it reforms the stiffness matrix.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<cmax>1e5</cmax>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The 
+\shape italic
+optimize_bw
+\shape default
+ parameter enables bandwidth minimization for the global stiffness matrix.
+ This can drastically decrease the memory requirements and running times
+ when using the skyline solver.
+ It is highly recommended when using the skyline solver.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<optimize_bw>1</optimize_bw>
+\end_layout
+
+\begin_layout Standard
+When using a different linear solver (e.g., pardiso or SuperLU), the bandwidth
+ optimization can still be performed if so desired.
+ However, for these solvers there will be little or no effect since these
+ solvers are not as sensitive to the bandwidth as the skyline solver.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+If no force is acting on the model, then convergence might be problematic
+ due to numerical noise in the calculations.
+ For example, this can happen in a displacement driven contact problem where
+ one of the contacting bodies is moved before initial contact is made.
+ When this happens, the residual norm will be very small.
+ When it drops below the tolerance set by 
+\shape italic
+min_residual
+\shape default
+, FEBio will assume that there is no force acting on the system and will
+ converge the time step.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+symmetric_stiffness 
+\emph default
+flag is used to set the symmetry of the global stiffness matrix.
+ Only specify this flag if you want to override the default symmetry, which
+ depends somewhat on the analysis type.
+ Forcing a symmetric matrix when the problem is non-symmetric may have negative
+ impact on convergence.
+ The values for this parameter are:
+\begin_inset Newline newline
+\end_inset
+
+- 0 = unsymmetic
+\begin_inset Newline newline
+\end_inset
+
+- 1 = symmetric
+\begin_inset Newline newline
+\end_inset
+
+- 2 = structurally symmetric
+\end_layout
+
+\begin_layout Subsection
+Solver Parameters for a Structural Mechanics Analysis
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Parameters-Solid-Analysis"
@@ -8635,8 +8950,7 @@ A structural mechanics analysis is defined by using the
 solid 
 \shape default
 type in Module section.
- All control parameters above can be used in a structural mechanics analysis.
- In addition, the following parameter can be defined:
+ The solver parameters are given in the table below:
 \end_layout
 
 \begin_layout Standard
@@ -8646,7 +8960,7 @@ type in Module section.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -8689,7 +9003,7 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8698,7 +9012,7 @@ dtol
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8707,40 +9021,11 @@ convergence tolerance on displacement
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0.001
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-symmetric_stiffness
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Choose between a symmetric or nonsymmetric formulation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1
 \end_layout
 
 \end_inset
@@ -8758,7 +9043,7 @@ Choose between a symmetric or nonsymmetric formulation
 \end_layout
 
 \begin_layout Subsection
-Parameters for Biphasic Analysis
+Solver Parameters for Biphasic Analysis
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Parameters-Biphasic-Analysis"
@@ -8786,7 +9071,7 @@ type in Module section.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -8829,7 +9114,7 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8838,7 +9123,7 @@ ptol
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8847,40 +9132,11 @@ Specify the fluid pressure convergence tolerance
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0.01 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-symmetric_biphasic
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Choose between a symmetric or nonsymmetric formulation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1 
 \end_layout
 
 \end_inset
@@ -8898,7 +9154,7 @@ Choose between a symmetric or nonsymmetric formulation
 \end_layout
 
 \begin_layout Subsection
-Parameters for Solute and Multiphasic Analyses
+Solver Parameters for Solute and Multiphasic Analyses
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Parameters-Solute-Analysis"
@@ -9013,7 +9269,7 @@ Specify the concentration convergence tolerance
 \end_layout
 
 \begin_layout Subsection
-Parameters for Heat Analysis
+Solver Parameters for Heat Analysis
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Parameters-Heat-Analysis"
@@ -9031,7 +9287,7 @@ A heat analysis uses the parameters defined in Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Common-Parameters"
+reference "subsec:Control-Parameters"
 
 \end_inset
 
@@ -9042,7 +9298,7 @@ reference "subsec:Common-Parameters"
 \end_layout
 
 \begin_layout Subsection
-Parameters for Fluid and Fluid-FSI Analyses
+Solver Parameters for Fluid and Fluid-FSI Analyses
 \end_layout
 
 \begin_layout Standard
@@ -9073,7 +9329,7 @@ reference "sec:Module-Section"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -9178,35 +9434,6 @@ convergence tolerance on dilatation
 \begin_inset Text
 
 \begin_layout Plain Layout
-qnmethod
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Quasi-Newton update method (5)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 rhoi
 \end_layout
 
@@ -9236,7 +9463,7 @@ Spectral radius parameter
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9245,7 +9472,7 @@ reform_each_time_step
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9254,40 +9481,11 @@ Flag for reforming stiffness matrix at the start of each time step
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-symmetric_stiffness
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Choose between a symmetric or nonsymmetric formulation
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-0
+1
 \end_layout
 
 \end_inset
@@ -9356,7 +9554,7 @@ rtol
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Common-Parameters"
+reference "subsec:Control-Parameters"
 
 \end_inset
 
@@ -11284,15 +11482,15 @@ To define a mesh data section add one of the following tags.
 \end_layout
 
 \begin_layout Description
-node_data Define data on a node set
+NodeData Define data on a node set
 \end_layout
 
 \begin_layout Description
-surface_data Define data on a surface
+SurfaceData Define data on a surface
 \end_layout
 
 \begin_layout Description
-element_data Define data on an element set
+ElementData Define data on an element set
 \end_layout
 
 \begin_layout Standard
@@ -65155,7 +65353,7 @@ reference "chap:Multi-step-Analysis"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Common-Parameters"
+reference "subsec:Control-Parameters"
 
 \end_inset
 
@@ -74861,6 +75059,9 @@ Users can request FEBio to output a binary dump file.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Restarting-a-Run"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -74869,42 +75070,10 @@ reference "subsec:Restarting-a-Run"
 \end_layout
 
 \begin_layout Standard
-The restart feature in FEBio allows the user to continue a previously terminated
- analysis.
- In addition, it allows the user to modify some of the parameters during
- the restart.
- To activate the restart feature, define the 
-\shape italic
-restart 
-\shape default
-element in the Control section:
-\end_layout
-
-\begin_layout LyX-Code
-<Control>
-\end_layout
-
-\begin_layout LyX-Code
-  <restart [file="<dump file>"]>1</restart>
-\end_layout
-
-\begin_layout LyX-Code
-  ...
-\end_layout
-
-\begin_layout LyX-Code
-</Control>
-\end_layout
-
-\begin_layout Standard
 This chapter describes the format of the restart input file.
  This file is used to redefine some parameters when restarting a previously
  terminated run and can also be used to extend the analysis.
- 
-\end_layout
-
-\begin_layout Standard
-The structure is very similar to the FEBio input file and also uses XML
+ The structure is very similar to the FEBio input file and also uses XML
  formatting.
  Since the file uses XML, the first line must be the XML header:
 \end_layout
@@ -78771,7 +78940,7 @@ reference "chap:Multi-step-Analysis"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Common-Parameters"
+reference "subsec:Control-Parameters"
 
 \end_inset
 
@@ -82788,7 +82957,7 @@ name "chap:FEBio-Plugins"
 
 \begin_layout Standard
 As of version 2.0 FEBio supports plugins.
- Plugins are dynamic libraries which extend the capabilities of FEBio at
+ Plugins are dynamic libraries that extend the capabilities of FEBio at
  runtime without the need to recompile the entire source code.
  This offers the user a powerful mechanism for extending the default feature
  set of FEBio with little effort.
@@ -82905,7 +83074,7 @@ An alternative way for loading a plugin is using the
 \end_layout
 
 \begin_layout LyX-Code
->febio2 -i input.feb -import myplugin.dll
+>febio -i input.feb -import myplugin.dll
 \end_layout
 
 \begin_layout Standard
@@ -82916,7 +83085,20 @@ myplugin.dll
  in the current working directory.
  If the plugin file is located in a different folder than the current working
  directory, you must prepend the relative or absolute path to the file.
+ Note that if the path contains spaces, you need to wrap it in quotes.
  
+\end_layout
+
+\begin_layout LyX-Code
+>febio -i input.feb -import "C:
+\backslash
+path
+\backslash
+to
+\backslash
+my custom plugin
+\backslash
+myplugin.dll"
 \end_layout
 
 \begin_layout Section
