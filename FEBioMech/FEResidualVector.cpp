@@ -47,14 +47,6 @@ FEResidualVector::~FEResidualVector()
 void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom)
 {
     
-    FEModel& fem = GetFEModel();
-    int dofX = fem.GetDOFIndex("x");
-    int dofY = fem.GetDOFIndex("y");
-    int dofZ = fem.GetDOFIndex("z");
-    int dofSX = fem.GetDOFIndex("sx");
-    int dofSY = fem.GetDOFIndex("sy");
-    int dofSZ = fem.GetDOFIndex("sz");
-
     vector<double>& R = m_R;
     
     int i, I, n;

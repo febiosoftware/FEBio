@@ -95,6 +95,8 @@ bool FESoluteFlux::Init()
 		m_dofU.AddDof(fem->GetDOFIndex("sz"));
 
 	}
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofC);
 	return FESurfaceLoad::Init();
 }
 
