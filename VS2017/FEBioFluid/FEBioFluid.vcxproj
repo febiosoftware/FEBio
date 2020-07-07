@@ -509,6 +509,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowFSIStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h" />
@@ -587,6 +588,7 @@
     <ClInclude Include="..\..\FEBioFluid\FESolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowFSIStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEThermoFluid.h" />
@@ -602,6 +604,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowFSIStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluid.cpp" />
@@ -679,6 +682,7 @@
     <ClCompile Include="..\..\FEBioFluid\FESolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowFSIStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEThermoFluid.cpp" />
