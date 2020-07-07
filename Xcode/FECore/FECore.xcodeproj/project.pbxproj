@@ -125,6 +125,8 @@
 		D5709DAC22833034007CAB0A /* FETetgenRefine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709DA622833034007CAB0A /* FETetgenRefine.cpp */; };
 		D58FA88224A1631400FC768B /* FEConstValueVec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58FA88024A1631400FC768B /* FEConstValueVec3.cpp */; };
 		D58FA88324A1631400FC768B /* FEConstValueVec3.h in Headers */ = {isa = PBXBuildFile; fileRef = D58FA88124A1631400FC768B /* FEConstValueVec3.h */; };
+		D5946E2124B524F90009C22F /* mathalg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5946E1F24B524F90009C22F /* mathalg.cpp */; };
+		D5946E2224B524F90009C22F /* mathalg.h in Headers */ = {isa = PBXBuildFile; fileRef = D5946E2024B524F90009C22F /* mathalg.h */; };
 		D5A37D2A2286167300867D77 /* FEOctreeSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A37D282286167300867D77 /* FEOctreeSearch.h */; };
 		D5A37D2B2286167300867D77 /* FEOctreeSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A37D292286167300867D77 /* FEOctreeSearch.cpp */; };
 		D5A56F8323D4FBFE002F28CA /* tens4dmm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */; };
@@ -529,6 +531,8 @@
 		D5709DA622833034007CAB0A /* FETetgenRefine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETetgenRefine.cpp; sourceTree = "<group>"; };
 		D58FA88024A1631400FC768B /* FEConstValueVec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEConstValueVec3.cpp; sourceTree = "<group>"; };
 		D58FA88124A1631400FC768B /* FEConstValueVec3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConstValueVec3.h; sourceTree = "<group>"; };
+		D5946E1F24B524F90009C22F /* mathalg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mathalg.cpp; sourceTree = "<group>"; };
+		D5946E2024B524F90009C22F /* mathalg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mathalg.h; sourceTree = "<group>"; };
 		D5A37D282286167300867D77 /* FEOctreeSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctreeSearch.h; sourceTree = "<group>"; };
 		D5A37D292286167300867D77 /* FEOctreeSearch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOctreeSearch.cpp; sourceTree = "<group>"; };
 		D5A56F8223D4FBFE002F28CA /* tens4dmm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tens4dmm.hpp; sourceTree = "<group>"; };
@@ -1162,6 +1166,8 @@
 				D5B9E4F2213F67DE0008B38A /* mat3d.h */,
 				D5B9E40E213F67DE0008B38A /* mat3d.hpp */,
 				D5B9E4CA213F67DE0008B38A /* mat6d.h */,
+				D5946E1F24B524F90009C22F /* mathalg.cpp */,
+				D5946E2024B524F90009C22F /* mathalg.h */,
 				D54E21C621517EEB008A9DD3 /* MathObject.cpp */,
 				D54E21C321517EEB008A9DD3 /* MathObject.h */,
 				D5B9E49F213F67DE0008B38A /* matrix.cpp */,
@@ -1362,6 +1368,7 @@
 				D5B9E527213F67DE0008B38A /* FEElementTraits.h in Headers */,
 				D5F1948221908646000F738D /* Preconditioner.h in Headers */,
 				D5613D57217B604F007CAB89 /* FEPointFunction.h in Headers */,
+				D5946E2224B524F90009C22F /* mathalg.h in Headers */,
 				D52D840021CE89A200472620 /* FEScalarValuator.h in Headers */,
 				D5709DAB22833034007CAB0A /* FEDofList.h in Headers */,
 				D5B9E5E5213F67DE0008B38A /* tens3ds.hpp in Headers */,
@@ -1578,6 +1585,7 @@
 				D5F1948121908646000F738D /* Preconditioner.cpp in Sources */,
 				D5B9E5D3213F67DE0008B38A /* FECorePlot.cpp in Sources */,
 				D54E21B12149BB56008A9DD3 /* FEFacetSet.cpp in Sources */,
+				D5946E2124B524F90009C22F /* mathalg.cpp in Sources */,
 				D5B9E5A2213F67DE0008B38A /* FEClosestPointProjection.cpp in Sources */,
 				D5B9E509213F67DE0008B38A /* FECube.cpp in Sources */,
 				D5B9E592213F67DE0008B38A /* FEDataExport.cpp in Sources */,
