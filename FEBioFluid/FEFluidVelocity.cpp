@@ -43,6 +43,9 @@ END_FECORE_CLASS();
 FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D), m_dofW(pfem), m_dofEF(pfem)
 {
     m_scale = 1.0;
+
+    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -89,15 +92,9 @@ void FEFluidVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! initialize
 bool FEFluidVelocity::Init()
 {
-	m_dofW.Clear();
-	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
-	m_dofEF.Clear();
-	if (m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
-
-	m_dof.AddDofs(m_dofW);
-	m_dof.AddDofs(m_dofEF);
-
-    FESurfaceLoad::Init();
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDofs(m_dofEF);
     
     // evaluate nodal velocities from boundary cards
 	FESurface* ps = &GetSurface();
@@ -120,7 +117,7 @@ bool FEFluidVelocity::Init()
     
     for (int i=0; i<ps->Nodes(); ++i) m_VN[i] /= nf[i];
     
-    return true;
+    return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------

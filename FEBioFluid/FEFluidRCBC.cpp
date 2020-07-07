@@ -65,6 +65,10 @@ bool FEFluidRCBC::Init()
 {
     if (FESurfaceLoad::Init() == false) return false;
     
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofEF);
+
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);

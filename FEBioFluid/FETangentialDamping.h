@@ -40,6 +40,9 @@ public:
     //! constructor
     FETangentialDamping(FEModel* pfem);
     
+    //! Initialization
+    bool Init() override;
+    
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;
     

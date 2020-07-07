@@ -40,7 +40,7 @@ END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofW(pfem)
+FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_beta = 1.0;
     m_rho = 1.0;
@@ -58,19 +58,11 @@ void FETangentialFlowStabilization::SetSurface(FESurface* ps)
 bool FETangentialFlowStabilization::Init()
 {
 	// get the degrees of freedom
-	m_dofU.Clear();
-	if (m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT)) == false) return false;
-
 	m_dofW.Clear();
 	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
 
     m_dof.Clear();
-    m_dof.AddDof(m_dofU[0]);
-    m_dof.AddDof(m_dofU[1]);
-    m_dof.AddDof(m_dofU[2]);
-    m_dof.AddDof(m_dofW[0]);
-    m_dof.AddDof(m_dofW[1]);
-    m_dof.AddDof(m_dofW[2]);
+    m_dof.AddDofs(m_dofW);
 
     if (FESurfaceLoad::Init() == false) return false;
     
@@ -141,10 +133,7 @@ void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 //-----------------------------------------------------------------------------
 void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEDofList dofs(GetFEModel());
-	dofs.AddDofs(m_dofU);
-	dofs.AddDofs(m_dofW);
-	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
 		FESurfaceElement& el = *mp.SurfaceElement();
 		double alpha = tp.alphaf;
@@ -165,27 +154,17 @@ void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FE
 		vec3d vtau = (I - dyad(n))*v;
         double vmag = vtau.unit();
         mat3d K = (I - dyad(n) + dyad(vtau))*(-m_beta*m_rho*vmag*da);
-        // force vector (change sign for inflow vs outflow)
-        vec3d ttt = vtau*(-m_beta*m_rho*vmag);
 
 		// shape functions and derivatives
 		double H_i  = dof_a.shape;
 
 		double H_j  = dof_b.shape;
-		double Gr_j = dof_b.shape_deriv_r;
-		double Gs_j = dof_b.shape_deriv_s;
 
         // calculate stiffness component
 		mat3d Kww = K*(H_i*H_j*alpha);
-		vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i*alpha);
-		mat3d Kwu; Kwu.skew(g);
-		Kwu = (ttt & n)*Kwu;
 		Kab.zero();
 
-		// dw/du
-		Kab.sub(3, 0, Kwu);
-
 		// dw/dw
-		Kab.sub(3, 3, Kww);
+		Kab.sub(0, 0, Kww);
 	});
 }

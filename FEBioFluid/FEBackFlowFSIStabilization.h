@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,11 +33,11 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Backflow stabilization prescribes a normal traction that opposes
 //! backflow on a boundary surface.
-class FEBIOFLUID_API FEBackFlowStabilization : public FESurfaceLoad
+class FEBIOFLUID_API FEBackFlowFSIStabilization : public FESurfaceLoad
 {
 public:
     //! constructor
-    FEBackFlowStabilization(FEModel* pfem);
+    FEBackFlowFSIStabilization(FEModel* pfem);
     
     //! calculate pressure stiffness
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
@@ -52,14 +52,15 @@ public:
     bool Init() override;
     
 protected:
-	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
+    vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
     
 protected:
-    double			m_beta;     //!< backflow stabilization coefficient
+    double          m_beta;     //!< backflow stabilization coefficient
     double          m_rho;      //!< fluid density
     
     // degrees of freedom
-	FEDofList	m_dofW;
+    FEDofList    m_dofU;
+    FEDofList    m_dofW;
     
     DECLARE_FECORE_CLASS();
 };

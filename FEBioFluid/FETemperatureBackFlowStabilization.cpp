@@ -35,7 +35,6 @@ SOFTWARE.*/
 //! constructor
 FETemperatureBackFlowStabilization::FETemperatureBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +45,7 @@ bool FETemperatureBackFlowStabilization::Init()
     
     // determine the nr of concentration equations
     m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
-    m_dof.AddVariable(m_dofT);
+    m_dof.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
 
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
