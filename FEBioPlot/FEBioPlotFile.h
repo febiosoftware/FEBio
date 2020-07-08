@@ -37,6 +37,11 @@ SOFTWARE.*/
 #include <list>
 using namespace std;
 
+// flag to indicate whether to use the 3.0 plot file
+#if defined(WIN32) && defined(_DEBUG)
+#define PLOT_FILE_3	1
+#endif
+
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
 //! plot file format (version 2).
@@ -45,8 +50,11 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
+#ifdef PLOT_FILE_3
+	enum { PLT_VERSION = 0x0030 };
+#else
 	enum { PLT_VERSION = 0x0008 };
-
+#endif
 	// file tags
 	enum { 
 		PLT_ROOT						= 0x01000000,
@@ -109,6 +117,12 @@ public:
 				PLT_PART				= 0x01045100,
 				PLT_PART_ID				= 0x01045101,
 				PLT_PART_NAME			= 0x01045102,
+			PLT_OBJECTS_SECTION			= 0x01050000,		// new in 3.0
+				PLT_OBJECT				= 0x01051000,		// new in 3.0
+					PLT_OBJECT_ID		= 0x01051001,		// new in 3.0
+					PLT_OBJECT_NAME		= 0x01051002,		// new in 3.0
+					PLT_OBJECT_POS		= 0x01051003,		// new in 3.0
+					PLT_OBJECT_ROT		= 0x01051004,		// new in 3.0
 		PLT_STATE						= 0x02000000,
 			PLT_STATE_HEADER			= 0x02010000,
 				PLT_STATE_HDR_ID		= 0x02010001,
@@ -123,7 +137,8 @@ public:
 				PLT_ELEMENT_DATA		= 0x02020400,
 				PLT_FACE_DATA			= 0x02020500,
 			PLT_MESH_STATE				= 0x02030000,
-				PLT_ELEMENT_STATE		= 0x02030001
+				PLT_ELEMENT_STATE		= 0x02030001,
+			PLT_OBJECTS_STATE			= 0x02040000
 	};
 	// --- element types ---
 	enum Elem_Type { 
@@ -210,6 +225,18 @@ public:
 		FESurface*	surf;
 	};
 
+	class Object
+	{
+	public:
+		Object() {}
+
+	public:
+		vec3d	m_r;	// object position
+		quatd	m_q;	// object orientation
+
+		std::string	m_name;
+	};
+
 public:
 	FEBioPlotFile(FEModel& fem);
 	~FEBioPlotFile(void);
@@ -241,6 +268,11 @@ public:
 	bool WriteMeshSection(FEModel& fem);
 
 public:
+	int Objects();
+	Object* GetObject(int i);
+	Object* AddObject(const std::string& name);
+
+public:
 	const Dictionary& GetDictionary() const { return m_dic; }
 
 protected:
@@ -255,6 +287,7 @@ protected:
 	void WriteSurfaceSection(FEMesh& m);
 	void WriteNodeSetSection(FEMesh& m);
 	void WritePartsSection  (FEModel& fem);
+	void WriteObjectsSection();
 
 	void WriteSolidDomain   (FESolidDomain&    dom);
 	void WriteShellDomain   (FEShellDomain&    dom);
@@ -266,6 +299,7 @@ protected:
 	void WriteNodeData    (FEModel& fem);
 	void WriteDomainData  (FEModel& fem);
 	void WriteSurfaceData (FEModel& fem);
+	void WriteObjectsState();
 
 	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
 	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
@@ -285,4 +319,6 @@ protected:
 	int			m_ncompress;	// compression level
 
 	vector<Surface>	m_Surf;
+
+	vector<Object*>	m_Obj;
 };

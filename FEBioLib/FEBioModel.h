@@ -189,6 +189,9 @@ private:
 	void echo_input();
 
 private:
+	void UpdatePlotObjects();
+
+private:
 	Timer		m_SolveTime;	//!< timer to track total time to solve problem
 	Timer		m_InputTime;	//!< timer to track time to read model
 	Timer		m_InitTime;		//!< timer to track model initialization

@@ -549,6 +549,28 @@ bool FEBioPlotFile::AddVariable(const char* sz, vector<int>& item, const char* s
 }
 
 //-----------------------------------------------------------------------------
+int FEBioPlotFile::Objects()
+{
+	return (int) m_Obj.size();
+}
+
+//-----------------------------------------------------------------------------
+FEBioPlotFile::Object* FEBioPlotFile::GetObject(int i)
+{
+	if ((i >= 0) && (i < Objects())) return m_Obj[i];
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+FEBioPlotFile::Object* FEBioPlotFile::AddObject(const std::string& name)
+{
+	Object* po = new Object;
+	m_Obj.push_back(po);
+	po->m_name = name;
+	return po;
+}
+
+//-----------------------------------------------------------------------------
 void FEBioPlotFile::SetCompression(int n)
 {
 	m_ncompress = n;
@@ -765,6 +787,18 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 			}
 			m_ar.EndChunk();
 		}
+
+#ifdef PLOT_FILE_3
+		// additional objects
+		if (m_Obj.size() > 0)
+		{
+			m_ar.BeginChunk(PLT_OBJECTS_SECTION);
+			{
+				WriteObjectsSection();
+			}
+			m_ar.EndChunk();
+		}
+#endif
 	}
 	m_ar.EndChunk();
 
@@ -1173,6 +1207,27 @@ void FEBioPlotFile::WritePartsSection(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteObjectsSection()
+{
+	for (int i = 0; i < m_Obj.size(); ++i)
+	{
+		Object* po = GetObject(i);
+		m_ar.BeginChunk(PLT_OBJECT);
+		{
+			m_ar.WriteChunk(PLT_OBJECT_NAME, po->m_name.c_str());
+			vec3d& r = po->m_r;
+			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
+			m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
+
+			quatd q = po->m_q;
+			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
+			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
+		}
+		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 {
 	// store the fem pointer
@@ -1239,6 +1294,17 @@ bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 			}
 		}
 		m_ar.EndChunk();
+
+#ifdef PLOT_FILE_3
+		if (m_Obj.size() > 0)
+		{
+			m_ar.BeginChunk(PLT_OBJECTS_STATE);
+			{
+				WriteObjectsState();
+			}
+			m_ar.EndChunk();
+		}
+#endif
 	}
 	m_ar.EndChunk();
 
@@ -1559,4 +1625,29 @@ void FEBioPlotFile::WriteMeshState(FEMesh& mesh)
 	}
 
 	m_ar.WriteChunk(PLT_ELEMENT_STATE, flags);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteObjectsState()
+{
+	for (int i = 0; i < Objects(); ++i)
+	{
+		Object* po = m_Obj[i];
+
+		int id = i + 1;
+
+		m_ar.BeginChunk(PLT_OBJECT);
+		{
+			m_ar.WriteChunk(PLT_OBJECT_ID, id);
+
+			vec3d& r = po->m_r;
+			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
+			m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
+
+			quatd q = po->m_q;
+			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
+			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
+		}
+		m_ar.EndChunk();
+	}
 }

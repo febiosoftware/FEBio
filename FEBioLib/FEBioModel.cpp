@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "febio.h"
 #include "version.h"
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 #ifdef WIN32
@@ -491,6 +492,9 @@ void FEBioModel::Write(unsigned int nwhen)
 			{
 				if (m_plot->IsValid() == false)
 				{
+					// Add the plot objects
+					UpdatePlotObjects();
+
 					if (m_plot->Open(*this, m_splot.c_str()) == false)
 					{
 						feLog("ERROR : Failed creating PLOT database\n");
@@ -590,6 +594,9 @@ void FEBioModel::Write(unsigned int nwhen)
 				// output the state if requested
 				if (bout) 
 				{
+					// update the plot objects
+					UpdatePlotObjects();
+
 					// see if we need to write a new mesh section
 					if (m_writeMesh) {
 						FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
@@ -670,6 +677,54 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	// Flushing the logfile each time we get here might be a bit overkill.
 	// For now, I'm flushing the log file in the output_cb method.
 //	m_log.flush();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::UpdatePlotObjects()
+{
+	FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
+	if (plt == nullptr) return;
+
+	int nrb = RigidBodies();
+	if (nrb == 0) return;
+
+	if (plt->Objects() == 0)
+	{
+		for (int i = 0; i < nrb; ++i)
+		{
+			FERigidBody* rb = GetRigidBody(i);
+			string name = rb->GetName();
+			if (name.empty())
+			{
+				stringstream ss;
+				ss << "Object" << i + 1;
+				name = ss.str();
+			}
+
+			FEBioPlotFile::Object* po = plt->AddObject(name);
+			po->m_r = rb->m_r0;
+			po->m_q = quatd(0, vec3d(1,0,0));
+		}
+	}
+	else
+	{
+		assert(nrb == plt->Objects());
+		for (int i = 0; i < nrb; ++i)
+		{
+			FERigidBody* rb = GetRigidBody(i);
+			string name = rb->GetName();
+			if (name.empty())
+			{
+				stringstream ss;
+				ss << "Object" << i + 1;
+				name = ss.str();
+			}
+
+			FEBioPlotFile::Object* po = plt->GetObject(i);
+			po->m_r = rb->m_rt;
+			po->m_q = rb->GetRotation();
+		}
+	}
 }
 
 //=============================================================================
@@ -872,13 +927,15 @@ bool FEBioModel::Init()
 		if (InitLogFile() == false) return false;
 	}
 
+	FEBioPlotFile* pplt = nullptr;
+
 	// open plot database file
 	FEAnalysis* step = GetCurrentStep();
 	if (step->GetPlotLevel() != FE_PLOT_NEVER)
 	{
 		if (m_plot == 0) 
 		{
-			FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+			pplt = new FEBioPlotFile(*this);
 			m_plot = pplt;
 
 			// set compression
