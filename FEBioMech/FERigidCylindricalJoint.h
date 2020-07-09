@@ -42,7 +42,7 @@ public:
     FERigidCylindricalJoint(FEModel* pfem);
     
     //! destructor
-    virtual ~FERigidCylindricalJoint() {}
+	~FERigidCylindricalJoint();
     
     //! initialization
     bool Init() override;
@@ -70,6 +70,12 @@ public:
     
     //! evaluate relative rotation
     vec3d RelativeRotation() override;
+
+	//! initial position 
+	vec3d InitialPosition() const;
+
+	//! current position
+	vec3d Position() const;
 
 protected:
 	int InitEquations(int neq) override;

@@ -80,6 +80,29 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnect
 }
 
 //-----------------------------------------------------------------------------
+FERigidCylindricalJoint::~FERigidCylindricalJoint()
+{
+
+}
+
+//-----------------------------------------------------------------------------
+//! initial position 
+vec3d FERigidCylindricalJoint::InitialPosition() const
+{
+	return m_q0;
+}
+
+//-----------------------------------------------------------------------------
+//! current position
+vec3d FERigidCylindricalJoint::Position() const
+{
+	FERigidBody& RBa = *m_rbA;
+	vec3d qa = m_qa0;
+	RBa.GetRotation().RotateVector(qa);
+	return RBa.m_rt + qa;
+}
+
+//-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
 bool FERigidCylindricalJoint::Init()

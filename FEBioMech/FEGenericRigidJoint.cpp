@@ -110,6 +110,25 @@ bool FEGenericRigidJoint::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! initial position 
+vec3d FEGenericRigidJoint::InitialPosition() const
+{
+	return m_q0;
+}
+
+//-----------------------------------------------------------------------------
+//! current position
+vec3d FEGenericRigidJoint::Position() const
+{
+	FERigidBody& RBa = *m_rbA;
+	quatd Qa = RBa.GetRotation();
+	vec3d qa = Qa * m_qa0;
+	vec3d ra = RBa.m_rt;
+	
+	return ra + qa;
+}
+
+//-----------------------------------------------------------------------------
 // allocate equations
 int FEGenericRigidJoint::InitEquations(int neq)
 {

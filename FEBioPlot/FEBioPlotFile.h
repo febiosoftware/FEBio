@@ -118,11 +118,17 @@ public:
 				PLT_PART_ID				= 0x01045101,
 				PLT_PART_NAME			= 0x01045102,
 			PLT_OBJECTS_SECTION			= 0x01050000,		// new in 3.0
-				PLT_OBJECT				= 0x01051000,		// new in 3.0
-					PLT_OBJECT_ID		= 0x01051001,		// new in 3.0
-					PLT_OBJECT_NAME		= 0x01051002,		// new in 3.0
-					PLT_OBJECT_POS		= 0x01051003,		// new in 3.0
-					PLT_OBJECT_ROT		= 0x01051004,		// new in 3.0
+				PLT_POINT_OBJECT		= 0x01051000,		// new in 3.0
+					PLT_POINT_ID		= 0x01051001,		// new in 3.0
+					PLT_POINT_TAG		= 0x01051002,		// new in 3.0
+					PLT_POINT_NAME		= 0x01051003,		// new in 3.0
+					PLT_POINT_POS		= 0x01051004,		// new in 3.0
+					PLT_POINT_ROT		= 0x01051005,		// new in 3.0
+				PLT_LINE_OBJECT			= 0x01052000,		// new in 3.0
+					PLT_LINE_ID			= 0x01052001,		// new in 3.0
+					PLT_LINE_TAG		= 0x01052002,		// new in 3.0
+					PLT_LINE_NAME		= 0x01052003,		// new in 3.0
+					PLT_LINE_COORDS		= 0x01052004,		// new in 3.0
 		PLT_STATE						= 0x02000000,
 			PLT_STATE_HEADER			= 0x02010000,
 				PLT_STATE_HDR_ID		= 0x02010001,
@@ -225,14 +231,32 @@ public:
 		FESurface*	surf;
 	};
 
-	class Object
+	class PointObject
 	{
 	public:
-		Object() {}
+		PointObject() { m_tag = 0; m_id = 0; }
 
 	public:
+		int		m_id;
+		int		m_tag;
+
 		vec3d	m_r;	// object position
 		quatd	m_q;	// object orientation
+
+		std::string	m_name;
+	};
+
+	class LineObject
+	{
+	public:
+		LineObject() {	m_tag = 0; m_id = 0;}
+
+	public:
+		int		m_id;
+		int		m_tag;
+
+		vec3d	m_r1;
+		vec3d	m_r2;
 
 		std::string	m_name;
 	};
@@ -268,9 +292,13 @@ public:
 	bool WriteMeshSection(FEModel& fem);
 
 public:
-	int Objects();
-	Object* GetObject(int i);
-	Object* AddObject(const std::string& name);
+	int PointObjects();
+	PointObject* GetPointObject(int i);
+	PointObject* AddPointObject(const std::string& name);
+
+	int LineObjects();
+	LineObject* GetLineObject(int i);
+	LineObject* AddLineObject(const std::string& name);
 
 public:
 	const Dictionary& GetDictionary() const { return m_dic; }
@@ -320,5 +348,6 @@ protected:
 
 	vector<Surface>	m_Surf;
 
-	vector<Object*>	m_Obj;
+	vector<PointObject*>	m_Points;
+	vector<LineObject*>		m_Lines;
 };

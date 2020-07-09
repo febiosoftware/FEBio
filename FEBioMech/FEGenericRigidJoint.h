@@ -58,6 +58,12 @@ public:
 	//! Reset data
 	void Reset() override;
 
+	//! initial position 
+	vec3d InitialPosition() const;
+
+	//! current position
+	vec3d Position() const;
+
 protected:
 	void UnpackLM(vector<int>& lm);
 

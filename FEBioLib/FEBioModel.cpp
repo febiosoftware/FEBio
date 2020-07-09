@@ -34,7 +34,14 @@ SOFTWARE.*/
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include <FEBioMech/ObjectDataRecord.h>
-#include "FECore/NLConstraintDataRecord.h"
+#include <FECore/NLConstraintDataRecord.h>
+#include <FEBioMech/FERigidConnector.h>
+#include <FEBioMech/FEGenericRigidJoint.h>
+#include <FEBioMech/FERigidPrismaticJoint.h>
+#include <FEBioMech/FERigidRevoluteJoint.h>
+#include <FEBioMech/FERigidCylindricalJoint.h>
+#include <FEBioMech/FERigidDamper.h>
+#include <FEBioMech/FERigidSpring.h>
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"
@@ -688,8 +695,11 @@ void FEBioModel::UpdatePlotObjects()
 	int nrb = RigidBodies();
 	if (nrb == 0) return;
 
-	if (plt->Objects() == 0)
+	FEModel& fem = *GetFEModel();
+
+	if (plt->PointObjects() == 0)
 	{
+		int nid = 1;
 		for (int i = 0; i < nrb; ++i)
 		{
 			FERigidBody* rb = GetRigidBody(i);
@@ -697,18 +707,73 @@ void FEBioModel::UpdatePlotObjects()
 			if (name.empty())
 			{
 				stringstream ss;
-				ss << "Object" << i + 1;
+				ss << "Object" << nid;
 				name = ss.str();
 			}
 
-			FEBioPlotFile::Object* po = plt->AddObject(name);
+			FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+			po->m_id = nid++;
+			po->m_tag = 1;
 			po->m_r = rb->m_r0;
 			po->m_q = quatd(0, vec3d(1,0,0));
+		}
+
+		// check rigid connectors
+		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+		{
+			FENLConstraint* pc = fem.NonlinearConstraint(i);
+
+			string name = pc->GetName();
+			if (name.empty())
+			{
+				stringstream ss;
+				ss << "Object" << nid;
+				name = ss.str();
+			}
+
+			FEGenericRigidJoint* rj = dynamic_cast<FEGenericRigidJoint*>(pc);
+			if (rj)
+			{
+				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+				po->m_id = nid++;
+				po->m_tag = 2;
+				po->m_r = rj->InitialPosition();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+
+			FERigidPrismaticJoint* rpj = dynamic_cast<FERigidPrismaticJoint*>(pc);
+			if (rpj)
+			{
+				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+				po->m_id = nid++;
+				po->m_tag = 3;
+				po->m_r = rpj->InitialPosition();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+
+			FERigidRevoluteJoint* rrj = dynamic_cast<FERigidRevoluteJoint*>(pc);
+			if (rrj)
+			{
+				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+				po->m_id = nid++;
+				po->m_tag = 4;
+				po->m_r = rrj->InitialPosition();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+
+			FERigidCylindricalJoint* rcj = dynamic_cast<FERigidCylindricalJoint*>(pc);
+			if (rcj)
+			{
+				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+				po->m_id = nid++;
+				po->m_tag = 5;
+				po->m_r = rcj->InitialPosition();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
 		}
 	}
 	else
 	{
-		assert(nrb == plt->Objects());
 		for (int i = 0; i < nrb; ++i)
 		{
 			FERigidBody* rb = GetRigidBody(i);
@@ -720,9 +785,122 @@ void FEBioModel::UpdatePlotObjects()
 				name = ss.str();
 			}
 
-			FEBioPlotFile::Object* po = plt->GetObject(i);
+			FEBioPlotFile::PointObject* po = plt->GetPointObject(i);
 			po->m_r = rb->m_rt;
 			po->m_q = rb->GetRotation();
+		}
+
+		// check rigid connectors
+		int n = nrb;
+		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+		{
+			FENLConstraint* pc = fem.NonlinearConstraint(i);
+
+			FEGenericRigidJoint* rj = dynamic_cast<FEGenericRigidJoint*>(pc);
+			if (rj)
+			{
+				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+				po->m_r = rj->Position();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+
+			FERigidPrismaticJoint* rpj = dynamic_cast<FERigidPrismaticJoint*>(pc);
+			if (rpj)
+			{
+				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+				po->m_r = rpj->Position();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+
+			FERigidRevoluteJoint* rrj = dynamic_cast<FERigidRevoluteJoint*>(pc);
+			if (rrj)
+			{
+				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+				po->m_r = rrj->Position();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+
+			FERigidCylindricalJoint* rcj = dynamic_cast<FERigidCylindricalJoint*>(pc);
+			if (rcj)
+			{
+				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+				po->m_r = rcj->Position();
+				po->m_q = quatd(0, vec3d(1, 0, 0));
+			}
+		}
+	}
+
+	if (plt->LineObjects() == 0)
+	{
+		int nid = 1;
+
+		// check rigid connectors
+		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+		{
+			FERigidConnector* prc = dynamic_cast<FERigidConnector*>(fem.NonlinearConstraint(i));
+			if (prc)
+			{
+				string name = prc->GetName();
+				if (name.empty())
+				{
+					stringstream ss;
+					ss << "Object" << nid;
+					name = ss.str();
+				}
+
+				vec3d ra = GetRigidBody(prc->m_nRBa)->m_r0;
+				vec3d rb = GetRigidBody(prc->m_nRBb)->m_r0;
+
+				FERigidSpring* rs = dynamic_cast<FERigidSpring*>(prc);
+				if (rs)
+				{
+					FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
+					po->m_id = nid++;
+					po->m_tag = 1;
+					po->m_r1 = ra;
+					po->m_r2 = rb;
+				}
+
+				FERigidDamper* rd = dynamic_cast<FERigidDamper*>(prc);
+				if (rd)
+				{
+					FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
+					po->m_id = nid++;
+					po->m_tag = 2;
+					po->m_r1 = ra;
+					po->m_r2 = rb;
+				}
+			}
+		}
+	}
+	else
+	{
+		// check rigid connectors
+		int n = 0;
+		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+		{
+			FERigidConnector* prc = dynamic_cast<FERigidConnector*>(fem.NonlinearConstraint(i));
+			if (prc)
+			{
+				vec3d ra = GetRigidBody(prc->m_nRBa)->m_rt;
+				vec3d rb = GetRigidBody(prc->m_nRBb)->m_rt;
+
+				FERigidSpring* rs = dynamic_cast<FERigidSpring*>(prc);
+				if (rs)
+				{
+					FEBioPlotFile::LineObject* po = plt->GetLineObject(n++);
+					po->m_r1 = ra;
+					po->m_r2 = rb;
+				}
+
+				FERigidDamper* rd = dynamic_cast<FERigidDamper*>(prc);
+				if (rd)
+				{
+					FEBioPlotFile::LineObject* po = plt->GetLineObject(n++);
+					po->m_r1 = ra;
+					po->m_r2 = rb;
+				}
+			}
 		}
 	}
 }

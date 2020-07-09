@@ -73,6 +73,11 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(p
 	m_bautopen = false;
 }
 
+FERigidPrismaticJoint::~FERigidPrismaticJoint()
+{
+
+}
+
 //-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
@@ -113,6 +118,23 @@ void FERigidPrismaticJoint::Serialize(DumpStream& ar)
     ar & m_e0;
     ar & m_ea0;
     ar & m_eb0;
+}
+
+//-----------------------------------------------------------------------------
+//! initial position 
+vec3d FERigidPrismaticJoint::InitialPosition() const
+{
+	return m_q0;
+}
+
+//-----------------------------------------------------------------------------
+//! current position
+vec3d FERigidPrismaticJoint::Position() const
+{
+	FERigidBody& RBa = *m_rbA;
+	vec3d qa = m_qa0; 
+	RBa.GetRotation().RotateVector(qa);
+	return RBa.m_rt + qa;
 }
 
 //-----------------------------------------------------------------------------

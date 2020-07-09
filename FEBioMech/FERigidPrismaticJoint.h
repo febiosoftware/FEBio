@@ -42,7 +42,7 @@ public:
     FERigidPrismaticJoint(FEModel* pfem);
     
     //! destructor
-    virtual ~FERigidPrismaticJoint() {}
+	~FERigidPrismaticJoint();
     
     //! initialization
     bool Init() override;
@@ -70,6 +70,12 @@ public:
     
     //! evaluate relative rotation
     vec3d RelativeRotation() override;
+
+	//! initial position 
+	vec3d InitialPosition() const;
+
+	//! current position
+	vec3d Position() const;
 
 public: // parameters
     double	m_atol;	//! augmented Lagrangian tolerance

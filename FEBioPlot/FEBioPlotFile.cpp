@@ -549,23 +549,45 @@ bool FEBioPlotFile::AddVariable(const char* sz, vector<int>& item, const char* s
 }
 
 //-----------------------------------------------------------------------------
-int FEBioPlotFile::Objects()
+int FEBioPlotFile::PointObjects()
 {
-	return (int) m_Obj.size();
+	return (int) m_Points.size();
 }
 
 //-----------------------------------------------------------------------------
-FEBioPlotFile::Object* FEBioPlotFile::GetObject(int i)
+FEBioPlotFile::PointObject* FEBioPlotFile::GetPointObject(int i)
 {
-	if ((i >= 0) && (i < Objects())) return m_Obj[i];
+	if ((i >= 0) && (i < PointObjects())) return m_Points[i];
 	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
-FEBioPlotFile::Object* FEBioPlotFile::AddObject(const std::string& name)
+FEBioPlotFile::PointObject* FEBioPlotFile::AddPointObject(const std::string& name)
 {
-	Object* po = new Object;
-	m_Obj.push_back(po);
+	PointObject* po = new PointObject;
+	m_Points.push_back(po);
+	po->m_name = name;
+	return po;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioPlotFile::LineObjects()
+{
+	return (int)m_Lines.size();
+}
+
+//-----------------------------------------------------------------------------
+FEBioPlotFile::LineObject* FEBioPlotFile::GetLineObject(int i)
+{
+	if ((i >= 0) && (i < PointObjects())) return m_Lines[i];
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+FEBioPlotFile::LineObject* FEBioPlotFile::AddLineObject(const std::string& name)
+{
+	LineObject* po = new LineObject;
+	m_Lines.push_back(po);
 	po->m_name = name;
 	return po;
 }
@@ -790,7 +812,7 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 
 #ifdef PLOT_FILE_3
 		// additional objects
-		if (m_Obj.size() > 0)
+		if (m_Points.size() > 0)
 		{
 			m_ar.BeginChunk(PLT_OBJECTS_SECTION);
 			{
@@ -1209,19 +1231,44 @@ void FEBioPlotFile::WritePartsSection(FEModel& fem)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteObjectsSection()
 {
-	for (int i = 0; i < m_Obj.size(); ++i)
+	for (int i = 0; i < m_Points.size(); ++i)
 	{
-		Object* po = GetObject(i);
-		m_ar.BeginChunk(PLT_OBJECT);
+		PointObject* po = GetPointObject(i);
+		m_ar.BeginChunk(PLT_POINT_OBJECT);
 		{
-			m_ar.WriteChunk(PLT_OBJECT_NAME, po->m_name.c_str());
+			int id = i + 1;
+			m_ar.WriteChunk(PLT_POINT_ID, id);
+
+			m_ar.WriteChunk(PLT_POINT_TAG, po->m_tag);
+
+			m_ar.WriteChunk(PLT_POINT_NAME, po->m_name.c_str());
 			vec3d& r = po->m_r;
 			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
-			m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
+			m_ar.WriteChunk(PLT_POINT_POS, f, 3);
 
 			quatd q = po->m_q;
 			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
-			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
+			m_ar.WriteChunk(PLT_POINT_ROT, a, 4);
+		}
+		m_ar.EndChunk();
+	}
+
+	for (int i = 0; i < m_Lines.size(); ++i)
+	{
+		LineObject* po = GetLineObject(i);
+		m_ar.BeginChunk(PLT_LINE_OBJECT);
+		{
+			int id = i + 1;
+			m_ar.WriteChunk(PLT_LINE_ID, id);
+
+			m_ar.WriteChunk(PLT_LINE_TAG, po->m_tag);
+
+			m_ar.WriteChunk(PLT_LINE_NAME, po->m_name.c_str());
+			vec3d r1 = po->m_r1;
+			vec3d r2 = po->m_r2;
+
+			float f[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
+			m_ar.WriteChunk(PLT_LINE_COORDS, f, 6);
 		}
 		m_ar.EndChunk();
 	}
@@ -1296,7 +1343,7 @@ bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 		m_ar.EndChunk();
 
 #ifdef PLOT_FILE_3
-		if (m_Obj.size() > 0)
+		if (m_Points.size() > 0)
 		{
 			m_ar.BeginChunk(PLT_OBJECTS_STATE);
 			{
@@ -1630,23 +1677,35 @@ void FEBioPlotFile::WriteMeshState(FEMesh& mesh)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteObjectsState()
 {
-	for (int i = 0; i < Objects(); ++i)
+	for (int i = 0; i < PointObjects(); ++i)
 	{
-		Object* po = m_Obj[i];
-
-		int id = i + 1;
-
-		m_ar.BeginChunk(PLT_OBJECT);
+		PointObject* po = m_Points[i];
+		m_ar.BeginChunk(PLT_POINT_OBJECT);
 		{
-			m_ar.WriteChunk(PLT_OBJECT_ID, id);
+			m_ar.WriteChunk(PLT_POINT_ID, po->m_id);
 
 			vec3d& r = po->m_r;
 			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
-			m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
+			m_ar.WriteChunk(PLT_POINT_POS, f, 3);
 
 			quatd q = po->m_q;
 			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
-			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
+			m_ar.WriteChunk(PLT_POINT_ROT, a, 4);
+		}
+		m_ar.EndChunk();
+	}
+
+	for (int i = 0; i < m_Lines.size(); ++i)
+	{
+		LineObject* po = GetLineObject(i);
+		m_ar.BeginChunk(PLT_LINE_OBJECT);
+		{
+			m_ar.WriteChunk(PLT_LINE_ID, po->m_id);
+
+			vec3d r1 = po->m_r1;
+			vec3d r2 = po->m_r2;
+			float f[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
+			m_ar.WriteChunk(PLT_LINE_COORDS, f, 6);
 		}
 		m_ar.EndChunk();
 	}
