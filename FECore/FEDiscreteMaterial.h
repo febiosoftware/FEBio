@@ -36,6 +36,8 @@ class FECORE_API FEDiscreteMaterialPoint : public FEMaterialPoint
 public:
 	FEMaterialPoint* Copy();
 
+	void Serialize(DumpStream& ar) override;
+
 public:
 	vec3d	m_dr0;	// initial relative position
 	vec3d	m_drp;	// previous relative position

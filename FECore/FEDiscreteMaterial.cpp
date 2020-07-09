@@ -37,5 +37,12 @@ FEMaterialPoint* FEDiscreteMaterialPoint::Copy()
 	return pt;
 }
 
+void FEDiscreteMaterialPoint::Serialize(DumpStream& ar)
+{
+	FEMaterialPoint::Serialize(ar);
+	ar & m_dr0 & m_drp & m_drt & m_dvt;
+}
+
+
 //=============================================================================
 FEDiscreteMaterial::FEDiscreteMaterial(FEModel* pfem) : FEMaterial(pfem) {}

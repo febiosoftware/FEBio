@@ -48,6 +48,7 @@ FEMaterialPoint* FEConstPrestrainGradient::MaterialPointData::Copy()
 //-----------------------------------------------------------------------------
 void FEConstPrestrainGradient::MaterialPointData::Serialize(DumpStream& ar)
 {
+	FEMaterialPoint::Serialize(ar);
 	ar & Fp;
 }
 

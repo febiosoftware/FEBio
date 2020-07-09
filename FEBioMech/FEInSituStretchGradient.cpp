@@ -45,14 +45,8 @@ FEMaterialPoint* FEInSituStretchGradient::MaterialPointData::Copy()
 
 void FEInSituStretchGradient::MaterialPointData::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_lam;
-	}
-	else
-	{
-		ar >> m_lam;
-	}
+	FEMaterialPoint::Serialize(ar);
+	ar & m_lam;
 }
 
 //-----------------------------------------------------------------------------

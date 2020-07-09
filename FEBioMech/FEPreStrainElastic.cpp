@@ -47,6 +47,7 @@ void FEPrestrainMaterialPoint::Init(bool bflag)
 //! Serialization
 void FEPrestrainMaterialPoint::Serialize(DumpStream& dmp)
 {
+	FEMaterialPoint::Serialize(dmp);
 	dmp & F0 & Fc;
 }
 
