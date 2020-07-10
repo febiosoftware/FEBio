@@ -107,6 +107,14 @@ bool FEFacetSlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! serialization
+void FEFacetSlidingSurface::Serialize(DumpStream& ar)
+{
+	FEContactSurface::Serialize(ar);
+	ar & m_Fn;
+}
+
+//-----------------------------------------------------------------------------
 vec3d FEFacetSlidingSurface::GetContactForce()
 {
 	// initialize contact force

@@ -78,6 +78,9 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 public:
     void GetVectorGap      (int nface, vec3d& pg) override;
     void GetContactTraction(int nface, vec3d& pt) override;
@@ -85,10 +88,7 @@ public:
     void GetNodalContactPressure(int nface, double* pg) override;
     void GetNodalContactTraction(int nface, vec3d* pt) override;
     void GetStickStatus(int nface, double& pg) override;
-    
-protected:
-    FEModel*	m_pfem;
-    
+     
 public:
     vec3d    m_Ft;     //!< total contact force (from equivalent nodal forces)
 };

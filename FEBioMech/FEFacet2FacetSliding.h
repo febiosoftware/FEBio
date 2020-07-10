@@ -67,6 +67,9 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 public:
     void GetContactTraction(int nface, vec3d& pt) override;
 	void GetNodalContactPressure(int nface, double* pn) override;

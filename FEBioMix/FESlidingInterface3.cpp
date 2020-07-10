@@ -102,7 +102,6 @@ void FESlidingSurface3::Data::Serialize(DumpStream& ar)
 FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 { 
 	m_bporo = m_bsolu = false;
-	m_pfem = pfem; 
 	m_dofC = -1;
 }
 
@@ -373,6 +372,7 @@ void FESlidingSurface3::Serialize(DumpStream& ar)
 	ar & m_poro;
 	ar & m_solu;
 	ar & m_pn;
+	ar & m_Ft;
 }
 
 //-----------------------------------------------------------------------------

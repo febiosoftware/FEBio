@@ -95,7 +95,7 @@ void FESlidingSurfaceBW::Data::Serialize(DumpStream& ar)
 
 FESlidingSurfaceBW::FESlidingSurfaceBW(FEModel* pfem) : FEContactSurface(pfem)
 {
-    m_pfem = pfem;
+    
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +129,14 @@ void FESlidingSurfaceBW::InitSlidingSurface()
 FEMaterialPoint* FESlidingSurfaceBW::CreateMaterialPoint()
 {
 	return new FESlidingSurfaceBW::Data;
+}
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FESlidingSurfaceBW::Serialize(DumpStream& ar)
+{
+	FEContactSurface::Serialize(ar);
+	ar & m_Ft;
 }
 
 //-----------------------------------------------------------------------------

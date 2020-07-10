@@ -92,9 +92,6 @@ public:
 private:
 	void GetContactPressure(int nface, double& pg);
 
-protected:
-	FEModel*	m_pfem;
-
 public:
 	bool	m_bporo;	//!< set poro-mode
 

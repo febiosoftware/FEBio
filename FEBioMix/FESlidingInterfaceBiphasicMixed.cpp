@@ -106,7 +106,6 @@ void FESlidingSurfaceBiphasicMixed::Data::Serialize(DumpStream& ar)
 FESlidingSurfaceBiphasicMixed::FESlidingSurfaceBiphasicMixed(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 {
     m_bporo = false;
-    m_pfem = pfem;
 }
 
 //-----------------------------------------------------------------------------
@@ -391,6 +390,7 @@ void FESlidingSurfaceBiphasicMixed::Serialize(DumpStream& ar)
 	ar & m_nn;
 	ar & m_pn;
 	ar & m_tn;
+	ar & m_Ft;
 }
 
 //-----------------------------------------------------------------------------

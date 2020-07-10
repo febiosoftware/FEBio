@@ -104,8 +104,7 @@ void FESlidingSurfaceBiphasic::Data::Serialize(DumpStream& ar)
 FESlidingSurfaceBiphasic::FESlidingSurfaceBiphasic(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 {
     m_bporo = false;
-    m_pfem = pfem;
-}
+ }
 
 //-----------------------------------------------------------------------------
 //! create material point data
@@ -380,6 +379,7 @@ void FESlidingSurfaceBiphasic::Serialize(DumpStream& ar)
 	ar & m_nn;
 	ar & m_pn;
 	ar & m_tn;
+	ar & m_Ft;
 }
 
 //-----------------------------------------------------------------------------

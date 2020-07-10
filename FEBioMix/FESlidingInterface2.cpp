@@ -92,7 +92,6 @@ void FESlidingSurface2::Data::Serialize(DumpStream& ar)
 FESlidingSurface2::FESlidingSurface2(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 { 
 	m_bporo = false;
-	m_pfem = pfem; 
 }
 
 //-----------------------------------------------------------------------------

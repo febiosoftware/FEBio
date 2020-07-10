@@ -123,7 +123,7 @@ vec3d FERigidSlidingSurface::GetContactForce()
 void FERigidSlidingSurface::Serialize(DumpStream &ar)
 {
 	FESurface::Serialize(ar);
-	ar & m_data;
+	ar & m_data & m_Fc;
 }
 
 //-----------------------------------------------------------------------------
