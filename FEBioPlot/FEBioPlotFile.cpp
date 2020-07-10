@@ -490,7 +490,26 @@ void FEBioPlotFile::Dictionary::Clear()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+void FEBioPlotFile::PlotObject::AddData(const char* szname, Var_Type type, FEPlotData* psave)
+{
+	DICTIONARY_ITEM item;
+	item.m_psave = nullptr;
+
+	item.m_szname[0] = 0;
+	int l = strlen(szname);
+	if (l >= STR_SIZE) l = STR_SIZE - 1;
+	strncpy(item.m_szname, szname, l);
+	item.m_szname[l] = 0;
+
+	item.m_ntype = type;
+	item.m_nfmt = FMT_ITEM;
+	item.m_psave = psave;
+
+	m_data.push_back(item);
+}
+
+
+//=============================================================================
 
 FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 {
@@ -567,6 +586,7 @@ FEBioPlotFile::PointObject* FEBioPlotFile::AddPointObject(const std::string& nam
 	PointObject* po = new PointObject;
 	m_Points.push_back(po);
 	po->m_name = name;
+	po->m_id = m_Points.size();
 	return po;
 }
 
@@ -589,6 +609,7 @@ FEBioPlotFile::LineObject* FEBioPlotFile::AddLineObject(const std::string& name)
 	LineObject* po = new LineObject;
 	m_Lines.push_back(po);
 	po->m_name = name;
+	po->m_id = m_Lines.size();
 	return po;
 }
 
@@ -738,22 +759,28 @@ void FEBioPlotFile::WriteDicList(list<FEBioPlotFile::DICTIONARY_ITEM>& dic)
 	{
 		m_ar.BeginChunk(PLT_DIC_ITEM);
 		{
-			m_ar.WriteChunk(PLT_DIC_ITEM_TYPE, pi->m_ntype);
-			m_ar.WriteChunk(PLT_DIC_ITEM_FMT , pi->m_nfmt);
-			m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYSIZE, pi->m_arraySize);
-			if ((pi->m_arraySize > 0) && (pi->m_arrayNames.size() == pi->m_arraySize))
-			{
-				for (int i = 0; i<(int)pi->m_arraySize; ++i)
-				{
-					string& si = pi->m_arrayNames[i];
-					const char* c = si.c_str();
-					m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYNAME, (char*)c, STR_SIZE);
-				}
-			}
-			m_ar.WriteChunk(PLT_DIC_ITEM_NAME, pi->m_szname, STR_SIZE);
+			WriteDictionaryItem(*pi);
 		}
 		m_ar.EndChunk();
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteDictionaryItem(DICTIONARY_ITEM& it)
+{
+	m_ar.WriteChunk(PLT_DIC_ITEM_TYPE, it.m_ntype);
+	m_ar.WriteChunk(PLT_DIC_ITEM_FMT, it.m_nfmt);
+	m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYSIZE, it.m_arraySize);
+	if ((it.m_arraySize > 0) && (it.m_arrayNames.size() == it.m_arraySize))
+	{
+		for (int i = 0; i < (int)it.m_arraySize; ++i)
+		{
+			string& si = it.m_arrayNames[i];
+			const char* c = si.c_str();
+			m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYNAME, (char*)c, STR_SIZE);
+		}
+	}
+	m_ar.WriteChunk(PLT_DIC_ITEM_NAME, it.m_szname, STR_SIZE);
 }
 
 //-----------------------------------------------------------------------------
@@ -812,7 +839,7 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 
 #ifdef PLOT_FILE_3
 		// additional objects
-		if (m_Points.size() > 0)
+		if ((m_Points.size() > 0) || (m_Lines.size() > 0))
 		{
 			m_ar.BeginChunk(PLT_OBJECTS_SECTION);
 			{
@@ -1236,19 +1263,7 @@ void FEBioPlotFile::WriteObjectsSection()
 		PointObject* po = GetPointObject(i);
 		m_ar.BeginChunk(PLT_POINT_OBJECT);
 		{
-			int id = i + 1;
-			m_ar.WriteChunk(PLT_POINT_ID, id);
-
-			m_ar.WriteChunk(PLT_POINT_TAG, po->m_tag);
-
-			m_ar.WriteChunk(PLT_POINT_NAME, po->m_name.c_str());
-			vec3d& r = po->m_r;
-			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
-			m_ar.WriteChunk(PLT_POINT_POS, f, 3);
-
-			quatd q = po->m_q;
-			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
-			m_ar.WriteChunk(PLT_POINT_ROT, a, 4);
+			WriteObject(po);
 		}
 		m_ar.EndChunk();
 	}
@@ -1258,17 +1273,33 @@ void FEBioPlotFile::WriteObjectsSection()
 		LineObject* po = GetLineObject(i);
 		m_ar.BeginChunk(PLT_LINE_OBJECT);
 		{
-			int id = i + 1;
-			m_ar.WriteChunk(PLT_LINE_ID, id);
+			WriteObject(po);
+		}
+		m_ar.EndChunk();
+	}
+}
 
-			m_ar.WriteChunk(PLT_LINE_TAG, po->m_tag);
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteObject(PlotObject* po)
+{
+	m_ar.WriteChunk(PLT_OBJECT_ID, po->m_id);
+	m_ar.WriteChunk(PLT_OBJECT_NAME, po->m_name.c_str());
+	m_ar.WriteChunk(PLT_OBJECT_TAG, po->m_tag);
 
-			m_ar.WriteChunk(PLT_LINE_NAME, po->m_name.c_str());
-			vec3d r1 = po->m_r1;
-			vec3d r2 = po->m_r2;
+	vec3d& r = po->m_pos;
+	float f[3] = { (float)r.x, (float)r.y, (float)r.z };
+	m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
 
-			float f[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
-			m_ar.WriteChunk(PLT_LINE_COORDS, f, 6);
+	quatd q = po->m_rot;
+	float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
+	m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
+
+	list<DICTIONARY_ITEM>::iterator it = po->m_data.begin();
+	for (int j = 0; j < po->m_data.size(); ++j, ++it)
+	{
+		m_ar.BeginChunk(PLT_OBJECT_DATA);
+		{
+			WriteDictionaryItem(*it);
 		}
 		m_ar.EndChunk();
 	}
@@ -1682,15 +1713,25 @@ void FEBioPlotFile::WriteObjectsState()
 		PointObject* po = m_Points[i];
 		m_ar.BeginChunk(PLT_POINT_OBJECT);
 		{
-			m_ar.WriteChunk(PLT_POINT_ID, po->m_id);
+			m_ar.WriteChunk(PLT_OBJECT_ID, po->m_id);
 
-			vec3d& r = po->m_r;
+			vec3d r = po->m_pos;
 			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
-			m_ar.WriteChunk(PLT_POINT_POS, f, 3);
+			m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
 
-			quatd q = po->m_q;
+			quatd q = po->m_rot;
 			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
-			m_ar.WriteChunk(PLT_POINT_ROT, a, 4);
+			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
+
+			r = po->m_r;
+			float c[3] = { r.x, r.y, r.z };
+			m_ar.WriteChunk(PLT_POINT_COORD, c, 3);
+
+			m_ar.BeginChunk(PLT_OBJECT_DATA);
+			{
+				WriteObjectData(po);
+			}
+			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
 	}
@@ -1700,13 +1741,45 @@ void FEBioPlotFile::WriteObjectsState()
 		LineObject* po = GetLineObject(i);
 		m_ar.BeginChunk(PLT_LINE_OBJECT);
 		{
-			m_ar.WriteChunk(PLT_LINE_ID, po->m_id);
+			m_ar.WriteChunk(PLT_OBJECT_ID, po->m_id);
+
+			vec3d r = po->m_pos;
+			float f[3] = { (float)r.x, (float)r.y, (float)r.z };
+			m_ar.WriteChunk(PLT_OBJECT_POS, f, 3);
+
+			quatd q = po->m_rot;
+			float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
+			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
 
 			vec3d r1 = po->m_r1;
 			vec3d r2 = po->m_r2;
-			float f[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
-			m_ar.WriteChunk(PLT_LINE_COORDS, f, 6);
+			float c[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
+			m_ar.WriteChunk(PLT_LINE_COORDS, c, 6);
+
+			m_ar.BeginChunk(PLT_OBJECT_DATA);
+			{
+				WriteObjectData(po);
+			}
+			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteObjectData(PlotObject* po)
+{
+	list<DICTIONARY_ITEM>::iterator it = po->m_data.begin();
+	for (int j = 0; j < po->m_data.size(); ++j, ++it)
+	{
+		assert(it->m_psave);
+
+		FEPlotObjectData* pd = dynamic_cast<FEPlotObjectData*>(it->m_psave); assert(pd);
+
+		FEDataStream a;
+		if (pd->Save(po, a))
+		{
+			m_ar.WriteData(j, a.data());
+		}
 	}
 }

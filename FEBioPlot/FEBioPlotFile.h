@@ -117,18 +117,21 @@ public:
 				PLT_PART				= 0x01045100,
 				PLT_PART_ID				= 0x01045101,
 				PLT_PART_NAME			= 0x01045102,
-			PLT_OBJECTS_SECTION			= 0x01050000,		// new in 3.0
-				PLT_POINT_OBJECT		= 0x01051000,		// new in 3.0
-					PLT_POINT_ID		= 0x01051001,		// new in 3.0
-					PLT_POINT_TAG		= 0x01051002,		// new in 3.0
-					PLT_POINT_NAME		= 0x01051003,		// new in 3.0
-					PLT_POINT_POS		= 0x01051004,		// new in 3.0
-					PLT_POINT_ROT		= 0x01051005,		// new in 3.0
-				PLT_LINE_OBJECT			= 0x01052000,		// new in 3.0
-					PLT_LINE_ID			= 0x01052001,		// new in 3.0
-					PLT_LINE_TAG		= 0x01052002,		// new in 3.0
-					PLT_LINE_NAME		= 0x01052003,		// new in 3.0
-					PLT_LINE_COORDS		= 0x01052004,		// new in 3.0
+
+			// plot objects were added in 3.0
+
+			PLT_OBJECTS_SECTION			= 0x01050000,
+					PLT_OBJECT_ID		= 0x01050001,
+					PLT_OBJECT_NAME		= 0x01050002,
+					PLT_OBJECT_TAG		= 0x01050003,
+					PLT_OBJECT_POS		= 0x01050004,
+					PLT_OBJECT_ROT		= 0x01050005,
+					PLT_OBJECT_DATA		= 0x01050006,
+				PLT_POINT_OBJECT		= 0x01051000,
+					PLT_POINT_COORD		= 0x01051001,
+				PLT_LINE_OBJECT			= 0x01052000,
+					PLT_LINE_COORDS		= 0x01052001,
+
 		PLT_STATE						= 0x02000000,
 			PLT_STATE_HEADER			= 0x02010000,
 				PLT_STATE_HDR_ID		= 0x02010001,
@@ -170,6 +173,7 @@ public:
 
 	// size of name variables
 	enum { STR_SIZE = 64 };
+
 
 public:
 	// Dictionary entry
@@ -231,34 +235,42 @@ public:
 		FESurface*	surf;
 	};
 
-	class PointObject
+	class PlotObject
 	{
 	public:
-		PointObject() { m_tag = 0; m_id = 0; }
+		PlotObject() {}
+
+		void AddData(const char* szname, Var_Type type, FEPlotData* psave = nullptr);
 
 	public:
-		int		m_id;
-		int		m_tag;
+		int		m_id;	// object ID
+		int		m_tag;	// user tag
 
-		vec3d	m_r;	// object position
-		quatd	m_q;	// object orientation
+		vec3d	m_pos;	// object's position
+		quatd	m_rot;	// object's orientation
 
-		std::string	m_name;
+		std::string	m_name;	// object's name
+
+		list<DICTIONARY_ITEM>	m_data;
 	};
 
-	class LineObject
+	class PointObject : public PlotObject
 	{
 	public:
-		LineObject() {	m_tag = 0; m_id = 0;}
+		PointObject() {}
 
 	public:
-		int		m_id;
-		int		m_tag;
+		vec3d	m_r;	// point position
+	};
 
-		vec3d	m_r1;
-		vec3d	m_r2;
+	class LineObject : public PlotObject
+	{
+	public:
+		LineObject() {}
 
-		std::string	m_name;
+	public:
+		vec3d	m_r1;	// point 1
+		vec3d	m_r2;	// point 2
 	};
 
 public:
@@ -309,6 +321,7 @@ protected:
 	bool WriteDictionary(FEModel& fem);
 
 	void WriteDicList(list<DICTIONARY_ITEM>& dic);
+	void WriteDictionaryItem(DICTIONARY_ITEM& it);
 
 	void WriteNodeSection   (FEMesh& m);
 	void WriteDomainSection (FEMesh& m);
@@ -316,6 +329,7 @@ protected:
 	void WriteNodeSetSection(FEMesh& m);
 	void WritePartsSection  (FEModel& fem);
 	void WriteObjectsSection();
+	void WriteObject(PlotObject* po);
 
 	void WriteSolidDomain   (FESolidDomain&    dom);
 	void WriteShellDomain   (FEShellDomain&    dom);
@@ -328,6 +342,7 @@ protected:
 	void WriteDomainData  (FEModel& fem);
 	void WriteSurfaceData (FEModel& fem);
 	void WriteObjectsState();
+	void WriteObjectData(PlotObject* po);
 
 	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
 	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
@@ -350,4 +365,13 @@ protected:
 
 	vector<PointObject*>	m_Points;
 	vector<LineObject*>		m_Lines;
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotObjectData : public FEPlotData
+{
+public:
+	FEPlotObjectData(FEModel* fem) : FEPlotData(fem) {}
+
+	virtual bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar) = 0;
 };
