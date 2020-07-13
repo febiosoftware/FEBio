@@ -27,9 +27,10 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/vec3d.h>
 #include "FERigidConnector.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FEGenericRigidJoint : public FERigidConnector
+class FEBIOMECH_API FEGenericRigidJoint : public FERigidConnector
 {
 public:
 	FEGenericRigidJoint(FEModel* fem);

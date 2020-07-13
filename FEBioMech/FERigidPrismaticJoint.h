@@ -29,13 +29,14 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidPrismaticJoint class implements a prismatic joint. The rigid joint
 //! allows the user to connect two rigid bodies at a point in space
 //! and allow translation along a single prescribed axis.
 
-class FERigidPrismaticJoint : public FERigidConnector
+class FEBIOMECH_API FERigidPrismaticJoint : public FERigidConnector
 {
 public:
     //! constructor

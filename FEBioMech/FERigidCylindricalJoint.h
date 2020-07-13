@@ -29,13 +29,14 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidCylindricalJoint class implements a cylindrical joint. The rigid joint
 //! allows the user to connect two rigid bodies at a point in space
 //! and allow rotation about, and translation along, a single prescribed axis.
 
-class FERigidCylindricalJoint : public FERigidConnector
+class FEBIOMECH_API FERigidCylindricalJoint : public FERigidConnector
 {
 public:
     //! constructor

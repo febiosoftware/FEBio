@@ -29,13 +29,14 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidRevoluteJoint class implements a revolute joint. The rigid joint
 //! allows the user to connect two rigid bodies at a point in space
 //! and allow rotation about a single prescribed axis.
 
-class FERigidRevoluteJoint : public FERigidConnector
+class FEBIOMECH_API FERigidRevoluteJoint : public FERigidConnector
 {
 public:
     //! constructor
