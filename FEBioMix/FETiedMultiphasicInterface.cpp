@@ -93,7 +93,6 @@ void FETiedMultiphasicSurface::Data::Serialize(DumpStream& ar)
 FETiedMultiphasicSurface::FETiedMultiphasicSurface(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 {
     m_bporo = m_bsolu = false;
-    m_pfem = pfem;
     m_dofC = -1;
 }
 

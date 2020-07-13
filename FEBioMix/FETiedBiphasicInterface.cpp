@@ -91,7 +91,6 @@ void FETiedBiphasicSurface::Data::Serialize(DumpStream& ar)
 FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 { 
 	m_bporo = false;
-	m_pfem = pfem; 
 }
 
 //-----------------------------------------------------------------------------

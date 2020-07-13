@@ -74,9 +74,6 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
-protected:
-    FEModel*	m_pfem;
-    
 public:
     bool                    m_bporo;	//!< set poro-mode
     bool					m_bsolu;	//!< set solute-mode

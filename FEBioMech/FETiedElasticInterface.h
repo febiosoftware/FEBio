@@ -70,9 +70,6 @@ public:
     void GetVectorGap      (int nface, vec3d& pg) override;
     void GetContactTraction(int nface, vec3d& pt) override;
     
-protected:
-    FEModel*    m_pfem;
-    
 public:
     vector<vec3d>           m_nn;   //!< node normals
 };

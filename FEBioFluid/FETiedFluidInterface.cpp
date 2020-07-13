@@ -91,7 +91,6 @@ void FETiedFluidSurface::Data::Serialize(DumpStream& ar)
 
 FETiedFluidSurface::FETiedFluidSurface(FEModel* pfem) : FEContactSurface(pfem), m_dofWE(pfem)
 {
-    m_pfem = pfem;
 }
 
 //-----------------------------------------------------------------------------

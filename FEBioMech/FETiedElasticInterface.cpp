@@ -81,7 +81,7 @@ void FETiedElasticSurface::Data::Serialize(DumpStream& ar)
 
 FETiedElasticSurface::FETiedElasticSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
-    m_pfem = pfem;
+
 }
 
 //-----------------------------------------------------------------------------

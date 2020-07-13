@@ -75,9 +75,7 @@ public:
     void GetViscousTraction (int nface, vec3d& tv);
     void GetNormalVelocity  (int nface, double& vn);
 
-protected:
-    FEModel*    m_pfem;
-    
+   
 public:
 	FEDofList	m_dofWE;
 };
