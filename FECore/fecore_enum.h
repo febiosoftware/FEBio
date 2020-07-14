@@ -341,7 +341,7 @@ enum Var_Type {
 // FMT_ITEM : one value stored for each item (e.g. element) of a region
 // FMT_MULT : one value for each node of each item of a region
 // FMT_REGION: one value per region (surface, domain)
-enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT, FMT_REGION };
+enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT, FMT_REGION, FMT_MATPOINTS };
 
 //-----------------------------------------------------------------------------
 enum FEDataType {

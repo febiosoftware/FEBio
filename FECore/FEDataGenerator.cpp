@@ -156,6 +156,23 @@ bool FEDataGenerator::Generate(FEDomainMap& map)
 			}
 		}
 		break;
+		case FMT_MATPOINTS:
+		{
+			int ni = el.GaussPoints();
+			for (int j = 0; j < ni; ++j)
+			{
+				FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+				vec3d ri = pt.m_r0;
+				switch (dataType)
+				{
+				case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				}
+			}
+		}
+		break;
 		};
 	}
 	return true;

@@ -415,7 +415,10 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		FEElementSet* feset = new FEElementSet(&fem);
 		string name = partName + "." + eset.Name();
 		feset->SetName(name);
-		feset->Create(elist);
+
+		FEDomain* dom = mesh.FindDomain(name);
+		if (dom) feset->Create(dom);
+		else feset->Create(elist);
 
 		mesh.AddElementSet(feset);
 	}

@@ -232,8 +232,19 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 		return;
 	}
 
+	// default format
+	Storage_Fmt fmt = (dataType == FE_MAT3D ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
+
+	// format overrider?
+	const char* szfmt = tag.AttributeValue("format", true);
+	if (szfmt)
+	{
+		if (stricmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
+		else throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
+	}
+
 	// create the data map
-	FEDomainMap* map = new FEDomainMap(dataType, (dataType==FE_MAT3D? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT));
+	FEDomainMap* map = new FEDomainMap(dataType, fmt);
 	map->Create(elset);
 	map->SetName(szname);
 
@@ -781,7 +792,7 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 			// set the value
 			mat3d Q(e1, e2, e3);
-			map->set<mat3d>(lid, Q);
+			map->setValue(lid, Q);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

@@ -113,6 +113,16 @@ bool FEDomainMap::Create(FEElementSet* ps, double val)
 		
 		return resize(nodes, val);
 	}
+	else if (m_fmt == FMT_MATPOINTS)
+	{
+		for (int i = 0; i < NE; ++i)
+		{
+			FEElement& el = *mesh->FindElementFromID((*ps)[i]);
+			int ne = el.GaussPoints();
+			if (ne > m_maxElemNodes) m_maxElemNodes = ne;
+		}
+		return resize(NE*m_maxElemNodes, val);
+	}
 	else return false;
 }
 
@@ -151,7 +161,7 @@ void FEDomainMap::setValue(int n, const vec2d& v)
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, const vec3d& v)
 {
-	if (m_fmt == FMT_MULT)
+	if ((m_fmt == FMT_MULT) || (m_fmt == FMT_MATPOINTS))
 	{
 		int index = n*m_maxElemNodes;
 		for (int i = 0; i < m_maxElemNodes; ++i) set<vec3d>(index + i, v);
@@ -165,7 +175,7 @@ void FEDomainMap::setValue(int n, const vec3d& v)
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, const mat3d& v)
 {
-	if (m_fmt == FMT_MULT)
+	if ((m_fmt == FMT_MULT) || (m_fmt == FMT_MATPOINTS))
 	{
 		int index = n*m_maxElemNodes;
 		for (int i = 0; i < m_maxElemNodes; ++i) set<mat3d>(index + i, v);
@@ -179,7 +189,7 @@ void FEDomainMap::setValue(int n, const mat3d& v)
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, const mat3ds& v)
 {
-	if (m_fmt == FMT_MULT)
+	if ((m_fmt == FMT_MULT) || (m_fmt == FMT_MATPOINTS))
 	{
 		int index = n * m_maxElemNodes;
 		for (int i = 0; i < m_maxElemNodes; ++i) set<mat3ds>(index + i, v);
@@ -261,6 +271,11 @@ double FEDomainMap::value(const FEMaterialPoint& pt)
 	{
 		v = get<double>(lid);
 	}
+	else if (m_fmt == FMT_MATPOINTS)
+	{
+		v = value<double>(lid, pt.m_index);
+	}
+	else { assert(false); }
 
 	return v;
 }
@@ -317,6 +332,10 @@ mat3d FEDomainMap::valueMat3d(const FEMaterialPoint& pt)
 	{
 		Q = get<mat3d>(lid);
 	}
+	else if (m_fmt == FMT_MATPOINTS)
+	{
+		return value<mat3d>(lid, pt.m_index);
+	}
 
 	return Q;
 }
@@ -359,6 +378,10 @@ mat3ds FEDomainMap::valueMat3ds(const FEMaterialPoint& pt)
 		// weighted average
 		Q = weightedAverageStructureTensor(Qi, w, ne);
 	}
+	else if (m_fmt == FMT_MATPOINTS)
+	{
+		return value<mat3ds>(lid, pt.m_index);
+	}
 
 	return Q;
 }
@@ -386,7 +409,7 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 	int oldElems = set1->Elements();
 	int newElems = elset->Elements();
 
-	if (StorageFormat() == FMT_MULT)
+	if ((StorageFormat() == FMT_MULT) || ((StorageFormat() == FMT_MATPOINTS)))
 	{
 		// assume the maxelempernodes was not modified
 		realloc(newElems*m_maxElemNodes);

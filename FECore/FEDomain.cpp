@@ -52,12 +52,24 @@ void FEDomain::SetMatID(int mid)
 //-----------------------------------------------------------------------------
 // This routine allocates the material point data for the element's integration points.
 // Currently, this has to be called after the elements have been assigned a type (since this
-// determines how many integration point an element gets). 
+// determines how many integration points an element gets). 
 void FEDomain::CreateMaterialPointData()
 {
 	FEMaterial* pmat = GetMaterial();
+	FEMesh* mesh = GetMesh();
 	if (pmat) ForEachElement([=](FEElement& el) {
-		for (int k = 0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
+
+		vec3d r[FEElement::MAX_NODES];
+		int ne = el.Nodes();
+		for (int i = 0; i < ne; ++i) r[i] = mesh->Node(el.m_node[i]).m_r0;
+
+		for (int k = 0; k < el.GaussPoints(); ++k)
+		{
+			FEMaterialPoint* mp = pmat->CreateMaterialPointData();
+			mp->m_r0 = el.Evaluate(r, k);
+			mp->m_index = k;
+			el.SetMaterialPointData(mp, k);
+		}
 	});
 }
 
