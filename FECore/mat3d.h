@@ -404,6 +404,15 @@ public:
 	// return a column vector from the matrix
 	vec3d col(int j) const;
 
+	// return a row vector from the matrix
+	vec3d row(int j) const;
+
+	// set the column of the matrix
+	void setCol(int i, const vec3d& a);
+
+	// set the row of the matrix
+	void setRow(int i, const vec3d& a);
+
 	// return the symmetric matrix 0.5*(A+A^T)
 	mat3ds sym() const;
 

@@ -928,6 +928,28 @@ inline vec3d mat3d::col(int j) const
 	return vec3d(d[0][j], d[1][j], d[2][j]);
 }
 
+// return a row vector from the matrix
+inline vec3d mat3d::row(int j) const
+{
+	return vec3d(d[j][0], d[j][1], d[j][2]);
+}
+
+// set the column of the matrix
+inline void mat3d::setCol(int i, const vec3d& a)
+{
+	d[0][i] = a.x;
+	d[1][i] = a.y;
+	d[2][i] = a.z;
+}
+
+// set the row of the matrix
+inline void mat3d::setRow(int i, const vec3d& a)
+{
+	d[i][0] = a.x;
+	d[i][1] = a.y;
+	d[i][2] = a.z;
+}
+
 // return the symmetric matrix 0.5*(A+A^T)
 inline mat3ds mat3d::sym() const
 {
