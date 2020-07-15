@@ -732,8 +732,7 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
 	// get the mat_axis parameter
-	ParamString s("mat_axis");
-	FEParam* param = mat->FindParameter(s);
+	FEParam* param = mat->FindParameter("mat_axis");
 	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 	if (param->type() != FE_PARAM_MAT3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 

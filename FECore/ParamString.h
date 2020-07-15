@@ -73,7 +73,7 @@ class FECORE_API ParamString
 {
 public:
 	//! constructor
-	explicit ParamString(const char* sz);
+	ParamString(const char* sz);
 
 	//! copy constructor
 	ParamString(const ParamString& p);
