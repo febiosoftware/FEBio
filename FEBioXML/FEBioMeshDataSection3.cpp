@@ -745,58 +745,103 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	ss << "material" << mat->GetID() << ".mat_axis";
 	string mapName = ss.str();
 
-	// create a domain map
-	FEDomainMap* map = new FEDomainMap(FE_MAT3D, FMT_ITEM);
-	map->SetName(mapName);
-	map->Create(&set);
-
-	++tag;
-	do
+	Storage_Fmt fmt = FMT_ITEM;
+	const char* szfmt = tag.AttributeValue("format", true);
+	if (szfmt)
 	{
-		if ((tag == "e") || (tag == "elem"))
+		if (stricmp(szfmt, "mat_points") == 0) fmt = FMT_MATPOINTS;
+	}
+
+	// the domain map we're about to create
+	FEDomainMap* map = nullptr;
+
+	// see if the generator is defined
+	const char* szgen = tag.AttributeValue("generator", true);
+	if (szgen)
+	{
+		// create a domain map
+		map = new FEDomainMap(FE_MAT3D, fmt);
+		map->SetName(mapName);
+		map->Create(&set);
+
+		// data will be generated
+		FEModel* fem = GetFEModel();
+		FEDataGenerator* gen = 0;
+		if (strcmp(szgen, "const") == 0) gen = new FEConstDataGenerator<mat3d>(fem);
+		else
 		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int lid = atoi(szlid) - 1;
-
-			// make sure the number is valid
-			if ((lid < 0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			// get the element
-			FEElement* el = mesh->FindElementFromID(set[lid]);
-			if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			// read parameters
-			double a[3] = { 0 };
-			double d[3] = { 0 };
-			++tag;
-			do
-			{
-				if (tag == "a") tag.value(a, 3);
-				else if (tag == "d") tag.value(d, 3);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			} while (!tag.isend());
-
-			vec3d v1(a[0], a[1], a[2]);
-			vec3d v2(d[0], d[1], d[2]);
-
-			vec3d e1(v1);
-			vec3d e3 = v1 ^ v2;
-			vec3d e2 = e3 ^ e1;
-
-			// normalize
-			e1.unit();
-			e2.unit();
-			e3.unit();
-
-			// set the value
-			mat3d Q(e1, e2, e3);
-			map->setValue(lid, Q);
+			gen = fecore_new<FEDataGenerator>(szgen, fem);
 		}
-		else throw XMLReader::InvalidTag(tag);
+		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+		// read the parameters
+		ReadParameterList(tag, gen);
+
+		// initialize the generator
+		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+
+		// generate the data
+		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
+	}
+	else
+	{
+		// This only works for ITEM storage
+		if (fmt != FMT_ITEM) throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
+
+		// create a domain map
+		map = new FEDomainMap(FE_MAT3D, FMT_ITEM);
+		map->SetName(mapName);
+		map->Create(&set);
+
 		++tag;
-	} while (!tag.isend());
+		do
+		{
+			if ((tag == "e") || (tag == "elem"))
+			{
+				// get the local element number
+				const char* szlid = tag.AttributeValue("lid");
+				int lid = atoi(szlid) - 1;
+
+				// make sure the number is valid
+				if ((lid < 0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+				// get the element
+				FEElement* el = mesh->FindElementFromID(set[lid]);
+				if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+				// read parameters
+				double a[3] = { 0 };
+				double d[3] = { 0 };
+				++tag;
+				do
+				{
+					if (tag == "a") tag.value(a, 3);
+					else if (tag == "d") tag.value(d, 3);
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				} while (!tag.isend());
+
+				vec3d v1(a[0], a[1], a[2]);
+				vec3d v2(d[0], d[1], d[2]);
+
+				vec3d e1(v1);
+				vec3d e3 = v1 ^ v2;
+				vec3d e2 = e3 ^ e1;
+
+				// normalize
+				e1.unit();
+				e2.unit();
+				e3.unit();
+
+				// set the value
+				mat3d Q(e1, e2, e3);
+				map->setValue(lid, Q);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		} while (!tag.isend());
+	}
+	assert(map);
 
 	// see if this map already exists
 	FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh->FindDataMap(mapName));

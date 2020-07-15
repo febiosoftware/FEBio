@@ -334,8 +334,9 @@ mat3d FEDomainMap::valueMat3d(const FEMaterialPoint& pt)
 	}
 	else if (m_fmt == FMT_MATPOINTS)
 	{
-		return value<mat3d>(lid, pt.m_index);
+		Q = value<mat3d>(lid, pt.m_index);
 	}
+	else { assert(false); }
 
 	return Q;
 }
