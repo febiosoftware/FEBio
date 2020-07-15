@@ -1524,7 +1524,12 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 	FEParamVec3& vec = pp->value<FEParamVec3>();
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue<vec3d, double>(dom, a, FEFiberVector(vec), [](const vec3d& r) -> double { return r.norm(); });
+	writeAverageElementValue<double>(dom, a, [&](const FEMaterialPoint& mp) -> double { 
+		const FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+		mat3d F = ep.m_F;
+		vec3d a = F*vec(mp);
+		return a.norm(); 
+	});
 
 	return true;
 }
