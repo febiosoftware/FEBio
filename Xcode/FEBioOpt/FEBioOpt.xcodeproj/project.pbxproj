@@ -60,7 +60,7 @@
 		D5322CA92142AACE008DE511 /* FEOptimizeInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizeInput.cpp; sourceTree = "<group>"; };
 		D5322CAA2142AACE008DE511 /* FEPowellOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPowellOptimizeMethod.h; sourceTree = "<group>"; };
 		D5322CAB2142AACE008DE511 /* FEScanOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScanOptimizeMethod.h; sourceTree = "<group>"; };
-		D5322CC42142AB40008DE511 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
+		D5322CC42142AB40008DE511 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = /usr/local/lib/liblevmar.a; sourceTree = "<absolute>"; };
 		D5FF2666233A64DD00C621EB /* FEParameterSweep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEParameterSweep.h; sourceTree = "<group>"; };
 		D5FF2667233A64DD00C621EB /* FEParameterSweep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParameterSweep.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */

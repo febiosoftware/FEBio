@@ -1724,7 +1724,7 @@ void FEBioPlotFile::WriteObjectsState()
 			m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
 
 			r = po->m_r;
-			float c[3] = { r.x, r.y, r.z };
+			float c[3] = { (float)r.x, (float)r.y, (float)r.z };
 			m_ar.WriteChunk(PLT_POINT_COORD, c, 3);
 
 			m_ar.BeginChunk(PLT_OBJECT_DATA);

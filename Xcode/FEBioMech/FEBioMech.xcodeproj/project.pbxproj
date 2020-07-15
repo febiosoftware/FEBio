@@ -877,7 +877,7 @@
 		D5322FE32142ACD8008DE511 /* FECoupledMooneyRivlin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoupledMooneyRivlin.h; sourceTree = "<group>"; };
 		D5322FE42142ACD8008DE511 /* FEContactInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactInterface.cpp; sourceTree = "<group>"; };
 		D5322FE52142ACD8008DE511 /* FEMortarTiedContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarTiedContact.cpp; sourceTree = "<group>"; };
-		D532318B2142AD6E008DE511 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../../../../../../usr/local/Cellar/gsl/2.4/lib/libgsl.a; sourceTree = "<group>"; };
+		D532318B2142AD6E008DE511 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = /usr/local/Cellar/gsl/2.6/lib/libgsl.a; sourceTree = "<absolute>"; };
 		D5613D2A217B5FCF007CAB89 /* FEElasticMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticMaterialPoint.h; sourceTree = "<group>"; };
 		D5613D2B217B5FCF007CAB89 /* FEFiberExponentialPowerUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberExponentialPowerUC.h; sourceTree = "<group>"; };
 		D5613D2C217B5FD0007CAB89 /* FEFiberNHUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberNHUC.h; sourceTree = "<group>"; };

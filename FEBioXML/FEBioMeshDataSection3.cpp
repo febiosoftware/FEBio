@@ -45,6 +45,13 @@ SOFTWARE.*/
 #include <sstream>
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
+#define szcmp    _stricmp
+#else
+#define szcmp    strcmp
+#endif
+
+//-----------------------------------------------------------------------------
 // helper function for converting a datatype attribute to FEDataType
 FEDataType str2datatype(const char* szdataType)
 {
@@ -239,7 +246,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	const char* szfmt = tag.AttributeValue("format", true);
 	if (szfmt)
 	{
-		if (stricmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
+		if (szcmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
 		else throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
 	}
 
@@ -748,7 +755,7 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	const char* szfmt = tag.AttributeValue("format", true);
 	if (szfmt)
 	{
-		if (stricmp(szfmt, "mat_points") == 0) fmt = FMT_MATPOINTS;
+		if (szcmp(szfmt, "mat_points") == 0) fmt = FMT_MATPOINTS;
 	}
 
 	// the domain map we're about to create

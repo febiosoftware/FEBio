@@ -312,7 +312,7 @@ void FEFluidFSITangentDiagnostic::deriv_residual(matrix& ke)
     pstep->m_final_time = dt;
     FEFluidFSISolver& solver = static_cast<FEFluidFSISolver&>(*pstep->GetFESolver());
     FETimeInfo& tp = fem.GetTime();
-    tp.alpha = solver.m_alpha;
+    tp.alpha = solver.m_alphaf;
     tp.beta  = solver.m_beta;
     tp.gamma = solver.m_gamma;
     tp.alphaf = solver.m_alphaf;
