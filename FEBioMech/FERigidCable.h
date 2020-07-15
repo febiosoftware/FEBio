@@ -31,22 +31,22 @@ SOFTWARE.*/
 
 class FERigidBody;
 
+class FERigidCablePoint : public FECoreBase
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FERigidCablePoint(FEModel* fem) : FECoreBase(fem) {}
+
+public:
+	int		m_rb;	//!< rigid body ID
+	vec3d	m_pos;	//!< position of attachment point
+
+	DECLARE_FECORE_CLASS();
+};
+
 class FERigidCable : public FEModelLoad
 {
-	class FECablePoint : public FECoreBase
-	{
-		FECORE_SUPER_CLASS
-
-	public:
-		FECablePoint(FEModel* fem) : FECoreBase(fem){}
-
-	public:
-		int		m_rb;	//!< rigid body ID
-		vec3d	m_pos;	//!< position of attachment point
-
-		DECLARE_FECORE_CLASS();
-	};
-
 public:
 	FERigidCable(FEModel* fem);
 
@@ -59,9 +59,6 @@ public:
 	//! Stiffness matrix
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
-	//! override for building points list
-	FECoreBase* GetProperty(int n) override;
-
 private:
 	void applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d& d, FEGlobalVector& R);
 
@@ -69,7 +66,7 @@ private:
 	double	m_force;		//!< magnitude of force (i.e. tension in cable)
 	vec3d	m_forceDir;		//!< direction of force at cable's end
 	bool	m_brelative;	//!< positions are defined relative w.r.t. rigid body's COM or not
-	std::vector<FECablePoint*>	m_points;
+	std::vector<FERigidCablePoint*>	m_points;
 
 private:
 	DECLARE_FECORE_CLASS();

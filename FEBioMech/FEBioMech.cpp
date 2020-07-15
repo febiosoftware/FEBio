@@ -571,10 +571,12 @@ REGISTER_FECORE_CLASS_EXPLICIT(FERigidAxialForce         , FEBC_ID, "rigid_axial
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyForce          , FEBC_ID, "rigid_force"      );
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyFixedBC        , FERIGIDBC_ID, "rigid_fixed"      );
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement   , FERIGIDBC_ID, "rigid_prescribed" );
-REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable              , FEBC_ID, "rigid_cable"      );
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyVelocity       , FERIGIDBC_ID, "rigid_velocity");
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyAngularVelocity, FERIGIDBC_ID, "rigid_angular_velocity");
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidNodeSet            , FERIGIDBC_ID, "rigid_node_set");
+
+REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable     , FEBC_ID    , "rigid_cable"      );
+REGISTER_FECORE_CLASS_EXPLICIT(FERigidCablePoint, FEOBJECT_ID, "rigid_cable_point");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

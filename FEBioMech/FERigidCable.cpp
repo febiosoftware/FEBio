@@ -29,12 +29,11 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
 
-REGISTER_SUPER_CLASS(FERigidCable::FECablePoint, FEOBJECT_ID);
+REGISTER_SUPER_CLASS(FERigidCablePoint, FEOBJECT_ID);
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidCable::FECablePoint, FECoreBase)
+BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreBase)
 	ADD_PARAMETER(m_rb, "rigid_body_id");
-	ADD_PARAMETER(m_pos, "point");
 	ADD_PARAMETER(m_pos, "position");
 END_FECORE_CLASS();
 
@@ -45,8 +44,7 @@ BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
 	ADD_PARAMETER(m_brelative, "relative");
 
 	// add the points property
-	ADD_PROPERTY(m_points, "point");
-
+	ADD_PROPERTY(m_points, "rigid_cable_point");
 END_FECORE_CLASS();
 
 FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(fem)
@@ -54,19 +52,6 @@ FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(fem)
 	m_force = 0;
 	m_forceDir = vec3d(0,0,-1);
 	m_brelative = true;
-}
-
-//! override for building points list
-FECoreBase* FERigidCable::GetProperty(int n)
-{
-	// make sure this references the point property
-	if (n != 0) return 0;
-
-	// create a new point
-	FECablePoint* p = new FECablePoint(0);
-	m_points.push_back(p);
-
-	return p;
 }
 
 //! initialization
