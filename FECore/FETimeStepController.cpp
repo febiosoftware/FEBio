@@ -48,6 +48,7 @@ BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_dtmax     , "dtmax");
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
 	ADD_PARAMETER(m_dtforce   , "dtforce");
+	ADD_PARAMETER(m_must_points, "must_points");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -89,6 +90,8 @@ void FETimeStepController::CopyFrom(FETimeStepController* tc)
 
 	m_ddt = tc->m_ddt;
 	m_dtp = tc->m_dtp;
+
+	m_must_points = tc->m_must_points;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +109,22 @@ bool FETimeStepController::Init()
 	{
 		m_nmplc = plc->GetID();
 		fem->DetachLoadController(p);
+
+		// if a must-point curve is defined and the must-points are empty,
+		// we copy the load curve points to the must-points
+		if (m_must_points.empty())
+		{
+			FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
+			if (lc)
+			{
+				FEPointFunction& f = lc->GetFunction();
+				for (int i = 0; i < f.Points(); ++i)
+				{
+					double ti = f.LoadPoint(i).time;
+					m_must_points.push_back(ti);
+				}
+			}
+		}
 	}
 
 	// initialize "previous" time step
@@ -222,7 +241,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	m_dtp = dtn;
 
 	// check for mustpoints
-	if (m_nmplc >= 0) dtn = CheckMustPoints(told, dtn);
+	if (m_must_points.empty() == false) dtn = CheckMustPoints(told, dtn);
 
 	// make sure we are not exceeding the final time
 	if (told + dtn > m_step->m_tend)
@@ -250,12 +269,11 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 	double dtnew = dt;
 	const double eps = m_step->m_tend*1e-12;
 	double tmust = tnew + eps;
-	FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem->GetLoadController(m_nmplc)));
-	FEPointFunction& lc = mpc.GetFunction();
 	m_nmust = -1;
-	if (m_next_must < lc.Points())
+	const int points = (int)m_must_points.size();
+	if (m_next_must < points)
 	{
-		FEPointFunction::LOADPOINT lp;
+		double lp;
 		if (m_next_must < 0)
 		{
 			// find the first must-point that is on or past this time
@@ -263,27 +281,27 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 			bool bfound = false;
 			do
 			{
-				lp = lc.LoadPoint(m_next_must);
-				if ((tmust > lp.time) && (fabs(tnew - lp.time) > 1e-12)) ++m_next_must;
+				lp = m_must_points[m_next_must];
+				if ((tmust > lp) && (fabs(tnew - lp) > 1e-12)) ++m_next_must;
 				else bfound = true;
-			} while ((bfound == false) && (m_next_must < lc.Points()));
+			} while ((bfound == false) && (m_next_must < points));
 
 			// make sure we did not pass all must points
-			if (m_next_must >= lc.Points()) return dt;
+			if (m_next_must >= points) return dt;
 		}
-		else lp = lc.LoadPoint(m_next_must);
+		else lp = m_must_points[m_next_must];
 
 		// TODO: what happens when dtnew < dtmin and the next time step fails??
-		if (tmust > lp.time)
+		if (tmust > lp)
 		{
-			dtnew = lp.time - t;
+			dtnew = lp - t;
 			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
 			m_nmust = m_next_must++;
 		}
-		else if (fabs(tnew - lp.time) < 1e-12)
+		else if (fabs(tnew - lp) < 1e-12)
 		{
 			m_nmust = m_next_must++;
-			tnew = lp.time;
+			tnew = lp;
 			dtnew = tnew - t;
 			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
 		}
@@ -308,4 +326,5 @@ void FETimeStepController::Serialize(DumpStream& ar)
 	ar & m_next_must;
 	ar & m_ddt & m_dtp;
 	ar & m_step;
+	ar & m_must_points;
 }

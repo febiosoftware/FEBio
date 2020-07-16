@@ -108,6 +108,7 @@ public:
 	int value(XMLTag& tag, double* pf, int n);
 	void value(XMLTag& tag, std::string& v);
 	void value(XMLTag& tag, std::vector<int>& v);
+	void value(XMLTag& tag, std::vector<double>& v);
 
 protected:
 	bool parseEnumParam(FEParam* pp, const char* val);

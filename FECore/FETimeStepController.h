@@ -78,6 +78,8 @@ public:
 	double	m_dtmin;		//!< min time step size
 	double	m_dtmax;		//!< max time step size
 
+	std::vector<double>	m_must_points;	//!< the list of must-points
+
 private:
 	double	m_ddt;			//!< used by auto-time stepper
 	double	m_dtp;			//!< previous time step size

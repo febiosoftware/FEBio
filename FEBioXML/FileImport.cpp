@@ -173,6 +173,46 @@ void FEFileSection::value(XMLTag& tag, std::vector<int>& v)
 }
 
 //-----------------------------------------------------------------------------
+void FEFileSection::value(XMLTag& tag, std::vector<double>& v)
+{
+	v.clear();
+	const char* sz = tag.szvalue();
+	do
+	{
+		const char* sze = strchr(sz, ',');
+
+		const char* szc = strchr(sz, ':');
+		if ((szc == nullptr) || (sze && (szc > sze)))
+		{
+			double d = atof(sz);
+			v.push_back(d);
+		}
+		else
+		{
+			double d0 = atof(sz);
+			double d1 = atof(szc + 1);
+			double di = 1.0;
+			// see if there is a second colon
+			const char* szc2 = strchr(szc + 1, ':');
+			if (szc2 && ((sze == nullptr) || (szc2 < sze))) di = atof(szc2 + 1);
+			if (di > 0)
+			{
+				const double eps = 1e-12;
+				for (double d = d0; d <= d1 + eps; d += di)
+				{
+					v.push_back(d);
+				}
+			}
+			else throw XMLReader::InvalidValue(tag);
+		}
+
+		if (sze) sz = sze + 1;
+		else sz = nullptr;
+	} 
+	while (sz);
+}
+
+//-----------------------------------------------------------------------------
 int FEFileSection::value(XMLTag& tag, int* pi, int n)
 {
 	const char* sz = tag.szvalue();
@@ -421,6 +461,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					bool bfound = parseEnumParam(pp, tag.szvalue());
 					if (bfound == false) throw XMLReader::InvalidValue(tag);
 				}
+			}
+			break;
+		case FE_PARAM_STD_VECTOR_DOUBLE:
+			{
+				std::vector<double>& v = pp->value< std::vector<double> >();
+				value(tag, v);
 			}
 			break;
 		case FE_PARAM_BOOL: value(tag, pp->value<bool    >()); break;
