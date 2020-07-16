@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEFiberIntegrationGaussKronrod.h"
 #include "gausskronrod.h"
 #include <FECore/log.h>
