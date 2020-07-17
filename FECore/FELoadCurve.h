@@ -58,7 +58,6 @@ public:
 	void SetInterpolation(FEPointFunction::INTFUNC f);
 	void SetExtendMode(FEPointFunction::EXTMODE f);
 
-protected:
 	double GetValue(double time) override;
 
 private:
