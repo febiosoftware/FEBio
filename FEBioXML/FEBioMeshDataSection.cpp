@@ -243,8 +243,6 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szgen = tag.AttributeValue("generator", true);
 			if (szgen)
 			{
-				if (dataType != FE_DOUBLE) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
-
 				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
 				if (gen == nullptr) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
