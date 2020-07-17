@@ -479,6 +479,11 @@ void FEMappedValueMat3d::setDataMap(FEDataMap* val)
 	m_val = val;
 }
 
+FEDataMap* FEMappedValueMat3d::dataMap()
+{
+	return m_val;
+}
+
 mat3d FEMappedValueMat3d::operator()(const FEMaterialPoint& pt)
 {
 	return m_val->valueMat3d(pt);
