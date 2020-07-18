@@ -35,7 +35,7 @@ BEGIN_FECORE_CLASS(FEFiberPowLinear, FEElasticFiberMaterial)
     ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    );
     ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
     ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-	ADD_PARAMETER(m_epsf, "espilon_scale");
+	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -181,7 +181,7 @@ BEGIN_FECORE_CLASS(FEFiberPowerLinear, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_E   , FE_RANGE_GREATER_OR_EQUAL(0.0), "E");
 	ADD_PARAMETER(m_beta, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_lam0, FE_RANGE_GREATER(1.0), "lam0");
-	ADD_PARAMETER(m_epsf, "espilon_scale");
+	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

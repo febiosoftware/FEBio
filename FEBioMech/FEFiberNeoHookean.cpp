@@ -37,7 +37,7 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberNH, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-	ADD_PARAMETER(m_epsf, "espilon_scale");
+	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
