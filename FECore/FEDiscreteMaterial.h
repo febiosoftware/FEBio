@@ -34,7 +34,7 @@ SOFTWARE.*/
 class FECORE_API FEDiscreteMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEMaterialPoint* Copy();
+	FEMaterialPoint* Copy() override;
 
 	void Serialize(DumpStream& ar) override;
 
