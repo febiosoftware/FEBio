@@ -104,6 +104,9 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 	// don't forget to delete the iterator
 	delete it;
 
+	// prevent division by zero
+	if (IFD == 0.0) IFD = 1.0;
+
 	return s / IFD;
 }
 
@@ -143,9 +146,12 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 		}
 		while (it->Next());
 	}
-
+	
 	// don't forget to delete the iterator
 	delete it;
+
+	// prevent division by zero
+	if (IFD == 0.0) IFD = 1.0;
 
 	// we multiply by two to add contribution from other half-sphere
 	return c / IFD;
@@ -186,6 +192,9 @@ double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& 
 
 	// don't forget to delete the iterator
 	delete it;
+
+	// prevent division by zero
+	if (IFD == 0.0) IFD = 1.0;
 
 	// we multiply by two to add contribution from other half-sphere
 	return sed / IFD;
