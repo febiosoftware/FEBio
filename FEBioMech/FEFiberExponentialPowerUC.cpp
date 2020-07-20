@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFiberExponentialPowerUC.h"
+#include <limits>
 #include <FECore/log.h>
 
 // define the material parameters
@@ -36,6 +37,7 @@ BEGIN_FECORE_CLASS(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
 	ADD_PARAMETER(m_beta, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi, "ksi");
 	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER(m_epsf , "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -45,6 +47,7 @@ FEFiberExponentialPowerUC::FEFiberExponentialPowerUC(FEModel* pfem) : FEElasticF
 	m_beta = 2;
 	m_ksi = 0;
 	m_mu = 0;
+    m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,7 +74,7 @@ mat3ds FEFiberExponentialPowerUC::DevFiberStress(FEMaterialPoint& mp, const vec3
 	double In_1 = n0*(C*n0) - 1.0;
 
 	// only take fibers in tension into consideration
-	const double eps = 0;
+    const double eps = m_epsf* std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -107,7 +110,7 @@ tens4ds FEFiberExponentialPowerUC::DevFiberTangent(FEMaterialPoint& mp, const ve
 	// distortional part of deformation gradient
 	mat3d F = pt.m_F*pow(J, -1.0 / 3.0);
 
-	const double eps = 0;
+    const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	tens4ds c;
@@ -170,7 +173,7 @@ double FEFiberExponentialPowerUC::DevFiberStrainEnergyDensity(FEMaterialPoint& m
 	double In_1 = n0*(C*n0) - 1.0;
 
 	// only take fibers in tension into consideration
-	const double eps = 0;
+    const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	double sed = 0.0;
 	if (In_1 >= eps)
 	{

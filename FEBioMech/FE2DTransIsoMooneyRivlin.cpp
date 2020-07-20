@@ -42,7 +42,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
 	ADD_PARAMETER(m_fiber, "fiber");
-	ADD_PARAMETER(m_epsf, "espilon_scale");
+	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];

@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FEFiberExpPow, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
-	ADD_PARAMETER(m_epsf , "espilon_scale");
+	ADD_PARAMETER(m_epsf , "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ BEGIN_FECORE_CLASS(FEFiberExponentialPower, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
 	ADD_PARAMETER(m_ksi  , "ksi"  );
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
-	ADD_PARAMETER(m_epsf , "espilon_scale");
+	ADD_PARAMETER(m_epsf , "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
