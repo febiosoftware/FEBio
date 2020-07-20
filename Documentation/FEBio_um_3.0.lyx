@@ -19979,6 +19979,27 @@ moment_penalty
  maximum reactions forces and moments acting at these joints, divided by
  the maximum amount of linear/angular separation that your analysis can
  tolerate for that joint.
+ Alternatively, set the 
+\emph on
+force_penalty
+\emph default
+ and 
+\emph on
+moment_penalty
+\emph default
+ parameters to 1 and turn on the 
+\emph on
+auto_penalty
+\emph default
+; this setting will automatically adjust the 
+\emph on
+force_penalty
+\emph default
+ and 
+\emph on
+moment_penalty
+\emph default
+ to an appropriate value.
 \end_layout
 
 \begin_layout Standard
@@ -20077,11 +20098,15 @@ A rigid revolute joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e4</force_penalty>
+  <force_penalty>1e0</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e4</moment_penalty>
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20276,11 +20301,15 @@ A rigid prismatic joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e4</force_penalty>
+  <force_penalty>1e0</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e4</moment_penalty>
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20484,11 +20513,15 @@ A rigid cylindrical joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e4</force_penalty>
+  <force_penalty>1e0</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e4</moment_penalty>
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20715,7 +20748,11 @@ A rigid spherical joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e4</force_penalty>
+  <force_penalty>1e0</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20797,7 +20834,7 @@ Optionally, the rotation of body
 \end_layout
 
 \begin_layout LyX-Code
-<moment_penalty>1e20</moment_penalty>
+<moment_penalty>1e0</moment_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20950,11 +20987,15 @@ A rigid planar joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e4</force_penalty>
+  <force_penalty>1e0</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e4</moment_penalty>
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21190,11 +21231,15 @@ A rigid lock connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e4</force_penalty>
+  <force_penalty>1e0</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e4</moment_penalty>
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
