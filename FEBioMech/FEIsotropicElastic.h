@@ -36,8 +36,8 @@ public:
 	FEIsotropicElastic(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 public:
-	double	m_E;	//!< Young's modulus
-	double	m_v;	//!< Poisson's ratio
+	FEParamDouble	m_E;	//!< Young's modulus
+	FEParamDouble	m_v;	//!< Poisson's ratio
 
 public:
 	//! calculate stress at material point
