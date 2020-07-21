@@ -195,8 +195,8 @@ bool FEFluidSolver::InitEquations()
 	AddSolutionVariable(&m_dofEF, 1, "dilatation", m_Ftol);
 
     // base class initialization
-    FENewtonSolver::InitEquations();
-    
+    if (FENewtonSolver::InitEquations() == false) return false;
+
     // determined the nr of velocity and dilatation equations
     FEMesh& mesh = GetFEModel()->GetMesh();
     m_nveq = m_ndeq = 0;

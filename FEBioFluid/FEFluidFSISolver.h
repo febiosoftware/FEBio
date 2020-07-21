@@ -122,6 +122,7 @@ public:
     double	m_Dtol;			//!< displacement tolerance
     double	m_Vtol;			//!< velocity tolerance
     double	m_Ftol;			//!< dilatation tolerance
+    double  m_minJf;        //!< minimum allowable compression ratio
 
 public:
     // equation numbers
@@ -144,10 +145,10 @@ public:
     double  m_rhoi;         //!< spectral radius (rho infinity)
     double  m_alphaf;       //!< alpha step for Y={v,e}
     double  m_alpham;       //!< alpha step for Ydot={∂v/∂t,∂e/∂t}
-    double  m_alpha;        //!< alpha
     double  m_beta;         //!< beta
     double  m_gamma;        //!< gamma
     int     m_pred;         //!< predictor method
+    int     m_order;        //!< generalized-alpha integration order
     
 protected:
 	FEDofList	m_dofU;		// solid displacement
@@ -160,7 +161,7 @@ protected:
 	FEDofList	m_dofAF;	// material time derivative of fluid velocity
 	FEDofList	m_dofW;	    // fluid velocity relative to solid
 	FEDofList	m_dofAW;	// material time derivative of fluid velocity relative to solid
-    int			m_dofEF;	// fluid dilatation
+    FEDofList	m_dofEF;	// fluid dilatation
     int			m_dofAEF;	// material time derivative of fluid dilatation
 
 protected:
