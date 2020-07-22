@@ -37,11 +37,15 @@ SOFTWARE.*/
 #include <FECore/NLConstraintDataRecord.h>
 #include <FEBioMech/FERigidConnector.h>
 #include <FEBioMech/FEGenericRigidJoint.h>
+#include <FEBioMech/FERigidSphericalJoint.h>
 #include <FEBioMech/FERigidPrismaticJoint.h>
 #include <FEBioMech/FERigidRevoluteJoint.h>
 #include <FEBioMech/FERigidCylindricalJoint.h>
+#include <FEBioMech/FERigidPlanarJoint.h>
 #include <FEBioMech/FERigidDamper.h>
 #include <FEBioMech/FERigidSpring.h>
+#include <FEBioMech/FERigidAngularDamper.h>
+#include <FEBioMech/FERigidContractileForce.h>
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"
@@ -719,6 +723,104 @@ private:
 	FERigidBody* m_rb;
 };
 
+
+//-----------------------------------------------------------------------------
+class FEPlotRigidConnectorTranslationLCS : public FEPlotObjectData
+{
+public:
+    FEPlotRigidConnectorTranslationLCS(FEModel* fem, FERigidConnector* prb) : FEPlotObjectData(fem), m_rc(prb) {}
+
+    bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+    {
+        assert(m_rc);
+        ar << m_rc->RelativeTranslation(false);
+        return true;
+    }
+
+private:
+    FERigidConnector* m_rc;
+};
+
+class FEPlotRigidConnectorRotationLCS : public FEPlotObjectData
+{
+public:
+    FEPlotRigidConnectorRotationLCS(FEModel* fem, FERigidConnector* prb) : FEPlotObjectData(fem), m_rc(prb) {}
+
+    bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+    {
+        assert(m_rc);
+        ar << m_rc->RelativeRotation(false);
+        return true;
+    }
+
+private:
+    FERigidConnector* m_rc;
+};
+
+class FEPlotRigidConnectorTranslationGCS : public FEPlotObjectData
+{
+public:
+    FEPlotRigidConnectorTranslationGCS(FEModel* fem, FERigidConnector* prb) : FEPlotObjectData(fem), m_rc(prb) {}
+
+    bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+    {
+        assert(m_rc);
+        ar << m_rc->RelativeTranslation(true);
+        return true;
+    }
+
+private:
+    FERigidConnector* m_rc;
+};
+
+class FEPlotRigidConnectorRotationGCS : public FEPlotObjectData
+{
+public:
+    FEPlotRigidConnectorRotationGCS(FEModel* fem, FERigidConnector* prb) : FEPlotObjectData(fem), m_rc(prb) {}
+
+    bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+    {
+        assert(m_rc);
+        ar << m_rc->RelativeRotation(true);
+        return true;
+    }
+
+private:
+    FERigidConnector* m_rc;
+};
+
+class FEPlotRigidConnectorForce : public FEPlotObjectData
+{
+public:
+    FEPlotRigidConnectorForce(FEModel* fem, FERigidConnector* prb) : FEPlotObjectData(fem), m_rc(prb) {}
+
+    bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+    {
+        assert(m_rc);
+        ar << m_rc->m_F;
+        return true;
+    }
+
+private:
+    FERigidConnector* m_rc;
+};
+
+class FEPlotRigidConnectorMoment : public FEPlotObjectData
+{
+public:
+    FEPlotRigidConnectorMoment(FEModel* fem, FERigidConnector* prb) : FEPlotObjectData(fem), m_rc(prb) {}
+
+    bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+    {
+        assert(m_rc);
+        ar << m_rc->m_M;
+        return true;
+    }
+
+private:
+    FERigidConnector* m_rc;
+};
+
 //-----------------------------------------------------------------------------
 void FEBioModel::UpdatePlotObjects()
 {
@@ -775,34 +877,88 @@ void FEBioModel::UpdatePlotObjects()
 				po->m_tag = 2;
 				po->m_pos = rj->InitialPosition();
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rj));
+                po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rj));
+                po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rj));
+                po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rj));
+                po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rj));
+                po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rj));
 			}
+
+            FERigidSphericalJoint* rsj = dynamic_cast<FERigidSphericalJoint*>(pc);
+            if (rsj)
+            {
+                FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+                po->m_tag = 3;
+                po->m_pos = rsj->InitialPosition();
+                po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rsj));
+                po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rsj));
+                po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rsj));
+                po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rsj));
+                po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rsj));
+                po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rsj));
+            }
 
 			FERigidPrismaticJoint* rpj = dynamic_cast<FERigidPrismaticJoint*>(pc);
 			if (rpj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 3;
+				po->m_tag = 4;
 				po->m_pos = rpj->InitialPosition();
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rpj));
+                po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rpj));
+                po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rpj));
+                po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rpj));
+                po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rpj));
+                po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rpj));
 			}
 
 			FERigidRevoluteJoint* rrj = dynamic_cast<FERigidRevoluteJoint*>(pc);
 			if (rrj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 4;
+				po->m_tag = 5;
 				po->m_pos = rrj->InitialPosition();
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rrj));
+                po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rrj));
+                po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rrj));
+                po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rrj));
+                po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rrj));
+                po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rrj));
 			}
 
 			FERigidCylindricalJoint* rcj = dynamic_cast<FERigidCylindricalJoint*>(pc);
 			if (rcj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 5;
+				po->m_tag = 6;
 				po->m_pos = rcj->InitialPosition();
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rcj));
+                po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rcj));
+                po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rcj));
+                po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rcj));
+                po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rcj));
+                po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rcj));
 			}
+            
+            FERigidPlanarJoint* rlj = dynamic_cast<FERigidPlanarJoint*>(pc);
+            if (rlj)
+            {
+                FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+                po->m_tag = 7;
+                po->m_pos = rlj->InitialPosition();
+                po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rlj));
+                po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rlj));
+                po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rlj));
+                po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rlj));
+                po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rlj));
+                po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rlj));
+            }
 			nid++;
 		}
 	}
@@ -830,6 +986,14 @@ void FEBioModel::UpdatePlotObjects()
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
 			}
 
+            FERigidSphericalJoint* rsj = dynamic_cast<FERigidSphericalJoint*>(pc);
+            if (rsj)
+            {
+                FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+                po->m_pos = rsj->Position();
+                po->m_rot = quatd(0, vec3d(1, 0, 0));
+            }
+
 			FERigidPrismaticJoint* rpj = dynamic_cast<FERigidPrismaticJoint*>(pc);
 			if (rpj)
 			{
@@ -853,6 +1017,14 @@ void FEBioModel::UpdatePlotObjects()
 				po->m_pos = rcj->Position();
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
 			}
+            
+            FERigidPlanarJoint* rlj = dynamic_cast<FERigidPlanarJoint*>(pc);
+            if (rlj)
+            {
+                FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+                po->m_pos = rlj->Position();
+                po->m_rot = quatd(0, vec3d(1, 0, 0));
+            }
 		}
 	}
 
@@ -884,6 +1056,10 @@ void FEBioModel::UpdatePlotObjects()
 					po->m_tag = 1;
 					po->m_r1 = ra;
 					po->m_r2 = rb;
+                    po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rs));
+                    po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rs));
+                    po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rs));
+                    po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rs));
 				}
 
 				FERigidDamper* rd = dynamic_cast<FERigidDamper*>(prc);
@@ -893,7 +1069,37 @@ void FEBioModel::UpdatePlotObjects()
 					po->m_tag = 2;
 					po->m_r1 = ra;
 					po->m_r2 = rb;
+                    po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rd));
+                    po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rd));
+                    po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rd));
+                    po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rd));
 				}
+                
+                FERigidAngularDamper* rad = dynamic_cast<FERigidAngularDamper*>(prc);
+                if (rad)
+                {
+                    FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
+                    po->m_tag = 3;
+                    po->m_r1 = ra;
+                    po->m_r2 = rb;
+                    po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rad));
+                    po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rad));
+                    po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rad));
+                    po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rad));
+                }
+                
+                FERigidContractileForce* rcf = dynamic_cast<FERigidContractileForce*>(prc);
+                if (rcf)
+                {
+                    FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
+                    po->m_tag = 4;
+                    po->m_r1 = ra;
+                    po->m_r2 = rb;
+                    po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rcf));
+                    po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rcf));
+                    po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rcf));
+                    po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rcf));
+                }
 			}
 		}
 	}
@@ -924,6 +1130,22 @@ void FEBioModel::UpdatePlotObjects()
 					po->m_r1 = ra;
 					po->m_r2 = rb;
 				}
+                
+                FERigidAngularDamper* rad = dynamic_cast<FERigidAngularDamper*>(prc);
+                if (rad)
+                {
+                    FEBioPlotFile::LineObject* po = plt->GetLineObject(n++);
+                    po->m_r1 = ra;
+                    po->m_r2 = rb;
+                }
+                
+                FERigidContractileForce* rcf = dynamic_cast<FERigidContractileForce*>(prc);
+                if (rcf)
+                {
+                    FEBioPlotFile::LineObject* po = plt->GetLineObject(n++);
+                    po->m_r1 = ra;
+                    po->m_r2 = rb;
+                }
 			}
 		}
 	}

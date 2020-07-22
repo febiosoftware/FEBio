@@ -326,7 +326,7 @@ void FERigidSpring::Reset()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidSpring::RelativeTranslation()
+vec3d FERigidSpring::RelativeTranslation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -346,7 +346,7 @@ vec3d FERigidSpring::RelativeTranslation()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidSpring::RelativeRotation()
+vec3d FERigidSpring::RelativeRotation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;

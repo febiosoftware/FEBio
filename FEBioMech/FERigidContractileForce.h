@@ -65,10 +65,10 @@ public:
     void Reset() override;
     
     //! evaluate relative translation
-    vec3d RelativeTranslation() override;
+    vec3d RelativeTranslation(const bool global) override;
     
     //! evaluate relative rotation
-    vec3d RelativeRotation() override;
+    vec3d RelativeRotation(const bool global) override;
 
 public: // parameters
     double	m_f0;       //! contractile force

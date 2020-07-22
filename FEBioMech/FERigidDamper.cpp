@@ -335,7 +335,7 @@ void FERigidDamper::Reset()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidDamper::RelativeTranslation()
+vec3d FERigidDamper::RelativeTranslation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -355,7 +355,7 @@ vec3d FERigidDamper::RelativeTranslation()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidDamper::RelativeRotation()
+vec3d FERigidDamper::RelativeRotation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;

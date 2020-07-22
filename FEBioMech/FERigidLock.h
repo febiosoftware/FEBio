@@ -66,10 +66,10 @@ public:
     void Reset() override;
     
     //! evaluate relative translation
-    vec3d RelativeTranslation() override;
+    vec3d RelativeTranslation(const bool global = false) override;
     
     //! evaluate relative rotation
-    vec3d RelativeRotation() override;
+    vec3d RelativeRotation(const bool global = false) override;
 
 public: // parameters
     double	m_atol;	//! augmented Lagrangian tolerance

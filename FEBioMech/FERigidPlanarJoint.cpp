@@ -74,6 +74,23 @@ FERigidPlanarJoint::FERigidPlanarJoint(FEModel* pfem) : FERigidConnector(pfem)
 }
 
 //-----------------------------------------------------------------------------
+//! initial position
+vec3d FERigidPlanarJoint::InitialPosition() const
+{
+    return m_q0;
+}
+
+//-----------------------------------------------------------------------------
+//! current position
+vec3d FERigidPlanarJoint::Position() const
+{
+    FERigidBody& RBa = *m_rbA;
+    vec3d qa = m_qa0;
+    RBa.GetRotation().RotateVector(qa);
+    return RBa.m_rt + qa;
+}
+
+//-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
 bool FERigidPlanarJoint::Init()
@@ -675,7 +692,7 @@ void FERigidPlanarJoint::Reset()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidPlanarJoint::RelativeTranslation()
+vec3d FERigidPlanarJoint::RelativeTranslation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -690,6 +707,8 @@ vec3d FERigidPlanarJoint::RelativeTranslation()
 
     // relative translation in global coordinate system
     vec3d x = rb + zb - ra - za;
+    
+    if (global) return x;
 
     // evaluate local basis for body A
     vec3d ea[3];
@@ -704,7 +723,7 @@ vec3d FERigidPlanarJoint::RelativeTranslation()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidPlanarJoint::RelativeRotation()
+vec3d FERigidPlanarJoint::RelativeRotation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -714,6 +733,8 @@ vec3d FERigidPlanarJoint::RelativeRotation()
     
     // relative rotation vector
     vec3d q = Q.GetRotationVector();
+    
+    if (global) return q;
     
     // evaluate local basis for body A
     vec3d ea[3];

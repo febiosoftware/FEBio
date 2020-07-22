@@ -894,7 +894,7 @@ void FERigidCylindricalJoint::Reset()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidCylindricalJoint::RelativeTranslation()
+vec3d FERigidCylindricalJoint::RelativeTranslation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -909,6 +909,8 @@ vec3d FERigidCylindricalJoint::RelativeTranslation()
 
     // relative translation in global coordinate system
     vec3d x = rb + zb - ra - za;
+    
+    if (global) return x;
 
     // evaluate local basis for body A
     vec3d ea[3];
@@ -923,7 +925,7 @@ vec3d FERigidCylindricalJoint::RelativeTranslation()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidCylindricalJoint::RelativeRotation()
+vec3d FERigidCylindricalJoint::RelativeRotation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -933,6 +935,8 @@ vec3d FERigidCylindricalJoint::RelativeRotation()
     
     // relative rotation vector
     vec3d q = Q.GetRotationVector();
+    
+    if (global) return q;
     
     // evaluate local basis for body A
     vec3d ea[3];
