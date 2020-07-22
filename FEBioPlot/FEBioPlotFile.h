@@ -39,7 +39,7 @@ using namespace std;
 
 // flag to indicate whether to use the 3.0 plot file
 #if defined(WIN32) && defined(_DEBUG)
-#define PLOT_FILE_3	1
+//#define PLOT_FILE_3	1
 #endif
 
 //-----------------------------------------------------------------------------

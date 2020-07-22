@@ -599,7 +599,7 @@ int FEBioPlotFile::LineObjects()
 //-----------------------------------------------------------------------------
 FEBioPlotFile::LineObject* FEBioPlotFile::GetLineObject(int i)
 {
-	if ((i >= 0) && (i < PointObjects())) return m_Lines[i];
+	if ((i >= 0) && (i < LineObjects())) return m_Lines[i];
 	return nullptr;
 }
 
