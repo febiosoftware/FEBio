@@ -176,7 +176,22 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 						else
 						{
 							feLogError("Rigid body rotations cannot mix prescribed and free components.\nRigid body: %d, Material: %d\n", RB.m_nID, RB.GetMaterialID());
-							throw "FATAL ERROR";
+							throw std::exception("FATAL ERROR");
+						}
+
+						// see if all or none prescribed dofs are relative
+						bool br[3] = { false, false, false };
+						for (int j = 3; j < 6; ++j)
+						{
+							FERigidBodyDisplacement* dc = RB.m_pDC[j];
+							if ((dc == nullptr) || dc->GetRelativeFlag()) br[j - 3] = true;
+						}
+
+						bool bf = ((br[0] == br[1]) && (br[1] == br[2]) && (br[0] == br[2]));
+						if (bf==false)
+						{
+							feLogError("All or none rigid rotations must have relative flag set.\nRigid body: %d, Material: %d\n", RB.m_nID, RB.GetMaterialID());
+							throw std::exception("FATAL ERROR");
 						}
 					}
 				}

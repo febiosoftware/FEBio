@@ -134,6 +134,8 @@ public:
 	int GetBC() const { return m_dof; }
 
 	void SetRelativeFlag(bool b) { m_brel = b; }
+	bool GetRelativeFlag() const { return m_brel; }
+
 	void SetValue(double v) { m_val = v; }
 
 private:

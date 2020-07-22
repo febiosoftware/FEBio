@@ -292,11 +292,16 @@ void FERigidBodyDisplacement::Activate()
 	m_ref = 0.0;
 	if (m_brel)
 	{
+		quatd Q = RB.GetRotation();
+		vec3d q = Q.GetRotationVector();
 		switch (m_dof)
 		{
 		case 0: m_ref = RB.m_rt.x - RB.m_r0.x; break;
 		case 1: m_ref = RB.m_rt.y - RB.m_r0.y; break;
 		case 2: m_ref = RB.m_rt.z - RB.m_r0.z; break;
+		case 3: m_ref = q.x; break;
+		case 4: m_ref = q.y; break;
+		case 5: m_ref = q.z; break;
 		}
 	}
 }
