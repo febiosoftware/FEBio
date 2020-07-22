@@ -320,7 +320,7 @@ void FERigidContractileForce::Reset()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidContractileForce::RelativeTranslation()
+vec3d FERigidContractileForce::RelativeTranslation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -340,7 +340,7 @@ vec3d FERigidContractileForce::RelativeTranslation()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidContractileForce::RelativeRotation()
+vec3d FERigidContractileForce::RelativeRotation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;

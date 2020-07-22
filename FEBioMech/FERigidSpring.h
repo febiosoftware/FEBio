@@ -65,10 +65,10 @@ public:
     void Reset() override;
     
     //! evaluate relative translation
-    vec3d RelativeTranslation() override;
+    vec3d RelativeTranslation(const bool global) override;
     
     //! evaluate relative rotation
-    vec3d RelativeRotation() override;
+    vec3d RelativeRotation(const bool global) override;
 
 public: // parameters
     vec3d	m_a0;       //! initial absolute position vector of spring on body A

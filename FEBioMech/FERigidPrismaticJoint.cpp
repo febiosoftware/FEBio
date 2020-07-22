@@ -689,7 +689,7 @@ void FERigidPrismaticJoint::Reset()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidPrismaticJoint::RelativeTranslation()
+vec3d FERigidPrismaticJoint::RelativeTranslation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -704,6 +704,8 @@ vec3d FERigidPrismaticJoint::RelativeTranslation()
 
     // relative translation in global coordinate system
     vec3d x = rb + zb - ra - za;
+    
+    if (global) return x;
 
     // evaluate local basis for body A
     vec3d ea[3];
@@ -718,7 +720,7 @@ vec3d FERigidPrismaticJoint::RelativeTranslation()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FERigidPrismaticJoint::RelativeRotation()
+vec3d FERigidPrismaticJoint::RelativeRotation(const bool global)
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -728,6 +730,8 @@ vec3d FERigidPrismaticJoint::RelativeRotation()
     
     // relative rotation vector
     vec3d q = Q.GetRotationVector();
+    
+    if (global) return q;
     
     // evaluate local basis for body A
     vec3d ea[3];
