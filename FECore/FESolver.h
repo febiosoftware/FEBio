@@ -48,7 +48,8 @@ enum EQUATION_SCHEME
 enum EQUATION_ORDER
 {
 	NORMAL_ORDER,
-	REVERSE_ORDER
+	REVERSE_ORDER,
+	FEBIO2_ORDER
 };
 
 //-----------------------------------------------------------------------------
