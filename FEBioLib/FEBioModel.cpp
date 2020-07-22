@@ -906,7 +906,7 @@ void FEBioModel::UpdatePlotObjects()
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
 				po->m_tag = 4;
 				po->m_pos = rpj->InitialPosition();
-				po->m_rot = quatd(0, vec3d(1, 0, 0));
+				po->m_rot = rpj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rpj));
                 po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rpj));
                 po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rpj));
@@ -921,7 +921,7 @@ void FEBioModel::UpdatePlotObjects()
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
 				po->m_tag = 5;
 				po->m_pos = rrj->InitialPosition();
-				po->m_rot = quatd(0, vec3d(1, 0, 0));
+				po->m_rot = rrj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rrj));
                 po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rrj));
                 po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rrj));
@@ -936,7 +936,7 @@ void FEBioModel::UpdatePlotObjects()
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
 				po->m_tag = 6;
 				po->m_pos = rcj->InitialPosition();
-				po->m_rot = quatd(0, vec3d(1, 0, 0));
+				po->m_rot = rcj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rcj));
                 po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rcj));
                 po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rcj));
@@ -951,7 +951,7 @@ void FEBioModel::UpdatePlotObjects()
                 FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
                 po->m_tag = 7;
                 po->m_pos = rlj->InitialPosition();
-                po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->m_rot = rlj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rlj));
                 po->AddData("Relative rotation (LCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationLCS(this, rlj));
                 po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rlj));
@@ -999,7 +999,7 @@ void FEBioModel::UpdatePlotObjects()
 			{
 				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
 				po->m_pos = rpj->Position();
-				po->m_rot = quatd(0, vec3d(1, 0, 0));
+				po->m_rot = rpj->Orientation();
 			}
 
 			FERigidRevoluteJoint* rrj = dynamic_cast<FERigidRevoluteJoint*>(pc);
@@ -1007,7 +1007,7 @@ void FEBioModel::UpdatePlotObjects()
 			{
 				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
 				po->m_pos = rrj->Position();
-				po->m_rot = quatd(0, vec3d(1, 0, 0));
+				po->m_rot = rrj->Orientation();
 			}
 
 			FERigidCylindricalJoint* rcj = dynamic_cast<FERigidCylindricalJoint*>(pc);
@@ -1015,7 +1015,7 @@ void FEBioModel::UpdatePlotObjects()
 			{
 				FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
 				po->m_pos = rcj->Position();
-				po->m_rot = quatd(0, vec3d(1, 0, 0));
+				po->m_rot = rcj->Orientation();
 			}
             
             FERigidPlanarJoint* rlj = dynamic_cast<FERigidPlanarJoint*>(pc);
@@ -1023,7 +1023,7 @@ void FEBioModel::UpdatePlotObjects()
             {
                 FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
                 po->m_pos = rlj->Position();
-                po->m_rot = quatd(0, vec3d(1, 0, 0));
+                po->m_rot = rlj->Orientation();
             }
 		}
 	}

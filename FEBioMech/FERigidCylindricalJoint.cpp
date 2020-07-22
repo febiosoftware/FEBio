@@ -103,6 +103,15 @@ vec3d FERigidCylindricalJoint::Position() const
 }
 
 //-----------------------------------------------------------------------------
+//! orientation
+quatd FERigidCylindricalJoint::Orientation() const
+{
+	quatd Q0(vec3d(0, 0, 1), m_e0[0]);
+	FERigidBody& RBa = *m_rbA;
+	return RBa.GetRotation()*Q0;
+}
+
+//-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
 bool FERigidCylindricalJoint::Init()

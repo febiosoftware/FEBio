@@ -78,6 +78,9 @@ public:
 	//! current position
 	vec3d Position() const;
 
+	//! current axis
+	quatd Orientation() const;
+
 
 public: // parameters
     double	m_atol;	//! augmented Lagrangian tolerance

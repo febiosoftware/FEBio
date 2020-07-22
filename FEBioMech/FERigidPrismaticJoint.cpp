@@ -138,6 +138,15 @@ vec3d FERigidPrismaticJoint::Position() const
 }
 
 //-----------------------------------------------------------------------------
+//! current orientation
+quatd FERigidPrismaticJoint::Orientation() const
+{
+	quatd Q0(vec3d(1, 0, 0), m_e0[0]);
+	FERigidBody& RBa = *m_rbA;
+	return RBa.GetRotation()*Q0;
+}
+
+//-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidPrismaticJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {

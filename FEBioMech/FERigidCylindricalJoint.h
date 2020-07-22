@@ -78,6 +78,9 @@ public:
 	//! current position
 	vec3d Position() const;
 
+	//! orientation
+	quatd Orientation() const;
+
 protected:
 	int InitEquations(int neq) override;
     
