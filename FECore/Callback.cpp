@@ -43,14 +43,17 @@ CallbackHandler::~CallbackHandler()
 //-----------------------------------------------------------------------------
 //! This function adds a callback routine
 //
-void CallbackHandler::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd)
+void CallbackHandler::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd, CBInsertPolicy insert)
 {
 	FECORE_CALLBACK cb;
 	cb.m_pcb = pcb;
 	cb.m_pd = pd;
 	cb.m_nwhen = nwhen;
 
-	m_pcb.push_back(cb);
+	if (insert == CBInsertPolicy::CB_ADD_END)
+		m_pcb.push_back(cb);
+	else
+		m_pcb.push_front(cb);
 }
 
 //-----------------------------------------------------------------------------

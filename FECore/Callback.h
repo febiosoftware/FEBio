@@ -67,11 +67,18 @@ struct FECORE_CALLBACK {
 class FECORE_API CallbackHandler
 {
 public:
+	enum CBInsertPolicy
+	{
+		CB_ADD_FRONT,
+		CB_ADD_END
+	};
+
+public:
 	CallbackHandler();
 	virtual ~CallbackHandler();
 
 	//! set callback function
-	void AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void* pd);
+	void AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void* pd, CBInsertPolicy insert = CBInsertPolicy::CB_ADD_END);
 
 	//! call the callback function
 	//! This function returns false if the run is to be aborted
