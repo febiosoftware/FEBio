@@ -45,7 +45,7 @@ public:
 	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
 		
 public:
-	double	m_perm;			//!< permeability
+	FEParamDouble	m_perm;			//!< permeability
 		
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

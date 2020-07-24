@@ -47,7 +47,7 @@ mat3ds FEPermConstIso::Permeability(FEMaterialPoint& mp)
 {
 	// --- constant isotropic permeability ---
 	
-	return mat3dd(m_perm);
+	return mat3dd(m_perm(mp));
 }
 
 //-----------------------------------------------------------------------------
