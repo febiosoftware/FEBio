@@ -301,6 +301,7 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
 {
 	FEModel& fem = *opt.GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	const char* sztype = tag.AttributeValue("type");
 	if (strcmp(sztype, "parameter") == 0)
@@ -342,6 +343,32 @@ FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& o
 		} while (!tag.isend());
 
 		return src;
+	}
+	else if (strcmp(sztype, "filter_sum") == 0)
+	{
+		FEDataFilterSum* flt = new FEDataFilterSum(&fem);
+
+		++tag;
+		do
+		{
+			if (tag == "node_data")
+			{
+				const char* szdata = tag.AttributeValue("data");
+				const char* szset = tag.AttributeValue("node_set");
+
+				FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+				if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+
+				FENodeLogData* nodeData = fecore_new<FENodeLogData>(szdata, &fem);
+				if (nodeData == nullptr) throw XMLReader::InvalidAttributeValue(tag, "data", szdata);
+
+				flt->SetData(nodeData, nodeSet);
+			}
+			++tag;
+		}
+		while (!tag.isend());
+
+		return flt;
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 

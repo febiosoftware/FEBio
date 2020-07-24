@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEPointFunction.h>
 #include <functional>
+#include <FECore/NodeDataRecord.h>
 
 //-------------------------------------------------------------------------------------------------
 // The FEDataSource class is used by the FEObjectiveFunction to query model data and evaluate it
@@ -113,4 +114,33 @@ public:
 
 private:
 	FEDataSource*	m_src;
+};
+
+//-------------------------------------------------------------------------------------------------
+class FEDataFilterSum : public FEDataSource
+{
+public:
+	FEDataFilterSum(FEModel* fem);
+	~FEDataFilterSum();
+
+	void SetData(FENodeLogData* data, FENodeSet* nodeSet);
+
+	// Initialize data
+	bool Init() override;
+
+	// reset data
+	void Reset() override;
+
+	// evaluate data source at x
+	double Evaluate(double x) override;
+
+
+private:
+	static bool update(FEModel* pmdl, unsigned int nwhen, void* pd);
+	void update();
+
+private:
+	FENodeLogData*	m_data;
+	FENodeSet*		m_nodeSet;
+	FEPointFunction		m_rf;
 };

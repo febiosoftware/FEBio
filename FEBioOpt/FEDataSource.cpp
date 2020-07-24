@@ -231,3 +231,80 @@ double FEDataFilterPositive::Evaluate(double t)
 	double v = m_src->Evaluate(t);
 	return (v >= 0.0 ? v : -v);
 }
+
+
+//=================================================================================================
+FEDataFilterSum::FEDataFilterSum(FEModel* fem) : FEDataSource(fem), m_rf(fem)
+{
+	m_data = nullptr;
+	m_nodeSet = nullptr;
+}
+
+FEDataFilterSum::~FEDataFilterSum()
+{
+	delete m_data;
+}
+
+void FEDataFilterSum::SetData(FENodeLogData* data, FENodeSet* nodeSet)
+{
+	m_data = data;
+	m_nodeSet = nodeSet;
+}
+
+// Initialize data
+bool FEDataFilterSum::Init()
+{
+	if (m_data == nullptr) return false;
+	if (m_nodeSet == nullptr) return false;
+
+	if (m_data->Init() == false) return false;
+
+	// register callback
+	m_fem.AddCallback(update, CB_MAJOR_ITERS, (void*)this);
+
+	return FEDataSource::Init();
+}
+
+// reset data
+void FEDataFilterSum::Reset()
+{
+	m_rf.Clear();
+	m_rf.Add(0, 0);
+}
+
+// evaluate data source at x
+double FEDataFilterSum::Evaluate(double x)
+{
+	return m_rf.value(x);
+}
+
+bool FEDataFilterSum::update(FEModel* pmdl, unsigned int nwhen, void* pd)
+{
+	// get the optimizaton data
+	FEDataFilterSum& src = *((FEDataFilterSum*)pd);
+	src.update();
+
+	return true;
+}
+
+void FEDataFilterSum::update()
+{
+	// get the current time value
+	double time = m_fem.GetTime().currentTime;
+
+	FEMesh* mesh = m_nodeSet->GetMesh();
+	FENodeSet& ns = *m_nodeSet;
+	double sum = 0.0;
+	for (int i = 0; i < m_nodeSet->Size(); ++i)
+	{
+		double vi = m_data->value(ns[i]);
+		sum += vi;
+	}
+
+	// evaluate the current reaction force value
+	double x = time;
+	double y = sum;
+
+	// add the data pair to the loadcurve
+	m_rf.Add(x, y);
+}
