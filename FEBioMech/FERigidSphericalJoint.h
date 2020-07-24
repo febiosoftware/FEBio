@@ -29,13 +29,14 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidSphericalJoint class implements a rigid spherical joint that
 //! functions under static and dynamic conditions. This joint allows the
 //! user to connect two rigid bodies at a point in space.
 
-class FERigidSphericalJoint : public FERigidConnector
+class FEBIOMECH_API FERigidSphericalJoint : public FERigidConnector
 {
 public:
     //! constructor

@@ -28,13 +28,14 @@ SOFTWARE.*/
 
 #pragma once
 #include "FERigidConnector.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidPlanarJoint class implements a planar joint. The rigid joint
 //! allows the user to connect two rigid bodies at a point in space
 //! and allow 2D translation in a plane and rotation about the plane normal.
 
-class FERigidPlanarJoint : public FERigidConnector
+class FEBIOMECH_API FERigidPlanarJoint : public FERigidConnector
 {
 public:
     //! constructor
