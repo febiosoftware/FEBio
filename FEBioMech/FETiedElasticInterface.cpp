@@ -41,6 +41,7 @@ BEGIN_FECORE_CLASS(FETiedElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
@@ -194,6 +195,7 @@ FETiedElasticInterface::FETiedElasticInterface(FEModel* pfem) : FEContactInterfa
     m_srad = 1.0;
     m_gtol = -1;    // we use augmentation tolerance by default
     m_bautopen = false;
+    m_bupdtpen = false;
     
     m_naugmin = 0;
     m_naugmax = 10;
@@ -291,17 +293,23 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::Activate()
+void FETiedElasticInterface::UpdateAutoPenalty()
 {
-    // don't forget to call the base class
-    FEContactInterface::Activate();
-    
     // calculate the penalty
     if (m_bautopen)
     {
         CalcAutoPenalty(m_ss);
         if (m_btwo_pass) CalcAutoPenalty(m_ms);
     }
+}
+
+//-----------------------------------------------------------------------------
+void FETiedElasticInterface::Activate()
+{
+    // don't forget to call the base class
+    FEContactInterface::Activate();
+    
+    UpdateAutoPenalty();
     
     // project the surfaces onto each other
     // this will evaluate the gap functions in the reference configuration
@@ -451,6 +459,10 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN];
     double N[8*MN];
+    
+    // Update auto-penalty if requested
+    if (m_bupdtpen && (GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter == 0))
+        UpdateAutoPenalty();
     
     // loop over the nr of passes
     int npass = (m_btwo_pass?2:1);

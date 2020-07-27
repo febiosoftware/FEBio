@@ -341,8 +341,12 @@ vec3d FERigidSpring::RelativeTranslation(const bool global)
 
     // relative translation in global coordinate system
     vec3d x = rb + zb - ra - za;
+    
+    if (global) return x;
+    
+    vec3d y = vec3d(1,0,0)*x.norm();
 
-    return x;
+    return y;
 }
 
 //-----------------------------------------------------------------------------

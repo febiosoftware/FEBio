@@ -46,6 +46,7 @@ BEGIN_FECORE_CLASS(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_ctol     , "ctol"                 );
 	ADD_PARAMETER(m_epsn     , "penalty"              );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"         );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"             );
 	ADD_PARAMETER(m_knmult   , "knmult"               );
 	ADD_PARAMETER(m_stol     , "search_tol"           );
@@ -445,6 +446,7 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_ambc = 0;
 	m_nsegup = 0;
 	m_bautopen = false;
+    m_bupdtpen = false;
     m_breloc = false;
     m_bsmaug = false;
 	
@@ -564,22 +566,28 @@ void FESlidingInterface3::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingInterface3::UpdateAutoPenalty()
+{
+    // calculate the penalty
+    if (m_bautopen)
+    {
+        CalcAutoPenalty(m_ss);
+        CalcAutoPenalty(m_ms);
+        if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
+        if (m_ss.m_bsolu) CalcAutoConcentrationPenalty(m_ss);
+        if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
+        if (m_ms.m_bsolu) CalcAutoConcentrationPenalty(m_ms);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingInterface3::Activate()
 {
 	// don't forget to call the base class
 	FEContactInterface::Activate();
 
-	// calculate the penalty
-	if (m_bautopen) 
-	{
-		CalcAutoPenalty(m_ss);
-		CalcAutoPenalty(m_ms);
-		if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-		if (m_ss.m_bsolu) CalcAutoConcentrationPenalty(m_ss);
-		if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-		if (m_ms.m_bsolu) CalcAutoConcentrationPenalty(m_ms);
-	}
-	
+    UpdateAutoPenalty();
+    
 	// update sliding interface data
 	Update();
 }
@@ -1018,6 +1026,8 @@ void FESlidingInterface3::Update()
 	if (psolver->m_niter == 0) {
 		biter = 0;
 		naug = psolver->m_naug;
+        // check update of auto-penalty
+        if (m_bupdtpen) UpdateAutoPenalty();
 	} else if (psolver->m_naug > naug) {
 		biter = psolver->m_niter;
 		naug = psolver->m_naug;

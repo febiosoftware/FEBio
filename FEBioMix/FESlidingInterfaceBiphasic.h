@@ -175,6 +175,8 @@ protected:
     void ProjectSurface(FESlidingSurfaceBiphasic& ss, FESlidingSurfaceBiphasic& ms, bool bupseg, bool bmove = false);
     
     //! calculate penalty factor
+    void UpdateAutoPenalty();
+    
     void CalcAutoPenalty(FESlidingSurfaceBiphasic& s);
     
     void CalcAutoPressurePenalty(FESlidingSurfaceBiphasic& s);

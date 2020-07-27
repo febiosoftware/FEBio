@@ -121,6 +121,8 @@ protected:
     void ProjectSurface(FETiedElasticSurface& ss, FETiedElasticSurface& ms);
     
     //! calculate penalty factor
+    void UpdateAutoPenalty();
+    
     void CalcAutoPenalty(FETiedElasticSurface& s);
     
 public:
@@ -139,6 +141,7 @@ public:
     
     double      m_epsn;         //!< normal penalty factor
     bool        m_bautopen;     //!< use autopenalty factor
+    bool            m_bupdtpen;     //!< update penalty at each time step
 
     DECLARE_FECORE_CLASS();
 };

@@ -166,6 +166,8 @@ protected:
 	void ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg, bool bmove = false);
 	
 	//! calculate penalty factor
+    void UpdateAutoPenalty();
+    
 	void CalcAutoPenalty(FESlidingSurface3& s);
 	
 	void CalcAutoPressurePenalty(FESlidingSurface3& s);
@@ -195,7 +197,8 @@ public:
 	
 	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor
-	
+    bool            m_bupdtpen;     //!< update penalty at each time step
+
 	// biphasic-solute contact parameters
 	double	m_epsp;		//!< fluid volumetric flow rate penalty
 	double	m_epsc;		//!< solute molar flow rate penalty

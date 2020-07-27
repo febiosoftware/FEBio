@@ -43,6 +43,7 @@ BEGIN_FECORE_CLASS(FETiedBiphasicInterface, FEContactInterface)
 	ADD_PARAMETER(m_ptol     , "ptol"               );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
@@ -230,6 +231,7 @@ FETiedBiphasicInterface::FETiedBiphasicInterface(FEModel* pfem) : FEContactInter
 	m_gtol = -1;	// we use augmentation tolerance by default
 	m_ptol = -1;	// we use augmentation tolerance by default
 	m_bautopen = false;
+    m_bupdtpen = false;
 	
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -332,22 +334,28 @@ void FETiedBiphasicInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
+void FETiedBiphasicInterface::UpdateAutoPenalty()
+{
+    // calculate the penalty
+    if (m_bautopen)
+    {
+        CalcAutoPenalty(m_ss);
+        if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
+        if (m_btwo_pass) {
+            CalcAutoPenalty(m_ms);
+            if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void FETiedBiphasicInterface::Activate()
 {
 	// don't forget to call the base class
 	FEContactInterface::Activate();
 
-	// calculate the penalty
-	if (m_bautopen) 
-	{
-		CalcAutoPenalty(m_ss);
-		if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-		if (m_btwo_pass) {
-			CalcAutoPenalty(m_ms);
-			if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-		}
-	}
-	
+    UpdateAutoPenalty();
+    
 	// project the surfaces onto each other
 	// this will evaluate the gap functions in the reference configuration
 	InitialProjection(m_ss, m_ms);
@@ -603,9 +611,9 @@ void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 	// we need to multiply with the timestep
     double dt = GetFEModel()->GetTime().timeIncrement;
 	
-	// get the mesh
-	FEMesh* pm = m_ss.GetMesh();
-	
+    // Update auto-penalty if requested
+    if (m_bupdtpen && GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter == 0) UpdateAutoPenalty();
+    
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)

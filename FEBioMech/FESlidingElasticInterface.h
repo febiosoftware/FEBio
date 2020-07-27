@@ -35,7 +35,7 @@ SOFTWARE.*/
 // & Wood's treatment of surface pressures
 
 //-----------------------------------------------------------------------------
-class FESlidingSurfaceBW : public FEContactSurface
+class FESlidingElasticSurface : public FEContactSurface
 {
 public:
     // data for each integration point
@@ -61,7 +61,7 @@ public:
     
 public:
     //! constructor
-    FESlidingSurfaceBW(FEModel* pfem);
+    FESlidingElasticSurface(FEModel* pfem);
     
     //! initialization
     bool Init() override;
@@ -94,14 +94,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FESlidingInterfaceBW : public FEContactInterface
+class FESlidingElasticInterface : public FEContactInterface
 {
 public:
     //! constructor
-    FESlidingInterfaceBW(FEModel* pfem);
+    FESlidingElasticInterface(FEModel* pfem);
     
     //! destructor
-    ~FESlidingInterfaceBW();
+    ~FESlidingElasticInterface();
     
     //! initialization
     bool Init() override;
@@ -110,10 +110,10 @@ public:
     void Activate() override;
     
     //! calculate the slip direction on the primary surface
-    vec3d SlipTangent(FESlidingSurfaceBW& ss, const int nel, const int nint, FESlidingSurfaceBW& ms, double& dh, vec3d& r);
+    vec3d SlipTangent(FESlidingElasticSurface& ss, const int nel, const int nint, FESlidingElasticSurface& ms, double& dh, vec3d& r);
     
     //! calculate contact traction
-    vec3d ContactTraction(FESlidingSurfaceBW& ss, const int nel, const int n, FESlidingSurfaceBW& ms, double& pn);
+    vec3d ContactTraction(FESlidingElasticSurface& ss, const int nel, const int n, FESlidingElasticSurface& ms, double& pn);
    
     //! calculate contact pressures for file output
     void UpdateContactPressures();
@@ -145,14 +145,16 @@ public:
 	void Update() override;
 
 protected:
-    void ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg, bool bmove = false);
+    void ProjectSurface(FESlidingElasticSurface& ss, FESlidingElasticSurface& ms, bool bupseg, bool bmove = false);
     
     //! calculate penalty factor
-    void CalcAutoPenalty(FESlidingSurfaceBW& s);
+    void UpdateAutoPenalty();
+    
+    void CalcAutoPenalty(FESlidingElasticSurface& s);
 
 public:
-    FESlidingSurfaceBW	m_ss;	//!< primary surface
-	FESlidingSurfaceBW	m_ms;	//!< secondary surface
+    FESlidingElasticSurface	m_ss;	//!< primary surface
+	FESlidingElasticSurface	m_ms;	//!< secondary surface
 
     int				m_knmult;		//!< higher order stiffness multiplier
     bool			m_btwo_pass;	//!< two-pass flag
@@ -169,7 +171,8 @@ public:
     
     double			m_epsn;			//!< normal penalty factor
     bool			m_bautopen;		//!< use autopenalty factor
-    
+    bool            m_bupdtpen;     //!< update penalty at each time step
+
     bool			m_btension;		//!< allow tension across interface
     
     double          m_mu;           //!< friction coefficient

@@ -644,26 +644,31 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEGlobalMatrix& K)
 	}
     
 }
+//-----------------------------------------------------------------------------
+void FESlidingInterfaceMP::UpdateAutoPenalty()
+{
+    // calculate the penalty
+    if (m_bautopen)
+    {
+        CalcAutoPenalty(m_ss);
+        CalcAutoPenalty(m_ms);
+        if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
+        for (int is=0; is<m_ssl.size(); ++is)
+            CalcAutoConcentrationPenalty(m_ss, m_ssl[is]);
+        if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
+        for (int im=0; im<m_msl.size(); ++im)
+            CalcAutoConcentrationPenalty(m_ms, m_msl[im]);
+    }
+}
 
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceMP::Activate()
 {
 	// don't forget to call the base members
 	FEContactInterface::Activate();
-
-	// calculate the penalty
-	if (m_bautopen) 
-	{
-		CalcAutoPenalty(m_ss);
-		CalcAutoPenalty(m_ms);
-		if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-		for (int is=0; is<m_ssl.size(); ++is)
-			CalcAutoConcentrationPenalty(m_ss, m_ssl[is]);
-		if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-		for (int im=0; im<m_msl.size(); ++im)
-			CalcAutoConcentrationPenalty(m_ms, m_msl[im]);
-	}
 	
+    UpdateAutoPenalty();
+    
 	// update sliding interface data
 	Update();
 }
@@ -1126,7 +1131,6 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 void FESlidingInterfaceMP::Update()
 {
 	double rs[2];
-	const int MN = FEElement::MAX_NODES;
 	
 	FEModel& fem = *GetFEModel();
 	
@@ -1136,8 +1140,6 @@ void FESlidingInterfaceMP::Update()
     
 	double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
 	
-    double psf = GetPenaltyScaleFactor();
-    
 	static int naug = 0;
 	static int biter = 0;
 	
@@ -1150,20 +1152,7 @@ void FESlidingInterfaceMP::Update()
 		biter = 0;
 		naug = psolver->m_naug;
         // check update of auto-penalty
-        if (m_bupdtpen) {
-            // calculate the penalty
-            if (m_bautopen)
-            {
-                CalcAutoPenalty(m_ss);
-                CalcAutoPenalty(m_ms);
-                if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-                for (int is=0; is<m_ssl.size(); ++is)
-                    CalcAutoConcentrationPenalty(m_ss, m_ssl[is]);
-                if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-                for (int im=0; im<m_msl.size(); ++im)
-                    CalcAutoConcentrationPenalty(m_ms, m_msl[im]);
-            }
-        }
+        if (m_bupdtpen) UpdateAutoPenalty();
 	} else if (psolver->m_naug > naug) {
 		biter = psolver->m_niter;
 		naug = psolver->m_naug;
