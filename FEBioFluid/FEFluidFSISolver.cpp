@@ -224,7 +224,7 @@ void FEFluidFSISolver:: SolverWarnings()
             for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
             {
                 FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-				FESlidingElasticInterface* pbw = dynamic_cast<FESlidingElasticInterface*>(pci);
+                FESlidingElasticInterface* pbw = dynamic_cast<FESlidingElasticInterface*>(pci);
                 if (pbw) {
                     feLogWarning("The sliding-elastic contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness 0 to false in Control section.");
                     break;
