@@ -1101,9 +1101,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						}
 						else if (tag.isempty() == false)
 						{
-							// There should be a parameter with the same name as the type
-							if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
-								throw XMLReader::InvalidValue(tag);
+							if ((tag.szvalue() != nullptr) && (tag.szvalue()[0] != 0))
+							{
+								// There should be a parameter with the same name as the type
+								if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+									throw XMLReader::InvalidValue(tag);
+							}
 						}
 					}
 				}
