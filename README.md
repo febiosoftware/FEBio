@@ -81,3 +81,8 @@ Please note that this will only increase the speed of the compilation process an
 
 # Contributing <a name="Contributing"></a>
 
+Refer to [CONTRIBUTING](CONTRIBUTING.md)
+
+# Code of conduct <a name="code_of_conduct"></a>
+
+Refer to [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
