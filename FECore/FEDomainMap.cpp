@@ -410,15 +410,39 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 	int oldElems = set1->Elements();
 	int newElems = elset->Elements();
 
-	if ((StorageFormat() == FMT_MULT) || ((StorageFormat() == FMT_MATPOINTS)))
+	if (StorageFormat() == FMT_MULT)
 	{
-		// assume the maxelempernodes was not modified
-		realloc(newElems*m_maxElemNodes);
+		assert(DataType() == FE_DOUBLE);
+
+		// get the max element nodes
+		int maxElemNodes = m_maxElemNodes;
+		if (map.m_maxElemNodes > maxElemNodes) maxElemNodes = map.m_maxElemNodes;
+		Realloc(newElems, maxElemNodes);
 
 		// set the new values of the map
 		for (int i = 0; i < set2->Elements(); ++i)
 		{
 			int n = set2->Element(i).Nodes();
+			for (int j = 0; j < n; ++j)
+			{
+				double v = map.value<double>(i, j);
+				setValue<double>(oldElems + i, j, v);
+			}
+		}
+	}
+	else if (StorageFormat() == FMT_MATPOINTS)
+	{
+		assert(DataType() == FE_DOUBLE);
+
+		// get the max element nodes
+		int maxElemNodes = m_maxElemNodes;
+		if (map.m_maxElemNodes > maxElemNodes) maxElemNodes = map.m_maxElemNodes;
+		Realloc(newElems, maxElemNodes);
+
+		// set the new values of the map
+		for (int i = 0; i < set2->Elements(); ++i)
+		{
+			int n = set2->Element(i).GaussPoints();
 			for (int j = 0; j < n; ++j)
 			{
 				double v = map.value<double>(i, j);
@@ -458,4 +482,30 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 	m_elset = elset;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDomainMap::Realloc(int newElemSize, int newMaxElemNodes)
+{
+	int oldMaxElemNodes = m_maxElemNodes;
+	assert(newMaxElemNodes >= oldMaxElemNodes);
+	if (newMaxElemNodes == oldMaxElemNodes) realloc(newElemSize*newMaxElemNodes);
+	else
+	{
+		FEDomainMap oldData(*this);
+		m_maxElemNodes = newMaxElemNodes;
+		realloc(newElemSize*newMaxElemNodes);
+		FEElementSet* set = m_elset;
+		for (int i = 0; i < set->Elements(); ++i)
+		{
+			int n = set->Element(i).Nodes();
+			if (StorageFormat() == FMT_MATPOINTS) n = set->Element(i).GaussPoints();
+
+			for (int j = 0; j < n; ++j)
+			{
+				double v = oldData.get<double>(i*oldMaxElemNodes + j);
+				setValue<double>(i, j, v);
+			}
+		}
+	}
 }

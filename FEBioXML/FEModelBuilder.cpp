@@ -645,12 +645,13 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	return spec;
 }
 
-void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap)
+void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap, int index)
 {
 	MappedParameter mp;
 	mp.pp = p;
 	mp.pc = parent;
 	mp.szname = strdup(szmap);
+	mp.index = index;
 
 	m_mappedParams.push_back(mp);
 }
@@ -671,7 +672,7 @@ void FEModelBuilder::ApplyParameterMaps()
 		// find the map of this parameter
 		if (p.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
-			FEParamDouble& v = p.value<FEParamDouble>();
+			FEParamDouble& v = p.value<FEParamDouble>(mp.index);
 			FEMappedValue* map = new FEMappedValue(&m_fem);
 			map->setDataMap(data);
 			v.setValuator(map);

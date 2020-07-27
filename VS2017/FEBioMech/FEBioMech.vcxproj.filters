@@ -483,9 +483,6 @@
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -727,6 +724,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FESlidingElasticInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1196,9 +1196,6 @@
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1428,6 +1425,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESurfaceAttractionBodyForce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FESlidingElasticInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

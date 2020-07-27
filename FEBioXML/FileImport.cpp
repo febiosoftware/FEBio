@@ -830,6 +830,40 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						pi.setValuator(v);
 					}
 				}
+				else if (strcmp(sztype, "map") == 0)
+				{ 
+					string sval = tag.szvalue();
+
+					vector<string> s = split_string(sval, ',');
+					if (s.size() != pp->dim()) throw XMLReader::InvalidValue(tag);
+
+					for (int i = 0; i < pp->dim(); ++i)
+					{
+						FEParamDouble& pi = pp->value<FEParamDouble>(i);
+
+						// allocate valuator
+						FEScalarValuator* val = fecore_alloc(FEMappedValue, GetFEModel());
+
+						// Figure out the item list
+						FEItemList* itemList = nullptr;
+						if (dynamic_cast<FESurfaceLoad*>(pc))
+						{
+							FESurfaceLoad* psl = dynamic_cast<FESurfaceLoad*>(pc);
+							itemList = psl->GetSurface().GetFacetSet();
+						}
+						pi.SetItemList(itemList);
+
+						// mapped values require special treatment
+						// The value is just the name of the map, but the problem is that 
+						// these maps may not be defined yet.
+						// So, we add them to the FEBioModel, which will process mapped 
+						// parameters after the rest of the file is processed
+						GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue(), i);
+
+						// assign the valuator to the parameter
+						pi.setValuator(val);
+					}
+				}
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 			else
@@ -1067,9 +1101,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						}
 						else if (tag.isempty() == false)
 						{
-							// There should be a parameter with the same name as the type
-							if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
-								throw XMLReader::InvalidValue(tag);
+							if ((tag.szvalue() != nullptr) && (tag.szvalue()[0] != 0))
+							{
+								// There should be a parameter with the same name as the type
+								if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+									throw XMLReader::InvalidValue(tag);
+							}
 						}
 					}
 				}

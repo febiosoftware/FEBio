@@ -693,8 +693,8 @@
     <ClInclude Include="..\..\FEBioMech\FERVEDamageMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FESlidingElasticInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
-    <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidLinearSystem.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidMaterial.h" />
@@ -932,8 +932,8 @@
     <ClCompile Include="..\..\FEBioMech\FERVEDamageMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESlidingElasticInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidLinearSystem.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidMaterial.cpp" />
