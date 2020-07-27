@@ -43,6 +43,7 @@ BEGIN_FECORE_CLASS(FESlidingInterface2, FEContactInterface)
 	ADD_PARAMETER(m_ptol     , "ptol"               );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
@@ -483,6 +484,7 @@ FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfe
 	m_ptol = 0;
 	m_nsegup = 0;
 	m_bautopen = false;
+    m_bupdtpen = false;
 	m_breloc = false;
     m_bsmaug = false;
     m_bdupr = true;
@@ -586,21 +588,27 @@ void FESlidingInterface2::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingInterface2::UpdateAutoPenalty()
+{
+    // calculate the penalty
+    if (m_bautopen)
+    {
+        CalcAutoPenalty(m_ss);
+        CalcAutoPenalty(m_ms);
+        CalcAutoPressurePenalty(m_ss);
+        CalcAutoPressurePenalty(m_ms);
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called during the initialization
 void FESlidingInterface2::Activate()
 {
 	// don't forget to call base member
 	FEContactInterface::Activate();
 
-	// calculate the penalty
-	if (m_bautopen) 
-	{
-		CalcAutoPenalty(m_ss);
-		CalcAutoPenalty(m_ms);
-		CalcAutoPressurePenalty(m_ss);
-		CalcAutoPressurePenalty(m_ms);
-	}
-
+    UpdateAutoPenalty();
+    
 	// update sliding interface data
 	Update();
 }
@@ -909,6 +917,8 @@ void FESlidingInterface2::Update()
 	if (psolver->m_niter == 0) {
 		biter = 0;
 		naug = psolver->m_naug;
+        // check update of auto-penalty
+        if (m_bupdtpen) UpdateAutoPenalty();
 	} else if (psolver->m_naug > naug) {
 		biter = psolver->m_niter;
 		naug = psolver->m_naug;

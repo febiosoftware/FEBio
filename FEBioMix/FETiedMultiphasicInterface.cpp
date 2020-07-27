@@ -46,6 +46,7 @@ BEGIN_FECORE_CLASS(FETiedMultiphasicInterface, FEContactInterface)
 	ADD_PARAMETER(m_ptol     , "ptol"               );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
@@ -306,6 +307,7 @@ FETiedMultiphasicInterface::FETiedMultiphasicInterface(FEModel* pfem) : FEContac
     m_gtol = -1;	// we use augmentation tolerance by default
     m_ptol = -1;	// we use augmentation tolerance by default
     m_bautopen = false;
+    m_bupdtpen = false;
     
     m_naugmin = 0;
     m_naugmax = 10;
@@ -436,11 +438,8 @@ void FETiedMultiphasicInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedMultiphasicInterface::Activate()
+void FETiedMultiphasicInterface::UpdateAutoPenalty()
 {
-    // don't forget to call the base class
-    FEContactInterface::Activate();
-    
     // calculate the penalty
     if (m_bautopen)
     {
@@ -453,6 +452,15 @@ void FETiedMultiphasicInterface::Activate()
         for (int im=0; im<m_msl.size(); ++im)
             CalcAutoConcentrationPenalty(m_ms, m_msl[im]);
     }
+}
+
+//-----------------------------------------------------------------------------
+void FETiedMultiphasicInterface::Activate()
+{
+    // don't forget to call the base class
+    FEContactInterface::Activate();
+    
+    UpdateAutoPenalty();
     
     // project the surfaces onto each other
     // this will evaluate the gap functions in the reference configuration
@@ -881,8 +889,13 @@ void FETiedMultiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo&
     vector< vector<double> > jn(nsol,vector<double>(MN));
     
     FEModel& fem = *GetFEModel();
-    
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    FESolver* psolver = pstep->GetFESolver();
+
     double dt = fem.GetTime().timeIncrement;
+    
+    // Update auto-penalty if requested
+    if (m_bupdtpen && psolver->m_niter == 0) UpdateAutoPenalty();
     
     // loop over the nr of passes
     int npass = (m_btwo_pass?2:1);

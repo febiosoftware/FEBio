@@ -127,6 +127,8 @@ protected:
 	void ProjectSurface(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms);
 	
 	//! calculate penalty factor
+    void UpdateAutoPenalty();
+    
 	void CalcAutoPenalty(FETiedBiphasicSurface& s);
 	
 	void CalcAutoPressurePenalty(FETiedBiphasicSurface& s);
@@ -149,7 +151,8 @@ public:
 	
 	double			m_epsn;			//!< normal penalty factor
 	bool			m_bautopen;		//!< use autopenalty factor
-	
+    bool            m_bupdtpen;     //!< update penalty at each time step
+
 	// biphasic contact parameters
 	double			m_epsp;		//!< flow rate penalty
 

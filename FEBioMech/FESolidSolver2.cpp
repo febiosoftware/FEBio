@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESolidSolver2.h"
 #include "FERigidConnector.h"
-#include "FESlidingInterfaceBW.h"
+#include "FESlidingElasticInterface.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FE3FieldElasticShellDomain.h"
 #include "FEBodyForce.h"
@@ -175,7 +175,7 @@ void FESolidSolver2::SolverWarnings()
 			for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
             {
 				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-                FESlidingInterfaceBW* pbw = dynamic_cast<FESlidingInterfaceBW*>(pci);
+                FESlidingElasticInterface* pbw = dynamic_cast<FESlidingElasticInterface*>(pci);
                 if (pbw) {
 					feLogWarning("The sliding-elastic contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to 0 in Control section.");
                     break;

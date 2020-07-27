@@ -625,12 +625,8 @@ void FESlidingInterfaceBiphasic::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-//! This function is called during the initialization
-void FESlidingInterfaceBiphasic::Activate()
+void FESlidingInterfaceBiphasic::UpdateAutoPenalty()
 {
-    // don't forget to call base member
-    FEContactInterface::Activate();
-    
     // calculate the penalty
     if (m_bautopen)
     {
@@ -639,6 +635,16 @@ void FESlidingInterfaceBiphasic::Activate()
         CalcAutoPressurePenalty(m_ss);
         CalcAutoPressurePenalty(m_ms);
     }
+}
+
+//-----------------------------------------------------------------------------
+//! This function is called during the initialization
+void FESlidingInterfaceBiphasic::Activate()
+{
+    // don't forget to call base member
+    FEContactInterface::Activate();
+    
+    UpdateAutoPenalty();
     
     // update sliding interface data
     Update();
@@ -952,16 +958,7 @@ void FESlidingInterfaceBiphasic::Update()
         biter = 0;
         naug = psolver->m_naug;
         // check update of auto-penalty
-        if (m_bupdtpen) {
-            // calculate the penalty
-            if (m_bautopen)
-            {
-                CalcAutoPenalty(m_ss);
-                CalcAutoPenalty(m_ms);
-                if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-                if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-            }
-        }
+        if (m_bupdtpen) UpdateAutoPenalty();
     } else if (psolver->m_naug > naug) {
         biter = psolver->m_niter;
         naug = psolver->m_naug;

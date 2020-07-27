@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FESlidingInterfaceBW.h"
+#include "FESlidingElasticInterface.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
@@ -36,11 +36,12 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_FECORE_CLASS(FESlidingInterfaceBW, FEContactInterface)
+BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
@@ -60,7 +61,7 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceBW, FEContactInterface)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESlidingSurfaceBW::Data::Data()
+FESlidingElasticSurface::Data::Data()
 {
     m_Lmd = 0.0;
     m_epsn = 1.0;
@@ -72,7 +73,7 @@ FESlidingSurfaceBW::Data::Data()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::Data::Serialize(DumpStream& ar)
+void FESlidingElasticSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
 	ar & m_gap;
@@ -90,16 +91,16 @@ void FESlidingSurfaceBW::Data::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-// FESlidingSurfaceBW
+// FESlidingElasticSurface
 //-----------------------------------------------------------------------------
 
-FESlidingSurfaceBW::FESlidingSurfaceBW(FEModel* pfem) : FEContactSurface(pfem)
+FESlidingElasticSurface::FESlidingElasticSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
     
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingSurfaceBW::Init()
+bool FESlidingElasticSurface::Init()
 {
     // initialize surface data first
     if (FEContactSurface::Init() == false) return false;
@@ -108,7 +109,7 @@ bool FESlidingSurfaceBW::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::InitSlidingSurface()
+void FESlidingElasticSurface::InitSlidingSurface()
 {
     for (int i=0; i<Elements(); ++i)
     {
@@ -126,27 +127,27 @@ void FESlidingSurfaceBW::InitSlidingSurface()
 
 //-----------------------------------------------------------------------------
 //! create material point data
-FEMaterialPoint* FESlidingSurfaceBW::CreateMaterialPoint()
+FEMaterialPoint* FESlidingElasticSurface::CreateMaterialPoint()
 {
-	return new FESlidingSurfaceBW::Data;
+	return new FESlidingElasticSurface::Data;
 }
 
 //-----------------------------------------------------------------------------
 //! serialization
-void FESlidingSurfaceBW::Serialize(DumpStream& ar)
+void FESlidingElasticSurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
 	ar & m_Ft;
 }
 
 //-----------------------------------------------------------------------------
-vec3d FESlidingSurfaceBW::GetContactForce()
+vec3d FESlidingElasticSurface::GetContactForce()
 {
     return m_Ft;
 }
 
 //-----------------------------------------------------------------------------
-double FESlidingSurfaceBW::GetContactArea()
+double FESlidingElasticSurface::GetContactArea()
 {
     // initialize contact area
     double a = 0;
@@ -183,7 +184,7 @@ double FESlidingSurfaceBW::GetContactArea()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::GetVectorGap(int nface, vec3d& pg)
+void FESlidingElasticSurface::GetVectorGap(int nface, vec3d& pg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -197,7 +198,7 @@ void FESlidingSurfaceBW::GetVectorGap(int nface, vec3d& pg)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::GetContactTraction(int nface, vec3d& pt)
+void FESlidingElasticSurface::GetContactTraction(int nface, vec3d& pt)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -211,7 +212,7 @@ void FESlidingSurfaceBW::GetContactTraction(int nface, vec3d& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::GetNodalVectorGap(int nface, vec3d* pg)
+void FESlidingElasticSurface::GetNodalVectorGap(int nface, vec3d* pg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -225,7 +226,7 @@ void FESlidingSurfaceBW::GetNodalVectorGap(int nface, vec3d* pg)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::GetNodalContactPressure(int nface, double* pg)
+void FESlidingElasticSurface::GetNodalContactPressure(int nface, double* pg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -239,7 +240,7 @@ void FESlidingSurfaceBW::GetNodalContactPressure(int nface, double* pg)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::GetNodalContactTraction(int nface, vec3d* pt)
+void FESlidingElasticSurface::GetNodalContactTraction(int nface, vec3d* pt)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -253,7 +254,7 @@ void FESlidingSurfaceBW::GetNodalContactTraction(int nface, vec3d* pt)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::GetStickStatus(int nface, double& pg)
+void FESlidingElasticSurface::GetStickStatus(int nface, double& pg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -267,10 +268,10 @@ void FESlidingSurfaceBW::GetStickStatus(int nface, double& pg)
 }
 
 //-----------------------------------------------------------------------------
-// FESlidingInterfaceBW
+// FESlidingElasticInterface
 //-----------------------------------------------------------------------------
 
-FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
+FESlidingElasticInterface::FESlidingElasticInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
     static int count = 1;
     SetID(count++);
@@ -303,12 +304,12 @@ FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(p
 }
 
 //-----------------------------------------------------------------------------
-FESlidingInterfaceBW::~FESlidingInterfaceBW()
+FESlidingElasticInterface::~FESlidingElasticInterface()
 {
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingInterfaceBW::Init()
+bool FESlidingElasticInterface::Init()
 {
     
     
@@ -339,17 +340,23 @@ bool FESlidingInterfaceBW::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::Activate()
+void FESlidingElasticInterface::UpdateAutoPenalty()
 {
-    // don't forget to call the base class!
-    FEContactInterface::Activate();
-    
     // calculate the penalty
     if (m_bautopen)
     {
         CalcAutoPenalty(m_ss);
         CalcAutoPenalty(m_ms);
     }
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingElasticInterface::Activate()
+{
+    // don't forget to call the base class!
+    FEContactInterface::Activate();
+    
+    UpdateAutoPenalty();
     
     // update sliding interface data
     Update();
@@ -357,7 +364,7 @@ void FESlidingInterfaceBW::Activate()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FESlidingInterfaceBW::BuildMatrixProfile(FEGlobalMatrix& K)
+void FESlidingElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
     FEModel& fem = *GetFEModel();
     FEMesh& mesh = fem.GetMesh();
@@ -375,7 +382,7 @@ void FESlidingInterfaceBW::BuildMatrixProfile(FEGlobalMatrix& K)
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
     {
-        FESlidingSurfaceBW& ss = (np == 0? m_ss : m_ms);
+        FESlidingElasticSurface& ss = (np == 0? m_ss : m_ms);
         
         int k, l;
         for (int j=0; j<ss.Elements(); ++j)
@@ -385,7 +392,7 @@ void FESlidingInterfaceBW::BuildMatrixProfile(FEGlobalMatrix& K)
             int* sn = &se.m_node[0];
             for (k=0; k<nint; ++k)
             {
-				FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(k));
+				FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(k));
 
                 FESurfaceElement* pe = data.m_pme;
                 
@@ -429,7 +436,7 @@ void FESlidingInterfaceBW::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
+void FESlidingElasticInterface::CalcAutoPenalty(FESlidingElasticSurface& s)
 {
     // get the mesh
     FEMesh& m = GetFEModel()->GetMesh();
@@ -447,14 +454,14 @@ void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(j));
+			FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*el.GetMaterialPoint(j));
             data.m_epsn = eps;
         }
     }
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg, bool bmove)
+void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESlidingElasticSurface& ms, bool bupseg, bool bmove)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
     double R = m_srad*mesh.GetBoundingBox().radius();
@@ -547,7 +554,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
         for (int j=0; j<nint; ++j)
         {
             // get the integration point data
-			FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(j));
+			FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*el.GetMaterialPoint(j));
 
             // calculate the global position of the integration point
             vec3d r = ss.Local2Global(el, j);
@@ -618,7 +625,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterfaceBW::Update()
+void FESlidingElasticInterface::Update()
 {
     static int naug = 0;
     static int biter = 0;
@@ -633,6 +640,8 @@ void FESlidingInterfaceBW::Update()
     if (psolver->m_niter == 0) {
         biter = 0;
         naug = psolver->m_naug;
+        // check update of auto-penalty
+        if (m_bautopen && m_bupdtpen) UpdateAutoPenalty();
     } else if (psolver->m_naug > naug) {
         biter = psolver->m_niter;
         naug = psolver->m_naug;
@@ -667,7 +676,7 @@ void FESlidingInterfaceBW::Update()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FESlidingInterfaceBW::SlipTangent(FESlidingSurfaceBW& ss, const int nel, const int nint, FESlidingSurfaceBW& ms, double& dh, vec3d& r)
+vec3d FESlidingElasticInterface::SlipTangent(FESlidingElasticSurface& ss, const int nel, const int nint, FESlidingElasticSurface& ms, double& dh, vec3d& r)
 {
     vec3d s1(0,0,0);
     dh = 0;
@@ -676,7 +685,7 @@ vec3d FESlidingInterfaceBW::SlipTangent(FESlidingSurfaceBW& ss, const int nel, c
     FESurfaceElement& se = ss.Element(nel);
     
     // get integration point data
-	FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(nint));
+	FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(nint));
 	double g = data.m_gap;
     vec3d nu = data.m_nu;
     
@@ -727,7 +736,7 @@ vec3d FESlidingInterfaceBW::SlipTangent(FESlidingSurfaceBW& ss, const int nel, c
 }
 
 //-----------------------------------------------------------------------------
-vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int nel, const int n, FESlidingSurfaceBW& ms, double& pn)
+vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, const int nel, const int n, FESlidingElasticSurface& ms, double& pn)
 {
     vec3d s1(0,0,0);
     vec3d drdot(0,0,0);
@@ -741,7 +750,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
 	FESurfaceElement& se = ss.Element(nel);
 
     // get the integration point data
-	FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(n));
+	FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(n));
 
     // penalty
     double eps = m_epsn*data.m_epsn*psf;
@@ -799,7 +808,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
                 double dh = 0;
                 
                 // slip direction
-                s1 = FESlidingInterfaceBW::SlipTangent(ss, nel, n, ms, dh, drdot);
+                s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
                 
                 // total traction
                 t = (nu + s1*(m_mu))*(-pn);
@@ -863,7 +872,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
                         double dh = 0;
                         
                         // slip direction
-                        s1 = FESlidingInterfaceBW::SlipTangent(ss, nel, n, ms, dh, drdot);
+                        s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
                         
                         // total traction
                         t = (nu + s1*(m_mu))*(-pn);
@@ -891,7 +900,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
                     double dh = 0;
                     
                     // slip direction
-                    s1 = FESlidingInterfaceBW::SlipTangent(ss, nel, n, ms, dh, drdot);
+                    s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
                     
                     // calculate frictional traction
                     t = (nu + s1*(m_mu))*(-pn);
@@ -909,7 +918,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESlidingElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     const int MN = FEElement::MAX_NODES;
     
@@ -926,8 +935,8 @@ void FESlidingInterfaceBW::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     for (int np=0; np<npass; ++np)
     {
         // get primary and secondary surface
-        FESlidingSurfaceBW& ss = (np == 0? m_ss : m_ms);
-        FESlidingSurfaceBW& ms = (np == 0? m_ms : m_ss);
+        FESlidingElasticSurface& ss = (np == 0? m_ss : m_ms);
+        FESlidingElasticSurface& ms = (np == 0? m_ms : m_ss);
         
         // loop over all primary elements
         //#pragma omp parallel for private(sLM, mLM, LM, en, fe, detJ, w, Hm, N)
@@ -963,7 +972,7 @@ void FESlidingInterfaceBW::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             for (int j=0; j<nint; ++j)
             {
                 // get integration point data
-				FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(j));
+				FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(j));
 
                 // calculate contact pressure and account for stick
                 double pn;
@@ -1058,7 +1067,7 @@ void FESlidingInterfaceBW::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // see how many reformations we've had to do so far
     int nref = LS.GetSolver()->m_nref;
@@ -1077,8 +1086,8 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
     for (int np=0; np < npass; ++np)
     {
         // get the primary and secondary surface
-        FESlidingSurfaceBW& ss = (np == 0? m_ss : m_ms);
-        FESlidingSurfaceBW& ms = (np == 0? m_ms : m_ss);
+        FESlidingElasticSurface& ss = (np == 0? m_ss : m_ms);
+        FESlidingElasticSurface& ms = (np == 0? m_ms : m_ss);
         
         // loop over all primary elements
         //#pragma omp parallel for private(detJ, w, Hm, N, sLM, mLM, LM, en, ke)
@@ -1114,7 +1123,7 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
             for (int j=0; j<nint; ++j)
             {
                 // get integration point data
-				FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(j));
+				FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(j));
 
                 // calculate contact pressure and account for stick
                 double pn;
@@ -1273,7 +1282,7 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                             // obtain the slip direction s1 and inverse of spatial increment dh
                             double dh = 0, hd = 0;
                             vec3d dr(0,0,0);
-                            vec3d s1 = FESlidingInterfaceBW::SlipTangent(ss, i, j, ms, dh, dr);
+                            vec3d s1 = FESlidingElasticInterface::SlipTangent(ss, i, j, ms, dh, dr);
                             
                             if (dh != 0)
                             {
@@ -1503,7 +1512,7 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::UpdateContactPressures()
+void FESlidingElasticInterface::UpdateContactPressures()
 {
     double psf = GetPenaltyScaleFactor();
     
@@ -1512,8 +1521,8 @@ void FESlidingInterfaceBW::UpdateContactPressures()
     const int MI = FEElement::MAX_INTPOINTS;
     for (int np=0; np<npass; ++np)
     {
-        FESlidingSurfaceBW& ss = (np == 0? m_ss : m_ms);
-        FESlidingSurfaceBW& ms = (np == 0? m_ms : m_ss);
+        FESlidingElasticSurface& ss = (np == 0? m_ss : m_ms);
+        FESlidingElasticSurface& ms = (np == 0? m_ms : m_ss);
         
         // loop over all elements of the primary surface
 #pragma omp parallel for
@@ -1526,7 +1535,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
             for (int i=0; i<nint; ++i)
             {
                 // get integration point data
-				FESlidingSurfaceBW::Data& sd = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(i));
+				FESlidingElasticSurface::Data& sd = static_cast<FESlidingElasticSurface::Data&>(*el.GetMaterialPoint(i));
 
                 double pn = 0;
                 
@@ -1556,7 +1565,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
                     vec3d ti[MI];
                     for (int j=0; j<mint; ++j)
                     {
-						FESlidingSurfaceBW::Data& md = static_cast<FESlidingSurfaceBW::Data&>(*pme->GetMaterialPoint(j));
+						FESlidingElasticSurface::Data& md = static_cast<FESlidingElasticSurface::Data&>(*pme->GetMaterialPoint(j));
 
                         pn = 0;
                         // evaluate traction on secondary surface
@@ -1593,7 +1602,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
+bool FESlidingElasticInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
     if (m_laugon != 1) return true;
@@ -1614,7 +1623,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& se = m_ss.Element(i);
         for (int j=0; j<se.GaussPoints(); ++j)
         {
-			FESlidingSurfaceBW::Data& ds = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(j));
+			FESlidingElasticSurface::Data& ds = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(j));
 			if (ds.m_bstick)
                 normL0 += ds.m_Lmt*ds.m_Lmt;
             else
@@ -1626,7 +1635,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& me = m_ms.Element(i);
 		for (int j = 0; j<me.GaussPoints(); ++j)
 		{
-			FESlidingSurfaceBW::Data& dm = static_cast<FESlidingSurfaceBW::Data&>(*me.GetMaterialPoint(j));
+			FESlidingElasticSurface::Data& dm = static_cast<FESlidingElasticSurface::Data&>(*me.GetMaterialPoint(j));
 			if (dm.m_bstick)
                 normL0 += dm.m_Lmt*dm.m_Lmt;
             else
@@ -1646,7 +1655,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
         vec3d tn[FEElement::MAX_INTPOINTS];
         if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
-			FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(j));
+			FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*el.GetMaterialPoint(j));
 			// update Lagrange multipliers on primary surface
             if (data.m_bstick) {
                 // if stick, augment total traction
@@ -1695,7 +1704,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
         vec3d tn[FEElement::MAX_INTPOINTS];
         if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
-			FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(j));
+			FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*el.GetMaterialPoint(j));
 			// update Lagrange multipliers on secondary surface
             if (data.m_bstick) {
                 // if stick, augment total traction
@@ -1765,7 +1774,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::Serialize(DumpStream &ar)
+void FESlidingElasticInterface::Serialize(DumpStream &ar)
 {
     // serialize contact data
     FEContactInterface::Serialize(ar);

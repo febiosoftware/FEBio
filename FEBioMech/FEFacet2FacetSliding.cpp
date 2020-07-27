@@ -41,6 +41,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , "penalty"      );
 	ADD_PARAMETER(m_bautopen , "auto_penalty" );
+    ADD_PARAMETER(m_bupdtpen , "update_penalty");
 	ADD_PARAMETER(m_atol     , "tolerance"    );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"     );
 	ADD_PARAMETER(m_gtol     , "gaptol"       );
@@ -248,6 +249,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_stol = 0.01;
 	m_btwo_pass = false;
 	m_bautopen = false;
+    m_bupdtpen = false;
 	m_nsegup = 0;	// always do segment updates
 	m_breloc = false;
     m_bsmaug = false;
@@ -354,14 +356,20 @@ bool FEFacet2FacetSliding::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFacet2FacetSliding::UpdateAutoPenalty()
+{
+    // calculate penalty factors
+    if (m_bautopen) CalcAutoPenalty(m_ss);
+}
+
+//-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::Activate()
 {
 	// don't forget the base class
 	FEContactInterface::Activate();
 
-	// calculate penalty factors
-	if (m_bautopen) CalcAutoPenalty(m_ss);
-
+    UpdateAutoPenalty();
+    
 	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms, true, m_breloc);
 
@@ -547,6 +555,8 @@ void FEFacet2FacetSliding::Update()
 	// We have to make sure that in this case, both surfaces get at least
 	// one pass!
 	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
+    
+    if ((niter == 0) && m_bupdtpen) UpdateAutoPenalty();
 
 	// project primary surface to secondary surface
 	ProjectSurface(m_ss, m_ms, bupdate);

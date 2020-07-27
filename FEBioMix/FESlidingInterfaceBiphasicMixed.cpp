@@ -672,12 +672,8 @@ void FESlidingInterfaceBiphasicMixed::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-//! This function is called during the initialization
-void FESlidingInterfaceBiphasicMixed::Activate()
+void FESlidingInterfaceBiphasicMixed::UpdateAutoPenalty()
 {
-    // don't forget to call base member
-    FEContactInterface::Activate();
-    
     // calculate the penalty
     if (m_bautopen)
     {
@@ -686,6 +682,16 @@ void FESlidingInterfaceBiphasicMixed::Activate()
         CalcAutoPressurePenalty(m_ss);
         CalcAutoPressurePenalty(m_ms);
     }
+}
+
+//-----------------------------------------------------------------------------
+//! This function is called during the initialization
+void FESlidingInterfaceBiphasicMixed::Activate()
+{
+    // don't forget to call base member
+    FEContactInterface::Activate();
+    
+    UpdateAutoPenalty();
     
     // update sliding interface data
     Update();
@@ -990,7 +996,6 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
 void FESlidingInterfaceBiphasicMixed::Update()
 {
 	DOFS& dofs = GetFEModel()->GetDOFS();
-	int degree_d = dofs.GetVariableInterpolationOrder(m_ss.m_varU);
 	int degree_p = dofs.GetVariableInterpolationOrder(m_ss.m_varP);
 
     double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
@@ -1009,16 +1014,7 @@ void FESlidingInterfaceBiphasicMixed::Update()
         biter = 0;
         naug = psolver->m_naug;
         // check update of auto-penalty
-        if (m_bupdtpen) {
-            // calculate the penalty
-            if (m_bautopen)
-            {
-                CalcAutoPenalty(m_ss);
-                CalcAutoPenalty(m_ms);
-                if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-                if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-            }
-        }
+        if (m_bupdtpen) UpdateAutoPenalty();
     } else if (psolver->m_naug > naug) {
         biter = psolver->m_niter;
         naug = psolver->m_naug;

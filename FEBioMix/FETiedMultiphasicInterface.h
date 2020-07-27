@@ -133,6 +133,8 @@ protected:
     void ProjectSurface(FETiedMultiphasicSurface& ss, FETiedMultiphasicSurface& ms);
     
     //! calculate penalty factor
+    void UpdateAutoPenalty();
+    
     void CalcAutoPenalty(FETiedMultiphasicSurface& s);
     
     void CalcAutoPressurePenalty(FETiedMultiphasicSurface& s);
@@ -164,7 +166,8 @@ public:
     
     double			m_epsn;			//!< normal penalty factor
     bool			m_bautopen;		//!< use autopenalty factor
-    
+    bool            m_bupdtpen;     //!< update penalty at each time step
+
     // multiphasic contact parameters
     double			m_epsp;         //!< fluid flow rate penalty
     double          m_epsc;			//!< solute molar flow rate penalty

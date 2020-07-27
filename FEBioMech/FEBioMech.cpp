@@ -157,7 +157,7 @@ SOFTWARE.*/
 #include "FERigidWallInterface.h"
 #include "FERigidSlidingContact.h"
 #include "FESlidingInterface.h"
-#include "FESlidingInterfaceBW.h"
+#include "FESlidingElasticInterface.h"
 #include "FEPeriodicSurfaceConstraint.h"
 #include "FETiedInterface.h"
 #include "FETiedElasticInterface.h"
@@ -543,7 +543,7 @@ REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node"  );
 
 REGISTER_FECORE_CLASS(FESlidingInterface         , "sliding-node-on-facet"      );
 REGISTER_FECORE_CLASS(FEFacet2FacetSliding       , "sliding-facet-on-facet"     );
-REGISTER_FECORE_CLASS(FESlidingInterfaceBW       , "sliding-elastic"            );
+REGISTER_FECORE_CLASS(FESlidingElasticInterface  , "sliding-elastic"            );
 REGISTER_FECORE_CLASS(FETiedInterface            , "tied-node-on-facet"         );
 REGISTER_FECORE_CLASS(FEFacet2FacetTied          , "tied-facet-on-facet"        );
 REGISTER_FECORE_CLASS(FETiedElasticInterface     , "tied-elastic"               );

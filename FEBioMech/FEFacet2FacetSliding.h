@@ -132,6 +132,8 @@ protected:
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup, bool bmove = false);
 
 	//! calculate auto-penalty
+    void UpdateAutoPenalty();
+    
 	void CalcAutoPenalty(FEFacetSlidingSurface& s);
 
 public:
@@ -140,6 +142,7 @@ public:
 	double	m_stol;			//!< search tolerance
 	bool	m_btwo_pass;	//!< two-pass flag
 	bool	m_bautopen;		//!< auto-penalty flag
+    bool    m_bupdtpen;     //!< update penalty at each time step
 	double	m_srad;			//!< search radius (% of model size)
 	int		m_nsegup;		//!< segment update parameter
 	bool	m_breloc;       //!< node relocation on initialization
