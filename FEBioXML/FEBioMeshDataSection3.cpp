@@ -255,9 +255,6 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	map->Create(elset);
 	map->SetName(szname);
 
-	// add it to the mesh
-	mesh.AddDataMap(map);
-
 	// see if there is a generator
 	const char* szgen = tag.AttributeValue("generator", true);
 	if (szgen)
@@ -284,9 +281,24 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 
 		// generate the data
 		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
+
+		// see if this map already exsits 
+		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szname));
+		if (oldMap)
+		{
+			oldMap->Merge(*map);
+			delete map;
+		}
+		else
+		{ 
+			mesh.AddDataMap(map);
+		}
 	}
 	else
 	{
+		// add it to the mesh
+		mesh.AddDataMap(map);
+
 		// read the data
 		ParseElementData(tag, *map);
 	}

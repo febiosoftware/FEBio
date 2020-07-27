@@ -96,6 +96,9 @@ public:
 	void fillValue(const mat3ds& v) override;
 
 private:
+	void Realloc(int newElemSize, int newMaxElemNodes);
+
+private:
 	int					m_fmt;				//!< storage format
 	int					m_maxElemNodes;		//!< max number of nodes for each element
 	FEElementSet*		m_elset;			//!< the element set on which this map is defined

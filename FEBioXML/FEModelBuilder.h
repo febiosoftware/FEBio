@@ -69,6 +69,7 @@ public:
 		FEParam*	pp;
 		FECoreBase*	pc;
 		const char*	szname;
+		int			index;
 	};
 
 	struct FEBIOXML_API MapLCToFunction
@@ -162,7 +163,7 @@ public:
 	void GlobalToLocalID(int* l, int n, vector<int>& m);
 
 public:
-	void AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap);
+	void AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap, int index = 0);
 
 	// This will associate all mapped parameters to their assigned maps.
 	void ApplyParameterMaps();
