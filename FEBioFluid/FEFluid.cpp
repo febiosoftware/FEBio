@@ -78,7 +78,7 @@ double FEFluid::Pressure(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
-double FEFluid::Pressure(const double e)
+double FEFluid::Pressure(const double e, const double T)
 {
     return -m_k*e;
 }

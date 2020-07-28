@@ -69,7 +69,7 @@ bool FEIdealGasIsothermal::Init()
 
 //-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
-double FEIdealGasIsothermal::Pressure(const double e)
+double FEIdealGasIsothermal::Pressure(const double e, const double T)
 {
     double J = 1 + e;
     return m_Pr*(1./J - 1);

@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FESurface.h>
 #include <FECore/writeplot.h>
+#include <FECore/FEDomainParameter.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -153,11 +154,15 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
         {
             // get the material
             FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-            
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+
+            if (!pfluid) {
+                pe = el.m_elem[1];
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+
             // see if this is a fluid element
-            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-            FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-            if (fluid || fsi) {
+            if (pfluid) {
                 // evaluate the average stress in this element
                 int nint = pe->GaussPoints();
                 mat3ds s(mat3dd(0));
@@ -179,6 +184,38 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
     
     // save results
 	a << fn;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot contact pressure
+bool FEPlotFluidSurfacePressure::Save(FESurface &surf, FEDataStream& a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    const int dof_EF = GetFEModel()->GetDOFIndex("ef");
+    const int dof_T = GetFEModel()->GetDOFIndex("T");
+    
+    writeElementValue<double>(surf, a, [=](int nface) {
+        FESurfaceElement& el = pcs->Element(nface);
+        double ef = pcs->Evaluate(nface, dof_EF);
+        double T = pcs->Evaluate(nface, dof_T);
+        FEElement* pe = el.m_elem[0];
+        if (pe) {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+            if (!fluid) {
+                pe = el.m_elem[1];
+                if (pe) fluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            if (fluid) return fluid->Pressure(ef, T);
+            else return 0.;
+        }
+        else return 0.;
+    });
     
     return true;
 }
@@ -217,10 +254,10 @@ bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
         {
             // get the material
             FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-            
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+
             // see if this is a fluid element
-            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-            if (fluid) {
+            if (pfluid) {
                 // evaluate the average stress in this element
                 int nint = pe->GaussPoints();
                 double s = 0;
@@ -278,10 +315,10 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
         {
             // get the material
             FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-            
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+
             // see if this is a fluid element
-            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-            if (fluid) {
+            if (pfluid) {
                 // evaluate the average stress in this element
                 int nint = pe->GaussPoints();
                 double s = 0;
@@ -289,7 +326,7 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
                 {
                     FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
                     FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-                    s += fluid->EnergyDensity(mp)*(pt.m_vft*m_area[j]);
+                    s += pfluid->EnergyDensity(mp)*(pt.m_vft*m_area[j]);
                 }
                 s /= nint;
                 
@@ -338,16 +375,9 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
             FEMaterial* pm = fem->GetMaterial(pe->GetMatID());
             
             // see if this is a fluid element
-            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-            FEFluidP* fluidP = dynamic_cast<FEFluidP*> (pm);
-            FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-            FEBiphasicFSI* bfsi = dynamic_cast<FEBiphasicFSI*> (pm);
-            if (fluid || fluidP || fsi || bfsi) {
-                double rhor;
-                if (fluid) rhor = fluid->m_rhor;
-                else if (fluidP) rhor = fluidP->Fluid()->m_rhor;
-                else if (fsi) rhor = fsi->Fluid()->m_rhor;
-                else rhor = bfsi->Fluid()->m_rhor;
+            FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+            if (fluid) {
+                double rhor = fluid->m_rhor;
                 // get the surface element
                 FESurfaceElement& el = pcs->Element(j);
                 // extract nodal velocities and dilatation
@@ -716,8 +746,8 @@ bool FEPlotPermeability::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotGradJ::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
-    if (pfluid == 0) return false;
+    FEBiphasicFSI* pbfsi = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
+    if (pbfsi == 0) return false;
     
     writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
         const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
@@ -730,9 +760,9 @@ bool FEPlotGradJ::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotGradPhiF::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
-    if (pfluid == 0) return false;
-    
+    FEBiphasicFSI* pbfsi = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
+    if (pbfsi == 0) return false;
+
     writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
         const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
         return (bpt ? bpt->m_gradphif : vec3d(0.0));

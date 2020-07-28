@@ -262,6 +262,7 @@ public:
 public:
 	// Evaluate field variables
 	double Evaluate(FESurfaceMaterialPoint& mp, int dof);
+    double Evaluate(int nface, int dof);
 
 public:
 	//! Evaluate a load vector. 

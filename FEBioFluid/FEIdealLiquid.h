@@ -84,6 +84,9 @@ public:
     
     //! dilatation from temperature and pressure
     double Dilatation(const double T, const double p) override;
+    
+    //! fluid pressure from state variables
+    double Pressure(const double ef, const double T) override;
 
 public:
     double      m_R;        //!< universal gas constant

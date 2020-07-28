@@ -27994,7 +27994,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="128" columns="3">
+<lyxtabular version="3" rows="129" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -30175,6 +30175,36 @@ reference "sec:Fluids"
 \begin_inset Text
 
 \begin_layout Plain Layout
+fluid surface pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Average fluid pressure on each face of a surface, evaluated from the nodal
+ values of the fluid dilatation on that face
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 fluid surface traction power 
 \end_layout
 
@@ -32236,15 +32266,7 @@ Some variables require the specification of a named surface (* in above
 \end_layout
 
 \begin_layout LyX-Code
-<var type="fluid surface force" surface=
-\begin_inset Quotes erd
-\end_inset
-
-airfoil
-\begin_inset Quotes erd
-\end_inset
-
-/>
+<var type="fluid surface force" surface="airfoil"/>
 \end_layout
 
 \begin_layout Standard
@@ -32731,7 +32753,7 @@ The fiber orientation is determined by a point in space and the global location
  of each element integration point.
  The value is the location of the point.
  The following example defines a spherical fiber distribution centered at
- [0,0,1]: 
+ [0,0,1]:
 \end_layout
 
 \begin_deeper
@@ -35327,7 +35349,7 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
-  <solid type=”Mooney-Rivlin”>
+  <solid type="Mooney-Rivlin">
 \end_layout
 
 \begin_layout LyX-Code
@@ -42692,7 +42714,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-  <solid type=”neo-Hookean”>
+  <solid type="neo-Hookean">
 \end_layout
 
 \begin_layout LyX-Code
@@ -48693,7 +48715,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <mat_axis type=”vector”>
+    <mat_axis type="vector">
 \end_layout
 
 \begin_layout LyX-Code
@@ -48725,7 +48747,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <mat_axis type=”vector”>
+    <mat_axis type="vector">
 \end_layout
 
 \begin_layout LyX-Code
@@ -56643,7 +56665,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<material id=”1” type="elastic damage">
+<material id="1" type="elastic damage">
 \end_layout
 
 \begin_layout LyX-Code
