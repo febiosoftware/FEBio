@@ -1876,6 +1876,7 @@ void FEBioGeometrySection25::ParseElementSetSection(XMLTag& tag)
 	if (l.empty() == false)
 	{
 		// see if all elements belong to the same domain
+		bool oneDomain = true;
 		FEElement* el = mesh.FindElementFromID(l[0]); assert(el);
 		FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
 		for (int i = 1; i < l.size(); ++i)
@@ -1883,11 +1884,18 @@ void FEBioGeometrySection25::ParseElementSetSection(XMLTag& tag)
 			FEElement* el_i = mesh.FindElementFromID(l[i]); assert(el);
 			FEDomain* dom_i = dynamic_cast<FEDomain*>(el_i->GetMeshPartition());
 
-			if (dom != dom_i) throw XMLReader::Error("Elements in an ElementSet must belong to the same part.");
+			if (dom != dom_i)
+			{
+				oneDomain = false;
+				break;
+			}
 		}
 
 		// assign indices to element set
-		pg->Create(dom, l);
+		if (oneDomain)
+			pg->Create(dom, l);
+		else
+			pg->Create(l);
 
 		// add the element set to the mesh
 		mesh.AddElementSet(pg);
