@@ -184,7 +184,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 						for (int j = 3; j < 6; ++j)
 						{
 							FERigidBodyDisplacement* dc = RB.m_pDC[j];
-							if ((dc == nullptr) || dc->GetRelativeFlag()) br[j - 3] = true;
+							if (dc && dc->GetRelativeFlag()) br[j - 3] = true;
 						}
 
 						bool bf = ((br[0] == br[1]) && (br[1] == br[2]) && (br[0] == br[2]));
