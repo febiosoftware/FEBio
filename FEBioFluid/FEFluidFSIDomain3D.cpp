@@ -851,7 +851,8 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		mat3d Gradw = Gradient(el, w, n);
 		mat3d Lw = Gradw*Fi;
 		pt.m_Lf = ept.m_L + Lw;
-		pt.m_Jf = 1 + el.Evaluate(e, n);
+        double ef = el.Evaluate(e, n);
+		pt.m_Jf = 1 + ef;
 		vec3d GradJf = Gradient(el, e, n);
 		pt.m_gradJf = Fi.transpose()*GradJf;
 
@@ -865,7 +866,7 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		pt.m_sf = m_pMat->Fluid()->Stress(mp);
 
 		// calculate the fluid pressure
-		pt.m_pf = m_pMat->Fluid()->Pressure(mp);
+		pt.m_pf = m_pMat->Fluid()->Pressure(ef);
     }
 }
 

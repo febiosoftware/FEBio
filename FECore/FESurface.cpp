@@ -2149,6 +2149,19 @@ double FESurface::Evaluate(FESurfaceMaterialPoint& mp, int dof)
 }
 
 //-----------------------------------------------------------------------------
+// Evaluate field variables
+double FESurface::Evaluate(int nface, int dof)
+{
+    double v = 0;
+
+    FESurfaceElement& el = Element(nface);
+    int neln = el.Nodes();
+    for (int j = 0; j < neln; ++j) v += Node(el.m_lnode[j]).get(dof);
+
+    return v/neln;
+}
+
+//-----------------------------------------------------------------------------
 void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool breference, FESurfaceVectorIntegrand f)
 {
 	int dofPerNode = dofList.Size();

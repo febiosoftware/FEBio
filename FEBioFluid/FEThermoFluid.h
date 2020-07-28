@@ -87,6 +87,9 @@ public:
     //! invert pressure-dilatation relation
     double Dilatation(const double T, const double p) override { return GetElastic()->Dilatation(T,p); }
     
+    //! fluid pressure from state variables
+    double Pressure(const double ef, const double T) override { return GetElastic()->Pressure(ef, T); };
+
     //! evaluate temperature
     double Temperature(FEMaterialPoint& mp) override;
 

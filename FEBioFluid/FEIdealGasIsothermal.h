@@ -42,7 +42,7 @@ public:
     bool Init() override;
     
     //! elastic pressure
-    double Pressure(const double e) override;
+    double Pressure(const double e, const double T = 0) override;
     
     //! tangent of elastic pressure with respect to strain J
     double Tangent_Pressure_Strain(FEMaterialPoint& mp) override;

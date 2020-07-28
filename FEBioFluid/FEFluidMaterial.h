@@ -94,6 +94,9 @@ public:
     //! strain + kinetic energy density
     double EnergyDensity(FEMaterialPoint& mp);
     
+    //! fluid pressure from state variables
+    virtual double Pressure(const double ef, const double T) = 0;
+    
 private: // material properties
     FEViscousFluid*        m_pViscous; //!< pointer to viscous part of fluid material
     

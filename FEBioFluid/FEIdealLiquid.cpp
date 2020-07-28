@@ -206,3 +206,12 @@ double FEIdealLiquid::Dilatation(const double T, const double p)
     
     return e;
 }
+
+//-----------------------------------------------------------------------------
+//! pressure from state variables
+double FEIdealLiquid::Pressure(const double ef, const double T)
+{
+    double p = -m_k*ef + m_beta*T;
+
+    return p;
+}

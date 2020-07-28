@@ -252,3 +252,15 @@ double FEIdealGas::Dilatation(const double T, const double p)
     
     return J - 1;
 }
+
+//-----------------------------------------------------------------------------
+//! pressure from state variables
+double FEIdealGas::Pressure(const double ef, const double T)
+{
+    double J = 1 + ef;
+    double Tabs = m_Tr + T;
+    
+    double p = m_Pr*(Tabs/(J*m_Tr) - 1);
+
+    return p;
+}

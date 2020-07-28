@@ -89,6 +89,16 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fluid surface pressure
+//!
+class FEPlotFluidSurfacePressure : public FEPlotSurfaceData
+{
+public:
+    FEPlotFluidSurfacePressure(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Fluid surface traction power
 //!
 class FEPlotFluidSurfaceTractionPower : public FEPlotSurfaceData

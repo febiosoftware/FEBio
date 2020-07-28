@@ -72,7 +72,7 @@ bool FEIdealGasIsentropic::Init()
 
 //-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
-double FEIdealGasIsentropic::Pressure(const double e)
+double FEIdealGasIsentropic::Pressure(const double e, const double T)
 {
     double J = 1 + e;
     return m_Pr*(pow(J, -m_gamma) - 1);
