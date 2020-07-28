@@ -550,7 +550,15 @@ void FEBioGeometrySection3::ParseNodeSetSection(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "node_set")
+		if ((tag == "n") || (tag == "node"))
+		{
+			int nid = -1;
+			tag.AttributeValue("id", nid);
+
+			nid = GetBuilder()->FindNodeFromID(nid);
+			pns->Add(nid);
+		}
+		else if (tag == "node_set")
 		{
 			const char* szset = tag.szvalue();
 
@@ -1027,9 +1035,6 @@ void FEBioGeometrySection3::ParseElementSetSection(XMLTag& tag)
 			pg->Create(dom, l);
 		else
 			pg->Create(l);
-
-		// add the element set to the mesh
-		mesh.AddElementSet(pg);
 	}
 
 	// only add non-empty element sets
