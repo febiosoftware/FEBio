@@ -163,10 +163,10 @@ bool FEOptimizeData::Solve()
 	{
 		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
-/*		felog.printf("\tFunction values:\n\n");
+		feLog("\tFunction values:\n\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
-			felog.printf("\t\t%15lg\n", ymin[i]);
-*/
+			feLog("\t\t%15lg\n", ymin[i]);
+
 		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
 		feLog("\tOptimal parameters:\n\n");
