@@ -560,7 +560,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio User's Manual}}
 \end_layout
@@ -660,7 +660,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio User's Manual}}
 \end_layout
@@ -675,7 +675,7 @@ status open
 
 
 \backslash
-href{http://febiodoc.sci.utah.edu/doxygen/}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Developer's 
 \end_layout
@@ -19369,6 +19369,109 @@ Starting with FEBio 2.6, two shell formulations have become available: The
  relevant degrees of freedom in those situations.
  However, this original formulation is maintained in the code for backward
  compatibility.
+\end_layout
+
+\begin_layout Standard
+Most of the shell elements available in FEBio use a 
+\emph on
+compatible strain
+\emph default
+ formulation, where the calculation of strain components is based only on
+ nodal displacements, similar to hexahedral or pentrahedral elements.
+ Users should be aware that this compatible strain formulation is very susceptib
+le to element locking when the shell thickness is much smaller than the
+ shell size (e.g., when the aspect ratio is less than 0.01).
+ Therefore, these shell formulations should be used with caution, keeping
+ in mind this important constraint.
+ Conversely, these shell elements perform very well when they are attached
+ to solid elements (e.g., skin over muscle), or sandwiched between shell elements
+ (e.g., cell membrane separating cytoplasm from extra-cellular matrix).
+\end_layout
+
+\begin_layout Standard
+The element-locking limitation of compatible strain shell formulations has
+ motivated the development of specialized shell formulations that attempt
+ to overcome locking.
+ The FE literature on this subject is rather extensive and we refer the
+ reader to the excellent review chapter by Bischoff et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bischoff18"
+literal "false"
+
+\end_inset
+
+ on this topic.
+ Methods for overcoming locking include the assumed natural strain (ANS)
+ formulation for transverse shear strains 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "MacNeal78,Bathe86"
+literal "false"
+
+\end_inset
+
+ and transverse normal strains 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Betsch95,Bischoff97"
+literal "false"
+
+\end_inset
+
+.
+ The ANS formulation may be supplemented with the enhanced assumed strain
+ (EAS) method 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo90"
+literal "false"
+
+\end_inset
+
+ and extended to large deformations 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Klinkel99,Vu-Quoc03,Simo93"
+literal "false"
+
+\end_inset
+
+.
+ FEBio includes the ANS (
+\emph on
+q4ans
+\emph default
+) and EAS (
+\emph on
+q4eas
+\emph default
+) quadrilateral shell element formulations of Vu-Quoc and Tan 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Vu-Quoc03"
+literal "false"
+
+\end_inset
+
+, using a seven-parameter EAS interpolation, which is otherwise substantially
+ similar to the five-parameter interpolation presented in an earlier study
+ by Klinkel et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Klinkel99"
+literal "false"
+
+\end_inset
+
+.
+ These shell elements are not suitable for attachment to a solid element,
+ nor sandwiching between two solid elements.
+ Since they don't experience element locking, they should be loaded more
+ slowly than compatible strain shell elements.
+ The formulations presented below are for the compatible strain shell elements.
 \end_layout
 
 \begin_layout Subsection

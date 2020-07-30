@@ -671,7 +671,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -789,7 +789,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -809,7 +809,7 @@ status open
 
 
 \backslash
-href{http://febiodoc.sci.utah.edu/doxygen/}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Developer's 
 \end_layout
@@ -7187,7 +7187,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -9582,7 +9582,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -10816,9 +10816,194 @@ name "subsec:Shell-Elements"
 \end_layout
 
 \begin_layout Standard
-FEBio currently supports 4-noded linear quadrilateral, 3-noded linear triangular
-, 8-noded quadratic quadrilateral, and 6-noded quadratic triangular shell
- element.
+FEBio currently supports the following shell elements:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tri3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3-node linear triangular shell element (compatible strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tri6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6-node quadratic triangular shell element (compatible strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+quad4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4-node linear quadrilateral shell element (compatible strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+quad8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8-node quadratic quadrilateral shell element (compatible strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+quad9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9-node quadratic quadrilateral shell element (compatible strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+q4ans
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4-node linear quadrilateral shell element (assumed natural strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+q4eas
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4-node linear quadrilateral shell element (enhanced assumed strain)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For shell elements that use a 
+\emph on
+compatible strain
+\emph default
+ formulation, the calculation of strain components is based on nodal displacemen
+ts, similar to hexahedral or pentrahedral elements.
+ Users should be aware that this compatible strain formulation is very susceptib
+le to element locking when the shell thickness is much smaller than the
+ shell size (e.g., when the aspect ratio is less than 0.01).
+ Therefore, these shell formulations should be used with caution, keeping
+ in mind this important constraint.
+ Conversely, these shell elements perform very well when they are attached
+ to solid elements (e.g., skin over muscle), or sandwiched between shell elements
+ (e.g., cell membrane separating cytoplasm from extra-cellular matrix), as
+ described in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou18"
+literal "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -10860,6 +11045,158 @@ Node numbering for shell elements
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The element-locking limitation of compatible strain shell formulations has
+ motivated the development of specialized shell formulations that attempt
+ to overcome locking.
+ The FE literature on this subject is rather extensive and we refer the
+ reader to the excellent review chapter by Bischoff et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bischoff18"
+literal "false"
+
+\end_inset
+
+ on this topic.
+ Methods for overcoming locking include the assumed natural strain (ANS)
+ formulation for transverse shear strains 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "MacNeal78,Bathe86"
+literal "false"
+
+\end_inset
+
+ and transverse normal strains 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Betsch95,Bischoff97"
+literal "false"
+
+\end_inset
+
+.
+ The ANS formulation may be supplemented with the enhanced assumed strain
+ (EAS) method 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo90"
+literal "false"
+
+\end_inset
+
+ and extended to large deformations 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Klinkel99,Vu-Quoc03,Simo93"
+literal "false"
+
+\end_inset
+
+.
+ FEBio includes the ANS (
+\emph on
+q4ans
+\emph default
+) and EAS (
+\emph on
+q4eas
+\emph default
+) quadrilateral shell element formulations of Vu-Quoc and Tan 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Vu-Quoc03"
+literal "false"
+
+\end_inset
+
+, using a seven-parameter EAS interpolation, which is otherwise substantially
+ similar to the five-parameter interpolation presented in an earlier study
+ by Klinkel et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Klinkel99"
+literal "false"
+
+\end_inset
+
+.
+ These shell elements are not suitable for attachment to a solid element,
+ nor sandwiching between two solid elements.
+ Since they don't experience element locking, they should be loaded more
+ slowly than compatible strain shell elements.
+ The most accurate of these shell formulation is 
+\emph on
+q4eas
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+By default, the nodes of a shell element define its 
+\emph on
+front
+\emph default
+ face.
+ The location of the shell element 
+\emph on
+back
+\emph default
+ face is calculated from the nodal values of the shell thickness, along
+ the opposite direction of nodal normals.
+ The nodal normal is evaluated by averaging the front face normal of all
+ shell elements sharing that node.
+ When a shell element is attached to a solid element (e.g., when the shell
+ nodes also represent the nodes of one face of the solid element), FEBio
+ automatically accounts for the shell thickness, reducing the height of
+ the solid element in the direction of the shell normal.
+ It is the user's responsibility to ensure that the shell thickness is less
+ than that of the solid element; otherwise, a negative Jacobian error will
+ be automatically generated.
+\end_layout
+
+\begin_layout Standard
+Prior to FEBio 2.6, the nodes of a shell element defined its 
+\emph on
+middle
+\emph default
+ face (halfway between front and back, such that the shell element extends
+ above and below the face defined by the shell nodes).
+ This older formulation can be recovered by setting 
+\emph on
+shell_formulation
+\emph default
+ to 0 in the 
+\emph on
+Control
+\emph default
+ section.
+ This setting only works with compatible strain shell formulations.
+\end_layout
+
+\begin_layout Standard
+When shell domains intersect such that three or more shell elements share
+ the same edge, as in a T-connection, users should set 
+\emph on
+shell_normal_nodal
+\emph default
+ to 0 in the 
+\emph on
+Control
+\emph default
+ section.
+ This setting ensures that the back face of a shell element is calculated
+ using the front face normal, instead of nodal normals, since the latter
+ would be ill-defined for nodes belonging to such an edge.
+\end_layout
+
+\begin_layout Standard
+Finally, please note that shell elements cannot be stacked in FEBio.
 \end_layout
 
 \begin_layout Subsubsection
@@ -32333,7 +32670,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -53384,7 +53721,15 @@ fibers-3d-gkt
  for compressible and uncoupled continuous fiber distributions.
  This integration rule should only be used with 3D fiber density distributions.
  This scheme automatically limits the range of integration to fibers that
- are in tension.
+ are in tension 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou16"
+literal "false"
+
+\end_inset
+
+.
  A Gauss-Kronrod quadrature rule is employed for integration across latitudes
  of the unit sphere.
  A trapezoidal rule is used for integration across longitudes.
@@ -58906,7 +59251,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -61882,7 +62227,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -64888,7 +65233,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -72224,7 +72569,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -74683,7 +75028,6 @@ fixed.
 \end_inset
 
  converges.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -78729,7 +79073,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Theory Manual}}
 \end_layout
@@ -83052,7 +83396,7 @@ status open
 
 
 \backslash
-href{http://febiodoc.sci.utah.edu/doxygen/}{
+href{https://febio.org/knowledgebase/}{
 \backslash
 emph{FEBio Developer's 
 \end_layout
