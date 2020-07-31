@@ -938,7 +938,7 @@ bool build_new_mesh(FEModel& fem, tetgenio& out, bool resetMesh)
 			if (out.tetrahedronattributelist[j] == i) nelems++;
 		}
 
-		dom.Create(nelems, FE_TET4G1);
+		dom.Create(nelems, FEElementLibrary::GetElementSpecFromType(FE_TET4G1));
 		int n = 0;
 		for (int j = 0; j < elems; ++j)
 		{

@@ -131,7 +131,7 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 		// create a copy of old domain (since we want to retain the old domain)
 		FEDomain* newDom = fecore_new<FEDomain>(oldDom.GetTypeStr(), &fem);
-		newDom->Create(NE0, FE_TET4G4);
+		newDom->Create(NE0, FEElementLibrary::GetElementSpecFromType(FE_TET4G4));
 		for (int j = 0; j < NE0; ++j)
 		{
 			FEElement& el0 = oldDom.ElementRef(j);
@@ -140,7 +140,7 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		}
 
 		// reallocate the old domain
-		oldDom.Create(8 * NE0, FE_TET4G4);
+		oldDom.Create(8 * NE0, FEElementLibrary::GetElementSpecFromType(FE_TET4G4));
 
 		// set new element nodes
 		int nel = 0;

@@ -113,9 +113,11 @@ void FEDomain::Serialize(DumpStream& ar)
 			ar >> pmat;
 			SetMaterial(pmat);
 
+			FE_Element_Spec espec; // invalid element spec!
+
 			int NEL = 0;
 			ar >> NEL;
-			Create(NEL);
+			Create(NEL, espec);
 			for (int i = 0; i < NEL; ++i)
 			{
 				FEElement& el = ElementRef(i);

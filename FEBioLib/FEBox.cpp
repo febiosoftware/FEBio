@@ -45,7 +45,7 @@ FEBoxMesh::~FEBoxMesh()
 
 }
 
-void FEBoxMesh::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
+void FEBoxMesh::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, FE_Element_Type nhex)
 {
 	int i, j, k, n;
 
@@ -92,7 +92,7 @@ void FEBoxMesh::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 	int *en;
 	n = 0;
 	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(fem);
-	pbd->Create(elems, nhex);
+	pbd->Create(elems, FEElementLibrary::GetElementSpecFromType(nhex));
 	pbd->SetMatID(-1);
 	AddDomain(pbd);
 	for (i=0; i<nx; ++i)

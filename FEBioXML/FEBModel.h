@@ -82,10 +82,13 @@ public:
 		int Elements() const { return (int) m_Elem.size(); }
 
 		FE_Element_Spec ElementSpec() const { return m_spec; }
+		void SetElementSpec(FE_Element_Spec spec) { m_spec = spec; }
 		
 		void Create(int nsize) { m_Elem.resize(nsize); }
+		void Reserve(int nsize) { m_Elem.reserve(nsize); }
 		const ELEMENT& GetElement(int i) const { return m_Elem[i]; }
 		ELEMENT& GetElement(int i) { return m_Elem[i]; }
+		void AddElement(const ELEMENT& el) { m_Elem.push_back(el); }
 
 	private:
 		FE_Element_Spec		m_spec;
@@ -156,6 +159,42 @@ public:
 		vector<int>	m_elem;
 	};
 
+	class SurfacePair
+	{
+	public:
+		SurfacePair();
+		SurfacePair(const SurfacePair& surfPair);
+
+		const string& Name() const;
+
+	public:
+		string	m_name;
+		string	m_primary;
+		string	m_secondary;		
+	};
+
+	class DiscreteSet
+	{
+	public:
+		struct ELEM
+		{
+			int	node[2];
+		};
+
+	public:
+		DiscreteSet();
+		DiscreteSet(const DiscreteSet& set);
+
+		void SetName(const string& name);
+		const string& Name() const;
+
+		void AddElement(int n0, int n1);
+		const vector<ELEM>& ElementList() const;
+
+	private:
+		string			m_name;
+		vector<ELEM>	m_elem;
+	};
 	class Part
 	{
 	public:
@@ -177,6 +216,7 @@ public:
 		int Surfaces() const { return (int) m_Surf.size(); }
 		void AddSurface(Surface* surf);
 		Surface* GetSurface(int i) { return m_Surf[i]; }
+		Surface* FindSurface(const string& name);
 
 		int NodeSets() const { return (int) m_NSet.size(); }
 		void AddNodeSet(NodeSet* nset) { m_NSet.push_back(nset); }
@@ -185,6 +225,14 @@ public:
 		int ElementSets() const { return (int) m_ESet.size(); }
 		void AddElementSet(ElementSet* eset) { m_ESet.push_back(eset); }
 		ElementSet* GetElementSet(int i) { return m_ESet[i]; }
+
+		int SurfacePairs() const { return (int)m_SurfPair.size(); }
+		void AddSurfacePair(SurfacePair* sp) { m_SurfPair.push_back(sp); }
+		SurfacePair* GetSurfacePair(int i) { return m_SurfPair[i]; }
+
+		int DiscreteSets() const { return (int)m_DiscSet.size(); }
+		void AddDiscreteSet(DiscreteSet* sp) { m_DiscSet.push_back(sp); }
+		DiscreteSet* GetDiscreteSet(int i) { return m_DiscSet[i]; }
 
 		int Nodes() const { return (int) m_Node.size(); }
 
@@ -197,6 +245,8 @@ public:
 		vector<Surface*>	m_Surf;
 		vector<NodeSet*>	m_NSet;
 		vector<ElementSet*>	m_ESet;
+		vector<SurfacePair*>	m_SurfPair;
+		vector<DiscreteSet*>	m_DiscSet;
 	};
 
 public:
@@ -204,6 +254,7 @@ public:
 	~FEBModel();
 
 	size_t Parts() const;
+	Part* GetPart(int i);
 	Part* AddPart(const std::string& name);
 	void AddPart(Part* part);
 

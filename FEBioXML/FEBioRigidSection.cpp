@@ -45,6 +45,7 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 	do
 	{
 		if (tag == "rigid_constraint") ParseRigidBC(tag);
+		else if (tag == "rigid_connector") ParseRigidConnector(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} 
@@ -107,4 +108,21 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 		ReadParameterList(tag, rc);
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+}
+
+void FEBioRigidSection::ParseRigidConnector(XMLTag& tag)
+{
+	const char* sztype = tag.AttributeValue("type");
+
+	FENLConstraint* plc = fecore_new<FENLConstraint>(sztype, GetFEModel());
+	if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname) plc->SetName(szname);
+
+	// read the parameter list
+	ReadParameterList(tag, plc);
+
+	// add this constraint to the current step
+	GetBuilder()->AddNonlinearConstraint(plc);
 }

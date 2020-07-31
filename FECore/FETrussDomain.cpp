@@ -36,7 +36,7 @@ FETrussDomain::FETrussDomain(FEModel* fem) : FEDomain(FE_DOMAIN_TRUSS, fem)
 }
 
 //-----------------------------------------------------------------------------
-void FETrussDomain::Create(int nsize, int elemType)
+bool FETrussDomain::Create(int nsize, FE_Element_Spec espec)
 {
 	m_Elem.resize(nsize);
 	for (int i = 0; i < nsize; ++i)
@@ -46,8 +46,10 @@ void FETrussDomain::Create(int nsize, int elemType)
 		el.SetMeshPartition(this);
 	}
 
-	if (elemType != -1)
-		for (int i=0; i<nsize; ++i) m_Elem[i].SetType(elemType);
+	if (espec.etype != FE_ELEM_INVALID_TYPE)
+		for (int i=0; i<nsize; ++i) m_Elem[i].SetType(espec.etype);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

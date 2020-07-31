@@ -38,8 +38,8 @@ public:
     FEDomain2D(FEModel* fem) : FEDomain(FE_DOMAIN_2D, fem) {}
     
     //! create storage for elements
-    void Create(int nelems, int elemType) override;
-    
+	bool Create(int nsize, FE_Element_Spec espec) override;
+
     //! return nr of elements
     int Elements() const override { return (int)m_Elem.size(); }
     

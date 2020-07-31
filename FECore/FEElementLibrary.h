@@ -72,6 +72,9 @@ public:
 	//! initialize library
 	static void Initialize();
 
+	//! get the element spec from the type
+	static FE_Element_Spec GetElementSpecFromType(FE_Element_Type elemType);
+
 private:
 	//! constructor
 	FEElementLibrary(){}

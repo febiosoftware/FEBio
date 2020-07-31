@@ -86,9 +86,6 @@ public:
 
 public: // interface for derived classes
 
-		//! create a domain of n elements of type
-	virtual void Create(int nelems, int elemType = -1) = 0;
-
 	//! return number of elements
 	virtual int Elements() const = 0;
 

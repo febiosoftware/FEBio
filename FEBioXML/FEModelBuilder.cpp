@@ -549,6 +549,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
     else if (strcmp(sztype, "q4eas"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = EAS_SHELL; }   // default shell type for q4eas
     else if (strcmp(sztype, "q4ans"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = ANS_SHELL; }   // default shell type for q4ans
 	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
+	else if (strcmp(sztype, "ut4"    ) == 0) { eshape = ET_TET4; m_but4 = true; }
 	else
 	{
 		// new way for defining element type and integration rule at the same time
@@ -636,6 +637,8 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	spec.m_bthree_field_tet = m_b3field_tet;
     spec.m_bthree_field_shell = m_b3field_shell;
 	spec.m_but4 = m_but4;
+	spec.m_ut4_alpha = m_ut4_alpha;
+	spec.m_ut4_bdev = m_ut4_bdev;
 	spec.m_shell_formulation = m_default_shell;
     spec.m_shell_norm_nodal = m_shell_norm_nodal;
 
@@ -777,4 +780,9 @@ void FEModelBuilder::Finish()
 {
 	ApplyParameterMaps();
 	ApplyLoadcurvesToFunctions();
+}
+
+FEBModel& FEModelBuilder::GetFEBModel()
+{
+	return m_feb;
 }

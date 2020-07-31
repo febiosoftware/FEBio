@@ -235,6 +235,18 @@ void FEUT4Domain::SetUT4Parameters(double alpha, bool bdev)
 }
 
 //-----------------------------------------------------------------------------
+//! override Create so we can grab the ut4 parameters
+bool FEUT4Domain::Create(int nelems, FE_Element_Spec espec)
+{
+	if (espec.m_but4 == false) return false;
+
+	m_alpha = espec.m_ut4_alpha;
+	m_bdev = espec.m_ut4_bdev;
+
+	return FEElasticSolidDomain::Create(nelems, espec);
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
 bool FEUT4Domain::Init()

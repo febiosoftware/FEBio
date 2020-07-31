@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-void FEDiscreteDomain::Create(int nelems, int elemType)
+bool FEDiscreteDomain::Create(int nelems, FE_Element_Spec espec)
 { 
 	m_Elem.resize(nelems); 
 	for (int i = 0; i < nelems; ++i)
@@ -42,8 +42,10 @@ void FEDiscreteDomain::Create(int nelems, int elemType)
 		el.SetMeshPartition(this);
 	}
 
-	if (elemType != -1)
-		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+	if (espec.etype != FE_ELEM_INVALID_TYPE)
+		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(espec.etype);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

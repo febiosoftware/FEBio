@@ -770,7 +770,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, pm));
 	mesh.AddDomain(pd);
 
-	pd->Create(1, FE_DISCRETE);
+	pd->Create(1, spec);
 	FEDiscreteElement& de = pd->Element(0);
 	de.SetID(++GetBuilder()->m_maxid);
 	

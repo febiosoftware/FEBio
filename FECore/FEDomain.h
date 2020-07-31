@@ -61,6 +61,9 @@ public:
 	// for the 3-field hex/shell domains.
 	virtual bool Augment(int naug) { return true; }
 
+	// create function
+	virtual bool Create(int elements, FE_Element_Spec espec) = 0;
+
 public:
 	//! Get the list of dofs on this domain
 	virtual const FEDofList& GetDOFList() const = 0;

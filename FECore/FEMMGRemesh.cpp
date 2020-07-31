@@ -576,7 +576,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 			if (gid == i) nelems++;
 		}
 
-		dom.Create(nelems, FE_TET4G1);
+		dom.Create(nelems, FEElementLibrary::GetElementSpecFromType(FE_TET4G1));
 		int c = 0;
 		for (int j = 0; j < elems; ++j)
 		{

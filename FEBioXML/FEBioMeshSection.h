@@ -27,13 +27,39 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMesh.h"
+#include "FEBioImport.h"
+#include "FEBModel.h"
 
-class FEBoxMesh : public FEMesh  
+//-----------------------------------------------------------------------------
+// Mesh section
+class FEBioMeshSection : public FEBioFileSection
 {
 public:
-	FEBoxMesh(FEModel* fem);
-	virtual ~FEBoxMesh();
+	FEBioMeshSection(FEBioImport* pim);
 
-	void Create(int nx, int ny, int nz, vec3d r0, vec3d r1, FE_Element_Type nhex = FE_HEX8G8);
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseNodeSection       (XMLTag& tag, FEBModel::Part* part);
+	void ParseSurfaceSection    (XMLTag& tag, FEBModel::Part* part);
+	void ParseElementSection    (XMLTag& tag, FEBModel::Part* part);
+	void ParseNodeSetSection    (XMLTag& tag, FEBModel::Part* part);
+	void ParseElementSetSection (XMLTag& tag, FEBModel::Part* part);
+	void ParseEdgeSection       (XMLTag& tag, FEBModel::Part* part);
+	void ParseSurfacePairSection(XMLTag& tag, FEBModel::Part* part);
+	void ParseDiscreteSetSection(XMLTag& tag, FEBModel::Part* part);
+};
+
+//-----------------------------------------------------------------------------
+// MeshDomains section
+class FEBioMeshDomainsSection : public FEBioFileSection
+{
+public:
+	FEBioMeshDomainsSection(FEBioImport* pim);
+
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseSolidDomainSection(XMLTag& tag);
+	void ParseShellDomainSection(XMLTag& tag);
 };

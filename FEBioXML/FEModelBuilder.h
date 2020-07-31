@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
 #include "febioxml_api.h"
+#include "FEBModel.h"
 #include <string>
 
 class FESolver;
@@ -173,10 +174,14 @@ public:
 	// finish the build process
 	void Finish();
 
+	FEBModel& GetFEBModel();
+
 private:
 	FEModel&		m_fem;				//!< model that is being constructed
 	FEAnalysis*		m_pStep;			//!< pointer to current analysis step
 	int				m_nsteps;			//!< nr of step sections read
+
+	FEBModel	m_feb;
 
 public:
 	int		m_maxid;		//!< max element ID

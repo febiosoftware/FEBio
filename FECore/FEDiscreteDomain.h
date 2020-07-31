@@ -36,7 +36,7 @@ class FECORE_API FEDiscreteDomain : public FEDomain
 public:
 	FEDiscreteDomain(FEModel* fem) : FEDomain(FE_DOMAIN_DISCRETE, fem) {}
 
-	void Create(int nelems, int elemType) override;
+	bool Create(int nsize, FE_Element_Spec espec) override;
 	int Elements() const override { return (int) m_Elem.size(); }
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }

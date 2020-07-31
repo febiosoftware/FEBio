@@ -426,7 +426,7 @@ void FEBioGeometrySection3::ParseElementSection(XMLTag& tag)
 	assert(elems);
 
 	// add domain it to the mesh
-	pdom->Create(elems, espec.etype);
+	pdom->Create(elems, espec);
 	pdom->SetMatID(pmat->GetID() - 1);
 	mesh.AddDomain(pdom);
 

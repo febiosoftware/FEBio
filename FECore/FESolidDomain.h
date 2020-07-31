@@ -51,8 +51,8 @@ public:
     FESolidDomain(FEModel* pfem);
     
     //! create storage for elements
-    void Create(int nsize, int elemType) override;
-    
+	bool Create(int nsize, FE_Element_Spec espec) override;
+
     //! return nr of elements
 	int Elements() const override;
 

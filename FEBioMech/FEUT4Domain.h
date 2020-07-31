@@ -78,6 +78,9 @@ public:
 	//! Set UT4 parameters
 	void SetUT4Parameters(double alpha, bool bdev);
 
+	//! override Create so we can grab the ut4 parameters
+	bool Create(int nelems, FE_Element_Spec espec) override;
+
 public: // overrides from FEElasticDomain
 
 	//! Update domain data

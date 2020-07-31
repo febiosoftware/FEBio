@@ -192,9 +192,12 @@ struct FE_Element_Spec
     bool                m_bthree_field_shell;
     bool                m_bthree_field_quad;
     bool                m_bthree_field_tri;
-	bool				m_but4;
 	int					m_shell_formulation;
     bool                m_shell_norm_nodal;
+
+	bool		m_but4;
+	double		m_ut4_alpha;
+	bool		m_ut4_bdev;
 
 	FE_Element_Spec()
 	{
@@ -207,6 +210,8 @@ struct FE_Element_Spec
 		m_shell_formulation = NEW_SHELL;
         m_shell_norm_nodal = true;
 		m_but4 = false;
+		m_ut4_alpha = 0.05;
+		m_ut4_bdev = false;
 	}
 
 	bool operator == (const FE_Element_Spec& s)

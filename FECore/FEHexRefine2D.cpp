@@ -606,7 +606,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 		{
 			// create a copy of old domain (since we want to retain the old domain)
 			FEDomain* newDom = fecore_new<FEDomain>(oldDom.GetTypeStr(), &fem);
-			newDom->Create(NE0, FE_HEX8G8);
+			newDom->Create(NE0, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 			for (int j = 0; j < NE0; ++j)
 			{
 				FEElement& el0 = oldDom.ElementRef(j);
@@ -616,7 +616,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 			}
 
 			// reallocate the old domain
-			oldDom.Create(4 * newElems + (NE0 - newElems), FE_HEX8G8);
+			oldDom.Create(4 * newElems + (NE0 - newElems), FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 
 			// set new element nodes
 			int nel = 0;

@@ -44,7 +44,7 @@ FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::Create(int nsize, int elemType)
+bool FESolidDomain::Create(int nsize, FE_Element_Spec espec)
 {
 	// allocate elements
     m_Elem.resize(nsize);
@@ -56,8 +56,10 @@ void FESolidDomain::Create(int nsize, int elemType)
 	}
 
 	// set element type
-	if (elemType != -1)
-		ForEachElement([=](FEElement& el) { el.SetType(elemType); });
+	if (espec.etype != FE_ELEM_INVALID_TYPE)
+		ForEachElement([=](FEElement& el) { el.SetType(espec.etype); });
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

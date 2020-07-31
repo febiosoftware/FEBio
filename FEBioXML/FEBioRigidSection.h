@@ -37,4 +37,5 @@ public:
 
 protected:
 	void ParseRigidBC(XMLTag& tag);
+	void ParseRigidConnector(XMLTag& tag);
 };

@@ -77,7 +77,7 @@ public:
 	FEShellDomainOld(FEModel* fem);
 
 	//! create storage for elements
-	void Create(int nsize, int elemType) override;
+	bool Create(int nsize, FE_Element_Spec espec) override;
 
 public:
 	//! return nr of elements
@@ -106,7 +106,7 @@ public:
 	FEShellDomainNew(FEModel* fem);
 
 	//! create storage for elements
-	void Create(int nsize, int elemType) override;
+	bool Create(int nsize, FE_Element_Spec espec) override;
 
 public:
 	//! return nr of elements

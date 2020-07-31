@@ -37,7 +37,7 @@ public:
 	FETrussDomain(FEModel* pm);
 
 public:
-	void Create(int nsize, int elemType) override;
+	bool Create(int nsize, FE_Element_Spec espec) override;
 
 	int Elements() const override { return (int)m_Elem.size(); }
 

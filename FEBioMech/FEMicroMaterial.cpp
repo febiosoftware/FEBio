@@ -33,7 +33,9 @@ SOFTWARE.*/
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
+#ifndef FEBIOMECH_EXPORTS
 #include "FEBioXML/FEBioImport.h"
+#endif
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
 #include "FEBCPrescribedDeformation.h"
@@ -195,11 +197,15 @@ bool FEMicroMaterial::Init()
 	if (FEElasticMaterial::Init() == false) return false;
 
 	// load the RVE model
+#ifndef FEBIOMECH_EXPORTS
 	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
 		return false;
 	}
+#else
+	return false;
+#endif
 
 	// We don't want to output anything from the RVE
 	m_mrve.BlockLog();

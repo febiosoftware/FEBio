@@ -74,6 +74,16 @@ void FEBModel::ElementSet::SetElementList(const vector<int>& elem) { m_elem = el
 const vector<int>& FEBModel::ElementSet::ElementList() const { return m_elem; }
 
 //=============================================================================
+FEBModel::SurfacePair::SurfacePair() {}
+FEBModel::SurfacePair::SurfacePair(const SurfacePair& surfPair)
+{
+	m_name = surfPair.m_name;
+	m_primary = surfPair.m_primary;
+	m_secondary = surfPair.m_secondary;
+}
+const string& FEBModel::SurfacePair::Name() const { return m_name; }
+
+//=============================================================================
 FEBModel::Domain::Domain()
 {
 	m_defaultShellThickness = 0.0;
@@ -125,6 +135,20 @@ void FEBModel::Surface::SetFacetList(const vector<FEBModel::FACET>& face) { m_Fa
 const vector<FEBModel::FACET>& FEBModel::Surface::FacetList() const { return m_Face; }
 
 //=============================================================================
+FEBModel::DiscreteSet::DiscreteSet() {}
+FEBModel::DiscreteSet::DiscreteSet(const FEBModel::DiscreteSet& set)
+{
+	m_name = set.m_name;
+	m_elem = set.m_elem;
+}
+
+void FEBModel::DiscreteSet::SetName(const string& name) { m_name = name; }
+const string& FEBModel::DiscreteSet::Name() const { return m_name; }
+
+void FEBModel::DiscreteSet::AddElement(int n0, int n1) { m_elem.push_back(ELEM{ n0, n1 } ); }
+const vector<FEBModel::DiscreteSet::ELEM>& FEBModel::DiscreteSet::ElementList() const { return m_elem; }
+
+//=============================================================================
 FEBModel::Part::Part() {}
 
 FEBModel::Part::Part(const std::string& name) : m_name(name) {}
@@ -137,6 +161,8 @@ FEBModel::Part::Part(const FEBModel::Part& part)
 	for (size_t i=0; i<part.m_Surf.size(); ++i) AddSurface(new Surface(*part.m_Surf[i]));
 	for (size_t i=0; i<part.m_NSet.size(); ++i) AddNodeSet(new NodeSet(*part.m_NSet[i]));
 	for (size_t i=0; i<part.m_ESet.size(); ++i) AddElementSet(new ElementSet(*part.m_ESet[i]));
+	for (size_t i = 0; i < part.m_SurfPair.size(); ++i) AddSurfacePair(new SurfacePair(*part.m_SurfPair[i]));
+	for (size_t i = 0; i < part.m_DiscSet.size(); ++i) AddDiscreteSet(new DiscreteSet(*part.m_DiscSet[i]));
 }
 
 FEBModel::Part::~Part()
@@ -144,6 +170,8 @@ FEBModel::Part::~Part()
 	for (size_t i=0; i<m_NSet.size(); ++i) delete m_NSet[i];
 	for (size_t i=0; i<m_Dom.size(); ++i) delete m_Dom[i];
 	for (size_t i = 0; i<m_Surf.size(); ++i) delete m_Surf[i];
+	for (size_t i = 0; i < m_SurfPair.size(); ++i) delete m_SurfPair[i];
+	for (size_t i = 0; i < m_DiscSet.size(); ++i) delete m_DiscSet[i];
 }
 
 void FEBModel::Part::SetName(const std::string& name) {	m_name = name; }
@@ -178,6 +206,16 @@ void FEBModel::Part::AddDomain(FEBModel::Domain* dom) { m_Dom.push_back(dom); }
 
 void FEBModel::Part::AddSurface(FEBModel::Surface* surf) { m_Surf.push_back(surf); }
 
+FEBModel::Surface* FEBModel::Part::FindSurface(const string& name)
+{
+	for (size_t i = 0; i < m_Surf.size(); ++i)
+	{
+		Surface* surf = m_Surf[i];
+		if (surf->Name() == name) return surf;
+	}
+	return nullptr;
+}
+
 //=============================================================================
 FEBModel::FEBModel()
 {
@@ -192,6 +230,11 @@ FEBModel::~FEBModel()
 size_t FEBModel::Parts() const
 {
 	return m_Part.size();
+}
+
+FEBModel::Part* FEBModel::GetPart(int i)
+{
+	return m_Part[i];
 }
 
 FEBModel::Part* FEBModel::AddPart(const std::string& name)
@@ -286,6 +329,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 
 	// get the part name
 	string partName = part.Name();
+	if (partName.empty() == false) partName += ".";
 
 	// process domains
 	int eid = E0;
@@ -308,10 +352,14 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		FEDomain* dom = febio.CreateDomain(spec, &mesh, mat);
 		if (dom == 0) return false;
 
-		dom->Create(elems, spec.etype);
+		if (dom->Create(elems, spec) == false)
+		{
+			return false;
+		}
+
 		dom->SetMatID(mat->GetID() - 1);
 
-		string domName = part.Name() + "." + partDomain.Name();
+		string domName = partName + partDomain.Name();
 		dom->SetName(domName);
 
 		// process element data
@@ -363,7 +411,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		FENodeSet* feset = fecore_alloc(FENodeSet, &fem);
 
 		// add the name
-		string name = partName + "." + set->Name();
+		string name = partName + set->Name();
 		feset->SetName(name.c_str());
 
 		// copy indices
@@ -385,7 +433,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 
 		// create a new facet set
 		FEFacetSet* fset = fecore_alloc(FEFacetSet, &fem);
-		string name = partName + "." + surf->Name();
+		string name = partName + surf->Name();
 		fset->SetName(name.c_str());
 
 		// copy data
@@ -413,7 +461,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 
 		int ne = (int) elist.size();
 		FEElementSet* feset = new FEElementSet(&fem);
-		string name = partName + "." + eset.Name();
+		string name = partName + eset.Name();
 		feset->SetName(name);
 
 		FEDomain* dom = mesh.FindDomain(name);
@@ -421,6 +469,48 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		else feset->Create(elist);
 
 		mesh.AddElementSet(feset);
+	}
+
+	// create surface pairs
+	int SPairs = part.SurfacePairs();
+	for (int i = 0; i < SPairs; ++i)
+	{
+		SurfacePair& spair = *part.GetSurfacePair(i);
+		string name = partName + spair.Name();
+
+		FESurfacePair* fesurfPair = new FESurfacePair(&mesh);
+		mesh.AddSurfacePair(fesurfPair);
+		fesurfPair->SetName(name);
+
+		FEFacetSet* surf1 = mesh.FindFacetSet(spair.m_primary);
+		if (surf1 == nullptr) return false;
+		fesurfPair->SetPrimarySurface(surf1);
+
+		FEFacetSet* surf2 = mesh.FindFacetSet(spair.m_secondary);
+		if (surf2 == nullptr) return false;
+		fesurfPair->SetSecondarySurface(surf2);
+	}
+
+	// create discrete element sets
+	int DSets = part.DiscreteSets();
+	for (int i = 0; i < DSets; ++i)
+	{
+		DiscreteSet& dset = *part.GetDiscreteSet(i);
+		string name = partName + dset.Name();
+
+		FEDiscreteSet* fedset = new FEDiscreteSet(&mesh);
+		mesh.AddDiscreteSet(fedset);
+		fedset->SetName(name);
+
+		const std::vector<DiscreteSet::ELEM>& elemList = dset.ElementList();
+
+		for (int j = 0; j < elemList.size(); ++j)
+		{
+			int n0 = NLT[elemList[j].node[0] - noff];
+			int n1 = NLT[elemList[j].node[1] - noff];
+
+			fedset->add(n0, n1);
+		}
 	}
 
 	return true;

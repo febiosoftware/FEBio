@@ -79,7 +79,7 @@ bool FEEASShellTangentUnloaded::Init()
     // create a solid domain
     FEElasticEASShellDomain* pd = new FEElasticEASShellDomain(&fem);
     pd->SetMaterial(pmat);
-    pd->Create(1, FE_SHELL_QUAD4G8);
+    pd->Create(1, FEElementLibrary::GetElementSpecFromType(FE_SHELL_QUAD4G8));
     pd->SetMatID(0);
     m.AddDomain(pd);
     FEShellElement& el = pd->Element(0);

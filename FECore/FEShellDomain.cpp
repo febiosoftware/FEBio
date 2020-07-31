@@ -132,7 +132,7 @@ FEShellDomainOld::FEShellDomainOld(FEModel* fem) : FEShellDomain(fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomainOld::Create(int nelems, int elemType)
+bool FEShellDomainOld::Create(int nelems, FE_Element_Spec espec)
 {
 	m_Elem.resize(nelems);
 	for (int i = 0; i < nelems; ++i)
@@ -142,8 +142,10 @@ void FEShellDomainOld::Create(int nelems, int elemType)
 		el.SetMeshPartition(this);
 	}
 
-	if (elemType != -1)
-		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+	if (espec.etype != FE_ELEM_INVALID_TYPE)
+		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(espec.etype);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -224,7 +226,7 @@ FEShellDomainNew::FEShellDomainNew(FEModel* fem) : FEShellDomain(fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomainNew::Create(int nelems, int elemType)
+bool FEShellDomainNew::Create(int nelems, FE_Element_Spec espec)
 {
 	m_Elem.resize(nelems);
 	for (int i = 0; i < nelems; ++i)
@@ -234,8 +236,10 @@ void FEShellDomainNew::Create(int nelems, int elemType)
 		el.SetMeshPartition(this);
 	}
 
-	if (elemType != -1)
-		for (int i = 0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+	if (espec.etype != FE_ELEM_INVALID_TYPE)
+		for (int i = 0; i<nelems; ++i) m_Elem[i].SetType(espec.etype);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

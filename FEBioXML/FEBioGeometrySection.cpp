@@ -221,7 +221,7 @@ void FEBioGeometrySection1x::ParseElementSection(XMLTag& tag)
 
 		// add it to the mesh
 		assert(d.nel);
-		pdom->Create(d.nel, d.elem.etype);
+		pdom->Create(d.nel, d.elem);
 		mesh.AddDomain(pdom);
 
 		// we reset the nr of elements since we'll be using 
@@ -625,7 +625,7 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 	assert(elems);
 
 	// add domain it to the mesh
-	pdom->Create(elems, espec.etype);
+	pdom->Create(elems, espec);
 	pdom->SetMatID(pmat->GetID() - 1);
 	mesh.AddDomain(pdom);
 
@@ -1354,7 +1354,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	assert(elems);
 
 	// add domain it to the mesh
-	pdom->Create(elems, espec.etype);
+	pdom->Create(elems, espec);
 	pdom->SetMatID(pmat->GetID() - 1);
 	mesh.AddDomain(pdom);
 

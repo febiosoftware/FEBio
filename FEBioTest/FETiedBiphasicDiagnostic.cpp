@@ -325,7 +325,7 @@ bool FETiedBiphasicTangentHex8::Init()
     // get the one-and-only domain
     FEBiphasicSolidDomain* pbd = new FEBiphasicSolidDomain(&fem);
     pbd->SetMaterial(pm);
-    pbd->Create(2, FE_HEX8G8);
+    pbd->Create(2, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
     pbd->SetMatID(0);
     mesh.AddDomain(pbd);
     
@@ -465,7 +465,7 @@ bool FETiedBiphasicTangentHex20::Init()
     // get the one-and-only domain
     FEBiphasicSolidDomain* pbd = new FEBiphasicSolidDomain(&fem);
     pbd->SetMaterial(pm);
-    pbd->Create(2, FE_HEX20G27);
+    pbd->Create(2, FEElementLibrary::GetElementSpecFromType(FE_HEX20G27));
     pbd->SetMatID(0);
     mesh.AddDomain(pbd);
     

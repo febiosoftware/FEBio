@@ -185,7 +185,7 @@ bool FEContactDiagnostic::Init()
 	// get the one-and-only domain
 	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&fem);
 	pbd->SetMaterial(pm);
-	pbd->Create(2, FE_HEX8G8);
+	pbd->Create(2, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 	pbd->SetMatID(0);
 	mesh.AddDomain(pbd);
 

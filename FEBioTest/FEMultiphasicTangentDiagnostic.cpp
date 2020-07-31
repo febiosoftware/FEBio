@@ -136,7 +136,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     // create a multiphasic domain
     FEMultiphasicSolidDomain* pd = new FEMultiphasicSolidDomain(&fem);
 	pd->SetMaterial(pmat);
-    pd->Create(1, FE_HEX8G8);
+    pd->Create(1, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 	pd->SetMatID(0);
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);
