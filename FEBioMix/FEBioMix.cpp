@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FEMultiphasicStandard.h"
-#include "FEMultiphasicFCD.h"
 #include "FEMultiphasicMultigeneration.h"
 #include "FESolute.h"
 #include "FETriphasic.h"
@@ -147,7 +146,6 @@ REGISTER_FECORE_CLASS(FEMultiphasicSolver   , "multiphasic");
 REGISTER_FECORE_CLASS(FEBiphasic                          , "biphasic"          );
 REGISTER_FECORE_CLASS(FEBiphasicSolute                    , "biphasic-solute"   );
 REGISTER_FECORE_CLASS(FEMultiphasicStandard               , "multiphasic"       );
-REGISTER_FECORE_CLASS(FEMultiphasicFCD                    , "multiphasic-fcd"   );
 REGISTER_FECORE_CLASS(FEMultiphasicMultigeneration        , "multiphasic-multigeneration");
 REGISTER_FECORE_CLASS(FESolute                            , "solute"            );
 REGISTER_FECORE_CLASS(FETriphasic                         , "triphasic"         );
