@@ -95,6 +95,7 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 
 		double vn = v*n;
 
+		Kab.zero();
 		if (m_beta*vn < 0) {
 
 			// shape functions and derivatives
@@ -107,7 +108,6 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 			// calculate stiffness component
 			mat3d Kww = K*(H_i * H_j)*tp.alphaf;
 
-			Kab.zero();
 			Kab.sub(0, 0, Kww);
 		}
 	});
@@ -162,6 +162,10 @@ void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 			fa[0] = H * f.x;
 			fa[1] = H * f.y;
 			fa[2] = H * f.z;
+		}
+		else
+		{
+			fa[0] = fa[1] = fa[2] = 0.0;
 		}
 	});
 }
