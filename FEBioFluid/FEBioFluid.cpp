@@ -54,9 +54,7 @@ SOFTWARE.*/
 #include "FEFluidRCRBC.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
-#include "FETangentialFlowBiphasicStabilization.h"
 #include "FEBackFlowStabilization.h"
-#include "FEBackFlowBiphasicStabilization.h"
 #include "FEFluidRCBC.h"
 
 #include "FETiedFluidInterface.h"
@@ -134,9 +132,7 @@ REGISTER_FECORE_CLASS(FEFluidResistanceBC          , "fluid resistance");
 REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
 REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
-REGISTER_FECORE_CLASS(FETangentialFlowBiphasicStabilization, "fluid tangential biphasic stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
-REGISTER_FECORE_CLASS(FEBackFlowBiphasicStabilization, "fluid backflow biphasic stabilization");
 REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
     
 //-----------------------------------------------------------------------------

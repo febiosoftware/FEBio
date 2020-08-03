@@ -40,6 +40,8 @@ SOFTWARE.*/
 #include "FEBiphasicFSIDomain3D.h"
 #include "FEBiphasicFSIDomainFactory.h"
 #include "FEBiphasicFSITraction.h"
+#include "FEBackFlowBiphasicStabilization.h"
+#include "FETangentialFlowBiphasicStabilization.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
@@ -96,5 +98,9 @@ void FEBioFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FEBiphasicFSITraction, "biphasic-FSI traction");
 
+    REGISTER_FECORE_CLASS(FEBackFlowBiphasicStabilization, "fluid backflow biphasic stabilization");
+    
+    REGISTER_FECORE_CLASS(FETangentialFlowBiphasicStabilization, "fluid tangential biphasic stabilization");
+    
     febio.SetActiveModule(0);
 }

@@ -43,7 +43,6 @@ END_FECORE_CLASS()
 FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_beta = 1.0;
-    m_rho = 1.0;
     
     // get the degrees of freedom
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
@@ -58,20 +57,6 @@ bool FEBackFlowStabilization::Init()
 {
     if (FESurfaceLoad::Init() == false) return false;
 
-	// get fluid density from first surface element
-    // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
-    if (pe == nullptr) return false;
-
-	// get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-	FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
-	if (fluid == nullptr) return false;
-
-	// get the density
-	m_rho = fluid->ReferentialDensity();
-    
     return true;
 }
 
@@ -80,7 +65,6 @@ bool FEBackFlowStabilization::Init()
 void FEBackFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-	ar & m_rho;
 	ar & m_dofW;
 }
 
@@ -91,11 +75,17 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
+        // get the density
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+        double rho = fluid->ReferentialDensity();
+
 		// tangent vectors
-		vec3d rt[FEElement::MAX_NODES];
-		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
-		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
-		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+		vec3d r0[FEElement::MAX_NODES];
+		m_psurf->GetReferenceNodalCoordinates(el, r0);
+		vec3d dxr = el.eval_deriv1(r0, mp.m_index);
+		vec3d dxs = el.eval_deriv2(r0, mp.m_index);
 
 		vec3d n = dxr ^ dxs;
 		double da = n.unit();
@@ -112,7 +102,7 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 
 			double H_j  = dof_b.shape;
 
-			mat3d K = dyad(n)*(m_beta*m_rho * 2 * vn*da);
+			mat3d K = dyad(n)*(m_beta*rho * 2 * vn*da);
 
 			// calculate stiffness component
 			mat3d Kww = K*(H_i * H_j)*tp.alphaf;
@@ -143,11 +133,17 @@ void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
+        // get the density
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+        double rho = fluid->ReferentialDensity();
+
 		// tangent vectors
-		vec3d rt[FEElement::MAX_NODES];
-		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
-		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
-		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+		vec3d r0[FEElement::MAX_NODES];
+		m_psurf->GetReferenceNodalCoordinates(el, r0);
+		vec3d dxr = el.eval_deriv1(r0, mp.m_index);
+		vec3d dxs = el.eval_deriv2(r0, mp.m_index);
 
 		// normal and area element
 		vec3d n = dxr ^ dxs;
@@ -160,7 +156,7 @@ void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 		if (m_beta*vn < 0) {
 
 			// force vector (change sign for inflow vs outflow)
-			vec3d f = n*(m_beta*m_rho*vn*vn*da);
+			vec3d f = n*(m_beta*rho*vn*vn*da);
 
 			double H = dof_a.shape;
 			fa[0] = H * f.x;

@@ -44,6 +44,17 @@ FETangentialFlowFSIStabilization::FETangentialFlowFSIStabilization(FEModel* pfem
 {
     m_beta = 1.0;
     m_rho = 1.0;
+    
+    // get the degrees of freedom
+    m_dofU.Clear();
+    m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
+    
+    m_dofW.Clear();
+    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofW);
 }
 
 //-----------------------------------------------------------------------------
@@ -57,16 +68,6 @@ void FETangentialFlowFSIStabilization::SetSurface(FESurface* ps)
 //! initialize
 bool FETangentialFlowFSIStabilization::Init()
 {
-    // get the degrees of freedom
-    m_dofU.Clear();
-    if (m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT)) == false) return false;
-
-    m_dofW.Clear();
-    if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
-
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofU);
-    m_dof.AddDofs(m_dofW);
 
     if (FESurfaceLoad::Init() == false) return false;
     
@@ -92,6 +93,8 @@ void FETangentialFlowFSIStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
     ar & m_rho;
+    ar & m_dofU;
+    ar & m_dofW;
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +115,16 @@ void FETangentialFlowFSIStabilization::LoadVector(FEGlobalVector& R, const FETim
 {
     m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
-        vec3d n = mp.dxr ^ mp.dxs;
+        FESurfaceElement& el = *mp.SurfaceElement();
+        
+        // tangent vectors
+        vec3d rt[FEElement::MAX_NODES];
+        m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
+        vec3d dxr = el.eval_deriv1(rt, mp.m_index);
+        vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+        
+        // normal and area element
+        vec3d n = dxr ^ dxs;
         double da = n.unit();
 
         // fluid velocity
@@ -139,14 +151,13 @@ void FETangentialFlowFSIStabilization::StiffnessMatrix(FELinearSystem& LS, const
     m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
         FESurfaceElement& el = *mp.SurfaceElement();
-        double alpha = tp.alphaf;
 
         // fluid velocity
-        vec3d v = FluidVelocity(mp, alpha);
+        vec3d v = FluidVelocity(mp, tp.alphaf);
 
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
-        m_psurf->GetNodalCoordinates(el, alpha, rt);
+        m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
         vec3d dxr = el.eval_deriv1(rt, mp.m_index);
         vec3d dxs = el.eval_deriv2(rt, mp.m_index);
         
@@ -168,8 +179,8 @@ void FETangentialFlowFSIStabilization::StiffnessMatrix(FELinearSystem& LS, const
         double Gs_j = dof_b.shape_deriv_s;
 
         // calculate stiffness component
-        mat3d Kww = K*(H_i*H_j*alpha);
-        vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i*alpha);
+        mat3d Kww = K*(H_i*H_j*tp.alphaf);
+        vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i*tp.alphaf);
         mat3d Kwu; Kwu.skew(g);
         Kwu = (ttt & n)*Kwu;
         Kab.zero();
