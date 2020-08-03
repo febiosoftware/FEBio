@@ -33,45 +33,88 @@ SOFTWARE.*/
 #include <stdlib.h>
 #include <ostream>
 
-bool NumCore::write_hb(CompactMatrix& K, const char* szfile)
+bool NumCore::write_hb(CompactMatrix& K, const char* szfile, int mode)
 {
 	// This currently assumes a CRS matrix
-	FILE* fp = fopen(szfile, "wb");
-	if (fp == 0) return false;
+	if (mode == 0)
+	{
+		FILE* fp = fopen(szfile, "wb");
+		if (fp == 0) return false;
 
-	int	symmFlag = K.isSymmetric();
-	int offset = K.Offset();
-	int rowFlag = K.isRowBased();
-	int nrow = K.Rows();
-	int ncol = K.Columns();
-	int nsize = nrow;	// this is the reason we currently assume CRS
-	int nnz = K.NonZeroes();
-	fwrite(&symmFlag, sizeof(symmFlag), 1, fp);
-	fwrite(&offset, sizeof(offset), 1, fp);
-	fwrite(&rowFlag, sizeof(rowFlag), 1, fp);
-	fwrite(&nrow, sizeof(nrow), 1, fp);
-	fwrite(&ncol, sizeof(ncol), 1, fp);
-	fwrite(&nnz, sizeof(nnz), 1, fp);
-	fwrite(K.Pointers(), sizeof(int), nsize + 1, fp);
-	fwrite(K.Indices(), sizeof(int), nnz, fp);
-	fwrite(K.Values(), sizeof(double), nnz, fp);
+		int	symmFlag = K.isSymmetric();
+		int offset = K.Offset();
+		int rowFlag = K.isRowBased();
+		int nrow = K.Rows();
+		int ncol = K.Columns();
+		int nsize = nrow;	// this is the reason we currently assume CRS
+		int nnz = K.NonZeroes();
+		fwrite(&symmFlag, sizeof(symmFlag), 1, fp);
+		fwrite(&offset, sizeof(offset), 1, fp);
+		fwrite(&rowFlag, sizeof(rowFlag), 1, fp);
+		fwrite(&nrow, sizeof(nrow), 1, fp);
+		fwrite(&ncol, sizeof(ncol), 1, fp);
+		fwrite(&nnz, sizeof(nnz), 1, fp);
+		fwrite(K.Pointers(), sizeof(int), nsize + 1, fp);
+		fwrite(K.Indices(), sizeof(int), nnz, fp);
+		fwrite(K.Values(), sizeof(double), nnz, fp);
 
-	fclose(fp);
+		fclose(fp);
+	}
+	else
+	{
+		FILE* fp = fopen(szfile, "wt");
+		if (fp == 0) return false;
+
+		int	symmFlag = K.isSymmetric();
+		int offset = K.Offset();
+		int rowFlag = K.isRowBased();
+		int nrow = K.Rows();
+		int ncol = K.Columns();
+		int nsize = nrow;	// this is the reason we currently assume CRS
+		int nnz = K.NonZeroes();
+		fprintf(fp, "%d // symmetry flag\n", symmFlag);
+		fprintf(fp, "%d // offset\n", offset);
+		fprintf(fp, "%d // row flag\n", rowFlag);
+		fprintf(fp, "%d // number of rows\n", nrow);
+		fprintf(fp, "%d // number of columns\n", ncol);
+		fprintf(fp, "%d // nonzeroes\n", nnz);
+		double* d = K.Values();
+		for (int i = 0; i < nnz; ++i)
+		{
+			fprintf(fp, "%.12lg\n", d[i]);
+		}
+		fclose(fp);
+	}
 
 	return true;
 }
 
 // write a vector to file
-bool NumCore::write_vector(const vector<double>& a, const char* szfile)
+bool NumCore::write_vector(const vector<double>& a, const char* szfile, int mode)
 {
-	FILE* fp = fopen(szfile, "wb");
-	if (fp == 0) return false;
+	if (mode == 0)
+	{
+		FILE* fp = fopen(szfile, "wb");
+		if (fp == 0) return false;
 
-	int N = (int)a.size();
-	fwrite(&N, sizeof(int), 1, fp);
-	fwrite(&a[0], sizeof(double), N, fp);
+		int N = (int)a.size();
+		fwrite(&N, sizeof(int), 1, fp);
+		fwrite(&a[0], sizeof(double), N, fp);
 
-	fclose(fp);
+		fclose(fp);
+	}
+	else
+	{
+		FILE* fp = fopen(szfile, "wt");
+		if (fp == 0) return false;
+
+		int N = (int)a.size();
+		fprintf(fp, "%d // size\n", N);
+		for (int i=0; i<N; ++i)
+			fprintf(fp, "%lg\n", a[i]);
+
+		fclose(fp);
+	}
 
 	return true;
 }

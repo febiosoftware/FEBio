@@ -33,10 +33,13 @@ SOFTWARE.*/
 namespace NumCore
 {
 	// write a matrix to file
-	bool write_hb(CompactMatrix& K, const char* szfile);
+	// mode:
+	// - 0 = binary mode
+	// - 1 = text mode
+	bool write_hb(CompactMatrix& K, const char* szfile, int mode = 0);
 
 	// write a vector to file
-	bool write_vector(const vector<double>& a, const char* szfile);
+	bool write_vector(const vector<double>& a, const char* szfile, int mode = 0);
 
 	// calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
 	double inverse_infnorm(CompactMatrix* A);

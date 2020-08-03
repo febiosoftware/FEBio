@@ -525,6 +525,12 @@ int FEBioCmd_out::run(int nargs, char **argv)
 	FEBioModel* fem = GetFEM();
 	if (fem == nullptr) return need_active_model();
 
+	int mode = 0; // binary
+	if (nargs > 1)
+	{
+		if (strcmp(argv[1], "-txt") == 0) mode = 1; // text 
+	}
+
 	FESolver* solver = fem->GetCurrentStep()->GetFESolver();
 	SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
 	std::vector<double> R = solver->GetLoadVector();
@@ -539,8 +545,8 @@ int FEBioCmd_out::run(int nargs, char **argv)
 		sprintf(szK, "%s.out", buf);
 		sprintf(szR, "%s_rhs.out", buf);
 
-		febio::write_hb(*A, szK);
-		febio::write_vector(R, szR);
+		febio::write_hb(*A, szK, mode);
+		febio::write_vector(R, szR, mode);
 
 		cout << "\nFiles written: " << szK << ", " << szR << endl;
 	}

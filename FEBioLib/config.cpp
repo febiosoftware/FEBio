@@ -442,9 +442,9 @@ FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* sz
 }
 
 // write a matrix to file
-bool write_hb(CompactMatrix& K, const char* szfile)
+bool write_hb(CompactMatrix& K, const char* szfile, int mode)
 {
-	return NumCore::write_hb(K, szfile);
+	return NumCore::write_hb(K, szfile, mode);
 }
 
 // print matrix sparsity pattern to svn file
@@ -454,9 +454,9 @@ void print_svg(CompactMatrix* m, std::ostream &out, int i0, int j0, int i1, int 
 }
 
 // write a vector to file
-bool write_vector(const vector<double>& a, const char* szfile)
+bool write_vector(const vector<double>& a, const char* szfile, int mode)
 {
-	return NumCore::write_vector(a, szfile);
+	return NumCore::write_vector(a, szfile, mode);
 }
 
 } // namespace febio
