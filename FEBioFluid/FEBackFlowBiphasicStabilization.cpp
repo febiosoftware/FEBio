@@ -105,6 +105,7 @@ void FEBackFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, const 
         
         double vn = v*n;
         
+        Kab.zero();
         if (m_beta*vn < 0) {
             
             // shape functions and derivatives
@@ -122,7 +123,6 @@ void FEBackFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, const 
             vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i * tnt*tp.alphaf);
             mat3d Kuu; Kuu.skew(g);
             
-            Kab.zero();
             Kab.sub(0, 0, Kuu);
             Kab.sub(0, 3, Kuw);
         }
@@ -172,6 +172,10 @@ void FEBackFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const FETime
             fa[0] = H * f.x;
             fa[1] = H * f.y;
             fa[2] = H * f.z;
+        }
+        else
+        {
+            fa[0] = fa[1] = fa[2] = 0.0;
         }
     });
 }

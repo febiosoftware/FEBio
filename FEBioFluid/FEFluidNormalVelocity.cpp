@@ -191,12 +191,9 @@ void FEFluidNormalVelocity::Activate()
     {
         FENode& node = ps->Node(i);
         // mark node as having prescribed DOF
-//        if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
-//        if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
-//        if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
-        node.set_bc(m_dofW[0], DOF_PRESCRIBED);
-        node.set_bc(m_dofW[1], DOF_PRESCRIBED);
-        node.set_bc(m_dofW[2], DOF_PRESCRIBED);
+        if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
+        if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
+        if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
     }
 }
 
