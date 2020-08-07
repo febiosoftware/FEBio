@@ -45,6 +45,7 @@ FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FE
     m_beta = 1.0;
     
     // get the degrees of freedom
+    m_dofW.Clear();
     m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     
     m_dof.Clear();

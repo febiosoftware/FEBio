@@ -41,7 +41,17 @@ END_FECORE_CLASS()
 FETangentialFlowBiphasicStabilization::FETangentialFlowBiphasicStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofW(pfem)
 {
     m_beta = 1.0;
-    m_rho = 1.0;
+    
+    // get the degrees of freedom
+    m_dofU.Clear();
+    m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
+    
+    m_dofW.Clear();
+    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofW);
 }
 
 //-----------------------------------------------------------------------------
@@ -55,32 +65,7 @@ void FETangentialFlowBiphasicStabilization::SetSurface(FESurface* ps)
 //! initialize
 bool FETangentialFlowBiphasicStabilization::Init()
 {
-    // get the degrees of freedom
-    m_dofU.Clear();
-    if (m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT)) == false) return false;
-    
-    m_dofW.Clear();
-    if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofU);
-    m_dof.AddDofs(m_dofW);
-
     if (FESurfaceLoad::Init() == false) return false;
-    
-    // get fluid density from first surface element
-    // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
-    if (pe == nullptr) return false;
-    
-    // get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    FEFluid* fluid = pm->ExtractProperty<FEFluid>();
-    if (fluid == nullptr) return false;
-    
-    // get the density and bulk modulus
-    m_rho = fluid->m_rhor;
     
     return true;
 }
@@ -89,7 +74,6 @@ bool FETangentialFlowBiphasicStabilization::Init()
 void FETangentialFlowBiphasicStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar & m_rho;
 	ar & m_dofU & m_dofW;
 }
 
@@ -111,6 +95,14 @@ void FETangentialFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const 
 {
     m_psurf->LoadVector(R, m_dofU, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
         
+        FESurfaceElement& el = *mp.SurfaceElement();
+        
+        // get the density
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+        double rho = fluid->ReferentialDensity();
+
         vec3d n = mp.dxr ^ mp.dxs;
         double da = n.unit();
         
@@ -123,7 +115,7 @@ void FETangentialFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const 
         double vmag = vtau.norm();
         
         // force vector (change sign for inflow vs outflow)
-        vec3d f = vtau*(-m_beta*m_rho*vmag*da);
+        vec3d f = vtau*(-m_beta*rho*vmag*da);
         
         double H = dof_a.shape;
         fa[0] = H * f.x;
@@ -140,6 +132,12 @@ void FETangentialFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, 
         FESurfaceElement& el = *mp.SurfaceElement();
         double alpha = tp.alphaf;
         
+        // get the density
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+        double rho = fluid->ReferentialDensity();
+        
         // fluid velocity
         vec3d v = FluidVelocity(mp, alpha);
         
@@ -155,9 +153,9 @@ void FETangentialFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, 
         mat3dd I(1.0);
         vec3d vtau = (I - dyad(n))*v;
         double vmag = vtau.unit();
-        mat3d K = (I - dyad(n) + dyad(vtau))*(-m_beta*m_rho*vmag*da);
+        mat3d K = (I - dyad(n) + dyad(vtau))*(-m_beta*rho*vmag*da);
         // force vector (change sign for inflow vs outflow)
-        vec3d ttt = vtau*(-m_beta*m_rho*vmag);
+        vec3d ttt = vtau*(-m_beta*rho*vmag);
         
         // shape functions and derivatives
         double H_i  = dof_a.shape;

@@ -41,10 +41,11 @@ END_FECORE_CLASS()
 FEBackFlowBiphasicStabilization::FEBackFlowBiphasicStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofW(pfem)
 {
     m_beta = 1.0;
-    m_rho = 1.0;
     
     // get the degrees of freedom
+    m_dofU.Clear();
     m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
+    m_dofW.Clear();
     m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     
     m_dof.Clear();
@@ -58,20 +59,6 @@ bool FEBackFlowBiphasicStabilization::Init()
 {
     if (FESurfaceLoad::Init() == false) return false;
 
-    // get fluid density from first surface element
-    // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
-    if (pe == nullptr) return false;
-    
-    // get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    FEFluid* fluid = pm->ExtractProperty<FEFluid>();
-    if (fluid == nullptr) return false;
-    
-    // get the density
-    m_rho = fluid->m_rhor;
-    
     return true;
 }
 
@@ -80,7 +67,6 @@ bool FEBackFlowBiphasicStabilization::Init()
 void FEBackFlowBiphasicStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar & m_rho;
 	ar & m_dofU & m_dofW;
 }
 
@@ -90,6 +76,12 @@ void FEBackFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, const 
     m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
         
         FESurfaceElement& el = *mp.SurfaceElement();
+        
+        // get the density
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+        double rho = fluid->ReferentialDensity();
         
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
@@ -115,8 +107,8 @@ void FEBackFlowBiphasicStabilization::StiffnessMatrix(FELinearSystem& LS, const 
             double Gr_j = dof_b.shape_deriv_r;
             double Gs_j = dof_b.shape_deriv_s;
             
-            mat3d K = dyad(n)*(m_beta*m_rho * 2 * vn*da);
-            double tnt = m_beta*m_rho*vn*vn;
+            mat3d K = dyad(n)*(m_beta*rho * 2 * vn*da);
+            double tnt = m_beta*rho*vn*vn;
             
             // calculate stiffness component
             mat3d Kuw = K*(H_i * H_j)*tp.alphaf;
@@ -149,6 +141,12 @@ void FEBackFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const FETime
         
         FESurfaceElement& el = *mp.SurfaceElement();
         
+        // get the density
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
+        double rho = fluid->ReferentialDensity();
+        
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
         m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
@@ -166,7 +164,7 @@ void FEBackFlowBiphasicStabilization::LoadVector(FEGlobalVector& R, const FETime
         if (m_beta*vn < 0) {
             
             // force vector (change sign for inflow vs outflow)
-            vec3d f = n*(m_beta*m_rho*vn*vn*da);
+            vec3d f = n*(m_beta*rho*vn*vn*da);
             
             double H = dof_a.shape;
             fa[0] = H * f.x;

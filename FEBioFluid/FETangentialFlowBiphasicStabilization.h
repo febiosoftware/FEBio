@@ -58,7 +58,6 @@ protected:
     
 protected:
     double            m_beta;     //!< damping coefficient
-    double          m_rho;      //!< fluid density
     
     // degrees of freedom
     FEDofList    m_dofU;

@@ -44,7 +44,9 @@ bool FETemperatureBackFlowStabilization::Init()
     if (FESurfaceLoad::Init() == false) return false;
     
     // determine the nr of concentration equations
+    m_dofW.Clear();
     m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
+    m_dof.Clear();
     m_dof.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
 
     FESurface* ps = &GetSurface();
