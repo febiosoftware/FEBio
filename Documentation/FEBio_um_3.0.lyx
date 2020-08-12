@@ -15383,6 +15383,9 @@ data_type="scalar"
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:generator"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -15961,6 +15964,121 @@ type.
 </body_load>
 \end_layout
 
+\begin_layout Subsubsection
+Surface Attraction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Surface-Attraction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A surface attraction body force can be used to attract a mesh toward a boundary
+ surface, for the purpose of creating a mesh bias.
+ This can be useful for fluid analyses where a finer mesh is needed in the
+ vicinity of a no-slip boundary.
+ The benefit of this tool over other existing tools for creating a biased
+ mesh is its ability to work with structured and unstructured meshes, as
+ well as linear and higher-order elements.
+\end_layout
+
+\begin_layout Standard
+For each element in the mesh, its shortest distance 
+\begin_inset Formula $r$
+\end_inset
+
+ to the selected boundary surface is evaluated using a surface projection
+ algorithm.
+ Then, an attractive body force per mass,
+\begin_inset Formula 
+\[
+\mathbf{b}=s\exp\left(-\frac{r}{\rho}\right)\mathbf{n}
+\]
+
+\end_inset
+
+is evaluated along the unit vector 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ directed along the shortest projection distance.
+ Here, 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is a characteristic boundary layer thickness (
+\emph on
+blt
+\emph default
+) and 
+\begin_inset Formula $s$
+\end_inset
+
+ is a scale factor for the body force (
+\emph on
+bsf
+\emph default
+), whose value may be adjusted relative to account for the stiffness of
+ the elastic solid material assigned to the mesh.
+\end_layout
+
+\begin_layout LyX-Code
+<body_load type="surface attraction" elem_set="EB1" surface="PressureLoad1">
+\end_layout
+
+\begin_layout LyX-Code
+    <blt>0.5</blt>
+\end_layout
+
+\begin_layout LyX-Code
+    <bsf lc="1">20</bsf>
+\end_layout
+
+\begin_layout LyX-Code
+    <search_radius>0.1</search_radius>
+\end_layout
+
+\begin_layout LyX-Code
+    <search_tol>0.01</search_tol>
+\end_layout
+
+\begin_layout LyX-Code
+</body_load>
+\end_layout
+
+\begin_layout Standard
+Note that this body force requires the specification of an attractive surface;
+ optionally, it also accepts the specification of the element set subjected
+ to this attractive body force.
+ The 
+\emph on
+search_radius
+\emph default
+ and 
+\emph on
+search_tol
+\emph default
+ parameters are used for the projection algorithm.
+ They have the same meaning as in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Sliding-Interfaces"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -16380,7 +16498,7 @@ The following table lists the properties that are defined for sliding interfaces
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="18" columns="7">
+<lyxtabular version="3" rows="19" columns="7">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2in">
@@ -16691,6 +16809,107 @@ bullet$
 
 \begin_layout Plain Layout
 0 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+updated auto-penalty calculation at each step (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -18255,8 +18474,18 @@ Here,
 \begin_inset Formula $E$
 \end_inset
 
-depends on the precise material formulation, in general one can regard it
- as a measure of the small strain Young's modulus of the material.
+ depends on the precise material formulation, in general one can regard
+ it as a measure of the small strain Young's modulus of the material, when
+ 
+\emph on
+update_penalty
+\emph default
+ is 0.
+ If update_penalty is set to 1, 
+\begin_inset Formula $E$
+\end_inset
+
+ is recalculated at each iteration to account for the current deformation.
 \end_layout
 
 \begin_deeper
@@ -19245,6 +19474,402 @@ augmentation tolerance
 \end_layout
 
 \begin_layout Subsection
+Tied Elastic Interfaces
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Elastic-Interfaces"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A tied elastic interface is similar to the tied interface.
+ It may be used for tying solid materials.
+ It enforces continuity of the displacement across the interface.
+ The following control parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+normal penalty scale factor (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pressure_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pressure penalty scale factor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+auto_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+auto-penalty calculation flag (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update auto-penalty calculation flag (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+two_pass
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+two-pass flag (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+laugon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+augmented Lagrangian flag (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+aug.
+ Lagrangian convergence tolerance (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gaptol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tolerance for gap value (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+symmetric_stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+symmetric stiffness matrix flag (7)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search_tol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Projection search tolerance (8)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search_radius
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search radius (10)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Tied Biphasic Interfaces
 \begin_inset CommandInset label
 LatexCommand label
@@ -19271,7 +19896,7 @@ A tied biphasic interface is similar to the tied interface.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="3">
+<lyxtabular version="3" rows="12" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -19395,6 +20020,35 @@ auto-penalty calculation flag (2)
 
 \begin_layout Plain Layout
 0 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update auto-penalty calculation flag (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -19547,7 +20201,7 @@ symmetric stiffness matrix flag (7)
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -19556,7 +20210,7 @@ search_tol
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -19565,11 +20219,40 @@ Projection search tolerance (8)
 
 \end_inset
 </cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
+0.01
+\end_layout
 
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search_radius
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search radius (10)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
 \end_layout
 
 \end_inset
@@ -19614,7 +20297,7 @@ A tied multiphasic interface is similar to the tied biphasic interface.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="3">
+<lyxtabular version="3" rows="13" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -19773,6 +20456,35 @@ auto-penalty calculation flag (2)
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update auto-penalty calculation flag (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -19919,7 +20631,7 @@ symmetric stiffness matrix flag (7)
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -19928,7 +20640,7 @@ search_tol
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -19937,11 +20649,40 @@ Projection search tolerance (8)
 
 \end_inset
 </cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
+0.01
+\end_layout
 
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search_radius
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+search radius (10)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
 \end_layout
 
 \end_inset
