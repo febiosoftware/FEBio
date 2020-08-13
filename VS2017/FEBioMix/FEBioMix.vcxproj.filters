@@ -141,9 +141,6 @@
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMix\FEMultiphasicFCD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicMultigeneration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -414,9 +411,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMix\FEMultiphasicFCD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicMultigeneration.cpp">

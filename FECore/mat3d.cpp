@@ -155,14 +155,22 @@ void mat3ds::exact_eigen(double l[3]) const
 	mat3ds T = (S.sqr()).dev();
 	double nT = T.norm();
 
-	double w = S.dotdot(T)/(nS*nT);	if (w > 1.0) w = 1.0; if (w < -1.0) w = -1.0;
-	double t = asin(w)/3.0;
-	double r = S.norm();
-	double z = tr()/S3;
+	double D = nS * nT;
+	if (D > 0.0)
+	{
+		double w = S.dotdot(T) / D;	if (w > 1.0) w = 1.0; if (w < -1.0) w = -1.0;
+		double t = asin(w) / 3.0;
+		double r = S.norm();
+		double z = tr() / S3;
 
-	l[0] = z/S3 + (r/S2)*(sin(t)/S3 + cos(t));
-	l[1] = z/S3 - (S2/S3)*r*sin(t);
-	l[2] = z/S3 + (r/S2)*(sin(t)/S3 - cos(t));
+		l[0] = z / S3 + (r / S2)*(sin(t) / S3 + cos(t));
+		l[1] = z / S3 - (S2 / S3)*r*sin(t);
+		l[2] = z / S3 + (r / S2)*(sin(t) / S3 - cos(t));
+	}
+	else
+	{
+		l[0] = l[1] = l[2] = 0.0;
+	}
 }
 
 //-----------------------------------------------------------------------------

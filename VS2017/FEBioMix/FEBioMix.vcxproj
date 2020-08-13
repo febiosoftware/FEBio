@@ -548,7 +548,6 @@
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h" />
-    <ClInclude Include="..\..\FEBioMix\FEMultiphasicFCD.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicMultigeneration.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicShellDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolidDomain.h" />
@@ -640,7 +639,6 @@
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp" />
-    <ClCompile Include="..\..\FEBioMix\FEMultiphasicFCD.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicMultigeneration.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolidDomain.cpp" />
