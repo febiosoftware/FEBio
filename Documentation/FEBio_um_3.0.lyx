@@ -3897,7 +3897,7 @@ reference "sec:Command-Line"
  line.
  When running in debug mode, FEBio performs additional checks and prints
  out more information to the screen and to the plot file.
- It will also store all non-converged geometry states to the plot file.
+ It will also store all non-converged states to the plot file.
  These non-converged states can be very useful for determining the cause
  of non-convergence or slow convergence.
  Because of this additional work, the problem may run slightly slower.
@@ -4272,11 +4272,17 @@ Material
 
 \shape italic
 \emph on
-Geometry
+Mesh
 \shape default
 \emph default
- Defines the geometry of the problem, such as nodal coordinates and element
+ Defines the mesh of the problem, including nodal coordinates and element
  connectivity.
+ 
+\end_layout
+
+\begin_layout Description
+MeshDomains Assigns materials and other formulation attributes to element
+ sets.
  
 \end_layout
 
@@ -4400,8 +4406,8 @@ The current format specification expects the different sections of the input
  file to be listed in the same order as given above.
  Not all sections are required.
  Empty sections can be omitted and some are optional.
- A minimal file must contain at least the Control, Material and Geometry
- sections.
+ A minimal file must contain at least the Control, Material, Mesh, and MeshDomai
+ns sections.
  The rest of this chapter describes each of these sections in more detail.
 \end_layout
 
@@ -4434,21 +4440,22 @@ Version 3.0
  for modeling heterogeneous parameters.
  Heterogeneous parameters can be created via mathematical expressions or
  via the MeshData section.
- The MeshData section was completely revised.
  It also introduces a more consistent way for referencing model parameters.
  The 
 \emph on
 Geometry 
 \emph default
-section was revised and the 
+section was replaced with the 
 \emph on
-Part 
+Mesh 
 \emph default
 and 
 \emph on
-Instance 
+MeshDomains 
 \emph default
-subsections were added.
+sections in order to further separate the definition of the mesh and its
+ physical attributes (e.g.
+ material assignments).
  
 \end_layout
 
@@ -4768,7 +4775,7 @@ tag and contain sections defined in this document.
  However, the included file does not need to define a complete model definition.
  For instance, it can contain only the 
 \shape italic
-Geometry
+Mesh
 \shape default
  section.
 \end_layout
@@ -4857,7 +4864,7 @@ Material
 \shape default
  and the 
 \shape italic
-Geometry
+Mesh
 \shape default
  section, the control file can read both these sections as follows.
 \end_layout
@@ -4867,7 +4874,7 @@ Geometry
 \end_layout
 
 \begin_layout LyX-Code
-<Geometry from="in.feb"/>
+<Mesh from="in.feb"/>
 \end_layout
 
 \begin_layout Standard
@@ -4877,7 +4884,7 @@ Material
 \shape default
 , 
 \shape italic
-Geometry
+Mesh
 \shape default
 , and 
 \shape italic
@@ -4900,7 +4907,7 @@ bc.feb
 \end_layout
 
 \begin_layout LyX-Code
-<febio_spec version="2.0">
+<febio_spec version="3.0">
 \end_layout
 
 \begin_layout LyX-Code
@@ -4924,7 +4931,7 @@ bc.feb
 \end_layout
 
 \begin_layout LyX-Code
-  <Geometry from="geom.feb"/>
+  <Mesh from="geom.feb"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5191,7 +5198,7 @@ For example:
 \end_layout
 
 \begin_layout LyX-Code
-<febio_spec version="2.5">
+<febio_spec version="3.0">
 \end_layout
 
 \begin_layout LyX-Code
@@ -5250,7 +5257,7 @@ Older versions of FEBio (format specification 1.2 and before) allowed you
 \end_layout
 
 \begin_layout LyX-Code
-<febio_spec version="2.0">
+<febio_spec version="3.0">
 \end_layout
 
 \begin_layout LyX-Code
@@ -10072,7 +10079,7 @@ reference "chap:Materials"
 \end_layout
 
 \begin_layout Section
-Geometry Section
+Mesh Section
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Geometry-Section"
@@ -10083,23 +10090,25 @@ name "sec:Geometry-Section"
 \end_layout
 
 \begin_layout Standard
-The geometry section contains all the geometry data, including nodal coordinates
- and element connectivity.
+The 
+\emph on
+Mesh 
+\emph default
+section contains all the mesh data, including nodal coordinates and element
+ connectivity.
  It has the following sub-sections:
 \end_layout
 
 \begin_layout Description
-
-\shape italic
-\emph on
-Part
-\shape default
-\emph default
- defines a part
+Nodes defines the nodal coordinates of the mesh
 \end_layout
 
 \begin_layout Description
-Instance creates an instance of a part
+
+\series bold
+Elements 
+\series default
+defines the elements of the mesh
 \end_layout
 
 \begin_layout Description
@@ -10171,21 +10180,13 @@ define a surface pair that can be used by a contact definition.
 \begin_layout Standard
 At least one 
 \emph on
-Part 
+Nodes 
 \emph default
 must be defined and one 
 \emph on
-Instance 
+Elements
 \emph default
-section.
- The purpose of the 
-\emph on
-Instance
-\emph default
- section is to instantiate a part (i.e.
- add it to the global mesh assembly), assign materials to element sets,
- and set other domain parameters, such as default shell thicknesses, and
- quadrature rules.
+ section.
  The other sections are optional.
  The 
 \shape italic
@@ -10219,50 +10220,7 @@ sections define sets of nodes, edges, facets, discrete elements, elements,
 \end_layout
 
 \begin_layout Subsection
-Part Section
-\end_layout
-
-\begin_layout Standard
-A 
-\emph on
-Part 
-\emph default
-section defines the mesh for a part (or object) and includes nodal coordinates,
- element connectivity, and (optionally) nodesets, surfaces, segments, element
- sets.
- It consists of the following subsections.
-\end_layout
-
-\begin_layout Description
-Nodes Defines the nodal coordinates of the nodes
-\end_layout
-
-\begin_layout Description
-Elements Defines an element set on the part and the element connectivity.
- 
-\end_layout
-
-\begin_layout Description
-NodeSet Defines a node set on the part
-\end_layout
-
-\begin_layout Description
-Edge Defines an edge list
-\end_layout
-
-\begin_layout Description
-Surface Defines a surface on the part
-\end_layout
-
-\begin_layout Subsubsection
 Nodes Section
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Nodes-Section"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -10367,7 +10325,7 @@ sections can be defined, but each node can only be defined once.
 </Nodes>
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Elements Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11199,7 +11157,7 @@ Control
 Finally, please note that shell elements cannot be stacked in FEBio.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 NodeSet Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11303,7 +11261,7 @@ Node sets can also be nested.
 This is useful for defining larger nodesets without repeating node numbers.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Edge Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11374,7 +11332,7 @@ line3
  3-node line element 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Surface Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11491,7 +11449,7 @@ Surface elements cannot overlap element boundaries.
  They are also not to be confused with shell elements.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 ElementSet Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11544,139 +11502,6 @@ tag is defined which takes the element id as an attribute.
 
 \begin_layout LyX-Code
 </ElementSet>
-\end_layout
-
-\begin_layout Subsection
-Instance Section
-\end_layout
-
-\begin_layout Standard
-The 
-\emph on
-Instance 
-\emph default
-section is used to instantiate a part.
- During instantiation the part's mesh is added to the global mesh assembly.
- In addition, the part's nodal coordinates can be transformed, and materials
- are assigned to the part's element sets.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<Instance part="part01" name="part1">
-\end_layout
-
-\begin_layout LyX-Code
-  <transform>
-\end_layout
-
-\begin_layout LyX-Code
-    <scale>1,1,1</scale>
-\end_layout
-
-\begin_layout LyX-Code
-    <rotate>0,0,0,1</rotate>
-\end_layout
-
-\begin_layout LyX-Code
-    <translate>0,0,0</translate>
-\end_layout
-
-\begin_layout LyX-Code
-  </transform>
-\end_layout
-
-\begin_layout LyX-Code
-  <domain elem_set="set1" mat="material01"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <domain elem_set="shell_set1" mat="material02">
-\end_layout
-
-\begin_layout LyX-Code
-    <shell_thickness>0.015</shell_thickness>
-\end_layout
-
-\begin_layout LyX-Code
-  </domain>
-\end_layout
-
-\begin_layout LyX-Code
-</ElementSet>
-\end_layout
-
-\begin_layout Standard
-The name attribute is optional and if omitted the instance will have the
- same name as the part.
- A single part can be instantiated multiple times.
- In that case, you need to make sure that each instance is given a unique
- name.
- 
-\end_layout
-
-\begin_layout Standard
-The 
-\emph on
-transform
-\emph default
- item is optional, but can be used to position, rotate, or scale a part
- during instantiation.
- The transform operations are applied in the order scale, rotate, and translate.
- 
-\end_layout
-
-\begin_layout Subsection
-NodeSet Section
-\end_layout
-
-\begin_layout Standard
-Node sets from parts can be combined to create global node sets.
- Global node sets can be used by boundary conditions.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<NodeSet name="set01">
-\end_layout
-
-\begin_layout LyX-Code
-  <node_set>part1.set1</node_set>
-\end_layout
-
-\begin_layout LyX-Code
-  <node_set>part2.set3</node_set>
-\end_layout
-
-\begin_layout LyX-Code
-</NodeSet>
-\end_layout
-
-\begin_layout Subsection
-Surface Section
-\end_layout
-
-\begin_layout Standard
-Surfaces from parts can be combined to create global surfaces.
- Global surfaces can be used by boundary conditions and loads, and are used
- to define surface pairs.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<Surface name="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <surface>part1.top_surface</surface>
-\end_layout
-
-\begin_layout LyX-Code
-  <surface>part2.left_surface</surface>
-\end_layout
-
-\begin_layout LyX-Code
-</Surface>
 \end_layout
 
 \begin_layout Subsection
@@ -11792,6 +11617,107 @@ section.
 \end_layout
 
 \begin_layout Section
+MeshDomains Section
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+MeshDomains 
+\emph default
+section assigns various physical attributes to the element sets of the mesh.
+ For each of the 
+\emph on
+Elements 
+\emph default
+sections in the 
+\emph on
+Mesh 
+\emph default
+section, define a 
+\emph on
+SolidDomain 
+\emph default
+or a 
+\emph on
+ShellDomain 
+\emph default
+section, depending on whether the elements are solid or shells.
+ Each domain also requires a material name that defines the material properties
+ of the domain.
+ 
+\end_layout
+
+\begin_layout Subsection
+SolidDomain Section
+\end_layout
+
+\begin_layout Standard
+Use the 
+\emph on
+SolidDomain 
+\emph default
+section to define a solid domain.
+ This section takes two parameters: 
+\end_layout
+
+\begin_layout Description
+
+\series bold
+name 
+\series default
+The name of the element set (defined via an 
+\emph on
+Elements 
+\emph default
+section).
+ This element set must only contain solid elements.
+ 
+\end_layout
+
+\begin_layout Description
+mat The name of the material that will be assigned to this domain
+\end_layout
+
+\begin_layout Subsection
+SohellDomain Section
+\end_layout
+
+\begin_layout Standard
+Use the 
+\emph on
+ShellDomain 
+\emph default
+section to define a shell domain.
+ This section takes two parameters: 
+\end_layout
+
+\begin_layout Description
+
+\series bold
+name 
+\series default
+The name of the element set (defined via an 
+\emph on
+Elements 
+\emph default
+section).
+ This element set must only contain shell elements.
+ 
+\end_layout
+
+\begin_layout Description
+mat The name of the material that will be assigned to this domain
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 MeshData Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -11807,8 +11733,7 @@ The
 \shape italic
 MeshData 
 \shape default
-section is where data is specified that can be mapped to the geometry of
- the model.
+section is where data is specified that can be mapped to the mesh.
  The data can be applied to a parameter of the model, e.g.
  a material parameter, or a pressure load.
  
@@ -12486,7 +12411,7 @@ Here,
 \shape italic
 nodeset1 
 \shape default
-is the name of a node set defined in the Geometry section.
+is the name of a node set defined in the Mesh section.
  See Section
 \begin_inset space ~
 \end_inset
@@ -12516,7 +12441,11 @@ Here,
 \emph on
 surface1 
 \emph default
-is a surface defined in the Geometry section.
+is a surface defined in the 
+\emph on
+Mesh
+\emph default
+ section.
  Similarly, defining a node set via an element set is done using 
 \emph on
 @elem_set:.
@@ -12839,8 +12768,11 @@ nodeset
 
 \begin_layout Standard
 The node set must be defined in the 
+\emph on
+Mesh
 \shape italic
-Geometry 
+\emph default
+ 
 \shape default
 section.
  
@@ -12925,8 +12857,11 @@ rigid body
 
  material) that in turn defines the rigid body.
  The node set must be defined in the 
+\emph on
+Mesh
 \shape italic
-Geometry 
+\emph default
+ 
 \shape default
 section.
 \end_layout
@@ -13714,8 +13649,11 @@ follower forces
 surface 
 \emph default
 attribute.The surface must be defined in the 
+\emph on
+Mesh
 \shape italic
-Geometry 
+\emph default
+ 
 \shape default
 section.
  
@@ -16119,8 +16057,11 @@ surface_pair
 \shape default
 attribute defines the surface pair to use for this contact definition.
  The surface pair is defined the the 
+\emph on
+Mesh
 \shape italic
-Geometry 
+\emph default
+ 
 \shape default
 section.
  For example:
@@ -22841,7 +22782,7 @@ surface
 \emph default
  (SymmetryPlane01 in this example), is defined in the 
 \emph on
-Geometry
+Mesh
 \emph default
  section.
  Let 
@@ -22951,7 +22892,7 @@ surface
 \emph default
  (NormalFlowSurface01 in this example), is defined in the 
 \emph on
-Geometry
+Mesh
 \emph default
  section.
  Let 
@@ -23579,7 +23520,11 @@ name "sec:Discrete-Section"
 
 \begin_layout Standard
 This section defines the materials used by the discrete elements and assigns
- these materials to the discrete elements sets defined in the Geometry section.
+ these materials to the discrete elements sets defined in the 
+\emph on
+Mesh
+\emph default
+ section.
  The materials are defined via the 
 \shape italic
 discrete_material 
@@ -23787,8 +23732,11 @@ name "subsec:Discrete-Section"
 
 \begin_layout Standard
 After the discrete materials are defined, the materials are assigned to
- the discrete element sets that are defined in the Geometry section using
- the 
+ the discrete element sets that are defined in the 
+\emph on
+Mesh
+\emph default
+ section using the 
 \shape italic
 discrete 
 \shape default
@@ -23809,7 +23757,11 @@ dmat
 \series bold
 discrete_set
 \series default
- discrete element set defined in the Geometry section 
+ discrete element set defined in the 
+\emph on
+Mesh
+\emph default
+ section 
 \end_layout
 
 \begin_layout Subsection
@@ -33365,7 +33317,7 @@ reference "subsec:Surface-Section"
 
 ) within 
 \emph on
-Geometry
+Mesh
 \emph default
  (Section
 \begin_inset space ~
@@ -76909,15 +76861,27 @@ section, preferably at the bottom of the input file.
 \end_layout
 
 \begin_layout LyX-Code
-  <Geometry>
+  <Mesh>
 \end_layout
 
 \begin_layout LyX-Code
-    <!-- geometry goes here -->
+    <!-- mesh goes here -->
 \end_layout
 
 \begin_layout LyX-Code
-  </Geometry>
+  </Mesh>
+\end_layout
+
+\begin_layout LyX-Code
+  <MeshDomains>
+\end_layout
+
+\begin_layout LyX-Code
+    <!-- mesh domains go here -->
+\end_layout
+
+\begin_layout LyX-Code
+  </MeshDomains>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77086,7 +77050,7 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-<febio_spec version="2.5">
+<febio_spec version="3.0">
 \end_layout
 
 \begin_layout LyX-Code
@@ -77098,7 +77062,7 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-    <material id="1" name="Material 1" type="neo-Hookean">
+    <material id="1" name="material1" type="neo-Hookean">
 \end_layout
 
 \begin_layout LyX-Code
@@ -77122,7 +77086,7 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-  <Geometry>
+  <Mesh>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77166,11 +77130,11 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-    <Elements>
+    <Elements name="Part1" type="hex8">
 \end_layout
 
 \begin_layout LyX-Code
-      <hex8 id="1" mat="1">1,5,7,3,2,6,8,4</hex8>
+      <elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77274,7 +77238,19 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-  </Geometry>
+  </Mesh>
+\end_layout
+
+\begin_layout LyX-Code
+  <MeshDomains>
+\end_layout
+
+\begin_layout LyX-Code
+    <SolidDomain name="Part1" mat="material1"/>
+\end_layout
+
+\begin_layout LyX-Code
+  </MeshDomains>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77282,15 +77258,39 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-    <fix bc="x" node_set="set1"/>
+    <bc type="fix" node_set="set1">
 \end_layout
 
 \begin_layout LyX-Code
-    <fix bc="y" node_set="set2"/>
+      <dofs>x</dofs>
 \end_layout
 
 \begin_layout LyX-Code
-    <fix bc="z" node_set="set3"/>
+    </bc>
+\end_layout
+
+\begin_layout LyX-Code
+    <bc type="fix" node_set="set2">
+\end_layout
+
+\begin_layout LyX-Code
+      <dofs>y</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+    </bc>
+\end_layout
+
+\begin_layout LyX-Code
+    <bc type="fix" node_set="set3">
+\end_layout
+
+\begin_layout LyX-Code
+      <dofs>z</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+    </bc>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77302,19 +77302,27 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-    <loadcurve id="1">
+    <load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout LyX-Code
-      <loadpoint>0,0</loadpoint>
+      <points>
 \end_layout
 
 \begin_layout LyX-Code
-      <loadpoint>1,0.1</loadpoint>
+       <point>0,0</point>
 \end_layout
 
 \begin_layout LyX-Code
-    </loadcurve>
+       <point>1,0.1</point>
+\end_layout
+
+\begin_layout LyX-Code
+      </points>
+\end_layout
+
+\begin_layout LyX-Code
+    </load_controller>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77346,19 +77354,19 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-      <prescribe bc="x" node_set="set4">
+      <bc type="prescribe" node_set="set4">
 \end_layout
 
 \begin_layout LyX-Code
-	<scale lc="1">1.0</scale>
+        <dof>x</dof>
 \end_layout
 
 \begin_layout LyX-Code
-	<node id="8" bc="x" lc="1">1</node>
+    	<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout LyX-Code
-      </prescribe>
+      </bc>
 \end_layout
 
 \begin_layout LyX-Code
@@ -77386,7 +77394,7 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout LyX-Code
-      <analysis type="dynamic"></analysis>
+      <analysis>dynamic</analysis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -78594,8 +78602,8 @@ name "sec:Running-Parameter-Optimization"
 \begin_layout Standard
 As explained above, a parameter optimization problem is described using
  two input files.
- First, a standard FEBio input file that defines the geometry, materials,
- boundary conditions, etc.
+ First, a standard FEBio input file that defines the mesh, materials, boundary
+ conditions, etc.
  The second input file describes the parameter optimization data, such as
  the objective and which model parameters are to be optimized.
  The format of the second file is described above.
