@@ -58,9 +58,16 @@ ILUT_Preconditioner::ILUT_Preconditioner(FEModel* fem) : Preconditioner(fem)
 	m_zeroReplace = 1e-10;
 }
 
+SparseMatrix* ILUT_Preconditioner::CreateSparseMatrix(Matrix_Type ntype)
+{
+	if (ntype != REAL_UNSYMMETRIC) return nullptr;
+	m_K = new CRSSparseMatrix(1);
+	SetSparseMatrix(m_K);
+	return m_K;
+}
+
 bool ILUT_Preconditioner::Factor()
 {
-	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
 	assert(m_K->Offset() == 1);
 

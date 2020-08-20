@@ -41,6 +41,8 @@ public:
 	// apply to vector P x = y
 	bool BackSolve(double* x, double* y) override;
 
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+
 public:
 	int		m_maxfill;
 	double	m_fillTol;
