@@ -90,6 +90,9 @@
     <ClInclude Include="..\..\NumCore\StrategySolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NumCore\FEASTEigenSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\BIPNSolver.cpp">
@@ -159,6 +162,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NumCore\StrategySolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\FEASTEigenSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,25 +24,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#pragma once
+#include <FECore/SparseMatrix.h>
+#include <FECore/matrix.h>
+#include <FECore/EigenSolver.h>
 
-
-#include "stdafx.h"
-#include "FEBioTest.h"
-#include <FECore/FECoreKernel.h>
-#include "FEBioDiagnostic.h"
-#include "FETangentDiagnostic.h"
-#include "FERestartDiagnostics.h"
-#include "FEJFNKTangentDiagnostic.h"
-#include "FEBioEigenSolver.h"
-
-namespace FEBioTest
+class FEASTEigenSolver : public EigenSolver
 {
+public:
+	FEASTEigenSolver(FEModel* fem);
 
-void InitModule()
-{
-	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
-	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
-	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
-	REGISTER_FECORE_CLASS(FEBioEigenSolver, "eigen");
-}
-}
+	bool Init();
+
+	bool EigenSolve(SparseMatrix* A, SparseMatrix* B, vector<double>& eigenValues, matrix& eigenVectors) override;
+
+private:
+	int	m_fpm[128];
+	double	m_emin, m_emax;
+	int	m_m0;
+
+	DECLARE_FECORE_CLASS();
+};

@@ -508,6 +508,7 @@
     <ClInclude Include="..\..\NumCore\BoomerAMGSolver.h" />
     <ClInclude Include="..\..\NumCore\CompactSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\CompactUnSymmMatrix.h" />
+    <ClInclude Include="..\..\NumCore\FEASTEigenSolver.h" />
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h" />
     <ClInclude Include="..\..\NumCore\Hypre_PCG_AMG.h" />
@@ -534,6 +535,7 @@
     <ClCompile Include="..\..\NumCore\BoomerAMGSolver.cpp" />
     <ClCompile Include="..\..\NumCore\CompactSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\CompactUnSymmMatrix.cpp" />
+    <ClCompile Include="..\..\NumCore\FEASTEigenSolver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRESSolver.cpp" />
     <ClCompile Include="..\..\NumCore\HypreGMRESsolver.cpp" />
     <ClCompile Include="..\..\NumCore\Hypre_PCG_AMG.cpp" />

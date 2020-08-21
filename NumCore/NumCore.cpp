@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "NumCore.h"
 #include "SkylineSolver.h"
@@ -47,6 +44,7 @@ SOFTWARE.*/
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
+#include "FEASTEigenSolver.h"
 
 //=============================================================================
 // Call this to initialize the NumCore module
@@ -71,6 +69,9 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
 	REGISTER_FECORE_CLASS(ILUT_Preconditioner, "ilut");
 	REGISTER_FECORE_CLASS(IncompleteCholesky , "ichol");
+
+	// register eigen solvers
+	REGISTER_FECORE_CLASS(FEASTEigenSolver, "feast");
 
 	// set default linear solver
 	// (Set this before the configuration is read in because
