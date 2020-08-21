@@ -17,6 +17,8 @@
 		D50EC38B2217AD75006F6A57 /* CompactSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3852217AD75006F6A57 /* CompactSymmMatrix.cpp */; };
 		D52D840B21CE89BC00472620 /* MatrixTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D840621CE89BC00472620 /* MatrixTools.cpp */; };
 		D52D840E21CE89BC00472620 /* MatrixTools.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D840921CE89BC00472620 /* MatrixTools.h */; };
+		D550834A24F086CE00E919D8 /* FEASTEigenSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D550834824F086CE00E919D8 /* FEASTEigenSolver.cpp */; };
+		D550834B24F086CE00E919D8 /* FEASTEigenSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D550834924F086CE00E919D8 /* FEASTEigenSolver.h */; };
 		D5C5B798239F0B8900D29EE0 /* Hypre_PCG_AMG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C5B796239F0B8900D29EE0 /* Hypre_PCG_AMG.cpp */; };
 		D5C5B799239F0B8900D29EE0 /* Hypre_PCG_AMG.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C5B797239F0B8900D29EE0 /* Hypre_PCG_AMG.h */; };
 		D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */; };
@@ -67,6 +69,8 @@
 		D50EC3852217AD75006F6A57 /* CompactSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactSymmMatrix.cpp; sourceTree = "<group>"; };
 		D52D840621CE89BC00472620 /* MatrixTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MatrixTools.cpp; sourceTree = "<group>"; };
 		D52D840921CE89BC00472620 /* MatrixTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatrixTools.h; sourceTree = "<group>"; };
+		D550834824F086CE00E919D8 /* FEASTEigenSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEASTEigenSolver.cpp; sourceTree = "<group>"; };
+		D550834924F086CE00E919D8 /* FEASTEigenSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEASTEigenSolver.h; sourceTree = "<group>"; };
 		D5C5B796239F0B8900D29EE0 /* Hypre_PCG_AMG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Hypre_PCG_AMG.cpp; sourceTree = "<group>"; };
 		D5C5B797239F0B8900D29EE0 /* Hypre_PCG_AMG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hypre_PCG_AMG.h; sourceTree = "<group>"; };
 		D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ILUT_Preconditioner.cpp; sourceTree = "<group>"; };
@@ -151,6 +155,8 @@
 				D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */,
 				D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */,
 				D50EC3842217AD75006F6A57 /* CompactUnSymmMatrix.h */,
+				D550834824F086CE00E919D8 /* FEASTEigenSolver.cpp */,
+				D550834924F086CE00E919D8 /* FEASTEigenSolver.h */,
 				D5F6DC7F213F63B7001E96CB /* FGMRESSolver.cpp */,
 				D5F6DC85213F63B7001E96CB /* FGMRESSolver.h */,
 				D5C5B796239F0B8900D29EE0 /* Hypre_PCG_AMG.cpp */,
@@ -202,6 +208,7 @@
 				D50EC3892217AD75006F6A57 /* BlockMatrix.h in Headers */,
 				D5F6DCC7213F63B7001E96CB /* BlockSolver.h in Headers */,
 				D5F6DCB3213F63B7001E96CB /* PardisoSolver.h in Headers */,
+				D550834B24F086CE00E919D8 /* FEASTEigenSolver.h in Headers */,
 				D5F6DCA4213F63B7001E96CB /* SchurSolver.h in Headers */,
 				D5F6DCD6213F63B7001E96CB /* BIPNSolver.h in Headers */,
 				D5F6DCB5213F63B7001E96CB /* LUSolver.h in Headers */,
@@ -291,6 +298,7 @@
 				D5F1945F21908513000F738D /* IncompleteCholesky.cpp in Sources */,
 				D5F6DCA9213F63B7001E96CB /* LUSolver.cpp in Sources */,
 				D5F1945E21908513000F738D /* ILU0_Preconditioner.cpp in Sources */,
+				D550834A24F086CE00E919D8 /* FEASTEigenSolver.cpp in Sources */,
 				D50EC3872217AD75006F6A57 /* BlockMatrix.cpp in Sources */,
 				D5F6DCD0213F63B7001E96CB /* stdafx.cpp in Sources */,
 				D5F6DCB8213F63B7001E96CB /* BIPNSolver.cpp in Sources */,
