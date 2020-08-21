@@ -12,9 +12,8 @@ The following functions need to be defined in the plugin and are needed for plug
 
 1. GetSDKVersion: Returns the version of the SDK library that is used by this plugin.
 2. PluginInitialize: Place for initializing plugin data
-3. PluginGetFactory: Method called for registering the plugin classes with FEBio.
-4. PluginCleanup: Place for releasing any resources allocated by the plugin.
-5. GetPluginVersion: Return the version number of plugin. 
+3. PluginCleanup: Place for releasing any resources allocated by the plugin.
+4. GetPluginVersion: Return the version number of plugin. 
 
 Although these functions are referred to as the required functions, only the GetSDKVersion and PluginInitialize are really mandatory. The other ones only need to be defined if they are actually used. 
 
@@ -48,30 +47,26 @@ that the plugin uses the same kernel object as the FEBio executable. Since a plu
 (and related resources such as the logfile). However, this is usally not desirable and calling the SetInstance function ensure that both the plugin and the FEBio 
 executable use the same kernel.
 
-
-\section PluginGetFactory
-Plugins can define multiple new classes. A factory class needs to be created for each new class. A factory class is simply a mechanism that FEBio uses to instantiate the new plugin classes. See section \ref factory_classes for more details on how to create a plugin factory class. These factory classes need to be registered with FEBio. This is done using the PluginGetFactory.
-
-\code
-FECORE_EXPORT FECoreFactory* PluginGetFactory(int i);
-\endcode
-
-This function will be called by FEBio and is used to return a pointer to a factory class. It will be called until it returns null. During each call a pointer to a factory class is returned. 
-
-Note that this function is not required when registering the plugin's classes in the PluginInitialize function. Please see \ref factory_classes for more information on this.
-
 \section PluginCleanup
 This function will be called when FEBio terminates and can be used to deallocate resources.
 
 \code
 FECORE_EXPORT void PluginCleanup()
+{
+	// Clean up plugin resources 
+}
 \endcode
 
 \section GetPluginVersion
 You can define a verion number for a plugin by implementing the optional function GetPluginVersion. 
 
 \code
-FECORE_EXPORT void GetPluginVersion(int& major, int& minor, int& patch);
+FECORE_EXPORT void GetPluginVersion(int& major, int& minor, int& patch)
+{
+	major = 1;
+	minor = 0;
+	patch = 3;
+}
 \endcode
 
 At this point, FEBio doesn't do much with these version numbers except print them to the screen when the plugin is loaded. 

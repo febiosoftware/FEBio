@@ -4,7 +4,7 @@
 FEBio is a finite element solver that is specifically designed for biomechanical applications. It solves the nonlinear finite
 element equations using a quasi-Newton method. It offers  biologically relevant constitutive models and modeling scenarios.
 
-As of FEBio 2.0, the source code is organized into different modules, each module implemented in a separate library. 
+The source code is organized into different modules, each module implemented in a separate library. 
 The following figure shows the relationship between the different modules.
 
 \image html febio_overview.png "Overview of FEBio"
@@ -15,8 +15,7 @@ libraries and the functionality they implement. A more detailed description is p
 \li <b>FECore</b>: a library containing most base classes that define the FEBio framework.
 \li <b>FEBioMech</b>: a library implementing solution algorithms for solving 3D structural mechanics problems.
 \li <b>FEBioMix</b>: this library extends FEBioMech and adds support for biphasic and materials with solutes (e.g. triphasic and multiphasic), as well as chemical reactions.
-\li <b>FEBioHeat</b>: a library implementing solution algorithms for 3D linear steady state and transient heat problems.
-\li <b>FEBioFluid</b>: a library that implements a fluid mechanics solver for solving transient fluid dynamics problems.
+\li <b>FEBioFluid</b>: a library that implements a fluid mechanics solver for solving transient fluid dynamics problems, as well as a fluid-solid-interaction (FSI) solver.
 
 Additional libraries are provided to assist in running FEBio problems.
 
@@ -47,10 +46,6 @@ The FEBioMix library extends the FEBioMech library by solving a type of coupled 
 mixture. The fluid is assumed to be composed of a solvent that may contain one or more solutes. Optionally, the solute concentrations can be affected
 by chemical reactions. This library also implements contact algorithms for handling fluid flow across contacting interfaces. Both quasi-static as well
 as transient conditions can be modeled. 
-
-\section FEBioHeat FEBioHeat
-This library implements steady-state and transient linear heat transfer. Currently, it only supports an isotropic Fourier constitutive model. Supported
-boundary conditions include prescribed temperature, heat flux, and convective heat flux. 
 
 \section FEBioFluid FEBioFluid
 The FEBioFluid library implements a fluid mechanics solver for solving transient fluid dynamics problems.

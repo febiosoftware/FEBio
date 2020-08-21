@@ -32,39 +32,40 @@ public:
 
 public:
 	// Cauchy-stress calculation
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
 	// Spatial elasticity tensor calculation
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	// class initialization (optional)
-	virtual void Init();
+	bool Init() override;
 
 	// class validation (optional)
-	virtual void Validate();
+	bool Validate() override;
 
-	// declare as having a parameter list
+	// required macro for integrating this class with FECore
 	DECLARE_FECORE_CLASS();
 };
 \endcode
 
-The class derives, as expected, publicly from FEElasticMaterial. It then defines a couple of public variables. These variables will store the material parameters as is discussed below. After this, the class also declares a few member functions. Note that all these functions are virtual. Furthermore, the Stress and Tangent are declared as abstract in the base class, so they have to be overridden in the derived class. The Init function is optional, since a default implementation (which does nothing) is provided.
+The class derives, as expected, publicly from FEElasticMaterial. It then defines a couple of public variables. These variables will store the material parameters as is discussed below. After this, the class also declares a few member functions. Note that all these functions are overrides of functions defined in base classes. Furthermore, the Stress and Tangent are declared as abstract in the base class, so they have to be overridden in the derived class. The Init function is optional, since a default implementation (which does nothing) is provided.
 
 At this point it is useful to discuss a common practice in adding new classes in C++. Usually the definition of the class is split over two separate files. One file, the so-called header file, declares the new class. The implementation of the function members are placed in a separate file, usually a .cpp file. FEBio follows this practice and therefore the neo-Hookean implementation is spread over two files: the FENeoHookean.h  contains the class definition and FENeoHookean.cpp contains the member function definitions. It is recommended that the implementation of new materials follows this practice. The last line of the class definition contain a macro that will help with the registration the class' material parameters.
 
 \subsection step2 Registering the new material
 
-In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done by defining a factory class and creating an instance of this class and then passing a pointer to the factory back to FEBio in the PluginGetFactory function.
-
-A material factory can be defined like this.
+In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done in the PluginInitialize function, which must be provided by the user. (see \ref factory_classes)
 
 \code
-FERegisterClass_T<FENeoHookean> material_factory(FEMATERIAL_ID, "neo-hookean");
+FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
+{
+	\\ Set the kernel to match FEBio's kernel
+	FECoreKernel::SetInstance(&fecore);
+	
+	\\ Register the classes in this plugin
+	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
+}
 \endcode
-
-Note that the constructor of the class two parameters. A super class ID which defines the type
-of class that the factory creates (a material in this case) and a name that uniquely defines the class. This name will 
-later be used to define the material in the input file and can also be used for other purposes.
 
 \subsection step3 Defining the material parameters
 
@@ -185,7 +186,7 @@ Although the detailed implementation of this constitutive model will not be expl
 
 On line 3 a perhaps strange construction appears. As mentioned before, the material point stores all the information about the current point at which the stress is required. This class however, stores its data per material type. In this example only elastic materials are mentioned (that is, materials derived from the FEElasticMaterial class), but there are other types of materials as will be discussed in the advanced section below. Each material type can define different attributes that need to be stored in the material point class. In order to access the data that corresponds to a particular material class, the user can use the ExtractData member function of the material point class. The class returns the subset of data that are relevant for this class of material. In this case the returned data is of the type FEElasticMaterialPoint. 
  
-On line 5, the local deformation gradient is accessed from the material point data and on line 6, the local Jacobian (which is the determinant of the deformation gradient ). These are data members that can be accessed directly. Line 12 illustrates how to obtain additional information using the material point’s member functions. In this case, the left Cauchy-Green tensor is retrieved using the LeftCauchyGreen member function. A more detailed description of the available data and function members can be found in the advanced section. 
+On line 5, the local deformation gradient is accessed from the material point data and on line 6, the local Jacobian (which is the determinant of the deformation gradient ). These are data members that can be accessed directly. Line 12 illustrates how to obtain additional information using the material point's member functions. In this case, the left Cauchy-Green tensor is retrieved using the LeftCauchyGreen member function. A more detailed description of the available data and function members can be found in the advanced section. 
 
 Line 22 shows an example of how the actual stress can be computed. FEBio defines a whole bunch of classes that facilitate the use of tensors. For example, the mat3ds class implements a second-order 3D symmetric tensor of doubles (the d stands for double). The mat3dd class implements a second-order 3D diagonal tensor.  We will see some examples of fourth-order tensor classes in the tangent function.
 
@@ -231,7 +232,7 @@ In addition to the material classes defining solid materials, there are several 
 
 \section mat_sec2 The FEElasticMaterialPoint class
 
-As was shown above, the stress and tangent are evaluated at so-called material points. These are points at which the state of the deformation is tracked. Most often, these points correspond to the integration points of the elements. Material points are implemented by deriving special classes from the FEMaterialPoint base class. A class of particular importance is the FEElasticMaterialPoint class which is used to define the state of hyper-elastic materials. Unless your material implementation requires additional (history-dependent) data, this is the class you will use in the stress and tangent functions.
+As was shown above, the stress and tangent are evaluated at so-called material points. These are points at which the state of the deformation is tracked. Most often, these points correspond to the integration points of the elements. Material points are implemented by deriving special classes from the FEMaterialPoint base class. A class of particular importance is the FEElasticMaterialPoint class, which is used to define the state of hyper-elastic materials. Unless your material implementation requires additional (history-dependent) data, this is the class you will use in the stress and tangent functions.
 
 The FEElasticMaterialPoint class defines the state of an elastic material point, or more precisely, the state of a material derived from the FEElasticMaterial class. It defines the following state variables.
 
@@ -239,7 +240,6 @@ The FEElasticMaterialPoint class defines the state of an elastic material point,
 \li vec3d rt: the position of the material point in the spatial frame
 \li mat3d F: the deformation gradient
 \li double J: the Jacobian, that is the determinant of the deformation gradient
-\li mat3d Q: a rotation matrix describing the element coordinate system
 \li mat3ds s: the Cauchy stress tensor
 
 If your material derives from FEElasticMaterial (or FEUncoupledMaterial) and no additional state data is required, you do not need to derive a new material point class. For all elastic materials this is the default material point data class to store the point data. 
@@ -261,7 +261,7 @@ For materials that require additional information to be stored at the material p
 If the steps to register the material and its material parameters have been followed as outlined in the previous sections, the material class will be seamlessly integrated in FEBio's framework. One of the important consequences of this is that the xml-input file reader will automatically recognize the new material and its parameters. For example, imagine the user created a new class MyFancyMaterial and named it "fancy material" by registering the material as follows. 
 
 \code
-REGISTER_FECORE_CLASS(MyFancyMaterial, FEMATERIAL_ID, "fancy material");
+REGISTER_FECORE_CLASS(MyFancyMaterial, "fancy material");
 \endcode
 
 This macro associates the name "fancy material" with the MyFancyMaterial class. This name will now be used as the type identifier in the xml-input file.
@@ -332,7 +332,7 @@ To run the tangent diagnostic, simply type the following at the command prompt.
 >febio -d filename [ENTER]
 \endcode
 
-Note that the command option –d needs to be used instead of the usual –i to inform FEBio that you are running a diagnostics problem and not a regular model. Replace "filename" with the name of the actual input file.
+Note that the command option -d needs to be used instead of the usual -i to inform FEBio that you are running a diagnostics problem and not a regular model. Replace "filename" with the name of the actual input file.
 
 This diagnostic test outputs a log file that contains the tangent stiffness as calculated from the implementation and a finite difference approximation to this tangent. It also contains the difference between these two matrices and the matrix element where the difference is largest. Although a small difference between the two matrices can be expected due to the finite difference approximation, the difference should be small, e.g. less than 0.01%. If this is not the case, there is probably a mistake in either the Stress function or in the Tangent function or both. To identify the culprit, the result of the simulation, which is reported as usual in the plot file, can be compared to a known solution (or a solution obtained in a different fashion). If the solutions correspond, then the problem most likely lies with the tangent implementation. If the solutions do not agree, then the implementation of the Cauchy stress is probably also erroneous. 
 
@@ -352,7 +352,7 @@ To define the variable m_a as the storage for a material parameter, specify the 
 ADD_PARAMETER(m_a, 3, "a");
 \endcode
 
-In the input file, the parameter’s values can then be defined using a comma-separated list. For example,
+In the input file, the parameter's values can then be defined using a comma-separated list. For example,
 
 \code
 <a>0.1, 0.23, -0.73</a>
