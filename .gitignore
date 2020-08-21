@@ -381,3 +381,6 @@ MigrationBackup/
 *.exe
 *.out
 *.app
+
+# miscellaneous
+Documentation/Doxygen/doc

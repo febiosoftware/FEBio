@@ -266,7 +266,8 @@ enum SUPER_CLASS_ID {
 	FERIGIDBC_ID,					// derived from FERigidBC
 	FENEWTONSTRATEGY_ID,			// derived from FENewtonStrategy
 	FEITEMLIST_ID,                  // derived from FEItemList (NOTE: work in progress!)
-	FETIMECONTROLLER_ID				// derived from FETimeStepController
+	FETIMECONTROLLER_ID,			// derived from FETimeStepController
+	FEEIGENSOLVER_ID				// derived from EigenSolver
 };
 
 ///////////////////////////////////////////////////////////////////////////////

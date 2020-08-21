@@ -8,20 +8,19 @@ FEBio uses this callback mechanism to accomplish several things. A callback is u
 To register a callback function, call the FEModel::AddCallback function. 
 
 \code
-void FEModel::AddCallback(FEBCORE_CB_FNC pcb, unsigned int nwhen, void *pd);
+void FEModel::AddCallback(FEBCORE_CB_FNC pcb, unsigned int nwhen, void *pd, CBInsertPolicy insert = CBInsertPolicy::CB_ADD_END);
 \endcode
 
-This function takes three parameters. The first is a pointer to the callback function. This function must be of FECORE_CB_FNC type which is described below.
-The second parameter is an unsigned integer that defines when FEBio will call the callback. The third parameter is a void pointer that the user
-can use to pass data to the callback. 
+This function takes three required parameters and one optional. The first is a pointer to the callback function. This function must be of FECORE_CB_FNC type which is described below.
+The second parameter is an unsigned integer that defines when FEBio will call the callback. The third parameter is a void pointer that the user can use to pass data to the callback. The last parameter, which is optional, tells whether the callback should be added to the front or back of the callback queue. 
 
 The callback function must have the FEBIO_CB_FNC type which is defined as follows.
 
 \code
-void (*FEBIO_CB_FNC)(FEModel&, unsigned int, void*);
+void (*FEBIO_CB_FNC)(FEModel*, unsigned int, void*);
 \endcode
 
-When FEBio calls the function, the first parameter will be a reference to the FE model. This reference can be used to query information from the model. Users can also make changes to the FEModel if needed.
+When FEBio calls the function, the first parameter will be a pointer to the FE model. This pointer can be used to query information from the model. Users can also make changes to the FEModel if needed.
 
 The second parameter is the reason why FEBio called this function. Since
 callbacks can be called for multiple events, this parameter will contain the explicit reason. 
@@ -33,6 +32,11 @@ It can take on the following values.
 \li <b>CB_SOLVED</b>: Call after the entire model is solved.
 \li <b>CB_UPDATE_TIME</b>: Call when the time was updated and before the time step is solved.
 \li <b>CB_AUGMENT</b>: Call before each augmentation
+\li <b>CB_STEP_SOLVED</b>: Call when the step was solved
+\li <b>CB_MATRIX_REFORM</b>: Call when the stiffness matrix is reformed
+\li <b>CB_REMESH</b>: Call after remesh
+\li <b>CB_PRE_MATRIX_SOLVE:</b> Call right before matrix solve
+\li <b>CB_RESET</b>: Call after FEModel::Reset
 \li <b>CB_ALWAYS</b>: Call whenever FEBio calls the callbacks.
 
 Note that these flags can be combined using bitwise OR. For instance, CB_MAJOR_ITERS | CB_MINOR_ITERS will cause the callback to be called both during the 
@@ -43,7 +47,7 @@ The third parameter is the same parameter that was passed when the callback was 
 For example, the following code snippet shows how to define a callback that is always called.
 
 \code
-void my_cb(FEModel&, unsigned int, void*);
+void my_cb(FEModel*, unsigned int, void*);
 
 FEModel fem;
 fem.AddCallback(my_cb, CB_ALWAYS, 0);
@@ -52,7 +56,7 @@ fem.AddCallback(my_cb, CB_ALWAYS, 0);
 Inside the callback function, the reason parameter can be used to determine why the callback was called. 
 
 \code
-void my_cb(FEModel& fem, unsigned int nreason, void* pd)
+void my_cb(FEModel* fem, unsigned int nreason, void* pd)
 {
 	if (nreason & CB_INIT)
 	{

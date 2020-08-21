@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,26 +23,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include <FECore/FECoreTask.h>
 
-
-
-#include "stdafx.h"
-#include "FEBioTest.h"
-#include <FECore/FECoreKernel.h>
-#include "FEBioDiagnostic.h"
-#include "FETangentDiagnostic.h"
-#include "FERestartDiagnostics.h"
-#include "FEJFNKTangentDiagnostic.h"
-#include "FEBioEigenSolver.h"
-
-namespace FEBioTest
+class FEBioEigenSolver : public FECoreTask
 {
+public:
+	FEBioEigenSolver(FEModel* fem);
 
-void InitModule()
-{
-	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
-	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
-	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
-	REGISTER_FECORE_CLASS(FEBioEigenSolver, "eigen");
-}
-}
+	bool Init(const char* szfile) override;
+
+	bool Run() override;
+};

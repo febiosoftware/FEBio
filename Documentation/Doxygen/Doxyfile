@@ -38,7 +38,7 @@ PROJECT_NAME           = FEBio
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 2.7
+PROJECT_NUMBER         = 3.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -435,7 +435,7 @@ LOOKUP_CACHE_SIZE      = 0
 # normally produced when WARNINGS is set to YES.
 # The default value is: NO.
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES, all private members of a class will
 # be included in the documentation.
@@ -862,12 +862,10 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../../VS2008/ \
-                         ../../VS2010/ \
-                         ../../FEBioTM/ \
-                         ../../XCode5/ \
-                         ../../VS2013/ \
-                         ../../VS2015/
+EXCLUDE                = ../../Xcode \
+                         ../../VS2017 \
+                         ../../VS2015 \
+                         ../../build
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
