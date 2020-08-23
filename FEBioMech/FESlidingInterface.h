@@ -172,6 +172,7 @@ public:
 
 	bool			m_bautopen;	//!< auto penalty calculation
 	double			m_eps;		//!< penalty scale factor 
+	bool			m_bupdtpen;	//!< update penalty 
 
 	bool			m_breloc;	//!< initial node relocation
 

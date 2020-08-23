@@ -79,6 +79,7 @@ BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_nsegup       , "seg_up"       );
 	ADD_PARAMETER(m_bself_contact, "self_contact" );
 	ADD_PARAMETER(m_sradius      , "search_radius");
+	ADD_PARAMETER(m_bupdtpen     , "update_penalty");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -399,6 +400,8 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_knmult = 1;
 
 	m_breloc = false;
+
+	m_bupdtpen = false;
 
 	m_nsegup = 0;	// always do segment updates
 	m_bautopen = false;	// don't use auto-penalty
