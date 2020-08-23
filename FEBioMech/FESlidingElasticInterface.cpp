@@ -287,6 +287,7 @@ FESlidingElasticInterface::FESlidingElasticInterface(FEModel* pfem) : FEContactI
     m_srad = 1.0;
     m_nsegup = 0;
     m_bautopen = false;
+	m_bupdtpen = false;
     m_btension = false;
     m_breloc = false;
     m_bsmaug = false;
