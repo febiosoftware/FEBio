@@ -696,9 +696,6 @@
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelasticUC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityHardening.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEActiveFiberStress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -727,6 +724,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESlidingElasticInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticDamage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticDamageMaterialPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1397,9 +1400,6 @@
     <ClCompile Include="..\..\FEBioMech\FEGenericHyperelasticUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityHardening.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEActiveFiberStress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1428,6 +1428,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESlidingElasticInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticDamage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticDamageMaterialPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -29,6 +29,10 @@
 #include "FEReactivePlasticDamageMaterialPoint.h"
 #include "FEElasticMaterial.h"
 
+#ifndef max
+#define max(a, b) ((a)>(b)?(a):(b))
+#endif
+
 ////////////////////// PLASTIC DAMAGE MATERIAL POINT //////////////////////////////
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEReactivePlasticDamageMaterialPoint::Copy()

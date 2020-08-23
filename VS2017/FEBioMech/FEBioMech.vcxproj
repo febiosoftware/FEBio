@@ -659,8 +659,9 @@
     <ClInclude Include="..\..\FEBioMech\FEPreStrainElastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEPreStrainUncoupledElastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticDamage.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticDamageMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactivePlasticity.h" />
-    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityHardening.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveViscoelastic.h" />
@@ -898,8 +899,9 @@
     <ClCompile Include="..\..\FEBioMech\FEPreStrainElastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPreStrainUncoupledElastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticDamage.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticDamageMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactivePlasticity.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityHardening.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveViscoelastic.cpp" />
