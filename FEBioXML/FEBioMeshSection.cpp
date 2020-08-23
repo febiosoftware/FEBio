@@ -364,6 +364,9 @@ void FEBioMeshDomainsSection::Parse(XMLTag& tag)
 		throw XMLReader::Error("Failed building parts.");
 	}
 
+	// tell the file reader to rebuild the node ID table
+	GetBuilder()->BuildNodeList();
+
 	// At this point the mesh is completely read in.
 	// Now we can allocate the degrees of freedom.
 	FEModel& fem = *GetFEModel();

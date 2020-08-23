@@ -38,4 +38,5 @@ public:
 	void Parse(XMLTag& tag);
 	void ParseBC(XMLTag& tag);
 	void ParseBCRigid(XMLTag& tag);	// read rigid contact section
+	void ParseLinearConstraint(XMLTag& tag);
 };

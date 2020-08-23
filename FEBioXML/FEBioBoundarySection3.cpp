@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FECore/FEBoundaryCondition.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FECore/FEModel.h>
+#include <FECore/FELinearConstraintManager.h>
 
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection3::Parse(XMLTag& tag)
@@ -60,6 +61,13 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 	if (strcmp(sztype, "rigid") == 0)
 	{
 		ParseBCRigid(tag);
+		return;
+	}
+
+	// handle linar constraints
+	if (strcmp(sztype, "linear constraint") == 0)
+	{
+		ParseLinearConstraint(tag);
 		return;
 	}
 
@@ -137,4 +145,73 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 
 	// read the parameter list
 	ReadParameterList(tag, prn);
+}
+
+
+//-----------------------------------------------------------------------------
+//! Parse the linear constraints section of the xml input file
+//! This section is a subsection of the Boundary section
+
+void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	DOFS& dofs = fem.GetDOFS();
+
+	// make sure there is a constraint defined
+	if (tag.isleaf()) return;
+
+	FEModelBuilder* feb = GetBuilder();
+
+	FELinearConstraint lc(&fem);
+
+	++tag;
+	do
+	{
+		if (tag == "node")
+		{
+			int nodeId;
+			tag.value(nodeId);
+			lc.m_parentDof.node = feb->FindNodeFromID(nodeId);
+		}
+		else if (tag == "dof")
+		{
+			lc.m_parentDof.dof = dofs.GetDOF(tag.szvalue());
+		}
+		else if (tag == "child_dof")
+		{
+			FELinearConstraint::DOF dof;
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					int nodeId;
+					tag.value(nodeId);
+					dof.node = feb->FindNodeFromID(nodeId);
+				}
+				else if (tag == "dof")
+				{
+					dof.dof = dofs.GetDOF(tag.szvalue());
+				}
+				else if (tag == "value")
+				{
+					double v;
+					tag.value(v);
+					dof.val = v;
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			} 
+			while (!tag.isend());
+
+			lc.m_childDof.push_back(dof);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	// add the linear constraint to the system
+	fem.GetLinearConstraintManager().AddLinearConstraint(lc);
+	GetBuilder()->AddComponent(&lc);
 }
