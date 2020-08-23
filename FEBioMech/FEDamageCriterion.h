@@ -136,3 +136,15 @@ public:
 	//! damage
 	double DamageCriterion(FEMaterialPoint& pt);
 };
+
+//-----------------------------------------------------------------------------
+// max octahedral strain as damage criterion
+
+class FEDamageCriterionOSS : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionOSS(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt);
+};

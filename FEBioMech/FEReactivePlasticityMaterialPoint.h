@@ -28,7 +28,6 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/FEMaterialPoint.h"
 #include "FEReactivePlasticity.h"
-#include "FEReactivePlasticityHardening.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------

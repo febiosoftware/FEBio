@@ -206,3 +206,20 @@ double FEDamageCriterionMNLS::DamageCriterion(FEMaterialPoint& mp)
     
     return mnls;
 }
+
+//-----------------------------------------------------------------------------
+// octahedral shear strain damage criterion
+double FEDamageCriterionOSS::DamageCriterion(FEMaterialPoint& mp)
+{
+    // evaluate strain tensor
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3ds E = pt.Strain();
+    
+    // evaluate principal normal plastic strains
+    double ps[3];
+    E.eigen2(ps);
+    
+    double oss = sqrt((2.0/3.0)*(SQR(ps[0])+SQR(ps[1])+SQR(ps[2])));
+    
+    return oss;
+}

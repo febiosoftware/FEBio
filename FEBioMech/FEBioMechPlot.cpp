@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEFatigueMaterial.h"
 #include "FEReactivePlasticity.h"
+#include "FEReactivePlasticDamage.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
@@ -1837,8 +1838,10 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 				FEMaterialPoint& pt = *el.GetMaterialPoint(j);
 				FEDamageMaterialPoint* ppd = pt.ExtractData<FEDamageMaterialPoint>();
                 FEFatigueMaterialPoint* ppf = pt.ExtractData<FEFatigueMaterialPoint>();
+                FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
 				if (ppd) D += (float) ppd->m_D;
                 else if (ppf) D += (float) ppf->m_D;
+                else if (prd) D += (float) prd->m_D;
 			}
 			D /= (float) nint;
 			a.push_back(D);
@@ -1945,9 +1948,11 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
                     FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
                     FEFatigueMaterialPoint* ppf = pt.GetPointData(k)->ExtractData<FEFatigueMaterialPoint>();
                     FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                    FEReactivePlasticDamageMaterialPoint* prd = pt.GetPointData(k)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
                     if (ppd) D += (float) (1.0 - ppd->m_D);
                     else if (ppf) D += (float) ppf->m_wit;
                     else if (prp) D += (float) (1.0 - prp->YieldedBonds());
+                    else if (prd) D += (float) prd->IntactBonds();
                 }
             }
             D /= (float) nint;
@@ -1972,10 +1977,12 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
                     FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
                     FEFatigueMaterialPoint* ppf = pt.GetPointData(k)->ExtractData<FEFatigueMaterialPoint>();
                     FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                    FEReactivePlasticDamageMaterialPoint* prd = pt.GetPointData(k)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
                     FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                     if (ppd) D += (float) (1 - ppd->m_D);
                     else if (ppf) D += (float) ppf->m_wit;
                     else if (prp) D += (float) (1 - prp->YieldedBonds());
+                    else if (prd) D += (float) prd->IntactBonds();
                     else if (pem)
                     {
                         int NE = (int)pem->m_w.size();
@@ -1984,9 +1991,11 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
                             FEDamageMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEDamageMaterialPoint>();
                             FEFatigueMaterialPoint* ppf = pem->GetPointData(l)->ExtractData<FEFatigueMaterialPoint>();
                             FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                            FEReactivePlasticDamageMaterialPoint* prd = pt.GetPointData(k)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
                             if (ppd) D += (float) (1 - ppd->m_D);
                             else if (ppf) D += (float) ppf->m_wit;
                             else if (prp) D += (float) (1-prp->YieldedBonds());
+                            else if (prd) D += (float) prd->IntactBonds();
                         }
                     }
                 }
@@ -2009,9 +2018,11 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
                 FEDamageMaterialPoint* ppd = pt.ExtractData<FEDamageMaterialPoint>();
                 FEFatigueMaterialPoint* ppf = pt.ExtractData<FEFatigueMaterialPoint>();
                 FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
+                FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
                 if (ppd) D += (float) (1 - ppd->m_D);
                 else if (ppf) D += (float) ppf->m_wit;
                 else if (prp) D += (float) (1-prp->YieldedBonds());
+                else if (prd) D += (float) prd->IntactBonds();
             }
             D /= (float) nint;
             a.push_back(D);
@@ -2121,7 +2132,9 @@ bool FEPlotOctahedralPlasticStrain::Save(FEDomain &dom, FEDataStream& a)
                 for (int k=0; k<NC; ++k)
                 {
                     FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                    FEReactivePlasticDamageMaterialPoint* prd = pt.GetPointData(k)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
                     if (prp) D += (float) prp->m_gp[0];
+                    else if (prd) D += (float) prd->m_gp[0];
                 }
             }
             D /= (float) nint;
@@ -2144,15 +2157,19 @@ bool FEPlotOctahedralPlasticStrain::Save(FEDomain &dom, FEDataStream& a)
                 for (int k=0; k<NC; ++k)
                 {
                     FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                    FEReactivePlasticDamageMaterialPoint* prd = pt.GetPointData(k)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
                     FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                     if (prp) D += (float) prp->m_gp[0];
+                    else if (prd) D += (float) prd->m_gp[0];
                     else if (pem)
                     {
                         int NE = (int)pem->m_w.size();
                         for (int l=0; l<NE; ++l)
                         {
                             FEReactivePlasticityMaterialPoint* prp = pt.GetPointData(k)->ExtractData<FEReactivePlasticityMaterialPoint>();
+                            FEReactivePlasticDamageMaterialPoint* prd = pt.GetPointData(k)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
                             if (prp) D += (float) prp->m_gp[0];
+                            else if (prd) D += (float) prd->m_gp[0];
                         }
                     }
                 }
@@ -2173,7 +2190,9 @@ bool FEPlotOctahedralPlasticStrain::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& pt = *el.GetMaterialPoint(j);
                 FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
+                FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
                 if (prp) D += (float) prp->m_gp[0];
+                else if (prd) D += (float) prd->m_gp[0];
             }
             D /= (float) nint;
             a.push_back(D);

@@ -117,7 +117,7 @@ SOFTWARE.*/
 #include "FECoupledMooneyRivlin.h"
 #include "FECoupledVerondaWestmann.h"
 #include "FEReactivePlasticity.h"
-#include "FEReactivePlasticityHardening.h"
+#include "FEReactivePlasticDamage.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEUncoupledReactiveViscoelastic.h"
 #include "FEBondRelaxation.h"
@@ -324,7 +324,7 @@ REGISTER_FECORE_CLASS(FEDamageMaterial                 , "elastic damage"       
 REGISTER_FECORE_CLASS(FERVEDamageMaterial              , "reactive viscoelastic damage"        );
 REGISTER_FECORE_CLASS(FEFatigueMaterial                , "reactive fatigue"                    );
 REGISTER_FECORE_CLASS(FEReactivePlasticity             , "reactive plasticity"                 );
-REGISTER_FECORE_CLASS(FEReactivePlasticityHardening    , "reactive plasticity hardening"       );
+REGISTER_FECORE_CLASS(FEReactivePlasticDamage          , "reactive plastic damage"             );
 
 // Uncoupled elastic materials (derived from FEUncoupledMaterial)
 REGISTER_FECORE_CLASS(FEArrudaBoyce                          , "Arruda-Boyce"                           );
@@ -447,6 +447,7 @@ REGISTER_FECORE_CLASS(FEDamageCriterionVMS , "DC von Mises stress"          );
 REGISTER_FECORE_CLASS(FEDamageCriterionMSS , "DC max shear stress"          );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNS , "DC max normal stress"         );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
+REGISTER_FECORE_CLASS(FEDamageCriterionOSS , "DC octahedral shear strain"   );
 
 // prestrain materials
 REGISTER_FECORE_CLASS(FEPrestrainElastic         , "prestrain elastic");

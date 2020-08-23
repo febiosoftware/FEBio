@@ -75,6 +75,8 @@
 		D54E21FB21517EEE008A9DD3 /* MSolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D921517EEE008A9DD3 /* MSolve.cpp */; };
 		D54E21FC21517EEE008A9DD3 /* MFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21DA21517EEE008A9DD3 /* MFunctions.h */; };
 		D54E21FD21517EEE008A9DD3 /* MEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */; };
+		D550834E24F086E300E919D8 /* EigenSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D550834C24F086E300E919D8 /* EigenSolver.cpp */; };
+		D550834F24F086E300E919D8 /* EigenSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D550834D24F086E300E919D8 /* EigenSolver.h */; };
 		D559C4C922D9169E00CDC2BD /* FEMat3dSphericalAngleMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D559C4C522D9169D00CDC2BD /* FEMat3dSphericalAngleMap.h */; };
 		D559C4CA22D9169E00CDC2BD /* FEParabolicMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D559C4C622D9169D00CDC2BD /* FEParabolicMap.cpp */; };
 		D559C4CB22D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D559C4C722D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp */; };
@@ -481,6 +483,8 @@
 		D54E21D921517EEE008A9DD3 /* MSolve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MSolve.cpp; sourceTree = "<group>"; };
 		D54E21DA21517EEE008A9DD3 /* MFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MFunctions.h; sourceTree = "<group>"; };
 		D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MEvaluate.cpp; sourceTree = "<group>"; };
+		D550834C24F086E300E919D8 /* EigenSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EigenSolver.cpp; sourceTree = "<group>"; };
+		D550834D24F086E300E919D8 /* EigenSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EigenSolver.h; sourceTree = "<group>"; };
 		D559C4C522D9169D00CDC2BD /* FEMat3dSphericalAngleMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMat3dSphericalAngleMap.h; sourceTree = "<group>"; };
 		D559C4C622D9169D00CDC2BD /* FEParabolicMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParabolicMap.cpp; sourceTree = "<group>"; };
 		D559C4C722D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMat3dSphericalAngleMap.cpp; sourceTree = "<group>"; };
@@ -879,6 +883,8 @@
 				D5B9E43A213F67DE0008B38A /* DumpStream.h */,
 				D5B9E42B213F67DE0008B38A /* eig3.cpp */,
 				D5B9E45E213F67DE0008B38A /* eig3.h */,
+				D550834C24F086E300E919D8 /* EigenSolver.cpp */,
+				D550834D24F086E300E919D8 /* EigenSolver.h */,
 				D5B9E45F213F67DE0008B38A /* ElementDataRecord.cpp */,
 				D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */,
 				D5B9E415213F67DE0008B38A /* FEAnalysis.cpp */,
@@ -1350,6 +1356,7 @@
 				D5B9E51B213F67DE0008B38A /* tens5d.hpp in Headers */,
 				D5B9E54F213F67DE0008B38A /* FENewtonSolver.h in Headers */,
 				D51E6153224440030049F545 /* FEErosionAdaptor.h in Headers */,
+				D550834F24F086E300E919D8 /* EigenSolver.h in Headers */,
 				D5B9E5DB213F67DE0008B38A /* tens6d.hpp in Headers */,
 				D5B9E5B6213F67DE0008B38A /* FEAnalysis.h in Headers */,
 				D5B9E5EF213F67DE0008B38A /* FETransform.h in Headers */,
@@ -1713,6 +1720,7 @@
 				D5B9E51D213F67DE0008B38A /* Image.cpp in Sources */,
 				D5B9E5EB213F67DE0008B38A /* FEBoundaryCondition.cpp in Sources */,
 				D5B9E55C213F67DE0008B38A /* FEParamValidator.cpp in Sources */,
+				D550834E24F086E300E919D8 /* EigenSolver.cpp in Sources */,
 				D5B9E534213F67DE0008B38A /* FEBodyLoad.cpp in Sources */,
 				D54E21EA21517EEE008A9DD3 /* MObj2String.cpp in Sources */,
 				D5B9E513213F67DE0008B38A /* FECallback.cpp in Sources */,

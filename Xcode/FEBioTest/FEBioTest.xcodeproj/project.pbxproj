@@ -39,6 +39,8 @@
 		D5322C4C2142A96C008DE511 /* FEBioTest.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C2C2142A96B008DE511 /* FEBioTest.h */; };
 		D5322C4D2142A96C008DE511 /* FEContactDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C2D2142A96B008DE511 /* FEContactDiagnostic.cpp */; };
 		D5322C4E2142A96C008DE511 /* FEFluidFSITangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C2E2142A96B008DE511 /* FEFluidFSITangentDiagnostic.cpp */; };
+		D550835224F086F700E919D8 /* FEBioEigenSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D550835024F086F700E919D8 /* FEBioEigenSolver.cpp */; };
+		D550835324F086F700E919D8 /* FEBioEigenSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D550835124F086F700E919D8 /* FEBioEigenSolver.h */; };
 		D559C4D022D916CA00CDC2BD /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D559C4CD22D916CA00CDC2BD /* stdafx.h */; };
 		D559C4D122D916CA00CDC2BD /* FEJFNKTangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D559C4CE22D916CA00CDC2BD /* FEJFNKTangentDiagnostic.h */; };
 		D559C4D222D916CA00CDC2BD /* FEJFNKTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D559C4CF22D916CA00CDC2BD /* FEJFNKTangentDiagnostic.cpp */; };
@@ -78,6 +80,8 @@
 		D5322C2C2142A96B008DE511 /* FEBioTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioTest.h; sourceTree = "<group>"; };
 		D5322C2D2142A96B008DE511 /* FEContactDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactDiagnostic.cpp; sourceTree = "<group>"; };
 		D5322C2E2142A96B008DE511 /* FEFluidFSITangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidFSITangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D550835024F086F700E919D8 /* FEBioEigenSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioEigenSolver.cpp; sourceTree = "<group>"; };
+		D550835124F086F700E919D8 /* FEBioEigenSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioEigenSolver.h; sourceTree = "<group>"; };
 		D559C4CD22D916CA00CDC2BD /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
 		D559C4CE22D916CA00CDC2BD /* FEJFNKTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEJFNKTangentDiagnostic.h; sourceTree = "<group>"; };
 		D559C4CF22D916CA00CDC2BD /* FEJFNKTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEJFNKTangentDiagnostic.cpp; sourceTree = "<group>"; };
@@ -115,6 +119,8 @@
 			children = (
 				D5322C172142A96B008DE511 /* FEBioDiagnostic.cpp */,
 				D5322C0F2142A96B008DE511 /* FEBioDiagnostic.h */,
+				D550835024F086F700E919D8 /* FEBioEigenSolver.cpp */,
+				D550835124F086F700E919D8 /* FEBioEigenSolver.h */,
 				D5322C1D2142A96B008DE511 /* FEBioTest.cpp */,
 				D5322C2C2142A96B008DE511 /* FEBioTest.h */,
 				D5322C232142A96B008DE511 /* FEBiphasicTangentDiagnostic.cpp */,
@@ -166,6 +172,7 @@
 				D5322C3B2142A96C008DE511 /* FEPrintMatrixDiagnostic.h in Headers */,
 				D5322C322142A96C008DE511 /* FETangentDiagnostic.h in Headers */,
 				D559C4D122D916CA00CDC2BD /* FEJFNKTangentDiagnostic.h in Headers */,
+				D550835324F086F700E919D8 /* FEBioEigenSolver.h in Headers */,
 				D5322C442142A96C008DE511 /* FEFluidFSITangentDiagnostic.h in Headers */,
 				D5322C4C2142A96C008DE511 /* FEBioTest.h in Headers */,
 				D5322C3C2142A96C008DE511 /* FEPrintHBMatrixDiagnostic.h in Headers */,
@@ -247,6 +254,7 @@
 				D5322C4A2142A96C008DE511 /* FEDiagnostic.cpp in Sources */,
 				D5322C3E2142A96C008DE511 /* FEEASShellTangentDiagnostic.cpp in Sources */,
 				D5322C4E2142A96C008DE511 /* FEFluidFSITangentDiagnostic.cpp in Sources */,
+				D550835224F086F700E919D8 /* FEBioEigenSolver.cpp in Sources */,
 				D5322C422142A96C008DE511 /* FEPrintHBMatrixDiagnostic.cpp in Sources */,
 				D5322C352142A96C008DE511 /* FEMultiphasicTangentDiagnostic.cpp in Sources */,
 				D5322C372142A96C008DE511 /* FEBioDiagnostic.cpp in Sources */,
