@@ -633,9 +633,25 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	spec.eclass = eclass;
 	spec.eshape = eshape;
 	spec.etype = etype;
-	spec.m_bthree_field_hex = m_b3field_hex;
-	spec.m_bthree_field_tet = m_b3field_tet;
-    spec.m_bthree_field_shell = m_b3field_shell;
+
+	// set three-field flag
+	switch (eshape)
+	{
+	case ET_HEX8   : spec.m_bthree_field = m_b3field_hex; break;
+	case ET_PENTA6 : spec.m_bthree_field = m_b3field_hex; break;
+	case ET_PYRA5  : spec.m_bthree_field = m_b3field_hex; break;
+	case ET_TET4   : spec.m_bthree_field = m_b3field_tet; break;
+	case ET_TET5   : spec.m_bthree_field = m_b3field_tet; break;
+	case ET_TET10  : spec.m_bthree_field = m_b3field_tet; break;
+	case ET_TET15  : spec.m_bthree_field = m_b3field_tet; break;
+	case ET_TET20  : spec.m_bthree_field = m_b3field_tet; break;
+	case ET_QUAD4  : spec.m_bthree_field = m_b3field_shell || m_b3field_quad; break;
+	case ET_TRI3   : spec.m_bthree_field = m_b3field_shell || m_b3field_tri; break;
+	case ET_TRI6   : spec.m_bthree_field = m_b3field_shell; break;
+	case ET_QUAD8  : spec.m_bthree_field = m_b3field_shell; break;
+	case ET_QUAD9  : spec.m_bthree_field = m_b3field_shell; break;
+	}
+
 	spec.m_but4 = m_but4;
 	spec.m_ut4_alpha = m_ut4_alpha;
 	spec.m_ut4_bdev = m_ut4_bdev;

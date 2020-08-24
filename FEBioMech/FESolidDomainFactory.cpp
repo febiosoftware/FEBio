@@ -78,7 +78,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		if (eshape == ET_HEX8)
 		{
 			// three-field implementation for uncoupled materials
-			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";
+			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
 			else
 			{
 				if (etype == FE_HEX8G1) sztype = "udg-hex";
@@ -93,7 +93,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			}
 			else
 			{
-				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_tet)) sztype = "three-field-solid";
+				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
 				else sztype = "elastic-solid";
 			}
 		}
@@ -114,7 +114,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		else if (eshape == ET_PENTA6)
 		{
 			// three-field implementation for uncoupled materials
-			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";
+			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
 			else sztype = "elastic-solid";
 		}
         else if (eshape == ET_PENTA15)
@@ -126,7 +126,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		else if (eshape == ET_PYRA5)
 		{
 			// three-field implementation for uncoupled materials
-			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";
+			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
 			else sztype = "elastic-solid";
 		}
 		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3) || (eshape == ET_QUAD8) || (eshape == ET_TRI6))
@@ -136,9 +136,9 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			case NEW_SHELL:
                     // three-field implementation for uncoupled materials
                     if (dynamic_cast<FEUncoupledMaterial*>(pmat)) {
-                        if (spec.m_bthree_field_shell) sztype = "three-field-shell";
-                        else if ((eshape == ET_QUAD4) && spec.m_bthree_field_quad) sztype = "three-field-shell";
-                        else if ((eshape == ET_TRI3) && spec.m_bthree_field_tri) sztype = "three-field-shell";
+                        if (spec.m_bthree_field) sztype = "three-field-shell";
+                        else if ((eshape == ET_QUAD4) && spec.m_bthree_field) sztype = "three-field-shell";
+                        else if ((eshape == ET_TRI3) && spec.m_bthree_field) sztype = "three-field-shell";
                         else sztype = "elastic-shell";
                     }
                     else

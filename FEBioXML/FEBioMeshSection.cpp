@@ -409,6 +409,25 @@ void FEBioMeshDomainsSection::ParseSolidDomainSection(XMLTag& tag)
 		partDomain->SetElementSpec(newSpec);
 	}
 
+	// see if the three_field flag is defined
+	const char* sz3field = tag.AttributeValue("three_field", true);
+	if (sz3field)
+	{
+		if (strcmp(sz3field, "on") == 0)
+		{
+			FE_Element_Spec espec = partDomain->ElementSpec();
+			espec.m_bthree_field = true;
+			partDomain->SetElementSpec(espec);
+		}
+		else if (strcmp(sz3field, "off") == 0)
+		{
+			FE_Element_Spec espec = partDomain->ElementSpec();
+			espec.m_bthree_field = false;
+			partDomain->SetElementSpec(espec);
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "three_field", sz3field);
+	}
+
 	// read additional parameters
 	if (tag.isleaf() == false)
 	{
@@ -452,4 +471,23 @@ void FEBioMeshDomainsSection::ParseShellDomainSection(XMLTag& tag)
 
 	// set the material name
 	partDomain->SetMaterialName(szmat);
+
+	// see if the three_field flag is defined
+	const char* sz3field = tag.AttributeValue("three_field", true);
+	if (sz3field)
+	{
+		if (strcmp(sz3field, "on") == 0)
+		{
+			FE_Element_Spec espec = partDomain->ElementSpec();
+			espec.m_bthree_field = true;
+			partDomain->SetElementSpec(espec);
+		}
+		else if (strcmp(sz3field, "off") == 0)
+		{
+			FE_Element_Spec espec = partDomain->ElementSpec();
+			espec.m_bthree_field = false;
+			partDomain->SetElementSpec(espec);
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "three_field", sz3field);
+	}
 }
