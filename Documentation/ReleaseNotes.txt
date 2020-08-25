@@ -49,6 +49,8 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 * FEBio3 defines a new file structure. One of the major changes is that the Geometry section was replaced with a Mesh section, which defines the mesh independent of any physics attributes (i.e. materials), and a MeshDomains section, which maps materials and other parameters to element sets. Please see the FEBio3 user's manual for more information on the new file format. Despite this new format, FEBio3 will continue to read format 2.5 and format 2.0 with few exceptions. Also see the backward compatibility notes below. 
 
+* FEBio3 introduces a new mechanism for defining heterogeneous model parameters. Many parameters can now be made dependent on position and other model parameters via mathematical expressions and parameter maps. This new mechanism is very flexible and works with many material parameters, boundary conditions, and loads. 
+
 * Support for iterative linear solvers was significantly expanded, including some solvers based on Algebraic Multigrid Method (AMG). In addition, a Jacobian-Free-Krylov-Newton method is available as well. Some of these new solvers have shown great performance compared to the default direct solver. However, it must be emphasised that performance is highly problem-dependent and may require tuning of solver parameters. Please see the user manual for details on how to use and configure the iterative solvers. 
 
 * FEBio3 introduces a generalization of "load curves", namely "load controllers". Load controllers essentially control the values of model parameters as a function of time and even as a function of other model parameters. This allows users to use load controllers to create feedback systems (e.g. PID control system). 
