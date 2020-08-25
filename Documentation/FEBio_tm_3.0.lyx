@@ -61,8 +61,8 @@ figs-within-sections
 \use_package amssymb 2
 \use_package cancel 0
 \use_package esint 1
-\use_package mathdots 0
-\use_package mathtools 0
+\use_package mathdots 1
+\use_package mathtools 1
 \use_package mhchem 0
 \use_package stackrel 0
 \use_package stmaryrd 0
@@ -25451,7 +25451,7 @@ noprefix "false"
  it can be shown that
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\boldsymbol{\sigma}}{\partial\mathbf{F}}=\left(\boldsymbol{\mathcal{C}}+\mathbf{I}\varoslash\boldsymbol{\sigma}+\boldsymbol{\sigma}\varobslash\mathbf{I}-\boldsymbol{\sigma}\otimes\mathbf{I}\right)\cdot\mathbf{F}^{-T}\,,\label{eq:dmg-stress-tangent}
+\frac{\partial\boldsymbol{\sigma}}{\partial\mathbf{F}}=\left(\boldsymbol{\mathcal{C}}+\mathbf{I}\,\underline{\otimes}\,\boldsymbol{\sigma}+\boldsymbol{\sigma}\,\overline{\otimes}\mathbf{I}-\boldsymbol{\sigma}\otimes\mathbf{I}\right)\cdot\mathbf{F}^{-T}\,,\label{eq:dmg-stress-tangent}
 \end{equation}
 
 \end_inset
@@ -25798,7 +25798,7 @@ where we used
 and
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\mathbf{E}}{\partial\mathbf{U}}=\frac{1}{2}\frac{\partial\mathbf{U}^{2}}{\partial\mathbf{U}}=\frac{1}{2}\left(\mathbf{I}\varodot\mathbf{U}+\mathbf{U}\varodot\mathbf{I}\right)\,.\label{eq:dmg-E-U-tangent}
+\frac{\partial\mathbf{E}}{\partial\mathbf{U}}=\frac{1}{2}\frac{\partial\mathbf{U}^{2}}{\partial\mathbf{U}}=\frac{1}{2}\left(\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{U}+\mathbf{U}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.\label{eq:dmg-E-U-tangent}
 \end{equation}
 
 \end_inset
