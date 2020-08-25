@@ -154,13 +154,15 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
     
     for (int i=0; i<m_n; ++i) {
         mat3d Fs = pe.m_F;
+        mat3d R = pe.m_F*pe.RightStretchInverse();
         mat3d Fe = Fs*pp.m_Fusi[i];
         
         // store safe copy of total deformation gradient
         mat3d Ftmp = pe.m_F;
         double Jtmp = pe.m_J;
         pe.m_F = Fe; pe.m_J = Fe.det();
-        
+        mat3ds Ue = pe.RightStretch();
+
         // evaluate yield measure
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
         
@@ -191,6 +193,7 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
         pe.m_F = Fv; pe.m_J = Fv.det();
+        mat3ds Uv = pe.RightStretch();
         mat3ds Nv = YieldSurfaceNormal(pe);
         double Nvmag = Nv.norm();
         mat3dd I(1);
@@ -214,11 +217,10 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
                 phi2 = phi;
                 lam2 = lam;
             }
-            mat3d Rv = Fv*pe.RightStretchInverse();
-            mat3d dFvdlam = -Fe*Nv*(beta/Nvmag);
+            mat3d dUvdlam = -Ue*Nv*(beta/Nvmag);
             if (m_isochrc)
-                dFvdlam += Fe*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
-            double dlam = -phi/(Rv*Nv*dFvdlam.transpose()).trace();
+                dUvdlam += Ue*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
+            double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
             lam += dlam;
             if (iter == 3) {
                 d = lam1*lam2*(lam1-lam2);
@@ -248,7 +250,8 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
             }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-            Fv = Fe*ImN*beta;
+            Uv = (Ue*ImN).sym()*beta;
+            Fv = R*Uv;
             if (fabs(dlam) <= m_rtol*fabs(lam)) conv = true;
             if (fabs(lam) <= m_rtol*m_rtol) conv = true;
         }
