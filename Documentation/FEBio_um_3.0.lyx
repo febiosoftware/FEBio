@@ -861,7 +861,7 @@ This section provides a brief overview of how FEBio works.
 \begin_layout Standard
 When FEBio starts, first it will load the configuration file, where it will
  find instructions on what linear solver to use, what plugins to load, etc.
- Pleas see section 
+ Please see section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "chap:Configuration-File"
