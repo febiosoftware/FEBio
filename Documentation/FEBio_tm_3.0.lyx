@@ -25781,9 +25781,25 @@ noprefix "false"
 
 The damage surface normal can be evaluated from
 \begin_inset Formula 
-\[
-\mathbf{N}=\frac{\partial e}{\partial\mathbf{E}}:\frac{\partial\mathbf{E}}{\partial\mathbf{U}}
-\]
+\begin{equation}
+\mathbf{N}=\frac{\partial e}{\partial\mathbf{E}}:\frac{\partial\mathbf{E}}{\partial\mathbf{U}}=\frac{1}{3e}\left(\dev\mathbf{E}\cdot\mathbf{U}+\mathbf{U}\cdot\dev\mathbf{E}\right)\,,\label{eq:dmg-OLS-N}
+\end{equation}
+
+\end_inset
+
+where we used
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial e}{\partial\mathbf{E}}=\frac{2}{3e}\dev\mathbf{E}\label{eq:dmg-e-tangent}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\mathbf{E}}{\partial\mathbf{U}}=\frac{1}{2}\frac{\partial\mathbf{U}^{2}}{\partial\mathbf{U}}=\frac{1}{2}\left(\mathbf{I}\varodot\mathbf{U}+\mathbf{U}\varodot\mathbf{I}\right)\,.\label{eq:dmg-E-U-tangent}
+\end{equation}
 
 \end_inset
 
