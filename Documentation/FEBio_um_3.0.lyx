@@ -175,7 +175,7 @@ User's Manual Version 3.0
 \begin_layout Date
 
 \series bold
-Last Updated: August 24, 2020
+Last Updated: May 9, 2019
 \end_layout
 
 \begin_layout Standard
@@ -1003,7 +1003,6 @@ See the figure below for an overview of the basic FEBio flow.
 \begin_layout Standard
 \begin_inset Graphics
 	filename Figures/FEBio flow.png
-	width 7in
 
 \end_inset
 
@@ -10747,7 +10746,6 @@ status open
 \begin_inset Graphics
 	filename Figures/FigNodeNumberingSolidElements.png
 	lyxscale 50
-	width 7in
 
 \end_inset
 
@@ -10991,7 +10989,6 @@ status open
 \begin_inset Graphics
 	filename Figures/FigNodeNumberingShellElements.png
 	lyxscale 50
-	width 7in
 
 \end_inset
 
