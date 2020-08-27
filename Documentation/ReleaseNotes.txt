@@ -41,6 +41,16 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   3.0.1   8/27/2020
+
+===========================================================================
+
+* A bug was fixed with continuous fiber distribution materials that use the Gauss-Kronrod integration rule. 
+
+* A bug was fixed in reading surfaces with quad9 elements. 
+
+===========================================================================
+
  R E L E A S E   3.0.0   8/24/2020
 
 ===========================================================================
