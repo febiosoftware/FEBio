@@ -58,6 +58,9 @@ public:
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
 
+private:
+	double IntegratedFiberDensity(FEMaterialPoint& pt);
+
 protected:
     FEElasticFiberMaterial*     m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution

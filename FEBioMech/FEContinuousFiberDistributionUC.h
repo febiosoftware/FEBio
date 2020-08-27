@@ -58,6 +58,9 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
 
+private:
+	double IntegratedFiberDensity(FEMaterialPoint& pt);
+
 public:
     FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
