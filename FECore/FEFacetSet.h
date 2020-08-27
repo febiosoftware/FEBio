@@ -45,7 +45,7 @@ public:
 	struct FACET
 	{
 		// max nr of nodes for each facet
-		enum { MAX_NODES = 8};
+		enum { MAX_NODES = 9};
 
 		// different facet types
 		enum FacetType {
@@ -54,11 +54,12 @@ public:
 			QUAD4 = 4,
 			TRI6  = 6,
 			TRI7  = 7,
-			QUAD8 = 8
+			QUAD8 = 8,
+			QUAD9 = 9
 		};
 
 		int	node[FACET::MAX_NODES];
-		int	ntype;	//	3=tri3, 4=quad4, 6=tri6, 7=tri7, 8=quad8
+		int	ntype;	//	3=tri3, 4=quad4, 6=tri6, 7=tri7, 8=quad8, 9=quad9
 
 		void Serialize(DumpStream& ar);
 
