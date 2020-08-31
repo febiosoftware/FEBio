@@ -34,11 +34,42 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FE3FieldElasticShellDomain, FEElasticShellDomain)
+	ADD_PARAMETER(m_blaugon, "laugon");
+	ADD_PARAMETER(m_augtol , "atol");
+	ADD_PARAMETER(m_naugmin, "minaug");
+	ADD_PARAMETER(m_naugmax, "maxaug");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 void FE3FieldElasticShellDomain::ELEM_DATA::Serialize(DumpStream& ar)
 {
 	ar & eJ;
 	ar & ep;
 	ar & Lk;
+}
+
+//-----------------------------------------------------------------------------
+FE3FieldElasticShellDomain::FE3FieldElasticShellDomain(FEModel* pfem) : FEElasticShellDomain(pfem)
+{
+	m_blaugon = false;
+	m_augtol = 0.01;
+	m_naugmin = 0;
+	m_naugmax = 0;
+}
+
+//-----------------------------------------------------------------------------
+FE3FieldElasticShellDomain& FE3FieldElasticShellDomain::operator = (FE3FieldElasticShellDomain& d) 
+{ 
+	m_Elem = d.m_Elem; 
+	m_pMesh = d.m_pMesh; 
+	return (*this); 
+}
+
+//-----------------------------------------------------------------------------
+bool FE3FieldElasticShellDomain::DoAugmentations() const
+{
+	return m_blaugon;
 }
 
 //-----------------------------------------------------------------------------
@@ -472,7 +503,7 @@ bool FE3FieldElasticShellDomain::Augment(int naug)
     assert(pmi);
     
     // make sure Augmented Lagrangian flag is on
-    if (pmi->m_blaugon == false) return true;
+    if (m_blaugon == false) return true;
     
     // do the augmentation
     int n;
@@ -500,13 +531,13 @@ bool FE3FieldElasticShellDomain::Augment(int naug)
     
     feLog(" material %d\n", pmi->GetID());
     feLog("                        CURRENT         CHANGE        REQUIRED\n");
-    feLog("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_augtol);
+    feLog("   pressure norm : %15le%15le%15le\n", normL1, pctn, m_augtol);
     
     // check convergence
     bool bconv = true;
-    if (pctn >= pmi->m_augtol) bconv = false;
-    if (pmi->m_naugmin > naug) bconv = false;
-    if ((pmi->m_naugmax > 0) && (pmi->m_naugmax <= naug)) bconv = true;
+    if (pctn >= m_augtol) bconv = false;
+    if (m_naugmin > naug) bconv = false;
+    if ((m_naugmax > 0) && (m_naugmax <= naug)) bconv = true;
     
     // do the augmentation only if we have not yet converged
     if (bconv == false)

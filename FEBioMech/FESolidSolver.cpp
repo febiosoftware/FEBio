@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FE3FieldElasticSolidDomain.h"
+#include "FE3FieldElasticShellDomain.h"
 #include "FEResidualVector.h"
 #include "FEUncoupledMaterial.h"
 #include "FEContactInterface.h"
@@ -353,11 +354,16 @@ void FESolidSolver::PrepStep()
 	}
 
 	// see if we need to do incompressible augmentations
-	int nmat = fem.Materials();
-	for (int i = 0; i<nmat; ++i)
+	// TODO: Should I do these augmentations in a nlconstraint class instead?
+	int ndom = mesh.Domains();
+	for (int i = 0; i < ndom; ++i)
 	{
-		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(fem.GetMaterial(i));
-		if (pmi && pmi->m_blaugon) m_baugment = true;
+		FEDomain* dom = &mesh.Domain(i);
+		FE3FieldElasticSolidDomain* dom3f = dynamic_cast<FE3FieldElasticSolidDomain*>(dom);
+		if (dom3f && dom3f->DoAugmentations()) m_baugment = true;
+
+		FE3FieldElasticShellDomain* dom3fs = dynamic_cast<FE3FieldElasticShellDomain*>(dom);
+		if (dom3fs && dom3fs->DoAugmentations()) m_baugment = true;
 	}
 
 	// see if we have to do nonlinear constraint augmentations

@@ -1167,7 +1167,7 @@ void FEBioGeometrySection25::ParseInstanceSection(XMLTag& tag)
 	}
 
 	// build this part
-	if (m_feb.BuildPart(*GetFEModel(), *newPart, transform) == false) throw FEBioImport::FailedBuildingPart(newPart->Name());
+	if (m_feb.BuildPart(*GetFEModel(), *newPart, true, transform) == false) throw FEBioImport::FailedBuildingPart(newPart->Name());
 }
 
 //-----------------------------------------------------------------------------

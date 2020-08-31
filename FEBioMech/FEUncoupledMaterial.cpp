@@ -28,15 +28,12 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEUncoupledMaterial.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
 BEGIN_FECORE_CLASS(FEUncoupledMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
-	ADD_PARAMETER(m_blaugon, "laugon");
-	ADD_PARAMETER(m_augtol , "atol"  );
-	ADD_PARAMETER(m_naugmin, "minaug");
-	ADD_PARAMETER(m_naugmax, "maxaug");
     ADD_PARAMETER(m_npmodel, "pressure_model" );
 END_FECORE_CLASS();
 
@@ -44,12 +41,36 @@ END_FECORE_CLASS();
 //! constructor
 FEUncoupledMaterial::FEUncoupledMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_blaugon = false;
-	m_augtol = 0.01;
-	m_naugmin = 0;
-	m_naugmax = 0;
 	m_K = 0;	// invalid value!
     m_npmodel = 0;
+}
+
+//-----------------------------------------------------------------------------
+bool FEUncoupledMaterial::Init()
+{
+	// K has to be non-zero if this is a top-level material, otherwise
+	// it should be zero. 
+	FECoreBase* parent = GetParent();
+	FEUncoupledMaterial* parentMat = dynamic_cast<FEUncoupledMaterial*>(GetParent());
+	if (parentMat)
+	{
+		if (m_K != 0.0)
+		{
+			feLogWarning("K should only be defined at the top-level.\nValue will be ignored.");
+
+			// NOTE: This should not be neccessary, but just to be safe. 
+			m_K = 0.0;
+		}
+	}
+	else
+	{
+		if (m_K <= 0.0)
+		{
+			feLogError("K must be a positive number.");
+			return false;
+		}
+	}
+	return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

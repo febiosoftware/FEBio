@@ -54,6 +54,9 @@ public:
 	//! constructor
 	FEUncoupledMaterial(FEModel* pfem);
 
+	//! initialization
+	bool Init() override;
+
 public:
 
 //----------------->
@@ -119,13 +122,8 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
     
 public:
-	double	m_K;		//!< bulk modulus
-
-	bool	m_blaugon;		//!< augmented lagrangian flag
-	double	m_augtol;		//!< augmented lagrangian tolerance
-	int		m_naugmin;		//!< minimum number of augmentations
-	int		m_naugmax;		//!< max number of augmentations
-    int     m_npmodel;      //!< pressure model for U(J)
+	double	m_K;			//!< bulk modulus
+	int     m_npmodel;      //!< pressure model for U(J)
 
 	DECLARE_FECORE_CLASS();
 };

@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/sys.h"
 #include "FEBioMech/FE3FieldElasticSolidDomain.h"
+#include "FEBioMech/FE3FieldElasticShellDomain.h"
 #include "FEBioMech/FEUncoupledMaterial.h"
 #include <FEBioMech/FEBodyForce.h>
 #include <FECore/FEBoundaryCondition.h>
@@ -957,14 +958,19 @@ void FEFluidFSISolver::PrepStep()
         if (ci.IsActive() && (ci.m_laugon != 1)) m_baugment = true;
     }
     
-    // see if we need to do incompressible augmentations
-    int nmat = fem.Materials();
-    for (int i = 0; i<nmat; ++i)
-    {
-        FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(fem.GetMaterial(i));
-        if (pmi && pmi->m_blaugon) m_baugment = true;
-    }
-    
+	// see if we need to do incompressible augmentations
+	// TODO: Should I do these augmentations in a nlconstraint class instead?
+	int ndom = mesh.Domains();
+	for (int i = 0; i < ndom; ++i)
+	{
+		FEDomain* dom = &mesh.Domain(i);
+		FE3FieldElasticSolidDomain* dom3f = dynamic_cast<FE3FieldElasticSolidDomain*>(dom);
+		if (dom3f && dom3f->DoAugmentations()) m_baugment = true;
+
+		FE3FieldElasticShellDomain* dom3fs = dynamic_cast<FE3FieldElasticShellDomain*>(dom);
+		if (dom3fs && dom3fs->DoAugmentations()) m_baugment = true;
+	}
+
     // see if we have to do nonlinear constraint augmentations
     if (fem.NonlinearConstraints() != 0) m_baugment = true;
 }

@@ -359,7 +359,7 @@ void FEBioMeshDomainsSection::Parse(XMLTag& tag)
 	// let's build the part
 	FEBModel& feb = GetBuilder()->GetFEBModel();
 	FEBModel::Part* part = feb.GetPart(0); assert(part);
-	if (feb.BuildPart(*GetFEModel(), *part) == false)
+	if (feb.BuildPart(*GetFEModel(), *part, false) == false)
 	{
 		throw XMLReader::Error("Failed building parts.");
 	}
@@ -368,8 +368,16 @@ void FEBioMeshDomainsSection::Parse(XMLTag& tag)
 	GetBuilder()->BuildNodeList();
 
 	// At this point the mesh is completely read in.
-	// Now we can allocate the degrees of freedom.
+	// allocate material point data
 	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.CreateMaterialPointData();
+	}
+
+	// Now we can allocate the degrees of freedom.
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
@@ -392,6 +400,9 @@ void FEBioMeshDomainsSection::ParseSolidDomainSection(XMLTag& tag)
 	const char* szmat = tag.AttributeValue("mat");
 	FEMaterial* mat = fem.FindMaterial(szmat);
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "mat", szmat);
+
+	// set the material name
+	partDomain->SetMaterialName(szmat);
 
 	// see if the element type is specified
 	const char* szelem = tag.AttributeValue("elem_type", true);
@@ -428,26 +439,55 @@ void FEBioMeshDomainsSection::ParseSolidDomainSection(XMLTag& tag)
 		else throw XMLReader::InvalidAttributeValue(tag, "three_field", sz3field);
 	}
 
+	// --- build the domain --- 
+	// we'll need the kernel for creating domains
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+
+	// element count
+	int elems = partDomain->Elements();
+
+	// get the element spect
+	FE_Element_Spec spec = partDomain->ElementSpec();
+
+	// create the domain
+	FEDomain* dom = febio.CreateDomain(spec, &mesh, mat);
+	if (dom == 0) throw XMLReader::InvalidTag(tag);
+
+	mesh.AddDomain(dom);
+
+	if (dom->Create(elems, spec) == false)
+	{
+		throw XMLReader::InvalidTag(tag);
+	}
+
+	// assign the material
+	dom->SetMatID(mat->GetID() - 1);
+
+	// get the part name
+	string partName = part->Name();
+	if (partName.empty() == false) partName += ".";
+
+	string domName = partName + partDomain->Name();
+	dom->SetName(domName);
+
+	// process element data
+	for (int j = 0; j < elems; ++j)
+	{
+		const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
+
+		FEElement& el = dom->ElementRef(j);
+		el.SetID(domElement.id);
+
+		// TODO: This assumes one-based indexing of all nodes!
+		int ne = el.Nodes();
+		for (int n = 0; n < ne; ++n) el.m_node[n] = domElement.node[n] - 1;
+	}
+
 	// read additional parameters
 	if (tag.isleaf() == false)
 	{
-		FE_Element_Spec elemSpec = partDomain->ElementSpec();
-
-		++tag;
-		do
-		{
-			if      (tag == "alpha"   ) tag.value(elemSpec.m_ut4_alpha);
-			else if (tag == "iso_stab") tag.value(elemSpec.m_ut4_bdev);
-			else throw XMLReader::InvalidTag(tag);
-
-			++tag;
-		} while (!tag.isend());
-
-		partDomain->SetElementSpec(elemSpec);
+		ReadParameterList(tag, dom);
 	}
-
-	// set the material name
-	partDomain->SetMaterialName(szmat);
 }
 
 void FEBioMeshDomainsSection::ParseShellDomainSection(XMLTag& tag)

@@ -48,10 +48,10 @@ protected:
 
 public:
 	//! constructor
-	FE3FieldElasticSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
+	FE3FieldElasticSolidDomain(FEModel* pfem);
 
 	//! \todo Do I really use this?
-	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d);
 
 	//! initialize class
 	bool Init() override;
@@ -89,6 +89,16 @@ protected:
 	//! update the stress of an element
 	void UpdateElementStress(int iel, const FETimeInfo& tp) override;
 
+public:
+	bool DoAugmentations() const;
+
 protected:
 	vector<ELEM_DATA>	m_Data;
+
+	bool	m_blaugon;		//!< augmented lagrangian flag
+	double	m_augtol;		//!< augmented lagrangian tolerance
+	int		m_naugmin;		//!< minimum number of augmentations
+	int		m_naugmax;		//!< max number of augmentations
+
+	DECLARE_FECORE_CLASS();
 };
