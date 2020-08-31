@@ -48,15 +48,6 @@ FEContinuousFiberDistributionUC::FEContinuousFiberDistributionUC(FEModel* pfem) 
 FEContinuousFiberDistributionUC::~FEContinuousFiberDistributionUC() {}
 
 //-----------------------------------------------------------------------------
-bool FEContinuousFiberDistributionUC::Init()
-{
-	// initialize fiber integration scheme
-	if (FEUncoupledMaterial::Init() == false) return false;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
 FEMaterialPoint* FEContinuousFiberDistributionUC::CreateMaterialPointData() 
 {

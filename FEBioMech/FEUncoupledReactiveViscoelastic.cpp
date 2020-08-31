@@ -65,19 +65,6 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
 }
 
 //-----------------------------------------------------------------------------
-//! data initialization
-bool FEUncoupledReactiveViscoelasticMaterial::Init()
-{
-    // set the mixture's bulk modulus based on the base and bond materials
-	if (m_K == 0.0)
-	{
-		m_K = m_pBase->m_K + m_pBond->m_K;
-	}
-
-    return FEUncoupledMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEUncoupledReactiveViscoelasticMaterial::CreateMaterialPointData()
 {

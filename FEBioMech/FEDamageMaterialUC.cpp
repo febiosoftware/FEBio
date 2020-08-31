@@ -56,18 +56,6 @@ FEMaterialPoint* FEDamageMaterialUC::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization.
-bool FEDamageMaterialUC::Init()
-{
-    if (FEUncoupledMaterial::Init() == false) return false;
-    
-    // set bulk modulus to that of base elastic material
-    m_K = m_pBase->m_K;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 //! calculate stress at material point
 mat3ds FEDamageMaterialUC::DevStress(FEMaterialPoint& pt)
 {

@@ -177,27 +177,28 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 {
 	// define the file structure
 	m_map["Module"     ] = new FEBioModuleSection     (this);
-	m_map["Material"   ] = new FEBioMaterialSection   (this);
 	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
 	m_map["Output"     ] = new FEBioOutputSection     (this);
 
 	// older formats
 	if (nversion < 0x0200)
 	{
-		m_map["Control"    ] = new FEBioControlSection    (this);
+		m_map["Control"    ] = new FEBioControlSection      (this);
+		m_map["Material"   ] = new FEBioMaterialSection     (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection1x   (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection1x   (this);
 		m_map["Loads"      ] = new FEBioLoadsSection1x      (this);
 		m_map["Constraints"] = new FEBioConstraintsSection1x(this);
 		m_map["Step"       ] = new FEBioStepSection         (this);
 		m_map["Initial"    ] = new FEBioInitialSection      (this);
-		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection     (this);
 	}
 
 	// version 2.0
 	if (nversion == 0x0200)
 	{
-		m_map["Control"    ] = new FEBioControlSection    (this);
+		m_map["Control"    ] = new FEBioControlSection     (this);
+		m_map["Material"   ] = new FEBioMaterialSection    (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection2   (this);
 		m_map["Initial"    ] = new FEBioInitialSection     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection2   (this);
@@ -208,13 +209,14 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Code"       ] = new FEBioCodeSection        (this); // added in FEBio 2.4 (experimental feature!)
 		m_map["Constraints"] = new FEBioConstraintsSection2(this);
 		m_map["Step"       ] = new FEBioStepSection2       (this);
-		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection    (this);
 	}
 
 	// version 2.5
 	if (nversion == 0x0205)
 	{
 		m_map["Control"    ] = new FEBioControlSection      (this);
+		m_map["Material"   ] = new FEBioMaterialSection     (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
@@ -227,7 +229,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["LoadData"   ] = new FEBioLoadDataSection     (this);
 		m_map["MeshData"   ] = new FEBioMeshDataSection     (this);
 		m_map["Step"       ] = new FEBioStepSection25       (this);
-		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection(this);	// added in FEBio 3.0
+		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
 
 	// version 3.0
@@ -237,6 +239,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		SetStopOnUnknownAttribute(true);
 
 		m_map["Control"    ] = new FEBioControlSection3     (this);
+		m_map["Material"   ] = new FEBioMaterialSection3    (this);
 		m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Mesh"       ] = new FEBioMeshSection         (this);
 		m_map["MeshDomains"] = new FEBioMeshDomainsSection  (this);

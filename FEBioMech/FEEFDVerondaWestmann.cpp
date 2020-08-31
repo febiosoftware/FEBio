@@ -41,10 +41,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEEFDVerondaWestmann::FEEFDVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_VW(pfem), m_EFD(pfem) 
 {
-	// although we don't use K of the child materials, we need to set it to a non-zero value
-	// otherwise FEBio will complain
-	m_VW.m_K = 1.0;
-	m_EFD.m_K = 1.0;
+
 }
 
 //-----------------------------------------------------------------------------

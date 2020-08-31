@@ -66,9 +66,6 @@ public:
 	//! calculate strain energy density at material point
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
-	//! data initialization and checking
-	bool Init() override;
-
 	//! the density is the sum of the constituent densities
 	double Density(FEMaterialPoint& mp) override;
 

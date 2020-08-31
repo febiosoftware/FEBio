@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/FEMaterial.h"
+#include <FEBioMech/FEUncoupledMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! This function creates a material by checking the type attribute against
@@ -99,6 +100,11 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 
 			// parse the material parameters
 			ReadParameterList(tag, pmat);
+
+			// For uncoupled materials, we collect the bulk moduli of child materials
+			// and assign it to the top-level material (this one)
+			FEUncoupledMaterial* pucm = dynamic_cast<FEUncoupledMaterial*>(pmat);
+			if (pucm) FixUncoupledMaterial(pucm);
 		}
 		else throw XMLReader::InvalidTag(tag);
 
@@ -106,4 +112,98 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+void FEBioMaterialSection::FixUncoupledMaterial(FEUncoupledMaterial* mat)
+{
+	double K = mat->m_K;
+	for (int i = 0; i < mat->Properties(); ++i)
+	{
+		FEUncoupledMaterial* mati = dynamic_cast<FEUncoupledMaterial*>(mat->GetProperty(i));
+		if (mati)
+		{
+			FixUncoupledMaterial(mati);
+			K += mati->m_K;
+			mati->m_K = 0.0;
+		}
+	}
+	mat->m_K = K;
+}
+
+
+//===============================================================================
+
+//-----------------------------------------------------------------------------
+//! This function creates a material by checking the type attribute against
+//! registered materials. Also, if the tag defines attributes (other than
+//! type and name), the material is offered a chance to process the attributes.
+FEMaterial* FEBioMaterialSection3::CreateMaterial(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// get the material type
+	const char* sztype = tag.AttributeValue("type", true);
+
+	// in some case, a type is not defined (e.g. for solutes)
+	// in that case, we use the tag name as the type
+	if (sztype == 0) sztype = tag.Name();
+
+	// create a new material of this type
+	FEMaterial* pmat = GetBuilder()->CreateMaterial(sztype);
+	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	return pmat;
+}
+
+//-----------------------------------------------------------------------------
+//! Parse the Materials section. 
+void FEBioMaterialSection3::Parse(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// Make sure no materials are defined
+	if (fem.Materials() != 0) throw FEBioImport::DuplicateMaterialSection();
+
+	// reset material counter
+	m_nmat = 0;
+
+	++tag;
+	do
+	{
+		if (tag == "material")
+		{
+			// check that the ID attribute is defined and that it 
+			// equals the number of materials + 1.
+			int nid = -1;
+			tag.AttributeValue("id", nid);
+			int nmat = fem.Materials();
+			if (nid != nmat + 1) throw XMLReader::InvalidAttributeValue(tag, "id");
+
+			// make sure that the name is unique
+			const char* szname = tag.AttributeValue("name");
+			FEMaterial* mat = fem.FindMaterial(szname);
+			if (mat)
+			{
+				throw XMLReader::InvalidAttributeValue(tag, "name");
+			}
+
+			// create a material from this tag
+			FEMaterial* pmat = CreateMaterial(tag); assert(pmat);
+			pmat->SetName(szname);
+
+			// add the material
+			fem.AddMaterial(pmat);
+			++m_nmat;
+
+			// set the material's ID
+			pmat->SetID(m_nmat);
+
+			// parse the material parameters
+			ReadParameterList(tag, pmat);
+		}
+		else throw XMLReader::InvalidTag(tag);
+
+		// read next tag
+		++tag;
+	} while (!tag.isend());
 }

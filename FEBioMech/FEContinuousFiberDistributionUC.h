@@ -42,9 +42,6 @@ public:
     FEContinuousFiberDistributionUC(FEModel* pfem);
     ~FEContinuousFiberDistributionUC();
     
-    // Initialization
-    bool Init() override;
-    
 public:
 	//! calculate stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt) override;

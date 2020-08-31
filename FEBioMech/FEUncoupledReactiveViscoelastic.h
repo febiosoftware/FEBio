@@ -54,8 +54,6 @@ public:
     void SetBondMaterial(FEUncoupledMaterial* pbond) { m_pBond = pbond; }
     
 public:
-    //! data initialization
-    bool Init() override;
     
     //! stress function
     mat3ds DevStress(FEMaterialPoint& pt) override;
