@@ -153,7 +153,10 @@ double bessi1(double X)
 }
 
 //-----------------------------------------------------------------------------
-FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem) {}
+FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem) 
+{
+	m_fib.SetParent(this);
+}
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()

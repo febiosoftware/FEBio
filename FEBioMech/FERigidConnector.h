@@ -26,6 +26,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FENLConstraint.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 class FERigidBody;
@@ -35,7 +36,7 @@ class FERigidBody;
 //! spherical, revolute, prismatic and cylindrical joints, as well
 //! as springs and dampers that connect rigid bodies.
 
-class FERigidConnector : public FENLConstraint
+class FEBIOMECH_API FERigidConnector : public FENLConstraint
 {
 public:
     //! constructor

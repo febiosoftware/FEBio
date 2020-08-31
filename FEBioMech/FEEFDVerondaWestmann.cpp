@@ -41,7 +41,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEEFDVerondaWestmann::FEEFDVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_VW(pfem), m_EFD(pfem) 
 {
-
+	m_VW.SetParent(this);
+	m_EFD.SetParent(this);
 }
 
 //-----------------------------------------------------------------------------

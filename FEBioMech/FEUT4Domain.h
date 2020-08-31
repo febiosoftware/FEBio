@@ -143,4 +143,6 @@ private:
 	double	(*m_Ge)[4][3];
 
 	FENodeElemList	m_NEL;
+
+	DECLARE_FECORE_CLASS();
 };

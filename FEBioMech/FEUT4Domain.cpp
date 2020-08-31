@@ -153,6 +153,12 @@ void FEUT4Domain::UT4NODE::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEUT4Domain, FEElasticSolidDomain)
+	ADD_PARAMETER(m_alpha, "alpha");
+	ADD_PARAMETER(m_bdev, "iso_stab");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
 FEUT4Domain::FEUT4Domain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {

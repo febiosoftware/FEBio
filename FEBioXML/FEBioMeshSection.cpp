@@ -455,6 +455,10 @@ void FEBioMeshDomainsSection::ParseSolidDomainSection(XMLTag& tag)
 
 	mesh.AddDomain(dom);
 
+	// TODO: Should the domain parameters be read in before
+	//       the domain is created? For UT4 domains, this is necessary
+	//       since the initial ut4 parameters are copied from the element spec.
+	//       but they can be overridden by the parameters.
 	if (dom->Create(elems, spec) == false)
 	{
 		throw XMLReader::InvalidTag(tag);
@@ -529,5 +533,55 @@ void FEBioMeshDomainsSection::ParseShellDomainSection(XMLTag& tag)
 			partDomain->SetElementSpec(espec);
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "three_field", sz3field);
+	}
+
+	// --- build the domain --- 
+	// we'll need the kernel for creating domains
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+
+	// element count
+	int elems = partDomain->Elements();
+
+	// get the element spect
+	FE_Element_Spec spec = partDomain->ElementSpec();
+
+	// create the domain
+	FEDomain* dom = febio.CreateDomain(spec, &mesh, mat);
+	if (dom == 0) throw XMLReader::InvalidTag(tag);
+
+	mesh.AddDomain(dom);
+
+	if (dom->Create(elems, spec) == false)
+	{
+		throw XMLReader::InvalidTag(tag);
+	}
+
+	// assign the material
+	dom->SetMatID(mat->GetID() - 1);
+
+	// get the part name
+	string partName = part->Name();
+	if (partName.empty() == false) partName += ".";
+
+	string domName = partName + partDomain->Name();
+	dom->SetName(domName);
+
+	// process element data
+	for (int j = 0; j < elems; ++j)
+	{
+		const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
+
+		FEElement& el = dom->ElementRef(j);
+		el.SetID(domElement.id);
+
+		// TODO: This assumes one-based indexing of all nodes!
+		int ne = el.Nodes();
+		for (int n = 0; n < ne; ++n) el.m_node[n] = domElement.node[n] - 1;
+	}
+
+	// read additional parameters
+	if (tag.isleaf() == false)
+	{
+		ReadParameterList(tag, dom);
 	}
 }

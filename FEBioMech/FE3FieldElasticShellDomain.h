@@ -34,7 +34,7 @@ SOFTWARE.*/
 //! shell element. Results indicate that using this class produces poorer convergence
 //! with shells than the standard FEElasticShellDomain.  This class is included
 //! only for development purposes.
-class FE3FieldElasticShellDomain : public FEElasticShellDomain
+class FEBIOMECH_API FE3FieldElasticShellDomain : public FEElasticShellDomain
 {
 protected:
     struct ELEM_DATA
