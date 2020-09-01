@@ -105,6 +105,7 @@ void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
     }
 }
 
+//-----------------------------------------------------------------------------
 //! Evaluate net mass fraction of yielded bonds
 double FEReactivePlasticityMaterialPoint::YieldedBonds()
 {

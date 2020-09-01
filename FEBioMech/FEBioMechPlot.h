@@ -586,6 +586,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Yielded bond fraction (fatigue)
+class FEPlotYieldedBondFraction : public FEPlotDomainData
+{
+public:
+    FEPlotYieldedBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Octahedral Plastic Strain
 class FEPlotOctahedralPlasticStrain : public FEPlotDomainData
 {
