@@ -425,6 +425,8 @@ void FE3FieldElasticShellDomain::Update(const FETimeInfo& tp)
 //! material and a dilatational term.
 void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
     // get the material
     FEUncoupledMaterial& mat = *(dynamic_cast<FEUncoupledMaterial*>(m_pMat));
     
@@ -442,24 +444,39 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
     int neln = el.Nodes();
     
     // nodal coordinates
-    const int NME = FEElement::MAX_NODES;
-    vec3d r0[NME], rt[NME];
-    for (int j=0; j<neln; ++j)
+    const int NELN = FEElement::MAX_NODES;
+    vec3d r0[NELN], s0[NELN], r[NELN], s[NELN];
+    vec3d v[NELN], w[NELN];
+    vec3d a[NELN], b[NELN];
+    // nodal coordinates
+    GetCurrentNodalCoordinates(el, r, m_alphaf, false);
+    GetCurrentNodalCoordinates(el, s, m_alphaf, true);
+    GetReferenceNodalCoordinates(el, r0, false);
+    GetReferenceNodalCoordinates(el, s0, true);
+
+    // update dynamic quantities
+    if (m_update_dynamic)
     {
-        r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
-        rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+        for (int j=0; j<neln; ++j)
+        {
+            FENode& node = m_pMesh->Node(el.m_node[j]);
+            v[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*m_alphaf + node.m_vp*(1-m_alphaf);
+            w[j] = node.get_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2])*m_alphaf + node.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2])*(1-m_alphaf);
+            a[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
+            b[j] = node.get_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2])*m_alpham + node.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2])*(1-m_alpham);
+        }
     }
-    
+
     // calculate the average dilatation and pressure
-    double v = 0, V = 0;
+    double vt = 0, V = 0;
     for (int n=0; n<nint; ++n)
     {
-        v += detJ(el, n)*gw[n];
+        vt += detJ(el, n)*gw[n];
         V += detJ0(el, n)*gw[n];
     }
     
     // calculate volume ratio
-    ed.eJ = v / V;
+    ed.eJ = vt / V;
     
     // Calculate pressure. This is a sum of a Lagrangian term and a penalty term
     //      <--- Lag. mult. -->  <-- penalty -->
@@ -476,11 +493,23 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //         since the material point coordinates are not used by most materials.
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
-        
-        // get the deformation gradient and determinant
-        pt.m_J = defgrad(el, pt.m_F, n);
+        pt.m_r0 = evaluate(el, r0, s0, n);
+        pt.m_rt = evaluate(el, r, s, n);
+
+        // get the deformation gradient and determinant at intermediate time
+        double Jt, Jp;
+        mat3d Ft, Fp;
+        Jt = defgrad(el, Ft, n);
+        Jp = defgradp(el, Fp, n);
+        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+        pt.m_J = pt.m_F.det();
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (Ft - Fp)*Fi/dt;
+        if (m_update_dynamic)
+        {
+            pt.m_v = evaluate(el, v, w, n);
+            pt.m_a = evaluate(el, a, b, n);
+        }
         
         // update specialized material points
         m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
@@ -492,6 +521,23 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
         // Therefore we call the DevStress function and add the pressure term
         // seperately.
         pt.m_s = mat3dd(ed.ep) + mat.DevStress(mp);
+        
+        
+        // adjust stress for strain energy conservation
+        if (m_alphaf == 0.5)
+        {
+            // evaluate strain energy at current time
+            FEElasticMaterialPoint et = pt;
+            et.m_F = Ft;
+            et.m_J = Jt;
+            FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+            pt.m_Wt = pme->StrainEnergyDensity(et);
+            
+            mat3ds D = pt.m_L.sym();
+            double D2 = D.dotdot(D);
+            if (D2 > 0)
+                pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
+        }
     }
 }
 
