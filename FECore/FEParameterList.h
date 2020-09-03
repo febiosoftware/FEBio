@@ -51,6 +51,7 @@ class FEParamMat3ds;
 class FEDataArray;
 class tens3drs;
 class FEMaterialPointProperty;
+class Image;
 
 //-----------------------------------------------------------------------------
 typedef list<FEParam>::iterator FEParamIterator;
@@ -175,6 +176,7 @@ public:
 	void AddParameter(std::vector<std::string>& v, const char* sz);
 	void AddParameter(FEMaterialPointProperty& v, const char* sz);
 	void AddParameter(MSimpleExpression& m, const char* sz);
+	void AddParameter(Image& im           , const char* sz);
 
 	void AddParameter(int&           v, RANGE rng, const char* sz);
 	void AddParameter(double&        v, RANGE rng, const char* sz);

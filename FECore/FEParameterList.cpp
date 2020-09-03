@@ -309,6 +309,7 @@ void FEParamContainer::AddParameter(std::vector<double>& v, const char* sz) { Ad
 void FEParamContainer::AddParameter(std::vector<vec2d>&  v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D, 1, sz); }
 void FEParamContainer::AddParameter(std::vector<std::string>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_STRING, 1, sz); }
 void FEParamContainer::AddParameter(FEMaterialPointProperty& v, const char* sz) { AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
+void FEParamContainer::AddParameter(Image& v                  , const char* sz) { AddParameter(&v, FE_PARAM_IMAGE_3D, 1, sz); }
 
 void FEParamContainer::AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT, 1, rng, sz); }
 void FEParamContainer::AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE, 1, rng, sz); }

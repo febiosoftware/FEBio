@@ -1503,22 +1503,23 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-class FEFiberVector
+bool FEPlotFiberStretch::SetFilter(const char* szfilter)
 {
-public:
-	FEFiberVector(FEParamVec3& vec) : m_vec(vec) {}
-	vec3d operator()(const FEMaterialPoint& mp)
-	{
-		return m_vec(mp);
-	}
-private:
-	FEParamVec3&	m_vec;
-};
+	m_matComp = szfilter;
+	return true;
+}
 
 bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
+
+	if (m_matComp.empty() == false)
+	{
+		pme = dynamic_cast<FEElasticMaterial*>(pme->GetProperty(m_matComp.c_str()));
+		if (pme == nullptr) return false;
+	}
+
 	ParamString ps("fiber");
 	FEParam* pp = pme->FindParameter(ps);
 	if (pp == 0) return false;
@@ -1527,8 +1528,11 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	writeAverageElementValue<double>(dom, a, [&](const FEMaterialPoint& mp) -> double { 
 		const FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+		mat3d Q = pme->GetLocalCS(mp);
+		vec3d a0 = vec(mp); a0.unit();
+		vec3d ar = Q * a0;
 		mat3d F = ep.m_F;
-		vec3d a = F*vec(mp);
+		vec3d a = F*ar;
 		return a.norm(); 
 	});
 
@@ -1536,25 +1540,80 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+class FEFiberVector
+{
+public:
+	FEFiberVector(FEMaterial* pm, FEParamVec3& vec) : m_pm(pm), m_vec(vec) {}
+	vec3d operator()(const FEMaterialPoint& mp)
+	{
+		const FEElasticMaterialPoint* pt = mp.ExtractData<const FEElasticMaterialPoint>();
+		if (pt)
+		{
+			mat3d Q = m_pm->GetLocalCS(mp);
+			mat3d F = pt->m_F;
+			vec3d a0 = m_vec(mp); a0.unit();
+			vec3d ar = Q * a0;
+			vec3d a = F * ar; a.unit();
+			return a;
+		}
+		else
+			return m_vec(mp);
+	}
+private:
+	FEMaterial*		m_pm;
+	FEParamVec3&	m_vec;
+};
+
+
+FEPlotFiberVector::FEPlotFiberVector(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) 
+{
+}
+
+bool FEPlotFiberVector::SetFilter(const char* szfilter)
+{
+	m_matComp = szfilter;
+	return true;
+}
+
 bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
+
+	if (m_matComp.empty() == false)
+	{
+		pme = dynamic_cast<FEElasticMaterial*>(pme->GetProperty(m_matComp.c_str()));
+		if (pme == nullptr) return false;
+	}
+
 	ParamString ps("fiber");
 	FEParam* pp = pme->FindParameter(ps);
 	if (pp == 0) return false;
 	FEParamVec3& vec = pp->value<FEParamVec3>();
 
-	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(vec), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
+	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(pme, vec), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
+
+bool FEPlotMaterialAxes::SetFilter(const char* szfilter)
+{
+	m_matComp = szfilter;
+	return true;
+}
+
 bool FEPlotMaterialAxes::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
+
+	if (m_matComp.empty() == false)
+	{
+		pme = dynamic_cast<FEElasticMaterial*>(pme->GetProperty(m_matComp.c_str()));
+		if (pme == nullptr) return false;
+	}
 
 	int BE = dom.Elements();
 	for (int i = 0; i<BE; ++i)
@@ -1603,10 +1662,22 @@ private:
 	FEElasticMaterial*	m_mat;
 };
 
+bool FEPlotDevFiberStretch::SetFilter(const char* szfilter)
+{
+	m_matComp = szfilter;
+	return true;
+}
+
 bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
+
+	if (m_matComp.empty() == false)
+	{
+		pme = dynamic_cast<FEElasticMaterial*>(pme->GetProperty(m_matComp.c_str()));
+		if (pme == nullptr) return false;
+	}
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FEDevFiberStretch lam(pme);
