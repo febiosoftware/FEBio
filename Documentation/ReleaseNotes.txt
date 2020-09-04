@@ -37,7 +37,7 @@ This document describes the features that have been added to the latest
 FEBio release as well as the more important bug fixes. Please consult
 the FEBio User's Manual for a more detailed description of the new features.
 To report any bugs or request new features, please visit the FEBio forum 
-at http://mrlforums.sci.utah.edu/forums/.
+at https://forums.febio.org/.
 
 ===========================================================================
 
