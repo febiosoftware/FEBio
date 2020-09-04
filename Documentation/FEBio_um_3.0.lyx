@@ -24809,7 +24809,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-constant
+constant*
 \end_layout
 
 \end_inset
@@ -24829,7 +24829,7 @@ The value of the curve is the value of the closest endpoint
 \begin_inset Text
 
 \begin_layout Plain Layout
-extrapolate*
+extrapolate
 \end_layout
 
 \end_inset
