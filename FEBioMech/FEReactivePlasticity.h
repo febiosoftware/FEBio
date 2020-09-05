@@ -81,6 +81,7 @@ private:
 public:
     double      m_wmin;     // initial fraction of yielding bonds
     double      m_wmax;     // final fraction of yielding bonds
+    double      m_we;       // fraction of unyielding bonds
     double      m_Ymin;     // initial yield measure
     double      m_Ymax;     // yield measure when all bonds have yielded
     int         m_n;        // number of yield levels

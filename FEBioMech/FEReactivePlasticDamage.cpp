@@ -46,19 +46,19 @@ BEGIN_FECORE_CLASS(FEReactivePlasticDamage, FEElasticMaterial)
     // set material properties
     ADD_PROPERTY(m_pBase,   "elastic");
     ADD_PROPERTY(m_pCrit,   "yield_criterion");
-    ADD_PROPERTY(m_pYDamg,  "yield_damage"   );
-    ADD_PROPERTY(m_pYDCrit, "yield_damage_criterion");
-    ADD_PROPERTY(m_pIDamg,  "intact_damage"   );
-    ADD_PROPERTY(m_pIDCrit, "intact_damage_criterion");
+    ADD_PROPERTY(m_pYDamg,  "yield_damage"           , FEProperty::Optional);
+    ADD_PROPERTY(m_pYDCrit, "yield_damage_criterion" , FEProperty::Optional);
+    ADD_PROPERTY(m_pIDamg,  "intact_damage"          , FEProperty::Optional);
+    ADD_PROPERTY(m_pIDCrit, "intact_damage_criterion", FEProperty::Optional);
 
-    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymin"  );
-    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
-    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)     , "wmin"  );
-    ADD_PARAMETER(m_wmax   , FE_RANGE_CLOSED(0.0, 1.0)     , "wmax"  );
-    ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "n"     );
-    ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"  );
-    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "bias"  );
+    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  );
+    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax");
+    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)     , "w0"  );
+    ADD_PARAMETER(m_we     , FE_RANGE_CLOSED(0.0, 1.0)     , "we"  );
+    ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
+    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "r"   );
     ADD_PARAMETER(m_isochrc, "isochoric");
+    ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 
 END_FECORE_CLASS();
 
@@ -68,6 +68,7 @@ FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMater
 {
     m_n = 1;
     m_wmin = m_wmax = 1;
+    m_we = 0;
     m_Ymin = m_Ymax = 0;
     m_isochrc = true;
     m_rtol = 1e-4;
@@ -80,6 +81,7 @@ FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMater
 //! Initialization.
 bool FEReactivePlasticDamage::Init()
 {
+    m_wmax = 1 - m_we;
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
     if (m_pMat != nullptr) {
         feLogError("Elastic material should not be of type uncoupled");
@@ -283,13 +285,13 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
     pp.m_D = 0.0;
     
     // get intact damage criterion
-    pp.m_Eit = m_pIDCrit->DamageCriterion(pt);
+    if (m_pIDCrit) pp.m_Eit = m_pIDCrit->DamageCriterion(pt);
     double Es = max(pp.m_Eit, pp.m_Eim);
     
     for (int i=0; i<m_n; ++i) {
         if (pp.m_yld[i] == 0)
         {
-            pp.m_di[i] = m_pIDamg->cdf(Es);
+            pp.m_di[i] = m_pIDamg ? m_pIDamg->cdf(Es) : 0;
             pp.m_wi[i] = (1.0-pp.m_di[i])*w[i];
             pp.m_d[i] = pp.m_di[i]*w[i];
             // what if we iterate here, update damage, then the next iteration decides we actually are yielding?
@@ -305,9 +307,9 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
             pe.m_F = Fp;
             
             // calculate damage
-            pp.m_Eyt[i] = m_pYDCrit->DamageCriterion(pt);
+            if (m_pYDCrit) pp.m_Eyt[i] = m_pYDCrit->DamageCriterion(pt);
             double Ey = max(pp.m_Eyt[i], pp.m_Eym[i]);
-            pp.m_dy[i] = m_pYDamg->cdf(Ey);
+            pp.m_dy[i] = m_pYDamg ? m_pYDamg->cdf(Ey) : 0;
             
             // restore total deformation gradient
             pe.m_F = Ftmp;

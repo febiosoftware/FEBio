@@ -42,14 +42,14 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     ADD_PROPERTY(m_pBase, "elastic");
     ADD_PROPERTY(m_pCrit, "criterion");
 
-    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymin"  );
-    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
-    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)       , "wmin"  );
-    ADD_PARAMETER(m_wmax   , FE_RANGE_CLOSED(0.0, 1.0)       , "wmax"  );
-    ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "n"     );
-    ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"  );
-    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "bias"  );
+    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  );
+    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax");
+    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)     , "w0"  );
+    ADD_PARAMETER(m_we     , FE_RANGE_CLOSED(0.0, 1.0)     , "we"  );
+    ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
+    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "r"   );
     ADD_PARAMETER(m_isochrc, "isochoric");
+    ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 
 END_FECORE_CLASS();
 
@@ -59,6 +59,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
 {
     m_n = 1;
     m_wmin = m_wmax = 1;
+    m_we = 0;
     m_Ymin = m_Ymax = 0;
     m_isochrc = true;
     m_rtol = 1e-4;
@@ -71,6 +72,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
 //! Initialization.
 bool FEReactivePlasticity::Init()
 {
+    m_wmax = 1 - m_we;
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
     if (m_pMat != nullptr) {
         feLogError("Elastic material should not be of type uncoupled");
