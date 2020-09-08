@@ -20,10 +20,10 @@ if(USE_MKL)
 		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_intel_lp64.lib)
 			message(SEND_ERROR "Could not find mkl_intel_lp64.lib. Check MKL_LIB_DIR.")
 		endif()
-		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_intel_lp64.lib)
+		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_core.lib)
 			message(SEND_ERROR "Could not find mkl_core.lib. Check MKL_LIB_DIR.")
 		endif()
-		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_intel_lp64.lib)
+		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_intel_thread.lib)
 			message(SEND_ERROR "Could not find mkl_intel_thread.lib. Check MKL_LIB_DIR.")
 		endif()
 		if(NOT EXISTS ${OMP_LIB})
@@ -33,8 +33,20 @@ if(USE_MKL)
 			message(SEND_ERROR "Could not find mkl.h. Check MKL_INC.")
 		endif()
 	else()
-		if(NOT DEFINED ENV{MKLROOT})
-			message(SEND_ERROR "MKLROOT environment variable not set. Please source compilervars.sh.")
+		if(NOT EXISTS ${MKL_LIB_DIR}/libmkl_intel_lp64.a)
+			message(SEND_ERROR "Could not find libmkl_intel_lp64.a. Check MKL_LIB_DIR.")
+		endif()
+		if(NOT EXISTS ${MKL_LIB_DIR}/libmkl_core.a)
+			message(SEND_ERROR "Could not find libmkl_core.a. Check MKL_LIB_DIR.")
+		endif()
+		if(NOT EXISTS ${MKL_LIB_DIR}/libmkl_intel_thread.a)
+			message(SEND_ERROR "Could not find libmkl_intel_thread.a. Check MKL_LIB_DIR.")
+		endif()
+		if(NOT EXISTS ${OMP_LIB})
+			message(SEND_ERROR "Could not find libiomp5.so or libiomp5.dylib. Check OMP_LIB.")
+		endif()
+		if(NOT EXISTS ${MKL_INC}/mkl.h)
+			message(SEND_ERROR "Could not find mkl.h. Check MKL_INC.")
 		endif()
 	endif()
 endif()
@@ -93,35 +105,74 @@ endif()
 
 # MKL - On Unix the compilervars.sh should be run to find the MKL libraries. 
 if(WIN32)
-	find_path(MKL_INC mkl.h PATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools/compilers_and_libraries/windows/mkl/include
-		DOC "MKL include directory")
-	find_path(MKL_LIB_DIR mkl_core.lib PATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64
-		DOC "MKL Library directory")
-	find_library(OMP_LIB libiomp5md PATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64
-		DOC "OMP Library")		
-	
-	if(MKL_INC AND MKL_LIB_DIR AND OMP_LIB)
-		option(USE_MKL "Required for pardiso and iterative solvers" ON)
-	else()
-		option(USE_MKL "Required for pardiso and iterative solvers" OFF)
+	find_file(MKLROOT mkl
+		PATHS $ENV{ProgramFiles\(x86\)}/Intel* $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*
+		PATH_SUFFIXES "compilers_and_libraries/windows"
+		DOC "MKL root directory")
+		
+	if(MKLROOT)
+		find_path(MKL_INC mkl.h
+			PATHS ${MKLROOT}/include
+			DOC "MKL include directory")
+		find_path(MKL_LIB_DIR mkl_core.lib 
+			PATHS ${MKLROOT}/lib
+			PATH_SUFFIXES "intel64"
+			DOC "MKL Library directory")
+		find_library(OMP_LIB iomp5md 
+			#PATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64
+			PATHS ${MKLROOT}/../compiler/lib/ ${MKLROOT}/../lib/
+			PATH_SUFFIXES "intel64" "intel32"
+			DOC "OMP Library")		
 	endif()
 else()
-	if(DEFINED ENV{MKLROOT})
-		option(USE_MKL "Required for pardiso and iterative solvers" ON)
+	#if(DEFINED ENV{MKLROOT})
+		#set(MKLROOT $ENV{MKLROOT})
+	#else()
+	if(APPLE)
+		find_file(MKLROOT mkl
+			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel
+			PATH_SUFFIXES "compilers_and_libraries/mac"
+			DOC "MKL root directory")
 	else()
-		option(USE_MKL "Required for pardiso and iterative solvers" OFF)
+		find_file(MKLROOT mkl
+			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel
+			PATH_SUFFIXES "compilers_and_libraries/linux"
+			DOC "MKL root directory")
 	endif()
+	#endif()
+
+	if(MKLROOT)
+		find_path(MKL_INC mkl.h
+			PATHS ${MKLROOT}/include
+			DOC "MKL include directory")
+		find_path(MKL_LIB_DIR libmkl_core.a 
+			PATHS ${MKLROOT}/lib
+			PATH_SUFFIXES "intel64"
+			DOC "MKL Library directory")
+		find_library(OMP_LIB iomp5
+			PATHS ${MKLROOT}/../lib
+			PATH_SUFFIXES "intel64" "intel32"
+			NO_DEFAULT_PATH
+			DOC "OMP Library")		
+	endif()
+	
+endif()
+
+if(MKL_INC AND MKL_LIB_DIR AND OMP_LIB)
+	option(USE_MKL "Required for pardiso and iterative solvers" ON)
+else()
+	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
 endif()
 
 # HYPRE
 if(WIN32)
 	find_path(HYPRE_INC HYPRE.h 
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/hypre*" "src" "src/build" "src/cmbuild"
+		PATH_SUFFIXES "include" "include/hypre" "src" "src/include" "src/hypre/include"
         DOC "HYPRE include directory")
 	find_library(HYPRE_LIB HYPRE 
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "src" "src/build" "src/cmbuild"
+        PATH_SUFFIXES "src" "src/build" "src/mbuild"
 		DOC "HYPRE library path")
 else()
 	find_path(HYPRE_INC HYPRE_IJ_mv.h
@@ -130,7 +181,7 @@ else()
 		DOC "HYPRE include directory")
 	find_library(HYPRE_LIB HYPRE 
         PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "src" "src/build" "src/cmbuild"
+        PATH_SUFFIXES "src" "src/build" "src/cbuild"
 		DOC "HYPRE library path")
 endif()	
 
@@ -144,7 +195,7 @@ endif()
 
 # MMG
 if(WIN32)
-	find_path(MMG_INC mmg/libmmg.h
+	find_path(MMG_INC mmg\mmg3d\libmmg3d.h
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
 		PATH_SUFFIXES "include" "include/mmg*" "src" "build" "build/include"
         DOC "MMG include directory")
@@ -153,13 +204,13 @@ if(WIN32)
         PATH_SUFFIXES "*/lib" "*/*/lib" #"build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
 		DOC "MMG library path")
 else()
-	find_path(MMG_INC mmg/libmmg.h
+	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
         PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "include" "include/mmg*" "build" "build/include" "src" 
+        PATH_SUFFIXES "include" "include/mmg" "build" "build/include" "cbuild" "cbuild/include" "src" 
 		DOC "MMG include directory")
 	find_library(MMG_LIB mmg3d 
         PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
+        PATH_SUFFIXES "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
 		DOC "MMG library path")
 endif()	
 
@@ -296,6 +347,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 	add_definitions(-static-intel -no-intel-extensions)
 endif()
 
+# Properly use OMP if llvm has been installed from brew
+if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
+	add_definitions(-fopenmp)
+endif()
+
 ##### Set up executable compilation #####
 file(GLOB SOURCES "FEBio3/*.cpp")
 add_executable (febio3 ${SOURCES})
@@ -327,14 +383,18 @@ if(USE_MKL)
 		target_link_libraries(febio3 ${MKL_LIB_DIR}/mkl_intel_lp64.lib ${MKL_LIB_DIR}/mkl_core.lib
 			${MKL_LIB_DIR}/mkl_intel_thread.lib)
 		target_link_libraries(febio3 ${OMP_LIB})
-	elseif(APPLE)
-		target_link_libraries(febio3 $ENV{MKLROOT}/lib/libmkl_intel_lp64.a $ENV{MKLROOT}/lib/libmkl_core.a
-			$ENV{MKLROOT}/lib/libmkl_intel_thread.a)
-		target_link_libraries(febio3 -liomp5 -pthread -ldl)
 	else()
-		target_link_libraries(febio3 -Wl,--start-group $ENV{MKLROOT}/lib/intel64/libmkl_intel_lp64.a $ENV{MKLROOT}/lib/intel64/libmkl_core.a
-			$ENV{MKLROOT}/lib/intel64/libmkl_intel_thread.a -Wl,--end-group)
-		target_link_libraries(febio3 -liomp5 -pthread -ldl)
+		target_link_libraries(febio3 ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
+			${MKL_LIB_DIR}/libmkl_intel_thread.a)
+		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
+	#elseif(APPLE)
+		#target_link_libraries(febio3 $ENV{MKLROOT}/lib/libmkl_intel_lp64.a $ENV{MKLROOT}/lib/libmkl_core.a
+			#$ENV{MKLROOT}/lib/libmkl_intel_thread.a)
+		#target_link_libraries(febio3 -liomp5 -pthread -ldl)
+	#else()
+		#target_link_libraries(febio3 -Wl,--start-group $ENV{MKLROOT}/lib/intel64/libmkl_intel_lp64.a $ENV{MKLROOT}/lib/intel64/libmkl_core.a
+			#$ENV{MKLROOT}/lib/intel64/libmkl_intel_thread.a -Wl,--end-group)
+		#target_link_libraries(febio3 -liomp5 -pthread -ldl)
 	endif()
 endif()
 
