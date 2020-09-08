@@ -125,9 +125,6 @@ if(WIN32)
 			DOC "OMP Library")		
 	endif()
 else()
-	#if(DEFINED ENV{MKLROOT})
-		#set(MKLROOT $ENV{MKLROOT})
-	#else()
 	if(APPLE)
 		find_file(MKLROOT mkl
 			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel
@@ -139,7 +136,6 @@ else()
 			PATH_SUFFIXES "compilers_and_libraries/linux"
 			DOC "MKL root directory")
 	endif()
-	#endif()
 
 	if(MKLROOT)
 		find_path(MKL_INC mkl.h
