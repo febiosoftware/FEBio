@@ -201,7 +201,7 @@ if(WIN32)
         DOC "MMG include directory")
 	find_library(MMG_LIB mmg3d 
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "*/lib" "*/*/lib" #"build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
 		DOC "MMG library path")
 else()
 	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
@@ -230,7 +230,7 @@ if(WIN32)
         DOC "TetGen include directory")
 	find_library(TET_LIB tet 
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "*/lib" "*/*/lib" #"build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
 		DOC "TetGen library path")
 else()
 	find_path(TET_INC tetgen.h
@@ -239,7 +239,7 @@ else()
 		DOC "TetGen include directory")
 	find_library(TET_LIB tet 
         PATHS /opt/tetgen* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "*/lib" "*/*/lib" #"build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
 		DOC "TetGen library path")
 endif()	
 
@@ -383,18 +383,14 @@ if(USE_MKL)
 		target_link_libraries(febio3 ${MKL_LIB_DIR}/mkl_intel_lp64.lib ${MKL_LIB_DIR}/mkl_core.lib
 			${MKL_LIB_DIR}/mkl_intel_thread.lib)
 		target_link_libraries(febio3 ${OMP_LIB})
-	else()
+	elseif(APPLE)
 		target_link_libraries(febio3 ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
 			${MKL_LIB_DIR}/libmkl_intel_thread.a)
 		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
-	#elseif(APPLE)
-		#target_link_libraries(febio3 $ENV{MKLROOT}/lib/libmkl_intel_lp64.a $ENV{MKLROOT}/lib/libmkl_core.a
-			#$ENV{MKLROOT}/lib/libmkl_intel_thread.a)
-		#target_link_libraries(febio3 -liomp5 -pthread -ldl)
-	#else()
-		#target_link_libraries(febio3 -Wl,--start-group $ENV{MKLROOT}/lib/intel64/libmkl_intel_lp64.a $ENV{MKLROOT}/lib/intel64/libmkl_core.a
-			#$ENV{MKLROOT}/lib/intel64/libmkl_intel_thread.a -Wl,--end-group)
-		#target_link_libraries(febio3 -liomp5 -pthread -ldl)
+    else()
+        target_link_libraries(febio3 -Wl,--start-group ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
+			${MKL_LIB_DIR}/libmkl_intel_thread.a -Wl,--end-group)
+		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
 	endif()
 endif()
 
