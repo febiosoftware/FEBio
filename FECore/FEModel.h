@@ -416,6 +416,9 @@ public:
 	// return a timer by index
 	Timer* GetTimer(int i);
 
+	// get the number of calls to Update()
+	int UpdateCounter() const;
+
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 

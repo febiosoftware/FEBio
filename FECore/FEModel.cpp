@@ -97,6 +97,8 @@ public:
 		m_nStep = -1;
 		m_ftime0 = 0;
 
+		m_nupdates = 0;
+
 		m_bsolved = false;
 
 		m_block_log = false;
@@ -120,6 +122,8 @@ public: // TODO: Find a better place for these parameters
 	double		m_ftime0;			//!< start time of current step
 
 	bool	m_block_log;
+
+	int		m_nupdates;	//!< number of calls to FEModel::Update
 
 public:
 	std::vector<FEMaterial*>				m_MAT;		//!< array of materials
@@ -531,8 +535,18 @@ bool FEModel::Init()
 }
 
 //-----------------------------------------------------------------------------
+// get the number of calls to Update()
+int FEModel::UpdateCounter() const
+{
+	return m_imp->m_nupdates;
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::Update()
 {
+	// update model counter
+	m_imp->m_nupdates++;
+	
 	// update mesh
 	FEMesh& mesh = GetMesh();
 	const FETimeInfo& tp = GetTime();

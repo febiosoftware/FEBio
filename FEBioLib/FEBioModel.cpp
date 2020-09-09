@@ -548,7 +548,7 @@ void FEBioModel::Write(unsigned int nwhen)
 
 				if (bdebug)
 				{
-					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_SOLVED))
+					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_MINOR_ITERS) || (nwhen == CB_SOLVED))
 					{
 						bout = true;
 					}
@@ -603,8 +603,11 @@ void FEBioModel::Write(unsigned int nwhen)
 				}
 
 				// output the state if requested
-				if (bout) 
+				static int lastUpdate = -1;
+				if (bout && (lastUpdate != UpdateCounter()) )
 				{
+					lastUpdate = UpdateCounter();
+
 					// update the plot objects
 					UpdatePlotObjects();
 
