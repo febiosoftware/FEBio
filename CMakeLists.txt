@@ -191,7 +191,7 @@ endif()
 
 # MMG
 if(WIN32)
-	find_path(MMG_INC mmg\mmg3d\libmmg3d.h
+	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
 		PATH_SUFFIXES "include" "include/mmg*" "src" "build" "build/include"
         DOC "MMG include directory")
