@@ -419,6 +419,9 @@ public:
 	// get the number of calls to Update()
 	int UpdateCounter() const;
 
+	// this can be used to change the update counter
+	void IncrementUpdateCounter();
+
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 

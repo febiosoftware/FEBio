@@ -542,6 +542,12 @@ int FEModel::UpdateCounter() const
 }
 
 //-----------------------------------------------------------------------------
+void FEModel::IncrementUpdateCounter()
+{
+	m_imp->m_nupdates++;
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::Update()
 {
 	// update model counter

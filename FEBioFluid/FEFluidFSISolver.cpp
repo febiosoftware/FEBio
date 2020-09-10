@@ -695,6 +695,10 @@ void FEFluidFSISolver::Update(vector<double>& ui)
     FETimeInfo& tp = fem.GetTime();
     tp.currentIteration = m_niter;
 
+	// NOTE: The FSI solver does not call FEModel::Update (should it?)
+	//       so we need to increment the update counter here.
+	fem.IncrementUpdateCounter();
+
     // update EAS
     UpdateEAS(ui);
     UpdateIncrementsEAS(ui, true);
