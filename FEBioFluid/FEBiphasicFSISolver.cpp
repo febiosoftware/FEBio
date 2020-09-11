@@ -69,7 +69,6 @@ ADD_PARAMETER(m_Vtol, "vtol"        );
 ADD_PARAMETER(m_Ftol, "ftol"        );
 ADD_PARAMETER(m_rhoi, "rhoi"        );
 ADD_PARAMETER(m_pred, "predictor"   );
-ADD_PARAMETER(m_QS, "quasistatic"   );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -103,8 +102,6 @@ m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(p
     m_beta = 0.5625;
     m_gamma = 1;
     m_pred = 0;
-    
-    m_QS = 0;
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
@@ -290,6 +287,47 @@ bool FEBiphasicFSISolver::Init()
     
     SolverWarnings();
     
+    // set flag for transient or steady-state analyses
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    for (int i=0; i<mesh.Domains(); ++i)
+    {
+        FEDomain& dom = mesh.Domain(i);
+        if (dom.IsActive())
+        {
+            FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
+            FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
+            FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
+            if (fdom) {
+                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                    fdom->SetSteadyStateAnalysis();
+                else
+                    fdom->SetTransientAnalysis();
+            }
+            else if (fsidom) {
+                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                    fsidom->SetSteadyStateAnalysis();
+                else
+                    fsidom->SetTransientAnalysis();
+            }
+            else if (bfsidom) {
+                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                    bfsidom->SetSteadyStateAnalysis();
+                else
+                    bfsidom->SetTransientAnalysis();
+            }
+        }
+    }
+    
+    // set the dynamic update flag only if we are running a dynamic analysis
+    bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
+    for (int i = 0; i < mesh.Domains(); ++i)
+    {
+        FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+        FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
+        if (d) d->SetDynamicUpdateFlag(b);
+        if (s) s->SetDynamicUpdateFlag(b);
+    }
+
     return true;
 }
 
@@ -596,6 +634,18 @@ void FEBiphasicFSISolver::UpdateKinematics(vector<double>& ui)
             double aeft = aefp*cgi + (eft - efp)/(m_gamma*dt);
             n.set(m_dofAEF, aeft);
         }
+    }
+
+    // update nonlinear constraints (needed for updating Lagrange Multiplier)
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* nlc = fem.NonlinearConstraint(i);
+        if (nlc->IsActive()) nlc->Update(m_Ui, ui);
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive()) spc->Update(ui);
     }
 }
 
@@ -1306,41 +1356,6 @@ bool FEBiphasicFSISolver::Residual(vector<double>& R)
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
-    // set flag for transient or steady-state analyses
-    FEAnalysis* pstep = fem.GetCurrentStep();
-    for (int i=0; i<mesh.Domains(); ++i)
-    {
-        FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive())
-        {
-            FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
-            FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
-            if (fdom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
-                    fdom->SetSteadyStateAnalysis();
-                else
-                    fdom->SetTransientAnalysis();
-            }
-            else if (fsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
-                    fsidom->SetSteadyStateAnalysis();
-                else
-                    fsidom->SetTransientAnalysis();
-            }
-            else if (bfsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
-                    bfsidom->SetSteadyStateAnalysis();
-                else
-                    bfsidom->SetTransientAnalysis();
-                if (m_QS==1)
-                    bfsidom->SetQuasiAnalysis();
-                else
-                    bfsidom->UnsetQuasiStateAnalysis();
-            }
-        }
-    }
-    
     // calculate the internal (stress) forces
     for (int i=0; i<mesh.Domains(); ++i)
     {
@@ -1402,6 +1417,7 @@ bool FEBiphasicFSISolver::Residual(vector<double>& R)
     vector<double> F;
     
     // calculate inertial forces
+    FEAnalysis* pstep = fem.GetCurrentStep();
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);

@@ -146,7 +146,6 @@ public:
     double  m_beta;         //!< beta
     double  m_gamma;        //!< gamma
     int     m_pred;         //!< predictor method
-    double  m_QS;           //!< Quasistatic
     
 protected:
     FEDofList    m_dofU;        // solid displacement

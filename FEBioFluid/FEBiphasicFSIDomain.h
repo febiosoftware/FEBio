@@ -75,10 +75,7 @@ public:
     //! transient analysis
     void SetTransientAnalysis() { m_btrans = true; }
     void SetSteadyStateAnalysis() { m_btrans = false; }
-    void SetQuasiAnalysis() { m_bquasi = true; }
-    void UnsetQuasiStateAnalysis() { m_bquasi = false; }
     
 protected:
     bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
-    bool        m_bquasi;   // flag for quasi (true) or not (false)
 };
