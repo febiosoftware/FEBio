@@ -719,6 +719,9 @@ void FEBiphasicFSISolver::Update(vector<double>& ui)
         FEBodyLoad* pbl = fem.GetBodyLoad(i);
         if (pbl->IsActive()) pbl->Update();
     }
+    
+    // update model state
+    GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------
