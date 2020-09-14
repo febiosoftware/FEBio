@@ -1108,7 +1108,7 @@ bool FESolidSolver2::StiffnessMatrix()
 		{
 			FEDomain& dom = mesh.Domain(i);
 			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-			if (mat->IsRigid() == false)
+			if (mat && (mat->IsRigid() == false))
 			{
 				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
 				edom.MassMatrix(LS, a);
@@ -1328,7 +1328,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		{
 			FEDomain& dom = mesh.Domain(nd);
 			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-			if (mat->IsRigid() == false)
+			if (mat && (mat->IsRigid() == false))
 			{
 				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
 				edom.InertialForces(RHS, F);
