@@ -24262,7 +24262,7 @@ attribute defines the material type.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
+<lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -24313,7 +24313,7 @@ spring that has a linear force-displacement relation
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -24322,11 +24322,31 @@ nonlinear spring
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 user defines the force-displacement relation 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hill
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+discrete material that defines a Hill-type muscle model
 \end_layout
 
 \end_inset
@@ -24343,8 +24363,16 @@ user defines the force-displacement relation
 
 \end_layout
 
+\begin_layout Subsubsection
+Linear Spring
+\end_layout
+
 \begin_layout Standard
-The linear element requires the E parameter that defines the spring constant.
+The linear spring requires the E parameter that defines the spring constant.
+\end_layout
+
+\begin_layout Subsubsection
+Nonlinear spring
 \end_layout
 
 \begin_layout Standard
@@ -24352,8 +24380,337 @@ The nonlinear spring requires the
 \shape italic
 force
 \shape default
- parameter which defines the loadcurve that will be used for the force-displacem
-ent relation.
+ parameter, which defines the loadcurve that will be used for the force-displace
+ment relation.
+\end_layout
+
+\begin_layout Subsubsection
+Hill
+\end_layout
+
+\begin_layout Standard
+The Hill discrete material defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Vmax
+\emph default
+: maximum shortening velocity
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+ac
+\emph default
+: activation level
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Fmax
+\emph default
+: maximum force
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Ksh
+\emph default
+: shape parameter
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Lmax
+\emph default
+: relative length at which Fmax occurs.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+L0
+\emph default
+: initial reference length
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Sv
+\emph default
+: max velocity scale
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Ftl
+\emph default
+: normalized tension-length curve
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Ftv
+\emph default
+: normalized tension-velocity curve
+\end_layout
+
+\begin_layout Standard
+The force in the Hill discrete element is the sum of the passive element
+ and the active element.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F=F_{p}+F_{a}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The passive force is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{p}=\begin{cases}
+Fmax\left(\exp\left(Ksh\left(l-1\right)/Lmax-1\right)/\exp\left(Ksh-1\right)\right) & ,l>1\\
+0 & ,l\leqslant1
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where l is the relative stretch defined by, 
+\begin_inset Formula $l=lm/l0$
+\end_inset
+
+ and 
+\begin_inset Formula $lm$
+\end_inset
+
+is the discrete element length and 
+\begin_inset Formula $l0$
+\end_inset
+
+is either the L0 parameter, or the initial discrete element length (if L0
+ is set to zero).
+ 
+\end_layout
+
+\begin_layout Standard
+The active force is given by, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Fa=ac*Fmax*Ftl\left(l\right)*Ftv\left(v\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $v$
+\end_inset
+
+, a measure of the relative discrete element's growth speed, is defined
+ by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+v=vm/\left(Vmax*Sv\left(ac\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $vm$
+\end_inset
+
+is the actual discrete element's growth speed.
+ 
+\end_layout
+
+\begin_layout Standard
+The properties Sv, Ftl, and Ftv, are optional and will evaluate to 1 if
+ omitted.
+ They can be defined as load curves.
+ See the exampe below.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<discrete_material id="1" name="test" type="Hill">
+\end_layout
+
+\begin_layout LyX-Code
+  <Vmax>1</Vmax>
+\end_layout
+
+\begin_layout LyX-Code
+  <ac>0.1</ac>
+\end_layout
+
+\begin_layout LyX-Code
+  <Fmax>50</Fmax>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ksh>5</Ksh>
+\end_layout
+
+\begin_layout LyX-Code
+  <Lmax>1.5</Lmax>
+\end_layout
+
+\begin_layout LyX-Code
+  <L0>10</L0>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ftl type="point">
+\end_layout
+
+\begin_layout LyX-Code
+    <interpolate>smooth</interpolate> 				
+\end_layout
+
+\begin_layout LyX-Code
+    <points>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0.0,	0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0.1,	0.000258139</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.2,	0.00161616</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.3,	0.00740118</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.4,	0.0272783</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.5,	0.0820396</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.6,	0.201851</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.7,	0.406524</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.8,	0.670275</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>0.9,	0.904792</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.0,	0.999955</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.1,	0.904792</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.2,	0.670275</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.3,	0.406524</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.4,	0.201851</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.5,	0.0820396</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.6,	0.0272783</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.7,	0.00740118</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.8,	0.00161616</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>1.9,	0.000258139</pt>
+\end_layout
+
+\begin_layout LyX-Code
+  	<pt>2.0,	0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+	</points>
+\end_layout
+
+\begin_layout LyX-Code
+  </Ftl> 
+\end_layout
+
+\begin_layout LyX-Code
+</discrete_material> 
 \end_layout
 
 \begin_layout Subsection
