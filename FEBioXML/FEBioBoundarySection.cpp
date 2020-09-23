@@ -1331,13 +1331,12 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// get the type
-			int ntype = 0;
-			bool bfollow = false;
+			int ntype = FERigidBodyForce::FORCE_LOAD;
 			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype)
 			{
-				if (strcmp(sztype, "ramp") == 0) ntype = 1;
-				else if (strcmp(sztype, "follow") == 0) bfollow = true;
+				if      (strcmp(sztype, "ramp"  ) == 0) ntype = FERigidBodyForce::FORCE_TARGET;
+				else if (strcmp(sztype, "follow") == 0) ntype = FERigidBodyForce::FORCE_FOLLOW;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 
@@ -1351,10 +1350,9 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 
 			// create the rigid body force
 			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-			pFC->SetType(ntype);
+			pFC->SetLoadType(ntype);
 			pFC->SetRigidMaterialID(nmat);
 			pFC->SetDOF(bc);
-			pFC->SetFollowFlag(bfollow);
 
 			double val = 0.0;
 			value(tag, val);

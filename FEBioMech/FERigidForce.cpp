@@ -243,16 +243,23 @@ BEGIN_FECORE_CLASS(FERigidBodyForce, FEModelLoad)
 	ADD_PARAMETER(m_rigidMat, "rb");
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_force, "value");
-	ADD_PARAMETER(m_bfollow, "follow");
+	ADD_PARAMETER(m_ntype, "load_type");
 END_FECORE_CLASS();
 
 FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(pfem)
 {
-	m_bfollow = false;
-	m_ntype = RAMP;
+	m_ntype = FORCE_LOAD;
 	m_trg = 0.0;
 	m_rid = -1;
 }
+
+void FERigidBodyForce::SetRigidMaterialID(int nid) { m_rigidMat = nid; }
+
+void FERigidBodyForce::SetDOF(int bc) { m_dof = bc; }
+
+void FERigidBodyForce::SetLoadType(int loadType) { m_ntype = loadType; }
+
+void FERigidBodyForce::SetForce(double f) { m_force = f; }
 
 //-----------------------------------------------------------------------------
 bool FERigidBodyForce::Init()
@@ -277,7 +284,7 @@ void FERigidBodyForce::Activate()
 	m_rid = pm->GetRigidBodyID(); assert(m_rid >= 0);
 
 	FERigidBody& rb = *fem.GetRigidBody(m_rid);
-	if (m_ntype == TARGET)
+	if (m_ntype == FORCE_TARGET)
 	{
 		switch (m_dof)
 		{
@@ -311,32 +318,7 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidBody& rb = *fem.GetRigidBody(m_rid);
 
-	if (m_bfollow == false)
-	{
-		int I  = rb.m_LM[m_dof];
-		if (m_ntype == RAMP)
-		{
-			if (I>=0)
-			{
-				R[I] += m_force;
-			}
-		}
-		else if (m_ntype == TARGET)
-		{
-			// get the current analysis step
-			FEAnalysis* pstep = fem.GetCurrentStep();
-
-			double t0 = pstep->m_tstart;
-			double t1 = pstep->m_tend;
-			double w = (tp.currentTime - t0)/(t1 - t0);
-			assert((w>=-0.0000001)&&(w<=1.0000001));
-			double f0 = m_trg, f1 = m_force;
-
-			double f = f0*(1.0 - w) + f1*w;
-			R[I] += f;
-		}
-	}
-	else
+	if (m_ntype == FORCE_FOLLOW)
 	{
 		// setup the force vector
 		vec3d f(0,0,0);
@@ -352,6 +334,30 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		n = rb.m_LM[0]; if (n >= 0) R[n] += f.x;
 		n = rb.m_LM[1]; if (n >= 0) R[n] += f.y;
 		n = rb.m_LM[2]; if (n >= 0) R[n] += f.z;
+	}
+	else if (m_ntype == FORCE_LOAD)
+	{
+		int I = rb.m_LM[m_dof];
+		if (I >= 0)
+		{
+			R[I] += m_force;
+		}
+	}
+	else if (m_ntype == FORCE_TARGET)
+	{
+		// get the current analysis step
+		FEAnalysis* pstep = fem.GetCurrentStep();
+
+		double t0 = pstep->m_tstart;
+		double t1 = pstep->m_tend;
+		double w = (tp.currentTime - t0) / (t1 - t0);
+		assert((w >= -0.0000001) && (w <= 1.0000001));
+		double f0 = m_trg, f1 = m_force;
+
+		double f = f0 * (1.0 - w) + f1 * w;
+
+		int I = rb.m_LM[m_dof];
+		R[I] += f;
 	}
 }
 
