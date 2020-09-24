@@ -296,11 +296,22 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	}
 	else
 	{
-		// add it to the mesh
-		mesh.AddDataMap(map);
+		string name = szname;
 
 		// read the data
 		ParseElementData(tag, *map);
+
+		// see if this map already exsits 
+		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(name));
+		if (oldMap)
+		{
+			oldMap->Merge(*map);
+			delete map;
+		}
+		else
+		{
+			mesh.AddDataMap(map);
+		}
 	}
 }
 /*
