@@ -51,10 +51,10 @@ public:
 	int Materials() { return (int)m_pMat.size(); }
 
 	// return a material component
-	FEUncoupledMaterial* GetMaterial(int i) { return m_pMat[i]; }
+	FEElasticMaterial* GetMaterial(int i) { return m_pMat[i]; }
 
 	// Add a material component
-	void AddMaterial(FEUncoupledMaterial* pm);
+	void AddMaterial(FEElasticMaterial* pm);
 
 public:
 	//! calculate stress at material point
@@ -71,7 +71,7 @@ public:
 
 
 private:
-	std::vector<FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials
+	std::vector<FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
 
 	DECLARE_FECORE_CLASS();
 };
