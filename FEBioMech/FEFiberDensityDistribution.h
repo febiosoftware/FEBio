@@ -81,7 +81,7 @@ public:
     double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
-    double m_b;         // concentration parameter
+    FEParamDouble m_b;         // concentration parameter
     
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
@@ -122,12 +122,12 @@ public:
 class FEEllipticalFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
-    FEEllipticalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = 1; }
+    FEEllipticalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = 1; m_spa[1] = 1; }
     
     double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
-    double m_spa[2];    // semi-principal axes of ellipse
+    FEParamDouble m_spa[2];    // semi-principal axes of ellipse
     
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
@@ -144,7 +144,7 @@ public:
     double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
-    double m_b;         // concentration parameter
+    FEParamDouble m_b;         // concentration parameter
     
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

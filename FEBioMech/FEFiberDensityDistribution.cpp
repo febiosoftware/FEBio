@@ -66,7 +66,8 @@ double FEVonMises3DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
 {
     // The local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(phi)
-    double R = exp(m_b*(2*SQR(n0.x)-1));
+    double b = m_b(mp);
+    double R = exp(b*(2*SQR(n0.x)-1));
     return R;
 }
 
@@ -109,7 +110,9 @@ double FEEllipticalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
 {
     // 2d fibers lie in the local x-y plane
     // n0.x = cos(theta) and n0.y = sin(theta)
-    double R = 1.0/sqrt(SQR(n0.x/m_spa[0])+SQR(n0.y/m_spa[1]));
+    double a0 = m_spa[0](mp);
+    double a1 = m_spa[1](mp);
+    double R = 1.0/sqrt(SQR(n0.x/a0)+SQR(n0.y/a1));
     return R;
 }
 
@@ -124,7 +127,8 @@ double FEVonMises2DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
     // The fiber bundle is in the x-y plane and
     // the local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(theta)
-    double R = exp(m_b*(2*SQR(n0.x)-1));
+    double b = m_b(mp);
+    double R = exp(b*(2*SQR(n0.x)-1));
     return R;
 }
 
