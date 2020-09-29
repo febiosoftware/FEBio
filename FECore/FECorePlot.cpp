@@ -71,21 +71,25 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	{
 		FEParamDouble& p = m_param.value<FEParamDouble>();
 
-		FEItemList* itemList = p.GetItemList();
-		if (itemList == 0)
+		// check for materials first
+		if (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
+		else 
 		{
-			// for material parameters, the item list can be empty
-			if      (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
-			else if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
-//			else if (dynamic_cast<FESurfaceLoad*>(pc)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FESurfaceLoad*>(pc)->GetSurface().GetFacetSet(); }
-			else return false;
-		}
-		else
-		{
-			if      (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
-			else if (dynamic_cast<FEFacetSet*>(itemList)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FEFacetSet*>(itemList); }
-			else if (dynamic_cast<FEElementSet*>(itemList)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEElementSet*>(itemList))->GetDomainList(); }
-			else return false;
+			FEItemList* itemList = p.GetItemList();
+			if (itemList == 0)
+			{
+				// for some classes, the item list can be empty
+				if      (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
+	//			else if (dynamic_cast<FESurfaceLoad*>(pc)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FESurfaceLoad*>(pc)->GetSurface().GetFacetSet(); }
+				else return false;
+			}
+			else
+			{
+				if      (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+				else if (dynamic_cast<FEFacetSet*>(itemList)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FEFacetSet*>(itemList); }
+				else if (dynamic_cast<FEElementSet*>(itemList)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEElementSet*>(itemList))->GetDomainList(); }
+				else return false;
+			}
 		}
 
 		SetVarType(PLT_FLOAT);

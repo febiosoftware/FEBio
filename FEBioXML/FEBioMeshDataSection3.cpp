@@ -298,8 +298,21 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	{
 		string name = szname;
 
-		// read the data
-		ParseElementData(tag, *map);
+		if (tag.isleaf())
+		{
+			if (dataType == FE_DOUBLE)
+			{
+				double v = 0.0;
+				tag.value(v);
+				map->set(v);
+			}
+			else throw XMLReader::InvalidValue(tag);
+		}
+		else
+		{
+			// read the data
+			ParseElementData(tag, *map);
+		}
 
 		// see if this map already exsits 
 		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(name));
