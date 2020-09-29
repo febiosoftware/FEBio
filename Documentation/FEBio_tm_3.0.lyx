@@ -249,7 +249,7 @@ status open
 
 \end_inset
 
-Dave Rawlins (
+Michael Herron (
 \begin_inset ERT
 status open
 
@@ -257,7 +257,7 @@ status open
 
 
 \backslash
-href{mailto:rawlins@sci.utah.edu}{rawlins@sci.utah.edu}
+href{mailto:michael.herron@utah.edu}{michael.herron@utah.edu}
 \end_layout
 
 \end_inset
@@ -7451,6 +7451,331 @@ reference "eq:virtual work"
  energy densities.
 \end_layout
 
+\begin_layout Section
+Fluid-Structure Interactions
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Fluid-Structure-Interactions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We model the fluid domain in an FSI analysis as a mixture of an isothermal
+ compressible viscous fluid and a hyperelastic compressible solid, where
+ the solid has zero apparent density, and negligible (but non-zero) elasticity.
+ In a mixture framework, all mixture constituents coexist at every point
+ in the continuum.
+ For our FSI implementation, the finite element mesh is defined on the solid
+ material, and the negligible (but non-zero) elasticity of the solid is
+ intended to regularize the mesh deformation.
+ The fluid flows through this mesh, unimpeded by the solid.
+ In particular, in this FSI model there is no frictional interaction between
+ the fluid and solid materials inside the mixture domain (i.e., no Darcy-Brinkman
+ type of friction), but the no-slip boundary condition may be prescribed
+ on boundaries of the mixture domain, where applicable.
+\end_layout
+
+\begin_layout Subsection
+FSI Governing Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FSI-Governing-Equations"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The momentum balance for the fluid is
+\begin_inset Formula 
+\begin{equation}
+\rho^{f}\mathbf{a}^{f}=\divg\boldsymbol{\sigma}^{f}+\rho^{f}\mathbf{b}\,,\label{eq:fsi-fluid-momentum}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ is the external body force acting on the FSI domain, 
+\begin_inset Formula $\mathbf{a}^{f}$
+\end_inset
+
+ is the fluid acceleration,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}^{f}=\frac{\partial\mathbf{v}^{f}}{\partial t}+\mathbf{L}^{f}\cdot\mathbf{v}^{f}\,,\label{eq:fsi-fluid-acceleration}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\mathbf{L}^{f}=\grad\mathbf{v}^{f}$
+\end_inset
+
+ is the fluid velocity gradient.
+ In principle, the same momentum equation may be used for the solid (substitutin
+g 
+\begin_inset Formula $f$
+\end_inset
+
+ with 
+\begin_inset Formula $s$
+\end_inset
+
+); however, since we opted to let 
+\begin_inset Formula $\rho^{s}=0$
+\end_inset
+
+ (no solid mass), the momentum balance for the solid simply reduces to
+\begin_inset Formula 
+\begin{equation}
+\divg\boldsymbol{\sigma}^{s}=\mathbf{0}\,.\label{eq:fsi-solid-momentum}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We model the fluid as isothermal and compressible, consistent with our CFD
+ implementation.
+ Thus, the fluid stress may be separated into the elastic pressure 
+\begin_inset Formula $p\left(J^{f}\right)$
+\end_inset
+
+, which only depends on the fluid volume ratio 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+, and the viscous stress 
+\begin_inset Formula $\boldsymbol{\tau}\left(J^{f},\mathbf{L}^{f}\right)$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}^{f}=-p\mathbf{I}+\boldsymbol{\tau}\,.\label{eq:fsi-fluid-stress-split}
+\end{equation}
+
+\end_inset
+
+Recall that there is no dependence on temperature in an isothermal formulation.
+ As done in our previous study, we integrate the mass balance for the fluid
+ to produce
+\begin_inset Formula 
+\begin{equation}
+\rho^{f}=\frac{\rho_{r}^{f}}{J^{f}}\,,\label{eq:fsi-integrated-fluid-mass}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\rho_{r}^{f}$
+\end_inset
+
+ is the fluid density in the reference state (e.g., under ambient pressure)
+ and 
+\begin_inset Formula $J^{f}=\det\mathbf{F}^{f}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{F}^{f}$
+\end_inset
+
+ is the fluid deformation gradient.
+ We also use the kinematic constraint
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial J^{f}}{\partial t}+\grad J^{f}\cdot\mathbf{v}^{f}=J^{f}\divg\mathbf{v}^{f}\,,\label{eq:fsi-fluid-kinematic constraint}
+\end{equation}
+
+\end_inset
+
+to relate the fluid volume ratio 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ to its velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, in the spatial frame.
+\end_layout
+
+\begin_layout Standard
+The mesh through which the fluid flows is defined on the solid component
+ of the mixture.
+ Therefore, we define the relative velocity between the fluid and solid
+ as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{w}=\mathbf{v}^{f}-\mathbf{v}^{s}\,.\label{eq:fsi-fluid-relative-velocity}
+\end{equation}
+
+\end_inset
+
+Since the solid has zero volume fraction, this expression is the same as
+ the flux of fluid relative to the solid.
+ We choose to define the nodal degrees of freedom in the mixture domain
+ to be the relative fluid velocity 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+, the fluid dilatation 
+\begin_inset Formula $e^{f}=J^{f}-1$
+\end_inset
+
+, and the solid displacement 
+\begin_inset Formula $\mathbf{u}^{s}$
+\end_inset
+
+, which is related to the solid velocity via 
+\begin_inset Formula $\mathbf{v}^{s}=\dot{\mathbf{u}}^{s}$
+\end_inset
+
+, with the dot operator denoting the material time derivative following
+ the solid.
+ (For notational convenience, we will continue using 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ in the equations below, instead of 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+).
+ Now,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}^{f}=\mathbf{w}+\mathbf{v}^{s}\,,\label{eq:fsi-fluid-velocity}
+\end{equation}
+
+\end_inset
+
+from which it follows that the fluid velocity gradient is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{L}^{f}=\mathbf{L}^{w}+\mathbf{L}^{s}\,,\label{eq:fsi-fluid-velocity-gradient}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{L}^{w}=\grad\mathbf{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{L}^{s}=\grad\mathbf{v}^{s}$
+\end_inset
+
+.
+ The fluid acceleration may now be rewritten in terms of the FEA degrees
+ of freedom as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}^{f}=\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}+\left(\mathbf{L}^{w}+\mathbf{L}^{s}\right)\cdot\mathbf{w}\,,\label{eq:fsi-fluid-acceleration-redux}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\dot{\mathbf{v}}^{s} & =\frac{\partial\mathbf{v}^{s}}{\partial t}+\mathbf{L}^{s}\cdot\mathbf{v}^{s}\\
+\dot{\mathbf{w}} & =\frac{\partial\mathbf{w}}{\partial t}+\mathbf{L}^{w}\cdot\mathbf{v}^{s}
+\end{aligned}
+\label{eq:fsi-vs-w-material-derivs}
+\end{equation}
+
+\end_inset
+
+are the material time derivatives of the solid and relative fluid velocities,
+ in the frame following the solid.
+ We conveniently use this material time derivative (instead of the material
+ time derivative following the fluid) since we define the mixture domain
+ mesh on the solid.
+\end_layout
+
+\begin_layout Standard
+Similarly, the kinematic constraint relating 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ may be rewritten as
+\begin_inset Formula 
+\begin{equation}
+\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}=J^{f}\divg\left(\mathbf{w}+\mathbf{v}^{s}\right)\,,\label{eq:fsi-fluid-kinematic-redux}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\dot{J}^{f}=\frac{\partial J^{f}}{\partial t}+\grad J^{f}\cdot\mathbf{v}^{s}\,.\label{eq:fsi-dilatation-material-deriv}
+\end{equation}
+
+\end_inset
+
+Finally, as done routinely in our studies of biphasic and multiphasic materials,
+ we find it convenient to substitute the kinematic identity
+\begin_inset Formula 
+\begin{equation}
+\divg\mathbf{v}^{s}=\frac{\dot{J}^{s}}{J^{s}}\,,\label{eq:fsi-solid-kinematic-constraint}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $J^{s}=\det\mathbf{F}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{I}+\Grad\mathbf{u}^{s}$
+\end_inset
+
+ is the solid deformation gradient.
+ 
+\end_layout
+
+\begin_layout Standard
+In summary, the governing equations for the FSI mixture domain are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & \divg\boldsymbol{\sigma}^{s}=\mathbf{0}\\
+ & \rho^{f}\mathbf{a}^{f}=\divg\boldsymbol{\sigma}^{f}+\rho^{f}\mathbf{b}\\
+ & \frac{1}{J^{f}}\left(\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)=\divg\mathbf{w}+\frac{\dot{J}^{s}}{J^{s}}
+\end{aligned}
+\label{eq:fsi-governing-equations}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{a}^{f}$
+\end_inset
+
+ is given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fsi-fluid-acceleration-redux"
+
+\end_inset
+
+ above.
+\end_layout
+
 \begin_layout Chapter
 The Nonlinear FE Method
 \begin_inset CommandInset label
@@ -14045,6 +14370,1724 @@ reference "eq:ideal-fluid"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Section
+Weak Formulation for FSI
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Weak-Formulation-FSI"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+General Formulation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FSI-General-Formulation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The strong form of the virtual work statement is 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W & =\int_{b}\delta\mathbf{v}^{s}\cdot\divg\boldsymbol{\sigma}^{s}\,dv\\
+ & +\int_{b}\delta\mathbf{w}\cdot\left[\divg\boldsymbol{\sigma}^{f}+\rho^{f}\left(\mathbf{b}-\mathbf{a}^{f}\right)\right]\,dv\\
+ & -\int_{b}\delta J^{f}\left[\frac{1}{J^{f}}\left(\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)-\divg\mathbf{w}-\frac{\dot{J}^{s}}{J^{s}}\right]\,dv
+\end{aligned}
+\,.\label{eq:fsi-virtual-work-strong}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $b$
+\end_inset
+
+ is the mixture domain (whose boundaries are defined on the solid), 
+\begin_inset Formula $\delta\mathbf{v}^{s}$
+\end_inset
+
+ is the virtual solid velocity, 
+\begin_inset Formula $\delta\mathbf{w}$
+\end_inset
+
+ is the virtual relative fluid velocity, and 
+\begin_inset Formula $\delta J^{f}$
+\end_inset
+
+ is the virtual energy density.
+ The weak form of this statement may be written as the difference 
+\begin_inset Formula $\delta W=\delta W_{ext}-\delta W_{int}$
+\end_inset
+
+ between external virtual work 
+\begin_inset Formula $\delta W_{ext}$
+\end_inset
+
+ and internal virtual work 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+, where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{int} & =\int_{b}\boldsymbol{\sigma}^{s}:\grad\delta\mathbf{v}^{s}\,dv\\
+ & +\int_{b}\boldsymbol{\tau}:\grad\delta\mathbf{w}\,dv+\int_{b}\delta\mathbf{w}\cdot\left(\grad p+\rho^{f}\mathbf{a}^{f}\right)\,dv\\
+ & +\int_{b}\delta J^{f}\left[\frac{1}{J^{f}}\left(\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)-\frac{\dot{J}^{s}}{J^{s}}\right]\,dv\\
+ & +\int_{b}\mathbf{w}\cdot\grad\delta J^{f}\,dv
+\end{aligned}
+\,,\label{eq:fsi-internal-virtual-work}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{ext} & =\int_{\partial b}\delta\mathbf{v}^{s}\cdot\mathbf{t}^{s}\,da\\
+ & +\int_{\partial b}\delta\mathbf{w}\cdot\mathbf{t}^{\tau}\,da+\int_{b}\delta\mathbf{w}\cdot\rho^{f}\mathbf{b}\,dv\\
+ & +\int_{\partial b}\delta J^{f}w_{n}\,da
+\end{aligned}
+\,.\label{eq:fsi-external-virtual-work}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mathbf{t}^{s}=\boldsymbol{\sigma}^{s}\cdot\mathbf{n}$
+\end_inset
+
+ is the solid traction, 
+\begin_inset Formula $\mathbf{t}^{\tau}=\boldsymbol{\tau}\cdot\mathbf{n}$
+\end_inset
+
+ is the fluid viscous traction, and 
+\begin_inset Formula $w_{n}=\mathbf{w}_{n}\cdot\mathbf{n}$
+\end_inset
+
+ is the normal component of the relative fluid velocity on the boundary
+ 
+\begin_inset Formula $\partial b$
+\end_inset
+
+, whose outward unit normal is 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ In practice, both 
+\begin_inset Formula $\boldsymbol{\sigma}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{s}$
+\end_inset
+
+ should contribute negligibly to 
+\begin_inset Formula $\delta W$
+\end_inset
+
+, but they cannot be set exactly to zero since we need some small elasticity
+ to regularize the deforming mixture mesh.
+\end_layout
+
+\begin_layout Subsection
+Time Integration
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FSI-Time-Integration"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the generalized 
+\begin_inset Formula $\alpha-$
+\end_inset
+
+method we evaluate displacements and velocities at the intermediate time
+ 
+\begin_inset Formula $t_{n+\alpha_{f}}=t_{n}+\alpha_{f}\left(t_{n+1}-t_{n}\right)$
+\end_inset
+
+, such that
+\begin_inset Formula 
+\[
+\begin{aligned}\boldsymbol{\chi}_{n+\alpha_{f}}^{s} & =\left(1-\alpha_{f}\right)\boldsymbol{\chi}_{n}^{s}+\alpha_{f}\boldsymbol{\chi}_{n+1}^{s}\\
+\mathbf{u}_{n+\alpha_{f}}^{s} & =\left(1-\alpha_{f}\right)\mathbf{u}_{n}^{s}+\alpha_{f}\mathbf{u}_{n+1}^{s}\\
+\mathbf{v}_{n+\alpha_{f}}^{s} & =\left(1-\alpha_{f}\right)\mathbf{v}_{n}^{s}+\alpha_{f}\mathbf{v}_{n+1}^{s}\\
+\mathbf{w}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{w}_{n}+\alpha_{f}\mathbf{w}_{n+1}\\
+J_{n+\alpha_{f}}^{f} & =\left(1-\alpha_{f}\right)J_{n}^{f}+\alpha_{f}J_{n+1}^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+In particular, it follows that
+\begin_inset Formula 
+\[
+\mathbf{F}_{n+\alpha_{f}}^{s}=\frac{\partial\boldsymbol{\chi}_{n+\alpha_{f}}^{s}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}_{n}^{s}+\alpha_{f}\mathbf{F}_{n+1}^{s}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+J_{n+\alpha_{f}}^{s}=\det\mathbf{F}_{n+\alpha_{f}}^{s}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\dot{J}_{n+\alpha_{f}}^{s}=J_{n+\alpha_{f}}^{s}\mathbf{F}_{n+\alpha_{f}}^{-T}:\Grad\mathbf{v}_{n+\alpha_{f}}^{s}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbf{L}_{n+\alpha_{f}}^{s}=\Grad\mathbf{v}_{n+\alpha_{f}}^{s}\cdot\mathbf{F}_{n+\alpha_{f}}^{-1}
+\]
+
+\end_inset
+
+In practice however, we get better numerical results when using
+\begin_inset Formula 
+\[
+\dot{J}_{n+\alpha_{f}}^{s}=\frac{J_{n+1}^{s}-J_{n}^{s}}{\Delta t}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbf{L}_{n+\alpha_{f}}^{s}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}_{n+\alpha_{f}}^{-1}
+\]
+
+\end_inset
+
+Similarly, we evaluate velocity derivatives at the intermediate time 
+\begin_inset Formula $t_{n+\alpha_{m}}=t_{n}+\alpha_{m}\left(t_{n+1}-t_{n}\right)$
+\end_inset
+
+, such that
+\begin_inset Formula 
+\[
+\begin{aligned}\dot{\mathbf{v}}_{n+\alpha_{m}}^{s} & =\left(1-\alpha_{m}\right)\dot{\mathbf{v}}_{n}^{s}+\alpha_{m}\dot{\mathbf{v}}_{n+1}^{s}\\
+\dot{\mathbf{w}}_{n+\alpha_{m}} & =\left(1-\alpha_{m}\right)\dot{\mathbf{w}}_{n}+\alpha_{m}\dot{\mathbf{w}}_{n+1}\\
+\dot{J}_{n+\alpha_{m}}^{f} & =\left(1-\alpha_{m}\right)\dot{J}_{n}^{f}+\alpha_{m}\dot{J}_{n+1}^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+The parameters 
+\begin_inset Formula $\alpha_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{m}$
+\end_inset
+
+ are evaluated from a single parameter 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+ using
+\begin_inset Formula 
+\begin{equation}
+\alpha_{f}=\frac{1}{1+\rho_{\infty}}\,,\quad\alpha_{m}=\frac{1}{2}\frac{3-\rho_{\infty}}{1+\rho_{\infty}}\,,\label{eq:fsi-ga-alphas-1st}
+\end{equation}
+
+\end_inset
+
+for first-order systems, or
+\begin_inset Formula 
+\begin{equation}
+\alpha_{f}=\frac{1}{1+\rho_{\infty}}\,,\quad\alpha_{m}=\frac{2-\rho_{\infty}}{1+\rho_{\infty}}\,,\label{eq:fsi-ga-alphas-2nd}
+\end{equation}
+
+\end_inset
+
+for second-order systems, where 
+\begin_inset Formula $0\le\rho_{\infty}\le1$
+\end_inset
+
+.
+ This parameter is the spectral radius for an infinite time step, which
+ controls the amount of damping of high frequencies; a value of zero produces
+ the greatest amount of damping, anihilating the highest frequency in one
+ step, whereas a value of one preserves the highest frequency.
+ Since the solid motion is governed by a second-order differential equation
+ in time, we adopt the formulas for second-order systems.
+\end_layout
+
+\begin_layout Standard
+To complete the integration scheme, we evaluate
+\begin_inset Formula 
+\[
+\begin{aligned}\beta & =\frac{1}{4}\left(1+\alpha_{m}-\alpha_{f}\right)^{2}\\
+\gamma & =\frac{1}{2}+\alpha_{m}-\alpha_{f}
+\end{aligned}
+\]
+
+\end_inset
+
+then
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{v}_{n+1}^{s} & =\mathbf{v}_{n}^{s}+\Delta t\left[\left(1-\gamma\right)\dot{\mathbf{v}}_{n}^{s}+\gamma\dot{\mathbf{v}}_{n+1}^{s}\right]\\
+\mathbf{u}_{n+1}^{s} & =\mathbf{u}_{n}^{s}+\Delta t\mathbf{v}_{n}^{s}+\frac{\Delta t^{2}}{2}\left[\left(1-2\beta\right)\dot{\mathbf{v}}_{n}^{s}+2\beta\dot{\mathbf{v}}_{n+1}^{s}\right]\\
+\mathbf{w}_{n+1} & =\mathbf{w}_{n}+\Delta t\left[\left(1-\gamma\right)\dot{\mathbf{w}}_{n}+\gamma\dot{\mathbf{w}}_{n+1}\right]\\
+J_{n+1}^{f} & =J_{n}^{f}+\Delta t\left[\left(1-\gamma\right)\dot{J}_{n}^{f}+\gamma\dot{J}_{n+1}^{f}\right]
+\end{aligned}
+\]
+
+\end_inset
+
+Thus,
+\begin_inset Formula 
+\[
+\begin{aligned}\dot{\mathbf{v}}_{n+1}^{s} & =\frac{1}{\beta\Delta t}\left(\frac{\mathbf{u}_{n+1}^{s}-\mathbf{u}_{n}^{s}}{\Delta t}-\mathbf{v}_{n}^{s}\right)+\left(1-\frac{1}{2\beta}\right)\dot{\mathbf{v}}_{n}^{s}\\
+\dot{\mathbf{w}}_{n+1} & =\frac{\mathbf{w}_{n+1}-\mathbf{w}_{n}}{\gamma\Delta t}+\left(1-\frac{1}{\gamma}\right)\dot{\mathbf{w}}_{n}=\frac{\mathbf{w}_{n+\alpha_{f}}-\mathbf{w}_{n}}{\alpha_{f}\gamma\Delta t}-\left(\frac{1}{\gamma}-1\right)\dot{\mathbf{w}}_{n}\\
+\dot{J}_{n+1}^{f} & =\frac{J_{n+1}^{f}-J_{n}^{f}}{\gamma\Delta t}+\left(1-\frac{1}{\gamma}\right)\dot{J}_{n}^{f}=\frac{J_{n+\alpha_{f}}^{f}-J_{n}^{f}}{\alpha_{f}\gamma\Delta t}-\left(\frac{1}{\gamma}-1\right)\dot{J}_{n}^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+According to this method 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Jansen00"
+literal "true"
+
+\end_inset
+
+, the virtual work is evaluated using intermediate time step values, at
+ 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+ for all parameters except 
+\begin_inset Formula $\dot{\mathbf{v}}^{s}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\mathbf{w}}$
+\end_inset
+
+, and 
+\begin_inset Formula $\dot{J}^{f}$
+\end_inset
+
+, which are evaluated at 
+\begin_inset Formula $t_{n+\alpha_{m}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\end_layout
+
+\begin_layout Standard
+The discretization of the internal work produces
+\begin_inset Formula 
+\begin{equation}
+\delta W_{int}=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\int_{b}\mathbf{f}_{a}^{u}\,dv+\delta\mathbf{w}_{a}\cdot\int_{b}\mathbf{f}_{a}^{w}\,dv+\delta J_{a}^{f}\int_{b}f_{a}^{J}\,dv\label{eq:fsi-discretized-internal-work}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}\delta W_{int} & =\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\int_{b}\boldsymbol{\sigma}^{s}\cdot\grad N_{a}\,dv\\
+ & +\sum_{a}\delta\mathbf{w}_{a}\cdot\int_{b}\boldsymbol{\tau}\cdot\grad N_{a}\,dv+\sum_{a}\delta\mathbf{w}_{a}\cdot\int_{b}N_{a}\left(\grad p+\rho^{f}\mathbf{a}^{f}\right)\,dv\\
+ & +\sum_{a}\delta J_{a}^{f}\int_{b}N_{a}\left[\frac{1}{J^{f}}\left(\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)-\frac{\dot{J}^{s}}{J^{s}}\right]\,dv\\
+ & +\sum_{a}\delta J_{a}^{f}\int_{b}\mathbf{w}\cdot\grad N_{a}\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a}^{u} & =\boldsymbol{\sigma}^{s}\cdot\grad N_{a}\\
+\mathbf{f}_{a}^{w} & =\boldsymbol{\tau}\cdot\grad N_{a}+N_{a}\left(\grad p+\rho^{f}\mathbf{a}^{f}\right)\\
+f_{a}^{J} & =N_{a}\left[\frac{1}{J^{f}}\left(\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)-\frac{\dot{J}^{s}}{J^{s}}\right]+\mathbf{w}\cdot\grad N_{a}
+\end{aligned}
+\label{eq:fsi-discretized-residuals}
+\end{equation}
+
+\end_inset
+
+We used the following interpolations:
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{s} & =\sum_{a}N_{a}\delta\mathbf{v}_{a}^{s} & \Delta\mathbf{u} & =\sum_{b}N_{b}\Delta\mathbf{u}_{b}\\
+\grad\delta\mathbf{v}^{s} & =\sum_{a}\delta\mathbf{v}_{a}^{s}\otimes\grad N_{a} & \grad\Delta\mathbf{u} & =\sum_{b}\Delta\mathbf{u}_{b}\otimes\grad N_{b}\\
+\divg\delta\mathbf{v}^{s} & =\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\grad N_{a} & \divg\Delta\mathbf{u} & =\sum_{b}\Delta\mathbf{u}_{b}\cdot\grad N_{b}\\
+\delta\mathbf{w} & =\sum_{a}N_{a}\delta\mathbf{w}_{a} & \Delta\mathbf{w} & =\sum_{b}N_{b}\Delta\mathbf{w}_{b}\\
+\grad\delta\mathbf{w} & =\sum_{a}\delta\mathbf{w}_{a}\otimes\grad N_{a} & \grad\Delta\mathbf{w} & =\sum_{b}\Delta\mathbf{w}_{b}\otimes\grad N_{b}\\
+\delta J^{f} & =\sum_{a}N_{a}\delta J_{a}^{f} & \Delta J^{f} & =\sum_{b}N_{b}\Delta J_{b}^{f}\\
+\grad\delta J^{f} & =\sum_{a}\delta J_{a}^{f}\grad N_{a} & \grad\Delta J^{f} & =\sum_{b}\Delta J_{b}^{f}\grad N_{b}
+\end{aligned}
+\label{eq:fsi-interpolations}
+\end{equation}
+
+\end_inset
+
+Note that the 
+\begin_inset Formula $\grad\equiv\frac{\partial}{\partial\mathbf{x}}$
+\end_inset
+
+ operator should be evaluated using 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The solution of the nonlinear equation 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+ is obtained by linearizing this relation as
+\begin_inset Formula 
+\begin{equation}
+\delta W+D\delta W\left[\Delta\mathbf{u}\right]+D\delta W\left[\Delta\mathbf{w}\right]+D\delta W\left[\Delta J^{f}\right]\approx0\,,\label{eq:fsi-linearized-virtual-work}
+\end{equation}
+
+\end_inset
+
+where the operator 
+\begin_inset Formula $D\delta W\left[\cdot\right]$
+\end_inset
+
+ represents the directional derivative of 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ at 
+\begin_inset Formula $\left(\mathbf{u}^{s},\mathbf{w},J^{f}\right)$
+\end_inset
+
+ along an increment 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{u}^{s}$
+\end_inset
+
+, 
+\begin_inset Formula $\Delta\mathbf{w}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+, or 
+\begin_inset Formula $\Delta J^{f}$
+\end_inset
+
+ of 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+To linearize the virtual work, we need to express the integrals appearing
+ in 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta W_{ext}$
+\end_inset
+
+ over the material frame of the finite element solid domain.
+ For notational convenience, we let 
+\begin_inset Formula $J\equiv J^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}\equiv\mathbf{F}^{s}$
+\end_inset
+
+.
+ Thus,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\int_{b}\boldsymbol{\sigma}^{s}:\grad\delta\mathbf{v}^{s}\,dv & =\int_{B}\mathbf{F}\cdot\mathbf{S}^{s}:\Grad\delta\mathbf{v}^{s}\,dV\end{aligned}
+\,,\label{eq:fsi-work-material-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{S}^{s}=J\cdot\mathbf{F}^{-1}\cdot\boldsymbol{\sigma}^{s}\cdot\mathbf{F}^{-T}$
+\end_inset
+
+ is the second Piola-Kirchhoff stress for the solid material.
+ Similarly,
+\begin_inset Formula 
+\begin{equation}
+\int_{b}\boldsymbol{\tau}:\grad\delta\mathbf{w}\,dv=\int_{B}\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}:\Grad\delta\mathbf{w}\,dV\,.\label{eq:fsi-work-material-2}
+\end{equation}
+
+\end_inset
+
+Next,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & \int_{b}\delta\mathbf{w}\cdot\left(\grad p+\rho^{f}\mathbf{a}^{f}\right)\,dv\\
+ & =\int_{B}\delta\mathbf{w}\cdot\left(J\mathbf{F}^{-T}\cdot\Grad p+J\rho^{f}\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\rho^{f}\left(\Grad\mathbf{w}+\Grad\mathbf{v}^{s}\right)\cdot\mathbf{W}\right)\,dV
+\end{aligned}
+\label{eq:fsi-work-material-3-4}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\int_{b}\delta J^{f}\left[\frac{1}{J^{f}}\left(\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)-\frac{\dot{J}}{J}\right]\,dv=\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV\label{eq:fsi-work-material-5}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\int_{b}\mathbf{w}\cdot\grad\delta J^{f}\,dv=\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV\label{eq:fsi-work-material-6}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{W}=J\mathbf{F}^{-1}\cdot\mathbf{w}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Keep in mind that we are solving for the motions 
+\begin_inset Formula $\boldsymbol{\chi}_{n+1}^{\iota}$
+\end_inset
+
+ at 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+.
+ Therefore,
+\begin_inset Formula 
+\[
+\begin{aligned}D\mathbf{u}^{s}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Delta\mathbf{u}\\
+D\mathbf{F}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Grad\Delta\mathbf{u}\\
+DJ\left[\Delta\mathbf{u}\right] & =\alpha_{f}J\left(\divg\Delta\mathbf{u}\right)\\
+D\dot{J}\left[\Delta\mathbf{u}\right] & =D\left(J\mathbf{F}^{-T}:\Grad\mathbf{v}^{s}\right)\left[\Delta\mathbf{u}\right]\\
+ & =\alpha_{f}J\left[\left(\divg\mathbf{v}^{s}+\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)-\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}^{s}\right]\\
+D\mathbf{v}^{s}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{f}\gamma}{\beta\Delta t}\Delta\mathbf{u}\\
+D\mathbf{w}\left[\Delta\mathbf{w}\right] & =\alpha_{f}\Delta\mathbf{w}\\
+DJ^{f}\left[\Delta J^{f}\right] & =\alpha_{f}\Delta J^{f}\\
+D\rho^{f}\left[\Delta J^{f}\right] & =-\alpha_{f}\frac{\rho^{f}}{J^{f}}\Delta J^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+In general, 
+\begin_inset Formula $\boldsymbol{\sigma}^{s}$
+\end_inset
+
+ (and thus, 
+\begin_inset Formula $\mathbf{S}^{s}$
+\end_inset
+
+) is only a function of the solid strain, such as the right Cauchy-Green
+ tensor 
+\begin_inset Formula $\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}$
+\end_inset
+
+ or the Green-Lagrange strain 
+\begin_inset Formula $\mathbf{E}=\left(\mathbf{C}-\mathbf{I}\right)/2$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\[
+D\mathbf{E}\left[\Delta\mathbf{u}\right]=\frac{\alpha_{f}}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)
+\]
+
+\end_inset
+
+Therefore, following the standard approach in solid mechanics, the linearization
+ of 
+\begin_inset Formula $\mathbf{S}^{s}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{S}^{s} & =D\mathbf{S}^{s}\left[\Delta\mathbf{u}\right]=\frac{\partial\mathbf{S}^{s}}{\partial\mathbf{E}}:D\mathbf{E}\left[\Delta\mathbf{u}\right]\\
+ & =\alpha_{f}\boldsymbol{\mathbb{C}}^{s}:\frac{1}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\\
+ & =\alpha_{f}\boldsymbol{\mathbb{C}}^{s}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right):\Delta\boldsymbol{\varepsilon}
+\end{aligned}
+\label{eq:fsi-solid-stress-linearization}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In general, 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is a function of the fluid volume ratio 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ and the rate of deformation of the fluid, 
+\begin_inset Formula $\mathbf{D}^{f}=\frac{1}{2}\left(\mathbf{L}^{f}+\left(\mathbf{L}^{f}\right)^{T}\right)$
+\end_inset
+
+.
+ However, since 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ is not a degree of freedom, we need to let 
+\begin_inset Formula $\mathbf{D}^{f}=\mathbf{D}^{w}+\mathbf{D}^{s}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{D}^{w}=\frac{1}{2}\left(\mathbf{L}^{w}+\left(\mathbf{L}^{w}\right)^{T}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{D}^{s}=\frac{1}{2}\left(\mathbf{L}^{s}+\left(\mathbf{L}^{s}\right)^{T}\right)$
+\end_inset
+
+.
+ Thus,
+\begin_inset Formula 
+\begin{equation}
+D\boldsymbol{\tau}=\boldsymbol{\mathcal{C}}^{\tau}:\left(D\mathbf{D}^{f}\left[\Delta\mathbf{w}\right]+D\mathbf{D}^{f}\left[\Delta\mathbf{u}\right]\right)+\frac{\partial\boldsymbol{\tau}}{\partial J^{f}}DJ^{f}\left[\Delta J^{f}\right]\label{eq:fsi-fluid-stress-linearization}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}^{\tau}=\frac{\partial\boldsymbol{\tau}}{\partial\mathbf{D}^{f}}\label{eq:fsi-viscous-tangent-tensor}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of 
+\begin_inset Formula $\int_{B}\mathbf{F}\cdot\mathbf{S}^{s}:\Grad\delta\mathbf{v}^{s}\,dV$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & D\left(\int_{B}\mathbf{F}\cdot\mathbf{S}^{s}:\Grad\delta\mathbf{v}^{s}\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{b}\alpha_{f}\left(\boldsymbol{\sigma}^{s}:\grad^{T}\Delta\mathbf{u}\cdot\grad\delta\mathbf{v}^{s}+\grad\delta\mathbf{v}^{s}:\boldsymbol{\mathcal{C}}^{s}:\Delta\boldsymbol{\varepsilon}\right)\,dv
+\end{aligned}
+\label{eq:fsi-term-1-Du}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}^{s}=J^{-1}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):\boldsymbol{\mathbb{C}}^{s}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right)
+\]
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\begin{equation}
+D\left(\int_{B}\mathbf{F}\cdot\mathbf{S}^{s}:\Grad\delta\mathbf{v}^{s}\,dV\right)\left[\Delta\mathbf{w}\right]=0\label{eq:fsi-term-1-Dw}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+D\left(\int_{B}\mathbf{F}\cdot\mathbf{S}^{s}:\Grad\delta\mathbf{v}^{s}\,dV\right)\left[\Delta J^{f}\right]=0\label{eq:fsi-term-1-DJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretized version produces
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{b}\alpha_{f}\left(\boldsymbol{\sigma}^{s}:\grad^{T}\Delta\mathbf{u}\cdot\grad\delta\mathbf{v}^{s}+\grad\delta\mathbf{v}^{s}:\boldsymbol{\mathcal{C}}^{s}:\Delta\boldsymbol{\varepsilon}\right)\,dv\\
+ & =\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{uu}\,dv\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{ab}^{uu}=\alpha_{f}\left(\left(\grad N_{a}\cdot\boldsymbol{\sigma}^{s}\cdot\grad N_{b}\right)\mathbf{I}+\left(\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{s}\cdot\grad N_{b}\right)\right)\label{eq:fsi-term-1-Kuu}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{ab}^{uw}=\mathbf{0}\label{eq:term-1-Kuw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{k}_{ab}^{uJ}=\mathbf{0}\label{eq:term-1-kuJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of 
+\begin_inset Formula $\int_{B}\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}:\Grad\delta\mathbf{w}\,dV$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & D\left(\int_{B}\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}:\Grad\delta\mathbf{w}\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{b}\alpha_{f}\left(\boldsymbol{\tau}:\grad\delta\mathbf{w}\cdot\Delta\mathbf{G}+\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\,dv
+\end{aligned}
+\label{eq:fsi-term-2-Du}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\int_{B}\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}:\Grad\delta\mathbf{w}\,dV\right)\left[\Delta\mathbf{u}\right] & =\int_{B}D\left(\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}\right)\left[\Delta\mathbf{u}\right]:\Grad\delta\mathbf{w}\,dV\\
+ & =\int_{B}\left(D\boldsymbol{\tau}\left[\Delta\mathbf{u}\right]\cdot J\mathbf{F}^{-T}+\boldsymbol{\tau}\cdot D\left(J\mathbf{F}^{-T}\right)\left[\Delta\mathbf{u}\right]\right):\Grad\delta\mathbf{w}\,dV
+\end{aligned}
+\]
+
+\end_inset
+
+where we used
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}^{\tau}=\frac{\partial\boldsymbol{\tau}}{\partial\mathbf{D}^{f}}\,.
+\]
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left(\int_{B}\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}:\Grad\delta\mathbf{w}\,dV\right)\left[\Delta\mathbf{w}\right] & =\int_{b}\alpha_{f}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\grad\Delta\mathbf{w}\,dv\end{aligned}
+\label{eq:fsi-term-2-Dw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+D\left(\int_{B}\boldsymbol{\tau}\cdot J\mathbf{F}^{-T}:\Grad\delta\mathbf{w}\,dV\right)\left[\Delta J^{f}\right]=\int_{b}\alpha_{f}\Delta J^{f}\boldsymbol{\tau}_{J}^{\prime}:\grad\delta\mathbf{w}\,dv\label{eq:fsi-term-2-DJ}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}_{J}^{\prime}=\frac{\partial\boldsymbol{\tau}}{\partial J^{f}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretized version produces
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{b}\alpha_{f}\left(\boldsymbol{\tau}:\grad\delta\mathbf{w}\cdot\Delta\mathbf{G}+\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\,dv\\
+ & =\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{wu}\,dv\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{ab}^{wu}=\alpha_{f}\boldsymbol{\tau}\cdot\left(\grad N_{a}\otimes\grad N_{b}-\grad N_{b}\otimes\grad N_{a}\right)+\left(\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}\right)\cdot\mathbf{M}\label{eq:fsi-term-2-Kwu}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\int_{b}\alpha_{f}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\grad\Delta\mathbf{w}\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{ww}\,dv\cdot\Delta\mathbf{w}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{ab}^{ww}=\alpha_{f}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}\label{eq:fsi-term-2-Kww}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\int_{b}\alpha_{f}\Delta J^{f}\boldsymbol{\tau}_{J}^{\prime}:\grad\delta\mathbf{w}\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{k}_{ab}^{wJ}\,dv\,\Delta J_{b}^{f}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{k}_{ab}^{wJ}=\alpha_{f}N_{b}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad N_{a}\label{eq:fsi-term-2-kwJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of 
+\begin_inset Formula $\int_{B}\delta\mathbf{w}\cdot J\mathbf{F}^{-T}\cdot\Grad p\,dV$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta\mathbf{w}\cdot J\mathbf{F}^{-T}\cdot\Grad p\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{b}\alpha_{f}\delta\mathbf{w}\cdot\Delta\mathbf{G}^{T}\cdot\grad p\,dv
+\end{aligned}
+}\label{eq:fsi-term-3-Du}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\delta\mathbf{w}\cdot J\mathbf{F}^{-T}\cdot\Grad p\,dV\right)\left[\Delta\mathbf{w}\right]=0}\label{eq:fsi-term-3-Dw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta\mathbf{w}\cdot J\mathbf{F}^{-T}\cdot\Grad p\,dV\right)\left[\Delta J^{f}\right]\\
+ & =\int_{b}\alpha_{f}\delta\mathbf{w}\cdot\left(\Delta J^{f}p^{\prime\prime}\left(J^{f}\right)\grad J^{f}+p^{\prime}\left(J^{f}\right)\grad\Delta J^{f}\right)\,dv
+\end{aligned}
+}\label{eq:fsi-term-3-DJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretization of these terms produces
+\begin_inset Formula 
+\[
+\int_{b}\alpha_{f}\delta\mathbf{w}\cdot\Delta\mathbf{G}^{T}\cdot\grad p\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{wu}\,dv\cdot\Delta\mathbf{u}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{wu}=\alpha_{f}N_{a}\left(\grad p\otimes\grad N_{b}-\grad N_{b}\otimes\grad p\right)}\label{eq:fsi-term-3-Kwu}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{ww}=\mathbf{0}}\label{eq:term-3-Kww}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\int_{b}\alpha_{f}\delta\mathbf{w}\cdot\left(\Delta J^{f}p^{\prime\prime}\left(J^{f}\right)\grad J^{f}+p^{\prime}\left(J^{f}\right)\grad\Delta J^{f}\right)\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{k}_{ab}^{wJ}\,dv\Delta J_{b}^{f}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{wJ}=\alpha_{f}N_{a}\left(N_{b}p^{\prime\prime}\left(J^{f}\right)\grad J^{f}+p^{\prime}\left(J^{f}\right)\grad N_{b}\right)}\label{eq:fsi-term-3-kwJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of 
+\begin_inset Formula $\int_{B}\delta\mathbf{w}\cdot\rho^{f}\left[J\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\left(\Grad\mathbf{w}+\Grad\mathbf{v}^{s}\right)\cdot\mathbf{W}\right]\,dV$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{B}\delta\mathbf{w}\cdot\rho^{f}\left[J\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\left(\Grad\mathbf{w}+\Grad\mathbf{v}^{s}\right)\cdot\mathbf{W}\right]\,dV
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}\left[J\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\left(\Grad\mathbf{w}+\Grad\mathbf{v}^{s}\right)\cdot\mathbf{W}\right]\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{b}\delta\mathbf{w}\cdot\alpha_{f}\rho^{f}\left[\left(\divg\Delta\mathbf{u}\right)\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\frac{\gamma}{\beta\Delta t}\grad\Delta\mathbf{u}\cdot\mathbf{w}+\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}\Delta\mathbf{u}\right]\,dv\\
+ & +\int_{b}\delta\mathbf{w}\cdot\alpha_{f}\rho^{f}\mathbf{L}^{f}\cdot\Delta\mathbf{G}\cdot\mathbf{w}\,dv
+\end{aligned}
+}\label{eq:fsi-term-4-Du}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}\left[J\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\left(\Grad\mathbf{w}+\Grad\mathbf{v}^{s}\right)\cdot\mathbf{W}\right]\,dV\right)\left[\Delta\mathbf{w}\right]\\
+ & =\int_{b}\delta\mathbf{w}\cdot\alpha_{f}\rho^{f}\left[\left(\frac{\alpha_{m}}{\alpha_{f}\gamma\Delta t}\mathbf{I}+\mathbf{L}^{f}\right)\cdot\Delta\mathbf{w}+\grad\Delta\mathbf{w}\cdot\mathbf{w}\right]\,dv
+\end{aligned}
+}\label{eq:fsi-term-4-Dw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}\left[J\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\left(\Grad\mathbf{w}+\Grad\mathbf{v}^{s}\right)\cdot\mathbf{W}\right]\,dV\right)\left[\Delta J^{f}\right]\\
+ & =-\int_{b}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho^{f}}{J^{f}}\Delta J^{f}\mathbf{a}^{f}\,dv
+\end{aligned}
+}\label{eq:fsi-term-4-DJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretized version is given by
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{b}\delta\mathbf{w}\cdot\alpha_{f}\rho^{f}\left[\left(\divg\Delta\mathbf{u}\right)\left(\dot{\mathbf{w}}+\dot{\mathbf{v}}^{s}\right)+\frac{\gamma}{\beta\Delta t}\grad\Delta\mathbf{u}\cdot\mathbf{w}+\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}\Delta\mathbf{u}\right]\,dv\\
+ & +\int_{b}\delta\mathbf{w}\cdot\alpha_{f}\rho^{f}\mathbf{L}^{f}\cdot\Delta\mathbf{G}\cdot\mathbf{w}\,dv\\
+ & =\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{wu}\,dv\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned}\mathbf{K}_{ab}^{wu} & =\alpha_{f}N_{a}\rho^{f}\left[\mathbf{a}^{f}\otimes\grad N_{b}-\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{L}^{f}+\left(\frac{\gamma}{\beta\Delta t}\left(\grad N_{b}\cdot\mathbf{w}\right)+\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}N_{b}\right)\mathbf{I}\right]\end{aligned}
+}\label{eq:fsi-term-4-Kwu}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{b}\delta\mathbf{w}\cdot\alpha_{f}\rho^{f}\left[\left(\frac{\alpha_{m}}{\alpha_{f}\gamma\Delta t}\mathbf{I}+\mathbf{L}^{f}\right)\cdot\Delta\mathbf{w}+\grad\Delta\mathbf{w}\cdot\mathbf{w}\right]\,dv\\
+ & =\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{ww}\,dv\cdot\Delta\mathbf{w}_{b}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{ww}=\alpha_{f}N_{a}\rho^{f}\left[N_{b}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma\Delta t}\mathbf{I}+\mathbf{L}^{f}\right)+\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}\right]}\label{eq:fsi-term-4-Kww}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+-\int_{B}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho^{f}}{J^{f}}\Delta J^{f}\mathbf{a}^{f}\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{k}_{ab}^{wJ}\,dv\Delta J_{b}^{f}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{wJ}=-\alpha_{f}N_{a}N_{b}\frac{\rho^{f}}{J^{f}}\mathbf{a}^{f}}\label{eq:fsi-term-4-kwJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of 
+\begin_inset Formula $\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & D\left(\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(DJ\left[\Delta\mathbf{u}\right]\dot{J}^{f}+\Grad J^{f}\cdot D\mathbf{W}\left[\Delta\mathbf{u}\right]\right)-D\dot{J}\left[\Delta\mathbf{u}\right]\right]\,dV\\
+ & =\int_{b}\delta J^{f}\alpha_{f}\left[\left(\frac{\dot{J}^{f}}{J^{f}}-\divg\mathbf{v}^{s}-\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)+\mathbf{w}\cdot\left[\left(\divg\Delta\mathbf{u}\right)\mathbf{I}-\grad^{T}\Delta\mathbf{u}\right]\cdot\frac{\grad J^{f}}{J^{f}}+\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}^{s}\right]\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{b}\delta J^{f}\alpha_{f}\left[\left(\frac{\dot{J}^{f}}{J^{f}}-\divg\mathbf{v}^{s}-\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)+\mathbf{w}\cdot\Delta\mathbf{G}^{T}\cdot\frac{\grad J^{f}}{J^{f}}+\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}^{s}\right]\,dv
+\end{aligned}
+}\label{eq:fsi-term-5-Du}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV\right)\left[\Delta\mathbf{w}\right]\\
+ & =\int_{b}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\Delta\mathbf{w}\cdot\grad J^{f}\,dv
+\end{aligned}
+}\label{eq:fsi-term-5-Dw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\delta J^{f}\left[\frac{1}{J^{f}}\left(J\dot{J}^{f}+\Grad J^{f}\cdot\mathbf{W}\right)-\dot{J}\right]\,dV\right)\left[\Delta J^{f}\right]\\
+ & =\int_{b}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\left(\left[\frac{\alpha_{m}}{\alpha_{f}\gamma\Delta t}-\frac{1}{J^{f}}\left(\dot{J}^{f}+\mathbf{w}\cdot\grad J^{f}\right)\right]\Delta J^{f}+\mathbf{w}\cdot\grad\Delta J^{f}\right)\,dv
+\end{aligned}
+}\label{eq:fsi-term-5-DJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretization of these terms produces
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{b}\delta J^{f}\alpha_{f}\left[\left(\frac{\dot{J}^{f}}{J^{f}}-\divg\mathbf{v}^{s}-\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)+\mathbf{w}\cdot\Delta\mathbf{G}^{T}\cdot\frac{\grad J^{f}}{J^{f}}+\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}^{s}\right]\,dv\\
+ & =\sum_{a}\delta J_{a}^{f}\sum_{b}\int_{b}\mathbf{k}_{ab}^{Ju}\,dv\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned}\mathbf{k}_{ab}^{Ju} & =\alpha_{f}N_{a}\left[\left(\frac{\dot{J}^{f}}{J^{f}}-\divg\mathbf{v}^{s}-\frac{\gamma}{\beta\Delta t}\right)\grad N_{b}+\left(\grad N_{b}\otimes\frac{\grad J^{f}}{J^{f}}-\frac{\grad J^{f}}{J^{f}}\otimes\grad N_{b}\right)\cdot\mathbf{w}+\left(\mathbf{L}^{s}\right)^{T}\cdot\grad N_{b}\right]\end{aligned}
+}\label{eq:fsi-term-5-kJu}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\int_{b}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\Delta\mathbf{w}\cdot\grad J^{f}\,dv=\sum_{a}\delta J_{a}^{f}\sum_{b}\int_{b}\mathbf{k}_{ab}^{Jw}\,dv\cdot\Delta\mathbf{w}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{Jw}=\alpha_{f}\frac{N_{a}N_{b}}{J^{f}}\grad J^{f}}\label{eq:fsi-term-5-kJw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{b}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\left(\left[\frac{\alpha_{m}}{\alpha_{f}\gamma\Delta t}-\frac{1}{J^{f}}\left(\dot{J}^{f}+\mathbf{w}\cdot\grad J^{f}\right)\right]\Delta J^{f}+\mathbf{w}\cdot\grad\Delta J^{f}\right)\,dv\\
+ & =\sum_{a}\delta J_{a}^{f}\sum_{b}\int_{b}k_{ab}^{JJ}\,dv\Delta J_{b}^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{k_{ab}^{JJ}=\alpha_{f}N_{a}\frac{1}{J^{f}}\left(N_{b}\left[\frac{\alpha_{m}}{\alpha_{f}\gamma\Delta t}-\frac{1}{J^{f}}\left(\dot{J}^{f}+\mathbf{w}\cdot\grad J^{f}\right)\right]+\mathbf{w}\cdot\grad N_{b}\right)}\label{eq:fsi-term-5-kJJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of 
+\begin_inset Formula $-\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV\right)\left[\Delta\mathbf{u}\right]=\int_{b}\alpha_{f}\mathbf{w}\cdot\Delta\mathbf{G}^{T}\cdot\grad\delta J^{f}\,dv}\label{eq:fsi-term-6-Du}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & D\left(\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{B}\Grad\delta J^{f}\cdot D\mathbf{W}\left[\Delta\mathbf{w}\right]\,dV\\
+ & =\int_{B}\alpha_{f}\Delta\mathbf{w}\cdot\grad\delta J^{f}\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV\right)\left[\Delta\mathbf{w}\right]=\int_{B}\alpha_{f}\Delta\mathbf{w}\cdot\grad\delta J^{f}\,dv}\label{eq:fsi-term-6-Dw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\Grad\delta J^{f}\cdot\mathbf{W}\,dV\right)\left[\Delta J^{f}\right]=0}\label{eq:fsi-term-6-DJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretization of these terms produces
+\begin_inset Formula 
+\[
+\int_{b}\alpha_{f}\mathbf{w}\cdot\Delta\mathbf{G}^{T}\cdot\grad\delta J^{f}\,dv=\sum_{a}\delta J_{a}^{f}\sum_{b}\int_{v}\mathbf{k}_{ab}^{Ju}\,dv\cdot\Delta\mathbf{u}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{Ju}=\alpha_{f}\left(\grad N_{b}\otimes\grad N_{a}-\grad N_{a}\otimes\grad N_{b}\right)\cdot\mathbf{w}}\label{eq:fsi-term-6-kJu}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\int_{B}\alpha_{f}\Delta\mathbf{w}\cdot\grad\delta J^{f}\,dv=\sum_{a}\delta J_{a}^{f}\sum_{b}\int_{b}\mathbf{k}_{ab}^{Jw}\,dv\cdot\Delta\mathbf{w}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{Jw}=\alpha_{f}N_{b}\grad N_{a}}\label{eq:fsi-term-6-kJw}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{k_{ab}^{JJ}=0}\label{eq:fsi-term-6-kJJ}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Body force term 
+\begin_inset Formula $\int_{b}\delta\mathbf{w}\cdot\rho^{f}\mathbf{b}\,dv$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The body force term may be discretized as
+\begin_inset Formula 
+\[
+\int_{b}\delta\mathbf{w}\cdot\rho^{f}\mathbf{b}\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\int_{b}N_{a}\rho^{f}\mathbf{b}\,dv
+\]
+
+\end_inset
+
+To linearizes this expression, we first evaluate it in the material domain,
+\begin_inset Formula 
+\[
+\int_{b}\delta\mathbf{w}\cdot\rho^{f}\mathbf{b}\,dv=\int_{B}\delta\mathbf{w}\cdot\rho^{f}J\mathbf{b}\,dV
+\]
+
+\end_inset
+
+Now,
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}J\mathbf{b}\,dV\right)\left[\Delta\mathbf{u}\right]=\int_{b}\alpha_{f}\rho^{f}\left(\divg\Delta\mathbf{u}\right)\delta\mathbf{w}\cdot\mathbf{b}\,dv}\label{eq:fsi-bf-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}J\mathbf{b}\,dV\right)\left[\Delta\mathbf{w}\right]=0}\label{eq:fsi-bf-2}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}J\mathbf{b}\,dV\right)\left[\Delta J^{f}\right]=-\int_{b}\Delta J^{f}\frac{\alpha_{f}\rho^{f}}{J^{f}}\delta\mathbf{w}\cdot\mathbf{b}\,dv}\label{eq:fsi-bf-3}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discrete forms of these expressions are given by
+\begin_inset Formula 
+\[
+\int_{b}\alpha_{f}\rho^{f}\left(\divg\Delta\mathbf{u}\right)\delta\mathbf{w}\cdot\mathbf{b}\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{wu}\,dv\cdot\Delta\mathbf{u}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{wu}=\alpha_{f}\rho^{f}N_{a}\mathbf{b}\otimes\grad N_{b}}\label{eq:fsi-bf-4}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{ww}=\mathbf{0}}\label{eq:fsi-bf-5}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+-\int_{b}\Delta J^{f}\frac{\alpha_{f}\rho^{f}}{J^{f}}\delta\mathbf{w}\cdot\mathbf{b}\,dv=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{b}\mathbf{k}_{ab}^{wJ}\,dv\,\Delta J_{b}^{f}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{wJ}=-\alpha_{f}N_{a}N_{b}\frac{\rho^{f}}{J^{f}}\mathbf{b}}\label{eq:fsi-bf-6}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Fluid traction acting on solid interface
+\end_layout
+
+\begin_layout Standard
+At a fluid-solid interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, the fluid traction 
+\begin_inset Formula $\mathbf{t}^{f}=\boldsymbol{\sigma}^{f}\cdot\mathbf{n}$
+\end_inset
+
+ acts on the solid surface, 
+\begin_inset Formula $\mathbf{t}^{s}=-\mathbf{t}^{f}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is the outward normal to the fluid surface.
+ The resulting virtual work on the solid domain is
+\begin_inset Formula 
+\[
+\delta G=\int_{\Gamma}\delta\mathbf{v}^{s}\cdot\mathbf{t}_{n+\alpha_{f}}^{s}\,da=\int_{\Gamma}-\delta\mathbf{v}^{s}\cdot\boldsymbol{\sigma}^{f}\cdot\mathbf{n}\,da=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\boldsymbol{\sigma}^{f}\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+The linearization of this work is given by
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta\mathbf{u}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(\boldsymbol{\mathcal{C}}^{v}:\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)+\boldsymbol{\sigma}^{f}\cdot\left(\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\times\mathbf{g}_{2}+\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}\right)\right]\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+\mathbf{g}_{\alpha}=\frac{\partial\mathbf{x}}{\partial\eta^{\alpha}}
+\]
+
+\end_inset
+
+are covariant basis vectors on 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+.
+ Similarly,
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta\mathbf{w}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(\boldsymbol{\mathcal{C}}^{v}:\grad\Delta\mathbf{w}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\right]\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta J^{f}\right]=\int_{\Gamma_{\eta}}-\Delta J^{f}\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(-p^{\prime}\left(J^{f}\right)+\boldsymbol{\tau}_{J}^{\prime}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\right]\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretized form of these equations is
+\begin_inset Formula 
+\[
+\delta G=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\int_{\Gamma}\mathbf{f}_{a}\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{f}_{a}=-N_{a}\boldsymbol{\sigma}^{f}\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)}\label{eq:fsi-ft-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta\mathbf{u}\right]=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\sum_{b}\int_{\Gamma_{\eta}}\mathbf{K}_{ab}^{uu}\,d\eta^{1}d\eta^{2}\cdot\Delta\mathbf{u}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{uu}=-\alpha_{f}N_{a}\left(\left[\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}^{v}\cdot\grad N_{b}\right]\cdot\mathbf{M}+\boldsymbol{\sigma}^{f}\cdot\boldsymbol{\mathcal{A}}\left\{ \frac{\partial N_{b}}{\partial\eta^{2}}\mathbf{g}_{1}-\frac{\partial N_{b}}{\partial\eta^{1}}\mathbf{g}_{2}\right\} \right)}\label{eq:fsi-ft-2}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta\mathbf{w}\right]=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\sum_{b}\int_{\Gamma_{\eta}}\mathbf{K}_{ab}^{uw}\,d\eta^{1}d\eta^{2}\cdot\Delta\mathbf{w}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{uw}=-\alpha_{f}N_{a}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}^{v}\cdot\grad N_{b}}\label{eq:fsi-ft-3}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta J^{f}\right]=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\sum_{b}\int_{\Gamma_{\eta}}\mathbf{k}_{ab}^{uJ}\,d\eta^{1}d\eta^{2}\,\Delta J_{b}^{f}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{k}_{ab}^{uJ}=-\alpha_{f}N_{a}N_{b}\left(-p^{\prime}\left(J^{f}\right)+\boldsymbol{\tau}_{J}^{\prime}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)}\label{eq:fsi-ft-4}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Special Boundary Conditions
+\end_layout
+
+\begin_layout Subsubsection
+Backflow Stabilization
+\end_layout
+
+\begin_layout Standard
+Let the normal component of the viscous traction be given by 
+\begin_inset Formula 
+\begin{equation}
+t_{n}^{\tau}=\begin{cases}
+\beta\rho_{r}w_{n}^{2} & w_{n}<0\\
+0 & w_{n}\ge0
+\end{cases}\,.\label{eq:fsi-BFS-normal-traction}
+\end{equation}
+
+\end_inset
+
+Then, the contribution of this traction to the virtual external work 
+\begin_inset Formula $\delta W_{ext}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+\delta G=\int_{\partial\Omega}\delta\mathbf{w}\cdot t_{n}^{\tau}\mathbf{n}\,da\,.\label{eq:fsi-BFSckflow-virtual-work}
+\end{equation}
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ along an increment 
+\begin_inset Formula $\Delta\mathbf{w}$
+\end_inset
+
+ in the relative velocity is given by
+\begin_inset Formula 
+\begin{equation}
+D\delta G\left[\Delta\mathbf{w}\right]=\int_{\partial\Omega}\delta\mathbf{w}\cdot\alpha_{f}\mathbf{K}_{n}\cdot\Delta\mathbf{w}\,da\,,\label{eq:fsi-BFS-linearization}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{n}=\begin{cases}
+2\beta\rho_{r}w_{n}\left(\mathbf{n}\otimes\mathbf{n}\right) & v_{n}<0\\
+\mathbf{0} & v_{n}\ge0
+\end{cases}\,.\label{eq:fsi-BFS-stiffness}
+\end{equation}
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta\mathbf{u}\right]=\int_{\partial\Omega_{\eta}}\delta\mathbf{w}\cdot\alpha_{f}t_{n}^{\tau}\left(\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}-\mathbf{g}_{2}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\right)\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+The discretized form of 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\delta G=\sum_{a}\delta\mathbf{w}_{a}\cdot\int_{\partial\Omega_{\eta}}\mathbf{f}_{a}^{n}\,d\eta^{1}d\eta^{2},\quad\boxed{\mathbf{f}_{a}^{n}=N_{a}t_{n}^{\tau}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)}\,,\label{eq:fsi-BFS-discretized-work}
+\end{equation}
+
+\end_inset
+
+whereas the discretized form of 
+\begin_inset Formula $D\delta G\left[\Delta\mathbf{v}\right]$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+D\delta G\left[\Delta\mathbf{v}\right]=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\left(\int_{\partial\Omega_{\eta}}\mathbf{K}_{ab}^{wu}\,d\eta^{1}d\eta^{2}\cdot\Delta\mathbf{u}+\int_{\partial\Omega_{\eta}}\mathbf{K}_{ab}^{ww}\,d\eta^{1}d\eta^{2}\cdot\Delta\mathbf{w}_{b}\right)\,,\label{eq:BFS-discretized-tangent-1}
+\end{equation}
+
+\end_inset
+
+with
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{ww}=\alpha_{f}N_{a}N_{b}\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\mathbf{K}_{n}}\,,\label{eq:fsi-BFS-Kww}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{wu}=\alpha_{f}N_{a}t_{n}^{\tau}\boldsymbol{\mathcal{A}}\left\{ \frac{\partial N_{b}}{\partial\eta^{2}}\mathbf{g}_{1}-\frac{\partial N_{b}}{\partial\eta^{1}}\mathbf{g}_{2}\right\} }\label{eq:fsi-BFS-Kwu}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Tangential Stabilization
+\end_layout
+
+\begin_layout Standard
+The tangential traction given by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}_{t}^{\tau}=-\beta\rho_{r}\left|\mathbf{w}_{t}\right|\mathbf{w}_{t}\,.\label{eq:fsi-tangential-stabilization}
+\end{equation}
+
+\end_inset
+
+This form shows that 
+\begin_inset Formula $\mathbf{t}_{t}^{\tau}$
+\end_inset
+
+ opposes tangential flow.
+ The external virtual work for this traction is
+\begin_inset Formula 
+\begin{equation}
+\delta G=\int_{\partial\Omega}\delta\mathbf{w}\cdot\mathbf{t}_{t}^{\tau}\,da\,.\label{eq:fsi-TS-external-work}
+\end{equation}
+
+\end_inset
+
+Its linearization along an increment 
+\begin_inset Formula $\Delta\mathbf{w}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+D\delta G\left[\Delta\mathbf{w}\right]=\int_{\partial\Omega}\delta\mathbf{w}\cdot\alpha_{f}\mathbf{K}_{t}\cdot\Delta\mathbf{w}\,da\,,\label{eq:fsi-TS-linearization}
+\end{equation}
+
+\end_inset
+
+where it can be shown that
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{t}=-\beta\rho_{r}\left|\mathbf{w}_{t}\right|\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}+\frac{\mathbf{w}_{t}}{\left|\mathbf{w}_{t}\right|}\otimes\frac{\mathbf{w}_{t}}{\left|\mathbf{w}_{t}\right|}\right)\,.\label{eq:fsi-TS-stiffness}
+\end{equation}
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\[
+D\delta G\left[\Delta\mathbf{u}\right]=\int_{\partial\Omega_{\eta}}\delta\mathbf{w}\cdot\alpha_{f}\left(\mathbf{t}_{t}^{\tau}\otimes\mathbf{n}\right)\cdot\left(\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\times\mathbf{g}_{2}+\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}\right)\,d\eta^{1}d\eta^{2}\,.
+\]
+
+\end_inset
+
+The discretized form of 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\delta G=\sum_{a}\delta\mathbf{v}_{a}\cdot\int_{\partial\Omega}\mathbf{f}_{a}^{\tau}\,d\eta^{1}d\eta^{2}\,,\quad\boxed{\mathbf{f}_{a}^{\tau}=N_{a}\mathbf{t}_{t}^{\tau}\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,.\label{eq:fsi-TS-discretized-work}
+\end{equation}
+
+\end_inset
+
+The discretized form of 
+\begin_inset Formula $D\delta G\left[\Delta\mathbf{v}\right]$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+D\delta G\left[\Delta\mathbf{v}\right]=\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\int_{\partial\Omega_{\eta}}\left(\mathbf{K}_{ab}^{wu}\cdot\Delta\mathbf{u}_{b}+\mathbf{K}_{ab}^{ww}\cdot\Delta\mathbf{w}_{b}\right)\,d\eta^{1}d\eta^{2}\,,\label{eq:TS-discretized-tangent-1}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{ww}=\alpha_{f}N_{a}N_{b}\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\mathbf{K}_{t}}\,,\label{eq:fsi-TS-Kww}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{wu}=\alpha_{f}N_{a}\left(\mathbf{t}_{t}^{\tau}\otimes\mathbf{n}\right)\cdot\boldsymbol{\mathcal{A}}\left\{ \frac{\partial N_{b}}{\partial\eta^{2}}\mathbf{g}_{1}-\frac{\partial N_{b}}{\partial\eta^{1}}\mathbf{g}_{2}\right\} }\,.\label{eq:fsi-TS-Kwu}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
