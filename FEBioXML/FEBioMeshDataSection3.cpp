@@ -227,14 +227,22 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	FEDataType dataType = str2datatype(szdataType);
 	if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
 
+	// see if a generator is defined
+	const char* szgen = tag.AttributeValue("generator", true);
+
 	// get the name or var (required!)
-	const char* szname = tag.AttributeValue("name", true);
-	if (szname == nullptr)
+	const char* szvar = tag.AttributeValue("var", true);
+	const char* szname = (szvar == nullptr ? tag.AttributeValue("name") : nullptr);
+
+	bool isVar = (szvar != nullptr);
+	string mapName = (isVar ? szvar : szname);
+
+	// process some special variables
+	if ((szname == nullptr) && (szgen == nullptr))
 	{
-		const char* szvar = tag.AttributeValue("var");
-		if (strcmp(szvar, "shell thickness") == 0) ParseShellThickness(tag, *elset);
-		else if (strcmp(szvar, "fiber") == 0) ParseMaterialFibers(tag, *elset);
-		else if (strcmp(szvar, "mat_axis") == 0) ParseMaterialAxes(tag, *elset);
+		if      (strcmp(szvar, "shell thickness") == 0) ParseShellThickness(tag, *elset);
+		else if (strcmp(szvar, "fiber"          ) == 0) ParseMaterialFibers(tag, *elset);
+		else if (strcmp(szvar, "mat_axis"       ) == 0) ParseMaterialAxes(tag, *elset);
 		else throw XMLReader::InvalidAttributeValue(tag, "var");
 		return;
 	}
@@ -253,12 +261,33 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	// create the data map
 	FEDomainMap* map = new FEDomainMap(dataType, fmt);
 	map->Create(elset);
-	map->SetName(szname);
 
 	// see if there is a generator
-	const char* szgen = tag.AttributeValue("generator", true);
 	if (szgen)
 	{
+		// make sure the parameter is valid
+		FEParamDouble* pp = nullptr;
+		if (isVar)
+		{
+			// find the variable
+			ParamString paramName(szvar);
+			FEParam* pv = fem.FindParameter(paramName);
+			if (pv == nullptr) throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
+
+			// make sure it's a mapped parameter
+			if (pv->type() != FE_PARAM_DOUBLE_MAPPED)throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
+
+			// if it's an array parameter, get the right index
+			if (pv->dim() > 1)
+			{
+				ParamString l = paramName.last();
+				int m = l.Index();
+				assert(m >= 0);
+				pp = &(pv->value<FEParamDouble>(m));
+			}
+			else pp = &(pv->value<FEParamDouble>());
+		}
+
 		FEDataGenerator* gen = 0;
 		// data will be generated
 		if (strcmp(szgen, "const") == 0)
@@ -282,16 +311,29 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 		// generate the data
 		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
 
-		// see if this map already exsits 
-		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szname));
+		// see if this map is already defined
+		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
 		if (oldMap)
 		{
+			// it is, so merge it
 			oldMap->Merge(*map);
+
+			// we can now delete this map
 			delete map;
 		}
 		else
-		{ 
+		{
+			// nope, so add it
+			map->SetName(mapName);
 			mesh.AddDataMap(map);
+
+			// apply the map
+			if (pp)
+			{
+				FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+				val->setDataMap(map);
+				pp->setValuator(val);
+			}
 		}
 	}
 	else
