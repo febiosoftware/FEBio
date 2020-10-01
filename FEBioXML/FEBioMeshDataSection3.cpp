@@ -365,6 +365,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 		}
 		else
 		{
+			map->SetName(name);
 			mesh.AddDataMap(map);
 		}
 	}
