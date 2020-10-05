@@ -340,3 +340,50 @@ tens4ds Dc2 =  (4/sqrt(i3))*((w11 +w2 + 2*i1*w12 + 2*i2*w13 + 2*i1*i2*w23 + i1*i
  */
 	return D;
 }
+
+//! calculate strain energy density at material point
+double FEPRLig::StrainEnergyDensity(FEMaterialPoint& pt)
+{
+    double sed = 0;
+
+    FEElasticMaterialPoint& mp = *pt.ExtractData<FEElasticMaterialPoint>();
+    
+    // obtain the deformation tensor F
+    mat3d &F = mp.m_F;
+    
+    // calculate left and right Cauchy-Green tensors and their squares
+    mat3ds c  =  mp.RightCauchyGreen();
+    mat3ds c2 =  c.sqr();
+    
+    // Define the 2nd order identity tensor
+    mat3dd I(1);
+    
+    // get the local coordinate systems
+    mat3d Q = GetLocalCS(pt);
+    
+    // declare initial material direction vector
+    vec3d a0 = Q.col(0);
+    
+    // calculate the current material axis lam*a = F*a0;
+    vec3d a = F*a0;
+    
+    // normalize material axis and store fiber stretch ;
+    double lam = a.unit();
+    
+    //////////////////////////Strain invariants ///////////////////////////////////////////////
+    
+    // define scalar strain invariants i1:15
+    double i1 =  c.tr();
+    double i2 =  0.5*(i1*i1 - c2.tr());
+    double i3 =  c.det();
+    double i4 =     a0*(c*a0);
+    double i5 =  a0*(c2*a0);
+
+    double Wfiber = 0.5*m_c1/m_c2*(exp(m_c2*pow(lam-1,2))-1);
+    double Wmatrix = m_u/2*(i1-3) - m_u*log(sqrt(i3));
+    double Wvol = m_k/2*pow(log((i5-i1*i4+i2)/(pow(i4, 2*(m_m-m_v0)*exp(-4*m_m*(lam-1))))),2);
+    
+    sed = Wfiber + Wmatrix + Wvol;
+    
+    return sed;
+}

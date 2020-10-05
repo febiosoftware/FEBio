@@ -511,7 +511,7 @@ class FEPlotMaterialAxes : public FEPlotDomainData
 public:
 	FEPlotMaterialAxes(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM){}
 	bool SetFilter(const char* szfilter) override;
-	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
 private:
 	std::string		m_matComp;
 };
@@ -523,7 +523,7 @@ class FEPlotFiberStretch : public FEPlotDomainData
 public:
 	FEPlotFiberStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool SetFilter(const char* szfilter) override;
-	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
 private:
 	std::string		m_matComp;
 };
@@ -535,7 +535,7 @@ class FEPlotDevFiberStretch : public FEPlotDomainData
 public:
 	FEPlotDevFiberStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool SetFilter(const char* szfilter) override;
-	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
 private:
 	std::string		m_matComp;
 };
