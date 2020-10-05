@@ -149,7 +149,12 @@ FELocalVectorGenerator::FELocalVectorGenerator(FEModel* fem) : FEVec3dValuator(f
 
 bool FELocalVectorGenerator::Init()
 {
-	if ((m_n[0] == 0) && (m_n[1] == 0)) m_n[1] = 1;
+	if ((m_n[0] <= 0) && (m_n[1] <= 0))
+	{
+		m_n[0] = 1;
+		m_n[1] = 2;
+	}
+	if ((m_n[0] <= 0) || (m_n[1] <= 0)) return false;
 	return FEVec3dValuator::Init();
 }
 
@@ -158,8 +163,8 @@ vec3d FELocalVectorGenerator::operator () (const FEMaterialPoint& mp)
 	FEElement* el = mp.m_elem; assert(el);
 
 	FEMeshPartition* dom = el->GetMeshPartition();
-	vec3d r0 = dom->Node(el->m_lnode[m_n[0]]).m_r0;
-	vec3d r1 = dom->Node(el->m_lnode[m_n[1]]).m_r0;
+	vec3d r0 = dom->Node(el->m_lnode[m_n[0]-1]).m_r0;
+	vec3d r1 = dom->Node(el->m_lnode[m_n[1]-1]).m_r0;
 
 	vec3d n = r1 - r0;
 	n.unit();
