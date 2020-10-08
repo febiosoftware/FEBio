@@ -732,6 +732,9 @@
     <ClInclude Include="..\..\FEBioMech\FEReactivePlasticDamageMaterialPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEContinuousElasticDamage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1434,6 +1437,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEReactivePlasticDamageMaterialPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEContinuousElasticDamage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
