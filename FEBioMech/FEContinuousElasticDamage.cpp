@@ -208,8 +208,6 @@ mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 	double K3 = I1 * I4 - I5;
 
 	double g1 = 1.0 - 3.0*m_kappa / 2.0;
-	double g2 = m_kappa * I1 + g1 * K3 - 2.0;
-	if (g2 < 0.0) g2 = 0.0;
 
 	// get internal variables
 	double D = damagePoint.m_D;
@@ -268,7 +266,10 @@ mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 		damagePoint.m_D = D;
 	}
 
-	double g = 2.0*m_a1*m_a2*pow(g2, m_a2 - 1.0);
+//	double P = (1.0 - D)*(m_kappa * I1 + g1 * K3) - 2.0;
+	double P = (m_kappa * I1 + g1 * K3) - 2.0;
+	if (P < 0.0) P = 0.0;
+	double g = 2.0*m_a1*m_a2*pow(P, m_a2 - 1.0);
 
 	mat3dd I(1.0);
 	mat3ds m = dyad(a);
