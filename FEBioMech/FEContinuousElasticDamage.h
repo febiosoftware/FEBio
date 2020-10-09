@@ -63,5 +63,11 @@ private:
 	double	m_a1, m_a2, m_kappa;
 	FEParamVec3		m_fiber;
 
+	// damage model parameters
+	double	m_tinit;		// start time of damage
+	double	m_Dmax;			// max damage
+	double	m_beta_s;		// saturation parameter
+	double	m_gamma_max;	// saturation parameter
+
 	DECLARE_FECORE_CLASS();
 };

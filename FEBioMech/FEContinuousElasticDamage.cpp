@@ -25,13 +25,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEContinuousElasticDamage.h"
+#include <FECore/FEModel.h>
+
+// Macauley Bracket
+#define MB(a) ((a)>0.0?(a):0.0)
 
 //=========================================================================================
 
 class FEContinuousElasticDamage::Data : public FEMaterialPoint
 {
 public:
-	Data(FEMaterialPoint* pm) : FEMaterialPoint(pm) {}
+	Data(FEMaterialPoint* pm) : FEMaterialPoint(pm) 
+	{
+		m_D = 0.0;
+		m_psi_f0_ini = 0.0;
+		m_psi_f0 = 0.0;
+		m_psi_f0_prev = 0.0;
+		m_bt_ini = 0.0;
+		m_bt = 0.0;
+		m_bt_prev = 0.0;
+		m_gamma = 0.0;
+		m_gamma_prev = 0.0;
+	}
+
+	void Init() override
+	{
+		m_D = 0.0;
+		m_psi_f0_ini = 2.0;	// we set this to the initial value
+		m_psi_f0 = 2.0;		// we set this to the initial value
+		m_psi_f0_prev = 2.0; // we set this to the initial value
+		m_bt_ini = 0.0;
+		m_bt = 0.0;
+		m_bt_prev = 0.0;
+		m_gamma = 0.0;
+		m_gamma_prev = 0.0;
+	}
+
+	void Update(const FETimeInfo& timeInfo) override
+	{
+		m_gamma_prev = m_gamma;
+		m_bt_prev = m_bt;
+		m_psi_f0_prev = m_psi_f0;
+	}
+
+public:
+	double	m_D;		// accumulated damage
+
+	double	m_psi_f0_ini;
+	double	m_psi_f0, m_psi_f0_prev;
+
+	double	m_bt_ini;
+	double	m_bt, m_bt_prev;
+
+	double	m_gamma, m_gamma_prev;
 };
 
 //=========================================================================================
@@ -43,6 +89,10 @@ BEGIN_FECORE_CLASS(FEContinuousElasticDamage, FEElasticMaterial)
 	ADD_PARAMETER(m_a2, FE_RANGE_GREATER(1.0), "a2");
 	ADD_PARAMETER(m_kappa, FE_RANGE_CLOSED(0.0, 2.0/3.0), "kappa");
 	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PARAMETER(m_tinit, FE_RANGE_GREATER_OR_EQUAL(0.0), "t0");
+	ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+	ADD_PARAMETER(m_beta_s, FE_RANGE_GREATER(0.0), "beta_s");
+	ADD_PARAMETER(m_gamma_max, FE_RANGE_GREATER(0.0), "gamma_max");
 END_FECORE_CLASS();
 
 FEContinuousElasticDamage::FEContinuousElasticDamage(FEModel* fem) : FEElasticMaterial(fem)
@@ -55,6 +105,12 @@ FEContinuousElasticDamage::FEContinuousElasticDamage(FEModel* fem) : FEElasticMa
 	m_kappa = 0.0;
 
 	m_fiber = vec3d(1, 0, 0);
+
+	m_tinit = 1e9;	// large value so, no damage accumulation by default
+	m_Dmax = 1.0;
+
+	m_beta_s = 0.0;
+	m_gamma_max = 0.0;
 }
 
 FEMaterialPoint* FEContinuousElasticDamage::CreateMaterialPointData()
@@ -133,6 +189,8 @@ mat3ds FEContinuousElasticDamage::MatrixStress(FEMaterialPoint& mp)
 mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEContinuousElasticDamage::Data& damagePoint = *mp.ExtractData<FEContinuousElasticDamage::Data>();
+
 	mat3d F = pt.m_F;
 	mat3ds C = pt.RightCauchyGreen();
 	mat3ds C2 = C.sqr();
@@ -153,13 +211,71 @@ mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 	double g2 = m_kappa * I1 + g1 * K3 - 2.0;
 	if (g2 < 0.0) g2 = 0.0;
 
+	// get internal variables
+	double D = damagePoint.m_D;
+	double bt_prev = damagePoint.m_bt_prev;
+	double psi_f0_prev = damagePoint.m_psi_f0_prev;
+	double gamma_prev = damagePoint.m_gamma_prev;
+
+	// get current simulation time.
+	double t = GetFEModel()->GetTime().currentTime;
+
+	// (i) compute trans-iso strain energy
+	double psi_f0 = m_kappa * I1 + g1 * K3;
+
+	// looks like these are hardcoded parameters
+	double r_s = 0.99;
+	double r_inf = 0.99;
+
+	// (ii) check initial damage state
+	double eps = 1e-9; // NOTE: should be machine eps
+	if (t >= (m_tinit - eps))
+	{
+		// (b) compute bt
+		double bt = bt_prev + MB(psi_f0 - psi_f0_prev);
+
+		// init damage 
+		// NOTE: hmmm, this seems to assume that we actually hit this time point, which
+		//       is not guaranteed obviously. Need better initialization. 
+		if ((t > m_tinit - eps) && (t < m_tinit + eps))
+		{
+			damagePoint.m_psi_f0_ini = psi_f0;
+			damagePoint.m_bt_ini = bt;
+		}
+
+		// (iii) calculate max damage saturation value 
+		// trial criterion
+		double phi_trial = MB(psi_f0 - damagePoint.m_psi_f0_ini) - gamma_prev;
+
+		// check algorithmic saturation criterion
+		double gamma = 0;
+		if (phi_trial > eps) gamma = MB(psi_f0 - damagePoint.m_psi_f0_ini);
+		else gamma = gamma_prev;
+
+		// compute damage saturation value
+		double Ds = m_Dmax * (1.0 - exp(log(1.0 - r_inf)*gamma / m_gamma_max));
+
+		// (iv) compute internal variable
+		double beta = MB(bt - damagePoint.m_bt_ini);
+
+		// (v) evaluate damage function
+		D = Ds * (1.0 - exp(log(1.0 - r_s)*beta / m_beta_s));
+
+		// update internal variables
+		damagePoint.m_bt = bt;
+		damagePoint.m_psi_f0 = psi_f0;
+		damagePoint.m_gamma = gamma;
+		damagePoint.m_D = D;
+	}
+
 	double g = 2.0*m_a1*m_a2*pow(g2, m_a2 - 1.0);
 
 	mat3dd I(1.0);
 	mat3ds m = dyad(a);
 	mat3ds aob = dyads(a, b*a);
-	mat3ds t = b * I4 + m * (I1*I4) - aob * I4;
-	mat3ds s = (b*m_kappa + t*g1)*(g / J);
+	mat3ds ts = b * I4 + m * (I1*I4) - aob * I4;
+//	mat3ds s = (1.0 - D)*(b*m_kappa + ts*g1)*(g / J);
+	mat3ds s = (b*m_kappa + ts * g1)*(g / J);
 
 	return s;
 }
