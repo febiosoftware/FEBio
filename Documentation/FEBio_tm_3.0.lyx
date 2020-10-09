@@ -39096,7 +39096,7 @@ and expect that
 
  when the constraint is enforced.
  Note that 
-\begin_inset Formula $\mathbf{R}^{T}=\mathbf{R}$
+\begin_inset Formula $\mathbf{R}^{T}\cdot\mathbf{R}=\mathbf{I}$
 \end_inset
 
  because of the orthogonality of 
