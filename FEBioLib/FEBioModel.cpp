@@ -1057,8 +1057,9 @@ void FEBioModel::UpdatePlotObjects()
 				{
 					FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
 					po->m_tag = 1;
-					po->m_r1 = ra;
-					po->m_r2 = rb;
+					po->m_rot = quatd(0, vec3d(1, 0, 0));
+					po->m_r1 = rs->m_at;
+					po->m_r2 = rs->m_bt;
                     po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rs));
                     po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rs));
                     po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rs));
@@ -1096,8 +1097,8 @@ void FEBioModel::UpdatePlotObjects()
                 {
                     FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
                     po->m_tag = 4;
-                    po->m_r1 = ra;
-                    po->m_r2 = rb;
+                    po->m_r1 = rcf->m_at;
+                    po->m_r2 = rcf->m_bt;
                     po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rcf));
                     po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rcf));
                     po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rcf));
@@ -1122,8 +1123,8 @@ void FEBioModel::UpdatePlotObjects()
 				if (rs)
 				{
 					FEBioPlotFile::LineObject* po = plt->GetLineObject(n++);
-					po->m_r1 = ra;
-					po->m_r2 = rb;
+					po->m_r1 = rs->m_at;
+					po->m_r2 = rs->m_bt;
 				}
 
 				FERigidDamper* rd = dynamic_cast<FERigidDamper*>(prc);
@@ -1146,8 +1147,8 @@ void FEBioModel::UpdatePlotObjects()
                 if (rcf)
                 {
                     FEBioPlotFile::LineObject* po = plt->GetLineObject(n++);
-                    po->m_r1 = ra;
-                    po->m_r2 = rb;
+                    po->m_r1 = rcf->m_at;
+                    po->m_r2 = rcf->m_bt;
                 }
 			}
 		}

@@ -67,6 +67,9 @@ bool FERigidSpring::Init()
     // set spring insertions relative to rigid body center of mass
     m_qa0 = m_a0 - m_rbA->m_r0;
     m_qb0 = m_b0 - m_rbB->m_r0;
+
+	m_at = m_a0;
+	m_bt = m_b0;
     
     return true;
 }
@@ -307,7 +310,10 @@ void FERigidSpring::Update()
 	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
-    
+
+	m_at = ra + za;
+	m_bt = rb + zb;
+
     c = rb + zb - ra - za;
     double L = c.norm();
     m_F = (L > 0) ? c*((1 - m_L0/L)*m_k) : c*m_k;

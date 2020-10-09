@@ -13531,7 +13531,111 @@ Rigid
 \emph default
  section is used to define all rigid constraints, rigid body initial kinematics,
  and rigid connectors, and rigid joints.
+ The motion of a point 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ connected to a rigid body is given by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{x}=\mathbf{r}\left(t\right)+\mathbf{R}\left(t\right)\cdot\mathbf{Z}=\mathbf{r}\left(t\right)+\mathbf{z}\left(t\right)\label{eq:rbm-position}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{r}\left(t\right)$
+\end_inset
+
+ is the position of the rigid body center of mass and 
+\begin_inset Formula $\mathbf{R}\left(t\right)$
+\end_inset
+
+ is the body's (proper orthogonal) rotation tensor, which satisfies 
+\begin_inset Formula $\mathbf{R}\left(t_{0}\right)=\mathbf{I}$
+\end_inset
+
+ at the initial time 
+\begin_inset Formula $t_{0}$
+\end_inset
+
+; here, 
+\begin_inset Formula $\mathbf{z}\left(t\right)=\mathbf{R}\left(t\right)\cdot\mathbf{Z}$
+\end_inset
+
+ is the distance of the point from the body's center of mass, and 
+\begin_inset Formula $\mathbf{X}=\mathbf{r}\left(t_{0}\right)+\mathbf{Z}$
+\end_inset
+
+ is the initial position.
+ In FEBio, the rotation is evaluated as 
+\begin_inset Formula $\mathbf{R}\left(t\right)=\exp\left[\boldsymbol{\xi}\left(t\right)\right]$
+\end_inset
+
+, where 
+\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
+\end_inset
+
+ is the material rotation of the rigid body from its reference configuration.
+ In practice, 
+\begin_inset Formula $\boldsymbol{\xi}$
+\end_inset
+
+ is stored as a quaternion to facilitate the multiplication of rotation
+ tensors.
+ The exponential map 
+\begin_inset Formula $\exp\left[\boldsymbol{\xi}\left(t\right)\right]$
+\end_inset
+
+ is given in full form as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{R}\left(t\right)=\exp\left[\boldsymbol{\xi}\left(t\right)\right]=\cos\xi\,\mathbf{I}-\sin\xi\,\boldsymbol{\mathcal{E}}\cdot\mathbf{n}+\left(1-\cos\xi\right)\mathbf{n}\otimes\mathbf{n}\label{eq:rbr-rotation-tensor}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\mathcal{E}}$
+\end_inset
+
+ is the third-order permutation pseudo-tensor with rectangular components
  
+\begin_inset Formula $\varepsilon_{ijk}$
+\end_inset
+
+ (permutation symbol).
+ Here, 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is the unit vector along the axis of rotation and 
+\begin_inset Formula $\xi$
+\end_inset
+
+ is the angle of rotation about 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+, such that 
+\begin_inset Formula $\boldsymbol{\xi}=\xi\mathbf{n}$
+\end_inset
+
+.
+ Both 
+\begin_inset Formula $\xi$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ may evolve over time.
+ Either none or all the components of 
+\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
+\end_inset
+
+ must be prescribed (or fixed) for a rigid body.
 \end_layout
 
 \begin_layout Subsection
@@ -13752,10 +13856,14 @@ x
 
 \begin_layout Plain Layout
 Constrain the 
-\begin_inset Formula $x$
+\begin_inset Formula $x-$
 \end_inset
 
-degree of freedom 
+component of the center of mass position 
+\begin_inset Formula $\mathbf{r}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -13776,10 +13884,14 @@ y
 
 \begin_layout Plain Layout
 Constrain the 
-\begin_inset Formula $y$
+\begin_inset Formula $y-$
 \end_inset
 
-degree of freedom 
+component of the center of mass position 
+\begin_inset Formula $\mathbf{r}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -13800,10 +13912,14 @@ z
 
 \begin_layout Plain Layout
 Constrain the 
-\begin_inset Formula $z$
+\begin_inset Formula $z-$
 \end_inset
 
-degree of freedom 
+component of the center of mass position 
+\begin_inset Formula $\mathbf{r}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -13823,11 +13939,15 @@ Rx
 \begin_inset Text
 
 \begin_layout Plain Layout
-Prevent the rigid body from rotating around the 
+Constrain the 
 \begin_inset Formula $x-$
 \end_inset
 
-axis 
+component of the material rotation 
+\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -13847,11 +13967,15 @@ Ry
 \begin_inset Text
 
 \begin_layout Plain Layout
-Prevent the rigid body from rotating around the 
+Constrain the 
 \begin_inset Formula $y-$
 \end_inset
 
-axis 
+component of the material rotation 
+\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -13871,11 +13995,15 @@ Rz
 \begin_inset Text
 
 \begin_layout Plain Layout
-Prevent the rigid body from rotating around the 
+Constrain the 
 \begin_inset Formula $z-$
 \end_inset
 
-axis 
+component of the material rotation 
+\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
+\end_inset
+
+
 \end_layout
 
 \end_inset

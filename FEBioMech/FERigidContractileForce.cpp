@@ -62,6 +62,9 @@ bool FERigidContractileForce::Init()
     // set force insertions relative to rigid body center of mass
     m_qa0 = m_a0 - m_rbA->m_r0;
     m_qb0 = m_b0 - m_rbB->m_r0;
+
+	m_at = m_a0;
+	m_bt = m_b0;
     
     return true;
 }
@@ -302,6 +305,9 @@ void FERigidContractileForce::Update()
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
     
+	m_at = ra + za;
+	m_bt = rb + zb;
+
     vec3d n = rb + zb - ra - za;
     n.unit();
     m_F = n*m_f0;
