@@ -75,6 +75,10 @@ public: // parameters
     vec3d	m_a0;       //! initial absolute position vector of spring on body A
     vec3d	m_b0;       //! initial absolute position vector of spring on body B
 
+    // output parameters
+    vec3d    m_at;        //!< current absolute position of spring on body A
+    vec3d    m_bt;        //!< current absolute position of spring on body B
+    
 protected:
     vec3d	m_qa0;      //! initial relative position vector of spring on body A
     vec3d	m_qb0;      //! initial relative position vector of spring on body B
