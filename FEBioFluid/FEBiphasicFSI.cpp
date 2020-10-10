@@ -58,7 +58,7 @@ FEMaterialPoint* FEBiphasicFSIMaterialPoint::Copy()
 void FEBiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPoint::Serialize(ar);
-    ar & m_w & m_aw & m_Jdot & m_phis & m_phif & m_phi0 & m_gradphif & m_gradJ & m_Lw;
+    ar & m_w & m_aw & m_Jdot & m_phis & m_phif & m_phi0 & m_gradphif & m_gradJ & m_Lw & m_ss;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,6 +67,7 @@ void FEBiphasicFSIMaterialPoint::Init()
     m_w = m_aw = m_gradphif = m_gradJ = vec3d(0,0,0);
     m_Jdot = m_phis = m_phif = m_phi0 = 0;
     m_Lw = mat3d(0.0);
+    m_ss.zero();
     
     FEMaterialPoint::Init();
 }

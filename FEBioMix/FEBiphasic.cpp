@@ -64,6 +64,7 @@ void FEBiphasicMaterialPoint::Serialize(DumpStream& ar)
 	FEMaterialPoint::Serialize(ar);
 	ar & m_p & m_gradp & m_gradpp;
 	ar & m_w & m_pa & m_phi0 & m_phi0p & m_phi0hat & m_Jp;
+    ar & m_ss;
 }
 
 //-----------------------------------------------------------------------------
@@ -75,6 +76,7 @@ void FEBiphasicMaterialPoint::Init()
 	m_phi0 = m_phi0p = 0;
 	m_phi0hat = 0;
 	m_Jp = 1;
+    m_ss.zero();
 
 	FEMaterialPoint::Init();
 }

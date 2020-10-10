@@ -130,7 +130,6 @@ void FEBiphasicFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
                 FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
                 FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
-                FEBiphasicFSIMaterialPoint& ft = *mp.ExtractData<FEBiphasicFSIMaterialPoint>();
                 et.m_Wp = et.m_Wt;
                 
                 if ((pt.m_Jf <= 0) || (et.m_J <= 0)) {
@@ -227,7 +226,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3], detJ;
     
-    mat3ds sv, ss, si, pi;
+    mat3ds sv, se, pi;
     vec3d gradp, divTe;
     mat3ds km1;
     
@@ -258,16 +257,13 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         
         // get the viscous stress tensor for this integration point
         sv = m_pMat->Fluid()->GetViscous()->Stress(mp);
+        se = m_pMat->Solid()->Stress(mp);
         // get the gradient of the elastic pressure
         gradp = pt.m_gradJf*m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
-        // get the solid stress tensor
-        ss = et.m_s;
         // get inverse of permeability tensor
         km1 = m_pMat->InvPermeability(mp);
         //get pI
         pi = mat3dd(m_pMat->Fluid()->Pressure(mp));
-        //get inner stress
-        si = -pi + sv + ss;
         
         H = el.H(n);
         Gr = el.Gr(n);
@@ -287,7 +283,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         
         for (i=0; i<neln; ++i)
         {
-            vec3d fs = ((ss-sv*ft.m_phis)*gradN[i] + (sv*ft.m_gradJ/(ft.m_phif*et.m_J)*ft.m_phis - km1*ft.m_w)*H[i])*detJ;
+            vec3d fs = ((se-sv*ft.m_phis)*gradN[i] + (sv*ft.m_gradJ/(ft.m_phif*et.m_J)*ft.m_phis - km1*ft.m_w)*H[i])*detJ;
             vec3d ff = (sv*gradN[i] + (gradp + km1*ft.m_w - sv*ft.m_gradJ*ft.m_phis/(ft.m_phif*et.m_J))*H[i])*detJ;
             double fJ = (H[i]*(dJfdotf*ft.m_phif/pt.m_Jf - dJsoJ) + gradN[i]*ft.m_w)*detJ;
             
@@ -354,9 +350,7 @@ void FEBiphasicFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEBiphasicFSIMaterialPoint& ft = *mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-        double densf = m_pMat->FluidDensity(mp);
         double densTs = m_pMat->TrueSolidDensity(mp);
-        double denss = m_pMat->SolidDensity(mp);
         double densTf = m_pMat->TrueFluidDensity(mp);
         
         detJ = detJt(el, n, tp.alphaf)*gw[n];
@@ -476,7 +470,6 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
     
     double dt = tp.timeIncrement;
     double a = tp.gamma/(tp.beta*dt);
-    double b = tp.alpham/(tp.alphaf*tp.beta*dt*dt);
     double c = tp.alpham/(tp.alphaf*tp.gamma*dt);
     
     double dtrans = m_btrans ? 1 : m_sseps;
@@ -521,16 +514,13 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
         FEBiphasicFSIMaterialPoint& fpt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
         
         // get the tangents
-        mat3ds ss = et.m_s;
+        mat3ds se = m_pMat->Solid()->Stress(mp);
         tens4ds cs = m_pMat->Solid()->Tangent(mp);
         mat3ds sv = m_pMat->Fluid()->GetViscous()->Stress(mp);
         mat3ds svJ = m_pMat->Fluid()->GetViscous()->Tangent_Strain(mp);
         tens4ds cv = m_pMat->Fluid()->Tangent_RateOfDeformation(mp);
-        double p = m_pMat->Fluid()->Pressure(mp);
         double dp = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         double d2p = m_pMat->Fluid()->Tangent_Pressure_Strain_Strain(mp);
-        // Jfdot wrt fluid
-        double dJfdotf = pt.m_Jfdot + pt.m_gradJf*fpt.m_w/fpt.m_phif;
         vec3d gradp = pt.m_gradJf*dp;
         // Jsdot/Js = div(vs)
         double dJsoJ = fpt.m_Jdot/et.m_J;
@@ -562,7 +552,7 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
                 tens4d km1km1 = dyad2(km1,km1);
                 tens4d Kfull = tens4d(K);
                 
-                mat3d Kuu = (sv*((gradN[j]&gradN[i])*fpt.m_phis) - (-((sv*gradN[i])&gradN[j])*fpt.m_phis/fpt.m_phif + vdotTdotv(gradN[i], cv, gradN[j])*(-fpt.m_Lw.sym()*fpt.m_phis/(fpt.m_phif*fpt.m_phif) + M))*fpt.m_phis - vdotTdotv(gradN[i], cv, fpt.m_w*fpt.m_phis/(fpt.m_phif*fpt.m_phif)) * ((fpt.m_gradphif&gradN[j])*2.0*fpt.m_phis/fpt.m_phif + (gradN[j]&fpt.m_gradphif)) + vdotTdotv(gradN[i], cv, fpt.m_w*fpt.m_phis*fpt.m_phis/(fpt.m_phif*fpt.m_phif)) * ((-fpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + mat3dd((ss*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) - (((sv*fpt.m_gradJ)*fpt.m_phis/(et.m_J*fpt.m_phif*fpt.m_phif))&gradN[j])*H[i] + (-((sv*fpt.m_gradJ)&gradN[j])*fpt.m_phis/fpt.m_phif + vdotTdotv(fpt.m_gradJ, cv, gradN[j])*(-fpt.m_Lw.sym()*fpt.m_phis/(fpt.m_phif*fpt.m_phif) + M))*fpt.m_phis/(fpt.m_phif*et.m_J)*H[i] + vdotTdotv(fpt.m_gradJ, cv, fpt.m_w*fpt.m_phis/(fpt.m_phif*fpt.m_phif*fpt.m_phif*et.m_J)*H[i]) * ((fpt.m_gradphif&gradN[j])*2.0*fpt.m_phis/fpt.m_phif + (gradN[j]&fpt.m_gradphif)) - vdotTdotv(fpt.m_gradJ, cv, fpt.m_w*fpt.m_phis*fpt.m_phis/(fpt.m_phif*fpt.m_phif*fpt.m_phif*et.m_J)*H[i]) * ((-fpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + sv*((fpt.m_gradJ&gradN[j]) - (gradN[j]&fpt.m_gradJ) + gradgradN[j]*et.m_J)*H[i]*fpt.m_phis/(fpt.m_phif*et.m_J) + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //mixture 3 adjusted viscous stress
+                mat3d Kuu = (sv*((gradN[j]&gradN[i])*fpt.m_phis) - (-((sv*gradN[i])&gradN[j])*fpt.m_phis/fpt.m_phif + vdotTdotv(gradN[i], cv, gradN[j])*(-fpt.m_Lw.sym()*fpt.m_phis/(fpt.m_phif*fpt.m_phif) + M))*fpt.m_phis - vdotTdotv(gradN[i], cv, fpt.m_w*fpt.m_phis/(fpt.m_phif*fpt.m_phif)) * ((fpt.m_gradphif&gradN[j])*2.0*fpt.m_phis/fpt.m_phif + (gradN[j]&fpt.m_gradphif)) + vdotTdotv(gradN[i], cv, fpt.m_w*fpt.m_phis*fpt.m_phis/(fpt.m_phif*fpt.m_phif)) * ((-fpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) - (((sv*fpt.m_gradJ)*fpt.m_phis/(et.m_J*fpt.m_phif*fpt.m_phif))&gradN[j])*H[i] + (-((sv*fpt.m_gradJ)&gradN[j])*fpt.m_phis/fpt.m_phif + vdotTdotv(fpt.m_gradJ, cv, gradN[j])*(-fpt.m_Lw.sym()*fpt.m_phis/(fpt.m_phif*fpt.m_phif) + M))*fpt.m_phis/(fpt.m_phif*et.m_J)*H[i] + vdotTdotv(fpt.m_gradJ, cv, fpt.m_w*fpt.m_phis/(fpt.m_phif*fpt.m_phif*fpt.m_phif*et.m_J)*H[i]) * ((fpt.m_gradphif&gradN[j])*2.0*fpt.m_phis/fpt.m_phif + (gradN[j]&fpt.m_gradphif)) - vdotTdotv(fpt.m_gradJ, cv, fpt.m_w*fpt.m_phis*fpt.m_phis/(fpt.m_phif*fpt.m_phif*fpt.m_phif*et.m_J)*H[i]) * ((-fpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + sv*((fpt.m_gradJ&gradN[j]) - (gradN[j]&fpt.m_gradJ) + gradgradN[j]*et.m_J)*H[i]*fpt.m_phis/(fpt.m_phif*et.m_J) + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //mixture 3 adjusted viscous stress
                 
                 mat3d Kuw = (vdotTdotv(gradN[i], cv, (fpt.m_gradphif*H[j]/fpt.m_phif-gradN[j]))*fpt.m_phis/fpt.m_phif + vdotTdotv((-fpt.m_gradphif*H[j]/fpt.m_phif + gradN[j]), cv, fpt.m_gradJ)*H[i]*fpt.m_phis/(fpt.m_phif*et.m_J) - km1*H[i]*H[j])*detJ; //mixture 3 adjusted stress
                 
@@ -779,13 +769,8 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEBiphasicFSIMaterialPoint& fpt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
         
-        double densf = m_pMat->FluidDensity(mp);
         double denss = m_pMat->SolidDensity(mp);
-        double densTs = m_pMat->TrueSolidDensity(mp);
         double densTf = m_pMat->TrueFluidDensity(mp);
-        double dp = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
-        vec3d gradp = pt.m_gradJf*dp;
-        mat3ds km1 = m_pMat->InvPermeability(mp);
         
         // Jsdot/Js = div(vs)
         double dJsoJ = fpt.m_Jdot/et.m_J;
@@ -981,8 +966,11 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         pt.m_sf = m_pMat->Fluid()->Stress(mp);
         
         // calculate the solid stress at this material point
-        ept.m_s = m_pMat->Solid()->Stress(mp);
-        
+        ft.m_ss = m_pMat->Solid()->Stress(mp) - pt.m_sf*(1-ft.m_phif);
+
+        // calculate the mixture stress at this material point
+        ept.m_s = ft.m_ss + pt.m_sf;
+
         // calculate the fluid pressure
         pt.m_pf = m_pMat->Fluid()->Pressure(mp);
     }

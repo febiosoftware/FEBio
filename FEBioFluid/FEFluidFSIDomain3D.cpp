@@ -264,7 +264,7 @@ void FEFluidFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>
         // get the gradient of the elastic pressure
         gradp = pt.m_gradJf*m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         // get the solid stress tensor
-        ss = et.m_s;
+        ss = ft.m_ss;
 
         H = el.H(n);
         Gr = el.Gr(n);
@@ -834,7 +834,6 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		Jp = defgradp(el, Fp, n);
 		ept.m_F = Ft*alphaf + Fp*(1 - alphaf);
 		ept.m_J = ept.m_F.det();
-		ept.m_s = m_pMat->Solid()->Stress(mp);
 		mat3d Fi = ept.m_F.inverse();
 		ept.m_L = (Ft - Fp)*Fi*(dtrans / dt);
 		ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
@@ -862,8 +861,10 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         // update specialized material points
         m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
         
-		// calculate the stress at this material point
+		// calculate the stresses at this material point
 		pt.m_sf = m_pMat->Fluid()->Stress(mp);
+        ft.m_ss = m_pMat->Solid()->Stress(mp);
+        ept.m_s = pt.m_sf + ft.m_ss;
 
 		// calculate the fluid pressure
 		pt.m_pf = m_pMat->Fluid()->Pressure(ef);

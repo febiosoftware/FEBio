@@ -62,6 +62,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Solid stress
+class FEPlotSolidStress : public FEPlotDomainData
+{
+public:
+    FEPlotSolidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Fluid flux
 class FEPlotFluidFlux : public FEPlotDomainData
 {

@@ -301,10 +301,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Element fluid stresses
-class FEPlotElementFluidStress : public FEPlotDomainData
+class FEPlotFluidStress : public FEPlotDomainData
 {
 public:
-    FEPlotElementFluidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    FEPlotFluidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -485,6 +485,15 @@ class FEPlotFluidIsobaricSpecificHeatCapacity : public FEPlotDomainData
 {
 public:
     FEPlotFluidIsobaricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element solid stresses
+class FEPlotFSISolidStress : public FEPlotDomainData
+{
+public:
+    FEPlotFSISolidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

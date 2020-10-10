@@ -53,6 +53,7 @@ public:
     vec3d       m_w;      //!< fluid flux relative to solid
     vec3d       m_aw;     //!< material time derivative of m_wt
     double      m_Jdot;   //!< time derivative of solid volume ratio
+    mat3ds      m_ss;     //!< solid stress
 };
 
 //-----------------------------------------------------------------------------

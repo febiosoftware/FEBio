@@ -252,6 +252,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidLoadSupport                 , "fluid load suppo
 REGISTER_FECORE_CLASS(FEPlotMixtureFluidFlowRate             , "fluid flow rate"     );
 REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density");
 REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient" );
+REGISTER_FECORE_CLASS(FEPlotSolidStress                      , "solid stress"        );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeConcentration, "c");
