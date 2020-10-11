@@ -26,6 +26,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBiphasicFSI.h"
+#include "FEFluidFSI.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>
 
@@ -58,14 +59,14 @@ FEMaterialPoint* FEBiphasicFSIMaterialPoint::Copy()
 void FEBiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPoint::Serialize(ar);
-    ar & m_w & m_aw & m_Jdot & m_phis & m_phif & m_phi0 & m_gradphif & m_gradJ & m_Lw & m_ss;
+    ar & m_phi0 & m_gradJ & m_Lw & m_ss;
 }
 
 //-----------------------------------------------------------------------------
 void FEBiphasicFSIMaterialPoint::Init()
 {
-    m_w = m_aw = m_gradphif = m_gradJ = vec3d(0,0,0);
-    m_Jdot = m_phis = m_phif = m_phi0 = 0;
+    m_gradJ = vec3d(0,0,0);
+    m_phi0 = 0;
     m_Lw = mat3d(0.0);
     m_ss.zero();
     
@@ -94,7 +95,8 @@ FEBiphasicFSI::FEBiphasicFSI(FEModel* pfem) : FEMaterial(pfem)
 FEMaterialPoint* FEBiphasicFSI::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint(m_pSolid->CreateMaterialPointData());
-    FEBiphasicFSIMaterialPoint* bfpt = new FEBiphasicFSIMaterialPoint(fpt);
+    FEFSIMaterialPoint* fst = new FEFSIMaterialPoint(fpt);
+    FEBiphasicFSIMaterialPoint* bfpt = new FEBiphasicFSIMaterialPoint(fst);
     
     bfpt->m_phi0 = m_phi0;
     
@@ -114,11 +116,7 @@ bool FEBiphasicFSI::Init()
 //! Porosity in current configuration
 double FEBiphasicFSI::Porosity(FEMaterialPoint& pt)
 {
-    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
-    
-    // relative volume
-    double J = et.m_J;
-    double phiw = 1 - m_phi0/J;
+    double phiw = 1 - SolidVolumeFrac(pt);
     // check for pore collapse
     // TODO: throw an error if pores collapse
     // phiw cant be 0
@@ -132,15 +130,29 @@ double FEBiphasicFSI::Porosity(FEMaterialPoint& pt)
 double FEBiphasicFSI::SolidVolumeFrac(FEMaterialPoint& pt)
 {
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    FEBiphasicFSIMaterialPoint& bt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
     
     // relative volume
     double J = et.m_J;
-    double phis = m_phi0/J;
+    double phis = bt.m_phi0/J;
     // check if phis is negative
     // TODO: throw an error if pores collapse
     phis = (phis >= 0) ? phis : 0;
     
     return phis;
+}
+
+//-----------------------------------------------------------------------------
+//! porosity gradient
+vec3d FEBiphasicFSI::gradPorosity(FEMaterialPoint& pt)
+{
+    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    FEBiphasicFSIMaterialPoint& bt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
+
+    double J = et.m_J;
+    double phis = SolidVolumeFrac(pt);
+
+    return bt.m_gradJ*(phis/J);
 }
 
 //-----------------------------------------------------------------------------

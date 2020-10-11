@@ -50,13 +50,7 @@ public:
     
 public:
     // Biphasic FSI material data
-    vec3d       m_w;        //!< fluid flux relative to solid
-    vec3d       m_aw;       //!< material time derivative of m_wt
     mat3d       m_Lw;       //!< grad of m_wt
-    double      m_Jdot;     //!< time derivative of solid volume ratio
-    double      m_phis;     //!< solid volume fraction
-    double      m_phif;     //!< fluid volume fraction
-    vec3d       m_gradphif; //!< gradient of fluid volume fraction
     vec3d       m_gradJ;    //!< gradient of J
     double      m_phi0;     //!< solid volume fraction in reference configuration
     mat3ds      m_ss;       //!< solid stress
@@ -106,6 +100,9 @@ public:
     
     //! Solid Volume
     double SolidVolumeFrac(FEMaterialPoint& pt);
+    
+    //! porosity gradient
+    vec3d gradPorosity(FEMaterialPoint& pt);
     
     //! solid density
     double TrueSolidDensity(FEMaterialPoint& mp) { return m_pSolid->Density(mp); }

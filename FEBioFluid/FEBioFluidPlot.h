@@ -228,6 +228,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element relative fluid flux
+class FEPlotFSIFluidFlux : public FEPlotDomainData
+{
+public:
+    FEPlotFSIFluidFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Permeability
 class FEPlotPermeability : public FEPlotDomainData
 {
@@ -255,20 +264,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element relative fluid velocity
-class FEPlotRelativeFluidVolume : public FEPlotDomainData
+//! Element porosity
+class FEPlotBFSIPorosity : public FEPlotDomainData
 {
 public:
-    FEPlotRelativeFluidVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    FEPlotBFSIPorosity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
-//! Element relative fluid velocity
-class FEPlotRelativeSolidVolume : public FEPlotDomainData
+//! Element solid volume fraction
+class FEPlotBFSISolidVolumeFraction : public FEPlotDomainData
 {
 public:
-    FEPlotRelativeSolidVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    FEPlotBFSISolidVolumeFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

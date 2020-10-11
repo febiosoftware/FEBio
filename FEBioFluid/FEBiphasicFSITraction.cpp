@@ -226,9 +226,9 @@ void FEBiphasicFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
             svJ += pfsi->Fluid()->GetViscous()->Tangent_Strain(mp);
             cv += pfsi->Fluid()->Tangent_RateOfDeformation(mp);
             Ls += ep.m_L;
-            phif += ft.m_phif;
-            phis += ft.m_phis;
-            gradphif += ft.m_gradphif;
+            phif += pfsi->Porosity(mp);
+            phis += pfsi->SolidVolumeFrac(mp);
+            gradphif += pfsi->gradPorosity(mp);
             gradJ += ft.m_gradJ;
             Dw += ft.m_Lw.sym();
             J += ep.m_J;

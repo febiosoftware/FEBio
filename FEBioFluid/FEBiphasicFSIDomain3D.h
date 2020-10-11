@@ -45,6 +45,9 @@ public:
     //! activate
     void Activate() override;
     
+    //! reset domain data
+    void Reset() override;
+    
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
