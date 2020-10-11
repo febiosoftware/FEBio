@@ -235,6 +235,7 @@ public:
 	// For solids, a surface element can be connected to two elements 
 	// if the surface is an inside surface. For boundary surfaces
 	// the second element index is -1. 
-	FEElement*		m_elem[2];				
+	FEElement*		m_elem[2];
+    int             m_order;
 };
 

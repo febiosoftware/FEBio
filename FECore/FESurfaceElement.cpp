@@ -36,6 +36,7 @@ FESurfaceElement::FESurfaceElement()
 {
 	m_lid = -1;
 	m_elem[0] = m_elem[1] = nullptr;
+    m_order = 0;
 }
 
 FESurfaceElement::FESurfaceElement(const FESurfaceElement& el) : FEElement(el)

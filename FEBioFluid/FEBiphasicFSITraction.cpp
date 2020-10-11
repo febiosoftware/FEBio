@@ -82,6 +82,7 @@ bool FEBiphasicFSITraction::Init()
         FEBiphasicFSI* pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
         if (pfsi) {
             m_K[j] = pfsi->Fluid()->m_k;
+            m_s[j] = (double)el.m_order;
         }
         else if (!m_bself[j]) {
             // extract the second of two elements on this interface
@@ -89,7 +90,7 @@ bool FEBiphasicFSITraction::Init()
             pm = fem->GetMaterial(m_elem[j]->GetMatID());
             pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
             if (pfsi == nullptr) return false;
-            m_s[j] = -1;
+            m_s[j] = -(double)el.m_order;
             m_K[j] = pfsi->Fluid()->m_k;
         }
         else
