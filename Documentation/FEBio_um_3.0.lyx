@@ -49305,6 +49305,31 @@ Here,
 \end_inset
 
  is the determinant of the deformation gradient tensor.
+ The relationship between the material parameters, E, and v, and the parameters
+ used in the strain-energy function, is as follows.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu=\dfrac{E}{2(1+\nu)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\lambda=\dfrac{\nu E}{(1+\nu)(1-2\nu)}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
