@@ -77,7 +77,7 @@ public:
     FEFluid* Fluid() { return m_pFluid; }
     FEElasticMaterial* Solid() { return m_pSolid; }
     
-private: // material properties
+protected: // material properties
     FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
     FEFluid*                    m_pFluid;	//!< pointer to fluid material
     

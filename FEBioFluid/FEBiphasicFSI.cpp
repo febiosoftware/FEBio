@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEBiphasicFSI, FEMaterial)
+BEGIN_FECORE_CLASS(FEBiphasicFSI, FEFluidFSI)
 
 ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
 
@@ -80,13 +80,11 @@ void FEBiphasicFSIMaterialPoint::Init()
 //-----------------------------------------------------------------------------
 //! FEFluidFSI constructor
 
-FEBiphasicFSI::FEBiphasicFSI(FEModel* pfem) : FEMaterial(pfem)
+FEBiphasicFSI::FEBiphasicFSI(FEModel* pfem) : FEFluidFSI(pfem)
 {
     m_rhoTw = 0;
     m_phi0 = 0;
     
-    m_pSolid = 0;
-    m_pFluid = 0;
     m_pPerm = 0;
 }
 
