@@ -394,23 +394,23 @@ void FESurface::FindElements(FESurfaceElement& el)
                 vec3d g[3];
                 int nn = sel.GetFace(j, nf);
                 
-                bool found = false;
+                int found = 0;
                 if (nn == el.Nodes())
                 {
                     switch (nn)
                     {
-                        case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
-                        case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
-                        case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
-                        case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
-                        case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
-                        case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                        case 3: found = el.HasNodes(nf,3); break;
+                        case 4: found = el.HasNodes(nf,4); break;
+                        case 6: found = el.HasNodes(nf,3); break;
+                        case 7: found = el.HasNodes(nf,3); break;
+                        case 8: found = el.HasNodes(nf,4); break;
+                        case 9: found = el.HasNodes(nf,4); break;
                         default:
                             assert(false);
                     }
                 }
-                if (found) {
-                    if (el.m_elem[0] == nullptr) el.m_elem[0] = &sel;
+                if (found != 0) {
+                    if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; el.m_order = found; }
                     else el.m_elem[1] = &sel;
                 }
             }

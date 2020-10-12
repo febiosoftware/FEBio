@@ -55,7 +55,7 @@ FEMaterialPoint* FEFSIMaterialPoint::Copy()
 void FEFSIMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
-	ar & m_w & m_aw & m_Jdot;
+	ar & m_w & m_aw & m_Jdot & m_ss;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,6 +63,7 @@ void FEFSIMaterialPoint::Init()
 {
     m_w = m_aw = vec3d(0,0,0);
     m_Jdot = 0;
+    m_ss.zero();
     
     FEMaterialPoint::Init();
 }

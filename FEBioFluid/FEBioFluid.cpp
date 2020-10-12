@@ -148,23 +148,24 @@ REGISTER_FECORE_CLASS(FEConstraintNormalFlow      , "normal fluid flow"      );
 // classes derived from FEPlotData
 REGISTER_FECORE_CLASS(FEPlotDisplacement               , "displacement"             );
 REGISTER_FECORE_CLASS(FEPlotNodalFluidVelocity         , "nodal fluid velocity"     );
-REGISTER_FECORE_CLASS(FEPlotNodalRelativeFluidVelocity , "nodal relative fluid velocity"     );
+REGISTER_FECORE_CLASS(FEPlotNodalRelativeFluidVelocity , "nodal fluid flux"         );
 REGISTER_FECORE_CLASS(FEPlotFluidDilatation            , "fluid dilatation"         );
 REGISTER_FECORE_CLASS(FEPlotElasticFluidPressure	   , "elastic fluid pressure"   );
 REGISTER_FECORE_CLASS(FEPlotFluidVolumeRatio		   , "fluid volume ratio"       );
 REGISTER_FECORE_CLASS(FEPlotFluidDensity               , "fluid density"            );
 REGISTER_FECORE_CLASS(FEPlotFluidDensityRate           , "fluid density rate"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVelocity              , "fluid velocity"           );
-REGISTER_FECORE_CLASS(FEPlotRelativeSolidVolume        , "solid volume fraction"    );
-REGISTER_FECORE_CLASS(FEPlotRelativeFluidVolume        , "fluid volume fraction"    );
+REGISTER_FECORE_CLASS(FEPlotBFSISolidVolumeFraction    , "solid volume fraction"    );
+REGISTER_FECORE_CLASS(FEPlotBFSIPorosity               , "fluid volume fraction"    );
 REGISTER_FECORE_CLASS(FEPlotFluidTemperature           , "fluid temperature"        );
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVelocity      , "relative fluid velocity"  );
+REGISTER_FECORE_CLASS(FEPlotFSIFluidFlux               , "fluid flux"               );
 REGISTER_FECORE_CLASS(FEPlotPermeability               , "bfsi permeability"  );
 REGISTER_FECORE_CLASS(FEPlotGradJ                      , "dilatation gradient"      );
 REGISTER_FECORE_CLASS(FEPlotGradPhiF                   , "fluid volume ratio gradient");
 REGISTER_FECORE_CLASS(FEPlotFluidAcceleration          , "fluid acceleration"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVorticity             , "fluid vorticity"          );
-REGISTER_FECORE_CLASS(FEPlotElementFluidStress         , "fluid stress"             );
+REGISTER_FECORE_CLASS(FEPlotFluidStress                , "fluid stress"             );
 REGISTER_FECORE_CLASS(FEPlotElementFluidRateOfDef      , "fluid rate of deformation");
 REGISTER_FECORE_CLASS(FEPlotFluidStressPowerDensity    , "fluid stress power density");
 REGISTER_FECORE_CLASS(FEPlotFluidHeatSupplyDensity     , "fluid heat supply density");
@@ -193,6 +194,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidSpecificFreeEnthalpy  , "fluid specific free en
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificStrainEnergy  , "fluid specific strain energy"  );
 REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
 REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity , "fluid isobaric specific heat capacity");
+REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"             );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");

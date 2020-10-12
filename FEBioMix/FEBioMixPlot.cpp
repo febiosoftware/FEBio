@@ -272,6 +272,39 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotSolidStress::Save(FEDomain &dom, FEDataStream& a)
+{
+    FESolidDomain* bd = dynamic_cast<FESolidDomain*>(&dom);
+    FEShellDomain* bsd = dynamic_cast<FEShellDomain*>(&dom);
+    if (bd && (
+               (dynamic_cast<FEBiphasicSolidDomain* >(bd)) ||
+               (dynamic_cast<FEBiphasicSoluteSolidDomain*>(bd)) ||
+               (dynamic_cast<FETriphasicDomain*     >(bd)) ||
+               (dynamic_cast<FEMultiphasicSolidDomain*>(bd))))
+    {
+        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+            return (pt ? pt->m_ss : mat3ds(0.0));
+        });
+        return true;
+    }
+    else if (bsd && (
+                     (dynamic_cast<FEBiphasicShellDomain*>(bsd)) ||
+                     (dynamic_cast<FEBiphasicSoluteShellDomain*>(bsd)) ||
+                     (dynamic_cast<FEMultiphasicShellDomain*>(bsd))
+                     ))
+    {
+        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+            return (pt ? pt->m_ss : mat3ds(0.0));
+        });
+        return true;
+    }
+    
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	FESolidDomain* bd = dynamic_cast<FESolidDomain*>(&dom);

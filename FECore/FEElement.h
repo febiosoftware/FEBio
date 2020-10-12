@@ -184,7 +184,10 @@ public:
 	// see if this element has the node n
     bool HasNode(int n) const;
 
-	// find local element index of node n    
+    // see if this element has the list of nodes n
+    int HasNodes(int* n, const int ns) const;
+    
+	// find local element index of node n
     int FindNode(int n) const;
 
 	// project data to nodes

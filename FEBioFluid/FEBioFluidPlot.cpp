@@ -61,7 +61,7 @@ bool FEPlotDisplacement::Save(FEMesh& m, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-//! Store the nodal fluid velocity
+//! Store the nodal fluid velocity (only for CFD domains)
 bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
 {
 	FEModel* fem = GetFEModel();
@@ -72,18 +72,20 @@ bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
     int dofVY = fem->GetDOFIndex("vy");
     int dofVZ = fem->GetDOFIndex("vz");
 
-	bool bvel = true;
-	if ((dofVX == -1) || (dofVY == -1) || (dofVZ == -1))
+	bool bcfd = false;
+	if ((dofVX == -1) && (dofVY == -1) && (dofVZ == -1))
 	{
-		bvel = false;
+		bcfd = true;
 	}
     
-	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
-		vec3d vs = (bvel ? node.get_vec3d(dofVX, dofVY, dofVZ) : vec3d(0, 0, 0));
-		vec3d w = node.get_vec3d(dofWX, dofWY, dofWZ);
-		return vs + w;
-	});
-    return true;
+    if (bcfd) {
+        writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+            return node.get_vec3d(dofWX, dofWY, dofWZ);
+        });
+        return true;
+    }
+    else
+        return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -687,45 +689,57 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRelativeFluidVolume::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
-    if (pfluid == 0) return false;
-    
-    // write solid element data
-    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-        const FEBiphasicFSIMaterialPoint* ppt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-        return (ppt ? ppt->m_phif : 0.0);
-    });
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotRelativeSolidVolume::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
-    if (pfluid == 0) return false;
-    
-    // write solid element data
-    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-        const FEBiphasicFSIMaterialPoint* ppt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-        return (ppt ? ppt->m_phis : 0.0);
-    });
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
+        const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+        return (fpt ? fpt->m_vft - ept->m_v : vec3d(0.0));
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotBFSIPorosity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasicFSI* bp = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
+    if (bp == 0) return false;
+
+    // write solid element data
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        return bp->Porosity(const_cast<FEMaterialPoint&>(mp));
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotBFSISolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasicFSI* bp = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
+    if (bp == 0) return false;
+    
+    // write solid element data
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        return bp->SolidVolumeFrac(const_cast<FEMaterialPoint&>(mp));
+    });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFSIFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
 	if (pfluid == 0) return false;
 
 	writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFSIMaterialPoint* ppt = mp.ExtractData<FEFSIMaterialPoint>();
-        const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-        return (ppt ? ppt->m_w : bpt? bpt->m_w : vec3d(0.0));
+        return (ppt ? ppt->m_w : vec3d(0.0));
 	});
     
     return true;
@@ -760,14 +774,14 @@ bool FEPlotGradJ::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotGradPhiF::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicFSI* pbfsi = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
-    if (pbfsi == 0) return false;
-
-    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
-        const FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-        return (bpt ? bpt->m_gradphif : vec3d(0.0));
-    });
+    FEBiphasicFSI* bp = dom.GetMaterial()->ExtractProperty<FEBiphasicFSI>();
+    if (bp == 0) return false;
     
+    // write solid element data
+    writeAverageElementValue<vec3d>(dom, a, [=](const FEMaterialPoint& mp) {
+        return bp->gradPorosity(const_cast<FEMaterialPoint&>(mp));
+    });
+
     return true;
 }
 
@@ -818,7 +832,7 @@ bool FEPlotFluidHeatFlux::Save(FEDomain &dom, FEDataStream& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
-bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
+bool FEPlotFluidStress::Save(FEDomain& dom, FEDataStream& a)
 {
     FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
 	if (pfluid == 0) return false;
@@ -1189,5 +1203,29 @@ bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& 
         });
         return true;
     }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average stresses for each element.
+bool FEPlotFSISolidStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (dynamic_cast<FEFluidFSIDomain* >(&dom))
+    {
+        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEFSIMaterialPoint* pt = (mp.ExtractData<FEFSIMaterialPoint>());
+            return (pt ? pt->m_ss : mat3ds(0.0));
+        });
+        return true;
+    }
+    else if (dynamic_cast<FEBiphasicFSIDomain* >(&dom))
+    {
+        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEBiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEBiphasicFSIMaterialPoint>());
+            return (pt ? pt->m_ss : mat3ds(0.0));
+        });
+        return true;
+    }
+    
     return false;
 }

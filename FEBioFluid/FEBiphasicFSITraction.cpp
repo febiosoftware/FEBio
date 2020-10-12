@@ -82,6 +82,7 @@ bool FEBiphasicFSITraction::Init()
         FEBiphasicFSI* pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
         if (pfsi) {
             m_K[j] = pfsi->Fluid()->m_k;
+            m_s[j] = (double)el.m_order;
         }
         else if (!m_bself[j]) {
             // extract the second of two elements on this interface
@@ -89,7 +90,7 @@ bool FEBiphasicFSITraction::Init()
             pm = fem->GetMaterial(m_elem[j]->GetMatID());
             pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
             if (pfsi == nullptr) return false;
-            m_s[j] = -1;
+            m_s[j] = -(double)el.m_order;
             m_K[j] = pfsi->Fluid()->m_k;
         }
         else
@@ -226,9 +227,9 @@ void FEBiphasicFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
             svJ += pfsi->Fluid()->GetViscous()->Tangent_Strain(mp);
             cv += pfsi->Fluid()->Tangent_RateOfDeformation(mp);
             Ls += ep.m_L;
-            phif += ft.m_phif;
-            phis += ft.m_phis;
-            gradphif += ft.m_gradphif;
+            phif += pfsi->Porosity(mp);
+            phis += pfsi->SolidVolumeFrac(mp);
+            gradphif += pfsi->gradPorosity(mp);
             gradJ += ft.m_gradJ;
             Dw += ft.m_Lw.sym();
             J += ep.m_J;

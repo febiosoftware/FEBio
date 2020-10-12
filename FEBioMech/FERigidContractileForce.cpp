@@ -305,8 +305,8 @@ void FERigidContractileForce::Update()
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
     
-	m_at = ra + za;
-	m_bt = rb + zb;
+	m_at = RBa.m_rt + zat;
+	m_bt = RBb.m_rt + zbt;
 
     vec3d n = rb + zb - ra - za;
     n.unit();

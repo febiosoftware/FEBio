@@ -311,8 +311,8 @@ void FERigidSpring::Update()
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
 
-	m_at = ra + za;
-	m_bt = rb + zb;
+	m_at = RBa.m_rt + zat;
+	m_bt = RBb.m_rt + zbt;
 
     c = rb + zb - ra - za;
     double L = c.norm();

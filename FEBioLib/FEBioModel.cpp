@@ -1071,8 +1071,9 @@ void FEBioModel::UpdatePlotObjects()
 				{
 					FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
 					po->m_tag = 2;
-					po->m_r1 = ra;
-					po->m_r2 = rb;
+                    po->m_rot = quatd(0, vec3d(1, 0, 0));
+					po->m_r1 = rd->m_at;
+					po->m_r2 = rd->m_bt;
                     po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rd));
                     po->AddData("Relative rotation (GCS)", PLT_VEC3F, new FEPlotRigidConnectorRotationGCS(this, rd));
                     po->AddData("Reaction force (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorForce(this, rd));
@@ -1097,6 +1098,7 @@ void FEBioModel::UpdatePlotObjects()
                 {
                     FEBioPlotFile::LineObject* po = plt->AddLineObject(name);
                     po->m_tag = 4;
+                    po->m_rot = quatd(0, vec3d(1, 0, 0));
                     po->m_r1 = rcf->m_at;
                     po->m_r2 = rcf->m_bt;
                     po->AddData("Relative translation (GCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationGCS(this, rcf));

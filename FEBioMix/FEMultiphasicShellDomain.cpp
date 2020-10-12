@@ -2329,6 +2329,9 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         // update specialized material points
         m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
         
+        // calculate the solid stress at this material point
+        ppt.m_ss = pmb->GetElasticMaterial()->Stress(mp);
+        
         // evaluate the stress
         pt.m_s = pmb->Stress(mp);
         

@@ -63,6 +63,9 @@ bool FERigidDamper::Init()
     m_qa0 = m_a0 - m_rbA->m_r0;
     m_qb0 = m_b0 - m_rbB->m_r0;
     
+    m_at = m_a0;
+    m_bt = m_b0;
+    
     return true;
 }
 
@@ -318,6 +321,9 @@ void FERigidDamper::Update()
     vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
     vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
     vec3d vb = vbt*alpha + vbp*(1-alpha);
+    
+    m_at = RBa.m_rt + zat;
+    m_bt = RBb.m_rt + zbt;
     
     m_F = (vb - va)*m_c;
 }
