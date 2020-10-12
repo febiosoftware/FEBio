@@ -993,7 +993,7 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         pt.m_sf = m_pMat->Fluid()->Stress(mp);
         
         // calculate the solid stress at this material point
-        ft.m_ss = m_pMat->Solid()->Stress(mp) - pt.m_sf*phis;
+        ft.m_ss = m_pMat->Solid()->Stress(mp) - m_pMat->Fluid()->GetViscous()->Stress(mp)*phis;
 
         // calculate the mixture stress at this material point
         ept.m_s = ft.m_ss + pt.m_sf;
