@@ -1210,18 +1210,14 @@ bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& 
 //! Store the average stresses for each element.
 bool FEPlotFSISolidStress::Save(FEDomain& dom, FEDataStream& a)
 {
-    if (dynamic_cast<FEFluidFSIDomain* >(&dom))
+    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+    if (pfluid == 0) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeAverageElementValue<mat3ds>(sd, a, [](const FEMaterialPoint& mp) {
             const FEFSIMaterialPoint* pt = (mp.ExtractData<FEFSIMaterialPoint>());
-            return (pt ? pt->m_ss : mat3ds(0.0));
-        });
-        return true;
-    }
-    else if (dynamic_cast<FEBiphasicFSIDomain* >(&dom))
-    {
-        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
-            const FEBiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEBiphasicFSIMaterialPoint>());
             return (pt ? pt->m_ss : mat3ds(0.0));
         });
         return true;
