@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,25 +23,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-#include "stdafx.h"
-#include "FEBioMech.h"
-#include <assert.h>
+#pragma once
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
-{
-	switch (var)
-	{
-	case DISPLACEMENT           : return "displacement"               ; break;
-	case SHELL_ROTATION         : return "shell rotation"             ; break;
-	case RIGID_ROTATION         : return "rigid rotation"             ; break;
-	case SHELL_DISPLACEMENT     : return "shell displacement"         ; break;
-	case VELOCTIY               : return "velocity"                   ; break;
-	case SHELL_VELOCITY         : return "shell velocity"             ; break;
-	case SHELL_ACCELERATION     : return "shell acceleration"         ; break;
-	}
+//! The FEBioMech module
+//! This module defines classes for dealing with large deformation structural
+//! mechanics problems. 
 
-	assert(false);
-	return nullptr;
+namespace FEBioMech
+{
+	//! Initialize the FEBioMech module
+	FEBIOMECH_API void InitModule();
 }

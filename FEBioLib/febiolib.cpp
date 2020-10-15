@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FECore/FECore.h"
 #include "NumCore/NumCore.h"
-#include "FEBioMech/FEBioMech.h"
+#include "FEBioMech/FEBioMechModule.h"
 #ifndef MECH_ONLY
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioOpt/FEBioOpt.h"

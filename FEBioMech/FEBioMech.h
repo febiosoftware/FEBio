@@ -36,9 +36,6 @@ SOFTWARE.*/
 
 namespace FEBioMech
 {
-	//! Initialize the FEBioMech module
-	FEBIOMECH_API void InitModule();
-
 	enum MECH_VARIABLE {
 		DISPLACEMENT,
 		SHELL_ROTATION,
