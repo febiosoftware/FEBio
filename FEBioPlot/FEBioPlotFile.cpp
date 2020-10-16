@@ -162,7 +162,30 @@ private:
 class FEPlotArrayVariable : public FEPlotDomainData
 {
 public:
-	FEPlotArrayVariable(FEModel* fem, const char* szname, int index) : FEPlotDomainData(fem, PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
+	FEPlotArrayVariable(FEModel* fem, const char* szname, int index) : FEPlotDomainData(fem, PLT_FLOAT, FMT_NODE) 
+	{ 
+		strcpy(m_szname, szname); 
+		m_index = index;
+		if (index == -1)
+		{
+			// get the DOFS
+			FEModel& fem = *GetFEModel();
+			DOFS& dofs = fem.GetDOFS();
+
+			// see if this variable exists
+			int nvar = dofs.GetVariableIndex(m_szname);
+			if (nvar >= 0)
+			{
+				// get the size of the variable
+				int n = dofs.GetVariableSize(nvar);
+				if (n > 0)
+				{
+					SetVarType(PLT_ARRAY);
+					SetArraySize(n);
+				}
+			}
+		}
+	}
 	bool Save(FEDomain& D, FEDataStream& a)
 	{
 		// get the DOFS
@@ -178,28 +201,72 @@ public:
 		if (n == 0) return false;
 
 		// get the start index of the DOFS
-		int ndof = dofs.GetDOF(nvar, m_index);
-		if (ndof < 0) return false;
-
-		// see if this domain contains this dof
-		const FEDofList& domDofs = D.GetDOFList();
-		bool bfound = false;
-		for (int i = 0; i<(int)domDofs.Size(); ++i)
+		if (m_index >= 0)
 		{
-			if (domDofs[i] == ndof)
+			int ndof = dofs.GetDOF(nvar, m_index);
+			if (ndof < 0) return false;
+
+			// see if this domain contains this dof
+			const FEDofList& domDofs = D.GetDOFList();
+			bool bfound = false;
+			for (int i = 0; i < (int)domDofs.Size(); ++i)
 			{
-				bfound = true;
-				break;
+				if (domDofs[i] == ndof)
+				{
+					bfound = true;
+					break;
+				}
+			}
+			if (bfound == false) return false;
+
+			// store the nodal data
+			int NN = D.Nodes();
+			for (int i = 0; i < NN; ++i)
+			{
+				FENode& node = D.Node(i);
+				a << node.get(ndof);
 			}
 		}
-		if (bfound == false) return false;
-
-		// store the nodal data
-		int NN = D.Nodes();
-		for (int i = 0; i<NN; ++i)
+		else
 		{
-			FENode& node = D.Node(i);
-			a << node.get(ndof);
+			const FEDofList& domDofs = D.GetDOFList();
+
+			vector<int> dofList(n, -1);
+			for (int dof_i = 0; dof_i < n; dof_i++)
+			{
+				int ndof = dofs.GetDOF(nvar, dof_i);
+				// see if this domain contains this dof
+				bool bfound = false;
+				for (int i = 0; i < (int)domDofs.Size(); ++i)
+				{
+					if (domDofs[i] == ndof)
+					{
+						bfound = true;
+						dofList[dof_i] = i;
+						break;
+					}
+				}
+			}
+
+			// store the nodal data
+			int NN = D.Nodes();
+			for (int i = 0; i < NN; ++i)
+			{
+				FENode& node = D.Node(i);
+				for (int dof_i = 0; dof_i < n; dof_i++)
+				{
+					int ndof = dofList[dof_i];
+					if (ndof < 0)
+					{
+						a << 0.0;
+					}
+					else
+					{
+						// store the nodal data
+						a << node.get(ndof);
+					}
+				}
+			}
 		}
 
 		return true;
@@ -381,9 +448,14 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				int ndofs = dofs.GetVariableSize(sz);
 				if (fltType == 0)
 				{
-					index = dofs.GetIndex(sz, szflt);
+					index = -1;
+					if (szflt)
+					{
+
+						index = dofs.GetIndex(sz, szflt);
+						if ((index < 0) || (index >= ndofs)) return false;
+					}
 				}
-				if ((index < 0) || (index >= ndofs)) return false;
 
 				ps = new FEPlotArrayVariable(pfem, sz, index);
 				return AddDomainVariable(ps, szname, item);
