@@ -467,10 +467,14 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	// find the domain with the same name
+	// find the domain
 	string domName = set.GetName();
-	FEDomain* dom = mesh.FindDomain(domName);
-	if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", domName.c_str());
+	FEDomainList& DL = set.GetDomainList();
+	if (DL.Domains() != 1)
+	{
+		throw XMLReader::InvalidAttributeValue(tag, "elem_set", domName.c_str());
+	}
+	FEDomain* dom = DL.GetDomain(0);
 
 	// get its material
 	FEMaterial* domMat = dom->GetMaterial();
