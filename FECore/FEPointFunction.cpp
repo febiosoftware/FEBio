@@ -394,6 +394,26 @@ double FEPointFunction::derive(double time) const
 }
 
 //-----------------------------------------------------------------------------
+double FEPointFunction::deriv2(double time) const
+{
+    int N = (int)m_points.size();
+    if (N <= 1) return 0;
+    
+    double Dt = m_points[N - 1].x() - m_points[0].x();
+    double dt = Dt*0.001;
+    double t0 = time - dt;
+    double t1 = time + dt;
+    
+    double v1 = value(t1);
+    double v0 = value(t0);
+    double v  = value(time);
+    
+    double D = (v1 - 2*v + v0) / (dt * dt);
+    
+    return D;
+}
+
+//-----------------------------------------------------------------------------
 FEFunction1D* FEPointFunction::copy()
 {
 	FEPointFunction* f = new FEPointFunction(GetFEModel());

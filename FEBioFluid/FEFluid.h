@@ -77,7 +77,7 @@ public:
     double Temperature(FEMaterialPoint& mp) override { return m_Tr; }
 
     //! evaluate dilatation from pressure
-    double Dilatation(const double T, const double p) override;
+    bool Dilatation(const double T, const double p, double& e) override;
     
 public:
     double      m_k;        //!< bulk modulus at J=1
