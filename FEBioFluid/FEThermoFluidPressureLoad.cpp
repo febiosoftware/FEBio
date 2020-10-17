@@ -99,10 +99,9 @@ void FEThermoFluidPressureLoad::Update()
             // get the temperature at this node
             double T = node.get(m_dofT);
             // calculate the dilatation
-            double e = 0;
+            double e = node.get(m_dofEF);
             bool good = m_pfluid->Dilatation(T,m_p0, e);
             assert(good);
-            double p = m_pfluid->Pressure(e, T);    // check result
             // set node as having prescribed DOF
             node.set(m_dofEF, e);
         }

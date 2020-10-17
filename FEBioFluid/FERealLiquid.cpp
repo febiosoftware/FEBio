@@ -203,7 +203,7 @@ double FERealLiquid::SpecificEntropy(FEMaterialPoint& mp)
     double q = tf.m_T/m_Tr;
     double de = fp.m_Jf - m_Jsat->value(q);
     double dJsat = m_Jsat->derive(q);
-    double s = m_ssat->value(q) - m_psat->value(q)*dJsat + de*m_psat->derive(q);
+    double s = m_ssat->value(q) + de*m_psat->derive(q);
     for (int k=1; k<=m_nvc; ++k)
         s += (m_B[k-1]->derive(q)*de/(k+1) - dJsat*m_B[k-1]->value(q))*pow(de,k);
 
@@ -247,8 +247,7 @@ double FERealLiquid::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
     double de = fp.m_Jf - m_Jsat->value(q);
     double dJsat = m_Jsat->derive(q);
     double dJsa2 = m_Jsat->deriv2(q);
-    double dsT = m_ssat->derive(q) + de*m_psat->deriv2(q)
-    - 2*dJsat*m_psat->derive(q) - dJsa2*m_psat->value(q);
+    double dsT = m_ssat->derive(q) + de*m_psat->deriv2(q) - dJsat*m_psat->derive(q);
     for (int k=1; k<=m_nvc; ++k)
         dsT += (k*pow(dJsat, 2) - de*dJsa2)*m_B[k-1]->value(q)*pow(de, k-1)
         - 2*dJsat*m_B[k-1]->derive(q)*pow(de, k)
@@ -293,7 +292,7 @@ double FERealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
+/*
     // evaluate the dilatation that makes the gage pressure = 0 at the given temperature
     double e = fp.m_Jf - 1; // initial guess
     bool good = Dilatation(tf.m_T, 0, e);
@@ -310,7 +309,12 @@ double FERealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
     double dpT = Tangent_Temperature(*fmt);
     double dpJ = Tangent_Strain(*fmt);
     double cp = cv - (m_Tr + tf.m_T)*pow(dpT, 2)/(m_rhor*dpJ);
-    
+    */
+    double cv = IsochoricSpecificHeatCapacity(mp);
+    double p = Pressure(mp);
+    double dpT = Tangent_Temperature(mp);
+    double dpJ = Tangent_Strain(mp);
+    double cp = cv + (dpT/dpJ)/m_rhor*(p - (m_Tr + tf.m_T)*dpT);
     return cp;
 }
 
