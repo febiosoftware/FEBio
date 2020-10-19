@@ -39,6 +39,16 @@ SOFTWARE.*/
 #include <FECore/FEConstValueVec3.h>
 #include <sstream>
 
+// in FEBioMeshDataSection3.cpp
+FEDataType str2datatype(const char* szdataType);
+
+//-----------------------------------------------------------------------------
+#ifdef WIN32
+#define szcmp    _stricmp
+#else
+#define szcmp    strcmp
+#endif
+
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
 {
@@ -110,7 +120,23 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				else
 				{
 					const char* szname = tag.AttributeValue("name");
-					FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
+
+					const char* szdatatype = tag.AttributeValue("datatype");
+					FEDataType dataType = str2datatype(szdatatype);
+					if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdatatype);
+
+					// default format
+					Storage_Fmt fmt = (dataType == FE_MAT3D ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
+
+					// format overrider?
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (szcmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
+						else throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
+					}
+
+					FEDomainMap* map = new FEDomainMap(dataType, fmt);
 					map->Create(part);
 					map->SetName(szname);
 

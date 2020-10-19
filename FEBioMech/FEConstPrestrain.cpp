@@ -60,7 +60,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEConstPrestrainGradient::FEConstPrestrainGradient(FEModel* pfem) : FEPrestrainGradient(pfem)
 {
-	m_Fp.unit();
+	m_Fp = mat3dd(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ FEMaterialPoint* FEConstPrestrainGradient::CreateMaterialPointData()
 mat3d FEConstPrestrainGradient::Prestrain(FEMaterialPoint& mp)
 {
 	MaterialPointData& ep = *mp.ExtractData<MaterialPointData>();
-	return m_Fp*ep.Fp;
+	return m_Fp(mp)*ep.Fp;
 }
 
 //-----------------------------------------------------------------------------

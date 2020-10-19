@@ -53,7 +53,7 @@ public:
 	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
 
 protected:
-	mat3d	m_Fp;
+	FEParamMat3d	m_Fp;
 
 	DECLARE_FECORE_CLASS();
 };
