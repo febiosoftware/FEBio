@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 
 #include "FEBioMech.h"
+#include "FEBioMechModule.h"
 #include "FE2DFiberNeoHookean.h"
 #include "FE2DTransIsoMooneyRivlin.h"
 #include "FE2DTransIsoVerondaWestmann.h"
