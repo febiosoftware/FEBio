@@ -38,6 +38,8 @@ public:
 
 	FEMaterialPoint* CreateMaterialPointData() override;
 
+	double Damage(FEMaterialPoint& mp);
+
 public:
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
@@ -62,6 +64,8 @@ private:
 	// fiber parameters
 	double	m_a1, m_a2, m_kappa;
 	FEParamVec3		m_fiber;
+
+	double	m_r_s, m_r_inf;
 
 	// damage model parameters
 	double	m_tinit;		// start time of damage

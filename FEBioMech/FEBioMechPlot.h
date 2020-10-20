@@ -912,3 +912,11 @@ public:
 	FEPlotDiscreteElementForce(FEModel* fem) : FEPlotDomainData(fem, PLT_VEC3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotContinuousDamage : public FEPlotDomainData
+{
+public:
+	FEPlotContinuousDamage(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

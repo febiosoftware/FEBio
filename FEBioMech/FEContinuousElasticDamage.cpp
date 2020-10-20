@@ -29,6 +29,7 @@ SOFTWARE.*/
 
 // Macauley Bracket
 #define MB(a) ((a)>0.0?(a):0.0)
+#define SIGN(a) ((a)>0.0?1.0:0.0)
 
 //=========================================================================================
 
@@ -111,6 +112,10 @@ FEContinuousElasticDamage::FEContinuousElasticDamage(FEModel* fem) : FEElasticMa
 
 	m_beta_s = 0.0;
 	m_gamma_max = 0.0;
+
+	// Looks like these are hard-coded
+	m_r_s = 0.99;
+	m_r_inf = 0.99;
 }
 
 FEMaterialPoint* FEContinuousElasticDamage::CreateMaterialPointData()
@@ -118,9 +123,17 @@ FEMaterialPoint* FEContinuousElasticDamage::CreateMaterialPointData()
 	return new FEContinuousElasticDamage::Data(new FEElasticMaterialPoint);
 }
 
+double FEContinuousElasticDamage::Damage(FEMaterialPoint& mp)
+{
+	FEContinuousElasticDamage::Data& damagePoint = *mp.ExtractData<FEContinuousElasticDamage::Data>();
+	return damagePoint.m_D;
+}
+
 double FEContinuousElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEContinuousElasticDamage::Data& damagePoint = *mp.ExtractData<FEContinuousElasticDamage::Data>();
+
 	mat3ds C = pt.RightCauchyGreen();
 	mat3ds C2 = C.sqr();
 	double I1 = C.tr();
@@ -141,8 +154,10 @@ double FEContinuousElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
 	double I5 = a0 * (C2*a0);
 	double K3 = I1 * I4 - I5;
 
-	double Psi_fiber = m_a1 * pow((m_kappa*I1 + (1.0-3.0*m_kappa/2.0)*K3)-2.0, m_a2);
-
+	double D = damagePoint.m_D;
+	double Psi0 = m_kappa * I1 + (1.0 - 3.0*m_kappa / 2.0)*K3;
+	double P = (1.0 - D)*Psi0 - 2.0;
+	double Psi_fiber = m_a1 * pow(P, m_a2);
 
 	// add it all up
 	double Psi = Psi_matrix + Psi_fiber;
@@ -221,10 +236,6 @@ mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 	// (i) compute trans-iso strain energy
 	double psi_f0 = m_kappa * I1 + g1 * K3;
 
-	// looks like these are hardcoded parameters
-	double r_s = 0.99;
-	double r_inf = 0.99;
-
 	// (ii) check initial damage state
 	double eps = 1e-9; // NOTE: should be machine eps
 	if (t >= (m_tinit - eps))
@@ -251,13 +262,13 @@ mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 		else gamma = gamma_prev;
 
 		// compute damage saturation value
-		double Ds = m_Dmax * (1.0 - exp(log(1.0 - r_inf)*gamma / m_gamma_max));
+		double Ds = m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max));
 
 		// (iv) compute internal variable
 		double beta = MB(bt - damagePoint.m_bt_ini);
 
 		// (v) evaluate damage function
-		D = Ds * (1.0 - exp(log(1.0 - r_s)*beta / m_beta_s));
+		D = Ds * (1.0 - exp(log(1.0 - m_r_s)*beta / m_beta_s));
 
 		// update internal variables
 		damagePoint.m_bt = bt;
@@ -266,17 +277,15 @@ mat3ds FEContinuousElasticDamage::FiberStress(FEMaterialPoint& mp)
 		damagePoint.m_D = D;
 	}
 
-//	double P = (1.0 - D)*(m_kappa * I1 + g1 * K3) - 2.0;
-	double P = (m_kappa * I1 + g1 * K3) - 2.0;
+	double P = (1.0 - D)*(psi_f0) - 2.0;
 	if (P < 0.0) P = 0.0;
-	double g = 2.0*m_a1*m_a2*pow(P, m_a2 - 1.0);
+	double dm = m_a1*m_a2*pow(P, m_a2 - 1.0);
 
 	mat3dd I(1.0);
 	mat3ds m = dyad(a);
 	mat3ds aob = dyads(a, b*a);
 	mat3ds ts = b * I4 + m * (I1*I4) - aob * I4;
-//	mat3ds s = (1.0 - D)*(b*m_kappa + ts*g1)*(g / J);
-	mat3ds s = (b*m_kappa + ts * g1)*(g / J);
+	mat3ds s = (b*m_kappa + ts*g1)*(2*dm*(1.0 - D) / J);
 
 	return s;
 }
@@ -312,7 +321,7 @@ mat3ds FEContinuousElasticDamage::SecantStress(FEMaterialPoint& mp)
 	double W = StrainEnergyDensity(mp);
 
 	// create deformation gradient increment
-	double eps = 1e-7;
+	double eps = 1e-9;
 	vec3d e[3];
 	e[0] = vec3d(1, 0, 0); e[1] = vec3d(0, 1, 0); e[2] = vec3d(0, 0, 1);
 	mat3ds S(0.0);
@@ -345,6 +354,8 @@ mat3ds FEContinuousElasticDamage::SecantStress(FEMaterialPoint& mp)
 tens4ds FEContinuousElasticDamage::FiberTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEContinuousElasticDamage::Data& damagePoint = *mp.ExtractData<FEContinuousElasticDamage::Data>();
+
 	mat3d F = pt.m_F;
 	mat3ds C = pt.RightCauchyGreen();
 	mat3ds C2 = C.sqr();
@@ -360,24 +371,64 @@ tens4ds FEContinuousElasticDamage::FiberTangent(FEMaterialPoint& mp)
 	double I5 = a0 * (C2*a0);
 	double K3 = I1 * I4 - I5;
 
+	double k = 1.0 - 3.0*m_kappa / 2.0;
+
+	double D = damagePoint.m_D;
+
+	double Psi0 = m_kappa * I1 + k * K3;
+	double P = (1.0 - D)*(Psi0)-2.0;
+	if (P < 0) P = 0.0;
+	double dm = m_a1 * m_a2*pow(P, m_a2 - 1.0);
+	double d2m = m_a1 * m_a2 * (m_a2 - 1.0)*pow(P, m_a2 - 2.0);
+
 	mat3ds m = dyad(a);
 	mat3ds aBa = dyads(a, b*a);
 	
-	mat3dd I(1.0);
 	mat3ds t = b * I4 + m * (I1*I4) - aBa * I4;
-	tens4ds p = dyad4s(a, b, a)*(I4*2.0);
+	mat3ds s0 = (b * m_kappa + t * k)*(2.0 / J);
+
+	tens4ds aba = dyad4s(a, b, a)*(I4*2.0);
 	tens4ds bom = dyad1s(b, m);
 	tens4ds bot = dyad1s(b, t);
 	tens4ds txt = dyad1s(t);
 	tens4ds bxb = dyad1s(b);
+	tens4ds sxs = dyad1s(s0);
 
-	double g1 = 1.0 - 3.0*m_kappa / 2.0;
-	double g2 = m_kappa * I1 + g1 * K3 - 2.0;
-	if (g2 < 0.0) g2 = 0.0;
+	// elastic stiffness 
+	tens4ds c0 = (bom*I4 - aba)*(4.0*k / J);
+	tens4ds ceD = sxs*(J*d2m*(1.0-D)) + c0*((1.0 - D)*dm);
 
-	tens4ds c = (bxb*(m_kappa*m_kappa) + bot*(m_kappa*g1) + txt*(g1*g1))*((m_a2-1.0)*pow(g2, m_a2-2));
-	c += (bom*I4 - p)*(g1*pow(g2, m_a2 - 1.0));
-	c *= 4.0*m_a1*m_a2 / J;
+	tens4ds c = ceD;
+
+	// damage stiffness
+	double bt = damagePoint.m_bt;
+	double gamma = damagePoint.m_gamma;
+	double Ds = m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max));
+	double beta = MB(bt - damagePoint.m_bt_ini);
+
+	double psi0_prev = damagePoint.m_psi_f0_prev;
+	double psi0_ini = damagePoint.m_psi_f0_ini;
+	double gamma_prev = damagePoint.m_gamma_prev;
+
+	double dD_dbeta = -Ds * (log(1 - m_r_s) / m_beta_s)*exp(log(1 - m_r_s)*beta / m_beta_s);
+	double dDs_dgamma = -m_Dmax * (log(1 - m_r_inf) / m_gamma_max)*exp(log(1 - m_r_inf)*gamma / m_gamma_max);
+	double dD_dDs = 1.0 - exp(log(1 - m_r_s)*beta / m_beta_s);
+	double dbeta_dpsi0 = 0.25*(SIGN(bt - damagePoint.m_bt_ini) + 1)*(SIGN(Psi0 - psi0_prev) + 1);
+	double dgamma_dpsi0 = 0.5*(SIGN(Psi0 - psi0_ini) + 1);
+
+	double meps = 1e-9; // NOTE: should be machine eps
+	if (Psi0 - psi0_prev > meps)
+	{
+		tens4ds Cd = sxs * ((dm + d2m * (1 - D)*Psi0)*dD_dbeta*dbeta_dpsi0);
+		c -= Cd;
+	}
+
+	double phi_trial = MB(Psi0 - damagePoint.m_psi_f0_ini) - gamma_prev;
+	if (phi_trial > meps)
+	{
+		tens4ds Cd = sxs*((dm + d2m*(1 - D)*Psi0)*dD_dDs*dDs_dgamma*dgamma_dpsi0);
+		c -= Cd;
+	}
 
 	return c;
 }

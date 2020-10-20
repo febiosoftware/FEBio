@@ -144,6 +144,7 @@ SOFTWARE.*/
 #include "FEGenericTransIsoHyperelasticUC.h"
 #include "FEActiveFiberStress.h"
 #include "FEActiveFiberStressUC.h"
+#include "FEContinuousElasticDamage.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -298,6 +299,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelastic, "trans-iso hyperelastic");
+	REGISTER_FECORE_CLASS(FEContinuousElasticDamage, "continuous elastic damage");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -651,6 +653,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotPreStrainCompatibility, "prestrain compatibility");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStretch, "discrete element stretch");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce, "discrete element force");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage, "continuous damage");
+
 
 	// 2O continuum fields
 	REGISTER_FECORE_CLASS(FEPlotElementGnorm, "G norm");

@@ -60,6 +60,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include "FEDiscreteElasticMaterial.h"
 #include "FEDiscreteElasticDomain.h"
+#include "FEContinuousElasticDamage.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -3203,3 +3204,32 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 
 	return true;
 }
+
+bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEContinuousElasticDamage* mat = dynamic_cast<FEContinuousElasticDamage*>(dom.GetMaterial());
+	if (mat == nullptr) return false;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		double D = 0.0;
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			double Dj = mat->Damage(mp);
+
+			D += Dj;
+		}
+		D /= (double)nint;
+
+		a << D;
+	}
+
+	return true;
+}
+
