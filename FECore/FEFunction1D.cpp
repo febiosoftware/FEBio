@@ -87,6 +87,14 @@ bool FEMathFunction::Init()
 	else
 		m_dexp.Create("0");
 
+    m_d2exp.AddVariable(m_dexp.Variable(0)->Name());
+    if (m_dexp.Variables() == 1) {
+        MITEM mi = MDerive(m_dexp.GetExpression(), *m_dexp.Variable(0));
+        m_d2exp.SetExpression(mi);
+    }
+    else
+        m_d2exp.Create("0");
+
 #ifdef _DEBUG
 	MObj2String o2s;
 	string s = o2s.Convert(m_dexp);
@@ -101,6 +109,7 @@ FEFunction1D* FEMathFunction::copy()
 	m->m_s = m_s;
 	m->m_exp = m_exp;
 	m->m_dexp = m_dexp;
+    m->m_d2exp = m_d2exp;
 	return m;
 }
 
@@ -114,4 +123,10 @@ double FEMathFunction::derive(double t) const
 {
 	vector<double> var(1, t);
 	return m_dexp.value_s(var);
+}
+
+double FEMathFunction::deriv2(double t) const
+{
+    vector<double> var(1, t);
+    return m_d2exp.value_s(var);
 }

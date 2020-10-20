@@ -810,8 +810,15 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	const char* szname = name.c_str();
 
 	FEMesh* mesh = const_cast<FEMesh*>(set.GetMesh());
-	FEDomain* dom = mesh->FindDomain(name);
-	if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
+
+	// find the domain
+	string domName = set.GetName();
+	FEDomainList& DL = set.GetDomainList();
+	if (DL.Domains() != 1)
+	{
+		throw XMLReader::InvalidAttributeValue(tag, "elem_set", domName.c_str());
+	}
+	FEDomain* dom = DL.GetDomain(0);
 
 	// get the material
 	FEMaterial* mat = dom->GetMaterial();

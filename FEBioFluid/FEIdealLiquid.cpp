@@ -62,7 +62,8 @@ bool FEIdealLiquid::Init()
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
-    
+    if (m_Pr <= 0) { feLogError("A positive referential absolute pressure P must be defined in Globals section"); return false; }
+
     m_pMat = dynamic_cast<FEThermoFluid*>(GetParent());
     m_rhor = m_pMat->ReferentialDensity();
     
@@ -200,11 +201,11 @@ double FEIdealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-double FEIdealLiquid::Dilatation(const double T, const double p)
+bool FEIdealLiquid::Dilatation(const double T, const double p, double& e)
 {
-    double e = (m_beta*T - p)/m_k;
+    e = (m_beta*T - p)/m_k;
     
-    return e;
+    return true;
 }
 
 //-----------------------------------------------------------------------------

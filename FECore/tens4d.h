@@ -215,7 +215,7 @@ tens4dms dyad1ms(const mat3ds& a, const mat3ds& b);
 #include "tens4dms.hpp"
 
 //-----------------------------------------------------------------------------
-//! Class for 4th order tensors without both minor symmetries
+//! Class for 4th order tensors with both minor symmetries
 
 // We store components of this tensor as a 6x6 matrix.
 // The tensor is stored in column major order:

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D511EF13253A74AE00893F69 /* FEBioMechModule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D511EF11253A74AE00893F69 /* FEBioMechModule.cpp */; };
+		D511EF14253A74AE00893F69 /* FEBioMechModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D511EF12253A74AE00893F69 /* FEBioMechModule.h */; };
 		D5135C29232191C6008AFD7D /* FENaturalNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5135C27232191C6008AFD7D /* FENaturalNeoHookean.cpp */; };
 		D5135C2A232191C6008AFD7D /* FENaturalNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */; };
 		D51E614C22443FDB0049F545 /* FEMaxStressCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */; };
@@ -486,6 +488,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D511EF11253A74AE00893F69 /* FEBioMechModule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMechModule.cpp; sourceTree = "<group>"; };
+		D511EF12253A74AE00893F69 /* FEBioMechModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioMechModule.h; sourceTree = "<group>"; };
 		D5135C27232191C6008AFD7D /* FENaturalNeoHookean.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FENaturalNeoHookean.cpp; sourceTree = "<group>"; };
 		D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FENaturalNeoHookean.h; sourceTree = "<group>"; };
 		D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMaxStressCriterion.cpp; sourceTree = "<group>"; };
@@ -1028,6 +1032,8 @@
 				D5322F0A2142ACD8008DE511 /* FEBioMech.h */,
 				D5322F572142ACD8008DE511 /* FEBioMechData.cpp */,
 				D5322F222142ACD8008DE511 /* FEBioMechData.h */,
+				D511EF11253A74AE00893F69 /* FEBioMechModule.cpp */,
+				D511EF12253A74AE00893F69 /* FEBioMechModule.h */,
 				D5322F9F2142ACD8008DE511 /* FEBioMechPlot.cpp */,
 				D5322E802142ACD7008DE511 /* FEBioMechPlot.h */,
 				D5322FD62142ACD8008DE511 /* FEBodyForce.cpp */,
@@ -1573,6 +1579,7 @@
 				D53230DD2142ACD9008DE511 /* FEVerondaWestmann.h in Headers */,
 				D53230372142ACD9008DE511 /* FENeoHookeanTransIso.h in Headers */,
 				D532301B2142ACD9008DE511 /* FEUDGHexDomain.h in Headers */,
+				D511EF14253A74AE00893F69 /* FEBioMechModule.h in Headers */,
 				D565CDC9215D28A500E08ED6 /* RigidBC.h in Headers */,
 				D53230E52142ACD9008DE511 /* FEFiberIntegrationScheme.h in Headers */,
 				D53231232142ACD9008DE511 /* FECGSolidSolver.h in Headers */,
@@ -1936,6 +1943,7 @@
 				D532309F2142ACD9008DE511 /* FECoupledMooneyRivlin.cpp in Sources */,
 				D532310C2142ACD9008DE511 /* FEStickyInterface.cpp in Sources */,
 				D53231722142ACD9008DE511 /* FEViscousMaterialPoint.cpp in Sources */,
+				D511EF13253A74AE00893F69 /* FEBioMechModule.cpp in Sources */,
 				D53231082142ACD9008DE511 /* FEFiberPowLinear.cpp in Sources */,
 				D565CDCD215D28A500E08ED6 /* RigidBC.cpp in Sources */,
 				D53230A82142ACD9008DE511 /* FEDamageMaterial.cpp in Sources */,

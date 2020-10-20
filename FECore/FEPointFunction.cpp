@@ -379,18 +379,99 @@ double FEPointFunction::derive(double time) const
 {
 	int N = (int)m_points.size();
 	if (N <= 1) return 0;
+    double tmax = m_points[N-1].x();
+    double tmin = m_points[0].x();
 
-	double Dt = m_points[N - 1].x() - m_points[0].x();
-	double dt = Dt*0.001;
-	double t0 = time - dt;
-	double t1 = time + dt;
+    double Dt = m_points[N - 1].x() - m_points[0].x();
+    double dt = Dt*1e-9;
+    double D = 0;
+    
+    if (time >= tmax) {
+        // use backward difference
+        double t2 = time - 2*dt;
+        double t1 = time - dt;
+        double t0 = time;
+        
+        double v2 = value(t2);
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        D = (v2 - 4*v1 + 3*v0) / (2 * dt);
+    }
+    else if (time <= tmin) {
+        // use forward difference
+        double t0 = time;
+        double t1 = time + dt;
+        double t2 = time + 2*dt;
 
-	double v1 = value(t1);
-	double v0 = value(t0);
-
-	double D = (v1 - v0) / (2 * dt);
+        double v0 = value(t0);
+        double v1 = value(t1);
+        double v2 = value(t2);
+        
+        D = (-v2 + 4*v1 - 3*v0) / (2 * dt);
+    }
+    else {
+        // use central difference
+        double t0 = time - dt;
+        double t1 = time + dt;
+        
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        D = (v1 - v0) / (2 * dt);
+    }
 
 	return D;
+}
+
+//-----------------------------------------------------------------------------
+double FEPointFunction::deriv2(double time) const
+{
+    int N = (int)m_points.size();
+    if (N <= 1) return 0;
+    double tmax = m_points[N-1].x();
+    double tmin = m_points[0].x();
+    
+    double Dt = m_points[N - 1].x() - m_points[0].x();
+    double dt = Dt*1e-9;
+    double D = 0;
+    
+    if (time >= tmax) {
+        // use backward difference
+        double t2 = time - 2*dt;
+        double t1 = time - dt;
+        double t0 = time;
+        
+        double v2 = value(t2);
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        D = (v2 - 2*v1 + v0) / (dt * dt);
+    }
+    else if (time <= tmin) {
+        // use forward difference
+        double t0 = time;
+        double t1 = time + dt;
+        double t2 = time + 2*dt;
+        
+        double v0 = value(t0);
+        double v1 = value(t1);
+        double v2 = value(t2);
+        
+        D = (v2 - 2*v1 + v0) / (dt * dt);
+    }
+    else {
+        // use central difference
+        double t0 = time - dt;
+        double t1 = time + dt;
+        
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        D = (v1 + v0 - 2*value(time)) / (dt * dt);
+    }
+    
+    return D;
 }
 
 //-----------------------------------------------------------------------------

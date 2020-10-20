@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include "FEBiphasicFSIDomain3D.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
-#include "FEBioBiphasicFSI.h"
+#include "FEBioFSI.h"
 #include "FEFluidFSI.h"
 #include <FECore/FELinearSystem.h>
 
@@ -42,14 +42,14 @@ FEBiphasicFSIDomain3D::FEBiphasicFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem
     m_btrans = true;
     m_sseps = 0;
     
-    m_dofU.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::DISPLACEMENT));
-    m_dofV.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::VELOCITY));
-    m_dofW.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::RELATIVE_FLUID_VELOCITY));
-    m_dofAW.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::RELATIVE_FLUID_ACCELERATION));
-    m_dofSU.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::SHELL_DISPLACEMENT));
-    m_dofR.AddVariable(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::RIGID_ROTATION));
-    m_dofEF  = pfem->GetDOFIndex(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::FLUID_DILATATION), 0);
-    m_dofAEF = pfem->GetDOFIndex(FEBioBiphasicFSI::GetVariableName(FEBioBiphasicFSI::FLUID_DILATATION_TDERIV), 0);
+    m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+    m_dofV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::VELOCITY));
+    m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+    m_dofAW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_ACCELERATION));
+    m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+    m_dofR.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
+    m_dofEF  = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    m_dofAEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION_TDERIV), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -993,7 +993,7 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         pt.m_sf = m_pMat->Fluid()->Stress(mp);
         
         // calculate the solid stress at this material point
-        ft.m_ss = m_pMat->Solid()->Stress(mp) - pt.m_sf*phis;
+        ft.m_ss = m_pMat->Solid()->Stress(mp) - m_pMat->Fluid()->GetViscous()->Stress(mp)*phis;
 
         // calculate the mixture stress at this material point
         ept.m_s = ft.m_ss + pt.m_sf;

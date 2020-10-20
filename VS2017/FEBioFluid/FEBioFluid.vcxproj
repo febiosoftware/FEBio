@@ -508,10 +508,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBackFlowFSIStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h" />
-    <ClInclude Include="..\..\FEBioFluid\FEBioBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidP.h" />
@@ -523,9 +521,6 @@
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.h" />
-    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomainFactory.h" />
-    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSISolver.h" />
-    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSITraction.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauYasudaFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.h" />
@@ -579,6 +574,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEIdealLiquid.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEPowellEyringFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FERealLiquid.h" />
     <ClInclude Include="..\..\FEBioFluid\FESoluteBackflowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FESoluteConvectiveFlow.h" />
     <ClInclude Include="..\..\FEBioFluid\FESolutesDomain.h" />
@@ -587,7 +583,6 @@
     <ClInclude Include="..\..\FEBioFluid\FESolutesMaterial.h" />
     <ClInclude Include="..\..\FEBioFluid\FESolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
-    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowFSIStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.h" />
@@ -603,10 +598,8 @@
     <ClInclude Include="..\..\FEBioFluid\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioFluid\FEBackFlowBiphasicStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowFSIStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp" />
-    <ClCompile Include="..\..\FEBioFluid\FEBioBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidP.cpp" />
@@ -617,9 +610,6 @@
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.cpp" />
-    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomainFactory.cpp" />
-    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSISolver.cpp" />
-    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSITraction.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.cpp" />
@@ -673,6 +663,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEIdealLiquid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FERealLiquid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FESoluteBackflowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FESoluteConvectiveFlow.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FESolutesDomain.cpp" />
@@ -681,7 +672,6 @@
     <ClCompile Include="..\..\FEBioFluid\FESolutesMaterial.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FESolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
-    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowBiphasicStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowFSIStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETemperatureBackFlowStabilization.cpp" />

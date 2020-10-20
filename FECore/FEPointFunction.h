@@ -108,6 +108,9 @@ public: // implement from base class
 	//! returns the derivative value at time
 	double derive(double x) const override;
 
+    //! returns the second derivative value at time
+    double deriv2(double x) const override;
+
 protected:
 	double ExtendValue(double t) const;
 

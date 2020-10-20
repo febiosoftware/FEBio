@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,29 +23,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
 #pragma once
-#include "febiofluid_api.h"
+#include "febiomech_api.h"
 
-namespace FEBioBiphasicFSI {
-    
-    FEBIOFLUID_API void InitModule();
-    
-    enum BIPHASIC_FSI_VARIABLE {
-        DISPLACEMENT,
-        VELOCITY,
-        SHELL_ROTATION,
-        SHELL_DISPLACEMENT,
-        SHELL_VELOCITY,
-        SHELL_ACCELERATION,
-        RIGID_ROTATION,
-        RELATIVE_FLUID_VELOCITY,
-        RELATIVE_FLUID_ACCELERATION,
-        FLUID_VELOCITY,
-        FLUID_ACCELERATION,
-        FLUID_DILATATION,
-        FLUID_DILATATION_TDERIV
-    };
-    
-    FEBIOFLUID_API const char* GetVariableName(BIPHASIC_FSI_VARIABLE var);
+//-----------------------------------------------------------------------------
+//! The FEBioMech module
+//! This module defines classes for dealing with large deformation structural
+//! mechanics problems. 
+
+namespace FEBioMech
+{
+	//! Initialize the FEBioMech module
+	FEBIOMECH_API void InitModule();
 }

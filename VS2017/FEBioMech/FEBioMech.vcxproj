@@ -517,6 +517,7 @@
     <ClInclude Include="..\..\FEBioMech\FEBCRigidDeformation.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBioMechModule.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
     <ClInclude Include="..\..\FEBioMech\febiomech_api.h" />
     <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
@@ -758,6 +759,7 @@
     <ClCompile Include="..\..\FEBioMech\FEBCRigidDeformation.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMech.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMechData.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBioMechModule.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBondRelaxation.cpp" />

@@ -65,7 +65,7 @@ public:
     virtual double StrainEnergyDensity(FEMaterialPoint& mp) = 0;
     
     //! invert pressure-dilatation relation
-    virtual double Dilatation(const double T, const double p) = 0;
+    virtual bool Dilatation(const double T, const double p, double& e) = 0;
     
     //! evaluate temperature
     virtual double Temperature(FEMaterialPoint& mp) = 0;

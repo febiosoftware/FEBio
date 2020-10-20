@@ -1,44 +1,48 @@
 /*This file is part of the FEBio source code and is licensed under the MIT license
-listed below.
-
-See Copyright-FEBio.txt for details.
-
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
-the City of New York, and others.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.*/
+ listed below.
+ 
+ See Copyright-FEBio.txt for details.
+ 
+ Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+ the City of New York, and others.
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.*/
 
 
 
 #pragma once
 #include "FEElasticFluid.h"
 #include "FEThermoFluid.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for the viscous part of the fluid response.
 //! These materials provide the viscous stress and its tangents.
 //!
-class FEBIOFLUID_API FEIdealLiquid : public FEElasticFluid
+class FEBIOFLUID_API FERealLiquid : public FEElasticFluid
 {
 public:
-    FEIdealLiquid(FEModel* pfem);
-    ~FEIdealLiquid() {}
+    enum { MAX_NVC = 3 };
+    
+public:
+    FERealLiquid(FEModel* pfem);
+    ~FERealLiquid() {}
     
     //! initialization
     bool Init() override;
@@ -87,21 +91,22 @@ public:
     
     //! fluid pressure from state variables
     double Pressure(const double ef, const double T) override;
-
+    
 public:
     double      m_R;        //!< universal gas constant
     double      m_Pr;       //!< referential absolute pressure
     double      m_Tr;       //!< referential absolute temperature
     double      m_rhor;     //!< referential mass density
-    double      m_k;        //!< bulk modulus at J=1
-    double      m_beta;     //!< coefficient of temperature for gage pressure
-    double      m_cv;       //!< isochoric specific heat capacity
-    double      m_ar;       //!< referential specific free energy
-    double      m_sr;       //!< referential specific entropy
-    
+    FEFunction1D*   m_psat;         //!< normalized gage pressure on saturation curve (multiply by m_Pr to get actual value)
+    FEFunction1D*   m_asat;         //!< normalized specific free energy on saturation curve (multiply by m_rhor/m_Pr to get actual value)
+    FEFunction1D*   m_ssat;         //!< normalized specific entropy on saturation curve (multiply by m_rhor*m_Tr/m_Pr to get actual value)
+    FEFunction1D*   m_Jsat;         //!< volume ratio on saturation curve
+    int             m_nvc;          //!< number of virial coefficients for pressure constitutive relation
+    FEFunction1D*   m_B[MAX_NVC];   //!< non-dimensional virial coefficients for pressure constitutive relation
+
     FEThermoFluid*  m_pMat; //!< parent thermo-fluid material
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
-
+    
 };

@@ -64,6 +64,8 @@ public:
 	// default implementation is a forward-difference
 	virtual double derive(double x) const;
 
+    virtual double deriv2(double x) const = 0;
+    
 	virtual void Clear() {}
 };
 
@@ -85,6 +87,11 @@ public:
 	{
 		return m_slope;
 	}
+
+    double deriv2(double t) const override
+    {
+        return 0;
+    }
 
 private:
 	double	m_slope;
@@ -108,10 +115,13 @@ public:
 
 	double derive(double t) const override;
 
+    double deriv2(double t) const override;
+
 private:
 	std::string			m_s;
 	MSimpleExpression	m_exp;
 	MSimpleExpression	m_dexp;
+    MSimpleExpression   m_d2exp;
 
 	DECLARE_FECORE_CLASS();
 };

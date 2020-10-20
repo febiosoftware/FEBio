@@ -246,11 +246,11 @@ double FEIdealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-double FEIdealGas::Dilatation(const double T, const double p)
+bool FEIdealGas::Dilatation(const double T, const double p, double& e)
 {
     double J = (T+m_Tr)/m_Tr/(1+p/m_Pr);
-    
-    return J - 1;
+    e = J - 1;
+    return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -28,15 +28,14 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEThermoFluid.h"
-#include <FEBioMech/FEAugLagLinearConstraint.h>
-#include <FECore/FENodeSet.h>
+#include <FECore/FESurfaceLoad.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FEConstraintNormalFlow class implements a fluid surface with zero
 //! tangential velocity as a linear constraint.
 
-class FEBIOFLUID_API FEThermoFluidPressureLoad : public FENodeConstraintSet
+class FEBIOFLUID_API FEThermoFluidPressureLoad : public FESurfaceLoad
 {
 public:
     //! constructor
@@ -45,27 +44,31 @@ public:
     //! destructor
     ~FEThermoFluidPressureLoad() {}
     
-    //! Activation
-    void Activate() override;
+    //! calculate traction stiffness (there is none for this load)
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
     
-    //! initialization
+    //! calculate load vector (there is none for this load)
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override {}
+    
+    //! set the dilatation
+    void Update() override;
+    
+    //! initialize
     bool Init() override;
     
-    //! Get the surface
-    FENodeSet* GetNodeSet() override { return &m_nset; }
+    //! activate
+    void Activate() override;
+    
+    //! serialization
+    void Serialize(DumpStream& ar) override;
     
 protected:
-    FENodeSet       m_nset;
     int             m_dofT;
     int             m_dofEF;
-    double          m_alpha;
-    FEThermoFluid*  m_tfluid;
-    
-    double constraint(FEAugLagLinearConstraint& LC) override;
+    FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
 
 public:
     double  m_p0;       // prescribed pressure
-    int     m_matID;    // material associated with node set
     
     DECLARE_FECORE_CLASS();
 };

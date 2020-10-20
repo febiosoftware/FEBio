@@ -491,7 +491,7 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
     vector<vec3d> gradN(neln);
 
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);    // optionally multiply this by m_btrans
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;    // optionally multiply this by m_btrans
 
     double *H, *Gr, *Gs, *Gt;
     
@@ -854,26 +854,20 @@ void FEThermoFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
     
     // nodal coordinates
     const int NELN = FEElement::MAX_NODES;
-    vec3d vt[NELN], vp[NELN];
-    vec3d at[NELN], ap[NELN];
-    double et[NELN], ep[NELN];
-    double aet[NELN], aep[NELN];
-    double Tt[NELN], Tp[NELN];
-    double aTt[NELN], aTp[NELN];
+    vec3d v[NELN];
+    vec3d a[NELN];
+    double e[NELN];
+    double ae[NELN];
+    double T[NELN];
+    double aT[NELN];
     for (int j=0; j<neln; ++j) {
         FENode& node = m_pMesh->Node(el.m_node[j]);
-        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
-        vp[j] = node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
-        at[j] = node.get_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
-        ap[j] = node.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
-        et[j] = node.get(m_dofEF);
-        ep[j] = node.get_prev(m_dofEF);
-        aet[j] = node.get(m_dofAEF);
-        aep[j] = node.get_prev(m_dofAEF);
-        Tt[j] = node.get(m_dofT);
-        Tp[j] = node.get_prev(m_dofT);
-        aTt[j] = node.get(m_dofAT);
-        aTp[j] = node.get_prev(m_dofAT);
+        v[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-alphaf);
+        a[j] = node.get_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2])*alpham + node.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2])*(1-alpham);
+        e[j] = node.get(m_dofEF)*alphaf + node.get_prev(m_dofEF)*(1-alphaf);
+        ae[j] = node.get(m_dofAEF)*alpham + node.get_prev(m_dofAEF)*(1-alpham);
+        T[j] = node.get(m_dofT)*alphaf + node.get_prev(m_dofT)*(1-alphaf);
+        aT[j] = node.get(m_dofAT)*alpham + node.get_prev(m_dofAT)*(1-alpham);
     }
     
     // loop over the integration points and update
@@ -886,18 +880,18 @@ void FEThermoFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         FEThermoFluidMaterialPoint& tf = *(mp.ExtractData<FEThermoFluidMaterialPoint>());
         
         // material point data
-        pt.m_vft = el.Evaluate(vt, n)*alphaf + el.Evaluate(vp, n)*(1-alphaf);
-        pt.m_Lf = gradient(el, vt, n)*alphaf + gradient(el, vp, n)*(1-alphaf);
+        pt.m_vft = el.Evaluate(v, n);
+        pt.m_Lf = gradient(el, v, n);
         pt.m_aft = pt.m_Lf*pt.m_vft;
-        if (m_btrans) pt.m_aft += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
-        pt.m_Jf = 1 + el.Evaluate(et, n)*alphaf + el.Evaluate(ep, n)*(1-alphaf);
-        pt.m_gradJf = gradient(el, et, n)*alphaf + gradient(el, ep, n)*(1-alphaf);
+        if (m_btrans) pt.m_aft += el.Evaluate(a, n);
+        pt.m_Jf = 1 + el.Evaluate(e, n);
+        pt.m_gradJf = gradient(el, e, n);
         pt.m_Jfdot = pt.m_gradJf*pt.m_vft;
-        if (m_btrans) pt.m_Jfdot += el.Evaluate(aet, n)*alpham + el.Evaluate(aep, n)*(1-alpham);
-        tf.m_T = el.Evaluate(Tt, n)*alphaf + el.Evaluate(Tp, n)*(1-alphaf);
-        tf.m_gradT = gradient(el, Tt, n)*alphaf + gradient(el, Tp, n)*(1-alphaf);
+        if (m_btrans) pt.m_Jfdot += el.Evaluate(ae, n);
+        tf.m_T = el.Evaluate(T, n);
+        tf.m_gradT = gradient(el, T, n);
         tf.m_Tdot = tf.m_gradT*pt.m_vft;
-        if (m_btrans) tf.m_Tdot += el.Evaluate(aTt, n)*alpham + el.Evaluate(aTp, n)*(1-alpham);
+        if (m_btrans) tf.m_Tdot += el.Evaluate(aT, n);
 
         // calculate the stress at this material point
         pt.m_sf = m_pMat->Stress(mp);

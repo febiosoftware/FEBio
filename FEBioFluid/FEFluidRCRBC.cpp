@@ -164,7 +164,9 @@ void FEFluidRCRBC::Update()
     double p = pR + pi + m_pd + pC;
     
     // calculate the dilatation
-    double e = m_pfluid->Dilatation(0,p);
+    double e = 0;
+    bool good = m_pfluid->Dilatation(0,p,e);
+    assert(good);
     
     // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();
