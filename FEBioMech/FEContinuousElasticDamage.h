@@ -25,20 +25,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FEElasticMaterial.h"
+#include "FEElasticFiberMaterial.h"
+
+class FEFiberDamagePoint;
+
+class FEDamageInterface
+{
+public:
+	FEDamageInterface() {}
+	virtual ~FEDamageInterface() {}
+	double Damage(FEMaterialPoint& mp);
+};
 
 // This class implements the elastic damage framework from 
 // Balzani, Brinkhues, Holzapfel, Comput. Methods Appl. Mech. Engrg. 213–216 (2012) 139–151
 
-class FEBIOMECH_API FEContinuousElasticDamage : public FEElasticMaterial
+class FEDamageFiberPower : public FEElasticFiberMaterial, public FEDamageInterface
 {
-	class Data;
+public:
+	FEDamageFiberPower(FEModel* fem);
 
+	FEMaterialPoint* CreateMaterialPointData() override;
+
+	//! Strain energy density
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// calculate stress in fiber direction a0
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// Spatial tangent
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+
+public:
+	// fiber parameters
+	double	m_a1, m_a2, m_kappa;
+
+	// damage model parameters
+	double	m_tinit;		// start time of damage
+	double	m_Dmax;			// max damage
+	double	m_beta_s;		// saturation parameter
+	double	m_gamma_max;	// saturation parameter
+	double	m_r_s, m_r_inf;
+
+	DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMECH_API FEContinuousElasticDamage : public FEElasticMaterial, public FEDamageInterface
+{
 public:
 	FEContinuousElasticDamage(FEModel* fem);
 
 	FEMaterialPoint* CreateMaterialPointData() override;
-
-	double Damage(FEMaterialPoint& mp);
 
 public:
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
@@ -49,29 +86,17 @@ public:
 
 private:
 	mat3ds MatrixStress(FEMaterialPoint& mp);
-	mat3ds FiberStress(FEMaterialPoint& mp);
-
 	tens4ds MatrixTangent(FEMaterialPoint& mp);
-	tens4ds FiberTangent(FEMaterialPoint& mp);
-
 	mat3ds SecantStress(FEMaterialPoint& mp);
 
 private:
 	// matrix parameters
 	double		m_c1;
 	double		m_k;
-
-	// fiber parameters
-	double	m_a1, m_a2, m_kappa;
 	FEParamVec3		m_fiber;
 
-	double	m_r_s, m_r_inf;
-
-	// damage model parameters
-	double	m_tinit;		// start time of damage
-	double	m_Dmax;			// max damage
-	double	m_beta_s;		// saturation parameter
-	double	m_gamma_max;	// saturation parameter
+	// fiber parameters
+	FEDamageFiberPower	m_fib;
 
 	DECLARE_FECORE_CLASS();
 };

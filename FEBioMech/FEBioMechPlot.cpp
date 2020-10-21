@@ -3205,9 +3205,33 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+//=================================================================================================
+FEPlotContinuousDamage::FEPlotContinuousDamage(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM)
+{
+	m_propIndex = 0;
+}
+
+bool FEPlotContinuousDamage::SetFilter(const char* sz)
+{
+	m_prop = sz;
+	return true;
+}
+
 bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEContinuousElasticDamage* mat = dynamic_cast<FEContinuousElasticDamage*>(dom.GetMaterial());
+	// get the material
+	FEMaterial* domMat = dom.GetMaterial();
+	if (domMat == nullptr) return false;
+
+	// get the fiber damage component
+	FEDamageInterface* mat = nullptr;
+	if (m_prop.empty()) mat = dynamic_cast<FEDamageInterface*>(domMat);
+	else
+	{
+		ParamString ps(m_prop.c_str());
+		m_propIndex = ps.Index();
+		mat = dynamic_cast<FEDamageInterface*>(domMat->GetProperty(ps));
+	}
 	if (mat == nullptr) return false;
 
 	FEMesh& mesh = *dom.GetMesh();
@@ -3221,7 +3245,8 @@ bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			double Dj = mat->Damage(mp);
+			FEMaterialPoint* pt = mp.GetPointData(m_propIndex);
+			double Dj = mat->Damage(*pt);
 
 			D += Dj;
 		}
