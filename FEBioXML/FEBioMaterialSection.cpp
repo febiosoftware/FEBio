@@ -32,6 +32,8 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include "FECore/FEMaterial.h"
 #include <FEBioMech/FEUncoupledMaterial.h>
+#include <FECore/log.h>
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 //! This function creates a material by checking the type attribute against
@@ -80,8 +82,19 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 			if (nid != nmat+1) throw XMLReader::InvalidAttributeValue(tag, "id");
 
 			// make sure that the name is unique
-			const char* szname = tag.AttributeValue("name");
-			FEMaterial* mat = fem.FindMaterial(szname);
+			std::string name;
+			const char* szname = tag.AttributeValue("name", true);
+			if (szname == nullptr)
+			{
+				stringstream ss;
+				ss << "Material" << nid;
+				name = ss.str();
+
+				feLogWarningEx((&fem), "Material %d has no name.\nIt was given the name %s.", nid, name.c_str());
+			}
+			else name = szname;
+
+			FEMaterial* mat = fem.FindMaterial(name);
 			if (mat)
 			{
 				throw XMLReader::InvalidAttributeValue(tag, "name");
@@ -89,7 +102,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 
 			// create a material from this tag
 			FEMaterial* pmat = CreateMaterial(tag); assert(pmat);
-			pmat->SetName(szname);
+			pmat->SetName(name);
 
 			// add the material
 			fem.AddMaterial(pmat);
