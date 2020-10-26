@@ -27,6 +27,9 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include "FEElasticFiberMaterial.h"
 
+// These classes implement the elastic damage framework from 
+// Balzani, Brinkhues, Holzapfel, Comput. Methods Appl. Mech. Engrg. 213–216 (2012) 139–151
+
 class FEFiberDamagePoint;
 
 class FEDamageInterface
@@ -36,9 +39,6 @@ public:
 	virtual ~FEDamageInterface() {}
 	double Damage(FEMaterialPoint& mp);
 };
-
-// This class implements the elastic damage framework from 
-// Balzani, Brinkhues, Holzapfel, Comput. Methods Appl. Mech. Engrg. 213–216 (2012) 139–151
 
 class FEDamageFiberPower : public FEElasticFiberMaterial, public FEDamageInterface
 {
@@ -59,6 +59,36 @@ public:
 public:
 	// fiber parameters
 	double	m_a1, m_a2, m_kappa;
+
+	// damage model parameters
+	double	m_tinit;		// start time of damage
+	double	m_Dmax;			// max damage
+	double	m_beta_s;		// saturation parameter
+	double	m_gamma_max;	// saturation parameter
+	double	m_r_s, m_r_inf;
+
+	DECLARE_FECORE_CLASS();
+};
+
+class FEDamageFiberExponential : public FEElasticFiberMaterial, public FEDamageInterface
+{
+public:
+	FEDamageFiberExponential(FEModel* fem);
+
+	FEMaterialPoint* CreateMaterialPointData() override;
+
+	//! Strain energy density
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// calculate stress in fiber direction a0
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// Spatial tangent
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+
+public:
+	// fiber parameters
+	double	m_k1, m_k2, m_kappa;
 
 	// damage model parameters
 	double	m_tinit;		// start time of damage

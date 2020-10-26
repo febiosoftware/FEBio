@@ -47,15 +47,16 @@ public:
 		m_bt_prev = 0.0;
 		m_gamma = 0.0;
 		m_gamma_prev = 0.0;
+		m_psf_c = 0.0;
 		m_init = false;
 	}
 
 	void Init() override
 	{
 		m_D = 0.0;
-		m_psi_f0_ini = 2.0;	// we set this to the initial value
-		m_psi_f0 = 2.0;		// we set this to the initial value
-		m_psi_f0_prev = 2.0; // we set this to the initial value
+		m_psi_f0_ini = m_psf_c;// we set this to the initial value
+		m_psi_f0 = m_psf_c;		// we set this to the initial value
+		m_psi_f0_prev = m_psf_c; // we set this to the initial value
 		m_bt_ini = 0.0;
 		m_bt = 0.0;
 		m_bt_prev = 0.0;
@@ -75,7 +76,7 @@ public:
 	bool	m_init;	// initialization flag
 	double	m_D;		// accumulated damage
 
-	double	m_psi_f0_ini;
+	double	m_psi_f0_ini, m_psf_c;
 	double	m_psi_f0, m_psi_f0_prev;
 
 	double	m_bt_ini;
@@ -303,7 +304,9 @@ FEDamageFiberPower::FEDamageFiberPower(FEModel* fem) : FEElasticFiberMaterial(fe
 
 FEMaterialPoint* FEDamageFiberPower::CreateMaterialPointData()
 {
-	return new FEFiberDamagePoint(new FEElasticMaterialPoint);
+	FEFiberDamagePoint* mp = new FEFiberDamagePoint(new FEElasticMaterialPoint);
+	mp->m_psf_c = 2.0;
+	return mp;
 }
 
 //! Strain energy density
@@ -467,6 +470,225 @@ tens4ds FEDamageFiberPower::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 
 	// elastic stiffness 
 	tens4ds c0 = (bom*I4 - aba)*(4.0*k / J);
+	tens4ds ceD = sxs * (J*d2m*(1.0 - D)) + c0 * ((1.0 - D)*dm);
+
+	tens4ds c = ceD;
+
+	// damage stiffness
+	double bt = damagePoint.m_bt;
+	double gamma = damagePoint.m_gamma;
+	double Ds = m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max));
+	double beta = MB(bt - damagePoint.m_bt_ini);
+
+	double psi0_prev = damagePoint.m_psi_f0_prev;
+	double psi0_ini = damagePoint.m_psi_f0_ini;
+	double gamma_prev = damagePoint.m_gamma_prev;
+
+	double dD_dbeta = -Ds * (log(1 - m_r_s) / m_beta_s)*exp(log(1 - m_r_s)*beta / m_beta_s);
+	double dDs_dgamma = -m_Dmax * (log(1 - m_r_inf) / m_gamma_max)*exp(log(1 - m_r_inf)*gamma / m_gamma_max);
+	double dD_dDs = 1.0 - exp(log(1 - m_r_s)*beta / m_beta_s);
+	double dbeta_dpsi0 = 0.25*(SIGN(bt - damagePoint.m_bt_ini) + 1)*(SIGN(Psi0 - psi0_prev) + 1);
+	double dgamma_dpsi0 = 0.5*(SIGN(Psi0 - psi0_ini) + 1);
+
+	double meps = 1e-9; // NOTE: should be machine eps
+	if (Psi0 - psi0_prev > meps)
+	{
+		tens4ds Cd = sxs * ((dm + d2m * (1 - D)*Psi0)*dD_dbeta*dbeta_dpsi0);
+		c -= Cd;
+	}
+
+	double phi_trial = MB(Psi0 - damagePoint.m_psi_f0_ini) - gamma_prev;
+	if (phi_trial > meps)
+	{
+		tens4ds Cd = sxs * ((dm + d2m * (1 - D)*Psi0)*dD_dDs*dDs_dgamma*dgamma_dpsi0);
+		c -= Cd;
+	}
+
+	return c;
+}
+
+
+//=================================================================================================
+BEGIN_FECORE_CLASS(FEDamageFiberExponential, FEElasticFiberMaterial)
+	ADD_PARAMETER(m_k1, FE_RANGE_GREATER_OR_EQUAL(0.0), "k1");
+	ADD_PARAMETER(m_k2, FE_RANGE_GREATER(1.0), "k2");
+	ADD_PARAMETER(m_kappa, FE_RANGE_CLOSED(0.0, 1.0/3.0), "kappa");
+	ADD_PARAMETER(m_tinit, FE_RANGE_GREATER_OR_EQUAL(0.0), "t0");
+	ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+	ADD_PARAMETER(m_beta_s, FE_RANGE_GREATER(0.0), "beta_s");
+	ADD_PARAMETER(m_gamma_max, FE_RANGE_GREATER(0.0), "gamma_max");
+END_FECORE_CLASS();
+
+FEDamageFiberExponential::FEDamageFiberExponential(FEModel* fem) : FEElasticFiberMaterial(fem)
+{
+	m_k1 = 0.0;
+	m_k2 = 0.0;
+	m_kappa = 0.0;
+
+	m_tinit = 1e9;	// large value so, no damage accumulation by default
+	m_Dmax = 1.0;
+
+	m_beta_s = 0.0;
+	m_gamma_max = 0.0;
+
+	// Looks like these are hard-coded
+	m_r_s = 0.99;
+	m_r_inf = 0.99;
+}
+
+FEMaterialPoint* FEDamageFiberExponential::CreateMaterialPointData()
+{
+	FEFiberDamagePoint* mp = new FEFiberDamagePoint(new FEElasticMaterialPoint);
+	mp->m_psf_c = 1.0;
+	return mp;
+}
+
+//! Strain energy density
+double FEDamageFiberExponential::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
+
+	mat3ds C = pt.RightCauchyGreen();
+	mat3ds C2 = C.sqr();
+	double I1 = C.tr();
+	double J = pt.m_J;
+	double J23 = pow(J, 2. / 3.);
+	double lnJ = log(J);
+
+	double I1_tilde = I1 / J23;
+
+	// fiber strain energy
+	double I4 = a0 * (C*a0);
+
+	double D = damagePoint.m_D;
+	double Psi0 = m_kappa * I1 + (1.0 - 3.0*m_kappa)*I4;
+	double P = (1.0 - D)*Psi0 - 2.0;
+	if (P < 0) P = 0.0;
+	double Psi_fiber = 0.5*m_k1*(exp(m_k2*P*P) - 1) / m_k2;
+
+	return Psi_fiber;
+}
+
+// calculate stress in fiber direction a0
+mat3ds FEDamageFiberExponential::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
+
+	mat3d F = pt.m_F;
+	mat3ds C = pt.RightCauchyGreen();
+	mat3ds C2 = C.sqr();
+	mat3ds b = pt.LeftCauchyGreen();
+	double I1 = C.tr();
+	double J = pt.m_J;
+
+	vec3d a = F * a0;
+	a.unit();
+
+	double I4 = a0 * (C *a0);
+
+	double g1 = 1.0 - 3.0*m_kappa;
+
+	// get internal variables
+	double D = damagePoint.m_D;
+	double bt_prev = damagePoint.m_bt_prev;
+	double psi_f0_prev = damagePoint.m_psi_f0_prev;
+	double gamma_prev = damagePoint.m_gamma_prev;
+
+	// get current simulation time.
+	double t = GetFEModel()->GetTime().currentTime;
+
+	// (i) compute trans-iso strain energy
+	double psi_f0 = m_kappa * I1 + g1 * I4;
+
+	// (ii) check initial damage state
+	double eps = 1e-9; // NOTE: should be machine eps
+	if (t >= (m_tinit - eps))
+	{
+		// (b) compute bt
+		double bt = bt_prev + MB(psi_f0 - psi_f0_prev);
+
+		// init damage 
+		if (damagePoint.m_init == false)
+		{
+			damagePoint.m_psi_f0_ini = psi_f0;
+			damagePoint.m_bt_ini = bt;
+			damagePoint.m_init = true;
+		}
+
+		// (iii) calculate max damage saturation value 
+		// trial criterion
+		double phi_trial = MB(psi_f0 - damagePoint.m_psi_f0_ini) - gamma_prev;
+
+		// check algorithmic saturation criterion
+		double gamma = 0;
+		if (phi_trial > eps) gamma = MB(psi_f0 - damagePoint.m_psi_f0_ini);
+		else gamma = gamma_prev;
+		assert(gamma >= gamma_prev);
+
+		// compute damage saturation value
+		double Ds = m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max));
+
+		// (iv) compute internal variable
+		double beta = MB(bt - damagePoint.m_bt_ini);
+
+		// (v) evaluate damage function
+		D = Ds * (1.0 - exp(log(1.0 - m_r_s)*beta / m_beta_s));
+
+		// update internal variables
+		damagePoint.m_bt = bt;
+		damagePoint.m_psi_f0 = psi_f0;
+		damagePoint.m_gamma = gamma;
+		damagePoint.m_D = D;
+	}
+
+	double P = (1.0 - D)*(psi_f0)-1.0;
+	if (P < 0.0) P = 0.0;
+	double dm = m_k1 * P*exp(m_k2*P*P);
+
+	mat3dd I(1.0);
+	mat3ds m = dyad(a);
+	mat3ds s = (b*m_kappa + m * (I4*g1))*(2 * dm*(1.0 - D) / J);
+
+	return s;
+}
+
+// Spatial tangent
+tens4ds FEDamageFiberExponential::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
+
+	mat3d F = pt.m_F;
+	mat3ds C = pt.RightCauchyGreen();
+	mat3ds C2 = C.sqr();
+	mat3ds b = pt.LeftCauchyGreen();
+	double I1 = C.tr();
+	double J = pt.m_J;
+
+	vec3d a = F * a0;
+	a.unit();
+
+	double I4 = a0 * (C *a0);
+
+	double k = 1.0 - 3.0*m_kappa;
+
+	double D = damagePoint.m_D;
+
+	double Psi0 = m_kappa * I1 + k * I4;
+	double P = (1.0 - D)*(Psi0)-2.0;
+	if (P < 0) P = 0.0;
+	double dm = m_k1 * P*exp(m_k2*P*P);
+	double d2m = m_k1*(1.0 + 2.0*m_k2* P*P)* exp(m_k2*P*P);
+
+	mat3ds m = dyad(a);
+	mat3ds s0 = (b * m_kappa + m *(I4 * k))*(2.0 / J);
+
+	tens4ds sxs = dyad1s(s0);
+
+	// elastic stiffness 
+	tens4ds c0(0.0);
 	tens4ds ceD = sxs * (J*d2m*(1.0 - D)) + c0 * ((1.0 - D)*dm);
 
 	tens4ds c = ceD;
