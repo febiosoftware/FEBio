@@ -48,6 +48,8 @@ public:
 	double	m_L2;	//!< tendon fiber constant L2
 
 	double	m_lam1;	//!< max exponential fiber stretch
+
+	FEParamVec3		m_fiber;
 	
 public:
 	//! calculate deviatoric stress at material point

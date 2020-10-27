@@ -74,8 +74,11 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = Q*m_fiber.unitVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -225,8 +228,11 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.m_s.dev();
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = Q*m_fiber.unitVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
