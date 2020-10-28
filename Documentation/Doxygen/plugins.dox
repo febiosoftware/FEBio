@@ -1,9 +1,13 @@
 /**
 \page plugins FEBio Plugins
 
+Introduction
+------------
 FEBio has a plugin mechanism that allows users to add new capabilities to FEBio without changing or recompiling the source code. This makes it easy
 to implement new features, such as constitutive models, or boundary conditions. 
 
+Plugin documentation
+--------------------
 If you are new to plugins, it is recommended to checkout the following link first.
 
 \li \subpage plugin_basics
@@ -16,7 +20,12 @@ If you are looking for information about a particular type of plugin, choose one
 \li \subpage plugin_solver
 \li \subpage plugin_nlc
 
-The following links contain more advanced plugin topics.
-\li \subpage plugin_advanced
+Advanced topics
+---------------
+The following articles discuss some advanced topics related to the FEBio plugin framework. Please select one of the following links to learn more about a particular topic.
+
+\li \subpage plugin_log
+\li \subpage plugin_cast
+\li \subpage plugin_upgrade
 
 */
