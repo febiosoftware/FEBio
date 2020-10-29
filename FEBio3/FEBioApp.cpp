@@ -401,19 +401,18 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else
 		{
-			// we allow FEBio to run without a -i option if no option is specified on the command line
-			// so that we can run an .feb file by right-clicking on it in windows
-			if (nargs == 2)
+			// if no input file is given yet, we'll assume this is the input file
+			if (ops.szfile[0] == 0)
 			{
-				const char* szext = strrchr(argv[1], '.');
+				const char* szext = strrchr(sz, '.');
 				if (szext == 0)
 				{
 					// we assume a default extension of .feb if none is provided
-					sprintf(ops.szfile, "%s.feb", argv[1]);
+					sprintf(ops.szfile, "%s.feb", sz);
 				}
 				else
 				{
-					strcpy(ops.szfile, argv[1]);
+					strcpy(ops.szfile, sz);
 				}
 				ops.binteractive = false;
 			}
