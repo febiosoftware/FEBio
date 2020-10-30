@@ -2942,7 +2942,9 @@ bool FEPlotPreStrainStretchError::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotPreStrainCorrection::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(dom.GetMaterial());
+	FEMaterial* mat = dom.GetMaterial();
+	FEElasticMaterial* solidMat = mat->ExtractProperty<FEElasticMaterial>();
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(solidMat);
 	if (pmat == 0) return false;
 
 	int NE = dom.Elements();
