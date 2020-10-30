@@ -59,6 +59,10 @@ at https://forums.febio.org/.
 
 * A bug was fixed that caused a crash when a file was using 9-node quadratic surface elements. 
 
+* Support was added to reading mat3d data from ElementData section. 
+
+* Added support for assigning data maps to F0 parameter of const prestrain gradient. 
+
 ===========================================================================
 
  R E L E A S E   3.0.2   10/5/2020
