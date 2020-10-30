@@ -57,6 +57,7 @@ protected:
 
 private:
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
+	void ParseElementData(XMLTag& tag, FEDomainMap& map);
 	void ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag);
 	FEElement* ParseElement(XMLTag& tag, FEElementSet& set);
 

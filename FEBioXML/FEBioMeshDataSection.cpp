@@ -120,6 +120,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				else
 				{
 					const char* szname = tag.AttributeValue("name");
+					string name = szname;
 
 					const char* szdatatype = tag.AttributeValue("datatype");
 					FEDataType dataType = str2datatype(szdatatype);
@@ -138,10 +139,22 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 					FEDomainMap* map = new FEDomainMap(dataType, fmt);
 					map->Create(part);
-					map->SetName(szname);
 
-					// add it to the mesh
-					mesh.AddDataMap(map);
+					// parse the data
+					ParseElementData(tag, *map);
+
+					// see if this map already exsits 
+					FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(name));
+					if (oldMap)
+					{
+						oldMap->Merge(*map);
+						delete map;
+					}
+					else
+					{
+						map->SetName(name);
+						mesh.AddDataMap(map);
+					}
 				}
 			}
 			else
@@ -755,6 +768,73 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEElementSet& set, vect
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEDomainMap& map)
+{
+	const FEElementSet* set = map.GetElementSet();
+	if (set == nullptr) throw XMLReader::InvalidTag(tag);
+
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nelems = set->Elements();
+
+	FEDataType dataType = map.DataType();
+	int dataSize = map.DataSize();
+	int m = map.MaxNodes();
+	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
+
+	// TODO: For vec3d values, I sometimes need to normalize the vectors (e.g. for fibers). How can I do this?
+
+	int ncount = 0;
+	++tag;
+	do
+	{
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		int nread = tag.value(data, m*dataSize);
+		if (nread == dataSize)
+		{
+			double* v = data;
+			switch (dataType)
+			{
+			case FE_DOUBLE:	map.setValue(n, v[0]); break;
+			case FE_VEC2D:	map.setValue(n, vec2d(v[0], v[1])); break;
+			case FE_VEC3D:	map.setValue(n, vec3d(v[0], v[1], v[2])); break;
+			case FE_MAT3D: map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+			default:
+				assert(false);
+			}
+		}
+		else if (nread == m * dataSize)
+		{
+			double* v = data;
+			for (int i = 0; i < m; ++i, v += dataSize)
+			{
+				switch (dataType)
+				{
+				case FE_DOUBLE:	map.setValue(n, i, v[0]); break;
+				case FE_VEC2D:	map.setValue(n, i, vec2d(v[0], v[1])); break;
+				case FE_VEC3D:	map.setValue(n, i, vec3d(v[0], v[1], v[2])); break;
+				default:
+					assert(false);
+				}
+			}
+		}
+		else throw XMLReader::InvalidValue(tag);
+		++tag;
+
+		ncount++;
+	} while (!tag.isend());
+
+	if (ncount != nelems) throw FEBioImport::MeshDataError();
 }
 
 //-----------------------------------------------------------------------------

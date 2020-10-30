@@ -86,6 +86,7 @@ bool FEDomainMap::Create(FEElementSet* ps, double val)
 	}
 	else if (m_fmt == FMT_ITEM)
 	{
+		m_maxElemNodes = 1;
 		return resize(NE, val);
 	}
 	else if (m_fmt == FMT_NODE)
