@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 void FEBioControlSection::Parse(XMLTag& tag)
@@ -127,6 +128,10 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			}
             else if (tag == "shell_normal_nodal") tag.value(feb->m_shell_norm_nodal);
 			else if (tag == "integration") ParseIntegrationRules(tag);
+			else if (tag == "print_level")
+			{
+				feLogWarningEx((&fem), "The print_level parameter is no longer supported and will be ignored.");
+			}
 			else return false;
 		}
 	}

@@ -37,11 +37,6 @@ SOFTWARE.*/
 #include <list>
 using namespace std;
 
-// flag to indicate whether to use the 3.0 plot file
-#if defined(WIN32) && defined(_DEBUG)
-//#define PLOT_FILE_3	1
-#endif
-
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
 //! plot file format (version 2).
@@ -50,11 +45,8 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-#ifdef PLOT_FILE_3
 	enum { PLT_VERSION = 0x0030 };
-#else
-	enum { PLT_VERSION = 0x0008 };
-#endif
+
 	// file tags
 	enum { 
 		PLT_ROOT						= 0x01000000,

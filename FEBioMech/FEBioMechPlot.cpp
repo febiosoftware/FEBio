@@ -60,6 +60,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include "FEDiscreteElasticMaterial.h"
 #include "FEDiscreteElasticDomain.h"
+#include "FEContinuousElasticDamage.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -3203,3 +3204,57 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 
 	return true;
 }
+
+//=================================================================================================
+FEPlotContinuousDamage::FEPlotContinuousDamage(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM)
+{
+	m_propIndex = 0;
+}
+
+bool FEPlotContinuousDamage::SetFilter(const char* sz)
+{
+	m_prop = sz;
+	return true;
+}
+
+bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
+{
+	// get the material
+	FEMaterial* domMat = dom.GetMaterial();
+	if (domMat == nullptr) return false;
+
+	// get the fiber damage component
+	FEDamageInterface* mat = nullptr;
+	if (m_prop.empty()) mat = dynamic_cast<FEDamageInterface*>(domMat);
+	else
+	{
+		ParamString ps(m_prop.c_str());
+		m_propIndex = ps.Index();
+		mat = dynamic_cast<FEDamageInterface*>(domMat->GetProperty(ps));
+	}
+	if (mat == nullptr) return false;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		double D = 0.0;
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEMaterialPoint* pt = mp.GetPointData(m_propIndex);
+			double Dj = mat->Damage(*pt);
+
+			D += Dj;
+		}
+		D /= (double)nint;
+
+		a << D;
+	}
+
+	return true;
+}
+

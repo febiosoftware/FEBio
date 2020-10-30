@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidMaterial.h>
 #include <FECore/FEFacetSet.h>
+#include <FECore/log.h>
 
 //---------------------------------------------------------------------------------
 void FEBioBoundarySection::BuildNodeSetMap()
@@ -694,7 +695,28 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 
 	// Read the parameter list
 	FEParameterList& pl = pdc->GetParameterList();
-	ReadParameterList(tag, pl);
+
+	++tag;
+	do
+	{
+		if (ReadParameter(tag, pl, 0, 0) == false)
+		{
+			if (tag == "value")
+			{
+				feLogWarningEx((&fem), "The value parameter of the prescribed bc is deprecated.");
+
+				// make sure it has no attributes
+				if (tag.m_natt != 0)throw XMLReader::InvalidTag(tag);
+
+				// NOTE: This will only work if the scale was set to 1!!
+				double v;
+				tag.value(v);
+				pdc->SetScale(v);
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
+		++tag;
+	} while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

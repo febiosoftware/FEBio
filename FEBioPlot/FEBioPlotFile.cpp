@@ -909,7 +909,6 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 			m_ar.EndChunk();
 		}
 
-#ifdef PLOT_FILE_3
 		// additional objects
 		if ((m_Points.size() > 0) || (m_Lines.size() > 0))
 		{
@@ -919,7 +918,6 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 			}
 			m_ar.EndChunk();
 		}
-#endif
 	}
 	m_ar.EndChunk();
 
@@ -1445,7 +1443,6 @@ bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 		}
 		m_ar.EndChunk();
 
-#ifdef PLOT_FILE_3
 		if (m_Points.size() > 0)
 		{
 			m_ar.BeginChunk(PLT_OBJECTS_STATE);
@@ -1454,7 +1451,6 @@ bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 			}
 			m_ar.EndChunk();
 		}
-#endif
 	}
 	m_ar.EndChunk();
 

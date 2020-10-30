@@ -912,3 +912,15 @@ public:
 	FEPlotDiscreteElementForce(FEModel* fem) : FEPlotDomainData(fem, PLT_VEC3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotContinuousDamage : public FEPlotDomainData
+{
+public:
+	FEPlotContinuousDamage(FEModel* fem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+	bool SetFilter(const char* sz) override;
+private:
+	std::string	m_prop;
+	int			m_propIndex;
+};

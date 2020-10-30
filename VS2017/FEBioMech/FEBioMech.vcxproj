@@ -530,6 +530,7 @@
     <ClInclude Include="..\..\FEBioMech\FEConstPrestrain.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContinuousElasticDamage.h" />
     <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistributionUC.h" />
     <ClInclude Include="..\..\FEBioMech\FECoupledMooneyRivlin.h" />
@@ -770,6 +771,7 @@
     <ClCompile Include="..\..\FEBioMech\FEConstPrestrain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContinuousElasticDamage.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistributionUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECoupledMooneyRivlin.cpp" />

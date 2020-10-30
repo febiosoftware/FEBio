@@ -40,6 +40,7 @@ BEGIN_FECORE_CLASS(FETendonMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_L1  , "l1");
 	ADD_PARAMETER(m_L2  , "l2");
 	ADD_PARAMETER(m_lam1, "lam_max");
+	ADD_PARAMETER(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 
@@ -68,7 +69,7 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	mat3d Q = GetLocalCS(mp);
 
 	// get the initial fiber direction
-	vec3d a0 = Q.col(0);
+	vec3d a0 = Q * m_fiber.unitVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -195,8 +196,8 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
 
-	// get local fiber direction
-	vec3d a0 = Q.col(0);
+	// get the initial fiber direction
+	vec3d a0 = Q * m_fiber.unitVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

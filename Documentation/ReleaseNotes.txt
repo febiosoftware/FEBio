@@ -41,6 +41,26 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.1.0   11/2/2020
+
+===========================================================================
+
+* The xplt format 3 is now used, which adds data on rigid bodies and rigid constraints to the plot file. 
+
+* The "fiber" property was added to the "tendon" material. 
+
+* Some backward compatibility issues were addressed: The deprecated "print_level" parameter is ignored and will not cause FEBio to stop. The deprecated "value" parameter of the prescribed BC is now mapped to the "scale" parameter. 
+
+* An issue was fixed with reading mat_axis element data in MeshData section. 
+
+* The "solid stress" plot variable was added for biphasic, multiphasic, and fluid-FSI materials. 
+
+* The bulk-modulus (k) of uncoupled materials is only taken from the top-level material. This is different from previous FEBio versions, where the specification of the bulk modulus depended on the material. For backward compatibility, febio 2.5 files will still processed in a manner that produces the same behavior as in FEBio 2.10. For the 3.0 files, only top-level bulk moduli are allowed. 
+
+* A bug was fixed that caused a crash when a file was using 9-node quadratic surface elements. 
+
+===========================================================================
+
  R E L E A S E   3.0.2   10/5/2020
 
 ===========================================================================

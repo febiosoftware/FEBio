@@ -1,0 +1,36 @@
+/**
+\page plugin_upgrade Upgrading plugins to FEBio 3.0
+
+This document describes important details for upgrading a plugin that was designed for FEBio2 to FEBio3. 
+
+Parameter declaration
+---------------------
+\li DECLARE_PARAMETER_LIST must be replaced with DECLARE_FECORE_CLASS
+\li BEGIN_PARAMETER_LIST must be replaced with BEGIN_FECORE_CLASS
+\li END_PARAMETER_LIST must be replaced with END_FECORE_CLASS
+\li Type specification in ADD_PARAMETER is no longer necessary
+\li ADD_PARAMETER2 no longer exsists. ADD_PARAMETER must be used for all parameter declarations. 
+
+Property declaration
+--------------------
+\li Properties are now defined in the BEGIN_FECORE_CLASS/END_FECORE_CLASS using the ADD_PROPERTY macro. 
+\li Properties can be declared using pointer syntax and no longer require the FEPropertyT template declaration.
+
+Class registration
+------------------
+\li Factory approach for registering plugin classes is deprecated. Use REGISTER_FECORE_CLASS instead in the PluginInitialize function. 
+
+Plot classes
+------------
+\li Base class for plot variables are now FEPlotDomainData (instead of FEDomainData)
+\li Base class requires passing FEModel pointer
+
+Miscellaneous
+-------------
+\li SetLocalCoordinateSystem is no longer available since material axes are defined via the new framework for specifying heterogeneous properties.
+\li FECoreBase::GetFEModel() returns FEModel*. 
+\li Stiffness matrix assembly should be done via FELinearSystem class. 
+\li Use FEElementMatrix for creating element stiffness matrix. 
+\li FEModel needs to be acquired with GetFEModel() (base class variable m_fem is private)
+\li log mechanism was changed. 
+*/
