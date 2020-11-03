@@ -320,3 +320,89 @@ void FEElementDataTable::GetMeasurements(vector<double>& y)
 		y[i] = m_Data[i].target;
 	}
 }
+
+
+//=============================================================================
+FENodeDataTable::FENodeDataTable(FEModel* fem) : FEObjectiveFunction(fem)
+{
+	
+}
+
+bool FENodeDataTable::AddValue(int nodeID, vector<double>& v)
+{
+	if (v.size() != m_var.size()) return false;
+
+	for (int i = 0; i < v.size(); ++i)
+	{
+		Entry d;
+		d.nodeId = nodeID;
+		d.target = v[i];
+		d.ivar = i;
+		d.index = -1;
+		m_Data.push_back(d);
+	}
+}
+
+void FENodeDataTable::AddVariable(FENodeLogData* var)
+{
+	m_var.push_back(var);
+}
+
+bool FENodeDataTable::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	int N = (int)m_Data.size();
+	if (N == 0) return false;
+
+	for (int i = 0; i < N; ++i)
+	{
+		Entry& di = m_Data[i];
+		FENode* node = mesh.FindNodeFromID(di.nodeId);
+
+		if (node == nullptr) return false;
+		di.index = di.nodeId - 1;	// NOTE: This assumes one-based indexing of node IDs. 
+	}
+
+	return true;
+}
+
+// return number of measurements (i.e. nr of terms in objective function)
+int FENodeDataTable::Measurements()
+{
+	return (int)m_Data.size();
+}
+
+// evaluate the function values (i.e. the f_i above)
+void FENodeDataTable::EvaluateFunctions(vector<double>& f)
+{
+	assert(m_var.size() > 0);
+
+	int N = (int)m_Data.size();
+	f.resize(N);
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i < N; ++i)
+	{
+		int n = m_Data[i].index;
+		int v = m_Data[i].ivar;
+
+		// calculate node value
+		double val = m_var[v]->value(n);
+
+		// store result
+		f[i] = val;
+	}
+}
+
+// get the measurement vector (i.e. the y_i above)
+void FENodeDataTable::GetMeasurements(vector<double>& y)
+{
+	int N = (int)m_Data.size();
+	y.resize(N);
+	for (int i = 0; i < N; ++i)
+	{
+		y[i] = m_Data[i].target;
+	}
+}

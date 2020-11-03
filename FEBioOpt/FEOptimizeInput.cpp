@@ -286,6 +286,72 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 		}
 		while (!tag.isend());
 	}
+	else if (strcmp(sztype, "node-data") == 0)
+	{
+		FENodeDataTable* obj = new FENodeDataTable(&fem);
+		m_opt->SetObjective(obj);
+
+		int nvars = 0;
+		++tag;
+		do
+		{
+			if (tag == "var")
+			{
+				const char* sztype = tag.AttributeValue("type");
+
+				char buf[256] = { 0 };
+				strcpy(buf, sztype);
+				char* ch = buf;
+				char* sz = buf;
+				while (*sz)
+				{
+					if ((*ch == 0) || (*ch == ';'))
+					{
+						char ch2 = *ch;
+						*ch = 0;
+						
+						// try to allocate the element data record
+						FENodeLogData* var = fecore_new<FENodeLogData>(sz, &fem);
+						if (var == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+						obj->AddVariable(var);
+						nvars++;
+
+						if (ch2 != 0) ch++;
+						sz = ch;
+					}
+					else ch++;
+				}
+			}
+			else if (tag == "data")
+			{
+				if (nvars == 0)
+				{
+					throw XMLReader::InvalidTag(tag);
+				}
+
+				++tag;
+				do
+				{
+					if (tag == "node")
+					{
+						const char* szid = tag.AttributeValue("id");
+						int nid = atoi(szid);
+						vector<double> v(nvars, 0.0);
+						int nread = tag.value(&v[0], nvars);
+						if (nread != nvars) throw XMLReader::InvalidValue(tag);
+						obj->AddValue(nid, v);
+					}
+					else throw XMLReader::InvalidTag(tag);
+
+					++tag;
+				}
+				while (!tag.isend());
+			}
+			++tag;
+		}
+		while (!tag.isend());
+	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	FEOptimizeMethod* solver = m_opt->GetSolver();

@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <string>
 #include "FEDataSource.h"
 #include <FECore/ElementDataRecord.h>
+#include <FECore/NodeDataRecord.h>
 using namespace std;
 
 class FEModel;
@@ -203,4 +204,40 @@ public:
 private:
 	std::vector<Entry>	m_Data;
 	FELogElemData*		m_var;
+};
+
+//=============================================================================
+// This objective function evaluates node values with a user-defined
+// table of values. The table stores for each node the required value. 
+class FENodeDataTable : public FEObjectiveFunction
+{
+	struct Entry {
+		int			nodeId;	// the ID of the node
+		double		target;	// the target value
+		int			index;	// zero-based node index
+		int			ivar;  // variable
+	};
+
+public:
+	FENodeDataTable(FEModel* fem);
+
+	bool Init() override;
+
+	bool AddValue(int elemID, vector<double>& v);
+
+	void AddVariable(FENodeLogData* var);
+
+public:
+	// return number of measurements (i.e. nr of terms in objective function)
+	int Measurements() override;
+
+	// evaluate the function values (i.e. the f_i above)
+	void EvaluateFunctions(vector<double>& f) override;
+
+	// get the measurement vector (i.e. the y_i above)
+	void GetMeasurements(vector<double>& y) override;
+
+private:
+	std::vector<Entry>				m_Data;
+	std::vector<FENodeLogData*>		m_var;
 };
