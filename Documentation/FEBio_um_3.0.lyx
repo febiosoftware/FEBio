@@ -78589,7 +78589,7 @@ solution
 \end_inset
 
  of the problem is known, and the problem's model parameters are sought.
- In this case, the solution will often be an experimentally determined reaction
+ For instance, the solution can be an experimentally determined reaction
  force curve, and the unknown parameters are the material parameters that
  will recreate the reaction force curve by solving a forward FE problem.
  Another common application is determining the model parameters that achieve
@@ -78715,7 +78715,8 @@ Constraints
 \shape default
 \emph default
  defines linear constraints for the model parameters (requires a solution
- method that supports linear constraints).
+ method that supports linear constraints, e.g.
+ constrained levmar).
  
 \end_layout
 
@@ -78737,8 +78738,8 @@ name "subsec:Model-Section"
 \begin_layout Standard
 The optional Task section can be used to define the task that is executed
  by FEBio when solving the FE model.
- By default, FEBio will solve the standard forward solver, but if needed,
- a custom task can be selected.
+ By default, FEBio will solve the standard forward problem, but if needed,
+ a custom task can be defined.
  
 \end_layout
 
@@ -79528,24 +79529,144 @@ This section defines the functional model that is used to evaluate the objective
 \end_inset
 
  above).
- There are currently two functional models supported, namely the 
-\begin_inset Quotes eld
+ The particular functional model is defined via the 
+\emph on
+type
+\emph default
+ attribute, and the following table lists the available options.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 data-fit
-\begin_inset Quotes erd
-\end_inset
+\end_layout
 
- and 
-\begin_inset Quotes eld
 \end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
+\begin_layout Plain Layout
+Fits data, usually specified as a function of time, to a model output parameter
+ (e.g.
+ rigid reaction force)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 target
-\begin_inset Quotes erd
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Optimizes until one or more output model parameters achieve a target value.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+element-data
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The target data is defined as a tabulated list of element values.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+node-data
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The target data is defined as a tabulated list of nodal values.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
 \end_inset
 
-.
- They will be described separetely below.
+
+\end_layout
+
+\begin_layout Standard
+These options will be described separetely in the following sections.
  
 \end_layout
 
@@ -79561,8 +79682,12 @@ The data-fit model
 \end_layout
 
 \begin_layout Standard
-The data-fit model tries to fit predicted FE data to a user-defined data
- curve of time-value pairs.
+The 
+\emph on
+data-fit
+\emph default
+ model tries to fit predicted FE data to a user-defined data curve of time-value
+ pairs.
  The data curve usually represents some experimentally obtained result,
  e.g.
  reaction force, as a function of time.
@@ -79681,6 +79806,174 @@ This defines the data function as a function of time.
 
 \begin_layout LyX-Code
 </fnc>
+\end_layout
+
+\begin_layout Subsubsection
+The target model
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+target 
+\emph default
+model tries to optimize model parameters such that one or more output variables
+ achieve a user-defined target value.
+ This model requires a list of variables and target values for each variable.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<Objective type="target">
+\end_layout
+
+\begin_layout LyX-Code
+  <var name="[enter name]">[target value]</var>
+\end_layout
+
+\begin_layout LyX-Code
+  ...
+\end_layout
+
+\begin_layout LyX-Code
+</Objective>
+\end_layout
+
+\begin_layout Standard
+The name refers to a model output parameter.
+ The example below will optimize until the X-euler angle of the rigid body
+ 'Material2' becomes 0.5.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<Objective type="target">
+\end_layout
+
+\begin_layout LyX-Code
+  <var name="fem.rigidbody('Material2').euler.y">0.5</var>
+\end_layout
+
+\begin_layout LyX-Code
+</Objective>
+\end_layout
+
+\begin_layout Subsubsection
+The element-data model
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+element-data 
+\emph default
+model uses a tabulated list of element values as the target for the optimization.
+ In addition, it requires an output variable that will be matched against
+ the element data.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<Objective type="element-data">
+\end_layout
+
+\begin_layout LyX-Code
+  <var type="[enter variable name]"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <data>
+\end_layout
+
+\begin_layout LyX-Code
+    <elem id="1">0.123</elem>
+\end_layout
+
+\begin_layout LyX-Code
+    ...
+\end_layout
+
+\begin_layout LyX-Code
+  </data>
+\end_layout
+
+\begin_layout LyX-Code
+</Objective>
+\end_layout
+
+\begin_layout Standard
+The variable can be any of the element output data listed in the logfile
+ section (See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:ElementSet-Section"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Subsubsection
+The node-data model
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+node-data 
+\emph default
+model uses a tabulated list of nodal values as the target for the optimization.
+ In addition, it requires an output variable that will be matched against
+ the nodal data.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<Objective type="node-data">
+\end_layout
+
+\begin_layout LyX-Code
+  <var type="[enter variable name]"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <data>
+\end_layout
+
+\begin_layout LyX-Code
+    <node id="1">0.123</elem>
+\end_layout
+
+\begin_layout LyX-Code
+    ...
+\end_layout
+
+\begin_layout LyX-Code
+  </data>
+\end_layout
+
+\begin_layout LyX-Code
+</Objective>
+\end_layout
+
+\begin_layout Standard
+The variable can be any of the node output data listed in the logfile section
+ (See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Node_Data-Class"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ 
 \end_layout
 
 \begin_layout Standard
