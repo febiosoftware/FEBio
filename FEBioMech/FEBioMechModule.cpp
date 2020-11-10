@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FESpringMaterial.h"
+#include "FETorsionalSpring.h"
 #include "FEDonnanEquilibrium.h"
 #include "FEEFDDonnanEquilibrium.h"
 #include "FEEFDMooneyRivlin.h"
@@ -406,6 +407,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FENonLinearSpring, "nonlinear spring");
 	REGISTER_FECORE_CLASS(FEExperimentalSpring, "experimental spring");
 	REGISTER_FECORE_CLASS(FEDiscreteContractileMaterial, "Hill");
+	REGISTER_FECORE_CLASS(FETorsionalSpring, "torsion spring");
 
 	// bond relaxation materials (used by reactive visco-elastic materials)
 	REGISTER_FECORE_CLASS(FEBondRelaxationExponential, "relaxation-exponential");

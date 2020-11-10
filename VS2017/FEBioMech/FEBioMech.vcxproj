@@ -717,6 +717,7 @@
     <ClInclude Include="..\..\FEBioMech\FETiedContactSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FETiedElasticInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FETiedInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FETorsionalSpring.h" />
     <ClInclude Include="..\..\FEBioMech\FETractionLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FETransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FETransIsoVerondaWestmann.h" />
@@ -959,6 +960,7 @@
     <ClCompile Include="..\..\FEBioMech\FETiedContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETiedElasticInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETiedInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETorsionalSpring.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETransIsoVerondaWestmann.cpp" />
