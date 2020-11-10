@@ -341,6 +341,8 @@ bool FENodeDataTable::AddValue(int nodeID, vector<double>& v)
 		d.index = -1;
 		m_Data.push_back(d);
 	}
+
+	return true;
 }
 
 void FENodeDataTable::AddVariable(FENodeLogData* var)
