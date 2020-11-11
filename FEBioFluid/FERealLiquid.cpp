@@ -49,7 +49,9 @@ END_FECORE_CLASS();
 
 FERealLiquid::FERealLiquid(FEModel* pfem) : FEElasticFluid(pfem)
 {
+    m_nvc = 0;
     m_R = m_Pr = m_Tr = 0;
+    m_B[0] = m_B[1] = m_B[2] = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,9 +65,17 @@ bool FERealLiquid::Init()
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
     if (m_Pr <= 0) { feLogError("A positive referential absolute pressure P must be defined in Globals section"); return false; }
-    
+    if (m_nvc == 0){ feLogError("At least one virial coefficient must be specified in this real liquid"); return false; }
+
     m_pMat = dynamic_cast<FEThermoFluid*>(GetParent());
     m_rhor = m_pMat->ReferentialDensity();
+    
+    m_psat->Init();
+    m_asat->Init();
+    m_ssat->Init();
+    m_Jsat->Init();
+    for (int k=0; k<m_nvc; ++k)
+        if (m_B[k]) m_B[k]->Init();
     
     return true;
 }
@@ -290,26 +300,7 @@ double FERealLiquid::Tangent_cv_Temperature(FEMaterialPoint& mp)
 //! isobaric specific heat capacity
 double FERealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-/*
-    // evaluate the dilatation that makes the gage pressure = 0 at the given temperature
-    double e = fp.m_Jf - 1; // initial guess
-    bool good = Dilatation(tf.m_T, 0, e);
-    assert(good);
-
-    // create a material point with this temperature and dilatation
-    FEFluidMaterialPoint* fmp = new FEFluidMaterialPoint();
-    FEThermoFluidMaterialPoint* fmt = new FEThermoFluidMaterialPoint(fmp);
-    fmp->m_Jf = 1 + e;
-    fmt->m_T = tf.m_T;
-    
-    // for this dilatation evaluate the following terms
-    double cv = IsochoricSpecificHeatCapacity(*fmt);
-    double dpT = Tangent_Temperature(*fmt);
-    double dpJ = Tangent_Strain(*fmt);
-    double cp = cv - (m_Tr + tf.m_T)*pow(dpT, 2)/(m_rhor*dpJ);
-    */
     double cv = IsochoricSpecificHeatCapacity(mp);
     double p = Pressure(mp);
     double dpT = Tangent_Temperature(mp);
@@ -352,9 +343,8 @@ bool FERealLiquid::Dilatation(const double T, const double p, double& e)
             double det = pow(B0,2) + 4*B1*(p/m_Pr - psat);
             if (det < 0) return false;
             det = sqrt(det);
-            double e0 = Jsat - 1 - (B0+det)/(2*B1);
-//            double e1 = Jsat - 1 - (B0-det)/(2*B1);
-            e = e0;
+            // only one root of this quadratic equation is valid.
+            e = Jsat - 1 - (B0+det)/(2*B1);
             return true;
         }
             break;
@@ -369,7 +359,7 @@ bool FERealLiquid::Dilatation(const double T, const double p, double& e)
                 fp->m_Jf = 1 + e;
                 double f = Pressure(*ft) - p;
                 double df = Tangent_Strain(*ft);
-                double de = -f/df;
+                double de = (df != 0) ? -f/df : 0;
                 e += de;
                 if ((fabs(de) < errrel*fabs(e)) ||
                     (fabs(f/m_Pr) < errabs)) { convgd = true; done = true; }

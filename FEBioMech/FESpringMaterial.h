@@ -82,6 +82,8 @@ class FENonLinearSpring : public FESpringMaterial
 {
 public:
 	FENonLinearSpring(FEModel* pfem);
+    
+    bool Init() override;
 
 	double force    (double dl) override;
 	double stiffness(double dl) override;

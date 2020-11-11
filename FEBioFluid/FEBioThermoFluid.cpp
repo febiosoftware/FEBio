@@ -35,9 +35,11 @@ SOFTWARE.*/
 #include "FEThermoFluidDomainFactory.h"
 #include "FEFluidNormalHeatFlux.h"
 #include "FEIdealGas.h"
+#include "FERealGas.h"
 #include "FEIdealLiquid.h"
 #include "FERealLiquid.h"
 #include "FEFluidConstantConductivity.h"
+#include "FETempDependentConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
 
@@ -79,9 +81,11 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
 
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
+    REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
     REGISTER_FECORE_CLASS(FEIdealLiquid, "ideal liquid");
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
+    REGISTER_FECORE_CLASS(FETempDependentConductivity, "temp-dependent thermal conductivity");
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure");
 
     febio.SetActiveModule(0);

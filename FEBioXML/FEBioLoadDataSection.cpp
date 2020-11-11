@@ -66,6 +66,10 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 				if      (type == "step"  ) ntype = FEPointFunction::STEP;
 				else if (type == "linear") ntype = FEPointFunction::LINEAR;
 				else if (type == "smooth") ntype = FEPointFunction::SMOOTH;
+                else if (type == "polynomial"  ) ntype = FEPointFunction::POLYNOMIAL;
+                else if (type == "cubic spline") ntype = FEPointFunction::CSPLINE;
+                else if (type == "Akima"       ) ntype = FEPointFunction::AKIMA;
+                else if (type == "Steffen"     ) ntype = FEPointFunction::STEFFEN;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 			}
 

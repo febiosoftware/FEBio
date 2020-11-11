@@ -498,6 +498,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Thermal conductivity
+class FEPlotFluidThermalConductivity : public FEPlotDomainData
+{
+public:
+    FEPlotFluidThermalConductivity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element solid stresses
 class FEPlotFSISolidStress : public FEPlotDomainData
 {

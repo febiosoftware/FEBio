@@ -1207,6 +1207,24 @@ bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& 
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidThermalConductivity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidThermalConductivity* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidThermalConductivity>();
+    if (pfluid == 0) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeIntegratedElementValue<double>(sd, a, [=](const FEMaterialPoint& mp) {
+            FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+            return pfluid->ThermalConductivity(mp_noconst);
+        });
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
 bool FEPlotFSISolidStress::Save(FEDomain& dom, FEDataStream& a)
 {

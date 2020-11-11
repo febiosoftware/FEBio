@@ -1812,6 +1812,7 @@
 					"-DHAS_MMG",
 					"-Xpreprocessor",
 					"-fopenmp",
+					"-DHAVE_GSL",
 				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
@@ -1875,6 +1876,7 @@
 					"-DHAS_MMG",
 					"-Xpreprocessor",
 					"-fopenmp",
+					"-DHAVE_GSL",
 				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";

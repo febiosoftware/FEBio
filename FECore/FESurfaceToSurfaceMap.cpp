@@ -88,8 +88,10 @@ bool FESurfaceToSurfaceMap::Init()
 		m_ccp2->HandleQuads(true);
 		if (m_ccp2->Init() == false) return false;
 	}
+    
+    m_func->Init();
 
-	return true;
+	return FEDataGenerator::Init();
 }
 
 void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)

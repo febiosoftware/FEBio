@@ -215,7 +215,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"-DPLOT_FILE_3",
 					"-Xpreprocessor",
 					"-fopenmp",
 				);
@@ -276,7 +275,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"-DPLOT_FILE_3",
 					"-Xpreprocessor",
 					"-fopenmp",
 				);

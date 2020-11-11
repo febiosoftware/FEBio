@@ -194,6 +194,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidSpecificFreeEnthalpy  , "fluid specific free en
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificStrainEnergy  , "fluid specific strain energy"  );
 REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
 REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity , "fluid isobaric specific heat capacity");
+REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity   , "fluid thermal conductivity"    );
 REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"             );
 
 //-----------------------------------------------------------------------------

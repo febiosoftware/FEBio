@@ -30,6 +30,10 @@ SOFTWARE.*/
 #include "FEFunction1D.h"
 
 #include <vector>
+#ifdef HAVE_GSL
+#include "gsl/gsl_errno.h"
+#include "gsl/gsl_spline.h"
+#endif
 
 //-----------------------------------------------------------------------------
 class DumpStream;
@@ -52,7 +56,7 @@ public:
 
 public:
 	//! Interpolation functions
-	enum INTFUNC { STEP = 0, LINEAR = 1, SMOOTH = 2 };
+	enum INTFUNC { STEP = 0, LINEAR = 1, SMOOTH = 2, POLYNOMIAL = 3, CSPLINE = 4, AKIMA = 5, STEFFEN = 6 };
 
 	//! Extend mode
 	enum EXTMODE { CONSTANT, EXTRAPOLATE, REPEAT, REPEAT_OFFSET };
@@ -62,7 +66,10 @@ public:
 	FEPointFunction(FEModel* fem);
 
 	//! destructor
-	virtual ~FEPointFunction();
+	~FEPointFunction();
+    
+    //! initialize
+    bool Init() override;
 
 	//! adds a point to the point curve
 	void Add(double x, double y);
@@ -119,7 +126,16 @@ protected:
 public:
 	int		m_fnc;	//!< interpolation function
 	int		m_ext;	//!< extend mode
+    bool    m_bln;  //!< points represent (ln(x),y) instead of (x,y)
 	std::vector<vec2d>	m_points;
+    
+private:
+    double* m_x;        //!<  x values
+    double* m_y;        //!<  y values
+#ifdef HAVE_GSL
+    gsl_interp_accel*   m_acc;
+    gsl_spline*         m_spline;
+#endif
 
 	DECLARE_FECORE_CLASS();
 };

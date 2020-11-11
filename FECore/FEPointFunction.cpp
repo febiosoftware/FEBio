@@ -33,20 +33,63 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
 	ADD_PARAMETER(m_points, "points");
-	ADD_PARAMETER(m_fnc, "interpolate", FE_PARAM_ATTRIBUTE, "step\0linear\0smooth\0");
+	ADD_PARAMETER(m_fnc, "interpolate", FE_PARAM_ATTRIBUTE, "step\0linear\0smooth\0polynomial\0cubic spline\0Akima\0Steffen\0");
 	ADD_PARAMETER(m_ext, "extend"     , FE_PARAM_ATTRIBUTE, "constant\0extrapolate\0repeat\0repeat offset\0");
+    ADD_PARAMETER(m_bln, "log");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! default constructor
 FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR), m_ext(CONSTANT)
 {
+    m_acc = nullptr;
+    m_spline = nullptr;
+    m_bln = false;
 }
 
 //-----------------------------------------------------------------------------
 FEPointFunction::~FEPointFunction()
 {
 
+}
+
+//-----------------------------------------------------------------------------
+//! Clears the loadcurve data
+bool FEPointFunction::Init()
+{
+#ifdef HAVE_GSL
+    if (m_fnc >= POLYNOMIAL) {
+        // store points in arrays suitable for GSL
+        const int N = Points();
+        m_x = new double[N];
+        m_y = new double[N];
+        for (int i=0; i<N; ++i) {
+            m_x[i] = m_points[i].x();
+            m_y[i] = m_points[i].y();
+        }
+        // initialize GSL spline
+        m_acc = gsl_interp_accel_alloc();
+        switch (m_fnc) {
+            case POLYNOMIAL:
+                m_spline = gsl_spline_alloc(gsl_interp_polynomial, N);
+                break;
+            case CSPLINE:
+                m_spline = gsl_spline_alloc(gsl_interp_cspline, N);
+                break;
+            case AKIMA:
+                m_spline = gsl_spline_alloc(gsl_interp_akima, N);
+                break;
+            case STEFFEN:
+                m_spline = gsl_spline_alloc(gsl_interp_steffen, N);
+                break;
+
+            default:
+                break;
+        }
+        gsl_spline_init (m_spline, m_x, m_y, N);
+    }
+#endif
+    return FEFunction1D::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +172,7 @@ inline double qerp(double t, double t0, double f0, double t1, double f1, double 
 
 double FEPointFunction::value(double time) const
 {
+    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x();
 	int nsize = Points();
 	if (nsize == 0) return 0;
 	if (nsize == 1) return m_points[0].y();
@@ -138,8 +182,21 @@ double FEPointFunction::value(double time) const
 	if (time == m_points[0].x()) return m_points[0].y();
 	if (time == m_points[N].x()) return m_points[N].y();
 
-	if (time < m_points[0].x()) return ExtendValue(time);
-	if (time > m_points[N].x()) return ExtendValue(time);
+    double tmax = m_points[N].x();
+    double tmin = m_points[0].x();
+    if (m_fnc >= POLYNOMIAL)
+    {
+#ifdef HAVE_GSL
+        if (time > tmax) return gsl_spline_eval(m_spline, tmax, m_acc);
+        else if (time < tmin) return gsl_spline_eval(m_spline, tmin, m_acc);
+        else return gsl_spline_eval(m_spline, time, m_acc);
+#else
+        return 0;
+#endif
+    }
+    
+	if (time < tmin) return ExtendValue(time);
+	if (time > tmax) return ExtendValue(time);
 
 	if (m_fnc == LINEAR)
 	{
@@ -233,7 +290,6 @@ double FEPointFunction::value(double time) const
 			}
 		}
 	}
-
 	return 0;
 }
 
@@ -310,6 +366,7 @@ double FEPointFunction::ExtendValue(double t) const
 
 int FEPointFunction::FindPoint(double t, double& tval, int startIndex)
 {
+    if (m_bln) t = (t > 0) ? log(t) : m_points[0].x();
 	switch (m_ext)
 	{
 	case REPEAT:
@@ -344,6 +401,7 @@ int FEPointFunction::FindPoint(double t, double& tval, int startIndex)
 
 bool FEPointFunction::HasPoint(double t) const
 {
+    if (m_bln) t = (t > 0) ? log(t) : m_points[0].x();
 	const double tmax = m_points[Points() - 1].x();
 	const double eps = 1e-7 * tmax;
 
@@ -377,11 +435,22 @@ void FEPointFunction::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 double FEPointFunction::derive(double time) const
 {
+    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x();
 	int N = (int)m_points.size();
 	if (N <= 1) return 0;
     double tmax = m_points[N-1].x();
     double tmin = m_points[0].x();
 
+    if (m_fnc >= POLYNOMIAL) {
+#ifdef HAVE_GSL
+        if (time > tmax) return gsl_spline_eval_deriv(m_spline, tmax, m_acc);
+        else if (time < tmin) return gsl_spline_eval_deriv(m_spline, tmin, m_acc);
+        else return gsl_spline_eval_deriv(m_spline, time, m_acc);
+#else
+        return 0;
+#endif
+    }
+    
     double Dt = m_points[N - 1].x() - m_points[0].x();
     double dt = Dt*1e-9;
     double D = 0;
@@ -427,13 +496,24 @@ double FEPointFunction::derive(double time) const
 //-----------------------------------------------------------------------------
 double FEPointFunction::deriv2(double time) const
 {
+    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x();
     int N = (int)m_points.size();
     if (N <= 1) return 0;
     double tmax = m_points[N-1].x();
     double tmin = m_points[0].x();
     
+    if (m_fnc >= POLYNOMIAL) {
+#ifdef HAVE_GSL
+        if (time > tmax) return gsl_spline_eval_deriv2(m_spline, tmax, m_acc);
+        else if (time < tmin) return gsl_spline_eval_deriv2(m_spline, tmin, m_acc);
+        else return gsl_spline_eval_deriv2(m_spline, time, m_acc);
+#else
+        return 0;
+#endif
+    }
+    
     double Dt = m_points[N - 1].x() - m_points[0].x();
-    double dt = Dt*1e-9;
+    double dt = Dt*1e-3;
     double D = 0;
     
     if (time >= tmax) {
@@ -463,12 +543,14 @@ double FEPointFunction::deriv2(double time) const
     else {
         // use central difference
         double t0 = time - dt;
-        double t1 = time + dt;
-        
-        double v1 = value(t1);
+        double t1 = time;
+        double t2 = time + dt;
+
         double v0 = value(t0);
-        
-        D = (v1 + v0 - 2*value(time)) / (dt * dt);
+        double v1 = value(t1);
+        double v2 = value(t2);
+
+        D = (v2 -2*v1 + v0) / (dt * dt);
     }
     
     return D;

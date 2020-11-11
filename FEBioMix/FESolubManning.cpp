@@ -83,6 +83,7 @@ bool FESolubManning::Init()
 		feLogError("Function for solub not assigned");
 		return false;
 	}
+    m_solub->Init();
     
     return true;
 }
