@@ -42,8 +42,10 @@ END_FECORE_CLASS();
 //! default constructor
 FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR), m_ext(CONSTANT)
 {
-    m_acc = nullptr;
+#ifdef HAVE_GSL
+	m_acc = nullptr;
     m_spline = nullptr;
+#endif
     m_bln = false;
 }
 
