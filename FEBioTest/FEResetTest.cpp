@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,24 +27,51 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEBioTest.h"
-#include <FECore/FECoreKernel.h>
-#include "FEBioDiagnostic.h"
-#include "FETangentDiagnostic.h"
-#include "FERestartDiagnostics.h"
-#include "FEJFNKTangentDiagnostic.h"
-#include "FEBioEigenSolver.h"
 #include "FEResetTest.h"
+#include <FEBioLib/FEBioModel.h>
+#include <FECore/log.h>
 
-namespace FEBioTest
+//-----------------------------------------------------------------------------
+FEResetTest::FEResetTest(FEModel*pfem) : FECoreTask(pfem)
 {
-
-void InitModule()
-{
-	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
-	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
-	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
-	REGISTER_FECORE_CLASS(FEBioEigenSolver, "eigen");
-	REGISTER_FECORE_CLASS(FEResetTest, "reset_test");
 }
+
+//-----------------------------------------------------------------------------
+// initialize the diagnostic
+bool FEResetTest::Init(const char* sz)
+{
+	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
+
+	// do the FE initialization
+	return fem.Init();
+}
+
+//-----------------------------------------------------------------------------
+// run the diagnostic
+bool FEResetTest::Run()
+{
+	FEBioModel* fem = dynamic_cast<FEBioModel*>(GetFEModel());
+
+	// try to run the model
+	if (fem->Solve() == false)
+	{
+		feLogEx(fem, "Failed to run model.");
+		return false;
+	}
+
+	// reset the model
+	if (fem->Reset() == false)
+	{
+		feLogEx(fem, "Failed to reset model.");
+		return false;
+	}
+
+	// try to run it again
+	if (fem->Solve() == false)
+	{
+		feLogEx(fem, "Failed to run model second time.");
+		return false;
+	}
+
+	return true;
 }

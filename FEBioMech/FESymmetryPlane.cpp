@@ -34,6 +34,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FESymmetryPlane::FESymmetryPlane(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
 {
+	m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -47,12 +48,15 @@ void FESymmetryPlane::Activate()
 //-----------------------------------------------------------------------------
 bool FESymmetryPlane::Init()
 {
+	// initialize surface
+	if (m_surf.Init() == false) return true;
+
     FEModel& fem = *FELinearConstraintSet::GetFEModel();
     DOFS& dofs = fem.GetDOFS();
     
-    // initialize surface
-    m_surf.Init();
-    
+	if (m_binit) return true;
+	m_binit = true;
+
     // evaluate the nodal normals
     int N = m_surf.Nodes();
     vec3d nu(0,0,0);

@@ -75,6 +75,9 @@
     <ClInclude Include="..\..\FEBioTest\FEBioEigenSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioTest\FEResetTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioTest\FEBioDiagnostic.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioTest\FEBioEigenSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioTest\FEResetTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

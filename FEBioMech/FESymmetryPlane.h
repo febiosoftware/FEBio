@@ -54,4 +54,5 @@ public:
     
 protected:
     FESurface    m_surf;
+	bool		m_binit;
 };

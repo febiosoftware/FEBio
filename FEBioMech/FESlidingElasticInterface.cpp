@@ -73,6 +73,20 @@ FESlidingElasticSurface::Data::Data()
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingElasticSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+
+	m_Lmd = 0.0;
+	m_epsn = 1.0;
+	m_Lmt = vec3d(0, 0, 0);
+	m_nu = m_s1 = m_dg = vec3d(0, 0, 0);
+	m_tr = vec3d(0, 0, 0);
+	m_rs = m_rsp = vec2d(0, 0);
+	m_bstick = false;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingElasticSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);

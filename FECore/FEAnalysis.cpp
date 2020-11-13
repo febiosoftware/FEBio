@@ -199,6 +199,8 @@ void FEAnalysis::Reset()
 
 	// Deactivate the step
 	Deactivate();
+
+	if (m_psolver) m_psolver->Reset();
 }
 
 //-----------------------------------------------------------------------------

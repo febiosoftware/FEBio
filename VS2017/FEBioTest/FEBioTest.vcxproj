@@ -513,6 +513,7 @@
     <ClInclude Include="..\..\FEBioTest\FEMultiphasicTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FEResetTest.h" />
     <ClInclude Include="..\..\FEBioTest\FERestartDiagnostics.h" />
     <ClInclude Include="..\..\FEBioTest\FETangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.h" />
@@ -534,6 +535,7 @@
     <ClCompile Include="..\..\FEBioTest\FEMultiphasicTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FEResetTest.cpp" />
     <ClCompile Include="..\..\FEBioTest\FERestartDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.cpp" />

@@ -138,6 +138,8 @@ bool FETimeStepController::Init()
 void FETimeStepController::Reset()
 {
 	m_dtp = m_step->m_dt0;
+	m_nmust = -1;
+	m_next_must = -1;
 }
 
 //-----------------------------------------------------------------------------

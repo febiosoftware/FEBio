@@ -1143,6 +1143,7 @@ bool FEModel::Reset()
 
 	// set the start time
 	m_imp->m_timeInfo.currentTime = 0;
+	m_imp->m_timeInfo.timeIncrement = 0;
 	m_imp->m_ftime0 = 0;
 
 	// set first time step

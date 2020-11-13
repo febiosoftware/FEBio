@@ -113,6 +113,14 @@ void FESolver::Clean()
 }
 
 //-----------------------------------------------------------------------------
+void FESolver::Reset()
+{
+	m_niter = 0;
+	m_nref = 0;
+	m_naug = 0;
+}
+
+//-----------------------------------------------------------------------------
 // get the linear solver
 LinearSolver* FESolver::GetLinearSolver()
 {

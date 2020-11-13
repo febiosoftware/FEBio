@@ -103,6 +103,9 @@ public:
 	//! rewind the solver (This is called when the time step fails and needs to retry)
 	virtual void Rewind() {}
 
+	//! called during model reset
+	virtual void Reset();
+
 	// Initialize linear equation system
 	virtual bool InitEquations();
 
