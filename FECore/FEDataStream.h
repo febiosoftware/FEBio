@@ -87,6 +87,7 @@ public:
 	}
 
 	void assign(size_t count, float f) { m_a.assign(count, f); }
+	void resize(size_t count, float f) { m_a.resize(count, f); }
 	void reserve(size_t count) { m_a.reserve(count); }
 	void push_back(const float& f) { m_a.push_back(f); }
 	size_t size() const { return m_a.size(); }

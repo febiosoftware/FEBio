@@ -1535,7 +1535,9 @@ void FEBioPlotFile::WriteNodeDataField(FEModel &fem, FEPlotData* pd)
 	FEDataStream a; a.reserve(ndata*N);
 	if (pd->Save(fem.GetMesh(), a))
 	{
+		// pad mismatches
 		assert(a.size() == N*ndata);
+		if (a.size() != N * ndata) a.resize(N*ndata, 0.f);
 		m_ar.WriteData(0, a.data());
 	}
 }
