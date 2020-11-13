@@ -1716,7 +1716,7 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //=============================================================================
-//! Store the average Euler-lagrange strain
+//! Store the average Lagrangian strain
 class FELagrangeStrain
 {
 public:

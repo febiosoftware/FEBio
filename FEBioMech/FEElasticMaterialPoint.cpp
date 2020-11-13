@@ -214,7 +214,7 @@ mat3ds FEElasticMaterialPoint::LeftStretchInverse() const
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the Euler-Lagrange strain at the current material point
+//! Calculates the Lagrangian strain at the current material point
 
 mat3ds FEElasticMaterialPoint::Strain() const
 {
@@ -229,7 +229,7 @@ mat3ds FEElasticMaterialPoint::Strain() const
 	C.yz() = F[0][1]*F[0][2]+F[1][1]*F[1][2]+F[2][1]*F[2][2]; // = C[1][2]
 	C.xz() = F[0][0]*F[0][2]+F[1][0]*F[1][2]+F[2][0]*F[2][2]; // = C[0][2]
 
-	// calculate the Euler-Lagrange strain
+	// calculate the Lagrangian strain
 	// E = 1/2*(C - 1)
 	mat3ds E = (C - mat3dd(1))*0.5;
 
