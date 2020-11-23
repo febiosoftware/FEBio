@@ -1003,6 +1003,7 @@ See the figure below for an overview of the basic FEBio flow.
 \begin_layout Standard
 \begin_inset Graphics
 	filename Figures/FEBio flow.png
+	scale 50
 
 \end_inset
 
@@ -9801,7 +9802,7 @@ name
 \end_layout
 
 \begin_layout LyX-Code
-      <density>0.97<density>
+      <density>0.97</density>
 \end_layout
 
 \begin_layout LyX-Code
@@ -9821,7 +9822,7 @@ name
 \end_layout
 
 \begin_layout LyX-Code
-      <density>3.21<density>
+      <density>3.21</density>
 \end_layout
 
 \begin_layout LyX-Code
@@ -9841,7 +9842,7 @@ name
 \end_layout
 
 \begin_layout LyX-Code
-      <density>1.54<density>
+      <density>1.54</density>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10290,7 +10291,7 @@ sections can be defined, but each node can only be defined once.
 \end_layout
 
 \begin_layout LyX-Code
-  <node id="1">0,0,0,</node>
+  <node id="1">0,0,0</node>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10298,7 +10299,7 @@ sections can be defined, but each node can only be defined once.
 \end_layout
 
 \begin_layout LyX-Code
-  </node id="101">1,1,1</node>
+  <node id="101">1,1,1</node>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10477,11 +10478,11 @@ Elements
 \end_layout
 
 \begin_layout LyX-Code
-  <elem id="2">1,2,3,4,5,6,7,8</elem>
+  <elem id="2">9,10,11,12,13,14,15,16</elem>
 \end_layout
 
 \begin_layout LyX-Code
-  <...>
+  ...
 \end_layout
 
 \begin_layout LyX-Code
@@ -10746,6 +10747,7 @@ status open
 \begin_inset Graphics
 	filename Figures/FigNodeNumberingSolidElements.png
 	lyxscale 50
+	scale 50
 
 \end_inset
 
@@ -10989,6 +10991,7 @@ status open
 \begin_inset Graphics
 	filename Figures/FigNodeNumberingShellElements.png
 	lyxscale 50
+	scale 75
 
 \end_inset
 
@@ -14167,8 +14170,8 @@ The
 \shape italic
 Loads 
 \shape default
-section defines all nodal, surface and body loads that can be applied to
- the model.
+section defines all nodal, edge, surface, and body loads that can be applied
+ to the model.
 \end_layout
 
 \begin_layout Subsection
@@ -14188,6 +14191,108 @@ Nodal loads are applied by the
 nodal_load 
 \shape default
 element.
+ The nodal load is defined by the 
+\emph on
+type 
+\emph default
+attribute.
+ The following table lists the available nodal loads.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodal_load
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A load that is added to the corresponding's dofs in the global force vector.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodal_force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A force applied to each node of a node set
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+nodal_load
+\end_layout
+
+\begin_layout Standard
+The nodal_load adds a value directly to the corresponding degrees of freedom
+ in the global external load vector.
  When the loads are applied to displacement degrees of freedom, the forces
  always point in the same direction and do not deform with the geometry
  (i.e.
@@ -14196,15 +14301,15 @@ element.
 \end_layout
 
 \begin_layout LyX-Code
-<nodal_load bc="x" node_set="set1">
+<nodal_load type="nodal_load" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>x</dof>
 \end_layout
 
 \begin_layout LyX-Code
   <scale lc="1">1.0</scale>
-\end_layout
-
-\begin_layout LyX-Code
-  <value>3.14</value>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14214,9 +14319,9 @@ element.
 \begin_layout Standard
 The 
 \shape italic
-bc
+dof
 \shape default
- attribute gives the degree of freedom.
+ parameter defins the degree of freedom.
  The following values are allowed:
 \end_layout
 
@@ -14293,6 +14398,7 @@ c2
 \end_inset
 
 .
+ 
 \end_layout
 
 \begin_layout Standard
@@ -14309,56 +14415,34 @@ parameter with the
 lc
 \shape default
  attribute.
- If a loadcurve is not specified, the value will be automatically ramped
- from a value of 0 at time 
-\begin_inset Formula $t=$
-\end_inset
+\end_layout
 
-0 to the value specified in the xml file at the time corresponding to the
- end of the analysis.
+\begin_layout Subsubsection
+nodal_force
 \end_layout
 
 \begin_layout Standard
-The value of the 
-\shape italic
+This nodal load defines a force that is applied to each node in the node
+ set.
+ The 
+\emph on
 value 
-\shape default
-parameter (e.g.
- 3.14 in the example above) is the value for the nodal force.
- This value will be scaled by the 
-\shape italic
-scale 
-\shape default
-parameter.
- Note that if a 
-\shape italic
-loadcurve
-\shape default
- is specified, this value scales the value determined by the 
-\shape italic
-loadcurve
-\shape default
-.
+\emph default
+parameter sets the force vector.
+ An optional load curve can be defined to scale the vector.
+ 
 \end_layout
 
-\begin_layout Standard
-To define a different value for each node of the node set, define a 
-\shape italic
-NodData
-\shape default
- field in the 
-\shape italic
-MeshData 
-\shape default
-section and reference it by defining the 
-\shape italic
-node_data 
-\shape default
-attribute in the 
-\shape italic
-value 
-\shape default
-parameter.
+\begin_layout LyX-Code
+<nodal_load type="nodal_force" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">1,0,0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+</nodal_load>
 \end_layout
 
 \begin_layout Subsection
@@ -14741,26 +14825,6 @@ A traction load applies a traction to a surface.
 \end_layout
 
 \begin_layout Standard
-If a different needs to be specified for each facet, use the following syntax.
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="traction" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <scale lc="1">1.0</scale>
-\end_layout
-
-\begin_layout LyX-Code
-  <traction surface_data="traction_value"/>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Standard
 The traction vector is determined by two quantities.
  The direction and magnitude is defined by the 
 \shape italic
@@ -15132,7 +15196,7 @@ l component of
 \end_layout
 
 \begin_layout LyX-Code
-  <flux [lc="1"]>1.0</flux>
+  <flux lc="1">1.0</flux>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15333,7 +15397,7 @@ The molar flux of solute relative to the solid matrix is given by the vector
 \end_layout
 
 \begin_layout LyX-Code
-  <flux [lc="1"]>1.0</flux>
+  <flux lc="1">1.0</flux>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15345,7 +15409,7 @@ The molar flux of solute relative to the solid matrix is given by the vector
 \end_layout
 
 \begin_layout LyX-Code
-</ surface_load>
+</surface_load>
 \end_layout
 
 \begin_layout Standard
@@ -15513,7 +15577,7 @@ element.
 \end_layout
 
 \begin_layout LyX-Code
-  <flux [lc="1"]>1.0</flux>
+  <flux lc="1">1.0</flux>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15561,7 +15625,7 @@ A convective heat flux can be defined to a surface that is cooled (or heated)
 \end_layout
 
 \begin_layout LyX-Code
-  <Ta [lc="1"]>1.0</Ta>
+  <Ta lc="1">1.0</Ta>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15676,46 +15740,6 @@ fluid traction
 </surface_load>
 \end_layout
 
-\begin_layout Standard
-If a different vector value needs to be specified for each facet, use the
- following syntax,
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="fluid traction" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <scale lc="1">1.0</scale>
-\end_layout
-
-\begin_layout LyX-Code
-  <traction surface_data="traction_value"/>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Standard
-and provide the facet values in a user-defined 
-\emph on
-SurfaceData
-\emph default
- map (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:generator"
-
-\end_inset
-
-).
-\end_layout
-
 \begin_layout Subsubsection
 Fluid Normal Traction
 \begin_inset CommandInset label
@@ -15764,7 +15788,7 @@ reference "subsec:Fluid-Traction"
 \end_layout
 
 \begin_layout LyX-Code
-  <scale [lc="1"]>1.0</scale>
+  <scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15773,46 +15797,6 @@ reference "subsec:Fluid-Traction"
 
 \begin_layout LyX-Code
 </surface_load>
-\end_layout
-
-\begin_layout Standard
-If a different scalar value needs to be specified for each facet, use the
- following syntax,
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="fluid normal traction" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <scale [lc="1"]>1.0</scale>
-\end_layout
-
-\begin_layout LyX-Code
-  <traction surface_data="traction_value"/>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Standard
-and provide the facet values in a user-defined 
-\emph on
-SurfaceData
-\emph default
- map (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:generator"
-
-\end_inset
-
-).
 \end_layout
 
 \begin_layout Subsubsection
@@ -15877,7 +15861,7 @@ reference "subsec:Fluid-Traction"
 \end_layout
 
 \begin_layout LyX-Code
-	<beta [lc="1"]>1</beta>
+	<beta lc="1">1</beta>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15942,7 +15926,7 @@ reference "subsec:Fluid-Traction"
 \end_layout
 
 \begin_layout LyX-Code
-	<beta [lc="1"]>1</beta>
+	<beta lc="1">1</beta>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15995,7 +15979,7 @@ fluid normal velocity
 \end_layout
 
 \begin_layout LyX-Code
-  <value [lc="1"]>1.0</value>
+  <value lc="1">1.0</value>
 \end_layout
 
 \begin_layout LyX-Code
@@ -16035,15 +16019,7 @@ value
 \end_layout
 
 \begin_layout LyX-Code
-  <velocity lc=
-\begin_inset Quotes erd
-\end_inset
-
-1
-\begin_inset Quotes erd
-\end_inset
-
->-1.0</velocity>
+  <velocity lc="1">-1.0</velocity>
 \end_layout
 
 \begin_layout LyX-Code
@@ -23443,15 +23419,7 @@ A rigid contractile force connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <f0 lc=
-\begin_inset Quotes erd
-\end_inset
-
-1
-\begin_inset Quotes erd
-\end_inset
-
->1</f0>
+  <f0 lc="1">1</f0>
 \end_layout
 
 \begin_layout LyX-Code
@@ -36429,6 +36397,10 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
+  <k>1000</k>
+\end_layout
+
+\begin_layout LyX-Code
   <solid type="Mooney-Rivlin">
 \end_layout
 
@@ -36438,10 +36410,6 @@ Example
 
 \begin_layout LyX-Code
     <c2>0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>1000</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -36458,10 +36426,6 @@ Example
 
 \begin_layout LyX-Code
     <beta>2.5, 3, 3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>15000</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -37419,6 +37383,10 @@ Single fiber oriented along
 \end_layout
 
 \begin_layout LyX-Code
+  <k>10e3</k>
+\end_layout
+
+\begin_layout LyX-Code
   <solid type="Mooney-Rivlin">
 \end_layout
 
@@ -37428,10 +37396,6 @@ Single fiber oriented along
 
 \begin_layout LyX-Code
     <c2>0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>10e3</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -37452,10 +37416,6 @@ Single fiber oriented along
 
 \begin_layout LyX-Code
     <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>5e3</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -37511,6 +37471,10 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
+ <k>10e3</k>
+\end_layout
+
+\begin_layout LyX-Code
   <solid type="Mooney-Rivlin">
 \end_layout
 
@@ -37520,10 +37484,6 @@ Two fibers in the plane orthogonal to
 
 \begin_layout LyX-Code
     <c2>0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>10e3</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -37544,10 +37504,6 @@ Two fibers in the plane orthogonal to
 
 \begin_layout LyX-Code
     <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>5e3</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -37584,10 +37540,6 @@ Two fibers in the plane orthogonal to
 
 \begin_layout LyX-Code
     <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>5e3</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -41416,6 +41368,10 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
+  <k>30e3</k>
+\end_layout
+
+\begin_layout LyX-Code
   <mat_axis type="vector">
 \end_layout
 
@@ -41441,10 +41397,6 @@ Example
 
 \begin_layout LyX-Code
     <c2>0.0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>2000</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -41480,10 +41432,6 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <k>15e3</k>
-\end_layout
-
-\begin_layout LyX-Code
   </solid>
 \end_layout
 
@@ -41513,10 +41461,6 @@ Example
 
 \begin_layout LyX-Code
     <beta>2.5, 3, 3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>15e3</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -44521,7 +44465,7 @@ Example (using units of mm, N, s, nmol, K)
 \end_layout
 
 \begin_layout LyX-Code
-    <phiw0>0.8</ phiw0>
+    <phiw0>0.8</phiw0>
 \end_layout
 
 \begin_layout LyX-Code
@@ -45493,7 +45437,7 @@ Example (using units of mm, N, s, nmol, K)
 \end_layout
 
 \begin_layout LyX-Code
-  <phiw0>0.8</ phiw0>
+  <phiw0>0.8</phiw0>
 \end_layout
 
 \begin_layout LyX-Code
@@ -45973,75 +45917,75 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout LyX-Code
-  <solid type="fiber-exp-pow"
+  <solid type="fiber-exp-pow">
 \end_layout
 
 \begin_layout LyX-Code
-<ksi>5</ksi>
+    <ksi>5</ksi>
 \end_layout
 
 \begin_layout LyX-Code
-<alpha>20</alpha>
+    <alpha>20</alpha>
 \end_layout
 
 \begin_layout LyX-Code
-<beta>3</beta>
+    <beta>3</beta>
 \end_layout
 
 \begin_layout LyX-Code
-<mat_axis type="angles">
+    <fiber type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-  <theta>90</theta>
+      <theta>90</theta>
 \end_layout
 
 \begin_layout LyX-Code
-  <phi>25</phi>
+      <phi>25</phi>
 \end_layout
 
 \begin_layout LyX-Code
-</mat_axis>
+    </fiber>
 \end_layout
 
 \begin_layout LyX-Code
-</solid>
+  </solid>
 \end_layout
 
 \begin_layout LyX-Code
-<solid type="fiber-exp-pow">
+  <solid type="fiber-exp-pow">
 \end_layout
 
 \begin_layout LyX-Code
-  <ksi>5</ksi>
+    <ksi>5</ksi>
 \end_layout
 
 \begin_layout LyX-Code
-  <alpha>20</alpha>
+    <alpha>20</alpha>
 \end_layout
 
 \begin_layout LyX-Code
-  <beta>3</beta>
+    <beta>3</beta>
 \end_layout
 
 \begin_layout LyX-Code
-  <mat_axis type="angles">
+    <fiber type="angles">
 \end_layout
 
 \begin_layout LyX-Code
-    <theta>-90</theta>
+      <theta>-90</theta>
 \end_layout
 
 \begin_layout LyX-Code
-    <phi>25</phi>
+      <phi>25</phi>
 \end_layout
 
 \begin_layout LyX-Code
-  </mat_axis>
+    </fiber>
 \end_layout
 
 \begin_layout LyX-Code
-</solid>
+  </solid>
 \end_layout
 
 \begin_layout LyX-Code
@@ -47424,7 +47368,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<material id="1" type="isotropic elastic"
+<material id="1" type="isotropic elastic">
 \end_layout
 
 \begin_layout LyX-Code
@@ -56320,6 +56264,10 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
+  <k>100</k>
+\end_layout
+
+\begin_layout LyX-Code
   <elastic type="Mooney-Rivlin">
 \end_layout
 
@@ -56329,10 +56277,6 @@ Example
 
 \begin_layout LyX-Code
     <c2>0.0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>100</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -61654,7 +61598,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<permeability name="Permeability" type="perm-const-iso ">
+<permeability name="Permeability" type="perm-const-iso">
 \end_layout
 
 \begin_layout LyX-Code
@@ -61956,7 +61900,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<permeability name="Permeability" type="perm-exp-iso ">
+<permeability name="Permeability" type="perm-exp-iso">
 \end_layout
 
 \begin_layout LyX-Code
@@ -63710,11 +63654,18 @@ reference "subsec:Specifying-Fiber-Orientation"
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset
 
- is given by 
-\begin_inset Formula $\mathbf{k}=\left(k_{0r}+k_{1r}^{T}+k_{2r}^{T}\right)\mathbf{I}+\left(k_{1r}^{A}-k_{1r}^{T}+k_{2r}^{A}-k_{2r}^{T}\right)\left(\mathbf{V}\otimes\mathbf{V}\right)$
+ is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbf{k_{|F=I}}=\left(k_{0r}+k_{1r}^{T}+k_{2r}^{T}\right)\mathbf{I}+\left(k_{1r}^{A}-k_{1r}^{T}+k_{2r}^{A}-k_{2r}^{T}\right)\left(\mathbf{V}\otimes\mathbf{V}\right)
+\]
+
 \end_inset
 
-.
+
 \end_layout
 
 \begin_layout Standard
@@ -65527,7 +65478,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <free_diff>0.005</ free_diff >
+  <free_diff>0.005</free_diff >
 \end_layout
 
 \begin_layout LyX-Code
@@ -67650,11 +67601,11 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<Step>
+<Module type="multiphasic"/>
 \end_layout
 
 \begin_layout LyX-Code
-  <Module type="multiphasic"/>
+<Step>
 \end_layout
 
 \begin_layout LyX-Code
@@ -67662,7 +67613,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-    <analysis type="steady-state"/>
+    <analysis>STEADY-STATE</analysis>
 \end_layout
 
 \begin_layout LyX-Code
@@ -67682,10 +67633,6 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <Module type="multiphasic"/>
-\end_layout
-
-\begin_layout LyX-Code
   <Control>
 \end_layout
 
@@ -67702,15 +67649,19 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-    <prescribe type="relative">
+    <bc type="prescribe" node_set="set1">
 \end_layout
 
 \begin_layout LyX-Code
-      <node id="22" bc="z" lc="4">1</node>
+      <dof>z</dof>
 \end_layout
 
 \begin_layout LyX-Code
-      ...
+      <scale>1</scale>
+\end_layout
+
+\begin_layout LyX-Code
+      <relative>1</relative>
 \end_layout
 
 \begin_layout LyX-Code
@@ -72338,6 +72289,10 @@ Uniaxial contraction along
 \end_layout
 
 \begin_layout LyX-Code
+  <k>1000</k>
+\end_layout
+
+\begin_layout LyX-Code
   <solid type="Mooney-Rivlin">
 \end_layout
 
@@ -72347,10 +72302,6 @@ Uniaxial contraction along
 
 \begin_layout LyX-Code
     <c2>0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>1000</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -73127,7 +73078,7 @@ An example defining the stl parameter via a mathematical expression.
 \end_layout
 
 \begin_layout LyX-Code
-    <stl>
+    </stl>
 \end_layout
 
 \begin_layout LyX-Code
@@ -73211,7 +73162,7 @@ An example defining the stl parameter via a point list.
 \end_layout
 
 \begin_layout LyX-Code
-    <stl>
+    </stl>
 \end_layout
 
 \begin_layout LyX-Code
@@ -74199,7 +74150,7 @@ An example defining the stl parameter via a mathematical expression.
 \end_layout
 
 \begin_layout LyX-Code
-    <stl>
+    </stl>
 \end_layout
 
 \begin_layout LyX-Code
@@ -74279,7 +74230,7 @@ An example defining the stl parameter via a point list.
 \end_layout
 
 \begin_layout LyX-Code
-    <stl>
+    </stl>
 \end_layout
 
 \begin_layout LyX-Code
@@ -79590,8 +79541,6 @@ data-fit
 
 \begin_layout Plain Layout
 Fits data, usually specified as a function of time, to a model output parameter
- (e.g.
- rigid reaction force)
 \end_layout
 
 \end_inset
@@ -83581,7 +83530,7 @@ pardiso
 
 \begin_layout Plain Layout
 A sparse direct solver, from the MKL library.
- The default solver in FEBio.
+ (default)
 \end_layout
 
 \end_inset
@@ -83590,7 +83539,7 @@ A sparse direct solver, from the MKL library.
 \begin_inset Text
 
 \begin_layout Plain Layout
-direct
+D
 \end_layout
 
 \end_inset
@@ -83599,7 +83548,7 @@ direct
 \begin_inset Text
 
 \begin_layout Plain Layout
-any
+S/U
 \end_layout
 
 \end_inset
@@ -83628,7 +83577,7 @@ A sparse direct solver, but not as efficient as pardiso.
 \begin_inset Text
 
 \begin_layout Plain Layout
-direct
+D
 \end_layout
 
 \end_inset
@@ -83637,7 +83586,7 @@ direct
 \begin_inset Text
 
 \begin_layout Plain Layout
-symmetric
+S
 \end_layout
 
 \end_inset
@@ -83657,7 +83606,7 @@ fgmres
 \begin_inset Text
 
 \begin_layout Plain Layout
-An implementation of the GMRES algorithm, from the MKL library.
+An implementation of the GMRES algorithm, from MKL .
 \end_layout
 
 \end_inset
@@ -83666,7 +83615,7 @@ An implementation of the GMRES algorithm, from the MKL library.
 \begin_inset Text
 
 \begin_layout Plain Layout
-iterative
+It
 \end_layout
 
 \end_inset
@@ -83675,7 +83624,7 @@ iterative
 \begin_inset Text
 
 \begin_layout Plain Layout
-unsymmetric
+U
 \end_layout
 
 \end_inset
@@ -83695,7 +83644,7 @@ cg
 \begin_inset Text
 
 \begin_layout Plain Layout
-An implementation of the CG algorithm, from the MKL library.
+An implementation of the CG algorithm, from MKL .
  
 \end_layout
 
@@ -83705,7 +83654,7 @@ An implementation of the CG algorithm, from the MKL library.
 \begin_inset Text
 
 \begin_layout Plain Layout
-iterative
+It
 \end_layout
 
 \end_inset
@@ -83714,7 +83663,7 @@ iterative
 \begin_inset Text
 
 \begin_layout Plain Layout
-symmetric
+S
 \end_layout
 
 \end_inset
@@ -83744,7 +83693,7 @@ An algebraic multigrid solver, from the HYPRE library.
 \begin_inset Text
 
 \begin_layout Plain Layout
-iterative
+It
 \end_layout
 
 \end_inset
@@ -83753,7 +83702,7 @@ iterative
 \begin_inset Text
 
 \begin_layout Plain Layout
-any
+S/U
 \end_layout
 
 \end_inset
@@ -83782,7 +83731,7 @@ A block based iterative solver.
 \begin_inset Text
 
 \begin_layout Plain Layout
-iterative
+It
 \end_layout
 
 \end_inset
@@ -83791,7 +83740,7 @@ iterative
 \begin_inset Text
 
 \begin_layout Plain Layout
-block
+B
 \end_layout
 
 \end_inset
@@ -83802,6 +83751,13 @@ block
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
+D=direct solver, It=iterative solver, S = symmetric format, U = unsymmetric
+ format, B = block format.
+ 
 \end_layout
 
 \begin_layout Standard
