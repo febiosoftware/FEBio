@@ -38,7 +38,7 @@ public:
     double	m_g;			// fiber angle
     
 public:
-    FEGasserOgdenHolzapfelUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+    FEGasserOgdenHolzapfelUC(FEModel* pfem) : FEUncoupledMaterial(pfem) { m_npmodel = 3; }
     
     //! calculate deviatoric stress at material point
     mat3ds DevStress(FEMaterialPoint& pt) override;
