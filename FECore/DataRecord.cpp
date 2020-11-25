@@ -205,7 +205,7 @@ bool DataRecord::Write()
 	if (fp && m_bcomm)
 	{
 		// we save the data in a seperate file
-		fprintf(fp, "File = %s\n", m_szfile);
+		feLogEx(m_pfem, "File = %s\n", m_szfile);
 
 		// make a note in the data file
 		fprintf(fp,"*Step  = %d\n", nstep);
