@@ -29,6 +29,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include <limits>
 #include "FEFiberExpLinear.h"
+#ifdef HAVE_GSL
+#include "gsl/gsl_sf_expint.h"
+#endif
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -139,6 +142,36 @@ tens4ds FEFiberExpLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 //! Calculate the fiber strain energy density
 double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0)
 {
-	// TODO: implement this
-	return 0;
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F * a0;
+
+	// normalize material axis and store fiber stretch
+	double lam = a.unit();
+	
+	// strain energy density
+	double sed = 0.0;
+#ifdef HAVE_GSL
+	if (lam >= 1)
+	{
+		if (lam < m_lam1)
+		{
+			sed = m_c3 * (exp(-m_c4)*
+				(gsl_sf_expint_Ei(m_c4*lam) - gsl_sf_expint_Ei(m_c4))
+				- log(lam));
+		}
+		else
+		{
+			double c6 = m_c3 * (exp(m_c4*(m_lam1 - 1)) - 1) - m_c5 * m_lam1;
+			sed = m_c5 * (lam - 1) + c6 * log(lam);
+		}
+	}
+#endif
+	// --- active contraction contribution to sed is zero ---
+
+	return sed;
 }

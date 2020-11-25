@@ -117,7 +117,6 @@ public:
 private:
 	mat3ds MatrixStress(FEMaterialPoint& mp);
 	tens4ds MatrixTangent(FEMaterialPoint& mp);
-	mat3ds SecantStress(FEMaterialPoint& mp);
 
 private:
 	// matrix parameters

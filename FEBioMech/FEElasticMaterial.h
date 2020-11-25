@@ -51,7 +51,15 @@ public:
     // get the elastic material
     virtual FEElasticMaterial* GetElasticMaterial() { return this; }
 
+public:
+	//! evaluates approximation to Cauchy stress using forward difference
+	mat3ds SecantStress(FEMaterialPoint& pt);
+
+	mat3ds SolidStress(FEMaterialPoint& pt);
+
 protected:
+	bool	m_secant_stress;	//!< use secant approximation to stress
+
 	DECLARE_FECORE_CLASS();
 };
 

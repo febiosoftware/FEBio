@@ -348,7 +348,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 
 		// get the 'D' matrix
 //		tens4ds C = m_pMat->Tangent(mp);
-        tens4dmm C = m_pMat->m_secant ? m_pMat->SecantTangent(mp) : m_pMat->Tangent(mp);
+        tens4dmm C = m_pMat->SolidTangent(mp);
 		C.extract(D);
 
 		// we only calculate the upper triangular part
@@ -641,7 +641,8 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
         
 		// calculate the stress at this material point
-        pt.m_s = m_pMat->Stress(mp);
+//		pt.m_s = m_pMat->Stress(mp);
+		pt.m_s = m_pMat->SolidStress(mp);
         
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5) 

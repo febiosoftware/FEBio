@@ -75,7 +75,7 @@ FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMater
     m_pBase = 0;
     m_pCrit = 0;
     m_bias = 0.9;
-    m_secant = true;
+    m_secant_tangent = true;
 }
 
 //-----------------------------------------------------------------------------
