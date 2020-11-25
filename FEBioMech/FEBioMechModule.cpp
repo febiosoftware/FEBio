@@ -190,6 +190,8 @@ SOFTWARE.*/
 #include "FERigidForce.h"
 #include "FERigidCable.h"
 #include "FEDiscreteContact.h"
+#include "FERigidFollowerForce.h"
+#include "FERigidFollowerMoment.h"
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -559,6 +561,8 @@ void FEBioMech::InitModule()
 	// TODO: define another SUPER_CLASS_ID for this
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidAxialForce, FEBC_ID, "rigid_axial_force");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyForce, FEBC_ID, "rigid_force");
+    REGISTER_FECORE_CLASS_EXPLICIT(FERigidFollowerForce, FEBC_ID, "rigid_follower_force");
+    REGISTER_FECORE_CLASS_EXPLICIT(FERigidFollowerMoment, FEBC_ID, "rigid_follower_moment");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyFixedBC, FERIGIDBC_ID, "rigid_fixed");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement, FERIGIDBC_ID, "rigid_prescribed");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyVelocity, FERIGIDBC_ID, "rigid_velocity");
