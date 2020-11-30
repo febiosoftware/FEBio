@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FECore/NLConstraintDataRecord.h"
 #include "FECore/FEModel.h"
 #include <FECore/FEModelData.h>
+#include <FECore/FSPath.h>
 
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::Parse(XMLTag& tag)
@@ -84,11 +85,28 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
+	// Get the feb file path
+	const char* szpath = GetFileReader()->GetFilePath();
+
 	// see if the log file has any attributes
 	const char* szlog = tag.AttributeValue("file", true);
-	if (szlog) GetFEBioImport()->SetLogfileName(szlog);
 
-	const char* szpath = GetFileReader()->GetFilePath();
+	// If the log filename is not a path, but just a filename, make the filename
+	// relative to the input file, otherwise, leave the path alone.
+	if(szlog)
+	{
+		if(!FSPath::isPath(szlog))
+		{
+			char szfile[1024] = {0};
+			sprintf(szfile, "%s%s", szpath, szlog);
+			GetFEBioImport()->SetLogfileName(szfile);
+		}
+		else
+		{
+			GetFEBioImport()->SetLogfileName(szlog);
+		}
+
+	}
 
 	if (tag.isleaf()) return;
 	++tag;
@@ -301,7 +319,26 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 
 	// get the optional plot file name
 	const char* szplt = tag.AttributeValue("file", true);
-	if (szplt) GetFEBioImport()->SetPlotfileName(szplt);
+
+	// If the plot filename is not a path, but just a filename, make the filename
+	// relative to the input file, otherwise, leave the path alone.
+	if(szplt)
+	{
+		if(!FSPath::isPath(szplt))
+		{
+			// Get the feb file path
+			const char* szpath = GetFileReader()->GetFilePath();
+
+			char szfile[1024] = {0};
+			sprintf(szfile, "%s%s", szpath, szplt);
+			GetFEBioImport()->SetPlotfileName(szfile);
+		}
+		else
+		{
+			GetFEBioImport()->SetPlotfileName(szplt);
+		}
+
+	}
 
 	// read and store the plot variables
 	if (!tag.isleaf())
