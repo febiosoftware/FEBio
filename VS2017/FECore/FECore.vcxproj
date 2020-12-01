@@ -649,6 +649,7 @@
     <ClInclude Include="..\..\FECore\FETimeStepController.h" />
     <ClInclude Include="..\..\FECore\FETransform.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
+    <ClInclude Include="..\..\FECore\FSPath.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\Integrate.h" />
     <ClInclude Include="..\..\FECore\JFNKMatrix.h" />
@@ -856,6 +857,7 @@
     <ClCompile Include="..\..\FECore\FETimeStepController.cpp" />
     <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FSPath.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\Integrate.cpp" />
     <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
