@@ -32,100 +32,117 @@ SOFTWARE.*/
 
 class FEFiberDamagePoint;
 
-class FEDamageInterface
+//=================================================================================================
+// Base class for continuous damage elastic fiber materials. 
+//
+class FEDamageElasticFiber : public FEElasticFiberMaterial
 {
 public:
-	FEDamageInterface() {}
-	virtual ~FEDamageInterface() {}
+	FEDamageElasticFiber(FEModel* fem);
+
 	double Damage(FEMaterialPoint& mp);
+
+	//! Strain energy density
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// calculate stress in fiber direction a0
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// Spatial tangent
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+
+protected:
+	// strain-energy and its derivatives
+	virtual double Psi0(FEMaterialPoint& mp, const vec3d& a0);
+	virtual mat3ds dPsi0_dC(FEMaterialPoint& mp, const vec3d& a0);
+	virtual tens4ds d2Psi0_dC(FEMaterialPoint& mp, const vec3d& a0);
+
+	virtual double m(double P);
+	virtual double dm_dP(double P);
+	virtual double d2m_dP(double P);
+
+protected:
+	// damage model parameters
+	double	m_tinit;		// start time of damage
+	double	m_Dmax;			// max damage
+	double	m_beta_s;		// saturation parameter
+	double	m_gamma_max;	// saturation parameter
+	double	m_r_s, m_r_inf;
+
+	DECLARE_FECORE_CLASS();
 };
 
-class FEDamageFiberPower : public FEElasticFiberMaterial, public FEDamageInterface
+//=================================================================================================
+class FEDamageFiberPower : public FEDamageElasticFiber
 {
 public:
 	FEDamageFiberPower(FEModel* fem);
 
 	FEMaterialPoint* CreateMaterialPointData() override;
 
-	//! Strain energy density
-	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+protected:
+	double Psi0(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds dPsi0_dC(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds d2Psi0_dC(FEMaterialPoint& mp, const vec3d& a0) override;
 
-	// calculate stress in fiber direction a0
-	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
-
-	// Spatial tangent
-	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+	double m(double P) override;
+	double dm_dP(double P) override;
+	double d2m_dP(double P) override;
 
 public:
 	// fiber parameters
 	double	m_a1, m_a2, m_kappa;
 
-	// damage model parameters
-	double	m_tinit;		// start time of damage
-	double	m_Dmax;			// max damage
-	double	m_beta_s;		// saturation parameter
-	double	m_gamma_max;	// saturation parameter
-	double	m_r_s, m_r_inf;
-
 	DECLARE_FECORE_CLASS();
 };
 
-class FEDamageFiberExponential : public FEElasticFiberMaterial, public FEDamageInterface
+//=================================================================================================
+class FEDamageFiberExponential : public FEDamageElasticFiber
 {
 public:
 	FEDamageFiberExponential(FEModel* fem);
 
 	FEMaterialPoint* CreateMaterialPointData() override;
 
-	//! Strain energy density
-	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+protected:
+	double Psi0(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds dPsi0_dC(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds d2Psi0_dC(FEMaterialPoint& mp, const vec3d& a0) override;
 
-	// calculate stress in fiber direction a0
-	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
-
-	// Spatial tangent
-	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+	double m(double P) override;
+	double dm_dP(double P) override;
+	double d2m_dP(double P) override;
 
 public:
 	// fiber parameters
 	double	m_k1, m_k2, m_kappa;
 
-	// damage model parameters
-	double	m_tinit;		// start time of damage
-	double	m_Dmax;			// max damage
-	double	m_beta_s;		// saturation parameter
-	double	m_gamma_max;	// saturation parameter
-	double	m_r_s, m_r_inf;
-
 	DECLARE_FECORE_CLASS();
 };
 
-class FEBIOMECH_API FEContinuousElasticDamage : public FEElasticMaterial, public FEDamageInterface
+
+//=================================================================================================
+class FEDamageFiberExpLinear: public FEDamageElasticFiber
 {
 public:
-	FEContinuousElasticDamage(FEModel* fem);
+	FEDamageFiberExpLinear(FEModel* fem);
 
 	FEMaterialPoint* CreateMaterialPointData() override;
 
+protected:
+	double Psi0(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds dPsi0_dC(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds d2Psi0_dC(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	double m(double P) override;
+	double dm_dP(double P) override;
+	double d2m_dP(double P) override;
+
 public:
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
-
-	mat3ds Stress(FEMaterialPoint& pt) override;
-
-	tens4ds Tangent(FEMaterialPoint& mp) override;
-
-private:
-	mat3ds MatrixStress(FEMaterialPoint& mp);
-	tens4ds MatrixTangent(FEMaterialPoint& mp);
-
-private:
-	// matrix parameters
-	double		m_c1;
-	double		m_k;
-	FEParamVec3		m_fiber;
-
-	// fiber parameters
-	FEDamageFiberPower	m_fib;
+	double	m_c3;
+	double	m_c4;
+	double	m_c5;
+	double	m_lamax;
 
 	DECLARE_FECORE_CLASS();
 };

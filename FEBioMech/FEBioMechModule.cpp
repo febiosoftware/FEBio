@@ -300,9 +300,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelastic, "trans-iso hyperelastic");
-	REGISTER_FECORE_CLASS(FEContinuousElasticDamage, "continuous elastic damage");
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
 	REGISTER_FECORE_CLASS(FEDamageFiberExponential, "damage fiber exponential");
+	REGISTER_FECORE_CLASS(FEDamageFiberExpLinear, "damage fiber exp-linear");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
