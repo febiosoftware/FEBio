@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,28 +27,33 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FECore/FEModelLoad.h"
 
-class FEGasserOgdenHolzapfelUC : public FEUncoupledMaterial
+//-----------------------------------------------------------------------------
+//! a follower force on a rigid body
+class FERigidFollowerForce : public FEModelLoad
 {
 public:
-    double	m_c;			// neo-Hookean c coefficient
-    double	m_k1,m_k2;		// fiber material constants
-    double	m_kappa;		// structure coefficient
-    double	m_g;			// fiber angle
-    
+    //! constructor
+    FERigidFollowerForce(FEModel* pfem);
+
+    //! initialization
+    bool Init() override;
+
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
+    //! Residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+    //! Stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+
 public:
-    FEGasserOgdenHolzapfelUC(FEModel* pfem) : FEUncoupledMaterial(pfem) { m_npmodel = 3; }
-    
-    //! calculate deviatoric stress at material point
-    mat3ds DevStress(FEMaterialPoint& pt) override;
-    
-    //! calculate deviatoric tangent stiffness at material point
-    tens4ds DevTangent(FEMaterialPoint& pt) override;
-    
-    //! calculate deviatoric strain energy density at material point
-    double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
-    
-    // declare parameter list
+    int     m_rid;      //!< rigid body ID
+    vec3d   m_X;        //!< coordinates of attachements in reference state
+    vec3d   m_f;        //!< force
+    bool    m_brelative;        //!< if active, the ra0 and rb0 are relative w.r.t. the COM
+
     DECLARE_FECORE_CLASS();
 };

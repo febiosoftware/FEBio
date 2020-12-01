@@ -79,6 +79,7 @@ public:
             case 0: return 0.5*m_K*pow(log(J),2); break;    // FEBio default
             case 1: return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); break;    // NIKE3D's Ogden material
             case 2: return 0.5*m_K*(J-1)*(J-1); break;      // ABAQUS
+            case 3: return 0.5*m_K*((J*J-1)/2-log(J)); break;      // ABAQUS - GOH
             default: { assert(false); return 0; }
         }
     }
@@ -88,6 +89,7 @@ public:
             case 0: return m_K*log(J)/J; break;
             case 1: return 0.5*m_K*(J - 1.0/J); break;
             case 2: return m_K*(J-1); break;
+            case 3: return 0.5*m_K*(J-1.0/J); break;
 			default: { assert(false); return 0; }
 		}
     }
@@ -98,6 +100,7 @@ public:
             case 0: return m_K*(1-log(J))/(J*J); break;
             case 1: return 0.5*m_K*(1 + 1.0/(J*J)); break;
             case 2: return m_K; break;
+            case 3: return 0.5*m_K*(1+1.0/(J*J)); break;
 			default: { assert(false); return 0; }
 		}
     }
