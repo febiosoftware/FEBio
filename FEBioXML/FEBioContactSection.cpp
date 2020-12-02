@@ -28,6 +28,8 @@ SOFTWARE.*/
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include <FEBioMech/FERigidSlidingContact.h>
+#include <FEBioMech/FESlidingInterface.h>
+#include <FEBioMech/FEFacet2FacetSliding.h>
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
@@ -90,7 +92,19 @@ void FEBioContactSection2::Parse(XMLTag& tag)
 						ReadParameterList(tag, pc);
 						GetBuilder()->AddNonlinearConstraint(pc);
 					}
-					else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+					else
+					{
+						// check for some older obsolete names
+						if      (strcmp(sztype, "facet-to-facet sliding") == 0) pci = fecore_alloc(FEFacet2FacetSliding, &fem);
+						else if (strcmp(sztype, "sliding_with_gaps"     ) == 0) pci = fecore_alloc(FESlidingInterface, &fem);
+
+						if (pci)
+						{
+							GetBuilder()->AddContactInterface(pci);
+							ParseContactInterface(tag, pci);
+						}
+						else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+					}
 				}
 			}
 		}
@@ -128,6 +142,14 @@ void FEBioContactSection25::Parse(XMLTag& tag)
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
 				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(sztype, &fem);
+
+				if (pci == nullptr)
+				{
+					// check for some older obsolete names
+					if      (strcmp(sztype, "facet-to-facet sliding") == 0) pci = fecore_alloc(FEFacet2FacetSliding, &fem);
+					else if (strcmp(sztype, "sliding_with_gaps"     ) == 0) pci = fecore_alloc(FESlidingInterface, &fem);
+				}
+
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);

@@ -724,6 +724,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype == 0) sztype = "const";
 
+			// ignore user type
+			if (sztype && (strcmp(sztype, "user") == 0)) return true;
+
 			// allocate valuator
 			FEMat3dValuator* val = fecore_new<FEMat3dValuator>(sztype, GetFEModel());
 			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);

@@ -29,12 +29,14 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
 #include <FEBioMech/FEPointBodyForce.h>
+#include <FEBioMech/FEPressureLoad.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>
+#include <FECore/log.h>
 
 //=============================================================================
 // FEBioLoadsSection1x
@@ -629,7 +631,38 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 		psl->SetSurface(psurf);
 
 		// read the parameters
-		if (!tag.isleaf()) ReadParameterList(tag, psl);
+		if (!tag.isleaf())
+		{
+			++tag;
+			do
+			{
+				if (ReadParameter(tag, psl, 0, 0) == false)
+				{
+					if ((tag == "value") && (dynamic_cast<FEPressureLoad*>(psl)))
+					{
+						feLogWarningEx((&fem), "The value parameter of the pressure load is deprecated.");
+
+						FEParam* pp = psl->GetParameter("pressure"); assert(pp);
+						FEParamDouble& val = pp->value<FEParamDouble>();
+
+						// NOTE: This will only work if the pressure was set to 1!!
+						const char* szsurfdata = tag.AttributeValue("surface_data", true);
+						if (szsurfdata)
+						{
+							GetBuilder()->AddMappedParameter(pp, psl, szsurfdata);
+						}
+						else
+						{
+							double v;
+							tag.value(v);
+							val = v;
+						}
+					}
+					else throw XMLReader::InvalidTag(tag);
+				}
+				++tag;
+			} while (!tag.isend());
+		}
 
 		// add it to the model
 		GetBuilder()->AddSurfaceLoad(psl);
