@@ -8150,23 +8150,35 @@ parameter, this option can also be used to only write results to the plotfile
 \end_layout
 
 \begin_layout LyX-Code
-<loadcurve id="1" type="step">
+<loadcontroller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout LyX-Code
-  <loadpoint>0,0</loadpoint>
+  <interpolate>STEP</interpolate>
 \end_layout
 
 \begin_layout LyX-Code
-  <loadpoint>0.5, 0.1</loadpoint>
+    <points>
 \end_layout
 
 \begin_layout LyX-Code
-  <loadpoint>1.0, 0.2</loadpoint>
+      <point>0,0</point>
 \end_layout
 
 \begin_layout LyX-Code
-</loadcurve>
+      <point>0.5, 0.1</point>
+\end_layout
+
+\begin_layout LyX-Code
+      <point>1.0, 0.2</point>
+\end_layout
+
+\begin_layout LyX-Code
+    </points>
+\end_layout
+
+\begin_layout LyX-Code
+</loadcontroller>
 \end_layout
 
 \begin_layout Standard
@@ -11363,7 +11375,7 @@ section allows users to define surfaces.
 \end_layout
 
 \begin_layout LyX-Code
-  <quad4 lid="1">1,2,3,4</quad4>
+  <quad4 id="1">1,2,3,4</quad4>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11570,11 +11582,11 @@ section defines a pair of surfaces that can be used to define surface-to-surface
 \end_layout
 
 \begin_layout LyX-Code
-  <primary surface="surface1"/>
+  <primary>surface1</primary>
 \end_layout
 
 \begin_layout LyX-Code
-  <secondary surface="surface2"/>
+  <secondary>surface2</secondary>
 \end_layout
 
 \begin_layout LyX-Code
@@ -13401,10 +13413,12 @@ fix
 \end_layout
 
 \begin_layout LyX-Code
-<bc type="fix" set="
+<bc type="fix" node_set="
 \shape italic
-nodeset
+\emph on
+set1
 \shape default
+\emph default
 ">
 \end_layout
 
@@ -13533,7 +13547,7 @@ The
 Rigid
 \emph default
  section is used to define all rigid constraints, rigid body initial kinematics,
- and rigid connectors, and rigid joints.
+ and rigid connectors.
  The motion of a point 
 \begin_inset Formula $\mathbf{x}$
 \end_inset
@@ -13566,7 +13580,8 @@ where
 \begin_inset Formula $\mathbf{z}\left(t\right)=\mathbf{R}\left(t\right)\cdot\mathbf{Z}$
 \end_inset
 
- is the distance of the point from the body's center of mass, and 
+ is the position vector of the point relative to the body's center of mass,
+ and 
 \begin_inset Formula $\mathbf{X}=\mathbf{r}\left(t_{0}\right)+\mathbf{Z}$
 \end_inset
 
@@ -13642,53 +13657,23 @@ where
 \end_layout
 
 \begin_layout Subsection
-Prescribed Rigid Body Degrees of Freedom
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Prescribed-Rigid-Body-DOFs"
-
-\end_inset
-
-
+Rigid Constraints
 \end_layout
 
 \begin_layout Standard
-Rigid bodies are initially unconstrained which means they can move in all
- three directions and can rotate about all three axes.
- To constrain the degrees of freedom of a rigid body you can use the 
-\shape italic
-rigid_body 
-\shape default
-element:
-\end_layout
-
-\begin_layout LyX-Code
-<rigid_body mat="<id>">
-\end_layout
-
-\begin_layout LyX-Code
-  <!-- constraints go here -->
-\end_layout
-
-\begin_layout LyX-Code
-</rigid_body>
+The rigid constraints section allows users to prescribe the kinematics,
+ forces, and moments applied to a single rigid body.
+ The particular constraint is defined via the 
+\emph on
+type 
+\emph default
+attribute.
+ 
 \end_layout
 
 \begin_layout Standard
-The 
-\shape italic
-mat 
-\shape default
-attribute defines the material (which must be rigid) that defines the rigid
- body.
-\end_layout
-
-\begin_layout Standard
-The following table lists the elements that can be defined in the 
-\shape italic
-rigid_body 
-\shape default
-element:
+The following rigid constraints can be defined.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -13698,7 +13683,7 @@ element:
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -13709,7 +13694,7 @@ element:
 \begin_layout Plain Layout
 
 \series bold
-Tag
+type
 \end_layout
 
 \end_inset
@@ -13721,7 +13706,72 @@ Tag
 
 \series bold
 Description
-\series default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+fix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fix one or more rigid degrees of freedom.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribe
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed the value of a rigid degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Apply a force (or moment) to a rigid degree of freedom.
  
 \end_layout
 
@@ -13729,11 +13779,93 @@ Description
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+initial_rigid_velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the initial velocity of the rigid body.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+initial_rigid_angular_velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the initial angular velocity of the rigid body
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fix Rigid Constraint
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+fix 
+\emph default
+rigid constraint fixes one or multiple rigid degrees of freedom.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-fixed
+
+\series bold
+parameters
 \end_layout
 
 \end_inset
@@ -13742,7 +13874,9 @@ fixed
 \begin_inset Text
 
 \begin_layout Plain Layout
-Degree of freedom is fixed 
+
+\series bold
+Description
 \end_layout
 
 \end_inset
@@ -13753,7 +13887,9 @@ Degree of freedom is fixed
 \begin_inset Text
 
 \begin_layout Plain Layout
-prescribed
+
+\emph on
+rb
 \end_layout
 
 \end_inset
@@ -13762,7 +13898,7 @@ prescribed
 \begin_inset Text
 
 \begin_layout Plain Layout
-Degree of freedom is prescribed by user 
+The rigid body's material ID (1)
 \end_layout
 
 \end_inset
@@ -13773,7 +13909,9 @@ Degree of freedom is prescribed by user
 \begin_inset Text
 
 \begin_layout Plain Layout
-force
+
+\emph on
+dofs
 \end_layout
 
 \end_inset
@@ -13782,7 +13920,8 @@ force
 \begin_inset Text
 
 \begin_layout Plain Layout
-A force is applied in direction of degree of freedom 
+The list of rigid degrees of freedom to fix.
+ (2) 
 \end_layout
 
 \end_inset
@@ -13800,11 +13939,948 @@ A force is applied in direction of degree of freedom
 \end_layout
 
 \begin_layout Standard
-All these tags require the 
-\shape italic
-bc 
-\shape default
-attribute which defines the degree of freedom that will be constrained.
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+id
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The values allowed for the 
+\emph on
+dofs 
+\emph default
+parameter are: Rx, Ry, Rz, Ru, Rv, Rw.
+ The first three (Rx, Ry, Rz) represent the displacement degrees of freedom.
+ The other three (Ru, Rv, Rw) are the rotational degrees of freedom.
+\end_layout
+
+\begin_layout Standard
+The following example fixes the displacement degrees of freedom.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_constraint type="fix">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>1</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <dofs>Rx,Ry,Rz</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Prescribe Rigid Constraint
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prescribe 
+\emph default
+rigid constraint prescribes the value of a rigid degree of freedom.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material ID.
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid degree of freedom to prescribe.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defines the value as relative or absolute.
+ (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+id
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Enumerate
+The values allowed for the 
+\emph on
+dof 
+\emph default
+parameter are: Rx, Ry, Rz, Ru, Rv, Rw.
+ The first three (Rx, Ry, Rz) represent the displacement degrees of freedom.
+ The other three (Ru, Rv, Rw) are the rotational degrees of freedom.
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set, the value is taken relative to the dof value
+ at the start of the step.
+\end_layout
+
+\begin_layout Standard
+The following example prescribes the x-displacement degree of freedom.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_constraint type="prescribe">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>1</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>Rx</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Force Rigid Constraint
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+force 
+\emph default
+rigid constraint applies a load directly to the rigid degree of freedom.
+ For a displacement degree of freedom, this is similar to applying a force
+ in the corresponding direction.
+ For a rotational degree of freedom, this is similar to applying a moment
+ to the corresponding direction.It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material ID.
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid degree of freedom to prescribe.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed force value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+load_type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defines the type of load.
+ (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+id
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Enumerate
+The values allowed for the 
+\emph on
+dof 
+\emph default
+parameter are: Rx, Ry, Rz, Ru, Rv, Rw.
+ The first three (Rx, Ry, Rz) represent the displacement degrees of freedom.
+ The other three (Ru, Rv, Rw) are the rotational degrees of freedom.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The load_type allows the following values:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+0 = a load (force/moment) is applied directly to the degree of freedom.
+ 
+\end_layout
+
+\begin_layout Enumerate
+1 = a follower load applied is applied to the rigid body.
+ The load is applied in the rigid body's coordinate system, so it rotates
+ with the rigid body.
+ This only works for Rx, Ry, Rz.
+ 
+\end_layout
+
+\begin_layout Enumerate
+2 = target load.
+ The load's value is ramped up from its initial value at the start of the
+ step, and ramped up linearly to the value specified in the 
+\emph on
+value 
+\emph default
+parameter.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+The following example applies a force in the x-direction.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_constraint type="force">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>1</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>Rx</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Initial Rigid Velocity
+\end_layout
+
+\begin_layout Standard
+In dynamic analysis, the initial velocity of a rigid body can be set via
+ the 
+\emph on
+initial_rigid_velocity
+\emph default
+ rigid constraint.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material ID.
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The initial velocity vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+id
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Standard
+The following example defines an initial velocity for a rigid body.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_constraint type="initial_rigid_velocity">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>1</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <value>1,0,0</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Initial Rigid Angular Velocity
+\end_layout
+
+\begin_layout Standard
+In dynamic analysis, the initial angular velocity of a rigid body can be
+ set via the 
+\emph on
+initial_rigid_angular_velocity
+\emph default
+ rigid constraint.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material ID.
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The initial angular velocity vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+id
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Standard
+The following example defines an initial angular velocity for a rigid body.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_constraint type="initial_angular_rigid_velocity">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>1</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <value>1,0,0</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_constraint>
+\end_layout
+
+\begin_layout Subsection
+Rigid Connectors
+\end_layout
+
+\begin_layout Standard
+The rigid connector section allows users to define different type of connections
+ between two rigid bodies.
+ The specific connector is defined via the 
+\emph on
+type 
+\emph default
+attribute.
+ 
+\end_layout
+
+\begin_layout Standard
+The rigid connectors fall into two categories.
+ The first category define different joints that contstrain the relative
+ motion of one rigid body with respect to the second one.
+ 
+\end_layout
+
+\begin_layout Standard
+Rigid joints produce nonlinear constraints between rigid bodies, which prevent
+ relative motion except along the degrees of freedom of the joint.
+ The term `rigid' refers to the bodies, not to the joints.
+ Each rigid joint needs to define two rigid bodies (
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b)$
+\end_inset
+
+, a joint origin common to both bodies, and a set of axes that determine
+ the relative orientation of the joint degrees of freedom.
+ These axes define orthonormal basis vectors 
+\begin_inset Formula $\left\{ \mathbf{e}_{1}^{a},\mathbf{e}_{2}^{a},\mathbf{e}_{3}^{a}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \mathbf{e}_{1}^{b},\mathbf{e}_{2}^{b},\mathbf{e}_{3}^{b}\right\} $
+\end_inset
+
+ on each rigid body, with both bases being coincident, 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+, at the start of the analysis, and given in world coordinates.
+\end_layout
+
+\begin_layout Standard
+The rigid joint nonlinear constraints produce reaction forces and moments
+ that are enforced with penalty parameters and Lagrange multipliers.
+ The penalty parameters, 
+\emph on
+force_penalty
+\emph default
+ and 
+\emph on
+moment_penalty
+\emph default
+, may be conceptualized as stiffnesses of linear/torsional springs that
+ prevent relative translations/rotations of the rigid bodies along degrees
+ of freedom that must remain constrained for that joint.
+ The penalty values should be selected based on a rough estimation of the
+ maximum reactions forces and moments acting at these joints, divided by
+ the maximum amount of linear/angular separation that your analysis can
+ tolerate for that joint.
+ Alternatively, set the 
+\emph on
+force_penalty
+\emph default
+ and 
+\emph on
+moment_penalty
+\emph default
+ parameters to 1 and turn on the 
+\emph on
+auto_penalty
+\emph default
+; this setting will automatically adjust the 
+\emph on
+force_penalty
+\emph default
+ and 
+\emph on
+moment_penalty
+\emph default
+ to an appropriate value.
+\end_layout
+
+\begin_layout Standard
+The augmented Lagrangian method is used by default, where the joint reaction
+ force and moment are treated as Lagrange multipliers, augmented at each
+ time step by the product of the force/moment penalty parameter and the
+ linear/angular gap.
+ Use the parameter 
+\emph on
+maxaug
+\emph default
+ to control the maximum allowable number of augmentations at each time step
+ (
+\emph on
+maxaug
+\emph default
+=0 produces the penalty method); use a non-zero value for the parameter
+ 
+\emph on
+minaug
+\emph default
+ to ensure a minimum number of augmentations.
+ Augmentations will proceed until the relative change in the reaction force/mome
+nt magnitude is less than 
+\emph on
+tolerance
+\emph default
+, and/or the linear gap is less than 
+\emph on
+gaptol
+\emph default
+, and/or the angular gap is less than 
+\emph on
+angtol
+\emph default
+.
+ Setting any of these parameters to zero disables that check.
+\end_layout
+
+\begin_layout Standard
+The nonlinear constraints that enforce these joints produce a non-symmetric
+ stiffness matrix.
+ Therefore, when using rigid joints, use the analysis setting for a non-symmetri
+c formulation, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Parameters-Solid-Analysis"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The following rigid joints can be defined.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -13825,7 +14901,7 @@ attribute which defines the degree of freedom that will be constrained.
 \begin_layout Plain Layout
 
 \series bold
-Bc
+type
 \end_layout
 
 \end_inset
@@ -13837,7 +14913,72 @@ Bc
 
 \series bold
 Description
-\series default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid spherical joint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Connect rigid bodies at point.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid revolute joint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rotation about a single prescribed axis
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid prismatic joint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Translation along a single prescribed axis.
  
 \end_layout
 
@@ -13845,168 +14986,66 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-x
+
+\emph on
+rigid cylindrical joint
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Constrain the 
-\begin_inset Formula $x-$
-\end_inset
-
-component of the center of mass position 
-\begin_inset Formula $\mathbf{r}$
-\end_inset
-
-
+Rotation and translation about prescribed axis.
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-y
+
+\emph on
+rigid planar joint
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Constrain the 
-\begin_inset Formula $y-$
-\end_inset
-
-component of the center of mass position 
-\begin_inset Formula $\mathbf{r}$
-\end_inset
-
-
+2D plane translation and rotation about normal.
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-z
+
+\emph on
+rigid lock
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Constrain the 
-\begin_inset Formula $z-$
-\end_inset
-
-component of the center of mass position 
-\begin_inset Formula $\mathbf{r}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Rx
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Constrain the 
-\begin_inset Formula $x-$
-\end_inset
-
-component of the material rotation 
-\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Ry
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Constrain the 
-\begin_inset Formula $y-$
-\end_inset
-
-component of the material rotation 
-\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Rz
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Constrain the 
-\begin_inset Formula $z-$
-\end_inset
-
-component of the material rotation 
-\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
-\end_inset
-
-
+Prevent any relative motion between rigid bodies.
 \end_layout
 
 \end_inset
@@ -14017,6 +15056,10 @@ component of the material rotation
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset VSpace defskip
 \end_inset
 
@@ -14024,134 +15067,3790 @@ component of the material rotation
 \end_layout
 
 \begin_layout Standard
-If the tag is 
-\shape italic
-prescribed
-\shape default
- or 
-\shape italic
-force
-\shape default
- then the 
-\shape italic
-lc 
-\shape default
-attribute can be used to specify a load curve defining the amplitude of
- the displacement or force.
- The value is then interpreted as a scale factor.
- For all other types the value is ignored.
- The syntax and interpretation is the same for the other translation and
- rotation codes.
+The second category of connectors apply a force on the rigid bodies that
+ is proportional to some relative motion.
+ The term `rigid' refers to the bodies, not to the connectors.
 \end_layout
 
 \begin_layout Standard
-When the type is 
+The following rigid connectors can be defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid spring
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applies a spring that connects the two rigid bodies.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid damper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applies a damper based on relative linear velocity.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid angular damper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applies a damper based on relative angular velocity.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid contractile force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Constant contractile force between rigid bodies.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid planar joint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2D plane translation and rotation about normal.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid lock
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prevent any relative motion between rigid bodies.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All of these joints and connectors define two parameters that reference
+ the two rigid bodies.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+body_a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The first rigid body in the connector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+body_b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The second rigid body in the connector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition, the joints definde above are all based on the Augmented Lagrangian
+ method, and consequently, also share the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+laugon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Augmentation flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+tolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specifies the augmentation tolerance
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+minaug
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The minimum number of augmentations.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+maxaug
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The maximum number of augmentations.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+gaptol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gap tolerance
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+angtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Angular separation tolerance
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Penalty factor applied to force augmentations.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Penalty factor applied to moment augmentations.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+auto_penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag to calculate penalty factor automatically.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Additional parameters, unique to a specific connector, are defined in the
+ sections below.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Spherical Joint
+\end_layout
+
+\begin_layout Standard
+A rigid spherical joint connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ at a point in space, allowing three degrees of freedom for rotation about
+ that point.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_origin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The position of the joint.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed rotation flag.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The x-component of the prescribed rotation.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The y-component of the prescribed rotation.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation_z
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The z-component of the prescribed rotation.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+X-component of applied moment 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Y-component of applied moment 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment_z
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Z-component of applied moment 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
 \shape italic
-force
+tolerance 
 \shape default
-, the force is applied at the center of mass for translational degrees of
- freedom and torque is applied around the center of mass for rotational
- degrees of freedom.
- The center of mass of a rigid body is either specified in the material
- definition or calculated automatically by FEBio.
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ Setting either of these elements to zero disables the enforcement of that
+ tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint (the origin of the basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+rotation_axis 
+\shape default
+element defines the orientation of the joint rotation axis in world coordinates
+ at the start of the analysis.
+\end_layout
+
+\begin_layout Standard
+Optionally, the rotation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_rotation>1</prescribed_rotation>
+\end_layout
+
+\begin_layout LyX-Code
+<rotation_x lc="1">1</rotation_x>
+\end_layout
+
+\begin_layout LyX-Code
+<rotation_y lc="2">1</rotation_y>
+\end_layout
+
+\begin_layout LyX-Code
+<rotation_z>0</rotation_z>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+prescribed_rotation
+\shape default
+ element is a flag that indicates that the motion of the joint is prescribed
+ (1 for prescribed, 0 for free).
+ The 
+\shape italic
+rotation_x
+\shape default
+, 
+\shape italic
+rotation_y
+\shape default
+ and 
+\shape italic
+rotation_z
+\shape default
+ elements specify the components 
+\begin_inset Formula $\left(\theta_{1},\theta_{2},\theta_{3}\right)$
+\end_inset
+
+ of rotation (with units of radians), with optional associated load curves.
+ The rotation occurs about the axis directed along 
+\begin_inset Formula $\theta_{1}\mathbf{e}_{1}^{a}+\theta_{2}\mathbf{e}_{2}^{a}+\theta_{3}\mathbf{e}_{3}^{a}$
+\end_inset
+
+, with a magnitude 
+\begin_inset Formula $\sqrt{\theta_{1}^{2}+\theta_{2}^{2}+\theta_{3}^{2}}$
+\end_inset
+
+.
+ Either all or none of the rotation components must be prescribed, since
+ all rotation components are needed to define a rotation tensor.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces tracking of the prescribed rotations between the two bodies.
+\end_layout
+
+\begin_layout Standard
+Optionally, moments may be prescribed on body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+, about the world coordinate axes, using the additional tag
+\end_layout
+
+\begin_layout LyX-Code
+<moment_x lc="3">1.e-3</moment_x>
+\end_layout
+
+\begin_layout LyX-Code
+<moment_y lc="4">3.e-3</moment_y>
+\end_layout
+
+\begin_layout LyX-Code
+<moment_z lc="5">2.e-3</moment_z>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+moment
+\shape default
+ elements specify the components of the moment vector in world coordinates,
+ with optional associated load curves.
+ The 
+\shape italic
+moment
+\shape default
+ elements should not be used simultaneously with a prescribed rotation.
 \end_layout
 
 \begin_layout Standard
 
-\shape italic
+\emph on
 Example:
 \end_layout
 
 \begin_layout LyX-Code
-<rigid_body mat="1">
+<constraint type="rigid spherical joint" name="Joint01">
 \end_layout
 
 \begin_layout LyX-Code
-  <prescribed bc="x" lc"1">2.0</prescribed>
+  <tolerance>0.1</tolerance>
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="y"/>
+  <gaptol>0</gaptol>
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="z"/>
+  <force_penalty>1e0</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="Rx"/>
+  <auto_penalty>1</auto_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="Ry"/>
+  <body_a>1</body_a>
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="Rz"/>
+  <body_b>2</body_b>
 \end_layout
 
 \begin_layout LyX-Code
-</rigid_body>
+  <joint_origin>0,0,0</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Revolute Joint
 \end_layout
 
 \begin_layout Standard
-In this example the rigid body that corresponds to material definition 
-\shape italic
-1 
-\shape default
-has a prescribed displacement defined for the 
-\begin_inset Formula $x$
-\end_inset
-
-degree of freedom and has all other degrees of freedom fixed.
-\end_layout
-
-\begin_layout Standard
-A force (torque) can be applied at the center of mass by setting the 
-\shape italic
-type 
-\shape default
-attribute to 
-\shape italic
-force
-\shape default
-.
- Note that specifying a force (torque) will automatically free the corresponding
- translational (rotational) degree of freedom.
- For example, applying a force in the 
-\begin_inset Formula $x$
-\end_inset
-
--direction while keeping the 
-\begin_inset Formula $y$
+The rigid revolute joint connector allows the user to connect two rigid
+ bodies 
+\begin_inset Formula $a$
 \end_inset
 
  and 
-\begin_inset Formula $z$
+\begin_inset Formula $b$
 \end_inset
 
-directions fixed and the rotational degrees of freedom free, can be done
- as follows:
+ at a point in space and allow rotation about a single prescribed axis.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_origin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The position of the joint.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rotation axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+transverse_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The transverse axis.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed rotation flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed rotation around axis.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applied moment about axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+tolerance 
+\shape default
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ The 
+\shape italic
+angtol
+\shape default
+ element defines the tolerance for angular separation of the joint axis
+ on the two bodies (in units of radians).
+ Setting any of these three elements to zero disables the enforcement of
+ that tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces parallelism of the joint axis on the two bodies.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint origin (the origin of the basis
+ 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+rotation_axis 
+\shape default
+element defines the orientation of the joint rotation axis 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+\end_layout
+
+\begin_layout Standard
+Optionally, the rotation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed using the additional tags
 \end_layout
 
 \begin_layout LyX-Code
-<rigid_body mat="1" >
+<prescribed_rotation>1</prescribed_rotation>
 \end_layout
 
 \begin_layout LyX-Code
-  <force bc="x" lc="1">1.0</force>
+<rotation lc="1">3.14159</rotation>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+prescribed_rotation
+\shape default
+ element is a flag that indicates that the motion of the joint is prescribed
+ (1 for prescribed, 0 for free).
+ The 
+\shape italic
+rotation
+\shape default
+ element specifies the amount of rotation (with units of radians) with an
+ optional associated load curve.
+\end_layout
+
+\begin_layout Standard
+Optionally, a moment may be prescribed on body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+, about the joint axis, using the additional tag
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="y"/>
+<moment lc="1">5.e-3</moment>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+moment
+\shape default
+ element specifies the magnitude of the moment, with an optional associated
+ load curve.
+ The 
+\shape italic
+moment
+\shape default
+ element should not be used simultaneously with a prescribed rotation.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <fixed bc="z"/>
+<constraint type="rigid revolute joint" name="Joint 1">
 \end_layout
 
 \begin_layout LyX-Code
-</rigid_body>
+  <tolerance>0</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <gaptol>1e-4</gaptol>
+\end_layout
+
+\begin_layout LyX-Code
+  <angtol>1e-4</angtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_penalty>1e0</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>3</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_origin>-150,0,2</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+  <rotation_axis>0,0,1</rotation_axis>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Prismatic Joint
+\end_layout
+
+\begin_layout Standard
+The rigid prismatic joint connector allows the user to connect two rigid
+ bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ at a point in space and allow translation along a single prescribed axis.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_origin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The position of the joint.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+translation_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The translation axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+transverse_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The transverse axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_translation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+translation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation along axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applied force along axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+tolerance 
+\shape default
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ The 
+\shape italic
+angtol
+\shape default
+ element defines the tolerance for angular separation of the joint axis
+ on the two bodies (in units of radians).
+ Setting any of these three elements to zero disables the enforcement of
+ that tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces parallelism of the joint axis on the two bodies.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint (the origin of the basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+translation_axis 
+\shape default
+element defines the orientation 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ of the joint translation axis in world coordinates at the start of the
+ analysis.
+\end_layout
+
+\begin_layout Standard
+Optionally, the translation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_translation>1</prescribed_translation>
+\end_layout
+
+\begin_layout LyX-Code
+<translation lc="1">5.0</translation>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+prescribed_translation
+\shape default
+ element is a flag that indicates that the motion of the joint is prescribed
+ (1 for prescribed, 0 for free).
+ The 
+\shape italic
+translation
+\shape default
+ element specifies the amount of translation (with units of length) with
+ an optional associated load curve.
+\end_layout
+
+\begin_layout Standard
+Optionally, a force may be prescribed on body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+, along the joint axis using the additional tag
+\end_layout
+
+\begin_layout LyX-Code
+<force lc="1">5.e-3</force>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+force
+\shape default
+ element specifies the magnitude of the force, with an optional associated
+ load curve.
+ The 
+\shape italic
+force
+\shape default
+ element should not be used simultaneously with a prescribed translation.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid prismatic joint" name="Joint02 ">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <gaptol>1e-4</gaptol>
+\end_layout
+
+\begin_layout LyX-Code
+  <angtol>1e-4</angtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_penalty>1e0</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>4</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>1</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_origin>-150,0,2</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+  <translation_axis>1,0,0</translation_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <prescribed_translation>150</prescribed_translation>
+\end_layout
+
+\begin_layout LyX-Code
+  <translation lc="1">1</translation>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Cylindrical Joint
+\end_layout
+
+\begin_layout Standard
+A rigid cylindrical joint connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ at a point in space, allowing one degree of freedom for rotation about
+ an axis through that point, and another degree of freedom for translation
+ along that axis.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_origin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The position of the joint.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The joint axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+transverse_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The transverse axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_translation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+translation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation along axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applied force along axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed rotation flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed rotation around axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Applied moment about axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+tolerance 
+\shape default
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ The 
+\shape italic
+angtol
+\shape default
+ element defines the tolerance for angular separation of the joint axis
+ on the two bodies (in units of radians).
+ Setting any of these three elements to zero disables the enforcement of
+ that tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces parallelism of the joint axis on the two bodies.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint (the origin of the basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+joint_axis 
+\shape default
+element defines the orientation 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ of the joint rotation and translation axis in world coordinates at the
+ start of the analysis.
+\end_layout
+
+\begin_layout Standard
+Optionally, the rotation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_rotation>1</prescribed_rotation>
+\end_layout
+
+\begin_layout LyX-Code
+<rotation lc="1">1.570796327</rotation>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+prescribed_rotation
+\shape default
+ element is a flag that indicates that the motion of the joint is prescribed
+ (1 for prescribed, 0 for free).
+ The 
+\shape italic
+rotation
+\shape default
+ element specifies the amount of rotation (with units of radians) with an
+ optional associated load curve.
+\end_layout
+
+\begin_layout Standard
+Optionally, the translation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_translation>1</prescribed_translation>
+\end_layout
+
+\begin_layout LyX-Code
+<translation lc="2">10.0</translation>
+\end_layout
+
+\begin_layout Standard
+Optionally, a moment may be prescribed about the joint axis using the additional
+ tag
+\end_layout
+
+\begin_layout LyX-Code
+<moment lc="1">5.e-3</moment>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+moment
+\shape default
+ element specifies the magnitude of the moment, with an optional associated
+ load curve.
+ The 
+\shape italic
+moment
+\shape default
+ element should not be used simultaneously with a prescribed rotation.
+\end_layout
+
+\begin_layout Standard
+Optionally, a force may be prescribed along the joint axis using the additional
+ tag
+\end_layout
+
+\begin_layout LyX-Code
+<force lc="1">2.0</force>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+force
+\shape default
+ element specifies the magnitude of the force, with an optional associated
+ load curve.
+ The 
+\shape italic
+force
+\shape default
+ element should not be used simultaneously with a prescribed translation.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid cylindrical joint" name="Joint03">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <gaptol>1e-4</gaptol>
+\end_layout
+
+\begin_layout LyX-Code
+  <angtol>1e-4</angtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_penalty>1e0</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_origin>0,0,0</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_axis>0,0,1</joint_axis>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Planar Joint
+\end_layout
+
+\begin_layout Standard
+A rigid planar joint connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+, allowing one degree of freedom for rotation about the axis 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ through that point, and two degrees of freedom for translations in the
+ plane perpendicular to that axis, along 
+\begin_inset Formula $\mathbf{e}_{2}^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}_{3}^{a}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_origin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The position of the joint.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The joint axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+translation_axis_1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The first translation axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed rotation flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed rotation around axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_translation_1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation 1 flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+translation_1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation along axis 1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+prescribed_translation_2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation 2 flag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+translation_2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed translation along axis 2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+tolerance 
+\shape default
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ The 
+\shape italic
+angtol
+\shape default
+ element defines the tolerance for angular separation of the joint axes
+ on the two bodies (in units of radians).
+ Setting any of these three elements to zero disables the enforcement of
+ that tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating along the rotation
+ axis.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces parallelism of the joint rotation axis on the two bodies.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint (the origin of the basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+rotation_axis 
+\shape default
+element defines the orientation of the joint rotation axis 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ The 
+\shape italic
+translation_axis_1
+\shape default
+ element defines the orientation of the joint translation axis 
+\begin_inset Formula $\mathbf{e}_{2}^{a}$
+\end_inset
+
+ in the plane perpendicular to the joint rotation axis, in world coordinates
+ at the start of the analysis.
+\end_layout
+
+\begin_layout Standard
+Optionally, the rotation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_rotation>1</prescribed_rotation>
+\end_layout
+
+\begin_layout LyX-Code
+<rotation lc="1">1.570796327</rotation>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+prescribed_rotation
+\shape default
+ element is a flag that indicates that the motion of the joint is prescribed
+ (1 for prescribed, 0 for free).
+ The 
+\shape italic
+rotation
+\shape default
+ element specifies the amount of rotation (with units of radians) with an
+ optional associated load curve.
+\end_layout
+
+\begin_layout Standard
+Optionally, the translation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed along 
+\begin_inset Formula $\mathbf{e}_{2}^{a}$
+\end_inset
+
+ using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_translation_1>1</prescribed_translation_1>
+\end_layout
+
+\begin_layout LyX-Code
+<translation_1 lc="2">10.0</translation_1>
+\end_layout
+
+\begin_layout Standard
+Optionally, the translation of body 
+\begin_inset Formula $b$
+\end_inset
+
+ relative to body 
+\begin_inset Formula $a$
+\end_inset
+
+ may be prescribed along 
+\begin_inset Formula $\mathbf{e}_{3}^{a}$
+\end_inset
+
+ using the additional tags
+\end_layout
+
+\begin_layout LyX-Code
+<prescribed_translation_2>1</prescribed_translation_2>
+\end_layout
+
+\begin_layout LyX-Code
+<translation_2 lc="2">10.0</translation_2>
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid planar joint" name="Joint01">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <gaptol>1e-4</gaptol>
+\end_layout
+
+\begin_layout LyX-Code
+  <angtol>1e-4</angtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_penalty>1e0</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_origin>0,0,0</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+  <rotation_axis>0,-0.5,0.8660254</rotation_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <translation_axis_1>1,0,0</translation_axis_1>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Lock Joint
+\end_layout
+
+\begin_layout Standard
+A rigid lock connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+, preventing relative motion between them.
+ It requires the specification of a joint origin and two orthgonal axes
+ 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+joint_origin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The position of the joint.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+first_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The first axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+second_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The second axis.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+tolerance 
+\shape default
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ The 
+\shape italic
+angtol
+\shape default
+ element defines the tolerance for angular separation of the joint axes
+ on the two bodies (in units of radians).
+ Setting any of these three elements to zero disables the enforcement of
+ that tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating along the rotation
+ axis.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces parallelism of the joint rotation axis on the two bodies.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint (the origin of the basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+first_axis 
+\shape default
+element defines the orientation of the axis 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ The 
+\shape italic
+second_axis
+\shape default
+ element defines the orientation of the second axis 
+\begin_inset Formula $\mathbf{e}_{2}$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid lock" name="Joint01">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <gaptol>1e-4</gaptol>
+\end_layout
+
+\begin_layout LyX-Code
+  <angtol>1e-4</angtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_penalty>1e0</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment_penalty>1e0</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <auto_penalty>1</auto_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_origin>0,0,0</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+  <first_axis>1,0,0</first_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <second_axis>0,1,0</second_axis>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Spring
+\end_layout
+
+\begin_layout Standard
+The rigid spring applies a linear spring that connects two rigid bodies
+ 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ at arbitrary points (not necessarily nodes).
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+k
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring constant (in units of force per length)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion_a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Insertion point of the spring on body a
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion_b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Insection point of the spring on body b
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+free_length
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The length of the unloaded spring (1) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+If the free_length parameter is zero, then the initial length of the spring,
+ as defined by the two insertion points, is taken as the free length.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid spring">
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_a>0,0,1</insertion_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_b>0,0,3</insertion_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>1</k>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Damper
+\end_layout
+
+\begin_layout Standard
+The rigid damper applies a linear damper that connects two rigid bodies
+ 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ at arbitrary points (not necessarily nodes).
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Damping constant
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion_a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Insertion point of the spring on body a
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion_b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Insection point of the spring on body b
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid damper">
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_a>0,0,1</insertion_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_b>0,0,3</insertion_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <c>1e-7</c>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Angular Damper
+\end_layout
+
+\begin_layout Standard
+The rigid angular damper applies an angular damper that connects two rigid
+ bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Angular damping constant
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid angular damper">
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <c>1e-3</c>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Contractile Force
+\end_layout
+
+\begin_layout Standard
+The rigid contractile force applies an actuator force between arbitrary
+ points (not necessarily nodes) on two rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In addition to the shared parameters above, it defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+f0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The applied force (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion_a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Insertion point of the spring on body a
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion_b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Insection point of the spring on body b
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The f0 parameter represents the actuator force (positive for contraction).
+ Optionally, it may be associated with a load curve.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid contractile force">
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_a>0,0,1</insertion_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_b>0,0,3</insertion_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <f0 lc="1">1</f0>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
 \end_layout
 
 \begin_layout Section
@@ -16527,7 +21226,7 @@ This body force per mass
 
  may be spatially inhomogeneous.
  The spatial inhomogeneity may be specified using a formula with variables
- x, y, z.
+ X, Y, Z.
  For example:
 \end_layout
 
@@ -16536,15 +21235,15 @@ This body force per mass
 \end_layout
 
 \begin_layout LyX-Code
-  <x>x+y+z</x>
+  <x>X+Y+Z</x>
 \end_layout
 
 \begin_layout LyX-Code
-  <y>x-y-z</y>
+  <y>X-Y-Z</y>
 \end_layout
 
 \begin_layout LyX-Code
-  <z>x*x+z</z>
+  <z>X*X+Z</z>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21692,1786 +26391,6 @@ The Constraints section allows the user to enforce additional constraints
 \end_layout
 
 \begin_layout Subsection
-Rigid Joints
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Joints"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Rigid joints produce nonlinear constraints between rigid bodies, which prevent
- relative motion except along the degrees of freedom of the joint.
- The term `rigid' refers to the bodies, not to the joints.
- Each rigid joint needs to define two rigid bodies (
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b)$
-\end_inset
-
-, a joint origin common to both bodies, and a set of axes that determine
- the relative orientation of the joint degrees of freedom.
- These axes define orthonormal basis vectors 
-\begin_inset Formula $\left\{ \mathbf{e}_{1}^{a},\mathbf{e}_{2}^{a},\mathbf{e}_{3}^{a}\right\} $
-\end_inset
-
- and 
-\begin_inset Formula $\left\{ \mathbf{e}_{1}^{b},\mathbf{e}_{2}^{b},\mathbf{e}_{3}^{b}\right\} $
-\end_inset
-
- on each rigid body, with both bases being coincident, 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
-\end_inset
-
-, at the start of the analysis, and given in world coordinates.
-\end_layout
-
-\begin_layout Standard
-The rigid joint nonlinear constraints produce reaction forces and moments
- that are enforced with penalty parameters and Lagrange multipliers.
- The penalty parameters, 
-\emph on
-force_penalty
-\emph default
- and 
-\emph on
-moment_penalty
-\emph default
-, may be conceptualized as stiffnesses of linear/torsional springs that
- prevent relative translations/rotations of the rigid bodies along degrees
- of freedom that must remain constrained for that joint.
- The penalty values should be selected based on a rough estimation of the
- maximum reactions forces and moments acting at these joints, divided by
- the maximum amount of linear/angular separation that your analysis can
- tolerate for that joint.
- Alternatively, set the 
-\emph on
-force_penalty
-\emph default
- and 
-\emph on
-moment_penalty
-\emph default
- parameters to 1 and turn on the 
-\emph on
-auto_penalty
-\emph default
-; this setting will automatically adjust the 
-\emph on
-force_penalty
-\emph default
- and 
-\emph on
-moment_penalty
-\emph default
- to an appropriate value.
-\end_layout
-
-\begin_layout Standard
-The augmented Lagrangian method is used by default, where the joint reaction
- force and moment are treated as Lagrange multipliers, augmented at each
- time step by the product of the force/moment penalty parameter and the
- linear/angular gap.
- Use the parameter 
-\emph on
-maxaug
-\emph default
- to control the maximum allowable number of augmentations at each time step
- (
-\emph on
-maxaug
-\emph default
-=0 produces the penalty method); use a non-zero value for the parameter
- 
-\emph on
-minaug
-\emph default
- to ensure a minimum number of augmentations.
- Augmentations will proceed until the relative change in the reaction force/mome
-nt magnitude is less than 
-\emph on
-tolerance
-\emph default
-, and/or the linear gap is less than 
-\emph on
-gaptol
-\emph default
-, and/or the angular gap is less than 
-\emph on
-angtol
-\emph default
-.
- Setting any of these parameters to zero disables that check.
-\end_layout
-
-\begin_layout Standard
-The nonlinear constraints that enforce these joints produce a non-symmetric
- stiffness matrix.
- Therefore, when using rigid joints, use the analysis setting for a non-symmetri
-c formulation, see Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Parameters-Solid-Analysis"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Revolute Joint
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Revolute-Joint"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid revolute joint connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- at a point in space, allowing one degree of freedom for rotation about
- an axis through that point:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid revolute joint" name="Joint 1">
-\end_layout
-
-\begin_layout LyX-Code
-  <tolerance>0</tolerance>
-\end_layout
-
-\begin_layout LyX-Code
-  <gaptol>1e-4</gaptol>
-\end_layout
-
-\begin_layout LyX-Code
-  <angtol>1e-4</angtol>
-\end_layout
-
-\begin_layout LyX-Code
-  <force_penalty>1e0</force_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <moment_penalty>1e0</moment_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <auto_penalty>1</auto_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>3</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_origin>-150,0,2</joint_origin>
-\end_layout
-
-\begin_layout LyX-Code
-  <rotation_axis>0,0,1</rotation_axis>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-tolerance 
-\shape default
-element defines the augmentation tolerance.
- That is, when the relative change in the constraint forces and moments
- (the Lagrange multipliers) are less than this value.
- The 
-\shape italic
-gaptol
-\shape default
- element defines the tolerance for spatial separation of the joint origin
- on the two bodies (in units of length).
- The 
-\shape italic
-angtol
-\shape default
- element defines the tolerance for angular separation of the joint axis
- on the two bodies (in units of radians).
- Setting any of these three elements to zero disables the enforcement of
- that tolerance.
- The 
-\shape italic
-force_penalty
-\shape default
- parameter (with units of force per length) represents the stiffness that
- prevents the joint origin on the two bodies from separating.
- The 
-\shape italic
-moment_penalty
-\shape default
- parameter (with units of moment per radians) represents the torsional stiffness
- that enforces parallelism of the joint axis on the two bodies.
- The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-joint_origin 
-\shape default
-element defines the position of the joint origin (the origin of the basis
- 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
-\end_inset
-
- in world coordinates at the start of the analysis.
- Note that this point does not have to be inside or on the surface of either
- of the two bodies.
- The 
-\shape italic
-rotation_axis 
-\shape default
-element defines the orientation of the joint rotation axis 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- in world coordinates at the start of the analysis.
-\end_layout
-
-\begin_layout Standard
-Optionally, the rotation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_rotation>1</prescribed_rotation>
-\end_layout
-
-\begin_layout LyX-Code
-<rotation lc="1">3.14159</rotation>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-prescribed_rotation
-\shape default
- element is a flag that indicates that the motion of the joint is prescribed
- (1 for prescribed, 0 for free).
- The 
-\shape italic
-rotation
-\shape default
- element specifies the amount of rotation (with units of radians) with an
- optional associated load curve.
-\end_layout
-
-\begin_layout Standard
-Optionally, a moment may be prescribed on body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
-, about the joint axis, using the additional tag
-\end_layout
-
-\begin_layout LyX-Code
-<moment lc="1">5.e-3</moment>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-moment
-\shape default
- element specifies the magnitude of the moment, with an optional associated
- load curve.
- The 
-\shape italic
-moment
-\shape default
- element should not be used simultaneously with a prescribed rotation.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Prismatic Joint
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Prismatic-Joint"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid prismatic joint connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- at a point in space, allowing one degree of freedom for translation along
- an axis through that point:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid prismatic joint" name="Joint02 ">
-\end_layout
-
-\begin_layout LyX-Code
-  <tolerance>0</tolerance>
-\end_layout
-
-\begin_layout LyX-Code
-  <gaptol>1e-4</gaptol>
-\end_layout
-
-\begin_layout LyX-Code
-  <angtol>1e-4</angtol>
-\end_layout
-
-\begin_layout LyX-Code
-  <force_penalty>1e0</force_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <moment_penalty>1e0</moment_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <auto_penalty>1</auto_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>4</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>1</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_origin>-150,0,2</joint_origin>
-\end_layout
-
-\begin_layout LyX-Code
-  <translation_axis>1,0,0</translation_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  <prescribed_translation>150</prescribed_translation>
-\end_layout
-
-\begin_layout LyX-Code
-  <translation lc="1">1</translation>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-tolerance 
-\shape default
-element defines the augmentation tolerance.
- That is, when the relative change in the constraint forces and moments
- (the Lagrange multipliers) are less than this value.
- The 
-\shape italic
-gaptol
-\shape default
- element defines the tolerance for spatial separation of the joint origin
- on the two bodies (in units of length).
- The 
-\shape italic
-angtol
-\shape default
- element defines the tolerance for angular separation of the joint axis
- on the two bodies (in units of radians).
- Setting any of these three elements to zero disables the enforcement of
- that tolerance.
- The 
-\shape italic
-force_penalty
-\shape default
- parameter (with units of force per length) represents the stiffness that
- prevents the joint origin on the two bodies from separating.
- The 
-\shape italic
-moment_penalty
-\shape default
- parameter (with units of moment per radians) represents the torsional stiffness
- that enforces parallelism of the joint axis on the two bodies.
- The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-joint_origin 
-\shape default
-element defines the position of the joint (the origin of the basis 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
-\end_inset
-
- in world coordinates at the start of the analysis.
- Note that this point does not have to be inside or on the surface of either
- of the two bodies.
- The 
-\shape italic
-translation_axis 
-\shape default
-element defines the orientation 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- of the joint translation axis in world coordinates at the start of the
- analysis.
-\end_layout
-
-\begin_layout Standard
-Optionally, the translation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_translation>1</prescribed_translation>
-\end_layout
-
-\begin_layout LyX-Code
-<translation lc="1">5.0</translation>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-prescribed_translation
-\shape default
- element is a flag that indicates that the motion of the joint is prescribed
- (1 for prescribed, 0 for free).
- The 
-\shape italic
-translation
-\shape default
- element specifies the amount of translation (with units of length) with
- an optional associated load curve.
-\end_layout
-
-\begin_layout Standard
-Optionally, a force may be prescribed on body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
-, along the joint axis using the additional tag
-\end_layout
-
-\begin_layout LyX-Code
-<force lc="1">5.e-3</force>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-force
-\shape default
- element specifies the magnitude of the force, with an optional associated
- load curve.
- The 
-\shape italic
-force
-\shape default
- element should not be used simultaneously with a prescribed translation.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Cylindrical Joint
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Cylindrical-Joint"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid cylindrical joint connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- at a point in space, allowing one degree of freedom for rotation about
- an axis through that point, and another degree of freedom for translation
- along that axis:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid cylindrical joint" name="Joint03">
-\end_layout
-
-\begin_layout LyX-Code
-  <tolerance>0</tolerance>
-\end_layout
-
-\begin_layout LyX-Code
-  <gaptol>1e-4</gaptol>
-\end_layout
-
-\begin_layout LyX-Code
-  <angtol>1e-4</angtol>
-\end_layout
-
-\begin_layout LyX-Code
-  <force_penalty>1e0</force_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <moment_penalty>1e0</moment_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <auto_penalty>1</auto_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_origin>0,0,0</joint_origin>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_axis>0,0,1</joint_axis>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-tolerance 
-\shape default
-element defines the augmentation tolerance.
- That is, when the relative change in the constraint forces and moments
- (the Lagrange multipliers) are less than this value.
- The 
-\shape italic
-gaptol
-\shape default
- element defines the tolerance for spatial separation of the joint origin
- on the two bodies (in units of length).
- The 
-\shape italic
-angtol
-\shape default
- element defines the tolerance for angular separation of the joint axis
- on the two bodies (in units of radians).
- Setting any of these three elements to zero disables the enforcement of
- that tolerance.
- The 
-\shape italic
-force_penalty
-\shape default
- parameter (with units of force per length) represents the stiffness that
- prevents the joint origin on the two bodies from separating.
- The 
-\shape italic
-moment_penalty
-\shape default
- parameter (with units of moment per radians) represents the torsional stiffness
- that enforces parallelism of the joint axis on the two bodies.
- The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-joint_origin 
-\shape default
-element defines the position of the joint (the origin of the basis 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
-\end_inset
-
- in world coordinates at the start of the analysis.
- Note that this point does not have to be inside or on the surface of either
- of the two bodies.
- The 
-\shape italic
-joint_axis 
-\shape default
-element defines the orientation 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- of the joint rotation and translation axis in world coordinates at the
- start of the analysis.
-\end_layout
-
-\begin_layout Standard
-Optionally, the rotation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_rotation>1</prescribed_rotation>
-\end_layout
-
-\begin_layout LyX-Code
-<rotation lc="1">1.570796327</rotation>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-prescribed_rotation
-\shape default
- element is a flag that indicates that the motion of the joint is prescribed
- (1 for prescribed, 0 for free).
- The 
-\shape italic
-rotation
-\shape default
- element specifies the amount of rotation (with units of radians) with an
- optional associated load curve.
-\end_layout
-
-\begin_layout Standard
-Optionally, the translation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_translation>1</prescribed_translation>
-\end_layout
-
-\begin_layout LyX-Code
-<translation lc="2">10.0</translation>
-\end_layout
-
-\begin_layout Standard
-Optionally, a moment may be prescribed about the joint axis using the additional
- tag
-\end_layout
-
-\begin_layout LyX-Code
-<moment lc="1">5.e-3</moment>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-moment
-\shape default
- element specifies the magnitude of the moment, with an optional associated
- load curve.
- The 
-\shape italic
-moment
-\shape default
- element should not be used simultaneously with a prescribed rotation.
-\end_layout
-
-\begin_layout Standard
-Optionally, a force may be prescribed along the joint axis using the additional
- tag
-\end_layout
-
-\begin_layout LyX-Code
-<force lc="1">2.0</force>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-force
-\shape default
- element specifies the magnitude of the force, with an optional associated
- load curve.
- The 
-\shape italic
-force
-\shape default
- element should not be used simultaneously with a prescribed translation.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Spherical Joint
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Spherical-Joint"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid spherical joint connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- at a point in space, allowing three degrees of freedom for rotation about
- that point:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid spherical joint" name="Joint01">
-\end_layout
-
-\begin_layout LyX-Code
-  <tolerance>0.1</tolerance>
-\end_layout
-
-\begin_layout LyX-Code
-  <gaptol>0</gaptol>
-\end_layout
-
-\begin_layout LyX-Code
-  <force_penalty>1e0</force_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <auto_penalty>1</auto_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_origin>0,0,0</joint_origin>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-tolerance 
-\shape default
-element defines the augmentation tolerance.
- That is, when the relative change in the constraint forces and moments
- (the Lagrange multipliers) are less than this value.
- The 
-\shape italic
-gaptol
-\shape default
- element defines the tolerance for spatial separation of the joint origin
- on the two bodies (in units of length).
- Setting either of these elements to zero disables the enforcement of that
- tolerance.
- The 
-\shape italic
-force_penalty
-\shape default
- parameter (with units of force per length) represents the stiffness that
- prevents the joint origin on the two bodies from separating.
- The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-joint_origin 
-\shape default
-element defines the position of the joint (the origin of the basis 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
-\end_inset
-
- in world coordinates at the start of the analysis.
- Note that this point does not have to be inside or on the surface of either
- of the two bodies.
- The 
-\shape italic
-rotation_axis 
-\shape default
-element defines the orientation of the joint rotation axis in world coordinates
- at the start of the analysis.
-\end_layout
-
-\begin_layout Standard
-Optionally, the rotation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<moment_penalty>1e0</moment_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_rotation>1</prescribed_rotation>
-\end_layout
-
-\begin_layout LyX-Code
-<rotation_x lc="1">1</rotation_x>
-\end_layout
-
-\begin_layout LyX-Code
-<rotation_y lc="2">1</rotation_y>
-\end_layout
-
-\begin_layout LyX-Code
-<rotation_z>0</rotation_z>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-prescribed_rotation
-\shape default
- element is a flag that indicates that the motion of the joint is prescribed
- (1 for prescribed, 0 for free).
- The 
-\shape italic
-rotation_x
-\shape default
-, 
-\shape italic
-rotation_y
-\shape default
- and 
-\shape italic
-rotation_z
-\shape default
- elements specify the components 
-\begin_inset Formula $\left(\theta_{1},\theta_{2},\theta_{3}\right)$
-\end_inset
-
- of rotation (with units of radians), with optional associated load curves.
- The rotation occurs about the axis directed along 
-\begin_inset Formula $\theta_{1}\mathbf{e}_{1}^{a}+\theta_{2}\mathbf{e}_{2}^{a}+\theta_{3}\mathbf{e}_{3}^{a}$
-\end_inset
-
-, with a magnitude 
-\begin_inset Formula $\sqrt{\theta_{1}^{2}+\theta_{2}^{2}+\theta_{3}^{2}}$
-\end_inset
-
-.
- Either all or none of the rotation components must be prescribed, since
- all rotation components are needed to define a rotation tensor.
- The 
-\shape italic
-moment_penalty
-\shape default
- parameter (with units of moment per radians) represents the torsional stiffness
- that enforces tracking of the prescribed rotations between the two bodies.
-\end_layout
-
-\begin_layout Standard
-Optionally, moments may be prescribed on body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
-, about the world coordinate axes, using the additional tag
-\end_layout
-
-\begin_layout LyX-Code
-<moment_x lc="3">1.e-3</moment_x>
-\end_layout
-
-\begin_layout LyX-Code
-<moment_y lc="4">3.e-3</moment_y>
-\end_layout
-
-\begin_layout LyX-Code
-<moment_z lc="5">2.e-3</moment_z>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-moment
-\shape default
- elements specify the components of the moment vector in world coordinates,
- with optional associated load curves.
- The 
-\shape italic
-moment
-\shape default
- elements should not be used simultaneously with a prescribed rotation.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Planar Joint
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Planar-Joint"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid planar joint connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
-, allowing one degree of freedom for rotation about the axis 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- through that point, and two degrees of freedom for translations in the
- plane perpendicular to that axis, along 
-\begin_inset Formula $\mathbf{e}_{2}^{a}$
-\end_inset
-
- and 
-\begin_inset Formula $\mathbf{e}_{3}^{a}$
-\end_inset
-
-:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid planar joint" name="Joint01">
-\end_layout
-
-\begin_layout LyX-Code
-  <tolerance>0</tolerance>
-\end_layout
-
-\begin_layout LyX-Code
-  <gaptol>1e-4</gaptol>
-\end_layout
-
-\begin_layout LyX-Code
-  <angtol>1e-4</angtol>
-\end_layout
-
-\begin_layout LyX-Code
-  <force_penalty>1e0</force_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <moment_penalty>1e0</moment_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <auto_penalty>1</auto_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_origin>0,0,0</joint_origin>
-\end_layout
-
-\begin_layout LyX-Code
-  <rotation_axis>0,-0.5,0.8660254</rotation_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  <translation_axis_1>1,0,0</translation_axis_1>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-tolerance 
-\shape default
-element defines the augmentation tolerance.
- That is, when the relative change in the constraint forces and moments
- (the Lagrange multipliers) are less than this value.
- The 
-\shape italic
-gaptol
-\shape default
- element defines the tolerance for spatial separation of the joint origin
- on the two bodies (in units of length).
- The 
-\shape italic
-angtol
-\shape default
- element defines the tolerance for angular separation of the joint axes
- on the two bodies (in units of radians).
- Setting any of these three elements to zero disables the enforcement of
- that tolerance.
- The 
-\shape italic
-force_penalty
-\shape default
- parameter (with units of force per length) represents the stiffness that
- prevents the joint origin on the two bodies from separating along the rotation
- axis.
- The 
-\shape italic
-moment_penalty
-\shape default
- parameter (with units of moment per radians) represents the torsional stiffness
- that enforces parallelism of the joint rotation axis on the two bodies.
- The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-joint_origin 
-\shape default
-element defines the position of the joint (the origin of the basis 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
-\end_inset
-
- in world coordinates at the start of the analysis.
- Note that this point does not have to be inside or on the surface of either
- of the two bodies.
- The 
-\shape italic
-rotation_axis 
-\shape default
-element defines the orientation of the joint rotation axis 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- in world coordinates at the start of the analysis.
- The 
-\shape italic
-translation_axis_1
-\shape default
- element defines the orientation of the joint translation axis 
-\begin_inset Formula $\mathbf{e}_{2}^{a}$
-\end_inset
-
- in the plane perpendicular to the joint rotation axis, in world coordinates
- at the start of the analysis.
-\end_layout
-
-\begin_layout Standard
-Optionally, the rotation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_rotation>1</prescribed_rotation>
-\end_layout
-
-\begin_layout LyX-Code
-<rotation lc="1">1.570796327</rotation>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-prescribed_rotation
-\shape default
- element is a flag that indicates that the motion of the joint is prescribed
- (1 for prescribed, 0 for free).
- The 
-\shape italic
-rotation
-\shape default
- element specifies the amount of rotation (with units of radians) with an
- optional associated load curve.
-\end_layout
-
-\begin_layout Standard
-Optionally, the translation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed along 
-\begin_inset Formula $\mathbf{e}_{2}^{a}$
-\end_inset
-
- using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_translation_1>1</prescribed_translation_1>
-\end_layout
-
-\begin_layout LyX-Code
-<translation_1 lc="2">10.0</translation_1>
-\end_layout
-
-\begin_layout Standard
-Optionally, the translation of body 
-\begin_inset Formula $b$
-\end_inset
-
- relative to body 
-\begin_inset Formula $a$
-\end_inset
-
- may be prescribed along 
-\begin_inset Formula $\mathbf{e}_{3}^{a}$
-\end_inset
-
- using the additional tags
-\end_layout
-
-\begin_layout LyX-Code
-<prescribed_translation_2>1</prescribed_translation_2>
-\end_layout
-
-\begin_layout LyX-Code
-<translation_2 lc="2">10.0</translation_2>
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Lock
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Planar-Lock"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid lock connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
-, preventing relative motion between them.
- It requires the specification of a joint origin and two orthgonal axes
- 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- and 
-\begin_inset Formula $\mathbf{e}_{2}$
-\end_inset
-
-:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid lock" name="Joint01">
-\end_layout
-
-\begin_layout LyX-Code
-  <tolerance>0</tolerance>
-\end_layout
-
-\begin_layout LyX-Code
-  <gaptol>1e-4</gaptol>
-\end_layout
-
-\begin_layout LyX-Code
-  <angtol>1e-4</angtol>
-\end_layout
-
-\begin_layout LyX-Code
-  <force_penalty>1e0</force_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <moment_penalty>1e0</moment_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <auto_penalty>1</auto_penalty>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <joint_origin>0,0,0</joint_origin>
-\end_layout
-
-\begin_layout LyX-Code
-  <first_axis>1,0,0</first_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  <second_axis>0,1,0</second_axis>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-tolerance 
-\shape default
-element defines the augmentation tolerance.
- That is, when the relative change in the constraint forces and moments
- (the Lagrange multipliers) are less than this value.
- The 
-\shape italic
-gaptol
-\shape default
- element defines the tolerance for spatial separation of the joint origin
- on the two bodies (in units of length).
- The 
-\shape italic
-angtol
-\shape default
- element defines the tolerance for angular separation of the joint axes
- on the two bodies (in units of radians).
- Setting any of these three elements to zero disables the enforcement of
- that tolerance.
- The 
-\shape italic
-force_penalty
-\shape default
- parameter (with units of force per length) represents the stiffness that
- prevents the joint origin on the two bodies from separating along the rotation
- axis.
- The 
-\shape italic
-moment_penalty
-\shape default
- parameter (with units of moment per radians) represents the torsional stiffness
- that enforces parallelism of the joint rotation axis on the two bodies.
- The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-joint_origin 
-\shape default
-element defines the position of the joint (the origin of the basis 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
-\end_inset
-
- in world coordinates at the start of the analysis.
- Note that this point does not have to be inside or on the surface of either
- of the two bodies.
- The 
-\shape italic
-first_axis 
-\shape default
-element defines the orientation of the axis 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
- in world coordinates at the start of the analysis.
- The 
-\shape italic
-second_axis
-\shape default
- element defines the orientation of the second axis 
-\begin_inset Formula $\mathbf{e}_{2}$
-\end_inset
-
- in world coordinates at the start of the analysis.
-\end_layout
-
-\begin_layout Standard
-<Constraints> <constraint type="[name of update rule]"> <!-- parameters
- go here --> </constraint> </Constraints> 
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-Rigid Connectors
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Connectors"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Rigid connectors produce forces between rigid bodies.
- The term `rigid' refers to the bodies, not to the connectors.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Spring
-\begin_inset CommandInset label
-LatexCommand label
-name "subsubsec:Rigid-Spring"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid spring connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- with a linear spring:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid spring">
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <insertion_a>0,0,1</insertion_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <insertion_b>0,0,3</insertion_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <k>1</k>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-insertion_a 
-\shape default
-element defines the position of the spring insertion point on rigid body
- 
-\begin_inset Formula $a$
-\end_inset
-
-.
- The 
-\shape italic
-insertion_b 
-\shape default
-element defines the position of the spring insertion point on rigid body
- 
-\begin_inset Formula $b$
-\end_inset
-
-.
- The 
-\begin_inset Formula $k$
-\end_inset
-
- element represents the spring stiffness (in units of force per length).
- The resting length of the spring is the distance between insertion points
- at the start of the analysis.
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Damper
-\begin_inset CommandInset label
-LatexCommand label
-name "subsubsec:Rigid-Damper"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid damper connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- with a linear damper:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid damper">
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <insertion_a>0,0,1</insertion_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <insertion_b>0,0,3</insertion_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <c>1e-7</c>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-insertion_a 
-\shape default
-element defines the position of the damper insertion point on rigid body
- 
-\begin_inset Formula $a$
-\end_inset
-
-.
- The 
-\shape italic
-insertion_b 
-\shape default
-element defines the position of the damper insertion point on rigid body
- 
-\begin_inset Formula $b$
-\end_inset
-
-.
- The 
-\begin_inset Formula $c$
-\end_inset
-
- element represents the damping coefficient (in units of force per velocity).
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Angular Damper
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Angular-Damper"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid angular damper connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- with an angular damper:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid angular damper">
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <c>1e-3</c>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\begin_inset Formula $c$
-\end_inset
-
- element represents the damping coefficient (in units of moment per angular
- velocity).
-\end_layout
-
-\begin_layout Subsubsection
-Rigid Contractile Force
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Rigid-Contractile-Force"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A rigid contractile force connects rigid bodies 
-\begin_inset Formula $a$
-\end_inset
-
- and 
-\begin_inset Formula $b$
-\end_inset
-
- with a force actuator:
-\end_layout
-
-\begin_layout LyX-Code
-<constraint type="rigid contractile force">
-\end_layout
-
-\begin_layout LyX-Code
-  <body_a>1</body_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <body_b>2</body_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <insertion_a>0,0,1</insertion_a>
-\end_layout
-
-\begin_layout LyX-Code
-  <insertion_b>0,0,3</insertion_b>
-\end_layout
-
-\begin_layout LyX-Code
-  <f0 lc="1">1</f0>
-\end_layout
-
-\begin_layout LyX-Code
-</constraint>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-body_a
-\shape default
- and 
-\shape italic
-body_b 
-\shape default
-elements are the material numbers of the two rigid bodies.
- The 
-\shape italic
-insertion_a 
-\shape default
-element defines the position of the force actuator insertion point on rigid
- body 
-\begin_inset Formula $a$
-\end_inset
-
-.
- The 
-\shape italic
-insertion_b 
-\shape default
-element defines the position of the force actuator insertion point on rigid
- body 
-\begin_inset Formula $b$
-\end_inset
-
-.
- The 
-\begin_inset Formula $f0$
-\end_inset
-
- element represents the actuator force (positive for contraction).
- Optionally, it may be associated with a load curve.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
 Symmetry Plane
 \begin_inset CommandInset label
 LatexCommand label
@@ -24948,6 +27867,125 @@ This example defines a cable that runs through the centers of mass of two
 \end_layout
 
 \begin_layout Section
+Step Section
+\end_layout
+
+\begin_layout Standard
+The analysis can be divided into separate steps, where in each step, different
+ boundary and loading conditions can be applied.
+ Each analysis step is defined via a 
+\emph on
+step 
+\emph default
+section.
+ In each step, the following sections can be defined: 
+\end_layout
+
+\begin_layout Itemize
+Control
+\end_layout
+
+\begin_layout Itemize
+Initial
+\end_layout
+
+\begin_layout Itemize
+Boundary
+\end_layout
+
+\begin_layout Itemize
+Loads
+\end_layout
+
+\begin_layout Itemize
+Constraints
+\end_layout
+
+\begin_layout Itemize
+Contact
+\end_layout
+
+\begin_layout Itemize
+Rigid
+\end_layout
+
+\begin_layout Standard
+When a boundary condition, (load, constraint, contact, etc.,) is applied
+ to a step, then this boundary condition (load, constraint, contact, etc.)
+ is only active during the step.
+ Boundary conditions (loads, constraints, contacts, etc.) that are defined
+ in the main body of the file will persist through all the step.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<!-- main body of file -->
+\end_layout
+
+\begin_layout LyX-Code
+ ...
+\end_layout
+
+\begin_layout LyX-Code
+<Step> 
+\end_layout
+
+\begin_layout LyX-Code
+ <step id="1"> 
+\end_layout
+
+\begin_layout LyX-Code
+  <Control>
+\end_layout
+
+\begin_layout LyX-Code
+    … 
+\end_layout
+
+\begin_layout LyX-Code
+  </Control>
+\end_layout
+
+\begin_layout LyX-Code
+ </step>
+\end_layout
+
+\begin_layout LyX-Code
+ <step id="2">
+\end_layout
+
+\begin_layout LyX-Code
+   <Control>
+\end_layout
+
+\begin_layout LyX-Code
+    … 
+\end_layout
+
+\begin_layout LyX-Code
+   </Control>
+\end_layout
+
+\begin_layout LyX-Code
+ </step> 
+\end_layout
+
+\begin_layout LyX-Code
+  … 
+\end_layout
+
+\begin_layout LyX-Code
+</Step>
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 LoadData Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -25022,19 +28060,39 @@ element for all data points:
 \end_layout
 
 \begin_layout LyX-Code
-<load_controller id="1" [interpolate="type" extend="extend"]>
+<load_controller id="1" 
+\series bold
+type="loadcurve"
+\series default
+>
 \end_layout
 
 \begin_layout LyX-Code
-  <point> 0, 0 </point>
+  <interpolate>LINEAR</interpolate>
 \end_layout
 
 \begin_layout LyX-Code
-  ...
+  <extend>CONSTANT</extend>
 \end_layout
 
 \begin_layout LyX-Code
-  <point> 1, 1 </point>
+  <points>
+\end_layout
+
+\begin_layout LyX-Code
+    <point> 0, 0 </point>
+\end_layout
+
+\begin_layout LyX-Code
+    ...
+\end_layout
+
+\begin_layout LyX-Code
+    <point> 1, 1 </point>
+\end_layout
+
+\begin_layout LyX-Code
+  </points>
 \end_layout
 
 \begin_layout LyX-Code
@@ -25057,7 +28115,7 @@ attribute is the loadcurve number and is used in other sections of the input
 \end_layout
 
 \begin_layout Standard
-The optional attributes 
+The optional parameters 
 \shape italic
 interpolate 
 \shape default
@@ -25118,7 +28176,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-step
+STEP
 \end_layout
 
 \end_inset
@@ -25138,7 +28196,7 @@ Use a step interpolation function
 \begin_inset Text
 
 \begin_layout Plain Layout
-linear*
+LINEAR*
 \end_layout
 
 \end_inset
@@ -25158,7 +28216,7 @@ Use a linear interpolation function
 \begin_inset Text
 
 \begin_layout Plain Layout
-smooth
+SMOOTH
 \end_layout
 
 \end_inset
@@ -25167,7 +28225,7 @@ smooth
 \begin_inset Text
 
 \begin_layout Plain Layout
-The values are interpolated using a cubic spline.
+The values are interpolated using a cubic polynomial.
  
 \end_layout
 
@@ -25220,9 +28278,9 @@ status open
 \series bold
 The different values for the 
 \emph on
-type
+interpolate
 \emph default
- attribute of load curves
+ parameter of load curves
 \end_layout
 
 \end_inset
@@ -25272,7 +28330,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-constant*
+CONSTANT*
 \end_layout
 
 \end_inset
@@ -25292,7 +28350,7 @@ The value of the curve is the value of the closest endpoint
 \begin_inset Text
 
 \begin_layout Plain Layout
-extrapolate
+EXTRAPOLATE
 \end_layout
 
 \end_inset
@@ -25312,7 +28370,7 @@ The value is extrapolated linearly from the endpoints
 \begin_inset Text
 
 \begin_layout Plain Layout
-repeat
+REPEAT
 \end_layout
 
 \end_inset
@@ -25332,7 +28390,7 @@ The curve is repeated
 \begin_inset Text
 
 \begin_layout Plain Layout
-repeat offset
+REPEAT OFFSET
 \end_layout
 
 \end_inset
@@ -25381,6 +28439,8 @@ status open
 \align center
 \begin_inset Graphics
 	filename Figures/FigLoadCurveExtend.png
+	lyxscale 50
+	scale 50
 
 \end_inset
 
@@ -25395,7 +28455,7 @@ The different values for the
 \emph on
 extend
 \emph default
- attribute of the load curve.
+ parameter of the load curve.
 \end_layout
 
 \end_inset
