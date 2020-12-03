@@ -289,7 +289,19 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	if (ReadFile(szfile) == false) return false;
 
 	// finish building
-	m_builder->Finish();
+	try {
+		m_builder->Finish();
+	}
+	catch (std::exception e)
+	{
+		const char* szerr = e.what();
+		if (szerr == nullptr) szerr = "(unknown exception)";
+		return errf("%s", e.what());
+	}	
+	catch (...)
+	{
+		return errf("unknown exception.");
+	}
 
 	return true;
 }
