@@ -700,7 +700,7 @@ void FEModelBuilder::ApplyParameterMaps()
 				std::stringstream ss;
 				ss << "Cannot assign map \"" << data->GetName() << "\" to parameter \"" << p.name() << "\" : bad data type";
 				string err = ss.str();
-				throw std::exception(err.c_str());
+				throw std::runtime_error(err.c_str());
 			}
 			map->setDataMap(data);
 			v.setValuator(map);
@@ -715,7 +715,7 @@ void FEModelBuilder::ApplyParameterMaps()
 				std::stringstream ss;
 				ss << "Cannot assign map \"" << data->GetName() << "\" to parameter \"" << p.name() << "\" : bad data type";
 				string err = ss.str();
-				throw std::exception(err.c_str());
+				throw std::runtime_error(err.c_str());
 			}
 			map->setDataMap(data);
 			v.setValuator(map);
@@ -730,7 +730,7 @@ void FEModelBuilder::ApplyParameterMaps()
 				std::stringstream ss;
 				ss << "Cannot assign map \"" << data->GetName() << "\" to parameter \"" << p.name() << "\" : bad data type";
 				string err = ss.str();
-				throw std::exception(err.c_str());
+				throw std::runtime_error(err.c_str());
 			}
 			map->setDataMap(data);
 			v.setValuator(map);
