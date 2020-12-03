@@ -80972,7 +80972,6 @@ The Cauchy stress takes on the following form,
 \end_layout
 
 \begin_layout Standard
-\align center
 \begin_inset Formula $\sigma=\frac{2}{J}(1-D)\frac{dm}{dP}\left[\kappa b+\left(1-\frac{3}{2}\kappa\right)\left[bI_{4}+I_{1}I_{4}m-I_{4}a\bigodot ba\right]\right]$
 \end_inset
 
@@ -81255,7 +81254,6 @@ The Cauchy stress then takes on the following form,
 \end_layout
 
 \begin_layout Standard
-\align center
 \begin_inset Formula $\sigma=\frac{2}{J}(1-D)\frac{dm}{dP}\left[\kappa b+(1-3\kappa)I_{4}m\right]$
 \end_inset
 
@@ -81269,7 +81267,7 @@ Example:
 \end_layout
 
 \begin_layout Standard
-<solid type="damage fiber exponential"> 
+</solid> <solid type="damage fiber exponential"> 
 \end_layout
 
 \begin_layout Standard
