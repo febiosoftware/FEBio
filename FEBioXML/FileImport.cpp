@@ -24,7 +24,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
+#ifndef strnicmp
+#define strnicmp strncasecmp
+#endif
 
 #include "stdafx.h"
 #include "FileImport.h"
@@ -260,6 +262,10 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 //-----------------------------------------------------------------------------
 int enumValue(const char* val, const char* szenum)
 {
+	if ((val == nullptr) || (szenum == nullptr)) return -1;
+
+	int L = strlen(val);
+
 	const char* ch = szenum;
 
 	int n = 0;
@@ -275,7 +281,7 @@ int enumValue(const char* val, const char* szenum)
 			nval = atoi(ce + 1);
 		}
 
-		if (strncmp(ch, val, l) == 0)
+		if ((L==l) && (strnicmp(ch, val, l) == 0))
 		{
 			return nval;
 		}

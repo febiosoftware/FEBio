@@ -253,12 +253,12 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_nsegup = 0;	// always do segment updates
 	m_breloc = false;
     m_bsmaug = false;
+	m_srad = 0.0;
 
 	m_atol = 0.01;
 	m_gtol = 0;
 	m_naugmin = 0;
 	m_naugmax = 10;
-	m_srad = 1.0;
 
 	m_dxtol = 0;
 
@@ -496,23 +496,8 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			vec3d x(0,0,0), q;
 			for (int k=0; k<nn; ++k) x += re[k]*H[k];
 
-			// see if the point still projects to the same element
-			if (pt.m_pme)
-			{
-				// update projection to secondary surface element
-				FESurfaceElement& mel = *pt.m_pme;
-				q = ms.ProjectToSurface(mel, x, pt.m_rs[0], pt.m_rs[1]);
+			FESurfaceElement* pme_prev = pt.m_pme;
 
-				// see if the projection is still in the element
-				if (bsegup && (!ms.IsInsideElement(mel, pt.m_rs[0], pt.m_rs[1], m_stol)))
-				{
-					// if not, do a new search
-					pt.m_rs = vec2d(0,0);
-					FESurfaceElement* pme = 0;
-					pme = cpp.Project(x, q, pt.m_rs);
-					pt.m_pme = pme;
-				}
-			}
 			if (bsegup)
 			{
 				// find the secondary surface segment this element belongs to
@@ -520,6 +505,12 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				FESurfaceElement* pme = 0;
 				pme = cpp.Project(x, q, pt.m_rs);
 				pt.m_pme = pme;
+			}
+			else if (pt.m_pme)
+			{
+				// update projection to secondary surface element
+				FESurfaceElement& mel = *pt.m_pme;
+				q = ms.ProjectToSurface(mel, x, pt.m_rs[0], pt.m_rs[1]);
 			}
 
 			// update normal and gap at integration point
@@ -533,12 +524,29 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 
 				// calculate gap
 				pt.m_gap = -pt.m_nu*(x - q);
+
+				// if gap is negative reset contact
+				if (bsegup && (pt.m_gap < 0.0))
+				{
+//					pt.m_gap = 0.0;
+//					pt.m_pme = nullptr;
+				}
+
+				// make sure the distance is less than the search radius
+				double L = (x - q).norm();
+				if (bsegup && (m_srad > 0.0) && (L > m_srad))
+				{
+					pt.m_pme = nullptr;
+					pt.m_gap = 0;
+					pt.m_Lm = 0;
+				}
 			}
-			else
+
+			if (pt.m_pme == nullptr)
 			{
 				// since the node is not in contact, we set the gap and Lagrange multiplier to zero
 				pt.m_gap = 0;
-				pt.m_Lm = 0;
+	//			pt.m_Lm = 0;
 			}
 		}
 	}
