@@ -528,7 +528,8 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				// if gap is negative reset contact
 				if (bsegup && (pt.m_gap < 0.0))
 				{
-					pt.m_pme = nullptr;
+//					pt.m_gap = 0.0;
+//					pt.m_pme = nullptr;
 				}
 
 				// make sure the distance is less than the search radius
@@ -536,6 +537,8 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				if (bsegup && (m_srad > 0.0) && (L > m_srad))
 				{
 					pt.m_pme = nullptr;
+					pt.m_gap = 0;
+					pt.m_Lm = 0;
 				}
 			}
 
@@ -543,7 +546,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			{
 				// since the node is not in contact, we set the gap and Lagrange multiplier to zero
 				pt.m_gap = 0;
-				pt.m_Lm = 0;
+	//			pt.m_Lm = 0;
 			}
 		}
 	}
