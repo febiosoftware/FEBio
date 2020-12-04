@@ -375,7 +375,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>fecore.lib;febioplot.lib;zlibstaticd.lib;febioxml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;febioplot.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -601,6 +601,7 @@
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelasticUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericRigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.h" />
@@ -677,6 +678,8 @@
     <ClInclude Include="..\..\FEBioMech\FERigidContractileForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidCylindricalJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidDamper.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidFollowerForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidFollowerMoment.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidLock.h" />
@@ -920,6 +923,8 @@
     <ClCompile Include="..\..\FEBioMech\FERigidContractileForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidCylindricalJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidDamper.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidFollowerForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidFollowerMoment.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidLock.cpp" />

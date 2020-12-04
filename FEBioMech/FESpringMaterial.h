@@ -29,10 +29,11 @@ SOFTWARE.*/
 #pragma once
 #include "FEDiscreteElasticMaterial.h"
 #include <FECore/FEFunction1D.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements
-class FESpringMaterial : public FEDiscreteElasticMaterial
+class FEBIOMECH_API FESpringMaterial : public FEDiscreteElasticMaterial
 {
 public:
 	FESpringMaterial(FEModel* pfem) : FEDiscreteElasticMaterial(pfem) {}
@@ -46,7 +47,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! linear spring
-class FELinearSpring : public FESpringMaterial
+class FEBIOMECH_API FELinearSpring : public FESpringMaterial
 {
 public:
 	FELinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
@@ -62,7 +63,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! tension-only linear spring
-class FETensionOnlyLinearSpring : public FESpringMaterial
+class FEBIOMECH_API FETensionOnlyLinearSpring : public FESpringMaterial
 {
 public:
 	FETensionOnlyLinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
@@ -78,7 +79,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! general purpose nonlinear spring
-class FENonLinearSpring : public FESpringMaterial
+class FEBIOMECH_API FENonLinearSpring : public FESpringMaterial
 {
 public:
 	FENonLinearSpring(FEModel* pfem);
@@ -96,7 +97,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEExperimentalSpring : public FESpringMaterial
+class FEBIOMECH_API FEExperimentalSpring : public FESpringMaterial
 {
 public:
 	FEExperimentalSpring(FEModel* fem);

@@ -572,9 +572,6 @@
     <ClInclude Include="..\..\FEBio3\febio_cb.h" />
     <ClInclude Include="..\..\FEBio3\Interrupt.h" />
     <ClInclude Include="..\..\FEBio3\stdafx.h" />
-    <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h" />
-    <ClInclude Include="..\..\FEBioMech\FERigidFollowerForce.h" />
-    <ClInclude Include="..\..\FEBioMech\FERigidFollowerMoment.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBio3\breakpoint.cpp" />
@@ -586,8 +583,6 @@
     <ClCompile Include="..\..\FEBio3\febio_cb.cpp" />
     <ClCompile Include="..\..\FEBio3\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio3\stdafx.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FERigidFollowerForce.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FERigidFollowerMoment.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -28,10 +28,10 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEModelLoad.h"
-
+#include "febiomech_api.h"
 //-----------------------------------------------------------------------------
 //! a follower force on a rigid body
-class FERigidFollowerForce : public FEModelLoad
+class FEBIOMECH_API FERigidFollowerForce : public FEModelLoad
 {
 public:
     //! constructor
