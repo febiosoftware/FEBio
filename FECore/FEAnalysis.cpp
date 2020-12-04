@@ -573,6 +573,10 @@ int FEAnalysis::SolveTimeStep()
 		feLogError("Exception detected: %s\n", e.what());
 		nerr = 2;
 	}
+	catch (...)
+	{
+		nerr = 2;
+	}
 
 	return nerr;
 }
