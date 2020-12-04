@@ -721,6 +721,15 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStress1, "s1");
 	REGISTER_FECORE_CLASS(FELogElemStress2, "s2");
 	REGISTER_FECORE_CLASS(FELogElemStress3, "s3");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 0, 0, "s1x");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 0, 1, "s1y");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 0, 2, "s1z");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 1, 0, "s2x");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 1, 1, "s2y");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 1, 2, "s2z");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 2, 0, "s3x");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 2, 1, "s3y");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 2, 2, "s3z");
 	REGISTER_FECORE_CLASS(FELogElemDeformationGradientXX, "Fxx");
 	REGISTER_FECORE_CLASS(FELogElemDeformationGradientXY, "Fxy");
 	REGISTER_FECORE_CLASS(FELogElemDeformationGradientXZ, "Fxz");

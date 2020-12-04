@@ -402,6 +402,28 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemStressEigenVector : public FELogElemData
+{
+public:
+	FELogElemStressEigenVector(FEModel* pfem) : FELogElemData(pfem), m_eigenVector(-1), m_component(-1) {}
+	double value(FEElement& el);
+
+protected:
+	int	m_eigenVector;
+	int	m_component;
+};
+
+template <int eigenVector, int component> class FELogElemStressEigenVector_T : public FELogElemStressEigenVector
+{
+public:
+	FELogElemStressEigenVector_T(FEModel* pfem) : FELogElemStressEigenVector(pfem)
+	{
+		m_eigenVector = eigenVector;
+		m_component = component;
+	}
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemDeformationGradientXX : public FELogElemData
 {
 public:

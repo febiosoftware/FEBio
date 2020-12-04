@@ -209,6 +209,11 @@ public:
 	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), 0, theName);
 
 //-----------------------------------------------------------------------------
+// version for classes that require template arguments
+#define REGISTER_FECORE_CLASS_T2(theClass, theArg1, theArg2, theName) \
+	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::classID(), 0, theName);
+
+//-----------------------------------------------------------------------------
 // Create an instance of a class.
 // This assumes that TBase is derived from FECoreBase and defines a class ID. 
 template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* pfem)
