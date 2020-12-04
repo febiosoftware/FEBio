@@ -264,7 +264,11 @@ int enumValue(const char* val, const char* szenum)
 {
 	if ((val == nullptr) || (szenum == nullptr)) return -1;
 
+	// get the string's length. 
+	// there could be a comma, so correct for that.
 	int L = strlen(val);
+	const char* c = strchr(val, ',');
+	if (c) L = c - val;
 
 	const char* ch = szenum;
 
