@@ -252,6 +252,8 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 //-----------------------------------------------------------------------------
 void FELinearConstraintSet::Serialize(DumpStream& ar)
 {
+	FESurfaceConstraint::Serialize(ar);
+
 	if (ar.IsShallow())
 	{
 		if (ar.IsSaving())
@@ -269,14 +271,14 @@ void FELinearConstraintSet::Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_tol << m_eps << m_naugmax << m_nID;
+			ar << m_nID;
 			ar << (int) m_LC.size();
 			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
 			for (int i=0; i<(int) m_LC.size(); ++i, ++it) (*it)->Serialize(ar);
 		}
 		else
 		{
-			ar >> m_tol >> m_eps >> m_naugmax >> m_nID;
+			ar >> m_nID;
 			int n;
 			ar >> n;
 			m_LC.clear();

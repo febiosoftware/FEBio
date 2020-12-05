@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FENodeDataMap.h"
 #include "FENodeSet.h"
 #include "FEDofList.h"
+#include "FEModelParam.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -99,8 +100,8 @@ public:
 	void SetValue(double v);
 
 private:
-	int			m_dof;		//!< degree of freedom
-	double		m_data;		//!< nodal values
+	int				m_dof;		//!< degree of freedom
+	FEParamDouble	m_data;		//!< nodal values
 
 	DECLARE_FECORE_CLASS();
 };

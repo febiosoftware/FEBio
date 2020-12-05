@@ -65,11 +65,15 @@ public:
 	//! Is this a rigid material or not
 	virtual bool IsRigid() const { return false; }
 
+	virtual mat3ds SolidStress(FEMaterialPoint& pt);
+
+	tens4dmm SolidTangent(FEMaterialPoint& pt);
+
 protected:
 	FEParamDouble	m_density;	//!< material density
     
 public:
-    bool            m_secant;   //!< flag for using secant tangent
+    bool            m_secant_tangent;   //!< flag for using secant tangent
 
 	DECLARE_FECORE_CLASS();
 };

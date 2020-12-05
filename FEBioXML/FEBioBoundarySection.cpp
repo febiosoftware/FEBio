@@ -705,13 +705,19 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 			{
 				feLogWarningEx((&fem), "The value parameter of the prescribed bc is deprecated.");
 
-				// make sure it has no attributes
-				if (tag.m_natt != 0)throw XMLReader::InvalidTag(tag);
-
 				// NOTE: This will only work if the scale was set to 1!!
-				double v;
-				tag.value(v);
-				pdc->SetScale(v);
+				const char* sznodedata = tag.AttributeValue("node_data", true);
+				if (sznodedata)
+				{
+					FEParam* pp = pdc->GetParameter("scale"); assert(pp);
+					GetBuilder()->AddMappedParameter(pp, pdc, sznodedata);
+				}
+				else
+				{
+					double v;
+					tag.value(v);
+					pdc->SetScale(v);
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}

@@ -190,6 +190,8 @@ SOFTWARE.*/
 #include "FERigidForce.h"
 #include "FERigidCable.h"
 #include "FEDiscreteContact.h"
+#include "FERigidFollowerForce.h"
+#include "FERigidFollowerMoment.h"
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -300,9 +302,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelastic, "trans-iso hyperelastic");
-	REGISTER_FECORE_CLASS(FEContinuousElasticDamage, "continuous elastic damage");
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
 	REGISTER_FECORE_CLASS(FEDamageFiberExponential, "damage fiber exponential");
+	REGISTER_FECORE_CLASS(FEDamageFiberExpLinear, "damage fiber exp-linear");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -559,6 +561,8 @@ void FEBioMech::InitModule()
 	// TODO: define another SUPER_CLASS_ID for this
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidAxialForce, FEBC_ID, "rigid_axial_force");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyForce, FEBC_ID, "rigid_force");
+    REGISTER_FECORE_CLASS_EXPLICIT(FERigidFollowerForce, FEBC_ID, "rigid_follower_force");
+    REGISTER_FECORE_CLASS_EXPLICIT(FERigidFollowerMoment, FEBC_ID, "rigid_follower_moment");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyFixedBC, FERIGIDBC_ID, "rigid_fixed");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement, FERIGIDBC_ID, "rigid_prescribed");
 	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyVelocity, FERIGIDBC_ID, "rigid_velocity");
@@ -717,6 +721,15 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStress1, "s1");
 	REGISTER_FECORE_CLASS(FELogElemStress2, "s2");
 	REGISTER_FECORE_CLASS(FELogElemStress3, "s3");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 0, 0, "s1x");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 0, 1, "s1y");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 0, 2, "s1z");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 1, 0, "s2x");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 1, 1, "s2y");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 1, 2, "s2z");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 2, 0, "s3x");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 2, 1, "s3y");
+	REGISTER_FECORE_CLASS_T2(FELogElemStressEigenVector_T, 2, 2, "s3z");
 	REGISTER_FECORE_CLASS(FELogElemDeformationGradientXX, "Fxx");
 	REGISTER_FECORE_CLASS(FELogElemDeformationGradientXY, "Fxy");
 	REGISTER_FECORE_CLASS(FELogElemDeformationGradientXZ, "Fxz");

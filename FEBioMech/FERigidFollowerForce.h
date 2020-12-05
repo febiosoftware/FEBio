@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,46 +27,33 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FESolidMaterial.h"
-#include "FEElasticMaterialPoint.h"
-
+#include "FECore/FEModelLoad.h"
+#include "febiomech_api.h"
 //-----------------------------------------------------------------------------
-//! Base class for (hyper-)elastic materials
-
-class FEBIOMECH_API FEElasticMaterial : public FESolidMaterial
+//! a follower force on a rigid body
+class FEBIOMECH_API FERigidFollowerForce : public FEModelLoad
 {
 public:
-	//! constructor 
-	FEElasticMaterial(FEModel* pfem);
+    //! constructor
+    FERigidFollowerForce(FEModel* pfem);
 
-	//! destructor
-	~FEElasticMaterial();
+    //! initialization
+    bool Init() override;
 
-	//! create material point data for this material
-	FEMaterialPoint* CreateMaterialPointData() override { return new FEElasticMaterialPoint; }
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
 
-	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
-    
-    // get the elastic material
-    virtual FEElasticMaterial* GetElasticMaterial() { return this; }
+    //! Residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+    //! Stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 public:
-	//! evaluates approximation to Cauchy stress using forward difference
-	mat3ds SecantStress(FEMaterialPoint& pt);
+    int     m_rid;      //!< rigid body ID
+    vec3d   m_X;        //!< coordinates of attachements in reference state
+    vec3d   m_f;        //!< force
+    bool    m_brelative;        //!< if active, the ra0 and rb0 are relative w.r.t. the COM
 
-	mat3ds SolidStress(FEMaterialPoint& pt);
-
-protected:
-	bool	m_secant_stress;	//!< use secant approximation to stress
-
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-class FEBIOMECH_API FEElasticStress : public FEDomainParameter
-{
-public:
-	FEElasticStress();
-	FEParamValue value(FEMaterialPoint& mp) override;
+    DECLARE_FECORE_CLASS();
 };

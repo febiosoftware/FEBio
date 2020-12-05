@@ -321,7 +321,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -375,7 +375,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>fecore.lib;febioplot.lib;zlibstaticd.lib;febioxml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;febioplot.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -452,7 +452,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -601,6 +601,7 @@
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelasticUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericRigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelastic.h" />
@@ -677,6 +678,8 @@
     <ClInclude Include="..\..\FEBioMech\FERigidContractileForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidCylindricalJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidDamper.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidFollowerForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidFollowerMoment.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidLock.h" />
@@ -920,6 +923,8 @@
     <ClCompile Include="..\..\FEBioMech\FERigidContractileForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidCylindricalJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidDamper.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidFollowerForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidFollowerMoment.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidLock.cpp" />

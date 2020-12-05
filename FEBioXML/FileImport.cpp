@@ -24,8 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #include "stdafx.h"
 #include "FileImport.h"
 #include <FECore/Image.h>
@@ -45,6 +43,10 @@ SOFTWARE.*/
 #include <stdarg.h>
 #include <sstream>
 #include "FEBioImport.h"
+
+#ifndef WIN32
+#define strnicmp strncasecmp
+#endif
 
 //-----------------------------------------------------------------------------
 FEFileException::FEFileException()
@@ -260,6 +262,14 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 //-----------------------------------------------------------------------------
 int enumValue(const char* val, const char* szenum)
 {
+	if ((val == nullptr) || (szenum == nullptr)) return -1;
+
+	// get the string's length. 
+	// there could be a comma, so correct for that.
+	int L = strlen(val);
+	const char* c = strchr(val, ',');
+	if (c) L = c - val;
+
 	const char* ch = szenum;
 
 	int n = 0;
@@ -275,7 +285,7 @@ int enumValue(const char* val, const char* szenum)
 			nval = atoi(ce + 1);
 		}
 
-		if (strncmp(ch, val, l) == 0)
+		if ((L==l) && (strnicmp(ch, val, l) == 0))
 		{
 			return nval;
 		}
@@ -723,6 +733,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// get the type
 			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype == 0) sztype = "const";
+
+			// ignore user type
+			if (sztype && (strcmp(sztype, "user") == 0)) return true;
 
 			// allocate valuator
 			FEMat3dValuator* val = fecore_new<FEMat3dValuator>(sztype, GetFEModel());

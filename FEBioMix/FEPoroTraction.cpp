@@ -37,7 +37,6 @@ BEGIN_FECORE_CLASS(FEPoroNormalTraction, FESurfaceLoad)
 	ADD_PARAMETER(m_blinear   , "linear"   );
     ADD_PARAMETER(m_bshellb   , "shell_bottom");
 	ADD_PARAMETER(m_beffective, "effective");
-	ADD_PARAMETER(m_PC        , "value");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -48,8 +47,6 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_blinear = false; 
     m_bshellb = false;
 	m_beffective = false;
-
-	m_PC = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +54,7 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 void FEPoroNormalTraction::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.SetItemList(ps->GetFacetSet());
+	m_traction.SetItemList(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------
@@ -176,7 +173,7 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 	int neln = el.Nodes();
 
 	// calculate nodal normal tractions
-	double tr = m_traction*m_PC(mp);
+	double tr = m_traction(mp);
 
 	// if the prescribed traction is effective, evaluate the total traction
 	if (m_beffective)

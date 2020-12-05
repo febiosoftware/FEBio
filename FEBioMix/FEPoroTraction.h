@@ -59,13 +59,10 @@ private:
 	double Traction(FESurfaceMaterialPoint& mp);
 
 protected:
-	double	m_traction;		//!< traction value
+	FEParamDouble	m_traction;		//!< traction value
 	bool	m_blinear;		//!< linear or not (true is non-follower, false is follower)
     bool    m_bshellb;      //!< flag for prescribing traction on shell bottom
 	bool	m_beffective;	//!< effective or total normal traction
-
-	// pressure boundary data
-	FEParamDouble		m_PC;		//!< pressure boundary cards
 
 	DECLARE_FECORE_CLASS();
 };

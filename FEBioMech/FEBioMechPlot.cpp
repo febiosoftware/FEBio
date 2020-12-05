@@ -3226,13 +3226,13 @@ bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
 	if (domMat == nullptr) return false;
 
 	// get the fiber damage component
-	FEDamageInterface* mat = nullptr;
-	if (m_prop.empty()) mat = dynamic_cast<FEDamageInterface*>(domMat);
+	FEDamageElasticFiber* mat = nullptr;
+	if (m_prop.empty()) mat = dynamic_cast<FEDamageElasticFiber*>(domMat);
 	else
 	{
 		ParamString ps(m_prop.c_str());
 		m_propIndex = ps.Index();
-		mat = dynamic_cast<FEDamageInterface*>(domMat->GetProperty(ps));
+		mat = dynamic_cast<FEDamageElasticFiber*>(domMat->GetProperty(ps));
 	}
 	if (mat == nullptr) return false;
 

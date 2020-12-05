@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEInitialCondition.h"
 #include "DumpStream.h"
+#include "FEMaterialPoint.h"
 #include "FENode.h"
 
 REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
@@ -118,16 +119,18 @@ BEGIN_FECORE_CLASS(FEInitialDOF, FENodalIC)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEInitialDOF::FEInitialDOF(FEModel* pfem) : FENodalIC(pfem), m_data(FE_DOUBLE)
+FEInitialDOF::FEInitialDOF(FEModel* pfem) : FENodalIC(pfem)
 {
 	m_dof = -1;
+	m_data = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-FEInitialDOF::FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset) : FENodalIC(fem), m_data(FE_DOUBLE)
+FEInitialDOF::FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset) : FENodalIC(fem)
 {
 	SetDOF(ndof);
 	SetNodeSet(nset);
+	m_data = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +163,16 @@ void FEInitialDOF::SetValue(double v)
 
 //-----------------------------------------------------------------------------
 // return the values for node i
-void FEInitialDOF::GetNodalValues(int inode, std::vector<double>& values)
+void FEInitialDOF::GetNodalValues(int inode, std::vector<double>& val)
 {
-	values[0] = m_data;
+	assert(val.size() == 1);
+	const FENodeSet& nset = *GetNodeSet();
+	int nid = nset[inode];
+	const FENode& node = *nset.Node(inode);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = inode;
+
+	val[0] = m_data(mp);
 }

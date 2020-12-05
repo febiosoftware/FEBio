@@ -625,6 +625,39 @@ double FELogElemStress3::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemStressEigenVector::value(FEElement& el)
+{
+	assert(m_eigenVector >= 0);
+	assert(m_component >= 0);
+
+	// calculate average stress
+	mat3ds s(0.0);
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		s += pt.m_s;
+	}
+	s /= (double)nint;
+
+	// get the eigen vectors
+	vec3d e[3];
+	double l[3];
+	s.eigen(l, e);
+
+	// extract component
+	double v = 0.0;
+	switch (m_component)
+	{
+	case 0: v = e[m_eigenVector].x; break;
+	case 1: v = e[m_eigenVector].y; break;
+	case 2: v = e[m_eigenVector].z; break;
+	}
+
+	return v;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemDeformationGradientXX::value(FEElement& el)
 {
 	double val = 0.0;

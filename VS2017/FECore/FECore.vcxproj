@@ -316,7 +316,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -446,7 +446,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -649,6 +649,7 @@
     <ClInclude Include="..\..\FECore\FETimeStepController.h" />
     <ClInclude Include="..\..\FECore\FETransform.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
+    <ClInclude Include="..\..\FECore\FSPath.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\Integrate.h" />
     <ClInclude Include="..\..\FECore\JFNKMatrix.h" />
@@ -856,6 +857,7 @@
     <ClCompile Include="..\..\FECore\FETimeStepController.cpp" />
     <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FSPath.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\Integrate.cpp" />
     <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
