@@ -49,11 +49,11 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 //! Initializes material point data.
 void FEReactiveVEMaterialPoint::Init()
 {
-	// initialize data to zero
-	m_Fi.clear();
-	m_Ji.clear();
-	m_v.clear();
-	m_w.clear();
+	// initialize data to include first generation (initially intact bonds)
+    m_Fi.resize(1,mat3dd(1));
+    m_Ji.resize(1,1);
+    m_v.resize(1,0);
+    m_w.resize(1,1);
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
