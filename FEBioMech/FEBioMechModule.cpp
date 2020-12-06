@@ -63,8 +63,7 @@ SOFTWARE.*/
 #include "FEFiberNHUC.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
-#include "FEGasserOgdenHolzapfel.h"
-#include "FEGasserOgdenHolzapfelUC.h"
+#include "FEHolzapfelGasserOgden.h"
 #include "FEHolmesMow.h"
 #include "FEHuiskesSupply.h"
 #include "FEIncompNeoHookean.h"
@@ -273,7 +272,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
 	REGISTER_FECORE_CLASS(FEEllipsoidalFiberDistributionOld, "ellipsoidal fiber distribution (old)");
 	REGISTER_FECORE_CLASS(FEFungOrthoCompressible, "Fung-ortho-compressible");
-	REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfel, "Gasser-Ogden-Holzapfel");
 	REGISTER_FECORE_CLASS(FECompressibleGentMaterial, "compressible Gent");
 	REGISTER_FECORE_CLASS(FEHolmesMow, "Holmes-Mow");
 	REGISTER_FECORE_CLASS(FEIsotropicElastic, "isotropic elastic");
@@ -326,7 +324,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEEFDUncoupled, "EFD uncoupled");
 	REGISTER_FECORE_CLASS(FEEFDVerondaWestmann, "EFD Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FEFungOrthotropic, "Fung orthotropic");
-	REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfelUC, "Gasser-Ogden-Holzapfel-uncoupled");
+	REGISTER_FECORE_CLASS(FEHolzapfelGasserOgden, "Holzapfel-Gasser-Ogden");
 	REGISTER_FECORE_CLASS(FEGentMaterial, "Gent");
 	REGISTER_FECORE_CLASS(FEIncompNeoHookean, "incomp neo-Hookean");
 	REGISTER_FECORE_CLASS(FEMooneyRivlin, "Mooney-Rivlin");

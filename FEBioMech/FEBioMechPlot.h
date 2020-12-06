@@ -918,7 +918,7 @@ class FEPlotContinuousDamage : public FEPlotDomainData
 {
 public:
 	FEPlotContinuousDamage(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
 	bool SetFilter(const char* sz) override;
 private:
 	std::string	m_prop;

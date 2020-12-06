@@ -27,22 +27,28 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEGasserOgdenHolzapfelUC.h"
+#include "FEHolzapfelGasserOgden.h"
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEGasserOgdenHolzapfelUC, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEHolzapfelGasserOgden, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c    , FE_RANGE_GREATER_OR_EQUAL(0.0), "c");
 	ADD_PARAMETER(m_k1   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k1");
 	ADD_PARAMETER(m_k2   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k2");
 	ADD_PARAMETER(m_kappa, FE_RANGE_CLOSED(0.0, 1.0/3.0), "kappa");
-	ADD_PARAMETER(m_g    , "gamma");
+	ADD_PARAMETER(m_gdeg , "gamma");
 END_FECORE_CLASS();
 
-#define ONE 0.9999
+//-----------------------------------------------------------------------------
+//! Initialize
+bool FEHolzapfelGasserOgden::Init()
+{
+    m_g = m_gdeg*PI/180;
+    return FEUncoupledMaterial::Init();
+}
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
-mat3ds FEGasserOgdenHolzapfelUC::DevStress(FEMaterialPoint& mp)
+mat3ds FEHolzapfelGasserOgden::DevStress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -97,7 +103,7 @@ mat3ds FEGasserOgdenHolzapfelUC::DevStress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric tangent
-tens4ds FEGasserOgdenHolzapfelUC::DevTangent(FEMaterialPoint& mp)
+tens4ds FEHolzapfelGasserOgden::DevTangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -163,7 +169,7 @@ tens4ds FEGasserOgdenHolzapfelUC::DevTangent(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
-double FEGasserOgdenHolzapfelUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
+double FEHolzapfelGasserOgden::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
