@@ -34,7 +34,7 @@ class FEASTEigenSolver : public EigenSolver
 public:
 	FEASTEigenSolver(FEModel* fem);
 
-	bool Init();
+	bool Init() override;
 
 	bool EigenSolve(SparseMatrix* A, SparseMatrix* B, vector<double>& eigenValues, matrix& eigenVectors) override;
 
