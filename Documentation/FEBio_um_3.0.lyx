@@ -41501,6 +41501,439 @@ Example
 \end_layout
 
 \begin_layout Subsubsection
+Holzapfel-Gasser-Ogden
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Mooney-Rivlin-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for the uncoupled Holzapfel-Gasser-Ogden material 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Gasser06"
+literal "false"
+
+\end_inset
+
+ is 
+\emph on
+Holzapfel-Gasser-Ogden
+\emph default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shear modulus of ground matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fiber modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fiber exponential coefficient
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<gamma>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fiber mean orientation angle 
+\begin_inset Formula $\gamma$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+deg
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kappa>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fiber dispersion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bulk modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material model uncouples deviatoric and volumetric behaviors.
+ The deviatoric strain-energy function is given by: 
+\begin_inset Formula 
+\[
+\Psi_{r}=\tilde{\Psi}_{r}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\tilde{\Psi}_{r}=\frac{c}{2}\left(\tilde{I}_{1}-3\right)+\frac{k_{1}}{2k_{2}}\sum_{\alpha=1}^{2}\left(\exp\left(k_{2}\left\langle \tilde{E}_{\alpha}\right\rangle ^{2}\right)-1\right)
+\]
+
+\end_inset
+
+and the default volumetric strain energy function is
+\begin_inset Formula 
+\[
+U\left(J\right)=\frac{k}{2}\left(\frac{J^{2}-1}{2}-\ln J\right)
+\]
+
+\end_inset
+
+The fiber strain is
+\begin_inset Formula 
+\[
+\tilde{E}_{\alpha}=\kappa\left(\tilde{I}_{1}-3\right)+\left(1-3\kappa\right)\left(\tilde{I}_{4\alpha}-1\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{I}_{1}=\tr\tilde{\mathbf{C}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{I}_{4\alpha}=\mathbf{a}_{\alpha r}\cdot\tilde{\mathbf{C}}\cdot\mathbf{a}_{\alpha r}$
+\end_inset
+
+.
+ The Macaulay brackets around 
+\begin_inset Formula $\left\langle \tilde{E}_{\alpha}\right\rangle $
+\end_inset
+
+ indicate that this term is zero when 
+\begin_inset Formula $\tilde{E}_{\alpha}<0$
+\end_inset
+
+ and equal to 
+\begin_inset Formula $\tilde{E}_{\alpha}$
+\end_inset
+
+ when this strain is positive.
+\end_layout
+
+\begin_layout Standard
+There are two fiber families along the vectors 
+\begin_inset Formula $\mathbf{a}_{\alpha r}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha=1,2$
+\end_inset
+
+), lying in the 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} $
+\end_inset
+
+ plane of the local material axes 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+, making an angle 
+\begin_inset Formula $\pm\gamma$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+.
+ Each fiber family has a dispersion 
+\begin_inset Formula $\kappa$
+\end_inset
+
+, where 
+\begin_inset Formula $0\le\kappa\le\frac{1}{3}$
+\end_inset
+
+.
+ When 
+\begin_inset Formula $\kappa=0$
+\end_inset
+
+ there is no fiber dispersion, implying that all the fibers in that family
+ act along the angle 
+\begin_inset Formula $\pm\gamma$
+\end_inset
+
+; the value 
+\begin_inset Formula $\kappa=\frac{1}{3}$
+\end_inset
+
+ represents an isotropic fiber dispersion.
+ All other intermediate values of 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ produce a 
+\begin_inset Formula $\pi-$
+\end_inset
+
+periodic von Mises fiber distribution, as described in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Gasser06"
+literal "false"
+
+\end_inset
+
+.
+ 
+\begin_inset Formula $c$
+\end_inset
+
+ is the shear modulus of the ground matrix; 
+\begin_inset Formula $k_{1}$
+\end_inset
+
+ is the fiber modulus and 
+\begin_inset Formula $k_{2}$
+\end_inset
+
+ is the exponential coefficient.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" type="Holzapfel-Gasser-Ogden">
+\end_layout
+
+\begin_layout LyX-Code
+  <c>7.64</c>
+\end_layout
+
+\begin_layout LyX-Code
+  <k1>996.6</k1>
+\end_layout
+
+\begin_layout LyX-Code
+  <k2>524.6</k2>
+\end_layout
+
+\begin_layout LyX-Code
+  <gamma>49.98</gamma>
+\end_layout
+
+\begin_layout LyX-Code
+  <kappa>0.226</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>100</k>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Mooney-Rivlin
 \begin_inset CommandInset label
 LatexCommand label
