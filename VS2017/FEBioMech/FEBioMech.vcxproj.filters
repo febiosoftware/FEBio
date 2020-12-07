@@ -261,12 +261,6 @@
     <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -750,6 +744,9 @@
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEHolzapfelGasserOgden.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -993,12 +990,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp">
@@ -1467,6 +1458,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERigidFollowerMoment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEHolzapfelGasserOgden.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

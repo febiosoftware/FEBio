@@ -598,8 +598,6 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthoCompressible.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h" />
-    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
-    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericHyperelasticUC.h" />
@@ -608,6 +606,7 @@
     <ClInclude Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
+    <ClInclude Include="..\..\FEBioMech\FEHolzapfelGasserOgden.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEInitialPreStrain.h" />
@@ -843,8 +842,6 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthoCompressible.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGenericBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGenericHyperelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGenericHyperelasticUC.cpp" />
@@ -853,6 +850,7 @@
     <ClCompile Include="..\..\FEBioMech\FEGenericTransIsoHyperelasticUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEHolzapfelGasserOgden.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEInitialPreStrain.cpp" />
