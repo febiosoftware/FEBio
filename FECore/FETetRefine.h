@@ -40,5 +40,9 @@ protected:
 	bool DoTetRefinement(FEModel& fem);
 
 private:
+	int	m_maxiter;
+
 	int	m_NN;
+
+	DECLARE_FECORE_CLASS();
 };

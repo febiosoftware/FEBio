@@ -31,25 +31,46 @@ SOFTWARE.*/
 #include "FESolidDomain.h"
 #include "FEMeshTopo.h"
 #include "FEFixedBC.h"
+#include "FESurface.h"
+#include "log.h"
+
+BEGIN_FECORE_CLASS(FETetRefine, FERefineMesh)
+	ADD_PARAMETER(m_maxiter, "max_iters");
+END_FECORE_CLASS();
 
 FETetRefine::FETetRefine(FEModel* fem) : FERefineMesh(fem)
 {
-
+	m_maxiter = 0;
 }
 
 bool FETetRefine::Apply(int iteration)
 {
+	if (iteration >= m_maxiter) return true;
+
 	FEModel& fem = *GetFEModel();
 
 	// build the mesh-topo
-	if (BuildMeshTopo() == false) return false;
+	if (BuildMeshTopo() == false)
+	{
+		feLogError("Cannot apply tet refinement: Error building topo structure.");
+		return true;
+	}
 
 	// do the mesh refinement
-	if (DoTetRefinement(fem) == false) return false;
+	if (DoTetRefinement(fem) == false)
+	{
+		feLogError("Cannot apply tet refinement: Error during refinement.");
+		return true;
+	}
 
 	// all done
-	return true;
+	return false;
 }
+
+struct TRI
+{
+	int n[3];
+};
 
 bool FETetRefine::DoTetRefinement(FEModel& fem)
 {
@@ -107,6 +128,7 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 			double v = (node0.get(j) + node1.get(j))*0.5;
 			node.set(j, v);
 		}
+		node.UpdateValues();
 	}
 	assert(n == N1);
 
@@ -186,6 +208,89 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		FEDomain& dom = mesh.Domain(i);
 		dom.CreateMaterialPointData();
 		dom.Init();
+		dom.Activate();
+	}
+
+	const int FLUT[4][3] = {
+		{ 0, 3, 5 },
+		{ 1, 4, 3 },
+		{ 2, 5, 4 },
+		{ 3, 4, 5 },
+	};
+
+	// recreate surfaces
+	int faceMark = 1;
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+		int NF0 = surf.Elements();
+
+		vector<int> faceList = topo.FaceIndexList(surf);
+		assert(faceList.size() == NF0);
+
+		vector<TRI> tri(NF0);
+		for (int j = 0; j < NF0; ++j)
+		{
+			FESurfaceElement& el = surf.Element(j);
+			TRI t;
+			t.n[0] = el.m_node[0];
+			t.n[1] = el.m_node[1];
+			t.n[2] = el.m_node[2];
+			tri[j] = t;
+		}
+
+		int NF1 = NF0 * 4;
+		surf.Create(NF1);
+		int nf = 0;
+		for (int j = 0; j < NF0; ++j)
+		{
+			TRI& t = tri[j];
+
+			std::vector<int> ee = topo.FaceEdgeList(faceList[j]); assert(ee.size() == 3);
+
+			// build the look-up table
+			int FNL[6] = { 0 };
+			FNL[0] = t.n[0];
+			FNL[1] = t.n[1];
+			FNL[2] = t.n[2];
+
+			// the edges may not be ordered correctly, so we need to do a search here.
+			for (int k = 0; k < 3; k++)
+			{
+				int a = t.n[k];
+				int b = t.n[(k+1)%3];
+				int e = -1;
+				for (int l = 0; l < 3; ++l)
+				{
+					const FEEdgeList::EDGE& edge = topo.Edge(ee[l]);
+					if ((edge.node[0] == a) && (edge.node[1] == b)) { e = l; break; }
+					if ((edge.node[1] == a) && (edge.node[0] == b)) { e = l; break; }
+				}
+				assert(e >= 0);
+				FNL[k + 3] = N0 + ee[e];
+			}
+
+			for (int k = 0; k < 4; ++k)
+			{
+				FESurfaceElement& fj = surf.Element(nf++);
+				fj.SetType(FE_TRI3G3);
+				fj.m_node[0] = FNL[FLUT[k][0]];
+				fj.m_node[1] = FNL[FLUT[k][1]];
+				fj.m_node[2] = FNL[FLUT[k][2]];
+			}
+		}
+
+		surf.CreateMaterialPointData();
+		surf.Init();
+
+		// also update the facet set if the surface has one
+		FEFacetSet* fset = surf.GetFacetSet();
+		if (fset)
+		{
+			fset->Create(surf);
+		}
+
+		faceMark++;
 	}
 
 	// update node sets
