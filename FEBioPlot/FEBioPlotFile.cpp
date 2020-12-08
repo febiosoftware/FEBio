@@ -586,6 +586,7 @@ void FEBioPlotFile::PlotObject::AddData(const char* szname, Var_Type type, FEPlo
 FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 {
 	m_ncompress = 0;
+	m_meshesWritten = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -910,16 +911,21 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 		}
 
 		// additional objects
-		if ((m_Points.size() > 0) || (m_Lines.size() > 0))
+		if (m_meshesWritten == 0)
 		{
-			m_ar.BeginChunk(PLT_OBJECTS_SECTION);
+			if ((m_Points.size() > 0) || (m_Lines.size() > 0))
 			{
-				WriteObjectsSection();
+				m_ar.BeginChunk(PLT_OBJECTS_SECTION);
+				{
+					WriteObjectsSection();
+				}
+				m_ar.EndChunk();
 			}
-			m_ar.EndChunk();
 		}
 	}
 	m_ar.EndChunk();
+
+	m_meshesWritten++;
 
 	return true;
 }

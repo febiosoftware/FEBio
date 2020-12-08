@@ -352,6 +352,7 @@ protected:
 	PltArchive	m_ar;	// the data archive
 	FEModel&	m_fem;
 	int			m_ncompress;	// compression level
+	int			m_meshesWritten;	// nr of meshes written
 
 	vector<Surface>	m_Surf;
 
