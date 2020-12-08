@@ -44,15 +44,9 @@ public:
     //! assignment operator
     FEFluidDomain3D& operator = (FEFluidDomain3D& d);
     
-    //! activate
-    void Activate() override;
-
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
-    //! Unpack element data
-    void UnpackLM(FEElement& el, vector<int>& lm) override;
-
 public: // overrides from FEDomain
     
     //! get the material
