@@ -513,6 +513,7 @@
     <ClInclude Include="..\..\FEBioMech\FEActiveFiberStressUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEAzimuthConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEBCPrescribedDeformation.h" />
     <ClInclude Include="..\..\FEBioMech\FEBCRigidDeformation.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
@@ -758,6 +759,7 @@
     <ClCompile Include="..\..\FEBioMech\FEActiveFiberStressUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEAzimuthConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBCRigidDeformation.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMech.cpp" />

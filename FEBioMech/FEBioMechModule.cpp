@@ -165,6 +165,7 @@ SOFTWARE.*/
 #include "FETiedElasticInterface.h"
 #include "FEStickyInterface.h"
 #include "FEPointConstraint.h"
+#include "FEAzimuthConstraint.h"
 #include "FEFacet2FacetTied.h"
 #include "FEVolumeConstraint.h"
 #include "FEDistanceConstraint.h"
@@ -524,6 +525,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGPAConstraint, "prestrain");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint, "in-situ stretch");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint2, "in-situ stretch2");
+	REGISTER_FECORE_CLASS(FEAzimuthConstraint, "azimuth constraint");
 
 	// Lagrange multiplier constraints
 	REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node");
