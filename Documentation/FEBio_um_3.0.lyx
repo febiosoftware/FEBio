@@ -80818,7 +80818,7 @@ and the time associated with the current loading situation is represented
 .
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Damage Fiber Power
 \begin_inset CommandInset label
 LatexCommand label
@@ -81219,7 +81219,7 @@ Example:
 </solid>
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Damage Fiber Exponential
 \begin_inset CommandInset label
 LatexCommand label
