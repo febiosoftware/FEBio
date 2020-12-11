@@ -80371,8 +80371,8 @@ reference "subsec:Uncoupled-Solid-Mixture"
 \end_inset
 
  , e.g.
- to describe the matrix) in conjunction with a Continuous Damage solid consititu
-ent (See sub-sections 
+ to describe the matrix) in conjunction with a Continuous Damage solid constitue
+nt (See sub-sections 
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Continuous-Damage"
@@ -80400,7 +80400,7 @@ The scalar damage variable
 \end_inset
 
  is embedded in the strain energy function of the fibers, its relationship
- is dependent on the Continuous Damage solid consitituent chosen.
+ is dependent on the Continuous Damage solid constituent chosen.
  The scalar damage variable 
 \begin_inset Formula $\mathit{D}$
 \end_inset
@@ -80419,7 +80419,7 @@ The scalar damage variable
 \end_layout
 
 \begin_layout Standard
-The following material damage parameteres must be defined:
+The following material damage parameters must be defined:
 \end_layout
 
 \begin_layout Standard
@@ -80449,7 +80449,7 @@ Parameter
 \end_inset
 
 (
-\begin_inset Formula $0\leqslant\beta_{s}\leqslant1)$
+\begin_inset Formula $0\leqslant D_{\infty}\leqslant1000)$
 \end_inset
 
 
@@ -80461,7 +80461,7 @@ Parameter
 \begin_inset Text
 
 \begin_layout Plain Layout
-[ ]
+[M]
 \end_layout
 
 \end_inset
@@ -80535,7 +80535,7 @@ Parameter
 \begin_inset Text
 
 \begin_layout Plain Layout
-[ ]
+[M]
 \end_layout
 
 \end_inset
@@ -80647,15 +80647,71 @@ and
 \begin_inset Formula $\mathit{r_{s}}$
 \end_inset
 
- of the maximal damage value 
+(
+\begin_inset Formula $0\leqslant r_{s}\leqslant1$
+\end_inset
+
+) of the maximal damage value 
 \begin_inset Formula $\mathit{D}_{s}$
 \end_inset
 
  for a fixed maximum load level.
- It is the material parameter for the damage behavior in the individual
- cycles.
- To make sure damage evolution begins to accumulate only when damage is
- accrued, 
+ At 
+\begin_inset Formula $\beta=\beta_{s}$
+\end_inset
+
+, the overall damage 
+\begin_inset Formula $D=r_{s}*D_{s}$
+\end_inset
+
+.
+ For example, in Figure 1, 
+\begin_inset Formula $D_{s}=1,$
+\end_inset
+
+
+\begin_inset Formula $r_{s}=0.5,$
+\end_inset
+
+and 
+\begin_inset Formula $\beta_{s}=1$
+\end_inset
+
+, meaning the overall damage in this cycle has reached 50% of the maximal
+ damage value 
+\begin_inset Formula $\mathit{D}_{s}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename C:/Users/Alex/Desktop/beta.PNG
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+Figure 1: Overall Damage variable 
+\begin_inset Formula $\mathit{D}$
+\end_inset
+
+as a function of Continuous Damage variable 
+\begin_inset Formula $\mathit{\beta}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To make sure damage evolution begins to accumulate only when damage is accrued,
+ 
 \begin_inset Formula $\tilde{\beta_{ini}}$
 \end_inset
 
@@ -80721,7 +80777,7 @@ and
 \end_inset
 
  that has reached a certain fraction 
-\begin_inset Formula $\mathit{r_{\infty}}$
+\begin_inset Formula $\mathit{r_{\infty}}(0\leqslant r_{\infty}\leqslant1)$
 \end_inset
 
  of the maximal damage value 
@@ -80729,6 +80785,19 @@ and
 \end_inset
 
  for a fixed maximum load level.
+ At 
+\begin_inset Formula $\gamma=\gamma_{\infty}$
+\end_inset
+
+, the overall damage 
+\begin_inset Formula $D_{s}=r_{\infty}*D_{\infty}$
+\end_inset
+
+ (the same relationship can be adapted from Figure 1 with 
+\begin_inset Formula $\gamma\sim\beta,r_{\infty}\sim r_{s},D_{\infty}\sim D_{s},D_{s}\sim D$
+\end_inset
+
+).
  
 \begin_inset Formula $\Psi_{ini}^{0}$
 \end_inset
@@ -80738,7 +80807,7 @@ and
  in relation to arterial expansion).
  It is the initial damage strain energy threshold value for the fibers.
  The time associated with the loading history is denoted by 
-\begin_inset Formula $\mathit{s\epsilon\mathbb{R^{+}}}$
+\begin_inset Formula $\mathit{s\epsilon\mathbb{\mathbb{R}}}$
 \end_inset
 
 and the time associated with the current loading situation is represented
@@ -80749,7 +80818,7 @@ and the time associated with the current loading situation is represented
 .
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Damage Fiber Power
 \begin_inset CommandInset label
 LatexCommand label
@@ -80820,7 +80889,7 @@ Parameter
 \begin_inset Text
 
 \begin_layout Plain Layout
-[ ]
+[M]
 \end_layout
 
 \end_inset
@@ -80924,7 +80993,7 @@ The strain energy is assumed to be of the following form,
 \end_layout
 
 \begin_layout Standard
-where 
+where the modified internal energy function 
 \begin_inset Formula $\mathit{P(C,D)}=(1-D)\Psi^{0}-c$
 \end_inset
 
@@ -80940,7 +81009,91 @@ reference "sec:Continuous-Damage"
 \end_inset
 
 ).
- By setting, 
+ 
+\begin_inset Formula $m(P(C,D))$
+\end_inset
+
+ is the arbitrary convex and monotonically increasing function, whose first
+ derivative is zero in the origin.
+ Possible functions of 
+\begin_inset Formula $\bar{P}$
+\end_inset
+
+ are given by
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $\bar{P}_{1}:=J_{4}^{(a)}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{P}_{3}:=K_{1}^{(a)}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{P}_{2}:=K_{2}^{(a)}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{P}_{4}:=K_{3}^{(a)}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+(
+\begin_inset Formula $\bar{P}_{5}:=I_{1},\bar{P}_{6}:=I_{2},\bar{P}_{7}:=I_{3}$
+\end_inset
+
+),
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $a$
+\end_inset
+
+ denotes the direction of the fibers.
+\end_layout
+
+\begin_layout Standard
+The subtraction of 
+\begin_inset Formula $c$
+\end_inset
+
+ ensures the stress-free reference configuration for the undamaged case
+ is satisfied, 
+\begin_inset Formula $c$
+\end_inset
+
+ is the value of the function 
+\begin_inset Formula $\bar{P}$
+\end_inset
+
+ in the natural state and is given by
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $c$
+\end_inset
+
+=
+\begin_inset Formula $\bar{P_{i}}(C=I)$
+\end_inset
+
+ for 
+\begin_inset Formula $i=1,...,7).$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+By setting, 
 \end_layout
 
 \begin_layout Standard
@@ -80962,6 +81115,35 @@ the strain-energy form above can be made suitable for modeling damage,
 \begin_layout Standard
 \align center
 \begin_inset Formula $\varPsi(C,D)=\alpha_{1}\left(\left(1-D\right)\left[\kappa I_{1}+\left(1-\frac{3}{2}\kappa\right)K_{3}\right]-c\right)^{\alpha_{2}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The fifth invariant is not polyconvex, therefore alternative polyconvex
+ invariant functions are defined as
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{1}^{(a)}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J_{5}^{(a)}-I_{1}J_{4}^{(a)}+I_{2}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{2}^{(a)}=tr\left[C(I-M_{(a)})\right]=I_{1}-J_{4}^{(a)}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{3}^{(a)}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J_{4}^{(a)}+J_{5}^{(a)}$
 \end_inset
 
 .
@@ -81037,7 +81219,7 @@ Example:
 </solid>
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Damage Fiber Exponential
 \begin_inset CommandInset label
 LatexCommand label
@@ -81108,7 +81290,7 @@ Parameter
 \begin_inset Text
 
 \begin_layout Plain Layout
-[ ]
+[M]
 \end_layout
 
 \end_inset
@@ -81227,15 +81409,60 @@ The strain-energy function is given by,
 \end_layout
 
 \begin_layout Standard
-And
+and
 \end_layout
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $\mathit{m(P)=\frac{k_{1}}{2k_{2}}\left\{ \exp\left(k_{2}\left\langle P\right\rangle ^{2}\right)-1\right\} }$
+\begin_inset Formula $\mathit{m(P)=\frac{k_{1}}{2k_{2}}\left\{ \exp\left(k_{2}\left\langle P\right\rangle ^{2}\right)-1\right\} ,}$
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+where possible functions of 
+\begin_inset Formula $\bar{P}$
+\end_inset
+
+ are given by
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $\bar{P}_{1}:=J_{4}^{(a)}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{P}_{3}:=K_{1}^{(a)}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{P}_{2}:=K_{2}^{(a)}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{P}_{4}:=K_{3}^{(a)}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+(
+\begin_inset Formula $\bar{P}_{5}:=I_{1},\bar{P}_{6}:=I_{2},\bar{P}_{7}:=I_{3}$
+\end_inset
+
+),
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $a$
+\end_inset
+
+ denotes the direction of the fibers.
 \end_layout
 
 \begin_layout Standard
