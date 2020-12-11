@@ -69,10 +69,36 @@ vec3d FEBiphasicContactSurface::GetFluidForce()
 //-----------------------------------------------------------------------------
 double FEBiphasicContactSurface::GetFluidLoadSupport()
 {
-    double W = GetContactForce().norm();
-    double Wp = GetFluidForce().norm();
-    if (W == 0) return 0;
-    return Wp/W;
+    int n, i;
+    
+    // initialize contact force
+    double FLS = 0;
+    double A = 0;
+    
+    // loop over all elements of the surface
+    for (n=0; n<Elements(); ++n)
+    {
+        FESurfaceElement& el = Element(n);
+        // evaluate the fluid force for that element
+        for (i=0; i<el.GaussPoints(); ++i)
+        {
+            FEBiphasicContactPoint *cp = dynamic_cast<FEBiphasicContactPoint*>(el.GetMaterialPoint(i));
+            if (cp) {
+                double w = el.GaussWeights()[i];
+                // get the base vectors
+                vec3d g[2];
+                CoBaseVectors(el, i, g);
+                // normal (magnitude = area)
+                vec3d n = g[0] ^ g[1];
+                double da = n.norm();
+                FLS += cp->m_fls*w*da;
+            }
+        }
+    }
+    
+    A = GetContactArea();
+    
+    return (A > 0) ? FLS/A : 0;
 }
 
 //-----------------------------------------------------------------------------
