@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "DumpStream.h"
 #include "FENode.h"
+#include "FEMaterialPoint.h"
 
 REGISTER_SUPER_CLASS(FENodalLoad, FENODALLOAD_ID);
 
@@ -180,10 +181,27 @@ bool FENodalDOFLoad::SetDofList(FEDofList& dofList)
 //! Return the current value of the nodal load
 void FENodalDOFLoad::GetNodalValues(int n, std::vector<double>& val)
 {
-	val[0] = m_scale;
+	assert(val.size() == 1);
+	const FENodeSet& nset = *GetNodeSet();
+	int nid = nset[n];
+	const FENode& node = *nset.Node(n);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = n;
+
+	val[0] = m_scale(mp);
 }
 
 double FENodalDOFLoad::NodeValue(int n)
 {
-	return m_scale;
+	const FENodeSet& nset = *GetNodeSet();
+	int nid = nset[n];
+	const FENode& node = *nset.Node(n);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = n;
+
+	return m_scale(mp);
 }
