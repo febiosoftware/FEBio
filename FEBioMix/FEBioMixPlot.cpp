@@ -56,6 +56,36 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+// Plot local fluid load support
+bool FEPlotLocalFluidLoadSupport::Save(FESurface& surf, FEDataStream& a)
+{
+    FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    writeElementValue<double>(surf, a, [=](int nface) {
+        double gn;
+        pcs->GetLocalFLS(nface, gn);
+        return gn;
+    });
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot effective friction coefficient
+bool FEPlotEffectiveFrictionCoeff::Save(FESurface& surf, FEDataStream& a)
+{
+    FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    writeElementValue<double>(surf, a, [=](int nface) {
+        double gn;
+        pcs->GetMuEffective(nface, gn);
+        return gn;
+    });
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 {
     FESurface* pcs = &surf;

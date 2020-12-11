@@ -49,7 +49,6 @@ public:
         double	m_epsn;     //!< penalty factor
         double	m_epsp;     //!< pressure penalty factor
         double  m_p1;       //!< fluid pressure
-        double  m_mueff;    //!< effective friction coefficient
         vec3d	m_nu;       //!< normal at integration points
         vec3d   m_s1;       //!< tangent along slip direction
         vec3d   m_tr;       //!< contact traction
@@ -95,7 +94,8 @@ public:
     void GetVectorGap      (int nface, vec3d& pg) override;
     void GetContactTraction(int nface, vec3d& pt) override;
     void GetSlipTangent    (int nface, vec3d& pt);
-    void GetMuEffective    (int nface, double& pg);
+    void GetMuEffective    (int nface, double& pg) override;
+    void GetLocalFLS       (int nface, double& pg) override;
     void GetNodalVectorGap      (int nface, vec3d* pg) override;
     void GetNodalContactPressure(int nface, double* pg) override;
     void GetNodalContactTraction(int nface, vec3d* pt) override;

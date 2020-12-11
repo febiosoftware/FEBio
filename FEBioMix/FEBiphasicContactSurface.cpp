@@ -75,6 +75,18 @@ double FEBiphasicContactSurface::GetFluidLoadSupport()
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicContactSurface::GetMuEffective(int nface, double& pg)
+{
+    pg = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicContactSurface::GetLocalFLS(int nface, double& pg)
+{
+    pg = 0;
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
