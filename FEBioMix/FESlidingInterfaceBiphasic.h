@@ -199,7 +199,8 @@ public:
     int				m_nsegup;		//!< segment update parameter
     bool			m_breloc;		//!< node relocation on startup
     bool            m_bsmaug;       //!< smooth augmentation
-    
+    bool            m_bsmfls;       //!< smooth local fluid load support
+
     double			m_epsn;		    //!< normal penalty factor
     bool			m_bautopen;	    //!< use autopenalty factor
     bool            m_bupdtpen;     //!< update penalty at each time step
