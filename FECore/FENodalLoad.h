@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEModelLoad.h"
 #include "FENodeDataMap.h"
 #include "FEDofList.h"
+#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
@@ -104,15 +105,14 @@ public:
 
 	//! get/set load 
 	void SetLoad(double s);
-	double GetLoad() const { return m_scale; }
 
 	void GetNodalValues(int n, std::vector<double>& val) override;
 
 	double NodeValue(int n);
 
 private:
-	int			m_dof;		//!< degree of freedom index
-	double		m_scale;	//!< applied load scale factor
+	int				m_dof;		//!< degree of freedom index
+	FEParamDouble	m_scale;	//!< applied load scale factor
 
 	DECLARE_FECORE_CLASS();
 };
