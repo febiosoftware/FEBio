@@ -154,7 +154,7 @@ void FEBiphasicSoluteSolidDomain::InitMaterialPoints()
             pt.m_pa = m_pMat->Pressure(mp);
             
             // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->m_phi0;
+            pt.m_phi0 = m_pMat->m_phi0(mp);
             
             // calculate stress
             pm.m_s = m_pMat->Stress(mp);
@@ -233,7 +233,7 @@ void FEBiphasicSoluteSolidDomain::Reset()
         FESolutesMaterialPoint&  ps = *(mp.ExtractData<FESolutesMaterialPoint >());
             
         // initialize referential solid volume fraction
-        pt.m_phi0 = m_pMat->m_phi0;
+        pt.m_phi0 = m_pMat->m_phi0(mp);
             
         // initialize multiphasic solutes
         ps.m_nsol = nsol;

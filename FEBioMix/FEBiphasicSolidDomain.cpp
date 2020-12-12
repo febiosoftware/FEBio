@@ -232,7 +232,7 @@ void FEBiphasicSolidDomain::Reset()
 		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 
 		// initialize referential solid volume fraction
-		pt.m_phi0 = m_pMat->m_phi0;
+		pt.m_phi0 = m_pMat->m_phi0(mp);
 	});
 }
 
@@ -258,7 +258,7 @@ void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 		int nel_p = el.ShapeFunctions(degree_p);
 
 		// get the element force vector and initialize it to zero
-		int ndof = 4*nel_d;
+		int ndof = 3*nel_d + nel_p;
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector

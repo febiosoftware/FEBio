@@ -119,7 +119,6 @@ FEMaterialPoint* FEBiphasic::CreateMaterialPointData()
 	}
 	else pt->SetNext(ep);
 
-	pt->m_phi0 = m_phi0;
 	return pt;
 }
 

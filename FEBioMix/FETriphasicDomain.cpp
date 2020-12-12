@@ -169,7 +169,7 @@ void FETriphasicDomain::Activate()
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 
 			// initialize referential solid volume fraction
-			pt.m_phi0 = pmb->m_phi0;
+			pt.m_phi0 = pmb->m_phi0(mp);
 
 			// initialize effective fluid pressure, its gradient, and fluid flux
 			pt.m_p = el.Evaluate(p0, n);
@@ -221,7 +221,7 @@ void FETriphasicDomain::Reset()
 		FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
 		// initialize referential solid volume fraction
-		pt.m_phi0 = pmb->m_phi0;
+		pt.m_phi0 = pmb->m_phi0(mp);
 			
 		// initialize multiphasic solutes
 		ps.m_nsol = nsol;

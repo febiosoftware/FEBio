@@ -118,9 +118,9 @@ public:
     FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
     
 public: // material parameters
-	double						m_phi0;			//!< solid volume fraction in reference configuration
+	FEParamDouble				m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density
-	double						m_cFr;			//!< fixed charge density in reference configurations
+	FEParamDouble				m_cFr;			//!< fixed charge density in reference configurations
 	double						m_penalty;		//!< penalty for enforcing electroneutrality
 
 public:

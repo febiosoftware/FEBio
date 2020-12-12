@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FESolute.h"
 #include "FEOsmoticCoefficient.h"
 #include "FESoluteInterface.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
@@ -102,7 +103,7 @@ public:
 	
 public: // material parameters
 	double						m_rhoTw;		//!< true fluid density
-	double						m_phi0;			//!< solid volume fraction in reference configuration
+	FEParamDouble				m_phi0;			//!< solid volume fraction in reference configuration
 
 public:
 	double						m_Mu;			//!< solute molecular weight

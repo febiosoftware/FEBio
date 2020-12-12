@@ -153,7 +153,7 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	// relative volume
 	double J = et.m_J;
 	double phi0 = pet.m_phi0;
-	double cF = m_cFr*(1-phi0)/(J-phi0);
+	double cF = m_cFr(pt)*(1-phi0)/(J-phi0);
 	
 	return cF;
 }
