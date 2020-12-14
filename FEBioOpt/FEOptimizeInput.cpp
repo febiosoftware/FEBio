@@ -211,7 +211,8 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 					do
 					{
 						tag.value(v, 2);
-						data.push_back(pair<double, double>(v[0], v[1]));
+						pair<double, double> p(v[0], v[1]);
+						data.push_back(p);
 						++tag;
 					} while (!tag.isend());
 				}
