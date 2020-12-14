@@ -38,6 +38,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEPrescribedActiveContractionUniaxial::FEPrescribedActiveContractionUniaxial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_T0 = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,7 +82,8 @@ mat3ds FEPrescribedActiveContractionUniaxial::Stress(FEMaterialPoint &mp)
     mat3ds N = dyad(nt);
     
     // evaluate the active stress
-    mat3ds s = N*(m_T0/J);
+	double T0 = m_T0(mp);
+    mat3ds s = N*(T0/J);
     
     return s;
 }

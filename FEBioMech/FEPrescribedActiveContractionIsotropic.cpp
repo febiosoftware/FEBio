@@ -38,6 +38,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEPrescribedActiveContractionIsotropic::FEPrescribedActiveContractionIsotropic(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_T0 = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,7 +50,8 @@ mat3ds FEPrescribedActiveContractionIsotropic::Stress(FEMaterialPoint &mp)
     mat3ds b = pt.LeftCauchyGreen();
     
     // evaluate the active stress
-    mat3ds s = b*(m_T0/J);
+	double T0 = m_T0(mp);
+    mat3ds s = b*(T0/J);
     
     return s;
 }

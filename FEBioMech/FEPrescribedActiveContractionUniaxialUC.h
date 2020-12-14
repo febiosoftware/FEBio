@@ -51,7 +51,7 @@ public:
     tens4ds DevTangent(FEMaterialPoint& pt) override;
     
 public:
-    double	m_T0;       // prescribed active stress
+    FEParamDouble	m_T0;       // prescribed active stress
 
 private:
 	vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)

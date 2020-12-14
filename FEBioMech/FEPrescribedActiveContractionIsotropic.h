@@ -45,7 +45,7 @@ public:
     tens4ds Tangent(FEMaterialPoint& pt) override;
     
 public:
-    double	m_T0;       // prescribed active stress
+    FEParamDouble	m_T0;       // prescribed active stress
     
     DECLARE_FECORE_CLASS();
 };

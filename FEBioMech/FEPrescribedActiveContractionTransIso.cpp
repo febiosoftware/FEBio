@@ -38,6 +38,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEPrescribedActiveContractionTransIso::FEPrescribedActiveContractionTransIso(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_T0 = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,7 +83,8 @@ mat3ds FEPrescribedActiveContractionTransIso::Stress(FEMaterialPoint &mp)
     mat3ds N = dyad(nt);
     
     // evaluate the active stress
-    mat3ds s = (b-N)*(m_T0/J);
+	double T0 = m_T0(mp);
+    mat3ds s = (b-N)*(T0/J);
     
     return s;
 }
