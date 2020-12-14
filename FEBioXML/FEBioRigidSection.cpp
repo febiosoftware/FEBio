@@ -34,6 +34,8 @@ SOFTWARE.*/
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidMaterial.h>
 #include <FEBioMech/FERigidForce.h>
+#include <FEBioMech/FERigidFollowerForce.h>
+#include <FEBioMech/FERigidFollowerMoment.h>
 
 void FEBioRigidSection::Parse(XMLTag& tag)
 {
@@ -107,6 +109,20 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 
 		ReadParameterList(tag, rc);
 	}
+    else if (strcmp(sztype, "follower force") == 0)
+    {
+        FERigidFollowerForce* rc = fecore_alloc(FERigidFollowerForce, &fem);
+        GetBuilder()->AddModelLoad(rc);
+        
+        ReadParameterList(tag, rc);
+    }
+    else if (strcmp(sztype, "follower moment") == 0)
+    {
+        FERigidFollowerMoment* rc = fecore_alloc(FERigidFollowerMoment, &fem);
+        GetBuilder()->AddModelLoad(rc);
+        
+        ReadParameterList(tag, rc);
+    }
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 }
 
