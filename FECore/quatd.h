@@ -225,13 +225,16 @@ public:
 	{
 		vec3d r(x,y,z);
 		r.unit();
-		double a = (double)(acos(w)*2.0);
+		double a = GetAngle();
 		return r*a;
 	}
 
 	double GetAngle() const
 	{
-		return (double)(acos(w)*2.0);
+        vec3d r(x,y,z);
+        double sha = r.unit();
+        double cha = w;
+		return (double)(atan2(sha,cha)*2.0);
 	}
 
 	// use only when *this is unit vector

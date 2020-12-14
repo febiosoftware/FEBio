@@ -1319,8 +1319,6 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 		// they need to be interpreted differently than displacements
 		if (RB.m_prb == 0)
 		{
-			quatd qdu;          // quaternion of net increment
-
 			if (RB.m_bpofr) {
 				// if all rotation components are known (prescribed or fixed)
 				// evaluate net increment from load curve
@@ -1344,15 +1342,11 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 				if (lm[3] >= 0) { vUi.x = Ui[lm[3]]; vui.x = ui[lm[3]]; }
 				if (lm[4] >= 0) { vUi.y = Ui[lm[4]]; vui.y = ui[lm[4]]; }
 				if (lm[5] >= 0) { vUi.z = Ui[lm[5]]; vui.z = ui[lm[5]]; }
-				quatd qUi(2 * atan(vUi.norm() / 2), vUi);                    // Cayley transform
-				quatd qui(2 * atan(vui.norm() / 2), vui);                    // Cayley transform
-				qdu = qui*qUi;
+				quatd qUi(2 * atan(vUi.norm() / 2), vUi);                   // Cayley transform
+				quatd qui(2 * atan(vui.norm() / 2), vui);                   // Cayley transform
+				quatd qdu = qui*qUi;                                        // quaternion of net increment
 
 				qdu.MakeUnit();                                         // clean-up roundoff errors
-				vec3d vdu = qdu.GetVector()*(2 * tan(qdu.GetAngle() / 2));  // Cayley transform
-				du[3] = vdu.x; du[4] = vdu.y; du[5] = vdu.z;
-
-				quatd qdu(2 * atan(vdu.norm() / 2), vdu);
 				quatd Q = qdu*RB.m_qp;
 				Q.MakeUnit();
 
