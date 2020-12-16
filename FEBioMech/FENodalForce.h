@@ -47,7 +47,7 @@ protected: // required functions of FENodalLoad
 	void GetNodalValues(int inode, std::vector<double>& val) override;
 
 private:
-	vec3d	m_f;		//!< the applied force
+	FEParamVec3		m_f;		//!< the applied force
 
 	DECLARE_FECORE_CLASS();
 };
