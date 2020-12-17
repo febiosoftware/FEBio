@@ -23,12 +23,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEPointFunction.h"
 #include "DumpStream.h"
+#ifdef HAVE_GSL
+#include "gsl/gsl_errno.h"
+#include "gsl/gsl_spline.h"
+#endif
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
@@ -38,13 +39,24 @@ BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
     ADD_PARAMETER(m_bln, "log");
 END_FECORE_CLASS();
 
+class FEPointFunction::Imp
+{
+public:
+	double* m_x;        //!<  x values
+	double* m_y;        //!<  y values
+#ifdef HAVE_GSL
+	gsl_interp_accel*   m_acc;
+	gsl_spline*         m_spline;
+#endif
+};
+
 //-----------------------------------------------------------------------------
 //! default constructor
-FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR), m_ext(CONSTANT)
+FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR), m_ext(CONSTANT), imp(new Imp)
 {
 #ifdef HAVE_GSL
-	m_acc = nullptr;
-    m_spline = nullptr;
+	imp->m_acc = nullptr;
+	imp->m_spline = nullptr;
 #endif
     m_bln = false;
 }
@@ -63,32 +75,32 @@ bool FEPointFunction::Init()
     if (m_fnc >= POLYNOMIAL) {
         // store points in arrays suitable for GSL
         const int N = Points();
-        m_x = new double[N];
-        m_y = new double[N];
+		imp->m_x = new double[N];
+		imp->m_y = new double[N];
         for (int i=0; i<N; ++i) {
-            m_x[i] = m_points[i].x();
-            m_y[i] = m_points[i].y();
+			imp->m_x[i] = m_points[i].x();
+			imp->m_y[i] = m_points[i].y();
         }
         // initialize GSL spline
-        m_acc = gsl_interp_accel_alloc();
+		imp->m_acc = gsl_interp_accel_alloc();
         switch (m_fnc) {
             case POLYNOMIAL:
-                m_spline = gsl_spline_alloc(gsl_interp_polynomial, N);
+				imp->m_spline = gsl_spline_alloc(gsl_interp_polynomial, N);
                 break;
             case CSPLINE:
-                m_spline = gsl_spline_alloc(gsl_interp_cspline, N);
+				imp->m_spline = gsl_spline_alloc(gsl_interp_cspline, N);
                 break;
             case AKIMA:
-                m_spline = gsl_spline_alloc(gsl_interp_akima, N);
+				imp->m_spline = gsl_spline_alloc(gsl_interp_akima, N);
                 break;
             case STEFFEN:
-                m_spline = gsl_spline_alloc(gsl_interp_steffen, N);
+				imp->m_spline = gsl_spline_alloc(gsl_interp_steffen, N);
                 break;
 
             default:
                 break;
         }
-        gsl_spline_init (m_spline, m_x, m_y, N);
+        gsl_spline_init (imp->m_spline, imp->m_x, imp->m_y, N);
     }
 #endif
     return FEFunction1D::Init();
@@ -189,9 +201,9 @@ double FEPointFunction::value(double time) const
     if (m_fnc >= POLYNOMIAL)
     {
 #ifdef HAVE_GSL
-        if (time > tmax) return gsl_spline_eval(m_spline, tmax, m_acc);
-        else if (time < tmin) return gsl_spline_eval(m_spline, tmin, m_acc);
-        else return gsl_spline_eval(m_spline, time, m_acc);
+        if (time > tmax) return gsl_spline_eval(imp->m_spline, tmax, imp->m_acc);
+        else if (time < tmin) return gsl_spline_eval(imp->m_spline, tmin, imp->m_acc);
+        else return gsl_spline_eval(imp->m_spline, time, imp->m_acc);
 #else
         return 0;
 #endif
@@ -445,9 +457,9 @@ double FEPointFunction::derive(double time) const
 
     if (m_fnc >= POLYNOMIAL) {
 #ifdef HAVE_GSL
-        if (time > tmax) return gsl_spline_eval_deriv(m_spline, tmax, m_acc);
-        else if (time < tmin) return gsl_spline_eval_deriv(m_spline, tmin, m_acc);
-        else return gsl_spline_eval_deriv(m_spline, time, m_acc);
+        if (time > tmax) return gsl_spline_eval_deriv(imp->m_spline, tmax, imp->m_acc);
+        else if (time < tmin) return gsl_spline_eval_deriv(imp->m_spline, tmin, imp->m_acc);
+        else return gsl_spline_eval_deriv(imp->m_spline, time, imp->m_acc);
 #else
         return 0;
 #endif
@@ -506,9 +518,9 @@ double FEPointFunction::deriv2(double time) const
     
     if (m_fnc >= POLYNOMIAL) {
 #ifdef HAVE_GSL
-        if (time > tmax) return gsl_spline_eval_deriv2(m_spline, tmax, m_acc);
-        else if (time < tmin) return gsl_spline_eval_deriv2(m_spline, tmin, m_acc);
-        else return gsl_spline_eval_deriv2(m_spline, time, m_acc);
+        if (time > tmax) return gsl_spline_eval_deriv2(imp->m_spline, tmax, imp->m_acc);
+        else if (time < tmin) return gsl_spline_eval_deriv2(imp->m_spline, tmin, imp->m_acc);
+        else return gsl_spline_eval_deriv2(imp->m_spline, time, imp->m_acc);
 #else
         return 0;
 #endif

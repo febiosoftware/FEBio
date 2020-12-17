@@ -23,17 +23,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FEFunction1D.h"
-
 #include <vector>
-#ifdef HAVE_GSL
-#include "gsl/gsl_errno.h"
-#include "gsl/gsl_spline.h"
-#endif
 
 //-----------------------------------------------------------------------------
 class DumpStream;
@@ -46,6 +38,8 @@ class DumpStream;
 
 class FECORE_API FEPointFunction : public FEFunction1D
 {
+	class Imp;
+
 public:
 	//! Load point structure
 	struct LOADPOINT
@@ -130,12 +124,7 @@ public:
 	std::vector<vec2d>	m_points;
     
 private:
-    double* m_x;        //!<  x values
-    double* m_y;        //!<  y values
-#ifdef HAVE_GSL
-    gsl_interp_accel*   m_acc;
-    gsl_spline*         m_spline;
-#endif
+	Imp*	imp;
 
 	DECLARE_FECORE_CLASS();
 };
