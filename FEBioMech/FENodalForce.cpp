@@ -28,6 +28,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FENodalForce.h"
 #include "FEBioMech.h"
+#include <FECore/FENodeSet.h>
+#include <FECore/FEMaterialPoint.h>
+#include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
 	ADD_PARAMETER(m_f, "value");
@@ -45,7 +48,18 @@ bool FENodalForce::SetDofList(FEDofList& dofList)
 
 void FENodalForce::GetNodalValues(int inode, std::vector<double>& val)
 {
-	val[0] = m_f.x;
-	val[1] = m_f.y;
-	val[2] = m_f.z;
+	assert(val.size() == 3);
+	const FENodeSet& nset = *GetNodeSet();
+	int nid = nset[inode];
+	const FENode& node = *nset.Node(inode);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = inode;
+
+	vec3d f = m_f(mp);
+
+	val[0] = f.x;
+	val[1] = f.y;
+	val[2] = f.z;
 }
