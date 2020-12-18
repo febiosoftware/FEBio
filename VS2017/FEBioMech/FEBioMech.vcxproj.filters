@@ -750,6 +750,9 @@
     <ClInclude Include="..\..\FEBioMech\FEAzimuthConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEHolzapfelUnconstrained.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1467,6 +1470,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEAzimuthConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEHolzapfelUnconstrained.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

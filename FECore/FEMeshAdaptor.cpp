@@ -97,10 +97,13 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 			bool bselect = Check(el, elemVal);
 			if (bselect)
 			{
-				elem.push_back(pair<int, double>(nelem, elemVal));
+				int nid = nelem;
+				if (elemSet) nid = (*elemSet)[nelem];
+				elem.push_back(pair<int, double>(nid, elemVal));
 				nselected++;
 			}
 		}
+		nelem++;
 	}
 
 	FEMeshAdaptorSelection selectedElement;

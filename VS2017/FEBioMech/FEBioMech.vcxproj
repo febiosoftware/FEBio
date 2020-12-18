@@ -608,6 +608,7 @@
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolzapfelGasserOgden.h" />
+    <ClInclude Include="..\..\FEBioMech\FEHolzapfelUnconstrained.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEInitialPreStrain.h" />
@@ -853,6 +854,7 @@
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolzapfelGasserOgden.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEHolzapfelUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEInitialPreStrain.cpp" />
