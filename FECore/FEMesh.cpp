@@ -909,3 +909,89 @@ FEDataMap* FEMesh::GetDataMap(int i)
 {
 	return m_DataMap[i];
 }
+
+//==============================================================================
+FEElementIterator::FEElementIterator(FEMesh* mesh, FEElementSet* elemSet) : m_mesh(mesh), m_eset(elemSet)
+{
+	reset();
+}
+
+void FEElementIterator::reset()
+{
+	assert(m_mesh);
+	m_el = nullptr;
+	m_dom = -1;
+	m_index = -1;
+	if (m_eset)
+	{
+		if (m_eset->Elements())
+		{
+			m_index = 0;
+			m_el = &m_eset->Element(0);
+		}
+	}
+	else if (m_mesh && (m_mesh->Domains() > 0))
+	{
+		FEDomain& dom = m_mesh->Domain(0);
+		if (dom.Elements())
+		{
+			m_dom = 0;
+			m_index = 0;
+			m_el = &dom.ElementRef(0);
+		}
+	}
+}
+
+void FEElementIterator::operator++()
+{
+	if (m_el == nullptr)
+	{
+		assert(false);
+		return;
+	}
+
+	if (m_eset)
+	{
+		m_index++;
+		if (m_index < m_eset->Elements())
+		{
+			m_el = &m_eset->Element(m_index);
+		}
+		else
+		{
+			m_el = nullptr;
+		}
+	}
+	else if (m_mesh)
+	{
+		m_index++;
+		FEDomain& dom = m_mesh->Domain(m_dom);
+		if (m_index >= dom.Elements())
+		{
+			m_dom++;
+			if (m_dom < m_mesh->Domains())
+			{
+				FEDomain& dom2 = m_mesh->Domain(m_dom);
+				if (dom2.Elements())
+				{
+					m_index = 0;
+					m_el = &dom2.ElementRef(0);
+				}
+				else
+				{
+					m_el = nullptr;
+				}
+			}
+			else
+			{
+				m_el = nullptr;
+			}
+		}
+		else m_el = &dom.ElementRef(m_index);
+	}
+	else
+	{
+		assert(false);
+		m_el = nullptr;
+	}
+}

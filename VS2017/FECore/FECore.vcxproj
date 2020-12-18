@@ -587,7 +587,6 @@
     <ClInclude Include="..\..\FECore\FESolidElementShape.h" />
     <ClInclude Include="..\..\FECore\FESurfaceElement.h" />
     <ClInclude Include="..\..\FECore\FESurfaceElementShape.h" />
-    <ClInclude Include="..\..\FECore\FETetgenRefine.h" />
     <ClInclude Include="..\..\FECore\FETetRefine.h" />
     <ClInclude Include="..\..\FECore\FEValuator.h" />
     <ClInclude Include="..\..\FECore\FEVec3dValuator.h" />
@@ -796,7 +795,6 @@
     <ClCompile Include="..\..\FECore\FESolidElementShape.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceElement.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceElementShape.cpp" />
-    <ClCompile Include="..\..\FECore\FETetgenRefine.cpp" />
     <ClCompile Include="..\..\FECore\FETetRefine.cpp" />
     <ClCompile Include="..\..\FECore\FEVec3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />

@@ -68,6 +68,7 @@ public:
 	// return the local index of an element into the element set
 	// returns -1 if the element is not part of element set
 	int GetLocalIndex(const FEElement& el) const;
+	bool Contains(const FEElement& el) const;
 
 	// Get the element ID list
 	const std::vector<int>& GetElementIDList() const { return m_Elem; }
@@ -103,4 +104,9 @@ protected:
 inline int FEElementSet::GetLocalIndex(const FEElement& el) const
 {
 	return m_LUT[el.GetID() - m_minID];
+}
+
+inline bool FEElementSet::Contains(const FEElement& el) const
+{
+	return (GetLocalIndex(el) != -1);
 }

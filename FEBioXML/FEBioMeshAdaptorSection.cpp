@@ -55,6 +55,17 @@ void FEBioMeshAdaptorSection::ParseMeshAdaptor(XMLTag& tag)
 	FEMeshAdaptor* meshAdaptor = fecore_new<FEMeshAdaptor>(sztype, fem);
 	if (meshAdaptor == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+	// get the optional element set
+	const char* set = tag.AttributeValue("elem_set", true);
+	if (set)
+	{
+		FEMesh& mesh = fem->GetMesh();
+		FEElementSet* elemSet = mesh.FindElementSet(set);
+		if (elemSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", set);
+
+		meshAdaptor->SetElementSet(elemSet);
+	}
+
 	fem->AddMeshAdaptor(meshAdaptor);
 
 	ReadParameterList(tag, meshAdaptor);

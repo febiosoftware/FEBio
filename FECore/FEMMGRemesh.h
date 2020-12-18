@@ -39,6 +39,8 @@ public:
 private:
 	bool Remesh();
 
+	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
+
 private:
 	int		m_maxiter;
 	int		m_maxelem;

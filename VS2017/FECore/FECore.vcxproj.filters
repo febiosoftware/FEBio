@@ -612,9 +612,6 @@
     <ClInclude Include="..\..\FECore\FEDofList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FETetgenRefine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FEOctreeSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1185,9 +1182,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEDofList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\FETetgenRefine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEOctreeSearch.cpp">

@@ -41,7 +41,7 @@ SOFTWARE.*/
 class FEMMGRemesh::MMG
 {
 public:
-	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMeshAdaptorCriterion* criterion, double scale);
+	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMMGRemesh* mmgRemesh, double scale);
 	bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem);
 
 public:
@@ -133,7 +133,7 @@ bool FEMMGRemesh::Remesh()
 
 	// --- build the MMG mesh ---
 	FEMeshTopo& topo = *m_topo;
-	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, m_criterion, m_scale) == false) return false;
+	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, this, m_scale) == false) return false;
 	
 	// set the control parameters
 	MMG3D_Set_dparameter(mmgMesh, mmgSol, MMG3D_DPARAM_hmin, m_hmin);
@@ -169,7 +169,7 @@ bool FEMMGRemesh::Remesh()
 
 #ifdef HAS_MMG
 
-bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMeshAdaptorCriterion* criterion, double scale)
+bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMMGRemesh* mmgRemesh, double scale)
 {
 	FEMesh& mesh = *topo.GetMesh();
 	int NN = mesh.Nodes();
@@ -333,16 +333,17 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 	}
 
 	// scale factors
+	FEMeshAdaptorCriterion* criterion = mmgRemesh->GetCriterion();
 	if (criterion)
 	{
-		vector< pair<int, double> > elemList = criterion->GetElementList();
+		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(mmgRemesh->GetElementSet());
 		for (int i = 0; i < (int)elemList.size(); ++i)
 		{
-			FEElement& el = *topo.Element(elemList[i].first);
+			FEElement& el = *topo.Element(elemList[i].m_elementIndex);
 			for (int j = 0; j < el.Nodes(); ++j)
 			{
 				double s = scale;
-				if (elemList[i].second != 0.0) s = elemList[i].second;
+				if (elemList[i].m_scaleFactor != 0.0) s = elemList[i].m_scaleFactor;
 				edgeScale[el.m_node[j]] = s;
 			}
 		}
@@ -597,6 +598,22 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		dom.CreateMaterialPointData();
 		dom.Init();
 		dom.Activate();
+	}
+	mesh.RebuildLUT();
+
+	// recreate element sets
+	for (int i = 0; i < mesh.ElementSets(); ++i)
+	{
+		FEElementSet& eset = mesh.ElementSet(i);
+
+		// get the domain list
+		// NOTE: Don't get the reference, since then the same reference
+		// is passed to Create below, which causes problems.
+		FEDomainList domList = eset.GetDomainList();
+		if (domList.IsEmpty()) { throw std::runtime_error("Error in FEMMGRemesh!"); }
+
+		// recreate the element set from the domain list
+		eset.Create(domList);
 	}
 
 	// recreate surfaces

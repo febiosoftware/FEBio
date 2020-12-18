@@ -55,7 +55,6 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
-#include "FETetgenRefine.h"
 #include "FEMMGRemesh.h"
 #include "FEConstValueVec3.h"
 
@@ -166,7 +165,6 @@ REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
 REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
 REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
-REGISTER_FECORE_CLASS(FETetgenRefine  , "tetgen_refine");
 REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
 
 REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");

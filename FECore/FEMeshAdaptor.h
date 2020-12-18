@@ -35,6 +35,7 @@ SOFTWARE.*/
 class FEModel;
 class FEElement;
 class FEMaterialPoint;
+class FEElementSet;
 
 //-----------------------------------------------------------------------------
 // Base class for all mesh adaptors
@@ -45,10 +46,40 @@ class FECORE_API FEMeshAdaptor : public FECoreBase
 public:
 	FEMeshAdaptor(FEModel* fem);
 
+	void SetElementSet(FEElementSet* elemSet);
+	FEElementSet* GetElementSet();
+
 	// The mesh adaptor should return true if the mesh remained unchanged
 	// otherwise, it should return false.
 	// iteration is the iteration number of the mesh adaptation loop
 	virtual bool Apply(int iteration) = 0;
+
+private:
+	FEElementSet*	m_elemSet;
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEMeshAdaptorSelection
+{
+public:
+	struct Item {
+		int		m_elementIndex;
+		double	m_scaleFactor;
+	};
+
+public:
+	FEMeshAdaptorSelection() {}
+	FEMeshAdaptorSelection(size_t size) : m_itemList(size) {}
+
+	void resize(size_t newSize) { m_itemList.resize(newSize); }
+	Item& operator [] (size_t item) { return m_itemList[item]; }
+	const Item& operator [] (size_t item) const { return m_itemList[item]; }
+	bool empty() const { return m_itemList.empty(); }
+	size_t size() const { return m_itemList.size(); }
+	void push_back(int elemIndex, double scale) { m_itemList.push_back(Item{ elemIndex, scale }); }
+
+private:
+	std::vector<Item>	m_itemList;
 };
 
 //-----------------------------------------------------------------------------
@@ -69,10 +100,9 @@ public:
 public:
 
 	// return a list of elements that satisfy the criterion
-	// each item is a pair where 
-	// first = element ID, 
-	// second = suggested element size scale factor (or zero if no suggestion)
-	virtual std::vector<pair<int, double> > GetElementList();
+	// The elements will be selected from the element set. If nullptr is passed
+	// for the element set, the entire mesh will be processed
+	virtual FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset);
 
 	// This function needs to be overridden in order to select some elements
 	// that satisfy the selection criterion
@@ -119,7 +149,7 @@ class FECORE_API FEElementSelectionCriterion : public FEMeshAdaptorCriterion
 {
 public:
 	FEElementSelectionCriterion(FEModel* fem);
-	virtual std::vector<pair<int, double> > GetElementList() override;
+	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
 
 private:
 	vector<int>	m_elemList;
@@ -133,7 +163,7 @@ class FECORE_API FEDomainErrorCriterion : public FEMeshAdaptorCriterion
 public:
 	FEDomainErrorCriterion(FEModel* fem);
 
-	virtual std::vector<pair<int, double> > GetElementList() override;
+	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
 
 	// derived classes must implement this function
 	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;

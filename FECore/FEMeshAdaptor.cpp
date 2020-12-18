@@ -38,8 +38,19 @@ REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
 
 FEMeshAdaptor::FEMeshAdaptor(FEModel* fem) : FECoreBase(fem)
 {
-
+	m_elemSet = nullptr;
 }
+
+void FEMeshAdaptor::SetElementSet(FEElementSet* elemSet)
+{
+	m_elemSet = elemSet;
+}
+
+FEElementSet* FEMeshAdaptor::GetElementSet()
+{
+	return m_elemSet;
+}
+
 
 REGISTER_SUPER_CLASS(FEMeshAdaptorCriterion, FEMESHADAPTORCRITERION_ID);
 
@@ -65,35 +76,34 @@ void FEMeshAdaptorCriterion::SetMaxElements(int m)
 }
 
 // return a list of elements that satisfy the criterion
-std::vector<pair<int, double> > FEMeshAdaptorCriterion::GetElementList()
+FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet* elemSet)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
+	// allocate iterator
+	FEElementIterator it(&mesh, elemSet);
+
+	// loop over elements
 	int nselected = 0;
 	int nelem = 0;
 	vector< pair<int, double> > elem;
-	for (int i = 0; i < mesh.Domains(); ++i)
+	for (;it.isValid(); ++it)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		int NE = dom.Elements();
-		for (int j = 0; j < NE; ++j, ++nelem)
+		FEElement& el = *it;
+		if (el.isActive())
 		{
-			FEElement& el = dom.ElementRef(j);
-			if (el.isActive())
+			double elemVal = 0;
+			bool bselect = Check(el, elemVal);
+			if (bselect)
 			{
-				double elemVal = 0;
-				bool bselect = Check(el, elemVal);
-				if (bselect)
-				{
-					elem.push_back(pair<int, double>(nelem, elemVal));
-					nselected++;
-				}
+				elem.push_back(pair<int, double>(nelem, elemVal));
+				nselected++;
 			}
 		}
 	}
 
-	std::vector<pair<int, double> > selectedElement;
+	FEMeshAdaptorSelection selectedElement;
 	if (nselected > 0)
 	{
 		// sort the list
@@ -109,8 +119,8 @@ std::vector<pair<int, double> > FEMeshAdaptorCriterion::GetElementList()
 		selectedElement.resize(nelem);
 		for (int i = 0; i < nelem; ++i)
 		{
-			selectedElement[i].first = elem[i].first;
-			selectedElement[i].second = 0.;
+			selectedElement[i].m_elementIndex = elem[i].first;
+			selectedElement[i].m_scaleFactor = 0.;
 		}
 	}
 
@@ -179,13 +189,14 @@ FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshA
 
 }
 
-std::vector<pair<int, double> > FEElementSelectionCriterion::GetElementList()
+FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElementSet* elemSet)
 {
-	vector<pair<int, double> > elemList(m_elemList.size(), pair<int, double>(-1, 0.0));
+	FEMeshAdaptorSelection elemList(m_elemList.size());
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (int i = 0; i < (int)m_elemList.size(); ++i)
 	{
-		elemList[i].first = m_elemList[i] - 1;
+		elemList[i].m_elementIndex = m_elemList[i] - 1;
+		elemList[i].m_scaleFactor = 0.0;
 	}
 	return elemList;
 }
@@ -202,7 +213,7 @@ FEDomainErrorCriterion::FEDomainErrorCriterion(FEModel* fem) : FEMeshAdaptorCrit
 	SetSort(true);
 }
 
-std::vector<pair<int, double> > FEDomainErrorCriterion::GetElementList()
+FEMeshAdaptorSelection FEDomainErrorCriterion::GetElementSelection(FEElementSet* elemSet)
 {
 	// get the mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -216,13 +227,12 @@ std::vector<pair<int, double> > FEDomainErrorCriterion::GetElementList()
 	});
 
 	// the element list of elements that need to be refined
-	std::vector<pair<int, double> > elemList;
+	FEMeshAdaptorSelection elemList;
 
-	FEElementList EL(mesh);
-	FEElementList::iterator it = EL.begin();
 	// find the min and max stress values
+	FEElementIterator it(&mesh, elemSet);
 	double smin = 1e99, smax = -1e99;
-	for (int i = 0; i < NE; ++i, ++it)
+	for (; it.isValid(); ++it)
 	{
 		FEElement& el = *it;
 		int ni = el.GaussPoints();
@@ -237,8 +247,8 @@ std::vector<pair<int, double> > FEDomainErrorCriterion::GetElementList()
 
 	// calculate errors
 	double ev[FEElement::MAX_NODES];
-	it = EL.begin();
-	for (int i = 0; i < NE; ++i, ++it)
+	it.reset();
+	for (int i = 0; it.isValid(); ++it, ++i)
 	{
 		FEElement& el = *it;
 		int ne = el.Nodes();
@@ -266,7 +276,7 @@ std::vector<pair<int, double> > FEDomainErrorCriterion::GetElementList()
 		if (max_err > m_pct)
 		{
 			double f = m_pct / max_err;
-			elemList.push_back(pair<int, double>(i, f));
+			elemList.push_back(i, f);
 		}
 	}
 
