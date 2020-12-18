@@ -2865,6 +2865,19 @@ bool FEPlotPreStrainStretch::Save(FEDomain& dom, FEDataStream& a)
 	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(mat);
 	if (pmat == 0) return false;
 
+	// get the elastic component
+	FEProperty* prop = mat->FindProperty("elastic");
+	if (prop == nullptr) return false;
+
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(prop->get(0));
+	if (pme== 0) return false;
+
+	// get the fiber property
+	ParamString ps("fiber");
+	FEParam* pp = pme->FindParameter(ps);
+	if (pp == 0) return false;
+	FEParamVec3& vec = pp->value<FEParamVec3>();
+
 	int NE = dom.Elements();
 	for (int i = 0; i<NE; ++i)
 	{
@@ -2879,12 +2892,12 @@ bool FEPlotPreStrainStretch::Save(FEDomain& dom, FEDataStream& a)
 
 			mat3d& F = pt.m_F;
 			mat3d Fp = pp.prestrain();
-
 			mat3d Ft = F*Fp;
 
 			mat3d Q = mat->GetLocalCS(mp);
-			vec3d a0 = Q.col(0);
-			vec3d a = Ft*a0;
+			vec3d a0 = vec.unitVector(mp);
+			vec3d ar = Q * a0;
+			vec3d a = Ft*ar;
 
 			double lambda = a.norm();
 			lam += lambda;
