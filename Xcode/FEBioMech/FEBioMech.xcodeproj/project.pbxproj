@@ -13,6 +13,8 @@
 		D5135C2A232191C6008AFD7D /* FENaturalNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */; };
 		D51E614C22443FDB0049F545 /* FEMaxStressCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */; };
 		D51E614D22443FDB0049F545 /* FEMaxStressCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D51E614B22443FDB0049F545 /* FEMaxStressCriterion.h */; };
+		D524F6B4258BEB6000A403CD /* FEHolzapfelUnconstrained.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D524F6B2258BEB6000A403CD /* FEHolzapfelUnconstrained.cpp */; };
+		D524F6B5258BEB6000A403CD /* FEHolzapfelUnconstrained.h in Headers */ = {isa = PBXBuildFile; fileRef = D524F6B3258BEB6000A403CD /* FEHolzapfelUnconstrained.h */; };
 		D52D841C21CE9A7600472620 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D841921CE9A7600472620 /* stdafx.cpp */; };
 		D5322FE72142ACD9008DE511 /* FEDeformableSpringDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322E442142ACD7008DE511 /* FEDeformableSpringDomain.cpp */; };
 		D5322FE82142ACD9008DE511 /* FEExplicitSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322E452142ACD7008DE511 /* FEExplicitSolidSolver.h */; };
@@ -502,6 +504,8 @@
 		D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FENaturalNeoHookean.h; sourceTree = "<group>"; };
 		D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMaxStressCriterion.cpp; sourceTree = "<group>"; };
 		D51E614B22443FDB0049F545 /* FEMaxStressCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaxStressCriterion.h; sourceTree = "<group>"; };
+		D524F6B2258BEB6000A403CD /* FEHolzapfelUnconstrained.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEHolzapfelUnconstrained.cpp; sourceTree = "<group>"; };
+		D524F6B3258BEB6000A403CD /* FEHolzapfelUnconstrained.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEHolzapfelUnconstrained.h; sourceTree = "<group>"; };
 		D52D841921CE9A7600472620 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
 		D5322E352142ACC9008DE511 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5322E442142ACD7008DE511 /* FEDeformableSpringDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDeformableSpringDomain.cpp; sourceTree = "<group>"; };
@@ -1230,6 +1234,8 @@
 				D5322F462142ACD8008DE511 /* FEHolmesMow.h */,
 				D5322F1A2142ACD8008DE511 /* FEHolzapfelGasserOgden.cpp */,
 				D5322E932142ACD7008DE511 /* FEHolzapfelGasserOgden.h */,
+				D524F6B2258BEB6000A403CD /* FEHolzapfelUnconstrained.cpp */,
+				D524F6B3258BEB6000A403CD /* FEHolzapfelUnconstrained.h */,
 				D5322F432142ACD8008DE511 /* FEHuiskesSupply.cpp */,
 				D5322FC82142ACD8008DE511 /* FEHuiskesSupply.h */,
 				D5322ED62142ACD7008DE511 /* FEIncompNeoHookean.cpp */,
@@ -1541,6 +1547,7 @@
 				D53230C62142ACD9008DE511 /* FEPeriodicSurfaceConstraint.h in Headers */,
 				D532306C2142ACD9008DE511 /* FETrussMaterial.h in Headers */,
 				D5BD65A62333E32000EB9FD1 /* FEConstPrestrain.h in Headers */,
+				D524F6B5258BEB6000A403CD /* FEHolzapfelUnconstrained.h in Headers */,
 				D53230D62142ACD9008DE511 /* FEElasticShellDomain.h in Headers */,
 				D5C13ED3240477A3005897E1 /* FEActiveFiberStress.h in Headers */,
 				D53231532142ACD9008DE511 /* FEFiberIntegrationTriangle.h in Headers */,
@@ -2006,6 +2013,7 @@
 				D5DAB6D022A954F1004C4213 /* FERVEDamageMaterial.cpp in Sources */,
 				D5BD65AC2333E32000EB9FD1 /* FEPreStrainConstraint.cpp in Sources */,
 				D53231792142ACD9008DE511 /* FEBodyForce.cpp in Sources */,
+				D524F6B4258BEB6000A403CD /* FEHolzapfelUnconstrained.cpp in Sources */,
 				D53230282142ACD9008DE511 /* FEPressureLoad.cpp in Sources */,
 				D532311C2142ACD9008DE511 /* FEExplicitSolidSolver.cpp in Sources */,
 				D53231872142ACD9008DE511 /* FEContactInterface.cpp in Sources */,

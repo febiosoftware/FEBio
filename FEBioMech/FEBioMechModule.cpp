@@ -63,8 +63,9 @@ SOFTWARE.*/
 #include "FEFiberNHUC.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
-#include "FEHolzapfelGasserOgden.h"
 #include "FEHolmesMow.h"
+#include "FEHolzapfelGasserOgden.h"
+#include "FEHolzapfelUnconstrained.h"
 #include "FEHuiskesSupply.h"
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
@@ -275,6 +276,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFungOrthoCompressible, "Fung-ortho-compressible");
 	REGISTER_FECORE_CLASS(FECompressibleGentMaterial, "compressible Gent");
 	REGISTER_FECORE_CLASS(FEHolmesMow, "Holmes-Mow");
+    REGISTER_FECORE_CLASS(FEHolzapfelUnconstrained, "HGO unconstrained");
 	REGISTER_FECORE_CLASS(FEIsotropicElastic, "isotropic elastic");
 	REGISTER_FECORE_CLASS(FECoupledMooneyRivlin, "coupled Mooney-Rivlin");
 	REGISTER_FECORE_CLASS(FECoupledVerondaWestmann, "coupled Veronda-Westmann");

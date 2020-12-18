@@ -28,15 +28,15 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEUncoupledMaterial.h"
+#include <FECore/FEModelParam.h>
 
 class FEHolzapfelGasserOgden : public FEUncoupledMaterial
 {
 public:
-    double	m_c;			// neo-Hookean c coefficient
-    double	m_k1,m_k2;		// fiber material constants
-    double	m_kappa;		// structure coefficient
-    double	m_gdeg;			// fiber angle in degrees
-    double  m_g;            // fiber angle in radians
+    FEParamDouble  m_c;         // neo-Hookean c coefficient
+    FEParamDouble  m_k1,m_k2;   // fiber material constants
+    FEParamDouble  m_kappa;     // structure coefficient
+    FEParamDouble  m_gdeg;      // fiber angle in degrees
 
 public:
     FEHolzapfelGasserOgden(FEModel* pfem) : FEUncoupledMaterial(pfem) { m_npmodel = 3; }
@@ -49,9 +49,6 @@ public:
     
     //! calculate deviatoric strain energy density at material point
     double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
-    
-    //! initialize material
-    bool Init() override;
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
