@@ -686,7 +686,12 @@ void FEModelBuilder::ApplyParameterMaps()
 		FEParam& p = *mp.pp;
 
 		FEDataMap* data = (FEDataMap*)mesh.FindDataMap(mp.szname);
-		assert(data);
+		if (data == nullptr)
+		{
+			stringstream ss;
+			ss << "Can't find map \"" << mp.szname << "\" for parameter \"" << p.name() << "\"";
+			throw std::runtime_error(ss.str());
+		}
 
 		FEItemList* itemList = data->GetItemList();
 
