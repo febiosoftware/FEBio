@@ -45,17 +45,12 @@ SOFTWARE.*/
 #include "FEMat3dValuator.h"
 #include "FEMat3dSphericalAngleMap.h"
 #include "FEAnalysis.h"
-#include "FEErosionAdaptor.h"
-#include "FEHexRefine.h"
-#include "FEHexRefine2D.h"
-#include "FETetRefine.h"
 #include "BFGSSolver.h"
 #include "FEBroydenStrategy.h"
 #include "JFNKStrategy.h"
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
-#include "FEMMGRemesh.h"
 #include "FEConstValueVec3.h"
 
 #define FECORE_VERSION		0
@@ -159,15 +154,4 @@ REGISTER_FECORE_CLASS(FEFacetSet  , "surface" );
 REGISTER_FECORE_CLASS(FEElementSet, "elem_set");
 
 REGISTER_FECORE_CLASS(FESurface, "surface");
-
-// mesh adaptors
-REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
-REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
-REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
-REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
-REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
-
-REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");
-REGISTER_FECORE_CLASS(FEMaxVariableCriterion, "max_variable");
-REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
 }

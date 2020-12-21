@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FECore/FECore.h"
 #include "NumCore/NumCore.h"
+#include "FEAMR/FEAMR.h"
 #include "FEBioMech/FEBioMechModule.h"
 #ifndef MECH_ONLY
 #include "FEBioMix/FEBioMix.h"
@@ -60,6 +61,7 @@ void InitLibrary()
 	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
 
 	FECore::InitModule();
+	FEAMR::InitModule();
 	NumCore::InitModule();
 	FEBioMech::InitModule();
 

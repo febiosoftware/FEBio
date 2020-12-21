@@ -24,26 +24,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #pragma once
-#include "FEMeshAdaptor.h"
+#include <FECore/FEMeshAdaptor.h>
+class FEModel;
 
-class FEErosionAdaptor : public FEMeshAdaptor
+class FEMeshTopo;
+class FEBoundaryCondition;
+class FESurfaceLoad;
+class FESurfacePairConstraint;
+class FESurface;
+class FENodeSet;
+
+//-----------------------------------------------------------------------------
+// Base class for mesh refinement algorithms
+class FERefineMesh : public FEMeshAdaptor
 {
 public:
-	FEErosionAdaptor(FEModel* fem);
+	FERefineMesh(FEModel* fem);
 
-	bool Apply(int iteration) override;
+protected:
+	bool BuildMeshTopo();
+	void UpdateModel();
 
-private:
-	void RemoveIslands();
-
-private:
-	int		m_maxIters;
-	bool	m_bremoveIslands;
-
-	FEMeshAdaptorCriterion*	m_criterion;
-
-	DECLARE_FECORE_CLASS()
+protected:
+	FEMeshTopo*	m_topo;
 };

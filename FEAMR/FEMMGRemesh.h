@@ -23,24 +23,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
+#include <vector>
+#include "FERefineMesh.h"
 
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+class FEMMGRemesh : public FERefineMesh
 {
-public:
-	FEMaxStressCriterion(FEModel* fem);
+	class MMG;
 
-	bool Check(FEElement& el, double& elemVal) override;
+public:
+	FEMMGRemesh(FEModel* fem);
+
+	bool Apply(int iteration) override;
 
 private:
-	double	m_maxStress;
-	int		m_metric;
+	bool Remesh();
 
-	DECLARE_FECORE_CLASS()
+	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
+
+private:
+	int		m_maxiter;
+	int		m_maxelem;
+
+	double	m_scale;	// element scale factor
+	double	m_hmin;		// minimum element size
+	double	m_hausd;	// Hausdorff value
+	double	m_hgrad;	// gradation
+
+	FEMeshAdaptorCriterion*	m_criterion;
+
+	MMG*	mmg;
+
+	DECLARE_FECORE_CLASS();
 };
-

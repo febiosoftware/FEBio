@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,24 +23,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEMaxVolumeCriterion.h"
+#include <FECore/FESolidDomain.h>
 
+BEGIN_FECORE_CLASS(FEMaxVolumeCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_maxVolume, "max_vol");
+END_FECORE_CLASS();
 
-
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+FEMaxVolumeCriterion::FEMaxVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	FEMaxStressCriterion(FEModel* fem);
+	m_maxVolume = 0.0;
+}
 
-	bool Check(FEElement& el, double& elemVal) override;
+bool FEMaxVolumeCriterion::Check(FEElement& el, double& elemVal)
+{
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
+	if (dom == nullptr) return false;
 
-private:
-	double	m_maxStress;
-	int		m_metric;
+	elemVal = dom->Volume(dynamic_cast<FESolidElement&>(el));
 
-	DECLARE_FECORE_CLASS()
-};
-
+	return (elemVal >= m_maxVolume);
+}

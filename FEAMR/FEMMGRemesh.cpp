@@ -25,16 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMMGRemesh.h"
-#include "FEModel.h"
-#include "FEMeshTopo.h"
-#include "FEMesh.h"
-#include "FEDomain.h"
-#include "FESolidDomain.h"
-#include "FESurface.h"
-#include "log.h"
-#include "FEOctreeSearch.h"
-#include "FENNQuery.h"
-
+#include <FECore/FEModel.h>
+#include <FECore/FEMeshTopo.h>
+#include <FECore/FEMesh.h>
+#include <FECore/FEDomain.h>
+#include <FECore/FESolidDomain.h>
+#include <FECore/FESurface.h>
+#include <FECore/log.h>
+#include <FECore/FEOctreeSearch.h>
+#include <FECore/FENNQuery.h>
+#include <FECore/FEMeshAdaptorCriterion.h>
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
 

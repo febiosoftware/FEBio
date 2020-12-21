@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,24 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEElementSelectionCriterion.h"
+#include <FECore/FEModel.h>
 
+BEGIN_FECORE_CLASS(FEElementSelectionCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_elemList, "element_list");
+END_FECORE_CLASS();
 
-
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	FEMaxStressCriterion(FEModel* fem);
 
-	bool Check(FEElement& el, double& elemVal) override;
+}
 
-private:
-	double	m_maxStress;
-	int		m_metric;
-
-	DECLARE_FECORE_CLASS()
-};
-
+FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElementSet* elemSet)
+{
+	FEMeshAdaptorSelection elemList(m_elemList.size());
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (int i = 0; i < (int)m_elemList.size(); ++i)
+	{
+		elemList[i].m_elementIndex = m_elemList[i] - 1;
+		elemList[i].m_scaleFactor = 0.0;
+	}
+	return elemList;
+}

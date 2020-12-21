@@ -24,35 +24,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <vector>
 #include "FERefineMesh.h"
 
-class FECORE_API FEMMGRemesh : public FERefineMesh
+class FEHexRefine : public FERefineMesh
 {
-	class MMG;
-
 public:
-	FEMMGRemesh(FEModel* fem);
+	FEHexRefine(FEModel* fem);
 
 	bool Apply(int iteration) override;
 
-private:
-	bool Remesh();
+protected:
+	bool RefineMesh(FEModel& fem);
+	void BuildSplitLists(FEModel& fem);
+	void UpdateNewNodes(FEModel& fem);
+	void FindHangingNodes(FEModel& fem);
+	void BuildNewDomains(FEModel& fem);
+	void UpdateNodeSet(FENodeSet& nset);
+	bool UpdateSurface(FESurface& surf);
 
-	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
-
 private:
+	int		m_maxelem;			// max nr of elements
+	int		m_elemRefine;		// max nr of elements to refine per step
 	int		m_maxiter;
-	int		m_maxelem;
+	vector<int>	m_elemList;
+	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
+	vector<int>	m_faceList;	// list of face flags to see whether the face was split
+	int			m_N0;
+	int			m_NC;
+	int			m_NN;
 
-	double	m_scale;	// element scale factor
-	double	m_hmin;		// minimum element size
-	double	m_hausd;	// Hausdorff value
-	double	m_hgrad;	// gradation
+	int	m_splitElems;
+	int m_splitFaces;
+	int m_splitEdges;
+	int	m_hangingNodes;
 
 	FEMeshAdaptorCriterion*	m_criterion;
-
-	MMG*	mmg;
 
 	DECLARE_FECORE_CLASS();
 };
