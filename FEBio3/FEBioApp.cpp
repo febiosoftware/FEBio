@@ -35,11 +35,8 @@ SOFTWARE.*/
 #include "breakpoint.h"
 #include <FEBioLib/febio.h>
 #include <FEBioLib/version.h>
-#include <FECore/FSPath.h>
 #include "febio_cb.h"
 #include "Interrupt.h"
-
-#include <iostream>
 
 FEBioApp* FEBioApp::m_This = nullptr;
 
@@ -381,10 +378,13 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				if (fp == 0) fp = stdout;
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
+
+			char* szver = getVersionString();
+
 #ifdef _DEBUG
-			fprintf(fp, "FEBio version  = %d.%d.%d (DEBUG)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+			fprintf(fp, "FEBio version  = %s (DEBUG)\n", szver);
 #else
-			fprintf(fp, "FEBio version  = %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+			fprintf(fp, "FEBio version  = %s\n", szver);
 #endif
 			if (fp != stdout) fclose(fp);
 		}
@@ -424,50 +424,6 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
 				return false;
 			}
-		}
-	}
-
-	// If the log, plot, and dump options that were passed are not paths, but just
-	// filenames, we make sure that they're relative to where the input file is.
-	// Absolute paths are left alone. Relative paths are also left alone, and so
-	// will be automatically relative to the current working directory.
-
-	// Get input file path
-	char febPath[512];
-	FSPath::filePath(ops.szfile, febPath);
-
-	if(blog)
-	{
-		if(!FSPath::isPath(ops.szlog))
-		{
-			char temp[512];
-			sprintf(temp, "%s%s", febPath, ops.szlog);
-
-			strcpy(ops.szlog, temp);
-		}
-	}
-
-	cout << ops.szlog << endl;
-
-	if(bplt)
-	{
-		if(!FSPath::isPath(ops.szplt))
-		{
-			char temp[512];
-			sprintf(temp, "%s%s", febPath, ops.szplt);
-
-			strcpy(ops.szplt, temp);
-		}
-	}
-
-	if(bdmp)
-	{
-		if(!FSPath::isPath(ops.szdmp))
-		{
-			char temp[512];
-			sprintf(temp, "%s%s", febPath, ops.szdmp);
-
-			strcpy(ops.szdmp, temp);
 		}
 	}
 

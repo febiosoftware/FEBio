@@ -35,7 +35,9 @@ SOFTWARE.*/
 int febio::Hello(LogStream& log)
 {
 	char szversion[128] = { 0 };
-	sprintf(szversion, "  version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+	char* szvernum = getVersionString();
+	sprintf(szversion, "  version %s\n", szvernum);
+	
 	log.print("===========================================================================\n");
 	log.print("         ________    _________   _______       __     _________            \n");
 	log.print("        |        |\\ |        |\\ |       \\\\    |  |\\  /         \\\\          \n");

@@ -318,18 +318,6 @@ set(DEF ${DEF} -DNDEBUG)
 add_definitions(${DEF})
 include_directories(${INC})
 
-##### Include FEBio libraries #####
-add_subdirectory (FEBioFluid)
-add_subdirectory (FEBioLib)
-add_subdirectory (FEBioMech)
-add_subdirectory (FEBioMix)
-add_subdirectory (FEBioOpt)
-add_subdirectory (FEBioPlot)
-add_subdirectory (FEBioTest)
-add_subdirectory (FEBioXML)
-add_subdirectory (FECore)
-add_subdirectory (NumCore)
-
 ##### Set up compiler flags #####
 if(WIN32)
 elseif(APPLE)
@@ -348,9 +336,43 @@ if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
 	add_definitions(-fopenmp)
 endif()
 
+##### Include FEBio libraries #####
+add_subdirectory (FEBioFluid)
+add_subdirectory (FEBioLib)
+add_subdirectory (FEBioMech)
+add_subdirectory (FEBioMix)
+add_subdirectory (FEBioOpt)
+add_subdirectory (FEBioPlot)
+add_subdirectory (FEBioTest)
+add_subdirectory (FEBioXML)
+add_subdirectory (FECore)
+add_subdirectory (NumCore)
+
 ##### Set up executable compilation #####
 file(GLOB SOURCES "FEBio3/*.cpp")
 add_executable (febio3 ${SOURCES})
+
+##### Set dev commit information #####
+
+execute_process(COMMAND git rev-parse --abbrev-ref HEAD
+    RESULT_VARIABLE SUCCESS
+    OUTPUT_VARIABLE BRANCH_NAME)
+
+string(STRIP ${BRANCH_NAME} BRANCH_NAME)
+string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
+    
+if(SUCCESS EQUAL 0 AND ISDEVELOP)
+    execute_process(COMMAND git rev-parse --short HEAD
+        RESULT_VARIABLE SUCCESS
+        OUTPUT_VARIABLE DEVCOMMIT)
+    
+    string(STRIP ${DEVCOMMIT} DEVCOMMIT)
+    
+    if(${SUCCESS} EQUAL 0)
+        target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
+    endif()
+endif()
+
 
 ##### Linking options #####
 
