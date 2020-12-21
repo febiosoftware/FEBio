@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,28 +23,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEAMR.h"
+#include <FECore/FECoreKernel.h>
+#include "FEErosionAdaptor.h"
+#include "FEHexRefine.h"
+#include "FEHexRefine2D.h"
+#include "FETetRefine.h"
+#include "FEMMGRemesh.h"
+#include "FEMaxVariableCriterion.h"
+#include "FEMaxVolumeCriterion.h"
+#include "FEElementSelectionCriterion.h"
 
-#pragma once
-#include "fecore_api.h"
-#include "FEMeshAdaptor.h"
-class FEModel;
-
-class FEMeshTopo;
-class FEBoundaryCondition;
-class FESurfaceLoad;
-class FESurfacePairConstraint;
-class FESurface;
-class FENodeSet;
-
-class FECORE_API FERefineMesh : public FEMeshAdaptor
+//-----------------------------------------------------------------------------
+void FEAMR::InitModule()
 {
-public:
-	FERefineMesh(FEModel* fem);
+// mesh adaptors
+REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
+REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
+REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
+REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
+REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
 
-protected:
-	bool BuildMeshTopo();
-	void UpdateModel();
-
-protected:
-	FEMeshTopo*	m_topo;
-};
+REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");
+REGISTER_FECORE_CLASS(FEMaxVariableCriterion, "max_variable");
+REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
+}

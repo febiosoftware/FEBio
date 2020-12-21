@@ -230,7 +230,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(MMGLIB)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
@@ -239,7 +239,7 @@
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(MMGLIB)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vanilla|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
@@ -316,7 +316,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -446,7 +446,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;HAVE_GSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -557,12 +557,9 @@
     <ClInclude Include="..\..\FECore\FEElementSet.h" />
     <ClInclude Include="..\..\FECore\FEElementShape.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
-    <ClInclude Include="..\..\FECore\FEErosionAdaptor.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FEFaceList.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
-    <ClInclude Include="..\..\FECore\FEHexRefine.h" />
-    <ClInclude Include="..\..\FECore\FEHexRefine2D.h" />
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
     <ClInclude Include="..\..\FECore\FEMat3dSphericalAngleMap.h" />
@@ -571,23 +568,21 @@
     <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h" />
     <ClInclude Include="..\..\FECore\FEMathController.h" />
     <ClInclude Include="..\..\FECore\FEMeshAdaptor.h" />
+    <ClInclude Include="..\..\FECore\FEMeshAdaptorCriterion.h" />
     <ClInclude Include="..\..\FECore\FEMeshPartition.h" />
     <ClInclude Include="..\..\FECore\FEMeshTopo.h" />
-    <ClInclude Include="..\..\FECore\FEMMGRemesh.h" />
     <ClInclude Include="..\..\FECore\FENodeList.h" />
     <ClInclude Include="..\..\FECore\FENodeSetConstraint.h" />
     <ClInclude Include="..\..\FECore\FEOctreeSearch.h" />
     <ClInclude Include="..\..\FECore\FEParabolicMap.h" />
     <ClInclude Include="..\..\FECore\FEPIDController.h" />
     <ClInclude Include="..\..\FECore\FEPropertyT.h" />
-    <ClInclude Include="..\..\FECore\FERefineMesh.h" />
     <ClInclude Include="..\..\FECore\FEScalarValuator.h" />
     <ClInclude Include="..\..\FECore\FEShellElement.h" />
     <ClInclude Include="..\..\FECore\FESolidElement.h" />
     <ClInclude Include="..\..\FECore\FESolidElementShape.h" />
     <ClInclude Include="..\..\FECore\FESurfaceElement.h" />
     <ClInclude Include="..\..\FECore\FESurfaceElementShape.h" />
-    <ClInclude Include="..\..\FECore\FETetRefine.h" />
     <ClInclude Include="..\..\FECore\FEValuator.h" />
     <ClInclude Include="..\..\FECore\FEVec3dValuator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />
@@ -767,12 +762,9 @@
     <ClCompile Include="..\..\FECore\FEElementSet.cpp" />
     <ClCompile Include="..\..\FECore\FEElementShape.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
-    <ClCompile Include="..\..\FECore\FEErosionAdaptor.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
     <ClCompile Include="..\..\FECore\FEFaceList.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
-    <ClCompile Include="..\..\FECore\FEHexRefine.cpp" />
-    <ClCompile Include="..\..\FECore\FEHexRefine2D.cpp" />
     <ClCompile Include="..\..\FECore\FELoadController.cpp" />
     <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\FEMat3dSphericalAngleMap.cpp" />
@@ -780,22 +772,20 @@
     <ClCompile Include="..\..\FECore\FEMat3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEMathController.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshAdaptor.cpp" />
+    <ClCompile Include="..\..\FECore\FEMeshAdaptorCriterion.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshPartition.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshTopo.cpp" />
-    <ClCompile Include="..\..\FECore\FEMMGRemesh.cpp" />
     <ClCompile Include="..\..\FECore\FENodeList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeSetConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FEOctreeSearch.cpp" />
     <ClCompile Include="..\..\FECore\FEParabolicMap.cpp" />
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />
-    <ClCompile Include="..\..\FECore\FERefineMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEScalarValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEShellElement.cpp" />
     <ClCompile Include="..\..\FECore\FESolidElement.cpp" />
     <ClCompile Include="..\..\FECore\FESolidElementShape.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceElement.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceElementShape.cpp" />
-    <ClCompile Include="..\..\FECore\FETetRefine.cpp" />
     <ClCompile Include="..\..\FECore\FEVec3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />
     <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />

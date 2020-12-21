@@ -23,24 +23,42 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
+#include "FERefineMesh.h"
 
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+class FEHexRefine2D : public FERefineMesh
 {
 public:
-	FEMaxStressCriterion(FEModel* fem);
+	FEHexRefine2D(FEModel* fem);
 
-	bool Check(FEElement& el, double& elemVal) override;
+	bool Apply(int iteration) override;
+
+protected:
+	bool RefineMesh(FEModel& fem);
+	bool BuildSplitLists(FEModel& fem);
+	void UpdateNewNodes(FEModel& fem);
+	void FindHangingNodes(FEModel& fem);
+	void BuildNewDomains(FEModel& fem);
+	void UpdateNodeSet(FENodeSet& nset);
+	bool UpdateSurface(FESurface& surf);
 
 private:
-	double	m_maxStress;
-	int		m_metric;
+	int		m_maxelem;			// max nr of elements
+	int		m_elemRefine;		// max nr of elements to refine per step
+	int		m_maxiter;
+	vector<int>	m_elemList;
+	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
+	vector<int>	m_faceList;	// list of face flags to see whether the face was split
+	int			m_N0;
+	int			m_NC;
+	int			m_NN;
 
-	DECLARE_FECORE_CLASS()
+	int	m_splitElems;
+	int m_splitFaces;
+	int m_splitEdges;
+	int	m_hangingNodes;
+
+	FEMeshAdaptorCriterion*	m_criterion;
+
+	DECLARE_FECORE_CLASS();
 };
-

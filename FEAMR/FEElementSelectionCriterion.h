@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,24 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
 
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+//-----------------------------------------------------------------------------
+class FEElementSelectionCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEMaxStressCriterion(FEModel* fem);
-
-	bool Check(FEElement& el, double& elemVal) override;
+	FEElementSelectionCriterion(FEModel* fem);
+	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
 
 private:
-	double	m_maxStress;
-	int		m_metric;
+	vector<int>	m_elemList;
 
-	DECLARE_FECORE_CLASS()
+	DECLARE_FECORE_CLASS();
 };
-

@@ -23,23 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERefineMesh.h"
-#include "FEModel.h"
-#include "FESolidDomain.h"
-#include "FEEdgeList.h"
-#include "FEElementList.h"
-#include "FEFaceList.h"
-#include "FEFixedBC.h"
-#include "FEPrescribedDOF.h"
-#include "FEMeshTopo.h"
-#include "FELinearConstraintManager.h"
-#include "FESurfacePairConstraint.h"
-#include "FESurfaceLoad.h"
-#include "FENodalLoad.h"
+#include <FECore/FEModel.h>
+#include <FECore/FESolidDomain.h>
+#include <FECore/FEEdgeList.h>
+#include <FECore/FEElementList.h>
+#include <FECore/FEFaceList.h>
+#include <FECore/FEFixedBC.h>
+#include <FECore/FEPrescribedDOF.h>
+#include <FECore/FEMeshTopo.h>
+#include <FECore/FELinearConstraintManager.h>
+#include <FECore/FESurfacePairConstraint.h>
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FENodalLoad.h>
 
 FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
 {

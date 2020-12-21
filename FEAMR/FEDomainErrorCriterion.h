@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,45 +23,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FERefineMesh.h"
+#include <FECore/FEMeshAdaptorCriterion.h>
 
-class FEHexRefine2D : public FERefineMesh
+class FEMaterialPoint;
+
+//-----------------------------------------------------------------------------
+class FEDomainErrorCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEHexRefine2D(FEModel* fem);
+	FEDomainErrorCriterion(FEModel* fem);
 
-	bool Apply(int iteration) override;
+	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
 
-protected:
-	bool RefineMesh(FEModel& fem);
-	bool BuildSplitLists(FEModel& fem);
-	void UpdateNewNodes(FEModel& fem);
-	void FindHangingNodes(FEModel& fem);
-	void BuildNewDomains(FEModel& fem);
-	void UpdateNodeSet(FENodeSet& nset);
-	bool UpdateSurface(FESurface& surf);
+	// derived classes must implement this function
+	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;
 
 private:
-	int		m_maxelem;			// max nr of elements
-	int		m_elemRefine;		// max nr of elements to refine per step
-	int		m_maxiter;
-	vector<int>	m_elemList;
-	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
-	vector<int>	m_faceList;	// list of face flags to see whether the face was split
-	int			m_N0;
-	int			m_NC;
-	int			m_NN;
-
-	int	m_splitElems;
-	int m_splitFaces;
-	int m_splitEdges;
-	int	m_hangingNodes;
-
-	FEMeshAdaptorCriterion*	m_criterion;
+	double	m_pct;
 
 	DECLARE_FECORE_CLASS();
 };

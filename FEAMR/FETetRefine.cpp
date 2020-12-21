@@ -23,16 +23,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FETetRefine.h"
-#include "FESolidDomain.h"
-#include "FEMeshTopo.h"
-#include "FEFixedBC.h"
-#include "FESurface.h"
-#include "log.h"
+#include <FECore/FESolidDomain.h>
+#include <FECore/FEMeshTopo.h>
+#include <FECore/FEFixedBC.h>
+#include <FECore/FESurface.h>
+#include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FETetRefine, FERefineMesh)
 	ADD_PARAMETER(m_maxiter, "max_iters");

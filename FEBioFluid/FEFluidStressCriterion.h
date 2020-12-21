@@ -24,7 +24,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMeshAdaptor.h>
+#include <FECore/FEMeshAdaptorCriterion.h>
+#include <FEAMR/FEDomainErrorCriterion.h>
 
 class FEFMaxFluidStressCriterion : public FEMeshAdaptorCriterion
 {

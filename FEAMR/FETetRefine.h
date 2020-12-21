@@ -23,24 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
+#include "FERefineMesh.h"
 
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+class FETetRefine : public FERefineMesh
 {
 public:
-	FEMaxStressCriterion(FEModel* fem);
+	FETetRefine(FEModel* fem);
 
-	bool Check(FEElement& el, double& elemVal) override;
+	bool Apply(int iteration);
+
+protected:
+	bool DoTetRefinement(FEModel& fem);
 
 private:
-	double	m_maxStress;
-	int		m_metric;
+	int	m_maxiter;
 
-	DECLARE_FECORE_CLASS()
+	int	m_NN;
+
+	DECLARE_FECORE_CLASS();
 };
-

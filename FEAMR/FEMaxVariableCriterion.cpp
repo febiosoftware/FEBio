@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,24 +23,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEMaxVariableCriterion.h"
+#include <FECore/FESolidDomain.h>
 
+BEGIN_FECORE_CLASS(FEMaxVariableCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_maxValue, "max_value");
+	ADD_PARAMETER(m_dof, "dof");
+END_FECORE_CLASS();
 
-
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+FEMaxVariableCriterion::FEMaxVariableCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	FEMaxStressCriterion(FEModel* fem);
+	m_maxValue = 0.0;
+	m_dof = -1;
+}
 
-	bool Check(FEElement& el, double& elemVal) override;
+bool FEMaxVariableCriterion::Check(FEElement& el, double& elemVal)
+{
+	if (m_dof == -1) return false;
 
-private:
-	double	m_maxStress;
-	int		m_metric;
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
+	if (dom == nullptr) return false;
 
-	DECLARE_FECORE_CLASS()
-};
-
+	FEMesh& mesh = *dom->GetMesh();
+	double maxVal = -1e99;
+	for (int i = 0; i < el.Nodes(); ++i)
+	{
+		double vi = mesh.Node(el.m_node[i]).get(m_dof);
+		if (vi > maxVal) maxVal = vi;
+	}
+	elemVal = maxVal;
+	return (elemVal >= m_maxValue);
+}
