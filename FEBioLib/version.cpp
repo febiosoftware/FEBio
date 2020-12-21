@@ -24,29 +24,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#include <cstdio>
+#include "version.h"
 
+char* getVersionString()
+{
+    static char version[32];
 
-#pragma once
+#ifndef DEVCOMMIT
+    sprintf(version, "%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+#else
+    sprintf(version, "%d.%d.%d.%s", VERSION, SUBVERSION, SUBSUBVERSION, DEVCOMMIT);
+#endif
 
-///////////////////////////////////////////////////////////////////////////////
-// FEBio version numbers
-// VERSION is the main version number. This number is only incremented when
-// major modifications or additions where added to the code
-// SUBVERSION is only incremented when minor modifications or 
-// additions where added to the code.
-// SUBSUBVERSION is incremented when bugs are fixed.
-
-#define VERSION			3
-#define SUBVERSION		1
-#define SUBSUBVERSION	0
-
-///////////////////////////////////////////////////////////////////////////////
-// Restart file version
-// This is the version number of the restart dump file format.
-// It is incremented when the structure of this file is modified.
-//
-
-#define RSTRTVERSION		0x06
-
-
-char* getVersionString();
+    return version;
+}
