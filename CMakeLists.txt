@@ -324,6 +324,9 @@ elseif(APPLE)
 	add_definitions(-O3 -fPIC -std=c++11 -static-libstdc++ -w)
 else()
 	add_definitions(-O3 -fPIC -fopenmp -std=c++11 -static-libstdc++ -w)
+    
+    set(CMAKE_BUILD_RPATH_USE_LINK_PATH FALSE)
+    set(CMAKE_BUILD_RPATH $ORIGIN/../lib/)
 endif()
 
 # Extra compiler flags for intel compiler
