@@ -276,6 +276,8 @@ void FEBioMeshSection::ParseElementSetSection(XMLTag& tag, FEBModel::Part* part)
 		++tag;
 	} while (!tag.isend());
 
+	if (elemList.empty()) throw XMLReader::InvalidTag(tag);
+
 	ps->SetElementList(elemList);
 }
 

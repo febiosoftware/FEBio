@@ -691,6 +691,16 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 			faceMark++;
 		}
+		else
+		{
+			// assume this node set is determined by the entire mesh
+			FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+//			if (nset.Size() == dom.Nodes())
+			{
+				nset.Clear();
+				for (int i = 0; i < dom.Nodes(); ++i) nset.Add(dom.NodeIndex(i));
+			}
+		}
 	}
 
 	return true;

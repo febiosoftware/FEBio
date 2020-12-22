@@ -467,9 +467,36 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		string name = partName + eset.Name();
 		feset->SetName(name);
 
+		// If a domain exists with the same name, we assume
+		// that this element set refers to the that domain (TODO: should actually check this!)
 		FEDomain* dom = mesh.FindDomain(name);
 		if (dom) feset->Create(dom);
-		else feset->Create(elist);
+		else
+		{
+			// A domain with the same name is not found, but it is possible that this 
+			// set still coincides with a domain, so let's see if we can find it. 
+			// see if all elements belong to the same domain
+			bool oneDomain = true;
+			FEElement* el = mesh.FindElementFromID(elist[0]); assert(el);
+			FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
+			for (int i = 1; i < elist.size(); ++i)
+			{
+				FEElement* el_i = mesh.FindElementFromID(elist[i]); assert(el);
+				FEDomain* dom_i = dynamic_cast<FEDomain*>(el_i->GetMeshPartition());
+
+				if (dom != dom_i)
+				{
+					oneDomain = false;
+					break;
+				}
+			}
+
+			// assign indices to element set
+			if (oneDomain && (dom->Elements() == elist.size()))
+				feset->Create(dom, elist);
+			else
+				feset->Create(elist);
+		}
 
 		mesh.AddElementSet(feset);
 	}

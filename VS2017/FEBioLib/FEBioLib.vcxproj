@@ -532,6 +532,7 @@
     <ClCompile Include="..\..\FEBioLib\memory.cpp" />
     <ClCompile Include="..\..\FEBioLib\plugin.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
+    <ClCompile Include="..\..\FEBioLib\version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
