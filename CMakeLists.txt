@@ -324,6 +324,9 @@ elseif(APPLE)
 	add_definitions(-O3 -fPIC -std=c++11 -static-libstdc++ -w)
 else()
 	add_definitions(-O3 -fPIC -fopenmp -std=c++11 -static-libstdc++ -w)
+    
+    set(CMAKE_BUILD_RPATH_USE_LINK_PATH FALSE)
+    set(CMAKE_BUILD_RPATH $ORIGIN/../lib/)
 endif()
 
 # Extra compiler flags for intel compiler
@@ -347,6 +350,7 @@ add_subdirectory (FEBioTest)
 add_subdirectory (FEBioXML)
 add_subdirectory (FECore)
 add_subdirectory (NumCore)
+add_subdirectory (FEAMR)
 
 ##### Set up executable compilation #####
 file(GLOB SOURCES "FEBio3/*.cpp")
@@ -379,10 +383,10 @@ endif()
 # Link FEBio libraries
 if(WIN32 OR APPLE)
 	target_link_libraries(febio3 fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr)
 else()
 	target_link_libraries(febio3 -Wl,--start-group fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid -Wl,--end-group)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr -Wl,--end-group)
 endif()
 
 # Link LEVMAR
