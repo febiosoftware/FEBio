@@ -7,6 +7,7 @@ DEP = $(patsubst $(FEBDIR)FEBio3/%.cpp, %.d, $(SRC))
 TARGET =  $(FEBDIR)build/bin/febio3.$(PLAT)
 
 FELIBS =  $(FEBDIR)build/lib/libfecore_$(PLAT).a
+FELIBS += $(FEBDIR)build/lib/libfeamr_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebiolib_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebioplot_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebiomech_$(PLAT).a
