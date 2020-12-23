@@ -103,7 +103,9 @@ protected:
 
 inline int FEElementSet::GetLocalIndex(const FEElement& el) const
 {
-	return m_LUT[el.GetID() - m_minID];
+	int eid = el.GetID();
+	if ((eid < m_minID) || (eid > m_maxID)) return -1;
+	else return m_LUT[el.GetID() - m_minID];
 }
 
 inline bool FEElementSet::Contains(const FEElement& el) const

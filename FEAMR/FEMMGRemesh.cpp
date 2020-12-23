@@ -332,11 +332,27 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 		}
 	}
 
+	FEElementSet* elset = mmgRemesh->GetElementSet();
+	if (elset)
+	{
+		// elements that are not in the element set will be flagged as required.
+		FEElementIterator it(&mesh);
+		int c = 1;
+		for (; it.isValid(); ++it, ++c)
+		{
+			FEElement& el = *it;
+			if (elset->Contains(el) == false)
+			{
+				MMG3D_Set_requiredTetrahedron(mmgMesh, c);
+			}
+		}
+	}
+
 	// scale factors
 	FEMeshAdaptorCriterion* criterion = mmgRemesh->GetCriterion();
 	if (criterion)
 	{
-		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(mmgRemesh->GetElementSet());
+		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
 		for (int i = 0; i < (int)elemList.size(); ++i)
 		{
 			FEElement& el = *topo.Element(elemList[i].m_elementIndex);
