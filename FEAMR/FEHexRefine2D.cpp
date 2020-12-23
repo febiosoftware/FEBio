@@ -148,6 +148,13 @@ bool FEHexRefine2D::RefineMesh(FEModel& fem)
 		if (UpdateSurface(surf) == false) return false;
 	}
 
+	// update all element sets
+	for (int i = 0; i < mesh.ElementSets(); ++i)
+	{
+		FEElementSet& set = mesh.ElementSet(i);
+		if (UpdateElementSet(set) == false) return false;
+	}
+
 	// print some stats:
 	feLog("\tNew mesh stats:\n");
 	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
@@ -237,9 +244,9 @@ bool FEHexRefine2D::BuildSplitLists(FEModel& fem)
 	int NF = topo.Faces();
 	m_faceList.assign(NF, -1);
 
-	// Before we figure out which faces to refine, we need to decide which
-	// faces can be considered. We will mark faces that should not be considered
-	// by a -2
+	// Faces in the XY plane will be split in four. Other faces will be split in two. 
+	// So, we need to figure out which faces lie in the XY plane and which do not. 
+	// We will mark faces that are not in the XY plane by a -2
 	for (int i = 0; i < NF; ++i)
 	{
 		const FEFaceList::FACE& face = topo.Face(i);
@@ -251,7 +258,7 @@ bool FEHexRefine2D::BuildSplitLists(FEModel& fem)
 		vec3d n = (r1 - r0) ^ (r2 - r0); n.unit();
 		if (fabs(n.z) < 0.999)
 		{
-			// this normal is not perpendicular to XY plane, so ignore
+			// this normal is not perpendicular to XY plane, so mark it
 			m_faceList[i] = -2;
 		}
 	}
@@ -260,22 +267,26 @@ bool FEHexRefine2D::BuildSplitLists(FEModel& fem)
 	{
 		if (m_elemList[i] != -1)
 		{
-			// we only want to split the faces that lie in the xy plane
-			// We do this by looking at the normal of the face and only 
-			// consider the faces that are normal to the xy plane.
 			int splitFaces = 0;
 			const std::vector<int>& elface = topo.ElementFaceList(i);
 			for (int j = 0; j < elface.size(); ++j)
 			{
 				if (m_faceList[elface[j]] == -1)
 				{
+					// this face will be split in 4
 					m_faceList[elface[j]] = 1;
+					splitFaces++;
+				}
+				else if (m_faceList[elface[j]] == -2)
+				{
+					// this face will be split in 2
+					m_faceList[elface[j]] = 2;
 					splitFaces++;
 				}
 			}
 
-			// There should always be two faces to split.
-			if (splitFaces != 2)
+			// There should always be at least two faces to split.
+			if (splitFaces < 2)
 			{
 				feLog("Cannot refine element due to error.");
 				return false;
@@ -286,10 +297,20 @@ bool FEHexRefine2D::BuildSplitLists(FEModel& fem)
 	// count how many faces to split
 	int N1 = mesh.Nodes();
 	m_splitFaces = 0;
-	for (int i = 0; i < m_faceList.size(); ++i) {
+	for (int i = 0; i < m_faceList.size(); ++i) 
+	{
 		if (m_faceList[i] == 1) {
 			m_faceList[i] = N1++;
 			m_splitFaces++;
+		}
+		else if (m_faceList[i] == 2)
+		{
+			m_splitFaces++;
+			m_faceList[i] = -2;
+		}
+		else
+		{
+			m_faceList[i] = -1;
 		}
 	}
 
@@ -678,6 +699,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 			delete newDom;
 		}
 	}
+	mesh.RebuildLUT();
 
 	// re-init domains
 	for (int i = 0; i < NDOM; ++i)
@@ -729,7 +751,7 @@ void FEHexRefine2D::UpdateNodeSet(FENodeSet& nset)
 
 bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 {
-	// look-up table for splitting quads
+	// look-up table for splitting quads in 4
 	const int LUT[4][4] = {
 		{ 0, 4, 8, 7 },
 		{ 4, 1, 5, 8 },
@@ -745,13 +767,14 @@ bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 	assert((int)faceList.size() == NF0);
 
 	// count how many faces to split
-	int splitFaces = 0;
+	int split4 = 0, split2 = 0;
 	for (int i = 0; i < faceList.size(); ++i)
 	{
 		int iface = faceList[i];
-		if (m_faceList[iface] >= 0) splitFaces++;
+		if (m_faceList[iface] >= 0) split4++;
+		if (m_faceList[iface] == -2) split2++;
 	}
-	if (splitFaces == 0) return false;
+	if (split4 + split2 == 0) return surf.Init();
 
 	// create a copy of the domain
 	FESurface oldSurf(GetFEModel());
@@ -766,7 +789,7 @@ bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 	}
 
 	// reallocate the domain (Assumes Quad faces!)
-	int NF1 = NF0 - splitFaces + 4 * (splitFaces);
+	int NF1 = NF0 - split4 + 4 * (split4) - split2 + 2*split2;
 	surf.Create(NF1);
 
 	// reinitialize the surface
@@ -802,6 +825,44 @@ bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 				el1.m_node[3] = NL[LUT[j][3]];
 			}
 		}
+		else if (m_faceList[iface] == -2)
+		{
+			const FEFaceList::FACE& face = topo.Face(iface);
+			const vector<int>& edge = topo.FaceEdgeList(iface);
+
+			int NL[2][4];
+
+			// there should be two edges that are split, and two that are not
+			int eid[4] = { m_edgeList[edge[0]], m_edgeList[edge[1]], m_edgeList[edge[2]], m_edgeList[edge[3]] };
+
+			if ((eid[0] >= 0) && (eid[2] >= 0))
+			{
+				assert((eid[1] == -1) && (eid[3] == -1));
+				NL[0][0] = face.node[0]; NL[1][0] = face.node[1];
+				NL[0][1] =       eid[0]; NL[1][1] = face.node[2];
+				NL[0][2] =       eid[2]; NL[1][2] =       eid[2];
+				NL[0][3] = face.node[3]; NL[1][3] =       eid[0];
+			}
+			else if ((eid[1] >= 0) && (eid[3] >= 0))
+			{
+				assert((eid[0] == -1) && (eid[2] == -1));
+				NL[0][0] = face.node[0]; NL[1][0] = face.node[2];
+				NL[0][1] = face.node[1]; NL[1][1] = face.node[3];
+				NL[0][2] =       eid[1]; NL[1][2] =       eid[3];
+				NL[0][3] =       eid[3]; NL[1][3] =       eid[1];
+			}
+			else { assert(false); }
+
+			for (int j = 0; j < 2; ++j)
+			{
+				FESurfaceElement& el1 = surf.Element(n++);
+				el1.SetType(FE_QUAD4G4);
+				el1.m_node[0] = NL[j][0];
+				el1.m_node[1] = NL[j][1];
+				el1.m_node[2] = NL[j][2];
+				el1.m_node[3] = NL[j][3];
+			}
+		}
 		else
 		{
 			FESurfaceElement& el1 = surf.Element(n++);
@@ -812,6 +873,21 @@ bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 			el1.m_node[3] = el0.m_node[3];
 		}
 	}
+	surf.CreateMaterialPointData();
 
 	return surf.Init();
+}
+
+bool FEHexRefine2D::UpdateElementSet(FEElementSet& eset)
+{
+	// get the domain list
+	// NOTE: Don't get the reference, since then the same reference
+	// is passed to Create below, which causes problems.
+	FEDomainList domList = eset.GetDomainList();
+	if (domList.IsEmpty()) { throw std::runtime_error("Error in FEHexRefine2D!"); }
+
+	// recreate the element set from the domain list
+	eset.Create(domList);
+
+	return true;
 }

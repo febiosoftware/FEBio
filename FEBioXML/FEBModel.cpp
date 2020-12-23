@@ -495,7 +495,20 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 			if (oneDomain && (dom->Elements() == elist.size()))
 				feset->Create(dom, elist);
 			else
-				feset->Create(elist);
+			{
+				// Couldn't find a single domain.
+				// But maybe this set encompasses the entire mesh? 
+				if (elist.size() == mesh.Elements())
+				{
+					FEDomainList allDomains;
+					for (int i = 0; i < mesh.Domains(); ++i) allDomains.AddDomain(&mesh.Domain(i));
+					feset->Create(allDomains);
+				}
+				else
+				{
+					feset->Create(elist);
+				}
+			}
 		}
 
 		mesh.AddElementSet(feset);

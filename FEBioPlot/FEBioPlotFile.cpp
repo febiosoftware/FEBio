@@ -1633,6 +1633,13 @@ void FEBioPlotFile::WriteDomainDataField(FEModel &fem, FEPlotData* pd)
 		for (int i = 0; i<ND; ++i) item.push_back(i);
 	}
 
+	// allow plot data to prepare for save
+	if (pd->PreSave() == false)
+	{
+		assert(false);
+		return;
+	}
+
 	// loop over all domains in the item list
 	int N = (int)item.size();
 	for (int i = 0; i<ND; ++i)

@@ -101,6 +101,10 @@ public: // override one of these functions depending on the Region_Type
 	virtual bool Save(FEDomain&  D, FEDataStream& a) { return false; }		// for FE_REGION_DOMAIN
 	virtual bool Save(FESurface& S, FEDataStream& a) { return false; }		// for FE_REGION_SURFACE
 
+public:
+	// will be called before Save
+	virtual bool PreSave() { return true; }
+
 public: // used by array variables
 	void SetArraySize(int n);
 	int GetArraysize() const;

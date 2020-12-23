@@ -840,8 +840,12 @@ public:
 class FEPlotStressError : public FEPlotDomainData
 {
 public:
-	FEPlotStressError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	FEPlotStressError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) { m_smax = m_smin = 0.0; }
 	bool Save(FEDomain& dom, FEDataStream& a);
+	bool PreSave() override;
+private:
+	double	m_smax, m_smin;
+	vector<double>	m_sn;
 };
 
 //-----------------------------------------------------------------------------

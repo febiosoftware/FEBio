@@ -41,6 +41,7 @@ protected:
 	void BuildNewDomains(FEModel& fem);
 	void UpdateNodeSet(FENodeSet& nset);
 	bool UpdateSurface(FESurface& surf);
+	bool UpdateElementSet(FEElementSet& set);
 
 private:
 	int		m_maxelem;			// max nr of elements

@@ -61,6 +61,7 @@ SOFTWARE.*/
 #include "FEDiscreteElasticMaterial.h"
 #include "FEDiscreteElasticDomain.h"
 #include "FEContinuousElasticDamage.h"
+#include <FECore/FEMeshAdaptor.h> // for projectToNodes
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -2762,31 +2763,43 @@ void project_stresses(FEDomain& dom, vector<double>& nodeVals)
 	}
 }
 
+bool FEPlotStressError::PreSave()
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int NN = mesh.Nodes();
+
+	// calculate the recovered nodal stresses
+	m_sn.assign(NN, 0.0);
+	projectToNodes(mesh, m_sn, [](FEMaterialPoint& mp) {
+		FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+		return (ep ? ep->m_s.effective_norm() : 0.0);
+	});
+
+	// find the min and max stress values
+	FEElementIterator it(&mesh);
+	m_smin = 1e99; m_smax = -1e99;
+	for (; it.isValid(); ++it)
+	{
+		FEElement& el = *it;
+		int ni = el.GaussPoints();
+		for (int j = 0; j < ni; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+			double sj = ep->m_s.effective_norm();
+			if (sj < m_smin) m_smin = sj;
+			if (sj > m_smax) m_smax = sj;
+		}
+	}
+	if (fabs(m_smin - m_smax) < 1e-12) m_smax++;
+
+	return true;
+}
+
 bool FEPlotStressError::Save(FEDomain& dom, FEDataStream& a)
 {
 	int NE = dom.Elements();
 	int NN = dom.Nodes();
-
-	// calculate the recovered stresses
-	vector<double> sn(NN);
-	project_stresses(dom, sn);
-
-	// find the min and max stress values
-	double smin = 1e99, smax = -1e99;
-	for (int i = 0; i < NE; ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-		int ni = el.GaussPoints();
-		for (int j = 0; j < ni; ++j)
-		{
-			FEElasticMaterialPoint* ep = el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-			double sj = ep->m_s.effective_norm();
-
-			if (sj < smin) smin = sj;
-			if (sj > smax) smax = sj;
-		}
-	}
-	if (fabs(smin - smax) < 1e-12) smax++;
 
 	// calculate errors
 	double ev[FEElement::MAX_NODES];
@@ -2799,7 +2812,7 @@ bool FEPlotStressError::Save(FEDomain& dom, FEDataStream& a)
 		// get the nodal values
 		for (int j = 0; j < ne; ++j)
 		{
-			ev[j] = sn[el.m_lnode[j]];
+			ev[j] = m_sn[el.m_node[j]];
 		}
 
 		// evaluate element error
@@ -2811,7 +2824,7 @@ bool FEPlotStressError::Save(FEDomain& dom, FEDataStream& a)
 
 			double snj = el.Evaluate(ev, j);
 
-			double err = fabs(sj - snj) / (smax - smin);
+			double err = fabs(sj - snj) / (m_smax - m_smin);
 			if (err > max_err) max_err = err;
 		}
 
