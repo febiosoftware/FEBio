@@ -24,31 +24,48 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEAMR.h"
-#include <FECore/FECoreKernel.h>
-#include "FEErosionAdaptor.h"
-#include "FEHexRefine.h"
-#include "FEHexRefine2D.h"
-#include "FETetRefine.h"
-#include "FEMMGRemesh.h"
-#include "FEMaxVariableCriterion.h"
-#include "FEMaxVolumeCriterion.h"
-#include "FEElementSelectionCriterion.h"
 #include "FEScaleAdaptorCriterion.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 
-//-----------------------------------------------------------------------------
-void FEAMR::InitModule()
+BEGIN_FECORE_CLASS(FEScaleAdaptorCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_scale, "scale");
+END_FECORE_CLASS();
+
+FEScaleAdaptorCriterion::FEScaleAdaptorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-// mesh adaptors
-REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
-REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
-REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
-REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
-REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
+	m_scale = 1.0;
 
-// adaptor criteria
-REGISTER_FECORE_CLASS(FEMaxVolumeCriterion       , "max_volume");
-REGISTER_FECORE_CLASS(FEMaxVariableCriterion     , "max_variable");
-REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
-REGISTER_FECORE_CLASS(FEScaleAdaptorCriterion    , "scale");
+	// set sort on by default
+	SetSort(true);
+}
+
+FEMeshAdaptorSelection FEScaleAdaptorCriterion::GetElementSelection(FEElementSet* elemSet)
+{
+	// get the mesh
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int NE = mesh.Elements();
+
+	// the element list of elements that need to be refined
+	FEMeshAdaptorSelection elemList;
+
+	// loop over the elements
+	FEElementIterator it(&mesh, elemSet);
+	for (int i = 0; it.isValid(); ++it, ++i)
+	{
+		FEElement& el = *it;
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		for (int j = 0; j < ni; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+			double s = m_scale(mp);
+			elemList.push_back(i, s);
+		}
+	}
+
+	// create the element list of elements that need to be refined
+	return elemList;
 }
