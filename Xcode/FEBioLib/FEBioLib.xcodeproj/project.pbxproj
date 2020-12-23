@@ -26,6 +26,7 @@
 		D53231C42142ADB9008DE511 /* FEBioModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231B42142ADB9008DE511 /* FEBioModel.h */; };
 		D54A704D242A3162007375FC /* FEBioConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54A704B242A3162007375FC /* FEBioConfig.cpp */; };
 		D54A704E242A3162007375FC /* FEBioConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = D54A704C242A3162007375FC /* FEBioConfig.h */; };
+		D5AE8CC92592ED24003AC08B /* version.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AE8CC82592ED24003AC08B /* version.cpp */; };
 		D5B29B2C22309413000ACD5E /* LogFileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B29B2622309412000ACD5E /* LogFileStream.h */; };
 		D5B29B2D22309413000ACD5E /* LogStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B29B2722309413000ACD5E /* LogStream.cpp */; };
 		D5B29B2E22309413000ACD5E /* LogStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B29B2822309413000ACD5E /* LogStream.h */; };
@@ -58,6 +59,7 @@
 		D53231B42142ADB9008DE511 /* FEBioModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioModel.h; sourceTree = "<group>"; };
 		D54A704B242A3162007375FC /* FEBioConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioConfig.cpp; sourceTree = "<group>"; };
 		D54A704C242A3162007375FC /* FEBioConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioConfig.h; sourceTree = "<group>"; };
+		D5AE8CC82592ED24003AC08B /* version.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = version.cpp; sourceTree = "<group>"; };
 		D5B29B2622309412000ACD5E /* LogFileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogFileStream.h; sourceTree = "<group>"; };
 		D5B29B2722309413000ACD5E /* LogStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LogStream.cpp; sourceTree = "<group>"; };
 		D5B29B2822309413000ACD5E /* LogStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogStream.h; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				D53231B22142ADB9008DE511 /* stdafx.cpp */,
 				D53231A72142ADB9008DE511 /* stdafx.h */,
 				D53231AD2142ADB9008DE511 /* targetver.h */,
+				D5AE8CC82592ED24003AC08B /* version.cpp */,
 				D53231A62142ADB9008DE511 /* version.h */,
 			);
 			name = FEBioLib;
@@ -214,6 +217,7 @@
 			files = (
 				D53231BE2142ADB9008DE511 /* plugin.cpp in Sources */,
 				D53231BA2142ADB9008DE511 /* FEBioModel.cpp in Sources */,
+				D5AE8CC92592ED24003AC08B /* version.cpp in Sources */,
 				D5B29B3022309413000ACD5E /* LogFileStream.cpp in Sources */,
 				D5E85D942200F8B400F5DF83 /* FEBioStdSolver.cpp in Sources */,
 				D53231B52142ADB9008DE511 /* input.cpp in Sources */,
