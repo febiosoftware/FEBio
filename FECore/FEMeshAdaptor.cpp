@@ -30,7 +30,7 @@ SOFTWARE.*/
 
 REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
 
-FEMeshAdaptor::FEMeshAdaptor(FEModel* fem) : FECoreBase(fem)
+FEMeshAdaptor::FEMeshAdaptor(FEModel* fem) : FEModelComponent(fem)
 {
 	m_elemSet = nullptr;
 }

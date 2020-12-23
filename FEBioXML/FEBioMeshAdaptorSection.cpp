@@ -67,6 +67,7 @@ void FEBioMeshAdaptorSection::ParseMeshAdaptor(XMLTag& tag)
 	}
 
 	fem->AddMeshAdaptor(meshAdaptor);
+	GetBuilder()->AddComponent(meshAdaptor);
 
 	ReadParameterList(tag, meshAdaptor);
 }
