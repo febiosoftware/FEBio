@@ -32,6 +32,9 @@
       location = "group:FECore/FECore.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:FEAMR/FEAMR.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:NumCore/NumCore.xcodeproj">
    </FileRef>
 </Workspace>
