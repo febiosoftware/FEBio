@@ -37803,7 +37803,7 @@ is a gap function that represents the vector distance between the joint
 \mathbf{P}=\begin{cases}
 \mathbf{P}_{1}=\mathbf{I} & \text{constrain relative translation along all directions}\\
 \mathbf{P}_{2}=\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)} & \text{constrain relative translation within plane normal to }\mathbf{n}^{\left(1\right)}\\
-\mathbf{P}_{3}=\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)} & \text{constrain relative translation along \ensuremath{\mathbf{n}^{\left(1\right)}}}
+\mathbf{P}_{3}=\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)} & \text{constrain relative translation along }\mathbf{n}^{\left(1\right)}
 \end{cases}\,.\label{eq:jf-P-projection}
 \end{equation}
 

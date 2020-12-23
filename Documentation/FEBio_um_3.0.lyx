@@ -37557,7 +37557,7 @@ This section describes the elastic materials, which are materials defined
  by a hyperelastic strain-enerygy function.
  A distinction will be made between so-called 
 \shape italic
-compressible 
+unconstrained 
 \shape default
 and 
 \shape italic
@@ -37565,7 +37565,10 @@ uncoupled
 \shape default
 materials.
  The former describe materials that can undergo volumetric compression.
- The latter are used for modeling (near-) incompressible materials.
+ The latter are used for modeling (nearly-) incompressible materials, thus
+ their constitutive models are constrained to produce an isochoric deformation,
+ as long as the user has selected a sufficiently large bulk modulus to enforce
+ that constraint.
 \end_layout
 
 \begin_layout Subsection
@@ -39202,7 +39205,7 @@ Example:
 \end_layout
 
 \begin_layout Subsubsection
-Ellipsoidal Fiber Distribution
+Ellipsoidal Fiber Distribution Uncoupled
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:EFD-Uncoupled"
@@ -39229,8 +39232,8 @@ EFD uncoupled
 .
  Since fibers can only sustain tension, this material is not stable on its
  own.
- It must be combined with a stable compressible material that acts as a
- ground matrix, using a 
+ It must be combined with a stable uncoupled material that acts as a ground
+ matrix, using a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -40135,738 +40138,6 @@ Example
 
 \begin_layout LyX-Code
   <mat_axis type="local">0,0,0</mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Exponential-Power Law, Uncoupled Formulation
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:fiber-exp-pow-uncoupled"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for a single fiber with an exponential-power law, in an
- uncoupled strain energy formulation, is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-exp-pow-uncoupled
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- Since fibers can only sustain tension, this material is not stable on its
- own.
- It must be combined with a stable uncoupled material that acts as a ground
- matrix, using a 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-uncoupled solid mixture
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
- container as described in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Uncoupled-Solid-Mixture"
-
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<ksi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\xi,$
-\end_inset
-
- representing a measure of the fiber modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<alpha>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\alpha,$
-\end_inset
-
- coefficient of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- power of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber is oriented along the unit vector 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
-, where 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
-\end_inset
-
- are orthonormal basis vectors representing the local element coordinate
- system when specified (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Specifying-Fiber-Orientation"
-
-\end_inset
-
-), or else the global Cartesian coordinate system.
- The stress 
-\begin_inset Formula $\tilde{\boldsymbol{\sigma}}$
-\end_inset
-
- for this fibrous material is given by 
-\begin_inset Formula 
-\[
-\tilde{\boldsymbol{\sigma}}=H\left(\tilde{I}_{n}-1\right)\frac{2\tilde{I}_{n}}{J}\frac{\partial\tilde{\Psi}}{\partial\tilde{I}_{n}}\mathbf{n}\otimes\mathbf{n},
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}_{n}^{2}=\mathbf{N}\cdot\mathbf{\tilde{C}}\cdot\mathbf{N}$
-\end_inset
-
- is the square of the fiber stretch, 
-\begin_inset Formula $\mathbf{n}=\mathbf{\tilde{F}}\cdot\mathbf{N}/\tilde{\lambda}_{n}$
-\end_inset
-
-, and 
-\begin_inset Formula $H\left(.\right)$
-\end_inset
-
- is the unit step function that enforces the tension-only contribution..
- The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\tilde{\Psi}=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(\tilde{I}_{n}-1\right)^{\beta}\right]-1\right)\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\xi>0$
-\end_inset
-
-, 
-\begin_inset Formula $\alpha\geqslant0$
-\end_inset
-
-, and 
-\begin_inset Formula $\beta\geqslant2$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Note: In the limit when 
-\begin_inset Formula $\alpha\to0$
-\end_inset
-
-, this expressions produces a power law, 
-\begin_inset Formula 
-\[
-\lim\limits _{\alpha\to0}\tilde{\Psi}=\frac{\xi}{\beta}\left(\tilde{I}_{n}-1\right)^{\beta}.
-\]
-
-\end_inset
-
-Note: When 
-\begin_inset Formula $\beta>2$
-\end_inset
-
-, the fiber modulus is zero at the strain origin (
-\begin_inset Formula $\tilde{I}_{n}=1)$
-\end_inset
-
-.
- Therefore, use 
-\begin_inset Formula $\beta>2$
-\end_inset
-
- when a smooth transition in the stress is desired from compression to tension.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout Standard
-Single fiber oriented along 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
-, embedded in a neo-Hookean ground matrix.
-\end_layout
-
-\begin_layout LyX-Code
-<material id="1" type="uncoupled solid mixture">
-\end_layout
-
-\begin_layout LyX-Code
-  <mat_axis type="local">0,0,0</mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  <k>10e3</k>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="Mooney-Rivlin">
-\end_layout
-
-\begin_layout LyX-Code
-    <c1>10.0</c1>
-\end_layout
-
-\begin_layout LyX-Code
-    <c2>0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="fiber-exp-pow-uncoupled">
-\end_layout
-
-\begin_layout LyX-Code
-    <ksi>5</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-    <alpha>20</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <mat_axis type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-        <theta>0</theta>
-\end_layout
-
-\begin_layout LyX-Code
-        <phi>90</phi>
-\end_layout
-
-\begin_layout LyX-Code
-    </mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout Standard
-Two fibers in the plane orthogonal to 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
-, oriented at ±25 degrees relative to 
-\begin_inset Formula $\mathbf{e}_{3}$
-\end_inset
-
-, embedded in a Mooney-Rivlin ground matrix.
-\end_layout
-
-\begin_layout LyX-Code
-<material id="1" type="uncoupled solid mixture">
-\end_layout
-
-\begin_layout LyX-Code
-  <mat_axis type="local">0,0,0</mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
- <k>10e3</k>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="Mooney-Rivlin">
-\end_layout
-
-\begin_layout LyX-Code
-    <c1>10.0</c1>
-\end_layout
-
-\begin_layout LyX-Code
-    <c2>0</c2>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="fiber-exp-pow">
-\end_layout
-
-\begin_layout LyX-Code
-    <ksi>5</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-    <alpha>20</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <mat_axis type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-        <theta>90</theta>
-\end_layout
-
-\begin_layout LyX-Code
-        <phi>25</phi>
-\end_layout
-
-\begin_layout LyX-Code
-    </mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="fiber-exp-pow">
-\end_layout
-
-\begin_layout LyX-Code
-    <ksi>5</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-    <alpha>20</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <mat_axis type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-        <theta>-90</theta>
-\end_layout
-
-\begin_layout LyX-Code
-        <phi>25</phi>
-\end_layout
-
-\begin_layout LyX-Code
-    </mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Toe-Linear Response, Uncoupled Formulation
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:fiber-pow-linear-uncoupled"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-pow-linear-uncoupled
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="3in">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<E>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $E,$
-\end_inset
-
- the fiber modulus in the linear range (
-\begin_inset Formula $E\geqslant0)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- the power-law exponent in the toe region (
-\begin_inset Formula $\beta\geqslant2)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<lam0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\lambda_{0},$
-\end_inset
-
- the stretch ratio when the toe region transitions to the linear region
- (
-\begin_inset Formula $\lambda_{0}>1)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)=\begin{cases}
-0 & \tilde{I}_{n}<1\\
-\frac{\xi}{2\beta}\left(\tilde{I}_{n}-1\right)^{\beta} & 1\leqslant\tilde{I}_{n}\leqslant I_{0}\\
-E\left(I_{0}^{1/2}-\tilde{I}_{n}^{1/2}\right)+B\left(\tilde{I}_{n}-I_{0}\right)+\Psi_{0} & I_{0}<\tilde{I}_{n}
-\end{cases}\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
-\end_inset
-
-, 
-\begin_inset Formula 
-\[
-\xi=\frac{E}{2\left(\beta-1\right)}\left(I_{0}-1\right)^{2-\beta},\,B=\frac{E}{2}\left[\frac{\left(I_{0}-1\right)}{2\left(\beta-1\right)}+I_{0}\right],\,\Psi_{0}=\frac{\xi}{2\beta}\left(I_{0}-1\right)^{\beta}
-\]
-
-\end_inset
-
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<material type="fiber-power-linear-uncoupled">
-\end_layout
-
-\begin_layout LyX-Code
-  <fiber type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-    <theta>20</center>
-\end_layout
-
-\begin_layout LyX-Code
-    <phi>90</phi>
-\end_layout
-
-\begin_layout LyX-Code
-  </fiber>
-\end_layout
-
-\begin_layout LyX-Code
-  <E>1</E>
-\end_layout
-
-\begin_layout LyX-Code
-  <beta>2.5</beta>
-\end_layout
-
-\begin_layout LyX-Code
-  <lam0>1.06</lam0>
 \end_layout
 
 \begin_layout LyX-Code
@@ -44807,7 +44078,7 @@ reference "subsec:Uncoupled-Materials"
 \begin_inset Text
 
 \begin_layout Plain Layout
-Container tag for compressible material
+Container tag for solid material
 \end_layout
 
 \end_inset
@@ -46155,10 +45426,10 @@ This example defines a thin soft tissue material where fibers are distributed
 \end_layout
 
 \begin_layout Subsection
-Compressible Materials
+Unconstrained Materials
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Compressible-Materials"
+name "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -46407,7 +45678,7 @@ index of solid bound molecule
 \end_layout
 
 \begin_layout Standard
-This model describes a compressible neo-Hookean material 
+This model describes an unconstrained neo-Hookean material 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
@@ -49011,725 +48282,6 @@ Example (using units of mm, N, s, nmol, K)
 
 \begin_layout LyX-Code
 </Globals>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Exponential-Power Law
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:fiber-exp-pow"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for a single fiber with an exponential-power law is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-exp-pow
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- Since fibers can only sustain tension, this material is not stable on its
- own.
- It must be combined with a stable compressible material that acts as a
- ground matrix, using a 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-solid mixture
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
- container as described in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Solid-Mixture"
-
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<ksi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\xi,$
-\end_inset
-
- representing a measure of the fiber modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<alpha>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\alpha,$
-\end_inset
-
- coefficient of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- power of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber is oriented along the unit vector 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
-, where 
-\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
-\end_inset
-
- are orthonormal basis vectors representing the local element coordinate
- system when specified (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Specifying-Fiber-Orientation"
-
-\end_inset
-
-), or else the global Cartesian coordinate system.
- The Cauchy stress for this fibrous material is given by 
-\begin_inset Formula 
-\[
-\boldsymbol{\sigma}=H\left(I_{n}-1\right)\frac{2I_{n}}{J}\frac{\partial\Psi}{\partial I_{n}}\mathbf{n}\otimes\mathbf{n},
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
-\end_inset
-
- is the square of the fiber stretch, 
-\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{N}/\lambda_{n}$
-\end_inset
-
-, and 
-\begin_inset Formula $H\left(.\right)$
-\end_inset
-
- is the unit step function that enforces the tension-only contribution.
- The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\Psi=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right)\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\xi>0$
-\end_inset
-
-, 
-\begin_inset Formula $\alpha\geqslant0$
-\end_inset
-
-, and 
-\begin_inset Formula $\beta\geqslant2$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Note: In the limit when 
-\begin_inset Formula $\alpha\to0$
-\end_inset
-
-, this expressions produces a power law, 
-\begin_inset Formula 
-\[
-\lim\limits _{\alpha\to0}\,\Psi=\frac{\xi}{\beta}\left(I_{n}-1\right)^{\beta}
-\]
-
-\end_inset
-
-Note: When 
-\begin_inset Formula $\beta>2$
-\end_inset
-
-, the fiber modulus is zero at the strain origin (
-\begin_inset Formula $I_{n}=1)$
-\end_inset
-
-.
- Therefore, use 
-\begin_inset Formula $\beta>2$
-\end_inset
-
- when a smooth transition in the stress is desired from compression to tension.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout Standard
-Single fiber oriented along 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
-, embedded in a neo-Hookean ground matrix.
-\end_layout
-
-\begin_layout LyX-Code
-<material id="1" type="solid mixture">
-\end_layout
-
-\begin_layout LyX-Code
-  <mat_axis type="local">0,0,0</mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="neo-Hookean">
-\end_layout
-
-\begin_layout LyX-Code
-    <E>1000.0</E>
-\end_layout
-
-\begin_layout LyX-Code
-    <v>0.45</v>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="fiber-exp-pow">
-\end_layout
-
-\begin_layout LyX-Code
-    <ksi>5</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-    <alpha>20</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <mat_axis type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-        <theta>0</theta>
-\end_layout
-
-\begin_layout LyX-Code
-        <phi>90</phi>
-\end_layout
-
-\begin_layout LyX-Code
-    </mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout Standard
-Two fibers in the plane orthogonal to 
-\begin_inset Formula $\mathbf{e}_{1}$
-\end_inset
-
-, oriented at ±25 degrees relative to 
-\begin_inset Formula $\mathbf{e}_{3}$
-\end_inset
-
-, embedded in a neo-Hookean ground matrix.
-\end_layout
-
-\begin_layout LyX-Code
-<material id="1" type="solid mixture">
-\end_layout
-
-\begin_layout LyX-Code
-  <mat_axis type="local">0,0,0</mat_axis>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="neo-Hookean">
-\end_layout
-
-\begin_layout LyX-Code
-    <E>1000.0</E>
-\end_layout
-
-\begin_layout LyX-Code
-    <v>0.45</v>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="fiber-exp-pow">
-\end_layout
-
-\begin_layout LyX-Code
-    <ksi>5</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-    <alpha>20</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <fiber type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-      <theta>90</theta>
-\end_layout
-
-\begin_layout LyX-Code
-      <phi>25</phi>
-\end_layout
-
-\begin_layout LyX-Code
-    </fiber>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="fiber-exp-pow">
-\end_layout
-
-\begin_layout LyX-Code
-    <ksi>5</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-    <alpha>20</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>3</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <fiber type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-      <theta>-90</theta>
-\end_layout
-
-\begin_layout LyX-Code
-      <phi>25</phi>
-\end_layout
-
-\begin_layout LyX-Code
-    </fiber>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Toe-Linear Response
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fiber-Pow-Linear"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-pow-linear
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="3in">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<E>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $E,$
-\end_inset
-
- the fiber modulus in the linear range (
-\begin_inset Formula $E\geqslant0)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- the power-law exponent in the toe region (
-\begin_inset Formula $\beta\geqslant2)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<lam0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\lambda_{0},$
-\end_inset
-
- the stretch ratio when the toe region transitions to the linear region
- (
-\begin_inset Formula $\lambda_{0}>1)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\Psi_{n}\left(I_{n}\right)=\begin{cases}
-0 & I_{n}<1\\
-\frac{\xi}{2\beta}\left(I_{n}-1\right)^{\beta} & 1\leqslant I_{n}\leqslant I_{0}\\
-E\left(I_{0}^{1/2}-I_{n}^{1/2}\right)+B\left(I_{n}-I_{0}\right)+\Psi_{0} & I_{0}<I_{n}
-\end{cases}\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
-\end_inset
-
-, 
-\begin_inset Formula 
-\[
-\xi=\frac{E}{2\left(\beta-1\right)}\left(I_{0}-1\right)^{2-\beta},\,B=\frac{E}{2}\left[\frac{\left(I_{0}-1\right)}{2\left(\beta-1\right)}+I_{0}\right],\,\Psi_{0}=\frac{\xi}{2\beta}\left(I_{0}-1\right)^{\beta}
-\]
-
-\end_inset
-
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<material type="fiber-power-linear">
-\end_layout
-
-\begin_layout LyX-Code
-  <fiber type="angles">
-\end_layout
-
-\begin_layout LyX-Code
-    <theta>20</center>
-\end_layout
-
-\begin_layout LyX-Code
-    <phi>90</phi>
-\end_layout
-
-\begin_layout LyX-Code
-  </fiber>
-\end_layout
-
-\begin_layout LyX-Code
-  <E>1</E>
-\end_layout
-
-\begin_layout LyX-Code
-  <beta>2.5</beta>
-\end_layout
-
-\begin_layout LyX-Code
-  <lam0>1.06</lam0>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
 \end_layout
 
 \begin_layout Standard
@@ -52936,7 +51488,7 @@ P
 \end_layout
 
 \begin_layout Standard
-This model describes a compressible Neo-Hookean material using the natural
+This model describes an unconstrained Neo-Hookean material using the natural
  strain tensor 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -53145,7 +51697,7 @@ Poisson's ratio
 \end_layout
 
 \begin_layout Standard
-This model describes a compressible Neo-Hookean material 
+This model describes an unconstrained Neo-Hookean material 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
@@ -53280,7 +51832,7 @@ name "subsec:Coupled-Mooney-Rivlin"
 \end_layout
 
 \begin_layout Standard
-The coupled Mooney-Rivlin material describes a compressible formulation
+The coupled Mooney-Rivlin material describes an unconstrained formulation
  of the Mooney-Rivlin material.
  The material type for this material is 
 \shape italic
@@ -53658,8 +52210,8 @@ P
 \end_layout
 
 \begin_layout Standard
-The coupled Veronda-Westmann material is a compressible formulation of the
- Veronda-Westmann material and is defined by the following strain-energy
+The coupled Veronda-Westmann material is an unconstrained formulation of
+ the Veronda-Westmann material and is defined by the following strain-energy
  function.
  
 \begin_inset Formula 
@@ -53756,8 +52308,7 @@ name "subsec:Ogden-Unconstrained"
 \end_layout
 
 \begin_layout Standard
-This material describes a compressible (unconstrained) hyperelastic Ogden
- material
+This material describes an unconstrained hyperelastic Ogden material
 \size small
  
 \begin_inset CommandInset citation
@@ -54677,7 +53228,7 @@ name "subsec:Solid-Mixture"
 \end_layout
 
 \begin_layout Standard
-This material describes a mixture of compressible elastic solids.
+This material describes a mixture of unconstrained elastic solids.
  It is a container for any combination of the materials described in Section
 \begin_inset space ~
 \end_inset
@@ -54685,7 +53236,7 @@ This material describes a mixture of compressible elastic solids.
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -54717,7 +53268,7 @@ reference "subsec:Compressible-Materials"
 \begin_inset Text
 
 \begin_layout Plain Layout
-Container tag for compressible material 
+Container tag for unconstrained solid material 
 \end_layout
 
 \end_inset
@@ -56849,6 +55400,2072 @@ Example:
 \end_layout
 
 \begin_layout Section
+Fibers
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fibers"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Fiber materials are used to model one-dimensional structures oriented along
+ a unit vector.
+ The associated strain energy density is a function of the normal strain
+ along that vector.
+ These fiber models are constructed such that the strain energy is non-zero
+ only when the fiber is in tension, under the idealized assumption that
+ fibers do not sustain any load in compression.
+ This assumption produces an inherent instability in the material response
+ of fibers, therefore such models must be combined with elastic materials
+ that can sustain compression and tension, thus serving as models of a ground
+ matrix.
+\end_layout
+
+\begin_layout Standard
+FEBio accommodates fiber models that can be combined with unconstrained
+ or uncoupled models of the ground matrix.
+ Historically, unconstrained models of a ground matrix have been combined
+ with unconstrained fiber models, whereas uncoupled models of a ground matrix
+ have been combined with uncoupled fiber models.
+ The manual sections presented below follow this conventional approach.
+\end_layout
+
+\begin_layout Standard
+However, it should be noted that some authors have expressed concerns about
+ using uncoupled fiber formulations in fiber-matrix material models 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Sansour08,Helfenstein10,Gultekin19"
+literal "false"
+
+\end_inset
+
+, due to two fundamental concerns: When highly nonlinear fibers become much
+ stiffer than the ground matrix upon loading, it may become difficult to
+ enforce an isochoric deformation, as would be expected in an uncoupled
+ formulation.
+ Furthermore, in an uncoupled formulation, the strain is split into its
+ deviatoric (isochoric) and volumetric parts and the fiber strain is evaluated
+ only from the deviatoric part.
+ This deviatoric fiber strain is not the true fiber strain, yet it is used
+ to determine whether the fiber is in tension.
+ These factors may result in non-physical deformations, as described by
+ Helfenstein et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Helfenstein10"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The solution advocated by these investigators has been to use an uncoupled
+ formulation for the ground matrix only, while the fiber models should remain
+ unconstrained 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Sansour08,Helfenstein10,Gultekin19"
+literal "false"
+
+\end_inset
+
+.
+ This can be done in FEBio by using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+uncoupled solid mixture
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Solid-Mixture"
+
+\end_inset
+
+, where the material representing the ground matrix is taken from the list
+ of uncoupled materials in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, whereas fiber models are taken from the list of unconstrained models in
+ Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Fiber-Models"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ or Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Continuous-Fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Unconstrained Fiber Models
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Unconstrained-Fiber-Models"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since fibers can only sustain tension, the materials listed here are not
+ stable on their own.
+ They must be combined with a stable material that acts as a ground matrix,
+ using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+solid mixture
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+
+\end_inset
+
+, within a <solid> tag.
+ These fiber models may also be used in continuous fiber distribution models
+ as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Continuous-Fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, within a <fibers> tag.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Exponential-Power Law
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:fiber-exp-pow"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a single fiber with an exponential-power law is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-exp-pow
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Since fibers can only sustain tension, this material is not stable on its
+ own.
+ It must be combined with a stable compressible material that acts as a
+ ground matrix, using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+solid mixture
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi,$
+\end_inset
+
+ representing a measure of the fiber modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\alpha,$
+\end_inset
+
+ coefficient of exponential argument
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta,$
+\end_inset
+
+ power of exponential argument
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber is oriented along the unit vector 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Specifying-Fiber-Orientation"
+
+\end_inset
+
+), or else the global Cartesian coordinate system.
+ The Cauchy stress for this fibrous material is given by 
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=H\left(I_{n}-1\right)\frac{2I_{n}}{J}\frac{\partial\Psi}{\partial I_{n}}\mathbf{n}\otimes\mathbf{n},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the square of the fiber stretch, 
+\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}/\lambda_{n}$
+\end_inset
+
+, and 
+\begin_inset Formula $H\left(.\right)$
+\end_inset
+
+ is the unit step function that enforces the tension-only contribution.
+ The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\Psi=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right)\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\xi>0$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha\geqslant0$
+\end_inset
+
+, and 
+\begin_inset Formula $\beta\geqslant2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Note: In the limit when 
+\begin_inset Formula $\alpha\to0$
+\end_inset
+
+, this expressions produces a power law, 
+\begin_inset Formula 
+\[
+\lim\limits _{\alpha\to0}\,\Psi=\frac{\xi}{\beta}\left(I_{n}-1\right)^{\beta}
+\]
+
+\end_inset
+
+Note: When 
+\begin_inset Formula $\beta>2$
+\end_inset
+
+, the fiber modulus is zero at the strain origin (
+\begin_inset Formula $I_{n}=1)$
+\end_inset
+
+.
+ Therefore, use 
+\begin_inset Formula $\beta>2$
+\end_inset
+
+ when a smooth transition in the stress is desired from compression to tension.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Single fiber oriented along 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+, embedded in a neo-Hookean ground matrix.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1000.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.45</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-exp-pow">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>5</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>3</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Two fibers in the plane orthogonal to 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+, oriented at ±25 degrees relative to 
+\begin_inset Formula $\mathbf{e}_{3}$
+\end_inset
+
+, embedded in a neo-Hookean ground matrix.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1000.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.45</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-exp-pow">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>5</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>3</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <fiber type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+      <theta>90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+      <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-exp-pow">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>5</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>3</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <fiber type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+      <theta>-90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+      <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Neo-Hookean Law
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-with-Neo-Hookean"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-NH
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu,$
+\end_inset
+
+ representing a measure of the fiber modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\Psi_{n}\left(I_{n}\right)=\frac{\mu}{4}\left(I_{n}-1\right)^{2}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mu>0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a continuous fiber distribution (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Continuous-Fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<fibers type="fiber-NH">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>1</mu>
+\end_layout
+
+\begin_layout LyX-Code
+</fibers>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Toe-Linear Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Pow-Linear"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-pow-linear
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $E,$
+\end_inset
+
+ the fiber modulus in the linear range (
+\begin_inset Formula $E\geqslant0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta,$
+\end_inset
+
+ the power-law exponent in the toe region (
+\begin_inset Formula $\beta\geqslant2)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<lam0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{0},$
+\end_inset
+
+ the stretch ratio when the toe region transitions to the linear region
+ (
+\begin_inset Formula $\lambda_{0}>1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\Psi_{n}\left(I_{n}\right)=\begin{cases}
+0 & I_{n}<1\\
+\frac{\xi}{2\beta}\left(I_{n}-1\right)^{\beta} & 1\leqslant I_{n}\leqslant I_{0}\\
+E\left(I_{0}^{1/2}-I_{n}^{1/2}\right)+B\left(I_{n}-I_{0}\right)+\Psi_{0} & I_{0}<I_{n}
+\end{cases}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\xi=\frac{E}{2\left(\beta-1\right)}\left(I_{0}-1\right)^{2-\beta},\,B=\frac{E}{2}\left[\frac{\left(I_{0}-1\right)}{2\left(\beta-1\right)}+I_{0}\right],\,\Psi_{0}=\frac{\xi}{2\beta}\left(I_{0}-1\right)^{\beta}
+\]
+
+\end_inset
+
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a solid mixture (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<solid type="fiber-pow-linear">
+\end_layout
+
+\begin_layout LyX-Code
+  <fiber type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+    <theta>20</center>
+\end_layout
+
+\begin_layout LyX-Code
+    <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+  </fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  <E>1</E>
+\end_layout
+
+\begin_layout LyX-Code
+  <beta>2.5</beta>
+\end_layout
+
+\begin_layout LyX-Code
+  <lam0>1.06</lam0>
+\end_layout
+
+\begin_layout LyX-Code
+</solid>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Uncoupled Fiber Models
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Uncoupled-Fiber-Models"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since fibers can only sustain tension, the materials listed here are not
+ stable on their own.
+ They must be combined with a stable material that acts as a ground matrix,
+ using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+uncoupled solid mixture
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Solid-Mixture"
+
+\end_inset
+
+, within a <solid> tag.
+ These fiber models may also be used in continuous fiber distribution models
+ as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Continuous-Fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, using a <fibers> tag.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Exponential-Power Law, Uncoupled Formulation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:fiber-exp-pow-uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a single fiber with an exponential-power law, in an
+ uncoupled strain energy formulation, is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-exp-pow-uncoupled
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Since fibers can only sustain tension, this material is not stable on its
+ own.
+ It must be combined with a stable uncoupled material that acts as a ground
+ matrix, using a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+uncoupled solid mixture
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ container as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Solid-Mixture"
+
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi,$
+\end_inset
+
+ representing a measure of the fiber modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\alpha,$
+\end_inset
+
+ coefficient of exponential argument
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta,$
+\end_inset
+
+ power of exponential argument
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber is oriented along the unit vector 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+, where 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ are orthonormal basis vectors representing the local element coordinate
+ system when specified (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Specifying-Fiber-Orientation"
+
+\end_inset
+
+), or else the global Cartesian coordinate system.
+ The stress 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}$
+\end_inset
+
+ for this fibrous material is given by 
+\begin_inset Formula 
+\[
+\tilde{\boldsymbol{\sigma}}=H\left(\tilde{I}_{n}-1\right)\frac{2\tilde{I}_{n}}{J}\frac{\partial\tilde{\Psi}}{\partial\tilde{I}_{n}}\mathbf{n}\otimes\mathbf{n},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{\tilde{C}}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the square of the fiber stretch, 
+\begin_inset Formula $\mathbf{n}=\mathbf{\tilde{F}}\cdot\mathbf{n}_{r}/\tilde{\lambda}_{n}$
+\end_inset
+
+, and 
+\begin_inset Formula $H\left(.\right)$
+\end_inset
+
+ is the unit step function that enforces the tension-only contribution..
+ The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\tilde{\Psi}=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(\tilde{I}_{n}-1\right)^{\beta}\right]-1\right)\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\xi>0$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha\geqslant0$
+\end_inset
+
+, and 
+\begin_inset Formula $\beta\geqslant2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Note: In the limit when 
+\begin_inset Formula $\alpha\to0$
+\end_inset
+
+, this expressions produces a power law, 
+\begin_inset Formula 
+\[
+\lim\limits _{\alpha\to0}\tilde{\Psi}=\frac{\xi}{\beta}\left(\tilde{I}_{n}-1\right)^{\beta}.
+\]
+
+\end_inset
+
+Note: When 
+\begin_inset Formula $\beta>2$
+\end_inset
+
+, the fiber modulus is zero at the strain origin (
+\begin_inset Formula $\tilde{I}_{n}=1)$
+\end_inset
+
+.
+ Therefore, use 
+\begin_inset Formula $\beta>2$
+\end_inset
+
+ when a smooth transition in the stress is desired from compression to tension.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Single fiber oriented along 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+, embedded in a Mooney-Rivlin ground matrix.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="uncoupled solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>10e3</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+    <c1>10.0</c1>
+\end_layout
+
+\begin_layout LyX-Code
+    <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-exp-pow-uncoupled">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>5</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>3</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Two fibers in the plane orthogonal to 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+, oriented at ±25 degrees relative to 
+\begin_inset Formula $\mathbf{e}_{3}$
+\end_inset
+
+, embedded in a Mooney-Rivlin ground matrix.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="uncoupled solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <mat_axis type="local">0,0,0</mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>10e3</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+    <c1>10.0</c1>
+\end_layout
+
+\begin_layout LyX-Code
+    <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-exp-pow-uncoupled">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>5</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>3</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-exp-pow-uncoupled">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>5</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>3</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+        <theta>-90</theta>
+\end_layout
+
+\begin_layout LyX-Code
+        <phi>25</phi>
+\end_layout
+
+\begin_layout LyX-Code
+    </mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Neo-Hookean Law Uncoupled
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Neo-Hookean-Uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-NH-uncoupled
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu,$
+\end_inset
+
+ representing a measure of the fiber modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\tilde{\Psi}_{n}\left(I_{n}\right)=\frac{\mu}{4}\left(\tilde{I}_{n}-1\right)^{2}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mu>0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a continuous fiber distribution (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Continuous-Fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<fibers type="fiber-NH-uncoupled">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>1</mu>
+\end_layout
+
+\begin_layout LyX-Code
+</fibers>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Toe-Linear Response, Uncoupled Formulation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:fiber-pow-linear-uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-pow-linear-uncoupled
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $E,$
+\end_inset
+
+ the fiber modulus in the linear range (
+\begin_inset Formula $E\geqslant0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta,$
+\end_inset
+
+ the power-law exponent in the toe region (
+\begin_inset Formula $\beta\geqslant2)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<lam0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{0},$
+\end_inset
+
+ the stretch ratio when the toe region transitions to the linear region
+ (
+\begin_inset Formula $\lambda_{0}>1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)=\begin{cases}
+0 & \tilde{I}_{n}<1\\
+\frac{\xi}{2\beta}\left(\tilde{I}_{n}-1\right)^{\beta} & 1\leqslant\tilde{I}_{n}\leqslant I_{0}\\
+E\left(I_{0}^{1/2}-\tilde{I}_{n}^{1/2}\right)+B\left(\tilde{I}_{n}-I_{0}\right)+\Psi_{0} & I_{0}<\tilde{I}_{n}
+\end{cases}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\xi=\frac{E}{2\left(\beta-1\right)}\left(I_{0}-1\right)^{2-\beta},\,B=\frac{E}{2}\left[\frac{\left(I_{0}-1\right)}{2\left(\beta-1\right)}+I_{0}\right],\,\Psi_{0}=\frac{\xi}{2\beta}\left(I_{0}-1\right)^{\beta}
+\]
+
+\end_inset
+
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a solid mixture (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Solid-Mixture"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<solid type="fiber-pow-linear-uncoupled">
+\end_layout
+
+\begin_layout LyX-Code
+  <fiber type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+    <theta>20</center>
+\end_layout
+
+\begin_layout LyX-Code
+    <phi>90</phi>
+\end_layout
+
+\begin_layout LyX-Code
+  </fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  <E>1</E>
+\end_layout
+
+\begin_layout LyX-Code
+  <beta>2.5</beta>
+\end_layout
+
+\begin_layout LyX-Code
+  <lam0>1.06</lam0>
+\end_layout
+
+\begin_layout LyX-Code
+</solid>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Continuous Fiber Distribution
 \begin_inset CommandInset label
 LatexCommand label
@@ -56865,18 +57482,18 @@ A continuous fiber distribution has a strain energy density that integrates
  from a point in the continuum,
 \begin_inset Formula 
 \[
-\Psi_{r}\left(\mathbf{C}\right)=\int_{A}H\left(I_{n}-1\right)R\left(\mathbf{n}\right)\Psi_{n}\left(I_{n}\right)\,dA\,,
+\Psi_{r}\left(\mathbf{C}\right)=\int_{A}H\left(I_{n}-1\right)R\left(\mathbf{n}_{r}\right)\Psi_{n}\left(I_{n}\right)\,dA\,,
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{n}$
+\begin_inset Formula $\mathbf{n}_{r}$
 \end_inset
 
  is the unit vector along the fiber orientation in the reference configuration,
  
-\begin_inset Formula $I_{n}=\mathbf{n}\cdot\mathbf{C}\cdot\mathbf{n}$
+\begin_inset Formula $I_{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
 \end_inset
 
  is the normal component of 
@@ -56884,7 +57501,7 @@ where
 \end_inset
 
  along 
-\begin_inset Formula $\mathbf{n}$
+\begin_inset Formula $\mathbf{n}_{r}$
 \end_inset
 
  (also the square of the stretch ratio along that direction), and 
@@ -56902,7 +57519,7 @@ literal "false"
 
 .
  Thus, 
-\begin_inset Formula $\mathbf{n}$
+\begin_inset Formula $\mathbf{n}_{r}$
 \end_inset
 
  spans all directions from the origin to points on the unit sphere or unit
@@ -56913,7 +57530,7 @@ literal "false"
 
  represents the strain energy density of the fiber bundle oriented along
  
-\begin_inset Formula $\mathbf{n}$
+\begin_inset Formula $\mathbf{n}_{r}$
 \end_inset
 
 ; 
@@ -56922,7 +57539,7 @@ literal "false"
 
  is the Heaviside unit step function that includes only fibers that are
  in tension; and 
-\begin_inset Formula $R\left(\mathbf{n}\right)$
+\begin_inset Formula $R\left(\mathbf{n}_{r}\right)$
 \end_inset
 
  is the fiber density distribution function that specifies the spatial fractiona
@@ -56930,22 +57547,56 @@ l distribution of fibers.
  This function satisfies the constraint
 \begin_inset Formula 
 \[
-\int_{A}R\left(\mathbf{n}\right)\,dA=1\,.
+\int_{A}R\left(\mathbf{n}_{r}\right)\,dA=1\,.
 \]
 
 \end_inset
 
+Fiber constitutive models may be taken from the list given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Fiber-Models"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 For a material with an uncoupled strain energy density the corresponding
  expression is
 \begin_inset Formula 
 \[
-\tilde{\Psi}_{r}\left(\tilde{\mathbf{C}}\right)=\int_{A}H\left(\tilde{I}_{n}-1\right)R\left(\mathbf{n}\right)\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)\,dA\,,
+\tilde{\Psi}_{r}\left(\tilde{\mathbf{C}}\right)=\int_{A}H\left(\tilde{I}_{n}-1\right)R\left(\mathbf{n}_{r}\right)\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)\,dA\,,
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $\tilde{I}_{n}=\mathbf{n}\cdot\tilde{\mathbf{C}}\cdot\mathbf{n}$
+\begin_inset Formula $\tilde{I}_{n}=\mathbf{n}_{r}\cdot\tilde{\mathbf{C}}\cdot\mathbf{n}_{r}$
+\end_inset
+
+.
+ In this case, fiber constitutive models may be taken from the list given
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Fiber-Models"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
 .
@@ -56959,10 +57610,10 @@ where
 \end_layout
 
 \begin_layout Subsection
-Compressible Continuous Fiber Distribution
+Unconstrained Continuous Fiber Distribution
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Compressible-Continuous-Fiber"
+name "subsec:Unconstrained-Continuous-Fiber"
 
 \end_inset
 
@@ -56970,7 +57621,7 @@ name "subsec:Compressible-Continuous-Fiber"
 \end_layout
 
 \begin_layout Standard
-The material type for a compressible continuous fiber distribution material
+The material type for an unconstrained continuous fiber distribution material
  is 
 \shape italic
 
@@ -57115,7 +57766,10 @@ The <fibers> tag encloses a description of the fiber constitutive relation
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Fibers"
+reference "subsec:Unconstrained-Fiber-Models"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -57372,7 +58026,10 @@ The <fibers> tag encloses a description of the fiber constitutive relation
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Fibers"
+reference "subsec:Uncoupled-Fiber-Models"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -57491,992 +58148,6 @@ Example
 
 \begin_layout LyX-Code
 </material>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-Fibers
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fibers"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A fiber material is needed in the specification of a continuous fiber distributi
-on.
- Use the uncoupled version of the fiber material when modeling an uncoupled
- continuous fiber distribution.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Exponential-Power Law
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fiber-with-Exponential-Power"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-exponential-power-law
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<ksi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\xi,$
-\end_inset
-
- representing a measure of the fiber modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<alpha>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\alpha,$
-\end_inset
-
- coefficient of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- power of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\Psi_{n}\left(I_{n}\right)=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right)\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\xi>0$
-\end_inset
-
-, 
-\begin_inset Formula $\alpha\geqslant0$
-\end_inset
-
-, and 
-\begin_inset Formula $\beta\geqslant2$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Note: In the limit when 
-\begin_inset Formula $\alpha\to0$
-\end_inset
-
-, this expressions produces a power law, 
-\begin_inset Formula 
-\[
-\lim\limits _{\alpha\to0}\Psi_{n}\left(I_{n}\right)=\frac{\xi}{\beta}\left(I_{n}-1\right)^{\beta}\,.
-\]
-
-\end_inset
-
-Note: When 
-\begin_inset Formula $\beta>2$
-\end_inset
-
-, the fiber modulus is zero at the strain origin (
-\begin_inset Formula $I_{n}=1)$
-\end_inset
-
-.
- Therefore, use 
-\begin_inset Formula $\beta>2$
-\end_inset
-
- when a smooth transition in the stress is desired from compression to tension.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<fibers type="fiber-exponential-power-law">
-\end_layout
-
-\begin_layout LyX-Code
-  <alpha>5</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-  <beta>2</beta>
-\end_layout
-
-\begin_layout LyX-Code
-  <ksi>1</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-</fibers>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Neo-Hookean Law
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fiber-with-Neo-Hookean"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-NH
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="1" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<mu>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\mu,$
-\end_inset
-
- representing a measure of the fiber modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\Psi_{n}\left(I_{n}\right)=\frac{\mu}{4}\left(I_{n}-1\right)^{2}\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\mu>0$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<fibers type="fiber-NH">
-\end_layout
-
-\begin_layout LyX-Code
-  <mu>1</mu>
-\end_layout
-
-\begin_layout LyX-Code
-</fibers>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Toe-Linear Response
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fiber-with-Toe-Linear"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-power-linear
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="3in">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<E>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $E,$
-\end_inset
-
- the fiber modulus in the linear range (
-\begin_inset Formula $E\geqslant0)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- the power-law exponent in the toe region (
-\begin_inset Formula $\beta\geqslant2)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<lam0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\lambda_{0},$
-\end_inset
-
- the stretch ratio when the toe region transitions to the linear region
- (
-\begin_inset Formula $\lambda_{0}>1)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\Psi_{n}\left(I_{n}\right)=\begin{cases}
-0 & I_{n}<1\\
-\frac{\xi}{2\beta}\left(I_{n}-1\right)^{\beta} & 1\leqslant I_{n}\leqslant I_{0}\\
-E\left(I_{0}^{1/2}-I_{n}^{1/2}\right)+B\left(I_{n}-I_{0}\right)+\Psi_{0} & I_{0}<I_{n}
-\end{cases}\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
-\end_inset
-
-, 
-\begin_inset Formula 
-\[
-\xi=\frac{E}{2\left(\beta-1\right)}I_{0}^{-3/2}\left(I_{0}-1\right)^{2-\beta},\,B=\frac{EI_{0}^{-3/2}}{2}\left[\frac{\left(I_{0}-1\right)}{2\left(\beta-1\right)}+I_{0}\right],\,\Psi_{0}=\frac{\xi}{2\beta}\left(I_{0}-1\right)^{\beta}
-\]
-
-\end_inset
-
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<fibers type="fiber-power-linear">
-\end_layout
-
-\begin_layout LyX-Code
-  <E>1</E>
-\end_layout
-
-\begin_layout LyX-Code
-  <beta>2.5</beta>
-\end_layout
-
-\begin_layout LyX-Code
-  <lam0>1.06</lam0>
-\end_layout
-
-\begin_layout LyX-Code
-</fibers>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Exponential-Power Law Uncoupled
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fiber-Exponential-Power-Uncoupled"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-exponential-power-law-uncoupled
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<ksi>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\xi,$
-\end_inset
-
- representing a measure of the fiber modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<alpha>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\alpha,$
-\end_inset
-
- coefficient of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta,$
-\end_inset
-
- power of exponential argument
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(\tilde{I}_{n}-1\right)^{\beta}\right]-1\right)\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\xi>0$
-\end_inset
-
-, 
-\begin_inset Formula $\alpha\geqslant0$
-\end_inset
-
-, and 
-\begin_inset Formula $\beta\geqslant2$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Note: In the limit when 
-\begin_inset Formula $\alpha\to0$
-\end_inset
-
-, this expressions produces a power law, 
-\begin_inset Formula 
-\[
-\lim\limits _{\alpha\to0}\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)=\frac{\xi}{\beta}\left(\tilde{I}_{n}-1\right)^{\beta}\,.
-\]
-
-\end_inset
-
-Note: When 
-\begin_inset Formula $\beta>2$
-\end_inset
-
-, the fiber modulus is zero at the strain origin (
-\begin_inset Formula $\tilde{I}_{n}=1)$
-\end_inset
-
-.
- Therefore, use 
-\begin_inset Formula $\beta>2$
-\end_inset
-
- when a smooth transition in the stress is desired from compression to tension.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<fibers type="fiber-exponential-power-law-uncoupled">
-\end_layout
-
-\begin_layout LyX-Code
-  <alpha>5</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-  <beta>2</beta>
-\end_layout
-
-\begin_layout LyX-Code
-  <ksi>1</ksi>
-\end_layout
-
-\begin_layout LyX-Code
-</fibers>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fiber with Neo-Hookean Law Uncoupled
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fiber-Neo-Hookean-Uncoupled"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This material type is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-fiber-NH-uncoupled
-\shape default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The following material parameters need to be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="1" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<mu>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\mu,$
-\end_inset
-
- representing a measure of the fiber modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The fiber strain energy density is given by 
-\begin_inset Formula 
-\[
-\tilde{\Psi}_{n}\left(I_{n}\right)=\frac{\mu}{4}\left(\tilde{I}_{n}-1\right)^{2}\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\mu>0$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<fibers type="fiber-NH-uncoupled">
-\end_layout
-
-\begin_layout LyX-Code
-  <mu>1</mu>
-\end_layout
-
-\begin_layout LyX-Code
-</fibers>
 \end_layout
 
 \begin_layout Standard
@@ -59453,7 +59124,7 @@ fibers-3d-gkt
 
 
 \shape default
- for compressible and uncoupled continuous fiber distributions.
+ for unconstrained and uncoupled continuous fiber distributions.
  This integration rule should only be used with 3D fiber density distributions.
  This scheme automatically limits the range of integration to fibers that
  are in tension 
@@ -59624,7 +59295,7 @@ fibers-3d-fei
 
 
 \shape default
- for compressible and uncoupled continuous fiber distributions.
+ for unconstrained and uncoupled continuous fiber distributions.
  This integration rule should only be used with 3D fiber density distributions.
  This scheme discretizes the unit sphere into a set of 
 \begin_inset Formula $N$
@@ -59793,7 +59464,7 @@ fibers-2d-trapezoidal
 
 
 \shape default
- for compressible and uncoupled continuous fiber distributions.
+ for unconstrained and uncoupled continuous fiber distributions.
  This integration rule should only be used with 2D fiber density distributions.
  This scheme discretizes the unit circle into a set of 
 \begin_inset Formula $N$
@@ -60229,10 +59900,10 @@ Example
 \end_layout
 
 \begin_layout Subsection
-Compressible Viscoelastic Materials
+Unconstrained Viscoelastic Materials
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Compressible-Viscoelastic-Materi"
+name "subsec:Unconstrained-Viscoelastic-Materi"
 
 \end_inset
 
@@ -60344,7 +60015,7 @@ viscoelastic coefficients
 \begin_inset Text
 
 \begin_layout Plain Layout
-elastic component (must be a compressible elastic solid)
+elastic component (must be an unconstrained elastic solid)
 \end_layout
 
 \end_inset
@@ -60451,7 +60122,7 @@ parameter describes the elastic material as given in Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -60948,15 +60619,15 @@ The <kinetics> parameter should be set to 1 for Type I bond kinetics or
  in response to any form of the strain; it should be set to 1 when the trigger
  is distortional strain; and it should be set to 2 when the trigger is dilatatio
 nal strain.
- The <elastic> and <bond> materials may be selected from the list of compressibl
-e elastic materials given in Section
+ The <elastic> and <bond> materials may be selected from the list of unconstrain
+ed elastic materials given in Section
 \begin_inset space ~
 \end_inset
 
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -62448,7 +62119,7 @@ reference "subsec:Uncoupled-Materials"
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -62669,11 +62340,11 @@ The <elastic> tag encloses a description of the constitutive relation of
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
- for compressible materials (used with 
+ for unconstrained materials (used with 
 \shape italic
 
 \begin_inset Quotes eld
@@ -64966,14 +64637,14 @@ where
 
  is the stress resulting from the deformation of the porous solid matrix.
  Therefore, the constitutive relation of the solid matrix should be chosen
- from the list of compressible materials provided in Section
+ from the list of unconstrained materials provided in Section
 \begin_inset space ~
 \end_inset
 
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -65281,7 +64952,7 @@ The <solid> tag encloses a description of the solid matrix constitutive
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -67935,14 +67606,14 @@ e.
  Yet the mixture is compressible because the pores of the solid matrix may
  gain or lose fluid under general loading conditions.
  Therefore, the constitutive relation of the solid matrix should be chosen
- from the list of compressible materials provided in Section
+ from the list of unconstrained materials provided in Section
 \begin_inset space ~
 \end_inset
 
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -68638,7 +68309,7 @@ The <solid> tag encloses a description of the solid matrix constitutive
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -70941,14 +70612,14 @@ Triphasic materials may be used to model the transport of a solvent and
  Yet the mixture is compressible because the pores of the solid matrix may
  gain or lose fluid under general loading conditions.
  Therefore, the constitutive relation of the solid matrix should be chosen
- from the list of compressible materials provided in Section
+ from the list of unconstrained materials provided in Section
 \begin_inset space ~
 \end_inset
 
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -72265,7 +71936,7 @@ The <solid> tag encloses a description of the solid matrix constitutive
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
@@ -76020,7 +75691,7 @@ Active contraction materials may be used to impose a (typically) contractile
 
  is the active contractile stress.
  The calculation of the contractile stress is the same, wether the solid
- mixture consists of uncoupled or compressible materials.
+ mixture consists of uncoupled or unconstrained materials.
 \end_layout
 
 \begin_layout Subsection
@@ -77122,10 +76793,10 @@ An example defining the stl parameter via a point list.
 \end_layout
 
 \begin_layout Subsection
-Contraction in Mixtures of Compressible Materials
+Contraction in Mixtures of Unconstrained Materials
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Contraction-Mixtures-Compressible"
+name "subsec:Contraction-Mixtures-Unconstrained"
 
 \end_inset
 
@@ -77139,8 +76810,8 @@ name "subsubsec:mylabel27"
 
 \end_inset
 
- When the solid mixture consists of compressible materials, the active contracti
-on material should be selected from the list below.
+ When the solid mixture consists of unconstrained materials, the active
+ contraction material should be selected from the list below.
 \end_layout
 
 \begin_layout Subsubsection
@@ -77156,7 +76827,7 @@ name "subsec:Prescribed-Uniaxial-Contraction"
 
 \begin_layout Standard
 The material type for prescribed active contraction along a single direction
- (or fiber) in a solid mixture of compressible materials is 
+ (or fiber) in a solid mixture of unconstrained materials is 
 \begin_inset Quotes eld
 \end_inset
 
@@ -77383,7 +77054,7 @@ name "subsec:Prescribed-TISO-Contraction"
 
 \begin_layout Standard
 The material type for prescribed isotropic active contraction in a plane
- transverse to a given direction (or fiber), in a solid mixture of compressible
+ transverse to a given direction (or fiber), in a solid mixture of unconstrained
  materials, is 
 \begin_inset Quotes eld
 \end_inset
@@ -77616,7 +77287,7 @@ name "subsec:Prescribed-Isotropic-Contraction"
 
 \begin_layout Standard
 The material type for prescribed isotropic active contraction, in a solid
- mixture of compressible materials, is 
+ mixture of unconstrained materials, is 
 \begin_inset Quotes eld
 \end_inset
 
@@ -78347,7 +78018,7 @@ For fluid analyses, which are performed over a fixed mesh, FEBio solves
  mesh (porous solid).
  The solid constituent of a fluid-FSI domain regularizes the mesh deformation;
  it is a hyperelastic solid whose constitutive relation is selected by the
- user; the recommended choice is the compressible neo-Hookean solid defined
+ user; the recommended choice is the unconstrained neo-Hookean solid defined
  in Section
 \begin_inset space ~
 \end_inset
@@ -80326,19 +79997,19 @@ reference "subsec:General-Specification-Fluid"
 
 .
  The <solid> tag encloses a description of the solid, which should be modeled
- as a compressible elastic solid, as given in Section
+ as an unconstrained elastic solid, as given in Section
 \begin_inset space ~
 \end_inset
 
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Compressible-Materials"
+reference "subsec:Unconstrained-Materials"
 
 \end_inset
 
 .
- The recommended choice is the compressible neo-Hookean solid defined in
+ The recommended choice is the unconstrained neo-Hookean solid defined in
  Section
 \begin_inset space ~
 \end_inset
