@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D53081442595627900FBA7BE /* FEScaleAdaptorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */; };
+		D53081452595627900FBA7BE /* FEScaleAdaptorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */; };
 		D5AE8CAB2592EBC6003AC08B /* FETetRefine.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AE8C932592EBC5003AC08B /* FETetRefine.h */; };
 		D5AE8CAC2592EBC6003AC08B /* FERefineMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */; };
 		D5AE8CAD2592EBC6003AC08B /* FEMaxVariableCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AE8C952592EBC5003AC08B /* FEMaxVariableCriterion.h */; };
@@ -34,6 +36,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScaleAdaptorCriterion.h; sourceTree = "<group>"; };
+		D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEScaleAdaptorCriterion.cpp; sourceTree = "<group>"; };
 		D5AE8C932592EBC5003AC08B /* FETetRefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETetRefine.h; sourceTree = "<group>"; };
 		D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERefineMesh.cpp; sourceTree = "<group>"; };
 		D5AE8C952592EBC5003AC08B /* FEMaxVariableCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaxVariableCriterion.h; sourceTree = "<group>"; };
@@ -96,6 +100,8 @@
 				D5AE8C9E2592EBC6003AC08B /* FEMMGRemesh.h */,
 				D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */,
 				D5AE8C9F2592EBC6003AC08B /* FERefineMesh.h */,
+				D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */,
+				D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */,
 				D5AE8CA92592EBC6003AC08B /* FETetRefine.cpp */,
 				D5AE8C932592EBC5003AC08B /* FETetRefine.h */,
 				D5AE8C962592EBC5003AC08B /* stdafx.h */,
@@ -144,6 +150,7 @@
 				D5AE8CAD2592EBC6003AC08B /* FEMaxVariableCriterion.h in Headers */,
 				D5AE8CBA2592EBC6003AC08B /* FEElementSelectionCriterion.h in Headers */,
 				D5AE8CB52592EBC6003AC08B /* FEMMGRemesh.h in Headers */,
+				D53081442595627900FBA7BE /* FEScaleAdaptorCriterion.h in Headers */,
 				D5AE8CB62592EBC6003AC08B /* FERefineMesh.h in Headers */,
 				D5AE8CAB2592EBC6003AC08B /* FETetRefine.h in Headers */,
 				D5AE8CBC2592EBC6003AC08B /* FEDomainErrorCriterion.h in Headers */,
@@ -213,6 +220,7 @@
 				D5AE8CBF2592EBC6003AC08B /* FEMMGRemesh.cpp in Sources */,
 				D5AE8CB92592EBC6003AC08B /* FEAMR.cpp in Sources */,
 				D5AE8CBD2592EBC6003AC08B /* FEElementSelectionCriterion.cpp in Sources */,
+				D53081452595627900FBA7BE /* FEScaleAdaptorCriterion.cpp in Sources */,
 				D5AE8CB82592EBC6003AC08B /* FEHexRefine2D.cpp in Sources */,
 				D5AE8CB42592EBC6003AC08B /* FEMaxVariableCriterion.cpp in Sources */,
 				D5AE8CB02592EBC6003AC08B /* FEDomainErrorCriterion.cpp in Sources */,
