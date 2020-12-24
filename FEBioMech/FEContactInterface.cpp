@@ -30,9 +30,10 @@ SOFTWARE.*/
 #include "FEContactInterface.h"
 #include "FEElasticMaterial.h"
 #include "FEContactSurface.h"
-#include "FECore/FEModel.h"
-#include "FECore/FESolver.h"
-#include "FECore/FEAnalysis.h"
+#include "FERigidMaterial.h"
+#include <FECore/FEModel.h>
+#include <FECore/FESolver.h>
+#include <FECore/FEAnalysis.h>
 
 BEGIN_FECORE_CLASS(FEContactInterface, FESurfacePairConstraint)
 	ADD_PARAMETER(m_laugon, "laugon"        );
@@ -69,33 +70,41 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	FEElement* pe = el.m_elem[0];
 	if (pe == nullptr) return 0.0;
 
+    double eps = 0;
+    
 	// extract the elastic material
 	FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEElasticMaterial>();
-	if (pme == nullptr) return 0.0;
-
-	// get a material point
-	FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
-	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-	// setup the material point
-	pt.m_F = mat3dd(1.0);
-	pt.m_J = 1;
-	pt.m_s.zero();
-
-	// get the tangent (stiffness) and it inverse (compliance) at this point
-	tens4ds S = pme->Tangent(mp);
-	tens4ds C = S.inverse();
-
-	// evaluate element surface normal at parametric center
-	vec3d t[2];
-	s.CoBaseVectors0(el, 0, 0, t);
-	vec3d n = t[0] ^ t[1];
-	n.unit();
-		
-	// evaluate normal component of the compliance matrix
-	// (equivalent to inverse of Young's modulus along n)
-	double eps = 1./(n*(vdotTdotv(n, C, n)*n));
-
+    if (pme) {
+        // get a material point
+        FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        
+        // setup the material point
+        pt.m_F = mat3dd(1.0);
+        pt.m_J = 1;
+        pt.m_s.zero();
+        
+        // get the tangent (stiffness) and it inverse (compliance) at this point
+        tens4ds S = pme->Tangent(mp);
+        tens4ds C = S.inverse();
+        
+        // evaluate element surface normal at parametric center
+        vec3d t[2];
+        s.CoBaseVectors0(el, 0, 0, t);
+        vec3d n = t[0] ^ t[1];
+        n.unit();
+        
+        // evaluate normal component of the compliance matrix
+        // (equivalent to inverse of Young's modulus along n)
+        eps = 1./(n*(vdotTdotv(n, C, n)*n));
+    }
+    else {
+        FERigidMaterial* prm = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FERigidMaterial>();
+        if (prm == nullptr) return 0.0;
+        eps = prm->m_E/(1 - pow(prm->m_v, 2));
+        if (eps == 0) return 0.0;
+    }
+    
 	// get the area of the surface element
 	double A = s.FaceArea(el);
 
