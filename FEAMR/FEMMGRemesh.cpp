@@ -41,10 +41,12 @@ SOFTWARE.*/
 class FEMMGRemesh::MMG
 {
 public:
-	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMMGRemesh* mmgRemesh, double scale);
+	MMG(FEMMGRemesh* mmgRemesh) : m_mmgRemesh(mmgRemesh) {}
+	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, double scale);
 	bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem);
 
 public:
+	FEMMGRemesh*	m_mmgRemesh;
 	std::vector<double>	m_metric;	// refinement metric
 	std::vector<int>	m_nodeSetTag;	// surface tags for node sets
 };
@@ -74,7 +76,7 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 	m_criterion = nullptr;
 
 #ifdef HAS_MMG
-	mmg = new FEMMGRemesh::MMG;
+	mmg = new FEMMGRemesh::MMG(this);
 #endif
 }
 
@@ -133,7 +135,7 @@ bool FEMMGRemesh::Remesh()
 
 	// --- build the MMG mesh ---
 	FEMeshTopo& topo = *m_topo;
-	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, this, m_scale) == false) return false;
+	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, m_scale) == false) return false;
 	
 	// set the control parameters
 	MMG3D_Set_dparameter(mmgMesh, mmgSol, MMG3D_DPARAM_hmin, m_hmin);
@@ -169,7 +171,7 @@ bool FEMMGRemesh::Remesh()
 
 #ifdef HAS_MMG
 
-bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMMGRemesh* mmgRemesh, double scale)
+bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, double scale)
 {
 	FEMesh& mesh = *topo.GetMesh();
 	int NN = mesh.Nodes();
@@ -332,7 +334,7 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 		}
 	}
 
-	FEElementSet* elset = mmgRemesh->GetElementSet();
+	FEElementSet* elset = m_mmgRemesh->GetElementSet();
 	if (elset)
 	{
 		// elements that are not in the element set will be flagged as required.
@@ -349,7 +351,7 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 	}
 
 	// scale factors
-	FEMeshAdaptorCriterion* criterion = mmgRemesh->GetCriterion();
+	FEMeshAdaptorCriterion* criterion = m_mmgRemesh->GetCriterion();
 	if (criterion)
 	{
 		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
