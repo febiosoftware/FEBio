@@ -830,6 +830,12 @@ bool FEFluidSolutesSolver::Quasin()
         if ((m_lineSearch->m_LStol > 0) && (s < m_lineSearch->m_LSmin)) bconv = false;
         
         // check energy divergence
+        //Changed to be like solid solver
+        /*
+        if (m_bdivreform)
+        {
+            if (normE1 > normEm) bconv = false;
+        }*/
         if (normE1 > normEm) bconv = false;
         
         // check solute convergence
@@ -1182,7 +1188,8 @@ void FEFluidSolutesSolver::Serialize(DumpStream& ar)
 {
     FENewtonSolver::Serialize(ar);
     if (ar.IsShallow()) return;
-    ar & m_nveq & m_ndeq;
+    ar & m_nveq & m_ndeq & m_nseq;
+    ar & m_nceq;
     ar & m_alphaf & m_alpham;
     ar & m_gammaf;
     ar & m_pred;

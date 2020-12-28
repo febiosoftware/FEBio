@@ -165,7 +165,7 @@ void FEFluidRCRBC::Update()
     
     // calculate the dilatation
     double e = 0;
-    bool good = m_pfluid->Dilatation(0,p,e);
+    bool good = m_pfluid->Dilatation(0,p,0,e);
     assert(good);
     
     // prescribe this dilatation at the nodes

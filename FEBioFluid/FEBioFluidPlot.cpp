@@ -118,6 +118,25 @@ bool FEPlotFluidDilatation::Save(FEMesh& m, FEDataStream& a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+//! Store the nodal dilatations
+bool FEPlotFluidEffectivePressure::Save(FEDomain& dom, FEDataStream& a)
+{
+    // get the dilatation dof index
+    int dof_e = GetFEModel()->GetDOFIndex("ef");
+    if (dof_e < 0) return false;
+    
+    FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+    if (pfluid == 0) return false;
+    
+    // loop over all nodes
+    writeNodalValues<double>(dom, a, [=, &dom](int i) {
+        FENode& node = dom.Node(i);
+        return pfluid->Pressure(node.get(dof_e));
+    });
+    return true;
+}
+
 //=============================================================================
 //                       S U R F A C E    D A T A
 //=============================================================================

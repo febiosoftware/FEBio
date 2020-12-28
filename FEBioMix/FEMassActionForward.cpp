@@ -33,35 +33,52 @@ SOFTWARE.*/
 //! molar supply at material point
 double FEMassActionForward::ReactionSupply(FEMaterialPoint& pt)
 {
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-	
-	// get reaction rate
-	double kF = m_pFwd->ReactionRate(pt);
-	
-	// evaluate the reaction molar supply
-	double zhat = kF;
-	
-	// start with contribution from solutes
-	const int nsol = (int)spt.m_ca.size();
-	for (int i=0; i<nsol; ++i) {
-		int vR = m_vR[i];
-		if (vR > 0) {
-			double c = spt.m_ca[i];
-			zhat *= pow(c, vR);
-		}
-	}
-	
-	// add contribution of solid-bound molecules
-	const int nsbm = (int)spt.m_sbmr.size();
-	for (int i=0; i<nsbm; ++i) {
-		int vR = m_vR[nsol+i];
-		if (vR > 0) {
-			double c = m_pMP->SBMConcentration(pt, i);
-			zhat *= pow(c, vR);
-		}
-	}
-	
-	return zhat;
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    
+    // get reaction rate
+    double kF = m_pFwd->ReactionRate(pt);
+    
+    // evaluate the reaction molar supply
+    double zhat = kF;
+    
+    // start with contribution from solutes
+    int nsol = 0;
+    if (m_pMP)
+        nsol = (int)spt.m_ca.size();
+    else if (m_pFS)
+        nsol = (int)fspt.m_ca.size();
+    else if (m_pSM)
+        nsol = (int)smpt.m_ca.size();
+    for (int i=0; i<nsol; ++i) {
+        int vR = m_vR[i];
+        if (vR > 0) {
+            double c = 0;
+            if (m_pMP)
+                c = spt.m_ca[i];
+            else if (m_pFS)
+                c = fspt.m_ca[i];
+            else if (m_pSM)
+                c = smpt.m_ca[i];
+            zhat *= pow(c, vR);
+        }
+    }
+    
+    // add contribution of solid-bound molecules
+    if (m_pMP)
+    {
+        const int nsbm = (int)spt.m_sbmr.size();
+        for (int i=0; i<nsbm; ++i) {
+            int vR = m_vR[nsol+i];
+            if (vR > 0) {
+                double c = m_pMP->SBMConcentration(pt, i);
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    
+    return zhat;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,23 +130,40 @@ double FEMassActionForward::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-	const int nsol = m_nsol;
-	
-	// if the derivative is taken with respect to a solid-bound molecule, return 0
-	if (sol >= nsol) {
-		return 0;
-	}
-	
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-	double zhat = ReactionSupply(pt);
-	double dzhatdc = 0;
-	for (int isol=0; isol<nsol; ++isol) {
-		dzhatdc += m_vR[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
-		if ((isol == sol) && (spt.m_c[sol] > 0))
-			dzhatdc += m_vR[isol]/spt.m_c[sol];
-	}
-	
-	dzhatdc *= zhat;
-	
-	return dzhatdc;
+    const int nsol = m_nsol;
+    
+    // if the derivative is taken with respect to a solid-bound molecule, return 0
+    if (sol >= nsol) {
+        return 0;
+    }
+    
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    double zhat = ReactionSupply(pt);
+    double dzhatdc = 0;
+    for (int isol=0; isol<nsol; ++isol) {
+        if (m_pMP)
+        {
+            dzhatdc += m_vR[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
+            if ((isol == sol) && (spt.m_c[sol] > 0))
+                dzhatdc += m_vR[isol]/spt.m_c[sol];
+        }
+        else if (m_pFS)
+        {
+            dzhatdc += m_vR[isol]*fspt.m_dkdc[isol][sol]/fspt.m_k[isol];
+            if ((isol == sol) && (fspt.m_c[sol] > 0))
+                dzhatdc += m_vR[isol]/fspt.m_c[sol];
+        }
+        else if (m_pSM)
+        {
+            dzhatdc += m_vR[isol]*smpt.m_dkdc[isol][sol]/smpt.m_k[isol];
+            if ((isol == sol) && (smpt.m_c[sol] > 0))
+                dzhatdc += m_vR[isol]/smpt.m_c[sol];
+        }
+    }
+    
+    dzhatdc *= zhat;
+    
+    return dzhatdc;
 }

@@ -28,7 +28,10 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FEBioMix/FESolute.h>
 #include <FEBioMix/FESoluteInterface.h>
+#include <FEBioMix/FEOsmoticCoefficient.h>
+#include <FEBioMix/FEChemicalReaction.h>
 #include "febiofluid_api.h"
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 class FEBIOFLUID_API FESolutesMaterial : public FEMaterial, public FESoluteInterface
@@ -51,14 +54,18 @@ public:
 
 	public:
 		vec3d	m_vft;		// fluid velocity at integration point
-		double	m_divf;		// divergence of fluid velocity
+		double	m_JfdotoJf;		// divergence of fluid velocity
 
 		// solutes material data
 		int                 m_nsol;     //!< number of solutes
 		vector<double>      m_c;        //!< solute concentration
+        vector<double>      m_ca;        //!< effective solute concentration
 		vector<vec3d>       m_gradc;    //!< spatial gradient of solute concentration
 		vector<vec3d>       m_j;        //!< solute molar flux
 		vector<double>      m_cdot;     //!< material time derivative of solute concentration following fluid
+        vector<double>    m_k;        //!< solute partition coefficient
+        vector<double>    m_dkdJ;        //!< 1st deriv of m_k with strain (J)
+        vector< vector<double> >    m_dkdc;            //!< 1st deriv of m_k with effective concentration
 	};
 
 public:
@@ -76,14 +83,47 @@ public:
 
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
+    
+    //! actual concentration (as opposed to effective concentration)
+    double ConcentrationActual(FEMaterialPoint& pt, const int sol);
+    
+    //! actual fluid pressure (as opposed to effective pressure)
+    double PressureActual(FEMaterialPoint& pt);
+    
+    //! partition coefficient
+    double PartitionCoefficient(FEMaterialPoint& pt, const int sol);
+    
+    //! partition coefficients and their derivatives
+    void PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+                                       vector<double>& dkdJ,
+                                       vector< vector<double> >& dkdc);
+    
+    //! solute density
+    double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
+    
+    //! solute molar mass
+    double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
+    
+    //! Add a chemical reaction
+    void AddChemicalReaction(FEChemicalReaction* pcr);
 
 	// solute interface
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
+    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
+    
+    int Reactions         () { return (int) m_pReact.size();    }
+public:
+    double    m_Rgas;            //!< universal gas constant
+    double    m_Tabs;            //!< absolute temperature
+    double    m_Fc;              //!< Faraday's constant
 
 private: // material properties
 	std::vector<FESolute*>  m_pSolute;      //!< pointer to solute materials
+    FEOsmoticCoefficient*        m_pOsmC;        //!< pointer to osmotic coefficient material
+    std::vector<FEChemicalReaction*>    m_pReact;        //!< pointer to chemical reactions
 
 	DECLARE_FECORE_CLASS();
 };

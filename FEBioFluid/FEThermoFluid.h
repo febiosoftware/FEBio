@@ -85,7 +85,7 @@ public:
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     //! invert pressure-dilatation relation
-    bool Dilatation(const double T, const double p, double& e) override { return GetElastic()->Dilatation(T,p, e); }
+    bool Dilatation(const double T, const double p, const double c, double& e) override { return GetElastic()->Dilatation(T,p,0,e); }
     
     //! fluid pressure from state variables
     double Pressure(const double ef, const double T) override { return GetElastic()->Pressure(ef, T); };

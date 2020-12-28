@@ -54,7 +54,7 @@ public:
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     //! invert pressure-dilatation relation
-    bool Dilatation(const double T, const double p, double& e) override;
+    bool Dilatation(const double T, const double p, const double c, double& e) override;
     
     //! evaluate temperature
     double Temperature(FEMaterialPoint& mp) override;

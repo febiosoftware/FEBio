@@ -414,7 +414,7 @@ double FERealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FERealGas::Dilatation(const double T, const double p, double& e)
+bool FERealGas::Dilatation(const double T, const double p, const double c, double& e)
 {
     double errrel = 1e-6;
     double errabs = 1e-6;

@@ -34,23 +34,27 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include <FECore/log.h>
 #include "FEMultiphasic.h"
+#include <FEBioFluid/FEFluidSolutes.h>
+#include <FEBioFluid/FESolutesMaterial.h>
 #include <stdlib.h>
 
 //-----------------------------------------------------------------------------
 FEReaction::FEReaction(FEModel* pfem) : FEMaterial(pfem)
 {
     m_pMP = 0;
+    m_pFS = 0;
+    m_pSM = 0;
 }
 
 //-----------------------------------------------------------------------------
 bool FEReaction::Init()
 {
     // make sure the parent class is set
-    assert(m_pMP);
-	if (m_pMP == 0) {
-		feLogError("Parent class not set");
-		return false;
-	}
+    assert(m_pMP || m_pFS || m_pSM);
+    if (m_pMP == 0 && m_pFS == 0 && m_pSM == 0) {
+        feLogError("Parent class not set");
+        return false;
+    }
     
     // now call base class
     if (FEMaterial::Init() == false) return false;
