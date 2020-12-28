@@ -47,6 +47,7 @@ public: // overloaded from base class
 
 	size_t size() const { return m_nsize; }
 	size_t reserved() const { return m_nreserved; }
+	bool EndOfStream() const;
 
 protected:
 	void grow_buffer(size_t l);

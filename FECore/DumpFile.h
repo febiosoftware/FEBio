@@ -46,6 +46,7 @@ public:
 	size_t write(const void* pd, size_t size, size_t count);
 	size_t read(void* pd, size_t size, size_t count);
 	void clear(){}
+	bool EndOfStream() const override;
 
 public:
 	DumpFile(FEModel& fem);

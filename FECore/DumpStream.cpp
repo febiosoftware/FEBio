@@ -36,7 +36,12 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 	m_bshallow = false;
 	m_bytes_serialized = 0;
 	m_ptr_lock = false;
+
+#ifdef _DEBUG
+	m_btypeInfo = true;
+#else
 	m_btypeInfo = false;
+#endif;
 }
 
 //-----------------------------------------------------------------------------
@@ -245,6 +250,11 @@ void DumpStream::AddPointer(void* p)
 DumpStream& DumpStream::write_matrix(matrix& o)
 {
 	if (m_btypeInfo) writeType(TypeID::TYPE_MATRIX);
+
+	// don't write type info for all components
+	bool oldTypeFlag = m_btypeInfo;
+	m_btypeInfo = false;
+
 	DumpStream& ar = *this;
 	int nr = o.rows();
 	int nc = o.columns();
@@ -259,6 +269,9 @@ DumpStream& DumpStream::write_matrix(matrix& o)
 
 		ar << data;
 	}
+
+	m_btypeInfo = oldTypeFlag;
+
 	return *this;
 }
 
@@ -266,6 +279,11 @@ DumpStream& DumpStream::write_matrix(matrix& o)
 DumpStream& DumpStream::read_matrix(matrix& o)
 {
 	if (m_btypeInfo) readType(TypeID::TYPE_MATRIX);
+
+	// don't read type info for all components
+	bool oldTypeFlag = m_btypeInfo;
+	m_btypeInfo = false;
+
 	DumpStream& ar = *this;
 	int nr = 0, nc = 0;
 	ar >> nr >> nc;
@@ -280,5 +298,52 @@ DumpStream& DumpStream::read_matrix(matrix& o)
 			for (int j = 0; j < nc; ++j) o(i, j) = data[n++];
 	}
 
+	m_btypeInfo = oldTypeFlag;
+
 	return *this;
+}
+
+//-----------------------------------------------------------------------------
+// read the next block
+bool DumpStream::readBlock(DataBlock d)
+{
+	// make sure we have type info
+	if (m_btypeInfo == false) return false;
+
+	// see if we have reached the end of the stream
+	if (EndOfStream()) return false;
+
+	// read the data type
+	uchar type = readType();
+
+	// turn off type flag since we already read it
+	m_btypeInfo = false;
+
+	// read/allocate data
+	switch (type)
+	{
+	case TypeID::TYPE_INT     : { int          v; read_raw(v); d.m_pd = new int         (v); } break;
+	case TypeID::TYPE_UINT    : { unsigned int v; read_raw(v); d.m_pd = new unsigned int(v); } break;
+	case TypeID::TYPE_FLOAT   : { float        v; read_raw(v); d.m_pd = new float       (v); } break;
+	case TypeID::TYPE_DOUBLE  : { double       v; read_raw(v); d.m_pd = new double      (v); } break;
+	case TypeID::TYPE_VEC2D   : { vec2d        v; read_raw(v); d.m_pd = new vec2d       (v); } break;
+	case TypeID::TYPE_VEC3D   : { vec3d        v; read_raw(v); d.m_pd = new vec3d       (v); } break;
+	case TypeID::TYPE_MAT2D   : { mat2d        v; read_raw(v); d.m_pd = new mat2d       (v); } break;
+	case TypeID::TYPE_MAT3D   : { mat3d        v; read_raw(v); d.m_pd = new mat3d       (v); } break;
+	case TypeID::TYPE_MAT3DD  : { mat3dd       v; read_raw(v); d.m_pd = new mat3dd      (v); } break;
+	case TypeID::TYPE_MAT3DS  : { mat3ds       v; read_raw(v); d.m_pd = new mat3ds      (v); } break;
+	case TypeID::TYPE_MAT3DA  : { mat3da       v; read_raw(v); d.m_pd = new mat3da      (v); } break;
+	case TypeID::TYPE_QUATD   : { quatd        v; read_raw(v); d.m_pd = new quatd       (v); } break;
+	case TypeID::TYPE_TENS3DS : { tens3ds      v; read_raw(v); d.m_pd = new tens3ds     (v); } break;
+	case TypeID::TYPE_TENS3DRS: { tens3drs     v; read_raw(v); d.m_pd = new tens3drs    (v); } break;
+	case TypeID::TYPE_MATRIX  : { matrix       v; read_raw(v); d.m_pd = new matrix      (v); } break;
+	default:
+		assert(false);
+		m_btypeInfo = true;
+		return false;
+	}
+
+	// turn the type info flag back on
+	m_btypeInfo = true;
+	return true;
 }

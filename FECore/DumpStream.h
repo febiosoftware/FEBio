@@ -80,6 +80,22 @@ class FECORE_API DumpStream
 		unsigned int	id;
 	};
 
+public: 
+	class DataBlock
+	{
+	public:
+		DataBlock() { m_type = TypeID::TYPE_UNKNOWN; m_pd = nullptr; }
+		~DataBlock() { if (m_pd) delete m_pd; m_pd = nullptr; }
+
+		int dataType() const { return m_type; }
+
+	private:
+		int		m_type;
+		void*	m_pd;
+
+		friend class DumpStream;
+	};
+
 public:
 	// This class is thrown when an error occurs reading the dumpfile
 	class ReadError{};
@@ -113,10 +129,17 @@ public:
 	bool HasTypeInfo() const;
 
 public:
+	// read the next block
+	bool readBlock(DataBlock d);
+
+public:
 	// These functions must be overloaded by derived classes
 	// and should return the number of bytes serialized
 	virtual size_t write(const void* pd, size_t size, size_t count) = 0;
 	virtual size_t read(void* pd, size_t size, size_t count) = 0;
+
+	// override function to indicate the end of stream was reached (while reading)
+	virtual bool EndOfStream() const = 0;
 
 	// additional function that need to be overridden
 	virtual void clear() = 0;
@@ -185,6 +208,9 @@ private:
 		assert(type == typeRead);
 		return (type == typeRead);
 	}
+
+protected:
+	size_t bytesSerialized() const { return m_bytes_serialized; }
 
 private:
 	bool		m_bsave;	//!< true if output stream, false for input stream
