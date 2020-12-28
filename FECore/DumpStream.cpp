@@ -36,6 +36,7 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 	m_bshallow = false;
 	m_bytes_serialized = 0;
 	m_ptr_lock = false;
+	m_btypeInfo = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -55,6 +56,20 @@ DumpStream::~DumpStream()
 {
 	m_ptr.clear();
 	m_bytes_serialized = 0;
+}
+
+//-----------------------------------------------------------------------------
+// set the write type info flag
+void DumpStream::WriteTypeInfo(bool b)
+{
+	m_btypeInfo = b;
+}
+
+//-----------------------------------------------------------------------------
+// see if the stream has type info
+bool DumpStream::HasTypeInfo() const
+{
+	return m_btypeInfo;
 }
 
 //-----------------------------------------------------------------------------
@@ -229,6 +244,7 @@ void DumpStream::AddPointer(void* p)
 //-----------------------------------------------------------------------------
 DumpStream& DumpStream::write_matrix(matrix& o)
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_MATRIX);
 	DumpStream& ar = *this;
 	int nr = o.rows();
 	int nc = o.columns();
@@ -249,6 +265,7 @@ DumpStream& DumpStream::write_matrix(matrix& o)
 //-----------------------------------------------------------------------------
 DumpStream& DumpStream::read_matrix(matrix& o)
 {
+	if (m_btypeInfo) readType(TypeID::TYPE_MATRIX);
 	DumpStream& ar = *this;
 	int nr = 0, nc = 0;
 	ar >> nr >> nc;

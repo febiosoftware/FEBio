@@ -42,6 +42,32 @@ SOFTWARE.*/
 class FEModel;
 class matrix;
 
+
+//-----------------------------------------------------------------------------
+enum TypeID
+{
+	TYPE_UNKNOWN,
+	TYPE_INT,
+	TYPE_UINT,
+	TYPE_FLOAT,
+	TYPE_DOUBLE,
+	TYPE_VEC2D,
+	TYPE_VEC3D,
+	TYPE_MAT2D,
+	TYPE_MAT3D,
+	TYPE_MAT3DD,
+	TYPE_MAT3DS,
+	TYPE_MAT3DA,
+	TYPE_QUATD,
+	TYPE_TENS3DS,
+	TYPE_TENS3DRS,
+	TYPE_MATRIX
+};
+
+#ifndef uchar
+#define uchar unsigned char
+#endif
+
 //-----------------------------------------------------------------------------
 //! A dump stream is used to serialize data to and from a data stream.
 //! This is used in FEBio for running and cold restarts. 
@@ -79,6 +105,12 @@ public:
 
 	// get the FE model
 	FEModel& GetFEModel() { return m_fem; }
+
+	// set the write type info flag
+	void WriteTypeInfo(bool b);
+
+	// see if the stream has type info
+	bool HasTypeInfo() const;
 
 public:
 	// These functions must be overloaded by derived classes
@@ -137,9 +169,27 @@ private:
 	DumpStream& write_matrix(matrix& o);
 	DumpStream& read_matrix(matrix& o);
 
+	void writeType(uchar type)
+	{
+		m_bytes_serialized += write(&type, sizeof(type), 1);
+	}
+	uchar readType()
+	{
+		uchar type;
+		m_bytes_serialized += read(&type, sizeof(type), 1);
+		return type;
+	}
+	bool readType(uchar type)
+	{
+		uchar typeRead = readType();
+		assert(type == typeRead);
+		return (type == typeRead);
+	}
+
 private:
 	bool		m_bsave;	//!< true if output stream, false for input stream
 	bool		m_bshallow;	//!< if true only shallow data needs to be serialized
+	bool		m_btypeInfo;	//!< write/read type info
 	FEModel&	m_fem;		//!< the FE Model that is being serialized
 
 	size_t	m_bytes_serialized;	//!< number or bytes serialized
@@ -148,14 +198,34 @@ private:
 	std::vector<Pointer>	m_ptr;
 };
 
+
+template <typename T> class typeInfo {};
+template <> class typeInfo<int>          { public: static uchar typeId() { return (uchar)TypeID::TYPE_INT;     }};
+template <> class typeInfo<unsigned int> { public: static uchar typeId() { return (uchar)TypeID::TYPE_UINT;    }};
+template <> class typeInfo<float>        { public: static uchar typeId() { return (uchar)TypeID::TYPE_FLOAT;   }};
+template <> class typeInfo<double>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_DOUBLE;  }};
+template <> class typeInfo<vec2d>        { public: static uchar typeId() { return (uchar)TypeID::TYPE_VEC2D;   }};
+template <> class typeInfo<vec3d>        { public: static uchar typeId() { return (uchar)TypeID::TYPE_VEC3D;   }};
+template <> class typeInfo<mat2d>        { public: static uchar typeId() { return (uchar)TypeID::TYPE_MAT3D;   }};
+template <> class typeInfo<mat3d>        { public: static uchar typeId() { return (uchar)TypeID::TYPE_MAT3D;   }};
+template <> class typeInfo<mat3dd>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_MAT3DD;  }};
+template <> class typeInfo<mat3ds>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_MAT3DS;  }};
+template <> class typeInfo<mat3da>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_MAT3DA;  }};
+template <> class typeInfo<quatd>        { public: static uchar typeId() { return (uchar)TypeID::TYPE_QUATD;   }};
+template <> class typeInfo<tens3ds>      { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS3DS; }};
+template <> class typeInfo<tens3drs>     { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS3DRS;}};
+template <> class typeInfo<matrix>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_MATRIX;  }};
+
 template <typename T> DumpStream& DumpStream::write_raw(const T& o)
 {
+	if (m_btypeInfo) writeType(typeInfo<T>::typeId());
 	m_bytes_serialized += write(&o, sizeof(T), 1);
 	return *this;
 }
 
 template <typename T> DumpStream& DumpStream::read_raw(T& o)
 {
+	if (m_btypeInfo) readType(typeInfo<T>::typeId());
 	m_bytes_serialized += read(&o, sizeof(T), 1);
 	return *this;
 }
@@ -163,14 +233,6 @@ template <typename T> DumpStream& DumpStream::read_raw(T& o)
 template <typename T> inline DumpStream& DumpStream::operator & (T& o)
 {
 	if (IsSaving()) (*this) << o; else (*this) >> o;
-	return *this;
-}
-
-template <typename T> inline DumpStream& DumpStream::operator << (T& o)
-{
-	AddPointer((void*)&o);
-	o.Serialize(*this);
-	check();
 	return *this;
 }
 
@@ -189,14 +251,6 @@ template <> inline DumpStream& DumpStream::operator << (tens3ds&  o) { return wr
 template <> inline DumpStream& DumpStream::operator << (tens3drs& o) { return write_raw(o); }
 template <> inline DumpStream& DumpStream::operator << (matrix&   o) { return write_matrix(o); }
 
-template <typename T> inline DumpStream& DumpStream::operator >> (T& o)
-{
-	AddPointer((void*)&o);
-	o.Serialize(*this);
-	check();
-	return *this;
-}
-
 template <> inline DumpStream& DumpStream::operator >> (int&          o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (unsigned int& o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (double&   o) { return read_raw(o); }
@@ -212,8 +266,27 @@ template <> inline DumpStream& DumpStream::operator >> (tens3ds&  o) { return re
 template <> inline DumpStream& DumpStream::operator >> (tens3drs& o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (matrix&   o) { return read_matrix(o); }
 
+template <typename T> inline DumpStream& DumpStream::operator << (T& o)
+{
+	AddPointer((void*)&o);
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
+	o.Serialize(*this);
+	check();
+	return *this;
+}
+
+template <typename T> inline DumpStream& DumpStream::operator >> (T& o)
+{
+	AddPointer((void*)&o);
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
+	o.Serialize(*this);
+	check();
+	return *this;
+}
+
 template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>& o)
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	int N = (int) o.size();
 	write(&N, sizeof(int), 1);
 	for (int i=0; i<N; ++i) (*this) << o[i];
@@ -222,6 +295,7 @@ template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>
 
 template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>& o)
 {
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
 	int N;
 	read(&N, sizeof(int), 1);
@@ -235,6 +309,7 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 
 template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
 	int N = (int) o.size();
 	write(&N, sizeof(int), 1);
@@ -248,6 +323,7 @@ template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 
 template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 {
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
 	int N;
 	read(&N, sizeof(int), 1);
@@ -266,6 +342,7 @@ template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 
 template <typename A, typename B> DumpStream& DumpStream::operator << (std::map<A, B>& o)
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	DumpStream& ar = *this;
 	int N = (int)o.size();
 	ar << N;
@@ -280,6 +357,7 @@ template <typename A, typename B> DumpStream& DumpStream::operator << (std::map<
 
 template <typename A, typename B> DumpStream& DumpStream::operator >> (std::map<A, B>& o)
 {
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& ar = *this;
 	int N = 0;
 	ar >> N;
@@ -296,12 +374,14 @@ template <typename A, typename B> DumpStream& DumpStream::operator >> (std::map<
 
 template <typename T, std::size_t N> DumpStream& DumpStream::operator << (T(&a)[N])
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	for (int i = 0; i < N; ++i) (*this) << a[i];
 	return *this;
 }
 
 template <typename T, std::size_t N> DumpStream& DumpStream::operator >> (T(&a)[N])
 {
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	for (int i = 0; i < N; ++i) (*this) >> a[i];
 	return *this;
 }
@@ -327,6 +407,7 @@ template <typename T> DumpStream& DumpStream::operator << (T* &a)
 	}
 
 	// serialize the object (assuming it has a Serialize member)
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	a->Serialize(*this);
 
 	return *this;
@@ -334,6 +415,7 @@ template <typename T> DumpStream& DumpStream::operator << (T* &a)
 
 template <typename T> DumpStream& DumpStream::operator << (std::vector<T*>& o)
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	size_t N = o.size();
 	write(&N, sizeof(size_t), 1);
 	for (size_t i = 0; i < N; ++i)
@@ -366,6 +448,7 @@ template <typename T> DumpStream& DumpStream::operator >> (T* &a)
 	AddPointer((void*)a);
 
 	// serialize the object
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	a->Serialize(*this);
 
 	return *this;
@@ -373,6 +456,7 @@ template <typename T> DumpStream& DumpStream::operator >> (T* &a)
 
 template <typename T> DumpStream& DumpStream::operator >> (std::vector<T*>& o)
 {
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	size_t N = 0;
 	read(&N, sizeof(size_t), 1);
 	if (N > 0)
