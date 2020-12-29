@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include <FECore/DumpMemStream.h>
 #include <FECore/FEDomainMap.h>
+#include "FELeastSquaresMapper.h"
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
 
@@ -57,7 +58,7 @@ public:
 private:
 	void build_map_data(FEModel& fem);
 	void map_data(FEModel& fem);
-	FEDomainMap* createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map);
+	FEDomainMap* createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map, FELeastSquaresMapper* LLQ);
 
 	void clear_maps()
 	{
@@ -912,7 +913,7 @@ FEDomainMap* createNodeDataMap(FEDomain& dom, FEDomainMap* map)
 	return nodeMap;
 }
 
-FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map)
+FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map, FELeastSquaresMapper* LLQ)
 {
 	assert(map->StorageFormat() == Storage_Fmt::FMT_NODE);
 
@@ -929,166 +930,120 @@ FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, ve
 		return nullptr;
 	}
 
+	// count nr of integration points
+	int NMP = 0;
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		NMP += el.GaussPoints();
+	}
+
+	int N0 = nodePos.size();
+
 	// create new domain map
 	FEDomainMap* elemData = new FEDomainMap(map->DataType(), Storage_Fmt::FMT_MATPOINTS);
 	FEElementSet* eset = new FEElementSet(&fem);
 	eset->Create(&dom);
 	elemData->Create(eset);
 
-	// --- Do moving least-squares transfer ---
-	const int nnc = m_mmgRemesh->m_nnc;
+	vector<double> srcData(N0);
+	vector<double> trgData(NMP);
+
+	vector< vector<double> > mappedData(NMP, vector<double>(9, 0.0));
 
 	// loop over all the new nodes
+	for (int l = 0; l < dataSize; ++l)
+	{
+		for (int i = 0; i < N0; ++i)
+		{
+			double vm = 0.0;
+			switch (dataType)
+			{
+			case FEDataType::FE_DOUBLE: vm = map->value<double>(0, i); break;
+			case FEDataType::FE_VEC3D:
+			{
+				vec3d v = map->value<vec3d>(0, i);
+				if (l == 0) vm = v.x;
+				if (l == 1) vm = v.y;
+				if (l == 2) vm = v.z;
+			}
+			break;
+			case FEDataType::FE_MAT3D:
+			{
+				int LUT[9][2] = { {0,0}, {0,1}, {0,2}, {1,0}, {1,1}, {1,2}, {2,0}, {2,1}, {2,2} };
+				mat3d v = map->value<mat3d>(0, i);
+				vm = v(LUT[l][0], LUT[l][1]);
+			}
+			break;
+			case FEDataType::FE_MAT3DS:
+			{
+				int LUT[6][2] = { {0,0}, {0,1}, {0,2}, {1,1}, {1,2}, {2,2} };
+				mat3ds v = map->value<mat3ds>(0, i);
+				vm = v(LUT[l][0], LUT[l][1]);
+			}
+			break;
+			default:
+				assert(false);
+			}
+			srcData[i] = vm;
+		}
+
+		LLQ->Map(srcData, trgData);
+
+		for (int i = 0; i < NMP; ++i)
+		{
+			mappedData[i][l] = trgData[i];
+		}
+	}
+
+	// write mapped data to domain map
+	int n = 0;
 	for (int i = 0; i < dom.Elements(); ++i)
 	{
 		FEElement& el = dom.ElementRef(i);
 		int nint = el.GaussPoints();
 		for (int j = 0; j < nint; ++j)
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-		
-			// get the spatial position
-			vec3d x = mp.m_r0;
+			vector<double>& vj = mappedData[n++];
 
-			// Find the closest M points
-			vector<int> closestNodes;
-			int M = findNeirestNeighbors(nodePos, x, nnc, closestNodes);
-			assert(M > 4);
-
-			// the last node is the farthest and determines the radius
-			vec3d& r = nodePos[closestNodes[M - 1]];
-			double L = sqrt((r - x)*(r - x));
-
-			// add some offset to make sure none of the points will have a weight of zero.
-			// Such points would otherwise be ignored, which reduces the net number of interpolation
-			// points and make the MLS system ill-conditioned
-			L += L * 0.05;
-
-			// evaluate weights and displacements
-			vector<vec3d> Xi(M);
-			vector<double> W(M);
-			for (int m = 0; m < M; ++m)
+			for (int l=0; l<dataSize;++l)
 			{
-				vec3d rm = nodePos[closestNodes[m]];
-				vec3d rj = x - rm;
-
-				Xi[m] = rj;
-
-				double D = sqrt(rj*rj);
-				double wj = 1.0 - D / L;
-				W[m] = wj;
-			}
-
-			// setup least squares problems
-			matrix A(4, 4);
-			A.zero();
-			for (int m = 0; m < M; ++m)
-			{
-				vec3d ri = Xi[m];
-				double P[4] = { 1.0, ri.x, ri.y, ri.z };
-				for (int a = 0; a < 4; ++a)
+				switch (dataType)
 				{
-					for (int b = 0; b < 4; ++b)
-					{
-						A(a, b) += W[m] * P[a] * P[b];
-					}
-				}
-			}
-
-			// solve the linear system of equations
-			vector<int> indx(4);
-			A.lufactor(indx);
-
-			// update nodal values
-			double vj[9];
-			for (int l = 0; l < dataSize; ++l)
-			{
-				vector<double> b(4, 0.0);
-				for (int m = 0; m < M; ++m)
+				case FEDataType::FE_DOUBLE: elemData->setValue(i, j, vj[0]); break;
+				case FEDataType::FE_VEC3D:
 				{
-					vec3d ri = Xi[m];
-					double P[4] = { 1.0, ri.x, ri.y, ri.z };
-
-					double vm = 0.0;
-					switch (dataType)
-					{
-					case FEDataType::FE_DOUBLE:
-					{
-						vm = map->value<double>(0, closestNodes[m]);
-					}
-					break;
-					case FEDataType::FE_VEC3D:
-					{
-						vec3d v = map->value<vec3d>(0, closestNodes[m]);
-						if (l == 0) vm = v.x;
-						if (l == 1) vm = v.y;
-						if (l == 2) vm = v.z;
-					}
-					break;
-					case FEDataType::FE_MAT3D:
-					{
-						int LUT[9][2] = { {0,0}, {0,1}, {0,2}, {1,0}, {1,1}, {1,2}, {2,0}, {2,1}, {2,2} };
-						mat3d v = map->value<mat3d>(0, closestNodes[m]);
-						vm = v(LUT[l][0], LUT[l][1]);
-					}
-					break;
-					case FEDataType::FE_MAT3DS:
-					{
-						int LUT[6][2] = { {0,0}, {0,1}, {0,2}, {1,1}, {1,2}, {2,2} };
-						mat3ds v = map->value<mat3ds>(0, closestNodes[m]);
-						vm = v(LUT[l][0], LUT[l][1]);
-					}
-					break;
-					default:
-						assert(false);
-					}
-
-					for (int a = 0; a < 4; ++a)
-					{
-						b[a] += W[m] * P[a] * vm;
-					}
+					vec3d v;
+					v.x = vj[0];
+					v.y = vj[1];
+					v.z = vj[2];
+					elemData->setValue(i, j, v);
 				}
-
-				A.lusolve(b, indx);
-
-				vj[l] = b[0];
-			}
-
-			switch (dataType)
-			{
-			case FEDataType::FE_DOUBLE: elemData->setValue(i, j, vj[0]); break;
-			case FEDataType::FE_VEC3D :
-			{
-				vec3d v;
-				v.x = vj[0];
-				v.y = vj[1];
-				v.z = vj[2];
-				elemData->setValue(i, j, v);
-			}
-			break;
-			case FEDataType::FE_MAT3D:
-			{
-				mat3d v;
-				v(0, 0) = vj[0]; v(0, 1) = vj[1]; v(0, 2) = vj[2];
-				v(1, 0) = vj[3]; v(1, 1) = vj[4]; v(1, 2) = vj[5];
-				v(2, 0) = vj[6]; v(2, 1) = vj[7]; v(2, 2) = vj[8];
-				elemData->setValue(i, j, v);
-			}
-			break;
-			case FEDataType::FE_MAT3DS:
-			{
-				mat3ds v;
-				v(0, 0) = vj[0]; 
-				v(0, 1) = vj[1]; 
-				v(0, 2) = vj[2];
-				v(1, 1) = vj[3]; 
-				v(1, 2) = vj[4];
-				v(2, 2) = vj[5];
-				elemData->setValue(i, j, v);
-			}
-			break;
-			default:
-				assert(false);
+				break;
+				case FEDataType::FE_MAT3D:
+				{
+					mat3d v;
+					v(0, 0) = vj[0]; v(0, 1) = vj[1]; v(0, 2) = vj[2];
+					v(1, 0) = vj[3]; v(1, 1) = vj[4]; v(1, 2) = vj[5];
+					v(2, 0) = vj[6]; v(2, 1) = vj[7]; v(2, 2) = vj[8];
+					elemData->setValue(i, j, v);
+				}
+				break;
+				case FEDataType::FE_MAT3DS:
+				{
+					mat3ds v;
+					v(0, 0) = vj[0];
+					v(0, 1) = vj[1];
+					v(0, 2) = vj[2];
+					v(1, 1) = vj[3];
+					v(1, 2) = vj[4];
+					v(2, 2) = vj[5];
+					elemData->setValue(i, j, v);
+				}
+				break;
+				default:
+					assert(false);
+				}
 			}
 		}
 	}
@@ -1232,6 +1187,31 @@ void FEMMGRemesh::MMG::map_data(FEModel& fem)
 		FEElementSet* elemSet = new FEElementSet(&fem);
 		elemSet->Create(&dom);
 
+		// build target node list
+		vector<vec3d> trgPoints; trgPoints.reserve(dom.Elements());
+		for (int i = 0; i < dom.Elements(); ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			int nint = el.GaussPoints();
+			for (int j = 0; j < nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				vec3d r = mp.m_r0;
+				trgPoints.push_back(r);
+			}
+		}
+
+		// set up mapper
+		FELeastSquaresMapper LLQ;
+		LLQ.SetNearestNeighborCount(m_mmgRemesh->m_nnc);
+		LLQ.SetSourcePoints(m_oldNodePos[i]);
+		LLQ.SetTargetPoints(trgPoints);
+		if (LLQ.Init() == false)
+		{
+			assert(false);
+			throw std::runtime_error("Failed to initialize LLQ");
+		}
+
 		// loop over all the domain maps
 		std::vector<FEDomainMap*>& nodeMap_i = m_nodeMapList[i];
 		int mapCount = nodeMap_i.size();
@@ -1241,7 +1221,7 @@ void FEMMGRemesh::MMG::map_data(FEModel& fem)
 			FEDomainMap* nodeMap = nodeMap_i[j];
 
 			// map node data to integration points
-			FEDomainMap* elemMap = createElemDataMap(fem, dom, m_oldNodePos[i], nodeMap);
+			FEDomainMap* elemMap = createElemDataMap(fem, dom, m_oldNodePos[i], nodeMap, &LLQ);
 
 			elemMapList[j] = elemMap;
 		}

@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\FEAMR\FEErosionAdaptor.cpp" />
     <ClCompile Include="..\..\FEAMR\FEHexRefine.cpp" />
     <ClCompile Include="..\..\FEAMR\FEHexRefine2D.cpp" />
+    <ClCompile Include="..\..\FEAMR\FELeastSquaresMapper.cpp" />
     <ClCompile Include="..\..\FEAMR\FEScaleAdaptorCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMaxVariableCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMaxVolumeCriterion.cpp" />
@@ -39,6 +40,7 @@
     <ClInclude Include="..\..\FEAMR\FEErosionAdaptor.h" />
     <ClInclude Include="..\..\FEAMR\FEHexRefine.h" />
     <ClInclude Include="..\..\FEAMR\FEHexRefine2D.h" />
+    <ClInclude Include="..\..\FEAMR\FELeastSquaresMapper.h" />
     <ClInclude Include="..\..\FEAMR\FEScaleAdaptorCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEMaxVariableCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEMaxVolumeCriterion.h" />

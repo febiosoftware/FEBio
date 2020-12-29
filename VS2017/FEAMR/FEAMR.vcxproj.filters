@@ -51,6 +51,9 @@
     <ClCompile Include="..\..\FEAMR\FEScaleAdaptorCriterion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEAMR\FELeastSquaresMapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEAMR\FERefineMesh.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEAMR\FEScaleAdaptorCriterion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEAMR\FELeastSquaresMapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
