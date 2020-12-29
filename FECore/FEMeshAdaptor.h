@@ -58,3 +58,4 @@ private:
 
 // helper function for projecting integration point data to nodes
 void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<double (FEMaterialPoint& mp)> f);
+void projectToNodes(FEDomain& dom, std::vector<double>& nodeVals, std::function<double(FEMaterialPoint& mp)> f);

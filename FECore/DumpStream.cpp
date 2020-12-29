@@ -305,7 +305,7 @@ DumpStream& DumpStream::read_matrix(matrix& o)
 
 //-----------------------------------------------------------------------------
 // read the next block
-bool DumpStream::readBlock(DataBlock d)
+bool DumpStream::readBlock(DataBlock& d)
 {
 	// make sure we have type info
 	if (m_btypeInfo == false) return false;
@@ -314,13 +314,13 @@ bool DumpStream::readBlock(DataBlock d)
 	if (EndOfStream()) return false;
 
 	// read the data type
-	uchar type = readType();
+	d.m_type = readType();
 
 	// turn off type flag since we already read it
 	m_btypeInfo = false;
 
 	// read/allocate data
-	switch (type)
+	switch (d.m_type)
 	{
 	case TypeID::TYPE_INT     : { int          v; read_raw(v); d.m_pd = new int         (v); } break;
 	case TypeID::TYPE_UINT    : { unsigned int v; read_raw(v); d.m_pd = new unsigned int(v); } break;

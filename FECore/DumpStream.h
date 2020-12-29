@@ -89,6 +89,8 @@ public:
 
 		int dataType() const { return m_type; }
 
+		template <typename T> T value() { return *((T*)(m_pd)); }
+
 	private:
 		int		m_type;
 		void*	m_pd;
@@ -128,9 +130,12 @@ public:
 	// see if the stream has type info
 	bool HasTypeInfo() const;
 
+	// return total nr of bytes that was serialized
+	size_t bytesSerialized() const { return m_bytes_serialized; }
+
 public:
 	// read the next block
-	bool readBlock(DataBlock d);
+	bool readBlock(DataBlock& d);
 
 public:
 	// These functions must be overloaded by derived classes
@@ -208,9 +213,6 @@ private:
 		assert(type == typeRead);
 		return (type == typeRead);
 	}
-
-protected:
-	size_t bytesSerialized() const { return m_bytes_serialized; }
 
 private:
 	bool		m_bsave;	//!< true if output stream, false for input stream
