@@ -45,7 +45,6 @@ class FEMMGRemesh::MMG
 public:
 	MMG(FEMMGRemesh* mmgRemesh) : m_mmgRemesh(mmgRemesh) 
 	{
-		m_map_data = true;
 	}
 	~MMG()
 	{
@@ -77,8 +76,6 @@ public:
 
 	std::vector< std::vector<vec3d> >		m_oldNodePos;	// old domain's nodal coordinates
 	std::vector< std::vector<FEDomainMap*> >	m_nodeMapList;	// list of nodal data for each domain
-
-	bool	m_map_data;
 };
 
 #endif
@@ -90,6 +87,8 @@ BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
 	ADD_PARAMETER(m_hmin, "min_element_size");
 	ADD_PARAMETER(m_hausd, "hausdorff");
 	ADD_PARAMETER(m_hgrad, "gradation");
+	ADD_PARAMETER(m_bmap_data, "map_data");
+	ADD_PARAMETER(m_nnc, "nnc");
 	ADD_PROPERTY(m_criterion, "criterion", 0);
 END_FECORE_CLASS();
 
@@ -104,6 +103,9 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 	m_hgrad = 1.3;
 
 	m_criterion = nullptr;
+
+	m_bmap_data = false;
+	m_nnc = 8;
 
 #ifdef HAS_MMG
 	mmg = new FEMMGRemesh::MMG(this);
@@ -440,7 +442,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 	// before we recreate the mesh, we need to extract the data that
 	// needs to be mapped between meshes.
-	if (m_map_data)
+	if (m_mmgRemesh->m_bmap_data)
 	{
 		build_map_data(fem);
 	}
@@ -488,6 +490,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 	else
 	{
 		// --- Do moving least-squares transfer ---
+		const int nnc = m_mmgRemesh->m_nnc;
 
 		// loop over all the new nodes
 		for (int i = 0; i < nodes; ++i)
@@ -497,7 +500,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 			// Find the closest M points
 			vector<int> closestNodes;
-			int M = findNeirestNeighbors(oldNodePos, x, 8, closestNodes);
+			int M = findNeirestNeighbors(oldNodePos, x, nnc, closestNodes);
 			assert(M > 4);
 
 			// the last node is the farthest and determines the radius
@@ -657,7 +660,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 	mesh.RebuildLUT();
 
 	// map data onto new mesh
-	if (m_map_data)
+	if (m_mmgRemesh->m_bmap_data)
 	{
 		map_data(fem);
 	}
@@ -933,7 +936,7 @@ FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, ve
 	elemData->Create(eset);
 
 	// --- Do moving least-squares transfer ---
-	FEMesh& mesh = *dom.GetMesh();
+	const int nnc = m_mmgRemesh->m_nnc;
 
 	// loop over all the new nodes
 	for (int i = 0; i < dom.Elements(); ++i)
@@ -949,11 +952,11 @@ FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, ve
 
 			// Find the closest M points
 			vector<int> closestNodes;
-			int M = findNeirestNeighbors(nodePos, x, 8, closestNodes);
+			int M = findNeirestNeighbors(nodePos, x, nnc, closestNodes);
 			assert(M > 4);
 
 			// the last node is the farthest and determines the radius
-			vec3d& r = mesh.Node(closestNodes[M - 1]).m_r0;
+			vec3d& r = nodePos[closestNodes[M - 1]];
 			double L = sqrt((r - x)*(r - x));
 
 			// add some offset to make sure none of the points will have a weight of zero.
@@ -962,16 +965,14 @@ FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, ve
 			L += L * 0.05;
 
 			// evaluate weights and displacements
-			vector<vec3d> Xi(M), Ui(M);
+			vector<vec3d> Xi(M);
 			vector<double> W(M);
 			for (int m = 0; m < M; ++m)
 			{
-				FENode& node = mesh.Node(closestNodes[m]);
-				vec3d uj = node.m_rt - node.m_r0;
-				vec3d rj = x - node.m_r0;
+				vec3d rm = nodePos[closestNodes[m]];
+				vec3d rj = x - rm;
 
 				Xi[m] = rj;
-				Ui[m] = uj;
 
 				double D = sqrt(rj*rj);
 				double wj = 1.0 - D / L;

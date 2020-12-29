@@ -50,9 +50,14 @@ private:
 	double	m_hausd;	// Hausdorff value
 	double	m_hgrad;	// gradation
 
+	bool	m_bmap_data;
+	int		m_nnc;		// nearest-neighbor-count
+
 	FEMeshAdaptorCriterion*	m_criterion;
 
 	MMG*	mmg;
+
+	friend class MMG;
 
 	DECLARE_FECORE_CLASS();
 };
