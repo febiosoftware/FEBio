@@ -560,6 +560,8 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesNaturalFlux.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesPressure.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver2.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
@@ -651,6 +653,8 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesNaturalFlux.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesPressure.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver2.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
