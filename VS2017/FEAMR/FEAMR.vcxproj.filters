@@ -98,5 +98,8 @@
     <ClInclude Include="..\..\FEAMR\FELeastSquaresMapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEAMR\feamr_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

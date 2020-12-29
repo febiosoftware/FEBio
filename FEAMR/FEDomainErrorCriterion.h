@@ -25,11 +25,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
+#include "feamr_api.h"
 
 class FEMaterialPoint;
 
 //-----------------------------------------------------------------------------
-class FEDomainErrorCriterion : public FEMeshAdaptorCriterion
+class FEAMR_API FEDomainErrorCriterion : public FEMeshAdaptorCriterion
 {
 public:
 	FEDomainErrorCriterion(FEModel* fem);

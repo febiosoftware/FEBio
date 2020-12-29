@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FECore/FEDataExport.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
-#include <FEBioLib/version.h>
 #include <FECore/FESurface.h>
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
@@ -693,6 +692,13 @@ void FEBioPlotFile::SetCompression(int n)
 }
 
 //-----------------------------------------------------------------------------
+//! set the version string
+void FEBioPlotFile::SetSoftwareString(const std::string& softwareString)
+{
+	m_softwareString = softwareString;
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioPlotFile::IsValid() const
 {
 	return m_ar.IsValid();
@@ -766,10 +772,11 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 	m_ar.WriteChunk(PLT_HDR_COMPRESSION, m_ncompress);
 
 	// software flag
-	char sz[256] = {0};
-	char* szver = getVersionString();
-	sprintf(sz, "FEBio %s", szver);
-	m_ar.WriteChunk(PLT_HDR_SOFTWARE, (const char*)sz);
+	if (m_softwareString.empty() == false)
+	{
+		const char* sz = m_softwareString.c_str();
+		m_ar.WriteChunk(PLT_HDR_SOFTWARE, sz);
+	}
 
 	return true;
 }

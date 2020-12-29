@@ -1282,6 +1282,12 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			// create a new plot file
 			pplt->SetCompression(m_pltCompression);
 
+			// set the software string
+			const char* szver = getVersionString();
+			char szbuf[256] = { 0 };
+			sprintf(szbuf, "FEBio %s", szver);
+			pplt->SetSoftwareString(szbuf);
+
 			// add plot variables
 			for (FEPlotVariable& vi : m_pltData)
 			{
@@ -1373,6 +1379,12 @@ bool FEBioModel::Init()
 
 			// set compression
 			pplt->SetCompression(m_pltCompression);
+
+			// set the software string
+			const char* szver = getVersionString();
+			char szbuf[256] = { 0 };
+			sprintf(szbuf, "FEBio %s", szver);
+			pplt->SetSoftwareString(szbuf);
 
 			// add plot variables
 			for (FEPlotVariable& vi : m_pltData)
