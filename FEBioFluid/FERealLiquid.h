@@ -87,7 +87,7 @@ public:
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
     
     //! dilatation from temperature and pressure
-    bool Dilatation(const double T, const double p, double& e) override;
+    bool Dilatation(const double T, const double p, const double c, double& e) override;
     
     //! fluid pressure from state variables
     double Pressure(const double ef, const double T) override;

@@ -62,6 +62,8 @@ public:
 
 protected:
 	void MapVelocitySolution();
+    
+    void CorrectActualPressure();
 
 private:
 	FEFluidSolver	m_fldSolver;
@@ -78,6 +80,7 @@ private:
 	double	m_rtol;
 	double	m_lstol;
 	double	m_minRes;
+    double  m_maxRes;
 	double	m_rhoi;
 	int		m_qnmethod;
 

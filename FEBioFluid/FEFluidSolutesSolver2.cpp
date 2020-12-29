@@ -45,6 +45,7 @@ BEGIN_FECORE_CLASS(FEFluidSolutesSolver2, FESolver)
 	ADD_PARAMETER(m_rtol, "rtol");
 	ADD_PARAMETER(m_lstol, "lstol");
 	ADD_PARAMETER(m_minRes, "min_residual");
+    ADD_PARAMETER(m_maxRes, "max_residual");
 	ADD_PARAMETER(m_rhoi, "rhoi");
 	ADD_PARAMETER(m_qnmethod, "qnmethod");
 END_FECORE_CLASS();
@@ -90,6 +91,7 @@ bool FEFluidSolutesSolver2::Init()
 	m_fldSolver.m_Rtol = m_rtol;
 	m_fldSolver.m_lineSearch->m_LStol = m_lstol;
 	m_fldSolver.m_Rmin = m_minRes;
+    m_fldSolver.m_Rmax = m_maxRes;
 	m_fldSolver.m_rhoi = m_rhoi;
 	m_fldSolver.m_qndefault = m_qnmethod;
 
@@ -103,6 +105,7 @@ bool FEFluidSolutesSolver2::Init()
 	m_sltSolver.m_Rtol = m_rtol;
 	m_sltSolver.m_lineSearch->m_LStol = m_lstol;
 	m_sltSolver.m_Rmin = m_minRes;
+    m_sltSolver.m_Rmax = m_maxRes;
 	m_sltSolver.m_rhoi = m_rhoi;
 	m_sltSolver.m_qndefault = m_qnmethod;
 
@@ -180,6 +183,9 @@ bool FEFluidSolutesSolver2::SolveStep()
 	// Now, we solve the solutes problem
 	feLog("\n** Solving for solute concentrations:\n");
 	if (m_sltSolver.SolveStep() == false) return false;
+    
+    //Correct pressure to include osmotic terms
+    CorrectActualPressure();
 
 	// All good!
 	return true;
@@ -223,8 +229,46 @@ void FEFluidSolutesSolver2::MapVelocitySolution()
 				FESolutesMaterial::Point& sp = *mp.ExtractData<FESolutesMaterial::Point>();
 
 				sp.m_vft = fp.m_vft;
-				sp.m_divf = fp.m_Jfdot / fp.m_Jf;
+				sp.m_JfdotoJf = fp.m_Jfdot / fp.m_Jf;
 			}			
 		}
 	}
+}
+
+void FEFluidSolutesSolver2::CorrectActualPressure()
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    
+    // loop over all domains
+    for (int m = 0; m < mesh.Domains(); ++m)
+    {
+        FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(m));
+        
+        const int NE = dom.Elements();
+        for (int i = 0; i < NE; ++i)
+        {
+            FESolidElement& el = dom.Element(i);
+            
+            const int nint = el.GaussPoints();
+            for (int n = 0; n < nint; ++n)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+                FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+                FESolutesMaterial::Point& sp = *mp.ExtractData<FESolutesMaterial::Point>();
+                
+                FEFluidSolutesMaterial2* fs2 = dom.GetMaterial()->ExtractProperty<FEFluidSolutesMaterial2>();
+                
+                double R = fs2->GetSolutesMaterial()->m_Rgas;
+                double T = fs2->GetSolutesMaterial()->m_Tabs;
+                const int nsol = fs2->GetSolutesMaterial()->Solutes();
+                
+                // calculate actual pressure
+                for (int isol=0; isol < nsol; ++isol)
+                {
+                    fp.m_pf += fs2->GetSolutesMaterial()->GetOsmoticCoefficient()->OsmoticCoefficient(mp)*R*T*sp.m_ca[isol];
+                }
+            }
+        }
+    }
 }

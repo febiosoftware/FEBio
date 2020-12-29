@@ -232,7 +232,7 @@ double FERealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
     
     // evaluate the dilatation that makes the pressure = 0 at the given temperature
     double e = fp.m_Jf - 1;
-    bool good = Dilatation(tf.m_T, 0, e);
+    bool good = Dilatation(tf.m_T, 0, 0, e);
     assert(good);
     
     // for this dilatation evaluate the specific free energy
@@ -311,7 +311,7 @@ double FERealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FERealLiquid::Dilatation(const double T, const double p, double& e)
+bool FERealLiquid::Dilatation(const double T, const double p, const double c, double& e)
 {
     double errrel = 1e-6;
     double errabs = 1e-6;

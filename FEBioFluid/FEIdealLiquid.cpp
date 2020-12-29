@@ -201,7 +201,7 @@ double FEIdealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FEIdealLiquid::Dilatation(const double T, const double p, double& e)
+bool FEIdealLiquid::Dilatation(const double T, const double p, const double c, double& e)
 {
     e = (m_beta*T - p)/m_k;
     

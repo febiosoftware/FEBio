@@ -120,7 +120,7 @@ double FEIdealGasIsentropic::StrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! invert pressure-dilatation relation
-bool FEIdealGasIsentropic::Dilatation(const double T, const double p, double& e)
+bool FEIdealGasIsentropic::Dilatation(const double T, const double p, const double c, double& e)
 {
     double J = pow(p/m_Pr+1, -1./m_gamma);
     e = J - 1;
