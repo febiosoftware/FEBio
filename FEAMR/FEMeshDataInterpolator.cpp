@@ -23,53 +23,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <vector>
-#include <FECore/matrix.h>
+#include "FEMeshDataInterpolator.h"
 
-//! Helper class for mapping data between two point sets using moving least squares.
-class FELeastSquaresMapper
+FEMeshDataInterpolator::FEMeshDataInterpolator()
 {
-	class Data
-	{
-	public:
-		Data();
-		Data(const Data& d);
-		void operator = (const Data& d);
+}
 
-	public:
-		matrix			A;
-		vector<int>		index;
-		vector<double>	W;
-		vector<vec3d>	X;
-		vector<int>		cpl;
-	};
+FEMeshDataInterpolator::~FEMeshDataInterpolator()
+{
+}
 
-public:
-	//! constructor
-	FELeastSquaresMapper();
-
-	//! Set the number of nearest neighbors to use (should be larger than 4)
-	void SetNearestNeighborCount(int nnc);
-
-	//! set the source points
-	void SetSourcePoints(const vector<vec3d>& srcPoints);
-
-	//! set the target points
-	void SetTargetPoints(const vector<vec3d>& trgPoints);
-
-	//! initialize MLQ data
-	bool Init();
-
-	//! map source data onto target data
-	//! input: sval - values of the source points
-	//! output: tval - values at the target points
-	bool Map(const std::vector<double>& sval, std::vector<double>& tval);
-
-private:
-	int		m_nnc;
-	std::vector<vec3d>	m_src;	// source points
-	std::vector<vec3d>	m_trg;	// target points
-
-	vector< Data >			m_data;
-};
+bool FEMeshDataInterpolator::Init()
+{ 
+	return true; 
+}

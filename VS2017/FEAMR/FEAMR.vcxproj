@@ -29,11 +29,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEAMR\FEAMR.cpp" />
     <ClCompile Include="..\..\FEAMR\FEDomainErrorCriterion.cpp" />
+    <ClCompile Include="..\..\FEAMR\FEDomainShapeInterpolator.cpp" />
     <ClCompile Include="..\..\FEAMR\FEElementSelectionCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEErosionAdaptor.cpp" />
     <ClCompile Include="..\..\FEAMR\FEHexRefine.cpp" />
     <ClCompile Include="..\..\FEAMR\FEHexRefine2D.cpp" />
-    <ClCompile Include="..\..\FEAMR\FELeastSquaresMapper.cpp" />
+    <ClCompile Include="..\..\FEAMR\FELeastSquaresInterpolator.cpp" />
+    <ClCompile Include="..\..\FEAMR\FEMeshDataInterpolator.cpp" />
+    <ClCompile Include="..\..\FEAMR\FEMeshShapeInterpolator.cpp" />
     <ClCompile Include="..\..\FEAMR\FEScaleAdaptorCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMaxVariableCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMaxVolumeCriterion.cpp" />
@@ -45,11 +48,14 @@
     <ClInclude Include="..\..\FEAMR\FEAMR.h" />
     <ClInclude Include="..\..\FEAMR\feamr_api.h" />
     <ClInclude Include="..\..\FEAMR\FEDomainErrorCriterion.h" />
+    <ClInclude Include="..\..\FEAMR\FEDomainShapeInterpolator.h" />
     <ClInclude Include="..\..\FEAMR\FEElementSelectionCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEErosionAdaptor.h" />
     <ClInclude Include="..\..\FEAMR\FEHexRefine.h" />
     <ClInclude Include="..\..\FEAMR\FEHexRefine2D.h" />
-    <ClInclude Include="..\..\FEAMR\FELeastSquaresMapper.h" />
+    <ClInclude Include="..\..\FEAMR\FELeastSquaresInterpolator.h" />
+    <ClInclude Include="..\..\FEAMR\FEMeshDataInterpolator.h" />
+    <ClInclude Include="..\..\FEAMR\FEMeshShapeInterpolator.h" />
     <ClInclude Include="..\..\FEAMR\FEScaleAdaptorCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEMaxVariableCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEMaxVolumeCriterion.h" />

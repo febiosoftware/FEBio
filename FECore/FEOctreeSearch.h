@@ -31,6 +31,7 @@ SOFTWARE.*/
 
 class FEElement;
 class FEMesh;
+class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! This class is a helper class to find ray intersection with a surface
@@ -63,6 +64,7 @@ class FECORE_API FEOctreeSearch
 
 public:
 	FEOctreeSearch(FEMesh* mesh);
+	FEOctreeSearch(FEDomain* domain);
 	~FEOctreeSearch();
 
 	//! initialize search structures
@@ -71,7 +73,8 @@ public:
 	FEElement* FindElement(const vec3d& x, double r[3]);
 
 protected:
-	FEMesh*		m_mesh;			//!< the surface to search
+	FEMesh*		m_mesh;			//!< the mesh
+	FEDomain*	m_dom;			//!< the domain to search (if null whole mesh will be searched)
 	Block*		m_root;			//!< root node in octree
 	int			m_max_level;	//!< maximum allowable number of levels in octree
 	int			m_max_elem;		//!< maximum allowable number of elements in any node

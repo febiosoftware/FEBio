@@ -37,7 +37,10 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include <FECore/DumpMemStream.h>
 #include <FECore/FEDomainMap.h>
-#include "FELeastSquaresMapper.h"
+#include "FELeastSquaresInterpolator.h"
+#include "FEMeshShapeInterpolator.h"
+#include "FEDomainShapeInterpolator.h"
+#include <FECore/FECoreKernel.h>
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
 
@@ -46,6 +49,7 @@ class FEMMGRemesh::MMG
 public:
 	MMG(FEMMGRemesh* mmgRemesh) : m_mmgRemesh(mmgRemesh) 
 	{
+		m_meshCopy = nullptr;
 	}
 	~MMG()
 	{
@@ -58,7 +62,7 @@ public:
 private:
 	void build_map_data(FEModel& fem);
 	void map_data(FEModel& fem);
-	FEDomainMap* createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map, FELeastSquaresMapper* LLQ);
+	FEDomainMap* createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map, FEMeshDataInterpolator* dataMapper);
 
 	void clear_maps()
 	{
@@ -71,6 +75,7 @@ private:
 	}
 
 public:
+	FEMesh*		m_meshCopy;				// (shallow) copy of old mesh
 	FEMMGRemesh*	m_mmgRemesh;
 	std::vector<double>	m_metric;	// refinement metric
 	std::vector<int>	m_nodeSetTag;	// surface tags for node sets
@@ -90,6 +95,7 @@ BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
 	ADD_PARAMETER(m_hgrad, "gradation");
 	ADD_PARAMETER(m_bmap_data, "map_data");
 	ADD_PARAMETER(m_nnc, "nnc");
+	ADD_PARAMETER(m_transferMethod, "transfer_method");
 	ADD_PROPERTY(m_criterion, "criterion", 0);
 END_FECORE_CLASS();
 
@@ -104,6 +110,8 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 	m_hgrad = 1.3;
 
 	m_criterion = nullptr;
+
+	m_transferMethod = 1;
 
 	m_bmap_data = false;
 	m_nnc = 8;
@@ -448,164 +456,82 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		build_map_data(fem);
 	}
 
+	// --- create a copy of the old mesh --- 
+	m_meshCopy = new FEMesh(nullptr);
+	m_meshCopy->CreateNodes(N0);
+	for (int i = 0; i < N0; ++i)
+	{
+		m_meshCopy->Node(i) = mesh.Node(i);
+	}
+
+	// now allocate domains
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		const char* sz = dom.GetTypeStr();
+
+		// create a new domain
+		FEDomain* pd = fecore_new<FEDomain>(sz, nullptr);
+		assert(pd);
+		pd->SetMesh(m_meshCopy);
+
+		// copy domain data
+		pd->CopyFrom(&dom);
+
+		// add it to the mesh
+		m_meshCopy->AddDomain(pd);
+	}
+	m_meshCopy->RebuildLUT();
+
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	vector<vec3d> nodePos(nodes);
 	vector<vector<double> > nodeVal(nodes, vector<double>(MAX_DOFS, 0.0));
 
-	int transferMethod = 1;
-
-	if (transferMethod == 0)
+	// allocate data mapper
+	FEMeshDataInterpolator* mapper = nullptr;
+	switch (m_mmgRemesh->m_transferMethod)
 	{
-		FEOctreeSearch octree(&mesh);
-		octree.Init();
+	case 0: mapper = new FEMeshShapeInterpolator(&mesh); break;
+	case 1: 
+	{
+		FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
+		MLQ->SetNearestNeighborCount(m_mmgRemesh->m_nnc);
+		MLQ->SetCheckForMatch(true);
+		MLQ->SetSourcePoints(oldNodePos);
+		mapper = MLQ;
+	}
+	break;
+	default:
+		assert(false);
+		return false;
+	}
 
-		// update solution
-		for (int i = 0; i < nodes; ++i)
+	// map nodal positions and nodal data
+	for (int i = 0; i < nodes; ++i)
+	{
+		vec3d ri = nodePos0[i];
+
+		if (mapper->SetTargetPoint(ri) == false)
 		{
-			vec3d ri = nodePos0[i];
+			assert(false);
+			delete mapper;
+			return false;
+		}
 
-			double r[3] = { 0 };
-			FESolidElement* el = (FESolidElement*)octree.FindElement(ri, r);
-			if (el == nullptr)
-			{
-				assert(false);
-				return false;
-			}
+		// get the nodal coordinates
+		nodePos[i] = mapper->MapVec3d([&mesh](int sourceNode) {
+			return mesh.Node(sourceNode).m_rt;
+		});
 
-			// get the nodal coordinates
-			vec3d rt[FEElement::MAX_NODES];
-			for (int j = 0; j < el->Nodes(); ++j) rt[j] = mesh.Node(el->m_node[j]).m_rt;
-
-			nodePos[i] = el->evaluate(rt, r[0], r[1], r[2]);
-
-			// update values
-			for (int l = 0; l < MAX_DOFS; ++l)
-			{
-				double v[FEElement::MAX_NODES] = { 0 };
-				for (int j = 0; j < el->Nodes(); ++j) v[j] = mesh.Node(el->m_node[j]).get(l);
-				double vl = el->evaluate(v, r[0], r[1], r[2]);
-				nodeVal[i][l] = vl;
-			}
+		// update values
+		for (int l = 0; l < MAX_DOFS; ++l)
+		{
+			nodeVal[i][l] = mapper->Map([&mesh, l](int sourceNode) {
+				return mesh.Node(sourceNode).get(l);
+			});
 		}
 	}
-	else
-	{
-		// --- Do moving least-squares transfer ---
-		const int nnc = m_mmgRemesh->m_nnc;
-
-		// loop over all the new nodes
-		for (int i = 0; i < nodes; ++i)
-		{
-			// get the spatial position
-			vec3d x = nodePos0[i];
-
-			// Find the closest M points
-			vector<int> closestNodes;
-			int M = findNeirestNeighbors(oldNodePos, x, nnc, closestNodes);
-			assert(M > 4);
-
-			// the last node is the farthest and determines the radius
-			vec3d& r = mesh.Node(closestNodes[M - 1]).m_r0;
-			double L = sqrt((r - x)*(r - x));
-
-			// add some offset to make sure none of the points will have a weight of zero.
-			// Such points would otherwise be ignored, which reduces the net number of interpolation
-			// points and make the MLS system ill-conditioned
-			L += L*0.05;
-
-			// evaluate weights and displacements
-			vector<vec3d> Xi(M), Ui(M);
-			vector<double> W(M);
-			for (int m = 0; m < M; ++m)
-			{
-				FENode& node = mesh.Node(closestNodes[m]);
-				vec3d uj = node.m_rt - node.m_r0;
-				vec3d rj = x - node.m_r0;
-
-				Xi[m] = rj;
-				Ui[m] = uj;
-
-				double D = sqrt(rj*rj);
-				double wj = 1.0 - D / L;
-				W[m] = wj;
-			}
-
-			// see if we have a (nearly) exact match with the closest point
-			if (W[0] > 0.999)
-			{
-				FENode& node = mesh.Node(closestNodes[0]);
-
-				// just use this point
-				nodePos[i] = node.m_rt;
-				for (int l = 0; l < MAX_DOFS; ++l)
-				{
-					nodeVal[i][l] = node.get(l);
-				}
-			}
-			else
-			{
-
-				// setup least squares problems
-				matrix A(4, 4);
-				A.zero();
-				vector<double> bx(4, 0.0), by(4, 0.0), bz(4, 0.0);
-				for (int m = 0; m < M; ++m)
-				{
-					vec3d ri = Xi[m];
-					vec3d ui = Ui[m];
-					double P[4] = { 1.0, ri.x, ri.y, ri.z };
-
-					for (int a = 0; a < 4; ++a)
-					{
-						for (int b = 0; b < 4; ++b)
-						{
-							A(a, b) += W[m] * P[a] * P[b];
-						}
-
-						bx[a] += W[m] * P[a] * ui.x;
-						by[a] += W[m] * P[a] * ui.y;
-						bz[a] += W[m] * P[a] * ui.z;
-					}
-				}
-
-				// solve the linear system of equations
-				vector<int> indx(4);
-				A.lufactor(indx);
-				A.lusolve(bx, indx);
-				A.lusolve(by, indx);
-				A.lusolve(bz, indx);
-
-				// evaluate at x
-				// this gives us the displacement
-				vec3d ui(bx[0], by[0], bz[0]);
-
-				// set the new position
-				nodePos[i] = nodePos0[i] + ui;
-
-				// update nodal values
-				for (int l = 0; l < MAX_DOFS; ++l)
-				{
-					vector<double> b(4, 0.0);
-					for (int m = 0; m < M; ++m)
-					{
-						vec3d ri = Xi[m];
-						double P[4] = { 1.0, ri.x, ri.y, ri.z };
-
-						double vm = mesh.Node(closestNodes[m]).get(l);
-
-						for (int a = 0; a < 4; ++a)
-						{
-							b[a] += W[m] * P[a] * vm;
-						}
-					}
-
-					A.lusolve(b, indx);
-
-					nodeVal[i][l] = b[0];
-				}
-			}
-		}
-	}
+	delete mapper;
 
 	// reallocate nodes
 	mesh.CreateNodes(nodes);
@@ -913,7 +839,7 @@ FEDomainMap* createNodeDataMap(FEDomain& dom, FEDomainMap* map)
 	return nodeMap;
 }
 
-FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map, FELeastSquaresMapper* LLQ)
+FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, vector<vec3d>& nodePos, FEDomainMap* map, FEMeshDataInterpolator* dataMapper)
 {
 	assert(map->StorageFormat() == Storage_Fmt::FMT_NODE);
 
@@ -988,7 +914,9 @@ FEDomainMap* FEMMGRemesh::MMG::createElemDataMap(FEModel& fem, FEDomain& dom, ve
 			srcData[i] = vm;
 		}
 
-		LLQ->Map(srcData, trgData);
+		dataMapper->Map(trgData, [&srcData](int sourcePoint) {
+			return srcData[sourcePoint];
+		});
 
 		for (int i = 0; i < NMP; ++i)
 		{
@@ -1202,11 +1130,31 @@ void FEMMGRemesh::MMG::map_data(FEModel& fem)
 		}
 
 		// set up mapper
-		FELeastSquaresMapper LLQ;
-		LLQ.SetNearestNeighborCount(m_mmgRemesh->m_nnc);
-		LLQ.SetSourcePoints(m_oldNodePos[i]);
-		LLQ.SetTargetPoints(trgPoints);
-		if (LLQ.Init() == false)
+		FEMeshDataInterpolator* mapper = nullptr;
+		switch (m_mmgRemesh->m_transferMethod)
+		{
+		case 0:
+		{
+			FEDomain* oldDomain = &m_meshCopy->Domain(i);
+			FEDomainShapeInterpolator* dsm = new FEDomainShapeInterpolator(oldDomain);
+			dsm->SetTargetPoints(trgPoints);
+			mapper = dsm;
+		}
+		break;
+		case 1:
+		{
+			FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
+			MLQ->SetNearestNeighborCount(m_mmgRemesh->m_nnc);
+			MLQ->SetSourcePoints(m_oldNodePos[i]);
+			MLQ->SetTargetPoints(trgPoints);
+			mapper = MLQ;
+		}
+		break;
+		default:
+			assert(false);
+			return;
+		}
+		if (mapper->Init() == false)
 		{
 			assert(false);
 			throw std::runtime_error("Failed to initialize LLQ");
@@ -1221,7 +1169,7 @@ void FEMMGRemesh::MMG::map_data(FEModel& fem)
 			FEDomainMap* nodeMap = nodeMap_i[j];
 
 			// map node data to integration points
-			FEDomainMap* elemMap = createElemDataMap(fem, dom, m_oldNodePos[i], nodeMap, &LLQ);
+			FEDomainMap* elemMap = createElemDataMap(fem, dom, m_oldNodePos[i], nodeMap, mapper);
 
 			elemMapList[j] = elemMap;
 		}

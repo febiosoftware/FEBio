@@ -214,6 +214,16 @@ FEOctreeSearch::FEOctreeSearch(FEMesh* mesh)
 {
 	m_root = nullptr;
 	m_mesh = mesh;
+	m_dom = nullptr;
+	m_max_level = 6;
+	m_max_elem = 9;
+}
+
+FEOctreeSearch::FEOctreeSearch(FEDomain* domain)
+{
+	m_root = nullptr;
+	m_mesh = domain->GetMesh();
+	m_dom = domain;
 	m_max_level = 6;
 	m_max_elem = 9;
 }
@@ -235,11 +245,23 @@ bool FEOctreeSearch::Init(double inflate)
 
 	Block& root = *m_root;
 
-	// Create the list of all surface elements in the root node
-	FEElementList EL(*m_mesh);
-	int nel = m_mesh->Elements();
-	for (FEElementList::iterator it = EL.begin(); it != EL.end(); ++it)
-		root.m_selist.push_back(it);
+	// Create the list of all elements in the root node
+	int nel = 0;
+	if (m_dom == nullptr)
+	{
+		FEElementList EL(*m_mesh);
+		nel = m_mesh->Elements();
+		for (FEElementList::iterator it = EL.begin(); it != EL.end(); ++it)
+			root.m_selist.push_back(it);
+	}
+	else
+	{
+		nel = m_dom->Elements();
+		for (int i = 0; i < nel; ++i)
+		{
+			root.m_selist.push_back(&m_dom->ElementRef(i));
+		}
+	}
 
 	// Find the bounding box of the mesh
 	vec3d r0 = (m_mesh->Node(0)).m_r0;

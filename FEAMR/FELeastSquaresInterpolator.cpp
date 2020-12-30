@@ -23,11 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FELeastSquaresMapper.h"
+#include "FELeastSquaresInterpolator.h"
 #include <FECore/FENNQuery.h>
 
-FELeastSquaresMapper::Data::Data() {}
-FELeastSquaresMapper::Data::Data(const Data& d)
+FELeastSquaresInterpolator::Data::Data() {}
+FELeastSquaresInterpolator::Data::Data(const Data& d)
 {
 	A = d.A;
 	index = d.index;
@@ -35,7 +35,7 @@ FELeastSquaresMapper::Data::Data(const Data& d)
 	X = d.X;
 	cpl = d.cpl;
 }
-void FELeastSquaresMapper::Data::operator = (const Data& d)
+void FELeastSquaresInterpolator::Data::operator = (const Data& d)
 {
 	A = d.A;
 	index = d.index;
@@ -44,24 +44,34 @@ void FELeastSquaresMapper::Data::operator = (const Data& d)
 	cpl = d.cpl;
 }
 
-FELeastSquaresMapper::FELeastSquaresMapper()
+FELeastSquaresInterpolator::FELeastSquaresInterpolator()
 {
 	m_nnc = 8;
+	m_checkForMatch = false;
 }
 
-void FELeastSquaresMapper::SetNearestNeighborCount(int nnc) { m_nnc = nnc; }
+void FELeastSquaresInterpolator::SetNearestNeighborCount(int nnc) { m_nnc = nnc; }
 
-void FELeastSquaresMapper::SetSourcePoints(const vector<vec3d>& srcPoints)
+void FELeastSquaresInterpolator::SetCheckForMatch(bool b) { m_checkForMatch = b; }
+
+void FELeastSquaresInterpolator::SetSourcePoints(const vector<vec3d>& srcPoints)
 {
 	m_src = srcPoints;
 }
 
-void FELeastSquaresMapper::SetTargetPoints(const vector<vec3d>& trgPoints)
+void FELeastSquaresInterpolator::SetTargetPoints(const vector<vec3d>& trgPoints)
 {
 	m_trg = trgPoints;
 }
 
-bool FELeastSquaresMapper::Init()
+bool FELeastSquaresInterpolator::SetTargetPoint(const vec3d& trgPoint)
+{
+	m_trg.clear();
+	m_trg.push_back(trgPoint);
+	return Init();
+}
+
+bool FELeastSquaresInterpolator::Init()
 {
 	if (m_nnc < 4) return false;
 	if (m_src.empty()) return false;
@@ -136,7 +146,7 @@ bool FELeastSquaresMapper::Init()
 	return true;
 }
 
-bool FELeastSquaresMapper::Map(const std::vector<double>& sval, std::vector<double>& tval)
+bool FELeastSquaresInterpolator::Map(std::vector<double>& tval, function<double(int sourceNode)> src)
 {
 	if (m_data.size() != m_trg.size()) return false;
 
@@ -147,7 +157,7 @@ bool FELeastSquaresMapper::Map(const std::vector<double>& sval, std::vector<doub
 		vector<int>& closestNodes = m_data[i].cpl;
 		int M = closestNodes.size();
 
-		// evaluate weights and displacements
+		// evaluate weights and positions
 		vector<vec3d>& X = d.X;
 		vector<double>& W = d.W;
 
@@ -158,7 +168,7 @@ bool FELeastSquaresMapper::Map(const std::vector<double>& sval, std::vector<doub
 			vec3d ri = d.X[m];
 			double P[4] = { 1.0, ri.x, ri.y, ri.z };
 
-			double vm = sval[closestNodes[m]];
+			double vm = src(closestNodes[m]);
 
 			for (int a = 0; a < 4; ++a)
 			{
@@ -173,4 +183,88 @@ bool FELeastSquaresMapper::Map(const std::vector<double>& sval, std::vector<doub
 	}
 
 	return true;
+}
+
+double FELeastSquaresInterpolator::Map(int inode, function<double(int sourceNode)> f)
+{
+	Data& d = m_data[inode];
+
+	vector<int>& closestNodes = m_data[inode].cpl;
+	int M = closestNodes.size();
+
+	// evaluate weights and positions
+	vector<vec3d>& X = d.X;
+	vector<double>& W = d.W;
+
+	if (m_checkForMatch)
+	{
+		if (W[0] > 0.999)
+		{
+			return f(closestNodes[0]);
+		}
+	}
+
+	// update nodal values
+	vector<double> b(4, 0.0);
+	for (int m = 0; m < M; ++m)
+	{
+		vec3d ri = d.X[m];
+		double P[4] = { 1.0, ri.x, ri.y, ri.z };
+
+		double vm = f(closestNodes[m]);
+
+		for (int a = 0; a < 4; ++a)
+		{
+			b[a] += W[m] * P[a] * vm;
+		}
+	}
+
+	// solve the linear system of equations
+	d.A.lusolve(b, d.index);
+
+	return b[0];
+}
+
+vec3d FELeastSquaresInterpolator::MapVec3d(int inode, function<vec3d(int sourceNode)> f)
+{
+	Data& d = m_data[inode];
+
+	vector<int>& closestNodes = m_data[inode].cpl;
+	int M = closestNodes.size();
+
+	// evaluate weights and positions
+	vector<vec3d>& X = d.X;
+	vector<double>& W = d.W;
+
+	if (m_checkForMatch)
+	{
+		if (W[0] > 0.999)
+		{
+			return f(closestNodes[0]);
+		}
+	}
+
+	// update nodal values
+	vector<double> bx(4, 0.0), by(4, 0.0), bz(4, 0.0);
+	for (int m = 0; m < M; ++m)
+	{
+		vec3d ri = d.X[m];
+		double P[4] = { 1.0, ri.x, ri.y, ri.z };
+
+		vec3d vm = f(closestNodes[m]);
+
+		for (int a = 0; a < 4; ++a)
+		{
+			bx[a] += W[m] * P[a] * vm.x;
+			by[a] += W[m] * P[a] * vm.y;
+			bz[a] += W[m] * P[a] * vm.z;
+		}
+	}
+
+	// solve the linear system of equations
+	d.A.lusolve(bx, d.index);
+	d.A.lusolve(by, d.index);
+	d.A.lusolve(bz, d.index);
+
+	return vec3d(bx[0], by[0], bz[0]);
 }

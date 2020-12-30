@@ -36,8 +36,10 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEMeshPartition, FEDOMAIN_ID);
 
 //-----------------------------------------------------------------------------
-FEMeshPartition::FEMeshPartition(int nclass, FEModel* fem) : FECoreBase(fem), m_pMesh(&fem->GetMesh()), m_nclass(nclass)
+FEMeshPartition::FEMeshPartition(int nclass, FEModel* fem) : FECoreBase(fem), m_nclass(nclass)
 {
+	m_pMesh = nullptr;
+	if (fem) m_pMesh = &fem->GetMesh();
 	m_bactive = true;
 }
 

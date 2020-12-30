@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,40 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <vector>
-#include "FERefineMesh.h"
+#include <functional>
+#include <FECore/matrix.h>
 
-class FEMMGRemesh : public FERefineMesh
+// Base classes for classes that interpolate data on a mesh
+class FEMeshDataInterpolator
 {
-	class MMG;
-
 public:
-	FEMMGRemesh(FEModel* fem);
+	FEMeshDataInterpolator();
+	virtual ~FEMeshDataInterpolator();
 
-	bool Apply(int iteration) override;
+	// do one-time initalization
+	virtual bool Init();
 
-private:
-	bool Remesh();
+	// set the next target point
+	// should return false if the target point cannot be evaluated
+	virtual bool SetTargetPoint(const vec3d& r) = 0;
 
-	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
+	//! map source data onto target data
+	//! output: tval - values at the target points
+	//! input: sval - values of the source points
+	virtual bool Map(std::vector<double>& tval, function<double(int sourceNode)> src) = 0;
 
-private:
-	int		m_maxiter;
-	int		m_maxelem;
-	int		m_transferMethod;
+	virtual double Map(int inode, function<double(int sourceNode)> src) = 0;
+	virtual vec3d MapVec3d(int inode, function<vec3d(int sourceNode)> src) = 0;
 
-	double	m_scale;	// element scale factor
-	double	m_hmin;		// minimum element size
-	double	m_hausd;	// Hausdorff value
-	double	m_hgrad;	// gradation
-
-	bool	m_bmap_data;
-	int		m_nnc;		// nearest-neighbor-count
-
-	FEMeshAdaptorCriterion*	m_criterion;
-
-	MMG*	mmg;
-
-	friend class MMG;
-
-	DECLARE_FECORE_CLASS();
+	double Map(function<double(int sourceNode)> f);
+	vec3d MapVec3d(function<vec3d(int sourceNode)> f);
 };
+
+inline double FEMeshDataInterpolator::Map(function<double(int sourceNode)> f) { return Map(0, f); }
+inline vec3d FEMeshDataInterpolator::MapVec3d(function<vec3d(int sourceNode)> f) { return MapVec3d(0, f); }
+
