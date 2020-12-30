@@ -41,12 +41,15 @@ FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem
 {
 	EXPORT_DATA(PLT_FLOAT, FMT_NODE, &m_nodePressure, "NPR fluid pressure");
 
-	m_varU = pfem->GetDOFS().GetVariableIndex(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT)); assert(m_varU >= 0);
-	m_varP = pfem->GetDOFS().GetVariableIndex(FEBioMix::GetVariableName(FEBioMix::FLUID_PRESSURE)); assert(m_varP >= 0);
+	if (pfem)
+	{
+		m_varU = pfem->GetDOFS().GetVariableIndex(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT)); assert(m_varU >= 0);
+		m_varP = pfem->GetDOFS().GetVariableIndex(FEBioMix::GetVariableName(FEBioMix::FLUID_PRESSURE)); assert(m_varP >= 0);
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------
