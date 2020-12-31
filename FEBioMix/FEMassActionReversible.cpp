@@ -33,70 +33,133 @@ SOFTWARE.*/
 //! molar supply at material point
 double FEMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)
 {
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-	
-	// get forward reaction rate
-	double k = m_pFwd->ReactionRate(pt);
-	
-	// evaluate the reaction molar supply
-	double zhat = k;
-	
-	// start with contribution from solutes
-	const int nsol = (int)spt.m_ca.size();
-	for (int i=0; i<nsol; ++i) {
-		int vR = m_vR[i];
-		if (vR > 0) {
-			double c = spt.m_ca[i];
-			zhat *= pow(c, vR);
-		}
-	}
-	
-	// add contribution of solid-bound molecules
-	const int nsbm = (int)spt.m_sbmr.size();
-	for (int i=0; i<nsbm; ++i) {
-		int vR = m_vR[nsol+i];
-		if (vR > 0) {
-			double c = m_pMP->SBMConcentration(pt, i);
-			zhat *= pow(c, vR);
-		}
-	}
-	
-	return zhat;
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    
+    // get forward reaction rate
+    double k = m_pFwd->ReactionRate(pt);
+    
+    // evaluate the reaction molar supply
+    double zhat = k;
+    
+    int nsol = 0;
+    
+    // start with contribution from solutes
+    if (m_pMP)
+    {
+        nsol = (int)spt.m_ca.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = spt.m_ca[i];
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    else if (m_pFS)
+    {
+        nsol = (int)fspt.m_ca.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = fspt.m_ca[i];
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    else if (m_pSM)
+    {
+        nsol = (int)smpt.m_ca.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = smpt.m_ca[i];
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    
+    if (m_pMP)
+    {
+        // add contribution of solid-bound molecules
+        const int nsbm = (int)spt.m_sbmr.size();
+        for (int i=0; i<nsbm; ++i) {
+            int vR = m_vR[nsol+i];
+            if (vR > 0) {
+                double c = m_pMP->SBMConcentration(pt, i);
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    
+    return zhat;
 }
 
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEMassActionReversible::RevReactionSupply(FEMaterialPoint& pt)
 {
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-	
-	// get forward reaction rate
-	double k = m_pRev->ReactionRate(pt);
-	
-	// evaluate the reaction molar supply
-	double zhat = k;
-	
-	// start with contribution from solutes
-	const int nsol = (int)spt.m_ca.size();
-	for (int i=0; i<nsol; ++i) {
-		int vP = m_vP[i];
-		if (vP > 0) {
-			double c = spt.m_ca[i];
-			zhat *= pow(c, vP);
-		}
-	}
-	
-	// add contribution of solid-bound molecules
-	const int nsbm = (int)spt.m_sbmr.size();
-	for (int i=0; i<nsbm; ++i) {
-		int vP = m_vP[nsol+i];
-		if (vP > 0) {
-			double c = m_pMP->SBMConcentration(pt, i);
-			zhat *= pow(c, vP);
-		}
-	}
-		
-	return zhat;
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    
+    // get forward reaction rate
+    double k = m_pRev->ReactionRate(pt);
+    
+    // evaluate the reaction molar supply
+    double zhat = k;
+    
+    // start with contribution from solutes
+    int nsol = 0;
+    if (m_pMP)
+    {
+        nsol = (int)spt.m_ca.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = spt.m_ca[i];
+                zhat *= pow(c, vP);
+            }
+        }
+    }
+    else if (m_pFS)
+    {
+        nsol = (int)fspt.m_ca.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = fspt.m_ca[i];
+                zhat *= pow(c, vP);
+            }
+        }
+    }
+    else if (m_pSM)
+    {
+        nsol = (int)smpt.m_ca.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = smpt.m_ca[i];
+                zhat *= pow(c, vP);
+            }
+        }
+    }
+    
+    if (m_pMP)
+    {
+        // add contribution of solid-bound molecules
+        const int nsbm = (int)spt.m_sbmr.size();
+        for (int i=0; i<nsbm; ++i) {
+            int vP = m_vP[nsol+i];
+            if (vP > 0) {
+                double c = m_pMP->SBMConcentration(pt, i);
+                zhat *= pow(c, vP);
+            }
+        }
+    }
+    
+    return zhat;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,6 +178,8 @@ mat3ds FEMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt
 	FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
 	
 	const int nsol = m_nsol;
 	const int nsbm = (int)m_v.size() - nsol;
@@ -131,7 +196,14 @@ mat3ds FEMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt
 	}
 	mat3ds I = mat3dd(1);
 	for (int isol=0; isol<nsol; ++isol)
-		dzhatFde += I*(m_vR[isol]*spt.m_dkdJ[isol]/spt.m_k[isol]);
+    {
+        if (m_pMP)
+            dzhatFde += I*(m_vR[isol]*spt.m_dkdJ[isol]/spt.m_k[isol]);
+        else if (m_pFS)
+            dzhatFde += I*(m_vR[isol]*fspt.m_dkdJ[isol]/fspt.m_k[isol]);
+        else if (m_pSM)
+            dzhatFde += I*(m_vR[isol]*smpt.m_dkdJ[isol]/smpt.m_k[isol]);
+    }
 	for (int isbm = 0; isbm<nsbm; ++isbm)
 		dzhatFde += I*(m_vR[nsol+isbm]/(J-phi0));
 	
@@ -146,7 +218,14 @@ mat3ds FEMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt
 		dzhatRde += dkRde/kR;
 	}
 	for (int isol=0; isol<nsol; ++isol)
-		dzhatRde += I*(m_vP[isol]*spt.m_dkdJ[isol]/spt.m_k[isol]);
+    {
+        if (m_pMP)
+            dzhatRde += I*(m_vP[isol]*spt.m_dkdJ[isol]/spt.m_k[isol]);
+        else if (m_pFS)
+            dzhatRde += I*(m_vP[isol]*fspt.m_dkdJ[isol]/fspt.m_k[isol]);
+        else if (m_pSM)
+            dzhatRde += I*(m_vP[isol]*smpt.m_dkdJ[isol]/smpt.m_k[isol]);
+    }
 	for (int isbm = 0; isbm<nsbm; ++isbm)
 		dzhatRde -= I*(m_vP[nsol+isbm]/(J-phi0));
 	
@@ -184,36 +263,68 @@ double FEMassActionReversible::Tangent_ReactionSupply_Pressure(FEMaterialPoint& 
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-	const int nsol = m_nsol;
-	
-	// if the derivative is taken with respect to a solid-bound molecule, return 0
-	if (sol >= nsol) {
-		return 0;
-	}
-	
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-
-	// forward reaction
-	double zhatF = FwdReactionSupply(pt);
-	double dzhatFdc = 0;
-	for (int isol=0; isol<nsol; ++isol) {
-		dzhatFdc += m_vR[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
-		if ((isol == sol) && (spt.m_c[sol] > 0))
-			dzhatFdc += m_vR[isol]/spt.m_c[sol];
-	}
-	
-	dzhatFdc *= zhatF;
-	
-	// reverse reaction
-	double zhatR = RevReactionSupply(pt);
-	double dzhatRdc = 0;
-	for (int isol=0; isol<nsol; ++isol) {
-		dzhatRdc += m_vP[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
-		if ((isol == sol) && (spt.m_c[sol] > 0))
-			dzhatRdc += m_vP[isol]/spt.m_c[sol];
-	}
-	
-	dzhatRdc *= zhatR;
-	
-	return dzhatFdc - dzhatRdc;
+    const int nsol = m_nsol;
+    
+    // if the derivative is taken with respect to a solid-bound molecule, return 0
+    if (sol >= nsol) {
+        return 0;
+    }
+    
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    
+    // forward reaction
+    double zhatF = FwdReactionSupply(pt);
+    double dzhatFdc = 0;
+    for (int isol=0; isol<nsol; ++isol) {
+        if (m_pMP)
+        {
+            dzhatFdc += m_vR[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
+            if ((isol == sol) && (spt.m_c[sol] > 0))
+                dzhatFdc += m_vR[isol]/spt.m_c[sol];
+        }
+        else if (m_pFS)
+        {
+            dzhatFdc += m_vR[isol]*fspt.m_dkdc[isol][sol]/fspt.m_k[isol];
+            if ((isol == sol) && (fspt.m_c[sol] > 0))
+                dzhatFdc += m_vR[isol]/fspt.m_c[sol];
+        }
+        else if (m_pSM)
+        {
+            dzhatFdc += m_vR[isol]*smpt.m_dkdc[isol][sol]/smpt.m_k[isol];
+            if ((isol == sol) && (smpt.m_c[sol] > 0))
+                dzhatFdc += m_vR[isol]/smpt.m_c[sol];
+        }
+    }
+    
+    dzhatFdc *= zhatF;
+    
+    // reverse reaction
+    double zhatR = RevReactionSupply(pt);
+    double dzhatRdc = 0;
+    for (int isol=0; isol<nsol; ++isol) {
+        if (m_pMP)
+        {
+            dzhatRdc += m_vP[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
+            if ((isol == sol) && (spt.m_c[sol] > 0))
+                dzhatRdc += m_vP[isol]/spt.m_c[sol];
+        }
+        else if (m_pFS)
+        {
+            dzhatRdc += m_vP[isol]*fspt.m_dkdc[isol][sol]/fspt.m_k[isol];
+            if ((isol == sol) && (fspt.m_c[sol] > 0))
+                dzhatRdc += m_vP[isol]/fspt.m_c[sol];
+        }
+        else if (m_pSM)
+        {
+            dzhatRdc += m_vP[isol]*smpt.m_dkdc[isol][sol]/smpt.m_k[isol];
+            if ((isol == sol) && (smpt.m_c[sol] > 0))
+                dzhatRdc += m_vP[isol]/smpt.m_c[sol];
+        }
+    }
+    
+    dzhatRdc *= zhatR;
+    
+    return dzhatFdc - dzhatRdc;
 }

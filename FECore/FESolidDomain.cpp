@@ -35,12 +35,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m_dofU(pfem), m_dofSU(pfem)
 {
-    m_dofU.AddDof(pfem->GetDOFIndex("x"));
-	m_dofU.AddDof(pfem->GetDOFIndex("y"));
-	m_dofU.AddDof(pfem->GetDOFIndex("z"));
-    m_dofSU.AddDof(pfem->GetDOFIndex("sx"));
-	m_dofSU.AddDof(pfem->GetDOFIndex("sy"));
-	m_dofSU.AddDof(pfem->GetDOFIndex("sz"));
+	if (pfem)
+	{
+		m_dofU.AddDof(pfem->GetDOFIndex("x"));
+		m_dofU.AddDof(pfem->GetDOFIndex("y"));
+		m_dofU.AddDof(pfem->GetDOFIndex("z"));
+		m_dofSU.AddDof(pfem->GetDOFIndex("sx"));
+		m_dofSU.AddDof(pfem->GetDOFIndex("sy"));
+		m_dofSU.AddDof(pfem->GetDOFIndex("sz"));
+	}
 }
 
 //-----------------------------------------------------------------------------

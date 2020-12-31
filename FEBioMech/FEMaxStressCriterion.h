@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEMeshAdaptor.h>
+#include <FECore/FEMeshAdaptorCriterion.h>
 
 
 class FEMaxStressCriterion : public FEMeshAdaptorCriterion

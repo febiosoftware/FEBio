@@ -34,6 +34,8 @@ SOFTWARE.*/
 #include "FEFluidSolutesDomain3D.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESoluteBackflowStabilization.h"
+#include "FEFluidSolutesNaturalFlux.h"
+#include "FEFluidSolutesPressure.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESolutesSolver.h"
@@ -80,6 +82,8 @@ void FEBioFluidSolutes::InitModule()
     
     REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
+    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux, "solute natural flux");
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressure, "pressure");
     
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow, "solute convective flow");
 

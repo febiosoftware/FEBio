@@ -34,6 +34,8 @@ SOFTWARE.*/
 double FEMassActionForwardEffective::ReactionSupply(FEMaterialPoint& pt)
 {
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
     
     // get reaction rate
     double kF = m_pFwd->ReactionRate(pt);
@@ -42,22 +44,37 @@ double FEMassActionForwardEffective::ReactionSupply(FEMaterialPoint& pt)
     double zhat = kF;
     
     // start with contribution from solutes
-    const int nsol = (int)spt.m_c.size();
+    int nsol = 0;
+    if (m_pMP)
+        nsol = (int)spt.m_c.size();
+    else if (m_pFS)
+        nsol = (int)fspt.m_c.size();
+    else if (m_pSM)
+        nsol = (int)smpt.m_c.size();
     for (int i=0; i<nsol; ++i) {
         int vR = m_vR[i];
         if (vR > 0) {
-            double c = spt.m_c[i];
+            double c = 0;
+            if (m_pMP)
+                c = spt.m_c[i];
+            else if (m_pFS)
+                c = fspt.m_c[i];
+            else if (m_pSM)
+                c = smpt.m_c[i];
             zhat *= pow(c, vR);
         }
     }
     
     // add contribution of solid-bound molecules
-    const int nsbm = (int)spt.m_sbmr.size();
-    for (int i=0; i<nsbm; ++i) {
-        int vR = m_vR[nsol+i];
-        if (vR > 0) {
-            double c = m_pMP->SBMConcentration(pt, i);
-            zhat *= pow(c, vR);
+    if (m_pMP)
+    {
+        const int nsbm = (int)spt.m_sbmr.size();
+        for (int i=0; i<nsbm; ++i) {
+            int vR = m_vR[nsol+i];
+            if (vR > 0) {
+                double c = m_pMP->SBMConcentration(pt, i);
+                zhat *= pow(c, vR);
+            }
         }
     }
     
@@ -108,9 +125,22 @@ double FEMassActionForwardEffective::Tangent_ReactionSupply_Concentration(FEMate
     if (sol >= nsol) return 0;
     
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
     double zhat = ReactionSupply(pt);
     double dzhatdc = 0;
-    if ((zhat > 0) && (spt.m_c[sol] > 0)) dzhatdc = m_vR[sol]/spt.m_c[sol]*zhat;
+    if (m_pMP)
+    {
+        if ((zhat > 0) && (spt.m_c[sol] > 0)) dzhatdc = m_vR[sol]/spt.m_c[sol]*zhat;
+    }
+    else if (m_pFS)
+    {
+        if ((zhat > 0) && (fspt.m_c[sol] > 0)) dzhatdc = m_vR[sol]/fspt.m_c[sol]*zhat;
+    }
+    else if (m_pSM)
+    {
+        if ((zhat > 0) && (smpt.m_c[sol] > 0)) dzhatdc = m_vR[sol]/smpt.m_c[sol]*zhat;
+    }
     
     return dzhatdc;
 }

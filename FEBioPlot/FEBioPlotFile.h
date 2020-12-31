@@ -295,6 +295,9 @@ public:
 	// Write a mesh section
 	bool WriteMeshSection(FEModel& fem);
 
+	//! set the software variable
+	void SetSoftwareString(const std::string& softwareString);
+
 public:
 	int PointObjects();
 	PointObject* GetPointObject(int i);
@@ -353,6 +356,7 @@ protected:
 	FEModel&	m_fem;
 	int			m_ncompress;	// compression level
 	int			m_meshesWritten;	// nr of meshes written
+	string		m_softwareString;	// the software string
 
 	vector<Surface>	m_Surf;
 

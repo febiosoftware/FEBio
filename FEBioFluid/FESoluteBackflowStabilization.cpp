@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FESoluteBackflowStabilization.h"
 #include "FEFluid.h"
 #include "FEBioFluidSolutes.h"
+#include <FECore/FENodeNodeList.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteBackflowStabilization, FESurfaceLoad)
@@ -42,6 +43,7 @@ FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FE
 {
     m_sol = 0;
     m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+    m_nnlist = FENodeNodeList();
 }
 
 //-----------------------------------------------------------------------------
@@ -63,6 +65,8 @@ bool FESoluteBackflowStabilization::Init()
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
     m_alpha = 1.0;
+    
+    m_nnlist.Create(fem.GetMesh());
 
     return true;
 }
@@ -99,8 +103,58 @@ void FESoluteBackflowStabilization::Update()
     {
         FENode& node = ps->Node(i);
         // set node as having prescribed DOF (concentration at previous time)
+        //Otherwise set node as having concentration of adjacent node
         if (node.m_ID[dofc] < -1)
             node.set(dofc, node.get_prev(dofc));
+        else
+        {
+            node.set_bc(dofc, DOF_PRESCRIBED);
+            node.m_ID[dofc] = -node.m_ID[dofc] - 2;
+            int nid = node.GetID()-1; //0 based
+            int val = m_nnlist.Valence(nid);
+            int* nlist = m_nnlist.NodeList(nid);
+            
+            vector<int> connectnidarray;
+            int connectnid=0;
+            //check which connecting nodes are not on surface
+            for (int j = 0; j<val; ++j)
+            {
+                int cnid = *(nlist+j);
+                bool isSurf = false;
+                for (int k=0; k<ps->Nodes(); ++k)
+                {
+                    if (cnid==ps->Node(k).GetID()-1)
+                        isSurf = true;
+                }
+                if (!isSurf)
+                {
+                    connectnidarray.push_back(cnid);
+                }
+            }
+            //find closest connecting node
+            if (connectnidarray.size()>0)
+            {
+                int cnodeIndex = 0;
+                FENode* cnodeArray = GetFEModel()->GetMesh().FindNodeFromID(connectnidarray[cnodeIndex]+1);
+                double smallDist = sqrt(pow((node.m_rt.x-cnodeArray->m_rt.x),2)+pow((node.m_rt.y-cnodeArray->m_rt.y),2)+pow((node.m_rt.z-cnodeArray->m_rt.z),2));
+                for (int j = 1; j<connectnidarray.size(); ++j)
+                {
+                    FENode* tempNode = GetFEModel()->GetMesh().FindNodeFromID(connectnidarray[j]+1);
+                    double temp = sqrt(pow((node.m_rt.x-tempNode->m_rt.x),2)+pow((node.m_rt.y-tempNode->m_rt.y),2)+pow((node.m_rt.z-tempNode->m_rt.z),2));
+                    if(temp<smallDist)
+                    {
+                        cnodeIndex = j;
+                        cnodeArray = tempNode;
+                        smallDist = temp;
+                    }
+                }
+                connectnid = connectnidarray[cnodeIndex];
+                FENode* cnode = GetFEModel()->GetMesh().FindNodeFromID(connectnid+1);
+                node.set(dofc, cnode->get(dofc));
+            }
+            else
+                node.set(dofc, 0);
+        }
     }
 }
 
@@ -200,4 +254,5 @@ void FESoluteBackflowStabilization::Serialize(DumpStream& ar)
 	ar & m_backflow;
 	ar & m_alpha;
 	ar & m_alphaf;
+    //ar & m_nnlist;
 }

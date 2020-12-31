@@ -36,6 +36,11 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FESSIShellDomain, FEShellDomainNew)
+	ADD_PARAMETER(m_bnodalnormals, "shell_normal_nodal");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
 {
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));

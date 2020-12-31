@@ -495,7 +495,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiotest.lib;febiofluid.lib;levmar.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlibstatic.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;feamr.lib;febiomech.lib;febiomix.lib;febioopt.lib;feamr.lib;febioplot.lib;febioxml.lib;febiotest.lib;febiofluid.lib;levmar.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlibstatic.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -532,6 +532,7 @@
     <ClCompile Include="..\..\FEBioLib\memory.cpp" />
     <ClCompile Include="..\..\FEBioLib\plugin.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
+    <ClCompile Include="..\..\FEBioLib\version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

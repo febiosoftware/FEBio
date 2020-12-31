@@ -540,15 +540,19 @@ void FEBioModel::Write(unsigned int nwhen)
 				// see if we need to output something
 				bool bdebug = GetDebugFlag();
 
+				// update flag
+				static int lastUpdate = -1;
+
 				// write a new mesh section if needed
 				if (nwhen == CB_REMESH)
 				{
 					m_writeMesh = true;
+					lastUpdate = -1;
 				}
 
 				if (bdebug)
 				{
-					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_MINOR_ITERS) || (nwhen == CB_SOLVED))
+					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_MINOR_ITERS) || (nwhen == CB_SOLVED) || (nwhen == CB_REMESH))
 					{
 						bout = true;
 					}
@@ -603,7 +607,6 @@ void FEBioModel::Write(unsigned int nwhen)
 				}
 
 				// output the state if requested
-				static int lastUpdate = -1;
 				if (bout && (lastUpdate != UpdateCounter()) )
 				{
 					lastUpdate = UpdateCounter();
@@ -1279,6 +1282,12 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			// create a new plot file
 			pplt->SetCompression(m_pltCompression);
 
+			// set the software string
+			const char* szver = getVersionString();
+			char szbuf[256] = { 0 };
+			sprintf(szbuf, "FEBio %s", szver);
+			pplt->SetSoftwareString(szbuf);
+
 			// add plot variables
 			for (FEPlotVariable& vi : m_pltData)
 			{
@@ -1370,6 +1379,12 @@ bool FEBioModel::Init()
 
 			// set compression
 			pplt->SetCompression(m_pltCompression);
+
+			// set the software string
+			const char* szver = getVersionString();
+			char szbuf[256] = { 0 };
+			sprintf(szbuf, "FEBio %s", szver);
+			pplt->SetSoftwareString(szbuf);
 
 			// add plot variables
 			for (FEPlotVariable& vi : m_pltData)

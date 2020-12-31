@@ -35,6 +35,8 @@ SOFTWARE.*/
 double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
 {
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
     
     // get forward reaction rate
     double k = m_pFwd->ReactionRate(pt);
@@ -43,22 +45,52 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
     double zhat = k;
     
     // start with contribution from solutes
-    const int nsol = (int)spt.m_c.size();
-    for (int i=0; i<nsol; ++i) {
-        int vR = m_vR[i];
-        if (vR > 0) {
-            double c = spt.m_c[i];
-            zhat *= pow(c, vR);
+    int nsol = 0;
+    if (m_pMP)
+    {
+        nsol = (int)spt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = spt.m_c[i];
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    else if (m_pFS)
+    {
+        nsol = (int)fspt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = fspt.m_c[i];
+                zhat *= pow(c, vR);
+            }
+        }
+    }
+    else if (m_pFS)
+    {
+        nsol = (int)smpt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = smpt.m_c[i];
+                zhat *= pow(c, vR);
+            }
         }
     }
     
     // add contribution of solid-bound molecules
-    const int nsbm = (int)spt.m_sbmr.size();
-    for (int i=0; i<nsbm; ++i) {
-        int vR = m_vR[nsol+i];
-        if (vR > 0) {
-            double c = m_pMP->SBMConcentration(pt, i);
-            zhat *= pow(c, vR);
+    if (m_pMP)
+    {
+        // add contribution of solid-bound molecules
+        const int nsbm = (int)spt.m_sbmr.size();
+        for (int i=0; i<nsbm; ++i) {
+            int vR = m_vR[nsol+i];
+            if (vR > 0) {
+                double c = m_pMP->SBMConcentration(pt, i);
+                zhat *= pow(c, vR);
+            }
         }
     }
     
@@ -70,6 +102,8 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
 double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
 {
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
     
     // get forward reaction rate
     double k = m_pRev->ReactionRate(pt);
@@ -78,22 +112,52 @@ double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
     double zhat = k;
     
     // start with contribution from solutes
-    const int nsol = (int)spt.m_c.size();
-    for (int i=0; i<nsol; ++i) {
-        int vP = m_vP[i];
-        if (vP > 0) {
-            double c = spt.m_c[i];
-            zhat *= pow(c, vP);
+    int nsol = 0;
+    if (m_pMP)
+    {
+        nsol = (int)spt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = spt.m_c[i];
+                zhat *= pow(c, vP);
+            }
+        }
+    }
+    else if (m_pFS)
+    {
+        nsol = (int)fspt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = fspt.m_c[i];
+                zhat *= pow(c, vP);
+            }
+        }
+    }
+    else if (m_pSM)
+    {
+        nsol = (int)smpt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = smpt.m_c[i];
+                zhat *= pow(c, vP);
+            }
         }
     }
     
     // add contribution of solid-bound molecules
-    const int nsbm = (int)spt.m_sbmr.size();
-    for (int i=0; i<nsbm; ++i) {
-        int vP = m_vP[nsol+i];
-        if (vP > 0) {
-            double c = m_pMP->SBMConcentration(pt, i);
-            zhat *= pow(c, vP);
+    if(m_pMP)
+    {
+        // add contribution of solid-bound molecules
+        const int nsbm = (int)spt.m_sbmr.size();
+        for (int i=0; i<nsbm; ++i) {
+            int vP = m_vP[nsol+i];
+            if (vP > 0) {
+                double c = m_pMP->SBMConcentration(pt, i);
+                zhat *= pow(c, vP);
+            }
         }
     }
     
@@ -176,16 +240,40 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
     }
     
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
     
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
     double dzhatFdc = 0;
-    if ((zhatF > 0) && (spt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/spt.m_c[sol];
+    if (m_pMP)
+    {
+        if ((zhatF > 0) && (spt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/spt.m_c[sol];
+    }
+    else if (m_pFS)
+    {
+        if ((zhatF > 0) && (fspt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/fspt.m_c[sol];
+    }
+    else if (m_pSM)
+    {
+        if ((zhatF > 0) && (smpt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/smpt.m_c[sol];
+    }
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double dzhatRdc = 0;
-    if ((zhatR > 0) && (spt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/spt.m_c[sol];
+    if (m_pMP)
+    {
+        if ((zhatR > 0) && (spt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/spt.m_c[sol];
+    }
+    else if (m_pFS)
+    {
+        if ((zhatR > 0) && (fspt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/fspt.m_c[sol];
+    }
+    else if (m_pSM)
+    {
+        if ((zhatR > 0) && (smpt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/smpt.m_c[sol];
+    }
 
     return dzhatFdc - dzhatRdc;
 }

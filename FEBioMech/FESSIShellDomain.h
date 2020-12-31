@@ -156,6 +156,8 @@ protected:
     
 public:
     bool        m_bnodalnormals; // flag for nodal (true) or element (false) normals
+
+	DECLARE_FECORE_CLASS();
 };
 
 

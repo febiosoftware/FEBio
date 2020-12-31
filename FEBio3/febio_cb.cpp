@@ -69,11 +69,14 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	// set the title of the console window.
 	Console* pShell = Console::GetHandle();
 
-	char szvers[32] = {0};
+	
+	char* szver = getVersionString();
+
+	char szvers[64] = {0};
 #ifdef _DEBUG
-	sprintf(szvers, "FEBio (DEBUG) %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+	sprintf(szvers, "FEBio (DEBUG) %s", szver);
 #else
-	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+	sprintf(szvers, "FEBio %s", szver);
 #endif
 
 	// print progress in title bar

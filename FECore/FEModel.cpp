@@ -497,6 +497,13 @@ bool FEModel::Init()
 	// initialize nonlinear constraints
 	if (InitConstraints() == false) return false;
 
+	// initialize mesh adaptors
+	for (int i = 0; i < MeshAdaptors(); ++i)
+	{
+		FEMeshAdaptor* ma = MeshAdaptor(i);
+		if (ma->Init() == false) return false;
+	}
+
 	// evaluate all load parameters
 	// Do this last in case any model components redefined their load curves.
 	if (EvaluateLoadParameters() == false) return false;

@@ -23,20 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMeshAdaptor.h"
-#include "FEDomain.h"
 #include "FESolidDomain.h"
-#include <FECore/FEModel.h>
-#include <FECore/FEElement.h>
 #include <FECore/FEElementList.h>
 
 REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
 
-FEMeshAdaptor::FEMeshAdaptor(FEModel* fem) : FECoreBase(fem)
+FEMeshAdaptor::FEMeshAdaptor(FEModel* fem) : FEModelComponent(fem)
 {
 	m_elemSet = nullptr;
 }
@@ -49,242 +43,6 @@ void FEMeshAdaptor::SetElementSet(FEElementSet* elemSet)
 FEElementSet* FEMeshAdaptor::GetElementSet()
 {
 	return m_elemSet;
-}
-
-
-REGISTER_SUPER_CLASS(FEMeshAdaptorCriterion, FEMESHADAPTORCRITERION_ID);
-
-BEGIN_FECORE_CLASS(FEMeshAdaptorCriterion, FECoreBase)
-	ADD_PARAMETER(m_sortList, "sort");
-	ADD_PARAMETER(m_maxelem, "max_elems");
-END_FECORE_CLASS();
-
-FEMeshAdaptorCriterion::FEMeshAdaptorCriterion(FEModel* fem) : FECoreBase(fem)
-{
-	m_sortList = false;
-	m_maxelem = 0;
-}
-
-void FEMeshAdaptorCriterion::SetSort(bool b)
-{
-	m_sortList = b;
-}
-
-void FEMeshAdaptorCriterion::SetMaxElements(int m)
-{
-	m_maxelem = m;
-}
-
-// return a list of elements that satisfy the criterion
-FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet* elemSet)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	// allocate iterator
-	FEElementIterator it(&mesh, elemSet);
-
-	// loop over elements
-	int nselected = 0;
-	int nelem = 0;
-	vector< pair<int, double> > elem;
-	for (;it.isValid(); ++it)
-	{
-		FEElement& el = *it;
-		if (el.isActive())
-		{
-			double elemVal = 0;
-			bool bselect = Check(el, elemVal);
-			if (bselect)
-			{
-				int nid = nelem;
-				if (elemSet) nid = (*elemSet)[nelem];
-				elem.push_back(pair<int, double>(nid, elemVal));
-				nselected++;
-			}
-		}
-		nelem++;
-	}
-
-	FEMeshAdaptorSelection selectedElement;
-	if (nselected > 0)
-	{
-		// sort the list
-		if (m_sortList) {
-			std::sort(elem.begin(), elem.end(), [](pair<int, double>& e1, pair<int, double>& e2) {
-				return e1.second > e2.second;
-			});
-		}
-
-		int nelem = elem.size();
-		if ((m_maxelem > 0) && (nelem > m_maxelem)) nelem = m_maxelem;
-
-		selectedElement.resize(nelem);
-		for (int i = 0; i < nelem; ++i)
-		{
-			selectedElement[i].m_elementIndex = elem[i].first;
-			selectedElement[i].m_scaleFactor = 0.;
-		}
-	}
-
-	return selectedElement;
-}
-
-bool FEMeshAdaptorCriterion::Check(FEElement& el, double& elemVal)
-{
-	return false;
-}
-
-BEGIN_FECORE_CLASS(FEMaxVolumeCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_maxVolume, "max_vol");
-END_FECORE_CLASS();
-
-FEMaxVolumeCriterion::FEMaxVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
-{
-	m_maxVolume = 0.0;
-}
-
-bool FEMaxVolumeCriterion::Check(FEElement& el, double& elemVal)
-{
-	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
-	if (dom == nullptr) return false;
-
-	elemVal = dom->Volume(dynamic_cast<FESolidElement&>(el));
-
-	return (elemVal >= m_maxVolume);
-}
-
-BEGIN_FECORE_CLASS(FEMaxVariableCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_maxValue, "max_value");
-	ADD_PARAMETER(m_dof, "dof");
-END_FECORE_CLASS();
-
-FEMaxVariableCriterion::FEMaxVariableCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
-{
-	m_maxValue = 0.0;
-	m_dof = -1;
-}
-
-bool FEMaxVariableCriterion::Check(FEElement& el, double& elemVal)
-{
-	if (m_dof == -1) return false;
-
-	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
-	if (dom == nullptr) return false;
-
-	FEMesh& mesh = *dom->GetMesh();
-	double maxVal = -1e99;
-	for (int i = 0; i < el.Nodes(); ++i)
-	{
-		double vi = mesh.Node(el.m_node[i]).get(m_dof);
-		if (vi > maxVal) maxVal = vi;
-	}
-	elemVal = maxVal;
-	return (elemVal >= m_maxValue);
-}
-
-BEGIN_FECORE_CLASS(FEElementSelectionCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_elemList, "element_list");
-END_FECORE_CLASS();
-
-FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
-{
-
-}
-
-FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElementSet* elemSet)
-{
-	FEMeshAdaptorSelection elemList(m_elemList.size());
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	for (int i = 0; i < (int)m_elemList.size(); ++i)
-	{
-		elemList[i].m_elementIndex = m_elemList[i] - 1;
-		elemList[i].m_scaleFactor = 0.0;
-	}
-	return elemList;
-}
-
-BEGIN_FECORE_CLASS(FEDomainErrorCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_pct, "error");
-END_FECORE_CLASS();
-
-FEDomainErrorCriterion::FEDomainErrorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
-{
-	m_pct = 0.0;
-
-	// set sort on by default
-	SetSort(true);
-}
-
-FEMeshAdaptorSelection FEDomainErrorCriterion::GetElementSelection(FEElementSet* elemSet)
-{
-	// get the mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int NE = mesh.Elements();
-	int NN = mesh.Nodes();
-
-	// calculate the recovered nodal stresses
-	vector<double> sn(NN);
-	projectToNodes(mesh, sn, [this](FEMaterialPoint& mp) {
-		return GetMaterialPointValue(mp);
-	});
-
-	// the element list of elements that need to be refined
-	FEMeshAdaptorSelection elemList;
-
-	// find the min and max stress values
-	FEElementIterator it(&mesh, elemSet);
-	double smin = 1e99, smax = -1e99;
-	for (; it.isValid(); ++it)
-	{
-		FEElement& el = *it;
-		int ni = el.GaussPoints();
-		for (int j = 0; j < ni; ++j)
-		{
-			double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
-			if (sj < smin) smin = sj;
-			if (sj > smax) smax = sj;
-		}
-	}
-	if (fabs(smin - smax) < 1e-12) return elemList;
-
-	// calculate errors
-	double ev[FEElement::MAX_NODES];
-	it.reset();
-	for (int i = 0; it.isValid(); ++it, ++i)
-	{
-		FEElement& el = *it;
-		int ne = el.Nodes();
-		int ni = el.GaussPoints();
-
-		// get the nodal values
-		for (int j = 0; j < ne; ++j)
-		{
-			ev[j] = sn[el.m_node[j]];
-		}
-
-		// evaluate element error
-		double max_err = 0;
-		for (int j = 0; j < ni; ++j)
-		{
-			double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
-
-			double snj = el.Evaluate(ev, j);
-
-			double err = fabs(sj - snj) / (smax - smin);
-			if (err > max_err) max_err = err;
-		}
-
-		// see if it's too large
-		if (max_err > m_pct)
-		{
-			double f = m_pct / max_err;
-			elemList.push_back(i, f);
-		}
-	}
-
-	// create the element list of elements that need to be refined
-	return elemList;
 }
 
 // helper function for projecting integration point data to nodes
@@ -331,3 +89,47 @@ void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<d
 		if (tag[i] > 0) nodeVals[i] /= (double)tag[i];
 	}
 }
+
+// helper function for projecting integration point data to nodes
+void projectToNodes(FEDomain& dom, std::vector<double>& nodeVals, std::function<double(FEMaterialPoint& mp)> f)
+{
+	// temp storage 
+	double si[FEElement::MAX_INTPOINTS];
+	double sn[FEElement::MAX_NODES];
+
+	// allocate nodeVals and create valence array (tag)
+	int NN = dom.Nodes();
+	vector<int> tag(NN, 0);
+	nodeVals.assign(NN, 0.0);
+
+	// loop over all elements
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int ne = e.Nodes();
+		int ni = e.GaussPoints();
+
+		// get the integration point values
+		for (int k = 0; k < ni; ++k)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+			si[k] = f(mp);
+		}
+
+		// project to nodes
+		e.project_to_nodes(si, sn);
+
+		for (int j = 0; j < ne; ++j)
+		{
+			nodeVals[e.m_lnode[j]] += sn[j];
+			tag[e.m_node[j]]++;
+		}
+	}
+
+	for (int i = 0; i < NN; ++i)
+	{
+		if (tag[i] > 0) nodeVals[i] /= (double)tag[i];
+	}
+}
+

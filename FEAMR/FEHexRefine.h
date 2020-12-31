@@ -23,27 +23,42 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEMeshAdaptor.h"
+#include "FERefineMesh.h"
 
-class FEErosionAdaptor : public FEMeshAdaptor
+class FEHexRefine : public FERefineMesh
 {
 public:
-	FEErosionAdaptor(FEModel* fem);
+	FEHexRefine(FEModel* fem);
 
 	bool Apply(int iteration) override;
 
-private:
-	void RemoveIslands();
+protected:
+	bool RefineMesh(FEModel& fem);
+	void BuildSplitLists(FEModel& fem);
+	void UpdateNewNodes(FEModel& fem);
+	void FindHangingNodes(FEModel& fem);
+	void BuildNewDomains(FEModel& fem);
+	void UpdateNodeSet(FENodeSet& nset);
+	bool UpdateSurface(FESurface& surf);
 
 private:
-	int		m_maxIters;
-	bool	m_bremoveIslands;
+	int		m_maxelem;			// max nr of elements
+	int		m_elemRefine;		// max nr of elements to refine per step
+	int		m_maxiter;
+	vector<int>	m_elemList;
+	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
+	vector<int>	m_faceList;	// list of face flags to see whether the face was split
+	int			m_N0;
+	int			m_NC;
+	int			m_NN;
+
+	int	m_splitElems;
+	int m_splitFaces;
+	int m_splitEdges;
+	int	m_hangingNodes;
 
 	FEMeshAdaptorCriterion*	m_criterion;
 
-	DECLARE_FECORE_CLASS()
+	DECLARE_FECORE_CLASS();
 };

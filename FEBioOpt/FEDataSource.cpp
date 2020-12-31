@@ -144,10 +144,10 @@ bool FEDataParameter::Init()
 	if (val.isValid() == false) {
 
 		// see if it's a data parameter
-		if (strstr(m_param.c_str(), "fem.element_data"))
+		if (strstr(m_ord.c_str(), "fem.element_data"))
 		{
 			char buf[256] = { 0 };
-			strcpy(buf, m_param.c_str());
+			strcpy(buf, m_ord.c_str());
 			char* sz = buf + 17;
 			char* c1 = strchr(sz, ',');
 			*c1++ = 0;
@@ -159,7 +159,7 @@ bool FEDataParameter::Init()
 			*c1 = 0;
 
 			FELogElemData* pd = fecore_new<FELogElemData>(sz, fem);
-			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_ord.c_str()); return false; }
 
 			FEMesh& mesh = fem->GetMesh();
 			FEElement* pe = mesh.FindElementFromID(eid);
@@ -173,11 +173,14 @@ bool FEDataParameter::Init()
 			return false;
 		}
 	}
-	if (val.type() != FE_PARAM_DOUBLE) {
-		feLogErrorEx(fem, "Invalid type for ordinate %s", m_ord.c_str());
-		return false;
+	else
+	{
+		if (val.type() != FE_PARAM_DOUBLE) {
+			feLogErrorEx(fem, "Invalid type for ordinate %s", m_ord.c_str());
+			return false;
+		}
+		m_fx = [=]() { return val.value<double>(); };
 	}
-	m_fx = [=]() { return val.value<double>(); };
 
 	// register callback
 	m_fem.AddCallback(update, CB_INIT | CB_MAJOR_ITERS, (void*) this);

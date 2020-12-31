@@ -28,13 +28,14 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEErosionAdaptor.h"
-#include "FEModel.h"
-#include "FEMesh.h"
-#include "FEDomain.h"
-#include "log.h"
-#include "FELinearConstraintManager.h"
-#include "FEElementList.h"
-#include "FEMeshTopo.h"
+#include <FECore/FEMeshAdaptorCriterion.h>
+#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
+#include <FECore/FEDomain.h>
+#include <FECore/log.h>
+#include <FECore/FELinearConstraintManager.h>
+#include <FECore/FEElementList.h>
+#include <FECore/FEMeshTopo.h>
 #include <algorithm>
 #include <stack>
 

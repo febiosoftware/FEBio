@@ -76,4 +76,4 @@ protected:
 };
 
 // function for finding the k closest neighbors
-int findNeirestNeighbors(const std::vector<vec3d>& point, const vec3d& x, int k, std::vector<int>& closestNodes);
+int FECORE_API findNeirestNeighbors(const std::vector<vec3d>& point, const vec3d& x, int k, std::vector<int>& closestNodes);

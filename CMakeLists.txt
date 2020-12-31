@@ -318,24 +318,15 @@ set(DEF ${DEF} -DNDEBUG)
 add_definitions(${DEF})
 include_directories(${INC})
 
-##### Include FEBio libraries #####
-add_subdirectory (FEBioFluid)
-add_subdirectory (FEBioLib)
-add_subdirectory (FEBioMech)
-add_subdirectory (FEBioMix)
-add_subdirectory (FEBioOpt)
-add_subdirectory (FEBioPlot)
-add_subdirectory (FEBioTest)
-add_subdirectory (FEBioXML)
-add_subdirectory (FECore)
-add_subdirectory (NumCore)
-
 ##### Set up compiler flags #####
 if(WIN32)
 elseif(APPLE)
 	add_definitions(-O3 -fPIC -std=c++11 -static-libstdc++ -w)
 else()
 	add_definitions(-O3 -fPIC -fopenmp -std=c++11 -static-libstdc++ -w)
+    
+    set(CMAKE_BUILD_RPATH_USE_LINK_PATH FALSE)
+    set(CMAKE_BUILD_RPATH $ORIGIN/../lib/)
 endif()
 
 # Extra compiler flags for intel compiler
@@ -348,19 +339,54 @@ if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
 	add_definitions(-fopenmp)
 endif()
 
+##### Include FEBio libraries #####
+add_subdirectory (FEBioFluid)
+add_subdirectory (FEBioLib)
+add_subdirectory (FEBioMech)
+add_subdirectory (FEBioMix)
+add_subdirectory (FEBioOpt)
+add_subdirectory (FEBioPlot)
+add_subdirectory (FEBioTest)
+add_subdirectory (FEBioXML)
+add_subdirectory (FECore)
+add_subdirectory (NumCore)
+add_subdirectory (FEAMR)
+
 ##### Set up executable compilation #####
 file(GLOB SOURCES "FEBio3/*.cpp")
 add_executable (febio3 ${SOURCES})
+
+##### Set dev commit information #####
+
+execute_process(COMMAND git rev-parse --abbrev-ref HEAD
+    RESULT_VARIABLE SUCCESS
+    OUTPUT_VARIABLE BRANCH_NAME)
+
+string(STRIP ${BRANCH_NAME} BRANCH_NAME)
+string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
+    
+if(SUCCESS EQUAL 0 AND ISDEVELOP)
+    execute_process(COMMAND git rev-parse --short HEAD
+        RESULT_VARIABLE SUCCESS
+        OUTPUT_VARIABLE DEVCOMMIT)
+    
+    string(STRIP ${DEVCOMMIT} DEVCOMMIT)
+    
+    if(${SUCCESS} EQUAL 0)
+        target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
+    endif()
+endif()
+
 
 ##### Linking options #####
 
 # Link FEBio libraries
 if(WIN32 OR APPLE)
 	target_link_libraries(febio3 fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr)
 else()
 	target_link_libraries(febio3 -Wl,--start-group fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid -Wl,--end-group)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr -Wl,--end-group)
 endif()
 
 # Link LEVMAR

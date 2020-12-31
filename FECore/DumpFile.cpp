@@ -79,12 +79,19 @@ void DumpFile::Close()
 size_t DumpFile::write(const void* pd, size_t size, size_t count)
 {
 	assert(IsSaving());
-	return fwrite(pd, size, count, m_fp);
+	int elemsWritten = fwrite(pd, size, count, m_fp);
+	return size * elemsWritten;
 }
 
 //! read buffer from archive
 size_t DumpFile::read(void* pd, size_t size, size_t count)
 {
 	assert(IsLoading());
-	return fread(pd, size, count, m_fp);
+	int elemsRead = fread(pd, size, count, m_fp);
+	return size * elemsRead;
+}
+
+bool DumpFile::EndOfStream() const
+{
+	return (feof(m_fp) != 0);
 }

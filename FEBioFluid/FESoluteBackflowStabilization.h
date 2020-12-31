@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include "FEFluidSolutes.h"
+#include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------
 //! FESoluteBackflowStabilization is a fluid surface where solute concentration
@@ -69,6 +70,7 @@ private:
     vector<bool> m_backflow;    //!< flag for nodes that have backflow
     double      m_alpha;
     double      m_alphaf;
+    FENodeNodeList m_nnlist;
 
     DECLARE_FECORE_CLASS();
 };

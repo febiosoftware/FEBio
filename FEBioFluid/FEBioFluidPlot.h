@@ -70,6 +70,15 @@ public:
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Nodal effective fluid pressures
+class FEPlotFluidEffectivePressure : public FEPlotDomainData
+{
+public:
+    FEPlotFluidEffectivePressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================

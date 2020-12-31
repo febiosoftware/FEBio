@@ -233,10 +233,12 @@ int FEBioCmd_UnLoadPlugin::run(int nargs, char* argv[])
 //-----------------------------------------------------------------------------
 int FEBioCmd_Version::run(int nargs, char** argv)
 {
+	char* szver = getVersionString();
+
 #ifdef _DEBUG
-	fprintf(stderr, "\nFEBio version %d.%d.%d (DEBUG)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+	fprintf(stderr, "\nFEBio version %s (DEBUG)\n", szver);
 #else
-	fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+	fprintf(stderr, "\nFEBio version %s\n", szver);
 #endif
 	fprintf(stderr, "SDK Version %d.%d\n", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION);
 	fprintf(stderr, "compiled on " __DATE__ "\n\n");

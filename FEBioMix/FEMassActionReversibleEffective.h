@@ -28,6 +28,8 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEMultiphasic.h"
+#include "FEBioFluid/FEFluidSolutes.h"
+#include "FEBioFluid/FESolutesMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for reversible chemical reaction
