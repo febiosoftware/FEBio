@@ -406,8 +406,8 @@
 					"/usr/local/hypre-master/src/hypre/lib",
 					/usr/local/opt/openmpi/lib,
 					"/usr/local/hypre-master/src/lib",
+					/usr/local/opt/libomp/lib,
 					"/usr/local/opt/open-mpi/lib",
-					/usr/local/Cellar/libomp/9.0.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -426,8 +426,8 @@
 					"/usr/local/hypre-master/src/hypre/lib",
 					/usr/local/opt/openmpi/lib,
 					"/usr/local/hypre-master/src/lib",
+					/usr/local/opt/libomp/lib,
 					"/usr/local/opt/open-mpi/lib",
-					/usr/local/Cellar/libomp/9.0.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
