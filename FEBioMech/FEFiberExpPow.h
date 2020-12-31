@@ -50,7 +50,8 @@ public:
 protected:
 	double	m_alpha;	// coefficient of (In-1) in exponential
 	double	m_beta;		// power of (In-1) in exponential
-	double	m_ksi;		// fiber modulus
+	FEParamDouble		m_ksi;		// fiber modulus
+	FEParamDouble		m_mu;       // shear modulus
 	double	m_epsf;
 
 	// declare the parameter list
