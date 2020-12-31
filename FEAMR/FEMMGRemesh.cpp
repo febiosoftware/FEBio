@@ -156,6 +156,14 @@ bool FEMMGRemesh::Apply(int iteration)
 	// reactivate the model
 	UpdateModel();
 
+	// print some mesh statistics
+	int NN = mesh.Nodes();
+	int NE = mesh.Elements();
+	feLog(" Mesh Statistics:\n");
+	feLog(" \tNumber of nodes    : %d\n", NN);
+	feLog(" \tNumber of elements : %d\n", NE);
+	feLog("\n");
+
 	// all done
 	return false;
 }
