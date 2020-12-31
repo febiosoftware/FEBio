@@ -61,6 +61,6 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 protected:
-	vector<int>		indx;	//!< indices
-	DenseMatrix*	m_pA;	//!< sparse matrix
+	vector<int>				indx;	//!< indices
+	FECore::DenseMatrix*	m_pA;	//!< sparse matrix
 };

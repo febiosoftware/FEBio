@@ -233,7 +233,7 @@ int FEBioCmd_UnLoadPlugin::run(int nargs, char* argv[])
 //-----------------------------------------------------------------------------
 int FEBioCmd_Version::run(int nargs, char** argv)
 {
-	char* szver = getVersionString();
+	char* szver = febio::getVersionString();
 
 #ifdef _DEBUG
 	fprintf(stderr, "\nFEBio version %s (DEBUG)\n", szver);

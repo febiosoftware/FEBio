@@ -46,5 +46,9 @@ SOFTWARE.*/
 
 #define RSTRTVERSION		0x06
 
+namespace febio
+{
 
 FEBIOLIB_API char* getVersionString();
+
+}

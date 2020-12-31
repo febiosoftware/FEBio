@@ -29,6 +29,8 @@ SOFTWARE.*/
 #pragma once
 #include "SparseMatrix.h"
 
+namespace FECore {
+
 //=============================================================================
 //! This class implements a full matrix
 //! that is a matrix that stores all its elements.
@@ -71,3 +73,5 @@ protected:
 	double*		m_pd;	//!< matrix values
 	double**	m_pr;	//!< pointers to rows
 };
+
+}

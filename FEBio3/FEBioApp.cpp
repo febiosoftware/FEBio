@@ -379,7 +379,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
 
-			char* szver = getVersionString();
+			char* szver = febio::getVersionString();
 
 #ifdef _DEBUG
 			fprintf(fp, "FEBio version  = %s (DEBUG)\n", szver);
