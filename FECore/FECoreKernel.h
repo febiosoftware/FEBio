@@ -124,8 +124,12 @@ public: // Modules
 	//! remove a module
 	bool RemoveModule(const char* szmodule);
 
-	//! Get a module
+	//! Get a module's name
 	const char* GetModuleName(int i) const;
+	const char* GetModuleNameFromId(int id) const;
+
+	//! Get a module's dependencies
+	unsigned int GetModuleDependencies(int i) const;
 
 	//! set the spec ID. Features with a matching spec ID will be preferred
 	//! set spec ID to -1 to stop caring

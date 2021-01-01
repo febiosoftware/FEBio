@@ -447,7 +447,14 @@ bool FECoreKernel::RemoveModule(const char* szmodule)
 }
 
 //! Get a module
-const char* FECoreKernel::GetModuleName(int id) const
+const char* FECoreKernel::GetModuleName(int i) const
+{
+	if ((i<0) || (i >= m_modules.size())) return nullptr;
+	return m_modules[i].szname;
+}
+
+//! Get a module
+const char* FECoreKernel::GetModuleNameFromId(int id) const
 {
 	for (size_t n = 0; n < m_modules.size(); ++n)
 	{
@@ -456,6 +463,14 @@ const char* FECoreKernel::GetModuleName(int id) const
 	}
 	return 0;
 }
+
+//! Get a module's dependencies
+unsigned int FECoreKernel::GetModuleDependencies(int i) const
+{
+	if ((i < 0) || (i >= m_modules.size())) return 0;
+	return m_modules[i].flags;
+}
+
 
 //! set the spec ID. Features with a matching spec ID will be preferred
 //! set spec ID to -1 to stop caring

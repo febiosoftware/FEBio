@@ -693,7 +693,7 @@ int FEBioCmd_list::run(int nargs, char** argv)
 				int mods = fecore.Modules();
 				for (int i = 0; i < mods; ++i)
 				{
-					const char* szmod = fecore.GetModuleName(1 << i);
+					const char* szmod = fecore.GetModuleName(i);
 					printf("%d: %s\n", i+1, szmod);
 				}
 				printf("\n");
@@ -735,8 +735,8 @@ int FEBioCmd_list::run(int nargs, char** argv)
 			SUPER_CLASS_ID superID = fac->GetSuperClassID();
 			const char* szclass = super_id_to_string(superID);
 
-			int module = fac->GetModuleID();
-			const char* szmodule = fecore.GetModuleName(module);
+			int moduleId = fac->GetModuleID();
+			const char* szmodule = fecore.GetModuleNameFromId(moduleId);
 			if ((szmod == 0) || (szmodule && (strcmp(szmodule, szmod) == 0)))
 			{
 				if ((sztype == 0) || (szcmp(szclass, sztype) == 0))
