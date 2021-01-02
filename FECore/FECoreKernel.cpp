@@ -499,7 +499,7 @@ bool FECoreKernel::SetModuleDependency(const char* szmodule)
 		Module& mi = m_modules[i];
 		if (strcmp(mi.szname, szmodule) == 0)
 		{
-			activeModule.flags |= mi.id;
+			activeModule.flags |= mi.flags;
 			return true;
 		}
 	}
