@@ -134,6 +134,7 @@ void FEBioMix::InitModule()
 	febio.SetActiveModule("solid");
 	REGISTER_FECORE_CLASS(FECarterHayes     , "Carter-Hayes");
 	REGISTER_FECORE_CLASS(FEPorousNeoHookean, "porous neo-Hookean");
+	REGISTER_FECORE_CLASS(FEPoroNormalTraction, "normal_traction");
 
 //======================================================================
 // setup the "biphasic" module
@@ -163,7 +164,6 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Surface loads
-	REGISTER_FECORE_CLASS(FEPoroNormalTraction, "normal_traction");
 	REGISTER_FECORE_CLASS(FEFluidFlux         , "fluidflux");
 	REGISTER_FECORE_CLASS(FEPressureStabilization, "pressure_stabilization");
 
@@ -253,6 +253,10 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
 	REGISTER_FECORE_CLASS(FEPlotOsmolarity                       , "osmolarity");
+	REGISTER_FECORE_CLASS(FEPlotCurrentDensity                   , "current density"     );
+	REGISTER_FECORE_CLASS(FEPlotFixedChargeDensity               , "fixed charge density");
+	REGISTER_FECORE_CLASS(FEPlotReferentialFixedChargeDensity    , "referential fixed charge density");
+	REGISTER_FECORE_CLASS(FEPlotElectricPotential                , "electric potential"  );
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FENodeLogData
@@ -359,10 +363,6 @@ void FEBioMix::InitModule()
 	// classes derived from FEPlotData
 	REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration      , "receptor-ligand concentration"   );
 	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"			    );
-	REGISTER_FECORE_CLASS(FEPlotElectricPotential                , "electric potential"  );
-	REGISTER_FECORE_CLASS(FEPlotCurrentDensity                   , "current density"     );
-	REGISTER_FECORE_CLASS(FEPlotFixedChargeDensity               , "fixed charge density");
-	REGISTER_FECORE_CLASS(FEPlotReferentialFixedChargeDensity    , "referential fixed charge density");
 	REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density");
 	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient" );
 

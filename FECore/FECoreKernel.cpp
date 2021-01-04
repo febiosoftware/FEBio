@@ -195,7 +195,7 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 	if (sztype == 0) return 0;
 
 	unsigned int activeID = 0;
-	unsigned int flags = 0;
+	unsigned int flags = 0xFFFF;
 	if (m_activeModule != -1)
 	{
 		Module& activeModule = m_modules[m_activeModule];
@@ -203,30 +203,8 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 		flags = activeModule.flags;
 	}
 
-	// first find by module
-	if (activeID != 0)
-	{
-		std::vector<FECoreFactory*>::iterator pf;
-		for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
-		{
-			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == superClassID) {
-
-				unsigned int mid = pfac->GetModuleID();
-				if ((mid == activeID) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
-				{
-					int nspec = pfac->GetSpecID();
-					if ((nspec == -1) || (m_nspec <= nspec))
-					{
-						return pfac->CreateInstance(pfem);
-					}
-				}
-			}
-		}
-	}
-
-	// check dependencies
-	if (flags != 0)
+	// first check active module
+	if (activeID > 0)
 	{
 		std::vector<FECoreFactory*>::iterator pf;
 		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
@@ -234,33 +212,45 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 			FECoreFactory* pfac = *pf;
 			if (pfac->GetSuperClassID() == superClassID) {
 
+				// see if we can match module first
 				unsigned int mid = pfac->GetModuleID();
-				if ((mid & flags) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
+				if (mid == activeID)
 				{
-					int nspec = pfac->GetSpecID();
-					if ((nspec == -1) || (m_nspec <= nspec))
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
 					{
-						return pfac->CreateInstance(pfem);
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac->CreateInstance(pfem);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	// we didn't find it.
-	// Let's ignore module
-	// TODO: This is mostly for backward compatibility, but eventually should be removed
+	// check dependencies
 	std::vector<FECoreFactory*>::iterator pf;
-	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
 		if (pfac->GetSuperClassID() == superClassID) {
-			if (strcmp(pfac->GetTypeStr(), sztype) == 0)
+
+			// see if we can match module first
+			unsigned int mid = pfac->GetModuleID();
+			if ((mid == 0) || (mid == activeID) || (mid & flags))
 			{
-				int nspec = pfac->GetSpecID();
-				if ((nspec == -1) || (m_nspec <= nspec))
+				// see if the type name matches
+				if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
 				{
-					return pfac->CreateInstance(pfem);
+					// check the spec (TODO: What is this for?)
+					int nspec = pfac->GetSpecID();
+					if ((nspec == -1) || (m_nspec <= nspec))
+					{
+						return pfac->CreateInstance(pfem);
+					}
 				}
 			}
 		}
