@@ -46,15 +46,8 @@ class LinearSolver;
 //! with the kernel.
 class FECORE_API FECoreKernel
 {
-	enum { ALL_MODULES = 0xFFFF };
-
-	struct Module
-	{
-		const char*		szname;	// name of module
-		unsigned int	id;		// unqiue ID (this is a bit value)
-		unsigned int	flags;	// ID + IDs of dependent modules
-		int				m_alloc_id;	// ID of allocator
-	};
+	// forward declaration of Module class
+	class Module;
 
 public:
 	// Do not call this function from a plugin as it will not return the correct
@@ -121,15 +114,12 @@ public: // Modules
 	//! set a dependency on a module
 	bool SetModuleDependency(const char* szmodule);
 
-	//! remove a module
-	bool RemoveModule(const char* szmodule);
-
 	//! Get a module's name
 	const char* GetModuleName(int i) const;
 	const char* GetModuleNameFromId(int id) const;
 
 	//! Get a module's dependencies
-	unsigned int GetModuleDependencies(int i) const;
+	vector<int> GetModuleDependencies(int i) const;
 
 	//! set the spec ID. Features with a matching spec ID will be preferred
 	//! set spec ID to -1 to stop caring
@@ -162,7 +152,7 @@ private:
 	ClassDescriptor*	m_default_solver;
 
 	// module list
-	vector<Module>	m_modules;
+	vector<Module*>	m_modules;
 	int				m_activeModule;
 
 	int				m_nspec;

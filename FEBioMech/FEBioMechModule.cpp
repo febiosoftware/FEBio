@@ -259,7 +259,6 @@ void FEBioMech::InitModule()
 	// Solver classes
 	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
-	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 	//-----------------------------------------------------------------------------
@@ -838,6 +837,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
 	REGISTER_FECORE_CLASS(FEMaxDamageCriterion, "max_damage");
 	REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
+
+	febio.CreateModule("explicit-solid");
+	febio.SetModuleDependency("solid");
+	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
+
 
 	febio.SetActiveModule(0);
 }

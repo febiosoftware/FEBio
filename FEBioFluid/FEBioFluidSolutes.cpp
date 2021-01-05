@@ -73,6 +73,7 @@ void FEBioFluidSolutes::InitModule()
     
     // define the fsi module
     febio.CreateModule("fluid-solutes");
+	febio.SetModuleDependency("fluid");
     febio.SetModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
 	// monolithic fluid-solutes solver
@@ -96,7 +97,6 @@ void FEBioFluidSolutes::InitModule()
 
 	febio.CreateModule("fluid-solutes2");
 	febio.SetModuleDependency("fluid-solutes");
-	febio.SetModuleDependency("fluid");
 
 	// segragated fluid-solutes solver
 	REGISTER_FECORE_CLASS(FEFluidSolutesSolver2, "fluid-solutes2");
