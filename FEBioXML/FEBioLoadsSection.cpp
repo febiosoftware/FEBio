@@ -636,7 +636,7 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 			++tag;
 			do
 			{
-				if (ReadParameter(tag, psl, 0, 0) == false)
+				if (ReadParameter(tag, psl) == false)
 				{
 					if ((tag == "value") && (dynamic_cast<FEPressureLoad*>(psl)))
 					{
