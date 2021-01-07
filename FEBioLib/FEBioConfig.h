@@ -33,6 +33,9 @@ public:
 
 	void Defaults();
 
+	void SetOutputLevel(int n);
+
 public:
 	int		m_printParams;
+	int		m_noutput;
 };

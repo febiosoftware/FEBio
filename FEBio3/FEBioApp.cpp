@@ -74,6 +74,9 @@ bool FEBioApp::Init(int argc, char* argv[])
 	// Initialize FEBio library
 	febio::InitLibrary();
 
+	// copy some flags to configuration
+	m_config.SetOutputLevel(m_ops.bsilent ? 0 : 1);
+
 	// read the configration file if specified
 	if (m_ops.szcnf[0])
 		if (febio::Configure(m_ops.szcnf, m_config) == false)

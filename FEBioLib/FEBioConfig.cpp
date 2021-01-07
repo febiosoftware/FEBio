@@ -27,7 +27,13 @@ SOFTWARE.*/
 
 FEBioConfig::FEBioConfig()
 {
+	m_noutput = 1;
 	Defaults();
+}
+
+void FEBioConfig::SetOutputLevel(int n)
+{
+	m_noutput = n;
 }
 
 void FEBioConfig::Defaults()
