@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include "feamr_api.h"
 
 //-----------------------------------------------------------------------------
-//! The FECore namespace encapsulates all classes that belong to the FECore library
+//! The FEAMR namespace encapsulates all classes that belong to the FEAMR library
 namespace FEAMR
 {
 	// initialize the module

@@ -98,6 +98,7 @@ void FEBioFluid::InitModule()
 
 	// define the fluid module
 	febio.CreateModule("fluid");
+	febio.SetModuleDependency("solid");	// for body-loads (e.g. see fl08)
 
 //-----------------------------------------------------------------------------
 // solver classes

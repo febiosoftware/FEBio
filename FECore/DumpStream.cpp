@@ -164,6 +164,7 @@ DumpStream& DumpStream::operator << (bool b)
 //-----------------------------------------------------------------------------
 DumpStream& DumpStream::operator << (int n)
 {
+	if (m_btypeInfo) writeType(TypeID::TYPE_INT);
 	m_bytes_serialized += write(&n, sizeof(int), 1);
 	return *this;
 }

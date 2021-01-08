@@ -40,8 +40,8 @@ public:
 
 	bool Init();
 
-	void print_matrix(DenseMatrix& m);
+	void print_matrix(FECore::DenseMatrix& m);
 
 protected:
-	void deriv_residual(DenseMatrix& K);
+	void deriv_residual(FECore::DenseMatrix& K);
 };

@@ -252,10 +252,13 @@ void FEBioMech::InitModule()
 	febio.RegisterDomain(new FESolidDomainFactory);
 
 	//-----------------------------------------------------------------------------
+	// create module
+	febio.CreateModule("solid");
+
+	//-----------------------------------------------------------------------------
 	// Solver classes
 	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
-	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 	//-----------------------------------------------------------------------------
@@ -356,13 +359,16 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
 	REGISTER_FECORE_CLASS(FEFiberPowLinear, "fiber-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberPowLinearUncoupled, "fiber-pow-linear-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberExponentialPower, "fiber-exponential-power-law");
 	REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC, "fiber-exponential-power-law-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
 	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
+
+	// obsolete fiber materials
+	REGISTER_FECORE_CLASS(FEFiberExponentialPower, "fiber-exponential-power-law");
+
 
 	// solid materials (derived from FESolidMaterial)
 	REGISTER_FECORE_CLASS(FERigidMaterial, "rigid body");
@@ -831,6 +837,13 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
 	REGISTER_FECORE_CLASS(FEMaxDamageCriterion, "max_damage");
 	REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
+
+	febio.CreateModule("explicit-solid");
+	febio.SetModuleDependency("solid");
+	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
+
+
+	febio.SetActiveModule(0);
 }
 
 //-----------------------------------------------------------------------------

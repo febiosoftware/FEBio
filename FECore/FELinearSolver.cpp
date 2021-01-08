@@ -453,4 +453,6 @@ void FELinearSolver::Update(vector<double>& u)
 		FEDomain& dom = mesh.Domain(i);
 		dom.Update(tp);
 	}
+
+	fem.IncrementUpdateCounter();
 }

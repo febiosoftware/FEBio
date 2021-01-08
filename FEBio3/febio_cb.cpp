@@ -70,7 +70,7 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	Console* pShell = Console::GetHandle();
 
 	
-	char* szver = getVersionString();
+	char* szver = febio::getVersionString();
 
 	char szvers[64] = {0};
 #ifdef _DEBUG

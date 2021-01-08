@@ -33,6 +33,40 @@ SOFTWARE.*/
 #include <stdarg.h>
 using namespace std;
 
+// A module defines a context in which features are defined and searched. 
+class FECoreKernel::Module
+{
+public:
+	const char*		m_szname;	// name of module
+	unsigned int	m_id;		// unqiue ID (starting at one)
+	int				m_alloc_id;	// ID of allocator
+	vector<int>		m_depMods;	// module dependencies
+
+	void AddDependency(Module& mod)
+	{
+		AddDependency(mod.m_id);
+		AddDependencies(mod.m_depMods);
+	}
+
+private:
+	void AddDependency(int mid)
+	{
+		for (size_t i = 0; i < m_depMods.size(); ++i)
+		{
+			if (m_depMods[i] == mid) return;
+		}
+		m_depMods.push_back(mid);
+	}
+
+	void AddDependencies(const vector<int>& mid)
+	{
+		for (size_t i = 0; i < mid.size(); ++i)
+		{
+			AddDependency(mid[i]);
+		}
+	}
+};
+
 //-----------------------------------------------------------------------------
 FECoreKernel* FECoreKernel::m_pKernel = 0;
 
@@ -118,10 +152,12 @@ LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 {
 	unsigned int activeID = 0;
+	vector<int> moduleDepends;
 	if (m_activeModule != -1)
 	{
-		Module& activeModule = m_modules[m_activeModule];
-		activeID = activeModule.id;
+		Module& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.m_id;
+		moduleDepends = activeModule.m_depMods;
 	}
 
 	// see if the name already exists
@@ -129,14 +165,19 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 	{
 		FECoreFactory* pfi = m_Fac[i];
 
-		if (pfi->GetSuperClassID() == ptf->GetSuperClassID())
+		if ((pfi->GetSuperClassID() == ptf->GetSuperClassID()) && 
+			(strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
 		{
-			unsigned int id = pfi->GetModuleID();
+			// A feature with the same is already registered. 
+			// We need to check the module to see if this would create an ambiguity
+			unsigned int modId = pfi->GetModuleID();
 
-			if ((id == activeID) && (pfi->GetSpecID() == ptf->GetSpecID()) && (strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
+			// If the same feature is defined in the active module,
+			// then this feature will replace the existing one. 
+			if ((modId == activeID) && (pfi->GetSpecID() == ptf->GetSpecID()))
 			{
 #ifdef _DEBUG
-				fprintf(stderr, "WARNING: %s feature is redefined\n", ptf->GetTypeStr());
+				fprintf(stderr, "WARNING: \"%s\" feature is redefined\n", ptf->GetTypeStr());
 #endif
 				m_Fac[i] = ptf;
 				return;
@@ -195,38 +236,16 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 	if (sztype == 0) return 0;
 
 	unsigned int activeID = 0;
-	unsigned int flags = 0;
+	vector<int> moduleDepends;
 	if (m_activeModule != -1)
 	{
-		Module& activeModule = m_modules[m_activeModule];
-		activeID = activeModule.id;
-		flags = activeModule.flags;
+		Module& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.m_id;
+		moduleDepends = activeModule.m_depMods;
 	}
 
-	// first find by module
-	if (activeID != 0)
-	{
-		std::vector<FECoreFactory*>::iterator pf;
-		for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
-		{
-			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == superClassID) {
-
-				unsigned int mid = pfac->GetModuleID();
-				if ((mid == activeID) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
-				{
-					int nspec = pfac->GetSpecID();
-					if ((nspec == -1) || (m_nspec <= nspec))
-					{
-						return pfac->CreateInstance(pfem);
-					}
-				}
-			}
-		}
-	}
-
-	// check dependencies
-	if (flags != 0)
+	// first check active module
+	if ((activeID > 0) || (activeID == 0))
 	{
 		std::vector<FECoreFactory*>::iterator pf;
 		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
@@ -234,48 +253,53 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 			FECoreFactory* pfac = *pf;
 			if (pfac->GetSuperClassID() == superClassID) {
 
+				// see if we can match module first
 				unsigned int mid = pfac->GetModuleID();
-				if ((mid & flags) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
+				if ((mid == activeID) || (mid== 0))
 				{
-					int nspec = pfac->GetSpecID();
-					if ((nspec == -1) || (m_nspec <= nspec))
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
 					{
-						return pfac->CreateInstance(pfem);
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac->CreateInstance(pfem);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	// we didn't find it.
-	// Let's ignore module
-	// TODO: This is mostly for backward compatibility, but eventually should be removed
+	// check dependencies in order in which they are defined
 	std::vector<FECoreFactory*>::iterator pf;
-	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	for (int i = 0; i < moduleDepends.size(); ++i)
 	{
-		FECoreFactory* pfac = *pf;
-		if (pfac->GetSuperClassID() == superClassID) {
-			if (strcmp(pfac->GetTypeStr(), sztype) == 0)
-			{
-				int nspec = pfac->GetSpecID();
-				if ((nspec == -1) || (m_nspec <= nspec))
+		unsigned modId = moduleDepends[i];
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == superClassID) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == 0) || (mid == modId))
 				{
-					return pfac->CreateInstance(pfem);
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac->CreateInstance(pfem);
+						}
+					}
 				}
 			}
 		}
 	}
-
-/*
-#ifdef _DEBUG
-	fprintf(stderr, "Unable to create class\n. These are the possible values:\n");
-	for (pf=m_Fac.begin(); pf!=m_Fac.end(); ++pf)
-	  {
-	    FECoreFactory* pfac = *pf;
-	    if (pfac->GetSuperClassID() == id) fprintf(stderr, "%s\n", pfac->GetTypeStr());
-	  }
-#endif
-*/
 	return 0;
 }
 
@@ -386,8 +410,8 @@ bool FECoreKernel::SetActiveModule(const char* szmod)
 	// see if the module exists or not
 	for (size_t i=0; i<m_modules.size(); ++i) 
 	{
-		Module& mi = m_modules[i];
-		if (strcmp(mi.szname, szmod) == 0)
+		Module& mi = *m_modules[i];
+		if (strcmp(mi.m_szname, szmod) == 0)
 		{
 			m_activeModule = (int) i;
 			return true;
@@ -417,11 +441,10 @@ bool FECoreKernel::CreateModule(const char* szmod)
 	if (SetActiveModule(szmod) == false)
 	{
 		// The module does not exist, so let's add it.
-		int newID = (1 << m_modules.size());
-		Module newModule;
-		newModule.szname = szmod;
-		newModule.id = newID;
-		newModule.flags = newID;
+		unsigned int newID = (unsigned int) m_modules.size() + 1;
+		Module* newModule = new Module;
+		newModule->m_szname = szmod;
+		newModule->m_id = newID;
 		m_modules.push_back(newModule);
 
 		// make this the active module
@@ -432,31 +455,37 @@ bool FECoreKernel::CreateModule(const char* szmod)
 }
 
 //-----------------------------------------------------------------------------
-//! remove a module
-bool FECoreKernel::RemoveModule(const char* szmodule)
+//! Get a module
+const char* FECoreKernel::GetModuleName(int i) const
 {
-	for (std::vector<Module>::iterator it = m_modules.begin(); it != m_modules.end(); ++it)
-	{
-		if (strcmp((*it).szname, szmodule) == 0)
-		{
-			m_modules.erase(it);
-			return true;
-		}
-	}
-	return false;
+	if ((i<0) || (i >= m_modules.size())) return nullptr;
+	return m_modules[i]->m_szname;
 }
 
 //! Get a module
-const char* FECoreKernel::GetModuleName(int id) const
+const char* FECoreKernel::GetModuleNameFromId(int id) const
 {
 	for (size_t n = 0; n < m_modules.size(); ++n)
 	{
-		const Module& mod = m_modules[n];
-		if (mod.id == id) return mod.szname;
+		const Module& mod = *m_modules[n];
+		if (mod.m_id == id) return mod.m_szname;
 	}
 	return 0;
 }
 
+//! Get a module's dependencies
+vector<int> FECoreKernel::GetModuleDependencies(int i) const
+{
+	vector<int> md;
+	if ((i >= 0) && (i < m_modules.size()))
+	{
+		md = m_modules[i]->m_depMods;
+	}
+	return md;
+}
+
+
+//-----------------------------------------------------------------------------
 //! set the spec ID. Features with a matching spec ID will be preferred
 //! set spec ID to -1 to stop caring
 void FECoreKernel::SetSpecID(int nspec)
@@ -469,22 +498,24 @@ void FECoreKernel::SetSpecID(int nspec)
 bool FECoreKernel::SetModuleDependency(const char* szmodule)
 {
 	if (m_activeModule == -1) return false;
-	Module& activeModule = m_modules[m_activeModule];
+	Module& activeModule = *m_modules[m_activeModule];
 
 	if (szmodule == 0)
 	{
 		// clear dependencies
-		activeModule.flags = activeModule.id;
+		activeModule.m_depMods.clear();
 		return true;
 	}
 
 	// find the module
 	for (size_t i = 0; i<m_modules.size(); ++i)
 	{
-		Module& mi = m_modules[i];
-		if (strcmp(mi.szname, szmodule) == 0)
+		Module& mi = *m_modules[i];
+		if (strcmp(mi.m_szname, szmodule) == 0)
 		{
-			activeModule.flags |= mi.id;
+			// add the module to the active module's dependency list
+			activeModule.AddDependency(mi);
+
 			return true;
 		}
 	}

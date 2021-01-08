@@ -1283,7 +1283,7 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			pplt->SetCompression(m_pltCompression);
 
 			// set the software string
-			const char* szver = getVersionString();
+			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
 			sprintf(szbuf, "FEBio %s", szver);
 			pplt->SetSoftwareString(szbuf);
@@ -1381,7 +1381,7 @@ bool FEBioModel::Init()
 			pplt->SetCompression(m_pltCompression);
 
 			// set the software string
-			const char* szver = getVersionString();
+			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
 			sprintf(szbuf, "FEBio %s", szver);
 			pplt->SetSoftwareString(szbuf);

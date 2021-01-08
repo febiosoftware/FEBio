@@ -74,6 +74,9 @@ bool FEBioApp::Init(int argc, char* argv[])
 	// Initialize FEBio library
 	febio::InitLibrary();
 
+	// copy some flags to configuration
+	m_config.SetOutputLevel(m_ops.bsilent ? 0 : 1);
+
 	// read the configration file if specified
 	if (m_ops.szcnf[0])
 		if (febio::Configure(m_ops.szcnf, m_config) == false)
@@ -379,7 +382,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
 
-			char* szver = getVersionString();
+			char* szver = febio::getVersionString();
 
 #ifdef _DEBUG
 			fprintf(fp, "FEBio version  = %s (DEBUG)\n", szver);

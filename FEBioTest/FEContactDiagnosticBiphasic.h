@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEDiagnostic.h"
-#include <FECore/DenseMatrix.h>
 
 //-----------------------------------------------------------------------------
 class FEContactBiphasicScenario : public FEDiagnosticScenario

@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBioMech/FEResidualVector.h"
 #include "FECore/log.h"
+using namespace FECore;
 
 void FEContactDiagnostic::print_matrix(DenseMatrix& m)
 {
