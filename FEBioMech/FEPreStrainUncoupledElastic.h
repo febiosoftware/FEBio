@@ -42,6 +42,9 @@ public:
 	//! return the pre-strain gradient property
 	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }
 
+	//! return the elastic material property
+	FEElasticMaterial* GetElasticMaterial() override { return m_mat; }
+
 public:
 	//! Cauchy stress 
 	mat3ds DevStress(FEMaterialPoint& mp) override;

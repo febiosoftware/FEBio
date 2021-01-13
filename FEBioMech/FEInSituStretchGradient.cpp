@@ -27,29 +27,6 @@ SOFTWARE.*/
 #include "FEInSituStretchGradient.h"
 
 //-----------------------------------------------------------------------------
-FEInSituStretchGradient::MaterialPointData::MaterialPointData()
-{
-	m_lam = 0.0;
-}
-	
-void FEInSituStretchGradient::MaterialPointData::Init(bool bflag)
-{
-}
-
-FEMaterialPoint* FEInSituStretchGradient::MaterialPointData::Copy()
-{
-	MaterialPointData* pm = new MaterialPointData();
-	pm->m_lam = m_lam;
-	return pm;
-}
-
-void FEInSituStretchGradient::MaterialPointData::Serialize(DumpStream& ar)
-{
-	FEMaterialPoint::Serialize(ar);
-	ar & m_lam;
-}
-
-//-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEInSituStretchGradient, FEPrestrainGradient)
 	ADD_PARAMETER(m_lam , "stretch"  );
 	ADD_PARAMETER(m_biso, "isochoric");
@@ -60,50 +37,51 @@ FEInSituStretchGradient::FEInSituStretchGradient(FEModel* pfem) : FEPrestrainGra
 {
 	m_lam = 1.0;
 	m_biso = true;
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEInSituStretchGradient::CreateMaterialPointData()
+bool FEInSituStretchGradient::Init()
 {
-	return new MaterialPointData;
-}
+	// make sure the parent material is a prestrain material
+	FEPrestrainMaterial* prestrainMat = dynamic_cast<FEPrestrainMaterial*>(GetParent());
+	if (prestrainMat == nullptr) return false;
 
-//-----------------------------------------------------------------------------
-double FEInSituStretchGradient::InSituStretch(FEMaterialPoint& mp)
-{
-	MaterialPointData& psp = *mp.ExtractData<MaterialPointData>();
-	// get the target stretch
-	double trg = 0;
-	if (psp.m_lam ==0.0) trg = (m_lam < 1e-15 ? 1.0 : m_lam);
-	else
-	{
-		double w = m_lam;
-		double l = psp.m_lam;
-		trg = w*l + (1.0-w);
-	}
-	return trg;
+	// get the elastic property
+	FEElasticMaterial* elasticMat = prestrainMat->GetElasticMaterial();
+
+	// make sure it has a fiber property
+	FEParam* fiberProp = elasticMat->FindParameter("fiber");
+	if (fiberProp == nullptr) return false;
+
+	// make sure it's a vector map
+	if (fiberProp->type() != FE_PARAM_VEC3D_MAPPED) return false;
+	m_fiber = &(fiberProp->value<FEParamVec3>());
+
+	return FEPrestrainGradient::Init();
 }
 
 //-----------------------------------------------------------------------------
 mat3d FEInSituStretchGradient::Prestrain(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	MaterialPointData& psp = *mp.ExtractData<MaterialPointData>();
 
 	// get the in-situ stretch
-	double lam = InSituStretch(mp);
+	double lam = m_lam(mp);
+
+	// get the fiber vector
+	vec3d a0 = m_fiber->unitVector(mp);
+	mat3d Q = GetLocalCS(mp);
+	vec3d at = Q * a0;
 
 	// set-up local uni-axial stretch tensor
 	double l = lam;
 	double li = (m_biso ? 1.0/sqrt(l) : 1.0);
-	mat3d U(l, 0.0, 0.0, 0.0, li, 0.0, 0.0, 0.0, li);
-
-	// get the coordinate transformation
-	mat3d Q = GetLocalCS(mp);
-	mat3d Qt = Q.transpose();
-
-	// rotate stretch tensor to global coordinates
-	mat3d F_bar = Q*U*Qt;
+	
+	// setup prestrain tensor: Fp = lam*A + li*(I - A);
+	mat3dd I(1.0);
+	mat3ds A = dyad(at);
+	mat3d F_bar = A * lam + (I - A)*li;
 
 	return F_bar;
 }
@@ -111,8 +89,7 @@ mat3d FEInSituStretchGradient::Prestrain(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 void FEInSituStretchGradient::Initialize(const mat3d& F, FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
-	FEInSituStretchGradient::MaterialPointData* ptis = mp.ExtractData<FEInSituStretchGradient::MaterialPointData>();
+/*	FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 
 	// calculate left polar decomposition
 	mat3d R;
@@ -140,4 +117,5 @@ void FEInSituStretchGradient::Initialize(const mat3d& F, FEMaterialPoint& mp)
 	Q(1,0) = a1.y; Q(1,1) = a2.y; Q(1,2) = a3.y;
 	Q(2,0) = a1.z; Q(2,1) = a2.z; Q(2,2) = a3.z;
 //	pt->m_Q = Q;
+*/
 }

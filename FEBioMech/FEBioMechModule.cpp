@@ -532,7 +532,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FE2OMicroConstraint, "2O microfluc");
 	REGISTER_FECORE_CLASS(FEGPAConstraint, "prestrain");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint, "in-situ stretch");
-	REGISTER_FECORE_CLASS(FEInSituStretchConstraint2, "in-situ stretch2");
 	REGISTER_FECORE_CLASS(FEAzimuthConstraint, "azimuth constraint");
 
 	// Lagrange multiplier constraints
