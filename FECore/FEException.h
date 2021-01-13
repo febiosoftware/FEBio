@@ -60,8 +60,12 @@ public:
 
 	static bool DoOutput();
 
+	static void clearFlag();
+	static bool IsThrown();
+
 public:
 	static bool m_boutput;	//!< set to false to suppress output of negative jacobians
+	static bool m_bthrown;
 };
 
 class FECORE_API ZeroDiagonal : public FEException

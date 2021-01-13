@@ -132,7 +132,7 @@ FEBioModel::FEBioModel()
 	m_dumpLevel = FE_DUMP_NEVER;
 
 	// --- I/O-Data ---
-	m_debug = false;
+	m_ndebug = 0;
 	m_becho = true;
 	m_plot = nullptr;
 	m_writeMesh = false;
@@ -174,10 +174,10 @@ int FEBioModel::GetLinearSolverTime()
 
 //-----------------------------------------------------------------------------
 //! set the debug level
-void FEBioModel::SetDebugFlag(bool b) { m_debug = b; }
+void FEBioModel::SetDebugLevel(int debugLvl) { m_ndebug = debugLvl; }
 
 //! get the debug level
-bool FEBioModel::GetDebugFlag() { return m_debug; }
+int FEBioModel::GetDebugLevel() { return m_ndebug; }
 
 //! set the dump level (for cold restarts)
 void FEBioModel::SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
@@ -538,7 +538,7 @@ void FEBioModel::Write(unsigned int nwhen)
 				bool bout = false;
 
 				// see if we need to output something
-				bool bdebug = GetDebugFlag();
+				int ndebug = GetDebugLevel();
 
 				// update flag
 				static int lastUpdate = -1;
@@ -550,7 +550,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					lastUpdate = -1;
 				}
 
-				if (bdebug)
+				if (ndebug == 1)
 				{
 					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_MINOR_ITERS) || (nwhen == CB_SOLVED) || (nwhen == CB_REMESH))
 					{
@@ -576,7 +576,16 @@ void FEBioModel::Write(unsigned int nwhen)
 
 					switch (nwhen)
 					{
-					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
+					case CB_MINOR_ITERS: 
+					{
+						if (nplt == FE_PLOT_MINOR_ITRS) bout = true;
+						if ((ndebug == 2) && (NegativeJacobian::IsThrown()))
+						{
+							bout = true;
+							NegativeJacobian::clearFlag();
+						}
+					}
+					break;
 					case CB_MAJOR_ITERS  : 
 						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true; 
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;

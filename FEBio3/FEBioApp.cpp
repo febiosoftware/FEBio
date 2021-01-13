@@ -155,7 +155,7 @@ int FEBioApp::RunModel()
 	fem.AddCallback(break_point_cb, CB_ALWAYS, 0);
 
 	// set options that were passed on the command line
-	fem.SetDebugFlag(m_ops.bdebug);
+	fem.SetDebugLevel(m_ops.ndebug);
 	fem.SetDumpLevel(m_ops.dumpLevel);
 
 	// set the output filenames
@@ -226,7 +226,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	CMDOPTIONS& ops = m_ops;
 
 	// set default options
-	ops.bdebug = false;
+	ops.ndebug = 0;
 	ops.bsplash = true;
 	ops.bsilent = false;
 	ops.binteractive = true;
@@ -326,7 +326,11 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else if (strcmp(sz, "-g") == 0)
 		{
-			ops.bdebug = true;
+			ops.ndebug = 1;
+		}
+		else if (strcmp(sz, "-g2") == 0)
+		{
+			ops.ndebug = 2;
 		}
 		else if (strcmp(sz, "-nosplash") == 0)
 		{

@@ -375,17 +375,17 @@ int FEBioCmd_Debug::run(int nargs, char** argv)
 	}
 
 	FEAnalysis* pstep = fem->GetCurrentStep();
-	bool bdebug = fem->GetDebugFlag();
-	if (nargs == 1) bdebug = !bdebug;
+	int ndebug = fem->GetDebugLevel();
+	if (nargs == 1) ndebug = (ndebug? 0 : 1);
 	else
 	{
-		if (strcmp(argv[1], "on") == 0) bdebug = true;
-		else if (strcmp(argv[1], "off") == 0) bdebug = false;
+		if (strcmp(argv[1], "on") == 0) ndebug = 0;
+		else if (strcmp(argv[1], "off") == 0) ndebug = 1;
 		else { fprintf(stderr, "%s is not a valid option for debug.\n", argv[1]); return 0; }
 	}
-	fem->SetDebugFlag(bdebug);
+	fem->SetDebugLevel(ndebug);
 
-	printf("Debug mode is %s\n", (bdebug?"on":"off"));
+	printf("Debug mode is %s\n", (ndebug?"on":"off"));
 	return 0;
 }
 
