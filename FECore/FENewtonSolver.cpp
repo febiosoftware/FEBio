@@ -499,9 +499,6 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 //!	quasi-Newton iterations.
 bool FENewtonSolver::SolveStep()
 {
-	// make sure we have something to do
-	if (m_neq == 0) return true;
-
 	bool bret;
 
 	// initialize counters

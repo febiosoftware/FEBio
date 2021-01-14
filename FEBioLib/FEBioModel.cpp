@@ -145,6 +145,8 @@ FEBioModel::FEBioModel()
 	m_pltCompression = 0;
 	m_pltAppendOnRestart = true;
 
+	m_lastUpdate = -1;
+
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
 	AddCallback(output_cb, CB_ALWAYS, this);
@@ -540,14 +542,11 @@ void FEBioModel::Write(unsigned int nwhen)
 				// see if we need to output something
 				int ndebug = GetDebugLevel();
 
-				// update flag
-				static int lastUpdate = -1;
-
 				// write a new mesh section if needed
 				if (nwhen == CB_REMESH)
 				{
 					m_writeMesh = true;
-					lastUpdate = -1;
+					m_lastUpdate = -1;
 				}
 
 				if (ndebug == 1)
@@ -616,9 +615,9 @@ void FEBioModel::Write(unsigned int nwhen)
 				}
 
 				// output the state if requested
-				if (bout && (lastUpdate != UpdateCounter()) )
+				if (bout && (m_lastUpdate != UpdateCounter()) )
 				{
-					lastUpdate = UpdateCounter();
+					m_lastUpdate = UpdateCounter();
 
 					// update the plot objects
 					UpdatePlotObjects();
@@ -1376,6 +1375,7 @@ bool FEBioModel::Init()
 	}
 
 	FEBioPlotFile* pplt = nullptr;
+	m_lastUpdate = -1;
 
 	// open plot database file
 	FEAnalysis* step = GetCurrentStep();

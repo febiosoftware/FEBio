@@ -226,6 +226,7 @@ protected:
 	vector<FEPlotVariable>	m_pltData;
 	int						m_pltCompression;
 	bool					m_pltAppendOnRestart;
+	int						m_lastUpdate;
 
 private:
 	Logfile	m_log;
