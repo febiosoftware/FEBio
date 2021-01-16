@@ -269,6 +269,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemSoluteFluxY           , "jy");
 	REGISTER_FECORE_CLASS(FELogElemSoluteFluxZ           , "jz");
 	REGISTER_FECORE_CLASS(FELogElemSoluteRefConcentration, "crc");
+	REGISTER_FECORE_CLASS(FELogFixedChargeDensity        , "cF");
 
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteConcentration_T, 0, "c1");
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteConcentration_T, 1, "c2");

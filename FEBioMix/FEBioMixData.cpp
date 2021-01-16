@@ -160,6 +160,19 @@ double FELogElemSoluteRefConcentration::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogFixedChargeDensity::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_cF;
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemSoluteConcentration_::value(FEElement& el)
 {
 	double val = 0.0;
