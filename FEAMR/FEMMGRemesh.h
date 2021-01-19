@@ -31,6 +31,11 @@ class FEMMGRemesh : public FERefineMesh
 {
 	class MMG;
 
+	enum TransferMethod {
+		TRANSFER_SHAPE,
+		TRANSFER_MLQ
+	};
+
 public:
 	FEMMGRemesh(FEModel* fem);
 

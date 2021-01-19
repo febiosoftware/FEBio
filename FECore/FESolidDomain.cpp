@@ -83,7 +83,8 @@ FESolidElement& FESolidDomain::Element(int n) { return m_Elem[n]; }
 //-----------------------------------------------------------------------------
 void FESolidDomain::CopyFrom(FEMeshPartition* pd)
 {
-    FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
+	FEDomain::CopyFrom(pd);
+	FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
     m_Elem = psd->m_Elem;
 	ForEachElement([=](FEElement& el) { el.SetMeshPartition(this); });
 }
