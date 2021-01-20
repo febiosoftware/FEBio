@@ -42,6 +42,9 @@ END_FECORE_CLASS();
 
 FEFiberExpPowUncoupled::FEFiberExpPowUncoupled(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
 { 
+	m_ksi = 0.0;
+	m_alpha = 0.0;
+	m_beta = 2.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -60,6 +63,8 @@ mat3ds FEFiberExpPowUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d& 
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
+
+	double ksi = m_ksi(mp);
 	
 	// only take fibers in tension into consideration
 	if (In_1 >= eps)
@@ -71,7 +76,7 @@ mat3ds FEFiberExpPowUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d& 
 		mat3ds N = dyad(nt);
 		
 		// calculate strain energy derivative
-		double Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -102,6 +107,8 @@ tens4ds FEFiberExpPowUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
 	
+	double ksi = m_ksi(mp);
+
 	// only take fibers in tension into consideration
 	if (In_1 >= eps)
 	{
@@ -114,8 +121,8 @@ tens4ds FEFiberExpPowUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d
 		
 		// calculate strain energy derivatives
 		double tmp = m_alpha*pow(In_1, m_beta);
-		double Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
-		double Wll = m_ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
+		double Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wll = ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -151,16 +158,18 @@ double FEFiberExpPowUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, 
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
 	
+	double ksi = m_ksi(mp);
+
 	// only take fibers in tension into consideration
 	const double eps = 0;
 	if (In_1 >= eps)
 	{
 		// calculate strain energy derivative
         if (m_alpha > 0) {
-            sed = m_ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
+            sed = ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
         }
         else
-            sed = m_ksi/m_beta*pow(In_1, m_beta);
+            sed = ksi/m_beta*pow(In_1, m_beta);
 	}
     
     return sed;
