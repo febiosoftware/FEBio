@@ -409,6 +409,9 @@ void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<dou
 void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
+    
+    int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
     for (int i=0; i<NE; ++i)
     {
         vector<double> fe;
@@ -418,8 +421,6 @@ void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, 
         FESolidElement& el = m_Elem[i];
         
         // get the element force vector and initialize it to zero
-        int nsol = m_pMat->Solutes();
-        int ndpn = 4+nsol;
         int ndof = ndpn*el.Nodes();
         fe.assign(ndof, 0);
         
@@ -440,8 +441,8 @@ void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, 
 void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
 {
     // jacobian
-    double detJ;
-    double *H;
+    double Ji[3][3], detJ;
+    const double *H, *Gr, *Gs, *Gt;
     double* gw = el.GaussWeights();
     vec3d f;
     
@@ -449,6 +450,9 @@ void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& e
     int neln = el.Nodes();
     int nsol = m_pMat->Solutes();
     int ndpn = 4+nsol;
+    
+    // gradient of shape functions
+    vector<vec3d> gradN(neln);
 
     // nodal coordinates
     vec3d r0[FEElement::MAX_NODES];
@@ -461,22 +465,53 @@ void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& e
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
         double dens = m_pMat->Fluid()->Density(mp);
         
         pt.m_r0 = el.Evaluate(r0, n);
         
-        detJ = detJ0(el, n)*gw[n];
+        detJ = invjac0(el, Ji, n)*gw[n];
+        
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
         // get the force
         f = BF.force(mp);
         
         H = el.H(n);
+        Gr = el.Gr(n);
+        Gs = el.Gs(n);
+        Gt = el.Gt(n);
+        
+        double R = m_pMat->m_Rgas;
+        double T = m_pMat->m_Tabs;
+        double dms = m_pMat->m_diffMtmSupp;
+        
+        // evaluate spatial gradient of shape functions
+        for (int i=0; i<neln; ++i)
+        {
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+        }
         
         for (int i=0; i<neln; ++i)
         {
-            fe[ndpn*i  ] -= H[i]*dens*f.x*detJ;
-            fe[ndpn*i+1] -= H[i]*dens*f.y*detJ;
-            fe[ndpn*i+2] -= H[i]*dens*f.z*detJ;
+            vec3d fs = f*H[i]*dens;
+            for(int isol = 0; isol<nsol; ++isol)
+            {
+                double M = m_pMat->GetSolute(isol)->MolarMass();
+                fs += f*H[i]*spt.m_k[isol]*spt.m_c[isol]*M*dms;
+            }
+            
+            fe[ndpn*i  ] -= fs.x*detJ;
+            fe[ndpn*i+1] -= fs.y*detJ;
+            fe[ndpn*i+2] -= fs.z*detJ;
+            for (int isol=0; isol<nsol; ++isol)
+            {
+                double d0 = m_pMat->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
+                double M = m_pMat->GetSolute(isol)->MolarMass();
+                fe[ndpn*i+4+isol] -= -gradN[i]*f*d0*M*spt.m_c[isol]/(R*T)*detJ;
+            }
         }
     }
 }
@@ -485,17 +520,19 @@ void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& e
 //! This function calculates the stiffness due to body forces
 void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke, const FETimeInfo& tp)
 {
-    int neln = el.Nodes();
-    int ndpn = ke.columns()/neln;
-    
     // jacobian
-    double detJ;
-    double *H;
+    double Ji[3][3], detJ;
+    const double *H, *Gr, *Gs, *Gt;
     double* gw = el.GaussWeights();
+    
+    // number of nodes
+    int neln = el.Nodes();
+    int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
     vec3d f, k;
     
     // gradient of shape functions
-    vec3d gradN;
+    vector<vec3d> gradN(neln);
     
     // loop over integration points
     int nint = el.GaussPoints();
@@ -503,26 +540,68 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        FEFluidSolutesMaterialPoint& spt = *(mp.ExtractData<FEFluidSolutesMaterialPoint>());
         
         // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
+        detJ = invjac0(el, Ji, n)*gw[n]*tp.alphaf;
         
         H = el.H(n);
         
         double dens = m_pMat->Fluid()->Density(mp);
+        double R = m_pMat->m_Rgas;
+        double T = m_pMat->m_Tabs;
+        double dms = m_pMat->m_diffMtmSupp;
         
         // get the force
         f = BF.force(mp);
         
-        H = el.H(n);
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
-        for (int i=0; i<neln; ++i) {
-            for (int j=0; j<neln; ++j)
+        H = el.H(n);
+        Gr = el.Gr(n);
+        Gs = el.Gs(n);
+        Gt = el.Gt(n);
+        
+        // evaluate spatial gradient of shape functions
+        for (int i=0; i<neln; ++i)
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+        
+        for (int i=0, i4=0; i<neln; ++i, i4 += ndpn) {
+            for (int j=0, j4 = 0; j<neln; ++j, j4 += ndpn)
             {
                 k = f*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
-                ke[ndpn*i  ][ndpn*j+3] += k.x;
-                ke[ndpn*i+1][ndpn*j+3] += k.y;
-                ke[ndpn*i+2][ndpn*j+3] += k.z;
+                ke[i4  ][j4+3] += k.x;
+                ke[i4+1][j4+3] += k.y;
+                ke[i4+2][j4+3] += k.z;
+                
+                for (int isol = 0; isol<nsol; ++isol)
+                {
+                    double M = m_pMat->GetSolute(isol)->MolarMass();
+                    double d0 = m_pMat->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
+                    vec3d kvc;
+                    for(int jsol=0; jsol<nsol; ++jsol)
+                    {
+                        double M2 = m_pMat->GetSolute(jsol)->MolarMass();
+                        double d0p = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, jsol);
+                        double kcc = 0;
+                        if (isol == jsol)
+                        {
+                            kvc += f*(spt.m_dkdc[isol][isol]*spt.m_c[isol]+spt.m_k[isol])*M*H[i]*H[j];
+                            kcc = -gradN[i]*f*(d0p*spt.m_c[isol]+d0)*M*H[j]/(R*T);
+                        }
+                        else
+                        {
+                            kvc += f*spt.m_c[jsol]*spt.m_dkdc[jsol][isol]*M2*H[i]*H[j];
+                            kcc = -gradN[i]*f*H[j]*d0p*M*spt.m_c[isol]/(R*T);
+                        }
+                        ke[i4+4+isol][j4+4+jsol] += kcc*detJ;
+                    }
+                    ke[i4  ][j4+4+isol] += kvc.x*detJ*dms;
+                    ke[i4+1][j4+4+isol] += kvc.y*detJ*dms;
+                    ke[i4+2][j4+4+isol] += kvc.z*detJ*dms;
+                }
             }
         }
     }
@@ -656,9 +735,27 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
                     double kappa = spt.m_k[isol];
                     vec3d kcv = gradN[i]*H[j]*spt.m_c[isol];
                     //vec3d kvc = gradN[i]*R*T*H[j]*(-dodc[isol]*kappa*spt.m_c[isol]-osmc*kappa); //mixture mtm bal
-                    vec3d kvc = gradN[j]*kappa*R*T*H[i]*dms; //fluid mtm bal
+                    vec3d kvc = vec3d(0); //fluid mtm bal
                     double kJc = H[i]*H[j]*dphiwhatdc[isol];
                     int irow = i4+4+isol;
+                    
+                    for(int jsol=0; jsol<nsol; ++jsol)
+                    {
+                        double kcc = 0;
+                        double d0p = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, jsol);
+                        if (isol == jsol)
+                        {
+                            //TODO: add partition coeff terms
+                            kvc += (spt.m_gradc[isol]*spt.m_dkdc[isol][isol]*H[j]+gradN[j]*spt.m_k[isol])*H[i]*R*T;
+                            kcc = -(ksi/dt*m_btrans*kappa-dchatdc[isol][jsol])*H[i]*H[j]-gradN[i]*spt.m_gradc[isol]*H[j]*d0p+gradN[i]*(-gradN[j]*d0+pt.m_vft*H[j]);
+                        }
+                        else
+                        {
+                            kvc += spt.m_gradc[jsol]*spt.m_dkdc[jsol][isol]*H[i]*H[j]*R*T;
+                            kcc = H[i]*H[j]*dchatdc[isol][jsol] + (-gradN[i]*spt.m_gradc[isol]*d0p)*H[j];
+                        }
+                        ke[irow][j4+4+jsol] += kcc*detJ;
+                    }
                     ke[i4  ][j4+4+isol] += kvc.x*detJ;
                     ke[i4+1][j4+4+isol] += kvc.y*detJ;
                     ke[i4+2][j4+4+isol] += kvc.z*detJ;
@@ -666,18 +763,6 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
                     ke[irow][j4  ] += kcv.x*detJ;
                     ke[irow][j4+1] += kcv.y*detJ;
                     ke[irow][j4+2] += kcv.z*detJ;
-                    
-                    for(int jsol=0; jsol<nsol; ++jsol)
-                    {
-                        double kcc = 0;
-                        double d0p = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, jsol);
-                        if (isol == jsol)
-                            //TODO: add partition coeff terms
-                            kcc = -(ksi/dt*m_btrans*kappa-dchatdc[isol][jsol])*H[i]*H[j]-gradN[i]*spt.m_gradc[isol]*H[j]*d0p+gradN[i]*(-gradN[j]*d0+pt.m_vft*H[j]);
-                        else
-                            kcc = H[i]*H[j]*dchatdc[isol][jsol] + (-gradN[i]*spt.m_gradc[isol]*d0p)*H[j];
-                        ke[irow][j4+4+jsol] += kcc*detJ;
-                    }
                 }
             }
         }
