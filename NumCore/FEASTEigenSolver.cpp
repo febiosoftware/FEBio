@@ -27,14 +27,17 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEASTEigenSolver.h"
 #include "CompactSymmMatrix.h"
-#undef PARDISO
-#include <mkl.h>
+
 
 BEGIN_FECORE_CLASS(FEASTEigenSolver, EigenSolver)
 	ADD_PARAMETER(m_m0, "m0");
 	ADD_PARAMETER(m_emin, "emin");
 	ADD_PARAMETER(m_emax, "emax");
 END_FECORE_CLASS();
+
+#ifdef MKL_ISS
+#undef PARDISO
+#include <mkl.h>
 
 FEASTEigenSolver::FEASTEigenSolver(FEModel* fem) : EigenSolver(fem)
 {
@@ -132,3 +135,8 @@ bool FEASTEigenSolver::EigenSolve(SparseMatrix* A, SparseMatrix* B, vector<doubl
 
 	return (info == 0);
 }
+#else 
+FEASTEigenSolver::FEASTEigenSolver(FEModel* fem) : EigenSolver(fem)  {}
+bool FEASTEigenSolver::Init() { return false; }
+bool FEASTEigenSolver::EigenSolve(SparseMatrix* A, SparseMatrix* B, vector<double>& eigenValues, matrix& eigenVectors) { return false; }
+#endif

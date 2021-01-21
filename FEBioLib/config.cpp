@@ -46,6 +46,7 @@ SOFTWARE.*/
 #include <dlfcn.h>
 #endif
 
+
 #ifdef WIN32
 extern "C" void __cdecl omp_set_num_threads(int);
 #else

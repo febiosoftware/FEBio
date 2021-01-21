@@ -555,7 +555,7 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
         
         // evaluate spatial gradgrad of shape functions
-        for (int i=0; i<neln; ++i) {
+        for (i=0; i<neln; ++i) {
             gradgradN[i] = (((dg[0][0] & g[0]) + (dg[0][1] & g[1]) + (dg[0][2] & g[2]))*Gr[i]
                             + ((dg[1][0] & g[0]) + (dg[1][1] & g[1]) + (dg[1][2] & g[2]))*Gs[i]
                             + ((dg[2][0] & g[0]) + (dg[2][1] & g[1]) + (dg[2][2] & g[2]))*Gt[i]
@@ -579,7 +579,7 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
                 
                 mat3d Kuu = (sv*((gradN[j]&gradN[i])*phis) - (-((sv*gradN[i])&gradN[j])*phis/phif + vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M))*phis - vdotTdotv(gradN[i], cv, fpt.m_w*phis/(phif*phif)) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif)) + vdotTdotv(gradN[i], cv, fpt.m_w*phis*phis/(phif*phif)) * ((-bpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) - (((sv*bpt.m_gradJ)*phis/(et.m_J*phif*phif))&gradN[j])*H[i] + (-((sv*bpt.m_gradJ)&gradN[j])*phis/phif + vdotTdotv(bpt.m_gradJ, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M))*phis/(phif*et.m_J)*H[i] + vdotTdotv(bpt.m_gradJ, cv, fpt.m_w*phis/(phif*phif*phif*et.m_J)*H[i]) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif)) - vdotTdotv(bpt.m_gradJ, cv, fpt.m_w*phis*phis/(phif*phif*phif*et.m_J)*H[i]) * ((-bpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + sv*((bpt.m_gradJ&gradN[j]) - (gradN[j]&bpt.m_gradJ) + gradgradN[j]*et.m_J)*H[i]*phis/(phif*et.m_J) + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //mixture 3 adjusted viscous stress
                 
-                mat3d Kuw = (vdotTdotv(gradN[i], cv, (gradphif*H[j]/phif-gradN[j]))*phis/phif + vdotTdotv((-gradphif*H[j]/phif + gradN[j]), cv, bpt.m_gradJ)*H[i]*phis/(phif*et.m_J) - km1*H[i]*H[j])*detJ; //mixture 3 adjusted stress
+                mat3d Kuw = (vdotTdotv(gradN[i], cv, (gradphif*H[j]/phif-gradN[j]))*phis/phif + vdotTdotv((-gradphif*H[j]/phif + gradN[j]), cv, bpt.m_gradJ)*H[i]*phis/(phif*phif*et.m_J) - km1*H[i]*H[j])*detJ; //mixture 3 adjusted stress
                 
                 vec3d kuJ = ((-svJ*gradN[i])*H[j]*phis + svJ*bpt.m_gradJ*H[j]*H[i]*phis/(phif*et.m_J))*detJ; //mixture 3 adjusted stress
                 
@@ -806,7 +806,7 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
         
         // evaluate spatial gradgrad of shape functions
-        for (int i=0; i<neln; ++i) {
+        for (i=0; i<neln; ++i) {
             gradgradN[i] = (((dg[0][0] & g[0]) + (dg[0][1] & g[1]) + (dg[0][2] & g[2]))*Gr[i]
                             + ((dg[1][0] & g[0]) + (dg[1][1] & g[1]) + (dg[1][2] & g[2]))*Gs[i]
                             + ((dg[2][0] & g[0]) + (dg[2][1] & g[1]) + (dg[2][2] & g[2]))*Gt[i]
@@ -827,7 +827,7 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
                 
                 mat3d Kuu = ((mat3dd(b*H[j]*dtrans))*denss*H[i] + (((et.m_a*phis)&gradN[j]) + mat3dd(b*phif*H[j]*dtrans) - ((fpt.m_w&gradN[j]) * (-1.0/phif*dJsoJ + a*dtrans) - (fpt.m_w&(et.m_L.transpose()*gradN[j]*dtrans)))*phis/phif + mat3dd(gradN[j]*fpt.m_w*a*dtrans) - ((bpt.m_Lw*fpt.m_w)&gradN[j])*phis/(phif*phif) + ((fpt.m_w&gradN[j])*((gradphif*2.0/phif + bpt.m_gradJ/et.m_J)*fpt.m_w) - (fpt.m_w&(gradgradN[j].transpose()*fpt.m_w)))*phis/(phif*phif) - pt.m_Lf*(mat3dd(gradN[j]*fpt.m_w)) - (pt.m_aft&gradN[j])*phis)*(-H[i]*densTf*phis/phif))*detJ; //mixture 2
                 
-                mat3d Kuw = ((mat3dd(c*dtrans-phis/phif*dJsoJ-(gradphif*fpt.m_w)/(phif*phif))+pt.m_Lf)*H[j] + mat3dd(gradN[j]*fpt.m_w)/phif)*(-H[i]*densTf*phis*detJ); //mixture 2
+                mat3d Kuw = ((mat3dd(c*dtrans-phis/phif*dJsoJ-(gradphif*fpt.m_w)/(phif*phif))+pt.m_Lf)*H[j] + mat3dd(gradN[j]*fpt.m_w)/phif)*(-H[i]*densTf/phif*phis*detJ); //mixture 2
                 
                 vec3d kuJ = pt.m_aft*(densTf/pt.m_Jf*H[i]*H[j]*phis*detJ); //mixture 2
                 mat3d Kwu = (((et.m_a&gradN[j])*phis + mat3dd(b*phif*H[j]*dtrans) - ((fpt.m_w&gradN[j]) * (-1.0/phif*dJsoJ + a*dtrans) - (fpt.m_w&(et.m_L.transpose()*gradN[j]*dtrans)))*phis/phif + mat3dd(gradN[j]*fpt.m_w*a*dtrans) - ((bpt.m_Lw*fpt.m_w)&gradN[j])*phis/(phif*phif) + ((fpt.m_w&gradN[j])*((gradphif*2.0/phif + bpt.m_gradJ/et.m_J)*fpt.m_w) - (fpt.m_w&(gradgradN[j].transpose()*fpt.m_w)))*phis/(phif*phif) - pt.m_Lf*mat3dd(gradN[j]*fpt.m_w))*(H[i]*densTf/phif) + (pt.m_aft&gradN[j])*H[i]*densTf*(1.0-phis/phif))*detJ;

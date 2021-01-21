@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEFluidFSIDomainFactory.h"
 #include "FEBackFlowFSIStabilization.h"
 #include "FETangentialFlowFSIStabilization.h"
+#include "FEBiphasicFSITraction.h"
 #include "FEBiphasicFSI.h"
 #include "FEBiphasicFSIDomain3D.h"
 
@@ -81,6 +82,8 @@ void FEBioFSI::InitModule()
 	REGISTER_FECORE_CLASS(FEFluidFSIDomain3D, "fluid-FSI-3D");
 
 	REGISTER_FECORE_CLASS(FEFluidFSITraction, "fluid-FSI traction");
+    
+    REGISTER_FECORE_CLASS(FEBiphasicFSITraction, "biphasic-FSI traction");
     
     REGISTER_FECORE_CLASS(FEBackFlowFSIStabilization, "fluid backflow stabilization");
     

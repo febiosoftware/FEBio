@@ -64,8 +64,10 @@ SparseMatrix* ILU0_Preconditioner::CreateSparseMatrix(Matrix_Type ntype)
 	return m_K;
 }
 
+#ifdef MKL_ISS
 bool ILU0_Preconditioner::Factor()
 {
+
 	if (m_K == 0) return false;
 	assert(m_K->Offset() == 1);
 
@@ -95,7 +97,7 @@ bool ILU0_Preconditioner::Factor()
 	if (ierr != 0) return false;
 
 	return true;
-}
+} 
 
 bool ILU0_Preconditioner::BackSolve(double* x, double* y)
 {
@@ -114,3 +116,8 @@ bool ILU0_Preconditioner::BackSolve(double* x, double* y)
 
 	return true;
 }
+
+#else
+bool ILU0_Preconditioner::Factor() { return false; }
+bool ILU0_Preconditioner::BackSolve(double* x, double* y) { return false; }
+#endif
