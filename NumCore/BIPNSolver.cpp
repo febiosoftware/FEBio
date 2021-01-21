@@ -593,18 +593,34 @@ int BIPNSolver::gmressolve(SparseMatrix* K, LinearSolver* PC, vector<double>& x,
 }
 
 #else	// ifdef MKL_ISS
+BEGIN_FECORE_CLASS(BIPNSolver, LinearSolver)
+	ADD_PARAMETER(m_maxiter, "maxiter");
+	ADD_PARAMETER(m_tol, "tol");
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_use_cg, "use_cg");
+	ADD_PARAMETER(m_cg_maxiter, "cg_maxiter");
+	ADD_PARAMETER(m_cg_tol, "cg_tol");
+	ADD_PARAMETER(m_cg_doResidualTest, "cg_check_residual");
+	ADD_PARAMETER(m_gmres_maxiter, "gmres_maxiter");
+	ADD_PARAMETER(m_gmres_tol, "gmres_tol");
+	ADD_PARAMETER(m_gmres_doResidualTest, "gmres_check_residual");
+	ADD_PARAMETER(m_gmres_pc, "gmres_precondition");
+	ADD_PARAMETER(m_do_jacobi, "do_jacobi");
+	ADD_PARAMETER(m_precondition_schur, "precondition_schur");
+END_FECORE_CLASS();
 
-BIPNSolver::BIPNSolver() : LinearSolver(fem), m_A(0) {}
+BIPNSolver::BIPNSolver(FEModel* fem) : LinearSolver(fem), m_A(0) {}
 bool BIPNSolver::PreProcess() { return false; }
 bool BIPNSolver::Factor() { return false; }
 bool BIPNSolver::BackSolve(double* x, double* b) { return false; }
 SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
 void BIPNSolver::SetPrintLevel(int n) {}
 void BIPNSolver::SetMaxIterations(int n) {}
-void BIPNSolver::SetPartition(int n) {}
 void BIPNSolver::SetTolerance(double eps) {}
 void BIPNSolver::UseConjugateGradient(bool b) {}
 void BIPNSolver::SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest) {}
-void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition) {}
-
+void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, int precondition) {}
+void BIPNSolver::DoJacobiPreconditioner(bool b) {}
+void BIPNSolver::SetSchurPreconditioner(int n) {}
+bool BIPNSolver::SetSparseMatrix(SparseMatrix* A) { return false; }
 #endif

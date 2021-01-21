@@ -66,6 +66,8 @@ SparseMatrix* ILUT_Preconditioner::CreateSparseMatrix(Matrix_Type ntype)
 	return m_K;
 }
 
+#ifdef MKL_ISS
+
 bool ILUT_Preconditioner::Factor()
 {
 	if (m_K == 0) return false;
@@ -120,3 +122,7 @@ bool ILUT_Preconditioner::BackSolve(double* x, double* y)
 
 	return true;
 }
+#else
+bool ILUT_Preconditioner::Factor() { return false; }
+bool ILUT_Preconditioner::BackSolve(double* x, double* y) { return false; }
+#endif

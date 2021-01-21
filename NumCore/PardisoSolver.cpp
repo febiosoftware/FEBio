@@ -319,5 +319,21 @@ void PardisoSolver::Destroy()
 	}
 	m_isFactored = false;
 }
+#else 
+BEGIN_FECORE_CLASS(PardisoSolver, LinearSolver)
+	ADD_PARAMETER(m_print_cn, "print_condition_number");
+	ADD_PARAMETER(m_iparm3, "precondition");
+END_FECORE_CLASS();
 
+PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem) {}
+PardisoSolver::~PardisoSolver() {}
+bool PardisoSolver::PreProcess() { return false; }
+bool PardisoSolver::Factor() { return false; }
+bool PardisoSolver::BackSolve(double* x, double* y) { return false; }
+void PardisoSolver::Destroy() {}
+SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
+bool PardisoSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
+void PardisoSolver::PrintConditionNumber(bool b) {}
+double PardisoSolver::condition_number() { return 0; }
+void PardisoSolver::UseIterativeFactorization(bool b) {}
 #endif

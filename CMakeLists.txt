@@ -7,7 +7,7 @@ project(FEBio)
 
 ##### Set appropriate flag for operating system ####
 if(WIN32)
-	set(DEF -DWIN32)
+	set(DEF -DWIN32 /MP /openmp)
 elseif(APPLE)
     set(DEF -D__APPLE__)
 else()
@@ -358,25 +358,48 @@ add_executable (febio3 ${SOURCES})
 
 ##### Set dev commit information #####
 
-execute_process(COMMAND git rev-parse --abbrev-ref HEAD
-    RESULT_VARIABLE SUCCESS
-    OUTPUT_VARIABLE BRANCH_NAME)
+# Cross platform execute_process
+macro(crossExecProcess CMD OUT)
+	if(WIN32)
+		execute_process(COMMAND cmd.exe /c ${CMD}
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			RESULT_VARIABLE SUCCESS
+			OUTPUT_VARIABLE ${OUT}
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+	else()
+		execute_process(COMMAND ${CMD}
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			RESULT_VARIABLE SUCCESS
+			OUTPUT_VARIABLE ${OUT}
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+	endif()
+endmacro()
 
-string(STRIP ${BRANCH_NAME} BRANCH_NAME)
-string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
-    
-if(SUCCESS EQUAL 0 AND ISDEVELOP)
-    execute_process(COMMAND git rev-parse --short HEAD
-        RESULT_VARIABLE SUCCESS
-        OUTPUT_VARIABLE DEVCOMMIT)
-    
-    string(STRIP ${DEVCOMMIT} DEVCOMMIT)
-    
-    if(${SUCCESS} EQUAL 0)
-        target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
-    endif()
+# Check for git and give warning if not available
+if(WIN32)
+	crossExecProcess("where git" NULL)
+else()
+	crossExecProcess("which git" NULL)
 endif()
 
+if(SUCCESS EQUAL 0)
+	# Get branch name and check if we're on the develop branch
+	crossExecProcess("git rev-parse --abbrev-ref HEAD" BRANCH_NAME)
+
+	string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
+	
+	# Get the commit info and set the DEVCOMMIT macro
+	if(SUCCESS EQUAL 0 AND ISDEVELOP)
+			
+		crossExecProcess("git rev-parse --short HEAD" DEVCOMMIT)
+		
+		if(${SUCCESS} EQUAL 0)
+			target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
+		endif()
+	endif()
+else()
+	message(WARNING "Could not find git in system PATH. Development version info will not be addded.")
+endif()
 
 ##### Linking options #####
 
@@ -430,6 +453,10 @@ endif(USE_TETGEN)
 if(USE_ZLIB)
 	target_link_libraries(febio3 ${ZLIB_LIBRARY_RELEASE})
 endif(USE_ZLIB)
+
+if(WIN32)
+	target_link_libraries(febio3 Psapi.lib)
+endif()
 
 ##### Create febio.xml #####
 if(USE_MKL)

@@ -359,6 +359,8 @@ double CRSSparseMatrix::diag(int i)
 //-----------------------------------------------------------------------------
 bool CRSSparseMatrix::mult_vector(double* x, double* r)
 {
+#ifdef MKL_ISS
+
 	// get the matrix size
 	const int N = Rows();
 
@@ -386,6 +388,9 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 	}
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 //! calculate the abs row sum 

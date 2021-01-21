@@ -159,6 +159,7 @@ bool IncompleteCholesky::Factor()
 
 bool IncompleteCholesky::BackSolve(double* x, double* y)
 {
+#ifdef MKL_ISS
 	int ivar = m_L->Rows();
 	double* pa = m_L->Values();
 	int* ia = m_L->Pointers();
@@ -174,4 +175,7 @@ bool IncompleteCholesky::BackSolve(double* x, double* y)
 	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, pa, ia, ja, &z[0], &x[0]);
 
 	return true;
+#else 
+	return true;
+#endif
 }
