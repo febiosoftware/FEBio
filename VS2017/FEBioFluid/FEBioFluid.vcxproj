@@ -529,6 +529,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSITraction.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauYasudaFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.h" />
@@ -622,6 +623,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSITraction.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.cpp" />
