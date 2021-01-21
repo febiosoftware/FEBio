@@ -66,6 +66,8 @@ public:
 		m_gamma = 0.0;
 		m_gamma_prev = 0.0;
 		m_init = false;
+
+		FEMaterialPoint::Init();
 	}
 
 	void Update(const FETimeInfo& timeInfo) override

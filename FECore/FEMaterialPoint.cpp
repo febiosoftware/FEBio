@@ -94,6 +94,7 @@ void FEMaterialPointArray::AddMaterialPoint(FEMaterialPoint* pt)
 void FEMaterialPointArray::Init()
 {
 	for (int i = 0; i<(int)m_mp.size(); ++i) m_mp[i]->Init();
+	FEMaterialPoint::Init();
 }
 
 //-----------------------------------------------------------------------------
