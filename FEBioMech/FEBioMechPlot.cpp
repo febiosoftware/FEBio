@@ -62,6 +62,7 @@ SOFTWARE.*/
 #include "FEDiscreteElasticDomain.h"
 #include "FEContinuousElasticDamage.h"
 #include <FECore/FEMeshAdaptor.h> // for projectToNodes
+#include "FESlidingInterface.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -114,11 +115,31 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 {
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
- 
-	writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
-		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-		return (pt ? pt->m_gap : 0.0);
-	});
+
+	// NOTE: the sliding surface does not use material points, so we need this little hack. 
+	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
+	if (ss)
+	{
+		for (int i = 0; i < ss->Elements(); ++i)
+		{
+			FEElement& el = ss->Element(i);
+			double g = 0.0;
+			for (int j = 0; j < el.Nodes(); ++j)
+			{
+				double gj = ss->m_data[el.m_lnode[j]].m_gap;
+				g += gj;
+			}
+			g /= el.Nodes();
+			a << g;
+		}
+	}
+	else
+	{
+		writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			return (pt ? pt->m_gap : 0.0);
+		});
+	}
     return true;
 }
 
@@ -143,11 +164,31 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
 {
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
-    
-	writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-		return (pt ? pt->m_Ln : 0.0);
-	});
+
+	// NOTE: the sliding surface does not use material points, so we need this little hack. 
+	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
+	if (ss)
+	{
+		for (int i = 0; i < ss->Elements(); ++i)
+		{
+			FEElement& el = ss->Element(i);
+			double p = 0.0;
+			for (int j = 0; j < el.Nodes(); ++j)
+			{
+				double pj = ss->m_data[el.m_lnode[j]].m_Ln;
+				p += pj;
+			}
+			p /= el.Nodes();
+			a << p;
+		}
+	}
+	else
+	{
+		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			return (pt ? pt->m_Ln : 0.0);
+		});
+	}
 
     return true;
 }
