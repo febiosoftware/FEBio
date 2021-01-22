@@ -391,7 +391,7 @@ if(SUCCESS EQUAL 0)
 	# Get the commit info and set the DEVCOMMIT macro
 	if(SUCCESS EQUAL 0 AND ISDEVELOP)
 			
-		crossExecProcess("git rev-parse --short HEAD" DEVCOMMIT)
+		crossExecProcess("git rev-parse --short=9 HEAD" DEVCOMMIT)
 		
 		if(${SUCCESS} EQUAL 0)
 			target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
