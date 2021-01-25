@@ -62,7 +62,15 @@ bool FESolidDomain::Create(int nsize, FE_Element_Spec espec)
 	if (espec.etype != FE_ELEM_INVALID_TYPE)
 		ForEachElement([=](FEElement& el) { el.SetType(espec.etype); });
 
+	m_elemSpec = espec;
+
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+FE_Element_Spec FESolidDomain::GetElementSpec() const
+{
+	return m_elemSpec;
 }
 
 //-----------------------------------------------------------------------------

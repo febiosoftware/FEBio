@@ -73,6 +73,8 @@ public:
     int GetElementType() const { return m_Elem[0].Type(); }
     
     int GetElementShape() const { return m_Elem[0].Shape(); }
+
+	FE_Element_Spec GetElementSpec() const;
     
     //! find the element in which point y lies
     FESolidElement* FindElement(const vec3d& y, double r[3]);
@@ -269,6 +271,7 @@ public:
 
 protected:
     vector<FESolidElement>	m_Elem;		//!< array of elements
+	FE_Element_Spec			m_elemSpec;	//!< the element spec
 
 	FEDofList	m_dofU;
 	FEDofList	m_dofSU;
