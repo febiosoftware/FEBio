@@ -63,6 +63,7 @@ SOFTWARE.*/
 #include "FEContinuousElasticDamage.h"
 #include <FECore/FEMeshAdaptor.h> // for projectToNodes
 #include "FESlidingInterface.h"
+#include "FETiedContactSurface.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -132,14 +133,32 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 			g /= el.Nodes();
 			a << g;
 		}
+		return true;
 	}
-	else
+
+	FETiedContactSurface* ts = dynamic_cast<FETiedContactSurface*>(pcs);
+	if (ts)
 	{
-		writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
-			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-			return (pt ? pt->m_gap : 0.0);
-		});
+		for (int i = 0; i < ts->Elements(); ++i)
+		{
+			FEElement& el = ts->Element(i);
+			double g = 0.0;
+			for (int j = 0; j < el.Nodes(); ++j)
+			{
+				double gj = ts->m_data[el.m_lnode[j]].m_gap;
+				g += gj;
+			}
+			g /= el.Nodes();
+			a << g;
+		}
+		return true;
 	}
+
+	writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+		return (pt ? pt->m_gap : 0.0);
+	});
+	
     return true;
 }
 

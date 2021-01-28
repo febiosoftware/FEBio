@@ -428,12 +428,13 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
                 // calculate the gap function
                 vec3d g = q - r;
                 pt.m_dg = g - pt.m_Gap;
-                
+				pt.m_gap = pt.m_dg.norm();                
             }
             else
             {
                 // the node is not tied
                 pt.m_dg = vec3d(0,0,0);
+				pt.m_gap = 0.0;
             }
         }
     }

@@ -239,6 +239,7 @@ void FETiedInterface::Update()
 			// calculate the gap function
 			// (taking possible offset into account)
 			ss.m_data[i].m_vgap = (rt - q) - nu*ss.m_data[i].m_off;
+			ss.m_data[i].m_gap = ss.m_data[i].m_vgap.norm();
 
 			// calculate force
 			ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
