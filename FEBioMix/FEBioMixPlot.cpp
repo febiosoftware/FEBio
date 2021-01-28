@@ -48,6 +48,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/writeplot.h>
 #include <FEBioFluid/FEFluidSolutes.h>
+#include <FEBioFluid/FEFluidSolutesDomain3D.h>
 #include <FEBioFluid/FESolutesMaterial.h>
 #include <FECore/FEEdgeList.h>
 
@@ -533,8 +534,8 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
                     FESolutesMaterial::Point* spt2 = (mp.ExtractData<FESolutesMaterial::Point>());
 
 					if (pt) ew += pt->m_ca[nsid];
-                    else if (spt) ew += spt->m_c[nsid];
-                    else if (spt2) ew += spt2->m_c[nsid];
+                    else if (spt) ew += spt->m_ca[nsid];
+                    else if (spt2) ew += spt2->m_ca[nsid];
 				}
 				ew /= el.GaussPoints();
 				a << ew;
@@ -621,15 +622,23 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 {
     FESolidDomain* sdom = dynamic_cast<FESolidDomain*>(&dom);
     FEShellDomain* ldom = dynamic_cast<FEShellDomain*>(&dom);
+    FEFluidSolutesDomain3D* fsdom = dynamic_cast<FEFluidSolutesDomain3D*>(&dom);
     if (sdom && (
         dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom) ||
         dynamic_cast<FETriphasicDomain*>(&dom) ||
-        dynamic_cast<FEMultiphasicSolidDomain*>(&dom))) {
+        dynamic_cast<FEMultiphasicSolidDomain*>(&dom) || fsdom)) {
 
 		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 			const FESolutesMaterialPoint* pt = mp.ExtractData<FESolutesMaterialPoint>();
+            const FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
 			double ew = 0.0;
-			for (int isol = 0; isol<(int)pt->m_ca.size(); ++isol) ew += pt->m_ca[isol];
+			for (int isol = 0; isol<(int)pt->m_ca.size(); ++isol)
+            {
+                if (fspt)
+                    ew += fspt->m_ca[isol];
+                else
+                    ew += pt->m_ca[isol];
+            }
 			return ew;
 		});
 
@@ -752,11 +761,18 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
-	if (ptd || pmd || psd)
+    FEFluidSolutesDomain3D* fsdom = dynamic_cast<FEFluidSolutesDomain3D*>(&dom);
+	if (ptd || pmd || psd || fsdom)
 	{
 		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 			const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-			return pt->m_psi;
+            const FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+            if (pt)
+                return pt->m_psi;
+            else if (fspt)
+                return fspt->m_psi;
+            else
+                return 0.0;
 		});
 		return true;
 	}
@@ -769,11 +785,18 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
-	if (ptd || pmd || psd)
+    FEFluidSolutesDomain3D* fsdom = dynamic_cast<FEFluidSolutesDomain3D*>(&dom);
+	if (ptd || pmd || psd || fsdom)
 	{
 		writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
 			const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-			return (pt ? pt->m_Ie : vec3d(0.0));
+            const FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+            if (pt)
+                return pt->m_Ie;
+            else if (fspt)
+                return fspt->m_Ie;
+            else
+                return vec3d(0.0);
 		});
 		return true;
 	}
