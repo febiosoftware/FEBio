@@ -40,7 +40,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     // set material properties
     ADD_PROPERTY(m_pBase, "elastic");
-    ADD_PROPERTY(m_pCrit, "criterion");
+    ADD_PROPERTY(m_pCrit, "yield_criterion");
 
     ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  );
     ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax");

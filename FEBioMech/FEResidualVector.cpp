@@ -92,100 +92,104 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
             int *lm;
             for (i=0; i<ndof; i+=ndn)
             {
-                FENode& node = m_fem.GetMesh().Node(en[i/ndn]);
-                if (node.m_rid >= 0)
-                {
-                    
-                    {
-                        vec3d F(fe[i], fe[i+1], fe[i+2]);
-                        
-                        // this is an interface dof
-                        // get the rigid body this node is connected to
-                        FERigidBody& RB = *fem->GetRigidBody(node.m_rid);
-                        lm = RB.m_LM;
-                        
-                        // add to total torque of this body
-                        a = node.m_rt - RB.m_rt;
-                        vec3d m = a ^ F;
-                        vec3d f = F;
-                        
-						// TODO: This code is only relevant when called from the shell domain residual and applies
-						//	     the reaction of the back-face nodes.
-						if (bdom)
+				int nid = en[i / ndn];
+				if (nid >= 0)
+				{
+					FENode& node = m_fem.GetMesh().Node(nid);
+					if (node.m_rid >= 0)
+					{
+
 						{
-							if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
-								vec3d d = node.m_dt;
-								vec3d b = a - d;
-								vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
-								f += Fd;
-								m += b ^ Fd;
+							vec3d F(fe[i], fe[i + 1], fe[i + 2]);
+
+							// this is an interface dof
+							// get the rigid body this node is connected to
+							FERigidBody& RB = *fem->GetRigidBody(node.m_rid);
+							lm = RB.m_LM;
+
+							// add to total torque of this body
+							a = node.m_rt - RB.m_rt;
+							vec3d m = a ^ F;
+							vec3d f = F;
+
+							// TODO: This code is only relevant when called from the shell domain residual and applies
+							//	     the reaction of the back-face nodes.
+							if (bdom)
+							{
+								if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
+									vec3d d = node.m_dt;
+									vec3d b = a - d;
+									vec3d Fd(fe[i + 3], fe[i + 4], fe[i + 5]);
+									f += Fd;
+									m += b ^ Fd;
+								}
 							}
+
+							n = lm[3];
+							if (n >= 0)
+							{
+#pragma omp atomic
+								R[n] += m.x;
+							}
+#pragma omp atomic
+							RB.m_Mr.x -= m.x;
+							n = lm[4];
+							if (n >= 0)
+							{
+#pragma omp atomic
+								R[n] += m.y;
+							}
+
+#pragma omp atomic
+							RB.m_Mr.y -= m.y;
+							n = lm[5];
+							if (n >= 0)
+							{
+#pragma omp atomic
+								R[n] += m.z;
+							}
+#pragma omp atomic
+							RB.m_Mr.z -= m.z;
+							/*
+							 // if the rotational degrees of freedom are constrained for a rigid node
+							 // then we need to add an additional component to the residual
+							 if (node.m_ID[m_dofRU] == lm[3])
+							 {
+							 d = node.m_Dt;
+							 n = lm[3]; if (n >= 0) R[n] += d.y*F.z-d.z*F.y; RB.m_Mr.x -= d.y*F.z-d.z*F.y;
+							 n = lm[4]; if (n >= 0) R[n] += d.z*F.x-d.x*F.z; RB.m_Mr.y -= d.z*F.x-d.x*F.z;
+							 n = lm[5]; if (n >= 0) R[n] += d.x*F.y-d.y*F.x; RB.m_Mr.z -= d.x*F.y-d.y*F.x;
+							 }
+							 */
+							 // add to global force vector
+							n = lm[0];
+							if (n >= 0)
+							{
+#pragma omp atomic
+								R[n] += f.x;
+							}
+#pragma omp atomic
+							RB.m_Fr.x -= f.x;
+							n = lm[1];
+							if (n >= 0)
+							{
+#pragma omp atomic
+								R[n] += f.y;
+							}
+#pragma omp atomic
+							RB.m_Fr.y -= f.y;
+
+							n = lm[2];
+							if (n >= 0)
+							{
+#pragma omp atomic
+								R[n] += f.z;
+							}
+#pragma omp atomic
+							RB.m_Fr.z -= f.z;
 						}
-                        
-                        n = lm[3];
-                        if (n >= 0)
-                        {
-#pragma omp atomic
-                            R[n] += m.x;
-                        }
-#pragma omp atomic
-                        RB.m_Mr.x -= m.x;
-                        n = lm[4];
-                        if (n >= 0)
-                        {
-#pragma omp atomic
-                            R[n] += m.y;
-                        }
-                        
-#pragma omp atomic
-                        RB.m_Mr.y -= m.y;
-                        n = lm[5];
-                        if (n >= 0)
-                        {
-#pragma omp atomic
-                            R[n] += m.z;
-                        }
-#pragma omp atomic
-                        RB.m_Mr.z -= m.z;
-                        /*
-                         // if the rotational degrees of freedom are constrained for a rigid node
-                         // then we need to add an additional component to the residual
-                         if (node.m_ID[m_dofRU] == lm[3])
-                         {
-                         d = node.m_Dt;
-                         n = lm[3]; if (n >= 0) R[n] += d.y*F.z-d.z*F.y; RB.m_Mr.x -= d.y*F.z-d.z*F.y;
-                         n = lm[4]; if (n >= 0) R[n] += d.z*F.x-d.x*F.z; RB.m_Mr.y -= d.z*F.x-d.x*F.z;
-                         n = lm[5]; if (n >= 0) R[n] += d.x*F.y-d.y*F.x; RB.m_Mr.z -= d.x*F.y-d.y*F.x;
-                         }
-                         */
-                        // add to global force vector
-                        n = lm[0];
-                        if (n >= 0)
-                        {
-#pragma omp atomic
-                            R[n] += f.x;
-                        }
-#pragma omp atomic
-                        RB.m_Fr.x -= f.x;
-                        n = lm[1];
-                        if (n >= 0) 
-                        {
-#pragma omp atomic
-                            R[n] += f.y;
-                        }
-#pragma omp atomic
-                        RB.m_Fr.y -= f.y;
-                        
-                        n = lm[2];
-                        if (n >= 0)
-                        {
-#pragma omp atomic
-                            R[n] += f.z;
-                        }
-#pragma omp atomic
-                        RB.m_Fr.z -= f.z;
-                    }
-                }
+					}
+				}
             }
         }
     }
