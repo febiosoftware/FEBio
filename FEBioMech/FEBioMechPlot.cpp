@@ -61,12 +61,9 @@ SOFTWARE.*/
 #include "FEDiscreteElasticMaterial.h"
 #include "FEDiscreteElasticDomain.h"
 #include "FEContinuousElasticDamage.h"
-<<<<<<< HEAD
-=======
 #include <FECore/FEMeshAdaptor.h> // for projectToNodes
 #include "FESlidingInterface.h"
 #include "FETiedContactSurface.h"
->>>>>>> f66d282215c6379354f696e8f1868cf3344304f7
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -119,9 +116,6 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 {
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
-<<<<<<< HEAD
- 
-=======
 
 	// NOTE: the sliding surface does not use material points, so we need this little hack. 
 	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
@@ -160,15 +154,11 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 		return true;
 	}
 
->>>>>>> f66d282215c6379354f696e8f1868cf3344304f7
 	writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
 		return (pt ? pt->m_gap : 0.0);
 	});
-<<<<<<< HEAD
-=======
 	
->>>>>>> f66d282215c6379354f696e8f1868cf3344304f7
     return true;
 }
 
