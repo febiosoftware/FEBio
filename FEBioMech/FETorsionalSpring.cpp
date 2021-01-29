@@ -50,7 +50,6 @@ vec3d FETorsionalSpring::Force(FEDiscreteMaterialPoint& mp)
 	mat3ds P = (I - exe) / l;
 	vec3d t = P * e0;
 
-	const double eps = 1e-9;
 	double F = -m_r*w;
 
 	return t*F;
@@ -76,4 +75,18 @@ mat3d FETorsionalSpring::Stiffness(FEDiscreteMaterialPoint& mp)
 	mat3ds T = dyad(t);
 
 	return T*(m_r) + Q*(m_r*w);
+}
+
+double FETorsionalSpring::StrainEnergy(FEDiscreteMaterialPoint& mp)
+{
+	vec3d e0 = mp.m_dr0; e0.unit();
+	vec3d et = mp.m_drt; 
+	double l = et.unit();
+
+	double w = e0 * et;
+
+	double E = m_r*(1-w*w)/2;
+
+	return E;
+
 }

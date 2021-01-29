@@ -38,6 +38,9 @@ public:
 	// evaluate the stiffness at a discrete element (= dF / dr)
 	mat3d Stiffness(FEDiscreteMaterialPoint& mp) override;
 
+	// evaluate the force at a discrete element
+	double StrainEnergy(FEDiscreteMaterialPoint& mp) override;
+
 private:
 	double	m_r;	//!< rotational stiffness
 

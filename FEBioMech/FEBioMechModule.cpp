@@ -411,6 +411,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEActiveFiberStressUC, "uncoupled active fiber stress");
 
 	// discrete materials
+	REGISTER_FECORE_CLASS(FECompositeDiscreteMaterial, "discrete composite");
 	REGISTER_FECORE_CLASS(FELinearSpring, "linear spring");
 	REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, "tension-only linear spring");
 	REGISTER_FECORE_CLASS(FENonLinearSpring, "nonlinear spring");
@@ -667,7 +668,10 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRPreStrainCorrection, "SPR prestrain correction");
 	REGISTER_FECORE_CLASS(FEPlotPreStrainCompatibility, "prestrain compatibility");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStretch, "discrete element stretch");
+	REGISTER_FECORE_CLASS(FEPlotDiscreteElementElongation, "discrete element elongation");
+	REGISTER_FECORE_CLASS(FEPlotDiscreteElementPercentElongation, "discrete element percent elongation");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce, "discrete element force");
+	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStrainEnergy, "discrete element strain energy");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage, "continuous damage");
 
 

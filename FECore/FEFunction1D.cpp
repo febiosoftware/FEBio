@@ -44,6 +44,11 @@ double FEFunction1D::derive(double x) const
 	return (value(x + eps) - value(x))/eps;
 }
 
+double FEFunction1D::integrate(double a, double b) const
+{
+	return (b-a)*((value(a) + value(b))/2);
+}
+
 void FEFunction1D::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);
@@ -95,6 +100,10 @@ bool FEMathFunction::Init()
     else
         m_d2exp.Create("0");
 
+	MITEM mi = MIntegral(m_dexp.GetExpression(), *m_dexp.Variable(0));
+    m_d2exp.SetExpression(mi);
+	
+
 #ifdef _DEBUG
 	MObj2String o2s;
 	string s = o2s.Convert(m_dexp);
@@ -129,4 +138,11 @@ double FEMathFunction::deriv2(double t) const
 {
     vector<double> var(1, t);
     return m_d2exp.value_s(var);
+}
+
+double FEMathFunction::integrate(double a, double b) const
+{
+	vector<double> varA(1, a);
+	vector<double> varB(1, b);
+    return m_iexp.value_s(varB) - m_iexp.value_s(varA);
 }
