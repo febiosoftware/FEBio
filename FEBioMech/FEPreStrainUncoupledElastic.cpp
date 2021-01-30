@@ -51,8 +51,8 @@ FEMaterialPoint* FEPreStrainUncoupledElastic::CreateMaterialPointData()
 	{
 		FEMaterialPoint* pm = m_mat->CreateMaterialPointData();
 		FEMaterialPoint* pg = m_Fp->CreateMaterialPointData();
-		pg->SetNext(pm);
-		return new FEPrestrainMaterialPoint(pg);
+		if (pg) pm->SetNext(pg);
+		return new FEPrestrainMaterialPoint(pm);
 	}
 }
 
