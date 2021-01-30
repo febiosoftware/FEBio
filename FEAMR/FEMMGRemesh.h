@@ -31,11 +31,6 @@ class FEMMGRemesh : public FERefineMesh
 {
 	class MMG;
 
-	enum TransferMethod {
-		TRANSFER_SHAPE,
-		TRANSFER_MLQ
-	};
-
 public:
 	FEMMGRemesh(FEModel* fem);
 
@@ -49,15 +44,11 @@ private:
 private:
 	int		m_maxiter;
 	int		m_maxelem;
-	int		m_transferMethod;
 
 	double	m_scale;	// element scale factor
 	double	m_hmin;		// minimum element size
 	double	m_hausd;	// Hausdorff value
 	double	m_hgrad;	// gradation
-
-	bool	m_bmap_data;
-	int		m_nnc;		// nearest-neighbor-count
 
 	FEMeshAdaptorCriterion*	m_criterion;
 

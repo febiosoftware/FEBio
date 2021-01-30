@@ -59,10 +59,32 @@ void FEElementSet::Create(FEDomain* dom, const std::vector<int>& elemList)
 }
 
 //-----------------------------------------------------------------------------
+void FEElementSet::CopyFrom(FEElementSet& eset)
+{
+	SetName(eset.GetName());
+
+	m_Elem = eset.m_Elem;
+
+	FEMesh* mesh = GetMesh(); assert(mesh);
+
+	m_dom.Clear();
+	FEDomainList& dl = eset.GetDomainList();
+	for (int i = 0; i < dl.Domains(); ++i)
+	{
+		FEDomain* di = dl.GetDomain(i);
+		FEDomain* newdi = mesh->FindDomain(di->GetName()); assert(newdi);
+		m_dom.AddDomain(newdi);
+	}
+
+	BuildLUT();
+}
+
+//-----------------------------------------------------------------------------
 void FEElementSet::Create(FEDomain* dom)
 {
 	m_dom.Clear();
 	m_dom.AddDomain(dom);
+	SetMesh(dom->GetMesh());
 
 	int NE = dom->Elements();
 	m_Elem.resize(NE, -1);

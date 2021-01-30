@@ -34,18 +34,43 @@ class FESurfaceLoad;
 class FESurfacePairConstraint;
 class FESurface;
 class FENodeSet;
+class FEDomainMap;
 
 //-----------------------------------------------------------------------------
 // Base class for mesh refinement algorithms
 class FERefineMesh : public FEMeshAdaptor
 {
+protected:
+	// Supported transfer methods for mapping data between meshes
+	enum TransferMethod {
+		TRANSFER_SHAPE,
+		TRANSFER_MLQ
+	};
+	
 public:
 	FERefineMesh(FEModel* fem);
+	~FERefineMesh();
 
 protected:
 	bool BuildMeshTopo();
 	void UpdateModel();
+	void CopyMesh();
+
+	bool build_map_data(FEModel& fem);
+	void map_data(FEModel& fem);
+	void clear_maps();
 
 protected:
-	FEMeshTopo*	m_topo;
+	FEMeshTopo*	m_topo;		//!< mesh topo structure
+
+	int		m_transferMethod;		//!< method for transferring data between meshes
+	bool	m_bmap_data;			//!< map data flag
+	int		m_nnc;					//!< nearest-neighbor-count for MLQ transfer method
+
+	FEMesh*	m_meshCopy;		//!< copy of "old" mesh, before refinement
+
+	std::vector< std::vector<FEDomainMap*> >	m_nodeMapList;	// list of nodal data for each domain
+	std::vector< FEDomainMap* >	m_meshDataList;					// list of nodal data for mesh data
+
+	DECLARE_FECORE_CLASS();
 };

@@ -42,6 +42,9 @@ BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
 	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
 	ADD_PROPERTY(m_criterion, "criterion");
+	ADD_PARAMETER(m_bmap_data, "map_data");
+	ADD_PARAMETER(m_nnc, "nnc");
+	ADD_PARAMETER(m_transferMethod, "transfer_method");
 END_FECORE_CLASS();
 
 FEHexRefine::FEHexRefine(FEModel* fem) : FERefineMesh(fem)
@@ -122,6 +125,15 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 	// make sure we have work to do
 	if (m_splitElems == 0) return false;
 
+	// map the data
+	if (m_bmap_data)
+	{
+		if (build_map_data(fem) == false)
+		{
+			return false;
+		}
+	}
+
 	// Next, the position and solution variables for all the nodes are updated.
 	// Note that this has to be done before recreating the elements since 
 	// the old elements are still needed to determine the new positions and solutions. 
@@ -133,6 +145,27 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 
 	// Now, we can create new elements
 	BuildNewDomains(fem);
+
+	// map data onto new mesh
+	if (m_bmap_data)
+	{
+		map_data(fem);
+	}
+
+	// recreate element sets
+	for (int i = 0; i < mesh.ElementSets(); ++i)
+	{
+		FEElementSet& eset = mesh.ElementSet(i);
+
+		// get the domain list
+		// NOTE: Don't get the reference, since then the same reference
+		// is passed to Create below, which causes problems.
+		FEDomainList domList = eset.GetDomainList();
+		if (domList.IsEmpty()) { throw std::runtime_error("Error in FEMMGRemesh!"); }
+
+		// recreate the element set from the domain list
+		eset.Create(domList);
+	}
 
 	// update node sets
 	for (int i = 0; i < mesh.NodeSets(); ++i)
@@ -831,6 +864,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 			delete newDom;
 		}
 	}
+	mesh.RebuildLUT();
 
 	// re-init domains
 	for (int i = 0; i < NDOM; ++i)

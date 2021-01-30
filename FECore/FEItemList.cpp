@@ -35,12 +35,19 @@ REGISTER_SUPER_CLASS(FEItemList, FEITEMLIST_ID);
 
 FEItemList::FEItemList(FEModel* fem) : FECoreBase(fem)
 {
-
+	if (fem)
+	{
+		m_mesh = &fem->GetMesh();
+	}
 }
 
 // get the mesh
 FEMesh* FEItemList::GetMesh() const
 {
-	FEModel* fem = GetFEModel();
-	return (fem ? &fem->GetMesh() : nullptr);
+	return m_mesh;
+}
+
+void FEItemList::SetMesh(FEMesh* mesh)
+{
+	m_mesh = mesh;
 }

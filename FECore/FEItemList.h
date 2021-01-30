@@ -31,6 +31,8 @@ SOFTWARE.*/
 #include "fecore_api.h"
 #include "FECoreBase.h"
 
+class FEMesh;
+
 class FECORE_API FEItemList : public FECoreBase
 {
 	FECORE_SUPER_CLASS
@@ -40,4 +42,9 @@ public:
 
 	// get the mesh
 	FEMesh* GetMesh() const;
+
+	void SetMesh(FEMesh* mesh);
+
+protected:
+	FEMesh*		m_mesh;
 };

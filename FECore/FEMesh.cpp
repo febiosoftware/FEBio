@@ -995,3 +995,46 @@ void FEElementIterator::operator++()
 		m_el = nullptr;
 	}
 }
+
+// create a copy of this mesh
+void FEMesh::CopyFrom(FEMesh& mesh)
+{
+	Clear();
+
+	int N0 = mesh.Nodes();
+	CreateNodes(N0);
+	for (int i = 0; i < N0; ++i)
+	{
+		Node(i) = mesh.Node(i);
+	}
+
+	// now allocate domains
+	ClearDomains();
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		const char* sz = dom.GetTypeStr();
+
+		// create a new domain
+		FEDomain* pd = fecore_new<FEDomain>(sz, nullptr);
+		assert(pd);
+		pd->SetMesh(this);
+
+		// copy domain data
+		pd->CopyFrom(&dom);
+
+		// add it to the mesh
+		AddDomain(pd);
+	}
+	RebuildLUT();
+
+	// copy element sets
+	for (int i = 0; i < mesh.ElementSets(); ++i)
+	{
+		FEElementSet& eset = mesh.ElementSet(i);
+		FEElementSet* pset = new FEElementSet(GetFEModel());
+		pset->SetMesh(this);
+		pset->CopyFrom(eset);
+		AddElementSet(pset);
+	}
+}
