@@ -37,7 +37,7 @@ public:
 	FEPreStrainConstraint(FEModel* pfem);
 
 	// This function must be overloaded by derived classes
-	virtual mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp) = 0;
+	virtual mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp, FEPrestrainMaterial* pmat) = 0;
 
 public:
 	bool Init() override;
@@ -68,7 +68,7 @@ class FEGPAConstraint : public FEPreStrainConstraint
 public:
 	FEGPAConstraint(FEModel* pfem) : FEPreStrainConstraint(pfem){}
 
-	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp);
+	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp, FEPrestrainMaterial* pmat) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -77,20 +77,11 @@ class FEInSituStretchConstraint: public FEPreStrainConstraint
 {
 public:
 	FEInSituStretchConstraint(FEModel* pfem);
-	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp) override;
+	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp, FEPrestrainMaterial* pmat) override;
 
 private:
 	double	m_max_stretch;
 	bool	m_biso;
 
 	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-// enforces just the fiber stretch (alternative algorithm)
-class FEInSituStretchConstraint2: public FEPreStrainConstraint
-{
-public:
-	FEInSituStretchConstraint2(FEModel* pfem);
-	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp);
 };

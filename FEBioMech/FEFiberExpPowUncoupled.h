@@ -48,9 +48,9 @@ public:
 	virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
     
 protected:
-	double	m_alpha;	// coefficient of (In-1) in exponential
-	double	m_beta;		// power of (In-1) in exponential
-	double	m_ksi;		// fiber modulus
+	double			m_alpha;	// coefficient of (In-1) in exponential
+	double			m_beta;		// power of (In-1) in exponential
+	FEParamDouble	m_ksi;		// fiber modulus
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

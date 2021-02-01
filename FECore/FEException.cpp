@@ -138,6 +138,7 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 */
 //=============================================================================
 bool NegativeJacobian::m_boutput = false;
+bool NegativeJacobian::m_bthrown = false;
 
 //-----------------------------------------------------------------------------
 NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
@@ -146,6 +147,7 @@ NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
 	m_ng = ng;
 	m_vol = vol;
 	m_pel = pe;
+	m_bthrown = true;
 	what("Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", m_iel, m_ng + 1, m_vol);
 }
 
@@ -153,4 +155,16 @@ NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
 bool NegativeJacobian::DoOutput()
 {
 	return m_boutput;
+}
+
+//-----------------------------------------------------------------------------
+void NegativeJacobian::clearFlag()
+{
+	m_bthrown = false;
+}
+
+//-----------------------------------------------------------------------------
+bool NegativeJacobian::IsThrown()
+{
+	return m_bthrown;
 }

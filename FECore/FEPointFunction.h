@@ -103,7 +103,7 @@ public:
 
 public: // implement from base class
 
-		//! returns the value of the load curve at time
+	//! returns the value of the load curve at time
 	double value(double x) const override;
 
 	//! returns the derivative value at time
@@ -112,9 +112,15 @@ public: // implement from base class
     //! returns the second derivative value at time
     double deriv2(double x) const override;
 
+	//! returns the definite integral value between a and b
+	double integrate(double a, double b) const override;
+
 protected:
 	double ExtendValue(double t) const;
 
+// private:
+// 	//! returns the area of a trapezoid between a and b
+// 	double trap(double a, double b) const;
 
 	// TODO: I need to make this public so the parameters can be mapped to the FELoadCurve
 public:

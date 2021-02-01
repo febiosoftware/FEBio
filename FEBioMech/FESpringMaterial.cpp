@@ -67,6 +67,17 @@ mat3d FESpringMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 	return A;
 }
 
+double FESpringMaterial::StrainEnergy(FEDiscreteMaterialPoint& mp)
+{
+	// calculate spring lengths
+	double L0 = mp.m_dr0.norm();
+	double Lt = mp.m_drt.norm();
+	double DL = Lt - L0;
+
+	// evaluate the spring force
+	return strainEnergy(DL);
+}
+
 //-----------------------------------------------------------------------------
 // FELinearSpring
 //-----------------------------------------------------------------------------
@@ -86,6 +97,11 @@ double FELinearSpring::stiffness(double dl)
 	return m_E;
 }
 
+double FELinearSpring::strainEnergy(double dl)
+{
+	return m_E*dl*dl/2;
+}
+
 //-----------------------------------------------------------------------------
 // FETensionOnlyLinearSpring
 //-----------------------------------------------------------------------------
@@ -103,6 +119,11 @@ double FETensionOnlyLinearSpring::force(double dl)
 double FETensionOnlyLinearSpring::stiffness(double dl)
 {
 	return (dl >= 0 ? m_E : 0);
+}
+
+double FETensionOnlyLinearSpring::strainEnergy(double dl)
+{
+	if(dl >= 0) return m_E*dl*dl/2; else return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -132,6 +153,11 @@ double FENonLinearSpring::force(double dl)
 double FENonLinearSpring::stiffness(double dl)
 {
 	return m_F->derive(dl);
+}
+
+double FENonLinearSpring::strainEnergy(double dl)
+{
+	return m_F->integrate(0, dl);
 }
 
 //-----------------------------------------------------------------------------
@@ -166,4 +192,12 @@ double FEExperimentalSpring::stiffness(double dl)
 		return m_E*exp(-m_E*dl / m_sM);
 	else
 		return m_E*exp(m_E*dl / m_sm);
+}
+
+double FEExperimentalSpring::strainEnergy(double dl)
+{
+	if (dl >= 0.0)
+		return m_sM*(m_sM/m_E*(exp(-m_E*dl/m_sM) - 1) + dl);
+	else
+		return m_sm*(m_sm/m_E*(exp(-m_E*dl/m_sm) - 1) - dl);
 }

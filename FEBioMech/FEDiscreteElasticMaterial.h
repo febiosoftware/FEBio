@@ -46,4 +46,29 @@ public:
 
 	// evaluate the stiffness at a discrete element (= dF / dr)
 	virtual mat3d Stiffness(FEDiscreteMaterialPoint& mp) = 0;
+
+	// evaluate the strain energy at a discrete element
+	virtual double StrainEnergy(FEDiscreteMaterialPoint& mp) {return 0.0;}
+};
+
+//-----------------------------------------------------------------------------
+//! composite material class for discrete elements
+class FEBIOMECH_API FECompositeDiscreteMaterial : public FEDiscreteElasticMaterial
+{
+public:
+	FECompositeDiscreteMaterial(FEModel* pfem);
+
+	// evaluate the force at a discrete element
+	vec3d Force(FEDiscreteMaterialPoint& mp);
+
+	// evaluate the stiffness at a discrete element (= dF / dr)
+	mat3d Stiffness(FEDiscreteMaterialPoint& mp);
+
+	// evaluate the strain energy at a discrete element
+	double StrainEnergy(FEDiscreteMaterialPoint& mp);
+
+private:
+	std::vector<FEDiscreteElasticMaterial*> m_mats;
+
+DECLARE_FECORE_CLASS();
 };

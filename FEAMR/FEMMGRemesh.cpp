@@ -35,16 +35,23 @@ SOFTWARE.*/
 #include <FECore/FEOctreeSearch.h>
 #include <FECore/FENNQuery.h>
 #include <FECore/FEMeshAdaptorCriterion.h>
+#include <FECore/FEDomainMap.h>
+#include "FELeastSquaresInterpolator.h"
+#include "FEMeshShapeInterpolator.h"
+#include "FEDomainShapeInterpolator.h"
+#include <FECore/FECoreKernel.h>
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
 
 class FEMMGRemesh::MMG
 {
 public:
-	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMMGRemesh* mmgRemesh, double scale);
+	MMG(FEMMGRemesh* mmgRemesh) : m_mmgRemesh(mmgRemesh) {}
+	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, double scale);
 	bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem);
 
 public:
+	FEMMGRemesh*	m_mmgRemesh;
 	std::vector<double>	m_metric;	// refinement metric
 	std::vector<int>	m_nodeSetTag;	// surface tags for node sets
 };
@@ -73,8 +80,11 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 
 	m_criterion = nullptr;
 
+	m_transferMethod = TRANSFER_MLQ;
+	m_nnc = 8;
+
 #ifdef HAS_MMG
-	mmg = new FEMMGRemesh::MMG;
+	mmg = new FEMMGRemesh::MMG(this);
 #endif
 }
 
@@ -113,6 +123,14 @@ bool FEMMGRemesh::Apply(int iteration)
 	// reactivate the model
 	UpdateModel();
 
+	// print some mesh statistics
+	int NN = mesh.Nodes();
+	int NE = mesh.Elements();
+	feLog(" Mesh Statistics:\n");
+	feLog(" \tNumber of nodes    : %d\n", NN);
+	feLog(" \tNumber of elements : %d\n", NE);
+	feLog("\n");
+
 	// all done
 	return false;
 }
@@ -133,7 +151,7 @@ bool FEMMGRemesh::Remesh()
 
 	// --- build the MMG mesh ---
 	FEMeshTopo& topo = *m_topo;
-	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, this, m_scale) == false) return false;
+	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, m_scale) == false) return false;
 	
 	// set the control parameters
 	MMG3D_Set_dparameter(mmgMesh, mmgSol, MMG3D_DPARAM_hmin, m_hmin);
@@ -169,7 +187,7 @@ bool FEMMGRemesh::Remesh()
 
 #ifdef HAS_MMG
 
-bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMMGRemesh* mmgRemesh, double scale)
+bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, double scale)
 {
 	FEMesh& mesh = *topo.GetMesh();
 	int NN = mesh.Nodes();
@@ -332,7 +350,7 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 		}
 	}
 
-	FEElementSet* elset = mmgRemesh->GetElementSet();
+	FEElementSet* elset = m_mmgRemesh->GetElementSet();
 	if (elset)
 	{
 		// elements that are not in the element set will be flagged as required.
@@ -349,7 +367,7 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 	}
 
 	// scale factors
-	FEMeshAdaptorCriterion* criterion = mmgRemesh->GetCriterion();
+	FEMeshAdaptorCriterion* criterion = m_mmgRemesh->GetCriterion();
 	if (criterion)
 	{
 		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
@@ -406,163 +424,64 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		MMG3D_Get_scalarSol(mmgSol, &m_metric[i]);
 	}
 
+	// build map data
+	if (m_mmgRemesh->m_bmap_data)
+	{
+		if (m_mmgRemesh->build_map_data(fem) == false)
+		{
+			return false;
+		}
+	}
+
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	vector<vec3d> nodePos(nodes);
 	vector<vector<double> > nodeVal(nodes, vector<double>(MAX_DOFS, 0.0));
 
-	int transferMethod = 1;
-
-	if (transferMethod == 0)
+	// allocate data mapper
+	FEMeshDataInterpolator* mapper = nullptr;
+	switch (m_mmgRemesh->m_transferMethod)
 	{
-		FEOctreeSearch octree(&mesh);
-		octree.Init();
+	case TRANSFER_SHAPE: mapper = new FEMeshShapeInterpolator(&mesh); break;
+	case TRANSFER_MLQ:
+	{
+		FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
+		MLQ->SetNearestNeighborCount(m_mmgRemesh->m_nnc);
+		MLQ->SetCheckForMatch(true);
+		MLQ->SetSourcePoints(oldNodePos);
+		mapper = MLQ;
+	}
+	break;
+	default:
+		assert(false);
+		return false;
+	}
 
-		// update solution
-		for (int i = 0; i < nodes; ++i)
+	// map nodal positions and nodal data
+	for (int i = 0; i < nodes; ++i)
+	{
+		vec3d ri = nodePos0[i];
+
+		if (mapper->SetTargetPoint(ri) == false)
 		{
-			vec3d ri = nodePos0[i];
+			assert(false);
+			delete mapper;
+			return false;
+		}
 
-			double r[3] = { 0 };
-			FESolidElement* el = (FESolidElement*)octree.FindElement(ri, r);
-			if (el == nullptr)
-			{
-				assert(false);
-				return false;
-			}
+		// get the nodal coordinates
+		nodePos[i] = mapper->MapVec3d([&mesh](int sourceNode) {
+			return mesh.Node(sourceNode).m_rt;
+		});
 
-			// get the nodal coordinates
-			vec3d rt[FEElement::MAX_NODES];
-			for (int j = 0; j < el->Nodes(); ++j) rt[j] = mesh.Node(el->m_node[j]).m_rt;
-
-			nodePos[i] = el->evaluate(rt, r[0], r[1], r[2]);
-
-			// update values
-			for (int l = 0; l < MAX_DOFS; ++l)
-			{
-				double v[FEElement::MAX_NODES] = { 0 };
-				for (int j = 0; j < el->Nodes(); ++j) v[j] = mesh.Node(el->m_node[j]).get(l);
-				double vl = el->evaluate(v, r[0], r[1], r[2]);
-				nodeVal[i][l] = vl;
-			}
+		// update values
+		for (int l = 0; l < MAX_DOFS; ++l)
+		{
+			nodeVal[i][l] = mapper->Map([&mesh, l](int sourceNode) {
+				return mesh.Node(sourceNode).get(l);
+			});
 		}
 	}
-	else
-	{
-		// --- Do moving least-squares transfer ---
-
-		// loop over all the new nodes
-		for (int i = 0; i < nodes; ++i)
-		{
-			// get the spatial position
-			vec3d x = nodePos0[i];
-
-			// Find the closest M points
-			vector<int> closestNodes;
-			int M = findNeirestNeighbors(oldNodePos, x, 8, closestNodes);
-			assert(M > 4);
-
-			// the last node is the farthest and determines the radius
-			vec3d& r = mesh.Node(closestNodes[M - 1]).m_r0;
-			double L = sqrt((r - x)*(r - x));
-
-			// add some offset to make sure none of the points will have a weight of zero.
-			// Such points would otherwise be ignored, which reduces the net number of interpolation
-			// points and make the MLS system ill-conditioned
-			L += L*0.05;
-
-			// evaluate weights and displacements
-			vector<vec3d> Xi(M), Ui(M);
-			vector<double> W(M);
-			for (int m = 0; m < M; ++m)
-			{
-				FENode& node = mesh.Node(closestNodes[m]);
-				vec3d uj = node.m_rt - node.m_r0;
-				vec3d rj = x - node.m_r0;
-
-				Xi[m] = rj;
-				Ui[m] = uj;
-
-				double D = sqrt(rj*rj);
-				double wj = 1.0 - D / L;
-				W[m] = wj;
-			}
-
-			// see if we have a (nearly) exact match with the closest point
-			if (W[0] > 0.999)
-			{
-				FENode& node = mesh.Node(closestNodes[0]);
-
-				// just use this point
-				nodePos[i] = node.m_rt;
-				for (int l = 0; l < MAX_DOFS; ++l)
-				{
-					nodeVal[i][l] = node.get(l);
-				}
-			}
-			else
-			{
-
-				// setup least squares problems
-				matrix A(4, 4);
-				A.zero();
-				vector<double> bx(4, 0.0), by(4, 0.0), bz(4, 0.0);
-				for (int m = 0; m < M; ++m)
-				{
-					vec3d ri = Xi[m];
-					vec3d ui = Ui[m];
-					double P[4] = { 1.0, ri.x, ri.y, ri.z };
-
-					for (int a = 0; a < 4; ++a)
-					{
-						for (int b = 0; b < 4; ++b)
-						{
-							A(a, b) += W[m] * P[a] * P[b];
-						}
-
-						bx[a] += W[m] * P[a] * ui.x;
-						by[a] += W[m] * P[a] * ui.y;
-						bz[a] += W[m] * P[a] * ui.z;
-					}
-				}
-
-				// solve the linear system of equations
-				vector<int> indx(4);
-				A.lufactor(indx);
-				A.lusolve(bx, indx);
-				A.lusolve(by, indx);
-				A.lusolve(bz, indx);
-
-				// evaluate at x
-				// this gives us the displacement
-				vec3d ui(bx[0], by[0], bz[0]);
-
-				// set the new position
-				nodePos[i] = nodePos0[i] + ui;
-
-				// update nodal values
-				for (int l = 0; l < MAX_DOFS; ++l)
-				{
-					vector<double> b(4, 0.0);
-					for (int m = 0; m < M; ++m)
-					{
-						vec3d ri = Xi[m];
-						double P[4] = { 1.0, ri.x, ri.y, ri.z };
-
-						double vm = mesh.Node(closestNodes[m]).get(l);
-
-						for (int a = 0; a < 4; ++a)
-						{
-							b[a] += W[m] * P[a] * vm;
-						}
-					}
-
-					A.lusolve(b, indx);
-
-					nodeVal[i][l] = b[0];
-				}
-			}
-		}
-	}
+	delete mapper;
 
 	// reallocate nodes
 	mesh.CreateNodes(nodes);
@@ -593,7 +512,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 			if (gid == i) nelems++;
 		}
 
-		dom.Create(nelems, FEElementLibrary::GetElementSpecFromType(FE_TET4G1));
+		dom.Create(nelems, dom.GetElementSpec());
 		int c = 0;
 		for (int j = 0; j < elems; ++j)
 		{
@@ -630,6 +549,12 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 		// recreate the element set from the domain list
 		eset.Create(domList);
+	}
+
+	// map data onto new mesh
+	if (m_mmgRemesh->m_bmap_data)
+	{
+		m_mmgRemesh->map_data(fem);
 	}
 
 	// recreate surfaces
@@ -721,4 +646,5 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 	return true;
 }
+
 #endif

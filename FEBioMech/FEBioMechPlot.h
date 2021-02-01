@@ -840,12 +840,8 @@ public:
 class FEPlotStressError : public FEPlotDomainData
 {
 public:
-	FEPlotStressError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) { m_smax = m_smin = 0.0; }
+	FEPlotStressError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
-	bool PreSave() override;
-private:
-	double	m_smax, m_smin;
-	vector<double>	m_sn;
 };
 
 //-----------------------------------------------------------------------------
@@ -910,10 +906,34 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEPlotDiscreteElementElongation : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementElongation(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotDiscreteElementPercentElongation : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementPercentElongation(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 class FEPlotDiscreteElementForce : public FEPlotDomainData
 {
 public:
 	FEPlotDiscreteElementForce(FEModel* fem) : FEPlotDomainData(fem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotDiscreteElementStrainEnergy : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementStrainEnergy(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

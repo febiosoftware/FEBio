@@ -31,32 +31,19 @@ SOFTWARE.*/
 class FEInSituStretchGradient : public FEPrestrainGradient
 {
 public:
-	class MaterialPointData : public FEMaterialPoint
-	{
-	public:
-		MaterialPointData();
-		void Init(bool bflag);
-		FEMaterialPoint* Copy();
-		void Serialize(DumpStream& ar);
-
-	public:
-		double	m_lam;	//!< in-situ fiber stretch
-	};
-
-public:
 	FEInSituStretchGradient(FEModel* pfem);
 
-	double InSituStretch(FEMaterialPoint& mp);
-	
+	bool Init() override;
+
 	mat3d Prestrain(FEMaterialPoint& mp) override;
 
 	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
 
-	FEMaterialPoint* CreateMaterialPointData() override;
-
 public:
-	double	m_lam;	//!< in-situ stretch
-	bool	m_biso;	//!< isochoric generator option
+	FEParamDouble	m_lam;	//!< in-situ stretch
+	bool			m_biso;	//!< isochoric generator option
+
+	FEParamVec3*	m_fiber;	// fiber property of the elastic material.
 
 	DECLARE_FECORE_CLASS();
 };

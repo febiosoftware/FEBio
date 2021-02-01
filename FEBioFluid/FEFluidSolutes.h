@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FEBioMix/FESoluteInterface.h>
 #include <FEBioMix/FEOsmoticCoefficient.h>
 #include <FEBioMix/FEChemicalReaction.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! FSI material point class.
@@ -60,9 +61,14 @@ public:
     vector<vec3d>       m_gradc;    //!< spatial gradient of solute concentration
     vector<vec3d>       m_j;        //!< solute molar flux
     vector<double>      m_cdot;     //!< material time derivative of solute concentration following fluid
+    double            m_psi;        //!< electric potential
+    vec3d            m_Ie;        //!< current density
     vector<double>    m_k;        //!< solute partition coefficient
     vector<double>    m_dkdJ;        //!< 1st deriv of m_k with strain (J)
+    vector<double>    m_dkdJJ;    //!< 2nd deriv of m_k with strain (J)
     vector< vector<double> >    m_dkdc;            //!< 1st deriv of m_k with effective concentration
+    vector< vector<double> >    m_dkdJc;        //!< cross deriv of m_k with J and c
+    vector< vector< vector<double> > > m_dkdcc;    // 2nd deriv of m_k with c
 };
 
 //-----------------------------------------------------------------------------
@@ -88,9 +94,6 @@ public:
     //! calculate solute molar flux
     vec3d SoluteFlux(FEMaterialPoint& pt, const int sol);
     
-    //! effective concentration (as opposed to effective concentration)
-    double Concentration(FEMaterialPoint& pt, const int sol);
-    
     //! actual concentration (as opposed to effective concentration)
     double ConcentrationActual(FEMaterialPoint& pt, const int sol);
     
@@ -105,11 +108,20 @@ public:
                                        vector<double>& dkdJ,
                                        vector< vector<double> >& dkdc);
     
+    //! electric potential
+    double ElectricPotential(FEMaterialPoint& pt, const bool eform=false);
+    
+    //! current density
+    vec3d CurrentDensity(FEMaterialPoint& pt);
+    
     //! solute density
     double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
     
     //! solute molar mass
     double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
+    
+    //! solute charge number
+    int SoluteChargeNumber(const int sol) { return m_pSolute[sol]->ChargeNumber(); }
     
     //! Add a chemical reaction
     void AddChemicalReaction(FEChemicalReaction* pcr);
@@ -128,6 +140,9 @@ public:
     double    m_Tabs;            //!< absolute temperature
     double    m_Fc;              //!< Faraday's constant
     bool      m_diffMtmSupp;     //!< Toggle on or off diffusive mtm supply for fluid
+    int        m_zmin;            //!< minimum charge number in mixture
+    int        m_ndeg;            //!< polynomial degree of zeta in electroneutrality
+    double              m_penalty;  //!< penalty for enforcing electroneutrality
     
 private: // material properties
     FEFluid*                m_pFluid;       //!< pointer to fluid material

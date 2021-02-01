@@ -63,14 +63,14 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	double pct = 100.0*f;
 
 	// check debug flag
-	bool bdebug = fem.GetDebugFlag();
+	int ndebug = fem.GetDebugLevel();
 
 	// obtain a pointer to the console object. We'll use this to
 	// set the title of the console window.
 	Console* pShell = Console::GetHandle();
 
 	
-	char* szver = getVersionString();
+	char* szver = febio::getVersionString();
 
 	char szvers[64] = {0};
 #ifdef _DEBUG
@@ -84,9 +84,9 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	const char* szfile = sfile.c_str();
 
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.GetCurrentStepIndex() + 1, nsteps, pct, szfile, szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.GetCurrentStepIndex() + 1, nsteps, pct, szfile, szvers, (ndebug?"(debug mode)": ""));
 	else
-		pShell->SetTitle("(%.f%%) %s - %s %s", pct, szfile, szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(%.f%%) %s - %s %s", pct, szfile, szvers, (ndebug?"(debug mode)": ""));
 
 	if (nsteps > 1)
 	{

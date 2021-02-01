@@ -454,6 +454,7 @@ void FENewtonSolver::Clean()
 	m_plinsolve = nullptr;
 	if (m_pK) delete m_pK; m_pK = nullptr;
 	if (m_qnstrategy) delete m_qnstrategy; m_qnstrategy = nullptr;
+	m_Var.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -498,9 +499,6 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 //!	quasi-Newton iterations.
 bool FENewtonSolver::SolveStep()
 {
-	// make sure we have something to do
-	if (m_neq == 0) return true;
-
 	bool bret;
 
 	// initialize counters

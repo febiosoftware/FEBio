@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include <cstdio>
 #include "version.h"
 
-char* getVersionString()
+char* febio::getVersionString()
 {
     static char version[32];
 

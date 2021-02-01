@@ -35,3 +35,53 @@ FEMaterialPoint* FEDiscreteElasticMaterial::CreateMaterialPointData()
 {
 	return new FEDiscreteElasticMaterialPoint;
 }
+
+//=============================================================================
+//					FECompositeDiscreteElasticMaterial
+//=============================================================================
+
+BEGIN_FECORE_CLASS(FECompositeDiscreteMaterial, FEDiscreteElasticMaterial)
+	ADD_PROPERTY(m_mats, "mat");
+END_FECORE_CLASS();
+
+
+FECompositeDiscreteMaterial::FECompositeDiscreteMaterial(FEModel* pfem) : FEDiscreteElasticMaterial(pfem)
+{
+
+}
+
+vec3d FECompositeDiscreteMaterial::Force(FEDiscreteMaterialPoint& mp)
+{
+	vec3d force; 
+
+	for(auto mat : m_mats)
+	{
+		force += mat->Force(mp);
+	}
+
+	return force;
+}
+
+mat3d FECompositeDiscreteMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
+{
+	mat3d stiffness; stiffness.zero();
+
+	for(auto mat : m_mats)
+	{
+		stiffness += mat->Stiffness(mp);
+	}
+
+	return stiffness;
+}
+
+double FECompositeDiscreteMaterial::StrainEnergy(FEDiscreteMaterialPoint& mp)
+{
+	double energy; 
+
+	for(auto mat : m_mats)
+	{
+		energy += mat->StrainEnergy(mp);
+	}
+
+	return energy;
+}

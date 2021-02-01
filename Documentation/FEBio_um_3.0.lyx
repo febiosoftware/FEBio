@@ -80626,7 +80626,12 @@ The
 in-situ stretch
 \emph default
  generator option calculates a prestrain gradient based on a fiber stretch
- and the fiber vector defined by the parent material.
+ and the fiber vector defined by the elastic material of the prestrain material.
+ This implies that this elastic material must define a 
+\emph on
+fiber
+\emph default
+ property.
  
 \end_layout
 
@@ -80806,6 +80811,49 @@ is used.
 \end_layout
 
 \begin_layout Standard
+The rotation tensor is defined implicitly via the fiber vector 
+\begin_inset Formula $\boldsymbol{a}$
+\end_inset
+
+ and the prestrain gradient tensor is effectively determined via, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\mathbf{F}}_{p,iso}=\lambda\mathbf{A}+\mu\left(\boldsymbol{1-}\mathbf{A}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathbf{A}=\boldsymbol{a}\otimes\boldsymbol{a},$
+\end_inset
+
+
+\begin_inset Formula $\lambda$
+\end_inset
+
+ the prescribed fiber stretch, and 
+\begin_inset Formula $\mu=\lambda^{-1/2}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mu=1$
+\end_inset
+
+ depending on the 
+\emph on
+isochoric 
+\emph default
+option.
+\end_layout
+
+\begin_layout Standard
 
 \emph on
 Example:
@@ -80816,15 +80864,43 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <elastic type="neo-Hookean">
+   <elastic type="coupled trans-iso Mooney-Rivlin">
 \end_layout
 
 \begin_layout LyX-Code
-    <E>1.0</E>
+        <k>0.1</k>
 \end_layout
 
 \begin_layout LyX-Code
-    <v>0.3</v>
+        <density>1e-09</density>
+\end_layout
+
+\begin_layout LyX-Code
+        <c1>0.01</c1>
+\end_layout
+
+\begin_layout LyX-Code
+        <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+        <c3>0.0139</c3>
+\end_layout
+
+\begin_layout LyX-Code
+        <c4>116.22</c4>
+\end_layout
+
+\begin_layout LyX-Code
+        <c5>535.09</c5>
+\end_layout
+
+\begin_layout LyX-Code
+        <lam_max>1.046</lam_max>
+\end_layout
+
+\begin_layout LyX-Code
+        <fiber type="vector">-0.0804,-0.508,-0.858</fiber>
 \end_layout
 
 \begin_layout LyX-Code
@@ -81231,8 +81307,16 @@ and
 
 \begin_layout Standard
 \align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset Graphics
-	filename C:/Users/Alex/Desktop/beta.PNG
+	filename Figures/beta.png
 	scale 80
 
 \end_inset
@@ -81242,12 +81326,20 @@ and
 
 \begin_layout Standard
 \align center
-Figure 1: Overall Damage variable 
+Overall Damage variable 
 \begin_inset Formula $\mathit{D}$
 \end_inset
 
 as a function of Continuous Damage variable 
 \begin_inset Formula $\mathit{\beta}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
 \end_inset
 
 
@@ -81716,47 +81808,47 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<a1>1400</a1> 				
+  <a1>1400</a1> 				
 \end_layout
 
 \begin_layout LyX-Code
-<a2>2.2</a2> 				
+  <a2>2.2</a2> 				
 \end_layout
 
 \begin_layout LyX-Code
-<kappa>1e-08</kappa> 				
+  <kappa>1e-08</kappa> 				
 \end_layout
 
 \begin_layout LyX-Code
-<t0>0.98</t0> 				
+  <t0>0.98</t0> 				
 \end_layout
 
 \begin_layout LyX-Code
-<Dmax>0.96</Dmax> 				
+  <Dmax>0.96</Dmax> 				
 \end_layout
 
 \begin_layout LyX-Code
-<beta_s>0.06</beta_s> 				
+  <beta_s>0.06</beta_s> 				
 \end_layout
 
 \begin_layout LyX-Code
-<gamma_max>17.98</gamma_max> 				
+  <gamma_max>17.98</gamma_max> 				
 \end_layout
 
 \begin_layout LyX-Code
-<fiber type="angles"> 					
+  <fiber type="angles"> 					
 \end_layout
 
 \begin_layout LyX-Code
-<theta>-39.87</theta> 					
+    <theta>-39.87</theta> 					
 \end_layout
 
 \begin_layout LyX-Code
-<phi>90</phi> 				
+    <phi>90</phi> 				
 \end_layout
 
 \begin_layout LyX-Code
-</fiber> 			
+  </fiber> 			
 \end_layout
 
 \begin_layout LyX-Code
@@ -82039,55 +82131,55 @@ The Cauchy stress then takes on the following form,
 Example:
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 <solid type="damage fiber exponential"> 
 \end_layout
 
-\begin_layout Standard
-<k1>1288.97</k1> 
+\begin_layout LyX-Code
+  <k1>1288.97</k1> 
 \end_layout
 
-\begin_layout Standard
-<k2>400</k2> 
+\begin_layout LyX-Code
+  <k2>400</k2> 
 \end_layout
 
-\begin_layout Standard
-<kappa>0.2</kappa> 
+\begin_layout LyX-Code
+  <kappa>0.2</kappa> 
 \end_layout
 
-\begin_layout Standard
-<t0>0.9</t0> 
+\begin_layout LyX-Code
+  <t0>0.9</t0> 
 \end_layout
 
-\begin_layout Standard
-<Dmax>0.99</Dmax> 
+\begin_layout LyX-Code
+  <Dmax>0.99</Dmax> 
 \end_layout
 
-\begin_layout Standard
-<beta_s>0.001</beta_s> 
+\begin_layout LyX-Code
+  <beta_s>0.001</beta_s> 
 \end_layout
 
-\begin_layout Standard
-<gamma_max>6.67</gamma_max> 
+\begin_layout LyX-Code
+  <gamma_max>6.67</gamma_max> 
 \end_layout
 
-\begin_layout Standard
-<fiber type="angles"> 
+\begin_layout LyX-Code
+  <fiber type="angles"> 
 \end_layout
 
-\begin_layout Standard
-<theta>-54.94</theta> 
+\begin_layout LyX-Code
+    <theta>-54.94</theta> 
 \end_layout
 
-\begin_layout Standard
-<phi>90</phi> 
+\begin_layout LyX-Code
+    <phi>90</phi> 
 \end_layout
 
-\begin_layout Standard
-</fiber> 
+\begin_layout LyX-Code
+  </fiber> 
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 </solid>
 \end_layout
 

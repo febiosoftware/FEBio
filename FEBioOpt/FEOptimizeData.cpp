@@ -230,7 +230,9 @@ bool FEOptimizeData::FESolve(const vector<double>& a)
 
 	// reset the FEM data
 	FEModel& fem = *GetFEModel();
+	fem.BlockLog();
 	fem.Reset();
+	fem.UnBlockLog();
 
 	// solve the FE problem
 	fem.BlockLog();

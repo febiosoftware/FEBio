@@ -66,6 +66,8 @@ public:
 		m_gamma = 0.0;
 		m_gamma_prev = 0.0;
 		m_init = false;
+
+		FEMaterialPoint::Init();
 	}
 
 	void Update(const FETimeInfo& timeInfo) override
@@ -550,7 +552,7 @@ double FEDamageFiberExpLinear::d2m_dP(double P)
 	else
 	{
 		double c6 = m_c3 * (exp(m_c4*Pmax) - 1) - (Pmax + 1.0) * m_c5;
-		d2m = -c6 / (P*P);
+		d2m = -c6 / ((P+1)*(P+1));
 	}
 
 	return d2m;

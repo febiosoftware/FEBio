@@ -556,7 +556,8 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	{
 		// new way for defining element type and integration rule at the same time
 		// this is useful for multi-step analyses where the geometry is read in before the control section.
-		if      (strcmp(sztype, "TET10G4"     ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4; }
+		if      (strcmp(sztype, "TET4G4"      ) == 0) { eshape = ET_TET4 ; m_ntet4  = FE_TET4G4; }
+		else if (strcmp(sztype, "TET10G4"     ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4; }
 		else if (strcmp(sztype, "TET10G8"     ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G8; }
 		else if (strcmp(sztype, "TET10GL11"   ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10GL11; }
 		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4;   m_ntri6 = FE_TRI6G3; }

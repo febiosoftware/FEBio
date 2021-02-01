@@ -323,6 +323,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -339,6 +340,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -355,6 +357,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -372,10 +375,11 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FECORE_DLL;FEBIOFLUID_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>fecore.lib;febiomech.lib;febiomix.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;febiomech.lib;febiomix.lib;feamr.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -392,6 +396,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -459,6 +464,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -477,6 +483,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -496,12 +503,13 @@
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;febiomech.lib;febiomix.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;febiomech.lib;febiomix.lib;feamr.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -521,6 +529,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSITraction.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauYasudaFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.h" />
@@ -560,6 +569,8 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesNaturalFlux.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesPressure.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver2.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
@@ -612,6 +623,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSITraction.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.cpp" />
@@ -651,6 +663,8 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesNaturalFlux.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesPressure.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver2.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />

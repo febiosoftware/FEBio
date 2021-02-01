@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEPreStrainConstraint.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
+#include "FEPreStrainElastic.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/log.h>
 
@@ -92,6 +93,10 @@ bool FEPreStrainConstraint::Augment(int naug, const FETimeInfo& tp)
 //! Check an augmentation for a specific domain/material pair
 bool FEPreStrainConstraint::Augment(FESolidDomain* psd, int n, int naug)
 {
+	// make sure this is a prestrain material
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(psd->GetMaterial());
+	if (pmat == nullptr) return true;
+
 	// check convergence
 	double	max_err = 0;
 	bool bconv = true;
@@ -109,7 +114,7 @@ bool FEPreStrainConstraint::Augment(FESolidDomain* psd, int n, int naug)
 			const mat3d& Fc = pt.PrestrainCorrection();
 			const mat3d& F = ep.m_F;
 
-			mat3d Fc_next = UpdateFc(F, Fc, mp);
+			mat3d Fc_next = UpdateFc(F, Fc, mp, pmat);
 
 			mat3d U = Fc_next - Fc;
 			double normU = U.norm();
@@ -140,7 +145,7 @@ bool FEPreStrainConstraint::Augment(FESolidDomain* psd, int n, int naug)
 				const mat3d& Fc = pt.PrestrainCorrection();
 				const mat3d& F = ep.m_F;
 
-				mat3d Fc_next = UpdateFc(F, Fc, mp);
+				mat3d Fc_next = UpdateFc(F, Fc, mp, pmat);
 				pt.setPrestrainCorrection(Fc_next);
 			}
 		}
@@ -150,7 +155,7 @@ bool FEPreStrainConstraint::Augment(FESolidDomain* psd, int n, int naug)
 }
 
 //-----------------------------------------------------------------------------
-mat3d FEGPAConstraint::UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp)
+mat3d FEGPAConstraint::UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp, FEPrestrainMaterial* pmat)
 {
 	return F * Fc_prev;
 }
@@ -169,15 +174,23 @@ FEInSituStretchConstraint::FEInSituStretchConstraint(FEModel* pfem) : FEPreStrai
 }
 
 //-----------------------------------------------------------------------------
-mat3d FEInSituStretchConstraint::UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp)
+mat3d FEInSituStretchConstraint::UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp, FEPrestrainMaterial* pmat)
 {
 	FEPrestrainMaterialPoint& psp = *mp.ExtractData<FEPrestrainMaterialPoint>();
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
+	FEElasticMaterial* elasticMat = pmat->GetElasticMaterial();
+	if (elasticMat == nullptr) return mat3dd(1.0);
+	FEParam* fp = elasticMat->FindParameter("fiber");
+	if (fp == nullptr) return mat3dd(1.0);
+	if (fp->type() != FE_PARAM_VEC3D_MAPPED) return mat3dd(1.0);
+	FEParamVec3& fiber = fp->value<FEParamVec3>();
+
 	// calculate the fiber stretch
-	mat3d Q;// = pt.m_Q;
-	vec3d a0 = Q.col(0);
-	vec3d a = F*a0;
+	mat3d Q = elasticMat->GetLocalCS(mp);
+	vec3d a0 = fiber(mp);
+	vec3d ar = Q * a0;
+	vec3d a = F*ar;
 	double l = a.norm();
 
 	if ((m_max_stretch == 0.0) ||(l <= m_max_stretch))
@@ -193,30 +206,4 @@ mat3d FEInSituStretchConstraint::UpdateFc(const mat3d& F, const mat3d& Fc_prev, 
 	{
 		return psp.PrestrainCorrection();
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-FEInSituStretchConstraint2::FEInSituStretchConstraint2(FEModel* pfem) : FEPreStrainConstraint(pfem)
-{
-}
-
-//-----------------------------------------------------------------------------
-mat3d FEInSituStretchConstraint2::UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp)
-{
-	FEPrestrainMaterialPoint& psp = *mp.ExtractData<FEPrestrainMaterialPoint>();
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	// calculate the fiber stretch
-	mat3d Q;// = pt.m_Q;
-	vec3d a0 = Q.col(0);
-	vec3d a = F*a0;
-	double l = a.norm();
-
-	double li = 1.0 / sqrt(l);
-
-	// setup the new correction
-	mat3d U(l, 0.0, 0.0, 0.0, li, 0.0, 0.0, 0.0, li);
-	mat3d Fc = Q*U*Q.transpose();
-	return Fc*Fc_prev;
 }

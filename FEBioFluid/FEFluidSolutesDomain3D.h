@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 #include "FEFluidDomain.h"
 #include "FEFluidSolutes.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements

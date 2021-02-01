@@ -40,9 +40,11 @@ public:
 
 	vec3d Force(FEDiscreteMaterialPoint& mp) override;
 	mat3d Stiffness(FEDiscreteMaterialPoint& mp) override;
+	virtual double StrainEnergy(FEDiscreteMaterialPoint& mp) override;
 
 	virtual double force    (double dl) = 0;
 	virtual double stiffness(double dl) = 0;
+	virtual double strainEnergy(double dl) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -53,6 +55,7 @@ public:
 	FELinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
 	double force    (double dl) override;
 	double stiffness(double dl) override;
+	double strainEnergy(double dl) override;
 
 public:
 	double m_E;	//!< spring constant
@@ -69,6 +72,7 @@ public:
 	FETensionOnlyLinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
 	double force    (double dl) override;
 	double stiffness(double dl) override;
+	double strainEnergy(double dl) override;
 
 public:
 	double m_E;	//!< spring constant
@@ -88,6 +92,7 @@ public:
 
 	double force    (double dl) override;
 	double stiffness(double dl) override;
+	double strainEnergy(double dl) override;
 
 public:
 	FEFunction1D*	m_F;	//!< force-displacement function
@@ -104,6 +109,7 @@ public:
 
 	double force(double dl) override;
 	double stiffness(double dl) override;
+	double strainEnergy(double dl) override;
 
 public:
 	double	m_E;

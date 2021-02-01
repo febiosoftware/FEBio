@@ -570,6 +570,64 @@ double FEPointFunction::deriv2(double time) const
     return D;
 }
 
+double FEPointFunction::integrate(double a, double b) const
+{
+	if(a == b) return 0;
+
+	// Swap a and b if a is greater than b
+	// negate the answer at the end.
+	int neg = 1;
+	if(a > b)
+	{
+		int temp = a;
+		a = b;
+		b = temp;
+		neg = -1;
+	}
+
+	double integral = 0.0;
+
+	// if both points are outside the bounds of the load curve 
+	// just do a single trapezoid
+	// TODO: add cases for  repeat and repeat offset curves
+	if(a > LoadPoint(Points() - 1).time || b < LoadPoint(0).time)
+	{
+		integral = (b-a)*(value(a) + value(b))/2;
+	}
+	else
+	{
+		// Find index of first point larger than a
+		int start = -1;
+		
+		for(int index = 0; index < Points(); index++)
+		{
+			if(LoadPoint(index).time > a)
+			{
+				start = index;
+				break;
+			}
+		}		
+
+		// Do trapezoid rule from a to next point
+		integral += (LoadPoint(start).time - value(a))*((LoadPoint(start).value + value(a))/2);
+		
+
+		// Loop over points between a and b and do trapezoid rule for each interval
+		int index;
+		for(index = start; index < Points() - 1; index++)
+		{
+			// Stop before overshooting b
+			if(LoadPoint(index + 1).time >= b) break;
+			integral += (LoadPoint(index + 1).time - LoadPoint(index).time)*((LoadPoint(index + 1).value + LoadPoint(index).value)/2);
+		}
+
+		//Do trapezoid rule from most recent point to b
+		integral += (value(b) - LoadPoint(index).time)*((value(b) + LoadPoint(index).value)/2);
+	}
+
+	return integral * neg;
+}
+
 //-----------------------------------------------------------------------------
 FEFunction1D* FEPointFunction::copy()
 {

@@ -54,5 +54,7 @@ private:
 
 	MMG*	mmg;
 
+	friend class MMG;
+
 	DECLARE_FECORE_CLASS();
 };

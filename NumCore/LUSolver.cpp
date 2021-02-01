@@ -39,7 +39,7 @@ LUSolver::LUSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 //! Create a sparse matrix
 SparseMatrix* LUSolver::CreateSparseMatrix(Matrix_Type ntype)
 { 
-	return (m_pA = new DenseMatrix()); 
+	return (m_pA = new FECore::DenseMatrix()); 
 }
 
 //-----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ bool LUSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool LUSolver::Factor()
 {
-	DenseMatrix& a = *m_pA;
+	FECore::DenseMatrix& a = *m_pA;
 
 	const double TINY = 1.0e-20;
 	int i, imax, j, k;
@@ -120,7 +120,7 @@ bool LUSolver::Factor()
 //-----------------------------------------------------------------------------
 bool LUSolver::BackSolve(double* x, double* b)
 {
-	DenseMatrix& a = *m_pA;
+	FECore::DenseMatrix& a = *m_pA;
 
 	x = b;
 

@@ -120,6 +120,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogFixedChargeDensity : public FELogElemData
+{
+public:
+	FELogFixedChargeDensity(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemSoluteConcentration_ : public FELogElemData
 {
 protected:

@@ -233,7 +233,7 @@ int FEBioCmd_UnLoadPlugin::run(int nargs, char* argv[])
 //-----------------------------------------------------------------------------
 int FEBioCmd_Version::run(int nargs, char** argv)
 {
-	char* szver = getVersionString();
+	char* szver = febio::getVersionString();
 
 #ifdef _DEBUG
 	fprintf(stderr, "\nFEBio version %s (DEBUG)\n", szver);
@@ -375,17 +375,17 @@ int FEBioCmd_Debug::run(int nargs, char** argv)
 	}
 
 	FEAnalysis* pstep = fem->GetCurrentStep();
-	bool bdebug = fem->GetDebugFlag();
-	if (nargs == 1) bdebug = !bdebug;
+	int ndebug = fem->GetDebugLevel();
+	if (nargs == 1) ndebug = (ndebug? 0 : 1);
 	else
 	{
-		if (strcmp(argv[1], "on") == 0) bdebug = true;
-		else if (strcmp(argv[1], "off") == 0) bdebug = false;
+		if (strcmp(argv[1], "on") == 0) ndebug = 0;
+		else if (strcmp(argv[1], "off") == 0) ndebug = 1;
 		else { fprintf(stderr, "%s is not a valid option for debug.\n", argv[1]); return 0; }
 	}
-	fem->SetDebugFlag(bdebug);
+	fem->SetDebugLevel(ndebug);
 
-	printf("Debug mode is %s\n", (bdebug?"on":"off"));
+	printf("Debug mode is %s\n", (ndebug?"on":"off"));
 	return 0;
 }
 
@@ -693,7 +693,7 @@ int FEBioCmd_list::run(int nargs, char** argv)
 				int mods = fecore.Modules();
 				for (int i = 0; i < mods; ++i)
 				{
-					const char* szmod = fecore.GetModuleName(1 << i);
+					const char* szmod = fecore.GetModuleName(i);
 					printf("%d: %s\n", i+1, szmod);
 				}
 				printf("\n");
@@ -735,8 +735,8 @@ int FEBioCmd_list::run(int nargs, char** argv)
 			SUPER_CLASS_ID superID = fac->GetSuperClassID();
 			const char* szclass = super_id_to_string(superID);
 
-			int module = fac->GetModuleID();
-			const char* szmodule = fecore.GetModuleName(module);
+			int moduleId = fac->GetModuleID();
+			const char* szmodule = fecore.GetModuleNameFromId(moduleId);
 			if ((szmod == 0) || (szmodule && (strcmp(szmodule, szmod) == 0)))
 			{
 				if ((sztype == 0) || (szcmp(szclass, sztype) == 0))

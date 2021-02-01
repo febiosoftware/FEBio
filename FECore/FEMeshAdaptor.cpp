@@ -89,3 +89,47 @@ void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<d
 		if (tag[i] > 0) nodeVals[i] /= (double)tag[i];
 	}
 }
+
+// helper function for projecting integration point data to nodes
+void projectToNodes(FEDomain& dom, std::vector<double>& nodeVals, std::function<double(FEMaterialPoint& mp)> f)
+{
+	// temp storage 
+	double si[FEElement::MAX_INTPOINTS];
+	double sn[FEElement::MAX_NODES];
+
+	// allocate nodeVals and create valence array (tag)
+	int NN = dom.Nodes();
+	vector<int> tag(NN, 0);
+	nodeVals.assign(NN, 0.0);
+
+	// loop over all elements
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int ne = e.Nodes();
+		int ni = e.GaussPoints();
+
+		// get the integration point values
+		for (int k = 0; k < ni; ++k)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+			si[k] = f(mp);
+		}
+
+		// project to nodes
+		e.project_to_nodes(si, sn);
+
+		for (int j = 0; j < ne; ++j)
+		{
+			nodeVals[e.m_lnode[j]] += sn[j];
+			tag[e.m_node[j]]++;
+		}
+	}
+
+	for (int i = 0; i < NN; ++i)
+	{
+		if (tag[i] > 0) nodeVals[i] /= (double)tag[i];
+	}
+}
+

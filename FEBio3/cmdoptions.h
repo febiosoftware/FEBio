@@ -33,7 +33,7 @@ struct CMDOPTIONS
 {
 	enum { MAXFILE = 512 };
 
-	bool		bdebug;			//!< debug flag
+	int		ndebug;			//!< debug flag
 
 	bool	bsplash;			//!< show splash screen or not
 	bool	bsilent;			//!< run FEBio in silent mode (no output to screen)
@@ -57,7 +57,7 @@ struct CMDOPTIONS
 
 	void defaults()
 	{
-		bdebug = false;
+		ndebug = 0;
 		bsplash = true;
 		bsilent = false;
 		binteractive = false;

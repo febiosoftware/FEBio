@@ -74,6 +74,9 @@ bool FEBioApp::Init(int argc, char* argv[])
 	// Initialize FEBio library
 	febio::InitLibrary();
 
+	// copy some flags to configuration
+	m_config.SetOutputLevel(m_ops.bsilent ? 0 : 1);
+
 	// read the configration file if specified
 	if (m_ops.szcnf[0])
 		if (febio::Configure(m_ops.szcnf, m_config) == false)
@@ -152,7 +155,7 @@ int FEBioApp::RunModel()
 	fem.AddCallback(break_point_cb, CB_ALWAYS, 0);
 
 	// set options that were passed on the command line
-	fem.SetDebugFlag(m_ops.bdebug);
+	fem.SetDebugLevel(m_ops.ndebug);
 	fem.SetDumpLevel(m_ops.dumpLevel);
 
 	// set the output filenames
@@ -223,7 +226,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	CMDOPTIONS& ops = m_ops;
 
 	// set default options
-	ops.bdebug = false;
+	ops.ndebug = 0;
 	ops.bsplash = true;
 	ops.bsilent = false;
 	ops.binteractive = true;
@@ -323,7 +326,11 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else if (strcmp(sz, "-g") == 0)
 		{
-			ops.bdebug = true;
+			ops.ndebug = 1;
+		}
+		else if (strcmp(sz, "-g2") == 0)
+		{
+			ops.ndebug = 2;
 		}
 		else if (strcmp(sz, "-nosplash") == 0)
 		{
@@ -379,7 +386,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
 
-			char* szver = getVersionString();
+			char* szver = febio::getVersionString();
 
 #ifdef _DEBUG
 			fprintf(fp, "FEBio version  = %s (DEBUG)\n", szver);

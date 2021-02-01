@@ -46,6 +46,7 @@ SOFTWARE.*/
 #include <dlfcn.h>
 #endif
 
+
 #ifdef WIN32
 extern "C" void __cdecl omp_set_num_threads(int);
 #else
@@ -65,6 +66,7 @@ namespace febio {
 
 	// create a map for the variables (defined with set)
 	static std::map<string, string> vars;
+	static bool boutput = true;
 
 	//-----------------------------------------------------------------------------
 	// configure FEBio
@@ -73,6 +75,7 @@ namespace febio {
 		vars.clear();
 
 		config.Defaults();
+		boutput = (config.m_noutput != 0);
 
 		// open the configuration file
 		XMLReader xml;
@@ -235,7 +238,7 @@ namespace febio {
 			// set this as the default solver
 			FECoreKernel& fecore = FECoreKernel::GetInstance();
 			fecore.SetDefaultSolver(cd);
-			fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
+			if (boutput) fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
 		}
 
 		return true;
@@ -335,7 +338,7 @@ namespace febio {
 		int nerr = pPM->LoadPlugin(szfile, info);
 		switch (nerr)
 		{
-		case 0: fprintf(stderr, "Success loading plugin %s (version %d.%d.%d)\n", sztitle, info.major, info.minor, info.patch); return true; break;
+		case 0: if (boutput) fprintf(stderr, "Success loading plugin %s (version %d.%d.%d)\n", sztitle, info.major, info.minor, info.patch); return true; break;
 		case 1:
 			fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile);
 #ifndef WIN32

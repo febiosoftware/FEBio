@@ -35,12 +35,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m_dofU(pfem), m_dofSU(pfem)
 {
-    m_dofU.AddDof(pfem->GetDOFIndex("x"));
-	m_dofU.AddDof(pfem->GetDOFIndex("y"));
-	m_dofU.AddDof(pfem->GetDOFIndex("z"));
-    m_dofSU.AddDof(pfem->GetDOFIndex("sx"));
-	m_dofSU.AddDof(pfem->GetDOFIndex("sy"));
-	m_dofSU.AddDof(pfem->GetDOFIndex("sz"));
+	if (pfem)
+	{
+		m_dofU.AddDof(pfem->GetDOFIndex("x"));
+		m_dofU.AddDof(pfem->GetDOFIndex("y"));
+		m_dofU.AddDof(pfem->GetDOFIndex("z"));
+		m_dofSU.AddDof(pfem->GetDOFIndex("sx"));
+		m_dofSU.AddDof(pfem->GetDOFIndex("sy"));
+		m_dofSU.AddDof(pfem->GetDOFIndex("sz"));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +62,15 @@ bool FESolidDomain::Create(int nsize, FE_Element_Spec espec)
 	if (espec.etype != FE_ELEM_INVALID_TYPE)
 		ForEachElement([=](FEElement& el) { el.SetType(espec.etype); });
 
+	m_elemSpec = espec;
+
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+FE_Element_Spec FESolidDomain::GetElementSpec() const
+{
+	return m_elemSpec;
 }
 
 //-----------------------------------------------------------------------------
@@ -80,7 +91,8 @@ FESolidElement& FESolidDomain::Element(int n) { return m_Elem[n]; }
 //-----------------------------------------------------------------------------
 void FESolidDomain::CopyFrom(FEMeshPartition* pd)
 {
-    FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
+	FEDomain::CopyFrom(pd);
+	FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
     m_Elem = psd->m_Elem;
 	ForEachElement([=](FEElement& el) { el.SetMeshPartition(this); });
 }

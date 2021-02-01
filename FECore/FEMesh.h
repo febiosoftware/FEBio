@@ -220,6 +220,9 @@ public:
 	static void SaveClass(DumpStream& ar, FEMesh* p);
 	static FEMesh* LoadClass(DumpStream& ar, FEMesh* p);
 
+	// create a copy of this mesh
+	void CopyFrom(FEMesh& mesh);
+
 public:
 	//! Calculate the surface representing the element boundaries
 	//! boutside : include all exterior facets

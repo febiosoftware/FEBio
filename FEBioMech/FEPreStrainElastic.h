@@ -89,6 +89,8 @@ class FEPrestrainMaterial
 {
 public:
 	virtual FEPrestrainGradient* PrestrainGradientProperty() = 0;
+
+	virtual FEElasticMaterial* GetElasticMaterial() = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -105,6 +107,9 @@ public:
 
 	//! return the pre-strain gradient property
 	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }
+
+	//! return the elastic material
+	FEElasticMaterial* GetElasticMaterial() override { return m_mat; }
 
 public:
 	//! Cauchy stress 

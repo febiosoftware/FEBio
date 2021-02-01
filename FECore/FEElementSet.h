@@ -51,6 +51,8 @@ public:
 	void Create(const std::vector<int>& elemList);
 	void Create(FEDomain* dom, const std::vector<int>& elemList);
 
+	void CopyFrom(FEElementSet& eset);
+
 	// add another element set
 	void Add(const FEElementSet& set);
 

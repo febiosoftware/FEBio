@@ -168,10 +168,10 @@ public: // Timers
 
 public:
 	//! set the debug level
-	void SetDebugFlag(bool b);
+	void SetDebugLevel(int debugLvl);
 
 	//! get the debug level
-	bool GetDebugFlag();
+	int GetDebugLevel();
 
 	//! set the dump level (for cold restarts)
 	void SetDumpLevel(int dumpLevel);
@@ -199,7 +199,7 @@ private:
 
 	PlotFile*	m_plot;			//!< the plot file
 	bool		m_becho;		//!< echo input to logfile
-	bool		m_debug;		//!< debug flag
+	int			m_ndebug;		//!< debug level flag
 	bool		m_writeMesh;	//!< write a new mesh section
 
 	int			m_logLevel;		//!< output level for log file
@@ -226,6 +226,7 @@ protected:
 	vector<FEPlotVariable>	m_pltData;
 	int						m_pltCompression;
 	bool					m_pltAppendOnRestart;
+	int						m_lastUpdate;
 
 private:
 	Logfile	m_log;

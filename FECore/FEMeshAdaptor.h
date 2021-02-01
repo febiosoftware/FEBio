@@ -57,4 +57,5 @@ private:
 };
 
 // helper function for projecting integration point data to nodes
-void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<double (FEMaterialPoint& mp)> f);
+void FECORE_API projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<double (FEMaterialPoint& mp)> f);
+void FECORE_API projectToNodes(FEDomain& dom, std::vector<double>& nodeVals, std::function<double(FEMaterialPoint& mp)> f);

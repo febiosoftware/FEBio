@@ -65,6 +65,11 @@ public:
 	virtual double derive(double x) const;
 
     virtual double deriv2(double x) const = 0;
+
+	// value of first definite integral of funciton from a to b
+	// can be overridden by derived classes.
+	// default implementation is trapezoidal rule
+	virtual double integrate(double a, double b) const;
     
 	virtual void Clear() {}
 };
@@ -117,11 +122,14 @@ public:
 
     double deriv2(double t) const override;
 
+	double integrate(double a, double b) const override;
+
 private:
 	std::string			m_s;
 	MSimpleExpression	m_exp;
 	MSimpleExpression	m_dexp;
     MSimpleExpression   m_d2exp;
+	MSimpleExpression   m_iexp;
 
 	DECLARE_FECORE_CLASS();
 };
