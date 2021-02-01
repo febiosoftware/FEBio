@@ -125,7 +125,7 @@ public:
     //! calculate inverse jacobian matrix w.r.t. reference frame
     double invjact(FESolidElement& el, double J[3][3], double r, double s, double t);
     
-    //! calculate inverse jacobian matrix w.r.t. current frame
+    //! calculate inverse jacobian matrix w.r.t. intermediate frame
     double invjact(FESolidElement& el, double J[3][3], int n, const double alpha);
     
     //! calculate inverse jacobian matrix w.r.t. previous time
@@ -140,6 +140,12 @@ public:
     
     //! calculate spatial gradient of vector function at integration points
     mat3d gradient(FESolidElement& el, vec3d* fn, int n);
+    
+    //! calculate gradient of function at integration points at intermediate time
+    vec3d gradient(FESolidElement& el, vector<double>& fn, int n, const double alpha);
+    
+    //! calculate spatial gradient of vector function at integration points at intermediate time
+    mat3d gradient(FESolidElement& el, vec3d* fn, int n, const double alpha);
     
     //! calculate spatial gradient of vector function at integration points
     //! at previous time

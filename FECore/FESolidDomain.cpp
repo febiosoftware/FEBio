@@ -1533,6 +1533,62 @@ mat3d FESolidDomain::gradient(FESolidElement& el, vec3d* fn, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate gradient of function at integration points at intermediate time
+vec3d FESolidDomain::gradient(FESolidElement& el, vector<double>& fn, int n, const double alpha)
+{
+    double Ji[3][3];
+    invjact(el, Ji, n, alpha);
+    
+    double* Grn = el.Gr(n);
+    double* Gsn = el.Gs(n);
+    double* Gtn = el.Gt(n);
+    
+    double Gx, Gy, Gz;
+    
+    vec3d gradf;
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+    {
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        Gx = Ji[0][0]*Grn[i]+Ji[1][0]*Gsn[i]+Ji[2][0]*Gtn[i];
+        Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i]+Ji[2][1]*Gtn[i];
+        Gz = Ji[0][2]*Grn[i]+Ji[1][2]*Gsn[i]+Ji[2][2]*Gtn[i];
+        
+        // calculate pressure gradient
+        gradf.x += Gx*fn[i];
+        gradf.y += Gy*fn[i];
+        gradf.z += Gz*fn[i];
+    }
+    
+    return gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate spatial gradient of function at integration points at intermediate time
+mat3d FESolidDomain::gradient(FESolidElement& el, vec3d* fn, int n, const double alpha)
+{
+    double Ji[3][3];
+    invjact(el, Ji, n, alpha);
+    
+    vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+    vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+    vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+    
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    mat3d gradf;
+    gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        gradf += fn[i] & (g1*Gr[i] + g2*Gs[i] + g3*Gt[i]);
+    
+    return gradf;
+}
+
+//-----------------------------------------------------------------------------
 //! calculate spatial gradient of function at integration points
 //! at previous time
 mat3d FESolidDomain::gradientp(FESolidElement& el, vec3d* fn, int n)
