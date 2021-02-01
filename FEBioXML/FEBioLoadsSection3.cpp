@@ -93,6 +93,7 @@ void FEBioLoadsSection3::ParseNodalLoad(XMLTag &tag)
 
 	// create nodal load
 	FENodalLoad* pfc = fecore_new<FENodalLoad>(sztype, GetFEModel());
+	if (pfc == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type");
 
 	// read (optional) name attribute
 	const char* szname = tag.AttributeValue("name", true);
