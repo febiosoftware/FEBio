@@ -17,6 +17,7 @@
 		D515C321259E24FC00F0C6FE /* FEDomainShapeInterpolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D515C319259E24FC00F0C6FE /* FEDomainShapeInterpolator.cpp */; };
 		D53081442595627900FBA7BE /* FEScaleAdaptorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */; };
 		D53081452595627900FBA7BE /* FEScaleAdaptorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */; };
+		D568D3C525C84DB900FC67CD /* feamr_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D568D3C425C84DB900FC67CD /* feamr_api.h */; };
 		D5AE8CAB2592EBC6003AC08B /* FETetRefine.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AE8C932592EBC5003AC08B /* FETetRefine.h */; };
 		D5AE8CAC2592EBC6003AC08B /* FERefineMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */; };
 		D5AE8CAD2592EBC6003AC08B /* FEMaxVariableCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AE8C952592EBC5003AC08B /* FEMaxVariableCriterion.h */; };
@@ -54,6 +55,7 @@
 		D515C319259E24FC00F0C6FE /* FEDomainShapeInterpolator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDomainShapeInterpolator.cpp; sourceTree = "<group>"; };
 		D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScaleAdaptorCriterion.h; sourceTree = "<group>"; };
 		D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEScaleAdaptorCriterion.cpp; sourceTree = "<group>"; };
+		D568D3C425C84DB900FC67CD /* feamr_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = feamr_api.h; sourceTree = "<group>"; };
 		D5AE8C932592EBC5003AC08B /* FETetRefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETetRefine.h; sourceTree = "<group>"; };
 		D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERefineMesh.cpp; sourceTree = "<group>"; };
 		D5AE8C952592EBC5003AC08B /* FEMaxVariableCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaxVariableCriterion.h; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 		D5AE8C922592EBC5003AC08B /* FEAMR */ = {
 			isa = PBXGroup;
 			children = (
+				D568D3C425C84DB900FC67CD /* feamr_api.h */,
 				D5AE8CA22592EBC6003AC08B /* FEAMR.cpp */,
 				D5AE8C9C2592EBC6003AC08B /* FEAMR.h */,
 				D5AE8C992592EBC5003AC08B /* FEDomainErrorCriterion.cpp */,
@@ -181,6 +184,7 @@
 				D5AE8CB62592EBC6003AC08B /* FERefineMesh.h in Headers */,
 				D5AE8CAB2592EBC6003AC08B /* FETetRefine.h in Headers */,
 				D515C31E259E24FC00F0C6FE /* FELeastSquaresInterpolator.h in Headers */,
+				D568D3C525C84DB900FC67CD /* feamr_api.h in Headers */,
 				D5AE8CBC2592EBC6003AC08B /* FEDomainErrorCriterion.h in Headers */,
 				D5AE8CB22592EBC6003AC08B /* FEMaxVolumeCriterion.h in Headers */,
 			);
