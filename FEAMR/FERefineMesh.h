@@ -51,6 +51,13 @@ public:
 	FERefineMesh(FEModel* fem);
 	~FERefineMesh();
 
+	// Apply mesh refinement
+	bool Apply(int iteration);
+
+protected:
+	// Derived classes need to override this function
+	virtual bool RefineMesh() = 0;
+
 protected:
 	bool BuildMeshTopo();
 	void UpdateModel();
@@ -62,6 +69,9 @@ protected:
 
 protected:
 	FEMeshTopo*	m_topo;		//!< mesh topo structure
+
+	int		m_maxiter;		// max nr of iterations per time step
+	int		m_maxelem;		// max nr of elements
 
 	int		m_transferMethod;		//!< method for transferring data between meshes
 	bool	m_bmap_data;			//!< map data flag

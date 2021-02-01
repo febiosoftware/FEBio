@@ -31,10 +31,11 @@ class FEHexRefine2D : public FERefineMesh
 public:
 	FEHexRefine2D(FEModel* fem);
 
-	bool Apply(int iteration) override;
+	bool Init() override;
+
+	bool RefineMesh() override;
 
 protected:
-	bool RefineMesh(FEModel& fem);
 	bool BuildSplitLists(FEModel& fem);
 	void UpdateNewNodes(FEModel& fem);
 	void FindHangingNodes(FEModel& fem);
@@ -44,9 +45,8 @@ protected:
 	bool UpdateElementSet(FEElementSet& set);
 
 private:
-	int		m_maxelem;			// max nr of elements
 	int		m_elemRefine;		// max nr of elements to refine per step
-	int		m_maxiter;
+
 	vector<int>	m_elemList;
 	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
 	vector<int>	m_faceList;	// list of face flags to see whether the face was split

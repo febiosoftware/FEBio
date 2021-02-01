@@ -25,6 +25,94 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELeastSquaresInterpolator.h"
 #include <FECore/FENNQuery.h>
+#include <algorithm>
+
+class KDTree
+{
+public:
+	KDTree()
+	{
+		m_parent = nullptr;
+		m_left = nullptr;
+		m_right = nullptr;
+	}
+
+	void build(vector<vec3d> pts, int depth = 0)
+	{
+		size_t n = pts.size();
+		if (n == 1)
+		{
+			m_r = pts[0];
+			return;
+		}
+
+		int axis = depth % 3;
+		std::sort(pts.begin(), pts.end(), [=](const vec3d& a, const vec3d& b) {
+			if (axis == 0) return (a.x < b.x);
+			if (axis == 1) return (a.y < b.y);
+			if (axis == 2) return (a.z < b.z);
+			return false;
+		});
+
+		int med = n / 2;
+
+		m_r = pts[med];
+
+		// build left list
+		if (med > 0)
+		{
+			vector<vec3d> l(pts.begin(), pts.begin() + med);
+			m_left = new KDTree(this);
+			m_left->build(l, depth + 1);
+		}
+
+		// build right list
+		if (med < n - 1)
+		{
+			vector<vec3d> r(pts.begin() + med + 1, pts.end());
+			m_right = new KDTree(this);
+			m_right->build(r, depth + 1);
+		}
+	}
+
+public:
+	vec3d	m_r;
+	KDTree*	m_parent;
+	KDTree*	m_left;
+	KDTree*	m_right;
+
+public:
+	KDTree(KDTree* parent) : m_parent(parent)
+	{
+		m_left = nullptr;
+		m_right = nullptr;
+	}
+};
+
+class NearestNeighborSearch
+{
+public:
+	NearestNeighborSearch() {}
+
+	void Init(const std::vector<vec3d>& points, int k)
+	{
+		m_k = k;
+		m_points = points;
+
+//		m_kdtree.build(m_points);
+	}
+
+	int findNearestNeighbors(const vec3d& x, std::vector<int>& closestNodes)
+	{
+		return findNeirestNeighbors(m_points, x, m_k, closestNodes);
+	}
+
+protected:
+	int				m_k;
+	vector<vec3d>	m_points;
+
+	KDTree	m_kdtree;
+};
 
 FELeastSquaresInterpolator::Data::Data() {}
 FELeastSquaresInterpolator::Data::Data(const Data& d)
@@ -82,10 +170,15 @@ bool FELeastSquaresInterpolator::Init()
 
 	m_data.resize(N1);
 
+	// initialize nearest neighbor search
+	NearestNeighborSearch NNS;
+	NNS.Init(m_src, m_nnc);
+
+	// do nearest-neighbor search
 	for (int i = 0; i < N1; ++i)
 	{
 		vec3d ri = m_trg[i];
-		int M = findNeirestNeighbors(m_src, ri, m_nnc, m_data[i].cpl);
+		int M = NNS.findNearestNeighbors(ri, m_data[i].cpl);
 		assert(M > 4);
 		m_data[i].cpl.resize(M);
 	}

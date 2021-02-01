@@ -88,59 +88,20 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 #endif
 }
 
-bool FEMMGRemesh::Apply(int iteration)
+bool FEMMGRemesh::Init()
 {
 	FEModel& fem = *GetFEModel();
-
-	if (iteration >= m_maxiter)
-	{
-		feLogWarning("Max iterations reached.");
-		return true;
-	}
-
-	// see if we should do anything
 	FEMesh& mesh = fem.GetMesh();
-	if ((m_maxelem > 0) && (mesh.Elements() >= m_maxelem))
-	{
-		feLog("\tElement limit reached.\n");
-		return true;
-	}
+	if (mesh.IsType(ET_TET4) == false) return false;
 
-	// build the mesh-topo
-	if (BuildMeshTopo() == false)
-	{
-		feLogError("Cannot apply tetgen refinement: Error building topo structure.");
-		return true;
-	}
-
-	// do the mesh refinement
-	if (Remesh() == false)
-	{
-		feLogError("Nothing to do.");
-		return true;
-	}
-
-	// reactivate the model
-	UpdateModel();
-
-	// print some mesh statistics
-	int NN = mesh.Nodes();
-	int NE = mesh.Elements();
-	feLog(" Mesh Statistics:\n");
-	feLog(" \tNumber of nodes    : %d\n", NN);
-	feLog(" \tNumber of elements : %d\n", NE);
-	feLog("\n");
-
-	// all done
-	return false;
+	return FERefineMesh::Init();
 }
 
-bool FEMMGRemesh::Remesh()
+bool FEMMGRemesh::RefineMesh()
 {
 #ifdef HAS_MMG
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	if (mesh.IsType(ET_TET4) == false) return false;
 
 	// initialize the MMG mesh
 	MMG5_pMesh mmgMesh = NULL;
@@ -424,15 +385,6 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		MMG3D_Get_scalarSol(mmgSol, &m_metric[i]);
 	}
 
-	// build map data
-	if (m_mmgRemesh->m_bmap_data)
-	{
-		if (m_mmgRemesh->build_map_data(fem) == false)
-		{
-			return false;
-		}
-	}
-
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	vector<vec3d> nodePos(nodes);
 	vector<vector<double> > nodeVal(nodes, vector<double>(MAX_DOFS, 0.0));
@@ -549,12 +501,6 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 		// recreate the element set from the domain list
 		eset.Create(domList);
-	}
-
-	// map data onto new mesh
-	if (m_mmgRemesh->m_bmap_data)
-	{
-		m_mmgRemesh->map_data(fem);
 	}
 
 	// recreate surfaces

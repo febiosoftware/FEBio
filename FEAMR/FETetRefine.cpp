@@ -32,36 +32,10 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FETetRefine, FERefineMesh)
-	ADD_PARAMETER(m_maxiter, "max_iters");
 END_FECORE_CLASS();
 
 FETetRefine::FETetRefine(FEModel* fem) : FERefineMesh(fem)
 {
-	m_maxiter = 0;
-}
-
-bool FETetRefine::Apply(int iteration)
-{
-	if (iteration >= m_maxiter) return true;
-
-	FEModel& fem = *GetFEModel();
-
-	// build the mesh-topo
-	if (BuildMeshTopo() == false)
-	{
-		feLogError("Cannot apply tet refinement: Error building topo structure.");
-		return true;
-	}
-
-	// do the mesh refinement
-	if (DoTetRefinement(fem) == false)
-	{
-		feLogError("Cannot apply tet refinement: Error during refinement.");
-		return true;
-	}
-
-	// all done
-	return false;
 }
 
 struct TRI
@@ -69,8 +43,10 @@ struct TRI
 	int n[3];
 };
 
-bool FETetRefine::DoTetRefinement(FEModel& fem)
+bool FETetRefine::RefineMesh()
 {
+	FEModel& fem = *GetFEModel();
+
 	if (m_topo == nullptr) return false;
 	FEMeshTopo& topo = *m_topo;
 
@@ -104,8 +80,8 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 	// assign dofs to new nodes
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	m_NN = mesh.Nodes();
-	for (int i = N0; i<m_NN; ++i)
+	int NN = mesh.Nodes();
+	for (int i = N0; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
 		node.SetDOFS(MAX_DOFS);
@@ -198,6 +174,7 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		// we don't need this anymore
 		delete newDom;
 	}
+	mesh.RebuildLUT();
 
 	// re-init domains
 	for (int i = 0; i < NDOM; ++i)
@@ -214,6 +191,21 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		{ 2, 5, 4 },
 		{ 3, 4, 5 },
 	};
+
+	// recreate element sets
+	for (int i = 0; i < mesh.ElementSets(); ++i)
+	{
+		FEElementSet& eset = mesh.ElementSet(i);
+
+		// get the domain list
+		// NOTE: Don't get the reference, since then the same reference
+		// is passed to Create below, which causes problems.
+		FEDomainList domList = eset.GetDomainList();
+		if (domList.IsEmpty()) { throw std::runtime_error("Error in FEMMGRemesh!"); }
+
+		// recreate the element set from the domain list
+		eset.Create(domList);
+	}
 
 	// recreate surfaces
 	int faceMark = 1;

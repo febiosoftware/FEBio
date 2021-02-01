@@ -34,11 +34,11 @@ class FEMMGRemesh : public FERefineMesh
 public:
 	FEMMGRemesh(FEModel* fem);
 
-	bool Apply(int iteration) override;
+	bool Init() override;
+
+	bool RefineMesh() override;
 
 private:
-	bool Remesh();
-
 	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
 
 private:

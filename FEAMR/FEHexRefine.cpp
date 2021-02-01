@@ -38,79 +38,36 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
-	ADD_PARAMETER(m_maxelem, "max_elems");
-	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
 	ADD_PROPERTY(m_criterion, "criterion");
-	ADD_PARAMETER(m_bmap_data, "map_data");
-	ADD_PARAMETER(m_nnc, "nnc");
-	ADD_PARAMETER(m_transferMethod, "transfer_method");
 END_FECORE_CLASS();
 
 FEHexRefine::FEHexRefine(FEModel* fem) : FERefineMesh(fem)
 {
-	m_maxelem = 0;
 	m_elemRefine = 0;
-	m_maxiter = -1;
 	m_criterion = nullptr;
 }
 
-bool FEHexRefine::Apply(int iteration)
+bool FEHexRefine::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	if (mesh.IsType(ET_HEX8) == false)
+	{
+		feLogError("Cannot apply hex refinement: Mesh is not a HEX8 mesh.");
+		return false;
+	}
+
+	return FERefineMesh::Init();
+}
+
+bool FEHexRefine::RefineMesh()
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	if ((m_maxiter >= 0) && (iteration >= m_maxiter))
-	{
-		feLog("\tMax iterations reached.\n");
-		return true;
-	}
-
-	// see if we should do anything
-	if ((m_maxelem > 0) && (mesh.Elements() >= m_maxelem))
-	{
-		feLog("\tElement limit reached.\n");
-		return true;
-	}
-
-	// make sure this is a hex mesh
-	// Note that we return true on error to indicate that 
-	// the mesh did not change
-	// TODO: Maybe trhow an exception instead of just returning on error
-	if (mesh.IsType(ET_HEX8) == false)
-	{
-		feLogError("Cannot apply hex refinement: Mesh is not a HEX8 mesh.");
-		return true;
-	}
-
-	// build the mesh-topo
-	// Note that we return true on error to indicate that 
-	// the mesh did not change
-	// TODO: Maybe trhow an exception instead of just returning on error
-	if (BuildMeshTopo() == false)
-	{
-		feLogError("Cannot apply hex refinement: Error building topo structure.");
-		return true;
-	}
-
-	// refine the mesh
-	if (RefineMesh(fem) == false)
-	{
-		feLog("\tNothing to do.\n");
-		return true;
-	}
-
-	// update the model
-	UpdateModel();
-
-	return false;
-}
-
-bool FEHexRefine::RefineMesh(FEModel& fem)
-{
 	FEMeshTopo& topo = *m_topo;
 
-	FEMesh& mesh = fem.GetMesh();
 	FEElementList allElems(mesh);
 
 	const int NEL = mesh.Elements();
@@ -123,16 +80,7 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 	BuildSplitLists(fem);
 
 	// make sure we have work to do
-	if (m_splitElems == 0) return false;
-
-	// map the data
-	if (m_bmap_data)
-	{
-		if (build_map_data(fem) == false)
-		{
-			return false;
-		}
-	}
+	if (m_splitElems == 0) return true;
 
 	// Next, the position and solution variables for all the nodes are updated.
 	// Note that this has to be done before recreating the elements since 
@@ -146,12 +94,6 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 	// Now, we can create new elements
 	BuildNewDomains(fem);
 
-	// map data onto new mesh
-	if (m_bmap_data)
-	{
-		map_data(fem);
-	}
-
 	// recreate element sets
 	for (int i = 0; i < mesh.ElementSets(); ++i)
 	{
@@ -161,7 +103,7 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 		// NOTE: Don't get the reference, since then the same reference
 		// is passed to Create below, which causes problems.
 		FEDomainList domList = eset.GetDomainList();
-		if (domList.IsEmpty()) { throw std::runtime_error("Error in FEMMGRemesh!"); }
+		if (domList.IsEmpty()) { throw std::runtime_error("Error in FEHexRefine!"); }
 
 		// recreate the element set from the domain list
 		eset.Create(domList);
@@ -180,11 +122,6 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 		FESurface& surf = mesh.Surface(i);
 		if (UpdateSurface(surf) == false) return false;
 	}
-
-	// print some stats:
-	feLog("\tNew mesh stats:\n");
-	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
-	feLog("\t  Elements ....... : %d\n", mesh.Elements());
 
 	return true;
 }

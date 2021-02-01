@@ -31,15 +31,7 @@ class FETetRefine : public FERefineMesh
 public:
 	FETetRefine(FEModel* fem);
 
-	bool Apply(int iteration);
-
-protected:
-	bool DoTetRefinement(FEModel& fem);
-
-private:
-	int	m_maxiter;
-
-	int	m_NN;
+	bool RefineMesh() override;
 
 	DECLARE_FECORE_CLASS();
 };

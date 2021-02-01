@@ -38,73 +38,33 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEHexRefine2D, FERefineMesh)
-	ADD_PARAMETER(m_maxelem, "max_elems");
-	ADD_PARAMETER(m_maxiter, "max_iter");
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
 	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
 
 FEHexRefine2D::FEHexRefine2D(FEModel* fem) : FERefineMesh(fem)
 {
-	m_maxelem = 0;
 	m_elemRefine = 0;
-	m_maxiter = -1;
 	m_criterion = nullptr;
 }
 
-bool FEHexRefine2D::Apply(int iteration)
+bool FEHexRefine2D::Init()
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	if ((m_maxiter >= 0) && (iteration >= m_maxiter))
-	{
-		feLog("\tMax iterations reached.\n");
-		return true;
-	}
-
-	// see if we should do anything
-	if ((m_maxelem > 0) && (mesh.Elements() >= m_maxelem))
-	{
-		feLog("\tElement limit reached.\n");
-		return true;
-	}
-
-	// make sure this is a hex mesh
-	// Note that we return true on error to indicate that 
-	// the mesh did not change
-	// TODO: Maybe trhow an exception instead of just returning on error
 	if (mesh.IsType(ET_HEX8) == false)
 	{
 		feLogError("Cannot apply hex refinement: Mesh is not a HEX8 mesh.");
 		return true;
 	}
 
-	// build the mesh-topo
-	// Note that we return true on error to indicate that 
-	// the mesh did not change
-	// TODO: Maybe trhow an exception instead of just returning on error
-	if (BuildMeshTopo() == false)
-	{
-		feLogError("Cannot apply hex refinement: Error building topo structure.");
-		return true;
-	}
-
-	// refine the mesh
-	if (RefineMesh(fem) == false)
-	{
-		feLog("\tNothing to do.\n");
-		return true;
-	}
-
-	// update the model
-	UpdateModel();
-
-	return false;
+	return FERefineMesh::Init();
 }
 
-bool FEHexRefine2D::RefineMesh(FEModel& fem)
+bool FEHexRefine2D::RefineMesh()
 {
+	FEModel& fem = *GetFEModel();
 	FEMeshTopo& topo = *m_topo;
 
 	FEMesh& mesh = fem.GetMesh();
@@ -154,11 +114,6 @@ bool FEHexRefine2D::RefineMesh(FEModel& fem)
 		FEElementSet& set = mesh.ElementSet(i);
 		if (UpdateElementSet(set) == false) return false;
 	}
-
-	// print some stats:
-	feLog("\tNew mesh stats:\n");
-	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
-	feLog("\t  Elements ....... : %d\n", mesh.Elements());
 
 	return true;
 }
