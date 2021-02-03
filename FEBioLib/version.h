@@ -35,7 +35,7 @@ SOFTWARE.*/
 // SUBSUBVERSION is incremented when bugs are fixed.
 
 #define VERSION			3
-#define SUBVERSION		1
+#define SUBVERSION		2
 #define SUBSUBVERSION	0
 
 ///////////////////////////////////////////////////////////////////////////////
