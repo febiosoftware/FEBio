@@ -1117,6 +1117,45 @@ void FEModel::Activate()
 }
 
 //-----------------------------------------------------------------------------
+// TODO: temporary construction. Need to see if I can just use Activate(). 
+//       This is called after remeshed
+void FEModel::Reactivate()
+{
+	// reactivate BCs
+	for (int i = 0; i < BoundaryConditions(); ++i)
+	{
+		FEBoundaryCondition& bc = *BoundaryCondition(i);
+		if (bc.IsActive()) bc.Activate();
+	}
+
+	// reactivate nodal loads
+	for (int i = 0; i < NodalLoads(); ++i)
+	{
+		FENodalLoad& nl = *NodalLoad(i);
+		if (nl.IsActive()) nl.Activate();
+	}
+
+	// update surface loads 
+	for (int i = 0; i < SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *SurfaceLoad(i);
+		FESurface& surf = sl.GetSurface();
+		sl.SetSurface(&surf);
+		if (sl.IsActive()) sl.Activate();
+	}
+
+	// update surface interactions
+	for (int i = 0; i < SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
+		if (ci.IsActive()) ci.Activate();
+	}
+
+	// reactivate the linear constraints
+	GetLinearConstraintManager().Activate();
+}
+
+//-----------------------------------------------------------------------------
 //! \todo Do I really need this function. I think calling FEModel::Init achieves the
 //! same effect.
 bool FEModel::Reset()

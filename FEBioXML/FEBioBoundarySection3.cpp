@@ -133,7 +133,7 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	// create new rigid node set
 	FERigidNodeSet* prn = fecore_alloc(FERigidNodeSet, &fem);
 
-	prn->SetNodeSet(*nodeSet);
+	prn->SetNodeSet(nodeSet);
 
 	fem.AddRigidNodeSet(prn);
 

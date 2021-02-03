@@ -49,6 +49,9 @@ public:
 	// model activation
 	void Activate() override;
 
+	// TODO: temporary construction. Would like to call Activate
+	void Reactivate() override;
+
 	// reset
 	bool Reset() override;
 

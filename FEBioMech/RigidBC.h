@@ -65,9 +65,7 @@ public:
 
 	void SetRigidMaterialID(int rid);
 
-	void SetNodeSet(FENodeSet& ns);
-
-	void AddNode(int nid);
+	void SetNodeSet(FENodeSet* ns);
 
 	void SetShellBC(SHELL_BC bc);
 
@@ -76,7 +74,7 @@ private: // parameters
 	int			m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
 
 private:
-	vector<int>		m_node;	// node number
+	FENodeSet*	m_nodeSet;
 
 	DECLARE_FECORE_CLASS();
 };

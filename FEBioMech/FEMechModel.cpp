@@ -157,6 +157,13 @@ void FEMechModel::Activate()
 }
 
 //-----------------------------------------------------------------------------
+void FEMechModel::Reactivate()
+{
+	FEModel::Reactivate();
+	m_prs->Activate();
+}
+
+//-----------------------------------------------------------------------------
 bool FEMechModel::Reset()
 {
 	if (FEModel::Reset() == false) return false;

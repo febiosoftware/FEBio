@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEDomainMap.h>
+#include <FECore/FESurfaceMap.h>
 #include <FECore/DumpMemStream.h>
 #include <FECore/log.h>
 #include "FELeastSquaresInterpolator.h"
@@ -68,7 +69,7 @@ FERefineMesh::~FERefineMesh()
 	if (m_meshCopy) delete m_meshCopy;
 	m_meshCopy = nullptr;
 
-	clear_maps();
+	ClearMapData();
 }
 
 // Apply mesh refinement
@@ -98,10 +99,10 @@ bool FERefineMesh::Apply(int iteration)
 	}
 
 	// build data maps
-	if (m_bmap_data)
+	feLog("-- Building map data:\n");
+	if (BuildMapData() == false)
 	{
-		feLog("-- Building map data:\n");
-		build_map_data(fem);
+		throw std::runtime_error("Failed mapping data.");
 	}
 
 	// refine the mesh (This is done by sub-classes)
@@ -114,11 +115,8 @@ bool FERefineMesh::Apply(int iteration)
 	feLog("-- Mesh refinement completed.\n");
 
 	// map data to new mesh
-	if (m_bmap_data)
-	{
-		feLog("-- Transferring map data to new mesh:\n");
-		map_data(fem);
-	}
+	feLog("-- Transferring map data to new mesh:\n");
+	TransferMapData();
 
 	// update the model
 	UpdateModel();
@@ -135,19 +133,20 @@ bool FERefineMesh::Apply(int iteration)
 	return false;
 }
 
-void FERefineMesh::clear_maps()
+void FERefineMesh::ClearMapData()
 {
-	for (size_t i = 0; i < m_nodeMapList.size(); ++i)
+	// clear domain maps
+	for (size_t i = 0; i < m_domainMapList.size(); ++i)
 	{
-		std::vector<FEDomainMap*>& map_i = m_nodeMapList[i];
+		std::vector<FEDomainMap*>& map_i = m_domainMapList[i];
 		for (size_t j = 0; j < map_i.size(); ++j) delete map_i[j];
 	}
-	m_nodeMapList.clear();
+	m_domainMapList.clear();
 
-	for (int i = 0; i < m_meshDataList.size(); ++i) delete m_meshDataList[i];
-	m_meshDataList.clear();
+	// clear user maps
+	for (int i = 0; i < m_userDataList.size(); ++i) delete m_userDataList[i];
+	m_userDataList.clear();
 }
-
 
 bool FERefineMesh::BuildMeshTopo()
 {
@@ -161,38 +160,7 @@ void FERefineMesh::UpdateModel()
 {
 	FEModel& fem = *GetFEModel();
 
-	// reactivate BCs
-	for (int i = 0; i < fem.BoundaryConditions(); ++i)
-	{
-		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-		if (bc.IsActive()) bc.Activate();
-	}
-
-	// reactivate nodal loads
-	for (int i = 0; i < fem.NodalLoads(); ++i)
-	{
-		FENodalLoad& nl = *fem.NodalLoad(i);
-		if (nl.IsActive()) nl.Activate();
-	}
-
-	// update surface loads 
-	for (int i = 0; i < fem.SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		FESurface& surf = sl.GetSurface();
-		sl.SetSurface(&surf);
-		if (sl.IsActive()) sl.Activate();
-	}
-
-	// update surface interactions
-	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
-	{
-		FESurfacePairConstraint& ci = *fem.SurfacePairConstraint(i);
-		if (ci.IsActive()) ci.Activate();
-	}
-
-	// reactivate the linear constraints
-	fem.GetLinearConstraintManager().Activate();
+	fem.Reactivate();
 }
 
 void FERefineMesh::CopyMesh()
@@ -638,17 +606,37 @@ void NodeToElemData(FEModel& fem, FEDomain& dom, FEDomainMap* nodeMap, FEDomainM
 	}
 }
 
-bool FERefineMesh::build_map_data(FEModel& fem)
+bool FERefineMesh::BuildMapData()
 {
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
 	// make a copy of the old mesh
 	// we need it for mapping data
 	CopyMesh();
-	clear_maps();
 
+	// clear all map data
+	ClearMapData();
+	m_domainMapList.clear();
+	m_domainMapList.resize(mesh.Domains());
+
+	// only map domain data if requested
+	if (m_bmap_data)
+	{
+		if (BuildDomainMapData() == false)
+		{
+			return false;
+		}
+	}
+
+	// do the same thing for the user-defined mesh data
+	return BuildUserMapData();
+}
+
+bool FERefineMesh::BuildDomainMapData()
+{
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-
-	m_nodeMapList.clear();
-	m_nodeMapList.resize(mesh.Domains());
 
 	// loop over all domains
 	for (int i = 0; i < mesh.Domains(); ++i)
@@ -657,283 +645,341 @@ bool FERefineMesh::build_map_data(FEModel& fem)
 
 		feLog(" Processing domain: %s\n", dom.GetName().c_str());
 
-		// write all material point data to a data stream
-		DumpMemStream ar(fem);
-		ar.Open(true, true);
-		ar.WriteTypeInfo(true);
-
-		// loop over all integration points
-		int totalPoints = 0;
-		for (int j = 0; j < dom.Elements(); ++j)
+		if (BuildDomainMapData(dom, i) == false)
 		{
-			FEElement& el = dom.ElementRef(j);
-			int nint = el.GaussPoints();
-			for (int k = 0; k < nint; ++k)
-			{
-				FEMaterialPoint* mp = el.GetMaterialPoint(k);
-				mp->Serialize(ar);
-			}
-			totalPoints += nint;
+			return false;
 		}
-
-		// figure out how much data was written for each material point
-		size_t bytes = ar.bytesSerialized();
-
-		size_t bytesPerPoint = bytes / totalPoints;
-		assert((bytes%totalPoints) == 0);
-
-		// re-open for reading
-		ar.Open(false, true);
-
-		// create an element set (we need this for the domain map below)
-		FEDomain& oldDomain = m_meshCopy->Domain(i);
-		FEElementSet* elemSet = new FEElementSet(&fem);
-		elemSet->Create(&oldDomain);
-
-		// next, we need to figure out the datamaps for each data item
-		vector<FEDomainMap*> mapList;
-		DumpStream::DataBlock d;
-		while (ar.bytesSerialized() < bytesPerPoint)
-		{
-			ar.readBlock(d);
-
-			const char* typeStr = nullptr;
-			FEDomainMap* map = nullptr;
-			switch (d.dataType())
-			{
-			case TypeID::TYPE_DOUBLE: map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MATPOINTS); typeStr = "double"; break;
-			case TypeID::TYPE_VEC3D : map = new FEDomainMap(FEDataType::FE_VEC3D , Storage_Fmt::FMT_MATPOINTS); typeStr = "vec3d" ; break;
-			case TypeID::TYPE_MAT3D : map = new FEDomainMap(FEDataType::FE_MAT3D , Storage_Fmt::FMT_MATPOINTS); typeStr = "mat3d" ; break;
-			case TypeID::TYPE_MAT3DS: map = new FEDomainMap(FEDataType::FE_MAT3DS, Storage_Fmt::FMT_MATPOINTS); typeStr = "mat3ds"; break;
-			default:
-				assert(false);
-				throw std::runtime_error("Error in mapping data.");
-			}
-
-			map->Create(elemSet, 0.0);
-
-			feLog("\tData map %d: %s\n", mapList.size(), typeStr);
-
-			mapList.push_back(map);
-		}
-
-		feLog(" %d data maps identified.\n", mapList.size());
-
-		// rewind for processing
-		ar.Open(false, true);
-
-		for (int j = 0; j < dom.Elements(); ++j)
-		{
-			FEElement& el = dom.ElementRef(j);
-			int nint = el.GaussPoints();
-			for (int k = 0; k < nint; ++k)
-			{
-				int m = 0;
-				size_t bytesRead = 0;
-				while (bytesRead < bytesPerPoint)
-				{
-					size_t size0 = ar.bytesSerialized();
-					bool b = ar.readBlock(d); assert(b);
-					size_t size1 = ar.bytesSerialized();
-					bytesRead += size1 - size0;
-
-					FEDomainMap* map = mapList[m];
-
-					switch (d.dataType())
-					{
-					case TypeID::TYPE_DOUBLE: { double v = d.value<double>(); map->setValue(j, k, v); } break;
-					case TypeID::TYPE_MAT3D: { mat3d  v = d.value<mat3d >(); map->setValue(j, k, v); } break;
-					case TypeID::TYPE_MAT3DS: { mat3ds v = d.value<mat3ds>(); map->setValue(j, k, v); } break;
-					}
-
-					m++;
-					assert(m <= mapList.size());
-				}
-			}
-		}
-
-		// Now, we need to project all the data onto the nodes
-		for (int j = 0; j < mapList.size(); ++j)
-		{
-			feLog("\tProcessing data map %d ...", j);
-			FEDomainMap* elemMap = mapList[j];
-
-			FEDataType dataType = elemMap->DataType();
-			FEDomainMap* nodeMap = new FEDomainMap(dataType, Storage_Fmt::FMT_NODE);
-			
-			FEElementSet* elset = const_cast<FEElementSet*>(elemMap->GetElementSet());
-			nodeMap->Create(elset);
-
-			bool bret = createNodeDataMap(dom, elemMap, nodeMap); assert(bret);
-			m_nodeMapList[i].push_back(nodeMap);
-			feLog("done.\n");
-		}
-	}
-
-	// do the same thing for the mesh data
-	feLog(" Processing user data maps:\n");
-	m_meshDataList.clear();
-	int dataMaps = mesh.DataMaps();
-	for (int i = 0; i < dataMaps; ++i)
-	{
-		FEDomainMap* dmap = dynamic_cast<FEDomainMap*>(mesh.GetDataMap(i));
-		if (dmap == nullptr) return false;
-		if (dmap->DataType() != FEDataType::FE_DOUBLE) return false;
-
-		feLog("\tProcessing user data map \"%s\" ...", dmap->GetName().c_str());
-
-		const FEElementSet* elset = dmap->GetElementSet();
-		const FEDomainList& domainList = elset->GetDomainList();
-		if (domainList.Domains() != 1) return false;
-		FEDomain& dom = const_cast<FEDomain&>(*domainList.GetDomain(0));
-
-		FEElementSet* oldElemSet = m_meshCopy->FindElementSet(dom.GetName()); assert(oldElemSet);
-
-		FEDataType dataType = dmap->DataType();
-		FEDomainMap* nodeMap = new FEDomainMap(dataType, Storage_Fmt::FMT_NODE);
-		nodeMap->Create(oldElemSet);
-
-		// create a node data map of this domain map
-		createNodeDataMap(dom, dmap, nodeMap);
-		m_meshDataList.push_back(nodeMap);
-
-		feLog("done.\n");
 	}
 
 	return true;
 }
 
-void FERefineMesh::map_data(FEModel& fem)
+bool FERefineMesh::BuildDomainMapData(FEDomain& dom, int domIndex)
 {
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	// loop over all domains
-	for (int i = 0; i < mesh.Domains(); ++i)
+	// write all material point data to a data stream
+	DumpMemStream ar(fem);
+	ar.Open(true, true);
+	ar.WriteTypeInfo(true);
+
+	// loop over all integration points
+	int totalPoints = 0;
+	for (int j = 0; j < dom.Elements(); ++j)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		feLog(" Mapping data for domain \"%s\":\n", dom.GetName().c_str());
-
-		// we need an element set for the domain maps below
-		FEElementSet* elemSet = new FEElementSet(&fem);
-		elemSet->Create(&dom);
-
-		// build source point list
-		FEDomain& oldDomain = m_meshCopy->Domain(i);
-		vector<vec3d> srcPoints; srcPoints.reserve(oldDomain.Nodes());
-		for (int i = 0; i < oldDomain.Nodes(); ++i)
+		FEElement& el = dom.ElementRef(j);
+		int nint = el.GaussPoints();
+		for (int k = 0; k < nint; ++k)
 		{
-			vec3d r = oldDomain.Node(i).m_r0;
-			srcPoints.push_back(r);
+			FEMaterialPoint* mp = el.GetMaterialPoint(k);
+			mp->Serialize(ar);
 		}
+		totalPoints += nint;
+	}
 
-		// build target node list
-		vector<vec3d> trgPoints; trgPoints.reserve(dom.Elements());
-		for (int i = 0; i < dom.Elements(); ++i)
-		{
-			FEElement& el = dom.ElementRef(i);
-			int nint = el.GaussPoints();
-			for (int j = 0; j < nint; ++j)
-			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				vec3d r = mp.m_r0;
-				trgPoints.push_back(r);
-			}
-		}
+	// figure out how much data was written for each material point
+	size_t bytes = ar.bytesSerialized();
 
-		// set up mapper
-		FEMeshDataInterpolator* mapper = nullptr;
-		switch (m_transferMethod)
+	size_t bytesPerPoint = bytes / totalPoints;
+	assert((bytes%totalPoints) == 0);
+
+	// re-open for reading
+	ar.Open(false, true);
+
+	// create an element set (we need this for the domain map below)
+	FEDomain& oldDomain = m_meshCopy->Domain(domIndex);
+	FEElementSet* elemSet = new FEElementSet(&fem);
+	elemSet->Create(&oldDomain);
+
+	// next, we need to figure out the datamaps for each data item
+	vector<FEDomainMap*> mapList;
+	DumpStream::DataBlock d;
+	while (ar.bytesSerialized() < bytesPerPoint)
+	{
+		ar.readBlock(d);
+
+		const char* typeStr = nullptr;
+		FEDomainMap* map = nullptr;
+		switch (d.dataType())
 		{
-		case TRANSFER_SHAPE:
-		{
-			FEDomain* oldDomain = &m_meshCopy->Domain(i);
-			FEDomainShapeInterpolator* dsm = new FEDomainShapeInterpolator(oldDomain);
-			dsm->SetTargetPoints(trgPoints);
-			mapper = dsm;
-		}
-		break;
-		case TRANSFER_MLQ:
-		{
-			FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
-			MLQ->SetNearestNeighborCount(m_nnc);
-			MLQ->SetSourcePoints(srcPoints);
-			MLQ->SetTargetPoints(trgPoints);
-			mapper = MLQ;
-		}
-		break;
+		case TypeID::TYPE_DOUBLE: map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MATPOINTS); typeStr = "double"; break;
+		case TypeID::TYPE_VEC3D: map = new FEDomainMap(FEDataType::FE_VEC3D, Storage_Fmt::FMT_MATPOINTS); typeStr = "vec3d"; break;
+		case TypeID::TYPE_MAT3D: map = new FEDomainMap(FEDataType::FE_MAT3D, Storage_Fmt::FMT_MATPOINTS); typeStr = "mat3d"; break;
+		case TypeID::TYPE_MAT3DS: map = new FEDomainMap(FEDataType::FE_MAT3DS, Storage_Fmt::FMT_MATPOINTS); typeStr = "mat3ds"; break;
 		default:
 			assert(false);
-			return;
-		}
-		if (mapper->Init() == false)
-		{
-			assert(false);
-			throw std::runtime_error("Failed to initialize LLQ");
+			throw std::runtime_error("Error in mapping data.");
 		}
 
-		// loop over all the domain maps
-		std::vector<FEDomainMap*>& nodeMap_i = m_nodeMapList[i];
-		int mapCount = nodeMap_i.size();
-		vector<FEDomainMap*> elemMapList(mapCount);
-		for (int j = 0; j < mapCount; ++j)
+		map->Create(elemSet, 0.0);
+
+		feLog("\tData map %d: %s\n", mapList.size(), typeStr);
+
+		mapList.push_back(map);
+	}
+
+	feLog(" %d data maps identified.\n", mapList.size());
+
+	// rewind for processing
+	ar.Open(false, true);
+
+	for (int j = 0; j < dom.Elements(); ++j)
+	{
+		FEElement& el = dom.ElementRef(j);
+		int nint = el.GaussPoints();
+		for (int k = 0; k < nint; ++k)
 		{
-			feLog("\tMapping map %d ...", j);
-			FEDomainMap* nodeMap = nodeMap_i[j];
-
-			// map node data to integration points
-			FEDomainMap* elemMap = createElemDataMap(fem, dom, srcPoints, nodeMap, mapper);
-
-			elemMapList[j] = elemMap;
-			feLog("done.\n");
-		}
-
-		// now we need to reconstruct the data stream
-		DumpMemStream ar(fem);
-		ar.Open(true, true);
-
-		for (int j = 0; j < dom.Elements(); ++j)
-		{
-			FEElement& el = dom.ElementRef(j);
-			int nint = el.GaussPoints();
-
-			for (int k = 0; k < nint; ++k)
+			int m = 0;
+			size_t bytesRead = 0;
+			while (bytesRead < bytesPerPoint)
 			{
-				for (int l = 0; l < mapCount; ++l)
+				size_t size0 = ar.bytesSerialized();
+				bool b = ar.readBlock(d); assert(b);
+				size_t size1 = ar.bytesSerialized();
+				bytesRead += size1 - size0;
+
+				FEDomainMap* map = mapList[m];
+
+				switch (d.dataType())
 				{
-					FEDomainMap* map = elemMapList[l];
-					switch (map->DataType())
-					{
-					case FEDataType::FE_DOUBLE: { double v = map->value<double>(j, k); ar << v; } break;
-					case FEDataType::FE_VEC3D: { vec3d  v = map->value<vec3d >(j, k); ar << v; } break;
-					case FEDataType::FE_MAT3D: { mat3d  v = map->value<mat3d >(j, k); ar << v; } break;
-					case FEDataType::FE_MAT3DS: { mat3ds v = map->value<mat3ds>(j, k); ar << v; } break;
-					default:
-						assert(false);
-					}
+				case TypeID::TYPE_DOUBLE: { double v = d.value<double>(); map->setValue(j, k, v); } break;
+				case TypeID::TYPE_MAT3D: { mat3d  v = d.value<mat3d >(); map->setValue(j, k, v); } break;
+				case TypeID::TYPE_MAT3DS: { mat3ds v = d.value<mat3ds>(); map->setValue(j, k, v); } break;
 				}
-			}
-		}
 
-		// time to serialize everything back to the new integration points
-		ar.Open(false, true);
-		for (int j = 0; j < dom.Elements(); ++j)
-		{
-			FEElement& el = dom.ElementRef(j);
-			int nint = el.GaussPoints();
-
-			for (int k = 0; k < nint; ++k)
-			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(k);
-				mp.Serialize(ar);
+				m++;
+				assert(m <= mapList.size());
 			}
 		}
 	}
 
+	// Now, we need to project all the data onto the nodes
+	for (int j = 0; j < mapList.size(); ++j)
+	{
+		feLog("\tProcessing data map %d ...", j);
+		FEDomainMap* elemMap = mapList[j];
+
+		FEDataType dataType = elemMap->DataType();
+		FEDomainMap* nodeMap = new FEDomainMap(dataType, Storage_Fmt::FMT_NODE);
+
+		FEElementSet* elset = const_cast<FEElementSet*>(elemMap->GetElementSet());
+		nodeMap->Create(elset);
+
+		bool bret = createNodeDataMap(dom, elemMap, nodeMap); assert(bret);
+		m_domainMapList[domIndex].push_back(nodeMap);
+		feLog("done.\n");
+	}
+}
+
+bool FERefineMesh::BuildUserMapData()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	m_userDataList.clear();
+	int dataMaps = mesh.DataMaps();
+	if (dataMaps > 0) feLog(" Processing user data maps:\n");
+
+	for (int i = 0; i < dataMaps; ++i)
+	{
+		FEDataMap* dataMap = mesh.GetDataMap(i);
+
+		// process domain map
+		FEDomainMap* dmap = dynamic_cast<FEDomainMap*>(dataMap);
+		if (dmap)
+		{
+			FEDataType dataType = dmap->DataType();
+			if ((dataType != FEDataType::FE_DOUBLE) && 
+				(dataType != FEDataType::FE_VEC3D)) return false;
+
+			feLog("\tProcessing user data map \"%s\" ...", dmap->GetName().c_str());
+
+			const FEElementSet* elset = dmap->GetElementSet();
+			const FEDomainList& domainList = elset->GetDomainList();
+			if (domainList.Domains() != 1) return false;
+			FEDomain& dom = const_cast<FEDomain&>(*domainList.GetDomain(0));
+
+			FEElementSet* oldElemSet = m_meshCopy->FindElementSet(dom.GetName()); assert(oldElemSet);
+
+			FEDomainMap* nodeMap = new FEDomainMap(dataType, Storage_Fmt::FMT_NODE);
+			nodeMap->Create(oldElemSet);
+
+			// create a node data map of this domain map
+			createNodeDataMap(dom, dmap, nodeMap);
+			m_userDataList.push_back(nodeMap);
+
+			feLog("done.\n");
+		}
+
+		FESurfaceMap* smap = dynamic_cast<FESurfaceMap*>(dataMap);
+		if (smap)
+		{
+			assert(false);
+		}
+	}
+
+	return true;
+}
+
+// Transfer data to new mesh
+void FERefineMesh::TransferMapData()
+{
+	// transfer domain data
+	if (m_bmap_data) TransferDomainMapData();
+
+	// transfer user-defined maps
+	TransferUserMapData();
+}
+
+// Transfer domain data back to the new mesh
+void FERefineMesh::TransferDomainMapData()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// loop over all domains
+	if (m_bmap_data && m_domainMapList.size())
+	{
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+
+			std::vector<FEDomainMap*>& nodeMap_i = m_domainMapList[i];
+			int mapCount = nodeMap_i.size();
+
+			if (mapCount > 0)
+			{
+				feLog(" Mapping data for domain \"%s\":\n", dom.GetName().c_str());
+
+				// we need an element set for the domain maps below
+				FEElementSet* elemSet = new FEElementSet(&fem);
+				elemSet->Create(&dom);
+
+				// build source point list
+				FEDomain& oldDomain = m_meshCopy->Domain(i);
+				vector<vec3d> srcPoints; srcPoints.reserve(oldDomain.Nodes());
+				for (int i = 0; i < oldDomain.Nodes(); ++i)
+				{
+					vec3d r = oldDomain.Node(i).m_r0;
+					srcPoints.push_back(r);
+				}
+
+				// build target node list
+				vector<vec3d> trgPoints; trgPoints.reserve(dom.Elements());
+				for (int i = 0; i < dom.Elements(); ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					int nint = el.GaussPoints();
+					for (int j = 0; j < nint; ++j)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+						vec3d r = mp.m_r0;
+						trgPoints.push_back(r);
+					}
+				}
+
+				// set up mapper
+				FEMeshDataInterpolator* mapper = nullptr;
+				switch (m_transferMethod)
+				{
+				case TRANSFER_SHAPE:
+				{
+					FEDomain* oldDomain = &m_meshCopy->Domain(i);
+					FEDomainShapeInterpolator* dsm = new FEDomainShapeInterpolator(oldDomain);
+					dsm->SetTargetPoints(trgPoints);
+					mapper = dsm;
+				}
+				break;
+				case TRANSFER_MLQ:
+				{
+					FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
+					MLQ->SetNearestNeighborCount(m_nnc);
+					MLQ->SetSourcePoints(srcPoints);
+					MLQ->SetTargetPoints(trgPoints);
+					mapper = MLQ;
+				}
+				break;
+				default:
+					assert(false);
+					return;
+				}
+				if (mapper->Init() == false)
+				{
+					assert(false);
+					throw std::runtime_error("Failed to initialize LLQ");
+				}
+
+				// loop over all the domain maps
+				vector<FEDomainMap*> elemMapList(mapCount);
+				for (int j = 0; j < mapCount; ++j)
+				{
+					feLog("\tMapping map %d ...", j);
+					FEDomainMap* nodeMap = nodeMap_i[j];
+
+					// map node data to integration points
+					FEDomainMap* elemMap = createElemDataMap(fem, dom, srcPoints, nodeMap, mapper);
+
+					elemMapList[j] = elemMap;
+					feLog("done.\n");
+				}
+
+				// now we need to reconstruct the data stream
+				DumpMemStream ar(fem);
+				ar.Open(true, true);
+
+				for (int j = 0; j < dom.Elements(); ++j)
+				{
+					FEElement& el = dom.ElementRef(j);
+					int nint = el.GaussPoints();
+
+					for (int k = 0; k < nint; ++k)
+					{
+						for (int l = 0; l < mapCount; ++l)
+						{
+							FEDomainMap* map = elemMapList[l];
+							switch (map->DataType())
+							{
+							case FEDataType::FE_DOUBLE: { double v = map->value<double>(j, k); ar << v; } break;
+							case FEDataType::FE_VEC3D: { vec3d  v = map->value<vec3d >(j, k); ar << v; } break;
+							case FEDataType::FE_MAT3D: { mat3d  v = map->value<mat3d >(j, k); ar << v; } break;
+							case FEDataType::FE_MAT3DS: { mat3ds v = map->value<mat3ds>(j, k); ar << v; } break;
+							default:
+								assert(false);
+							}
+						}
+					}
+				}
+
+				// time to serialize everything back to the new integration points
+				ar.Open(false, true);
+				for (int j = 0; j < dom.Elements(); ++j)
+				{
+					FEElement& el = dom.ElementRef(j);
+					int nint = el.GaussPoints();
+
+					for (int k = 0; k < nint; ++k)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(k);
+						mp.Serialize(ar);
+					}
+				}
+			}
+		}
+	}
+}
+
+// Transfer user data maps to new mesh
+void FERefineMesh::TransferUserMapData()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
 	// map mesh data
-	for (int i = 0; i < m_meshDataList.size(); ++i)
+	for (int i = 0; i < m_userDataList.size(); ++i)
 	{
 		FEDomainMap* elemMap = dynamic_cast<FEDomainMap*>(mesh.GetDataMap(i));
-		FEDomainMap* nodeMap = m_meshDataList[i];
+		FEDomainMap* nodeMap = m_userDataList[i];
 
 		feLog("\tMapping user map \"%s\" ...", elemMap->GetName().c_str());
 

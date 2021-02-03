@@ -112,6 +112,10 @@ public:
 	// model activation
 	virtual void Activate();
 
+	// TODO: temporary construction. Need to see if I can just use Activate(). 
+	//       This is called after remeshed
+	virtual void Reactivate();
+
 	// TODO: This function was introduced in order to call the initialization of the rigid system 
 	// at the correct time. Should look in better way.
 	virtual bool InitRigidSystem() { return true; }

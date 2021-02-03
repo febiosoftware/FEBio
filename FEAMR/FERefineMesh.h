@@ -63,9 +63,16 @@ protected:
 	void UpdateModel();
 	void CopyMesh();
 
-	bool build_map_data(FEModel& fem);
-	void map_data(FEModel& fem);
-	void clear_maps();
+	bool BuildMapData();
+	void TransferMapData();
+	void ClearMapData();
+
+	bool BuildDomainMapData();
+	bool BuildDomainMapData(FEDomain& dom, int domIndex);
+	void TransferDomainMapData();
+
+	bool BuildUserMapData();
+	void TransferUserMapData();
 
 protected:
 	FEMeshTopo*	m_topo;		//!< mesh topo structure
@@ -79,8 +86,8 @@ protected:
 
 	FEMesh*	m_meshCopy;		//!< copy of "old" mesh, before refinement
 
-	std::vector< std::vector<FEDomainMap*> >	m_nodeMapList;	// list of nodal data for each domain
-	std::vector< FEDomainMap* >	m_meshDataList;					// list of nodal data for mesh data
+	std::vector< std::vector<FEDomainMap*> >	m_domainMapList;	// list of nodal data for each domain
+	std::vector< FEDomainMap* >	m_userDataList;						// list of nodal data for user-defined mesh data
 
 	DECLARE_FECORE_CLASS();
 };

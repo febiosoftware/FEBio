@@ -1130,6 +1130,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		++tag;
 		int id, rb, rbp = -1;
 		FERigidNodeSet* prn = 0;
+		FENodeSet* ns = 0;
 		for (int i=0; i<nrn; ++i)
 		{
 			id = atoi(tag.AttributeValue("id"))-1;
@@ -1139,6 +1140,8 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			{
 				prn = fecore_alloc(FERigidNodeSet, &fem);
 				prn->SetRigidMaterialID(rb);
+				ns = new FENodeSet(&fem);
+				prn->SetNodeSet(ns);
 
 				// the default shell bc depends on the shell formulation
 				prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
@@ -1148,7 +1151,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				feb->AddComponent(prn);
 				rbp = rb;
 			}
-			prn->AddNode(id);
+			ns->Add(id);
 
 			++tag;
 		}
@@ -1262,7 +1265,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
 
 	prn->SetRigidMaterialID(rb);
-	prn->SetNodeSet(*nodeSet);
+	prn->SetNodeSet(nodeSet);
 
 	fem.AddRigidNodeSet(prn);
 	
