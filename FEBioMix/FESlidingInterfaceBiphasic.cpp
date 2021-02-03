@@ -537,7 +537,7 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
     m_bautopen = false;
     m_breloc = false;
     m_bsmaug = false;
-    m_bsmfls = true;
+    m_bsmfls = false;
     m_bupdtpen = false;
     m_mu = 0.0;
     m_phi = 0.0;
