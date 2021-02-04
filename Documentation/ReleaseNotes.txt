@@ -48,22 +48,21 @@ at https://forums.febio.org/.
 * Fixed issue with the "prestrain correction" plot variable. 
 * Added node-data objective function, which optimizes for nodal data. 
 * Implemented torsional spring. 
-* Added "temp-dependent thermal conductivity" material for temperature-dependent thermal conductivity in fluids. Added plot variable for fluid thermal conductivity. Added "real gas" class as material for thermofluid analyses.
 * The data filename is now written to the log file, not the data file.
 * Elastic materials can evaluate stress via "secant_stress" parameter.(This can be useful for debugging new material implementations). Also renamed "secant" to "secant_tangent", which approximates elatic tangent. 
 * Made "value" parameter of initial condition a mapped parameter.
 * Implemented a exp-linear damage fiber model.
+* Fixed Holzapfel-Gasser-Ogden formulation. Deleted unconstrained (compressible) version of this material.
 * Updated the Gasser-Ogden-Holzapfel model to be consistent with ABAQUS formulation.
+* Added "HGO unconstrained" material to model the unconstrained (compressible) Holzapfel-Gasser-Ogden material.  All parameters of "Holzapfel-Gasser-Ogden" are now mapped parameters.
 * Implemented rigid follower force and moment.
 * Fixed miscelleneous issues to improve backward compatibility with 2.5 format.
 * Modified projection logic in "sliding-facet-to-facet" contact. Added support for "search_radius" parameter.
 * An error is now thrown when data type of a map does not match the parameter's data type to which it is assigned.
 * Fixed bug in serialization of linear constraint set.
 * Added log output option for stess eigenvectors.
-* Fixed Holzapfel-Gasser-Ogden formulation. Deleted unconstrained (compressible) version of this material.
 * Implemented new "azimuth constraint", which fixes the angle coordinate of the cylindrical coordinates.
 * Introduced plot variables for local fluid load support and effective friction coefficient for biphasic and mixed biphasic contact interfaces.
-* Added option to use smoothed local fluid load support for evaluating the biphasic friction coefficient in "sliding-biphasic" and "sliding-biphasic-mixed"". This flag ("smooth_fls"), is true by default.
 * Modified method to evaluate fluid load support in sliding biphasic contact by averaging the local fluid load support over the contact area (instead of dividing the fluid force magnitude by the contact force magnitude).
 * Made scale parameter of "nodal load" a model parameter.
 * Made "phi0" parameter of biphasic, biphasic-solute and triphasic materials a mapped parameter.
@@ -71,7 +70,6 @@ at https://forums.febio.org/.
 * Made active stress parameter of active contraction materials a mapped parameter.
 * Made value parameter of FENodalForce a mapped parameter.
 * Fixed issue with "pretrain stretch" plot variable.
-* Added "HGO unconstrained" material to model the unconstrained (compressible) Holzapfel-Gasser-Ogden material.  All parameters of "Holzapfel-Gasser-Ogden" are now mapped parameters.
 * Fixed crash when a parameter references invalid map.
 * Fixed bugs with element data ordinates in parameter optimization.
 * Added shell domain parameter "shell_normal_nodal"
@@ -80,7 +78,6 @@ at https://forums.febio.org/.
 * Improved performance of initialization of solid-shell interface elements.
 * Made "ksi" parameter of "fiber-exp-pow-uncoupled" a mapped parameter.
 * Added new "damage fiber exp-linear" material.
-* Added body force for CFD solutes solver. Made edits of BFSI domain, including BFSI traction BC
 * Fixed output of contact gap and contact pressure for the "sliding node-on-facet".
 * Added strain energy calculation to discrete elements. Added "discrete strain energy" plot variable.
 * Fixed some issues with storing contact plot variables for nodal-integrated contact interfaces.
