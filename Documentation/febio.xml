@@ -2,4 +2,5 @@
 <febio_config version="3.0">
 	<default_linear_solver type="pardiso"></default_linear_solver>
 	<import>FEBioChem.dll</import>
+	<import>FEBioHeat.dll</import>
 </febio_config>
