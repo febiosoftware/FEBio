@@ -111,6 +111,10 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	// get the volume of the volume element
 	double V = m.ElementVolume(*pe);
 
+	// If the surface is a rigid shell with no thickness (which is allowed),
+	// the volume can be zero. In that case, we return 0. (which is also backward compatible)
+	if (V == 0.0) return 0.0;
+
 	return eps*A/V;
 }
 
