@@ -75,7 +75,7 @@ bool FERigidNodeSet::Init()
 {
 	// Make sure the rigid material exists
 	FEModel& fem = *GetFEModel();
-
+	if (m_rigidMat <= 0) return false;
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	if (pm == 0) return false;
 	if (pm->GetRigidBodyID() < 0) return false;
