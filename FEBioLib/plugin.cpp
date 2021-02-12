@@ -254,7 +254,11 @@ FEBioPluginManager* FEBioPluginManager::GetInstance()
 //-----------------------------------------------------------------------------
 FEBioPluginManager::~FEBioPluginManager()
 {
-	UnloadAllPlugins();
+	// NOTE: I (S.M.) commented this out since for very small problems that run
+	//       very quickly, FEBio can crash when it unloads the plugins on Windows. 
+	//       It looks like this is caused by some kind of race condition with Windows
+	//       dll management. 
+//	UnloadAllPlugins();
 }
 
 //-----------------------------------------------------------------------------
