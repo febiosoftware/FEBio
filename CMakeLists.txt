@@ -435,7 +435,14 @@ if(USE_MKL)
 	elseif(APPLE)
 		target_link_libraries(febio3 ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
 			${MKL_LIB_DIR}/libmkl_intel_thread.a)
-		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
+		
+        # Properly use OMP if llvm has been installed from brew
+        if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
+            target_link_libraries(febio3 /usr/local/opt/libomp/lib/libomp.dylib)
+        else()
+            target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
+        endif()
+        
     else()
         target_link_libraries(febio3 -Wl,--start-group ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
 			${MKL_LIB_DIR}/libmkl_intel_thread.a -Wl,--end-group)
