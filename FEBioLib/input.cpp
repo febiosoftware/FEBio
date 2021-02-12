@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FELoadCurve.h>
+#include <FECore/FEMeshAdaptor.h>
 #include <FECore/log.h>
 #include <string.h>
 
@@ -548,6 +549,23 @@ void FEBioModel::echo_input()
 			if (sztype == 0) sztype = "unknown";
 			feLog("\nnonlinear constraint %d - Type: %s\n", i + 1, sztype);
 			FEParameterList& pl = plc->GetParameterList();
+			print_parameter_list(pl);
+		}
+		feLog("\n\n");
+	}
+
+	if (fem.MeshAdaptors())
+	{
+		feLog(" MESH ADAPTOR DATA\n");
+		feLog("===========================================================================\n");
+		int NMA = fem.MeshAdaptors();
+		for (int i = 0; i < NMA; ++i)
+		{
+			FEMeshAdaptor* pma = fem.MeshAdaptor(i); assert(pma);
+			const char* sztype = pma->GetTypeStr();
+			if (sztype == 0) sztype = "unknown";
+			feLog("\nmesh adaptor %d - Type: %s\n", i + 1, sztype);
+			FEParameterList& pl = pma->GetParameterList();
 			print_parameter_list(pl);
 		}
 		feLog("\n\n");
