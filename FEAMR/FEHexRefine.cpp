@@ -808,6 +808,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 	{
 		FEDomain& dom = mesh.Domain(i);
 		dom.CreateMaterialPointData();
+		dom.Reset();	// NOTE: we need to call this to actually call the Init function on the material points.
 		dom.Init();
 		dom.Activate();
 	}

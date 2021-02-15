@@ -35,6 +35,16 @@ FEMaterialPoint* FEReactivePlasticityMaterialPoint::Copy()
 {
     FEReactivePlasticityMaterialPoint* pt = new FEReactivePlasticityMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
+
+	pt->m_Fusi = m_Fusi;
+	pt->m_Fvsi = m_Fvsi;
+	pt->m_Ku = m_Ku;
+	pt->m_Kv = m_Kv;
+	pt->m_w = m_w;
+	pt->m_gp = m_gp;
+	pt->m_gpp = m_gpp;
+	pt->m_gc = m_gc;
+
     return pt;
 }
 

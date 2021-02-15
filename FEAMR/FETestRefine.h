@@ -23,34 +23,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEAMR.h"
-#include <FECore/FECoreKernel.h>
-#include "FEErosionAdaptor.h"
-#include "FEHexRefine.h"
-#include "FEHexRefine2D.h"
-#include "FETetRefine.h"
-#include "FEMMGRemesh.h"
-#include "FETestRefine.h"
-#include "FEMaxVariableCriterion.h"
-#include "FEMaxVolumeCriterion.h"
-#include "FEElementSelectionCriterion.h"
-#include "FEScaleAdaptorCriterion.h"
+#pragma once
+#include "FERefineMesh.h"
 
-//-----------------------------------------------------------------------------
-void FEAMR::InitModule()
+class FETestRefine : public FERefineMesh
 {
-// mesh adaptors
-REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
-REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
-REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
-REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
-REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
-REGISTER_FECORE_CLASS(FETestRefine    , "test_refine");
+public:
+	FETestRefine(FEModel* fem);
 
-// adaptor criteria
-REGISTER_FECORE_CLASS(FEMaxVolumeCriterion       , "max_volume");
-REGISTER_FECORE_CLASS(FEMaxVariableCriterion     , "max_variable");
-REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
-REGISTER_FECORE_CLASS(FEScaleAdaptorCriterion    , "scale");
-}
+	bool RefineMesh() override;
+
+	DECLARE_FECORE_CLASS();
+};
+

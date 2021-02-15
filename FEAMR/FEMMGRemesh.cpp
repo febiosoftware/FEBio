@@ -484,6 +484,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 
 		// re-init domain
 		dom.CreateMaterialPointData();
+		dom.Reset();	// NOTE: we need to call this to actually call the Init function on the material points.
 		dom.Init();
 		dom.Activate();
 	}
