@@ -83,6 +83,7 @@ protected:
 	int		m_transferMethod;		//!< method for transferring data between meshes
 	bool	m_bmap_data;			//!< map data flag
 	int		m_nnc;					//!< nearest-neighbor-count for MLQ transfer method
+	int		m_nsdim;				//!< nearest-neighbor search dimension (2 or 3)
 
 	FEMesh*	m_meshCopy;		//!< copy of "old" mesh, before refinement
 

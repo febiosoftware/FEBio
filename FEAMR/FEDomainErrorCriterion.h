@@ -42,6 +42,7 @@ public:
 
 private:
 	double	m_pct;
+	double	m_hmin;		//!< min element size
 
 	DECLARE_FECORE_CLASS();
 };

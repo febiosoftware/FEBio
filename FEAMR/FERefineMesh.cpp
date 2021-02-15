@@ -50,6 +50,7 @@ BEGIN_FECORE_CLASS(FERefineMesh, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_bmap_data, "map_data");
 	ADD_PARAMETER(m_nnc      , "nnc");
+	ADD_PARAMETER(m_nsdim  , "nsdim");
 	ADD_PARAMETER(m_transferMethod, "transfer_method");
 END_FECORE_CLASS();
 
@@ -59,6 +60,7 @@ FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
 	m_bmap_data = false;
 	m_transferMethod = TRANSFER_SHAPE;
 	m_nnc = 8;
+	m_nsdim = 3;
 
 	m_maxiter = -1;
 	m_maxelem = -1;
@@ -770,6 +772,8 @@ bool FERefineMesh::BuildDomainMapData(FEDomain& dom, int domIndex)
 		m_domainMapList[domIndex].push_back(nodeMap);
 		feLog("done.\n");
 	}
+
+	return true;
 }
 
 bool FERefineMesh::BuildUserMapData()
@@ -895,6 +899,7 @@ void FERefineMesh::TransferDomainMapData()
 				{
 					FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
 					MLQ->SetNearestNeighborCount(m_nnc);
+					MLQ->SetDimension(m_nsdim);
 					MLQ->SetSourcePoints(srcPoints);
 					MLQ->SetTargetPoints(trgPoints);
 					mapper = MLQ;
@@ -1028,6 +1033,7 @@ void FERefineMesh::TransferUserMapData()
 		{
 			FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
 			MLQ->SetNearestNeighborCount(m_nnc);
+			MLQ->SetDimension(m_nsdim);
 			MLQ->SetSourcePoints(srcPoints);
 			MLQ->SetTargetPoints(trgPoints);
 			mapper = MLQ;

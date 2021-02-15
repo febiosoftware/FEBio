@@ -398,7 +398,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 	{
 		FELeastSquaresInterpolator* MLQ = new FELeastSquaresInterpolator;
 		MLQ->SetNearestNeighborCount(m_mmgRemesh->m_nnc);
-		MLQ->SetCheckForMatch(true);
+		MLQ->SetDimension(m_mmgRemesh->m_nsdim);
 		MLQ->SetSourcePoints(oldNodePos);
 		mapper = MLQ;
 	}
@@ -445,6 +445,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		node.SetDOFS(MAX_DOFS);
 		node.m_r0 = nodePos0[i];
 		node.m_rt = nodePos[i];
+		if (m_mmgRemesh->m_nsdim == 2) node.m_rt.z = node.m_r0.z;
 		for (int j = 0; j < node.m_ID.size(); ++j) {
 			node.set(j, nodeVal[i][j]);
 		}
