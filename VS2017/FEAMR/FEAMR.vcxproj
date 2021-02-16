@@ -50,6 +50,7 @@
     <ClCompile Include="..\..\FEAMR\FEMaxVolumeCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMMGRemesh.cpp" />
     <ClCompile Include="..\..\FEAMR\FERefineMesh.cpp" />
+    <ClCompile Include="..\..\FEAMR\FETestRefine.cpp" />
     <ClCompile Include="..\..\FEAMR\FETetRefine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +70,7 @@
     <ClInclude Include="..\..\FEAMR\FEMaxVolumeCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEMMGRemesh.h" />
     <ClInclude Include="..\..\FEAMR\FERefineMesh.h" />
+    <ClInclude Include="..\..\FEAMR\FETestRefine.h" />
     <ClInclude Include="..\..\FEAMR\FETetRefine.h" />
     <ClInclude Include="..\..\FEAMR\stdafx.h" />
   </ItemGroup>

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEHexRefine2D.h"
 #include "FETetRefine.h"
 #include "FEMMGRemesh.h"
+#include "FETestRefine.h"
 #include "FEMaxVariableCriterion.h"
 #include "FEMaxVolumeCriterion.h"
 #include "FEElementSelectionCriterion.h"
@@ -45,6 +46,7 @@ REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
 REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
 REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
+REGISTER_FECORE_CLASS(FETestRefine    , "test_refine");
 
 // adaptor criteria
 REGISTER_FECORE_CLASS(FEMaxVolumeCriterion       , "max_volume");

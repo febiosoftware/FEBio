@@ -51,6 +51,7 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_noutput     , "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
 	ADD_PARAMETER(m_nplot_stride, "plot_stride");
 	ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
+	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
 
 	ADD_PROPERTY(m_psolver, "solver");
 	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional);
@@ -67,6 +68,7 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
+	m_badaptorReSolve = true;
 
 	// --- Time Step Data ---
 	m_ntime = -1;
@@ -540,6 +542,12 @@ int FEAnalysis::SolveTimeStep()
 						fem.DoCallback(CB_REMESH);
 					}
 					feLog("\n");
+
+					if (m_badaptorReSolve == false)
+					{
+						bconv = true;
+						break;
+					}
 				}
 			}
 			else break;

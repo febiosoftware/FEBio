@@ -143,7 +143,8 @@ private:
 public:
 	// --- Control Data ---
 	//{
-		int		m_nanalysis;	//!< analysis type
+		int		m_nanalysis;		//!< analysis type
+		bool	m_badaptorReSolve;	//!< resolve analysis after mesh adaptor phase
 	//}
 
 	// --- Time Step Data ---

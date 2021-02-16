@@ -31,14 +31,38 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEDomainErrorCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(m_pct, "error");
+	ADD_PARAMETER(m_hmin, "hmin");
 END_FECORE_CLASS();
 
 FEDomainErrorCriterion::FEDomainErrorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
 	m_pct = 0.0;
 
+	m_hmin = 0;	// criterion not used by default
+
 	// set sort on by default
 	SetSort(true);
+}
+
+double MinEdgeLengthSqr(FEMesh* pm, FEElement& el)
+{
+	double h2 = 1e99;
+	int ne = el.Nodes();
+	for (int i = 0; i < ne; ++i)
+	{
+		for (int j = 0; j < ne; ++j)
+		{
+			if (i != j)
+			{
+				vec3d a = pm->Node(el.m_node[i]).m_r0;
+				vec3d b = pm->Node(el.m_node[j]).m_r0;
+
+				double L2 = (a - b).norm2();
+				if (L2 < h2) h2 = L2;
+			}
+		}
+	}
+	return h2;
 }
 
 FEMeshAdaptorSelection FEDomainErrorCriterion::GetElementSelection(FEElementSet* elemSet)
@@ -82,29 +106,40 @@ FEMeshAdaptorSelection FEDomainErrorCriterion::GetElementSelection(FEElementSet*
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// get the nodal values
-		for (int j = 0; j < ne; ++j)
+		// check for minimal element size
+		bool sizeCheck = true;
+		if (m_hmin > 0)
 		{
-			ev[j] = sn[el.m_node[j]];
+			double h2 = MinEdgeLengthSqr(&mesh, el);
+			if (h2 < m_hmin*m_hmin) sizeCheck = false;
 		}
 
-		// evaluate element error
-		double max_err = 0;
-		for (int j = 0; j < ni; ++j)
+		if (sizeCheck)
 		{
-			double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
+			// get the nodal values
+			for (int j = 0; j < ne; ++j)
+			{
+				ev[j] = sn[el.m_node[j]];
+			}
 
-			double snj = el.Evaluate(ev, j);
+			// evaluate element error
+			double max_err = 0;
+			for (int j = 0; j < ni; ++j)
+			{
+				double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
 
-			double err = fabs(sj - snj) / (smax - smin);
-			if (err > max_err) max_err = err;
-		}
+				double snj = el.Evaluate(ev, j);
 
-		// see if it's too large
-		if (max_err > m_pct)
-		{
-			double f = m_pct / max_err;
-			elemList.push_back(i, f);
+				double err = fabs(sj - snj) / (smax - smin);
+				if (err > max_err) max_err = err;
+			}
+
+			// see if it's too large
+			if (max_err > m_pct)
+			{
+				double f = m_pct / max_err;
+				elemList.push_back(i, f);
+			}
 		}
 	}
 

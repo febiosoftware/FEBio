@@ -24,25 +24,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include "feamr_api.h"
+#include "FERefineMesh.h"
 
-class FEMaterialPoint;
-
-//-----------------------------------------------------------------------------
-class FEAMR_API FEDomainErrorCriterion : public FEMeshAdaptorCriterion
+class FETestRefine : public FERefineMesh
 {
 public:
-	FEDomainErrorCriterion(FEModel* fem);
+	FETestRefine(FEModel* fem);
 
-	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
-
-	// derived classes must implement this function
-	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;
-
-private:
-	double	m_pct;
-	double	m_hmin;		//!< min element size
+	bool RefineMesh() override;
 
 	DECLARE_FECORE_CLASS();
 };
+

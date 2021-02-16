@@ -134,8 +134,16 @@ void FELeastSquaresInterpolator::Data::operator = (const Data& d)
 
 FELeastSquaresInterpolator::FELeastSquaresInterpolator()
 {
+	m_dim = 3;
 	m_nnc = 8;
 	m_checkForMatch = false;
+}
+
+//! Set dimension (2 or 3)
+void FELeastSquaresInterpolator::SetDimension(int d)
+{
+	assert((d == 2) || (d == 3));
+	m_dim = d;
 }
 
 void FELeastSquaresInterpolator::SetNearestNeighborCount(int nnc) { m_nnc = nnc; }
@@ -216,15 +224,15 @@ bool FELeastSquaresInterpolator::Init()
 		}
 
 		// setup least squares problems
-		d.A.resize(4, 4);
+		d.A.resize(m_dim + 1, m_dim + 1);
 		d.A.zero();
 		for (int m = 0; m < M; ++m)
 		{
 			vec3d ri = d.X[m];
 			double P[4] = { 1.0, ri.x, ri.y, ri.z };
-			for (int a = 0; a < 4; ++a)
+			for (int a = 0; a <= m_dim; ++a)
 			{
-				for (int b = 0; b < 4; ++b)
+				for (int b = 0; b <= m_dim; ++b)
 				{
 					d.A(a, b) += d.W[m] * P[a] * P[b];
 				}
@@ -232,7 +240,7 @@ bool FELeastSquaresInterpolator::Init()
 		}
 
 		// solve the linear system of equations
-		d.index.resize(4);
+		d.index.resize(m_dim + 1);
 		d.A.lufactor(d.index);
 	}
 
@@ -255,7 +263,7 @@ bool FELeastSquaresInterpolator::Map(std::vector<double>& tval, function<double(
 		vector<double>& W = d.W;
 
 		// update nodal values
-		vector<double> b(4, 0.0);
+		vector<double> b(m_dim + 1, 0.0);
 		for (int m = 0; m < M; ++m)
 		{
 			vec3d ri = d.X[m];
@@ -263,7 +271,7 @@ bool FELeastSquaresInterpolator::Map(std::vector<double>& tval, function<double(
 
 			double vm = src(closestNodes[m]);
 
-			for (int a = 0; a < 4; ++a)
+			for (int a = 0; a <= m_dim; ++a)
 			{
 				b[a] += W[m] * P[a] * vm;
 			}
@@ -291,14 +299,14 @@ double FELeastSquaresInterpolator::Map(int inode, function<double(int sourceNode
 
 	if (m_checkForMatch)
 	{
-		if (W[0] > 0.999)
+		if (W[0] > 0.9999)
 		{
 			return f(closestNodes[0]);
 		}
 	}
 
 	// update nodal values
-	vector<double> b(4, 0.0);
+	vector<double> b(m_dim + 1, 0.0);
 	for (int m = 0; m < M; ++m)
 	{
 		vec3d ri = d.X[m];
@@ -306,7 +314,7 @@ double FELeastSquaresInterpolator::Map(int inode, function<double(int sourceNode
 
 		double vm = f(closestNodes[m]);
 
-		for (int a = 0; a < 4; ++a)
+		for (int a = 0; a <= m_dim; ++a)
 		{
 			b[a] += W[m] * P[a] * vm;
 		}
@@ -331,14 +339,14 @@ vec3d FELeastSquaresInterpolator::MapVec3d(int inode, function<vec3d(int sourceN
 
 	if (m_checkForMatch)
 	{
-		if (W[0] > 0.999)
+		if (W[0] > 0.9999)
 		{
 			return f(closestNodes[0]);
 		}
 	}
 
 	// update nodal values
-	vector<double> bx(4, 0.0), by(4, 0.0), bz(4, 0.0);
+	vector<double> bx(m_dim+1, 0.0), by(m_dim + 1, 0.0), bz(m_dim + 1, 0.0);
 	for (int m = 0; m < M; ++m)
 	{
 		vec3d ri = d.X[m];
@@ -346,7 +354,7 @@ vec3d FELeastSquaresInterpolator::MapVec3d(int inode, function<vec3d(int sourceN
 
 		vec3d vm = f(closestNodes[m]);
 
-		for (int a = 0; a < 4; ++a)
+		for (int a = 0; a <= m_dim; ++a)
 		{
 			bx[a] += W[m] * P[a] * vm.x;
 			by[a] += W[m] * P[a] * vm.y;
@@ -357,6 +365,7 @@ vec3d FELeastSquaresInterpolator::MapVec3d(int inode, function<vec3d(int sourceN
 	// solve the linear system of equations
 	d.A.lusolve(bx, d.index);
 	d.A.lusolve(by, d.index);
+
 	d.A.lusolve(bz, d.index);
 
 	return vec3d(bx[0], by[0], bz[0]);

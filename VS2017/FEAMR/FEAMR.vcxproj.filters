@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\FEAMR\FEDomainShapeInterpolator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEAMR\FETestRefine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEAMR\FERefineMesh.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEAMR\FEDomainShapeInterpolator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEAMR\FETestRefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
