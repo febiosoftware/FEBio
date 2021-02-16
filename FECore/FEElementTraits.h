@@ -729,6 +729,39 @@ protected:
 };
 
 //=============================================================================
+//
+// FEPyra13
+//
+//=============================================================================
+
+//=============================================================================
+//! Base class for 13-node pyramid element
+class FEPyra13_ : public FESolidElementTraits
+{
+public:
+    enum { NELN = 13 };
+    
+public:
+    FEPyra13_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PYRA13, et){}
+};
+
+//=============================================================================
+// 13-node pyramid element using a 2x2x2 Gaussian integration rule
+class FEPyra13G8: public FEPyra13_
+{
+public:
+    enum { NINT = 8 };
+    
+public:
+    FEPyra13G8();
+    
+    void project_to_nodes(double* ai, double* ao) const override;
+    
+protected:
+    matrix    m_Ai;
+};
+
+//=============================================================================
 //    S U R F A C E   E L E M E N T S
 //
 // This section defines a set of surface element formulations for use in 3D

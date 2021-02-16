@@ -97,7 +97,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 				else sztype = "elastic-solid";
 			}
 		}
-		else if ((eshape == ET_HEX20) || (eshape == ET_HEX27))
+		else if ((eshape == ET_HEX20) || (eshape == ET_HEX27) || (eshape == ET_PYRA13))
 		{
 //			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";
 			sztype = "elastic-solid";
