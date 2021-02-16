@@ -39,13 +39,13 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
-//! plot file format (version 2).
+//! plot file format (version 3).
 //!
 class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-	enum { PLT_VERSION = 0x0030 };
+	enum { PLT_VERSION = 0x0031 };
 
 	// file tags
 	enum { 
@@ -128,6 +128,7 @@ public:
 			PLT_STATE_HEADER			= 0x02010000,
 				PLT_STATE_HDR_ID		= 0x02010001,
 				PLT_STATE_HDR_TIME		= 0x02010002,
+				PLT_STATE_STATUS        = 0x02010003,	// new in 3.1
 			PLT_STATE_DATA				= 0x02020000,
 				PLT_STATE_VARIABLE		= 0x02020001,
 				PLT_STATE_VAR_ID		= 0x02020002,
@@ -279,7 +280,7 @@ public:
 	bool Append(FEModel& fem, const char* szfile);
 
 	//! Write current FE state to plot database
-	bool Write(FEModel& fem, float ftime);
+	bool Write(FEModel& fem, float ftime, int flag = 0);
 
 	//! Add a variable to the dictionary
 	bool AddVariable(FEPlotData* ps, const char* szname);

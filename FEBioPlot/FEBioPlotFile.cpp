@@ -1390,7 +1390,7 @@ void FEBioPlotFile::WriteObject(PlotObject* po)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Write(FEModel &fem, float ftime)
+bool FEBioPlotFile::Write(FEModel &fem, float ftime, int flag)
 {
 	// store the fem pointer
 	m_pfem = &fem;
@@ -1403,6 +1403,7 @@ bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 		m_ar.BeginChunk(PLT_STATE_HEADER);
 		{
 			m_ar.WriteChunk(PLT_STATE_HDR_TIME, ftime);
+			m_ar.WriteChunk(PLT_STATE_STATUS, flag);
 		}
 		m_ar.EndChunk();
 

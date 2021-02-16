@@ -626,11 +626,14 @@ void FEBioModel::Write(unsigned int nwhen)
 					if (m_writeMesh) {
 						FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
 						plt->WriteMeshSection(*this);
-						m_writeMesh = false;
 					}
 
+					// write the state section
 					double time = GetTime().currentTime;
-					if (m_plot) m_plot->Write(*this, (float)time);
+					if (m_plot) m_plot->Write(*this, (float)time, (m_writeMesh ? 1 : 0));
+
+					// make sure to reset write mesh flag
+					m_writeMesh = false;
 				}
 			}
 		}
