@@ -43,9 +43,9 @@ class FECORE_API DumpFile : public DumpStream
 {
 public:
 	// overloaded from DumpStream
-	size_t write(const void* pd, size_t size, size_t count);
-	size_t read(void* pd, size_t size, size_t count);
-	void clear(){}
+	size_t write(const void* pd, size_t size, size_t count) override;
+	size_t read(void* pd, size_t size, size_t count) override;
+	void clear() override {}
 	bool EndOfStream() const override;
 
 public:

@@ -59,13 +59,13 @@ public:
 	FECompositeDiscreteMaterial(FEModel* pfem);
 
 	// evaluate the force at a discrete element
-	vec3d Force(FEDiscreteMaterialPoint& mp);
+	vec3d Force(FEDiscreteMaterialPoint& mp) override;
 
 	// evaluate the stiffness at a discrete element (= dF / dr)
-	mat3d Stiffness(FEDiscreteMaterialPoint& mp);
+	mat3d Stiffness(FEDiscreteMaterialPoint& mp) override;
 
 	// evaluate the strain energy at a discrete element
-	double StrainEnergy(FEDiscreteMaterialPoint& mp);
+	double StrainEnergy(FEDiscreteMaterialPoint& mp) override;
 
 private:
 	std::vector<FEDiscreteElasticMaterial*> m_mats;

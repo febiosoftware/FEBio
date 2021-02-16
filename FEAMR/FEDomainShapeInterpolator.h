@@ -44,7 +44,7 @@ public:
 	FEDomainShapeInterpolator(FEDomain* domain);
 	~FEDomainShapeInterpolator();
 
-	bool Init();
+	bool Init() override;
 
 	void SetTargetPoints(const vector<vec3d>& trgPoints);
 	bool SetTargetPoint(const vec3d& r) override;
