@@ -64,6 +64,7 @@ enum FE_Element_Shape {
 	ET_HEX20,
 	ET_HEX27,
 	ET_PYRA5,
+    ET_PYRA13,
 
 	// 2.5D elements
 	ET_QUAD4,
@@ -116,6 +117,7 @@ enum FE_Element_Type {
     FE_PENTA15G8,
     FE_PENTA15G21,
 	FE_PYRA5G8,
+    FE_PYRA13G8,
 
 	// 2.5D surface elements
 	FE_QUAD4G4,

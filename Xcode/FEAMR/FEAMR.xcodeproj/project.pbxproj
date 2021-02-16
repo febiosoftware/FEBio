@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D505331E25DC4C0600FF68DE /* FETestRefine.h in Headers */ = {isa = PBXBuildFile; fileRef = D505331C25DC4C0600FF68DE /* FETestRefine.h */; };
+		D505331F25DC4C0600FF68DE /* FETestRefine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D505331D25DC4C0600FF68DE /* FETestRefine.cpp */; };
 		D515C31A259E24FC00F0C6FE /* FEMeshShapeInterpolator.h in Headers */ = {isa = PBXBuildFile; fileRef = D515C312259E24FC00F0C6FE /* FEMeshShapeInterpolator.h */; };
 		D515C31B259E24FC00F0C6FE /* FEMeshDataInterpolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D515C313259E24FC00F0C6FE /* FEMeshDataInterpolator.cpp */; };
 		D515C31C259E24FC00F0C6FE /* FEMeshDataInterpolator.h in Headers */ = {isa = PBXBuildFile; fileRef = D515C314259E24FC00F0C6FE /* FEMeshDataInterpolator.h */; };
@@ -45,6 +47,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D505331C25DC4C0600FF68DE /* FETestRefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETestRefine.h; sourceTree = "<group>"; };
+		D505331D25DC4C0600FF68DE /* FETestRefine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETestRefine.cpp; sourceTree = "<group>"; };
 		D515C312259E24FC00F0C6FE /* FEMeshShapeInterpolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMeshShapeInterpolator.h; sourceTree = "<group>"; };
 		D515C313259E24FC00F0C6FE /* FEMeshDataInterpolator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMeshDataInterpolator.cpp; sourceTree = "<group>"; };
 		D515C314259E24FC00F0C6FE /* FEMeshDataInterpolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMeshDataInterpolator.h; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 				D5AE8C9F2592EBC6003AC08B /* FERefineMesh.h */,
 				D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */,
 				D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */,
+				D505331D25DC4C0600FF68DE /* FETestRefine.cpp */,
+				D505331C25DC4C0600FF68DE /* FETestRefine.h */,
 				D5AE8CA92592EBC6003AC08B /* FETetRefine.cpp */,
 				D5AE8C932592EBC5003AC08B /* FETetRefine.h */,
 				D5AE8C962592EBC5003AC08B /* stdafx.h */,
@@ -170,6 +176,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5AE8CB32592EBC6003AC08B /* FEAMR.h in Headers */,
+				D505331E25DC4C0600FF68DE /* FETestRefine.h in Headers */,
 				D515C320259E24FC00F0C6FE /* FEDomainShapeInterpolator.h in Headers */,
 				D515C31A259E24FC00F0C6FE /* FEMeshShapeInterpolator.h in Headers */,
 				D5AE8CC12592EBC6003AC08B /* FEErosionAdaptor.h in Headers */,
@@ -261,6 +268,7 @@
 				D515C31B259E24FC00F0C6FE /* FEMeshDataInterpolator.cpp in Sources */,
 				D5AE8CB02592EBC6003AC08B /* FEDomainErrorCriterion.cpp in Sources */,
 				D5AE8CB72592EBC6003AC08B /* FEMaxVolumeCriterion.cpp in Sources */,
+				D505331F25DC4C0600FF68DE /* FETestRefine.cpp in Sources */,
 				D5AE8CAC2592EBC6003AC08B /* FERefineMesh.cpp in Sources */,
 				D5AE8CC02592EBC6003AC08B /* FETetRefine.cpp in Sources */,
 			);

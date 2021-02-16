@@ -1014,6 +1014,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		case ET_TET20  : ne = 20; dtype = PLT_ELEM_TET20; break;
         case ET_PENTA15: ne = 15; dtype = PLT_ELEM_PENTA15; break;
 		case ET_PYRA5  : ne =  5; dtype = PLT_ELEM_PYRA5; break;
+        case ET_PYRA13 : ne = 13; dtype = PLT_ELEM_PYRA13; break;
         default:
 			assert(false);
 	}

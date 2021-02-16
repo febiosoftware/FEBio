@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "tens3d.h"
 #include "fecore_api.h"
 #include "FECoreKernel.h"
+#include "matrix.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -85,7 +86,29 @@ public:
 	{
 	public:
 		DataBlock() { m_type = TypeID::TYPE_UNKNOWN; m_pd = nullptr; }
-		~DataBlock() { if (m_pd) delete m_pd; m_pd = nullptr; }
+        ~DataBlock() {
+            if (m_pd) {
+                switch (m_type) {
+                    case TypeID::TYPE_INT: delete (int*) m_pd; break;
+                    case TypeID::TYPE_UINT: delete (unsigned int*) m_pd; break;
+                    case TypeID::TYPE_FLOAT: delete (float*) m_pd; break;
+                    case TypeID::TYPE_DOUBLE: delete (double*) m_pd; break;
+                    case TypeID::TYPE_VEC2D: delete (vec2d*) m_pd; break;
+                    case TypeID::TYPE_VEC3D: delete (vec3d*) m_pd; break;
+                    case TypeID::TYPE_MAT2D: delete (mat2d*) m_pd; break;
+                    case TypeID::TYPE_MAT3D: delete (mat3d*) m_pd; break;
+                    case TypeID::TYPE_MAT3DD: delete (mat3dd*) m_pd; break;
+                    case TypeID::TYPE_MAT3DS: delete (mat3ds*) m_pd; break;
+                    case TypeID::TYPE_MAT3DA: delete (mat3da*) m_pd; break;
+                    case TypeID::TYPE_QUATD: delete (quatd*) m_pd; break;
+                    case TypeID::TYPE_TENS3DS: delete (tens3ds*) m_pd; break;
+                    case TypeID::TYPE_TENS3DRS: delete (tens3drs*) m_pd; break;
+                    case TypeID::TYPE_MATRIX: delete (matrix*) m_pd; break;
+                    default: break;
+                }
+            }
+            m_pd = nullptr;
+        }
 
 		int dataType() const { return m_type; }
 

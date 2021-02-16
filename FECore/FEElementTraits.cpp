@@ -137,6 +137,7 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape esha
 		m_faces = 6;
 		break;
 	case ET_PYRA5:
+    case ET_PYRA13:
 		m_faces = 5;
 		break;
 	default:
@@ -1495,6 +1496,52 @@ void FEPyra5G8::project_to_nodes(double* ai, double* ao) const
 		ao[i] = 0;
 		for (int j = 0; j<NELN; ++j) ao[i] += m_Ai[i][j] * b[j];
 	}
+}
+
+
+//=============================================================================
+//              P Y R A 1 3
+//=============================================================================
+
+//=============================================================================
+//              P Y R A 1 3 G 8
+//=============================================================================
+
+FEPyra13G8::FEPyra13G8() : FEPyra13_(NINT, FE_PYRA13G8)
+{
+    // integration point coordinates
+    const double a = 1.0 / sqrt(3.0);
+    gr[0] = -a; gs[0] = -a; gt[0] = -a; gw[0] = 1;
+    gr[1] = a; gs[1] = -a; gt[1] = -a; gw[1] = 1;
+    gr[2] = a; gs[2] = a; gt[2] = -a; gw[2] = 1;
+    gr[3] = -a; gs[3] = a; gt[3] = -a; gw[3] = 1;
+    gr[4] = -a; gs[4] = -a; gt[4] = a; gw[4] = 1;
+    gr[5] = a; gs[5] = -a; gt[5] = a; gw[5] = 1;
+    gr[6] = a; gs[6] = a; gt[6] = a; gw[6] = 1;
+    gr[7] = -a; gs[7] = a; gt[7] = a; gw[7] = 1;
+    init();
+    
+    // we need Ai to project integration point data to the nodes
+    matrix A(NELN, NELN);
+    m_Ai.resize(NELN, NELN);
+    A = m_H.transpose()*m_H;
+    m_Ai = A.inverse();
+}
+
+void FEPyra13G8::project_to_nodes(double* ai, double* ao) const
+{
+    vector<double> b(NELN);
+    for (int i = 0; i<NELN; ++i)
+    {
+        b[i] = 0;
+        for (int j = 0; j<NINT; ++j) b[i] += m_H[j][i] * ai[j];
+    }
+    
+    for (int i = 0; i<NELN; ++i)
+    {
+        ao[i] = 0;
+        for (int j = 0; j<NELN; ++j) ao[i] += m_Ai[i][j] * b[j];
+    }
 }
 
 

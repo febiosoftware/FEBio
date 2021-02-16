@@ -64,6 +64,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterShape(new FEHex20  ); assert(n == ET_HEX20  );
 		n = m_pThis->RegisterShape(new FEHex27  ); assert(n == ET_HEX27  );
 		n = m_pThis->RegisterShape(new FEPyra5  ); assert(n == ET_PYRA5  );
+        n = m_pThis->RegisterShape(new FEPyra13 ); assert(n == ET_PYRA13 );
 		n = m_pThis->RegisterShape(new FEQuad4  ); assert(n == ET_QUAD4  );
 		n = m_pThis->RegisterShape(new FEQuad8  ); assert(n == ET_QUAD8  );
 		n = m_pThis->RegisterShape(new FEQuad9  ); assert(n == ET_QUAD9  );
@@ -98,6 +99,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
         n = m_pThis->RegisterTraits(new FEPenta15G8 ); assert(n==FE_PENTA15G8);
         n = m_pThis->RegisterTraits(new FEPenta15G21); assert(n==FE_PENTA15G21);
 		n = m_pThis->RegisterTraits(new FEPyra5G8   ); assert(n==FE_PYRA5G8  );
+        n = m_pThis->RegisterTraits(new FEPyra13G8  ); assert(n==FE_PYRA13G8 );
 		n = m_pThis->RegisterTraits(new FEQuad4G4   ); assert(n==FE_QUAD4G4  );
 		n = m_pThis->RegisterTraits(new FEQuad4NI   ); assert(n==FE_QUAD4NI  );
 		n = m_pThis->RegisterTraits(new FETri3G1    ); assert(n==FE_TRI3G1   );

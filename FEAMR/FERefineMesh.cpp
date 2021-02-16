@@ -772,8 +772,8 @@ bool FERefineMesh::BuildDomainMapData(FEDomain& dom, int domIndex)
 		m_domainMapList[domIndex].push_back(nodeMap);
 		feLog("done.\n");
 	}
-
-	return true;
+    
+    return true;
 }
 
 bool FERefineMesh::BuildUserMapData()

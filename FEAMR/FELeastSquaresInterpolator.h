@@ -66,7 +66,7 @@ public:
 	bool SetTargetPoint(const vec3d& trgPoint) override;
 
 	//! initialize MLQ data
-	bool Init();
+	bool Init() override;
 
 	//! map source data onto target data
 	//! input: sval - values of the source points
