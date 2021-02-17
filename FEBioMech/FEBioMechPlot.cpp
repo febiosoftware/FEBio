@@ -2867,36 +2867,48 @@ bool FEPlotFiberTargetStretch::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEMaterial* mat = dom.GetMaterial();
 	FEPrestrainMaterial * pmat = dynamic_cast<FEPrestrainMaterial*>(mat);
-	if (pmat)
+	if (pmat == nullptr) return false;
+
+	// get the elastic component
+	FEProperty* prop = mat->FindProperty("elastic");
+	if (prop == nullptr) return false;
+
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(prop->get(0));
+	if (pme == 0) return false;
+
+	// get the fiber property
+	ParamString ps("fiber");
+	FEParam* pp = pme->FindParameter(ps);
+	if (pp == 0) return false;
+	FEParamVec3& vec = pp->value<FEParamVec3>();
+
+	// we're good so store the in-situ stretch
+	int NE = dom.Elements();
+	for (int i = 0; i<NE; ++i)
 	{
-		// we're good so store the in-situ stretch
-		int NE = dom.Elements();
-		for (int i = 0; i<NE; ++i)
+		FEElement& e = dom.ElementRef(i);
+		int nint = e.GaussPoints();
+		double lam = 0.0;
+		for (int j = 0; j<nint; ++j)
 		{
-			FEElement& e = dom.ElementRef(i);
-			int nint = e.GaussPoints();
-			double lam = 0.0;
-			for (int j = 0; j<nint; ++j)
-			{
-				FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
-				FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-				FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
+			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+			FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
 
-				mat3d Fp = pp.initialPrestrain();
-				mat3d Q = mat->GetLocalCS(mp);
-				vec3d a0 = Q.col(0);
-				vec3d a = Fp*a0;
-				double lamp = a.norm();
+			mat3d Fp = pp.initialPrestrain();
+			mat3d Q = mat->GetLocalCS(mp);
+			vec3d a0 = vec.unitVector(mp);
+			vec3d ar = Q * a0;
+			vec3d a = Fp*ar;
+			double lamp = a.norm();
 
-				lam += lamp;
-			}
-			lam /= (double)nint;
-
-			a << lam;
+			lam += lamp;
 		}
-		return true;
+		lam /= (double)nint;
+
+		a << lam;
 	}
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -2957,6 +2969,19 @@ bool FEPlotPreStrainStretchError::Save(FEDomain& dom, FEDataStream& a)
 	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(mat);
 	if (pmat == 0) return false;
 
+	// get the elastic component
+	FEProperty* prop = mat->FindProperty("elastic");
+	if (prop == nullptr) return false;
+
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(prop->get(0));
+	if (pme == 0) return false;
+
+	// get the fiber property
+	ParamString ps("fiber");
+	FEParam* pp = pme->FindParameter(ps);
+	if (pp == 0) return false;
+	FEParamVec3& vec = pp->value<FEParamVec3>();
+
 	int NE = dom.Elements();
 	for (int i = 0; i<NE; ++i)
 	{
@@ -2969,18 +2994,21 @@ bool FEPlotPreStrainStretchError::Save(FEDomain& dom, FEDataStream& a)
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
 
+			// initial fiber vector
+			mat3d Q = mat->GetLocalCS(mp);
+			vec3d a0 = vec.unitVector(mp);
+			vec3d ar = Q * a0;
+
 			// target stretch
 			mat3d Fp = pp.initialPrestrain();
-			mat3d Q = mat->GetLocalCS(mp);
-			vec3d a0 = Q.col(0);
-			vec3d a = Fp*a0;
+			vec3d a = Fp*ar;
 			double lam_trg = a.norm();
 
 			// current stretch
 			mat3d& F = pt.m_F;
 			Fp = pp.prestrain();
 			mat3d Ft = F*Fp;
-			a = Ft*a0;
+			a = Ft*ar;
 
 			double lam_cur = a.norm();
 
