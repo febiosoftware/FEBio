@@ -56,7 +56,7 @@ BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
 	ADD_PARAMETER(m_bflips   , "flip_primary"       );
 	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
-    ADD_PARAMETER(m_bshellbs , "shell_bottom_primary " );
+    ADD_PARAMETER(m_bshellbs , "shell_bottom_primary"  );
     ADD_PARAMETER(m_bshellbm , "shell_bottom_secondary");
 END_FECORE_CLASS();
 
