@@ -29,6 +29,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEOsmCoefManning.h"
 #include "FEMultiphasic.h"
+#include "FEBioFluid/FEFluidSolutes.h"
+#include "FEBioFluid/FESolutesMaterial.h"
+#include "FEBioFluid/FEMultiphasicFSI.h"
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -47,6 +50,9 @@ FEOsmCoefManning::FEOsmCoefManning(FEModel* pfem) : FEOsmoticCoefficient(pfem)
     m_sol = -1;
     m_lsol = -1;
     m_pMP = nullptr;
+    m_pFS = nullptr;
+    m_pSM = nullptr;
+    m_pMF = nullptr;
     // by default, set the osmotic coefficient to a constant = 1
     m_osmc = new FELinearFunction(pfem,0,1);
 }
@@ -56,13 +62,24 @@ bool FEOsmCoefManning::Init()
 {
     // get the ancestor material which must be a multiphasic material
     m_pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
-	if (m_pMP == nullptr) {
-		feLogError("Ancestor material must be multiphasic");
+    m_pFS = dynamic_cast<FEFluidSolutes*> (GetAncestor());
+    m_pSM = dynamic_cast<FESolutesMaterial*> (GetAncestor());
+    m_pMF = dynamic_cast<FEMultiphasicFSI*> (GetAncestor());
+	if ((m_pMP == nullptr) && (m_pFS == nullptr) && (m_pSM == nullptr) && (m_pMF == nullptr)) {
+		feLogError("Ancestor material must have solutes");
 		return false;
 	}
     
     // extract the local id of the solute from the global id
-    m_lsol = m_pMP->FindLocalSoluteID(m_sol); // m_sol must be zero-based
+    // m_sol must be zero-based
+    if (m_pMP)
+        m_lsol = m_pMP->FindLocalSoluteID(m_sol);
+    if (m_pFS)
+        m_lsol = m_pFS->FindLocalSoluteID(m_sol);
+    if (m_pSM)
+        m_lsol = m_pSM->FindLocalSoluteID(m_sol);
+    if (m_pMF)
+        m_lsol = m_pMF->FindLocalSoluteID(m_sol);
 	if (m_lsol == -1) {
 		feLogError("Invalid value for sol");
 		return false;
@@ -111,10 +128,31 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Concentration(FEMaterialPoin
 double FEOsmCoefManning::OsmoticCoefficient_Manning(FEMaterialPoint& mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     // evaluate X = FCD/co-ion actual concentration
-    double ca = spt.m_ca[m_lsol];
-    double cF = fabs(spt.m_cF);
+    double ca = 0;
+    double cF = 0;
+    if (m_pMP)
+    {
+        ca = spt.m_ca[m_lsol];
+        cF = fabs(spt.m_cF);
+    }
+    else if (m_pFS)
+    {
+        ca = fspt.m_ca[m_lsol];
+    }
+    else if (m_pSM)
+    {
+        ca = smpt.m_ca[m_lsol];
+    }
+    else if (m_pMF)
+    {
+        ca = mfpt.m_ca[m_lsol];
+        cF = fabs(mfpt.m_cF);
+    }
     double X = 0;
     if (ca > 0) X = cF/ca;
     
@@ -136,19 +174,55 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Strain_Manning(FEMaterialPoi
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FEBiphasicMaterialPoint& bpt = *mp.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint& bfpt = *mp.ExtractData<FEBiphasicFSIMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    
     
     // evaluate X = FCD/co-ion actual concentration
-    double ca = spt.m_ca[m_lsol];
-    double cF = fabs(spt.m_cF);
+    double ca = 0.0;
+    double cF = 0.0;
+    double kt = 0.0;
+    double dktdJ = 0.0;
+    if (m_pMP)
+    {
+        ca = spt.m_ca[m_lsol];
+        cF = fabs(spt.m_cF);
+        kt = spt.m_k[m_lsol];
+        dktdJ = spt.m_dkdJ[m_lsol];
+    }
+    else if (m_pFS)
+    {
+        ca = fspt.m_ca[m_lsol];
+        kt = fspt.m_k[m_lsol];
+        dktdJ = fspt.m_dkdJ[m_lsol];
+    }
+    else if (m_pSM)
+    {
+        ca = smpt.m_ca[m_lsol];
+        kt = smpt.m_k[m_lsol];
+    }
+    else if (m_pMF)
+    {
+        ca = mfpt.m_ca[m_lsol];
+        cF = fabs(mfpt.m_cF);
+        kt = mfpt.m_k[m_lsol];
+        dktdJ = mfpt.m_dkdJ[m_lsol];
+    }
     double X = 0;
     if (ca > 0) X = cF/ca;
     
     // evaluate dX/dJ
     double J = pt.m_J;
-    double phisr = bpt.m_phi0;
-    double kt = spt.m_k[m_lsol];
-    double dktdJ = spt.m_dkdJ[m_lsol];
+    
+    double phisr = 0.0;
+    if (m_pMP)
+        phisr = bpt.m_phi0;
+    if (m_pMF)
+        phisr = bfpt.m_phi0;
+    
     double dXdJ = -(1./(J-phisr)+dktdJ/kt)*X;
     
     double dosmdX;
@@ -165,17 +239,51 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Strain_Manning(FEMaterialPoi
 double FEOsmCoefManning::Tangent_OsmoticCoefficient_Concentration_Manning(FEMaterialPoint &mp, const int isol)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     // evaluate X = FCD/co-ion actual concentration
-    double ca = spt.m_ca[m_lsol];
-    double cF = fabs(spt.m_cF);
+    double ca = 0;
+    double cF = 0;
+    double kta = 0;
+    double kt = 0;
+    int zt = 0;
+    if (m_pMP)
+    {
+        ca = spt.m_ca[m_lsol];
+        cF = fabs(spt.m_cF);
+        kta = spt.m_k[m_lsol];
+        kt = spt.m_k[isol];
+        zt = m_pMP->GetSolute(isol)->ChargeNumber();
+    }
+    else if (m_pFS)
+    {
+        ca = fspt.m_ca[m_lsol];
+        kta = fspt.m_k[m_lsol];
+        kt = fspt.m_k[isol];
+        zt = m_pFS->GetSolute(isol)->ChargeNumber();
+    }
+    else if (m_pSM)
+    {
+        ca = smpt.m_ca[m_lsol];
+        kta = smpt.m_k[m_lsol];
+        kt = smpt.m_k[isol];
+        zt = m_pSM->GetSolute(isol)->ChargeNumber();
+    }
+    else if (m_pMF)
+    {
+        ca = mfpt.m_ca[m_lsol];
+        cF = fabs(mfpt.m_cF);
+        kta = mfpt.m_k[m_lsol];
+        kt = mfpt.m_k[isol];
+        zt = m_pMF->GetSolute(isol)->ChargeNumber();
+    }
+    
     double X = 0;
     if (ca > 0) X = cF/ca;
     
     // evaluate dX/dc
-    double kta = spt.m_k[m_lsol];
-    double kt = spt.m_k[isol];
-    int zt = m_pMP->GetSolute(isol)->ChargeNumber();
     double dXdc = -zt*kt/ca;
     if (isol == m_lsol) dXdc -= kta*X/ca;
     
@@ -193,8 +301,27 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Concentration_Manning(FEMate
 double FEOsmCoefManning::OsmoticCoefficient_Wells(FEMaterialPoint& mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
-    double ca = spt.m_ca[m_lsol];
+    double ca = 0;
+    if (m_pMP)
+    {
+        ca = spt.m_ca[m_lsol];
+    }
+    else if (m_pFS)
+    {
+        ca = fspt.m_ca[m_lsol];
+    }
+    else if (m_pSM)
+    {
+        ca = smpt.m_ca[m_lsol];
+    }
+    else if (m_pMF)
+    {
+        ca = mfpt.m_ca[m_lsol];
+    }
     double osmc = m_osmc->value(ca);
     
     assert(osmc>0);
@@ -207,11 +334,34 @@ double FEOsmCoefManning::OsmoticCoefficient_Wells(FEMaterialPoint& mp)
 double FEOsmCoefManning::Tangent_OsmoticCoefficient_Strain_Wells(FEMaterialPoint &mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
-    double ca = spt.m_ca[m_lsol];
+    double f = 0;
+    double ca = 0;
+    if (m_pMP)
+    {
+        ca = spt.m_ca[m_lsol];
+        f = spt.m_dkdJ[m_lsol]*spt.m_c[m_lsol];
+    }
+    else if (m_pFS)
+    {
+        ca = fspt.m_ca[m_lsol];
+        f = fspt.m_dkdJ[m_lsol]*fspt.m_c[m_lsol];
+    }
+    else if (m_pSM)
+    {
+        ca = smpt.m_ca[m_lsol];
+        f = smpt.m_dkdJ[m_lsol]*smpt.m_c[m_lsol];
+    }
+    else if (m_pMF)
+    {
+        ca = mfpt.m_ca[m_lsol];
+        f = mfpt.m_dkdJ[m_lsol]*mfpt.m_c[m_lsol];
+    }
+    
     double dosmc = m_osmc->derive(ca);
-    
-    double f = spt.m_dkdJ[m_lsol]*spt.m_c[m_lsol];
     
     return dosmc*f;
 }
@@ -221,12 +371,38 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Strain_Wells(FEMaterialPoint
 double FEOsmCoefManning::Tangent_OsmoticCoefficient_Concentration_Wells(FEMaterialPoint &mp, const int isol)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
-    double ca = spt.m_ca[m_lsol];
+    double ca = 0;
+    double f = 0;
+    if (m_pMP)
+    {
+        ca = spt.m_ca[m_lsol];
+        f = spt.m_dkdc[m_lsol][isol]*spt.m_c[m_lsol];
+        if (isol == m_lsol) f += spt.m_k[m_lsol];
+    }
+    else if (m_pFS)
+    {
+        ca = fspt.m_ca[m_lsol];
+        f = fspt.m_dkdc[m_lsol][isol]*fspt.m_c[m_lsol];
+        if (isol == m_lsol) f += fspt.m_k[m_lsol];
+    }
+    else if (m_pSM)
+    {
+        ca = smpt.m_ca[m_lsol];
+        f = smpt.m_dkdc[m_lsol][isol]*smpt.m_c[m_lsol];
+        if (isol == m_lsol) f += smpt.m_k[m_lsol];
+    }
+    else if (m_pMF)
+    {
+        ca = mfpt.m_ca[m_lsol];
+        f = mfpt.m_dkdc[m_lsol][isol]*mfpt.m_c[m_lsol];
+        if (isol == m_lsol) f += mfpt.m_k[m_lsol];
+    }
+    
     double dosmc = m_osmc->derive(ca);
-    
-    double f = spt.m_dkdc[m_lsol][isol]*spt.m_c[m_lsol];
-    if (isol == m_lsol) f += spt.m_k[m_lsol];
     
     return dosmc*f;
 }

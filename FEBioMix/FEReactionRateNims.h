@@ -28,6 +28,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEMultiphasic.h"
+#include "FEBioFluid/FEFluidSolutes.h"
+#include "FEBioFluid/FESolutesMaterial.h"
+#include "FEBioFluid/FEMultiphasicFSI.h"
 
 //-----------------------------------------------------------------------------
 //! Concentration-history-dependent reaction rate.

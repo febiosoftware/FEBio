@@ -163,6 +163,9 @@ public:
     //! calculate material gradient of scalar function at integration points
     vec3d Gradient(FESolidElement& el, double* fn, int n);
     
+    //! calculate material gradient of scalar function at integration points
+    vec3d Gradient(FESolidElement& el, vector<double>& fn, int n);
+    
     //! calculate material gradient of vector function at integration points
     mat3d Gradient(FESolidElement& el, vec3d* fn, int n);
     

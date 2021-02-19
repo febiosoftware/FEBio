@@ -38,6 +38,8 @@ SOFTWARE.*/
 #include "FEFluidFSI.h"
 #include "FEBiphasicFSIDomain.h"
 #include "FEBiphasicFSI.h"
+#include "FEMultiphasicFSIDomain.h"
+#include "FEMultiphasicFSI.h"
 #include "FEThermoFluid.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/FEModel.h>

@@ -120,6 +120,17 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Actual solute concentration
+class FEPlotPartitionCoefficient : public FEPlotDomainData
+{
+public:
+    FEPlotPartitionCoefficient(FEModel* pfem);
+    bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+    vector<int>    m_sol;
+};
+
+//-----------------------------------------------------------------------------
 //! Solute flux (for biphasic solute problems)
 class FEPlotSoluteFlux : public FEPlotDomainData
 {

@@ -36,8 +36,6 @@ BEGIN_FECORE_CLASS(FEBiphasicFSI, FEFluidFSI)
 ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
 
 // material properties
-ADD_PROPERTY(m_pSolid, "solid");
-ADD_PROPERTY(m_pFluid, "fluid");
 ADD_PROPERTY(m_pPerm, "permeability");
 
 END_FECORE_CLASS();
@@ -96,8 +94,6 @@ FEMaterialPoint* FEBiphasicFSI::CreateMaterialPointData()
     FEFSIMaterialPoint* fst = new FEFSIMaterialPoint(fpt);
     FEBiphasicFSIMaterialPoint* bfpt = new FEBiphasicFSIMaterialPoint(fst);
     
-    bfpt->m_phi0 = m_phi0;
-    
     return bfpt;
 }
 
@@ -118,7 +114,7 @@ double FEBiphasicFSI::Porosity(FEMaterialPoint& pt)
     // check for pore collapse
     // TODO: throw an error if pores collapse
     // phiw cant be 0
-    phiw = (phiw > 0) ? phiw : 1.0e-15;
+    phiw = (phiw > 0) ? phiw : 0;
     
     return phiw;
 }
@@ -133,6 +129,7 @@ double FEBiphasicFSI::SolidVolumeFrac(FEMaterialPoint& pt)
     // relative volume
     double J = et.m_J;
     double phis = bt.m_phi0/J;
+    //double phis = m_phi0(pt)/J;
     // check if phis is negative
     // TODO: throw an error if pores collapse
     phis = (phis >= 0) ? phis : 0;
@@ -154,6 +151,46 @@ vec3d FEBiphasicFSI::gradPorosity(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! porosity gradient
+vec3d FEBiphasicFSI::gradPhifPhis(FEMaterialPoint& pt)
+{
+    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    FEBiphasicFSIMaterialPoint& bt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
+    
+    double phisr = SolidReferentialVolumeFraction(pt);
+    
+    vec3d gradphifphis = vec3d(0.0);
+    
+    if (phisr != 0)
+        gradphifphis = bt.m_gradJ/phisr;
+    
+    return gradphifphis;
+}
+
+//-----------------------------------------------------------------------------
+//! Solid referential apparent density
+double FEBiphasicFSI::SolidReferentialApparentDensity(FEMaterialPoint& pt)
+{
+    FEBiphasicFSIMaterialPoint& pet = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
+    
+    // evaluate referential apparent density of base solid
+    double density = TrueSolidDensity(pt);
+    double rhosr = pet.m_phi0*density;
+    
+    return rhosr;
+}
+
+//-----------------------------------------------------------------------------
+//! Solid referential volume fraction
+double FEBiphasicFSI::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
+{
+    // get referential apparent density of base solid (assumed constant)
+    double phisr = m_phi0(pt);
+    
+    return phisr;
+}
+
+//-----------------------------------------------------------------------------
 //! The stress of a poro-elastic material is the sum of the fluid stress
 //! and the elastic stress. Note that this function is declared in the base class
 //! so you do not have to reimplement it in a derived class, unless additional
@@ -168,18 +205,6 @@ mat3ds FEBiphasicFSI::Stress(FEMaterialPoint& mp)
     s = s + m_pFluid->Stress(mp);
     
     return s;
-}
-
-//-----------------------------------------------------------------------------
-//! The tangent is the sum of the elastic tangent plus the fluid tangent (it is 0). Note
-//! that this function is declared in the base class, so you don't have to
-//! reimplement it unless additional tangent components are required.
-
-tens4ds FEBiphasicFSI::Tangent(FEMaterialPoint& mp)
-{
-    // call solid tangent routine
-    tens4ds c = m_pSolid->Tangent(mp);
-    return c;
 }
 
 //-----------------------------------------------------------------------------

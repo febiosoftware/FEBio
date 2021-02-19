@@ -37,6 +37,7 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
     FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     // get forward reaction rate
     double k = m_pFwd->ReactionRate(pt);
@@ -79,6 +80,17 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
             }
         }
     }
+    else if (m_pFS)
+    {
+        nsol = (int)mfpt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vR = m_vR[i];
+            if (vR > 0) {
+                double c = mfpt.m_c[i];
+                zhat *= pow(c, vR);
+            }
+        }
+    }
     
     // add contribution of solid-bound molecules
     if (m_pMP)
@@ -104,6 +116,7 @@ double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
     FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     // get forward reaction rate
     double k = m_pRev->ReactionRate(pt);
@@ -146,6 +159,17 @@ double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
             }
         }
     }
+    else if (m_pMF)
+    {
+        nsol = (int)mfpt.m_c.size();
+        for (int i=0; i<nsol; ++i) {
+            int vP = m_vP[i];
+            if (vP > 0) {
+                double c = mfpt.m_c[i];
+                zhat *= pow(c, vP);
+            }
+        }
+    }
     
     // add contribution of solid-bound molecules
     if(m_pMP)
@@ -179,12 +203,22 @@ mat3ds FEMassActionReversibleEffective::Tangent_ReactionSupply_Strain(FEMaterial
 {
     FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
     FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint& bfpt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     const int nsol = m_nsol;
     const int nsbm = (int)m_v.size() - nsol;
     double J = ept.m_J;
-    double phi0 = bpt.m_phi0;
+    double phi0 = 0.0;
+    if (m_pMF)
+    {
+        phi0 = bfpt.m_phi0;
+    }
+    else
+    {
+        phi0 = bpt.m_phi0;
+    }
     
     // forward reaction
     double kF = m_pFwd->ReactionRate(pt);
@@ -242,6 +276,7 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
     FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
+    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
@@ -258,6 +293,10 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
     {
         if ((zhatF > 0) && (smpt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/smpt.m_c[sol];
     }
+    else if (m_pMF)
+    {
+        if ((zhatF > 0) && (mfpt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/mfpt.m_c[sol];
+    }
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
@@ -273,6 +312,10 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
     else if (m_pSM)
     {
         if ((zhatR > 0) && (smpt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/smpt.m_c[sol];
+    }
+    else if (m_pMF)
+    {
+        if ((zhatR > 0) && (mfpt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/mfpt.m_c[sol];
     }
 
     return dzhatFdc - dzhatRdc;

@@ -28,6 +28,8 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBiphasicSolute.h"
+#include <FEBioFluid/FEMultiphasicFSI.h>
+#include <FEBioFluid/FEFluidSolutes.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a material that has a porosity and concentration

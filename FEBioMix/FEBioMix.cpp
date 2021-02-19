@@ -251,6 +251,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration     , "effective solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellSoluteConcentration, "effective shell solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
+    REGISTER_FECORE_CLASS(FEPlotPartitionCoefficient             , "partition coefficient");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
 	REGISTER_FECORE_CLASS(FEPlotOsmolarity                       , "osmolarity");
 	REGISTER_FECORE_CLASS(FEPlotCurrentDensity                   , "current density"     );
