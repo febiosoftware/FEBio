@@ -180,7 +180,7 @@ std::string DataRecord::printToFormatString(int i)
 				*ch = '%'; sz = ch + 1;
 			}
 		}
-		else { ss << "%s"; break; }
+		else { ss << sz; break; }
 	} while (*sz);
 	ss << "\n";
 
