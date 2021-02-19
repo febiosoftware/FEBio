@@ -556,6 +556,7 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDeformationMapGenerator.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteElasticMaterial.h" />
@@ -802,6 +803,7 @@
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDeformationMapGenerator.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteElasticMaterial.cpp" />

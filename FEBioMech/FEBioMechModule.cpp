@@ -241,6 +241,7 @@ SOFTWARE.*/
 
 #include "FENodeToNodeConstraint.h"
 
+#include "FEDeformationMapGenerator.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -821,7 +822,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidBodyKineticEnergy, "KE");
 
 	//-----------------------------------------------------------------------------
-		// Derived from FELogConnectorData
+	// Derived from FELogConnectorData
 	REGISTER_FECORE_CLASS(FELogRigidConnectorForceX, "RCFx");
 	REGISTER_FECORE_CLASS(FELogRigidConnectorForceY, "RCFy");
 	REGISTER_FECORE_CLASS(FELogRigidConnectorForceZ, "RCFz");
@@ -840,6 +841,10 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
 	REGISTER_FECORE_CLASS(FEMaxDamageCriterion, "max_damage");
 	REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
+
+	//-----------------------------------------------------------------------------
+	// Derived from FEDataGenerator
+	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
 
 	febio.CreateModule("explicit-solid");
 	febio.SetModuleDependency("solid");
