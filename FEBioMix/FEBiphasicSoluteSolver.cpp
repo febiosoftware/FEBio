@@ -170,7 +170,11 @@ void FEBiphasicSoluteSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP[0]) || (dof == m_dofQ[0]) || (dof >= m_dofC[0])) f *= tp.timeIncrement;
+                bool adjust = false;
+                if ((dof == m_dofP[0]) || (dof == m_dofQ[0])) adjust = true;
+                else if ((m_dofC[0] > -1) && (dof == m_dofC[0])) adjust = true;
+                else if ((m_dofD[0] > -1) && (dof == m_dofD[0])) adjust = true;
+                if (adjust) f *= tp.timeIncrement;
 
 				// assemble into residual
 				R.Assemble(nid, dof, f);

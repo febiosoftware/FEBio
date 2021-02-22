@@ -441,7 +441,11 @@ void FEMultiphasicSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP) || (dof == m_dofQ) || (dof >= m_dofC)) f *= tp.timeIncrement;
+                bool adjust = false;
+                if ((dof == m_dofP) || (dof == m_dofQ)) adjust = true;
+                else if ((m_dofC > -1) && (dof >= m_dofC)) adjust = true;
+                else if ((m_dofD > -1) && (dof >= m_dofD)) adjust = true;
+                if (adjust) f *= tp.timeIncrement;
 
 				// assemble into residual
 				R.Assemble(nid, dof, f);
