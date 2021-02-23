@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEElasticMaterial.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FENodeNodeList.h>
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 FEBioMeshSection::FEBioMeshSection(FEBioImport* pim) : FEBioFileSection(pim) {}
@@ -137,8 +138,17 @@ void FEBioMeshSection::ParseElementSection(XMLTag& tag, FEBModel::Part* part)
 	FE_Element_Spec espec = GetBuilder()->ElementSpec(sztype);
 	if (FEElementLibrary::IsValid(espec) == false) throw FEBioImport::InvalidElementType();
 
+	// make sure the domain does not exist yet
+	FEBModel::Domain* dom = part->FindDomain(szname);
+	if (dom)
+	{
+		stringstream ss;
+		ss << "Duplicate part name found : " << szname;
+		throw std::runtime_error(ss.str());
+	}
+
 	// create the new domain
-	FEBModel::Domain* dom = new FEBModel::Domain(espec);
+	dom = new FEBModel::Domain(espec);
 	if (szname) dom->SetName(szname);
 
 	// add domain it to the mesh

@@ -446,6 +446,13 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 	{
 		return errf("\"%s\" is not a valid field variable name (line %d)\n", e.what(), xml.GetCurrentLine()-1);
 	}
+	// std::exception
+	catch (std::exception e)
+	{
+		const char* szerr = e.what();
+		if (szerr == nullptr) szerr = "(unknown exception)";
+		return errf("%s", szerr);
+	}
 	// --- Unknown exceptions ---
 	catch (...)
 	{
