@@ -525,6 +525,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidSolutes.h" />
     <ClInclude Include="..\..\FEBioFluid\febiofluid_api.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioMultiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioThermoFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBiphasicFSIDomain.h" />
@@ -568,6 +569,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutes.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesFlux.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesNaturalFlux.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesPressure.h" />
@@ -583,6 +585,14 @@
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsentropic.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsothermal.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealLiquid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSI.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSIDomain.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSIDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSIDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSIPressure.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSISoluteBackflowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSISoluteFlux.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEMultiphasicFSISolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEPowellEyringFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FERealGas.h" />
@@ -619,6 +629,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidPlot.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidSolutes.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioMultiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioThermoFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBiphasicFSIDomain.cpp" />
@@ -662,6 +673,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutes.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesFlux.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesNaturalFlux.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesPressure.cpp" />
@@ -677,6 +689,14 @@
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsentropic.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsothermal.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEIdealLiquid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSI.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSIDomain.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSIDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSIDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSIPressure.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSISoluteBackflowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSISoluteFlux.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEMultiphasicFSISolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FERealGas.cpp" />
