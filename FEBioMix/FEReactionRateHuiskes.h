@@ -28,6 +28,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEMultiphasic.h"
+#include "FEBioFluid/FEFluidSolutes.h"
+#include "FEBioFluid/FESolutesMaterial.h"
+#include "FEBioFluid/FEMultiphasicFSI.h"
 
 class FEBIOMIX_API FEReactionRateHuiskes : public FEReactionRate
 {

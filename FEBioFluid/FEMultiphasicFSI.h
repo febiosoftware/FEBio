@@ -1,33 +1,36 @@
 /*This file is part of the FEBio source code and is licensed under the MIT license
-listed below.
-
-See Copyright-FEBio.txt for details.
-
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
-the City of New York, and others.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.*/
-
-
+ listed below.
+ 
+ See Copyright-FEBio.txt for details.
+ 
+ Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+ the City of New York, and others.
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.*/
 
 #pragma once
 #include <FEBioMech/FEElasticMaterial.h>
+#include "FEFluidFSI.h"
+#include "FEBiphasicFSI.h"
+#include "FEMultiphasicFSI.h"
+#include <FEBioMix/FEHydraulicPermeability.h>
+#include <FEBioMech/FEBodyForce.h>
 #include "FEFluid.h"
 #include <FEBioMix/FESolute.h>
 #include <FEBioMix/FESoluteInterface.h>
@@ -38,11 +41,11 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEFluidSolutesMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEMultiphasicFSIMaterialPoint : public FEMaterialPoint
 {
 public:
     //! constructor
-    FEFluidSolutesMaterialPoint(FEMaterialPoint* pt);
+    FEMultiphasicFSIMaterialPoint(FEMaterialPoint* pt);
     
     //! create a shallow copy
     FEMaterialPoint* Copy();
@@ -54,7 +57,7 @@ public:
     void Init();
     
 public:
-    // solutes material data
+    // Multiphasic FSI material data
     int                 m_nsol;     //!< number of solutes
     vector<double>      m_c;        //!< effective solute concentration
     vector<double>      m_ca;        //!< effective solute concentration
@@ -63,7 +66,8 @@ public:
     vector<double>      m_cdot;     //!< material time derivative of solute concentration following fluid
     double            m_psi;        //!< electric potential
     vec3d            m_Ie;        //!< current density
-    double           m_pe;           //!< effective fluid pressure
+    double            m_pe;        //!< effective fluid pressure
+    double            m_cF;        //!< fixed charge density in current configuration
     vector<double>    m_k;        //!< solute partition coefficient
     vector<double>    m_dkdJ;        //!< 1st deriv of m_k with strain (J)
     vector<double>    m_dkdJJ;    //!< 2nd deriv of m_k with strain (J)
@@ -75,10 +79,10 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface
+class FEBIOFLUID_API FEMultiphasicFSI : public FEBiphasicFSI, public FESoluteInterface
 {
 public:
-    FEFluidSolutes(FEModel* pfem);
+    FEMultiphasicFSI(FEModel* pfem);
     
     // returns a pointer to a new material point object
     FEMaterialPoint* CreateMaterialPointData() override;
@@ -90,7 +94,26 @@ public:
     void Serialize(DumpStream& ar) override;
     
 public:
-    FEFluid* Fluid() { return m_pFluid; }
+    //! calculate inner stress at material point
+    mat3ds Stress(FEMaterialPoint& pt);
+    
+    //! return the diffusivity tensor as a matrix
+    void Diffusivity(double k[3][3], FEMaterialPoint& pt, int sol);
+    
+    //! return the diffusivity as a tensor
+    mat3ds Diffusivity(FEMaterialPoint& pt, int sol);
+    
+    //! return the inverse diffusivity as a tensor
+    mat3ds InvDiffusivity(FEMaterialPoint& pt, int sol);
+    
+    //! return the tangent diffusivity tensor
+    tens4dmm Diffusivity_Tangent_Strain(FEMaterialPoint& pt, int isol);
+    
+    //! return the tangent diffusivity tensor
+    mat3ds Diffusivity_Tangent_Concentration(FEMaterialPoint& pt, int isol, int jsol);
+    
+    //! return the diffusivity property
+    FESoluteDiffusivity* GetDiffusivity(int sol) { return m_pSolute[sol]->m_pDiff; }
     
     //! calculate solute molar flux
     vec3d SoluteFlux(FEMaterialPoint& pt, const int sol);
@@ -100,6 +123,9 @@ public:
     
     //! actual fluid pressure (as opposed to effective pressure)
     double PressureActual(FEMaterialPoint& pt);
+    
+    //! fixed charge density
+    virtual double FixedChargeDensity(FEMaterialPoint& pt);
     
     //! partition coefficient
     double PartitionCoefficient(FEMaterialPoint& pt, const int sol);
@@ -136,7 +162,9 @@ public:
     
     int Reactions         () { return (int) m_pReact.size();    }
     
-public:
+public: // material parameters
+    FEParamDouble       m_cFr;      //!< fixed charge density in reference configurations TODO: gradphisr
+    vector<FEBodyForce*>    m_mbf;       //!< body forces acting on this multiphasic material solutes
     double    m_Rgas;            //!< universal gas constant
     double    m_Tabs;            //!< absolute temperature
     double    m_Fc;              //!< Faraday's constant
@@ -145,12 +173,10 @@ public:
     int        m_ndeg;            //!< polynomial degree of zeta in electroneutrality
     double              m_penalty;  //!< penalty for enforcing electroneutrality
     
-private: // material properties
-    FEFluid*                m_pFluid;       //!< pointer to fluid material
+protected: // material properties
     std::vector<FESolute*>  m_pSolute;      //!< pointer to solute materials
     FEOsmoticCoefficient*        m_pOsmC;        //!< pointer to osmotic coefficient material
     std::vector<FEChemicalReaction*>    m_pReact;        //!< pointer to chemical reactions
     
-
     DECLARE_FECORE_CLASS();
 };

@@ -31,6 +31,8 @@ SOFTWARE.*/
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
+#include <FEBioFluid/FEMultiphasicFSI.h>
+#include <FEBioFluid/FEFluidSolutes.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -73,10 +75,18 @@ bool FEDiffAlbroIso::Init()
 //! Free diffusivity
 double FEDiffAlbroIso::Free_Diffusivity(FEMaterialPoint& mp)
 {
-	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+	FESolutesMaterialPoint* spt = mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint* mfpt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
 	
     // solute concentration
-    double ca = spt.m_ca[m_lsol];
+    double ca = 0;
+    if (spt)
+        ca = spt->m_ca[m_lsol];
+    else if (fspt)
+        ca = fspt->m_ca[m_lsol];
+    else if (mfpt)
+        ca = mfpt->m_ca[m_lsol];
     
     // diffusivity coefficient
     double d = m_diff0*exp(-m_cdinv*ca);
@@ -88,23 +98,45 @@ double FEDiffAlbroIso::Free_Diffusivity(FEMaterialPoint& mp)
 //! Tangent of free diffusivity with respect to concentration
 double FEDiffAlbroIso::Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol)
 {
-	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FESolutesMaterialPoint* spt = mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint* mfpt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
 	
     // solute concentration
-    double ca = spt.m_ca[m_lsol];
-    double c = spt.m_c[m_lsol];
+    double ca, c, dkdc, k;
+    ca = c = dkdc = k = 0;
+    if (spt)
+    {
+        ca = spt->m_ca[m_lsol];
+        c = spt->m_c[m_lsol];
+        dkdc = spt->m_dkdc[m_lsol][isol];
+        k = spt->m_k[m_lsol];
+    }
+    else if (fspt)
+    {
+        ca = fspt->m_ca[m_lsol];
+        c = fspt->m_c[m_lsol];
+        dkdc = fspt->m_dkdc[m_lsol][isol];
+        k = fspt->m_k[m_lsol];
+    }
+    else if (mfpt)
+    {
+        ca = mfpt->m_ca[m_lsol];
+        c = mfpt->m_c[m_lsol];
+        dkdc = mfpt->m_dkdc[m_lsol][isol];
+        k = mfpt->m_k[m_lsol];
+    }
     
     // diffusivity coefficient
     double d = m_diff0*exp(-m_cdinv*ca);
     // derivative of d w.r.t. actual concentration
     double dc = -m_cdinv*d;
-    double dkdc = spt.m_dkdc[m_lsol][isol];
+    
     
     // tangent w.r.t. concentration
-    if (isol == m_lsol) {
-        double k = spt.m_k[m_lsol];
+    if (isol == m_lsol)
         return dc*(k+dkdc*c);
-    } else
+    else
         return dc*dkdc*c;
 }
 
@@ -112,19 +144,32 @@ double FEDiffAlbroIso::Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& m
 //! Diffusivity tensor.
 mat3ds FEDiffAlbroIso::Diffusivity(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+	FEElasticMaterialPoint* et = mp.ExtractData<FEElasticMaterialPoint>();
+	FEBiphasicMaterialPoint* ppt = mp.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint* bfpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+	FESolutesMaterialPoint* spt = mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint* mfpt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
 	
 	// relative volume
-	double J = et.m_J;
+	double J = et->m_J;
 	
 	// solid volume fraction in reference configuration
-	double phi0 = ppt.m_phi0;
+	double phi0 = 0;
+    if (ppt)
+        phi0 = ppt->m_phi0;
+    else if (bfpt)
+        phi0 = bfpt->m_phi0;
     // porosity in current configuration
     double phiw = 1 - phi0/J;
     // solute concentration
-    double ca = spt.m_ca[m_lsol];
+    double ca = 0;
+    if (spt)
+        ca = spt->m_ca[m_lsol];
+    else if (fspt)
+        ca = fspt->m_ca[m_lsol];
+    else if (mfpt)
+        ca = mfpt->m_ca[m_lsol];
     
     // diffusivity coefficient
     double d = m_diff0*exp(-m_alphad*(1-phiw)/phiw - m_cdinv*ca);
@@ -139,24 +184,49 @@ mat3ds FEDiffAlbroIso::Diffusivity(FEMaterialPoint& mp)
 //! Tangent of diffusivity with respect to strain
 tens4dmm FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
-	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEElasticMaterialPoint* et = mp.ExtractData<FEElasticMaterialPoint>();
+    FEBiphasicMaterialPoint* ppt = mp.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint* bfpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+    FESolutesMaterialPoint* spt = mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint* mfpt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
 	
 	// relative volume
-	double J = et.m_J;
+	double J = et->m_J;
 	
 	// solid volume fraction in reference configuration
-	double phi0 = ppt.m_phi0;
+    double phi0 = 0;
+    if (ppt)
+        phi0 = ppt->m_phi0;
+    else if (bfpt)
+        phi0 = bfpt->m_phi0;
     // porosity in current configuration
     double phiw = 1 - phi0/J;
     // solute concentration
-    double ca = spt.m_ca[m_lsol];
-    double c = spt.m_c[m_lsol];
-    double dkdJ = spt.m_dkdJ[m_lsol];
+    double ca = 0;
+    double c = 0;
+    double dkdJ = 0;
+    if (spt)
+    {
+        ca = spt->m_ca[m_lsol];
+        c = spt->m_c[m_lsol];
+        dkdJ = spt->m_dkdJ[m_lsol];
+    }
+    else if (fspt)
+    {
+        ca = fspt->m_ca[m_lsol];
+        c = fspt->m_c[m_lsol];
+        dkdJ = fspt->m_dkdJ[m_lsol];
+    }
+    else if (mfpt)
+    {
+        ca = mfpt->m_ca[m_lsol];
+        c = mfpt->m_c[m_lsol];
+        dkdJ = mfpt->m_dkdJ[m_lsol];
+    }
     
     // diffusivity coefficient
     double d = m_diff0*exp(-m_alphad*(1-phiw)/phiw - m_cdinv*ca);
@@ -173,30 +243,56 @@ tens4dmm FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 //! Tangent of diffusivity with respect to concentration
 mat3ds FEDiffAlbroIso::Tangent_Diffusivity_Concentration(FEMaterialPoint &mp, const int isol)
 {
-	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FEElasticMaterialPoint* et = mp.ExtractData<FEElasticMaterialPoint>();
+    FEBiphasicMaterialPoint* ppt = mp.ExtractData<FEBiphasicMaterialPoint>();
+    FEBiphasicFSIMaterialPoint* bfpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+    FESolutesMaterialPoint* spt = mp.ExtractData<FESolutesMaterialPoint>();
+    FEFluidSolutesMaterialPoint* fspt = mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint* mfpt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
 	
 	// relative volume
-	double J = et.m_J;
+	double J = et->m_J;
 	
 	// solid volume fraction in reference configuration
-	double phi0 = ppt.m_phi0;
+    double phi0 = 0;
+    if (ppt)
+        phi0 = ppt->m_phi0;
+    else if (bfpt)
+        phi0 = bfpt->m_phi0;
     // porosity in current configuration
     double phiw = 1 - phi0/J;
     // solute concentration
-    double ca = spt.m_ca[m_lsol];
-    double c = spt.m_c[m_lsol];
+    double ca, c, dkdc, k;
+    ca = c = dkdc = k = 0;
+    if (spt)
+    {
+        ca = spt->m_ca[m_lsol];
+        c = spt->m_c[m_lsol];
+        dkdc = spt->m_dkdc[m_lsol][isol];
+        k = spt->m_k[m_lsol];
+    }
+    else if (fspt)
+    {
+        ca = fspt->m_ca[m_lsol];
+        c = fspt->m_c[m_lsol];
+        dkdc = fspt->m_dkdc[m_lsol][isol];
+        k = fspt->m_k[m_lsol];
+    }
+    else if (mfpt)
+    {
+        ca = mfpt->m_ca[m_lsol];
+        c = mfpt->m_c[m_lsol];
+        dkdc = mfpt->m_dkdc[m_lsol][isol];
+        k = mfpt->m_k[m_lsol];
+    }
     
     // diffusivity coefficient
     double d = m_diff0*exp(-m_alphad*(1-phiw)/phiw - m_cdinv*ca);
     // derivative of d w.r.t. actual concentration
     double dc = -m_cdinv*d;
-    double dkdc = spt.m_dkdc[m_lsol][isol];
     
     // tangent w.r.t. concentration
     if (isol == m_lsol) {
-        double k = spt.m_k[m_lsol];
         return mat3dd(dc*(k+dkdc*c));
     } else
         return mat3dd(dc*dkdc*c);

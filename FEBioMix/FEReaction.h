@@ -35,6 +35,7 @@ SOFTWARE.*/
 class FEMultiphasic;
 class FEFluidSolutes;
 class FESolutesMaterial;
+class FEMultiphasicFSI;
 
 //-----------------------------------------------------------------------------
 //! Base class for reactions.
@@ -59,4 +60,5 @@ public:
     FEMultiphasic*    m_pMP;        //!< pointer to multiphasic material where reaction occurs
     FEFluidSolutes*    m_pFS;        //!< pointer to fluid solutes material where reaction occurs
     FESolutesMaterial* m_pSM;       //!< pointer to solute (split) material where reaction occurs
+    FEMultiphasicFSI* m_pMF;       //!< pointer to multiphasic fsi material where reaction occurs
 };

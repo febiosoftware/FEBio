@@ -114,7 +114,7 @@ void FEBiphasicFSIDomain3D::Reset()
         FEBiphasicFSIMaterialPoint& pt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
         
         // initialize referential solid volume fraction
-        pt.m_phi0 = m_pMat->m_phi0;
+        pt.m_phi0 = m_pMat->m_phi0(mp);
     });
 }
 
@@ -452,7 +452,7 @@ void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
             for (int j=0; j<neln; ++j)
             {
                 kwJ = ff*(-H[i]*H[j]/pt.m_Jf);
-                kuJ = ff*(-H[i]*H[j]*phis/pt.m_Jf);
+                kuJ = ff*(H[i]*H[j]*phis/pt.m_Jf);
                 Kwu = (ff & gradN[j])*H[i];
                 Kuu = mat3d(0.0);
                 
@@ -974,6 +974,7 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         ft.m_aw = el.Evaluate(aw, n)*dtrans;
         
         // fluid material point data
+        bt.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
         double phif = m_pMat->Porosity(mp);
         double phis = m_pMat->SolidVolumeFrac(mp);
         vec3d gradphif = m_pMat->gradPorosity(mp);

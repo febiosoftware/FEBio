@@ -1676,6 +1676,38 @@ tens3dls FESolidDomain::gradientp(FESolidElement& el, mat3ds* fn, int n)
 
 //-----------------------------------------------------------------------------
 //! calculate material gradient of function at integration points
+vec3d FESolidDomain::Gradient(FESolidElement& el, vector<double>& fn, int n)
+{
+    double Ji[3][3];
+    invjac0(el, Ji, n);
+    
+    double* Grn = el.Gr(n);
+    double* Gsn = el.Gs(n);
+    double* Gtn = el.Gt(n);
+    
+    double Gx, Gy, Gz;
+    
+    vec3d Gradf;
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+    {
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        Gx = Ji[0][0]*Grn[i]+Ji[1][0]*Gsn[i]+Ji[2][0]*Gtn[i];
+        Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i]+Ji[2][1]*Gtn[i];
+        Gz = Ji[0][2]*Grn[i]+Ji[1][2]*Gsn[i]+Ji[2][2]*Gtn[i];
+        
+        // calculate pressure gradient
+        Gradf.x += Gx*fn[i];
+        Gradf.y += Gy*fn[i];
+        Gradf.z += Gz*fn[i];
+    }
+    
+    return Gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate material gradient of function at integration points
 vec3d FESolidDomain::Gradient(FESolidElement& el, double* fn, int n)
 {
     double Ji[3][3];

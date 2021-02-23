@@ -40,7 +40,11 @@ END_FECORE_CLASS();
 //! reaction rate at material point
 double FEReactionRateExpSED::ReactionRate(FEMaterialPoint& pt)
 {
-    double phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
+    double phir = 0;
+    if (m_pReact->m_pMP)
+        phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
+    else if (m_pReact->m_pMF)
+        phir = m_pReact->m_pMF->SolidReferentialVolumeFraction(pt);
     
     FERemodelingMaterialPoint& rpt = *(pt.ExtractData<FERemodelingMaterialPoint>());
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
@@ -54,12 +58,34 @@ double FEReactionRateExpSED::ReactionRate(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEReactionRateExpSED::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
-    double phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
-    
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    FEFluidMaterialPoint& ft = *pt.ExtractData<FEFluidMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint& mt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    
+    double phir = 0;
+    double p = 0;
+    
+    if (m_pReact->m_pMP)
+    {
+        phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
+        p = bt.m_pa;
+    }
+    else if (m_pReact->m_pFS)
+    {
+        p = ft.m_pf;
+    }
+    else if (m_pReact->m_pSM)
+    {
+        p = ft.m_pf;
+    }
+    else if (m_pReact->m_pMF)
+    {
+        phir = m_pReact->m_pMF->SolidReferentialVolumeFraction(pt);
+        p = mt.m_pe;
+    }
+    
     double J = et.m_J;
-    double p = bt.m_pa;
     double zhat = ReactionRate(pt);
     mat3dd I(1);
     mat3ds dzhatde = (I/(phir-J) + (et.m_s+I*p)/m_Psi0)*zhat;

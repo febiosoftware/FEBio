@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEMultiphasic.h"
 #include "FEBioFluid/FEFluidSolutes.h"
 #include "FEBioFluid/FESolutesMaterial.h"
+#include "FEBioFluid/FEMultiphasicFSI.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward chemical reaction, using effective concentrations

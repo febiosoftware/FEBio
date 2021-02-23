@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <stdlib.h>
 #include "FEBioFluid/FEFluidSolutes.h"
 #include "FEBioFluid/FESolutesMaterial.h"
+#include "FEBioFluid/FEMultiphasicFSI.h"
 
 
 //-----------------------------------------------------------------------------
@@ -91,6 +92,12 @@ bool FEChemicalReaction::Init()
         nsbm = 0;
         ntot = nsol + nsbm;
     }
+    else if (m_pMF)
+    {
+        nsol = m_pMF->Solutes();
+        nsbm = 0;
+        ntot = nsol + nsbm;
+    }
     else
     {
         nsol = 0;
@@ -117,6 +124,8 @@ bool FEChemicalReaction::Init()
             sid = m_pFS->GetSolute(isol)->GetSoluteID() - 1;
         else if (m_pSM)
             sid = m_pSM->GetSolute(isol)->GetSoluteID() - 1;
+        else if (m_pMF)
+            sid = m_pMF->GetSolute(isol)->GetSoluteID() - 1;
 		it = solR.find(sid);
 		if (it != solR.end()) m_vR[isol] = it->second;
 		it = solP.find(sid);
@@ -157,6 +166,10 @@ bool FEChemicalReaction::Init()
             {
                 m_Vbar += m_v[isol] * m_pSM->GetSolute(isol)->MolarMass() / m_pSM->GetSolute(isol)->Density();
             }
+            else if (m_pMF)
+            {
+                m_Vbar += m_v[isol] * m_pMF->GetSolute(isol)->MolarMass() / m_pMF->GetSolute(isol)->Density();
+            }
         }
 		for (isbm = 0; isbm<nsbm; ++isbm)
 			m_Vbar += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->MolarMass() / m_pMP->GetSBM(isbm)->Density();
@@ -177,6 +190,10 @@ bool FEChemicalReaction::Init()
         else if (m_pSM)
         {
             znet += m_v[isol] * m_pSM->GetSolute(isol)->ChargeNumber();
+        }
+        else if (m_pMF)
+        {
+            znet += m_v[isol] * m_pMF->GetSolute(isol)->ChargeNumber();
         }
     }
 	for (isbm = 0; isbm<nsbm; ++isbm)

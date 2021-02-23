@@ -74,8 +74,11 @@ public:
     //! calculate inner stress at material point
     mat3ds Stress(FEMaterialPoint& pt);
     
-    //! calculate inner tangent stiffness at material point
-    tens4ds Tangent(FEMaterialPoint& pt);
+    //! solid referential apparent density
+    double SolidReferentialApparentDensity(FEMaterialPoint& pt);
+    
+    //! solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
     
     //! return the permeability tensor as a matrix
     void Permeability(double k[3][3], FEMaterialPoint& pt);
@@ -101,6 +104,9 @@ public:
     //! porosity gradient
     vec3d gradPorosity(FEMaterialPoint& pt);
     
+    //! porosity gradient
+    vec3d gradPhifPhis(FEMaterialPoint& pt);
+    
     //! solid density
     double TrueSolidDensity(FEMaterialPoint& mp) { return Solid()->Density(mp); }
     
@@ -115,11 +121,11 @@ public:
     
 public: // material parameters
     double      m_rhoTw; //!< true fluid density
-    double      m_phi0;  //!< solid volume fraction in reference configuration
+    FEParamDouble      m_phi0;  //!< solid volume fraction in reference configuration
 
     vector<FEBodyForce*>    m_bf;       //!< body forces acting on this biphasic material
     
-private: // material properties
+protected: // material properties
     FEHydraulicPermeability*    m_pPerm;    //!< pointer to permeability material
     
     DECLARE_FECORE_CLASS();

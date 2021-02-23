@@ -40,8 +40,18 @@ END_FECORE_CLASS();
 //! reaction rate at material point
 double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
 {
-	double rhor = m_pReact->m_pMP->SolidReferentialApparentDensity(pt);
-    double phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
+	double rhor = 0;
+    double phir = 0;
+    if (m_pReact->m_pMP)
+    {
+        rhor = m_pReact->m_pMP->SolidReferentialApparentDensity(pt);
+        phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
+    }
+    else if (m_pReact->m_pMF)
+    {
+        rhor = m_pReact->m_pMF->SolidReferentialApparentDensity(pt);
+        phir = m_pReact->m_pMF->SolidReferentialVolumeFraction(pt);
+    }
 	
     FERemodelingMaterialPoint& rpt = *(pt.ExtractData<FERemodelingMaterialPoint>());
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
@@ -55,13 +65,36 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEReactionRateHuiskes::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
-	double rhor = m_pReact->m_pMP->SolidReferentialApparentDensity(pt);
-    double phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
-	
-	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    FEFluidMaterialPoint& ft = *pt.ExtractData<FEFluidMaterialPoint>();
+    FEMultiphasicFSIMaterialPoint& mt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    
+    double rhor = 0;
+    double phir = 0;
+    double p = 0;
+    if (m_pReact->m_pMP)
+    {
+        rhor = m_pReact->m_pMP->SolidReferentialApparentDensity(pt);
+        phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
+        p = bt.m_pa;
+    }
+    else if (m_pReact->m_pFS)
+    {
+        p = ft.m_pf;
+    }
+    else if (m_pReact->m_pSM)
+    {
+        p = ft.m_pf;
+    }
+    else if (m_pReact->m_pMF)
+    {
+        rhor = m_pReact->m_pMF->SolidReferentialApparentDensity(pt);
+        phir = m_pReact->m_pMF->SolidReferentialVolumeFraction(pt);
+        p = mt.m_pe;
+    }
+	
     double J = et.m_J;
-    double p = bt.m_pa;
     double zhat = ReactionRate(pt);
     mat3dd I(1);
     mat3ds dzhatde = (I*(-zhat) + (et.m_s+I*p)*(m_B/rhor))/(J-phir);
