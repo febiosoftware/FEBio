@@ -555,6 +555,12 @@ void FEBioModel::Write(unsigned int nwhen)
 					{
 						bout = true;
 					}
+
+					if (nwhen == CB_MAJOR_ITERS)
+					{
+						bout = true;
+						m_lastUpdate = -1;
+					}
 				}
 				else
 				{
@@ -586,7 +592,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					}
 					break;
 					case CB_MAJOR_ITERS  : 
-						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true; 
+						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true;
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
@@ -628,9 +634,17 @@ void FEBioModel::Write(unsigned int nwhen)
 						plt->WriteMeshSection(*this);
 					}
 
+					// set the status flag
+					int statusFlag = 0;
+					if (m_writeMesh) statusFlag = 1;
+					else if (nwhen != CB_MAJOR_ITERS)
+					{
+						statusFlag = 2;
+					}
+
 					// write the state section
 					double time = GetTime().currentTime;
-					if (m_plot) m_plot->Write(*this, (float)time, (m_writeMesh ? 1 : 0));
+					if (m_plot) m_plot->Write(*this, (float)time, statusFlag);
 
 					// make sure to reset write mesh flag
 					m_writeMesh = false;
