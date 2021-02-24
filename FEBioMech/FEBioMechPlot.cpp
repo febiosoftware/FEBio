@@ -184,6 +184,25 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
+	// NOTE: the sliding surface does not use material points, so we need this little hack. 
+	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
+	if (ss)
+	{
+		for (int i = 0; i < ss->Elements(); ++i)
+		{
+			FEElement& el = ss->Element(i);
+			double Lm = 0.0;
+			for (int j = 0; j < el.Nodes(); ++j)
+			{
+				double Lmj = ss->m_data[el.m_lnode[j]].m_Ln;
+				Lm += Lmj;
+			}
+			Lm /= el.Nodes();
+			a << Lm;
+		}
+		return true;
+	}
+
 	writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
 		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
 		return (pt ? pt->m_Ln : 0.0);
