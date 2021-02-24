@@ -77,7 +77,6 @@ BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_knmult       , "knmult"       );
 	ADD_PARAMETER(m_breloc       , "node_reloc"   );
 	ADD_PARAMETER(m_nsegup       , "seg_up"       );
-	ADD_PARAMETER(m_bself_contact, "self_contact" );
 	ADD_PARAMETER(m_sradius      , "search_radius");
 	ADD_PARAMETER(m_bupdtpen     , "update_penalty");
 END_FECORE_CLASS();
@@ -406,7 +405,6 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_nsegup = 0;	// always do segment updates
 	m_bautopen = false;	// don't use auto-penalty
 	m_btwo_pass = false; // don't use two-pass
-	m_bself_contact = false;	// no self-contact
 	m_sradius = 0;				// no search radius limitation
 
 	// set the siblings
@@ -478,7 +476,7 @@ void FESlidingInterface::Activate()
 
 	// for two-pass algorithms we repeat the previous
 	// two steps with primary and secondary surface switched
-	if (m_btwo_pass && (m_bself_contact == false))
+	if (m_btwo_pass)
 	{
 		ProjectSurface(m_ms, m_ss, true);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
@@ -542,31 +540,40 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			// if the node is no longer inside it.
 			if (bupseg)
 			{
-				if (!ms.IsInsideElement(mel, r, s, m_stol) && bupseg)
+				if (!ms.IsInsideElement(mel, r, s, m_stol))
 				{
 					// see if the node might have moved to another element
 					FESurfaceElement* pold = pme; 
 					ss.m_data[i].m_rs = vec2d(0,0);
 
-					if (m_bself_contact)
-						pme = cpp.Project(m, q, ss.m_data[i].m_rs);
-					else
-						pme = cpp.Project(x, q, ss.m_data[i].m_rs);
+					pme = cpp.Project(m, q, ss.m_data[i].m_rs);
 
 					if (pme == 0)
 					{
-						// nope, if has genuinly left contact
+						// nope, it has genuinly left contact
 						int* n = &pold->m_node[0];
-//						log.printf("node %d has left element (%d, %d, %d, %d)\n", m+1, n[0]+1, n[1]+1, n[2]+1, n[3]+1);
+//						feLog("node %d has left element (%d, %d, %d, %d)\n", m+1, n[0]+1, n[1]+1, n[2]+1, n[3]+1);
 					}
-					else if (m_mu*m_epsf > 0)
+					else 
 					{
-						// the node has moved to another segment.
-						// If friction is active we need to translate the frictional
-						// data to the new segment.
-						FESurfaceElement& eo = *pold;
-						FESurfaceElement& en = *pme;
-						MapFrictionData(i, ss, ms, en, eo, q);
+/*						if (pme != pold)
+						{
+							feLog("node %d has switched segments: ", m + 1);
+							int* n = &pold->m_node[0];
+							feLog("from (%d, %d, %d, %d), ", n[0] + 1, n[1] + 1, n[2] + 1, n[3] + 1);
+							n = &pme->m_node[0];
+							feLog("to (%d, %d, %d, %d)\n", n[0] + 1, n[1] + 1, n[2] + 1, n[3] + 1);
+						}
+*/
+						if (m_mu*m_epsf > 0)
+						{
+							// the node has moved to another segment.
+							// If friction is active we need to translate the frictional
+							// data to the new segment.
+							FESurfaceElement& eo = *pold;
+							FESurfaceElement& en = *pme;
+							MapFrictionData(i, ss, ms, en, eo, q);
+						}
 					}
 				}
 			}
@@ -576,10 +583,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			// get the secondary surface element
 			// don't forget to initialize the search for the first node!
 			ss.m_data[i].m_rs = vec2d(0,0);
-			if (m_bself_contact)
-				pme = cpp.Project(m, q, ss.m_data[i].m_rs);
-			else
-				pme = cpp.Project(x, q, ss.m_data[i].m_rs);
+			pme = cpp.Project(m, q, ss.m_data[i].m_rs);
 			if (pme)
 			{
 				// the node has come into contact so make sure to initialize
@@ -652,7 +656,7 @@ void FESlidingInterface::Update()
 	// project primary surface onto secondary surface
 	// this also calculates the nodal gap functions
 	ProjectSurface(m_ss, m_ms, bupdate);
-	if (m_btwo_pass && (m_bself_contact == false)) ProjectSurface(m_ms, m_ss, bupdate);
+	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupdate);
 
 	// Update the net contact pressures
 	UpdateContactPressures();
@@ -687,7 +691,6 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);
-	if (m_bself_contact) npass = 1;
 	for (int np=0; np<npass; ++np)
 	{
 		// pick the primary and secondary surfaces
@@ -1026,7 +1029,6 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);
-	if (m_bself_contact) npass = 1;
 	for (int np=0; np<npass; ++np)
 	{
 		// get the primary and secondary surface
@@ -1811,7 +1813,6 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 void FESlidingInterface::UpdateContactPressures()
 {
 	int npass = (m_btwo_pass?2:1);
-	if (m_bself_contact) npass = 1;
 	for (int np=0; np<npass; ++np)
 	{
 		FESlidingSurface& ss = (np == 0? m_ss : m_ms);

@@ -45,10 +45,13 @@ public:
 	bool Init();
 
 	//! Project a point onto surface
-	FESurfaceElement* Project(vec3d& x, vec3d& q, vec2d& r);
+	FESurfaceElement* Project(const vec3d& x, vec3d& q, vec2d& r);
 
 	//! Project a node onto a surface
 	FESurfaceElement* Project(int n, vec3d& q, vec2d& r);
+
+	//! Project a point of a surface element onto a surface
+	FESurfaceElement* Project(FESurfaceElement* pse, int intgrPoint, vec3d& q, vec2d& r);
 
 public:
 	//! Set the projection tolerance
@@ -66,15 +69,15 @@ public:
 	//! set if boundary projections are allowed
 	void AllowBoundaryProjections(bool b) { m_projectBoundary = b; }
 
-	//! Allow quads 
-	void HandleQuads(bool b) { m_handleQuads = b; }
+private:
+	bool ContainsElement(FESurfaceElement* el);
+	FESurfaceElement* ProjectSpecial(int closestPoint, const vec3d& x, vec3d& q, vec2d& r);
 
 protected:
 	double	m_tol;	//!< projection tolerance
 	double	m_rad;	//!< search radius
 	bool	m_bspecial;	//!< try to handle special cases
 	bool	m_projectBoundary;	//!< allow boundary projections
-	bool	m_handleQuads;
 
 protected:
 	FESurface&		m_surf;		//!< reference to surface

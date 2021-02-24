@@ -76,7 +76,6 @@ bool FESurfaceToSurfaceMap::Init()
 		m_ccp1 = new FEClosestPointProjection(*m_surf1);
 		m_ccp1->HandleSpecialCases(true);
 		m_ccp1->AllowBoundaryProjections(true);
-		m_ccp1->HandleQuads(true);
 		if (m_ccp1->Init() == false) return false;
 	}
 
@@ -85,7 +84,6 @@ bool FESurfaceToSurfaceMap::Init()
 		m_ccp2 = new FEClosestPointProjection(*m_surf2);
 		m_ccp2->HandleSpecialCases(true);
 		m_ccp2->AllowBoundaryProjections(true);
-		m_ccp2->HandleQuads(true);
 		if (m_ccp2->Init() == false) return false;
 	}
     

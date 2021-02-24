@@ -422,6 +422,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 {
 	FEClosestPointProjection cpp(ms);
 	cpp.HandleSpecialCases(true);
+	cpp.SetSearchRadius(m_srad);
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 
@@ -460,7 +461,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			// project onto the secondary surface
 			vec3d q;
 			vec2d rs(0,0);
-			FESurfaceElement* pme = cpp.Project(rt, q, rs);
+			FESurfaceElement* pme = cpp.Project(ss.NodeIndex(i), q, rs);
 			if (pme) 
 			{
 				double gap = (nu*(rt - q));
@@ -503,7 +504,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				// find the secondary surface segment this element belongs to
 				pt.m_rs = vec2d(0,0);
 				FESurfaceElement* pme = 0;
-				pme = cpp.Project(x, q, pt.m_rs);
+				pme = cpp.Project(&se, j, q, pt.m_rs);
 				pt.m_pme = pme;
 			}
 			else if (pt.m_pme)
@@ -530,15 +531,6 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				{
 //					pt.m_gap = 0.0;
 //					pt.m_pme = nullptr;
-				}
-
-				// make sure the distance is less than the search radius
-				double L = (x - q).norm();
-				if (bsegup && (m_srad > 0.0) && (L > m_srad))
-				{
-					pt.m_pme = nullptr;
-					pt.m_gap = 0;
-					pt.m_Lm = 0;
 				}
 			}
 
@@ -1144,10 +1136,9 @@ bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
             else {
                 double eps = m_epsn*data.m_eps;
                 Ln = data.m_Lm + eps*data.m_gap;
-                data.m_Lm = MBRACKET(Ln);
+				double Lm = MBRACKET(Ln);
+				normL1 += Lm*Lm;
             }
-            
-            normL1 += data.m_Lm*data.m_Lm;
             
             if (data.m_gap > 0)
             {
@@ -1173,11 +1164,10 @@ bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
             else {
                 double eps = m_epsn*data.m_eps;
                 Ln = data.m_Lm + eps*data.m_gap;
-                data.m_Lm = MBRACKET(Ln);
-            }
-            
-            normL1 += data.m_Lm*data.m_Lm;
-            
+				double Lm = MBRACKET(Ln);
+				normL1 += Lm*Lm;
+            }            
+           
             if (data.m_gap > 0)
             {
                 normg1 += data.m_gap*data.m_gap;
