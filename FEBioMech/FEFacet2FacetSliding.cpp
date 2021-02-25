@@ -501,11 +501,24 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 
 			if (bsegup)
 			{
-				// find the secondary surface segment this element belongs to
-				pt.m_rs = vec2d(0,0);
-				FESurfaceElement* pme = 0;
-				pme = cpp.Project(&se, j, q, pt.m_rs);
-				pt.m_pme = pme;
+				if (pt.m_pme)
+				{
+					// see if it still projects to the same facet
+					q = ms.ProjectToSurface(*pt.m_pme, x, pt.m_rs[0], pt.m_rs[1]);
+					if (ms.IsInsideElement(*pt.m_pme, pt.m_rs[0], pt.m_rs[1], m_stol) == false)
+					{
+						pt.m_pme = nullptr;
+					}
+				}
+
+				if (pt.m_pme == nullptr)
+				{
+					// find the secondary surface segment this element belongs to
+					pt.m_rs = vec2d(0, 0);
+					FESurfaceElement* pme = 0;
+					pme = cpp.Project(&se, j, q, pt.m_rs);
+					pt.m_pme = pme;
+				}
 			}
 			else if (pt.m_pme)
 			{
