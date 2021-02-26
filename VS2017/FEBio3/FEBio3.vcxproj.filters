@@ -45,6 +45,9 @@
     <ClInclude Include="..\..\FEBio3\febio_cb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBio3\ping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBio3\CommandManager.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio3\febio_cb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBio3\ping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

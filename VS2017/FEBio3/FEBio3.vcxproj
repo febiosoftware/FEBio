@@ -371,7 +371,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecore.lib;numcore.lib;feamr.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;tetgen.lib;hypred.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlibstaticd.lib;levmar.lib;mmg3d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;feamr.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;tetgen.lib;hypred.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlibstaticd.lib;levmar.lib;mmg3d.lib;psapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -523,7 +523,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecore.lib;numcore.lib;feamr.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;tetgen.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;levmar.lib;mmg3d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;feamr.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;tetgen.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;levmar.lib;mmg3d.lib;psapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Vanilla|x64'">
@@ -579,6 +579,7 @@
     <ClInclude Include="..\..\FEBio3\FEBioCommand.h" />
     <ClInclude Include="..\..\FEBio3\febio_cb.h" />
     <ClInclude Include="..\..\FEBio3\Interrupt.h" />
+    <ClInclude Include="..\..\FEBio3\ping.h" />
     <ClInclude Include="..\..\FEBio3\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -590,6 +591,7 @@
     <ClCompile Include="..\..\FEBio3\FEBioCommand.cpp" />
     <ClCompile Include="..\..\FEBio3\febio_cb.cpp" />
     <ClCompile Include="..\..\FEBio3\Interrupt.cpp" />
+    <ClCompile Include="..\..\FEBio3\ping.cpp" />
     <ClCompile Include="..\..\FEBio3\stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

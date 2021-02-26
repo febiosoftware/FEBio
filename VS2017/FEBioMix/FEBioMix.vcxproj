@@ -379,7 +379,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>fecore.lib;febiomech.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;febiomech.lib;febiofluid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
