@@ -1093,11 +1093,13 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					const char* szlc = tag.AttributeValue("lc", true);
 					if (szlc && (tag.m_natt == 1) && (tag == "force"))
 					{
+						double v = 1;
+						tag.value(v);
 						FEPointFunction* f = fecore_alloc(FEPointFunction, GetFEModel()); assert(f);
 						prop->SetProperty(f);
 
 						int lc = atoi(szlc) - 1;
-						GetBuilder()->MapLoadCurveToFunction(f, lc);
+						GetBuilder()->MapLoadCurveToFunction(f, lc, v);
 					}
 					else
 					{

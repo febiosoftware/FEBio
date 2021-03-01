@@ -800,9 +800,9 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 	else return mesh.FindNodeSet(setName);
 }
 
-void FEModelBuilder::MapLoadCurveToFunction(FEPointFunction* pf, int lc)
+void FEModelBuilder::MapLoadCurveToFunction(FEPointFunction* pf, int lc, double scale)
 {
-	MapLCToFunction m = { lc, pf };
+	MapLCToFunction m = { lc, scale, pf };
 	m_lc2fnc.push_back(m);
 }
 
@@ -819,6 +819,7 @@ void FEModelBuilder::ApplyLoadcurvesToFunctions()
 		FEPointFunction& f = lc->GetFunction();
 
 		m.pf->CopyFrom(f);
+		if (m.scale != 1.0) m.pf->Scale(m.scale);
 	}
 }
 

@@ -101,6 +101,11 @@ public:
 	// copy from another function
 	void CopyFrom(const FEPointFunction& f);
 
+public: // operations
+
+	// scale all y points by s
+	void Scale(double s);
+
 public: // implement from base class
 
 	//! returns the value of the load curve at time

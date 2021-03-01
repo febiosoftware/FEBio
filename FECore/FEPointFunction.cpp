@@ -158,6 +158,15 @@ void FEPointFunction::Add(double x, double y)
 }
 
 //-----------------------------------------------------------------------------
+void FEPointFunction::Scale(double s)
+{
+	for (int i = 0; i < Points(); ++i)
+	{
+		m_points[i].y() *= s;
+	}
+}
+
+//-----------------------------------------------------------------------------
 // FUNCTION : LoadCurve::Value
 // Returns the load curve's value at time t.
 // When the time value is outside the time range, the return value

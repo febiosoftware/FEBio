@@ -76,6 +76,7 @@ public:
 	struct FEBIOXML_API MapLCToFunction
 	{
 		int	lc;
+		double scale;
 		FEPointFunction*	pf;
 	};
 
@@ -148,7 +149,7 @@ public:
 	FENodeSet* FindNodeSet(const string& setName);
 
 public:
-	void MapLoadCurveToFunction(FEPointFunction* pf, int lc);
+	void MapLoadCurveToFunction(FEPointFunction* pf, int lc, double scale = 1.0);
 
 protected:
 	FESolver* BuildSolver(FEModel& fem);
