@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEElemElemList.h"
 #include "DumpStream.h"
 #include "matrix.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
@@ -267,6 +268,7 @@ bool FESurface::Init()
 	InitSurface();
 
 	// see if we can find all elements that the faces belong to
+	int invalidFacets = 0;
 	int ne = Elements();
 	for (int i=0; i<ne; ++i)
 	{
@@ -275,7 +277,13 @@ bool FESurface::Init()
 		else if (el.m_elem[0] == nullptr) el.m_elem[0] = FindElement(el);
         //to make sure
         else if (m_bitfc && (el.m_elem[1] == nullptr)) FindElements(el);
-		assert(el.m_elem[0] != nullptr);
+		if (el.m_elem[0] == nullptr) { invalidFacets++; }
+	}
+	if (invalidFacets > 0)
+	{
+		std::string surfName = GetName();
+		if (surfName.empty()) surfName = "(unknown)";
+		feLogWarning("The surface \"%s\" has %d invalid facets. \nThe model may not run correctly.", surfName.c_str(), invalidFacets);
 	}
 
 	vec3d re[FEElement::MAX_NODES];
