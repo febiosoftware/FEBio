@@ -85,7 +85,7 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FEFluidSolutesFlux, "solute flux");
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
     REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux, "solute natural flux");
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressure, "pressure");
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressure, "fluid pressure");
     
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow, "solute convective flow");
 

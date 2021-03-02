@@ -92,7 +92,7 @@ void FEBioMultiphasicFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FEMultiphasicFSISoluteFlux, "solute flux");
     REGISTER_FECORE_CLASS(FEMultiphasicFSISoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressure, "pressure");
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressure, "fluid pressure");
     
     febio.SetActiveModule(0);
 }

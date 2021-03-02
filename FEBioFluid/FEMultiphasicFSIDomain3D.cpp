@@ -529,21 +529,21 @@ void FEMultiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<d
         double phifdot = dJsoJ*phis;
         mat3dd I = mat3dd(1.0);
         
-        /* //Old Nat BC
+         //Old Nat BC
         mat3ds Tmix = se - sv*phis;
         for (int isol = 0; isol < nsol; ++isol)
         {
             Tmix += -mat3dd(1.0)*R*T*osmc*mt.m_ca[isol];
         }
-         */
+        
         
         //New Nat BC
-        mat3ds Tmix = -mat3dd(1.0)*pa + se - sv*phis;
+        //mat3ds Tmix = -mat3dd(1.0)*pa + se - sv*phis;
         
         for (i=0; i<neln; ++i)
         {
-            //vec3d fs = (Tmix*gradN[i] + (sv*gradphifphis*phis*phis/phif - km1*ft.m_w)*H[i])*detJ; //Old Nat BC
-            vec3d fs = (Tmix*gradN[i] + (-gradp + sv*gradphifphis*phis*phis/phif - km1*ft.m_w)*H[i])*detJ; //New Nat BC
+            vec3d fs = (Tmix*gradN[i] + (sv*gradphifphis*phis*phis/phif - km1*ft.m_w)*H[i])*detJ; //Old Nat BC
+            //vec3d fs = (Tmix*gradN[i] + (-gradp + sv*gradphifphis*phis*phis/phif - km1*ft.m_w)*H[i])*detJ; //New Nat BC
             vec3d ff = (sv*gradN[i] + (gradp + km1*ft.m_w - sv*gradphif/phif)*H[i])*detJ;
             double fJ = (H[i]*(dJfdotf*phif/pt.m_Jf - dJsoJ + phif*phiwhat) + gradN[i]*ft.m_w)*detJ;
             
@@ -831,11 +831,11 @@ void FEMultiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESoli
                 {
                     vec3d kwc = vec3d(0.0);
                     vec3d kuc = vec3d(0.0);
-                    vec3d kcu = ((gradN[i]&gradN[j])*D[isol]*BF.force(mp)*M[isol]*mt.m_k[isol]*mt.m_c[isol]/R/T*phif - gradN[j]*(gradN[i]*(D[isol]*BF.force(mp)))*M[isol]*mt.m_k[isol]*mt.m_c[isol]/R/T*phis -  ((gradN[j]&BF.force(mp))*D[isol]*et.m_J*mt.m_dkdJ[isol] + mat3dd(1.0)*(D[isol]*BF.force(mp)*gradN[j])*mt.m_k[isol] + vdotTdotv(gradN[j], dDdE[isol], BF.force(mp))*mt.m_k[isol] + (BF.force(mp)&gradN[j])*D[isol]*mt.m_k[isol]) *gradN[i]*M[isol]*mt.m_c[isol]/R/T*phif)*detJ*dms;
+                    vec3d kcu = ((gradN[i]&gradN[j])*D[isol]*BF.force(mp)*M[isol]*mt.m_k[isol]*mt.m_c[isol]/R/T*phif - gradN[j]*(gradN[i]*(D[isol]*BF.force(mp)))*M[isol]*mt.m_k[isol]*mt.m_c[isol]/R/T*phis -  ((gradN[j]&BF.force(mp))*D[isol]*et.m_J*mt.m_dkdJ[isol] + mat3dd(1.0)*(D[isol]*BF.force(mp)*gradN[j])*mt.m_k[isol] + vdotTdotv(BF.force(mp), dDdE[isol], gradN[j]).transpose()*mt.m_k[isol] + (BF.force(mp)&gradN[j])*D[isol]*mt.m_k[isol]) *gradN[i]*M[isol]*mt.m_c[isol]/R/T*phif)*detJ*dms;
                     for(int jsol=0; jsol<nsol; ++jsol)
                     {
                         double kcc = 0;
-                        kcu += ((gradN[i]&gradN[j])*D[jsol]*BF.force(mp)*M[jsol]*z[jsol]*penalty*mt.m_k[jsol]*mt.m_c[jsol]/R/T*phif - gradN[j]*(gradN[i]*(D[jsol]*BF.force(mp)))*M[jsol]*z[jsol]*penalty*mt.m_k[jsol]*mt.m_c[jsol]/R/T*phis - ((gradN[j]&BF.force(mp))*D[jsol]*et.m_J*mt.m_dkdJ[jsol] + mat3dd(1.0)*(D[jsol]*BF.force(mp)*gradN[j])*mt.m_k[jsol] + vdotTdotv(gradN[j], dDdE[jsol], BF.force(mp))*mt.m_k[jsol] + (BF.force(mp)&gradN[j])*D[jsol]*mt.m_k[jsol]) *gradN[i]*M[jsol]*z[jsol]*penalty*mt.m_c[jsol]/R/T*phif)*detJ*dms;
+                        kcu += ((gradN[i]&gradN[j])*D[jsol]*BF.force(mp)*M[jsol]*z[jsol]*penalty*mt.m_k[jsol]*mt.m_c[jsol]/R/T*phif - gradN[j]*(gradN[i]*(D[jsol]*BF.force(mp)))*M[jsol]*z[jsol]*penalty*mt.m_k[jsol]*mt.m_c[jsol]/R/T*phis - ((gradN[j]&BF.force(mp))*D[jsol]*et.m_J*mt.m_dkdJ[jsol] + mat3dd(1.0)*(D[jsol]*BF.force(mp)*gradN[j])*mt.m_k[jsol] + vdotTdotv(BF.force(mp), dDdE[jsol], gradN[j]).transpose()*mt.m_k[jsol] + (BF.force(mp)&gradN[j])*D[jsol]*mt.m_k[jsol]) *gradN[i]*M[jsol]*z[jsol]*penalty*mt.m_c[jsol]/R/T*phif)*detJ*dms;
                         if (isol == jsol)
                         {
                             kwc += (D[isol]*mt.m_dkdc[isol][isol]*mt.m_c[isol]/d0[isol] + D[isol]*mt.m_k[isol]/d0[isol] - D[isol]*mt.m_k[isol]*mt.m_c[isol]*d0p[isol][isol]/d0[isol]/d0[isol] + dDdc[isol][isol]*mt.m_k[isol]*mt.m_c[isol]/d0[isol])*BF.force(mp)*M[isol]*H[i]*H[j]*detJ*dms;
@@ -849,7 +849,7 @@ void FEMultiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESoli
                                 }
                                 else
                                 {
-                                    kcc += -(D[ksol]*mt.m_dkdc[ksol][isol]*mt.m_c[ksol] + dDdc[ksol][isol]*mt.m_k[ksol]*mt.m_c[ksol])*BF.force(mp)*gradN[i]*M[ksol]*z[ksol]/R/T*H[j]*phif*detJ;
+                                    kcc += -(D[ksol]*mt.m_dkdc[ksol][isol]*mt.m_c[ksol] + dDdc[ksol][isol]*mt.m_k[ksol]*mt.m_c[ksol])*BF.force(mp)*gradN[i]*M[ksol]*z[ksol]*penalty/R/T*H[j]*phif*detJ;
                                 }
                             }
                         }
@@ -866,7 +866,7 @@ void FEMultiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESoli
                                 }
                                 else
                                 {
-                                    kcc += -(D[ksol]*mt.m_dkdc[ksol][jsol]*mt.m_c[ksol] + dDdc[ksol][jsol]*mt.m_k[ksol]*mt.m_c[ksol])*BF.force(mp)*gradN[i]*M[ksol]*z[ksol]/R/T*H[j]*phif*detJ;
+                                    kcc += -(D[ksol]*mt.m_dkdc[ksol][jsol]*mt.m_c[ksol] + dDdc[ksol][jsol]*mt.m_k[ksol]*mt.m_c[ksol])*BF.force(mp)*gradN[i]*M[ksol]*z[ksol]*penalty/R/T*H[j]*phif*detJ;
                                 }
                             }
                         }
@@ -1077,14 +1077,14 @@ void FEMultiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, 
                 tens4d km1km1 = dyad2(km1,km1);
                 tens4d Kfull = tens4d(K);
                 
-                //mat3d Kuu = (sv*((gradN[i]&gradN[j])*phis/phif + (gradN[j]&gradN[i]))*phis - vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis - vdotTdotv(gradN[i], cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis/(phif*phif) + vdotTdotv(gradN[i], cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis/(phif*phif) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) -  sv*((gradphifphis&gradN[j])*2.0*phis*phis/phif + (gradN[j]&gradphifphis)*phis - gradgradN[j])*H[i]*phis/phif + vdotTdotv(gradphifphis, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis*phis/phif*H[i] + vdotTdotv(gradphifphis, cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis*phis/(phif*phif*phif)*H[i] - vdotTdotv(gradphifphis, cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis*phis/(phif*phif*phif)*H[i] + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //Old Nat BC
+                mat3d Kuu = (sv*((gradN[i]&gradN[j])*phis/phif + (gradN[j]&gradN[i]))*phis - vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis - vdotTdotv(gradN[i], cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis/(phif*phif) + vdotTdotv(gradN[i], cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis/(phif*phif) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) -  sv*((gradphifphis&gradN[j])*2.0*phis*phis/phif + (gradN[j]&gradphifphis)*phis - gradgradN[j])*H[i]*phis/phif + vdotTdotv(gradphifphis, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis*phis/phif*H[i] + vdotTdotv(gradphifphis, cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis*phis/(phif*phif*phif)*H[i] - vdotTdotv(gradphifphis, cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis*phis/(phif*phif*phif)*H[i] + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //Old Nat BC
                 
-                mat3d Kuu = (sv*((gradN[i]&gradN[j])*phis/phif + (gradN[j]&gradN[i]))*phis - vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis - vdotTdotv(gradN[i], cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis/(phif*phif) + vdotTdotv(gradN[i], cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis/(phif*phif) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) -  sv*((gradphifphis&gradN[j])*2.0*phis*phis/phif + (gradN[j]&gradphifphis)*phis - gradgradN[j])*H[i]*phis/phif + vdotTdotv(gradphifphis, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis*phis/phif*H[i] + vdotTdotv(gradphifphis, cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis*phis/(phif*phif*phif)*H[i] - vdotTdotv(gradphifphis, cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis*phis/(phif*phif*phif)*H[i] + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i] - ((gradp&gradN[j])-(gradN[j]&gradp))*H[i] - (gradN[i]&gradN[j])*pa + (gradN[j]&gradN[i])*pa)*detJ; //New Nat BC
+                //mat3d Kuu = (sv*((gradN[i]&gradN[j])*phis/phif + (gradN[j]&gradN[i]))*phis - vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis - vdotTdotv(gradN[i], cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis/(phif*phif) + vdotTdotv(gradN[i], cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis/(phif*phif) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) -  sv*((gradphifphis&gradN[j])*2.0*phis*phis/phif + (gradN[j]&gradphifphis)*phis - gradgradN[j])*H[i]*phis/phif + vdotTdotv(gradphifphis, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*phis*phis/phif*H[i] + vdotTdotv(gradphifphis, cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*phis*phis/(phif*phif*phif)*H[i] - vdotTdotv(gradphifphis, cv, fpt.m_w) * ((-gradphif&gradN[j]) + gradgradN[j]*phis)*phis*phis/(phif*phif*phif)*H[i] + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i] - ((gradp&gradN[j])-(gradN[j]&gradp))*H[i] - (gradN[i]&gradN[j])*pa + (gradN[j]&gradN[i])*pa)*detJ; //New Nat BC
                 
                 mat3d Kuw = (vdotTdotv(gradN[i], cv, (gradphif*H[j]/phif-gradN[j]))*phis/phif + vdotTdotv(gradphifphis, cv, (-gradphif*H[j]/phif + gradN[j]))*H[i]*phis*phis/(phif*phif) - km1*H[i]*H[j])*detJ;
                 
-                //vec3d kuJ = ((-svJ*gradN[i])*H[j]*phis + svJ*gradphifphis*H[j]*H[i]*phis*phis/phif)*detJ; //Old Nat BC
-                vec3d kuJ = (-(mat3dd(1.0)*dp+svJ*phis)*gradN[i]*H[j] + ((-pt.m_gradJf*d2p + svJ*gradphifphis*phis*phis/phif)*H[j] - gradN[j]*dp)*H[i])*detJ; //New Nat BC
+                vec3d kuJ = ((-svJ*gradN[i])*H[j]*phis + svJ*gradphifphis*H[j]*H[i]*phis*phis/phif)*detJ; //Old Nat BC
+                //vec3d kuJ = (-(mat3dd(1.0)*dp+svJ*phis)*gradN[i]*H[j] + ((-pt.m_gradJf*d2p + svJ*gradphifphis*phis*phis/phif)*H[j] - gradN[j]*dp)*H[i])*detJ; //New Nat BC
                 
                 mat3d Kwu = (((gradp&gradN[j])-(gradN[j]&gradp))*H[i] + sv*((gradphif&gradN[j])*(2*phis/phif)+(gradN[j]&gradphif) - gradgradN[j]*phis)*(H[i]/phif) - vdotTdotv(gradphif, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)*H[i]/phif - vdotTdotv(gradphif, cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))*H[i]/(phif*phif*phif) + vdotTdotv(gradphif, cv, fpt.m_w) * (-(gradphif&gradN[j]) + gradgradN[j]*phis)*H[i]/(phif*phif*phif) + sv*((gradN[i]&gradN[j])*(1-phis/phif)-(gradN[j]&gradN[i])) + vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M) + vdotTdotv(gradN[i], cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif))/(phif*phif) + vdotTdotv(gradN[i], cv, fpt.m_w) * ((gradphif&gradN[j]) - gradgradN[j]*phis)/(phif*phif) + (((km1*fpt.m_w)&gradN[j])*2.0 - (gradN[j]&(km1*fpt.m_w)) - km1*(gradN[j]*fpt.m_w) - ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ;
                 
@@ -1100,8 +1100,8 @@ void FEMultiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, 
                 
                 for (int isol = 0; isol < nsol; ++isol)
                 {
-                    //Kuu += (-(gradN[i]&gradN[j])*(osmc + et.m_J*dodJ)*R*T*mt.m_k[isol]*mt.m_c[isol] + (-(gradN[i]&gradN[j])*et.m_J*mt.m_dkdJ[isol] + ((gradN[j]&gradN[i]))*mt.m_k[isol])*mt.m_c[isol]*R*T*osmc - (mt.m_gradc[isol]&gradN[j])*mt.m_k[isol]*R*T*H[i] + (-(mt.m_gradc[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol] + (gradN[j]&mt.m_gradc[isol])*mt.m_k[isol])*H[i]*phif*R*T + (-((Dm1[isol]*mt.m_j[isol])&gradN[j])*2.0 + (gradN[j]&(Dm1[isol]*mt.m_j[isol])) + Dm1[isol]*(gradN[j]*mt.m_j[isol]) + ddot(ddot(Dm1Dm1[isol],dDdEfull[isol]),mat3dd(gradN[j]*mt.m_j[isol])))*H[i]*R*T + Dm1[isol]*(mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) - dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) - D[isol]*(gradN[j]&flux[isol]))*mt.m_k[isol]*H[i]*R*T - (flux[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*H[i]*R*T - (-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*mt.m_k[isol]*H[i]*R*T + (mt.m_j[isol]&gradN[j])*H[i]*(1/phif - phis/(phif*phif))*R*T/d0[isol] + (mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) + dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) + D[isol]*(gradN[j]&flux[isol]))*H[i]*R*T/phif/d0[isol]*mt.m_k[isol] + D[isol]*(flux[isol]&gradN[j])*H[i]*R*T/phif*et.m_J*mt.m_dkdJ[isol]/d0[isol] + D[isol]*(-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*H[i]*R*T/phif*mt.m_k[isol]/d0[isol] + (fpt.m_w&gradN[j])*H[i]*(phis/phif*mt.m_k[isol] - et.m_J*mt.m_dkdJ[isol])*phis/phif*R*T*mt.m_c[isol]/d0[isol])*dms*detJ; //Old Nat BC
-                    Kuu += (-(gradN[i]&gradN[j])*et.m_J*dodJ*R*T*mt.m_k[isol]*mt.m_c[isol] -(gradN[i]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*mt.m_c[isol]*R*T*osmc - (mt.m_gradc[isol]&gradN[j])*mt.m_k[isol]*R*T*H[i] + (-(mt.m_gradc[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol] + (gradN[j]&mt.m_gradc[isol])*mt.m_k[isol])*H[i]*phif*R*T + (-((Dm1[isol]*mt.m_j[isol])&gradN[j])*2.0 + (gradN[j]&(Dm1[isol]*mt.m_j[isol])) + Dm1[isol]*(gradN[j]*mt.m_j[isol]) + ddot(ddot(Dm1Dm1[isol],dDdEfull[isol]),mat3dd(gradN[j]*mt.m_j[isol])))*H[i]*R*T + Dm1[isol]*(mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) - dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) - D[isol]*(gradN[j]&flux[isol]))*mt.m_k[isol]*H[i]*R*T - (flux[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*H[i]*R*T - (-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*mt.m_k[isol]*H[i]*R*T + (mt.m_j[isol]&gradN[j])*H[i]*(1/phif - phis/(phif*phif))*R*T/d0[isol] + (mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) + dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) + D[isol]*(gradN[j]&flux[isol]))*H[i]*R*T/phif/d0[isol]*mt.m_k[isol] + D[isol]*(flux[isol]&gradN[j])*H[i]*R*T/phif*et.m_J*mt.m_dkdJ[isol]/d0[isol] + D[isol]*(-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*H[i]*R*T/phif*mt.m_k[isol]/d0[isol] + (fpt.m_w&gradN[j])*H[i]*(phis/phif*mt.m_k[isol] - et.m_J*mt.m_dkdJ[isol])*phis/phif*R*T*mt.m_c[isol]/d0[isol])*dms*detJ; //New Nat BC
+                    Kuu += (-(gradN[i]&gradN[j])*(osmc + et.m_J*dodJ)*R*T*mt.m_k[isol]*mt.m_c[isol] + (-(gradN[i]&gradN[j])*et.m_J*mt.m_dkdJ[isol] + ((gradN[j]&gradN[i]))*mt.m_k[isol])*mt.m_c[isol]*R*T*osmc - (mt.m_gradc[isol]&gradN[j])*mt.m_k[isol]*R*T*H[i] + (-(mt.m_gradc[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol] + (gradN[j]&mt.m_gradc[isol])*mt.m_k[isol])*H[i]*phif*R*T + (-((Dm1[isol]*mt.m_j[isol])&gradN[j])*2.0 + (gradN[j]&(Dm1[isol]*mt.m_j[isol])) + Dm1[isol]*(gradN[j]*mt.m_j[isol]) + ddot(ddot(Dm1Dm1[isol],dDdEfull[isol]),mat3dd(gradN[j]*mt.m_j[isol])))*H[i]*R*T + Dm1[isol]*(mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) - dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) - D[isol]*(gradN[j]&flux[isol]))*mt.m_k[isol]*H[i]*R*T - (flux[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*H[i]*R*T - (-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*mt.m_k[isol]*H[i]*R*T + (mt.m_j[isol]&gradN[j])*H[i]*(1/phif - phis/(phif*phif))*R*T/d0[isol] + (mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) + dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) + D[isol]*(gradN[j]&flux[isol]))*H[i]*R*T/phif/d0[isol]*mt.m_k[isol] + D[isol]*(flux[isol]&gradN[j])*H[i]*R*T/phif*et.m_J*mt.m_dkdJ[isol]/d0[isol] + D[isol]*(-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*H[i]*R*T/phif*mt.m_k[isol]/d0[isol] + (fpt.m_w&gradN[j])*H[i]*(phis/phif*mt.m_k[isol] - et.m_J*mt.m_dkdJ[isol])*phis/phif*R*T*mt.m_c[isol]/d0[isol])*dms*detJ; //Old Nat BC
+                    //Kuu += (-(gradN[i]&gradN[j])*et.m_J*dodJ*R*T*mt.m_k[isol]*mt.m_c[isol] -(gradN[i]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*mt.m_c[isol]*R*T*osmc - (mt.m_gradc[isol]&gradN[j])*mt.m_k[isol]*R*T*H[i] + (-(mt.m_gradc[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol] + (gradN[j]&mt.m_gradc[isol])*mt.m_k[isol])*H[i]*phif*R*T + (-((Dm1[isol]*mt.m_j[isol])&gradN[j])*2.0 + (gradN[j]&(Dm1[isol]*mt.m_j[isol])) + Dm1[isol]*(gradN[j]*mt.m_j[isol]) + ddot(ddot(Dm1Dm1[isol],dDdEfull[isol]),mat3dd(gradN[j]*mt.m_j[isol])))*H[i]*R*T + Dm1[isol]*(mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) - dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) - D[isol]*(gradN[j]&flux[isol]))*mt.m_k[isol]*H[i]*R*T - (flux[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*H[i]*R*T - (-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*mt.m_k[isol]*H[i]*R*T + (mt.m_j[isol]&gradN[j])*H[i]*(1/phif - phis/(phif*phif))*R*T/d0[isol] + (mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) + dDdEfull[isol].dot(mat3dd(gradN[j]*flux[isol])) + D[isol]*(gradN[j]&flux[isol]))*H[i]*R*T/phif/d0[isol]*mt.m_k[isol] + D[isol]*(flux[isol]&gradN[j])*H[i]*R*T/phif*et.m_J*mt.m_dkdJ[isol]/d0[isol] + D[isol]*(-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif)*H[i]*R*T/phif*mt.m_k[isol]/d0[isol] + (fpt.m_w&gradN[j])*H[i]*(phis/phif*mt.m_k[isol] - et.m_J*mt.m_dkdJ[isol])*phis/phif*R*T*mt.m_c[isol]/d0[isol])*dms*detJ; //New Nat BC
                     
                     Kwu += ((fpt.m_w&gradN[j])*H[i]*(1.0/phif-phis/(phif*phif))*R*T*mt.m_k[isol]*mt.m_c[isol]/d0[isol] + (fpt.m_w&gradN[j])*H[i]/phif*et.m_J*R*T*mt.m_dkdJ[isol]*mt.m_c[isol]/d0[isol] - (mt.m_j[isol]&gradN[j])*H[i]*(1.0/phif-phis/(phif*phif))*R*T/d0[isol] - (mat3dd((D[isol]*flux[isol])*gradN[j]) - D[isol]*(flux[isol]&gradN[j]) + dDdEfull[isol].dot(mat3dd(flux[isol]*gradN[j])) + D[isol]*(gradN[j]&flux[isol]) + D[isol]*(-(mt.m_gradc[isol]&gradN[j])*phis + (gradN[j]&mt.m_gradc[isol])*phif))*H[i]*R*T/phif/d0[isol]*mt.m_k[isol] - D[isol]*(flux[isol]&gradN[j])*et.m_J*mt.m_dkdJ[isol]*H[i]*R*T/phif/d0[isol])*detJ*dms;
                     
@@ -1642,18 +1642,18 @@ void FEMultiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp
         spt.m_cF = m_pMat->FixedChargeDensity(mp);
         
         // calculate the solid stress at this material point
-        //pt.m_sf = m_pMat->Fluid()->GetViscous()->Stress(mp) - mat3dd(1.0)*spt.m_pe; //Old Nat BC
-        //ft.m_ss = m_pMat->Solid()->Stress(mp) - m_pMat->Fluid()->GetViscous()->Stress(mp)*phis; //Old NatBC
-        /* //Old Nat BC
+        pt.m_sf = m_pMat->Fluid()->GetViscous()->Stress(mp); //Old Nat BC
+        ft.m_ss = m_pMat->Solid()->Stress(mp) - m_pMat->Fluid()->GetViscous()->Stress(mp)*phis; //Old NatBC
+         //Old Nat BC
         for (int isol=0; isol<nsol; ++isol)
             ft.m_ss += -mat3dd(1.0)*R*T*osmc*spt.m_ca[isol];
-         */
         
-        pt.m_sf = m_pMat->Fluid()->GetViscous()->Stress(mp); //New Nat BC
-        ft.m_ss = -mat3dd(1.0)*pt.m_pf + m_pMat->Solid()->Stress(mp) - m_pMat->Fluid()->GetViscous()->Stress(mp)*phis; //New NatBC
+        
+        //pt.m_sf = m_pMat->Fluid()->GetViscous()->Stress(mp); //New Nat BC
+        //ft.m_ss = -mat3dd(1.0)*pt.m_pf + m_pMat->Solid()->Stress(mp) - m_pMat->Fluid()->GetViscous()->Stress(mp)*phis; //New NatBC
         
         // calculate the mixture stress at this material point
-        ept.m_s =  ft.m_ss + pt.m_sf;
+        ept.m_s =  -mat3dd(1.0)*spt.m_pe + ft.m_ss + pt.m_sf;
     }
 }
 
