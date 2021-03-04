@@ -527,14 +527,14 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEMultiphasicShellDomain::InternalForces(FEGlobalVector& R)
 {
-    size_t NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
     
     // get nodal DOFS
     int nsol = m_pMat->Solutes();
     int ndpn = 2*(4+nsol);
     
 #pragma omp parallel for
-    for (size_t i=0; i<NE; ++i)
+    for (int i=0; i<NE; ++i)
     {
         // element force vector
         vector<double> fe;
@@ -690,14 +690,14 @@ void FEMultiphasicShellDomain::ElementInternalForce(FEShellElement& el, vector<d
 //-----------------------------------------------------------------------------
 void FEMultiphasicShellDomain::InternalForcesSS(FEGlobalVector& R)
 {
-    size_t NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
     
     // get nodal DOFS
     int nsol = m_pMat->Solutes();
     int ndpn = 2*(4+nsol);
     
 #pragma omp parallel for
-    for (size_t i=0; i<NE; ++i)
+    for (int i=0; i<NE; ++i)
     {
         // element force vector
         vector<double> fe;
@@ -1826,10 +1826,10 @@ void FEMultiphasicShellDomain::MembraneReactionFluxes(FEGlobalVector& R)
     const int mreact = m_pMat->MembraneReactions();
     if (mreact == 0) return;
     
-    size_t NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
     
 #pragma omp parallel for
-    for (size_t i=0; i<NE; ++i)
+    for (int i=0; i<NE; ++i)
     {
         // element force vector
         vector<double> fe;
