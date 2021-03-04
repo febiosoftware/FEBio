@@ -83,10 +83,16 @@ public:
     void Update(const FETimeInfo& tp) override;
     
     // update element state data
-    void UpdateElementStress(int iel, double dt);
+    void UpdateElementStress(int iel, const FETimeInfo& tp);
     
+    // update element shell material points if membrane reactions are present
+    void UpdateShellMPData(int iel, const FETimeInfo& tp);
+
     //! Unpack element data (overridden from FEDomain)
     void UnpackMembraneLM(FEShellElement& el, vector<int>& lm);
+    
+    //! build connectivity for matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
     
 public:
     

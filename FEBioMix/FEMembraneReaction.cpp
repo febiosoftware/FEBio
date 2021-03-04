@@ -70,7 +70,7 @@ FESoluteData* FEMembraneReaction::FindSoluteData(int nid)
     for (int i=0; i<N; ++i)
     {
         FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-        if (psd && (psd->GetID() == nid)) return psd;
+        if (psd && (psd->GetID() - 1 == nid)) return psd;
     }
     return 0;
 }
@@ -131,17 +131,17 @@ bool FEMembraneReaction::Init()
     //********* reactants and products on either side of membrane **********
     // count total number of solutes in model
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    m_NSOL = MAX_CDOFS;
+    int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
+    m_NSOL = MAX_DDOFS;
 
     // initialize the stoichiometric coefficients to zero
-    m_vRi.assign(MAX_CDOFS, 0); m_vRe.assign(MAX_CDOFS, 0);
-    m_vPi.assign(MAX_CDOFS, 0); m_vPe.assign(MAX_CDOFS, 0);
-    m_vi.assign(MAX_CDOFS, 0); m_ve.assign(MAX_CDOFS, 0);
+    m_vRi.assign(MAX_DDOFS, 0); m_vRe.assign(MAX_DDOFS, 0);
+    m_vPi.assign(MAX_DDOFS, 0); m_vPe.assign(MAX_DDOFS, 0);
+    m_vi.assign(MAX_DDOFS, 0); m_ve.assign(MAX_DDOFS, 0);
     
     // cycle through all the solutes in the mixture and determine
     // if they participate in this reaction
-    for (int ISOL = 0; ISOL<MAX_CDOFS; ++ISOL) {
+    for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
         it = m_solRi.find(ISOL);
         if (it != m_solRi.end()) m_vRi[ISOL] = it->second;
         it = m_solPi.find(ISOL);
@@ -153,7 +153,7 @@ bool FEMembraneReaction::Init()
     }
 
     // evaluate the net stoichiometric coefficient
-    for (int ISOL = 0; ISOL<MAX_CDOFS; ++ISOL) {
+    for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
         m_vi[ISOL] = m_vPi[ISOL] - m_vRi[ISOL];
         m_ve[ISOL] = m_vPe[ISOL] - m_vRe[ISOL];
     }
@@ -167,7 +167,7 @@ bool FEMembraneReaction::Init()
             m_Vbar += m_v[isol] * m_pMP->GetSolute(isol)->MolarMass() / m_pMP->GetSolute(isol)->Density();
         for (int isbm = 0; isbm<nsbm; ++isbm)
             m_Vbar += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->MolarMass() / m_pMP->GetSBM(isbm)->Density();
-        for (int ISOL = 0; ISOL<MAX_CDOFS; ++ISOL) {
+        for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
             FESoluteData* sd = FindSoluteData(ISOL);
             m_Vbar += m_vi[ISOL] * sd->m_M / sd->m_rhoT;
             m_Vbar += m_ve[ISOL] * sd->m_M / sd->m_rhoT;
@@ -180,7 +180,7 @@ bool FEMembraneReaction::Init()
         znet += m_v[isol] * m_pMP->GetSolute(isol)->ChargeNumber();
     for (int isbm = 0; isbm<nsbm; ++isbm)
         znet += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->ChargeNumber();
-    for (int ISOL = 0; ISOL<MAX_CDOFS; ++ISOL) {
+    for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
         FESoluteData* sd = FindSoluteData(ISOL);
         znet += m_vi[ISOL] * sd->m_z;
         znet += m_ve[ISOL] * sd->m_z;

@@ -57,8 +57,8 @@ double FEMembraneReactionRateIonChannel::ReactionRate(FEMaterialPoint& pt)
     double Fc = GetFEModel()->GetGlobalConstant("Fc");
     
     double k = 0;
-    if (ci != ce) k = R*T/pow(Fc*m_z,2)*m_g*log(ci/ce)/(ci-ce);
-    else if (ce != 0) k = R*T/pow(Fc*m_z,2)*m_g/ce;
+    if ((ci > 0) && (ce > 0))
+        k = (ci != ce) ? R*T*m_g/pow(Fc*m_z,2)*log(ci/ce)/(ci-ce) : R*T*m_g/pow(Fc*m_z,2)/ce;
     
     return k;
 }
@@ -75,7 +75,8 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ci(FEMaterialPoint
     double Fc = GetFEModel()->GetGlobalConstant("Fc");
     
     double dkdc = 0;
-    if ((ci > 0) && (ce > 0)) dkdc = R*T/pow(Fc*m_z,2)*m_g*(ci*(1-log(ci/ce))-ce)/pow(ci-ce,2)/ci;
+    if ((ci > 0) && (ce > 0))
+        dkdc = (ci != ce) ? R*T/pow(Fc*m_z,2)*m_g*(ci*(1-log(ci/ce))-ce)/pow(ci-ce,2)/ci : -R*T*m_g/pow(ci*Fc*m_z,2)/2;
     
     return dkdc;
 }
@@ -92,7 +93,8 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ce(FEMaterialPoint
     double Fc = GetFEModel()->GetGlobalConstant("Fc");
     
     double dkdc = 0;
-    if ((ci > 0) && (ce > 0)) dkdc = R*T/pow(Fc*m_z,2)*m_g*(ce*(1+log(ci/ce))-ci)/pow(ci-ce,2)/ce;
+    if ((ci > 0) && (ce > 0))
+        dkdc = (ci != ce) ? R*T*m_g/pow(Fc*m_z,2)*(ce*(1+log(ci/ce))-ci)/pow(ci-ce,2)/ce : -R*T*m_g/pow(ci*Fc*m_z,2)/2;
     
     return dkdc;
 }

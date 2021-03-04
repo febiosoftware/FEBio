@@ -34,6 +34,7 @@
 		D5DEB5672145858F0041CEEA /* libmkl_intel_lp64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5642145858F0041CEEA /* libmkl_intel_lp64.a */; settings = {ATTRIBUTES = (Weak, ); }; };
 		D5DEB5682145858F0041CEEA /* libmkl_intel_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5652145858F0041CEEA /* libmkl_intel_thread.a */; settings = {ATTRIBUTES = (Weak, ); }; };
 		D5DEB5692145858F0041CEEA /* libmkl_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5662145858F0041CEEA /* libmkl_core.a */; settings = {ATTRIBUTES = (Weak, ); }; };
+		D5E1AA9425ED649A003162AB /* ping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1AA9325ED649A003162AB /* ping.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -88,6 +89,8 @@
 		D5DEB5642145858F0041CEEA /* libmkl_intel_lp64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkl_intel_lp64.a; path = /opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib/libmkl_intel_lp64.a; sourceTree = "<absolute>"; };
 		D5DEB5652145858F0041CEEA /* libmkl_intel_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkl_intel_thread.a; path = /opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib/libmkl_intel_thread.a; sourceTree = "<absolute>"; };
 		D5DEB5662145858F0041CEEA /* libmkl_core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkl_core.a; path = /opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib/libmkl_core.a; sourceTree = "<absolute>"; };
+		D5E1AA9225ED649A003162AB /* ping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ping.h; sourceTree = "<group>"; };
+		D5E1AA9325ED649A003162AB /* ping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ping.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +159,8 @@
 				D53232862142AED6008DE511 /* FEBioCommand.h */,
 				D53232892142AED6008DE511 /* Interrupt.cpp */,
 				D532328B2142AED6008DE511 /* Interrupt.h */,
+				D5E1AA9325ED649A003162AB /* ping.cpp */,
+				D5E1AA9225ED649A003162AB /* ping.h */,
 				D532328E2142AED6008DE511 /* stdafx.cpp */,
 				D53232842142AED6008DE511 /* stdafx.h */,
 			);
@@ -247,6 +252,7 @@
 				D50EC3952217AE5A006F6A57 /* breakpoint.cpp in Sources */,
 				D53232952142AED6008DE511 /* FEBio.cpp in Sources */,
 				D53232932142AED6008DE511 /* Interrupt.cpp in Sources */,
+				D5E1AA9425ED649A003162AB /* ping.cpp in Sources */,
 				D53232942142AED6008DE511 /* CommandManager.cpp in Sources */,
 				D53232962142AED6008DE511 /* stdafx.cpp in Sources */,
 				D53232912142AED6008DE511 /* FEBioCommand.cpp in Sources */,
