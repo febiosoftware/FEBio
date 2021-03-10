@@ -15,11 +15,11 @@ set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER Autogen)
 
 ##### Set appropriate flag for operating system ####
 if(WIN32)
-	set(DEF -DWIN32 /MP /openmp)
+	add_definitions(-DWIN32 /MP /openmp)
 elseif(APPLE)
-    set(DEF -D__APPLE__)
+    add_definitions(-D__APPLE__)
 else()
-	set(DEF -DLINUX)
+	add_definitions(-DLINUX)
 endif()
 
 ##### Check that paths are valid #####
@@ -288,43 +288,38 @@ else()
 endif()
 
 ##### Set appropriate defines and includes #####
-set(INC ${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR})
 
 if(USE_MKL)
-	set(DEF ${DEF} -DMKL_ISS)
-	set(DEF ${DEF} -DPARDISO)
-	set(INC ${INC} ${MKL_INC})
+	add_definitions(-DMKL_ISS)
+	add_definitions(-DPARDISO)
+	include_directories(${MKL_INC})
 endif(USE_MKL)
 
 if(USE_HYPRE)
-	set(DEF ${DEF} -DHYPRE)
-	set(INC ${INC} ${HYPRE_INC})
+	add_definitions(-DHYPRE)
+	include_directories(${HYPRE_INC})
 endif(USE_HYPRE)
 
 if(USE_MMG)
-	set(DEF ${DEF} -DHAS_MMG)
-	set(INC ${INC} ${MMG_INC})
+	add_definitions(-DHAS_MMG)
+	include_directories(${MMG_INC})
 endif(USE_MMG)
 
 if(USE_TETGEN)
-	set(DEF ${DEF} -DTETLIBRARY)
-	set(INC ${INC} ${TET_INC})
+	add_definitions(-DTETLIBRARY)
+	include_directories(${TET_INC})
 endif(USE_TETGEN)
 
 if(USE_LEVMAR)
-	set(DEF ${DEF} -DHAVE_LEVMAR)
-	set(INC ${INC} ${LEVMAR_INC})
+	add_definitions(-DHAVE_LEVMAR)
+	include_directories(${LEVMAR_INC})
 endif(USE_LEVMAR)
 
 if(USE_ZLIB)
-	set(DEF ${DEF} -DHAVE_ZLIB)
-	set(INC ${INC} ${ZLIB_INCLUDE_DIR})
+	add_definitions(-DHAVE_ZLIB)
+	include_directories(${ZLIB_INCLUDE_DIR})
 endif(USE_ZLIB)
-
-set(DEF ${DEF} -DNDEBUG)
-
-add_definitions(${DEF})
-include_directories(${INC})
 
 ##### Set up compiler flags #####
 if(WIN32)
