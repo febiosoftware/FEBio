@@ -474,7 +474,7 @@ if(USE_ZLIB)
 endif(USE_ZLIB)
 
 if(WIN32)
-	target_link_libraries(febio3 Psapi.lib)
+	target_link_libraries(febio3 psapi.lib ws2_32.lib)
 endif()
 
 ##### Create febio.xml #####
