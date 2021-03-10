@@ -5,6 +5,14 @@ mark_as_advanced(FORCE CMAKE_BUILD_TYPE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_FILES_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER Autogen)
+
 ##### Set appropriate flag for operating system ####
 if(WIN32)
 	set(DEF -DWIN32 /MP /openmp)
@@ -339,18 +347,30 @@ if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
 	add_definitions(-fopenmp)
 endif()
 
-##### Include FEBio libraries #####
-add_subdirectory (FEBioFluid)
-add_subdirectory (FEBioLib)
-add_subdirectory (FEBioMech)
-add_subdirectory (FEBioMix)
-add_subdirectory (FEBioOpt)
-add_subdirectory (FEBioPlot)
-add_subdirectory (FEBioTest)
-add_subdirectory (FEBioXML)
-add_subdirectory (FECore)
-add_subdirectory (NumCore)
-add_subdirectory (FEAMR)
+##### Find Source Files #####
+
+macro(findHdrSrc name)
+	file(GLOB HDR_${name} "${name}/*.h")
+	file(GLOB SRC_${name} "${name}/*.cpp")
+endmacro()
+
+findHdrSrc(FEBioStudio)
+
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR)
+
+foreach(name IN LISTS FEBIO_LIBS)
+	findHdrSrc(${name})
+endforeach(name)
+
+macro(addLib name)
+    string(TOLOWER ${name} lname)
+	add_library(${lname} ${HDR_${name}} ${SRC_${name}})
+	set_property(TARGET ${lname} PROPERTY AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/CMakeFiles/AutoGen/${name}_autogen)
+endmacro()
+
+foreach(name IN LISTS FEBIO_LIBS)
+	addLib(${name})
+endforeach(name)
 
 ##### Set up executable compilation #####
 file(GLOB SOURCES "FEBio3/*.cpp")
@@ -435,14 +455,7 @@ if(USE_MKL)
 	elseif(APPLE)
 		target_link_libraries(febio3 ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
 			${MKL_LIB_DIR}/libmkl_intel_thread.a)
-		
-        # Properly use OMP if llvm has been installed from brew
-        if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
-            target_link_libraries(febio3 /usr/local/opt/libomp/lib/libomp.dylib)
-        else()
-            target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
-        endif()
-        
+		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
     else()
         target_link_libraries(febio3 -Wl,--start-group ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
 			${MKL_LIB_DIR}/libmkl_intel_thread.a -Wl,--end-group)
@@ -466,22 +479,24 @@ if(USE_ZLIB)
 endif(USE_ZLIB)
 
 if(WIN32)
-	target_link_libraries(febio3 Psapi.lib ws2_32.lib)
+	target_link_libraries(febio3 Psapi.lib)
 endif()
 
 ##### Create febio.xml #####
-if(USE_MKL)
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
+if(NOT EXISTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml)
+    if(USE_MKL)
+    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
 <febio_config version=\"3.0\">
-	<default_linear_solver type=\"pardiso\"></default_linear_solver>
+    <default_linear_solver type=\"pardiso\"></default_linear_solver>
 </febio_config>
 ")
-else()
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
+    else()
+    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
 <febio_config version=\"3.0\">
-	<default_linear_solver type=\"skyline\"></default_linear_solver>
+    <default_linear_solver type=\"skyline\"></default_linear_solver>
 </febio_config>
 ")
+    endif()
 endif()
 
 
