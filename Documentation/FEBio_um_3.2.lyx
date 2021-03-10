@@ -20726,6 +20726,15 @@ value
 \end_layout
 
 \begin_layout Standard
+Note that this 
+\emph on
+parabolic 
+\emph default
+option will not work if the mesh of the boundary surface has no internal
+ nodes.
+\end_layout
+
+\begin_layout Standard
 If an arbitrary distribution with different scalar value needs to be specified
  for each facet, use the following syntax,
 \end_layout
@@ -20823,6 +20832,53 @@ prescribe_nodal_velocities
 
 \begin_layout LyX-Code
 </surface_load>
+\end_layout
+
+\begin_layout Standard
+When the fluid is prescribed on a surface boundary, better numerical convergence
+ is achieved if the fluid dilatation is also prescribed on the rim (the
+ boundary curve) of that surface boundary.
+ While this can be done explicitly, a better option is to set the fluid
+ dilatation on the rim to match the average pressure on the surface boundary,
+ calculated during the analysis.
+ To select this option, use the 
+\emph on
+prescribe_rim_pressure
+\emph default
+ element (0=default, 1=prescribed), for example,
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="fluid normal velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <velocity>-1.0</velocity>
+\end_layout
+
+\begin_layout LyX-Code
+  <parabolic>1</parabolic>
+\end_layout
+
+\begin_layout LyX-Code
+  <prescribe_nodal_velocities>1</prescribe_nodal_velocities>
+\end_layout
+
+\begin_layout LyX-Code
+  <prescribe_rim_pressure>1</prescribe_rim_pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+Note that this 
+\emph on
+prescribe_rim_pressure 
+\emph default
+option will not work if the mesh of the boundary surface has no internal
+ nodes.
 \end_layout
 
 \begin_layout Subsubsection
