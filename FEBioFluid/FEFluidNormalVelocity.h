@@ -64,6 +64,9 @@ public:
     
     //! parabolic velocity profile
     bool SetParabolicVelocity();
+    
+    //! rim pressure
+    bool SetRimPressure();
 
 private:
 	double NormalVelocity(FESurfaceMaterialPoint& mp);
@@ -73,10 +76,12 @@ private:
     FESurfaceMap	m_VC;		//!< velocity boundary cards
 	bool            m_bpv;      //!< flag for prescribing nodal values
 	bool            m_bpar;     //!< flag for parabolic velocity
+    bool            m_brim;     //!< flag for setting rim pressure
 
 private:
 	vector<double>  m_VN;       //!< nodal scale factors
     vector<vec3d>   m_nu;       //!< nodal normals
+    vector<int>     m_rim;      //!< list of nodes on the rim
 
 	FEDofList	m_dofW;
     int         m_dofEF;
