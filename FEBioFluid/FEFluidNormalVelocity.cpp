@@ -37,10 +37,11 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalVelocity, FESurfaceLoad)
-	ADD_PARAMETER(m_velocity, "velocity");
-	ADD_PARAMETER(m_VC      , "value"   );
+	ADD_PARAMETER(m_velocity, "velocity"                  );
+	ADD_PARAMETER(m_VC      , "value"                     );
 	ADD_PARAMETER(m_bpv     , "prescribe_nodal_velocities");
-	ADD_PARAMETER(m_bpar    , "parabolic"  );
+	ADD_PARAMETER(m_bpar    , "parabolic"                 );
+    ADD_PARAMETER(m_brim    , "prescribe_rim_pressure"    );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -50,6 +51,7 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
     m_velocity = 0.0;
     m_bpv = true;
     m_bpar = false;
+    m_brim = false;
     
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
@@ -114,6 +116,41 @@ bool FEFluidNormalVelocity::Init()
     m_dof.Clear();
     m_dof.AddDofs(m_dofW);
     m_dof.AddDof(m_dofEF);
+
+    
+    // Set up data structure for setting rim pressure
+    if (m_brim) {
+        // find rim nodes (rim)
+        FEElemElemList EEL;
+        FESurface* ps = &GetSurface();
+        EEL.Create(ps);
+        
+        vector<bool> boundary(ps->Nodes(), false);
+        for (int i=0; i<ps->Elements(); ++i) {
+            FESurfaceElement& el = ps->Element(i);
+            for (int j=0; j<el.facet_edges(); ++j) {
+                FEElement* nel = EEL.Neighbor(i, j);
+                if (nel == nullptr) {
+                    int en[3] = {-1,-1,-1};
+                    el.facet_edge(j, en);
+                    boundary[en[0]] = true;
+                    boundary[en[1]] = true;
+                    if (en[2] > -1) boundary[en[2]] = true;
+                }
+            }
+        }
+        
+        // count number of non-boundary nodes
+        m_rim.reserve(ps->Nodes());
+        for (int i=0; i<ps->Nodes(); ++i)
+            if (boundary[i]) m_rim.push_back(i);
+        
+        if (m_rim.size() == ps->Nodes())
+        {
+            feLogError("Unable to set rim pressure\n");
+            return false;
+        }
+    }
 
     return true;
 }
@@ -195,6 +232,14 @@ void FEFluidNormalVelocity::Activate()
         if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
         if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
     }
+    
+    if (m_brim) {
+        for (int i=0; i<m_rim.size(); ++i) {
+            FENode& node = ps->Node(m_rim[i]);
+            // mark node as having prescribed DOF
+            if (node.get_bc(m_dofEF) != DOF_FIXED) node.set_bc(m_dofEF, DOF_PRESCRIBED);
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -213,6 +258,8 @@ void FEFluidNormalVelocity::Update()
         if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
         if (node.get_bc(m_dofW[2]) == DOF_PRESCRIBED) node.set(m_dofW[2], v.z);
     }
+    
+    if (m_brim) SetRimPressure();
     
     GetFEModel()->SetMeshUpdateFlag(true);
 }
@@ -423,6 +470,34 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     return true;
 }
 
+//-----------------------------------------------------------------------------
+//! Evaluate normal velocities by solving Poiseuille flow across the surface
+bool FEFluidNormalVelocity::SetRimPressure()
+{
+    FESurface* ps = &GetSurface();
+    
+    // evaluate dilatation everywhere but rim
+    double es = 0;
+    int neq = 0;
+    for (int i=0; i<ps->Nodes(); ++i) {
+        FENode& node = ps->Node(i);
+        if (node.get_bc(m_dofEF) == DOF_OPEN) {
+            es += node.get(m_dofEF);
+            ++neq;
+        }
+    }
+    es /= neq;
+
+    // set the rim pressure (dilatation)
+    for (int i=0; i<m_rim.size(); ++i) {
+        FENode& node = ps->Node(m_rim[i]);
+        node.set(m_dofEF,es);
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 //! serializatsion
 void FEFluidNormalVelocity::Serialize(DumpStream& ar)
 {

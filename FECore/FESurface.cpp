@@ -392,6 +392,7 @@ void FESurface::FindElements(FESurfaceElement& el)
         
         // check each solid element in this domain
         int nselem = pdom.Elements();
+#pragma omp parallel for shared (nselem)
         for (int l = 0; l<nselem; ++l) {
             FEElement& sel = pdom.ElementRef(l);
             
