@@ -69,6 +69,14 @@ protected:
 	double	m_gamma_max;	// saturation parameter
 	double	m_r_s, m_r_inf;
 
+	// D2 parameters
+	double m_D2_D0;
+	double m_D2_beta0;
+	double m_D2_x1;
+	double m_D2_x2;
+	double m_D2_a;
+	double m_D2_b;
+
 	DECLARE_FECORE_CLASS();
 };
 

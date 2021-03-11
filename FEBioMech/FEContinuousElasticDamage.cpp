@@ -97,6 +97,12 @@ BEGIN_FECORE_CLASS(FEDamageElasticFiber, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 	ADD_PARAMETER(m_beta_s, FE_RANGE_GREATER(0.0), "beta_s");
 	ADD_PARAMETER(m_gamma_max, FE_RANGE_GREATER(0.0), "gamma_max");
+	ADD_PARAMETER(m_D2_D0, "D2_D0");
+	ADD_PARAMETER(m_D2_beta0, "D2_beta0");
+	ADD_PARAMETER(m_D2_x1, "D2_x1");
+	ADD_PARAMETER(m_D2_x2, "D2_x2");
+	ADD_PARAMETER(m_D2_a, "D2_a");
+	ADD_PARAMETER(m_D2_b, "D2_b");
 END_FECORE_CLASS();
 
 FEDamageElasticFiber::FEDamageElasticFiber(FEModel* fem) : FEElasticFiberMaterial(fem)
@@ -110,6 +116,14 @@ FEDamageElasticFiber::FEDamageElasticFiber(FEModel* fem) : FEElasticFiberMateria
 	// Looks like these are hard-coded
 	m_r_s = 0.99;
 	m_r_inf = 0.99;
+
+	// initial values for D2 term
+	m_D2_D0 = 0.0;
+	m_D2_beta0 = 0.0;
+	m_D2_x1 = 1.0;
+	m_D2_x2 = 1.0;
+	m_D2_a = 0.0;
+	m_D2_b = 0.0;
 }
 
 double FEDamageElasticFiber::Damage(FEMaterialPoint& mp)
@@ -184,7 +198,11 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 		double beta = MB(bt - damagePoint.m_bt_ini);
 
 		// (v) evaluate damage function
-		D = Ds * (1.0 - exp(log(1.0 - m_r_s)*beta / m_beta_s));
+		double D1 = Ds * (1.0 - exp(log(1.0 - m_r_s)*beta / m_beta_s));
+
+		double D2 = m_D2_D0 + m_D2_a * exp((beta - m_D2_beta0) / m_D2_x1) + m_D2_b * exp((beta - m_D2_beta0) / m_D2_x2);
+
+		D = D1 + D2;
 
 		// update internal variables
 		damagePoint.m_bt = bt;
@@ -242,7 +260,10 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	double psi0_ini = damagePoint.m_psi_f0_ini;
 	double gamma_prev = damagePoint.m_gamma_prev;
 
-	double dD_dbeta = -Ds * (log(1 - m_r_s) / m_beta_s)*exp(log(1 - m_r_s)*beta / m_beta_s);
+	double dD1_dbeta = -Ds * (log(1 - m_r_s) / m_beta_s)*exp(log(1 - m_r_s)*beta / m_beta_s);
+	double dD2_dbeta = m_D2_a * exp((beta - m_D2_beta0) / m_D2_x1) / m_D2_x1 + m_D2_b * exp((beta - m_D2_beta0) / m_D2_x2) / m_D2_x2;
+	double dD_dbeta = dD1_dbeta + dD2_dbeta;
+
 	double dDs_dgamma = -m_Dmax * (log(1 - m_r_inf) / m_gamma_max)*exp(log(1 - m_r_inf)*gamma / m_gamma_max);
 	double dD_dDs = 1.0 - exp(log(1 - m_r_s)*beta / m_beta_s);
 	double dbeta_dpsi0 = 0.25*(SIGN(bt - damagePoint.m_bt_ini) + 1)*(SIGN(psi0 - psi0_prev) + 1);
