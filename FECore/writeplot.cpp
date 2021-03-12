@@ -147,3 +147,103 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 		ar.push_back((float)val[5][i]);
 	}
 }
+
+void ProjectToNodes(FEDomain& dom, vector<double>& nodeVals, function<double(FEMaterialPoint& mp)> f)
+{
+	// temp storage 
+	double si[FEElement::MAX_INTPOINTS];
+	double sn[FEElement::MAX_NODES];
+
+	// allocate nodeVals and create valence array (tag)
+	int NN = dom.Nodes();
+	vector<int> tag(NN, 0);
+	nodeVals.assign(NN, 0.0);
+
+	// loop over all elements
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int ne = e.Nodes();
+		int ni = e.GaussPoints();
+
+		// get the integration point values
+		for (int k = 0; k < ni; ++k)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+			double v = f(mp);
+			si[k] = v;
+		}
+
+		// project to nodes
+		e.project_to_nodes(si, sn);
+
+		for (int j = 0; j < ne; ++j)
+		{
+			nodeVals[e.m_lnode[j]] += sn[j];
+			tag[e.m_lnode[j]]++;
+		}
+	}
+
+	for (int i = 0; i < NN; ++i)
+	{
+		if (tag[i] > 0) nodeVals[i] /= (double)tag[i];
+	}
+}
+
+void writeRelativeError(FEDomain& dom, FEDataStream& a, function<double(FEMaterialPoint& mp)> f)
+{
+	int NE = dom.Elements();
+	int NN = dom.Nodes();
+
+	// calculate the recovered nodal values
+	vector<double> sn(NN);
+	ProjectToNodes(dom, sn, f);
+
+	// find the min and max values
+	double smin = 1e99, smax = -1e99;
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		int ni = el.GaussPoints();
+		for (int j = 0; j < ni; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			double sj = f(mp);
+
+			if (sj < smin) smin = sj;
+			if (sj > smax) smax = sj;
+		}
+	}
+	if (fabs(smin - smax) < 1e-12) smax++;
+
+	// calculate errors
+	double ev[FEElement::MAX_NODES];
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		// get the nodal values
+		for (int j = 0; j < ne; ++j)
+		{
+			ev[j] = sn[el.m_lnode[j]];
+		}
+
+		// evaluate element error
+		double max_err = 0;
+		for (int j = 0; j < ni; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			double sj = f(mp);
+
+			double snj = el.Evaluate(ev, j);
+
+			double err = fabs(sj - snj) / (smax - smin);
+			if (err > max_err) max_err = err;
+		}
+
+		a << max_err;
+	}
+}

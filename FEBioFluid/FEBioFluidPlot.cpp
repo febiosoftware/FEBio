@@ -1264,3 +1264,23 @@ bool FEPlotFSISolidStress::Save(FEDomain& dom, FEDataStream& a)
     
     return false;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidShearStressError::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		writeRelativeError(dom, a, [](FEMaterialPoint& mp) {
+			FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+			mat3ds s = fp.m_sf;
+			double v = s.max_shear();
+			return v;
+		});
+		return true;
+	}
+
+	return false;
+}

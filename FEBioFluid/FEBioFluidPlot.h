@@ -524,3 +524,11 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! fluid shear stress error
+class FEPlotFluidShearStressError : public FEPlotDomainData
+{
+public:
+	FEPlotFluidShearStressError(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

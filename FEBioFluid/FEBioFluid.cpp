@@ -198,6 +198,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric
 REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity , "fluid isobaric specific heat capacity");
 REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity   , "fluid thermal conductivity"    );
 REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"             );
+REGISTER_FECORE_CLASS(FEPlotFluidShearStressError      , "fluid shear stress error");
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");
@@ -238,8 +239,8 @@ REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptorCriterion
-REGISTER_FECORE_CLASS(FEFMaxFluidStressCriterion, "max fluid stress");
-REGISTER_FECORE_CLASS(FEFluidStressErrorCriterion, "fluid stress error");
+REGISTER_FECORE_CLASS(FEFMaxFluidStressCriterion, "max fluid shear stress");
+REGISTER_FECORE_CLASS(FEFluidStressErrorCriterion, "fluid shear stress error");
 
     febio.SetActiveModule(0);
 }

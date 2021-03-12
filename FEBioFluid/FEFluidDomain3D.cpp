@@ -46,16 +46,19 @@ FEFluidDomain3D::FEFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDo
     m_pMat = 0;
     m_btrans = true;
 
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-	m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
+	if (pfem)
+	{
+		m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+		m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
 
-	m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
-	m_dofAEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION_TDERIV), 0);
+		m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+		m_dofAEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION_TDERIV), 0);
 
-	FEDofList dofs(pfem);
-	dofs.AddDofs(m_dofW);
-	dofs.AddDof(m_dofEF);
-	m_dof = dofs;
+		FEDofList dofs(pfem);
+		dofs.AddDofs(m_dofW);
+		dofs.AddDof(m_dofEF);
+		m_dof = dofs;
+	}
 }
 
 //-----------------------------------------------------------------------------

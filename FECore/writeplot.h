@@ -234,3 +234,7 @@ template <class T> void writeNodalProjectedElementValues(FESurface& dom, FEDataS
 // TODO: I needed to give these functions a different name because of the implicit conversion between mat3ds and mat3dd
 FECORE_API void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::function<mat3dd(const FEMaterialPoint&)> fnc, int interpolOrder = -1);
 FECORE_API void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::function<mat3ds(const FEMaterialPoint&)> fnc, int interpolOrder = -1);
+
+// Helper functions for mapping data
+void ProjectToNodes(FEDomain& dom, vector<double>& nodeVals, function<double(FEMaterialPoint& mp)> f);
+void writeRelativeError(FEDomain& dom, FEDataStream& a, function<double(FEMaterialPoint& mp)> f);
