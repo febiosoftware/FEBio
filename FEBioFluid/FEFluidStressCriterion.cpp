@@ -52,9 +52,10 @@ bool FEFMaxFluidStressCriterion::Check(FEElement& el, double& elemVal)
 		if (fp)
 		{
 			mat3ds& s = fp->m_sf;
-			elemVal = s.max_shear();
-			if (elemVal >= m_maxStress)
+			double v = s.max_shear();
+			if (v >= m_maxStress)
 			{
+				elemVal = m_maxStress / v;
 				bselect = true;
 				break;
 			}

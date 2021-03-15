@@ -101,7 +101,7 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 		for (int i = 0; i < nelem; ++i)
 		{
 			selectedElement[i].m_elementIndex = elem[i].first;
-			selectedElement[i].m_scaleFactor = 0.;
+			selectedElement[i].m_scaleFactor = elem[i].second;
 		}
 	}
 
