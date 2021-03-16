@@ -236,5 +236,5 @@ FECORE_API void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar,
 FECORE_API void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::function<mat3ds(const FEMaterialPoint&)> fnc, int interpolOrder = -1);
 
 // Helper functions for mapping data
-void ProjectToNodes(FEDomain& dom, vector<double>& nodeVals, function<double(FEMaterialPoint& mp)> f);
-void writeRelativeError(FEDomain& dom, FEDataStream& a, function<double(FEMaterialPoint& mp)> f);
+FECORE_API void ProjectToNodes(FEDomain& dom, vector<double>& nodeVals, function<double(FEMaterialPoint& mp)> f);
+FECORE_API void writeRelativeError(FEDomain& dom, FEDataStream& a, function<double(FEMaterialPoint& mp)> f);
