@@ -12983,6 +12983,19 @@ rigid Define a rigid node set.
  
 \end_layout
 
+\begin_layout Description
+linear
+\begin_inset space ~
+\end_inset
+
+
+\series bold
+constraint 
+\series default
+Define a linear constraint between nodal degrees of freedom.
+ 
+\end_layout
+
 \begin_layout Subsection
 Prescribed Nodal Degrees of Freedom
 \begin_inset CommandInset label
@@ -13516,6 +13529,137 @@ Mesh
  
 \shape default
 section.
+\end_layout
+
+\begin_layout Subsection
+Linear Constraints
+\end_layout
+
+\begin_layout Standard
+A linear constraint can be used to couple nodal degrees of freedom.
+ The linear constraint has one dependent degree of freedom 
+\begin_inset Formula $u^{*}$
+\end_inset
+
+, and several independent degrees of freedom 
+\begin_inset Formula $u_{i}$
+\end_inset
+
+.
+ The linear constraint is defined as follows: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+u^{*}=c_{0}+c_{1}u_{1}+\ldots+c_{n}u_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, the 
+\begin_inset Formula $c_{i}$
+\end_inset
+
+ are user-specified scale factors and 
+\begin_inset Formula $c_{0}$
+\end_inset
+
+can be used to specified an offset.
+ 
+\end_layout
+
+\begin_layout Standard
+The dependent degree of freedom 
+\begin_inset Formula $u^{*}$
+\end_inset
+
+will be removed from the linear system of equations.
+ Consequently, this nodal degree of freedom should not be used in any other
+ boundary condition.
+ 
+\end_layout
+
+\begin_layout Standard
+To define a linear constraint, set the 
+\emph on
+type 
+\emph default
+attribute to 
+\emph on
+linear constraint
+\emph default
+.
+ The dependent degree of freedom, i.e.
+ the dof that will be removed, is specified via a node number and a dof
+ identifier.
+ Each child dof is defined via the 
+\emph on
+child_dof 
+\emph default
+tag and similarly requires the corresponding node and dof identifier, as
+ well as the value parameter.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="linear constraint">
+\end_layout
+
+\begin_layout LyX-Code
+  <node>5</node>
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>x</dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <child_dof>
+\end_layout
+
+\begin_layout LyX-Code
+    <node>8</node>
+\end_layout
+
+\begin_layout LyX-Code
+    <dof>x</dof>
+\end_layout
+
+\begin_layout LyX-Code
+    <value>1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  </child_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <child_dof>
+\end_layout
+
+\begin_layout LyX-Code
+    <node>9</node>
+\end_layout
+
+\begin_layout LyX-Code
+    <dof>x</dof>
+\end_layout
+
+\begin_layout LyX-Code
+    <value>-1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  </child_dof>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
 \end_layout
 
 \begin_layout Standard
