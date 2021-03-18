@@ -93,7 +93,7 @@ class FECORE_API IterationFailure {};
 
 class FECORE_API MaxResidualError {};
 
-class FECORE_API NANDetected {};
+class FECORE_API NANDetected : public FEException {};
 
 class FECORE_API FatalError {};
 

@@ -173,6 +173,7 @@ public:
 
 	//! Get a dof name
 	const char* GetDOFName(int nvar, int n);
+	const char* GetDOFName(int ndof);
 
 	//! serialization
 	void Serialize(DumpStream& ar);
