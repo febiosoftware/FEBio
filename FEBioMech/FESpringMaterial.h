@@ -97,6 +97,12 @@ public:
 public:
 	FEFunction1D*	m_F;	//!< force-displacement function
 
+	// spring rupture criteria
+	double	m_rupture_force;	//!< rupture force
+
+private:
+	bool	m_death;	// is spring death?
+
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
