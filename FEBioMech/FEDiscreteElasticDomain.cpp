@@ -123,30 +123,33 @@ void FEDiscreteElasticDomain::InternalForces(FEGlobalVector& R)
 		// get the discrete element
 		FEDiscreteElement& el = m_Elem[i];
 
-		// get the material point data
-		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
-		FEDiscreteElasticMaterialPoint& ep = *mp.ExtractData<FEDiscreteElasticMaterialPoint>();
+		if (el.isActive())
+		{
+			// get the material point data
+			FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+			FEDiscreteElasticMaterialPoint& ep = *mp.ExtractData<FEDiscreteElasticMaterialPoint>();
 
-		// evaluate the force
-		vec3d F = ep.m_Ft;
+			// evaluate the force
+			vec3d F = ep.m_Ft;
 
-		// set up the force vector
-		fe[0] = F.x;
-		fe[1] = F.y;
-		fe[2] = F.z;
-		fe[3] = -F.x;
-		fe[4] = -F.y;
-		fe[5] = -F.z;
+			// set up the force vector
+			fe[0] = F.x;
+			fe[1] = F.y;
+			fe[2] = F.z;
+			fe[3] = -F.x;
+			fe[4] = -F.y;
+			fe[5] = -F.z;
 
-		// setup the node vector
-		en[0] = el.m_node[0];
-		en[1] = el.m_node[1];
+			// setup the node vector
+			en[0] = el.m_node[0];
+			en[1] = el.m_node[1];
 
-		// set up the LM vector
-		UnpackLM(el, lm);
+			// set up the LM vector
+			UnpackLM(el, lm);
 
-		// assemble element
-		R.Assemble(en, lm, fe);
+			// assemble element
+			R.Assemble(en, lm, fe);
+		}
 	}
 }
 
@@ -169,27 +172,30 @@ void FEDiscreteElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 		// get the discrete element
 		FEDiscreteElement& el = m_Elem[i];
 
-		// get the material point data
-		FEDiscreteMaterialPoint& mp = dynamic_cast<FEDiscreteMaterialPoint&>(*el.GetMaterialPoint(0));
+		if (el.isActive())
+		{
+			// get the material point data
+			FEDiscreteMaterialPoint& mp = dynamic_cast<FEDiscreteMaterialPoint&>(*el.GetMaterialPoint(0));
 
-		// evaluate the stiffness
-		mat3d A = m_pMat->Stiffness(mp);
+			// evaluate the stiffness
+			mat3d A = m_pMat->Stiffness(mp);
 
-		ke.zero();
-		ke.add(0, 0, A); ke.add(0, 3, -A);
-		ke.add(3, 0, -A); ke.add(3, 3, A);
+			ke.zero();
+			ke.add(0, 0, A); ke.add(0, 3, -A);
+			ke.add(3, 0, -A); ke.add(3, 3, A);
 
-		// setup the node vector
-		en[0] = el.m_node[0];
-		en[1] = el.m_node[1];
+			// setup the node vector
+			en[0] = el.m_node[0];
+			en[1] = el.m_node[1];
 
-		// set up the LM vector
-		UnpackLM(el, lm);
+			// set up the LM vector
+			UnpackLM(el, lm);
 
-		// assemble the element into the global system
-		ke.SetNodes(en);
-		ke.SetIndices(lm);
-		LS.Assemble(ke);
+			// assemble the element into the global system
+			ke.SetNodes(en);
+			ke.SetIndices(lm);
+			LS.Assemble(ke);
+		}
 	}
 }
 
@@ -207,32 +213,36 @@ void FEDiscreteElasticDomain::Update(const FETimeInfo& tp)
 		// get the discrete element
 		FEDiscreteElement& el = m_Elem[i];
 
-		// get the material point data
-		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+		// only process active springs
+		if (el.isActive())
+		{
+			// get the material point data
+			FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
 
-		// get the nodes of the element
-		FENode& n1 = mesh.Node(el.m_node[0]);
-		FENode& n2 = mesh.Node(el.m_node[1]);
+			// get the nodes of the element
+			FENode& n1 = mesh.Node(el.m_node[0]);
+			FENode& n2 = mesh.Node(el.m_node[1]);
 
-		// get the nodal positions
-		vec3d& rt1 = n1.m_rt;
-		vec3d& rt2 = n2.m_rt;
+			// get the nodal positions
+			vec3d& rt1 = n1.m_rt;
+			vec3d& rt2 = n2.m_rt;
 
-		// get the previous nodal positions
-		vec3d rp1 = n1.m_rp;
-		vec3d rp2 = n2.m_rp;
+			// get the previous nodal positions
+			vec3d rp1 = n1.m_rp;
+			vec3d rp2 = n2.m_rp;
 
-		// get the initial nodal positions
-		vec3d ri1 = n1.m_r0;
-		vec3d ri2 = n2.m_r0;
+			// get the initial nodal positions
+			vec3d ri1 = n1.m_r0;
+			vec3d ri2 = n2.m_r0;
 
-		mp.m_drt = rt2 - rt1;
-		mp.m_drp = rp2 - rp1;
-		mp.m_dr0 = ri2 - ri1;
+			mp.m_drt = rt2 - rt1;
+			mp.m_drp = rp2 - rp1;
+			mp.m_dr0 = ri2 - ri1;
 
-		mp.m_dvt = (mp.m_drt - mp.m_drp) / dt;
+			mp.m_dvt = (mp.m_drt - mp.m_drp) / dt;
 
-		// evaluate the force
-		mp.m_Ft = m_pMat->Force(mp);
+			// evaluate the force
+			mp.m_Ft = m_pMat->Force(mp);
+		}
 	}
 }

@@ -235,6 +235,14 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 			FEParameterList& pl = pd->GetParameterList();
 			ReadParameterList(tag, pl);
 
+			// create an element set for this domain
+			FEElementSet* elset = new FEElementSet(&fem);
+			elset->Create(pd);
+			elset->SetName(pd->GetName());
+			mesh.AddElementSet(elset);
+
+			// create material point data for this domain
+
 			// initialize domain
 			pd->CreateMaterialPointData();
 		}

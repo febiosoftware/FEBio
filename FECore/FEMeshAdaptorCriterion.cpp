@@ -71,11 +71,11 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 		FEElement& el = *it;
 		if (el.isActive())
 		{
-			double elemVal = 0;
+			double elemVal = 0.0;
 			bool bselect = Check(el, elemVal);
 			if (bselect)
 			{
-				int nid = nelem;
+				int nid = el.GetID();
 				if (elemSet) nid = (*elemSet)[nelem];
 				elem.push_back(pair<int, double>(nid, elemVal));
 				nselected++;
@@ -100,8 +100,8 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 		selectedElement.resize(nelem);
 		for (int i = 0; i < nelem; ++i)
 		{
-			selectedElement[i].m_elementIndex = elem[i].first;
-			selectedElement[i].m_scaleFactor = elem[i].second;
+			selectedElement[i].m_elementId   = elem[i].first;
+			selectedElement[i].m_scaleFactor = 0.0;
 		}
 	}
 

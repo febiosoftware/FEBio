@@ -23,49 +23,56 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEScaleAdaptorCriterion.h"
-#include <FECore/FEModel.h>
-#include <FECore/FEMesh.h>
 
-BEGIN_FECORE_CLASS(FEScaleAdaptorCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_scale, "scale");
+#include "stdafx.h"
+#include "FESpringRuptureCriterion.h"
+#include "FEDiscreteElasticMaterial.h"
+#include <FECore/FEElement.h>
+
+BEGIN_FECORE_CLASS(FESpringRuptureCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_maxForce  , "max_force");
+	ADD_PARAMETER(m_maxStretch, "max_stretch");
 END_FECORE_CLASS();
 
-FEScaleAdaptorCriterion::FEScaleAdaptorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+FESpringRuptureCriterion::FESpringRuptureCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-	m_scale = 1.0;
+	m_maxForce = 0.0;
+	m_maxStretch = 0.0;
 
 	// set sort on by default
 	SetSort(true);
 }
 
-FEMeshAdaptorSelection FEScaleAdaptorCriterion::GetElementSelection(FEElementSet* elemSet)
+bool FESpringRuptureCriterion::Check(FEElement& el, double& elemVal)
 {
-	// get the mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int NE = mesh.Elements();
+	if (el.isActive() == false) return false;
 
-	// the element list of elements that need to be refined
-	FEMeshAdaptorSelection elemList;
-
-	// loop over the elements
-	FEElementIterator it(&mesh, elemSet);
-	for (int i = 0; it.isValid(); ++it, ++i)
+	bool bselect = false;
+	int nint = el.GaussPoints();
+	elemVal = 0;
+	for (int n = 0; n < nint; ++n)
 	{
-		FEElement& el = *it;
-		int ne = el.Nodes();
-		int ni = el.GaussPoints();
-
-		for (int j = 0; j < ni; ++j)
+		FEMaterialPoint* mp = el.GetMaterialPoint(n);
+		FEDiscreteElasticMaterialPoint* ep = mp->ExtractData<FEDiscreteElasticMaterialPoint>();
+		if (ep)
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			vec3d& Ft = ep->m_Ft;
+			double F = ep->m_drt*Ft;
+			double L0 = ep->m_dr0.norm();
+			double Lt = ep->m_drt.norm();
+			double s = Lt / L0;
 
-			double s = m_scale(mp);
-			elemList.push_back(el.GetID(), s);
+			if ((m_maxForce != 0.0) && (F >= m_maxForce))
+			{
+				bselect = true;
+			}
+
+			if ((m_maxStretch != 0.0) && (s >= m_maxStretch))
+			{
+				bselect = true;
+			}
 		}
 	}
 
-	// create the element list of elements that need to be refined
-	return elemList;
+	return bselect;
 }

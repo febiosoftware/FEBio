@@ -139,7 +139,9 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 		FEMeshAdaptorSelection selection = m_criterion->GetElementSelection(GetElementSet());
 		for (int i = 0; i < selection.size(); ++i)
 		{
-			m_elemList[selection[i].m_elementIndex] = 1;
+			int eid = selection[i].m_elementId;
+			int lid = topo.GetElementIndexFromID(eid);
+			m_elemList[lid] = 1;
 		}
 	}
 	else

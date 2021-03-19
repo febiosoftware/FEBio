@@ -35,7 +35,7 @@ class FECORE_API FEMeshAdaptorSelection
 {
 public:
 	struct Item {
-		int		m_elementIndex;
+		int		m_elementId;
 		double	m_scaleFactor;
 	};
 

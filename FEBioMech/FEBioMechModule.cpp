@@ -228,6 +228,7 @@ SOFTWARE.*/
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
 #include "FEStressErrorCriterion.h"
+#include "FESpringRuptureCriterion.h"
 
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
@@ -841,6 +842,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
 	REGISTER_FECORE_CLASS(FEMaxDamageCriterion, "max_damage");
 	REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
+	REGISTER_FECORE_CLASS(FESpringRuptureCriterion, "spring rupture");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FEDataGenerator

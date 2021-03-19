@@ -73,25 +73,12 @@ bool FEErosionAdaptor::Apply(int iteration)
 		return true;
 	}
 
-	vector<int> elemList(mesh.Elements(), 0);
-	for (int i = 0; i < selection.size(); ++i) elemList[selection[i].m_elementIndex] = 1;
-
-	int deactiveElems = 0;
-	int elem = 0;
-	for (int i = 0; i < mesh.Domains(); ++i)
+	for (int i = 0; i < selection.size(); ++i)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		int NE = dom.Elements();
-		for (int j = 0; j < NE; ++j, elem++)
-		{
-			if (elemList[elem] == 1)
-			{
-				FEElement& el = dom.ElementRef(j);
-				assert(el.isActive());
-				el.setInactive();
-				deactiveElems++;
-			}
-		}
+		FEMeshAdaptorSelection::Item& it = selection[i];
+		FEElement& el = *mesh.FindElementFromID(it.m_elementId);
+		assert(el.isActive());
+		el.setInactive();
 	}
 
 	// remove any islands
@@ -160,6 +147,7 @@ bool FEErosionAdaptor::Apply(int iteration)
 	// reactivate the linear constraints
 	LCM.Activate();
 
+	int deactiveElems = selection.size();
 	feLog("\tDeactivated elements: %d\n", deactiveElems);
 	return (deactiveElems == 0);
 }
