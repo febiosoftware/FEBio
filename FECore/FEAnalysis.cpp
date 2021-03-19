@@ -564,9 +564,9 @@ int FEAnalysis::SolveTimeStep()
 		feLogError("Fatal error in factorization of stiffness matrix. Aborting run.");
 		nerr = 2;
 	}
-	catch (NANDetected)
+	catch (NANDetected e)
 	{
-		feLogError("NAN Detected.");
+		feLogError("NAN Detected:\n%s", e.what());
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
 	catch (FEMultiScaleException)

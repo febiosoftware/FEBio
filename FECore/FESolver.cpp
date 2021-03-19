@@ -790,3 +790,31 @@ void FESolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 		if (fc.IsActive()) fc.LoadVector(R, tp);
 	}
 }
+
+//-----------------------------------------------------------------------------
+// return the node (mesh index) from an equation number
+FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
+{
+	FENodalDofInfo info;
+	info.m_eq = ieq;
+	info.m_node = -1;
+	info.m_dof = -1;
+
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		vector<int>& id = node.m_ID;
+		for (int j = 0; j < id.size(); ++j)
+		{
+			if (id[j] == ieq)
+			{
+				info.m_node = i;
+				info.m_dof = j;
+				return info;
+			}
+		}
+	}
+	return info;
+}

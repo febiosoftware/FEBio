@@ -884,6 +884,33 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 
 	GetFEModel()->DoCallback(CB_PRE_MATRIX_SOLVE);
 
+	// check for nans in the residual
+	double r2 = R * R;
+	if (ISNAN(r2))
+	{
+		FENodalDofInfo info;
+		const char* sz = "";
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		for (int i = 0; i < u.size(); ++i)
+		{
+			if (ISNAN(R[i]))
+			{
+				info = GetDOFInfoFromEquation(i);
+				if (info.m_node != -1)
+				{
+					info.m_node = mesh.Node(info.m_node).GetID();
+					DOFS& Dofs = GetFEModel()->GetDOFS();
+					sz = Dofs.GetDOFName(info.m_dof);
+					if (sz == nullptr) sz = "???";
+				}
+				break;
+			}
+		}
+		NANDetected e;
+		e.what("NAN detected in residual vector at index %d.\nNode id = %d, dof = %d ('%s')", info.m_eq, info.m_node, info.m_dof, sz);
+		throw (e);
+	}
+
 	// call the qn strategy to actuall solve the equations
 	m_qnstrategy->SolveEquations(u, R);
 
@@ -891,7 +918,27 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 	double u2 = u*u;
 	if (ISNAN(u2))
 	{
-		throw NANDetected();
+		FENodalDofInfo info;
+		const char* sz = "";
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		for (int i = 0; i < u.size(); ++i)
+		{
+			if (ISNAN(u[i]))
+			{
+				info = GetDOFInfoFromEquation(i);
+				if (info.m_node != -1)
+				{
+					info.m_node = mesh.Node(info.m_node).GetID();
+					DOFS& Dofs = GetFEModel()->GetDOFS();
+					sz = Dofs.GetDOFName(info.m_dof);
+					if (sz == nullptr) sz = "???";
+				}
+				break;
+			}
+		}
+		NANDetected e;
+		e.what("NAN detected in solution vector at index %d.\nNode id = %d, dof = %d ('%s')", info.m_eq, info.m_node, info.m_dof, sz);
+		throw (e);
 	}
 
 	// store the last solution for iterative solvers

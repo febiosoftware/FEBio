@@ -71,6 +71,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// structure identifying nodal dof info
+struct FENodalDofInfo
+{
+	int		m_eq = -1;		// equation number
+	int		m_node = -1;		// 0-based index into mesh!
+	int		m_dof = -1;		// index into nodal m_ID array
+};
+
+//-----------------------------------------------------------------------------
 class FEModel;
 class FEGlobalMatrix;
 class LinearSolver;
@@ -164,6 +173,9 @@ public:
 
 	// get the active dof map (returns nr of functions)
 	int GetActiveDofMap(vector<int>& dofMap);
+
+	// return the node (mesh index) from an equation number
+	FENodalDofInfo GetDOFInfoFromEquation(int ieq);
 
 public:
 	// extract the (square) norm of a solution vector
