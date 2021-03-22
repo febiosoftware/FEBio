@@ -67,7 +67,7 @@ void add_event_break_point(int nwhen)
 #ifdef WIN32
 #define szcmp	_stricmp
 #else
-#define szcmp	strcmp
+#define szcmp	strcasecmp
 #endif
 
 //-----------------------------------------------------------------------------
