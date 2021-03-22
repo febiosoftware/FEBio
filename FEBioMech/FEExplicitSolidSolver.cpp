@@ -47,6 +47,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_FECORE_CLASS(FEExplicitSolidSolver, FESolver)
+	ADD_PARAMETER(m_mass_lumping, "mass_lumping");
 	ADD_PARAMETER(m_dyn_damping, "dyn_damping");
 END_FECORE_CLASS();
 
@@ -56,6 +57,8 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem), m_
 	m_dyn_damping = 0.99;
 	m_niter = 0;
 	m_nreq = 0;
+
+	m_mass_lumping = HRZ_LUMPING;
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -96,73 +99,159 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 
 	vector<double> dummy(m_Mi);
 	FEGlobalVector Mi(fem, m_Mi, dummy);
-	matrix ke;
+	matrix me;
 	vector <int> lm;
 	vector <double> el_lumped_mass;
 
 	// loop over all domains
-	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	if (m_mass_lumping == NO_MASS_LUMPING)
 	{
-		// check whether it is a solid domain
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-		if (pbd)  // it is an elastic solid domain
+		// use consistent mass matrix.
+		// TODO: implement this
+		assert(false);
+		return false;
+	}
+	else if (m_mass_lumping == ROW_SUM_LUMPING)
+	{
+		for (int nd = 0; nd < mesh.Domains(); ++nd)
 		{
-			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
-
-			// loop over all the elements
-			for (int iel = 0; iel < pbd->Elements(); ++iel)
+			// check whether it is a solid domain
+			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+			if (pbd)  // it is an elastic solid domain
 			{
-				FESolidElement& el = pbd->Element(iel);
-				pbd->UnpackLM(el, lm);
+				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
 
-				int nint = el.GaussPoints();
-				int neln = el.Nodes();
-
-				ke.resize(neln, neln);
-				ke.zero();
-
-				// create the element mass matrix
-				for (int n = 0; n < nint; ++n)
+				// loop over all the elements
+				for (int iel = 0; iel < pbd->Elements(); ++iel)
 				{
-					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-					double d = pme->Density(mp);
-					double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
+					FESolidElement& el = pbd->Element(iel);
+					pbd->UnpackLM(el, lm);
 
-					double* H = el.H(n);
+					int nint = el.GaussPoints();
+					int neln = el.Nodes();
+
+					me.resize(neln, neln);
+					me.zero();
+
+					// create the element mass matrix
+					for (int n = 0; n < nint; ++n)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+						double d = pme->Density(mp);
+						double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
+
+						double* H = el.H(n);
+						for (int i = 0; i < neln; ++i)
+							for (int j = 0; j < neln; ++j)
+							{
+								double kab = H[i] * H[j] * detJ0*d;
+								me[i][j] += kab;
+							}
+					}
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(3 * neln, 0.0);
 					for (int i = 0; i < neln; ++i)
+					{
 						for (int j = 0; j < neln; ++j)
 						{
-							double kab = H[i] * H[j] * detJ0*d;
-							ke[i][j] += kab;
+							double kab = me[i][j];
+							el_lumped_mass[3 * i] += kab;
+							el_lumped_mass[3 * i + 1] += kab;
+							el_lumped_mass[3 * i + 2] += kab;
 						}
-				}
-
-				// reduce to a lumped mass vector and add up the total
-				el_lumped_mass.assign(3*neln, 0.0);
-				for (int i = 0; i < neln; ++i)
-				{
-					for (int j = 0; j < neln; ++j)
-					{
-						double kab = ke[i][j];
-						el_lumped_mass[3*i  ] += kab;
-						el_lumped_mass[3*i+1] += kab;
-						el_lumped_mass[3*i+2] += kab;
 					}
-				}
 
-				// assemble element matrix into inv_mass vector 
-				Mi.Assemble(el.m_node, lm, el_lumped_mass);
-			} // loop over elements
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				} // loop over elements
+			}
+			else
+			{
+				// TODO: we can only do solid domains right now.
+				return false;
+			}
 		}
-		else
+	}
+	else if (m_mass_lumping == HRZ_LUMPING)
+	{
+		for (int nd = 0; nd < mesh.Domains(); ++nd)
 		{
-			// TODO: we can only do solid domains right now.
-			return false;
+			// check whether it is a solid domain
+			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+			if (pbd)  // it is an elastic solid domain
+			{
+				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
+
+				// loop over all the elements
+				for (int iel = 0; iel < pbd->Elements(); ++iel)
+				{
+					FESolidElement& el = pbd->Element(iel);
+					pbd->UnpackLM(el, lm);
+
+					int nint = el.GaussPoints();
+					int neln = el.Nodes();
+
+					me.resize(neln, neln);
+					me.zero();
+
+					// calculate the element mass matrix (and element mass).
+					double Me = 0.0;
+					double* w = el.GaussWeights();
+					for (int n = 0; n < nint; ++n)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+						double d = pme->Density(mp);
+						double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
+						Me += d * detJ0 * w[n];
+
+						double* H = el.H(n);
+						for (int i = 0; i < neln; ++i)
+							for (int j = 0; j < neln; ++j)
+							{
+								double kab = H[i] * H[j] * detJ0*d;
+								me[i][j] += kab;
+							}
+					}
+
+					// calculate sum of diagonals
+					double S = 0.0;
+					for (int i = 0; i < neln; ++i) S += me[i][i];
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(3 * neln, 0.0);
+					for (int i = 0; i < neln; ++i)
+					{
+						double mab = me[i][i] * Me / S;
+						el_lumped_mass[3 * i    ] = mab;
+						el_lumped_mass[3 * i + 1] = mab;
+						el_lumped_mass[3 * i + 2] = mab;
+					}
+
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				} // loop over elements
+			}
+			else
+			{
+				// TODO: we can only do solid domains right now.
+				return false;
+			}
 		}
+	}
+	else
+	{
+		assert(false);
+		return false;
 	}
 
 	// we need the inverse of the lumped masses later
-	for (int i = 0; i < m_Mi.size(); ++i) m_Mi[i] = 1.0 / m_Mi[i];
+	// Also, make sure the lumped masses are positive.
+	for (int i = 0; i < m_Mi.size(); ++i)
+	{
+		if (m_Mi[i] <= 0.0) return false;
+		m_Mi[i] = 1.0 / m_Mi[i];
+	}
 
 	return true;
 }
