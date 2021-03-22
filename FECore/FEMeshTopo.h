@@ -57,6 +57,9 @@ public:
 	// return an element
 	FEElement* Element(int i);
 
+	// get the element index (into global element array) from an element ID
+	int GetElementIndexFromID(int elemId);
+
 	// return the number of faces in the mesh
 	int Faces();
 

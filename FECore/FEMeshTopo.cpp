@@ -37,6 +37,12 @@ SOFTWARE.*/
 class FEMeshTopo::MeshTopoImp
 {
 public:
+	MeshTopoImp()
+	{
+		m_minId = -1;
+	}
+
+public:
 	FEMesh*				m_mesh;			// the mesh
 	FEEdgeList			m_edgeList;		// the edge list
 	FEElementEdgeList	m_EEL;			// the element-edge list
@@ -48,11 +54,13 @@ public:
 	FEFaceEdgeList		m_FEL;			// face-edge list
 
 	std::vector<FEElement*>	m_elem;		// element list
+
+	std::vector<int>	m_lut;
+	int					m_minId;
 };
 
 FEMeshTopo::FEMeshTopo() : imp(new FEMeshTopo::MeshTopoImp)
 {
-
 }
 
 FEMeshTopo::~FEMeshTopo()
@@ -83,6 +91,34 @@ bool FEMeshTopo::Create(FEMesh* mesh)
 		{
 			imp->m_elem[NEL++] = &dom.ElementRef(j);
 		}
+	}
+
+	// build the index lookup table
+	FEElementIterator it(mesh);
+	imp->m_minId = -1;
+	int minId = -1, maxId = -1;
+	for (; it.isValid(); ++it)
+	{
+		int nid = (*it).GetID(); assert(nid != -1);
+		if (minId == -1)
+		{
+			minId = nid;
+			maxId = nid;
+		}
+		else
+		{
+			if (nid < minId) minId = nid;
+			if (nid > maxId) maxId = nid;
+		}
+	}
+	int lutSize = maxId - minId + 1;
+	imp->m_lut.assign(lutSize, -1);
+	imp->m_minId = minId;
+	int n = 0;
+	for (it.reset(); it.isValid(); ++it, ++n)
+	{
+		int nid = (*it).GetID() - minId;
+		imp->m_lut[nid] = n;
 	}
 
 	// create the element neighbor list
@@ -124,6 +160,15 @@ FEElement* FEMeshTopo::Element(int i)
 {
 	if (i < 0) return nullptr;
 	else return imp->m_elem[i];
+}
+
+int FEMeshTopo::GetElementIndexFromID(int elemId)
+{
+	int eid = elemId - imp->m_minId;
+	if ((eid < 0) || (eid >= imp->m_lut.size())) { assert(false); return -1; }
+	int lid = imp->m_lut[eid]; 
+	assert(lid != -1);
+	return lid;
 }
 
 int FEMeshTopo::Faces()

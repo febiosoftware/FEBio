@@ -718,6 +718,7 @@
     <ClInclude Include="..\..\FEBioMech\FESolidSolver2.h" />
     <ClInclude Include="..\..\FEBioMech\FESphericalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FESpringMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FESpringRuptureCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
@@ -965,6 +966,7 @@
     <ClCompile Include="..\..\FEBioMech\FESolidSolver2.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESphericalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESpringMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESpringRuptureCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />

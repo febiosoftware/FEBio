@@ -38,11 +38,10 @@ FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshA
 
 FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElementSet* elemSet)
 {
-	FEMeshAdaptorSelection elemList(m_elemList.size());
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMeshAdaptorSelection elemList(elemSet->Elements());
 	for (int i = 0; i < (int)m_elemList.size(); ++i)
 	{
-		elemList[i].m_elementIndex = m_elemList[i] - 1;
+		elemList[i].m_elementId = m_elemList[i];
 		elemList[i].m_scaleFactor = 0.0;
 	}
 	return elemList;

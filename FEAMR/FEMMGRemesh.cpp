@@ -334,7 +334,7 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
 		for (int i = 0; i < (int)elemList.size(); ++i)
 		{
-			FEElement& el = *topo.Element(elemList[i].m_elementIndex);
+			FEElement& el = *mesh.FindElementFromID(elemList[i].m_elementId);
 			for (int j = 0; j < el.Nodes(); ++j)
 			{
 				double s = scale;

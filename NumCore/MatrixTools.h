@@ -41,6 +41,12 @@ namespace NumCore
 	// write a vector to file
 	bool write_vector(const vector<double>& a, const char* szfile, int mode = 0);
 
+	// read compact matrix (binary mode only)
+	CompactMatrix* read_hb(const char* szfile);
+
+	// read vector<double> from file
+	bool read_vector(std::vector<double>& a, const char* szfile);
+
 	// calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
 	double inverse_infnorm(CompactMatrix* A);
 

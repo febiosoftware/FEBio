@@ -138,7 +138,7 @@ FEMeshAdaptorSelection FEDomainErrorCriterion::GetElementSelection(FEElementSet*
 			if (max_err > m_pct)
 			{
 				double f = m_pct / max_err;
-				elemList.push_back(i, f);
+				elemList.push_back(el.GetID(), f);
 			}
 		}
 	}

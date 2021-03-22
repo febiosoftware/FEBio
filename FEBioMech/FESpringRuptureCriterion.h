@@ -23,49 +23,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEScaleAdaptorCriterion.h"
-#include <FECore/FEModel.h>
-#include <FECore/FEMesh.h>
+#pragma once
+#include <FECore/FEMeshAdaptorCriterion.h>
 
-BEGIN_FECORE_CLASS(FEScaleAdaptorCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_scale, "scale");
-END_FECORE_CLASS();
-
-FEScaleAdaptorCriterion::FEScaleAdaptorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+class FESpringRuptureCriterion : public FEMeshAdaptorCriterion
 {
-	m_scale = 1.0;
+public:
+	FESpringRuptureCriterion(FEModel* fem);
 
-	// set sort on by default
-	SetSort(true);
-}
+	bool Check(FEElement& el, double& elemVal) override;
 
-FEMeshAdaptorSelection FEScaleAdaptorCriterion::GetElementSelection(FEElementSet* elemSet)
-{
-	// get the mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int NE = mesh.Elements();
+private:
+	double	m_maxForce;
+	double	m_maxStretch;
 
-	// the element list of elements that need to be refined
-	FEMeshAdaptorSelection elemList;
-
-	// loop over the elements
-	FEElementIterator it(&mesh, elemSet);
-	for (int i = 0; it.isValid(); ++it, ++i)
-	{
-		FEElement& el = *it;
-		int ne = el.Nodes();
-		int ni = el.GaussPoints();
-
-		for (int j = 0; j < ni; ++j)
-		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-
-			double s = m_scale(mp);
-			elemList.push_back(el.GetID(), s);
-		}
-	}
-
-	// create the element list of elements that need to be refined
-	return elemList;
-}
+	DECLARE_FECORE_CLASS()
+};
