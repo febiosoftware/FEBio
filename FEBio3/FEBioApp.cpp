@@ -93,7 +93,8 @@ bool FEBioApp::Init(int argc, char* argv[])
 	}
 
 	// ping repo server
-	ping();
+	// Removed for the time being, pending further instruction
+	// ping();
 
 	return true;
 }
