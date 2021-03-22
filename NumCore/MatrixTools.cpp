@@ -119,6 +119,73 @@ bool NumCore::write_vector(const vector<double>& a, const char* szfile, int mode
 	return true;
 }
 
+CompactMatrix* NumCore::read_hb(const char* szfile)
+{
+	// try to open the file
+	if (szfile == nullptr) return nullptr;
+	FILE* fp = fopen(szfile, "rb");
+	if (fp == nullptr) return nullptr;
+
+	int symmFlag, offset, rowFlag;
+	int nrow = 0, ncol = 0, nnz = 0;
+	if (fread(&symmFlag, sizeof(int), 1, fp) != 1) return nullptr;
+	if (fread(&offset  , sizeof(int), 1, fp) != 1) return nullptr;
+	if (fread(&rowFlag , sizeof(int), 1, fp) != 1) return nullptr;
+	if (fread(&nrow    , sizeof(int), 1, fp) != 1) return nullptr;
+	if (fread(&ncol    , sizeof(int), 1, fp) != 1) return nullptr;
+	if (fread(&nnz     , sizeof(int), 1, fp) != 1) return nullptr;
+
+	// allocate matrix
+	int nsize = 0;
+	CompactMatrix* K = 0;
+	if (symmFlag == 1)
+	{
+		K = new CompactSymmMatrix(offset);
+		nsize = nrow;
+	}
+	else
+	{
+		K = new CRSSparseMatrix(offset);
+		nsize = ncol;
+	}
+
+	// allocate data
+	double* pa = new double[nnz];
+	int* pi = new int[nnz];
+	int* pp = new int[nsize + 1];
+	K->alloc(nrow, ncol, nnz, pa, pi, pp);
+
+	// read in the data
+	if (fread(pp, sizeof(int)   , nsize + 1, fp) != nsize + 1) { fclose(fp); delete K; return 0; }
+	if (fread(pi, sizeof(int)   , nnz      , fp) != nnz      ) { fclose(fp); delete K; return 0; }
+	if (fread(pa, sizeof(double), nnz      , fp) != nnz      ) { fclose(fp); delete K; return 0; }
+
+	fclose(fp);
+
+	return K;
+}
+
+// read vector<double> from file
+bool NumCore::read_vector(std::vector<double>& a, const char* szfile)
+{
+	if (szfile == nullptr) return false;
+	FILE* fp = fopen(szfile, "rb");
+	if (fp == nullptr) return false;
+
+	int N;
+	fread(&N, sizeof(int), 1, fp);
+
+	a.resize(N);
+	if (fread(&a[0], sizeof(double), N, fp) != N)
+	{
+		fclose(fp);
+		return false;
+	}
+
+	fclose(fp);
+	return true;
+}
+
 // calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
 double NumCore::inverse_infnorm(CompactMatrix* A)
 {
