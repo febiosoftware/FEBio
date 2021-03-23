@@ -140,7 +140,7 @@ else()
 			DOC "MKL root directory")
 	else()
 		find_file(MKLROOT mkl
-			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel
+			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel $ENV{HOME}/intel $ENV{HOME}/*/intel
 			PATH_SUFFIXES "compilers_and_libraries/linux"
 			DOC "MKL root directory")
 	endif()
@@ -391,33 +391,35 @@ macro(crossExecProcess OUT)
 endmacro()
 
 # Check for git and give warning if not available
-if(WIN32)
-	set(CMD where git)
-else()
-    set(CMD which git)
-endif()
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+    if(WIN32)
+        set(CMD where git)
+    else()
+        set(CMD which git)
+    endif()
 
-    crossExecProcess(NULL)
+        crossExecProcess(NULL)
 
-if(SUCCESS EQUAL 0)
-	# Get branch name and check if we're on the develop branch
-    set(CMD git rev-parse --abbrev-ref HEAD)
-	crossExecProcess(BRANCH_NAME)
+    if(SUCCESS EQUAL 0)
+        # Get branch name and check if we're on the develop branch
+        set(CMD git rev-parse --abbrev-ref HEAD)
+        crossExecProcess(BRANCH_NAME)
 
-	string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
-	
-	# Get the commit info and set the DEVCOMMIT macro
-	if(SUCCESS EQUAL 0 AND ISDEVELOP)
+        string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
         
-        set(CMD git rev-parse --short=9 HEAD)
-		crossExecProcess(DEVCOMMIT)
-		
-		if(${SUCCESS} EQUAL 0)
-			target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
-		endif()
-	endif()
-else()
-	message(WARNING "Could not find git in system PATH. Development version info will not be addded.")
+        # Get the commit info and set the DEVCOMMIT macro
+        if(SUCCESS EQUAL 0 AND ISDEVELOP)
+            
+            set(CMD git rev-parse --short=9 HEAD)
+            crossExecProcess(DEVCOMMIT)
+            
+            if(${SUCCESS} EQUAL 0)
+                target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
+            endif()
+        endif()
+    else()
+        message(WARNING "Could not find git in system PATH. Development version info will not be addded.")
+    endif()
 endif()
 
 ##### Linking options #####
