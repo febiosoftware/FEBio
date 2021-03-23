@@ -335,6 +335,9 @@ endif()
 # Extra compiler flags for intel compiler
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 	add_definitions(-static-intel -no-intel-extensions)
+    if(APPLE)
+        add_definitions(-fopenmp)
+    endif()
 endif()
 
 # Properly use OMP if llvm has been installed from brew
