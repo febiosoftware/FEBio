@@ -37,6 +37,13 @@ SOFTWARE.*/
 //! problems.
 class FEExplicitSolidSolver : public FESolver
 {
+	enum MassLumpingMethod
+	{
+		NO_MASS_LUMPING,	// use consistent mass matrix
+		ROW_SUM_LUMPING,	// use simple row-sum lumping
+		HRZ_LUMPING			// use Hinton-Rock-Zienkiewicz lumping
+	};
+
 public:
 	//! constructor
 	FEExplicitSolidSolver(FEModel* pfem);
@@ -82,6 +89,7 @@ private:
 	bool CalculateMassMatrix();
 
 public:
+	int			m_mass_lumping;	//!< specify mass lumping method
 	double		m_dyn_damping;	//!< velocity damping for the explicit solver
 
 public:
