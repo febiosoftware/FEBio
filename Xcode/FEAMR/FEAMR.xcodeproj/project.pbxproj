@@ -20,6 +20,8 @@
 		D53081442595627900FBA7BE /* FEScaleAdaptorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */; };
 		D53081452595627900FBA7BE /* FEScaleAdaptorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */; };
 		D568D3C525C84DB900FC67CD /* feamr_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D568D3C425C84DB900FC67CD /* feamr_api.h */; };
+		D588571A260B989500659AEF /* FEFilterAdaptorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5885718260B989500659AEF /* FEFilterAdaptorCriterion.cpp */; };
+		D588571B260B989500659AEF /* FEFilterAdaptorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5885719260B989500659AEF /* FEFilterAdaptorCriterion.h */; };
 		D5AE8CAB2592EBC6003AC08B /* FETetRefine.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AE8C932592EBC5003AC08B /* FETetRefine.h */; };
 		D5AE8CAC2592EBC6003AC08B /* FERefineMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */; };
 		D5AE8CAD2592EBC6003AC08B /* FEMaxVariableCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AE8C952592EBC5003AC08B /* FEMaxVariableCriterion.h */; };
@@ -60,6 +62,8 @@
 		D53081422595627900FBA7BE /* FEScaleAdaptorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScaleAdaptorCriterion.h; sourceTree = "<group>"; };
 		D53081432595627900FBA7BE /* FEScaleAdaptorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEScaleAdaptorCriterion.cpp; sourceTree = "<group>"; };
 		D568D3C425C84DB900FC67CD /* feamr_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = feamr_api.h; sourceTree = "<group>"; };
+		D5885718260B989500659AEF /* FEFilterAdaptorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFilterAdaptorCriterion.cpp; sourceTree = "<group>"; };
+		D5885719260B989500659AEF /* FEFilterAdaptorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFilterAdaptorCriterion.h; sourceTree = "<group>"; };
 		D5AE8C932592EBC5003AC08B /* FETetRefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETetRefine.h; sourceTree = "<group>"; };
 		D5AE8C942592EBC5003AC08B /* FERefineMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERefineMesh.cpp; sourceTree = "<group>"; };
 		D5AE8C952592EBC5003AC08B /* FEMaxVariableCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaxVariableCriterion.h; sourceTree = "<group>"; };
@@ -102,6 +106,8 @@
 		D5AE8C922592EBC5003AC08B /* FEAMR */ = {
 			isa = PBXGroup;
 			children = (
+				D5885718260B989500659AEF /* FEFilterAdaptorCriterion.cpp */,
+				D5885719260B989500659AEF /* FEFilterAdaptorCriterion.h */,
 				D568D3C425C84DB900FC67CD /* feamr_api.h */,
 				D5AE8CA22592EBC6003AC08B /* FEAMR.cpp */,
 				D5AE8C9C2592EBC6003AC08B /* FEAMR.h */,
@@ -182,6 +188,7 @@
 				D5AE8CC12592EBC6003AC08B /* FEErosionAdaptor.h in Headers */,
 				D5AE8CB12592EBC6003AC08B /* FEHexRefine.h in Headers */,
 				D515C31C259E24FC00F0C6FE /* FEMeshDataInterpolator.h in Headers */,
+				D588571B260B989500659AEF /* FEFilterAdaptorCriterion.h in Headers */,
 				D5AE8CBB2592EBC6003AC08B /* FEHexRefine2D.h in Headers */,
 				D5AE8CAE2592EBC6003AC08B /* stdafx.h in Headers */,
 				D5AE8CAD2592EBC6003AC08B /* FEMaxVariableCriterion.h in Headers */,
@@ -270,6 +277,7 @@
 				D5AE8CB72592EBC6003AC08B /* FEMaxVolumeCriterion.cpp in Sources */,
 				D505331F25DC4C0600FF68DE /* FETestRefine.cpp in Sources */,
 				D5AE8CAC2592EBC6003AC08B /* FERefineMesh.cpp in Sources */,
+				D588571A260B989500659AEF /* FEFilterAdaptorCriterion.cpp in Sources */,
 				D5AE8CC02592EBC6003AC08B /* FETetRefine.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
