@@ -510,6 +510,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEAMR\FEFilterAdaptorCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.h" />

@@ -23,22 +23,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
 
-
-class FEMaxStressCriterion : public FEMeshAdaptorCriterion
+class FEStressCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEMaxStressCriterion(FEModel* fem);
+	FEStressCriterion(FEModel* fem);
 
-	bool Check(FEElement& el, double& elemVal) override;
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 
 private:
-	double	m_maxStress;
 	int		m_metric;
 
 	DECLARE_FECORE_CLASS()

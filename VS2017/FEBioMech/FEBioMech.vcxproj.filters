@@ -759,6 +759,9 @@
     <ClInclude Include="..\..\FEBioMech\FESpringRuptureCriterion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEAMR\FEFilterAdaptorCriterion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">

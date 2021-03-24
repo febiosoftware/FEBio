@@ -40,9 +40,5 @@ public:
 	// derived classes must implement this function
 	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;
 
-private:
-	double	m_pct;
-	double	m_hmin;		//!< min element size
-
 	DECLARE_FECORE_CLASS();
 };

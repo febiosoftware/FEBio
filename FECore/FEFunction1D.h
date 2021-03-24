@@ -106,6 +106,39 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+// A step function
+class FECORE_API FEStepFunction : public FEFunction1D
+{
+public:
+	FEStepFunction(FEModel* fem) : FEFunction1D(fem), m_x0(0.0), m_leftVal(0.0), m_rightVal(1.0) {}
+	FEStepFunction(FEModel* fem, double x0, double lv, double rv) : FEFunction1D(fem), m_x0(x0), m_leftVal(lv), m_rightVal(rv) {}
+	FEFunction1D* copy() override { return new FEStepFunction(GetFEModel(), m_x0, m_leftVal, m_rightVal); }
+
+	double value(double t) const override
+	{
+		return (t < m_x0 ? m_leftVal : m_rightVal);
+	}
+
+	double derive(double t) const override
+	{
+		return 0.0;
+	}
+
+	double deriv2(double t) const override
+	{
+		return 0.0;
+	}
+
+private:
+	double	m_x0;
+	double	m_leftVal;
+	double	m_rightVal;
+
+	DECLARE_FECORE_CLASS();
+};
+
+
+//-----------------------------------------------------------------------------
 //! function defined via math expression
 class FECORE_API FEMathFunction : public FEFunction1D
 {

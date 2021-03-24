@@ -40,10 +40,12 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEHexRefine2D, FERefineMesh)
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
 	ADD_PROPERTY(m_criterion, "criterion");
+	ADD_PARAMETER(m_maxValue, "max_value");
 END_FECORE_CLASS();
 
 FEHexRefine2D::FEHexRefine2D(FEModel* fem) : FERefineMesh(fem)
 {
+	m_maxValue = 0.0;
 	m_elemRefine = 0;
 	m_criterion = nullptr;
 }
@@ -131,9 +133,12 @@ bool FEHexRefine2D::BuildSplitLists(FEModel& fem)
 		FEMeshAdaptorSelection selection = m_criterion->GetElementSelection(GetElementSet());
 		for (int i = 0; i < selection.size(); ++i)
 		{
-			int eid = selection[i].m_elementId;
-			int lid = topo.GetElementIndexFromID(eid);
-			m_elemList[lid] = 1;
+			if (selection[i].m_elemValue > m_maxValue)
+			{
+				int eid = selection[i].m_elementId;
+				int lid = topo.GetElementIndexFromID(eid);
+				m_elemList[lid] = 1;
+			}
 		}
 	}
 	else

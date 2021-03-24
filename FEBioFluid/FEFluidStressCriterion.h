@@ -27,16 +27,11 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include <FEAMR/FEDomainErrorCriterion.h>
 
-class FEFMaxFluidStressCriterion : public FEMeshAdaptorCriterion
+class FEFluidStressCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEFMaxFluidStressCriterion(FEModel* fem);
-
-	bool Check(FEElement& el, double& elemVal) override;
-
-private:
-	double	m_maxStress;
-
+	FEFluidStressCriterion(FEModel* fem);
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 	DECLARE_FECORE_CLASS()
 };
 

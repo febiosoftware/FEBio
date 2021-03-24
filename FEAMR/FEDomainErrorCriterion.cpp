@@ -30,18 +30,10 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptor.h> // for projectToNodes
 
 BEGIN_FECORE_CLASS(FEDomainErrorCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_pct, "error");
-	ADD_PARAMETER(m_hmin, "hmin");
 END_FECORE_CLASS();
 
 FEDomainErrorCriterion::FEDomainErrorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-	m_pct = 0.0;
-
-	m_hmin = 0;	// criterion not used by default
-
-	// set sort on by default
-	SetSort(true);
 }
 
 double MinEdgeLengthSqr(FEMesh* pm, FEElement& el)
@@ -106,41 +98,25 @@ FEMeshAdaptorSelection FEDomainErrorCriterion::GetElementSelection(FEElementSet*
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// check for minimal element size
-		bool sizeCheck = true;
-		if (m_hmin > 0)
+		// get the nodal values
+		for (int j = 0; j < ne; ++j)
 		{
-			double h2 = MinEdgeLengthSqr(&mesh, el);
-			if (h2 < m_hmin*m_hmin) sizeCheck = false;
+			ev[j] = sn[el.m_node[j]];
 		}
 
-		if (sizeCheck)
+		// evaluate element error
+		double max_err = 0;
+		for (int j = 0; j < ni; ++j)
 		{
-			// get the nodal values
-			for (int j = 0; j < ne; ++j)
-			{
-				ev[j] = sn[el.m_node[j]];
-			}
+			double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
 
-			// evaluate element error
-			double max_err = 0;
-			for (int j = 0; j < ni; ++j)
-			{
-				double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
+			double snj = el.Evaluate(ev, j);
 
-				double snj = el.Evaluate(ev, j);
-
-				double err = fabs(sj - snj) / (smax - smin);
-				if (err > max_err) max_err = err;
-			}
-
-			// see if it's too large
-			if (max_err > m_pct)
-			{
-				double f = m_pct / max_err;
-				elemList.push_back(el.GetID(), f);
-			}
+			double err = fabs(sj - snj) / (smax - smin);
+			if (err > max_err) max_err = err;
 		}
+
+		elemList.push_back(el.GetID(), max_err);
 	}
 
 	// create the element list of elements that need to be refined

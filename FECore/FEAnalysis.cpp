@@ -523,7 +523,12 @@ int FEAnalysis::SolveTimeStep()
 						if (meshAdaptor->IsActive())
 						{
 							feLog("*mesh adaptor %d (%s):\n", i + 1, meshAdaptor->GetTypeStr());
-							bconv = (meshAdaptor->Apply(niter) && bconv);
+
+							// Apply the mesh adaptor. 
+							// It will return true if the mesh was modified. 
+							bool meshModified = meshAdaptor->Apply(niter);
+
+							bconv = ((meshModified == false) && bconv);
 							feLog("\n");
 						}
 					}

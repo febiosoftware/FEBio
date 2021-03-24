@@ -34,6 +34,7 @@ public:
 	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
 
 private:
+	double	m_value;
 	vector<int>	m_elemList;
 
 	DECLARE_FECORE_CLASS();

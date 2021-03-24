@@ -839,10 +839,11 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Derived from FEMeshAdaptorCriterion
-	REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
-	REGISTER_FECORE_CLASS(FEMaxDamageCriterion, "max_damage");
+	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
+	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
 	REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
-	REGISTER_FECORE_CLASS(FESpringRuptureCriterion, "spring rupture");
+	REGISTER_FECORE_CLASS(FESpringForceCriterion, "spring force");
+	REGISTER_FECORE_CLASS(FESpringStretchCriterion, "spring stretch");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FEDataGenerator

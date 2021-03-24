@@ -40,6 +40,7 @@
     <ClCompile Include="..\..\FEAMR\FEDomainShapeInterpolator.cpp" />
     <ClCompile Include="..\..\FEAMR\FEElementSelectionCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEErosionAdaptor.cpp" />
+    <ClCompile Include="..\..\FEAMR\FEFilterAdaptorCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEHexRefine.cpp" />
     <ClCompile Include="..\..\FEAMR\FEHexRefine2D.cpp" />
     <ClCompile Include="..\..\FEAMR\FELeastSquaresInterpolator.cpp" />

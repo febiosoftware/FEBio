@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <vector>
 #include "FERefineMesh.h"
+#include <FECore/FEFunction1D.h>
 
 class FEMMGRemesh : public FERefineMesh
 {
@@ -43,7 +44,9 @@ private:
 
 private:
 	int		m_maxiter;
-	int		m_maxelem;
+	bool	m_relativeSize;
+	bool	m_meshCoarsen;
+	bool	m_normalizeData;
 
 	double	m_scale;	// element scale factor
 	double	m_hmin;		// minimum element size
@@ -51,6 +54,8 @@ private:
 	double	m_hgrad;	// gradation
 
 	FEMeshAdaptorCriterion*	m_criterion;
+
+	FEFunction1D*	m_sfunc;	// sizing function
 
 	MMG*	mmg;
 

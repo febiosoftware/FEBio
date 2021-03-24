@@ -45,6 +45,7 @@ protected:
 	bool UpdateElementSet(FEElementSet& set);
 
 private:
+	double	m_maxValue;
 	int		m_elemRefine;		// max nr of elements to refine per step
 
 	vector<int>	m_elemList;

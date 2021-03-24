@@ -27,14 +27,13 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 
 //-----------------------------------------------------------------------------
-class FEMaxVariableCriterion : public FEMeshAdaptorCriterion
+class FEVariableCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEMaxVariableCriterion(FEModel* fem);
-	bool Check(FEElement& el, double& elemVal) override;
+	FEVariableCriterion(FEModel* fem);
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 
 private:
-	double	m_maxValue;
 	int		m_dof;
 
 	DECLARE_FECORE_CLASS();
