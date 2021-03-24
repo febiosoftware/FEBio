@@ -37,8 +37,10 @@ private:
 	void RemoveIslands();
 
 private:
-	int		m_maxIters;
-	bool	m_bremoveIslands;
+	int		m_maxIters;			// max iterations per time step
+	bool	m_bremoveIslands;	// remove disconnected elements
+	double	m_maxValue;			// the threshold value to eroder
+	int		m_maxelem;			// the max nr of elements to erode per adaptation iteration
 
 	FEMeshAdaptorCriterion*	m_criterion;
 

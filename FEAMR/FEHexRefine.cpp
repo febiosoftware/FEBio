@@ -39,12 +39,14 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
+	ADD_PARAMETER(m_maxValue, "max_value");
 	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
 
 FEHexRefine::FEHexRefine(FEModel* fem) : FERefineMesh(fem)
 {
 	m_elemRefine = 0;
+	m_maxValue = 0.0;
 	m_criterion = nullptr;
 }
 
@@ -80,7 +82,7 @@ bool FEHexRefine::RefineMesh()
 	BuildSplitLists(fem);
 
 	// make sure we have work to do
-	if (m_splitElems == 0) return true;
+	if (m_splitElems == 0) return false;
 
 	// Next, the position and solution variables for all the nodes are updated.
 	// Note that this has to be done before recreating the elements since 
@@ -120,7 +122,10 @@ bool FEHexRefine::RefineMesh()
 	for (int i = 0; i < mesh.Surfaces(); ++i)
 	{
 		FESurface& surf = mesh.Surface(i);
-		if (UpdateSurface(surf) == false) return false;
+		if (UpdateSurface(surf) == false)
+		{
+			throw std::runtime_error("Error in FEHexRefine!");
+		}
 	}
 
 	return true;
@@ -139,9 +144,12 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 		FEMeshAdaptorSelection selection = m_criterion->GetElementSelection(GetElementSet());
 		for (int i = 0; i < selection.size(); ++i)
 		{
-			int eid = selection[i].m_elementId;
-			int lid = topo.GetElementIndexFromID(eid);
-			m_elemList[lid] = 1;
+			if (selection[i].m_elemValue > m_maxValue)
+			{
+				int eid = selection[i].m_elementId;
+				int lid = topo.GetElementIndexFromID(eid);
+				m_elemList[lid] = 1;
+			}
 		}
 	}
 	else

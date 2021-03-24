@@ -56,6 +56,8 @@ public:
 
 protected:
 	// Derived classes need to override this function
+	// The return value should be true if the mesh was refined
+	// or false otherwise. 
 	virtual bool RefineMesh() = 0;
 
 protected:

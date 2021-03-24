@@ -28,40 +28,30 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include <FECore/FEElementList.h>
 
-BEGIN_FECORE_CLASS(FEFMaxFluidStressCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_maxStress, FE_RANGE_GREATER(0.0), "max_stress");
+BEGIN_FECORE_CLASS(FEFluidStressCriterion, FEMeshAdaptorCriterion)
 END_FECORE_CLASS();
 
-FEFMaxFluidStressCriterion::FEFMaxFluidStressCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+FEFluidStressCriterion::FEFluidStressCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-	m_maxStress = 0.0;
-
-	// set sort on by default
-	SetSort(true);
 }
 
-bool FEFMaxFluidStressCriterion::Check(FEElement& el, double& elemVal)
+bool FEFluidStressCriterion::GetElementValue(FEElement& el, double& elemVal)
 {
-	bool bselect = false;
+	double v = 0.0;
 	int nint = el.GaussPoints();
-	elemVal = 0;
 	for (int n = 0; n < nint; ++n)
 	{
 		FEMaterialPoint* mp = el.GetMaterialPoint(n);
 		FEFluidMaterialPoint* fp = mp->ExtractData<FEFluidMaterialPoint>();
-		if (fp)
-		{
-			mat3ds& s = fp->m_sf;
-			double v = s.max_shear();
-			if (v >= m_maxStress)
-			{
-				elemVal = m_maxStress / v;
-				bselect = true;
-				break;
-			}
-		}
+		if (fp == nullptr) return false;
+
+		mat3ds& s = fp->m_sf;
+		v += s.max_shear();
 	}
-	return bselect;
+	v /= (double)nint;
+
+	elemVal = v;
+	return true;
 }
 
 

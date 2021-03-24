@@ -27,13 +27,11 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 
 //-----------------------------------------------------------------------------
-class FEMaxVolumeCriterion : public FEMeshAdaptorCriterion
+class FEElementVolumeCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEMaxVolumeCriterion(FEModel* fem);
-	bool Check(FEElement& el, double& elemVal) override;
-private:
-	double	m_maxVolume;
+	FEElementVolumeCriterion(FEModel* fem);
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 
 	DECLARE_FECORE_CLASS();
 };

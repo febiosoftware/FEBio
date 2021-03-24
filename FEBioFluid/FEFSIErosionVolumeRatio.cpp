@@ -60,7 +60,7 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
     if ((m_maxIters >= 0) && (iteration >= m_maxIters))
     {
         feLog("Max iterations reached.");
-        return true;
+        return false;
     }
     
     int deactiveElems = 0;
@@ -171,7 +171,7 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
     if ((deactiveElems == 0) && (activeElems == 0))
     {
         feLog("Nothing to do.");
-        return true;
+        return false;
     }
     
     int melems = melem.size();
@@ -256,5 +256,5 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
 //    return (elems == 0);
     feLog("Deactivate elements: %d\n", melems);
     feLog("Reactivate elements: %d\n", activeElems);
-    return (melems == 0);
+    return (melems != 0);
 }

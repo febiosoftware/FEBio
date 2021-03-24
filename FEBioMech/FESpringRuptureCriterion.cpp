@@ -29,50 +29,49 @@ SOFTWARE.*/
 #include "FEDiscreteElasticMaterial.h"
 #include <FECore/FEElement.h>
 
-BEGIN_FECORE_CLASS(FESpringRuptureCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_maxForce  , "max_force");
-	ADD_PARAMETER(m_maxStretch, "max_stretch");
+BEGIN_FECORE_CLASS(FESpringForceCriterion, FEMeshAdaptorCriterion)
 END_FECORE_CLASS();
 
-FESpringRuptureCriterion::FESpringRuptureCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+FESpringForceCriterion::FESpringForceCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-	m_maxForce = 0.0;
-	m_maxStretch = 0.0;
-
-	// set sort on by default
-	SetSort(true);
 }
 
-bool FESpringRuptureCriterion::Check(FEElement& el, double& elemVal)
+bool FESpringForceCriterion::GetElementValue(FEElement& el, double& elemVal)
 {
-	if (el.isActive() == false) return false;
-
-	bool bselect = false;
-	int nint = el.GaussPoints();
 	elemVal = 0;
-	for (int n = 0; n < nint; ++n)
-	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(n);
-		FEDiscreteElasticMaterialPoint* ep = mp->ExtractData<FEDiscreteElasticMaterialPoint>();
-		if (ep)
-		{
-			vec3d& Ft = ep->m_Ft;
-			double F = ep->m_drt*Ft;
-			double L0 = ep->m_dr0.norm();
-			double Lt = ep->m_drt.norm();
-			double s = Lt / L0;
+	int nint = el.GaussPoints(); assert(nint == 1);
+	FEMaterialPoint* mp = el.GetMaterialPoint(0);
+	FEDiscreteElasticMaterialPoint* ep = mp->ExtractData<FEDiscreteElasticMaterialPoint>();
+	if (ep == nullptr) return false;
 
-			if ((m_maxForce != 0.0) && (F >= m_maxForce))
-			{
-				bselect = true;
-			}
+	vec3d& Ft = ep->m_Ft;
+	double F = ep->m_drt*Ft;
 
-			if ((m_maxStretch != 0.0) && (s >= m_maxStretch))
-			{
-				bselect = true;
-			}
-		}
-	}
+	elemVal = F;
+	return true;
+}
 
-	return bselect;
+
+
+BEGIN_FECORE_CLASS(FESpringStretchCriterion, FEMeshAdaptorCriterion)
+END_FECORE_CLASS();
+
+FESpringStretchCriterion::FESpringStretchCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+}
+
+bool FESpringStretchCriterion::GetElementValue(FEElement& el, double& elemVal)
+{
+	elemVal = 0;
+	int nint = el.GaussPoints(); assert(nint == 1);
+	FEMaterialPoint* mp = el.GetMaterialPoint(0);
+	FEDiscreteElasticMaterialPoint* ep = mp->ExtractData<FEDiscreteElasticMaterialPoint>();
+	if (ep == nullptr) return false;
+
+	double L0 = ep->m_dr0.norm();
+	double Lt = ep->m_drt.norm();
+	double s = Lt / L0;
+
+	elemVal = s;
+	return true;
 }

@@ -27,18 +27,16 @@ SOFTWARE.*/
 #include "FEMaxVariableCriterion.h"
 #include <FECore/FESolidDomain.h>
 
-BEGIN_FECORE_CLASS(FEMaxVariableCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_maxValue, "max_value");
+BEGIN_FECORE_CLASS(FEVariableCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(m_dof, "dof");
 END_FECORE_CLASS();
 
-FEMaxVariableCriterion::FEMaxVariableCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+FEVariableCriterion::FEVariableCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-	m_maxValue = 0.0;
 	m_dof = -1;
 }
 
-bool FEMaxVariableCriterion::Check(FEElement& el, double& elemVal)
+bool FEVariableCriterion::GetElementValue(FEElement& el, double& elemVal)
 {
 	if (m_dof == -1) return false;
 
@@ -53,5 +51,5 @@ bool FEMaxVariableCriterion::Check(FEElement& el, double& elemVal)
 		if (vi > maxVal) maxVal = vi;
 	}
 	elemVal = maxVal;
-	return (elemVal >= m_maxValue);
+	return true;
 }

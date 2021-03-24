@@ -61,19 +61,25 @@ public:
 BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_maxiter, "max_iters");
-	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_hmin, "min_element_size");
 	ADD_PARAMETER(m_hausd, "hausdorff");
 	ADD_PARAMETER(m_hgrad, "gradation");
+	ADD_PARAMETER(m_relativeSize, "relative_size");
+	ADD_PARAMETER(m_meshCoarsen, "mesh_coarsen");
+	ADD_PARAMETER(m_normalizeData, "normalize_data");
 	ADD_PROPERTY(m_criterion, "criterion", 0);
+	ADD_PROPERTY(m_sfunc, "size_function");
 END_FECORE_CLASS();
 
 FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 {
 	m_maxiter = 1;
 	m_maxelem = 0;
+	m_relativeSize = true;
+	m_meshCoarsen = false;
+	m_normalizeData = true;
 
-	m_scale = 0.5;
+	m_scale = 1.0;
 	m_hmin = 0.0;
 	m_hausd = 0.01;
 	m_hgrad = 1.3;
@@ -82,6 +88,8 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 
 	m_transferMethod = TRANSFER_MLQ;
 	m_nnc = 8;
+
+	m_sfunc = nullptr;
 
 #ifdef HAS_MMG
 	mmg = new FEMMGRemesh::MMG(this);
@@ -272,7 +280,6 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 		return false;
 	}
 
-	vector<double> edgeScale(NN, 1.0);
 	if (m_metric.empty())
 	{
 		// build the edge length table
@@ -328,29 +335,73 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 	}
 
 	// scale factors
+	vector<double> nodeScale(NN, 1.0);
 	FEMeshAdaptorCriterion* criterion = m_mmgRemesh->GetCriterion();
 	if (criterion)
 	{
 		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
+
+		// see if want to normalize the data
+		if (m_mmgRemesh->m_normalizeData)
+		{
+			// Find data range
+			double vmin, vmax;
+			for (int i = 0; i < (int)elemList.size(); ++i)
+			{
+				double v = elemList[i].m_elemValue;
+				if ((i == 0) || (v < vmin)) vmin = v;
+				if ((i == 0) || (v > vmax)) vmax = v;
+			}
+			if (vmax == vmin) vmax++;
+
+			// normalize data
+			for (int i = 0; i < (int)elemList.size(); ++i)
+			{
+				double v = elemList[i].m_elemValue;
+				elemList[i].m_elemValue = (v - vmin) / (vmax - vmin);
+			}
+		}
+
 		for (int i = 0; i < (int)elemList.size(); ++i)
 		{
 			FEElement& el = *mesh.FindElementFromID(elemList[i].m_elementId);
 			for (int j = 0; j < el.Nodes(); ++j)
 			{
-				double s = scale;
-				if (elemList[i].m_scaleFactor != 0.0) s = elemList[i].m_scaleFactor;
-				edgeScale[el.m_node[j]] = s;
+				double s = elemList[i].m_elemValue;
+				FEFunction1D* fs = m_mmgRemesh->m_sfunc;
+				if (fs)
+				{
+					s = fs->value(s);
+				}
+				if (s <= 0.0) s = scale;
+				nodeScale[el.m_node[j]] = s;
 			}
 		}
 	}
 	else
 	{
-		edgeScale.assign(NN, scale);
+		nodeScale.assign(NN, scale);
+	}
+
+	// adjust for relative scale flag
+	if (m_mmgRemesh->m_relativeSize)
+	{
+		for (int k = 0; k < NN; k++) {
+			nodeScale[k] *= m_metric[k];
+		}
+	}
+
+	// determine new size field
+	bool meshCoarsen = m_mmgRemesh->m_meshCoarsen;
+	for (int k = 0; k < NN; k++) 
+	{
+		double s = nodeScale[k];
+		if ((meshCoarsen) || (s < m_metric[k])) m_metric[k] = s;
 	}
 
 	// set the new metric
 	for (int k = 0; k < NN; k++) {
-		MMG3D_Set_scalarSol(mmgSol, m_metric[k]*edgeScale[k], k + 1);
+		MMG3D_Set_scalarSol(mmgSol, m_metric[k], k + 1);
 	}
 
 	return true;

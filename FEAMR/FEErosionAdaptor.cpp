@@ -41,6 +41,8 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEErosionAdaptor, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxIters, "max_iters");
+	ADD_PARAMETER(m_maxelem, "max_elems");
+	ADD_PARAMETER(m_maxValue, "max_value");
 	ADD_PARAMETER(m_bremoveIslands, "remove_islands");
 
 	ADD_PROPERTY(m_criterion, "criterion");
@@ -61,25 +63,40 @@ bool FEErosionAdaptor::Apply(int iteration)
 	if ((m_maxIters >= 0) && (iteration >= m_maxIters))
 	{
 		feLog("\tMax iterations reached.");
-		return true;
+		return false;
 	}
 
-	if (m_criterion == nullptr) return true;
+	// Make sure there is a criterion
+	if (m_criterion == nullptr) return false;
 
+	// get the element selection
 	FEMeshAdaptorSelection selection = m_criterion->GetElementSelection(GetElementSet());
 	if (selection.empty())
 	{
 		feLog("\tNothing to do.\n");
-		return true;
+		return false;
 	}
 
+	// sort the list if the max elem param was set
+	if (m_maxelem > 0) {
+		selection.Sort();
+	}
+
+	// process the list
+	int deactiveElems = 0;
 	for (int i = 0; i < selection.size(); ++i)
 	{
 		FEMeshAdaptorSelection::Item& it = selection[i];
-		FEElement& el = *mesh.FindElementFromID(it.m_elementId);
-		assert(el.isActive());
-		el.setInactive();
+		if (it.m_elemValue >= m_maxValue)
+		{
+			FEElement& el = *mesh.FindElementFromID(it.m_elementId);
+			assert(el.isActive());
+			el.setInactive();
+			deactiveElems++;
+			if ((m_maxelem > 0) && (deactiveElems >= m_maxelem)) break;
+		}
 	}
+	feLog("\tDeactivated elements: %d\n", deactiveElems);
 
 	// remove any islands
 	if (m_bremoveIslands) RemoveIslands();
@@ -147,9 +164,7 @@ bool FEErosionAdaptor::Apply(int iteration)
 	// reactivate the linear constraints
 	LCM.Activate();
 
-	int deactiveElems = selection.size();
-	feLog("\tDeactivated elements: %d\n", deactiveElems);
-	return (deactiveElems == 0);
+	return (deactiveElems != 0);
 }
 
 void FEErosionAdaptor::RemoveIslands()

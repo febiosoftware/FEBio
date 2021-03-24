@@ -47,7 +47,7 @@ public:
 	void SetElementSet(FEElementSet* elemSet);
 	FEElementSet* GetElementSet();
 
-	// The mesh adaptor should return true if the mesh remained unchanged
+	// The mesh adaptor should return true if the mesh was modified. 
 	// otherwise, it should return false.
 	// iteration is the iteration number of the mesh adaptation loop
 	virtual bool Apply(int iteration) = 0;

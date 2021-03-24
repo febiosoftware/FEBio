@@ -47,7 +47,7 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FERefineMesh, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxiter, "max_iters");
-	ADD_PARAMETER(m_maxelem, "max_elems");
+	ADD_PARAMETER(m_maxelem, "max_elements");
 	ADD_PARAMETER(m_bmap_data, "map_data");
 	ADD_PARAMETER(m_nnc      , "nnc");
 	ADD_PARAMETER(m_nsdim  , "nsdim");
@@ -84,14 +84,14 @@ bool FERefineMesh::Apply(int iteration)
 	if ((m_maxiter > 0) && (iteration >= m_maxiter))
 	{
 		feLog("Skipping refinement: Max iterations reached.");
-		return true;
+		return false;
 	}
 
 	// see if we reached max elements
 	if ((m_maxelem > 0) && (mesh.Elements() >= m_maxelem))
 	{
 		feLog("Skipping refinement: Element limit reached.\n");
-		return true;
+		return false;
 	}
 
 	// build the mesh-topo
@@ -109,10 +109,10 @@ bool FERefineMesh::Apply(int iteration)
 
 	// refine the mesh (This is done by sub-classes)
 	feLog("-- Starting Mesh refinement.\n");
-	bool bret = RefineMesh();
-	if (bret == false)
+	if (RefineMesh() == false)
 	{
-		throw std::runtime_error("Failed refining mesh.");
+		feLog("Nothing to refine.");
+		return false;
 	}
 	feLog("-- Mesh refinement completed.\n");
 
@@ -132,7 +132,7 @@ bool FERefineMesh::Apply(int iteration)
 	feLog("\n");
 
 	// all done!
-	return false;
+	return true;
 }
 
 void FERefineMesh::ClearMapData()

@@ -113,13 +113,13 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				Kab[0][1] = -kab.z;
 				Kab[0][2] = kab.y;
 
-				Kab[1][0] += kab.z;
-				Kab[1][1] += 0;
-				Kab[1][2] += -kab.x;
+				Kab[1][0] = kab.z;
+				Kab[1][1] = 0;
+				Kab[1][2] = -kab.x;
 
-				Kab[2][0] += -kab.y;
-				Kab[2][1] += kab.x;
-				Kab[2][2] += 0;
+				Kab[2][0] = -kab.y;
+				Kab[2][1] = kab.x;
+				Kab[2][2] = 0;
 
 				// if prescribed traction is effective, add stiffness component
 				if (traction->m_beffective)
@@ -170,7 +170,6 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 {
 	FESurfaceElement& el = *mp.SurfaceElement();
-	int neln = el.Nodes();
 
 	// calculate nodal normal tractions
 	double tr = m_traction(mp);
@@ -178,8 +177,6 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 	// if the prescribed traction is effective, evaluate the total traction
 	if (m_beffective)
 	{
-		FEMesh& mesh = *m_psurf->GetMesh();
-
 		// fluid pressure
 		tr -= m_psurf->Evaluate(mp, m_dof[3]);
 	}

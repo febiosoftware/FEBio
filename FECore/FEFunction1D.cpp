@@ -69,6 +69,13 @@ BEGIN_FECORE_CLASS(FELinearFunction, FEFunction1D)
 END_FECORE_CLASS();
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FEStepFunction, FEFunction1D)
+	ADD_PARAMETER(m_x0, "x0");
+	ADD_PARAMETER(m_leftVal , "left_val");
+	ADD_PARAMETER(m_rightVal, "right_val");
+END_FECORE_CLASS();
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FEMathFunction, FEFunction1D)
 	ADD_PARAMETER(m_s, "math");
 END_FECORE_CLASS();

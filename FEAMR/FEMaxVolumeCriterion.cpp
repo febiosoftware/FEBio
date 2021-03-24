@@ -27,21 +27,17 @@ SOFTWARE.*/
 #include "FEMaxVolumeCriterion.h"
 #include <FECore/FESolidDomain.h>
 
-BEGIN_FECORE_CLASS(FEMaxVolumeCriterion, FEMeshAdaptorCriterion)
-	ADD_PARAMETER(m_maxVolume, "max_vol");
+BEGIN_FECORE_CLASS(FEElementVolumeCriterion, FEMeshAdaptorCriterion)
 END_FECORE_CLASS();
 
-FEMaxVolumeCriterion::FEMaxVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+FEElementVolumeCriterion::FEElementVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-	m_maxVolume = 0.0;
 }
 
-bool FEMaxVolumeCriterion::Check(FEElement& el, double& elemVal)
+bool FEElementVolumeCriterion::GetElementValue(FEElement& el, double& elemVal)
 {
 	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
 	if (dom == nullptr) return false;
-
 	elemVal = dom->Volume(dynamic_cast<FESolidElement&>(el));
-
-	return (elemVal >= m_maxVolume);
+	return true;
 }

@@ -28,21 +28,20 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEElementSelectionCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_value, "value");
 	ADD_PARAMETER(m_elemList, "element_list");
 END_FECORE_CLASS();
 
 FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-
+	m_value = 1.0;
 }
 
 FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElementSet* elemSet)
 {
-	FEMeshAdaptorSelection elemList(elemSet->Elements());
-	for (int i = 0; i < (int)m_elemList.size(); ++i)
-	{
-		elemList[i].m_elementId = m_elemList[i];
-		elemList[i].m_scaleFactor = 0.0;
-	}
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMeshAdaptorSelection elemList;
+	// TODO: implement this
+	assert(false);
 	return elemList;
 }

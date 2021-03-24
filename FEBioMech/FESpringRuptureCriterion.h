@@ -26,16 +26,22 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
 
-class FESpringRuptureCriterion : public FEMeshAdaptorCriterion
+class FESpringForceCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FESpringRuptureCriterion(FEModel* fem);
+	FESpringForceCriterion(FEModel* fem);
 
-	bool Check(FEElement& el, double& elemVal) override;
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 
-private:
-	double	m_maxForce;
-	double	m_maxStretch;
+	DECLARE_FECORE_CLASS()
+};
+
+class FESpringStretchCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FESpringStretchCriterion(FEModel* fem);
+
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 
 	DECLARE_FECORE_CLASS()
 };

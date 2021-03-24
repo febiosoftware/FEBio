@@ -30,15 +30,12 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include "FEDamageMaterial.h"
 
-class FEMaxDamageCriterion : public FEMeshAdaptorCriterion
+class FEDamageAdaptorCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEMaxDamageCriterion(FEModel* fem);
+	FEDamageAdaptorCriterion(FEModel* fem);
 
-	bool Check(FEElement& el, double& elemVal) override;
-
-private:
-	double	m_maxDamage;
+	bool GetElementValue(FEElement& el, double& elemVal) override;
 
 	DECLARE_FECORE_CLASS()
 };

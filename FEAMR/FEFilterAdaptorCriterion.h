@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,49 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include <FECore/FEMeshAdaptorCriterion.h>
 
-
-
-#include "stdafx.h"
-#include "FEMaxDamageCriterion.h"
-#include "FEElasticMaterial.h"
-#include <FECore/FEElement.h>
-#include <FECore/FEModel.h>
-
-BEGIN_FECORE_CLASS(FEDamageAdaptorCriterion, FEMeshAdaptorCriterion)
-END_FECORE_CLASS();
-
-FEDamageAdaptorCriterion::FEDamageAdaptorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+class FECORE_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
 {
-}
+public:
+	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
 
-bool FEDamageAdaptorCriterion::GetElementValue(FEElement& el, double& elemVal)
-{
-	double D = 0.0;
-	int nint = el.GaussPoints();
-	for (int n = 0; n < nint; ++n)
-	{
-		FEDamageMaterialPoint* dp = nullptr;
-		FEMaterialPoint* mp = el.GetMaterialPoint(n);
-		// for mixtures, we have to make sure we get the right component
-		if (mp->Components() > 1)
-		{
-			for (int i = 0; i < mp->Components(); ++i)
-			{
-				FEMaterialPoint* mpi = mp->GetPointData(i);
-				dp = mpi->ExtractData<FEDamageMaterialPoint>();
-				if (dp) break;
-			}
-		}
-		else dp = mp->ExtractData<FEDamageMaterialPoint>();
-		if (dp == nullptr) return false;
+	bool GetElementValue(FEElement& el, double& elemValue) override;
 
-		// evaluate the damage at this point
-		D += dp->m_D;
-	}
-	D /= (double)nint;
+private:
+	double	m_min;
+	double	m_max;
+	FEMeshAdaptorCriterion*	m_data;
 
-	elemVal = D;
-
-	return true;
-}
+	DECLARE_FECORE_CLASS();
+};

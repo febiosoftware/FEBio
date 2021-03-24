@@ -44,6 +44,7 @@ BEGIN_FECORE_CLASS(FETiedMultiphasicInterface, FEContactInterface)
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_ptol     , "ptol"               );
+    ADD_PARAMETER(m_ctol     , "ctol"               );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
     ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
@@ -304,8 +305,9 @@ FETiedMultiphasicInterface::FETiedMultiphasicInterface(FEModel* pfem) : FEContac
     m_stol = 0.01;
     m_bsymm = true;
     m_srad = 1.0;
-    m_gtol = -1;	// we use augmentation tolerance by default
-    m_ptol = -1;	// we use augmentation tolerance by default
+    m_gtol = 0;
+    m_ptol = 0;
+    m_ctol = 0;
     m_bautopen = false;
     m_bupdtpen = false;
     
@@ -365,9 +367,6 @@ void FETiedMultiphasicInterface::BuildMatrixProfile(FEGlobalMatrix& K)
     const int dof_Z = fem.GetDOFIndex("z");
     const int dof_P = fem.GetDOFIndex("p");
     const int dof_C = fem.GetDOFIndex("concentration", 0);
-    const int dof_RU = fem.GetDOFIndex("Ru");
-    const int dof_RV = fem.GetDOFIndex("Rv");
-    const int dof_RW = fem.GetDOFIndex("Rw");
     
     int nsol = (int)m_sid.size();
     int ndpn = 7 + nsol;
@@ -406,11 +405,8 @@ void FETiedMultiphasicInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                         lm[ndpn*l+1] = id[dof_Y];
                         lm[ndpn*l+2] = id[dof_Z];
                         lm[ndpn*l+3] = id[dof_P];
-                        lm[ndpn*l+4] = id[dof_RU];
-                        lm[ndpn*l+5] = id[dof_RV];
-                        lm[ndpn*l+6] = id[dof_RW];
                         for (int m=0; m<nsol; ++m) {
-                            lm[ndpn*l+7+m] = id[dof_C + m_sid[m]];
+                            lm[ndpn*l+4+m] = id[dof_C + m_sid[m]];
                         }
                     }
                     
@@ -421,11 +417,8 @@ void FETiedMultiphasicInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                         lm[ndpn*(l+nseln)+1] = id[dof_Y];
                         lm[ndpn*(l+nseln)+2] = id[dof_Z];
                         lm[ndpn*(l+nseln)+3] = id[dof_P];
-                        lm[ndpn*(l+nseln)+4] = id[dof_RU];
-                        lm[ndpn*(l+nseln)+5] = id[dof_RV];
-                        lm[ndpn*(l+nseln)+6] = id[dof_RW];
                         for (int m=0; m<nsol; ++m) {
-                            lm[ndpn*(l+nseln)+7+m] = id[dof_C + m_sid[m]];
+                            lm[ndpn*(l+nseln)+4+m] = id[dof_C + m_sid[m]];
                         }
                     }
                     
@@ -713,9 +706,6 @@ double FETiedMultiphasicInterface::AutoConcentrationPenalty(FESurfaceElement& el
 // Perform initial projection between tied surfaces in reference configuration
 void FETiedMultiphasicInterface::InitialProjection(FETiedMultiphasicSurface& ss, FETiedMultiphasicSurface& ms)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    double R = m_srad*mesh.GetBoundingBox().radius();
-    
     FESurfaceElement* pme;
     vec3d r, nu;
     double rs[2];
@@ -792,6 +782,7 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
         int nint = el.GaussPoints();
         
         // get the nodal pressures
+        p1 = 0;
         if (sporo)
         {
             for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).get(m_dofP);
@@ -1382,7 +1373,7 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
                                 ke[k+3][l  ] += gac.x; ke[k+3][l+1] += gac.y; ke[k+3][l+2] += gac.z;
                                 for (int isol=0; isol<nsol; ++isol) {
                                     double epsc = m_epsc*pt.m_epsc[sl[isol]];
-                                    vec3d hac = (as[c]*(Hs[a]*jn[isol][j]))*(dt*detJ[j]*w[j]);
+                                    vec3d hac = (as[c]*(Hs[a]*jn[isol][j])*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l  ] += hac.x; ke[k+4+isol][l+1] += hac.y; ke[k+4+isol][l+2] += hac.z;
                                 }
                             }
@@ -1395,7 +1386,7 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
                                 ke[k+3][l  ] += gbc.x; ke[k+3][l+1] += gbc.y; ke[k+3][l+2] += gbc.z;
                                 for (int isol=0; isol<nsol; ++isol) {
                                     double epsc = m_epsc*pt.m_epsc[sl[isol]];
-                                    vec3d hbc = (-as[c]*(Hm[b]*jn[isol][j]))*(dt*detJ[j]*w[j]);
+                                    vec3d hbc = (-as[c]*(Hm[b]*jn[isol][j])*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l  ] += hbc.x; ke[k+4+isol][l+1] += hbc.y; ke[k+4+isol][l+2] += hbc.z;
                                 }
                             }

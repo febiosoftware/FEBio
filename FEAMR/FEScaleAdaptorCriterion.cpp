@@ -35,9 +35,6 @@ END_FECORE_CLASS();
 FEScaleAdaptorCriterion::FEScaleAdaptorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
 	m_scale = 1.0;
-
-	// set sort on by default
-	SetSort(true);
 }
 
 FEMeshAdaptorSelection FEScaleAdaptorCriterion::GetElementSelection(FEElementSet* elemSet)
@@ -57,13 +54,16 @@ FEMeshAdaptorSelection FEScaleAdaptorCriterion::GetElementSelection(FEElementSet
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
+		double v = 0.0;
 		for (int j = 0; j < ni; ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-
 			double s = m_scale(mp);
-			elemList.push_back(el.GetID(), s);
+			v += s;
 		}
+		v /= (double)ni;
+
+		elemList.push_back(el.GetID(), v);
 	}
 
 	// create the element list of elements that need to be refined

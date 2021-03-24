@@ -30,27 +30,22 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include <algorithm>
 
+//=============================================================================
+void FEMeshAdaptorSelection::Sort()
+{
+	std::sort(m_itemList.begin(), m_itemList.end(), [](Item& e1, Item& e2) {
+		return (e1.m_elemValue > e2.m_elemValue);
+	});
+}
+
+//=============================================================================
 REGISTER_SUPER_CLASS(FEMeshAdaptorCriterion, FEMESHADAPTORCRITERION_ID);
 
 BEGIN_FECORE_CLASS(FEMeshAdaptorCriterion, FECoreBase)
-	ADD_PARAMETER(m_sortList, "sort");
-	ADD_PARAMETER(m_maxelem, "max_elems");
 END_FECORE_CLASS();
 
 FEMeshAdaptorCriterion::FEMeshAdaptorCriterion(FEModel* fem) : FECoreBase(fem)
 {
-	m_sortList = false;
-	m_maxelem = 0;
-}
-
-void FEMeshAdaptorCriterion::SetSort(bool b)
-{
-	m_sortList = b;
-}
-
-void FEMeshAdaptorCriterion::SetMaxElements(int m)
-{
-	m_maxelem = m;
 }
 
 // return a list of elements that satisfy the criterion
@@ -63,52 +58,25 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 	FEElementIterator it(&mesh, elemSet);
 
 	// loop over elements
-	int nselected = 0;
-	int nelem = 0;
-	vector< pair<int, double> > elem;
+	FEMeshAdaptorSelection selectedElements;
 	for (;it.isValid(); ++it)
 	{
 		FEElement& el = *it;
 		if (el.isActive())
 		{
 			double elemVal = 0.0;
-			bool bselect = Check(el, elemVal);
-			if (bselect)
+			if (GetElementValue(el, elemVal))
 			{
 				int nid = el.GetID();
-				if (elemSet) nid = (*elemSet)[nelem];
-				elem.push_back(pair<int, double>(nid, elemVal));
-				nselected++;
+				selectedElements.push_back(nid, elemVal);
 			}
 		}
-		nelem++;
 	}
 
-	FEMeshAdaptorSelection selectedElement;
-	if (nselected > 0)
-	{
-		// sort the list
-		if (m_sortList) {
-			std::sort(elem.begin(), elem.end(), [](pair<int, double>& e1, pair<int, double>& e2) {
-				return e1.second > e2.second;
-			});
-		}
-
-		int nelem = elem.size();
-		if ((m_maxelem > 0) && (nelem > m_maxelem)) nelem = m_maxelem;
-
-		selectedElement.resize(nelem);
-		for (int i = 0; i < nelem; ++i)
-		{
-			selectedElement[i].m_elementId   = elem[i].first;
-			selectedElement[i].m_scaleFactor = 0.0;
-		}
-	}
-
-	return selectedElement;
+	return selectedElements;
 }
 
-bool FEMeshAdaptorCriterion::Check(FEElement& el, double& elemVal)
+bool FEMeshAdaptorCriterion::GetElementValue(FEElement& el, double& elemVal)
 {
 	return false;
 }

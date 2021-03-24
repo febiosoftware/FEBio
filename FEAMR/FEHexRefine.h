@@ -45,6 +45,8 @@ protected:
 
 private:
 	int		m_elemRefine;		// max nr of elements to refine per step
+	double	m_maxValue;
+
 	vector<int>	m_elemList;
 	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
 	vector<int>	m_faceList;	// list of face flags to see whether the face was split

@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEMaxVolumeCriterion.h"
 #include "FEElementSelectionCriterion.h"
 #include "FEScaleAdaptorCriterion.h"
+#include "FEFilterAdaptorCriterion.h"
 
 //-----------------------------------------------------------------------------
 void FEAMR::InitModule()
@@ -49,8 +50,9 @@ REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
 REGISTER_FECORE_CLASS(FETestRefine    , "test_refine");
 
 // adaptor criteria
-REGISTER_FECORE_CLASS(FEMaxVolumeCriterion       , "max_volume");
-REGISTER_FECORE_CLASS(FEMaxVariableCriterion     , "max_variable");
+REGISTER_FECORE_CLASS(FEElementVolumeCriterion   , "max_volume");
+REGISTER_FECORE_CLASS(FEVariableCriterion        , "max_variable");
 REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
 REGISTER_FECORE_CLASS(FEScaleAdaptorCriterion    , "scale");
+REGISTER_FECORE_CLASS(FEMinMaxFilterAdaptorCriterion, "min-max filter");
 }

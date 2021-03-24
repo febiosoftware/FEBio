@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\FEAMR\FETestRefine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEAMR\FEFilterAdaptorCriterion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEAMR\FERefineMesh.h">

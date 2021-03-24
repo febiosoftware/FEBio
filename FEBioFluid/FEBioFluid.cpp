@@ -239,7 +239,7 @@ REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptorCriterion
-REGISTER_FECORE_CLASS(FEFMaxFluidStressCriterion, "max fluid shear stress");
+REGISTER_FECORE_CLASS(FEFluidStressCriterion     , "fluid shear stress");
 REGISTER_FECORE_CLASS(FEFluidStressErrorCriterion, "fluid shear stress error");
 
     febio.SetActiveModule(0);
