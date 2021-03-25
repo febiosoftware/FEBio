@@ -243,70 +243,9 @@ bool DataRecord::Write()
 
 //-----------------------------------------------------------------------------
 
-void DataRecord::SetItemList(const char* szlist)
+void DataRecord::SetItemList(const std::vector<int>& items)
 {
-	int i, n = 0, n0, n1, nn;
-	char* ch;
-	char* sz = (char*) szlist;
-	int nread;
-	do
-	{
-		ch = strchr(sz, ',');
-		if (ch) *ch = 0;
-		nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
-		switch (nread)
-		{
-		case 1:
-			n1 = n0;
-			nn = 1;
-			break;
-		case 2:
-			nn = 1;
-			break;
-		case 3:
-			break;
-		default:
-			n0 = 0;
-			n1 = -1;
-			nn = 1;
-		}
-
-		for (i=n0; i<=n1; i += nn) ++n;
-
-		if (ch) *ch = ',';
-		sz = ch+1;
-	}
-	while (ch != 0);
-
-	if (n != 0)
-	{
-		m_item.resize(n);
-
-		sz = (char*) szlist;
-		n = 0;
-		do
-		{
-			ch = strchr(sz, ',');
-			if (ch) *ch = 0;
-			nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
-			switch (nread)
-			{
-			case 1:
-				n1 = n0;
-				nn = 1;
-				break;
-			case 2:
-				nn = 1;
-			}
-
-			for (i=n0; i<=n1; i += nn) m_item[n++] = i;
-			assert(n <= (int) m_item.size());
-
-			if (ch) *ch = ',';
-			sz = ch+1;
-		}
-		while (ch != 0);
-	}
+	m_item = items;
 }
 
 //-----------------------------------------------------------------------------
@@ -327,7 +266,7 @@ void DataRecord::Serialize(DumpStream &ar)
 	// when we're loading we need to reinitialize the file
 	if (ar.IsLoading())
 	{
-		Parse(m_szdata);
+		SetData(m_szdata);
 
 		if (m_fp) fclose(m_fp);
 		m_fp = 0;

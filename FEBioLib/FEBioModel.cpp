@@ -31,8 +31,9 @@ SOFTWARE.*/
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioXML/FERestartImport.h"
-#include "FECore/NodeDataRecord.h"
-#include "FECore/ElementDataRecord.h"
+#include <FECore/NodeDataRecord.h>
+#include <FECore/FaceDataRecord.h>
+#include <FECore/ElementDataRecord.h>
 #include <FEBioMech/ObjectDataRecord.h>
 #include <FECore/NLConstraintDataRecord.h>
 #include <FEBioMech/FERigidConnector.h>
@@ -1361,6 +1362,7 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 			switch(ntype)
 			{
 			case FE_DATA_NODE: pd = new NodeDataRecord        (this, 0); break;
+			case FE_DATA_FACE: pd = new FaceDataRecord        (this, 0); break;
 			case FE_DATA_ELEM: pd = new ElementDataRecord     (this, 0); break;
 			case FE_DATA_RB  : pd = new ObjectDataRecord      (this, 0); break;
 			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this, 0); break;

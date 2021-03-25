@@ -47,7 +47,7 @@ NodeDataRecord::NodeDataRecord(FEModel* pfem, const char* szfile) : DataRecord(p
 int NodeDataRecord::Size() const { return (int)m_Data.size(); }
 
 //-----------------------------------------------------------------------------
-void NodeDataRecord::Parse(const char* szexpr)
+void NodeDataRecord::SetData(const char* szexpr)
 {
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
@@ -99,7 +99,7 @@ void NodeDataRecord::SelectAllItems()
 // This sets the item list based on a node set.
 // Note that node sets store the nodes in a zero-based list. However, we need
 // a one-base list here.
-void NodeDataRecord::SetItemList(FENodeSet* pns)
+void NodeDataRecord::SetNodeSet(FENodeSet* pns)
 {
 	int n = pns->Size();
 	assert(n);

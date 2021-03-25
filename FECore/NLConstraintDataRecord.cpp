@@ -34,7 +34,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FELogNLConstraintData, FENLCLOGDATA_ID);
 
 //-----------------------------------------------------------------------------
-void NLConstraintDataRecord::Parse(const char* szexpr)
+void NLConstraintDataRecord::SetData(const char* szexpr)
 {
     char szcopy[MAX_STRING] = {0};
     strcpy(szcopy, szexpr);

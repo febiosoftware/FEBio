@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FERigidConnector.h"
 #include "FEVolumeConstraint.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(int nnode) 
@@ -191,6 +192,41 @@ double FENodeForceZ::value(int nnode)
 	return 0;
 }
 
+//-----------------------------------------------------------------------------
+double FELogContactGap::value(FESurfaceElement& el)
+{
+	double g = 0.0;
+	for (int i = 0; i < el.GaussPoints(); ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEContactMaterialPoint* cp = mp.ExtractData<FEContactMaterialPoint>();
+		if (cp)
+		{
+			g += cp->m_gap;
+		}
+	}
+	g /= (double)el.GaussPoints();
+
+	return g;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactPressure::value(FESurfaceElement& el)
+{
+	double Lm = 0.0;
+	for (int i = 0; i < el.GaussPoints(); ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEContactMaterialPoint* cp = mp.ExtractData<FEContactMaterialPoint>();
+		if (cp)
+		{
+			Lm += cp->m_Ln;
+		}
+	}
+	Lm /= (double)el.GaussPoints();
+
+	return Lm;
+}
 
 //-----------------------------------------------------------------------------
 double FELogElemPosX::value(FEElement& el)

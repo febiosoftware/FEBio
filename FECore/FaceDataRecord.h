@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,50 +23,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FECoreBase.h"
 #include "DataRecord.h"
 
-class FEElement;
-class FEElementSet;
+class FESurface;
+class FESurfaceElement;
 
 //-----------------------------------------------------------------------------
-//! Base class for element log data
-class FECORE_API FELogElemData : public FECoreBase
+//! This is the base class for a face data value.
+class FECORE_API FEFaceLogData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
 
 public:
-	FELogElemData(FEModel* fem);
-	virtual ~FELogElemData();
-	virtual double value(FEElement& el) = 0;
+	FEFaceLogData(FEModel* fem);
+	virtual ~FEFaceLogData();
+	virtual double value(FESurfaceElement& el) = 0;
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API ElementDataRecord : public DataRecord
+//! This class records surface data
+class FECORE_API FaceDataRecord : public DataRecord
 {
-	struct ELEMREF
-	{
-		int	ndom;
-		int	nid;
-	};
-
 public:
-	ElementDataRecord(FEModel* pfem, const char* szfile);
+	FaceDataRecord(FEModel* pfem, const char* szfile);
 	double Evaluate(int item, int ndata);
-	void SetData(const char* sz);
-	void SelectAllItems();
+	bool Initialize() override;
+	void SetData(const char* sz)  override;
+	void SelectAllItems() override;
+	void SetSurface(FESurface* surf);
+	void SetSurface(FESurface* surf, const std::vector<int>& items);
 	int Size() const;
-	void SetElementSet(FEElementSet* pg);
 
-protected:
-	void BuildELT();
-
-protected:
-	vector<ELEMREF>	m_ELT;
-	int				m_offset;
-	vector<FELogElemData*>	m_Data;
+private:
+	FESurface*	m_surface;
+	vector<FEFaceLogData*>	m_Data;
 };

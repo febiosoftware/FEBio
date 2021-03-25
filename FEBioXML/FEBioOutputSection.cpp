@@ -28,13 +28,50 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioOutputSection.h"
-#include "FECore/NodeDataRecord.h"
-#include "FECore/ElementDataRecord.h"
+#include <FECore/NodeDataRecord.h>
+#include <FECore/FaceDataRecord.h>
+#include <FECore/ElementDataRecord.h>
 #include <FEBioMech/ObjectDataRecord.h>
-#include "FECore/NLConstraintDataRecord.h"
-#include "FECore/FEModel.h"
+#include <FECore/NLConstraintDataRecord.h>
+#include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
+
+bool string_to_int_vector(const char* szlist, std::vector<int>& list)
+{
+	list.clear();
+	if (szlist == nullptr) return false;
+	if (szlist[0] == 0) return true;
+
+	char* ch = nullptr;
+	char* sz = (char*)szlist;
+	do
+	{
+		ch = strchr(sz, ',');
+		if (ch) *ch = 0;
+		int n0, n1, nn;
+		int nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+		switch (nread)
+		{
+		case 0: return false;
+			break;
+		case 1:
+			n1 = n0;
+			nn = 1;
+			break;
+		case 2:
+			nn = 1;
+		}
+
+		for (int i = n0; i <= n1; i += nn) list.push_back(i);
+
+		if (ch) *ch = ',';
+		sz = ch + 1;
+	}
+	while (ch != 0);
+
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::Parse(XMLTag& tag)
@@ -108,191 +145,158 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 	}
 
+	// get the (optional) file attribute
+	char szfilename[1024] = { 0 };
+	const char* szfile = tag.AttributeValue("file", true);
+	if (szfile)
+	{
+		// if we have a path, prepend the path's name
+		if (szpath && szpath[0])
+		{
+			sprintf(szfilename, "%s%s", szpath, szfile);
+		}
+		else strcpy(szfilename, szfile);
+		szfile = szfilename;
+	}
+
+	// get other attributes
+	const char* szdelim   = tag.AttributeValue("delim" , true);
+	const char* szformat  = tag.AttributeValue("format", true);
+
+	bool bcomment = true;
+	const char* szcomment = tag.AttributeValue("comments", true);
+	if (szcomment != 0)
+	{
+		if      (strcmp(szcomment, "on" ) == 0) bcomment = true;
+		else if (strcmp(szcomment, "off") == 0) bcomment = false;
+	}
+
 	if (tag.isleaf()) return;
 	++tag;
 	do
 	{
 		if (tag == "node_data")
 		{
-			const char* sz = tag.AttributeValue("file", true);
-
-			NodeDataRecord* prec = 0;
-			if (sz)
-			{
-				// if we have a path, prepend the path's name
-				char szfile[1024] = {0};
-				if (szpath && szpath[0])
-				{
-					sprintf(szfile, "%s%s", szpath, sz);
-				}
-				else strcpy(szfile, sz);
-
-				prec = new NodeDataRecord(&fem, szfile);
-			}
-			else prec = new NodeDataRecord(&fem, 0);
+			NodeDataRecord* prec = new NodeDataRecord(&fem, szfile);
 
 			const char* szdata = tag.AttributeValue("data");
-			prec->Parse(szdata);
+			prec->SetData(szdata);
 
 			const char* szname = tag.AttributeValue("name", true);
-			if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
-
-			sz = tag.AttributeValue("delim", true);
-			if (sz != 0) prec->SetDelim(sz);
-
-			sz = tag.AttributeValue("format", true);
-			if (sz!=0) prec->SetFormat(sz);
-
-			sz = tag.AttributeValue("comments", true);
-			if (sz != 0)
-			{
-				if      (strcmp(sz, "on") == 0) prec->SetComments(true);
-				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
-			}
+			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+			if (szdelim  != 0) prec->SetDelim(szdelim);
+			if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
 
 			const char* sztmp = "set";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
-			sz = tag.AttributeValue(sztmp, true);
+			const char* sz = tag.AttributeValue(sztmp, true);
 			if (sz)
 			{
 				FENodeSet* pns = mesh.FindNodeSet(sz);
 				if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
-				prec->SetItemList(pns);
+				prec->SetNodeSet(pns);
 			}
-			else prec->DataRecord::SetItemList(tag.szvalue());
+			else
+			{
+				std::vector<int> items;
+				string_to_int_vector(tag.szvalue(), items);
+				prec->SetItemList(items);
+			}
+
+			GetFEBioImport()->AddDataRecord(prec);
+		}
+		else if (tag == "face_data")
+		{
+			FaceDataRecord* prec = new FaceDataRecord(&fem, szfile);
+
+			const char* szdata = tag.AttributeValue("data");
+			prec->SetData(szdata);
+
+			const char* szname = tag.AttributeValue("name", true);
+			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+			if (szdelim  != 0) prec->SetDelim(szdelim);
+			if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			const char* sz = tag.AttributeValue("surface");
+			FESurface* surf = mesh.FindSurface(sz);
+			if (surf == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+
+			std::vector<int> items;
+			string_to_int_vector(tag.szvalue(), items);
+
+			prec->SetSurface(surf, items);
 
 			GetFEBioImport()->AddDataRecord(prec);
 		}
 		else if (tag == "element_data")
 		{
-			const char* sz = tag.AttributeValue("file", true);
-
-			ElementDataRecord* prec = 0;
-			if (sz)
-			{
-				// if we have a path, prepend the path's name
-				char szfile[1024] = {0};
-				if (szpath && szpath[0])
-				{
-					sprintf(szfile, "%s%s", szpath, sz);
-				}
-				else strcpy(szfile, sz);
-				prec = new ElementDataRecord(&fem, szfile);
-			}
-			else prec = new ElementDataRecord(&fem, 0);
+			ElementDataRecord* prec = new ElementDataRecord(&fem, szfile);
 
 			const char* szdata = tag.AttributeValue("data");
-			prec->Parse(szdata);
+			prec->SetData(szdata);
 
 			const char* szname = tag.AttributeValue("name", true);
-			if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
-
-			sz = tag.AttributeValue("delim", true);
-			if (sz != 0) prec->SetDelim(sz);
-
-			sz = tag.AttributeValue("format", true);
-			if (sz!=0) prec->SetFormat(sz);
-
-			sz = tag.AttributeValue("comments", true);
-			if (sz != 0)
-			{
-				if      (strcmp(sz, "on") == 0) prec->SetComments(true);
-				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
-			}
+			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+			if (szdelim  != 0) prec->SetDelim(szdelim);
+			if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
 
 			const char* sztmp = "elset";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "elem_set";
 
-			sz = tag.AttributeValue(sztmp, true);
+			const char* sz = tag.AttributeValue(sztmp, true);
 			if (sz)
 			{
 				FEElementSet* pes = mesh.FindElementSet(sz);
 				if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
-				prec->SetItemList(pes);
+				prec->SetElementSet(pes);
 			}
-			else prec->DataRecord::SetItemList(tag.szvalue());
+			else
+			{
+				std::vector<int> items;
+				string_to_int_vector(tag.szvalue(), items);
+				prec->SetItemList(items);
+			}
 
 			GetFEBioImport()->AddDataRecord(prec);
 		}
 		else if (tag == "rigid_body_data")
 		{
-			const char* sz = tag.AttributeValue("file", true);
-
-			ObjectDataRecord* prec = 0;
-			if (sz)
-			{
-				// if we have a path, prepend the path's name
-				char szfile[1024] = {0};
-				if (szpath && szpath[0])
-				{
-					sprintf(szfile, "%s%s", szpath, sz);
-				}
-				else strcpy(szfile, sz);
-				prec = new ObjectDataRecord(&fem, szfile);
-			}
-			else prec = new ObjectDataRecord(&fem, 0);
+			ObjectDataRecord* prec = new ObjectDataRecord(&fem, szfile);
 
 			const char* szdata = tag.AttributeValue("data");
-			prec->Parse(szdata);
+			prec->SetData(szdata);
 
 			const char* szname = tag.AttributeValue("name", true);
-			if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
+			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+			if (szdelim  != 0) prec->SetDelim(szdelim);
+			if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
 
-			sz = tag.AttributeValue("delim", true);
-			if (sz != 0) prec->SetDelim(sz);
-
-			sz = tag.AttributeValue("format", true);
-			if (sz!=0) prec->SetFormat(sz);
-
-			sz = tag.AttributeValue("comments", true);
-			if (sz != 0)
-			{
-				if      (strcmp(sz, "on") == 0) prec->SetComments(true);
-				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
-			}
-
-			prec->SetItemList(tag.szvalue());
+			std::vector<int> items;
+			string_to_int_vector(tag.szvalue(), items);
+			prec->SetItemList(items);
 
 			GetFEBioImport()->AddDataRecord(prec);
 		}
         else if (tag == "rigid_connector_data")
         {
-            const char* sz = tag.AttributeValue("file", true);
-            
-            NLConstraintDataRecord* prec = 0;
-            if (sz)
-            {
-                // if we have a path, prepend the path's name
-                char szfile[1024] = {0};
-                if (szpath && szpath[0])
-                {
-                    sprintf(szfile, "%s%s", szpath, sz);
-                }
-                else strcpy(szfile, sz);
-                prec = new NLConstraintDataRecord(&fem, szfile);
-            }
-            else prec = new NLConstraintDataRecord(&fem, 0);
+            NLConstraintDataRecord* prec = new NLConstraintDataRecord(&fem, szfile);
             
             const char* szdata = tag.AttributeValue("data");
-            prec->Parse(szdata);
+            prec->SetData(szdata);
             
             const char* szname = tag.AttributeValue("name", true);
-            if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
-            
-            sz = tag.AttributeValue("delim", true);
-            if (sz != 0) prec->SetDelim(sz);
-            
-            sz = tag.AttributeValue("format", true);
-            if (sz!=0) prec->SetFormat(sz);
-            
-            sz = tag.AttributeValue("comments", true);
-            if (sz != 0)
-            {
-                if      (strcmp(sz, "on") == 0) prec->SetComments(true);
-                else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
-            }
-            
-            prec->SetItemList(tag.szvalue());
+            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+            if (szdelim  != 0) prec->SetDelim(szdelim);
+            if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			std::vector<int> items;
+			string_to_int_vector(tag.szvalue(), items);
+			prec->SetItemList(items);
             
 			GetFEBioImport()->AddDataRecord(prec);
         }

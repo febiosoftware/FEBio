@@ -238,6 +238,7 @@ enum SUPER_CLASS_ID {
 	FEANALYSIS_ID,               	// derived from FEAnalysis
 	FESURFACEPAIRINTERACTION_ID, 	// derived from FESurfacePairInteraction
 	FENODELOGDATA_ID,            	// derived from FENodeLogData
+	FEFACELOGDATA_ID,				// derived from FEFaceLogData
 	FEELEMLOGDATA_ID,            	// derived from FELogElemata
 	FEOBJLOGDATA_ID,            	// derived from FELogObjectData
 	FEBC_ID,						// derived from FEBoundaryCondition (TODO: This does not work yet)

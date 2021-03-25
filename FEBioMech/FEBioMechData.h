@@ -27,11 +27,12 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/NodeDataRecord.h"
-#include "FECore/ElementDataRecord.h"
+#include <FECore/NodeDataRecord.h>
+#include <FECore/ElementDataRecord.h>
+#include <FECore/FaceDataRecord.h>
 #include "ObjectDataRecord.h"
-#include "FECore/NLConstraintDataRecord.h"
-#include "FECore/FENLConstraint.h"
+#include <FECore/NLConstraintDataRecord.h>
+#include <FECore/FENLConstraint.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -155,6 +156,26 @@ class FENodeForceZ: public FENodeLogData
 public: 
 	FENodeForceZ(FEModel* pfem) : FENodeLogData(pfem){} 
 	double value(int node); 
+};
+
+//=============================================================================
+// F A C E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+class FELogContactGap : public FEFaceLogData
+{
+public:
+	FELogContactGap(FEModel* fem) : FEFaceLogData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactPressure : public FEFaceLogData
+{
+public:
+	FELogContactPressure(FEModel* fem) : FEFaceLogData(fem) {}
+	double value(FESurfaceElement& el) override;
 };
 
 //=============================================================================
