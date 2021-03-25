@@ -64,8 +64,20 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 		FEElement& el = *it;
 		if (el.isActive())
 		{
+			// evaluate element average
+			bool bvalid = true;
 			double elemVal = 0.0;
-			if (GetElementValue(el, elemVal))
+			int ni = el.GaussPoints();
+			for (int i = 0; i < ni; ++i)
+			{
+				double vali = 0.0;
+				bool b = GetMaterialPointValue(*el.GetMaterialPoint(i), vali);
+				if (b) elemVal += vali;
+				bvalid = (bvalid && b);
+			}
+			elemVal /= (double)ni;
+
+			if (bvalid)
 			{
 				int nid = el.GetID();
 				selectedElements.push_back(nid, elemVal);
@@ -76,7 +88,7 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 	return selectedElements;
 }
 
-bool FEMeshAdaptorCriterion::GetElementValue(FEElement& el, double& elemVal)
+bool FEMeshAdaptorCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& elemVal)
 {
 	return false;
 }

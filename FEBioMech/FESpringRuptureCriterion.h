@@ -31,7 +31,7 @@ class FESpringForceCriterion : public FEMeshAdaptorCriterion
 public:
 	FESpringForceCriterion(FEModel* fem);
 
-	bool GetElementValue(FEElement& el, double& elemVal) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
 	DECLARE_FECORE_CLASS()
 };
@@ -41,7 +41,7 @@ class FESpringStretchCriterion : public FEMeshAdaptorCriterion
 public:
 	FESpringStretchCriterion(FEModel* fem);
 
-	bool GetElementValue(FEElement& el, double& elemVal) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
 	DECLARE_FECORE_CLASS()
 };

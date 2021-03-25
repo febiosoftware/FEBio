@@ -35,7 +35,7 @@ class FEScaleAdaptorCriterion : public FEMeshAdaptorCriterion
 public:
 	FEScaleAdaptorCriterion(FEModel* fem);
 
-	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
 private:
 	FEParamDouble	m_scale;

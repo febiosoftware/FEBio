@@ -47,7 +47,7 @@ class FEMMGRemesh::MMG
 {
 public:
 	MMG(FEMMGRemesh* mmgRemesh) : m_mmgRemesh(mmgRemesh) {}
-	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, double scale);
+	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo);
 	bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem);
 
 public:
@@ -59,7 +59,6 @@ public:
 #endif
 
 BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
-	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_hmin, "min_element_size");
 	ADD_PARAMETER(m_hausd, "hausdorff");
@@ -67,8 +66,8 @@ BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
 	ADD_PARAMETER(m_relativeSize, "relative_size");
 	ADD_PARAMETER(m_meshCoarsen, "mesh_coarsen");
 	ADD_PARAMETER(m_normalizeData, "normalize_data");
-	ADD_PROPERTY(m_criterion, "criterion", 0);
-	ADD_PROPERTY(m_sfunc, "size_function");
+	ADD_PROPERTY(m_criterion, "criterion");
+	ADD_PROPERTY(m_sfunc, "size_function", 0);
 END_FECORE_CLASS();
 
 FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
@@ -77,9 +76,8 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 	m_maxelem = 0;
 	m_relativeSize = true;
 	m_meshCoarsen = false;
-	m_normalizeData = true;
+	m_normalizeData = false;
 
-	m_scale = 1.0;
 	m_hmin = 0.0;
 	m_hausd = 0.01;
 	m_hgrad = 1.3;
@@ -120,7 +118,7 @@ bool FEMMGRemesh::RefineMesh()
 
 	// --- build the MMG mesh ---
 	FEMeshTopo& topo = *m_topo;
-	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, m_scale) == false) return false;
+	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo) == false) return false;
 	
 	// set the control parameters
 	MMG3D_Set_dparameter(mmgMesh, mmgSol, MMG3D_DPARAM_hmin, m_hmin);
@@ -156,7 +154,7 @@ bool FEMMGRemesh::RefineMesh()
 
 #ifdef HAS_MMG
 
-bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, double scale)
+bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo)
 {
 	FEMesh& mesh = *topo.GetMesh();
 	int NN = mesh.Nodes();
@@ -335,52 +333,57 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 	}
 
 	// scale factors
-	vector<double> nodeScale(NN, 1.0);
+	vector<double> nodeScale(NN, 0.0);
 	FEMeshAdaptorCriterion* criterion = m_mmgRemesh->GetCriterion();
-	if (criterion)
+
+	assert(criterion);
+	if (criterion == nullptr) return false;
+	FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
+
+	// see if want to normalize the data
+	if (m_mmgRemesh->m_normalizeData)
 	{
-		FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
-
-		// see if want to normalize the data
-		if (m_mmgRemesh->m_normalizeData)
-		{
-			// Find data range
-			double vmin, vmax;
-			for (int i = 0; i < (int)elemList.size(); ++i)
-			{
-				double v = elemList[i].m_elemValue;
-				if ((i == 0) || (v < vmin)) vmin = v;
-				if ((i == 0) || (v > vmax)) vmax = v;
-			}
-			if (vmax == vmin) vmax++;
-
-			// normalize data
-			for (int i = 0; i < (int)elemList.size(); ++i)
-			{
-				double v = elemList[i].m_elemValue;
-				elemList[i].m_elemValue = (v - vmin) / (vmax - vmin);
-			}
-		}
-
+		// Find data range
+		double vmin, vmax;
 		for (int i = 0; i < (int)elemList.size(); ++i)
 		{
-			FEElement& el = *mesh.FindElementFromID(elemList[i].m_elementId);
-			for (int j = 0; j < el.Nodes(); ++j)
-			{
-				double s = elemList[i].m_elemValue;
-				FEFunction1D* fs = m_mmgRemesh->m_sfunc;
-				if (fs)
-				{
-					s = fs->value(s);
-				}
-				if (s <= 0.0) s = scale;
-				nodeScale[el.m_node[j]] = s;
-			}
+			double v = elemList[i].m_elemValue;
+			if ((i == 0) || (v < vmin)) vmin = v;
+			if ((i == 0) || (v > vmax)) vmax = v;
+		}
+		if (vmax == vmin) vmax++;
+
+		// normalize data
+		for (int i = 0; i < (int)elemList.size(); ++i)
+		{
+			double v = elemList[i].m_elemValue;
+			elemList[i].m_elemValue = (v - vmin) / (vmax - vmin);
 		}
 	}
-	else
+
+	// map to nodal data
+	vector<int> tag(NN, 0);
+	for (int i = 0; i < (int)elemList.size(); ++i)
 	{
-		nodeScale.assign(NN, scale);
+		FEElement& el = *mesh.FindElementFromID(elemList[i].m_elementId);
+		for (int j = 0; j < el.Nodes(); ++j)
+		{
+			double s = elemList[i].m_elemValue;
+			FEFunction1D* fs = m_mmgRemesh->m_sfunc;
+			if (fs)
+			{
+				s = fs->value(s);
+			}
+			assert(s > 0.0);
+			if (s <= 0.0) return false;
+			nodeScale[el.m_node[j]] += s;
+			tag[el.m_node[j]]++;
+		}
+	}
+	for (int i = 0; i < NN; ++i)
+	{
+		if (tag[i] > 0) nodeScale[i] /= (double)tag[i];
+		else nodeScale[i] = (m_mmgRemesh->m_relativeSize ? 1.0 : m_metric[i]);
 	}
 
 	// adjust for relative scale flag

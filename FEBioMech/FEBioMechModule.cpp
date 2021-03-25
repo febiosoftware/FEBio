@@ -227,7 +227,6 @@ SOFTWARE.*/
 #include "FEPrescribedNormalDisplacement.h"
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
-#include "FEStressErrorCriterion.h"
 #include "FESpringRuptureCriterion.h"
 
 #include "FEInitialVelocity.h"
@@ -841,7 +840,6 @@ void FEBioMech::InitModule()
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
-	REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
 	REGISTER_FECORE_CLASS(FESpringForceCriterion, "spring force");
 	REGISTER_FECORE_CLASS(FESpringStretchCriterion, "spring stretch");
 

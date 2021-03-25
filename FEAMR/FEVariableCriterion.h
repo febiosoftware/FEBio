@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,18 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEStressErrorCriterion.h"
-#include "FEElasticMaterial.h"
+#pragma once
+#include <FECore/FEMeshAdaptorCriterion.h>
 
-FEStressErrorCriterion::FEStressErrorCriterion(FEModel* fem) : FEDomainErrorCriterion(fem)
+//-----------------------------------------------------------------------------
+class FEVariableCriterion : public FEMeshAdaptorCriterion
 {
-}
+public:
+	FEVariableCriterion(FEModel* fem);
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
-double FEStressErrorCriterion::GetMaterialPointValue(FEMaterialPoint& mp)
-{
-	FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
-	mat3ds& s = ep->m_s;
-	double v = s.effective_norm();
-	return v;
-}
+private:
+	int		m_dof;
+
+	DECLARE_FECORE_CLASS();
+};

@@ -35,7 +35,7 @@ class FEDamageAdaptorCriterion : public FEMeshAdaptorCriterion
 public:
 	FEDamageAdaptorCriterion(FEModel* fem);
 
-	bool GetElementValue(FEElement& el, double& elemVal) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
 	DECLARE_FECORE_CLASS()
 };

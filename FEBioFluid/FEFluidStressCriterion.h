@@ -25,20 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
-#include <FEAMR/FEDomainErrorCriterion.h>
 
 class FEFluidStressCriterion : public FEMeshAdaptorCriterion
 {
 public:
 	FEFluidStressCriterion(FEModel* fem);
-	bool GetElementValue(FEElement& el, double& elemVal) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 	DECLARE_FECORE_CLASS()
-};
-
-class FEFluidStressErrorCriterion : public FEDomainErrorCriterion
-{
-public:
-	FEFluidStressErrorCriterion(FEModel* fem);
-
-	double GetMaterialPointValue(FEMaterialPoint& mp) override;
 };
