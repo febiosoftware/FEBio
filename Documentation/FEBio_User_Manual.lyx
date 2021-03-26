@@ -169,13 +169,13 @@ status open
 
 \end_inset
 
-User's Manual Version 3.2
+User's Manual Version 3.3
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: Feburary 3, 2021
+Last Updated: March 26, 2021
 \end_layout
 
 \begin_layout Standard
@@ -2316,10 +2316,6 @@ name2
 \end_layout
 
 \begin_layout Description
--c data check only 
-\end_layout
-
-\begin_layout Description
 -s material parameter optimization control file 
 \end_layout
 
@@ -2833,6 +2829,17 @@ Example:
  FEBio will interrupt the run after the time step at time 1.0 is reached
  (i.e.
  has converged).
+ (See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Setting-break-points"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more informations on setting break points.)
 \end_layout
 
 \begin_layout Standard
@@ -2897,251 +2904,17 @@ break Add a breakpoint, which will stop FEBio at a particular time point
  or event.
  A breakpoint can be defined at a particular (simulation) time or at an
  event.
- To define a breakpoint at a particular time, just enter the time value
- after the break command.
- To break at an event, specify the event name at which to pause the run.
- The following list of events are defined.
- 
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Event
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-ALWAYS
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break on any event
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-INIT
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after model initialization
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-STEP_ACTIVE
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after step activation
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-MAJOR_ITERS
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after major iteration (i.e.
- time step) converged 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-MINOR_ITERS
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after minor iteration (i.e.
- Newton iteration)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-SOLVED
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after the model is solved
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-UPDATE_TIME
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break before time is incremented
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-AUGMENT
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break before augmentation
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-STEP_SOLVED
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after step is solved
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-MATRIX_REFORM
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-break after global matrix is reformed
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
+ (See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Setting-break-points"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-
+ for more details on break points.)
 \end_layout
 
 \begin_layout Description
@@ -3587,17 +3360,29 @@ A note on repeatability
 \end_layout
 
 \begin_layout Standard
-When using multiple processors, it can not always be guaranteed that all
- calculations are executed in the same order and, due to numerical round-off,
- the results of these calculations will not always be the same.
- In FEBio, this means that the same model run repeatedly on the same machine
- with multiple processors, may give slightly different convergence norms
- or even slightly different answers.
- In many cases, the differences should be small, but in some problems that
- are prone to ill-conditioning (e.g.
- contact) the discrepancies may be more significant.
- When running on one processor, the results of consecutive runs should always
- be identical.
+Ideally when the same model is run repeatedly, either on the same machine
+ or on different machines, it should produce the same convergence statistics
+ and results.
+ However, in practice this is not always the case and sometimes the convergence
+ stats and even the results can differ.
+ In most cases, the discrepancies should be small, however in some cases,
+ and especially in models that are prone to ill-conditioning (e.g.
+ contact), the discrepancies may be more significant.
+ The underlying reason is that it can not always be guaranteed that all
+ calculations are executed in the exact same order and, due to numerical
+ round-off, the results of these calculations will not always be the same.
+ On a single machine, this can happen when the model is run using multiple
+ processors.
+ (However, running the same model on a machine with a single processor should
+ always produce the exact same results.) This behavior can also be observed
+ when running the same model on different machines, especially if these
+ machines have different OS.
+ Similarly, although FEBio aims to be backward compatible, running the same
+ model with different versions of FEBio, may also show discrepancies for
+ similar reasons.
+ In this case, the discrepancies are likely caused by algorithmic optimizations
+ or changes in compiler settings.
+ 
 \end_layout
 
 \begin_layout Section
@@ -3913,6 +3698,358 @@ plot
 \end_layout
 
 \begin_layout Subsection
+Setting break points
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Setting-break-points"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Although ctrl+c can be used to interrupt a run, it might sometimes be difficult
+ to interrupt a run at a desired point.
+ For this reason, you can set break points, that will pause the execution
+ and bring up the febio prompt.
+ Breakpoints are set on the command line using the 
+\series bold
+-break
+\series default
+ option, followed by the break condition.
+ In addition, breakpoints can also be set via the FEBio prompt using the
+ 
+\series bold
+break 
+\series default
+option.
+ 
+\end_layout
+
+\begin_layout Standard
+To break at a particular time point, simply add the value of the time after
+ the -break option.
+ This example will break the run after time 0.45 completed (or the first
+ time point past 0.45): 
+\end_layout
+
+\begin_layout LyX-Code
+>febio -i input.feb -break 0.45
+\end_layout
+
+\begin_layout Standard
+Instead of breaking at a particular time, you can also interrupt the run
+ when a certain event happens.
+ To break at an event, specify the event name at which to pause the run.
+ The following list of events are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Event
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALWAYS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break on any event
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INIT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after model initialization
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STEP_ACTIVE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after step activation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MAJOR_ITERS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after major iteration (i.e.
+ time step) converged
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MINOR_ITERS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after minor iteration (i.e.
+ Newton iteration)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SOLVED
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after the model is solved
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+UPDATE_TIME
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break before time is incremented
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AUGMENT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break before augmentation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STEP_SOLVED
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after step is solved
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+REFORM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after global matrix and right hand side is reformed
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MATRIX_SOLVE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break right before the linear system solve
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, to pause the execution after a matrix reformation (and right-hand-s
+ide evaluation), enter the following command line.
+\end_layout
+
+\begin_layout LyX-Code
+>febio -i input.feb -break REFORM
+\end_layout
+
+\begin_layout Standard
+Once the code reaches a breakpoint, the febio prompt will be presented.
+ There are several commands that relate to breakpoints.
+ 
+\end_layout
+
+\begin_layout Description
+break Add a breakpoint
+\end_layout
+
+\begin_layout Description
+breaks Prints list of current breakpoints.
+\end_layout
+
+\begin_layout Description
+clear Clear one or all breakpoints.
+\end_layout
+
+\begin_layout Subsection
 Restarting a Run
 \begin_inset CommandInset label
 LatexCommand label
@@ -3972,38 +4109,6 @@ reference "chap:Restart-Input-file"
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Subsection
-Input File Checking
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Input-File-Checking"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\begin_inset Formula $-c$
-\end_inset
-
- option allows the user to stop FEBio after the initial data checking is
- done.
- This way, potential input errors can be spotted without running the actual
- problem.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example:
-\end_layout
-
-\begin_layout LyX-Code
-> febio –i input.feb –c
 \end_layout
 
 \begin_layout Chapter
@@ -5233,7 +5338,7 @@ In version 1.2 the Module section was optional.
 solid 
 \shape default
 module was used.
- In version 2.0 the Module section is required and must be the first section
+ Since version 2.0 the Module section is required and must be the first section
  in the file.
 \end_layout
 
@@ -5249,7 +5354,7 @@ Older versions of FEBio (format specification 1.2 and before) allowed you
 \end_layout
 
 \begin_layout LyX-Code
-<febio_spec version="3.0">
+<febio_spec version="1.2">
 \end_layout
 
 \begin_layout LyX-Code
