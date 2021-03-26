@@ -572,9 +572,6 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEGlobalMatrix& K)
 	const int dof_Z = fem.GetDOFIndex("z");
 	const int dof_P = fem.GetDOFIndex("p");
 	const int dof_C = fem.GetDOFIndex("concentration", 0);
-	const int dof_RU = fem.GetDOFIndex("Ru");
-	const int dof_RV = fem.GetDOFIndex("Rv");
-	const int dof_RW = fem.GetDOFIndex("Rw");
 
     int nsol = (int)m_sid.size();
     int ndpn = 7 + nsol;
@@ -614,11 +611,8 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEGlobalMatrix& K)
 						lm[ndpn*l+1] = id[dof_Y];
 						lm[ndpn*l+2] = id[dof_Z];
 						lm[ndpn*l+3] = id[dof_P];
-						lm[ndpn*l+4] = id[dof_RU];
-						lm[ndpn*l+5] = id[dof_RV];
-						lm[ndpn*l+6] = id[dof_RW];
                         for (int m=0; m<nsol; ++m) {
-                            lm[ndpn*l+7+m] = id[dof_C + m_sid[m]];
+                            lm[ndpn*l+4+m] = id[dof_C + m_sid[m]];
                         }
 					}
                     
@@ -629,11 +623,8 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEGlobalMatrix& K)
 						lm[ndpn*(l+nseln)+1] = id[dof_Y];
 						lm[ndpn*(l+nseln)+2] = id[dof_Z];
 						lm[ndpn*(l+nseln)+3] = id[dof_P];
-						lm[ndpn*(l+nseln)+4] = id[dof_RU];
-						lm[ndpn*(l+nseln)+5] = id[dof_RV];
-						lm[ndpn*(l+nseln)+6] = id[dof_RW];
                         for (int m=0; m<nsol; ++m) {
-                            lm[ndpn*(l+nseln)+7+m] = id[dof_C + m_sid[m]];
+                            lm[ndpn*(l+nseln)+4+m] = id[dof_C + m_sid[m]];
                         }
 					}
                     
@@ -676,9 +667,6 @@ void FESlidingInterfaceMP::Activate()
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceMP::CalcAutoPenalty(FESlidingSurfaceMP& s)
 {
-	// get the mesh
-	FEMesh& m = GetFEModel()->GetMesh();
-	
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
 	{
@@ -1024,6 +1012,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 			r = ss.Local2Global(el, j);
 			
 			// get the pressure at the integration point
+            p1 = 0;
 			if (sporo) p1 = el.eval(ps, j);
 			
 			// get the concentration at the integration point
@@ -1942,8 +1931,7 @@ void FESlidingInterfaceMP::UpdateContactPressures()
 	for (np=0; np<npass; ++np)
 	{
 		FESlidingSurfaceMP& ss = (np == 0? m_ss : m_ms);
-		FESlidingSurfaceMP& ms = (np == 0? m_ms : m_ss);
-		
+        
 		// loop over all elements of the primary surface
 		for (n=0; n<ss.Elements(); ++n)
 		{

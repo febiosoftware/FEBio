@@ -27,41 +27,41 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <assert.h>
+#include "FEBioFSI.h"
 #include "FEFluidFSISolver.h"
-#include "FEBioMech/FEElasticDomain.h"
-#include "FEBioMech/FEPressureLoad.h"
-#include "FEBioMech/FERigidConnector.h"
-#include "FEBioMech/FESlidingElasticInterface.h"
-#include "FEBioMech/FESSIShellDomain.h"
-#include "FEBioMech/FEResidualVector.h"
 #include "FEFluidFSIDomain.h"
 #include "FEFluidDomain.h"
 #include "FEBiphasicFSIDomain.h"
-#include "FECore/FEModel.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
-#include "NumCore/NumCore.h"
-#include <assert.h>
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/sys.h"
-#include "FEBioMech/FE3FieldElasticSolidDomain.h"
-#include "FEBioMech/FE3FieldElasticShellDomain.h"
-#include "FEBioMech/FEUncoupledMaterial.h"
-#include <FEBioMech/FEBodyForce.h>
-#include <FECore/FEBoundaryCondition.h>
-#include <FECore/FENodalLoad.h>
-#include <FECore/FESurfaceLoad.h>
 #include "FEFluidResistanceBC.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidNormalVelocity.h"
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
+#include <FEBioMech/FEElasticDomain.h>
+#include <FEBioMech/FEPressureLoad.h>
+#include <FEBioMech/FERigidConnector.h>
+#include <FEBioMech/FESlidingElasticInterface.h>
+#include <FEBioMech/FESSIShellDomain.h>
+#include <FEBioMech/FEResidualVector.h>
+#include <FEBioMech/FE3FieldElasticSolidDomain.h>
+#include <FEBioMech/FE3FieldElasticShellDomain.h>
+#include <FEBioMech/FEUncoupledMaterial.h>
+#include <FEBioMech/FEBodyForce.h>
+#include <FEBioMech/FESolidLinearSystem.h>
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/sys.h>
+#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FENodalLoad.h>
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/DumpStream.h>
-#include <FEBioMech/FESolidLinearSystem.h>
-#include "FEBioFSI.h"
+#include <NumCore/NumCore.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

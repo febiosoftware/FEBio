@@ -27,31 +27,32 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include "FEBioFluidSolutes.h"
 #include "FEFluidSolutesSolver.h"
 #include "FEFluidDomain.h"
 #include "FEFluidResidualVector.h"
-#include "FECore/FEModel.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
-#include "NumCore/NumCore.h"
-#include <assert.h>
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/sys.h"
-#include <FEBioMech/FEBodyForce.h>
-#include <FECore/FEBoundaryCondition.h>
-#include <FECore/FENodalLoad.h>
-#include <FECore/FESurfaceLoad.h>
 #include "FEFluidResistanceBC.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidNormalVelocity.h"
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FETiedFluidInterface.h"
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
+#include <NumCore/NumCore.h>
+#include <assert.h>
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/sys.h>
+#include <FEBioMech/FEBodyForce.h>
+#include <FEBioMech/FEResidualVector.h>
+#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FENodalLoad.h>
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
-#include "FEBioFluidSolutes.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -670,6 +671,9 @@ void FEFluidSolutesSolver::PrepStep()
         if (psl.IsActive()) psl.Update();
     }
     
+    // do the linear constraints
+    fem.GetLinearConstraintManager().PrepStep();
+    
     // intialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
@@ -1087,7 +1091,7 @@ bool FEFluidSolutesSolver::Residual(vector<double>& R)
     zero(m_Fr);
     
     // setup the global vector
-    FEFluidResidualVector RHS(fem, R, m_Fr);
+    FEResidualVector RHS(fem, R, m_Fr);
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();

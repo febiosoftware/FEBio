@@ -27,20 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEThermoFluidSolver.h"
-#include "FEThermoFluidDomain.h"
-#include "FEFluidResidualVector.h"
-#include <FECore/FEModel.h>
-#include <FECore/log.h>
-#include <FECore/DOFS.h>
-#include <NumCore/NumCore.h>
-#include <assert.h>
-#include <FECore/FEGlobalMatrix.h>
-#include <FECore/sys.h>
-#include <FEBioMech/FEBodyForce.h>
-#include <FECore/FEBoundaryCondition.h>
-#include <FECore/FENodalLoad.h>
-#include <FECore/FESurfaceLoad.h>
+#include "FEBioThermoFluid.h"
 #include "FEFluidHeatSupply.h"
 #include "FEFluidResistanceBC.h"
 #include "FEBackFlowStabilization.h"
@@ -48,11 +35,24 @@ SOFTWARE.*/
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FETiedFluidInterface.h"
+#include "FEThermoFluidSolver.h"
+#include "FEThermoFluidDomain.h"
+#include <assert.h>
+#include <FEBioMech/FEResidualVector.h>
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/sys.h>
+#include <FEBioMech/FEBodyForce.h>
+#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FENodalLoad.h>
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
-#include "FEBioThermoFluid.h"
+#include <NumCore/NumCore.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -933,7 +933,7 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
     zero(m_Fr);
     
     // setup the global vector
-    FEFluidResidualVector RHS(fem, R, m_Fr);
+    FEResidualVector RHS(fem, R, m_Fr);
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();

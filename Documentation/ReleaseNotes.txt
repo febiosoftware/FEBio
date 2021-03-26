@@ -41,6 +41,34 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.3   3/29/2021
+
+===========================================================================
+
+* The data log mechanism was extended to store surface data to the log file (github issue #10).
+* A bug was fixed in the enforcement of the concentration penalty in tied-multiphasic contact interface.
+* The explicit solver was repaired. It supports row-sum mass lumping (mass_lumping = 1) and Hinton-Rock-Zienkiewicz mass lumping (mass_lumping = 2) for higher order elements.
+* Breakpoint strings should now be case insensitive on Linux and macOS.
+* A check for NANS in the residual vector was added. If a Nan is detected, an error with node and dof info is printed.
+* The performance of the stiffness evaluations of multiphasic models using chemical reactions was improved significantly.
+* Loadcurves are now scaled based on the value of point functions that are defined via a load curve.
+* A check was added for invalid faces in surface definitions (i.e. faces that are not facets of an element).
+* The potfile now stores a status flag for each state. The flag depends on the action that triggered the write.
+* The "contact nodal gap" and "contact pressure" plot variables are fixed for "sliding node-on-facet" contact.
+* The self_contact flag in "sliding node-on-facet" was removed. Self-contact is now supported in all sliding contact algorithms. To use self-contact, just assign the same surface to the primary and secondary contact surface.
+* A bug was fixed regarding prescribed nodal loads in BiphasicSolute and Multiphasic analyses when no solutes are included in the model.
+* Added check for duplicate part names.
+* Implemented the "defgrad" data generator, which generates a deformation gradient from a nodal-displacement field. This can be used, for instance, in prestrain elastic materials to generate the prestrain gradient. 
+* A bug was fixed in "in-situ target stretch" and "prestrain stretch error" related to how the fiber vector was taken into account. 
+* A bug was fixed in formatting log data.
+* Support for a 13-node pyramid element was implemented.
+* Added check for valid material ID in rigid node set.
+* An issue was addressed with unloading of plugins at the end of FEBio's execution that was causing a crash on Windows.
+* A division by zero issue was fixed in the contact auto-penalty feature.
+
+
+===========================================================================
+
  R E L E A S E   3.2   2/5/2021
 
 ===========================================================================
