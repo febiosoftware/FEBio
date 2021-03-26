@@ -23,21 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEMaxVolumeCriterion.h"
-#include <FECore/FESolidDomain.h>
+#pragma once
+#include <FECore/FEMeshAdaptorCriterion.h>
 
-BEGIN_FECORE_CLASS(FEElementVolumeCriterion, FEMeshAdaptorCriterion)
-END_FECORE_CLASS();
-
-FEElementVolumeCriterion::FEElementVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+//-----------------------------------------------------------------------------
+class FEVariableCriterion : public FEMeshAdaptorCriterion
 {
-}
+public:
+	FEVariableCriterion(FEModel* fem);
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
-bool FEElementVolumeCriterion::GetElementValue(FEElement& el, double& elemVal)
-{
-	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
-	if (dom == nullptr) return false;
-	elemVal = dom->Volume(dynamic_cast<FESolidElement&>(el));
-	return true;
-}
+private:
+	int		m_dof;
+
+	DECLARE_FECORE_CLASS();
+};

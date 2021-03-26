@@ -39,10 +39,13 @@ class FEModel;
 class DumpStream;
 
 //-----------------------------------------------------------------------------
-#define FE_DATA_NODE	1
-#define FE_DATA_ELEM	2
-#define FE_DATA_RB		3
-#define FE_DATA_NLC		4
+enum FEDataRecordType {
+	FE_DATA_NODE = 0x01,
+	FE_DATA_FACE,
+	FE_DATA_ELEM,
+	FE_DATA_RB,
+	FE_DATA_NLC
+};
 
 //-----------------------------------------------------------------------------
 // Exception thrown when parsing fails
@@ -64,7 +67,7 @@ public:
 
 	bool Write();
 
-	void SetItemList(const char* szlist);
+	void SetItemList(const std::vector<int>& items);
 
 	void SetName(const char* sz);
 	void SetDelim(const char* sz);
@@ -76,7 +79,7 @@ public:
 	virtual double Evaluate(int item, int ndata) = 0;
 	virtual void SelectAllItems() = 0;
 	virtual void Serialize(DumpStream& ar);
-	virtual void Parse(const char* sz) = 0;
+	virtual void SetData(const char* sz) = 0;
 	virtual int Size() const = 0;
 
 private:

@@ -40,26 +40,18 @@ FEStressCriterion::FEStressCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 	m_metric = 0;
 }
 
-bool FEStressCriterion::GetElementValue(FEElement& el, double& elemVal)
+bool FEStressCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
-	// Calculate average element stress
-	mat3ds s;
-	s.zero();
-	int nint = el.GaussPoints();
-	for (int n = 0; n < nint; ++n)
-	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(n);
-		FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
-		if (ep == nullptr) return false;
-		s += ep->m_s;
-	}
-	s /= (double)nint;
+	FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+	if (ep == nullptr) return false;
 
-	// get the element metric
-	elemVal = 0.0;
+	mat3ds s = ep->m_s;
+
+	// get the metric
+	value = 0.0;
 	switch (m_metric)
 	{
-	case 0: elemVal = s.effective_norm(); break;
+	case 0: value = s.effective_norm(); break;
 	case 1:
 	{
 		mat3ds devs = s.dev();
@@ -68,7 +60,7 @@ bool FEStressCriterion::GetElementValue(FEElement& el, double& elemVal)
 		lmax = l[0];
 		if (l[1] > lmax) lmax = l[1];
 		if (l[2] > lmax) lmax = l[2];
-		elemVal = lmax;
+		value = lmax;
 	}
 	break;
 	default:

@@ -25,13 +25,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
+#include <FECore/FEMaterialPoint.h>
 
 class FECORE_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
 {
 public:
 	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
 
-	bool GetElementValue(FEElement& el, double& elemValue) override;
+	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
 
 private:
 	double	m_min;

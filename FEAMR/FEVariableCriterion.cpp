@@ -23,15 +23,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
+#include "stdafx.h"
+#include "FEVariableCriterion.h"
+#include <FECore/FESolidDomain.h>
 
-//-----------------------------------------------------------------------------
-class FEElementVolumeCriterion : public FEMeshAdaptorCriterion
+BEGIN_FECORE_CLASS(FEVariableCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_dof, "dof");
+END_FECORE_CLASS();
+
+FEVariableCriterion::FEVariableCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	FEElementVolumeCriterion(FEModel* fem);
-	bool GetElementValue(FEElement& el, double& elemVal) override;
+	m_dof = -1;
+}
 
-	DECLARE_FECORE_CLASS();
-};
+bool FEVariableCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
+{
+	if (m_dof == -1) return false;
+
+	FEElement* pe = mp.m_elem;
+	if (pe == nullptr) return false;
+
+	if ((mp.m_index < 0) || (mp.m_index >= pe->GaussPoints())) return false;
+
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(pe->GetMeshPartition());
+	if (dom == nullptr) return false;
+
+	FEMesh& mesh = *dom->GetMesh();
+
+	double vn[FEElement::MAX_NODES];
+	for (int i = 0; i < pe->Nodes(); ++i)
+	{
+		vn[i] = mesh.Node(pe->m_node[i]).get(m_dof);
+	}
+
+	value = pe->Evaluate(vn, mp.m_index);
+	return true;
+}

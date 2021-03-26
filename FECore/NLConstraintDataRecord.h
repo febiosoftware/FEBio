@@ -49,7 +49,7 @@ class FECORE_API NLConstraintDataRecord : public DataRecord
 public:
 	NLConstraintDataRecord(FEModel* pfem, const char* szfile);
     double Evaluate(int item, int ndata);
-    void Parse(const char* sz);
+    void SetData(const char* sz);
     void SelectAllItems();
 	int Size() const;
     

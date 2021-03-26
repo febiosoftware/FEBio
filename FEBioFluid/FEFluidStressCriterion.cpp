@@ -35,34 +35,11 @@ FEFluidStressCriterion::FEFluidStressCriterion(FEModel* fem) : FEMeshAdaptorCrit
 {
 }
 
-bool FEFluidStressCriterion::GetElementValue(FEElement& el, double& elemVal)
+bool FEFluidStressCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
-	double v = 0.0;
-	int nint = el.GaussPoints();
-	for (int n = 0; n < nint; ++n)
-	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(n);
-		FEFluidMaterialPoint* fp = mp->ExtractData<FEFluidMaterialPoint>();
-		if (fp == nullptr) return false;
-
-		mat3ds& s = fp->m_sf;
-		v += s.max_shear();
-	}
-	v /= (double)nint;
-
-	elemVal = v;
+	FEFluidMaterialPoint* fp = mp.ExtractData<FEFluidMaterialPoint>();
+	if (fp == nullptr) return false;
+	mat3ds& s = fp->m_sf;
+	value = s.max_shear();
 	return true;
-}
-
-
-FEFluidStressErrorCriterion::FEFluidStressErrorCriterion(FEModel* fem) : FEDomainErrorCriterion(fem)
-{
-}
-
-double FEFluidStressErrorCriterion::GetMaterialPointValue(FEMaterialPoint& mp)
-{
-	FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-	mat3ds s = fp.m_sf;
-	double v = s.max_shear();
-	return v;
 }

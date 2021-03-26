@@ -47,8 +47,7 @@
     <ClCompile Include="..\..\FEAMR\FEMeshDataInterpolator.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMeshShapeInterpolator.cpp" />
     <ClCompile Include="..\..\FEAMR\FEScaleAdaptorCriterion.cpp" />
-    <ClCompile Include="..\..\FEAMR\FEMaxVariableCriterion.cpp" />
-    <ClCompile Include="..\..\FEAMR\FEMaxVolumeCriterion.cpp" />
+    <ClCompile Include="..\..\FEAMR\FEVariableCriterion.cpp" />
     <ClCompile Include="..\..\FEAMR\FEMMGRemesh.cpp" />
     <ClCompile Include="..\..\FEAMR\FERefineMesh.cpp" />
     <ClCompile Include="..\..\FEAMR\FETestRefine.cpp" />
@@ -67,8 +66,7 @@
     <ClInclude Include="..\..\FEAMR\FEMeshDataInterpolator.h" />
     <ClInclude Include="..\..\FEAMR\FEMeshShapeInterpolator.h" />
     <ClInclude Include="..\..\FEAMR\FEScaleAdaptorCriterion.h" />
-    <ClInclude Include="..\..\FEAMR\FEMaxVariableCriterion.h" />
-    <ClInclude Include="..\..\FEAMR\FEMaxVolumeCriterion.h" />
+    <ClInclude Include="..\..\FEAMR\FEVariableCriterion.h" />
     <ClInclude Include="..\..\FEAMR\FEMMGRemesh.h" />
     <ClInclude Include="..\..\FEAMR\FERefineMesh.h" />
     <ClInclude Include="..\..\FEAMR\FETestRefine.h" />
