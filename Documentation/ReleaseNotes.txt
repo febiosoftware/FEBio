@@ -57,7 +57,6 @@ at https://forums.febio.org/.
 * The "contact nodal gap" and "contact pressure" plot variables are fixed for "sliding node-on-facet" contact.
 * The self_contact flag in "sliding node-on-facet" was removed. Self-contact is now supported in all sliding contact algorithms. To use self-contact, just assign the same surface to the primary and secondary contact surface.
 * A bug was fixed regarding prescribed nodal loads in BiphasicSolute and Multiphasic analyses when no solutes are included in the model.
-* Added Multiphasic FSI solver, made bug fixes in BFSI and CFD solute, added capabilities for these solvers in FEBioMix classes.
 * Added check for duplicate part names.
 * Implemented the "defgrad" data generator, which generates a deformation gradient from a nodal-displacement field. This can be used, for instance, in prestrain elastic materials to generate the prestrain gradient. 
 * A bug was fixed in "in-situ target stretch" and "prestrain stretch error" related to how the fiber vector was taken into account. 
