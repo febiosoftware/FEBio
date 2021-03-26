@@ -263,7 +263,8 @@ enum SUPER_CLASS_ID {
 	FENEWTONSTRATEGY_ID,			// derived from FENewtonStrategy
 	FEITEMLIST_ID,                  // derived from FEItemList (NOTE: work in progress!)
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
-	FEEIGENSOLVER_ID				// derived from EigenSolver
+	FEEIGENSOLVER_ID,				// derived from EigenSolver
+    FESURFACEPAIRINTERACTIONNL_ID   // derived from FESurfacePairInteraction
 };
 
 ///////////////////////////////////////////////////////////////////////////////

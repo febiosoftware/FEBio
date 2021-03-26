@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FETiedFluidInterface.h"
 #include <FECore/FENormalProjection.h>
+#include <FECore/FEClosestPointProjection.h>
 #include <FECore/log.h>
 #include <FECore/DumpStream.h>
 #include <FECore/FEGlobalMatrix.h>
@@ -49,6 +50,7 @@ BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
 	ADD_PARAMETER(m_srad     , "search_radius"      );
 	ADD_PARAMETER(m_naugmin  , "minaug"             );
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
+    ADD_PARAMETER(m_bfreedofs, "free_dofs"          );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -206,6 +208,7 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(p
     m_gtol = -1;    // we use augmentation tolerance by default
     m_ptol = -1;    // we use augmentation tolerance by default
     m_bautopen = false;
+    m_bfreedofs = false;
     
     m_naugmin = 0;
     m_naugmax = 10;
@@ -227,6 +230,10 @@ bool FETiedFluidInterface::Init()
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
     
+    // get the DOFS
+    m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
+    
     return true;
 }
 
@@ -236,10 +243,6 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
     FEModel& fem = *GetFEModel();
     FEMesh& mesh = fem.GetMesh();
-    
-    // get the DOFS
-	m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-	m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
     
     vector<int> lm(4*FEElement::MAX_NODES*2);
     
@@ -355,7 +358,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
     
     // check that it is a fluid material
-    FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+    FEFluidMaterial* fluid = dynamic_cast<FEFluidMaterial*> (pm);
     if (fluid == 0) return 0.0;
     m_pfluid = fluid;
 
@@ -377,6 +380,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
 // Perform initial projection between tied surfaces in reference configuration
 void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
 {
+    FEMesh& mesh = GetFEModel()->GetMesh();
     FESurfaceElement* pme;
     vec3d r, nu;
     double rs[2];
@@ -387,6 +391,13 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
     np.SetSearchRadius(m_srad);
     np.Init();
     
+    FEClosestPointProjection cp(ss);
+    cp.SetTolerance(m_stol);
+    cp.SetSearchRadius(m_srad);
+    cp.Init();
+    vec3d sq;
+    vec2d srs;
+
     // loop over all integration points
     int n = 0;
     for (int i=0; i<ss.Elements(); ++i)
@@ -419,6 +430,18 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
                 
                 // calculate the gap function
                 pt.m_Gap = q - r;
+                
+                // free the nodal dofs of pme if requested
+                if (m_bfreedofs) {
+                    for (int k=0; k<pme->Nodes(); ++k) {
+                        FENode& node = mesh.Node(pme->m_node[k]);
+                        FESurfaceElement* sme = cp.Project(node.m_rt, sq, srs);
+                        if (sme) {
+                            for (int l=0; l<m_dofWE.Size(); ++l)
+                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN) node.set_bc(m_dofWE[l], DOF_OPEN);
+                        }
+                    }
+                }
             }
             else
             {
@@ -430,7 +453,7 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
 }
 
 //-----------------------------------------------------------------------------
-// Evaluate gap functions for fluid tangential velocity and fluid pressure
+// Evaluate gap functions for fluid velocity and fluid pressure
 void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
@@ -451,7 +474,7 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
         // get the nodal velocities and pressures
         for (int j=0; j<ne; ++j) {
             vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-            ps[j] = m_pfluid->Pressure(mesh.Node(el.m_node[j]).get(m_dofWE[3]));
+            ps[j] = m_pfluid->Pressure(mesh.Node(el.m_node[j]).get(m_dofWE[3]),0);
         }
 
         for (int j=0; j<nint; ++j)
@@ -477,7 +500,7 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
 
                 // calculate the pressure gap function
                 double pm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m_pfluid->Pressure(mesh.Node(pme->m_node[k]).get(m_dofWE[3]));
+                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m_pfluid->Pressure(mesh.Node(pme->m_node[k]).get(m_dofWE[3]),0);
                 double p2 = pme->eval(pm, pt.m_rs[0], pt.m_rs[1]);
                 pt.m_pg = p1 - p2;
             }
@@ -688,7 +711,8 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
         {
             // get the next element
             FESurfaceElement& se = ss.Element(i);
-            
+            FEElement* sse = se.m_elem[0];
+
             // get nr of nodes and integration points
             int nseln = se.Nodes();
             int nint = se.GaussPoints();
@@ -698,7 +722,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
             double pn[FEElement::MAX_NODES];
             for (j=0; j<nseln; ++j) {
                 vt[j] = ss.GetMesh()->Node(se.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-                pn[j] = m_pfluid->Pressure(ss.GetMesh()->Node(se.m_node[j]).get(m_dofWE[3]));
+                pn[j] = m_pfluid->Pressure(ss.GetMesh()->Node(se.m_node[j]).get(m_dofWE[3]),0);
             }
             
             // copy the LM vector
@@ -743,7 +767,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     double pm[FEElement::MAX_NODES];
                     for (k=0; k<nmeln; ++k) {
                         vm[k] = ms.GetMesh()->Node(me.m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-                        pm[k] = m_pfluid->Pressure(ms.GetMesh()->Node(me.m_node[k]).get(m_dofWE[3]));
+                        pm[k] = m_pfluid->Pressure(ms.GetMesh()->Node(me.m_node[k]).get(m_dofWE[3]),0);
                     }
                     
                     // copy the LM vector
@@ -834,7 +858,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     // --- D I L A T A T I O N   S T I F F N E S S ---
                     {
                         double epsn = m_epsn*pt.m_epsn;
-                        double K = m_pfluid->m_k;
+                        double K = m_pfluid->BulkModulus(*sse->GetMaterialPoint(0));
                         
                         for (k=0; k<nseln; ++k) {
                             for (l=0; l<nseln; ++l)

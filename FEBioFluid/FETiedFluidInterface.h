@@ -29,7 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FEContactInterface.h>
 #include <FEBioMech/FEContactSurface.h>
-#include "FEFluid.h"
+#include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
 class FEBIOFLUID_API FETiedFluidSurface : public FEContactSurface
@@ -147,7 +147,9 @@ public:
     double          m_epsn;         //!< normal fluid velocity penalty factor
     bool            m_bautopen;     //!< use autopenalty factor
     
-    FEFluid*        m_pfluid;       //!< fluid pointer
+    bool            m_bfreedofs;    //!< flag to free constrained/fixed DOFS on secondary surface
+    
+    FEFluidMaterial* m_pfluid;       //!< fluid pointer
 
 	FEDofList		m_dofWE;
    
