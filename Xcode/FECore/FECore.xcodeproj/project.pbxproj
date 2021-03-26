@@ -25,6 +25,8 @@
 		D52D840521CE89A200472620 /* FEDomainParameter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D83FA21CE89A200472620 /* FEDomainParameter.cpp */; };
 		D5400D44249922C200570A47 /* FEMat3dsValuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5400D42249922C200570A47 /* FEMat3dsValuator.cpp */; };
 		D5400D45249922C200570A47 /* FEMat3dsValuator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5400D43249922C200570A47 /* FEMat3dsValuator.h */; };
+		D54626F4260E6FDA007E2D8E /* FaceDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54626F2260E6FDA007E2D8E /* FaceDataRecord.cpp */; };
+		D54626F5260E6FDA007E2D8E /* FaceDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D54626F3260E6FDA007E2D8E /* FaceDataRecord.h */; };
 		D54A66AF257BDCB90023C8D1 /* FSPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54A66AD257BDCB90023C8D1 /* FSPath.cpp */; };
 		D54A66B0257BDCB90023C8D1 /* FSPath.h in Headers */ = {isa = PBXBuildFile; fileRef = D54A66AE257BDCB90023C8D1 /* FSPath.h */; };
 		D54E21AC2149BB56008A9DD3 /* FEElementSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E219E2149BB54008A9DD3 /* FEElementSet.cpp */; };
@@ -424,6 +426,8 @@
 		D52D83FA21CE89A200472620 /* FEDomainParameter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDomainParameter.cpp; sourceTree = "<group>"; };
 		D5400D42249922C200570A47 /* FEMat3dsValuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMat3dsValuator.cpp; sourceTree = "<group>"; };
 		D5400D43249922C200570A47 /* FEMat3dsValuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMat3dsValuator.h; sourceTree = "<group>"; };
+		D54626F2260E6FDA007E2D8E /* FaceDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceDataRecord.cpp; sourceTree = "<group>"; };
+		D54626F3260E6FDA007E2D8E /* FaceDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FaceDataRecord.h; sourceTree = "<group>"; };
 		D54A66AD257BDCB90023C8D1 /* FSPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FSPath.cpp; sourceTree = "<group>"; };
 		D54A66AE257BDCB90023C8D1 /* FSPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPath.h; sourceTree = "<group>"; };
 		D54E219E2149BB54008A9DD3 /* FEElementSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElementSet.cpp; sourceTree = "<group>"; };
@@ -868,6 +872,8 @@
 				D550834D24F086E300E919D8 /* EigenSolver.h */,
 				D5B9E45F213F67DE0008B38A /* ElementDataRecord.cpp */,
 				D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */,
+				D54626F2260E6FDA007E2D8E /* FaceDataRecord.cpp */,
+				D54626F3260E6FDA007E2D8E /* FaceDataRecord.h */,
 				D5B9E415213F67DE0008B38A /* FEAnalysis.cpp */,
 				D5B9E4A3213F67DE0008B38A /* FEAnalysis.h */,
 				D5B9E421213F67DE0008B38A /* FEBodyLoad.cpp */,
@@ -1321,6 +1327,7 @@
 				D559C4CC22D9169E00CDC2BD /* FEParabolicMap.h in Headers */,
 				D5B9E5F4213F67DE0008B38A /* FEPlotData.h in Headers */,
 				D5B9E582213F67DE0008B38A /* targetver.h in Headers */,
+				D54626F5260E6FDA007E2D8E /* FaceDataRecord.h in Headers */,
 				D5B9E53C213F67DE0008B38A /* FEModelLoad.h in Headers */,
 				D5B805B3223BE2DC00198805 /* FEMeshAdaptor.h in Headers */,
 				D5B9E5A0213F67DE0008B38A /* FESurfaceConstraint.h in Headers */,
@@ -1635,6 +1642,7 @@
 				D5B9E570213F67DE0008B38A /* FESurfacePairConstraint.cpp in Sources */,
 				D5B9E57D213F67DE0008B38A /* FELinearConstraint.cpp in Sources */,
 				D5B9E558213F67DE0008B38A /* FENewtonStrategy.cpp in Sources */,
+				D54626F4260E6FDA007E2D8E /* FaceDataRecord.cpp in Sources */,
 				D5B9E549213F67DE0008B38A /* FEParameterList.cpp in Sources */,
 				D5B9E504213F67DE0008B38A /* JFNKMatrix.cpp in Sources */,
 				D5B9E543213F67DE0008B38A /* ParamString.cpp in Sources */,

@@ -489,8 +489,6 @@
 		D5DAB6D122A954F1004C4213 /* FERVEDamageMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */; };
 		D5E1AA8E25E3F892003162AB /* FEDeformationMapGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1AA8C25E3F892003162AB /* FEDeformationMapGenerator.h */; };
 		D5E1AA8F25E3F892003162AB /* FEDeformationMapGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1AA8D25E3F892003162AB /* FEDeformationMapGenerator.cpp */; };
-		D5E1B5A122B82B2F00E7939E /* FEStressErrorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */; };
-		D5E1B5A222B82B2F00E7939E /* FEStressErrorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */; };
 		D5EBB7A12328231800EED2BE /* FECarreauYasudaViscousSolid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */; };
 		D5EBB7A22328231800EED2BE /* FECarreauYasudaViscousSolid.h in Headers */ = {isa = PBXBuildFile; fileRef = D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */; };
 		D5F09074248A84FA00E4F940 /* FEDiscreteElasticMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F09070248A84FA00E4F940 /* FEDiscreteElasticMaterial.h */; };
@@ -985,8 +983,6 @@
 		D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FERVEDamageMaterial.h; sourceTree = "<group>"; };
 		D5E1AA8C25E3F892003162AB /* FEDeformationMapGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDeformationMapGenerator.h; sourceTree = "<group>"; };
 		D5E1AA8D25E3F892003162AB /* FEDeformationMapGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDeformationMapGenerator.cpp; sourceTree = "<group>"; };
-		D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStressErrorCriterion.h; sourceTree = "<group>"; };
-		D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStressErrorCriterion.cpp; sourceTree = "<group>"; };
 		D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FECarreauYasudaViscousSolid.cpp; sourceTree = "<group>"; };
 		D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FECarreauYasudaViscousSolid.h; sourceTree = "<group>"; };
 		D5F09070248A84FA00E4F940 /* FEDiscreteElasticMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiscreteElasticMaterial.h; sourceTree = "<group>"; };
@@ -1454,8 +1450,6 @@
 				D5322F2A2142ACD8008DE511 /* FESSIShellDomain.h */,
 				D5322F692142ACD8008DE511 /* FEStickyInterface.cpp */,
 				D5322F0D2142ACD8008DE511 /* FEStickyInterface.h */,
-				D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */,
-				D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */,
 				D5322E8E2142ACD7008DE511 /* FEStVenantKirchhoff.cpp */,
 				D5322EAA2142ACD7008DE511 /* FEStVenantKirchhoff.h */,
 				D58FA374247B03FD00AD6B17 /* FESurfaceAttractionBodyForce.cpp */,
@@ -1642,7 +1636,6 @@
 				D53230CD2142ACD9008DE511 /* FESSIShellDomain.h in Headers */,
 				D53230AE2142ACD9008DE511 /* FEOrthoElastic.h in Headers */,
 				D53230842142ACD9008DE511 /* FEUncoupledElasticMixture.h in Headers */,
-				D5E1B5A122B82B2F00E7939E /* FEStressErrorCriterion.h in Headers */,
 				D53230192142ACD9008DE511 /* FERVEModel.h in Headers */,
 				D53230692142ACD9008DE511 /* FEMembraneMaterial.h in Headers */,
 				D5322FF12142ACD9008DE511 /* geodesic.h in Headers */,
@@ -2089,7 +2082,6 @@
 				D53231362142ACD9008DE511 /* FEAugLagLinearConstraint.cpp in Sources */,
 				D532301D2142ACD9008DE511 /* FEPointBodyForce.cpp in Sources */,
 				D5322FFB2142ACD9008DE511 /* FEOrthotropicCLE.cpp in Sources */,
-				D5E1B5A222B82B2F00E7939E /* FEStressErrorCriterion.cpp in Sources */,
 				D576A7D5256C366B00415BF7 /* FERigidFollowerForce.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

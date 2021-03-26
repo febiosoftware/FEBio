@@ -70,9 +70,9 @@ bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
     int dofWX = fem->GetDOFIndex("wx");
     int dofWY = fem->GetDOFIndex("wy");
     int dofWZ = fem->GetDOFIndex("wz");
-    int dofVX = fem->GetDOFIndex("vx");
-    int dofVY = fem->GetDOFIndex("vy");
-    int dofVZ = fem->GetDOFIndex("vz");
+    int dofVX = fem->GetDOFIndex("vfx");
+    int dofVY = fem->GetDOFIndex("vfy");
+    int dofVZ = fem->GetDOFIndex("vfz");
 
 	bool bcfd = false;
 	if ((dofVX == -1) && (dofVY == -1) && (dofVZ == -1))
@@ -86,8 +86,12 @@ bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
         });
         return true;
     }
-    else
-        return false;
+    else {
+        writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+            return node.get_vec3d(dofVX, dofVY, dofVZ);
+        });
+        return true;
+    }
 }
 
 //-----------------------------------------------------------------------------
