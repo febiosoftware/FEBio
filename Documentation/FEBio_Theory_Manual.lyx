@@ -7465,7 +7465,16 @@ name "sec:Fluid-Structure-Interactions"
 \begin_layout Standard
 We model the fluid domain in an FSI analysis as a mixture of an isothermal
  compressible viscous fluid and a hyperelastic compressible solid, where
- the solid has zero apparent density, and negligible (but non-zero) elasticity.
+ the solid has zero apparent density, and negligible (but non-zero) elasticity
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim19"
+literal "false"
+
+\end_inset
+
+.
  In a mixture framework, all mixture constituents coexist at every point
  in the continuum.
  For our FSI implementation, the finite element mesh is defined on the solid
@@ -7774,6 +7783,1207 @@ reference "eq:fsi-fluid-acceleration-redux"
 \end_inset
 
  above.
+\end_layout
+
+\begin_layout Section
+Hybrid Biphasic Material
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Hybrid-Biphasic-Material"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In FEBio, the standard biphasic material consists of a mixture of intrinsically
+ incompressible solid and fluid constituents, as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Biphasic-Material"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In this standard material, the solid and fluid dynamics are neglected,
+ as well as the fluid viscosity.
+ When a user wishes to consider these dynamics effects, as well as fluid
+ viscosity, they may use a hybrid biphasic material, as described in this
+ section.
+ The complete theoretical framework for such materials can be found in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim21a"
+literal "false"
+
+\end_inset
+
+.
+ A hybrid biphasic domain is a mixture of an isothermal compressible viscous
+ fluid and a hyperelastic compressible porous solid whose solid skeleton
+ is intrinsically incompressible.
+ Unlike the fluid-FSI material, here the solid has non-negligible mass density
+ and elasticity, and frictional interactions may occur between the fluid
+ and solid constituents, modeled using a hydraulic permeability (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Hydraulic-Permeability"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ In FEBio, the hybrid biphasic material is called 
+\begin_inset Quotes eld
+\end_inset
+
+biphasic-FSI
+\begin_inset Quotes erd
+\end_inset
+
+, since it allows dynamic fluid-structure interactions between this material
+ and a fluid-FSI material, or a solid material.
+ Here, we may abbreviate 
+\begin_inset Quotes eld
+\end_inset
+
+biphasic-FSI
+\begin_inset Quotes erd
+\end_inset
+
+ as BFSI.
+ For BFSI domains, as with standard biphasic domains, the finite element
+ mesh is defined on the porous solid material.
+ The viscous fluid flows through this mesh, experiencing frictional drag
+ caused by the porous solid.
+ When two BFSI domains are interfaced, or when a BFSI domain is interfaced
+ with a fluid-FSI domain, the pseudo-no slip condition 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou89"
+literal "false"
+
+\end_inset
+
+ is enforced automatically on those interfaces.
+ When a BFSI domain interfaces with a solid domain, the no-slip boundary
+ condition has to be prescribed explicitly on those interfaces, where applicable.
+\end_layout
+
+\begin_layout Subsection
+BFSI Governing Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:BFSI-Governing-Equations"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We model the BFSI domain as an unconstrained mixture of an isothermal, compressi
+ble, and viscous fluid and an isothermal, deformable porous solid whose
+ skeleton material is intrinsically incompressible.
+ As usual in mixture theory, each constituent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha=s,f$
+\end_inset
+
+ for solid and fluid, respectively) has its own apparent density 
+\begin_inset Formula $\rho^{\alpha}=dm^{\alpha}/dV$
+\end_inset
+
+, which represents the ratio of the elemental mass 
+\begin_inset Formula $dm^{\alpha}$
+\end_inset
+
+ of constituent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ in the elemental mixture volume 
+\begin_inset Formula $dV$
+\end_inset
+
+.
+ This apparent density is related to the true density 
+\begin_inset Formula $\rho_{T}^{\alpha}=dm^{\alpha}/dV^{\alpha}$
+\end_inset
+
+ (mass of 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ per volume of 
+\begin_inset Formula $\alpha$
+\end_inset
+
+) via 
+\begin_inset Formula $\rho^{\alpha}=\varphi^{\alpha}\rho_{T}^{\alpha}$
+\end_inset
+
+, where 
+\begin_inset Formula $\varphi^{\alpha}=dV^{\alpha}/dV$
+\end_inset
+
+ is the volume fraction of 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ in the mixture, satisfying 
+\begin_inset Formula $\varphi^{s}+\varphi^{f}=1$
+\end_inset
+
+.
+ Since the solid skeleton is intrinsically incompressible, 
+\begin_inset Formula $\rho_{T}^{s}$
+\end_inset
+
+ is constant.
+ The boundaries of a biphasic domain are defined on the porous solid matrix.
+ The deformation gradient of the solid is denoted by 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+ and its determinant, 
+\begin_inset Formula $J^{s}=\det\mathbf{F}^{s}=dV/dV_{r}$
+\end_inset
+
+, represents the ratio of the mixture elemental volumes in the current (
+\begin_inset Formula $dV$
+\end_inset
+
+) and reference (
+\begin_inset Formula $dV_{r}$
+\end_inset
+
+) configurations.
+ Thus, since the solid skeleton is intrinsically incompressible, 
+\begin_inset Formula $J^{s}$
+\end_inset
+
+ purely represents the compressibility of the pore volume as fluid enters
+ or leaves the pore space, or as the compressible fluid within the pores
+ changes in volume.
+ The axiom of mass balance for the solid may be integrated in closed form
+ to produce 
+\begin_inset Formula $\rho^{s}=\rho_{r}^{s}/J^{s}$
+\end_inset
+
+, where 
+\begin_inset Formula $\rho_{r}^{s}=dm^{s}/dV_{r}$
+\end_inset
+
+ is the solid apparent density in the mixture reference configuration.
+ Therefore, we may define the referential solid volume fraction as 
+\begin_inset Formula $\varphi_{r}^{s}=\rho_{r}^{s}/\rho_{T}^{s}$
+\end_inset
+
+.
+ In the finite element analysis, 
+\begin_inset Formula $\varphi_{r}^{s}=dV^{s}/dV_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $\rho_{T}^{s}$
+\end_inset
+
+ are both specified by the user, then 
+\begin_inset Formula $\rho_{r}^{s}$
+\end_inset
+
+, 
+\begin_inset Formula $\rho^{s}$
+\end_inset
+
+, 
+\begin_inset Formula $\varphi^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi^{f}$
+\end_inset
+
+ are evaluated from the above relations, given a solution for 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+ (and thus, 
+\begin_inset Formula $J^{s}$
+\end_inset
+
+).
+ The solution for 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{I}+\Grad\mathbf{u}$
+\end_inset
+
+ is obtained by solving for the nodal solid displacement vector 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, where 
+\begin_inset Formula $\Grad\left(\cdot\right)$
+\end_inset
+
+ represents the gradient operator in the material frame.
+\end_layout
+
+\begin_layout Standard
+For the compressible fluid phase of a hybrid biphasic material, the true
+ density 
+\begin_inset Formula $\rho_{T}^{f}$
+\end_inset
+
+ varies with the intrinsic fluid volumetric strain, or dilatation, 
+\begin_inset Formula $e^{f}=J^{f}-1$
+\end_inset
+
+, where 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ is the volume ratio of the fluid in its current and reference configurations,
+ 
+\begin_inset Formula $dm^{f}$
+\end_inset
+
+ is the element mass of fluid and 
+\begin_inset Formula $dV^{f}$
+\end_inset
+
+ is the elemental volume of that fluid in the pores of the mixture, in the
+ current configuration.
+ It follows from this definition that
+\begin_inset Formula 
+\begin{equation}
+J^{f}=\frac{dV^{f}}{dV_{r}^{f}}=\frac{dV^{f}}{dm^{f}}\frac{dm^{f}}{dV_{r}^{f}}=\frac{\rho_{Tr}^{f}}{\rho_{T}^{f}}\thinspace,\label{eq:bfsi-Jf}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $dV_{r}^{f}$
+\end_inset
+
+ is the elemental volume of this same fluid (having the same elemental mass
+ 
+\begin_inset Formula $dm^{f}$
+\end_inset
+
+) in the fluid's reference configuration.
+ Thus, 
+\begin_inset Formula $\rho_{Tr}^{f}=dm^{f}/dV_{r}^{f}$
+\end_inset
+
+ is a constant representing the true fluid density in its reference configuratio
+n, which is specified by the user.
+ Accordingly, 
+\begin_inset Formula $J^{f}=1$
+\end_inset
+
+ in the limit when the fluid is idealized to be intrinsically incompressible.
+ This definition of 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ is consistent with that for a pure fluid, as shown in our earlier formulation
+ of computational fluid dynamics 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2018"
+literal "false"
+
+\end_inset
+
+.
+ As shown above, 
+\begin_inset Formula $\rho^{f}$
+\end_inset
+
+ may be evaluated as 
+\begin_inset Formula $\varphi^{f}\rho_{T}^{f}$
+\end_inset
+
+, which now expands into an expression involving solid and fluid volume
+ ratios,
+\begin_inset Formula 
+\begin{equation}
+\rho^{f}=\left(1-\frac{\varphi_{r}^{s}}{J^{s}}\right)\frac{\rho_{Tr}^{f}}{J^{f}}\,.\label{eq:bfsi-rhof-Jf-Js}
+\end{equation}
+
+\end_inset
+
+The limiting case when the fluid within the solid matrix pores has been
+ completely squeezed out corresponds to 
+\begin_inset Formula $\rho^{f}=0$
+\end_inset
+
+ (or 
+\begin_inset Formula $dm^{f}=0$
+\end_inset
+
+).
+ Based on the above relation, this is equivalent to having the entire mixture
+ volume 
+\begin_inset Formula $dV$
+\end_inset
+
+ reduce to the solid volume 
+\begin_inset Formula $dV^{s}$
+\end_inset
+
+ in the current configuration, or equivalently 
+\begin_inset Formula $J^{s}=\varphi_{r}^{s}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10"
+literal "false"
+
+\end_inset
+
+.
+ In this limiting case, the mixture becomes an intrinsically incompressible
+ solid and the finite element formulation presented in this study no longer
+ applies.
+\end_layout
+
+\begin_layout Standard
+We assume that 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{I}$
+\end_inset
+
+ (or equivalently, 
+\begin_inset Formula $\mathbf{u}=\mathbf{0}$
+\end_inset
+
+) and 
+\begin_inset Formula $e^{f}=0$
+\end_inset
+
+ at the start of a finite element analysis.
+ The fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ is included as a nodal degree of freedom, implying that it is continuous
+ across finite element boundaries.
+ This assumption is verified below, when we review the jump conditions on
+ axioms of mass, momentum and energy balance across interfaces.
+\end_layout
+
+\begin_layout Standard
+Since the axiom of mass balance for the solid has already been solved in
+ closed form, we only need to be concerned with the axiom of mass balance
+ for the fluid, or alternatively, that of the mixture, which takes the form
+\begin_inset Formula 
+\begin{equation}
+\frac{D^{f}J^{f}}{Dt}=\frac{J^{f}}{\varphi^{f}}\divg\left(\mathbf{v}^{s}+\mathbf{w}\right)\thinspace,\label{eq:bfsi-mix-mass-balance-f}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{v}^{s}$
+\end_inset
+
+ is the solid velocity (the material time derivative of the solid displacement
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+), and
+\begin_inset Formula 
+\begin{equation}
+\mathbf{w}=\varphi^{f}\left(\mathbf{v}^{f}-\mathbf{v}^{s}\right)\thinspace\label{eq:bfsi-fluid-flux}
+\end{equation}
+
+\end_inset
+
+is the volumetric flux of the fluid relative to the solid , with 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ representing the fluid velocity.
+ Here, 
+\begin_inset Formula $D^{f}\left(\cdot\right)/Dt$
+\end_inset
+
+ is the material time derivative operator in the spatial frame, following
+ the fluid motion.
+ Since the finite element mesh is defined on the porous solid matrix of
+ a biphasic mixture, and since the fluid flows relative to the solid, material
+ time derivatives need to follow the solid motion in the finite element
+ implementation.
+ A similar scheme was used in our implementations of solute transport within
+ deformable porous domains (Sections
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Triphasic-Multiphasic-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), to account for the motion of solutes relative to the porous solid matrix,
+ as well as in our FSI formulation (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Fluid-Structure-Interactions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2011,Ateshian2013,Shim2019"
+literal "true"
+
+\end_inset
+
+.
+ Thus, we substitute the following identity,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{D^{f}J^{f}}{Dt} & =\frac{\partial J^{f}}{\partial t}+\grad J^{f}\cdot\mathbf{v}^{f}\\
+ & =\frac{D^{s}J^{f}}{Dt}+\grad J^{f}\cdot\left(\mathbf{v}^{f}-\mathbf{v}^{s}\right)
+\end{aligned}
+\,,\label{eq:bfsi-DfJf-DsJf}
+\end{equation}
+
+\end_inset
+
+into the axiom of mixture mass balance in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-mix-mass-balance-f"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to produce the final form
+\begin_inset Formula 
+\begin{equation}
+\dot{J}^{f}+\frac{1}{\varphi^{f}}\grad J^{f}\cdot\mathbf{w}=\frac{J^{f}}{\varphi^{f}}\divg\left(\mathbf{v}^{s}+\mathbf{w}\right)\,.\label{eq:bfsi-fluid-kin-constr}
+\end{equation}
+
+\end_inset
+
+In this expression, the dot operator in 
+\begin_inset Formula $\dot{J}^{f}$
+\end_inset
+
+ represents the material time derivative following the solid motion.
+ In the solid material frame, this material time derivative reduces to the
+ partial time derivative.
+ Accordingly, we may now write 
+\begin_inset Formula $\mathbf{v}^{s}=\dot{\mathbf{u}}$
+\end_inset
+
+.
+ In the BFSI implementation, the fluid volumetric flux 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ relative to the solid is added to the list of nodal DOFs, giving us the
+ complete set 
+\begin_inset Formula $\left(\mathbf{u},\mathbf{w},e^{f}\right)$
+\end_inset
+
+.
+ This choice implies that 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ is continuous across finite element boundaries, as justified further below
+ when we review jump conditions across interfaces.
+\end_layout
+
+\begin_layout Standard
+Based on the constitutive assumptions of our hybrid biphasic formulation
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim21a"
+literal "false"
+
+\end_inset
+
+, the momentum balance equations for the fluid and solid constituents reduce
+ to
+\begin_inset Formula 
+\begin{equation}
+\rho^{f}\mathbf{a}^{f}=-\varphi^{f}\grad p+\divg\boldsymbol{\tau}^{f}+\rho^{f}\mathbf{b}^{f}-\varphi^{f}\mathbf{k}^{-1}\cdot\mathbf{w}\,,\label{eq:bfsi-fluid-momentum}
+\end{equation}
+
+\end_inset
+
+ and
+\begin_inset Formula 
+\begin{equation}
+\rho^{s}\mathbf{a}^{s}=-\varphi^{s}\grad p+\divg\boldsymbol{\sigma}^{e}+\rho^{s}\mathbf{b}^{s}+\varphi^{f}\mathbf{k}^{-1}\cdot\mathbf{w}\,,\label{eq:bfsi-solid-momentum}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{a}^{\alpha}=D^{\alpha}\mathbf{v}^{\alpha}/Dt$
+\end_inset
+
+ is the acceleration, 
+\begin_inset Formula $\mathbf{b}^{\alpha}$
+\end_inset
+
+ is the body force per mass acting on constituent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, 
+\begin_inset Formula $p$
+\end_inset
+
+ is the fluid pressure, 
+\begin_inset Formula $\boldsymbol{\tau}^{f}$
+\end_inset
+
+ is the apparent fluid viscous stress, and 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ is the apparent solid elastic stress.
+ These stress tensors are called apparent because their associated traction
+ vectors represent a force acting on constituent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ per elemental 
+\emph on
+mixture
+\emph default
+ area.
+ Here, 
+\begin_inset Formula $\mathbf{k}$
+\end_inset
+
+ is the hydraulic permeability tensor which regulates frictional drag between
+ the fluid and solid constituents; setting 
+\begin_inset Formula $\mathbf{k}^{-1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{0}$
+\end_inset
+
+ implies that this frictional drag is non-existent.
+ Since the fluid is compressible, its pressure must be given by a function
+ of state.
+ In the isothermal framework used here, this function only depends on 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, and its simplest form is
+\begin_inset Formula 
+\begin{equation}
+p=-Ke^{f}\,,\label{eq:bfsi-pressure-state}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ is the fluid bulk modulus (a user-specified material property).
+ In the limit when inertia and body forces are neglected (
+\begin_inset Formula $\mathbf{a}^{f}=\mathbf{b}^{f}=\mathbf{0}$
+\end_inset
+
+), the fluid momentum balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ produces the classical Darcy-Brinkman relation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Brinkman49"
+literal "false"
+
+\end_inset
+
+.
+ If the fluid viscous stress is also neglected (
+\begin_inset Formula $\boldsymbol{\tau}^{f}=\mathbf{0}$
+\end_inset
+
+), we recover Darcy's law, 
+\begin_inset Formula $\mathbf{w}=-\mathbf{k}\cdot\grad p$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since the finite element implementation requires all material time derivatives
+ to follow the motion of the solid, we recognize that 
+\begin_inset Formula $\mathbf{a}^{s}=\ddot{\mathbf{u}}$
+\end_inset
+
+ and we evaluate the fluid acceleration as 
+\begin_inset Formula $\mathbf{a}^{f}=\dot{\mathbf{v}}^{f}+\grad\mathbf{v}^{f}\cdot\left(\mathbf{v}^{f}-\mathbf{v}^{s}\right)$
+\end_inset
+
+.
+ However, since 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ is not a nodal degree of freedom, we use 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-flux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to substitute
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}^{f}=\frac{1}{\varphi^{f}}\mathbf{w}+\mathbf{v}^{s}\label{eq:bfsi-fluid-velocity}
+\end{equation}
+
+\end_inset
+
+into this expression.
+ It follows that the fluid velocity gradient 
+\begin_inset Formula $\mathbf{L}^{f}=\grad\mathbf{v}^{f}$
+\end_inset
+
+ may be evaluated as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{L}^{f}=\mathbf{L}^{s}+\frac{1}{\varphi^{f}}\left(\mathbf{L}^{w}-\frac{1}{\varphi^{f}}\mathbf{w}\otimes\grad\varphi^{f}\right)\,,\label{eq:bfsi-Lf}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{L}^{w}=\grad\mathbf{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{L}^{s}=\grad\mathbf{v}^{s}$
+\end_inset
+
+.
+ Now, the fluid acceleration takes the form
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}^{f}=\frac{1}{\varphi^{f}}\left(\dot{\mathbf{w}}+\phi^{f}\ddot{\mathbf{u}}-\frac{\varphi^{s}}{\varphi^{f}}\frac{\dot{J}^{s}}{J^{s}}\mathbf{w}+\mathbf{L}^{f}\cdot\mathbf{w}\right)\,.\label{eq:bfsi-af}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+BFSI Continuous Variables
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:BFSI-Continuous-Variables"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Jump conditions on the axioms of mass, momentum and energy balance are needed
+ to determine which variables may be selected as nodal DOFs in the finite
+ element implementation, and which tractions are naturally continuous across
+ an interface.
+ The full set of jump conditions for a hybrid biphasic material were derived
+ in our recent study for the constitutive assumptions adopted in this formulatio
+n 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim21a"
+literal "false"
+
+\end_inset
+
+.
+ Here, we summarize the salient results, which apply to an interface defined
+ on the porous solid matrix of the hybrid biphasic domain, which includes
+ the shared faces of adjoining biphasic elements.
+ Thus, the velocity of the interface is given by the velocity 
+\begin_inset Formula $\mathbf{v}^{s}$
+\end_inset
+
+ of the solid constituent of the hybrid biphasic material.
+ We employ the notation 
+\begin_inset Formula $\left[\left[f\right]\right]=f_{+}-f_{-}$
+\end_inset
+
+ to denote the jump in the function 
+\begin_inset Formula $f$
+\end_inset
+
+ across the interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, with 
+\begin_inset Formula $f_{+}$
+\end_inset
+
+ and 
+\begin_inset Formula $f_{-}$
+\end_inset
+
+ denoting the values of 
+\begin_inset Formula $f$
+\end_inset
+
+ on either side of 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+.
+ The unit normal on 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ is 
+\series bold
+
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+
+\series default
+, which points away from the 
+\begin_inset Formula $+$
+\end_inset
+
+ side.
+ A variable 
+\begin_inset Formula $f$
+\end_inset
+
+ which is continuous across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\left[\left[f\right]\right]=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Based on the jump condition on the axiom of mass balance, the normal component
+ of the mass flux of the fluid relative to the solid is continuous across
+ 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, 
+\begin_inset Formula $\left[\left[\rho_{T}^{f}\mathbf{w}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+.
+ Furthermore, a sufficient condition to satisfy the jump on the axiom of
+ energy balance is to enforce continuity of the fluid specific free enthalpy
+ (also known as the Gibbs function), 
+\begin_inset Formula $\left[\left[\psi^{f}+p/\rho_{T}^{f}\right]\right]=0$
+\end_inset
+
+, where 
+\begin_inset Formula $\psi^{f}$
+\end_inset
+
+ is the fluid specific free energy.
+ This jump condition applies only when there is fluid on both sides of the
+ interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+.
+ In an isothermal framework the specific free enthalpy is a function of
+ state that only depends on 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+, therefore this energy jump condition implies that 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ must be continuous across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, thus
+\begin_inset Formula 
+\begin{equation}
+\left[\left[J^{f}\right]\right]=0\,,\label{eq:bfsi-Jf-jump}
+\end{equation}
+
+\end_inset
+
+also implying that 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+.
+ Given 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-Jf"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it follows that 
+\begin_inset Formula $\left[\left[\rho_{T}^{f}\right]\right]=0$
+\end_inset
+
+ and the mass balance jump condition reduces to 
+\begin_inset Formula $\left[\left[\mathbf{w}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+, implying that the relative fluid flux component normal to 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ must be continuous.
+ For the tangential component of 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ on 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ we appeal to the analysis of Hou et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou1989"
+literal "false"
+
+\end_inset
+
+, who showed that a valid pseudo-noslip condition requires this tangential
+ component to be continuous.
+ Combining these two jump conditions produces
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\mathbf{w}\right]\right]=0\,.\label{eq:bfsi-fluid-flux-jump}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The momentum jump condition requires that the mixture traction be continuous
+ across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, thus 
+\begin_inset Formula $\left[\left[-p\mathbf{I}+\boldsymbol{\sigma}^{e}+\boldsymbol{\tau}^{f}\right]\right]\cdot\mathbf{n}=\mathbf{0}$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+ based on the energy jump, this mixture momentum jump condition reduces
+ to
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\boldsymbol{\sigma}^{e}+\boldsymbol{\tau}^{f}\right]\right]\cdot\mathbf{n}=0\,.\label{eq:bfsi-mix-mtm-jump}
+\end{equation}
+
+\end_inset
+
+Finally, another relation which is sufficient to satisfy the jump condition
+ on the energy balance is the continuity of the true fluid traction (force
+ acting on fluid per fluid area),
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\frac{\boldsymbol{\tau}^{f}}{\varphi^{f}}\right]\right]\cdot\mathbf{n}=0\,.\label{eq:bfsi-fluid-mtm-jump}
+\end{equation}
+
+\end_inset
+
+This jump condition 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, which also applies only if fluid is present on both sides of 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, is interesting because it implies that the viscous stress (and thus, the
+ viscosity) of a fluid flowing in a porous solid matrix scales with the
+ porosity of that medium, such that 
+\begin_inset Formula $\boldsymbol{\tau}^{f}=\phi^{f}\boldsymbol{\tau}$
+\end_inset
+
+ where 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ would be the true fluid viscous stress.
+ Thus, we can use FEBio's various constitutive relations for the viscous
+ stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ of Newtonian or non-Newtonian fluids and adapt those models to a biphasic
+ mixture where 
+\begin_inset Formula $\boldsymbol{\tau}^{f}$
+\end_inset
+
+ is evaluated as 
+\begin_inset Formula $\varphi^{f}\boldsymbol{\tau}$
+\end_inset
+
+.
+ Accordingly, the contribution of 
+\begin_inset Formula $\boldsymbol{\tau}^{f}$
+\end_inset
+
+ would properly reduce to zero in the limit as fluid content reduces to
+ zero (
+\begin_inset Formula $\varphi^{f}\to0$
+\end_inset
+
+), in which case the mixture momentum jump in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-mix-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ would reduce to 
+\begin_inset Formula $\left[\left[-p\mathbf{I}+\boldsymbol{\sigma}^{e}\right]\right]\cdot\mathbf{n}=\left[\left[\boldsymbol{\sigma}^{e}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+, since 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Letting 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ be nodal DOFs automatically enforces the jump conditions 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-Jf-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-flux-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, acting as essential boundary conditions, along with the solid displacement
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+.
+ Finally, subtracting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-mix-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we obtain the momentum jump condition for the solid constituent, 
+\begin_inset Formula 
+\begin{equation}
+\left[\left[-\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}^{f}+\boldsymbol{\sigma}^{e}\right]\right]\cdot\mathbf{n}=0\,.\label{eq:bfsi-solid-mtm-jump}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A BFSI domain may be reduced to a FSI domain by letting 
+\begin_inset Formula $\varphi_{r}^{s}\to0$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{k}^{-1}\to\mathbf{0}$
+\end_inset
+
+; the solid matrix would still be ascribed a material response but its stiffness
+ would need to be negligible.
+ The number of nodal DOFs would remain the same.
+ The CFD domain is a special case of the FSI domain where the mesh displacement
+ is uniformly 
+\begin_inset Formula $\mathbf{u}=\mathbf{0}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+However, when the biphasic domain interfaces with a non-porous solid domain
+ across 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+, the jump conditions 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-Jf-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ on 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-solid-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ on 
+\begin_inset Formula $\boldsymbol{\tau}^{f}$
+\end_inset
+
+ don't apply.
+ In that case, the jump condition 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-flux-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ on the relative fluid volumetric flux should reduce to 
+\begin_inset Formula $\mathbf{w}=\mathbf{0}$
+\end_inset
+
+ for the BFSI domain on 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+, although the user would have to enforce this no-slip condition explicitly
+ by prescribing it as an essential boundary condition.
+ The mixture momentum jump 
+\begin_inset Formula $\left[\left[-p\mathbf{I}+\boldsymbol{\sigma}^{e}+\boldsymbol{\tau}^{f}\right]\right]\cdot\mathbf{n}=\mathbf{0}$
+\end_inset
+
+ implies that the mixture traction on the BFSI side of an interface with
+ a solid is equal to the solid traction on the solid side.
+ This jump condition would also need to be enforced explicitly.
 \end_layout
 
 \begin_layout Chapter
@@ -16088,6 +17298,1661 @@ and
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Weak Formulation for BFSI
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:BFSI-Weak-Formulation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Virtual Work and Weak Form 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:BFSI-Virtual-Work"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The virtual work statement is used to enforce the three governing equations
+ needed to solve for the nodal DOFs 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, namely the mixture mass balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-kin-constr"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the fluid momentum balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and the solid momentum balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-solid-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ We may rewrite the momentum balance equations to facilitate the enforcement
+ of natural traction boundary conditions given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-fluid-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-solid-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Using 
+\begin_inset Formula $\boldsymbol{\tau}^{f}=\varphi^{f}\boldsymbol{\tau}$
+\end_inset
+
+, these become 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\varphi^{s}\left(-\rho_{T}^{f}\mathbf{a}^{f}+\rho_{T}^{s}\mathbf{a}^{s}\right)= & -\frac{\varphi^{s^{2}}}{\varphi^{f}}\mathbf{\boldsymbol{\tau}}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}+\divg\left(-\varphi^{s}\boldsymbol{\tau}+\boldsymbol{\sigma}^{e}\right)\\
+ & +\varphi^{s}\left(-\rho_{T}^{f}\mathbf{b}^{f}+\rho_{T}^{s}\mathbf{b}^{s}\right)+\mathbf{k}^{-1}\cdot\mathbf{w}\,,\\
+\rho_{T}^{f}\mathbf{a}^{f}= & -\grad p+\frac{1}{\phi^{f}}\mathbf{\boldsymbol{\tau}}\cdot\grad\varphi^{f}+\divg\boldsymbol{\tau}\\
+ & +\rho_{T}^{f}\mathbf{b}^{f}-\mathbf{k}^{-1}\cdot\mathbf{w}\,.
+\end{aligned}
+\label{eq:bfsi-gov-eqn-jump}
+\end{equation}
+
+\end_inset
+
+The virtual work statement for a Galerkin finite element formulation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonet97"
+literal "true"
+
+\end_inset
+
+ is 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+, where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W & =\int_{\Omega^{b}}\delta\mathbf{v}^{s}\cdot\left[\divg\left(-\varphi^{s}\boldsymbol{\tau}+\boldsymbol{\sigma}^{e}\right)-\frac{\varphi^{s^{2}}}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}+\mathbf{k}^{-1}\cdot\mathbf{w}\right]\,dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}^{s}\cdot\varphi^{s}\left(-\rho_{T}^{f}\left(\mathbf{b}^{f}-\mathbf{a}^{f}\right)+\rho_{T}^{s}\left(\mathbf{b}^{s}-\mathbf{a}^{s}\right)\right)\,dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\left[\divg\boldsymbol{\tau}-\grad p+\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\phi^{f}-\mathbf{k}^{-1}\cdot\mathbf{w}\right]\,dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\rho_{T}^{f}\left(\mathbf{b}^{f}-\mathbf{a}^{f}\right)\,dv\\
+ & +\int_{\Omega^{b}}\delta J^{f}\left[\divg\mathbf{w}+\frac{\dot{J}^{s}}{J^{s}}-\frac{1}{J^{f}}\left(\varphi^{f}\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)\right]\,dv\,.
+\end{aligned}
+\label{eq:bfsi-virtual-work-strong}
+\end{equation}
+
+\end_inset
+
+These integrals are evaluated in the current configuration of 
+\begin_inset Formula $\Omega^{b}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\delta\mathbf{v}^{s}$
+\end_inset
+
+ is the virtual solid velocity, 
+\begin_inset Formula $\delta\mathbf{w}$
+\end_inset
+
+ is the virtual relative fluid volumetric flux, and 
+\begin_inset Formula $\delta J^{f}$
+\end_inset
+
+ is the virtual fluid energy density.
+ Integrating by parts and using the divergence theorem, the weak form of
+ this statement may be written as 
+\begin_inset Formula $\delta W=\delta W_{ext}-\delta W_{int}$
+\end_inset
+
+ where the internal virtual work is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{int} & =\int_{\Omega^{b}}\left[\left(-\varphi^{s}\boldsymbol{\tau}+\boldsymbol{\sigma}^{e}\right):\grad\delta\mathbf{v}^{s}-\delta\mathbf{v}^{s}\cdot\mathbf{k}^{-1}\cdot\mathbf{w}\right]\,dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}^{s}\cdot\varphi^{s}\left(\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}-\rho_{T}^{f}\mathbf{a}^{f}+\rho_{T}^{s}\mathbf{a}^{s}\right)\,dv\\
+ & +\int_{\Omega^{b}}\boldsymbol{\tau}:\grad\delta\mathbf{w}\,dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\left(\grad p+\mathbf{k}^{-1}\cdot\mathbf{w}\right)\,dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\left(\rho_{T}^{f}\mathbf{a}^{f}-\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\varphi^{f}\right)\,dv\\
+ & +\int_{\Omega^{b}}\mathbf{w}\cdot\grad\delta J^{f}\,dv\,,\\
+ & +\int_{\Omega^{b}}\delta J^{f}\left[\frac{1}{J^{f}}\left(\varphi^{f}\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)-\frac{\dot{J}^{s}}{J^{s}}\right]\,dv
+\end{aligned}
+\label{eq:bfsi-int-virtual-work}
+\end{equation}
+
+\end_inset
+
+ and the external part is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{ext} & =\int_{\partial\Omega^{b}}\delta\mathbf{v}^{s}\cdot\mathbf{t}^{\sigma}\,da\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}^{s}\cdot\varphi^{s}\left(-\rho_{T}^{f}\mathbf{b}^{f}+\rho_{T}^{s}\mathbf{b}^{s}\right)\,dv\\
+ & +\int_{\partial\Omega^{b}}\delta\mathbf{w}\cdot\mathbf{t}^{\tau}\,da+\int_{\Omega^{f}}\delta\mathbf{w}\cdot\rho_{T}^{f}\mathbf{b}^{f}\,dv\\
+ & +\int_{\partial\Omega^{b}}\delta J^{f}w_{n}\,da\,.
+\end{aligned}
+\label{eq:bfsi-ext-virtual-work}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}^{\sigma}=-\phi^{s}\mathbf{t}^{\tau}+\mathbf{t}^{e}\,.\label{eq:bfsi-sigma-traction}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mathbf{t}^{e}=\boldsymbol{\sigma}^{e}\cdot\mathbf{n}$
+\end_inset
+
+ is the elastic traction, 
+\begin_inset Formula $\mathbf{t}^{\tau}=\boldsymbol{\tau}\cdot\mathbf{n}$
+\end_inset
+
+ is the true fluid viscous traction, and 
+\begin_inset Formula $w_{n}=\mathbf{w}_{n}\cdot\mathbf{n}$
+\end_inset
+
+ is the normal component of the relative fluid flux on the boundary 
+\begin_inset Formula $\partial\Omega^{b}$
+\end_inset
+
+, whose outward unit normal is 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ The traction 
+\begin_inset Formula $\mathbf{t}^{\sigma}$
+\end_inset
+
+ emerges from the jump condition in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-solid-mtm-jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The integrands of the surface integrals represent the natural boundary
+ conditions for this formulation.
+ If boundary conditions are not set explicitly on 
+\begin_inset Formula $\partial\Omega^{b}$
+\end_inset
+
+, the natural boundary conditions are 
+\begin_inset Formula $\mathbf{t}^{\sigma}=\mathbf{0}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+, and 
+\begin_inset Formula $w_{n}=0$
+\end_inset
+
+.
+ These natural boundary conditions are consistent with the jump conditions
+ presented above.
+ Essential boundary conditions are prescribed on the solid displacement
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, relative volumetric fluid flux 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+, and fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, which are also consistent with the above jump conditions.
+ In particular, an essential no-slip boundary condition may be prescribed
+ on 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+ by setting 
+\begin_inset Formula $\mathbf{w}=\mathbf{0}$
+\end_inset
+
+.
+ A symmetry plane may be prescribed with the essential boundary condition
+ 
+\begin_inset Formula $u_{n}\equiv\mathbf{u}\cdot\mathbf{n}=0$
+\end_inset
+
+ and the natural boundary conditions 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{n}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In this formulation, the mixture traction is defined as 
+\begin_inset Formula $\mathbf{t}=-p\mathbf{n}+\mathbf{t}^{e}+\phi^{f}\mathbf{t}^{\tau}$
+\end_inset
+
+, which may also be written as 
+\begin_inset Formula $\mathbf{t}=-p\mathbf{n}+\mathbf{t}^{\sigma}+\mathbf{t}^{\tau}$
+\end_inset
+
+.
+ Because of the way we chose to split the internal and external virtual
+ work in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-int-virtual-work"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-ext-virtual-work"
+
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ is not a natural boundary condition in this formulation.
+ In this expression for 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}^{\sigma}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ may be prescribed as natural boundary conditions, whereas 
+\begin_inset Formula $p$
+\end_inset
+
+ may be prescribed as an essential boundary condition on 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ However, there are two general scenarios where 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ needs to be prescribed on a region of the boundary 
+\begin_inset Formula $\partial\Omega^{b}$
+\end_inset
+
+ with incomplete prior knowledge of 
+\begin_inset Formula $p$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}^{\sigma}$
+\end_inset
+
+, or 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+: (1) When a BFSI boundary 
+\begin_inset Formula $\Gamma^{b}$
+\end_inset
+
+ represents a free surface (such as the fluid surface in channel flow),
+ the mixture traction boundary condition requires that 
+\begin_inset Formula $\mathbf{t}=\mathbf{0}$
+\end_inset
+
+, in which case it is necessary to explicitly enforce 
+\begin_inset Formula $-p\mathbf{n}+\mathbf{t}^{\sigma}+\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+ as a constraint equation on that boundary, to impart the free surface 
+\begin_inset Formula $\Gamma^{b}$
+\end_inset
+
+ its natural shape.
+ (2) At a biphasic-solid interface 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ must balance the traction acting on the adjoining solid domain.
+ Since 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ is continuous across 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+ due to shared nodes, the solid natural boundary condition 
+\begin_inset Formula $\mathbf{t}^{\sigma}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ is already accounted for by the deformation, so that it is only necessary
+ to prescribe the portion 
+\begin_inset Formula $-p\mathbf{n}+\mathbf{t}^{\tau}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ on the solid domain, thus 
+\begin_inset Formula $-p\mathbf{n}+\mathbf{t}^{\tau}+\mathbf{t}^{s}=\mathbf{0}$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{t}^{s}$
+\end_inset
+
+ is the (equal and opposite) traction acting on the solid domain.
+ In both cases, the form of this traction boundary condition is the same,
+ with 
+\begin_inset Formula $\mathbf{t}^{e}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{s}$
+\end_inset
+
+ representing the tractions acting on 
+\begin_inset Formula $\Gamma^{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+, respectively.
+\end_layout
+
+\begin_layout Standard
+For both of these cases, the resulting virtual work on the free surface
+ 
+\begin_inset Formula $\Gamma^{b}$
+\end_inset
+
+ or the interface 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+ takes the form
+\begin_inset Formula 
+\begin{equation}
+\delta F=-\int_{\Gamma}\delta\mathbf{v}^{s}\cdot\left(-p\mathbf{n}+\mathbf{t}^{\tau}\right)\,da\,,\label{eq:bfsi-traction-virtual-work}
+\end{equation}
+
+\end_inset
+
+where the elemental area 
+\begin_inset Formula $da$
+\end_inset
+
+ on 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ may be evaluated from the covariant basis vectors 
+\begin_inset Formula $\mathbf{g}_{\alpha}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha=1,2$
+\end_inset
+
+),
+\begin_inset Formula 
+\begin{equation}
+da=\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\,d\eta^{1}d\eta^{2}\,,\label{eq:bfsi-diff-area}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}_{\alpha}=\frac{\partial\mathbf{x}\left(\eta^{1},\eta^{2}\right)}{\partial\eta^{\alpha}}\,,\label{eq:bfsi-covar-vectors}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\mathbf{x}\left(\eta^{1},\eta^{2}\right)$
+\end_inset
+
+ is the parametric representation of 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, defined on the solid constituent.
+ The outward normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ to 
+\begin_inset Formula $\Omega^{b}$
+\end_inset
+
+ on 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ is evaluated from
+\begin_inset Formula 
+\begin{equation}
+\mathbf{n}=\frac{\mathbf{g}_{1}\times\mathbf{g}_{2}}{\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,.\label{eq:bfsi-norm-vector}
+\end{equation}
+
+\end_inset
+
+As a result, the virtual work can be rewritten as 
+\begin_inset Formula 
+\begin{equation}
+\delta F=-\int_{\Gamma}\delta\mathbf{v}^{s}\cdot\left(-p\mathbf{I}+\boldsymbol{\tau}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\,d\eta^{1}d\eta^{2}\,.\label{eq:bfsi-traction-final}
+\end{equation}
+
+\end_inset
+
+In FEBio this boundary condition is called 
+\emph on
+BFSI traction
+\emph default
+, which the user must explicitly prescribe on free surfaces 
+\begin_inset Formula $\Gamma^{b}$
+\end_inset
+
+ and deformable interfaces 
+\begin_inset Formula $\Gamma^{bs}$
+\end_inset
+
+.
+ The code automatically determines which of these two types of interfaces
+ is being considered.
+\end_layout
+
+\begin_layout Subsection
+BFSI Linearization 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:BFSI-Linearization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the virtual work integral 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{equation}
+\delta W+D\delta W\left[\Delta\mathbf{u}\right]+D\delta W\left[\Delta\mathbf{w}\right]+D\delta W\left[\Delta J^{f}\right]\approx0\,,\label{eq:Virtual-Work-Expanded-BFSI}
+\end{equation}
+
+\end_inset
+
+ it may be expanded as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & D\delta W_{int}\left[\Delta\mathbf{u}\right]+D\delta W_{int}\left[\Delta\mathbf{w}\right]+D\delta W_{int}\left[\Delta J^{f}\right]\\
+ & -D\delta W_{ext}\left[\Delta\mathbf{u}\right]-D\delta W_{ext}\left[\Delta\mathbf{w}\right]-D\delta W_{ext}\left[\Delta J^{f}\right]\\
+ & \approx\delta W_{ext}-\delta W_{int}\,.
+\end{aligned}
+\label{eq:linearized-work-split-bfsi}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The linearizations of integrals are performed in the material frame of the
+ solid domain of 
+\begin_inset Formula $\Omega^{b}$
+\end_inset
+
+, allowing us to linearize 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ along increments 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+, 
+\begin_inset Formula $\Delta\mathbf{w}$
+\end_inset
+
+, or 
+\begin_inset Formula $\Delta J^{f}$
+\end_inset
+
+ by simply bringing the directional derivative operator inside the integrals
+ of Eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-int-virtual-work"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-ext-virtual-work"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ For notational convenience, we let 
+\begin_inset Formula $J\equiv J^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}\equiv\mathbf{F}^{s}$
+\end_inset
+
+.
+ Thus, the conversion of the internal virtual work to the material frame
+ of the solid produces 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{int}= & \int_{\Omega^{b}}\left(-\varphi_{r}^{s}\mathbf{T}_{d}+\mathbf{F}\cdot\boldsymbol{\sigma}^{e}\cdot\mathbf{F}^{T}\right):\Grad\delta\mathbf{v}\cdot\mathbf{F}^{-1}dV\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\varphi_{r}^{s}\left(\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}\cdot\mathbf{F}^{-T}\cdot\Grad\left(\frac{\varphi^{f}}{\varphi^{s}}\right)-\rho_{T}^{f}\mathbf{a}^{f}+\rho_{T}^{s}\dot{\mathbf{v}}^{s}\right)dV\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-J^{2}\mathbf{F}^{-T}\cdot\mathbf{K}^{-1}\cdot\mathbf{F}^{-1}\cdot\mathbf{w}dV\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot J\left(\rho_{T}^{f}\mathbf{a}^{f}+\mathbf{F}^{-T}\cdot\Grad p\right)dV\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot J\left(-\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\mathbf{F}^{-T}\cdot\Grad\varphi^{f}+J\mathbf{F}^{-T}\cdot\mathbf{K}^{-1}\cdot\mathbf{F}^{-1}\cdot\mathbf{w}\right)dV\\
+ & +\int_{\Omega^{b}}J\boldsymbol{\tau}:\Grad\delta\mathbf{w}\cdot\mathbf{F}^{-1}dV\\
+ & +\int_{\Omega^{b}}J\Grad\delta J^{f}\cdot\mathbf{F}^{-1}\cdot\mathbf{w}+\delta J^{f}\left(J\frac{\varphi^{f}}{J^{f}}\frac{D^{f}J^{f}}{Dt}-\dot{J}^{s}\right)dV\thinspace,
+\end{aligned}
+\label{eq:int-virtual-work-material-BFSI}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{S}=J\,\mathbf{F}^{-1}\cdot\boldsymbol{\sigma}^{e}\cdot\mathbf{F}^{-T}$
+\end_inset
+
+ is the second Piola-Kirchhoff stress for the solid constituent of the mixture,
+ 
+\begin_inset Formula $\mathbf{W}=J\mathbf{F}^{-1}\cdot\mathbf{w}$
+\end_inset
+
+ is the Piola transformation of 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+, and 
+\begin_inset Formula $dV=J^{-1}dv$
+\end_inset
+
+ is an elemental volume of 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+ in its material frame 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonet97"
+literal "true"
+
+\end_inset
+
+.
+ In addition, 
+\begin_inset Formula $\mathbf{K}^{-1}=J^{-1}\mathbf{F}^{T}\cdot\mathbf{k}^{-1}\cdot\mathbf{F}$
+\end_inset
+
+ is the inverse of the permeability tensor in the material frame.
+ Note that in the material frame, the fluid acceleration 
+\begin_inset Formula $\mathbf{a}^{f}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}^{f}=\frac{1}{\varphi^{f}}\left(\dot{\mathbf{w}}+\varphi^{f}\dot{\mathbf{v}}^{s}-\frac{\varphi^{s}}{\varphi^{f}}\frac{\dot{J}}{J}\mathbf{w}+\frac{1}{J}\left(\frac{1}{\varphi^{f}}\Grad\mathbf{w}+\Grad\mathbf{v}^{s}-\frac{1}{\varphi^{f^{2}}}\mathbf{w}\otimes\Grad\varphi^{f}\right)\cdot\mathbf{W}\right)\,.\label{eq:material-fluid-accel-BFSI}
+\end{equation}
+
+\end_inset
+
+ The linearization of 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ is then performed along an increment 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+, and the integral is reverted back to the spatial frame, yielding for the
+ displacement equations
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta\mathbf{u}\right]= & \int_{\Omega^{b}}\alpha_{f}\left(\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}^{e}:\grad\delta\mathbf{v}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\grad\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\varphi^{s}\boldsymbol{\tau}:\grad\delta\mathbf{v}\cdot\left(\grad\Delta\mathbf{u}+\frac{\varphi^{s}}{\varphi^{f}}\divg\Delta\mathbf{u}\mathbf{I}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\varphi^{s}\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}^{\tau}:\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{D}^{w}+\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\varphi^{s}\grad\delta\mathbf{v}:\frac{1}{\varphi^{f^{2}}}\boldsymbol{\mathcal{C}}^{\tau}:2\frac{\varphi^{s}}{\varphi^{f}}\left(\divg\Delta\mathbf{u}\right)\mathbf{w}\otimes\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\varphi^{s}\grad\delta\mathbf{v}:\frac{1}{\varphi^{f^{2}}}\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{w}\otimes\left(-\grad^{T}\Delta\mathbf{u}\cdot\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\varphi^{s}\grad\delta\mathbf{v}:\frac{1}{\varphi^{f^{2}}}\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{w}\otimes\left(-\left(\divg\Delta\mathbf{u}\right)\grad\varphi^{f}+\varphi^{s}\grad\left(\divg\Delta\mathbf{u}\right)\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\frac{\varphi^{s^{2}}}{\varphi^{f}}\boldsymbol{\tau}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\divg\Delta\mathbf{u}+\grad^{T}\Delta\mathbf{u}\right)\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\frac{\varphi^{s^{2}}}{\varphi^{f}}\boldsymbol{\tau}\cdot\frac{1}{\varphi^{s}}\grad\left(\divg\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\frac{\varphi^{s^{2}}}{\varphi^{f}}\boldsymbol{\mathcal{C}}^{\tau}:\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{D}^{w}+\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\boldsymbol{\mathcal{C}}^{\tau}:2\frac{\varphi^{s}}{\varphi^{f}}\left(\divg\Delta\mathbf{u}\right)\mathbf{w}\otimes\grad\varphi^{f}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{w}\otimes\left(-\grad^{T}\Delta\mathbf{u}\cdot\grad\varphi^{f}\right)\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{w}\otimes\left(-\divg\Delta\mathbf{u}\grad\varphi^{f}+\varphi^{s}\grad\left(\divg\Delta\mathbf{u}\right)\right)\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\varphi^{s}\left(\divg\Delta\mathbf{u}\right)\dot{\mathbf{v}}^{s}+\varphi^{f}\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\frac{\varphi^{s}}{\varphi^{f}}\left[\left(\left(-\frac{1}{\varphi^{f}}\right)\frac{\dot{J}}{J}+\frac{\gamma}{\beta\Delta t}\right)\divg\Delta\mathbf{u}-\grad^{T}\Delta\mathbf{u}:\mathbf{L}^{s}\right]\mathbf{w}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\divg\Delta\mathbf{u}\grad\mathbf{w}+\frac{\gamma}{\beta\Delta t}\grad\Delta\mathbf{u}\right)\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f^{3}}}\left[\left(\left(\varphi^{s}+1\right)\frac{1}{\varphi^{f}}\grad\varphi^{f}\divg\Delta\mathbf{u}-\varphi^{s}\grad\left(\divg\Delta\mathbf{u}\right)\right)\cdot\mathbf{w}\right]\mathbf{w}dv
+\end{aligned}
+\label{eq:Wint-lin-u-u-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\mathbf{L}^{f}\cdot\grad\Delta\mathbf{u}\cdot\mathbf{w}+\varphi^{s}\left(\divg\Delta\mathbf{u}\right)\mathbf{a}^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\rho^{s}\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}\Delta\mathbf{u}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\left(-2\left(\divg\Delta\mathbf{u}\right)\mathbf{k}^{-1}+\grad^{T}\Delta\mathbf{u}\cdot\mathbf{k}^{-1}\right)\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\left(\mathbf{k}^{-1}\cdot\grad\Delta\mathbf{u}+\left(\mathbf{k}^{-1}\underbar{\otimes}\mathbf{k}^{-1}\right):\mathsf{k}:\grad\Delta\mathbf{u}\right)\cdot\mathbf{w}dv\thinspace,
+\end{aligned}
+\]
+
+\end_inset
+
+ for the fluid flux equations 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta\mathbf{u}\right]= & \int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(-\frac{\varphi^{s}}{\varphi^{f}}\left[\left(-\frac{1}{\varphi^{f}}\frac{\dot{J}}{J}+\frac{\gamma}{\beta\Delta t}\right)\divg\Delta\mathbf{u}-\grad^{T}\Delta\mathbf{u}:\mathbf{L}^{s}\right]\mathbf{w}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\varphi^{s}\left(\divg\Delta\mathbf{u}\right)\dot{\mathbf{v}}^{s}+\varphi^{f}\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\divg\Delta\mathbf{u}\grad\mathbf{w}+\frac{\gamma}{\beta\Delta t}\grad\Delta\mathbf{u}\right)\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}\frac{1}{\varphi^{f^{2}}}\left[\left(\left(\varphi^{s}+1\right)\frac{1}{\varphi^{f}}\grad\varphi^{f}\left(\divg\Delta\mathbf{u}\right)-\varphi^{s}\grad\left(\divg\Delta\mathbf{u}\right)\right)\cdot\mathbf{w}\right]\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}\mathbf{L}^{f}\cdot\grad\Delta\mathbf{u}\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\left(1-\frac{\varphi^{s}}{\varphi^{f}}\right)\left(\divg\Delta\mathbf{u}\right)\rho_{T}^{f}\mathbf{a}^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\left(\left(\divg\Delta\mathbf{u}\right)\mathbf{I}-\grad^{T}\Delta\mathbf{u}\right)\cdot\grad pdv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\left(2\left(\divg\Delta\mathbf{u}\right)\mathbf{k}^{-1}-\grad^{T}\Delta\mathbf{u}\cdot\mathbf{k}^{-1}\right)\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\left(\mathbf{k}^{-1}\cdot\grad\Delta\mathbf{u}+\left(\mathbf{k}^{-1}\underbar{\otimes}\mathbf{k}^{-1}\right):\mathsf{k}:\grad\Delta\mathbf{u}\right)\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\left(\divg\Delta\mathbf{u}\right)\mathbf{I}+\grad^{T}\Delta\mathbf{u}\right)\cdot\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\left(\divg\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\frac{1}{\varphi^{f}}\boldsymbol{\mathcal{C}}^{\tau}:\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{D}^{w}+\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\cdot\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\frac{1}{\varphi^{f^{3}}}\boldsymbol{\mathcal{C}}^{\tau}:2\frac{\varphi^{s}}{\varphi^{f}}\left(\divg\Delta\mathbf{u}\right)\mathbf{w}\otimes\grad\varphi^{f}\cdot\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{1}{\varphi^{f^{3}}}\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{w}\otimes\left(-\grad^{T}\Delta\mathbf{u}\cdot\grad\varphi^{f}\right)\cdot\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{1}{\varphi^{f^{3}}}\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{w}\otimes\left(-\left(\divg\Delta\mathbf{u}\right)\grad\varphi^{f}+\varphi^{s}\grad\left(\divg\Delta\mathbf{u}\right)\right)\cdot\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\boldsymbol{\tau}:\grad\delta\mathbf{w}\cdot\left(\left(1-\frac{\varphi^{s}}{\varphi^{f}}\right)\left(\divg\Delta\mathbf{u}\right)\mathbf{I}-\grad\Delta\mathbf{u}\right)dv
+\end{aligned}
+\label{eq:Wint-lin-w-u-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & +\int_{\Omega^{b}}\alpha_{f}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{D}^{w}+\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:2\frac{\varphi^{s}}{\varphi^{f^{3}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{w}\otimes\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\frac{1}{\varphi^{f^{2}}}\mathbf{w}\otimes\left(-\grad^{T}\Delta\mathbf{u}\cdot\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\frac{1}{\varphi^{f^{2}}}\mathbf{w}\otimes\left(-\left(\divg\Delta\mathbf{u}\right)\grad\varphi^{f}+\varphi^{s}\grad\left(\divg\Delta\mathbf{u}\right)\right)dv\thinspace,
+\end{aligned}
+\]
+
+\end_inset
+
+ and for the fluid dilatation equations 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta\mathbf{u}\right]= & \int_{\Omega^{b}}\alpha_{f}\grad\delta J^{f}\cdot\left(\divg\Delta\mathbf{u}\mathbf{I}-\grad\Delta\mathbf{u}\right)\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\left(\dot{J}^{f}\divg\Delta\mathbf{u}+\grad J^{f}\cdot\left(\left(\divg\Delta\mathbf{u}\right)\mathbf{I}-\grad\Delta\mathbf{u}\right)\cdot\mathbf{w}\right)dv\\
+ & +\int_{\Omega^{b}}-\delta J^{f}\alpha_{f}\left(\divg\mathbf{v}^{s}+\frac{\gamma}{\beta\Delta t}\right)\divg\Delta\mathbf{u}+\grad^{T}\Delta\mathbf{u}:\mathbf{L}^{s}dv\thinspace,
+\end{aligned}
+\label{eq:Wint-lin-J-u-BFSI}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{M}=\frac{\gamma}{\beta\Delta t}\mathbf{I}-\mathbf{L}^{s}$
+\end_inset
+
+, and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ is the fourth-order spatial elasticity tensor associated with 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonet97"
+literal "true"
+
+\end_inset
+
+.
+ As done in the CFD formulation (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:CFD-Discretization-Linearization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2018"
+literal "true"
+
+\end_inset
+
+, we have introduced the fourth-order tensor 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}^{\tau}$
+\end_inset
+
+ representing the tangent of the viscous stress with respect to the rate
+ of deformation, 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}^{\tau}=\frac{\partial\boldsymbol{\tau}}{\partial\mathbf{D}^{f}}\,,\label{eq:visc-stress-tan-D-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{D}^{f}$
+\end_inset
+
+ is the fluid rate of deformation tensor (the symmetric part of 
+\begin_inset Formula $\mathbf{L}^{f}$
+\end_inset
+
+).
+ The tensors 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}_{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ depend on the choice of constitutive relations for the fluid and solid
+ constituents of 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+, respectively.
+ In addition, 
+\begin_inset Formula $\mathsf{k}$
+\end_inset
+
+ is the spatial fourth order permeability tensor with respect to right Cauchy-Gr
+een tensor 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+.
+ The linearized equations include the generalized-
+\begin_inset Formula $\alpha$
+\end_inset
+
+ parameters because the virtual work is evaluated at the intermediate time
+ step, while the increment itself (
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+ in this case) is at the current time step 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Jansen2000a"
+literal "true"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Following the same procedure, the linearizations of 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ along an increment 
+\begin_inset Formula $\Delta\mathbf{w}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta\mathbf{w}\right]= & \int_{\Omega^{b}}-\alpha_{f}\frac{\varphi^{s}}{\varphi^{f}}\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}^{\tau}:\left(\grad\Delta\mathbf{w}-\frac{1}{\varphi^{f}}\Delta\mathbf{w}\otimes\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\left(\frac{\alpha_{m}}{\gamma\alpha_{f}\Delta t}-\frac{\varphi^{s}}{\varphi^{f}}\frac{\dot{J}}{J}-\frac{1}{\varphi^{f^{2}}}\left(\grad\varphi^{f}\cdot\mathbf{w}\right)\right)\mathbf{I}+\mathbf{L}^{f}\right)\cdot\Delta\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f^{2}}}\grad\Delta\mathbf{w}\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\frac{\left(\varphi^{s}\right)^{2}}{\left(\varphi^{f}\right)^{2}}\boldsymbol{\mathcal{C}}^{\tau}:\left(\grad\Delta\mathbf{w}-\frac{1}{\varphi^{f}}\Delta\mathbf{w}\otimes\grad\varphi^{f}\right)\cdot\grad\left(\frac{\varphi^{f}}{\varphi^{s}}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot-\alpha_{f}\mathbf{k}^{-1}\cdot\Delta\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\left(\frac{\alpha_{m}}{\gamma\alpha_{f}\Delta t}-\frac{\varphi^{s}}{\varphi^{f}}\frac{\dot{J}}{J}-\frac{1}{\varphi^{f^{2}}}\left(\grad\varphi^{f}\cdot\mathbf{w}\right)\right)\mathbf{I}+\mathbf{L}^{f}\right)\cdot\Delta\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f^{2}}}\grad\Delta\mathbf{w}\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\mathbf{k}^{-1}\cdot\Delta\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\frac{1}{\varphi^{f^{2}}}\boldsymbol{\mathcal{C}}^{\tau}:\left(\frac{1}{\varphi^{f}}\Delta\mathbf{w}\otimes\grad\varphi^{f}-\grad\Delta\mathbf{w}\right)\cdot\grad\varphi^{f}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{1}{\varphi^{f}}\grad\delta\mathbf{w}:\boldsymbol{\mathcal{C}}^{\tau}:\left(\grad\Delta\mathbf{w}-\frac{1}{\varphi^{f}}\Delta\mathbf{w}\otimes\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\grad\delta J^{f}\cdot\Delta\mathbf{w}+\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\grad J^{f}\cdot\Delta\mathbf{w}dv\thinspace,
+\end{aligned}
+\label{eq:Wint-lin-w-BFSI}
+\end{equation}
+
+\end_inset
+
+ whereas the linearizations of 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ along an increment 
+\begin_inset Formula $\Delta J^{f}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta J^{f}\right]= & \int_{\Omega^{b}}-\alpha_{f}\varphi^{s}\boldsymbol{\tau}_{J}^{\prime}:\grad\delta\mathbf{v}\Delta J^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\varphi^{s}\left(\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}+\frac{\rho_{T}^{f}}{J^{f}}\mathbf{a}^{f}\right)\Delta J^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\left(p^{\prime\prime}\grad J^{f}\Delta J^{f}+p^{\prime}\grad\Delta J^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\left(\frac{\rho_{T}^{f}}{J^{f}}\mathbf{a}^{f}\Delta J^{f}+\frac{1}{\varphi^{f}}\boldsymbol{\tau}_{J}^{\prime}\Delta J^{f}\cdot\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\boldsymbol{\tau}_{J}^{\prime}:\grad\delta\mathbf{w}\Delta J^{f}dv\\
+ & +\int_{\Omega^{b}}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\left(\varphi^{f}\frac{\alpha_{m}}{\gamma\alpha_{f}\Delta t}-\frac{1}{J^{f}}\left(\varphi^{f}\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)\right)\Delta J^{f}dv\\
+ & +\int_{\Omega^{b}}\delta J^{f}\alpha_{f}\frac{1}{J^{f}}\grad\Delta J^{f}\cdot\mathbf{w}dv\thinspace.
+\end{aligned}
+\label{eq:Wint-lin-J-BFSI}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $p^{\prime}$
+\end_inset
+
+ and 
+\begin_inset Formula $p^{\prime\prime}$
+\end_inset
+
+ respectively represent the first and second derivatives of 
+\begin_inset Formula $p\left(J^{f}\right)$
+\end_inset
+
+.
+ We have also defined 
+\begin_inset Formula $\boldsymbol{\tau}_{J}^{\prime}$
+\end_inset
+
+ as the tangent of the viscous stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\tau}_{J}^{\prime}=\frac{\partial\boldsymbol{\tau}}{\partial J^{f}}\,.\label{eq:visc-stress-tan-J-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the external work, when 
+\begin_inset Formula $\mathbf{t}^{\sigma}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+, all 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{n}$
+\end_inset
+
+ are prescribed, the linearizations simplify to 
+\begin_inset Formula 
+\begin{equation}
+D\delta W_{ext}\left[\Delta\mathbf{u}\right]=\int_{\Omega^{b}}\delta\mathbf{w}\cdot\alpha_{f}\divg\Delta\mathbf{u}\rho_{T}^{f}\mathbf{b}^{f}dv\,,\label{eq:Wext-lin-u-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+D\delta W_{ext}\left[\Delta\mathbf{w}\right]=0\,,\label{eq:Wext-lin-w-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{ext}\left[\Delta J^{f}\right]= & \int_{\Omega^{b}}\delta\mathbf{w}\cdot-\alpha_{f}\frac{\rho_{T}^{f}}{J^{f}}\mathbf{b}^{f}\Delta J^{f}dv\\
+ & +\int_{\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{J^{f}}\mathbf{b}^{f}\Delta J^{f}dv\,.
+\end{aligned}
+\label{eq:Wext-lin-J-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As discussed in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Governing-Equations-FSI"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we define the fluid dilatation 
+\begin_inset Formula $e^{f}=J^{f}-1$
+\end_inset
+
+ as an alternative essential variable, since initial and boundary conditions
+ 
+\begin_inset Formula $e^{f}=0$
+\end_inset
+
+ are more convenient to handle in a numerical scheme than 
+\begin_inset Formula $J^{f}=1$
+\end_inset
+
+.
+ It follows that 
+\begin_inset Formula $\grad J^{f}=\grad e^{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\dot{J}^{f}=\dot{e}^{f}$
+\end_inset
+
+.
+ Therefore the changes to the above equations are minimal, simply requiring
+ the substitution 
+\begin_inset Formula $J^{f}=1+e^{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta J^{f}=\Delta e^{f}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+BFSI Spatial Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:BFSI-Spatial-Discretization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The degrees of freedom 
+\begin_inset Formula $\mathbf{u}\left(\mathbf{x},t\right)$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{w}\left(\mathbf{x},t\right)$
+\end_inset
+
+, 
+\begin_inset Formula $J^{f}\left(\mathbf{x},t\right)$
+\end_inset
+
+ are spatially interpolated over the domain 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+ using the same interpolation functions 
+\begin_inset Formula $N_{a}\left(\mathbf{x}\right)$
+\end_inset
+
+, with 
+\begin_inset Formula $a=1$
+\end_inset
+
+ to 
+\begin_inset Formula $n$
+\end_inset
+
+, where 
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of nodes in an element, 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{u}\left(\mathbf{x},t\right) & =\sum_{a=1}^{n}N_{a}\left(\mathbf{x}\right)\mathbf{u}_{a}\,,\\
+\mathbf{w}\left(\mathbf{x},t\right) & =\sum_{a=1}^{n}N_{a}\left(\mathbf{x}\right)\mathbf{w}_{a}\,,\\
+J^{f}\left(\mathbf{x},t\right) & =\sum_{a=1}^{n}N_{a}\left(\mathbf{x}\right)J_{a}^{f}\,.
+\end{aligned}
+\label{eq:spatial-interpol-BFSI}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mathbf{u}_{a}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{w}_{a}$
+\end_inset
+
+, and 
+\begin_inset Formula $J_{a}^{f}$
+\end_inset
+
+ are the nodal values of the degrees of freedom that evolve over time.
+ These relations may be used to evaluate 
+\begin_inset Formula $\mathbf{L}^{s}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{L}^{w}$
+\end_inset
+
+, 
+\begin_inset Formula $\divg\mathbf{w}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\mathbf{w}}$
+\end_inset
+
+, 
+\begin_inset Formula $\grad J^{f}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{J^{f}}$
+\end_inset
+
+, etc.
+ Similar interpolations are used for virtual increments 
+\begin_inset Formula $\delta\mathbf{v}$
+\end_inset
+
+, 
+\begin_inset Formula $\delta\mathbf{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta J^{f}$
+\end_inset
+
+, as well as real increments 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+, 
+\begin_inset Formula $\Delta\mathbf{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta J^{f}$
+\end_inset
+
+.
+ In practice, interpolations 
+\begin_inset Formula $N_{a}$
+\end_inset
+
+ are performed in the parametric space of each finite element, which is
+ a material frame.
+\end_layout
+
+\begin_layout Standard
+Now, the discretized form of 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+, using Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:int-virtual-work-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, may be written as 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{int} & =\sum_{a}\delta\mathbf{v}_{a}\cdot\mathbf{f}_{a}^{u}\\
+ & +\sum_{a}\delta\mathbf{w}_{a}\cdot\mathbf{f}_{a}^{w}\\
+ & +\sum_{a}\delta J_{a}^{f}f_{a}^{J}\,,
+\end{aligned}
+\label{eq:Wint-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a}^{u}= & \int_{\Omega^{b}}\left(-\varphi^{s}\boldsymbol{\tau}+\boldsymbol{\sigma}^{e}\right)\cdot\grad N_{a}dv\\
+ & +\int_{\Omega^{b}}N_{a}\left(\varphi^{s}\left(\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}-\rho_{T}^{f}\mathbf{a}^{f}+\rho_{T}^{s}\dot{\mathbf{v}}^{s}\right)-\mathbf{k}^{-1}\cdot\mathbf{w}\right)dv\,,\\
+\mathbf{f}_{a}^{w}= & \int_{\Omega^{b}}\boldsymbol{\tau}\cdot\grad N_{a}+N_{a}\left(\rho_{T}^{f}\mathbf{a}^{f}+\grad p-\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\grad\varphi^{f}+\mathbf{k}^{-1}\cdot\mathbf{w}\right)dv\,,\\
+f_{a}^{J}= & \int_{\Omega^{b}}\grad N_{a}\cdot\mathbf{w}+N_{a}\left(\frac{\varphi^{f}}{J^{f}}\frac{D^{f}J^{f}}{Dt}-\frac{\dot{J}^{s}}{J^{s}}\right)dv\,.
+\end{aligned}
+\label{eq:Wint-discret-parts-BFSI}
+\end{equation}
+
+\end_inset
+
+ The discretized form of 
+\begin_inset Formula $D\delta W_{int}\left[\Delta\mathbf{u}\right]$
+\end_inset
+
+ becomes 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta\mathbf{u}\right] & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{uu}\cdot\Delta\mathbf{u}_{b}\\
+ & +\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{wu}\cdot\Delta\mathbf{u}_{b}\\
+ & +\sum_{a}\delta J_{a}^{f}\sum_{b}\mathbf{k}_{ab}^{Ju}\cdot\Delta\mathbf{u}_{b}\,,
+\end{aligned}
+\label{eq:Wint-lin-u-discret-FSI}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{uu}= & \int_{\Omega^{b}}\alpha_{f}\left(\left(\boldsymbol{\sigma}^{e}:\grad N_{b}\otimes\grad N_{a}\right)\mathbf{I}+\grad N_{a}\cdot\boldsymbol{\mathcal{C}}\cdot\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\varphi^{s}\boldsymbol{\tau}\cdot\left(\frac{\varphi^{s}}{\varphi^{f}}\grad N_{a}\otimes\grad N_{b}+\grad N_{b}\otimes\grad N_{a}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\varphi^{s}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}\cdot\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{D}^{w}+\mathbf{M}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\frac{\varphi^{s}}{\varphi^{f^{2}}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\grad\varphi^{f}\otimes\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\frac{\varphi^{s}}{\varphi^{f^{2}}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(\grad N_{b}\otimes\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{\varphi^{s}}{\varphi^{f^{2}}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(-\grad\varphi^{f}\otimes\grad N_{b}+\varphi^{s}\grad\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f}}\boldsymbol{\tau}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\grad\frac{\varphi^{f}}{\varphi^{s}}\otimes\grad N_{b}+\grad N_{b}\otimes\grad\frac{\varphi^{f}}{\varphi^{s}}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f}}\boldsymbol{\tau}\cdot\frac{1}{\varphi^{s}}\grad\grad N_{b}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f}}\grad\frac{\varphi^{f}}{\varphi^{s}}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}\cdot\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{D}^{w}+\mathbf{M}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\grad\frac{\varphi^{f}}{\varphi^{s}}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\grad\varphi^{f}\otimes\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\grad\frac{\varphi^{f}}{\varphi^{s}}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(\grad N_{b}\otimes\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\grad\frac{\varphi^{f}}{\varphi^{s}}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(-\grad\varphi^{f}\otimes\grad N_{b}+\varphi^{s}\grad\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\frac{\varphi^{s}}{\varphi^{f}}\rho_{T}^{f}N_{a}\left(\varphi^{s}\dot{\mathbf{v}}^{s}\otimes\grad N_{b}+\varphi^{f}\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}N_{b}\mathbf{I}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\rho_{T}^{f}N_{a}\frac{\varphi^{s^{2}}}{\varphi^{f^{2}}}\left[\left(\left(-\frac{1}{\varphi^{f}}\right)\frac{\dot{J}}{J}+\frac{\gamma}{\beta\Delta t}\right)\mathbf{w}\otimes\grad N_{b}-\mathbf{w}\otimes\left(\mathbf{L}^{s^{T}}\cdot\grad N_{b}\right)\right]dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{L}^{w}\cdot\mathbf{w}\otimes\grad N_{b}+\frac{\gamma}{\beta\Delta t}\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\rho_{T}^{f}\frac{\varphi^{s}}{\varphi^{f^{4}}}\left(\varphi^{s}+1\right)\left(\grad\varphi^{f}\cdot\mathbf{w}\right)\mathbf{w}\otimes\grad N_{b}dv
+\end{aligned}
+\label{eq:Wint-lin-uu-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & +\int_{\Omega^{b}}\alpha_{f}N_{a}\rho_{T}^{f}\frac{\varphi^{s^{2}}}{\varphi^{f^{3}}}\mathbf{w}\otimes\grad\grad^{T}N_{b}\cdot\mathbf{w}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{\varphi^{s}}{\varphi^{f}}\rho_{T}^{f}N_{a}\left(\mathbf{L}^{f}\left(\grad N_{b}\cdot\mathbf{w}\right)+\varphi^{s}\mathbf{a}^{f}\otimes\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}\rho^{s}N_{b}\mathbf{I}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\left(-2\left(\mathbf{k}^{-1}\cdot\mathbf{w}\right)\otimes\grad N_{b}+\grad N_{b}\otimes\left(\mathbf{k}^{-1}\cdot\mathbf{w}\right)\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\left(\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{k}^{-1}+\left(\mathbf{k}^{-1}\underbar{\otimes}\mathbf{k}^{-1}\right):\mathsf{k}:\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}\right)dv\,,
+\end{aligned}
+\]
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{wu}= & \int_{\Omega^{b}}\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}N_{a}\left(\varphi^{s}\dot{\mathbf{v}}^{s}\otimes\grad N_{b}+\varphi^{f}\frac{\alpha_{m}}{\alpha_{f}\beta\Delta t^{2}}N_{b}\mathbf{I}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}N_{a}\frac{\varphi^{s}}{\varphi^{f}}\left(-\frac{1}{\varphi^{f}}\frac{\dot{J}}{J}+\frac{\gamma}{\beta\Delta t}\right)\mathbf{w}\otimes\grad N_{b}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}N_{a}\frac{\varphi^{s}}{\varphi^{f}}\mathbf{w}\otimes\left(\mathbf{L}^{s^{T}}\cdot\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(\mathbf{L}^{w}\cdot\mathbf{w}\right)\otimes\grad N_{b}+\frac{\gamma}{\beta\Delta t}\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\rho_{T}^{f}}{\varphi^{f^{4}}}\left(\varphi^{s}+1\right)\left(\grad\varphi^{f}\cdot\mathbf{w}\right)\mathbf{w}\otimes\grad N_{b}dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{\rho_{T}^{f}}{\varphi^{f^{3}}}\varphi^{s}\mathbf{w}\otimes\left(\grad\grad^{T}N_{b}\cdot\mathbf{w}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\frac{\rho_{T}^{f}}{\varphi^{f}}N_{a}\mathbf{L}^{f}\left(\grad N_{b}\cdot\mathbf{w}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\left(1-\frac{\varphi^{s}}{\varphi^{f}}\right)\rho_{T}^{f}\mathbf{a}^{f}\otimes\grad N_{b}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\left(\grad p\otimes\grad N_{b}-\grad N_{b}\otimes\grad p\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\left(2\left(\mathbf{k}^{-1}\cdot\mathbf{w}\right)\otimes\grad N_{b}-\grad N_{b}\otimes\left(\mathbf{k}^{-1}\cdot\mathbf{w}\right)\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\left(\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{k}^{-1}+\left(\mathbf{k}^{-1}\underbar{\otimes}\mathbf{k}^{-1}\right):\mathsf{k}:\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\grad\varphi^{f}\otimes\grad N_{b}+\grad N_{b}\otimes\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{1}{\varphi^{f}}\boldsymbol{\tau}\cdot\varphi^{s}\grad\grad N_{b}dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{1}{\varphi^{f}}\grad\varphi^{f}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}\cdot\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{D}^{w}+\mathbf{M}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{1}{\varphi^{f^{3}}}\grad\varphi^{f}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\grad\varphi^{f}\otimes\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\frac{1}{\varphi^{f^{3}}}\grad\varphi^{f}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(\grad N_{b}\otimes\grad\varphi^{f}\right)dv
+\end{aligned}
+\label{eq:Wint-lin-wu-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned} & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{1}{\varphi^{f^{3}}}\grad\varphi^{f}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(-\grad\varphi^{f}\otimes\grad N_{b}+\varphi^{s}\grad\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\boldsymbol{\tau}\cdot\left(\left(1-\frac{\varphi^{s}}{\varphi^{f}}\right)\grad N_{a}\otimes\grad N_{b}-\grad N_{b}\otimes\grad N_{a}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}\cdot\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{D}^{w}+\mathbf{M}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{1}{\varphi^{f^{2}}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f}}\grad\varphi^{f}\otimes\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{1}{\varphi^{f^{2}}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(\grad N_{b}\otimes\grad\varphi^{f}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\frac{1}{\varphi^{f^{2}}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(-\grad\varphi^{f}\otimes\grad N_{b}+\varphi^{s}\grad\grad N_{b}\right)dv\,,
+\end{aligned}
+\]
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{k}_{ab}^{Ju}= & \int_{\Omega^{b}}\alpha_{f}\left(\grad N_{b}\otimes\mathbf{w}-\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}\right)\cdot\grad N_{a}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{1}{J^{f}}\left(\dot{J}^{f}\grad N_{b}+\left(\grad N_{b}\otimes\mathbf{w}-\grad N_{b}\cdot\mathbf{w}\mathbf{I}\right)\cdot\grad J^{f}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}\left(\frac{\dot{J}}{J}+\frac{\gamma}{\beta\Delta t}\right)\grad N_{b}+\mathbf{L}^{s^{T}}\cdot\grad N_{b}dv\,,
+\end{aligned}
+\label{eq:Wint-lin-Ju-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+ whereas that of 
+\begin_inset Formula $D\delta W_{int}\left[\Delta\mathbf{w}\right]$
+\end_inset
+
+ becomes 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta\mathbf{w}\right] & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{uw}\cdot\Delta\mathbf{w}_{b}\\
+ & +\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{ww}\cdot\Delta\mathbf{w}_{b}\\
+ & +\sum_{a}\delta J_{a}^{f}\sum_{b}\mathbf{k}_{ab}^{Jw}\cdot\Delta\mathbf{w}_{b}\,,
+\end{aligned}
+\label{eq:Wint-lin-w-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{uw}= & \int_{\Omega^{b}}\alpha_{f}\frac{\varphi^{s}}{\varphi^{f}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\left(\frac{1}{\varphi^{f}}N_{b}\grad\varphi^{f}-\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f}}N_{a}\left(\left(\frac{\alpha_{m}}{\gamma\alpha_{f}\Delta t}-\frac{\varphi^{s}}{\varphi^{f}}\frac{\dot{J}}{J}-\frac{1}{\varphi^{f^{2}}}\left(\grad\varphi^{f}\cdot\mathbf{w}\right)\right)\mathbf{I}+\mathbf{L}^{f}\right)N_{b}dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{\varphi^{f^{2}}}N_{a}\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\left(\varphi^{s}\right)^{2}}{\left(\varphi^{f}\right)^{2}}\grad\frac{\varphi^{f}}{\varphi^{s}}\cdot\boldsymbol{\mathcal{C}}_{d}\cdot\left(-\frac{1}{\varphi^{f}}N_{b}\grad\varphi^{f}+\grad N_{b}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{a}N_{b}\mathbf{k}^{-1}dv\,,\\
+\mathbf{K}_{ab}^{ww}= & \int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\rho_{T}^{f}}{\varphi^{f}}\left(\left(\frac{\alpha_{m}}{\gamma\alpha_{f}\Delta t}-\frac{\varphi^{s}}{\varphi^{f}}\frac{\dot{J}}{J}-\frac{1}{\varphi^{f^{2}}}\left(\grad\varphi^{f}\cdot\mathbf{w}\right)\right)\mathbf{I}+\mathbf{L}^{f}\right)N_{b}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\frac{\rho_{T}^{f}}{\varphi^{f^{2}}}\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{a}\left(\frac{1}{\varphi^{f^{2}}}\grad\varphi^{f}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\left(\frac{1}{\varphi^{f}}N_{b}\grad\varphi^{f}-\grad N_{b}\right)+N_{b}\mathbf{k}^{-1}\right)dv\\
+ & +\int_{\Omega^{b}}\alpha_{f}\frac{1}{\varphi^{f}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\left(-\frac{1}{\varphi^{f}}N_{b}\grad\varphi^{f}+\grad N_{b}\right)dv\,,\\
+\mathbf{k}_{ab}^{Jw}= & \int_{\Omega^{b}}\alpha_{f}N_{b}\left(\grad N_{a}+N_{a}\frac{1}{J^{f}}\grad J^{f}\right)dv\,,
+\end{aligned}
+\label{eq:Wint-lin-w-discret-parts-BFSI}
+\end{equation}
+
+\end_inset
+
+ and finally, for 
+\begin_inset Formula $D\delta W_{int}\left[\Delta J^{f}\right]$
+\end_inset
+
+ the equations become 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{int}\left[\Delta J^{f}\right]= & \sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{k}_{ab}^{uJ}\Delta J_{b}^{f}\\
+ & +\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\mathbf{k}_{ab}^{wJ}\Delta J_{b}^{f}\\
+ & +\sum_{a}\delta J_{a}^{f}\sum_{b}k_{ab}^{JJ}\Delta J_{b}^{f}\,,
+\end{aligned}
+\label{eq:Wint-lin-J-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{k}_{ab}^{uJ}= & \int_{\Omega^{b}}\alpha_{f}\varphi^{s}N_{a}N_{b}\left(\frac{\varphi^{s}}{\varphi^{f}}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad\frac{\varphi^{f}}{\varphi^{s}}+\frac{\rho_{T}^{f}}{J^{f}}\mathbf{a}^{f}\right)dv\\
+ & +\int_{\Omega^{b}}-\alpha_{f}N_{b}\varphi^{s}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad N_{a}dv\,,\\
+\mathbf{k}_{ab}^{wJ}= & \int_{\Omega^{b}}\alpha_{f}N_{a}\left(p^{\prime}\grad N_{b}+N_{b}\left(p^{\prime\prime}\grad J^{f}-\frac{\rho_{T}^{f}}{J^{f}}\mathbf{a}^{f}-\frac{1}{\varphi^{f}}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad\varphi^{f}\right)\right)dv\Delta J_{b}^{f}\\
+ & +\int_{\Omega^{b}}\alpha_{f}N_{b}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad N_{a}dv\,,\\
+k_{ab}^{JJ}= & \int_{\Omega^{b}}\alpha_{f}N_{a}\frac{1}{J^{f}}\left(\left(\varphi^{f}\frac{\alpha_{m}}{\gamma\alpha_{f}\Delta t}-\frac{1}{J^{f}}\left(\varphi^{f}\dot{J}^{f}+\grad J^{f}\cdot\mathbf{w}\right)\right)N_{b}+\grad N_{b}\cdot\mathbf{w}\right)dv\,,
+\end{aligned}
+\label{eq:Wint-lin-J-discret-parts-BFSI}
+\end{equation}
+
+\end_inset
+
+ for external virtual work in Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ext-virtual-work"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the discretized equations are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{ext} & =\sum_{a}\delta\mathbf{v}_{a}\cdot\mathbf{f}_{a}^{u}\\
+ & +\sum_{a}\delta\mathbf{w}_{a}\cdot\mathbf{f}_{a}^{w}\\
+ & +\sum_{a}\delta J_{a}^{f}f_{a}^{J}\,,
+\end{aligned}
+\label{eq:Wext-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a,ext}^{u} & =\int_{\partial\Omega^{b}}N_{a}\mathbf{t}^{\sigma}da+\int_{\Omega^{b}}N_{a}\varphi^{s}\left(-\rho_{T}^{f}\mathbf{b}^{f}+\rho_{T}^{s}\mathbf{b}^{s}\right)dv\,,\\
+\mathbf{f}_{a,ext}^{w} & =\int_{\partial\Omega^{b}}N_{a}\mathbf{t}^{\tau}da+\int_{\Omega^{b}}\rho_{T}^{f}N_{a}\mathbf{b}^{f}dv\,,\\
+f_{a,ext}^{J} & =\int_{\partial\Omega^{b}}N_{a}w_{n}da\,,
+\end{aligned}
+\label{eq:Wext-discret-parts-BFSI}
+\end{equation}
+
+\end_inset
+
+and the discretized forms of the linearized external virtual work are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W_{ext}\left[\Delta\mathbf{u}\right] & =\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{wu}\cdot\Delta\mathbf{u}_{b}\,,\\
+D\delta W_{ext}\left[\Delta J^{f}\right] & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{k}_{ab}^{uJ}\Delta J_{b}^{f}+\sum_{a}\delta\mathbf{w}_{a}\cdot\sum_{b}\mathbf{k}_{ab}^{wJ}\Delta J_{b}^{f}\,,
+\end{aligned}
+\label{eq:Wext-lin-discret-BFSI}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab,ext}^{wu}= & \int_{\Omega^{b}}\alpha_{f}N_{a}\rho_{T}^{f}\mathbf{b}^{f}\otimes\grad N_{b}dv\,,\\
+\mathbf{k}_{ab,ext}^{uJ}= & -\int_{\Omega^{b}}\alpha_{f}\varphi^{s}\frac{\rho_{T}^{f}}{J^{f}}N_{a}N_{b}\mathbf{b}^{f}dv\,,\\
+\mathbf{k}_{ab,ext}^{wJ}= & -\int_{\Omega^{b}}\alpha_{f}\frac{\rho_{T}^{f}}{J^{f}}N_{a}N_{b}\mathbf{b}^{f}dv\,.
+\end{aligned}
+\label{eq:Wext-lin-discret-parts-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Combining these results, from the linearized virtual work equation of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:linearized-work-split"
+
+\end_inset
+
+ we can represent the system of equations in a compact matrix form as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{ccc}
+\mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{uw} & \mathbf{k}_{ab}^{uJ}-\mathbf{k}_{ab,ext}^{uJ}\\
+\mathbf{K}_{ab}^{wu}-\mathbf{K}_{ab,ext}^{wu} & \mathbf{K}_{ab}^{ww} & \mathbf{k}_{ab}^{wJ}-\mathbf{k}_{ab,ext}^{wJ}\\
+\mathbf{k}_{ab}^{Ju} & \mathbf{k}_{ab}^{Jw} & k_{ab}^{JJ}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}\\
+\Delta\mathbf{w}\\
+\Delta J^{f}
+\end{array}\right]=\left[\begin{array}{c}
+\mathbf{f}_{a,ext}^{u}-\mathbf{f}_{a}^{u}\\
+\mathbf{f}_{a,ext}^{w}-\mathbf{f}_{a}^{w}\\
+f_{a,ext}^{J}-f_{a}^{J}
+\end{array}\right]\,.\label{eq:Virtual-work-matrix-BFSI}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+BFSI Traction Interface 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:BFSI-Traction-Interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The virtual work 
+\begin_inset Formula $\delta F$
+\end_inset
+
+ on a biphasic-FSI interface was given in Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bfsi-traction-final"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The linearizations of 
+\begin_inset Formula $\delta F$
+\end_inset
+
+ are given by 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta F\left[\Delta\mathbf{u}\right]= & \int_{\partial\Omega^{b}}\delta\mathbf{v}\cdot\alpha_{f}\frac{\varphi^{s}}{\varphi^{f}}\left(\divg\Delta\mathbf{u}\right)\mathbf{T}_{d}\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\delta\mathbf{v}\cdot\boldsymbol{\mathcal{C}}^{\tau}:\alpha_{f}\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{D}^{w}+\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\delta\mathbf{v}\cdot\boldsymbol{\mathcal{C}}^{\tau}:\alpha_{f}\left(2\frac{\varphi^{s}}{\varphi^{f^{3}}}\left(\divg\Delta\mathbf{u}\right)\mathbf{w}\otimes\grad\varphi^{f}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\delta\mathbf{v}\cdot\boldsymbol{\mathcal{C}}^{\tau}:\alpha_{f}\left(-\frac{1}{\varphi^{f^{2}}}\mathbf{w}\otimes\left(-\grad^{T}\Delta\mathbf{u}\cdot\grad\varphi^{f}\right)\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}\delta\mathbf{v}\cdot\boldsymbol{\mathcal{C}}^{\tau}:\alpha_{f}\left(\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{w}\otimes\left(-\frac{1}{J}\left(\divg\Delta\mathbf{u}\right)\grad J+\grad\left(\divg\Delta\mathbf{u}\right)\right)\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\delta\mathbf{v}\cdot\alpha_{f}\boldsymbol{\tau}\cdot\left(\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\times\mathbf{g}_{2}+\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}\right)\thinspace d\eta^{1}d\eta^{2}\,,\\
+D\delta F\left[\Delta\mathbf{w}\right] & =\int_{\partial\Omega^{b}}-\delta\mathbf{v}\cdot\alpha_{f}\boldsymbol{\mathcal{C}}^{\tau}:\left(\frac{1}{\varphi^{f}}\grad\Delta\mathbf{w}-\frac{1}{\varphi^{f^{2}}}\Delta\mathbf{w}\otimes\grad\varphi^{f}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\,,\\
+D\delta F\left[\Delta J^{f}\right] & =\int_{\partial\Omega^{b}}-\delta\mathbf{v}\cdot\alpha_{f}\left(-p^{\prime}\mathbf{I}+\boldsymbol{\tau}_{J}^{\prime}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\Delta J^{f}\thinspace d\eta^{1}d\eta^{2}\,.
+\end{aligned}
+\label{eq:BFSI-int-lin}
+\end{equation}
+
+\end_inset
+
+ The discretized forms of this virtual work is 
+\begin_inset Formula 
+\begin{equation}
+\delta F=\sum_{a}\delta\mathbf{v}_{a}\cdot\mathbf{f}_{a}\,,\label{eq:BSI-int-discret}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{f}_{a}=\int_{\partial\Omega^{b}}-N_{a}\left(-p\mathbf{I}+\boldsymbol{\tau}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\,.\label{eq:BFSI-int-discret-parts}
+\end{equation}
+
+\end_inset
+
+The discretized forms of the linearizations are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta F\left[\Delta\mathbf{u}\right] & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{uu}\cdot\Delta\mathbf{u}_{b}\,,\\
+D\delta F\left[\Delta\mathbf{w}\right] & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{K}_{ab}^{uw}\cdot\Delta\mathbf{w}_{b}\,,\\
+D\delta F\left[\Delta J^{f}\right] & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\mathbf{k}_{ab}^{uJ}\Delta J_{b}^{f}\,,
+\end{aligned}
+\label{eq:BFSI-int-lin-discret}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{uu}= & \int_{\partial\Omega^{b}}\alpha_{f}N_{a}\frac{\varphi^{s}}{\varphi^{f}}\left(\boldsymbol{\tau}\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\right)\otimes\grad N_{b}\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\alpha_{f}N_{a}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}_{d}\cdot\grad N_{b}\cdot\left(-\frac{\varphi^{s}}{\varphi^{f^{2}}}\mathbf{D}^{w}+\mathbf{M}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\alpha_{f}N_{a}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(2\frac{\varphi^{s}}{\varphi^{f^{3}}}\grad\varphi^{f}\otimes\grad N_{b}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\alpha_{f}N_{a}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\left(\frac{1}{\varphi^{f^{2}}}\grad N_{b}\otimes\grad\varphi^{f}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}\alpha_{f}N_{a}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\mathbf{w}\cdot\frac{\varphi^{s}}{\varphi^{f^{2}}}\left(-\frac{1}{J}\grad J\otimes\grad N_{b}+\grad\grad N_{b}\right)\thinspace d\eta^{1}d\eta^{2}\\
+ & +\int_{\partial\Omega^{b}}-\alpha_{f}N_{a}\left(-p\mathbf{I}+\boldsymbol{\tau}\right)\cdot\boldsymbol{\mathcal{A}}\left\{ -\mathbf{g}_{2}\frac{\partial N_{b}}{\partial\eta^{1}}+\mathbf{g}_{1}\frac{\partial N_{b}}{\partial\eta^{2}}\right\} \thinspace d\eta^{1}d\eta^{2}\,,\\
+\mathbf{K}_{ab}^{uw}= & \int_{\partial\Omega^{b}}-\alpha_{f}N_{a}\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\cdot\boldsymbol{\mathcal{C}}_{d}\cdot\frac{1}{\varphi^{f}}\left(\grad N_{b}-\frac{1}{\varphi^{f}}N_{b}\grad\varphi^{f}\right)\thinspace d\eta^{1}d\eta^{2}\,,\\
+\mathbf{k}_{ab}^{uJ}= & \int_{\partial\Omega^{b}}-\alpha_{f}N_{a}N_{b}\left(-p^{\prime}\mathbf{I}+\boldsymbol{\tau}_{J}^{\prime}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\thinspace d\eta^{1}d\eta^{2}\,.
+\end{aligned}
+\label{eq:BFSI-int-lin-discret-parts}
+\end{equation}
+
+\end_inset
+
+ Note that 
+\begin_inset Formula $\boldsymbol{\mathcal{A}}\left\{ \cdot\right\} $
+\end_inset
+
+ represents the skew-symmetric tensor form of the bracketed vector.
 \end_layout
 
 \begin_layout Section
