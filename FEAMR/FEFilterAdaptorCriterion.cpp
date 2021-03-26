@@ -39,13 +39,11 @@ FEMinMaxFilterAdaptorCriterion::FEMinMaxFilterAdaptorCriterion(FEModel* fem) : F
 	m_max =  1.0e37;
 }
 
-bool FEMinMaxFilterAdaptorCriterion::GetElementValue(FEElement& el, double& elemValue)
+bool FEMinMaxFilterAdaptorCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
 	if (m_data == nullptr) return false;
-	double v = m_data->GetElementValue(el, elemValue);
-
-	if (elemValue < m_min) elemValue = m_min;
-	if (elemValue > m_max) elemValue = m_max;
-
-	return true;
+	bool b = m_data->GetMaterialPointValue(mp, value);
+	if (value < m_min) value = m_min;
+	if (value > m_max) value = m_max;
+	return b;
 }

@@ -31,7 +31,7 @@ class FEStressCriterion : public FEMeshAdaptorCriterion
 public:
 	FEStressCriterion(FEModel* fem);
 
-	bool GetElementValue(FEElement& el, double& elemVal) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
 private:
 	int		m_metric;

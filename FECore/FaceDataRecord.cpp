@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,20 +24,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "ObjectDataRecord.h"
-#include <FECore/FECoreKernel.h>
-#include <FECore/FEModel.h>
-#include "FERigidBody.h"
-#include <FECore/FEMaterial.h>
-#include "FEMechModel.h"
-#include "FERigidMaterial.h"
+#include "FaceDataRecord.h"
+#include "FECoreKernel.h"
+#include "FEModel.h"
+#include "FESurface.h"
 
-REGISTER_SUPER_CLASS(FELogObjectData, FEOBJLOGDATA_ID);
+REGISTER_SUPER_CLASS(FEFaceLogData, FEFACELOGDATA_ID);
 
 //-----------------------------------------------------------------------------
-void ObjectDataRecord::SetData(const char* szexpr)
+FEFaceLogData::FEFaceLogData(FEModel* fem) : FECoreBase(fem) {}
+
+//-----------------------------------------------------------------------------
+FEFaceLogData::~FEFaceLogData() {}
+
+//-----------------------------------------------------------------------------
+FaceDataRecord::FaceDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_FACE) 
 {
-	char szcopy[MAX_STRING] = {0};
+	m_surface = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+int FaceDataRecord::Size() const { return (int)m_Data.size(); }
+
+//-----------------------------------------------------------------------------
+void FaceDataRecord::SetData(const char* szexpr)
+{
+	char szcopy[MAX_STRING] = { 0 };
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;
 	m_Data.clear();
@@ -46,7 +58,7 @@ void ObjectDataRecord::SetData(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FELogObjectData* pdata = fecore_new<FELogObjectData>(sz, m_pfem);
+		FEFaceLogData* pdata = fecore_new<FEFaceLogData>(sz, m_pfem);
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;
@@ -55,54 +67,41 @@ void ObjectDataRecord::SetData(const char* szexpr)
 }
 
 //-----------------------------------------------------------------------------
-double ObjectDataRecord::Evaluate(int item, int ndata)
+bool FaceDataRecord::Initialize()
 {
-	FEMechModel* fem = dynamic_cast<FEMechModel*>(m_pfem);
-
-	FEMesh& mesh = fem->GetMesh();
-	int nrb = item - 1;
-	if ((nrb < 0) || (nrb >= m_pfem->Materials())) return 0;
-
-	double val = 0;
-
-	// find the rigid body that has this material
-	int NRB = fem->RigidBodies();
-	for (int i=0; i<NRB; ++i)
-	{
-		FERigidBody& obj = *fem->GetRigidBody(i);
-		if (obj.GetMaterialID() == nrb) return m_Data[ndata]->value(obj);
-	}
-
-	return val;
+	return (m_item.empty() == false);
 }
 
 //-----------------------------------------------------------------------------
-ObjectDataRecord::ObjectDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_RB) {}
-
-//-----------------------------------------------------------------------------
-int ObjectDataRecord::Size() const { return (int)m_Data.size(); }
-
-//-----------------------------------------------------------------------------
-void ObjectDataRecord::SelectAllItems()
+double FaceDataRecord::Evaluate(int item, int ndata)
 {
-	int n = 0, i;
-	for (i=0; i<m_pfem->Materials(); ++i)
-	{
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
-		if (pm) ++n;
-	}
+	int nface = item - 1;
+	return m_Data[ndata]->value(m_surface->Element(nface));
+}
 
-	if (n > 0)
-	{
-		m_item.resize(n);
-		n = 0;
-		for (i=0; i<m_pfem->Materials(); ++i)
-		{
-			FERigidMaterial* pm  = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
-			if (pm)
-			{
-				m_item[n++] = i+1;
-			}
-		}
+//-----------------------------------------------------------------------------
+void FaceDataRecord::SelectAllItems()
+{
+	assert(false);
+}
+
+//-----------------------------------------------------------------------------
+// This sets the item list based on a surface.
+void FaceDataRecord::SetSurface(FESurface* surface)
+{
+	assert(surface);
+	m_surface = surface;
+	int n = surface->Elements();
+	m_item.resize(n);
+	for (int i = 0; i < n; ++i) m_item[i] = i + 1;
+}
+
+void FaceDataRecord::SetSurface(FESurface* surface, const std::vector<int>& items)
+{
+	assert(surface);
+	if (items.empty()) SetSurface(surface);
+	else {
+		m_surface = surface;
+		m_item = items;
 	}
 }

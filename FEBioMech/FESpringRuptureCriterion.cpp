@@ -36,22 +36,17 @@ FESpringForceCriterion::FESpringForceCriterion(FEModel* fem) : FEMeshAdaptorCrit
 {
 }
 
-bool FESpringForceCriterion::GetElementValue(FEElement& el, double& elemVal)
+bool FESpringForceCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
-	elemVal = 0;
-	int nint = el.GaussPoints(); assert(nint == 1);
-	FEMaterialPoint* mp = el.GetMaterialPoint(0);
-	FEDiscreteElasticMaterialPoint* ep = mp->ExtractData<FEDiscreteElasticMaterialPoint>();
+	FEDiscreteElasticMaterialPoint* ep = mp.ExtractData<FEDiscreteElasticMaterialPoint>();
 	if (ep == nullptr) return false;
 
 	vec3d& Ft = ep->m_Ft;
 	double F = ep->m_drt*Ft;
 
-	elemVal = F;
+	value = F;
 	return true;
 }
-
-
 
 BEGIN_FECORE_CLASS(FESpringStretchCriterion, FEMeshAdaptorCriterion)
 END_FECORE_CLASS();
@@ -60,18 +55,15 @@ FESpringStretchCriterion::FESpringStretchCriterion(FEModel* fem) : FEMeshAdaptor
 {
 }
 
-bool FESpringStretchCriterion::GetElementValue(FEElement& el, double& elemVal)
+bool FESpringStretchCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
-	elemVal = 0;
-	int nint = el.GaussPoints(); assert(nint == 1);
-	FEMaterialPoint* mp = el.GetMaterialPoint(0);
-	FEDiscreteElasticMaterialPoint* ep = mp->ExtractData<FEDiscreteElasticMaterialPoint>();
+	FEDiscreteElasticMaterialPoint* ep = mp.ExtractData<FEDiscreteElasticMaterialPoint>();
 	if (ep == nullptr) return false;
 
 	double L0 = ep->m_dr0.norm();
 	double Lt = ep->m_drt.norm();
 	double s = Lt / L0;
 
-	elemVal = s;
+	value = s;
 	return true;
 }

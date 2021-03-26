@@ -47,7 +47,7 @@ ElementDataRecord::ElementDataRecord(FEModel* pfem, const char* szfile) : DataRe
 }
 
 //-----------------------------------------------------------------------------
-void ElementDataRecord::Parse(const char *szexpr)
+void ElementDataRecord::SetData(const char *szexpr)
 {
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
@@ -162,7 +162,7 @@ void ElementDataRecord::SelectAllItems()
 
 //-----------------------------------------------------------------------------
 // This sets the item list based on a element set.
-void ElementDataRecord::SetItemList(FEElementSet* pg)
+void ElementDataRecord::SetElementSet(FEElementSet* pg)
 {
 	int n = pg->Elements();
 	assert(n);

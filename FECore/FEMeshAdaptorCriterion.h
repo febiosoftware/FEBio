@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include "fecore_api.h"
 #include "FECoreBase.h"
+#include <FECore/FEMaterialPoint.h>
 
 class FEElementSet;
 class FEElement;
@@ -76,7 +77,7 @@ public:
 
 	// This function needs to be overridden in order to set the element's value.  
 	// Return false if the element cannot be evaluated. Otherwise return true.
-	virtual bool GetElementValue(FEElement& el, double& elemValue);
+	virtual bool GetMaterialPointValue(FEMaterialPoint& mp, double& value);
 
 	DECLARE_FECORE_CLASS();
 };

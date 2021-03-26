@@ -53,9 +53,9 @@ class FECORE_API NodeDataRecord : public DataRecord
 public:
 	NodeDataRecord(FEModel* pfem, const char* szfile);
 	double Evaluate(int item, int ndata);
-	void Parse(const char* sz);
+	void SetData(const char* sz);
 	void SelectAllItems();
-	void SetItemList(FENodeSet* pns);
+	void SetNodeSet(FENodeSet* pns);
 	int Size() const;
 
 private:

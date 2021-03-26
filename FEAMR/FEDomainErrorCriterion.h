@@ -37,8 +37,9 @@ public:
 
 	FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset) override;
 
-	// derived classes must implement this function
-	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;
+private:
+	double	m_error;
+	FEMeshAdaptorCriterion*	m_data;
 
 	DECLARE_FECORE_CLASS();
 };

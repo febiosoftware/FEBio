@@ -645,9 +645,6 @@
     <ClInclude Include="..\..\FEBioMech\FESolidLinearSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEStressErrorCriterion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERVEDamageMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1374,9 +1371,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESolidLinearSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEStressErrorCriterion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERVEDamageMaterial.cpp">
