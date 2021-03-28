@@ -61,6 +61,7 @@ SOFTWARE.*/
 
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
+#include "FEFluidSymmetryPlane.h"
 
 #include "FEBioFluidPlot.h"
 #include "FEBioFluidData.h"
@@ -144,6 +145,7 @@ REGISTER_FECORE_CLASS(FETiedFluidInterface, "tied-fluid");
 // constraint classes
 REGISTER_FECORE_CLASS(FEConstraintFrictionlessWall, "frictionless fluid wall");
 REGISTER_FECORE_CLASS(FEConstraintNormalFlow      , "normal fluid flow"      );
+REGISTER_FECORE_CLASS(FEFluidSymmetryPlane        , "symmetry plane"         );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
