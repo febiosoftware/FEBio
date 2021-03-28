@@ -21383,13 +21383,9 @@ name "subsec:Fluid-FSI-Traction"
 \end_layout
 
 \begin_layout Standard
-In a fluid-FSI analysis, the fluid traction across an interface between
- a 
-\emph on
-fluid-FSI
-\emph default
- material and a solid domain must be prescribed explicitly as a traction
- boundary condition on the solid domain.
+In a fluid-FSI analysis, the fluid traction across an interface with a solid
+ domain must be prescribed explicitly as a traction boundary condition on
+ the solid domain.
  Otherwise, the solid domain cannot sense the fluid pressure and viscous
  traction.
  Users must identify each surface on which this FSI surface load must be
@@ -21399,48 +21395,6 @@ fluid-FSI
 
 \begin_layout LyX-Code
 <surface_load type="fluid-FSI traction" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load>
-\end_layout
-
-\begin_layout Standard
-This surface load must also be prescribed on free fluid surfaces (such as
- the surface of the fluid in open channel flow) to allow those surfaces
- to deform in response to the fluid stresses (e.g., producing surface waves).
- (Do not apply this surface load on inlet or outlet boundaries through which
- fluid flows.)
-\end_layout
-
-\begin_layout Subsubsection
-Biphasic-FSI Traction
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Biphasic-FSI-Traction"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In a fluid-FSI analysis, the fluid traction across an interface between
- a 
-\emph on
-biphasic-FSI
-\emph default
- material and a solid domain must be prescribed explicitly as a traction
- boundary condition on the solid domain.
- Otherwise, the solid domain cannot sense the fluid pressure and viscous
- traction.
- Users must identify each surface on which this FSI surface load must be
- prescribed.
- There are no user-defined parameters for this surface load.
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="biphasic-FSI traction" surface="surface1">
 \end_layout
 
 \begin_layout LyX-Code
@@ -80687,55 +80641,55 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <fluid type="fluid">
+	<fluid type="fluid">
 \end_layout
 
 \begin_layout LyX-Code
-    <density>1000</density>
+		<density>1000</density>
 \end_layout
 
 \begin_layout LyX-Code
-    <k>2.2e9</k>
+		<k>2.2e9</k>
 \end_layout
 
 \begin_layout LyX-Code
-    <viscous type="Newtonian fluid">
+		<viscous type="Newtonian fluid">
 \end_layout
 
 \begin_layout LyX-Code
-      <mu>0.001</mu>
+			<mu>0.001</mu>
 \end_layout
 
 \begin_layout LyX-Code
-      <kappa>0</kappa>
+			<kappa>0</kappa>
 \end_layout
 
 \begin_layout LyX-Code
-    </viscous>
+		</viscous>
 \end_layout
 
 \begin_layout LyX-Code
-  </fluid>
+	</fluid>
 \end_layout
 
 \begin_layout LyX-Code
-  <solid type="neo-Hookean">
+	<solid type="neo-Hookean">
 \end_layout
 
 \begin_layout LyX-Code
-    <density>0</density>
+		<density>0</density>
 \end_layout
 
 \begin_layout LyX-Code
-    <E>1e-9</E>
+		<E>1e-9</E>
 \end_layout
 
 \begin_layout LyX-Code
-    <v>0</v>
+		<v>0</v>
 \end_layout
 
 \begin_layout LyX-Code
-  </solid>
+	</solid>
 \end_layout
 
 \begin_layout LyX-Code
@@ -80746,349 +80700,6 @@ Example:
 The value of <density> in the <solid> material is internally set to zero
  regardless of the user-defined value, since the deforming mesh should not
  be subjected to inertial forces.
-\end_layout
-
-\begin_layout Subsection
-General Specification of Biphasic-FSI Materials
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:General-Fluid-BFSI-Materials"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for a biphasic-FSI material is 
-\shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
-biphasic-FSI
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
-.
- This is a hybrid biphasic material used for modeling dynamic viscous fluid
- flow and frictional filtration through a porous-deformable solid.
- In contrast to the standard biphasic material described in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Biphasic-Materials"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-, this material accommodates fluid viscosity and fluid dynamics; therefore
- it can be interfaced seamlessly with a fluid-FSI material to allow viscous
- fluid transport across that interface.
- The following parameters must be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<phi0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
-\end_inset
-
- in the reference configuration (
-\begin_inset Formula $0<\varphi_{r}^{s}<1)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<fluid>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specification of the fluid material
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<solid>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specification of the porous solid material
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<permeability>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specification of the hydraulic permeability
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The parameter <phi0> must be greater than 0 (no solid) and less than 1 (no
- porosity).
- The <fluid> tag encloses a description of the fluid, as given in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:General-Specification-Fluid"
-
-\end_inset
-
-.
- The <solid> tag encloses a description of the solid matrix constitutive
- relation and associated material properties, such as those selected from
- the list provided in Sections
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Elastic-Solids"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
--
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Multigeneration-Solids"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
- The <permeability> tag encloses a description of the permeability constitutive
- relation and associated material properties, as may be selected from the
- list presented in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Permeability-Materials"
-
-\end_inset
-
-.
- To simulate the special case of zero friction between the fluid and solid
- (such as in the fluid-FSI material), it is permissible to set the permeability
- to zero.
- 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example:
-\end_layout
-
-\begin_layout LyX-Code
-<material id="2" name="Material2" type="biphasic-FSI">
-\end_layout
-
-\begin_layout LyX-Code
-  <phi0>0.25</phi0>
-\end_layout
-
-\begin_layout LyX-Code
-  <fluid type="fluid">
-\end_layout
-
-\begin_layout LyX-Code
-    <density>1e-9</density>
-\end_layout
-
-\begin_layout LyX-Code
-    <k>1e+09</k>
-\end_layout
-
-\begin_layout LyX-Code
-    <viscous type="Newtonian fluid">
-\end_layout
-
-\begin_layout LyX-Code
-      <mu>1</mu>
-\end_layout
-
-\begin_layout LyX-Code
-      <kappa>0</kappa>
-\end_layout
-
-\begin_layout LyX-Code
-    </viscous>
-\end_layout
-
-\begin_layout LyX-Code
-  </fluid>
-\end_layout
-
-\begin_layout LyX-Code
-  <solid type="neo-Hookean">
-\end_layout
-
-\begin_layout LyX-Code
-    <density>2e-9</density>
-\end_layout
-
-\begin_layout LyX-Code
-    <E>200</E>
-\end_layout
-
-\begin_layout LyX-Code
-    <v>0</v>
-\end_layout
-
-\begin_layout LyX-Code
-  </solid>
-\end_layout
-
-\begin_layout LyX-Code
-  <permeability type="perm-const-iso">
-\end_layout
-
-\begin_layout LyX-Code
-    <perm>0.005625</perm>
-\end_layout
-
-\begin_layout LyX-Code
-  </permeability>
-\end_layout
-
-\begin_layout LyX-Code
-</material>
-\end_layout
-
-\begin_layout Standard
-The value of <density> in the <fluid> and <solid> materials represents the
- true mass density of each constituent.
 \end_layout
 
 \begin_layout Section
@@ -87746,26 +87357,7 @@ reference "sec:Multigeneration-Solids"
 
 \end_inset
 
-, or it may be modeled as a porous deformable domain containing a viscous
- fluid, in which case one should use the 
-\emph on
-biphasic-FSI
-\emph default
- material for the tube wall (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:General-Fluid-BFSI-Materials"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-).
+.
  The inner tube (the fluid domain) should be modeled as a 
 \emph on
 fluid-FSI
@@ -87789,16 +87381,8 @@ In FEBio, a
 \emph on
 fluid-FSI
 \emph default
- material is modeled as a specialized fluid-solid mixture where the solid
- matrix density is zero and its stiffness should be set to a negligible
- value.
- In contrast, a 
-\emph on
-biphasic-FSI
-\emph default
- material is a full-fledged fluid-solid mixture, where the solid may have
- mass and exhibit any desired nonlinear elastic or inelastic response.
- Both FSI materials require the user to define a 
+ material is modeled as a specialized fluid-solid mixture.
+ It requires the user to define a 
 \emph on
 fluid
 \emph default
@@ -87818,31 +87402,8 @@ reference "sec:Fluids"
 \emph on
 solid
 \emph default
- material to regularize the mesh deformation, which may be selected from
- Sections
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Elastic-Solids"
-
-\end_inset
-
- through 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Multigeneration-Solids"
-
-\end_inset
-
- for a 
-\emph on
-biphasic-FSI
-\emph default
- material.
- In contrast, the 
+ material to regularize the mesh deformation.
+ The 
 \emph on
 solid
 \emph default
@@ -87894,8 +87455,8 @@ reference "subsec:Neo-Hookean"
 \end_layout
 
 \begin_layout Standard
-The degrees of freedom at each node of a FSI domain consist of the components
- of the solid displacement 
+The degrees of freedom at each node of a fluid-FSI domain consist of the
+ components of the solid displacement 
 \begin_inset Formula $\mathbf{u}$
 \end_inset
 
@@ -87916,8 +87477,7 @@ The degrees of freedom at each node of a FSI domain consist of the components
 \end_inset
 
 .
- A no-slip boundary between an FSI material and a solid domain may be defined
- by simply setting 
+ A no-slip boundary may be defined by simply setting 
 \begin_inset Formula $\mathbf{w}=\mathbf{0}$
 \end_inset
 
@@ -87937,38 +87497,25 @@ reference "subsec:Fluid-DOFs-BCs"
 \end_layout
 
 \begin_layout Standard
-Currently in FEBio, the mesh of a 
-\emph on
-fluid/biphasic-FSI
-\emph default
- material domain must be continuous with the mesh of surrounding solid domains.
- The surface between domains, which consists of the shared faces of adjoining
- finite elements from each domain, is called the FSI interface.
- Because the mesh is continuous, the solid displacement and the solid component
- of the traction are automatically continuous across FSI interfaces; when
- fluid is present on both sides of the interface, the relative fluid flux
- is also automatically continuous.
- In other words, when two FSI domains are adjoining (e.g., fluid-FSI with
- fluid-FSI, or fluid-FSI with biphasic-FSI), all boundary conditions are
- automatically satisfied across those interfaces.
- However, when an FSI domain interfaces with a solid domain, the fluid component
- of the traction in the 
+In FEBio 2.8 the mesh of a 
 \emph on
 fluid-FSI
 \emph default
- and 
+ domain must be continuous with the mesh of surrounding solid domains.
+ The surface between fluid and solid domains, which consists of the shared
+ faces of adjoining finite elements from each domain, is called the FSI
+ interface.
+ Because the mesh is continuous, the solid displacement and the solid component
+ of the traction are automatically continuous across FSI interfaces.
+ However, the fluid component of the traction in the 
 \emph on
-biphasic-FSI
+fluid-FSI
 \emph default
- domains must be explicitly transferred to the solid domain across that
+ domain must be explicitly transferred to the solid domain across the FSI
  interface.
  This is done by prescribing a 
 \emph on
 fluid-FSI traction
-\emph default
- or a 
-\emph on
-biphasic-FSI traction
 \emph default
  on that interface (Section
 \begin_inset space ~
@@ -87998,13 +87545,9 @@ fluid-FSI traction
 \end_layout
 
 \begin_layout Standard
-A 
-\emph on
-fluid-FSI traction
-\emph default
- is also required on free fluid surfaces, such as the surface of a fluid
- in open channel flow, in order to properly capture the motion of that surface
- (such as waves).
+A fluid-FSI traction is also required on free fluid surfaces, such as the
+ surface of a fluid in open channel flow, in order to properly capture the
+ motion of that surface (such as waves).
  This condition is required since the net traction 
 \begin_inset Formula $\mathbf{t}$
 \end_inset
@@ -88031,9 +87574,9 @@ fluid-FSI traction
 Here are a few cautionary notes to keep in mind when running FSI analyses:
  (1) Depending on the problem being analyzed, fluid-structure interactions
  may cause significant mesh deformations that lead to mesh distortion.
- Currently, adaptive meshing is not yet available to relieve this mesh distortio
-n, therefore analyses and meshes need to be designed to minimize this effect
- or to terminate before the solution becomes too corrupted.
+ As of FEBio 2.8 adaptive meshing is not yet available, therefore analyses
+ and meshes need to be designed to minimize this effect or to terminate
+ before the solution becomes too corrupted.
  (2) It is possible to pinch a solid domain that surrounds a fluid domain
  until the flow cross-section has reduced considerably; however it is not
  possible to completely shut off the flow, as this would require reducing
