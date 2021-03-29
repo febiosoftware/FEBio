@@ -147,7 +147,7 @@ figs-within-sections
 
 \begin_layout Title
 \begin_inset Graphics
-	filename Figures/FigFEBioTitle.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigFEBioTitle.png
 	width 4.88in
 
 \end_inset
@@ -459,7 +459,7 @@ Development of the FEBio project is supported in part by a grant from the
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename Figures/NIHlogo.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/NIHlogo.png
 	lyxscale 25
 	height 0.75in
 
@@ -1002,7 +1002,7 @@ See the figure below for an overview of the basic FEBio flow.
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename Figures/FEBio flow.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FEBio flow.png
 	scale 50
 
 \end_inset
@@ -10853,7 +10853,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigNodeNumberingSolidElements.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigNodeNumberingSolidElements.png
 	lyxscale 50
 	scale 50
 
@@ -11097,7 +11097,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigNodeNumberingShellElements.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigNodeNumberingShellElements.png
 	lyxscale 50
 	scale 75
 
@@ -28606,7 +28606,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigLoadCurveTypes.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigLoadCurveTypes.png
 
 \end_inset
 
@@ -28779,7 +28779,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigLoadCurveExtend.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigLoadCurveExtend.png
 	lyxscale 50
 	scale 50
 
@@ -38355,7 +38355,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigLocalFiberDirectionOption.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigLocalFiberDirectionOption.png
 
 \end_inset
 
@@ -38412,7 +38412,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigVectorFiberDirectionOption.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigVectorFiberDirectionOption.png
 
 \end_inset
 
@@ -38470,7 +38470,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalFiberDirectionOption.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigSphericalFiberDirectionOption.png
 
 \end_inset
 
@@ -38611,7 +38611,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSCS.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigSCS.png
 
 \end_inset
 
@@ -45580,7 +45580,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigMooneyRivlinVonMises.pdf
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigMooneyRivlinVonMises.pdf
 
 \end_inset
 
@@ -58663,7 +58663,7 @@ It requires no additional parameters.
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalDistribution.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigSphericalDistribution.png
 
 \end_inset
 
@@ -58839,7 +58839,7 @@ The value of
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigEllipsoidalDistribution.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigEllipsoidalDistribution.png
 
 \end_inset
 
@@ -59015,7 +59015,7 @@ The concentration parameter
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigPiPeriodicVonMisesDistribution.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigPiPeriodicVonMisesDistribution.png
 
 \end_inset
 
@@ -59290,7 +59290,7 @@ The semi-principal axis
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigEllipticalDistribution.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigEllipticalDistribution.png
 
 \end_inset
 
@@ -59468,7 +59468,7 @@ The concentration parameter
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigVonMisesDistribution.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigVonMisesDistribution.png
 
 \end_inset
 
@@ -59834,7 +59834,7 @@ The parameter <resolution> must be one of the values 20, 34, 60, 74, 196,
 
 
 \begin_inset Graphics
-	filename Figures/FigFiniteElementIntegration.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigFiniteElementIntegration.png
 
 \end_inset
 
@@ -63369,7 +63369,7 @@ represents the maximum allowable damage.
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFSimo.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFSimo.png
 
 \end_inset
 
@@ -63625,7 +63625,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFLogNormal.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFLogNormal.png
 
 \end_inset
 
@@ -63885,7 +63885,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFWeibull.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFWeibull.png
 
 \end_inset
 
@@ -64145,7 +64145,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFQuintic.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFQuintic.png
 
 \end_inset
 
@@ -64337,7 +64337,7 @@ where
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFStep.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFStep.png
 
 \end_inset
 
@@ -66085,7 +66085,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigPermExpIso.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/FigPermExpIso.png
 	lyxscale 50
 	scale 50
 
@@ -82296,7 +82296,7 @@ and
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/beta.png
+	filename ../../../GitHub/FEBio/Documentation/Figures/beta.png
 	scale 80
 
 \end_inset
@@ -91916,7 +91916,7 @@ _inf_ A very large number (= 1e308)
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 btprint "btPrintCited"
-bibfiles "FEBio3"
+bibfiles "../../../GitHub/FEBio/Documentation/FEBio3"
 options "bibtotoc,plain"
 
 \end_inset

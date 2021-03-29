@@ -39,7 +39,6 @@ SOFTWARE.*/
 #include "FEBiphasicFSITraction.h"
 #include "FEBiphasicFSI.h"
 #include "FEBiphasicFSIDomain3D.h"
-#include "FEFluidFSISymmetryPlane.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
@@ -94,7 +93,5 @@ void FEBioFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FEBiphasicFSIDomain3D, "biphasic-FSI-3D");
 
-    REGISTER_FECORE_CLASS(FEFSISymmetryPlane, "symmetry plane");
-    
     febio.SetActiveModule(0);
 }
