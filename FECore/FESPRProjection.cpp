@@ -133,8 +133,7 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 				for (int n=0; n<nint; ++n, ++m)
 				{
 					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-//					vec3d r = ep.m_rt - rc;
-					vec3d r = mp.m_r0 - rc;
+					vec3d r = mp.m_rt - rc;
 					pk[0] = 1.0; pk[1] = r.x; pk[2] = r.y; pk[3] = r.z;
 					if (NDOF >=  7) { pk[4] = r.x*r.y; pk[5] = r.y*r.z; pk[6] = r.x*r.z; }
 					if (NDOF >= 10) { pk[7] = r.x*r.x; pk[8] = r.y*r.y; pk[9] = r.z*r.z; }
@@ -160,9 +159,7 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 					for (int n=0; n<nint; ++n)
 					{
 						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-//						FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-//						vec3d r = ep.m_rt - rc;
-						vec3d r = mp.m_r0 - rc;
+						vec3d r = mp.m_rt - rc;
 						pk[0] = 1.0; pk[1] = r.x; pk[2] = r.y; pk[3] = r.z;
 						if (NDOF >=  7) { pk[4] = r.x*r.y; pk[5] = r.y*r.z; pk[6] = r.x*r.z; }
 						if (NDOF >= 10) { pk[7] = r.x*r.x; pk[8] = r.y*r.y; pk[9] = r.z*r.z; }
