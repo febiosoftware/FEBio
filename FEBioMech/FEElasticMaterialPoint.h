@@ -77,7 +77,6 @@ public:
     bool    m_buncoupled;   //!< set to true if this material point was created by an uncoupled material
     
 	// deformation data at intermediate time
-    vec3d   m_rt;   //!< spatial position
 	mat3d	m_F;	//!< deformation gradient
 	double	m_J;	//!< determinant of F
     vec3d   m_gradJ;  //!< gradient of J
