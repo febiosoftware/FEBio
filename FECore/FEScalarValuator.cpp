@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEModelParam.h"
 #include "FEModel.h"
 #include "DumpStream.h"
+#include "log.h"
 
 REGISTER_SUPER_CLASS(FEScalarValuator, FESCALARGENERATOR_ID);
 
@@ -128,8 +129,16 @@ bool FEMathValue::create(FECoreBase* pc)
 
 					FEDataMap* map = mesh.FindDataMap(vari->Name());
 					assert(map);
-					if (map == nullptr) return false;
-					if (map->DataType() != FEDataType::FE_DOUBLE) return false;
+					if (map == nullptr) { 
+						const char* szvar = vari->Name().c_str();
+						feLogError("Don't understand variable name \"%s\" in math expression.", szvar);
+						return false;
+					}
+					if (map->DataType() != FEDataType::FE_DOUBLE) {
+						const char* szvar = vari->Name().c_str();
+						feLogError("Variable \"%s\" is not a scalar variable.", szvar);
+						return false;
+					}
 
 					MathParam mp;
 					mp.type = 1;
