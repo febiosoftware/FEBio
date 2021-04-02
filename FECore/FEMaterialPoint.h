@@ -90,6 +90,7 @@ public:
 
 public:
 	vec3d		m_r0;		//!< material point position
+	vec3d		m_rt;		//!< current point position
 	double		m_J0;		//!< reference Jacobian
 	double		m_Jt;		//!< current Jacobian
 	FEElement*	m_elem;		//!< Element where this material point is
