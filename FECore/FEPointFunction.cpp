@@ -102,6 +102,9 @@ bool FEPointFunction::Init()
         }
         gsl_spline_init (imp->m_spline, imp->m_x, imp->m_y, N);
     }
+#else
+    feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 #endif
     return FEFunction1D::Init();
 }
@@ -214,6 +217,8 @@ double FEPointFunction::value(double time) const
         else if (time < tmin) return gsl_spline_eval(imp->m_spline, tmin, imp->m_acc);
         else return gsl_spline_eval(imp->m_spline, time, imp->m_acc);
 #else
+        feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
+        throw "FATAL ERROR";
         return 0;
 #endif
     }
@@ -470,6 +475,8 @@ double FEPointFunction::derive(double time) const
         else if (time < tmin) return gsl_spline_eval_deriv(imp->m_spline, tmin, imp->m_acc);
         else return gsl_spline_eval_deriv(imp->m_spline, time, imp->m_acc);
 #else
+        feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
+        throw "FATAL ERROR";
         return 0;
 #endif
     }
@@ -531,6 +538,8 @@ double FEPointFunction::deriv2(double time) const
         else if (time < tmin) return gsl_spline_eval_deriv2(imp->m_spline, tmin, imp->m_acc);
         else return gsl_spline_eval_deriv2(imp->m_spline, time, imp->m_acc);
 #else
+        feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
+        throw "FATAL ERROR";
         return 0;
 #endif
     }

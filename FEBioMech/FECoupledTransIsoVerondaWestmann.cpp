@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
+#include <FECore/log.h>
 #ifdef HAVE_GSL
 #include "gsl/gsl_sf_expint.h"
 #endif
@@ -243,6 +244,8 @@ double FECoupledTransIsoVerondaWestmann::StrainEnergyDensity(FEMaterialPoint& mp
     
     return sed;
 #else
-	return 0;
+    feLog("FATAL ERROR: Strain energy density calculation is not available for coupled trans-iso Veronda-Westmann material in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
+    return 0;
 #endif
 }

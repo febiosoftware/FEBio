@@ -318,6 +318,9 @@ double FEDamageCDFGamma::cdf(const double X)
 #ifdef HAVE_GSL
     if (X > 0)
         cdf = gsl_sf_gamma_inc_P(m_alpha,X/m_mu);
+#else
+    feLog("FATAL ERROR: CDF gamma material is not available in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 #endif
     
     return cdf;
@@ -332,6 +335,9 @@ double FEDamageCDFGamma::pdf(const double X)
 #ifdef HAVE_GSL
     if (X > 0)
         pdf = pow(X/m_mu, m_alpha-1)*exp(-X/m_mu)/m_mu*gsl_sf_gammainv(m_alpha);
+#else
+    feLog("FATAL ERROR: CDF gamma material is not available in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 #endif
     
     return pdf;

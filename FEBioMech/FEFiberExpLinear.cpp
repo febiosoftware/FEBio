@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include <limits>
 #include "FEFiberExpLinear.h"
+#include <FECore/log.h>
 #ifdef HAVE_GSL
 #include "gsl/gsl_sf_expint.h"
 #endif
@@ -170,6 +171,9 @@ double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
 			sed = m_c5 * (lam - 1) + c6 * log(lam);
 		}
 	}
+#else
+    feLog("FATAL ERROR: Strain energy density calculation is not available for fiber-exp-linear material in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 #endif
 	// --- active contraction contribution to sed is zero ---
 

@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEContinuousElasticDamage.h"
 #include <FECore/FEModel.h>
+#include <FECore/log.h>
 #ifdef HAVE_GSL
 #include "gsl/gsl_sf_expint.h"
 #endif
@@ -538,6 +539,9 @@ double FEDamageFiberExpLinear::m(double P)
 		double c6 = m_c3 * (exp(m_c4*Pmax) - 1) - (Pmax + 1.0) * m_c5;
 		m = m_c5 * P + c6 * log(P + 1.0);
 	}
+#else
+    feLog("FATAL ERROR: damage fiber exp-linear material is not available in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 #endif
 
 	return m;
