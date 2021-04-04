@@ -150,6 +150,9 @@ double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t, con
     }
     else
         g = 1;
+#else
+    feLog("FATAL ERROR: Fung bond relaxation is not available in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 #endif
     
     return g;

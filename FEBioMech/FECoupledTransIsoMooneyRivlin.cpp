@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
+#include <FECore/log.h>
 #ifdef HAVE_GSL
 #include "gsl/gsl_sf_expint.h"
 #endif
@@ -237,6 +238,8 @@ double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
     
     return sed;
 #else
+    feLog("FATAL ERROR: Strain energy density calculation is not available for coupled trans-iso Mooney-Rivlin material in this executable. Link to GSL!\n");
+    throw "FATAL ERROR";
 	return 0;
 #endif
 }
