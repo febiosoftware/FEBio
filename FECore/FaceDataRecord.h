@@ -48,13 +48,13 @@ class FECORE_API FaceDataRecord : public DataRecord
 {
 public:
 	FaceDataRecord(FEModel* pfem, const char* szfile);
-	double Evaluate(int item, int ndata);
+	double Evaluate(int item, int ndata) override;
 	bool Initialize() override;
 	void SetData(const char* sz)  override;
 	void SelectAllItems() override;
 	void SetSurface(FESurface* surf);
 	void SetSurface(FESurface* surf, const std::vector<int>& items);
-	int Size() const;
+	int Size() const override;
 
 private:
 	FESurface*	m_surface;

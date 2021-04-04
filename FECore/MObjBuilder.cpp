@@ -79,7 +79,7 @@ void init_function_lists()
 	FNC["fac"  ] = fac;
 	FNC["erf"  ] = erf;
 	FNC["erfc" ] = erfc;
-	FNC["tgamma"] = gamma;
+	FNC["tgamma"] = tgamma;
 
 	// 2-parameter functions
 #ifdef WIN32
