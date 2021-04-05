@@ -58,8 +58,6 @@ In addition, the following materials returned 0 for the strain energy density, a
 
  - "viscoelastic" (FEViscoElasticMaterial)
  - "uncoupled viscoelastic" (FEUncoupledViscoElasticMaterial)
- - "Carreau-Yasuda viscous solid" (FECarreauYasudaViscousSolid)
- - "Newtonian viscous solid uncoupled" (FENewtonianViscousSolid)
 
 ===========================================================================
 
