@@ -108,6 +108,15 @@ if(USE_ZLIB)
 	endif()
 endif()
 
+if(USE_GSL)
+	if(NOT EXISTS ${GSL_LIB})
+		message(SEND_ERROR "Could not find GSL library. Check GSL_LIB.")
+	endif()
+	if(NOT EXISTS ${GSL_INC}/gsl/gsl_spline.h)
+		message(SEND_ERROR "Could not find gsl_spline.h. Check GSL_INC.")
+	endif()
+endif()
+
 
 ##### Search for libaries #####
 
@@ -287,6 +296,27 @@ else()
     mark_as_advanced(CLEAR ZLIB_INCLUDE_DIR ZLIB_LIBRARY_RELEASE)
 endif()
 
+# GSL
+if(WIN32)
+	find_path(GSL_INC gsl/gsl_spline.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+		DOC "GSL include directory")
+	find_library(GSL_LIB gsl PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+		DOC "GSL library path")
+else()
+	find_path(GSL_INC gsl/gsl_spline.h PATHS /usr/local/include /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
+		DOC "GSL include directory")
+	find_library(GSL_LIB NAMES libgsl.a gsl PATHS /usr/local/lib64 /usr/local/lib /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
+		DOC "GSL library path")
+endif()	
+
+if(GSL_INC AND GSL_LIB)		
+	option(USE_GSL "Required for strain energy calculation for certain materials." ON)
+    mark_as_advanced(GSL_INC GSL_LIB)
+else()
+	option(USE_GSL "Required for strain energy calculation for certain materials." OFF)
+    mark_as_advanced(CLEAR GSL_INC GSL_LIB)
+endif()
+
 ##### Set appropriate defines and includes #####
 include_directories(${PROJECT_SOURCE_DIR})
 
@@ -321,12 +351,17 @@ if(USE_ZLIB)
 	include_directories(${ZLIB_INCLUDE_DIR})
 endif(USE_ZLIB)
 
+if(USE_GSL)
+	add_definitions(-DHAVE_GSL)
+	include_directories(${GSL_INC})
+endif(USE_GSL)
+
 ##### Set up compiler flags #####
 if(WIN32)
 elseif(APPLE)
-	add_definitions(-O3 -fPIC -std=c++11 -static-libstdc++ -w)
+	add_definitions(-fPIC -std=c++11 -static-libstdc++ -w)
 else()
-	add_definitions(-O3 -fPIC -fopenmp -std=c++11 -static-libstdc++ -w)
+	add_definitions(-fPIC -fopenmp -std=c++11 -static-libstdc++ -w)
     
     set(CMAKE_BUILD_RPATH_USE_LINK_PATH FALSE)
     set(CMAKE_BUILD_RPATH $ORIGIN/../lib/)
@@ -477,6 +512,11 @@ endif(USE_TETGEN)
 if(USE_ZLIB)
 	target_link_libraries(febio3 ${ZLIB_LIBRARY_RELEASE})
 endif(USE_ZLIB)
+
+# Link GSL
+if(USE_GSL)
+	target_link_libraries(febio3 ${GSL_LIB})
+endif(USE_GSL)
 
 if(WIN32)
 	target_link_libraries(febio3 psapi.lib ws2_32.lib)

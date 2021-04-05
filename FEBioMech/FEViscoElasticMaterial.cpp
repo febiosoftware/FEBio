@@ -247,5 +247,6 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
     
 	// return the total strain energy density
 	return sedt; */
+	throw "FATAL ERROR: FEViscoElasticMaterial::StrainEnergyDensity NOT IMPLEMENTED";
     return 0;
 }
