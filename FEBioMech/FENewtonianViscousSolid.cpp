@@ -72,6 +72,7 @@ tens4ds FENewtonianViscousSolid::Tangent(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 double FENewtonianViscousSolid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
+	throw "FATAL ERROR: FENewtonianViscousSolid::StrainEnergyDensity NOT IMPLEMENTED";
     return 0;
 }
 

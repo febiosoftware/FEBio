@@ -96,6 +96,7 @@ tens4ds FECarreauYasudaViscousSolid::Tangent(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 double FECarreauYasudaViscousSolid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
+	throw "FATAL ERROR: FECarreauYasudaViscousSolid::StrainEnergyDensity NOT IMPLEMENTED";
     return 0;
 }
 
