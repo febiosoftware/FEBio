@@ -561,12 +561,6 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 		et.m_r0 = pt.m_r0;
 		et.m_rt = pt.m_rt;
         et.m_F = Ft; et.m_J = Jt;
-        double Wt = mat.DevStrainEnergyDensity(et);
-        et.m_F = Fp; et.m_J = Jp;
-        double Wp = mat.DevStrainEnergyDensity(et);
-        
-        // store total strain energy density at current time
-        pt.m_Wt = Wt + eUt;
 
         // update specialized material points
         m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
@@ -581,6 +575,11 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
         
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5) {
+			double Wt = mat.DevStrainEnergyDensity(et);
+			// store total strain energy density at current time
+			pt.m_Wt = Wt + eUt;
+
+			double Wp = pt.m_Wp;
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);
             if (D2 > 0)
