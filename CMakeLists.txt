@@ -305,7 +305,7 @@ if(WIN32)
 else()
 	find_path(GSL_INC gsl/gsl_spline.h PATHS /usr/local/include /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
 		DOC "GSL include directory")
-	find_library(GSL_LIB gsl PATHS /usr/local/lib64 /usr/local/lib /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
+	find_library(GSL_LIB NAMES libgsl.a gsl PATHS /usr/local/lib64 /usr/local/lib /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
 		DOC "GSL library path")
 endif()	
 
