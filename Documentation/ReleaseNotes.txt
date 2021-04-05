@@ -41,6 +41,28 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.3.2   4/5/2021
+
+===========================================================================
+
+* This patch release fixes GSL support in FEBio for all OS. Not all previous builds, including the most recent ones, included support for GSL and consequently could produce incorrect results for certain types of models. For previous builds, materials that require GSL to evaluate the strain energy density, or other quantity, simply returned 0 in the absence of GSL support and did not produce an error message. The complete list of affected materials follows. The list shows the type string of the material, the source code class name, and the function where GSL is needed:   
+ - "relaxation-Fung" (FEBondRelaxationFung): relaxation function
+ - "damage fiber exp-linear" (FEDamageFiberExpLinear): strain energy density function
+ - "coupled trans-iso Mooney-Rivlin" (FECoupledTransIsoMooneyRivlin): strain energy density function
+ - "coupled trans-iso Veronda-Westmann" (FECoupledTransIsoVerondaWestmann): strain energy density function
+ - "CDF gamma" (FEDamageCDFGamma): evaluation of damage cumulative distribution function (cdf) and damage probability density function (pdf). 
+ - "fiber-exp-linear" (FEFiberExpLinear): strain energy density function
+ - "uncoupled fiber-exp-linear" (FEUncoupledFiberExpLinear): strain energy density function
+
+In addition, the following materials returned 0 for the strain energy density, and will now throw an error instead if the model attempts to evaluate the strain-energy function. 
+
+ - "viscoelastic" (FEViscoElasticMaterial)
+ - "uncoupled viscoelastic" (FEUncoupledViscoElasticMaterial)
+ - "Carreau-Yasuda viscous solid" (FECarreauYasudaViscousSolid)
+ - "Newtonian viscous solid uncoupled" (FENewtonianViscousSolid)
+
+===========================================================================
+
  R E L E A S E   3.3.1   4/2/2021
 
 ===========================================================================
