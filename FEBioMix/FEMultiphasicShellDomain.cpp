@@ -197,6 +197,8 @@ bool FEMultiphasicShellDomain::Init()
     
     for (int i = 0; i<(int)m_Elem.size(); ++i)
     {
+        UpdateShellMPData(i);
+        
         // get the solid element
         FEShellElement& el = m_Elem[i];
         
@@ -238,7 +240,7 @@ bool FEMultiphasicShellDomain::Init()
                 }
             }
             // check if this mixture includes membrane reactions
-/*            int mreact = (int)m_pMat->MembraneReactions();
+            int mreact = (int)m_pMat->MembraneReactions();
             if (mreact) {
                 // for membrane reactions involving solid-bound molecules,
                 // update their concentration
@@ -255,7 +257,7 @@ bool FEMultiphasicShellDomain::Init()
                         ps.m_sbmrhat[isbm] += (pt.m_J-phi0)*m_pMat->SBMMolarMass(isbm)*v*zetahat;
                     }
                 }
-            }*/
+            }
         }
     }
 
@@ -447,6 +449,8 @@ void FEMultiphasicShellDomain::Reset()
                 ps.m_idi.clear();
                 ps.m_ce.clear();
                 ps.m_ci.clear();
+                for (int j=0; j<m_pMat->MembraneReactions(); ++j)
+                    m_pMat->GetMembraneReaction(j)->ResetElementData(mp);
             }
         }
     }
@@ -519,6 +523,10 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             for (int j=0; j<m_pMat->Reactions(); ++j)
                 m_pMat->GetReaction(j)->InitializeElementData(mp);
             
+            // reset membrane reaction element data
+            for (int j=0; j<m_pMat->MembraneReactions(); ++j)
+                m_pMat->GetMembraneReaction(j)->InitializeElementData(mp);
+            
             mp.Update(timeInfo);
         }
     }
@@ -586,6 +594,7 @@ void FEMultiphasicShellDomain::ElementInternalForce(FEShellElement& el, vector<d
     int ndpn = 2*(4+nsol);
     
     const int nreact = m_pMat->Reactions();
+    const int mreact = m_pMat->MembraneReactions();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
     
@@ -647,6 +656,15 @@ void FEMultiphasicShellDomain::ElementInternalForce(FEShellElement& el, vector<d
         // chemical reactions
         for (i=0; i<nreact; ++i) {
             FEChemicalReaction* pri = m_pMat->GetReaction(i);
+            double zhat = pri->ReactionSupply(mp);
+            phiwhat += phiw*pri->m_Vbar*zhat;
+            for (isol=0; isol<nsol; ++isol)
+                chat[isol] += phiw*zhat*pri->m_v[isol];
+        }
+        
+        // membrane reactions
+        for (i=0; i<mreact; ++i) {
+            FEMembraneReaction* pri = m_pMat->GetMembraneReaction(i);
             double zhat = pri->ReactionSupply(mp);
             phiwhat += phiw*pri->m_Vbar*zhat;
             for (isol=0; isol<nsol; ++isol)
@@ -749,7 +767,8 @@ void FEMultiphasicShellDomain::ElementInternalForceSS(FEShellElement& el, vector
     int ndpn = 2*(4+nsol);
     
     const int nreact = m_pMat->Reactions();
-    
+    const int mreact = m_pMat->MembraneReactions();
+
     double dt = GetFEModel()->GetTime().timeIncrement;
     
     // repeat for all integration points
@@ -801,6 +820,15 @@ void FEMultiphasicShellDomain::ElementInternalForceSS(FEShellElement& el, vector
         // chemical reactions
         for (i=0; i<nreact; ++i) {
             FEChemicalReaction* pri = m_pMat->GetReaction(i);
+            double zhat = pri->ReactionSupply(mp);
+            phiwhat += phiw*pri->m_Vbar*zhat;
+            for (isol=0; isol<nsol; ++isol)
+                chat[isol] += phiw*zhat*pri->m_v[isol];
+        }
+        
+        // membrane reactions
+        for (i=0; i<mreact; ++i) {
+            FEMembraneReaction* pri = m_pMat->GetMembraneReaction(i);
             double zhat = pri->ReactionSupply(mp);
             phiwhat += phiw*pri->m_Vbar*zhat;
             for (isol=0; isol<nsol; ++isol)
@@ -942,7 +970,8 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffness(FEShellElement& el, m
     
     const int nsbm   = m_pMat->SBMs();
     const int nreact = m_pMat->Reactions();
-    
+    const int mreact = m_pMat->MembraneReactions();
+
     // zero stiffness matrix
     ke.zero();
     
@@ -1044,6 +1073,11 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffness(FEShellElement& el, m
             Phie += m_pMat->GetReaction(i)->m_Vbar*(I*m_pMat->GetReaction(i)->ReactionSupply(mp)
                                                     +m_pMat->GetReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
         
+        // membrane reactions
+        for (i=0; i<mreact; ++i)
+            Phie += m_pMat->GetMembraneReaction(i)->m_Vbar*mat3dd(m_pMat->GetMembraneReaction(i)->ReactionSupply(mp)
+                                                    +m_pMat->GetMembraneReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
+        
         for (isol=0; isol<nsol; ++isol) {
             // evaluate the permeability derivatives
             dKdc[isol] = m_pMat->GetPermeability()->Tangent_Permeability_Concentration(mp,isol);
@@ -1080,6 +1114,15 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffness(FEShellElement& el, m
                   +m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
                 Phic[isol] += phiw*m_pMat->GetReaction(ireact)->m_Vbar
                 *m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, isol);
+            }
+            
+            // membrane reactions
+            for (ireact=0; ireact<mreact; ++ireact) {
+                dchatde[isol] += m_pMat->GetMembraneReaction(ireact)->m_v[isol]
+                *mat3dd(m_pMat->GetMembraneReaction(ireact)->ReactionSupply(mp)
+                  +m_pMat->GetMembraneReaction(ireact)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
+                Phic[isol] += phiw*m_pMat->GetMembraneReaction(ireact)->m_Vbar
+                *m_pMat->GetMembraneReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, isol);
             }
         }
         
@@ -1234,6 +1277,25 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffness(FEShellElement& el, m
                         qcw[isol] -= ((zhatI+dzde*(J-phi0))*gradMw[j])*(sum1*c[isol])
                         +gradMw[j]*(c[isol]*(J-phi0)*sum2*zhat);
                     }
+                    
+                    // membrane reactions
+                    for (ireact=0; ireact<mreact; ++ireact) {
+                        double sum1 = 0;
+                        double sum2 = 0;
+                        for (isbm=0; isbm<nsbm; ++isbm) {
+                            sum1 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetMembraneReaction(ireact)->m_v[nsol+isbm]*
+                            ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/m_pMat->SBMDensity(isbm));
+                            sum2 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetMembraneReaction(ireact)->m_v[nsol+isbm]*
+                            (dkdr[isol][isbm]+(J-phi0)*dkdJr[isol][isbm]-dkdJ[isol]/m_pMat->SBMDensity(isbm));
+                        }
+                        double zhat = m_pMat->GetMembraneReaction(ireact)->ReactionSupply(mp);
+                        mat3dd zhatI(zhat);
+                        mat3ds dzde = mat3dd(m_pMat->GetMembraneReaction(ireact)->Tangent_ReactionSupply_Strain(mp));
+                        qcu[isol] -= ((zhatI+dzde*(J-phi0))*gradMu[j])*(sum1*c[isol])
+                        +gradMu[j]*(c[isol]*(J-phi0)*sum2*zhat);
+                        qcw[isol] -= ((zhatI+dzde*(J-phi0))*gradMw[j])*(sum1*c[isol])
+                        +gradMw[j]*(c[isol]*(J-phi0)*sum2*zhat);
+                    }
                 }
                 
                 for (isol=0; isol<nsol; ++isol) {
@@ -1362,6 +1424,30 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffness(FEShellElement& el, m
                                 qcd[isol][jsol] -= Mw[j]*phiw*((zhat+c[isol]*dzdc)*sum1+c[isol]*zhat*sum2);
                             }
                         }
+                        
+                        // membrane reactions
+                        for (ireact=0; ireact<mreact; ++ireact) {
+                            dchatdc[isol][jsol] += m_pMat->GetMembraneReaction(ireact)->m_v[isol]
+                            *m_pMat->GetMembraneReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
+                            double sum1 = 0;
+                            double sum2 = 0;
+                            for (isbm=0; isbm<nsbm; ++isbm) {
+                                sum1 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetMembraneReaction(ireact)->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/m_pMat->SBMDensity(isbm));
+                                sum2 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetMembraneReaction(ireact)->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdrc[isol][isbm][jsol]-dkdc[isol][jsol]/m_pMat->SBMDensity(isbm));
+                            }
+                            double zhat = m_pMat->GetMembraneReaction(ireact)->ReactionSupply(mp);
+                            double dzdc = m_pMat->GetMembraneReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, jsol);
+                            if (jsol != isol) {
+                                qcc[isol][jsol] -= Mu[j]*phiw*c[isol]*(dzdc*sum1+zhat*sum2);
+                                qcd[isol][jsol] -= Mw[j]*phiw*c[isol]*(dzdc*sum1+zhat*sum2);
+                            }
+                            else {
+                                qcc[isol][jsol] -= Mu[j]*phiw*((zhat+c[isol]*dzdc)*sum1+c[isol]*zhat*sum2);
+                                qcd[isol][jsol] -= Mw[j]*phiw*((zhat+c[isol]*dzdc)*sum1+c[isol]*zhat*sum2);
+                            }
+                        }
                     }
                 }
                 
@@ -1433,7 +1519,8 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffnessSS(FEShellElement& el,
     int ndpn = 2*(4+nsol);
     
     const int nreact = m_pMat->Reactions();
-    
+    const int mreact = m_pMat->MembraneReactions();
+
     // zero stiffness matrix
     ke.zero();
     
@@ -1530,6 +1617,11 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffnessSS(FEShellElement& el,
         for (i=0; i<nreact; ++i)
             Phie += m_pMat->GetReaction(i)->m_Vbar*(I*m_pMat->GetReaction(i)->ReactionSupply(mp)
                                                     +m_pMat->GetReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
+        
+        // membrane reactions
+        for (i=0; i<mreact; ++i)
+            Phie += m_pMat->GetReaction(i)->m_Vbar*mat3dd(m_pMat->GetMembraneReaction(i)->ReactionSupply(mp)
+                                                    +m_pMat->GetMembraneReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
         
         for (isol=0; isol<nsol; ++isol) {
             // evaluate the permeability derivatives
@@ -1788,6 +1880,11 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffnessSS(FEShellElement& el,
                         for (ireact=0; ireact<nreact; ++ireact)
                             dchatdc[isol][jsol] += m_pMat->GetReaction(ireact)->m_v[isol]
                             *m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
+                        
+                        // membrane reactions
+                        for (ireact=0; ireact<mreact; ++ireact)
+                            dchatdc[isol][jsol] += m_pMat->GetMembraneReaction(ireact)->m_v[isol]
+                            *m_pMat->GetMembraneReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
                     }
                 }
                 
@@ -2166,7 +2263,6 @@ void FEMultiphasicShellDomain::Update(const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEMultiphasicShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
-    UpdateShellMPData(iel, tp);
     double dt = tp.timeIncrement;
     
     int j, k, n;
@@ -2328,7 +2424,7 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp
 
 //-----------------------------------------------------------------------------
 // Extract the solute DOFs for the solid elements on either side of the shell domain
-void FEMultiphasicShellDomain::UpdateShellMPData(int iel, const FETimeInfo& tp)
+void FEMultiphasicShellDomain::UpdateShellMPData(int iel)
 {
     if (m_pMat->MembraneReactions() == 0) return;
     

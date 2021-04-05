@@ -86,7 +86,7 @@ public:
     void UpdateElementStress(int iel, const FETimeInfo& tp);
     
     // update element shell material points if membrane reactions are present
-    void UpdateShellMPData(int iel, const FETimeInfo& tp);
+    void UpdateShellMPData(int iel);
 
     //! Unpack element data (overridden from FEDomain)
     void UnpackMembraneLM(FEShellElement& el, vector<int>& lm);

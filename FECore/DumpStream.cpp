@@ -41,7 +41,7 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 	m_btypeInfo = true;
 #else
 	m_btypeInfo = false;
-#endif;
+#endif
 }
 
 //-----------------------------------------------------------------------------
