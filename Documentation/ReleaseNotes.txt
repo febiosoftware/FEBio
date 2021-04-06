@@ -59,6 +59,8 @@ In addition, the following materials returned 0 for the strain energy density, a
  - "viscoelastic" (FEViscoElasticMaterial)
  - "uncoupled viscoelastic" (FEUncoupledViscoElasticMaterial)
 
+* A bug was fixed in the log feature that wrote all log data to the same output file. 
+
 ===========================================================================
 
  R E L E A S E   3.3.1   4/2/2021
