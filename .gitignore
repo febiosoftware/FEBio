@@ -415,3 +415,7 @@ DerivedData/
 
 ## Gcc Patch
 /*.gcno
+
+## cmake build directories
+cbuild/
+cmbuild/
