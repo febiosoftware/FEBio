@@ -30,9 +30,7 @@ SOFTWARE.*/
 #include "FEBondRelaxation.h"
 #include "FEElasticMaterial.h"
 #include <FECore/log.h>
-#ifdef HAVE_GSL
-    #include "gsl/gsl_sf_expint.h"
-#endif
+#include <FECore/expint_Ei.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -142,18 +140,13 @@ double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t, con
 {
     double g = 0;
     
-#ifdef HAVE_GSL
     if (t > 0) {
         g = (m_tau2*exp(-t/m_tau2) - m_tau1*exp(-t/m_tau1)
-        + t*(gsl_sf_expint_Ei(-t/m_tau2) - gsl_sf_expint_Ei(-t/m_tau1)))
+        + t*(expint_Ei(-t/m_tau2) - expint_Ei(-t/m_tau1)))
         /(m_tau2 - m_tau1);
     }
     else
         g = 1;
-#else
-    feLog("FATAL ERROR: Fung bond relaxation is not available in this executable. Link to GSL!\n");
-    throw "FATAL ERROR";
-#endif
     
     return g;
 }
