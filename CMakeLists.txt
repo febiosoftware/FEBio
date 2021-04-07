@@ -42,8 +42,13 @@ include(FindDependencies.cmake)
 
 function(findLib libName libDir libOut)
     # Optional arguments ARGV3-ARVG6 can be used as alernative names for the library
-    find_library(TEMP NAMES ${libName} ${ARGV3} ${ARGV4} ${ARGV5} ${ARGV6}
-        PATHS ${${libDir}} NO_DEFAULT_PATH)
+    if(WIN32)
+        find_library(TEMP NAMES ${libName}.lib ${ARGV3}.lib ${ARGV4}.lib ${ARGV5}.lib ${ARGV6}.lib
+            PATHS ${${libDir}} NO_DEFAULT_PATH)
+    else()
+        find_library(TEMP NAMES lib${libName}.a lib${ARGV3}.a lib${ARGV4}.a lib${ARGV5}.a lib${ARGV6}.a
+            PATHS ${${libDir}} NO_DEFAULT_PATH)
+    endif()
     
     if(TEMP)
         set(${libOut} ${TEMP} PARENT_SCOPE)
@@ -294,7 +299,11 @@ endif()
 
 # Link MKL
 if(USE_MKL)
-    target_link_libraries(febio3 ${MKL_LIBS} ${MKL_OMP_LIB})
+    if(WIN32 OR APPLE)
+        target_link_libraries(febio3 ${MKL_LIBS} ${MKL_OMP_LIB})
+    else()
+        target_link_libraries(febio3 -Wl,--start-group ${MKL_LIBS} ${MKL_OMP_LIB} -Wl,--end-group)
+    endif()
 else()
     # If not using MKL, we still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
