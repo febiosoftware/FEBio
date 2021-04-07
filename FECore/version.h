@@ -34,8 +34,8 @@ SOFTWARE.*/
 // of FEBio. In that case, plugins need to be recompiled to be usable with the 
 // newer version of FEBio.
 #define FE_SDK_MAJOR_VERSION	3
-#define FE_SDK_SUB_VERSION		0
-#define FE_SDK_SUBSUB_VERSION	0
+#define FE_SDK_SUB_VERSION		3
+#define FE_SDK_SUBSUB_VERSION	2
 
 //-----------------------------------------------------------------------------
 // This macro needs to be exported by all plugins in the GetSDKVersion() function.

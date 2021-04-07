@@ -145,36 +145,37 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 	}
 
-	// get the (optional) file attribute
-	char szfilename[1024] = { 0 };
-	const char* szfile = tag.AttributeValue("file", true);
-	if (szfile)
-	{
-		// if we have a path, prepend the path's name
-		if (szpath && szpath[0])
-		{
-			sprintf(szfilename, "%s%s", szpath, szfile);
-		}
-		else strcpy(szfilename, szfile);
-		szfile = szfilename;
-	}
-
-	// get other attributes
-	const char* szdelim   = tag.AttributeValue("delim" , true);
-	const char* szformat  = tag.AttributeValue("format", true);
-
-	bool bcomment = true;
-	const char* szcomment = tag.AttributeValue("comments", true);
-	if (szcomment != 0)
-	{
-		if      (strcmp(szcomment, "on" ) == 0) bcomment = true;
-		else if (strcmp(szcomment, "off") == 0) bcomment = false;
-	}
-
 	if (tag.isleaf()) return;
 	++tag;
 	do
 	{
+		// get the (optional) file attribute
+		char szfilename[1024] = { 0 };
+		const char* szfile = tag.AttributeValue("file", true);
+		if (szfile)
+		{
+			// if we have a path, prepend the path's name
+			if (szpath && szpath[0])
+			{
+				sprintf(szfilename, "%s%s", szpath, szfile);
+			}
+			else strcpy(szfilename, szfile);
+			szfile = szfilename;
+		}
+
+		// get other attributes
+		const char* szdelim = tag.AttributeValue("delim", true);
+		const char* szformat = tag.AttributeValue("format", true);
+
+		bool bcomment = true;
+		const char* szcomment = tag.AttributeValue("comments", true);
+		if (szcomment != 0)
+		{
+			if (strcmp(szcomment, "on") == 0) bcomment = true;
+			else if (strcmp(szcomment, "off") == 0) bcomment = false;
+		}
+
+
 		if (tag == "node_data")
 		{
 			NodeDataRecord* prec = new NodeDataRecord(&fem, szfile);

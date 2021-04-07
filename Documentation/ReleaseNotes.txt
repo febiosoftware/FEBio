@@ -24,7 +24,7 @@
   Columbia University
   http://me.columbia.edu/mbl
 
-  copyright (c) University of Utah 2006-2019 - All rights reserved
+  copyright (c) University of Utah 2006-2021 - All rights reserved
 
 
 ===========================================================================
@@ -41,7 +41,7 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
- R E L E A S E   3.3.2   4/5/2021
+ R E L E A S E   3.3.2   4/6/2021
 
 ===========================================================================
 
@@ -58,6 +58,8 @@ In addition, the following materials returned 0 for the strain energy density, a
 
  - "viscoelastic" (FEViscoElasticMaterial)
  - "uncoupled viscoelastic" (FEUncoupledViscoElasticMaterial)
+
+* A bug was fixed in the log feature that wrote all log data to the same output file. 
 
 ===========================================================================
 
