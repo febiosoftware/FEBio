@@ -30,9 +30,7 @@ SOFTWARE.*/
 #include <limits>
 #include "FEFiberExpLinear.h"
 #include <FECore/log.h>
-#ifdef HAVE_GSL
-#include "gsl/gsl_sf_expint.h"
-#endif
+#include <FECore/expint_Ei.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -156,13 +154,12 @@ double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
 	
 	// strain energy density
 	double sed = 0.0;
-#ifdef HAVE_GSL
 	if (lam >= 1)
 	{
 		if (lam < m_lam1)
 		{
 			sed = m_c3 * (exp(-m_c4)*
-				(gsl_sf_expint_Ei(m_c4*lam) - gsl_sf_expint_Ei(m_c4))
+				(expint_Ei(m_c4*lam) - expint_Ei(m_c4))
 				- log(lam));
 		}
 		else
@@ -171,10 +168,6 @@ double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
 			sed = m_c5 * (lam - 1) + c6 * log(lam);
 		}
 	}
-#else
-    feLog("FATAL ERROR: Strain energy density calculation is not available for fiber-exp-linear material in this executable. Link to GSL!\n");
-    throw "FATAL ERROR";
-#endif
 	// --- active contraction contribution to sed is zero ---
 
 	return sed;

@@ -30,9 +30,7 @@ SOFTWARE.*/
 #include "FEUncoupledFiberExpLinear.h"
 #include <stdlib.h>
 #include <limits>
-#ifdef HAVE_GSL
-#include "gsl/gsl_sf_expint.h"
-#endif
+#include <FECore/expint_Ei.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEUncoupledFiberExpLinear, FEElasticFiberMaterialUC);
@@ -204,13 +202,12 @@ double FEUncoupledFiberExpLinear::DevFiberStrainEnergyDensity(FEMaterialPoint &m
 
 	// strain energy density
 	double sed = 0.0;
-#ifdef HAVE_GSL
 	if (lamd >= 1)
 	{
 		if (lamd < m_lam1)
 		{
 			sed = m_c3*(exp(-m_c4)*
-				(gsl_sf_expint_Ei(m_c4*lamd) - gsl_sf_expint_Ei(m_c4))
+				(expint_Ei(m_c4*lamd) - expint_Ei(m_c4))
 				- log(lamd));
 		}
 		else
@@ -219,7 +216,6 @@ double FEUncoupledFiberExpLinear::DevFiberStrainEnergyDensity(FEMaterialPoint &m
 			sed = m_c5*(lamd - 1) + c6*log(lamd);
 		}
 	}
-#endif
 	// --- active contraction contribution to sed is zero ---
 
 	return sed;
