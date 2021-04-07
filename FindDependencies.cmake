@@ -26,6 +26,7 @@ if(MKLROOT)
         
     find_library(MKL_CORE mkl_core
         PATHS ${MKLROOT}/lib
+        PATH_SUFFIXES "intel64" "intel32"
         NO_DEFAULT_PATH)
         
     if(MKL_CORE)
