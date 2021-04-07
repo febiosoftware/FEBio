@@ -19,9 +19,24 @@ else()
 		DOC "MKL root directory")
 endif()
 
-if(DEFINED MKLROOT)
-    set(MKL_INC ${MKLROOT}/include CACHE DOC "MKL include directory")
-    set(MKL_LIB_DIR ${MKLROOT}/lib/intel64 CACHE DOC "MKL Library directory")
+if(MKLROOT)
+    find_path(MKL_INC mkl.h 
+        PATHS ${MKLROOT}/include
+        DOC "MKL include directory")
+        
+    find_library(MKL_CORE mkl_core
+        PATHS ${MKLROOT}/lib
+        NO_DEFAULT_PATH)
+        
+    if(MKL_CORE)
+        get_filename_component(MKL_TEMP ${MKL_CORE} DIRECTORY)
+        set(MKL_LIB_DIR ${MKL_TEMP} CACHE PATH "MKL Library directory")
+        unset(MKL_TEMP)
+        unset(MKL_CORE CACHE)
+    else()
+        set(MKL_LIB_DIR "MKL_LIB_DIR-NOTFOUND" CACHE PATH "MKL Library directory")
+        unset(MKL_CORE CACHE)
+    endif()
     
     find_library(MKL_OMP_LIB 
         NAMES iomp5 iomp5md libiomp5md.lib
@@ -33,13 +48,14 @@ endif()
 
 if(MKL_INC AND MKL_LIB_DIR AND MKL_OMP_LIB)
 	option(USE_MKL "Required for pardiso and iterative solvers" ON)
+    set(OpenMP_C_FOUND true)
 else()
 	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
 endif()
 
 if(NOT USE_MKL AND NOT WIN32)
     # OpenMP
-    find_package(OpenMP)
+    find_package(OpenMP QUIET)
 endif()
 
 # HYPRE
@@ -98,37 +114,6 @@ if(MMG_INC AND MMG_LIB)
 else()
 	option(USE_MMG "Required for MMG use" OFF)
     mark_as_advanced(CLEAR MMG_INC MMG_LIB)
-endif()
-
-# TETGEN
-if(WIN32)
-	find_path(TET_INC tetgen.h
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/tetgen*" "src" "build" "build/include"
-        DOC "TetGen include directory")
-	find_library(TET_LIB 
-        NAMES tet tetgen
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
-		DOC "TetGen library path")
-else()
-	find_path(TET_INC tetgen.h
-        PATHS /opt/tetgen* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "include" "include/tetgen*" "src" "build" "build/include"
-		DOC "TetGen include directory")
-	find_library(TET_LIB 
-        NAMES tet tetgen 
-        PATHS /opt/tetgen* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
-		DOC "TetGen library path")
-endif()	
-
-if(TET_INC AND TET_LIB)		
-	option(USE_TETGEN "Required for adaptive remeshing" ON)
-    mark_as_advanced(TET_INC TET_LIB)
-else()
-	option(USE_TETGEN "Required for adaptive remeshing" OFF)
-    mark_as_advanced(CLEAR TET_INC TET_LIB)
 endif()
 
 # LEVMAR

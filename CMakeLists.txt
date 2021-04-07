@@ -96,15 +96,6 @@ if(USE_MMG)
 	endif()
 endif()
 
-if(USE_TETGEN)
-	if(NOT EXISTS ${TET_LIB})
-		message(SEND_ERROR "Could not find TetGen library. Check TET_LIB.")
-	endif()
-	if(NOT EXISTS ${TET_INC}/tetgen.h)
-		message(SEND_ERROR "Could not find tetgen.h. Check TET_INC.")
-	endif()
-endif()
-
 if(USE_LEVMAR)
 	if(NOT EXISTS ${LEVMAR_INC}/levmar.h)
 		message(SEND_ERROR "Could not find levmar.h. Check LEVMAR_INC.")
@@ -151,11 +142,6 @@ if(USE_MMG)
 	include_directories(${MMG_INC})
 endif(USE_MMG)
 
-if(USE_TETGEN)
-	add_definitions(-DTETLIBRARY)
-	include_directories(${TET_INC})
-endif(USE_TETGEN)
-
 if(USE_LEVMAR)
 	add_definitions(-DHAVE_LEVMAR)
 	include_directories(${LEVMAR_INC})
@@ -189,14 +175,11 @@ endif()
 # Extra compiler flags for intel compiler
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 	add_definitions(-static-intel -no-intel-extensions)
-    if(APPLE)
-        add_definitions(-fopenmp)
-    endif()
 endif()
 
-# Properly use OMP if llvm has been installed from brew
-if(APPLE AND "${CMAKE_CXX_COMPILER}" MATCHES "opt")
-	add_definitions(-fopenmp)
+# Add openMP flags for macOS if found.
+if(APPLE AND ${OpenMP_C_FOUND})
+    add_definitions(-Xpreprocessor -fopenmp)
 endif()
 
 ##### Find Source Files #####
@@ -323,11 +306,6 @@ endif()
 # Link MMG
 if(USE_MMG)
 	target_link_libraries(febio3 ${MMG_LIB})
-endif()
-
-# Link TETGEN
-if(USE_TETGEN)
-	target_link_libraries(febio3 ${TET_LIB})
 endif()
 
 # Link ZLIB
