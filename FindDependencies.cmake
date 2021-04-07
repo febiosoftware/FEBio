@@ -3,7 +3,7 @@ if(DEFINED ENV{MKLROOT})
     set(MKLROOT $ENV{MKLROOT} CACHE DOC "MKL root directory")
 else()
     if(WIN32)
-        set(MKLPATHS $ENV{ProgramFiles\(x86\)}/Intel* $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
+        set(MKLPATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
         set(MKLSUFFIXES "compilers_and_libraries/windows")
     elseif(APPLE)
         set(MKLPATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel)
@@ -24,7 +24,7 @@ if(DEFINED MKLROOT)
     set(MKL_LIB_DIR ${MKLROOT}/lib/intel64 CACHE DOC "MKL Library directory")
     
     find_library(MKL_OMP_LIB 
-        NAMES iomp5 iomp5md
+        NAMES iomp5 iomp5md libiomp5md.lib
         PATHS ${MKLROOT}/../lib ${MKLROOT}/../compiler/lib
         PATH_SUFFIXES "intel64" "intel32"
         NO_DEFAULT_PATH
@@ -37,20 +37,20 @@ else()
 	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
 endif()
 
-if(NOT USE_MKL)
+if(NOT USE_MKL AND NOT WIN32)
     # OpenMP
     find_package(OpenMP)
 endif()
 
 # HYPRE
 if(WIN32)
-	find_path(HYPRE_INC HYPRE.h 
+	find_path(HYPRE_INC HYPRE_IJ_mv.h
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
 		PATH_SUFFIXES "include" "include/hypre" "src" "src/include" "src/hypre/include"
         DOC "HYPRE include directory")
 	find_library(HYPRE_LIB HYPRE 
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "src" "src/build" "src/mbuild"
+        PATH_SUFFIXES "src" "src/build" "src/mbuild" "/src/vs2017/Release"
 		DOC "HYPRE library path")
 else()
 	find_path(HYPRE_INC HYPRE_IJ_mv.h
@@ -74,12 +74,12 @@ endif()
 # MMG
 if(WIN32)
 	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/mmg*" "src" "build" "build/include"
+        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
+		PATH_SUFFIXES "include" "include/mmg*" "src" "build" "build/include" "cmbuild/include"
         DOC "MMG include directory")
 	find_library(MMG_LIB mmg3d 
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
+        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
 		DOC "MMG library path")
 else()
 	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
@@ -136,6 +136,7 @@ if(WIN32)
 	find_path(LEVMAR_INC levmar.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
 		DOC "Levmar include directory")
 	find_library(LEVMAR_LIB levmar PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+        PATH_SUFFIXES "vs2017/Release"
 		DOC "Levmar library path")
 else()
 	find_path(LEVMAR_INC levmar.h PATHS /usr/local/ /opt/levmar* $ENV{HOME}/* $ENV{HOME}/*/*
@@ -186,5 +187,5 @@ else()
 endif()
 
 if(WIN32)
-    set(VCPKG_GSL false CACHE BOOL DOC "Use Vcpkg to link GSL")
+    option(VCPKG_GSL "Use Vcpkg to link GSL" OFF)
 endif()
