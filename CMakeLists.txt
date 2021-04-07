@@ -13,50 +13,64 @@ set(CMAKE_FILES_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER Autogen)
 
+# Set a default build type if none was specified
+set(default_build_type "Release")
+ 
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
 ##### Set appropriate flag for operating system ####
 if(WIN32)
-	add_definitions(-DWIN32 /MP /openmp)
+	add_definitions(-DWIN32)
 elseif(APPLE)
     add_definitions(-D__APPLE__)
 else()
 	add_definitions(-DLINUX)
 endif()
 
-##### Check that paths are valid #####
+##### Search for library and include directories #####
+
+include(FindDependencies.cmake)
+
+#### Check if paths are valid and find libs ####
+
+function(findLib libName libDir libOut)
+    # Optional arguments ARGV3-ARVG6 can be used as alernative names for the library
+    find_library(TEMP NAMES ${libName} ${ARGV3} ${ARGV4} ${ARGV5} ${ARGV6}
+        PATHS ${${libDir}} NO_DEFAULT_PATH)
+    
+    if(TEMP)
+        set(${libOut} ${TEMP} PARENT_SCOPE)
+        unset(TEMP CACHE)
+    else()
+        if(WIN32)
+            message(SEND_ERROR "Could not find ${libName}.lib. Check ${libName}.")
+        elseif(APPLE)
+            message(SEND_ERROR "Could not find lib${libName}.so, lib${libName}.a, or lib${libName}.dylib Check ${libDir}.")
+        else()
+            message(SEND_ERROR "Could not find lib${libName}.so, or lib${libName}.a. Check ${libDir}")
+        endif()
+        unset(TEMP CACHE)
+    endif()
+endfunction()
+
 if(USE_MKL)
-	if(WIN32)
-		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_intel_lp64.lib)
-			message(SEND_ERROR "Could not find mkl_intel_lp64.lib. Check MKL_LIB_DIR.")
-		endif()
-		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_core.lib)
-			message(SEND_ERROR "Could not find mkl_core.lib. Check MKL_LIB_DIR.")
-		endif()
-		if(NOT EXISTS ${MKL_LIB_DIR}/mkl_intel_thread.lib)
-			message(SEND_ERROR "Could not find mkl_intel_thread.lib. Check MKL_LIB_DIR.")
-		endif()
-		if(NOT EXISTS ${OMP_LIB})
-			message(SEND_ERROR "Could not find libiomp5md.lib. Check OMP_LIB.")
-		endif()
-		if(NOT EXISTS ${MKL_INC}/mkl.h)
-			message(SEND_ERROR "Could not find mkl.h. Check MKL_INC.")
-		endif()
-	else()
-		if(NOT EXISTS ${MKL_LIB_DIR}/libmkl_intel_lp64.a)
-			message(SEND_ERROR "Could not find libmkl_intel_lp64.a. Check MKL_LIB_DIR.")
-		endif()
-		if(NOT EXISTS ${MKL_LIB_DIR}/libmkl_core.a)
-			message(SEND_ERROR "Could not find libmkl_core.a. Check MKL_LIB_DIR.")
-		endif()
-		if(NOT EXISTS ${MKL_LIB_DIR}/libmkl_intel_thread.a)
-			message(SEND_ERROR "Could not find libmkl_intel_thread.a. Check MKL_LIB_DIR.")
-		endif()
-		if(NOT EXISTS ${OMP_LIB})
-			message(SEND_ERROR "Could not find libiomp5.so or libiomp5.dylib. Check OMP_LIB.")
-		endif()
-		if(NOT EXISTS ${MKL_INC}/mkl.h)
-			message(SEND_ERROR "Could not find mkl.h. Check MKL_INC.")
-		endif()
-	endif()
+    set(MKL_LIB_NAMES mkl_intel_lp64 mkl_core mkl_intel_thread)
+    foreach(name IN LISTS MKL_LIB_NAMES)
+        findLib(${name} MKL_LIB_DIR MKL_LIB)
+        list(APPEND MKL_LIBS ${MKL_LIB})
+        unset(MMG_LIB)
+    endforeach(name)
+    
+    if(NOT EXISTS ${MKL_OMP_LIB})
+        message(SEND_ERROR "Could not find MKL OMP library. Check MKL_OMP_LIB.")
+    endif()
 endif()
 
 if(USE_HYPRE)
@@ -91,11 +105,7 @@ if(USE_LEVMAR)
 		message(SEND_ERROR "Could not find levmar.h. Check LEVMAR_INC.")
 	endif()
 	if(NOT EXISTS ${LEVMAR_LIB})
-		if(WIN32)
-			message(SEND_ERROR "Could not find levmar.lib. Check LEVMAR_LIB.")
-		else()
-			message(SEND_ERROR "Could not find liblevmar.a. Check LEVMAR_LIB.")
-		endif()
+		message(SEND_ERROR "Could not find Levmar library. Check LEVMAR_LIB.")
 	endif()
 endif()
 
@@ -108,214 +118,13 @@ if(USE_ZLIB)
 	endif()
 endif()
 
-if(USE_GSL)
+if(USE_GSL AND NOT VCPKG_GSL)
 	if(NOT EXISTS ${GSL_LIB})
 		message(SEND_ERROR "Could not find GSL library. Check GSL_LIB.")
 	endif()
 	if(NOT EXISTS ${GSL_INC}/gsl/gsl_spline.h)
 		message(SEND_ERROR "Could not find gsl_spline.h. Check GSL_INC.")
 	endif()
-endif()
-
-
-##### Search for libaries #####
-
-# MKL - On Unix the compilervars.sh should be run to find the MKL libraries. 
-if(WIN32)
-	find_file(MKLROOT mkl
-		PATHS $ENV{ProgramFiles\(x86\)}/Intel* $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*
-		PATH_SUFFIXES "compilers_and_libraries/windows"
-		DOC "MKL root directory")
-		
-	if(MKLROOT)
-		find_path(MKL_INC mkl.h
-			PATHS ${MKLROOT}/include
-			DOC "MKL include directory")
-		find_path(MKL_LIB_DIR mkl_core.lib 
-			PATHS ${MKLROOT}/lib
-			PATH_SUFFIXES "intel64"
-			DOC "MKL Library directory")
-		find_library(OMP_LIB iomp5md 
-			#PATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64
-			PATHS ${MKLROOT}/../compiler/lib/ ${MKLROOT}/../lib/
-			PATH_SUFFIXES "intel64" "intel32"
-			DOC "OMP Library")		
-	endif()
-else()
-	if(APPLE)
-		find_file(MKLROOT mkl
-			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel
-			PATH_SUFFIXES "compilers_and_libraries/mac"
-			DOC "MKL root directory")
-	else()
-		find_file(MKLROOT mkl
-			PATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel $ENV{HOME}/intel $ENV{HOME}/*/intel
-			PATH_SUFFIXES "compilers_and_libraries/linux"
-			DOC "MKL root directory")
-	endif()
-
-	if(MKLROOT)
-		find_path(MKL_INC mkl.h
-			PATHS ${MKLROOT}/include
-			DOC "MKL include directory")
-		find_path(MKL_LIB_DIR libmkl_core.a 
-			PATHS ${MKLROOT}/lib
-			PATH_SUFFIXES "intel64"
-			DOC "MKL Library directory")
-		find_library(OMP_LIB iomp5
-			PATHS ${MKLROOT}/../lib
-			PATH_SUFFIXES "intel64" "intel32"
-			NO_DEFAULT_PATH
-			DOC "OMP Library")		
-	endif()
-	
-endif()
-
-if(MKL_INC AND MKL_LIB_DIR AND OMP_LIB)
-	option(USE_MKL "Required for pardiso and iterative solvers" ON)
-else()
-	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
-endif()
-
-# HYPRE
-if(WIN32)
-	find_path(HYPRE_INC HYPRE.h 
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/hypre" "src" "src/include" "src/hypre/include"
-        DOC "HYPRE include directory")
-	find_library(HYPRE_LIB HYPRE 
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "src" "src/build" "src/mbuild"
-		DOC "HYPRE library path")
-else()
-	find_path(HYPRE_INC HYPRE_IJ_mv.h
-        PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "include" "include/hypre" "src" "src/include" "src/hypre/include"
-		DOC "HYPRE include directory")
-	find_library(HYPRE_LIB HYPRE 
-        PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "src" "src/build" "src/cbuild"
-		DOC "HYPRE library path")
-endif()	
-
-if(HYPRE_INC AND HYPRE_LIB)		
-	option(USE_HYPRE "Required for HYPRE solver" ON)
-    mark_as_advanced(HYPRE_INC HYPRE_LIB)
-else()
-	option(USE_HYPRE "Required for HYPRE solver" OFF)
-    mark_as_advanced(CLEAR HYPRE_INC HYPRE_LIB)
-endif()
-
-# MMG
-if(WIN32)
-	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/mmg*" "src" "build" "build/include"
-        DOC "MMG include directory")
-	find_library(MMG_LIB mmg3d 
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
-		DOC "MMG library path")
-else()
-	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
-        PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "include" "include/mmg" "build" "build/include" "cbuild" "cbuild/include" "src" 
-		DOC "MMG include directory")
-	find_library(MMG_LIB mmg3d 
-        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
-		DOC "MMG library path")
-endif()	
-
-if(MMG_INC AND MMG_LIB)		
-	option(USE_MMG "Required for MMG use" ON)
-    mark_as_advanced(MMG_INC MMG_LIB)
-else()
-	option(USE_MMG "Required for MMG use" OFF)
-    mark_as_advanced(CLEAR MMG_INC MMG_LIB)
-endif()
-
-# TETGEN
-if(WIN32)
-	find_path(TET_INC tetgen.h
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/tetgen*" "src" "build" "build/include"
-        DOC "TetGen include directory")
-	find_library(TET_LIB tet 
-        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
-		DOC "TetGen library path")
-else()
-	find_path(TET_INC tetgen.h
-        PATHS /opt/tetgen* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "include" "include/tetgen*" "src" "build" "build/include"
-		DOC "TetGen include directory")
-	find_library(TET_LIB tet 
-        PATHS /opt/tetgen* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib"
-		DOC "TetGen library path")
-endif()	
-
-if(TET_INC AND TET_LIB)		
-	option(USE_TETGEN "Required for adaptive remeshing" ON)
-    mark_as_advanced(TET_INC TET_LIB)
-else()
-	option(USE_TETGEN "Required for adaptive remeshing" OFF)
-    mark_as_advanced(CLEAR TET_INC TET_LIB)
-endif()
-
-# LEVMAR
-if(WIN32)
-	find_path(LEVMAR_INC levmar.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "Levmar include directory")
-	find_library(LEVMAR_LIB levmar PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "Levmar library path")
-else()
-	find_path(LEVMAR_INC levmar.h PATHS /usr/local/ /opt/levmar* $ENV{HOME}/* $ENV{HOME}/*/*
-		DOC "Levmar include directory")
-	find_library(LEVMAR_LIB levmar PATHS /usr/local/ /opt/levmar* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build" "cbuild" "cmbuild"
-		DOC "Levmar library path")
-endif()	
-
-if(LEVMAR_INC AND LEVMAR_LIB)		
-	option(USE_LEVMAR "Required for optimization in FEBio" ON)
-    mark_as_advanced(LEVMAR_INC LEVMAR_LIB)
-else()
-	option(USE_LEVMAR "Required for optimization in FEBio" OFF)
-    mark_as_advanced(CLEAR LEVMAR_INC LEVMAR_LIB)
-endif()
-
-# ZLIB
-include(FindZLIB)
-
-if(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY_RELEASE)		
-	option(USE_ZLIB "Required for compressing xplt files" ON)
-    mark_as_advanced(ZLIB_INCLUDE_DIR ZLIB_LIBRARY_RELEASE)
-else()
-	option(USE_ZLIB "Required for compressing xplt files" OFF)
-    mark_as_advanced(CLEAR ZLIB_INCLUDE_DIR ZLIB_LIBRARY_RELEASE)
-endif()
-
-# GSL
-if(WIN32)
-	find_path(GSL_INC gsl/gsl_spline.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "GSL include directory")
-	find_library(GSL_LIB gsl PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "GSL library path")
-else()
-	find_path(GSL_INC gsl/gsl_spline.h PATHS /usr/local/include /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
-		DOC "GSL include directory")
-	find_library(GSL_LIB NAMES libgsl.a gsl PATHS /usr/local/lib64 /usr/local/lib /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
-		DOC "GSL library path")
-endif()	
-
-if(GSL_INC AND GSL_LIB)		
-	option(USE_GSL "Required for strain energy calculation for certain materials." ON)
-    mark_as_advanced(GSL_INC GSL_LIB)
-else()
-	option(USE_GSL "Required for strain energy calculation for certain materials." OFF)
-    mark_as_advanced(CLEAR GSL_INC GSL_LIB)
 endif()
 
 ##### Set appropriate defines and includes #####
@@ -354,15 +163,19 @@ endif(USE_ZLIB)
 
 if(USE_GSL)
 	add_definitions(-DHAVE_GSL)
-	include_directories(${GSL_INC})
+    
+    if(NOT VCPKG_GSL)
+        include_directories(${GSL_INC})
+    endif()
 endif(USE_GSL)
 
 ##### Set up compiler flags #####
 if(WIN32)
+    add_definitions(/MP /openmp)
 elseif(APPLE)
-	add_definitions(-fPIC -std=c++11 -static-libstdc++ -w)
+	add_definitions(-fPIC -static-libstdc++ -w)
 else()
-	add_definitions(-fPIC -fopenmp -std=c++11 -static-libstdc++ -w)
+	add_definitions(-fPIC -fopenmp -static-libstdc++ -w)
     
     set(CMAKE_BUILD_RPATH_USE_LINK_PATH FALSE)
     set(CMAKE_BUILD_RPATH $ORIGIN/../lib/)
@@ -475,69 +288,66 @@ endif()
 # Link LEVMAR
 if(USE_LEVMAR)
 	target_link_libraries(febio3 ${LEVMAR_LIB})
-endif(USE_LEVMAR)
+endif()
 
 # Link HYPRE
 if(USE_HYPRE)
 	target_link_libraries(febio3 ${HYPRE_LIB})
-endif(USE_HYPRE)
+endif()
 
 # Link MKL
 if(USE_MKL)
-	if(WIN32)
-		target_link_libraries(febio3 ${MKL_LIB_DIR}/mkl_intel_lp64.lib ${MKL_LIB_DIR}/mkl_core.lib
-			${MKL_LIB_DIR}/mkl_intel_thread.lib)
-		target_link_libraries(febio3 ${OMP_LIB})
-	elseif(APPLE)
-		target_link_libraries(febio3 ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
-			${MKL_LIB_DIR}/libmkl_intel_thread.a)
-		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
-    else()
-        target_link_libraries(febio3 -Wl,--start-group ${MKL_LIB_DIR}/libmkl_intel_lp64.a ${MKL_LIB_DIR}/libmkl_core.a
-			${MKL_LIB_DIR}/libmkl_intel_thread.a -Wl,--end-group)
-		target_link_libraries(febio3 ${OMP_LIB} -pthread -ldl)
-	endif()
+    target_link_libraries(febio3 ${MKL_LIBS} ${MKL_OMP_LIB})
+else()
+    # If not using MKL, we still need OpenMP from the system.
+    if(${OpenMP_C_FOUND})
+        target_link_libraries(febio3 ${OpenMP_C_LIBRARIES})
+    endif()
+endif()
+
+if(WIN32)
+	target_link_libraries(febio3 psapi.lib ws2_32.lib)
+else()
+    target_link_libraries(febio3 -pthread -ldl)
 endif()
 
 # Link MMG
 if(USE_MMG)
 	target_link_libraries(febio3 ${MMG_LIB})
-endif(USE_MMG)
+endif()
 
 # Link TETGEN
 if(USE_TETGEN)
 	target_link_libraries(febio3 ${TET_LIB})
-endif(USE_TETGEN)
+endif()
 
 # Link ZLIB
 if(USE_ZLIB)
 	target_link_libraries(febio3 ${ZLIB_LIBRARY_RELEASE})
-endif(USE_ZLIB)
+endif()
 
 # Link GSL
-if(USE_GSL)
+if(USE_GSL AND NOT VCPKG_GSL)
 	target_link_libraries(febio3 ${GSL_LIB})
-endif(USE_GSL)
-
-if(WIN32)
-	target_link_libraries(febio3 psapi.lib ws2_32.lib)
 endif()
 
 ##### Create febio.xml #####
 if(NOT EXISTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml)
-    if(USE_MKL)
     file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
 <febio_config version=\"3.0\">
     <default_linear_solver type=\"pardiso\"></default_linear_solver>
-</febio_config>
-")
-    else()
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
-<febio_config version=\"3.0\">
-    <default_linear_solver type=\"skyline\"></default_linear_solver>
-</febio_config>
-")
-    endif()
+</febio_config>")
 endif()
+
+if(USE_MKL)
+    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
+    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"pardiso\"" filedata ${filedata})
+    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml ${filedata})
+else()
+    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
+    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"skyline\"" filedata "${filedata}")
+    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "${filedata}")
+endif()
+
 
 
