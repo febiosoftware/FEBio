@@ -11,6 +11,8 @@
 		D5006A7921AAF98100031CB6 /* FEElementShape.h in Headers */ = {isa = PBXBuildFile; fileRef = D5006A7721AAF98100031CB6 /* FEElementShape.h */; };
 		D5044A672603DC8500C81BC4 /* FESurfacePairConstraintNL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5044A652603DC8500C81BC4 /* FESurfacePairConstraintNL.cpp */; };
 		D5044A682603DC8500C81BC4 /* FESurfacePairConstraintNL.h in Headers */ = {isa = PBXBuildFile; fileRef = D5044A662603DC8500C81BC4 /* FESurfacePairConstraintNL.h */; };
+		D50D09F0261E2ED3005564C6 /* expint_Ei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50D09EE261E2ED3005564C6 /* expint_Ei.cpp */; };
+		D50D09F1261E2ED3005564C6 /* expint_Ei.h in Headers */ = {isa = PBXBuildFile; fileRef = D50D09EF261E2ED3005564C6 /* expint_Ei.h */; };
 		D510616D217CDD1600CF1690 /* FEPropertyT.h in Headers */ = {isa = PBXBuildFile; fileRef = D510616C217CDD1600CF1690 /* FEPropertyT.h */; };
 		D51EBF9F217E3AED006F73C4 /* FEPIDController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51EBF9D217E3AED006F73C4 /* FEPIDController.cpp */; };
 		D51EBFA0217E3AED006F73C4 /* FEPIDController.h in Headers */ = {isa = PBXBuildFile; fileRef = D51EBF9E217E3AED006F73C4 /* FEPIDController.h */; };
@@ -412,6 +414,8 @@
 		D5006A7721AAF98100031CB6 /* FEElementShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElementShape.h; sourceTree = "<group>"; };
 		D5044A652603DC8500C81BC4 /* FESurfacePairConstraintNL.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FESurfacePairConstraintNL.cpp; sourceTree = "<group>"; };
 		D5044A662603DC8500C81BC4 /* FESurfacePairConstraintNL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FESurfacePairConstraintNL.h; sourceTree = "<group>"; };
+		D50D09EE261E2ED3005564C6 /* expint_Ei.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = expint_Ei.cpp; sourceTree = "<group>"; };
+		D50D09EF261E2ED3005564C6 /* expint_Ei.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = expint_Ei.h; sourceTree = "<group>"; };
 		D510616C217CDD1600CF1690 /* FEPropertyT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPropertyT.h; sourceTree = "<group>"; };
 		D51EBF9D217E3AED006F73C4 /* FEPIDController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPIDController.cpp; sourceTree = "<group>"; };
 		D51EBF9E217E3AED006F73C4 /* FEPIDController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPIDController.h; sourceTree = "<group>"; };
@@ -872,6 +876,8 @@
 				D550834D24F086E300E919D8 /* EigenSolver.h */,
 				D5B9E45F213F67DE0008B38A /* ElementDataRecord.cpp */,
 				D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */,
+				D50D09EE261E2ED3005564C6 /* expint_Ei.cpp */,
+				D50D09EF261E2ED3005564C6 /* expint_Ei.h */,
 				D54626F2260E6FDA007E2D8E /* FaceDataRecord.cpp */,
 				D54626F3260E6FDA007E2D8E /* FaceDataRecord.h */,
 				D5B9E415213F67DE0008B38A /* FEAnalysis.cpp */,
@@ -1343,6 +1349,7 @@
 				D5B9E57B213F67DE0008B38A /* FEProperty.h in Headers */,
 				D5B9E51E213F67DE0008B38A /* FEInitialCondition.h in Headers */,
 				D5B9E52B213F67DE0008B38A /* FEDataMathGenerator.h in Headers */,
+				D50D09F1261E2ED3005564C6 /* expint_Ei.h in Headers */,
 				D54E21E721517EEE008A9DD3 /* FEFixedBC.h in Headers */,
 				D5B9E541213F67DE0008B38A /* DataStore.h in Headers */,
 				D56B209223AD5F94000AE9C2 /* FESolidElement.h in Headers */,
@@ -1712,6 +1719,7 @@
 				D54E21F621517EEE008A9DD3 /* MCollect.cpp in Sources */,
 				D52D840221CE89A200472620 /* FEScalarValuator.cpp in Sources */,
 				D5B9E56F213F67DE0008B38A /* FEGlobalData.cpp in Sources */,
+				D50D09F0261E2ED3005564C6 /* expint_Ei.cpp in Sources */,
 				D54A66AF257BDCB90023C8D1 /* FSPath.cpp in Sources */,
 				D5B9E593213F67DE0008B38A /* FEModelData.cpp in Sources */,
 				D5B9E5E3213F67DE0008B38A /* FEMesh.cpp in Sources */,
