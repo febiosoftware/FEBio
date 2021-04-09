@@ -176,7 +176,7 @@ void mat3ds::exact_eigen(double l[3]) const
 //-----------------------------------------------------------------------------
 // Calculate the eigenvalues and eigenvectors of A using the method of
 // Connelly Barnes ( http://barnesc.blogspot.com/2007/02/eigenvectors-of-3x3-symmetric-matrix.html )
-void mat3ds::eigen2(double l[3], vec3d r[3])
+void mat3ds::eigen2(double l[3], vec3d r[3]) const
 {
     double A[3][3] = {xx(), xy(), xz(), xy(), yy(), yz(), xz(), yz(), zz()};
     double V[3][3];
