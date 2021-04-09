@@ -69,7 +69,7 @@ double gamma_inc_P(double a, double x)
         ++i;
         d *= x/(a+i);
         P += d;
-        if ((d < eps*fabs(P)) || (i > MAXITER)) convgd = true;
+        if ((fabs(d) < eps*fabs(P)) || (i > MAXITER)) convgd = true;
     }
     return P*exp(-x)*pow(x, a);
 }

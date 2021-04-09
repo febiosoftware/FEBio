@@ -63,7 +63,7 @@ double expint_Ei(double x)
         while (!convgd) {
             ++i;
             ei += d;
-            if ((d < eps*fabs(ei)) || (i > MAXITER)) convgd = true;
+            if ((fabs(d) < eps*fabs(ei)) || (i > MAXITER)) convgd = true;
             else d *= (i+1)/x;
         }
         ei *= exp(x)/x;
