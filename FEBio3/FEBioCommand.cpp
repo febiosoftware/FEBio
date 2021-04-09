@@ -379,8 +379,8 @@ int FEBioCmd_Debug::run(int nargs, char** argv)
 	if (nargs == 1) ndebug = (ndebug? 0 : 1);
 	else
 	{
-		if (strcmp(argv[1], "on") == 0) ndebug = 0;
-		else if (strcmp(argv[1], "off") == 0) ndebug = 1;
+		if      (strcmp(argv[1], "on" ) == 0) ndebug = 1;
+		else if (strcmp(argv[1], "off") == 0) ndebug = 0;
 		else { fprintf(stderr, "%s is not a valid option for debug.\n", argv[1]); return 0; }
 	}
 	fem->SetDebugLevel(ndebug);
