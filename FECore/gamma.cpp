@@ -24,49 +24,57 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
 
-#include "expint_Ei.h"
+#include "gamma.h"
 #include <limits>
 #include <math.h>
 
-// This is our homemade function for evaluating the exponential integral Ei(x), valid for
-// negative and positive values of x.
+//---------------------------------------------------------------------------------
+// evaluate natural logarithm of gamma function
+double gammaln(double x)
+{
+    static double c[6] = {
+        76.18009172947146,
+        -86.50532032941677,
+        24.01409824083091,
+        -1.231739572450155,
+        0.1208650973866179e-2,
+        -0.5395239384953e-5};
+    double z = x;
+    double gln = x + 5.5;
+    gln -= (x+0.5)*log(gln);
+    double s = 1.000000000190015;
+    for (int i=0; i<6; ++i) s += c[i]/++z;
+    gln = -gln + log(2.5066282746310005*s/x);
+    return gln;
+}
 
-double expint_Ei(double x)
+//---------------------------------------------------------------------------------
+// evaluate the inverse of the gamma function
+double gammainv(double x) {
+    if (x >= 0) return exp(-gammaln(x));
+    else return sin(M_PI*x)*exp(gammaln(1-x))/M_PI;
+}
+
+//---------------------------------------------------------------------------------
+// evaluate the incomplete Gamma function
+double gamma_inc_P(double a, double x)
 {
     const int MAXITER = 100;
-    if (x == 0) return -INFINITY;
     const double eps = 10*std::numeric_limits<double>::epsilon();
-    const double gamma = 0.5772156649015328606065120900824024310421;
-    double ei = 0;
+    bool convgd = false;
+    int i = 0;
+    double d = gammainv(a+1);
+    double P = d;
+    while (!convgd) {
+        ++i;
+        d *= x/(a+i);
+        P += d;
+        if ((d < eps*fabs(P)) || (i > MAXITER)) convgd = true;
+    }
+    return P*exp(-x)*pow(x, a);
+}
 
-    // use series expansion if x is sufficiently small
-    if (fabs(x) < fabs(log(eps))) {
-        // use series expansion if x is sufficiently small
-        ei = gamma;
-        ei += (x > 0) ? log(x) : log(-x);
-        double d = x;
-        int i=0;
-        bool convgd = false;
-        while (!convgd) {
-            ++i;
-            ei += d;
-            if ((fabs(d) < eps*fabs(ei)) || (i > MAXITER)) convgd = true;
-            else d *= (i*x)/pow(i+1,2);
-        }
-    }
-    else {
-        // use asymptotic expansion for sufficiently large x
-        ei = 1;
-        double d = 1./x;
-        int i=0;
-        bool convgd = false;
-        while (!convgd) {
-            ++i;
-            ei += d;
-            if ((d < eps*fabs(ei)) || (i > MAXITER)) convgd = true;
-            else d *= (i+1)/x;
-        }
-        ei *= exp(x)/x;
-    }
-    return ei;
+double gamma_inc_Q(double a, double x)
+{
+    return 1 - gamma_inc_P(a,x);
 }

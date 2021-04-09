@@ -23,50 +23,17 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
+#pragma once
 
-#include "expint_Ei.h"
-#include <limits>
-#include <math.h>
+// natural log of Gamma function (x ≥ 0)
+double gammaln(double x);
 
-// This is our homemade function for evaluating the exponential integral Ei(x), valid for
-// negative and positive values of x.
+// inverse of Gamma function (any x)
+double gammainv(double x);
 
-double expint_Ei(double x)
-{
-    const int MAXITER = 100;
-    if (x == 0) return -INFINITY;
-    const double eps = 10*std::numeric_limits<double>::epsilon();
-    const double gamma = 0.5772156649015328606065120900824024310421;
-    double ei = 0;
+// incomplete Gamma function P
+double gamma_inc_P(double a, double x);
 
-    // use series expansion if x is sufficiently small
-    if (fabs(x) < fabs(log(eps))) {
-        // use series expansion if x is sufficiently small
-        ei = gamma;
-        ei += (x > 0) ? log(x) : log(-x);
-        double d = x;
-        int i=0;
-        bool convgd = false;
-        while (!convgd) {
-            ++i;
-            ei += d;
-            if ((fabs(d) < eps*fabs(ei)) || (i > MAXITER)) convgd = true;
-            else d *= (i*x)/pow(i+1,2);
-        }
-    }
-    else {
-        // use asymptotic expansion for sufficiently large x
-        ei = 1;
-        double d = 1./x;
-        int i=0;
-        bool convgd = false;
-        while (!convgd) {
-            ++i;
-            ei += d;
-            if ((d < eps*fabs(ei)) || (i > MAXITER)) convgd = true;
-            else d *= (i+1)/x;
-        }
-        ei *= exp(x)/x;
-    }
-    return ei;
-}
+// complementary incomplete Gamma function Q
+double gamma_inc_Q(double a, double x);
+
