@@ -519,6 +519,7 @@
     <ClInclude Include="..\..\FECore\eig3.h" />
     <ClInclude Include="..\..\FECore\EigenSolver.h" />
     <ClInclude Include="..\..\FECore\ElementDataRecord.h" />
+    <ClInclude Include="..\..\FECore\expint_Ei.h" />
     <ClInclude Include="..\..\FECore\FaceDataRecord.h" />
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
@@ -653,6 +654,7 @@
     <ClInclude Include="..\..\FECore\FETransform.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FSPath.h" />
+    <ClInclude Include="..\..\FECore\gamma.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\Integrate.h" />
     <ClInclude Include="..\..\FECore\JFNKMatrix.h" />
@@ -731,6 +733,7 @@
     <ClCompile Include="..\..\FECore\eig3.cpp" />
     <ClCompile Include="..\..\FECore\EigenSolver.cpp" />
     <ClCompile Include="..\..\FECore\ElementDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\expint_Ei.cpp" />
     <ClCompile Include="..\..\FECore\FaceDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
@@ -856,6 +859,7 @@
     <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\FSPath.cpp" />
+    <ClCompile Include="..\..\FECore\gamma.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\Integrate.cpp" />
     <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
