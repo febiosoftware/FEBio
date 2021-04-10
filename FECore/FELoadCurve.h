@@ -52,6 +52,8 @@ public:
 	void Add(double time, double value);
 
 	void Clear();
+    
+    bool Init() override;
 
 	FEPointFunction& GetFunction() { return m_fnc; }
 

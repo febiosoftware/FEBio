@@ -394,6 +394,8 @@
 		D5D56E872355239E0078BCC4 /* ClassDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E842355239E0078BCC4 /* ClassDescriptor.h */; };
 		D5E82FD226206FCF00B23605 /* gamma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E82FD026206FCF00B23605 /* gamma.cpp */; };
 		D5E82FD326206FCF00B23605 /* gamma.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E82FD126206FCF00B23605 /* gamma.h */; };
+		D5E82FD62620A6FD00B23605 /* BSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E82FD42620A6FD00B23605 /* BSpline.cpp */; };
+		D5E82FD72620A6FD00B23605 /* BSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E82FD52620A6FD00B23605 /* BSpline.h */; };
 		D5E85DA322021E8C00F5DF83 /* FEFaceList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9B22021E8A00F5DF83 /* FEFaceList.h */; };
 		D5E85DA522021E8C00F5DF83 /* FEMeshTopo.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9D22021E8B00F5DF83 /* FEMeshTopo.h */; };
 		D5E85DA622021E8C00F5DF83 /* FEFaceList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9E22021E8B00F5DF83 /* FEFaceList.cpp */; };
@@ -800,6 +802,8 @@
 		D5D56E842355239E0078BCC4 /* ClassDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassDescriptor.h; sourceTree = "<group>"; };
 		D5E82FD026206FCF00B23605 /* gamma.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gamma.cpp; sourceTree = "<group>"; };
 		D5E82FD126206FCF00B23605 /* gamma.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gamma.h; sourceTree = "<group>"; };
+		D5E82FD42620A6FD00B23605 /* BSpline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BSpline.cpp; sourceTree = "<group>"; };
+		D5E82FD52620A6FD00B23605 /* BSpline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSpline.h; sourceTree = "<group>"; };
 		D5E85D9B22021E8A00F5DF83 /* FEFaceList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFaceList.h; sourceTree = "<group>"; };
 		D5E85D9D22021E8B00F5DF83 /* FEMeshTopo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMeshTopo.h; sourceTree = "<group>"; };
 		D5E85D9E22021E8B00F5DF83 /* FEFaceList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFaceList.cpp; sourceTree = "<group>"; };
@@ -852,6 +856,8 @@
 				D5B9E3FE213F67DE0008B38A /* Archive.h */,
 				D5B9E426213F67DE0008B38A /* BFGSSolver.cpp */,
 				D5B9E4B9213F67DE0008B38A /* BFGSSolver.h */,
+				D5E82FD42620A6FD00B23605 /* BSpline.cpp */,
+				D5E82FD52620A6FD00B23605 /* BSpline.h */,
 				D5B9E40C213F67DE0008B38A /* Callback.cpp */,
 				D5B9E4E0213F67DE0008B38A /* Callback.h */,
 				D5D56E842355239E0078BCC4 /* ClassDescriptor.h */,
@@ -1424,6 +1430,7 @@
 				D5BE6F822423B4FB009AE76F /* FENodeSetConstraint.h in Headers */,
 				D5B9E50F213F67DE0008B38A /* FEClosestPointProjection.h in Headers */,
 				D56B209123AD5F94000AE9C2 /* FEShellElement.h in Headers */,
+				D5E82FD72620A6FD00B23605 /* BSpline.h in Headers */,
 				D5AB623F220289E200AAF141 /* FEEdgeList.h in Headers */,
 				D5B9E5FF213F67DE0008B38A /* FECube.h in Headers */,
 				D565CDDD215D290C00E08ED6 /* FEDomainList.h in Headers */,
@@ -1586,6 +1593,7 @@
 				D5B9E592213F67DE0008B38A /* FEDataExport.cpp in Sources */,
 				D5B9E597213F67DE0008B38A /* FETimeInfo.cpp in Sources */,
 				D5B9E51F213F67DE0008B38A /* Callback.cpp in Sources */,
+				D5E82FD62620A6FD00B23605 /* BSpline.cpp in Sources */,
 				D5B9E554213F67DE0008B38A /* FESolidDomain.cpp in Sources */,
 				D5B9E5E2213F67DE0008B38A /* FEEdgeLoad.cpp in Sources */,
 				D5B9E583213F67DE0008B38A /* FEShellDomain.cpp in Sources */,
@@ -1799,7 +1807,6 @@
 					"$(OTHER_CFLAGS)",
 					"-Xpreprocessor",
 					"-fopenmp",
-					"-DHAVE_GSL",
 				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
@@ -1862,7 +1869,6 @@
 					"$(OTHER_CFLAGS)",
 					"-Xpreprocessor",
 					"-fopenmp",
-					"-DHAVE_GSL",
 				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";

@@ -27,15 +27,12 @@ SOFTWARE.*/
 #include "FEPointFunction.h"
 #include "DumpStream.h"
 #include "log.h"
-#ifdef HAVE_GSL
-#include "gsl/gsl_errno.h"
-#include "gsl/gsl_spline.h"
-#endif
+#include "BSpline.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
 	ADD_PARAMETER(m_points, "points");
-	ADD_PARAMETER(m_fnc, "interpolate", FE_PARAM_ATTRIBUTE, "step\0linear\0smooth\0polynomial\0cubic spline\0Akima\0Steffen\0");
+	ADD_PARAMETER(m_fnc, "interpolate", FE_PARAM_ATTRIBUTE, "step\0linear\0smooth\0cubic spline\0control points\0approximation\0");
 	ADD_PARAMETER(m_ext, "extend"     , FE_PARAM_ATTRIBUTE, "constant\0extrapolate\0repeat\0repeat offset\0");
     ADD_PARAMETER(m_bln, "log");
 END_FECORE_CLASS();
@@ -43,22 +40,14 @@ END_FECORE_CLASS();
 class FEPointFunction::Imp
 {
 public:
-	double* m_x;        //!<  x values
-	double* m_y;        //!<  y values
-#ifdef HAVE_GSL
-	gsl_interp_accel*   m_acc;
-	gsl_spline*         m_spline;
-#endif
+	BSpline*    m_spline;   //!< B-spline
 };
 
 //-----------------------------------------------------------------------------
 //! default constructor
 FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR), m_ext(CONSTANT), imp(new Imp)
 {
-#ifdef HAVE_GSL
-	imp->m_acc = nullptr;
 	imp->m_spline = nullptr;
-#endif
     m_bln = false;
 }
 
@@ -72,41 +61,34 @@ FEPointFunction::~FEPointFunction()
 //! Clears the loadcurve data
 bool FEPointFunction::Init()
 {
-#ifdef HAVE_GSL
-    if (m_fnc >= POLYNOMIAL) {
-        // store points in arrays suitable for GSL
+    if (m_fnc > SMOOTH) {
         const int N = Points();
-		imp->m_x = new double[N];
-		imp->m_y = new double[N];
-        for (int i=0; i<N; ++i) {
-			imp->m_x[i] = m_points[i].x();
-			imp->m_y[i] = m_points[i].y();
-        }
-        // initialize GSL spline
-		imp->m_acc = gsl_interp_accel_alloc();
+        // initialize B-spline
+        imp->m_spline = new BSpline();
         switch (m_fnc) {
-            case POLYNOMIAL:
-				imp->m_spline = gsl_spline_alloc(gsl_interp_polynomial, N);
-                break;
             case CSPLINE:
-				imp->m_spline = gsl_spline_alloc(gsl_interp_cspline, N);
+            {
+                int korder = min(N,4);
+				if (!imp->m_spline->init_interpolation(korder, m_points)) return false;
+            }
                 break;
-            case AKIMA:
-				imp->m_spline = gsl_spline_alloc(gsl_interp_akima, N);
+            case CPOINTS:
+            {
+                int korder = min(N,4);
+				if (!imp->m_spline->init(korder, m_points)) return false;
+            }
                 break;
-            case STEFFEN:
-				imp->m_spline = gsl_spline_alloc(gsl_interp_steffen, N);
+            case APPROX:
+            {
+                int korder = min(N/2+1,4);
+				if (!imp->m_spline->init_approximation(korder, N/2+1, m_points)) return false;
+            }
                 break;
 
             default:
                 break;
         }
-        gsl_spline_init (imp->m_spline, imp->m_x, imp->m_y, N);
     }
-#else
-    feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
-    throw "FATAL ERROR";
-#endif
     return FEFunction1D::Init();
 }
 
@@ -211,17 +193,11 @@ double FEPointFunction::value(double time) const
 
     double tmax = m_points[N].x();
     double tmin = m_points[0].x();
-    if (m_fnc >= POLYNOMIAL)
+    if (m_fnc > SMOOTH)
     {
-#ifdef HAVE_GSL
-        if (time > tmax) return gsl_spline_eval(imp->m_spline, tmax, imp->m_acc);
-        else if (time < tmin) return gsl_spline_eval(imp->m_spline, tmin, imp->m_acc);
-        else return gsl_spline_eval(imp->m_spline, time, imp->m_acc);
-#else
-        feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
-        throw "FATAL ERROR";
-        return 0;
-#endif
+        if (time > tmax) return imp->m_spline->eval(tmax);
+        else if (time < tmin) return imp->m_spline->eval(tmin);
+        else return imp->m_spline->eval(time);
     }
     
 	if (time < tmin) return ExtendValue(time);
@@ -470,16 +446,10 @@ double FEPointFunction::derive(double time) const
     double tmax = m_points[N-1].x();
     double tmin = m_points[0].x();
 
-    if (m_fnc >= POLYNOMIAL) {
-#ifdef HAVE_GSL
-        if (time > tmax) return gsl_spline_eval_deriv(imp->m_spline, tmax, imp->m_acc);
-        else if (time < tmin) return gsl_spline_eval_deriv(imp->m_spline, tmin, imp->m_acc);
-        else return gsl_spline_eval_deriv(imp->m_spline, time, imp->m_acc);
-#else
-        feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
-        throw "FATAL ERROR";
-        return 0;
-#endif
+    if (m_fnc > SMOOTH) {
+        if (time > tmax) return imp->m_spline->eval_deriv(tmax);
+        else if (time < tmin) return imp->m_spline->eval_deriv(tmin);
+        else return imp->m_spline->eval_deriv(time);
     }
     
     double Dt = m_points[N - 1].x() - m_points[0].x();
@@ -533,16 +503,10 @@ double FEPointFunction::deriv2(double time) const
     double tmax = m_points[N-1].x();
     double tmin = m_points[0].x();
     
-    if (m_fnc >= POLYNOMIAL) {
-#ifdef HAVE_GSL
-        if (time > tmax) return gsl_spline_eval_deriv2(imp->m_spline, tmax, imp->m_acc);
-        else if (time < tmin) return gsl_spline_eval_deriv2(imp->m_spline, tmin, imp->m_acc);
-        else return gsl_spline_eval_deriv2(imp->m_spline, time, imp->m_acc);
-#else
-        feLog("FATAL ERROR: requested polynomial interpolation in load curve is not available in this executable. Link to GSL!\n");
-        throw "FATAL ERROR";
-        return 0;
-#endif
+    if (m_fnc > SMOOTH) {
+        if (time > tmax) return imp->m_spline->eval_deriv2(tmax);
+        else if (time < tmin) return imp->m_spline->eval_deriv2(tmin);
+        else return imp->m_spline->eval_deriv2(time);
     }
     
     double Dt = m_points[N - 1].x() - m_points[0].x();

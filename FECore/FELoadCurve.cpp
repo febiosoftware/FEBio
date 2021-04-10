@@ -34,7 +34,7 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FELoadCurve, FELoadController)
 	ADD_PARAMETER(m_fnc.m_points, "points");
-	ADD_PARAMETER(m_fnc.m_fnc, "interpolate", 0, "STEP\0LINEAR\0SMOOTH\0");
+	ADD_PARAMETER(m_fnc.m_fnc, "interpolate", 0, "STEP\0LINEAR\0SMOOTH\0CUBIC SPLINE\0CONTROL POINTS\0APPROXIMATION\0");
 	ADD_PARAMETER(m_fnc.m_ext, "extend"     , 0, "CONSTANT\0EXTRAPOLATE\0REPEAT\0REPEAT OFFSET\0");
 END_FECORE_CLASS();
 
@@ -83,6 +83,11 @@ void FELoadCurve::Add(double time, double value)
 void FELoadCurve::Clear()
 {
 	m_fnc.Clear();
+}
+
+bool FELoadCurve::Init()
+{
+    return m_fnc.Init();
 }
 
 void FELoadCurve::SetInterpolation(FEPointFunction::INTFUNC f)
