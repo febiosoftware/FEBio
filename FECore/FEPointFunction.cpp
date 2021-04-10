@@ -64,6 +64,7 @@ bool FEPointFunction::Init()
     if (m_fnc > SMOOTH) {
         const int N = Points();
         // initialize B-spline
+        if (imp->m_spline) delete imp->m_spline;
         imp->m_spline = new BSpline();
         switch (m_fnc) {
             case CSPLINE:
