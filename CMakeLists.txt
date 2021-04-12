@@ -145,24 +145,30 @@ endif(USE_ZLIB)
 
 ##### Set up compiler flags #####
 if(WIN32)
-    add_definitions(/MP /openmp)
+    add_compile_options(/MP /openmp)
 elseif(APPLE)
-	add_definitions(-fPIC -static-libstdc++ -w)
+	add_compile_options(-fPIC -w)
 else()
-	add_definitions(-fPIC -fopenmp -static-libstdc++ -w)
+	add_compile_options(-fPIC -fopenmp -w)
+    
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
+    
+    # Extra compiler flags for intel compiler
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-intel")
+    endif()
     
     set(CMAKE_BUILD_RPATH_USE_LINK_PATH FALSE)
     set(CMAKE_BUILD_RPATH $ORIGIN/../lib/)
 endif()
 
-# Extra compiler flags for intel compiler
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-	add_definitions(-static-intel -no-intel-extensions)
+        add_compile_options(-no-intel-extensions)
 endif()
 
 # Add openMP flags for macOS if found.
 if(APPLE AND ${OpenMP_C_FOUND})
-    add_definitions(-Xpreprocessor -fopenmp)
+    add_compile_options(-Xpreprocessor -fopenmp)
 endif()
 
 ##### Find Source Files #####
@@ -283,7 +289,7 @@ endif()
 if(WIN32)
 	target_link_libraries(febio3 psapi.lib ws2_32.lib)
 else()
-    target_link_libraries(febio3 -pthread -ldl)
+    target_link_libraries(febio3 -pthread)# -ldl)
 endif()
 
 # Link MMG
@@ -315,4 +321,5 @@ else()
 endif()
 
 
-
+get_target_property(LINKEDLIBS febio3 LINK_LIBRARIES)
+file(WRITE test.txt "${LINKEDLIBS}")
