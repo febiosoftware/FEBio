@@ -52,6 +52,10 @@ public:
 	// iteration is the iteration number of the mesh adaptation loop
 	virtual bool Apply(int iteration) = 0;
 
+protected:
+	// call this after the model was updated
+	void UpdateModel();
+
 private:
 	FEElementSet*	m_elemSet;
 };

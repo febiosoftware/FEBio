@@ -158,13 +158,6 @@ bool FERefineMesh::BuildMeshTopo()
 	return m_topo->Create(&fem.GetMesh());
 }
 
-void FERefineMesh::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-
-	fem.Reactivate();
-}
-
 void FERefineMesh::CopyMesh()
 {
 	if (m_meshCopy) delete m_meshCopy;

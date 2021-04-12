@@ -62,7 +62,6 @@ protected:
 
 protected:
 	bool BuildMeshTopo();
-	void UpdateModel();
 	void CopyMesh();
 
 	bool BuildMapData();

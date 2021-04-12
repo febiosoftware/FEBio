@@ -29,6 +29,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEMinMaxFilterAdaptorCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(m_min, "min");
 	ADD_PARAMETER(m_max, "max");
+	ADD_PARAMETER(m_clamp, "clamp");
 
 	ADD_PROPERTY(m_data, "data");
 END_FECORE_CLASS();
@@ -37,13 +38,24 @@ FEMinMaxFilterAdaptorCriterion::FEMinMaxFilterAdaptorCriterion(FEModel* fem) : F
 {
 	m_min = -1.0e37;
 	m_max =  1.0e37;
+	m_clamp = true;
 }
 
 bool FEMinMaxFilterAdaptorCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
 	if (m_data == nullptr) return false;
 	bool b = m_data->GetMaterialPointValue(mp, value);
-	if (value < m_min) value = m_min;
-	if (value > m_max) value = m_max;
+	if (b)
+	{
+		if (m_clamp)
+		{
+			if (value < m_min) value = m_min;
+			if (value > m_max) value = m_max;
+		}
+		else if ((value < m_min) || (value > m_max))
+		{
+			b = false;
+		}
+	}
 	return b;
 }

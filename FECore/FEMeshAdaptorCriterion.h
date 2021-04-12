@@ -35,6 +35,13 @@ class FEElement;
 class FECORE_API FEMeshAdaptorSelection
 {
 public:
+	enum SortFlag
+	{
+		SORT_INCREASING,
+		SORT_DECREASING
+	};
+
+public:
 	struct Item {
 		int		m_elementId;
 		double	m_elemValue;
@@ -50,9 +57,10 @@ public:
 	bool empty() const { return m_itemList.empty(); }
 	size_t size() const { return m_itemList.size(); }
 	void push_back(int elemIndex, double scale) { m_itemList.push_back(Item{ elemIndex, scale }); }
+	void push_back(const Item& item) { m_itemList.push_back(item); }
 
 public:
-	void Sort();
+	void Sort(SortFlag sortFlag);
 
 private:
 	std::vector<Item>	m_itemList;

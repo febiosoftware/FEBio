@@ -46,23 +46,26 @@ FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElemen
 	{
 		FEElement& el = *it;
 
-		// see if this element is in the element_list
-		// TODO: This is really slow. Need to speed this up!
-		int eid = el.GetID();
-		int n = -1;
-		for (int i = 0; i < m_elemList.size(); ++i)
+		if (el.isActive())
 		{
-			if (m_elemList[i] == eid)
+			// see if this element is in the element_list
+			// TODO: This is really slow. Need to speed this up!
+			int eid = el.GetID();
+			int n = -1;
+			for (int i = 0; i < m_elemList.size(); ++i)
 			{
-				n = i;
-				break;
+				if (m_elemList[i] == eid)
+				{
+					n = i;
+					break;
+				}
 			}
-		}
 
-		// set the value
-		if (n != -1)
-		{
-			elemList.push_back(eid, m_value);
+			// set the value
+			if (n != -1)
+			{
+				elemList.push_back(eid, m_value);
+			}
 		}
 	}
 	return elemList;
