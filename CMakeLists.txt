@@ -114,15 +114,6 @@ if(USE_ZLIB)
 	endif()
 endif()
 
-if(USE_GSL AND NOT VCPKG_GSL)
-	if(NOT EXISTS ${GSL_LIB})
-		message(SEND_ERROR "Could not find GSL library. Check GSL_LIB.")
-	endif()
-	if(NOT EXISTS ${GSL_INC}/gsl/gsl_spline.h)
-		message(SEND_ERROR "Could not find gsl_spline.h. Check GSL_INC.")
-	endif()
-endif()
-
 ##### Set appropriate defines and includes #####
 include_directories(${PROJECT_SOURCE_DIR})
 
@@ -151,14 +142,6 @@ if(USE_ZLIB)
 	add_definitions(-DHAVE_ZLIB)
 	include_directories(${ZLIB_INCLUDE_DIR})
 endif(USE_ZLIB)
-
-if(USE_GSL)
-	add_definitions(-DHAVE_GSL)
-    
-    if(NOT VCPKG_GSL)
-        include_directories(${GSL_INC})
-    endif()
-endif(USE_GSL)
 
 ##### Set up compiler flags #####
 if(WIN32)
@@ -311,11 +294,6 @@ endif()
 # Link ZLIB
 if(USE_ZLIB)
 	target_link_libraries(febio3 ${ZLIB_LIBRARY_RELEASE})
-endif()
-
-# Link GSL
-if(USE_GSL AND NOT VCPKG_GSL)
-	target_link_libraries(febio3 ${GSL_LIB})
 endif()
 
 ##### Create febio.xml #####
