@@ -169,28 +169,3 @@ else()
 	option(USE_ZLIB "Required for compressing xplt files" OFF)
     mark_as_advanced(CLEAR ZLIB_INCLUDE_DIR ZLIB_LIBRARY_RELEASE)
 endif()
-
-# GSL
-if(WIN32)
-	find_path(GSL_INC gsl/gsl_spline.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "GSL include directory")
-	find_library(GSL_LIB gsl PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "GSL library path")
-else()
-	find_path(GSL_INC gsl/gsl_spline.h PATHS /usr/local/include /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
-		DOC "GSL include directory")
-	find_library(GSL_LIB NAMES libgsl.a gsl PATHS /usr/local/lib64 /usr/local/lib /opt/gsl* $ENV{HOME}/* $ENV{HOME}/*/*
-		DOC "GSL library path")
-endif()	
-
-if(GSL_INC AND GSL_LIB)		
-	option(USE_GSL "Required for strain energy calculation for certain materials." ON)
-    mark_as_advanced(GSL_INC GSL_LIB)
-else()
-	option(USE_GSL "Required for strain energy calculation for certain materials." OFF)
-    mark_as_advanced(CLEAR GSL_INC GSL_LIB)
-endif()
-
-if(WIN32)
-    option(VCPKG_GSL "Use Vcpkg to link GSL" OFF)
-endif()

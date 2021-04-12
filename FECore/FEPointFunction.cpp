@@ -29,6 +29,10 @@ SOFTWARE.*/
 #include "log.h"
 #include "BSpline.h"
 
+#ifndef min
+#define min(a,b) ((a)<(b)?(a):(b))
+#endif
+
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
 	ADD_PARAMETER(m_points, "points");
