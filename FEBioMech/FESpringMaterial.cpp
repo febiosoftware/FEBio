@@ -140,11 +140,6 @@ FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
 	m_F = nullptr;
 }
 
-bool FENonLinearSpring::Init() {
-    m_F->Init();
-    return FESpringMaterial::Init();
-}
-
 double FENonLinearSpring::force(double dl)
 {
 	return m_F->value(dl);

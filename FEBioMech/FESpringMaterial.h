@@ -88,8 +88,6 @@ class FEBIOMECH_API FENonLinearSpring : public FESpringMaterial
 public:
 	FENonLinearSpring(FEModel* pfem);
     
-    bool Init() override;
-
 	double force    (double dl) override;
 	double stiffness(double dl) override;
 	double strainEnergy(double dl) override;
