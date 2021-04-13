@@ -45,6 +45,12 @@ FEElementSet* FEMeshAdaptor::GetElementSet()
 	return m_elemSet;
 }
 
+void FEMeshAdaptor::UpdateModel()
+{
+	FEModel& fem = *GetFEModel();
+	fem.Reactivate();
+}
+
 // helper function for projecting integration point data to nodes
 void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<double(FEMaterialPoint& mp)> f)
 {

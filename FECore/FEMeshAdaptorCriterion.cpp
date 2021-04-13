@@ -31,11 +31,20 @@ SOFTWARE.*/
 #include <algorithm>
 
 //=============================================================================
-void FEMeshAdaptorSelection::Sort()
+void FEMeshAdaptorSelection::Sort(FEMeshAdaptorSelection::SortFlag sortFlag)
 {
-	std::sort(m_itemList.begin(), m_itemList.end(), [](Item& e1, Item& e2) {
-		return (e1.m_elemValue > e2.m_elemValue);
-	});
+	if (sortFlag == SORT_DECREASING)
+	{
+		std::sort(m_itemList.begin(), m_itemList.end(), [](Item& e1, Item& e2) {
+			return (e1.m_elemValue > e2.m_elemValue);
+		});
+	}
+	else
+	{
+		std::sort(m_itemList.begin(), m_itemList.end(), [](Item& e1, Item& e2) {
+			return (e1.m_elemValue < e2.m_elemValue);
+		});
+	}
 }
 
 //=============================================================================

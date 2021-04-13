@@ -37,6 +37,7 @@ public:
 private:
 	double	m_min;
 	double	m_max;
+	bool	m_clamp;
 	FEMeshAdaptorCriterion*	m_data;
 
 	DECLARE_FECORE_CLASS();

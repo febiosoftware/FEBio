@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptor.h>
+#include <FECore/FEMeshAdaptorCriterion.h>
 
 class FEErosionAdaptor : public FEMeshAdaptor
 {
@@ -39,8 +40,8 @@ private:
 private:
 	int		m_maxIters;			// max iterations per time step
 	bool	m_bremoveIslands;	// remove disconnected elements
-	double	m_maxValue;			// the threshold value to eroder
 	int		m_maxelem;			// the max nr of elements to erode per adaptation iteration
+	int		m_nsort;			// sort option (0 = none, 1 = smallest to largest, 2 = largest to smallest)
 
 	FEMeshAdaptorCriterion*	m_criterion;
 
