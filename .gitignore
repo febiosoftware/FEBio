@@ -419,3 +419,6 @@ DerivedData/
 ## cmake build directories
 cbuild/
 cmbuild/
+
+## Visual Studio Code
+.vscode/
