@@ -155,8 +155,6 @@ public:
 
     double deriv2(double t) const override;
 
-	double integrate(double a, double b) const override;
-
 private:
 	void evalParams(std::vector<double>& val, double t) const;
 
@@ -168,7 +166,6 @@ private:
 	MSimpleExpression	m_exp;
 	MSimpleExpression	m_dexp;
     MSimpleExpression   m_d2exp;
-	MSimpleExpression   m_iexp;
 
 	DECLARE_FECORE_CLASS();
 };
