@@ -1,6 +1,6 @@
 # MKL - On Unix the compilervars.sh should be run to find the MKL libraries.
 if(DEFINED ENV{MKLROOT})
-    set(MKLROOT $ENV{MKLROOT} CACHE DOC "MKL root directory")
+    set(MKLROOT $ENV{MKLROOT} CACHE PATH DOC "MKL root directory")
 else()
     if(WIN32)
         set(MKLPATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
@@ -49,6 +49,7 @@ endif()
 
 if(MKL_INC AND MKL_LIB_DIR AND MKL_OMP_LIB)
 	option(USE_MKL "Required for pardiso and iterative solvers" ON)
+    mark_as_advanced(MKL_INC MKL_LIB_DIR MKL_OMP_LIB)
     set(OpenMP_C_FOUND true)
 else()
 	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
