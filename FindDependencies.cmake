@@ -1,6 +1,6 @@
 # MKL - On Unix the compilervars.sh should be run to find the MKL libraries.
 if(DEFINED ENV{MKLROOT})
-    set(MKLROOT $ENV{MKLROOT} CACHE PATH DOC "MKL root directory")
+    set(MKLROOT $ENV{MKLROOT} CACHE PATH "MKL root directory")
 else()
     if(WIN32)
         set(MKLPATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
