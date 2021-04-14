@@ -48,6 +48,12 @@ MathObject::MathObject(const MathObject& mo)
 	}
 }
 
+void MathObject::Clear()
+{
+	for (int i = 0; i < m_Var.size(); ++i) delete m_Var[i];
+	m_Var.clear();
+}
+
 //-----------------------------------------------------------------------------
 void MathObject::operator = (const MathObject& mo)
 {

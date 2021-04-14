@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFunction1D.h"
+#include "FEModel.h"
 #include "DumpStream.h"
 #include "MMath.h"
 #include "MObj2String.h"
@@ -87,34 +88,76 @@ FEMathFunction::FEMathFunction(FEModel* fem) : FEFunction1D(fem)
 
 bool FEMathFunction::Init()
 {
-	if (m_exp.Create(m_s, "true") == false) return false;
-	if (m_exp.Variables() > 1) return false;
-	if (m_exp.Variables() < 1) m_exp.AddVariable("x");
+	// process the string
+	m_exp.Clear();
+	if (m_exp.Create(m_s, true) == false) return false;
 
-	m_dexp.AddVariable(m_exp.Variable(0)->Name());
-    if (m_exp.Variables() == 1) {
-        MITEM mi = MDerive(m_exp.GetExpression(), *m_exp.Variable(0));
+	// match variables to model parameters.
+	m_var.clear();
+	m_ix = -1;
+	FEModel* fem = GetFEModel();
+	for (int i=0; i<m_exp.Variables(); ++i)
+	{
+		MVariable* v = m_exp.Variable(i);
+		
+		ParamString ps(v->Name().c_str());
+		FEParamValue param = fem->GetParameterValue(ps);
+		if (param.isValid() == false)
+		{
+			// let's assume this is the independent parameter
+			if (m_ix == -1)
+			{
+				// push a dummy param value
+				m_var.push_back(FEParamValue());
+				m_ix = i;
+			}
+			else return false;
+		}
+		else
+		{
+			if (param.type() != FE_PARAM_DOUBLE) return false;
+			m_var.push_back(param);
+		}
+	}
+
+	// copy variables to derived expressions
+	m_dexp.Clear();
+	m_d2exp.Clear();
+	m_iexp.Clear();
+	for (int i = 0; i < m_exp.Variables(); ++i)
+	{
+		m_dexp.AddVariable(m_exp.Variable(i)->Name());
+		m_d2exp.AddVariable(m_exp.Variable(i)->Name());
+		m_iexp.AddVariable(m_exp.Variable(i)->Name());
+	}
+
+	// evaluate first derivative
+    if (m_ix != -1) {
+        MITEM mi = MDerive(m_exp.GetExpression(), *m_exp.Variable(m_ix));
 		m_dexp.SetExpression(mi);
     }
 	else
 		m_dexp.Create("0");
 
-    m_d2exp.AddVariable(m_dexp.Variable(0)->Name());
-    if (m_dexp.Variables() == 1) {
-        MITEM mi = MDerive(m_dexp.GetExpression(), *m_dexp.Variable(0));
+	// evaluate second derivative
+    if (m_ix != -1) {
+        MITEM mi = MDerive(m_dexp.GetExpression(), *m_dexp.Variable(m_ix));
         m_d2exp.SetExpression(mi);
     }
     else
         m_d2exp.Create("0");
 
-	MITEM mi = MIntegral(m_dexp.GetExpression(), *m_dexp.Variable(0));
-    m_d2exp.SetExpression(mi);
-	
-
-#ifdef _DEBUG
-	MObj2String o2s;
-	string s = o2s.Convert(m_dexp);
-#endif
+	// evaluate integral
+	if (m_ix != -1)
+	{
+		MITEM mi = MIntegral(m_exp.GetExpression(), *m_dexp.Variable(m_ix));
+		m_iexp.SetExpression(mi);
+	}
+	else
+	{
+		// TODO: implement this
+		m_iexp.Create("0");
+	}
 
 	return FEFunction1D::Init();
 }
@@ -123,33 +166,51 @@ FEFunction1D* FEMathFunction::copy()
 {
 	FEMathFunction* m = new FEMathFunction(GetFEModel());
 	m->m_s = m_s;
+	m->m_ix = m_ix;
+	m->m_var = m_var;
+
 	m->m_exp = m_exp;
 	m->m_dexp = m_dexp;
     m->m_d2exp = m_d2exp;
+	m->m_iexp = m_iexp;
 	return m;
+}
+
+void FEMathFunction::evalParams(std::vector<double>& val, double t) const
+{
+	val.resize(m_var.size());
+	for (int i = 0; i < m_var.size(); ++i)
+	{
+		if (i == m_ix) val[i] = t;
+		else val[i] = m_var[i].value<double>();
+	}
 }
 
 double FEMathFunction::value(double t) const
 {
-	vector<double> var(1, t);
-	return m_exp.value_s(var);
+	vector<double> v;
+	evalParams(v, t);
+	return m_exp.value_s(v);
 }
 
 double FEMathFunction::derive(double t) const
 {
-	vector<double> var(1, t);
-	return m_dexp.value_s(var);
+	vector<double> v;
+	evalParams(v, t);
+	return m_dexp.value_s(v);
 }
 
 double FEMathFunction::deriv2(double t) const
 {
-    vector<double> var(1, t);
-    return m_d2exp.value_s(var);
+	vector<double> v;
+	evalParams(v, t);
+	return m_d2exp.value_s(v);
 }
 
 double FEMathFunction::integrate(double a, double b) const
 {
-	vector<double> varA(1, a);
-	vector<double> varB(1, b);
-    return m_iexp.value_s(varB) - m_iexp.value_s(varA);
+	vector<double> va, vb;
+	evalParams(va, a);
+	evalParams(vb, b);
+    return m_iexp.value_s(vb) - m_iexp.value_s(va);
 }

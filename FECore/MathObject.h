@@ -58,6 +58,8 @@ public:
 	MVariable* Variable(int i) { return m_Var[i]; }
 	const MVariable* Variable(int i) const { return m_Var[i]; }
 
+	virtual void Clear();
+
 	virtual MathObject* copy() = 0;
 
 protected:

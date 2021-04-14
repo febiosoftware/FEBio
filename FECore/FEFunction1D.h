@@ -158,7 +158,13 @@ public:
 	double integrate(double a, double b) const override;
 
 private:
+	void evalParams(std::vector<double>& val, double t) const;
+
+private:
 	std::string			m_s;
+	int					m_ix;			// index of independent variable
+	std::vector<FEParamValue>	m_var;	// list of model parameters that are used as variables in expression.
+
 	MSimpleExpression	m_exp;
 	MSimpleExpression	m_dexp;
     MSimpleExpression   m_d2exp;
