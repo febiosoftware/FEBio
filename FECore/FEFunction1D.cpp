@@ -123,12 +123,10 @@ bool FEMathFunction::Init()
 	// copy variables to derived expressions
 	m_dexp.Clear();
 	m_d2exp.Clear();
-	m_iexp.Clear();
 	for (int i = 0; i < m_exp.Variables(); ++i)
 	{
 		m_dexp.AddVariable(m_exp.Variable(i)->Name());
 		m_d2exp.AddVariable(m_exp.Variable(i)->Name());
-		m_iexp.AddVariable(m_exp.Variable(i)->Name());
 	}
 
 	// evaluate first derivative
@@ -147,18 +145,6 @@ bool FEMathFunction::Init()
     else
         m_d2exp.Create("0");
 
-	// evaluate integral
-	if (m_ix != -1)
-	{
-		MITEM mi = MIntegral(m_exp.GetExpression(), *m_dexp.Variable(m_ix));
-		m_iexp.SetExpression(mi);
-	}
-	else
-	{
-		// TODO: implement this
-		m_iexp.Create("0");
-	}
-
 	return FEFunction1D::Init();
 }
 
@@ -172,7 +158,6 @@ FEFunction1D* FEMathFunction::copy()
 	m->m_exp = m_exp;
 	m->m_dexp = m_dexp;
     m->m_d2exp = m_d2exp;
-	m->m_iexp = m_iexp;
 	return m;
 }
 
@@ -205,12 +190,4 @@ double FEMathFunction::deriv2(double t) const
 	vector<double> v;
 	evalParams(v, t);
 	return m_d2exp.value_s(v);
-}
-
-double FEMathFunction::integrate(double a, double b) const
-{
-	vector<double> va, vb;
-	evalParams(va, a);
-	evalParams(vb, b);
-    return m_iexp.value_s(vb) - m_iexp.value_s(va);
 }
