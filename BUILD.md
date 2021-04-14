@@ -73,7 +73,7 @@ After running the configuration process, the CMake GUI will populate with severa
 
 The CMake script will do its best to automatically locate these packages, but if it is unable to do so, you will have to point CMake to the packages manually for each package that you'd like to use. 
 
-#### Manually Locating MKL
+### Manually Locating MKL
 
 If CMake is unable to locate MKL automatically, the `USE_MKL` option will be automatically turned off. A simple mechanism is provided for you to help the script to locate your MKL installtion. A variable called `MKLROOT` will have appeared in the CMake GUI. Enter the path to the _mkl_ directory of your Intel oneAPI installation as the value for the variable, then run the configuration step again. If you've correctly entered the path, it should find the necessary components of MKL. At this point you will need to manually turn the `USE_MKL` option back on.
 
