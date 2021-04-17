@@ -147,7 +147,7 @@ figs-within-sections
 
 \begin_layout Title
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigFEBioTitle.png
+	filename Figures/FigFEBioTitle.png
 	width 4.88in
 
 \end_inset
@@ -459,7 +459,7 @@ Development of the FEBio project is supported in part by a grant from the
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/NIHlogo.png
+	filename Figures/NIHlogo.png
 	lyxscale 25
 	height 0.75in
 
@@ -1002,7 +1002,7 @@ See the figure below for an overview of the basic FEBio flow.
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FEBio flow.png
+	filename Figures/FEBio flow.png
 	scale 50
 
 \end_inset
@@ -10853,7 +10853,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigNodeNumberingSolidElements.png
+	filename Figures/FigNodeNumberingSolidElements.png
 	lyxscale 50
 	scale 50
 
@@ -11097,7 +11097,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigNodeNumberingShellElements.png
+	filename Figures/FigNodeNumberingShellElements.png
 	lyxscale 50
 	scale 75
 
@@ -20685,6 +20685,54 @@ fluid traction
 \end_layout
 
 \begin_layout Subsubsection
+Fluid Pressure
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Pressure"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a fluid or fluid-FSI analysis, the Cauchy stress is given by 
+\begin_inset Formula $\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the elastic pressure and 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the viscous stress.
+ The 
+\emph on
+fluid pressure
+\emph default
+ surface load prescribes 
+\begin_inset Formula $p$
+\end_inset
+
+ on a boundary surface.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="fluid pressure" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure>0.05</pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Subsubsection
 Fluid Normal Traction
 \begin_inset CommandInset label
 LatexCommand label
@@ -26958,8 +27006,8 @@ maxaug
 \end_layout
 
 \begin_layout Standard
-This constraint should only be used on a surface where the fluid dilatation
- has been fixed or prescribed.
+This constraint should only be used on a surface where the fluid pressure
+ or dilatation has been fixed or prescribed.
  It is not compatible with boundary conditions that prescribe the fluid
  velocity.
  To prescribe a fluid velocity that remains normal to the selected surface,
@@ -28606,7 +28654,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigLoadCurveTypes.png
+	filename Figures/FigLoadCurveTypes.png
 
 \end_inset
 
@@ -28779,7 +28827,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigLoadCurveExtend.png
+	filename Figures/FigLoadCurveExtend.png
 	lyxscale 50
 	scale 50
 
@@ -38355,7 +38403,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigLocalFiberDirectionOption.png
+	filename Figures/FigLocalFiberDirectionOption.png
 
 \end_inset
 
@@ -38412,7 +38460,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigVectorFiberDirectionOption.png
+	filename Figures/FigVectorFiberDirectionOption.png
 
 \end_inset
 
@@ -38470,7 +38518,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigSphericalFiberDirectionOption.png
+	filename Figures/FigSphericalFiberDirectionOption.png
 
 \end_inset
 
@@ -38611,7 +38659,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigSCS.png
+	filename Figures/FigSCS.png
 
 \end_inset
 
@@ -45580,7 +45628,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigMooneyRivlinVonMises.pdf
+	filename Figures/FigMooneyRivlinVonMises.pdf
 
 \end_inset
 
@@ -58663,7 +58711,7 @@ It requires no additional parameters.
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigSphericalDistribution.png
+	filename Figures/FigSphericalDistribution.png
 
 \end_inset
 
@@ -58839,7 +58887,7 @@ The value of
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigEllipsoidalDistribution.png
+	filename Figures/FigEllipsoidalDistribution.png
 
 \end_inset
 
@@ -59015,7 +59063,7 @@ The concentration parameter
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigPiPeriodicVonMisesDistribution.png
+	filename Figures/FigPiPeriodicVonMisesDistribution.png
 
 \end_inset
 
@@ -59290,7 +59338,7 @@ The semi-principal axis
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigEllipticalDistribution.png
+	filename Figures/FigEllipticalDistribution.png
 
 \end_inset
 
@@ -59468,7 +59516,7 @@ The concentration parameter
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigVonMisesDistribution.png
+	filename Figures/FigVonMisesDistribution.png
 
 \end_inset
 
@@ -59834,7 +59882,7 @@ The parameter <resolution> must be one of the values 20, 34, 60, 74, 196,
 
 
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigFiniteElementIntegration.png
+	filename Figures/FigFiniteElementIntegration.png
 
 \end_inset
 
@@ -63369,7 +63417,7 @@ represents the maximum allowable damage.
 
 
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFSimo.png
+	filename Figures/FigDamageCDFSimo.png
 
 \end_inset
 
@@ -63625,7 +63673,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFLogNormal.png
+	filename Figures/FigDamageCDFLogNormal.png
 
 \end_inset
 
@@ -63885,7 +63933,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFWeibull.png
+	filename Figures/FigDamageCDFWeibull.png
 
 \end_inset
 
@@ -64145,7 +64193,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFQuintic.png
+	filename Figures/FigDamageCDFQuintic.png
 
 \end_inset
 
@@ -64337,7 +64385,7 @@ where
 
 
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigDamageCDFStep.png
+	filename Figures/FigDamageCDFStep.png
 
 \end_inset
 
@@ -66085,7 +66133,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/FigPermExpIso.png
+	filename Figures/FigPermExpIso.png
 	lyxscale 50
 	scale 50
 
@@ -82296,7 +82344,7 @@ and
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../../../GitHub/FEBio/Documentation/Figures/beta.png
+	filename Figures/beta.png
 	scale 80
 
 \end_inset
@@ -87235,9 +87283,8 @@ FEBio's fluid solver differs from most computational fluid dynamics programs
 \emph on
 fluid
 \emph default
- module, these two variables are related by a simple constitutive relation,
- 
-\begin_inset Formula $p=-K\,e^{f}$
+ module, these two variables are related by the constitutive relation, 
+\begin_inset Formula $p\left(e^{f}\right)=K\left(\frac{1}{1+e^{f}}-1\right)$
 \end_inset
 
 , where 
@@ -87309,16 +87356,29 @@ In a fluid analysis, the user may prescribe any of the components of
 \end_inset
 
  is prescribed explicitly, the latter is naturally assumed to be zero.
- Similarly, the user may either prescribe 
+ Similarly, the user may prescribe 
 \begin_inset Formula $e^{f}$
 \end_inset
 
- as an essential boundary condition (which is equivalent to prescribing
- 
-\begin_inset Formula $p=-Ke^{f}$
+ (or 
+\begin_inset Formula $p\left(e^{f}\right)$
 \end_inset
 
-), or 
+, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Pressure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) as an essential boundary condition, or 
 \begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
 \end_inset
 
