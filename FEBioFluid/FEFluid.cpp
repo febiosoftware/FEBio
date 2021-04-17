@@ -80,7 +80,14 @@ double FEFluid::Pressure(FEMaterialPoint& mp)
 //! elastic pressure from dilatation
 double FEFluid::Pressure(const double e, const double T)
 {
-    return -m_k*e;
+    return m_k*(1/(1+e)-1);
+}
+
+//-----------------------------------------------------------------------------
+double FEFluid::Tangent_Pressure_Strain(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    return -m_k/pow(fp.m_Jf,2);
 }
 
 //-----------------------------------------------------------------------------
@@ -125,7 +132,7 @@ mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
 double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double sed = m_k*pow(fp.m_Jf-1,2)/2;
+    double sed = m_k*(fp.m_Jf-1-log(fp.m_Jf));
     return sed;
 }
 
@@ -133,11 +140,12 @@ double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 //! invert pressure-dilatation relation
 bool FEFluid::Dilatation(const double T, const double p, const double c, double& e)
 {
-    e = -p/m_k;
+    e = 1/(1+p/m_k)-1;
     //for solute cases
     if (c != 0)
     {
-        e = -(p-T*c)/m_k;
+        e = 1/(1+(p-T*c)/m_k)-1;
+//        e = -(p-T*c)/m_k;
     }
     
     return true;

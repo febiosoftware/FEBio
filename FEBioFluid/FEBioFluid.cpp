@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include "FEFluidDomain3D.h"
 #include "FEFluidDomain2D.h"
 
+#include "FEFluidPressureLoad.h"
 #include "FEFluidTractionLoad.h"
 #include "FEFluidMixtureTractionLoad.h"
 #include "FEFluidNormalTraction.h"
@@ -123,6 +124,7 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D, "fluid-2D");
 
 //-----------------------------------------------------------------------------
 // Surface loads
+REGISTER_FECORE_CLASS(FEFluidPressureLoad          , "fluid pressure");
 REGISTER_FECORE_CLASS(FEFluidTractionLoad          , "fluid viscous traction");
 REGISTER_FECORE_CLASS(FEFluidMixtureTractionLoad   , "fluid mixture viscous traction");
 REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction");

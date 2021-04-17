@@ -62,7 +62,7 @@ public:
     double Pressure(const double e, const double T = 0) override;
 
     //! tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override { return -m_k; }
+    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override;
     
     //! 2nd tangent of elastic pressure with respect to strain J
     double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) override { return 0; }
