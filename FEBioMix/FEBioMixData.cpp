@@ -289,4 +289,19 @@ double FELogElemSBMConcentration_::value(FEElement& el)
 	return val / (double) nint;
 }
 
+//-----------------------------------------------------------------------------
+double FELogElemPorosity::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		const FEMaterialPoint& mp = el.GetMaterialPoint(i);
+		const FEElasticMaterialPoint* et = (mp.ExtractData<FEElasticMaterialPoint>());
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 
+		double p = (et && pt ? (1 - pt->m_phi0 / et->m_J) : 0.0);
+		val += p;
+	}
+	return val / (double) nint;
+}

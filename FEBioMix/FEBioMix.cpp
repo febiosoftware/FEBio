@@ -200,6 +200,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxX            , "wx");
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxY            , "wy");
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxZ            , "wz");
+	REGISTER_FECORE_CLASS(FELogElemPorosity              , "porosity");
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)

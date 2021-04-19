@@ -243,3 +243,11 @@ public:
 	FELogElemSBMConcentration_T(FEModel* pfem) : FELogElemSBMConcentration_(pfem, N) {}
 	double value(FEElement& el) { return FELogElemSBMConcentration_::value(el); }
 };
+
+//-----------------------------------------------------------------------------
+class FELogElemPorosity : public FELogElemData
+{
+public:
+	FELogElemPorosity(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
