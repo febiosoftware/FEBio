@@ -24,16 +24,18 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
 #pragma once
+#include "fecore_api.h"
+
 
 // natural log of Gamma function (x ≥ 0)
-double gammaln(double x);
+FECORE_API double gammaln(double x);
 
 // inverse of Gamma function (any x)
-double gammainv(double x);
+FECORE_API double gammainv(double x);
 
 // incomplete Gamma function P
-double gamma_inc_P(double a, double x);
+FECORE_API double gamma_inc_P(double a, double x);
 
 // complementary incomplete Gamma function Q
-double gamma_inc_Q(double a, double x);
+FECORE_API double gamma_inc_Q(double a, double x);
 

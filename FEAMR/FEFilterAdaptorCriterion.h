@@ -26,8 +26,9 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include <FECore/FEMaterialPoint.h>
+#include "feamr_api.h"
 
-class FECORE_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
 {
 public:
 	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
