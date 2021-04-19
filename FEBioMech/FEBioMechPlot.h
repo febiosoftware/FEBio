@@ -948,3 +948,27 @@ private:
 	std::string	m_prop;
 	int			m_propIndex;
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotContinuousDamageBeta : public FEPlotDomainData
+{
+public:
+	FEPlotContinuousDamageBeta(FEModel* fem);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
+	bool SetFilter(const char* sz) override;
+private:
+	std::string	m_prop;
+	int			m_propIndex;
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotContinuousDamageGamma : public FEPlotDomainData
+{
+public:
+	FEPlotContinuousDamageGamma(FEModel* fem);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
+	bool SetFilter(const char* sz) override;
+private:
+	std::string	m_prop;
+	int			m_propIndex;
+};

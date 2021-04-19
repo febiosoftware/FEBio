@@ -561,6 +561,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidPDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidPDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidPResistanceBC.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPressureLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidRCBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidRCRBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidResidualVector.h" />
@@ -665,6 +666,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidPDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidPDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidPResistanceBC.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidRCBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidRCRBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidResidualVector.cpp" />

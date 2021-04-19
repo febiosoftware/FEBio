@@ -96,12 +96,19 @@ BEGIN_FECORE_CLASS(FEDamageElasticFiber, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 	ADD_PARAMETER(m_beta_s, FE_RANGE_GREATER(0.0), "beta_s");
 	ADD_PARAMETER(m_gamma_max, FE_RANGE_GREATER(0.0), "gamma_max");
+
 	ADD_PARAMETER(m_D2_D0, "D2_D0");
 	ADD_PARAMETER(m_D2_beta0, "D2_beta0");
 	ADD_PARAMETER(m_D2_x1, "D2_x1");
 	ADD_PARAMETER(m_D2_x2, "D2_x2");
 	ADD_PARAMETER(m_D2_a, "D2_a");
 	ADD_PARAMETER(m_D2_b, "D2_b");
+
+	ADD_PARAMETER(m_D3_xb  , "D3_xb");
+	ADD_PARAMETER(m_D3_g0  , "D3_g0");
+	ADD_PARAMETER(m_D3_ginf, "D3_ginf");
+	ADD_PARAMETER(m_D3_xg  , "D3_xg");
+
 END_FECORE_CLASS();
 
 FEDamageElasticFiber::FEDamageElasticFiber(FEModel* fem) : FEElasticFiberMaterial(fem)
@@ -123,12 +130,30 @@ FEDamageElasticFiber::FEDamageElasticFiber(FEModel* fem) : FEElasticFiberMateria
 	m_D2_x2 = 1.0;
 	m_D2_a = 0.0;
 	m_D2_b = 0.0;
+
+	// initial values for D3 term
+	m_D3_xb = 1.0;
+	m_D3_xg = 1.0;
+	m_D3_g0 = 0.0;
+	m_D3_ginf = 0.0;
 }
 
 double FEDamageElasticFiber::Damage(FEMaterialPoint& mp)
 {
 	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
 	return damagePoint.m_D;
+}
+
+double FEDamageElasticFiber::beta(FEMaterialPoint& mp)
+{
+	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
+	return damagePoint.m_bt;
+}
+
+double FEDamageElasticFiber::gamma(FEMaterialPoint& mp)
+{
+	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
+	return damagePoint.m_gamma;
 }
 
 //! Strain energy density
@@ -199,9 +224,14 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 		// (v) evaluate damage function
 		double D1 = Ds * (1.0 - exp(log(1.0 - m_r_s)*beta / m_beta_s));
 
+		// D2 term
 		double D2 = m_D2_D0 + m_D2_a * exp((beta - m_D2_beta0) / m_D2_x1) + m_D2_b * exp((beta - m_D2_beta0) / m_D2_x2);
 
-		D = D1 + D2;
+		// D3 term
+		double D3s = m_D3_ginf / (1.0 + exp(-(gamma - m_D3_g0) / m_D3_xg));
+		double D3 = D3s * (beta * (1.0 - exp(-m_D3_xb * beta)));
+
+		D = D1 + D2 + D3;
 
 		// update internal variables
 		damagePoint.m_bt = bt;
@@ -261,9 +291,18 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 
 	double dD1_dbeta = -Ds * (log(1 - m_r_s) / m_beta_s)*exp(log(1 - m_r_s)*beta / m_beta_s);
 	double dD2_dbeta = m_D2_a * exp((beta - m_D2_beta0) / m_D2_x1) / m_D2_x1 + m_D2_b * exp((beta - m_D2_beta0) / m_D2_x2) / m_D2_x2;
-	double dD_dbeta = dD1_dbeta + dD2_dbeta;
+	
+	double D3s = m_D3_ginf / (1.0 + exp(-(gamma - m_D3_g0) / m_D3_xg));
+	double dD3_dDs = beta * (1.0 - exp(-m_D3_xb*beta));
+	double dD3_dbeta = D3s * (1.0 + exp(-m_D3_xb * beta)*(m_D3_xb*beta - 1.0));
+	
+	double dD_dbeta = dD1_dbeta + dD2_dbeta + dD3_dbeta;
 
 	double dDs_dgamma = -m_Dmax * (log(1 - m_r_inf) / m_gamma_max)*exp(log(1 - m_r_inf)*gamma / m_gamma_max);
+
+	double tmp = exp(-(gamma - m_D3_g0) / m_D3_xg);
+	double dD3s_dgamma = (m_D3_ginf / m_D3_xg)*(tmp / ((1.0 + tmp)*(1.0 + tmp)));
+
 	double dD_dDs = 1.0 - exp(log(1 - m_r_s)*beta / m_beta_s);
 	double dbeta_dpsi0 = 0.25*(SIGN(bt - damagePoint.m_bt_ini) + 1)*(SIGN(psi0 - psi0_prev) + 1);
 	double dgamma_dpsi0 = 0.5*(SIGN(psi0 - psi0_ini) + 1);
@@ -278,7 +317,7 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	double phi_trial = MB(psi0 - damagePoint.m_psi_f0_ini) - gamma_prev;
 	if (phi_trial > meps)
 	{
-		tens4ds Cd = sxs * ((dm + d2m * (1 - D)*psi0)*dD_dDs*dDs_dgamma*dgamma_dpsi0);
+		tens4ds Cd = sxs * ((dm + d2m * (1 - D)*psi0)*(dD_dDs*dDs_dgamma +  dD3_dDs*dD3s_dgamma)*dgamma_dpsi0);
 		c -= Cd;
 	}
 

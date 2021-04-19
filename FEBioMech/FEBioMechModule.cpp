@@ -674,6 +674,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce, "discrete element force");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStrainEnergy, "discrete element strain energy");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage, "continuous damage");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamageBeta, "continuous damage beta");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamageGamma, "continuous damage gamma");
 
 
 	// 2O continuum fields

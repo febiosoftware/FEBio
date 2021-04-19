@@ -3359,3 +3359,111 @@ bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+
+//=================================================================================================
+FEPlotContinuousDamageBeta::FEPlotContinuousDamageBeta(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM)
+{
+	m_propIndex = 0;
+}
+
+bool FEPlotContinuousDamageBeta::SetFilter(const char* sz)
+{
+	m_prop = sz;
+	return true;
+}
+
+bool FEPlotContinuousDamageBeta::Save(FEDomain& dom, FEDataStream& a)
+{
+	// get the material
+	FEMaterial* domMat = dom.GetMaterial();
+	if (domMat == nullptr) return false;
+
+	// get the fiber damage component
+	FEDamageElasticFiber* mat = nullptr;
+	if (m_prop.empty()) mat = dynamic_cast<FEDamageElasticFiber*>(domMat);
+	else
+	{
+		ParamString ps(m_prop.c_str());
+		m_propIndex = ps.Index();
+		mat = dynamic_cast<FEDamageElasticFiber*>(domMat->GetProperty(ps));
+	}
+	if (mat == nullptr) return false;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		double beta = 0.0;
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEMaterialPoint* pt = mp.GetPointData(m_propIndex);
+
+			double betaj = mat->beta(*pt);
+
+			beta += betaj;
+		}
+		beta /= (double)nint;
+
+		a << beta;
+	}
+
+	return true;
+}
+
+//=================================================================================================
+FEPlotContinuousDamageGamma::FEPlotContinuousDamageGamma(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM)
+{
+	m_propIndex = 0;
+}
+
+bool FEPlotContinuousDamageGamma::SetFilter(const char* sz)
+{
+	m_prop = sz;
+	return true;
+}
+
+bool FEPlotContinuousDamageGamma::Save(FEDomain& dom, FEDataStream& a)
+{
+	// get the material
+	FEMaterial* domMat = dom.GetMaterial();
+	if (domMat == nullptr) return false;
+
+	// get the fiber damage component
+	FEDamageElasticFiber* mat = nullptr;
+	if (m_prop.empty()) mat = dynamic_cast<FEDamageElasticFiber*>(domMat);
+	else
+	{
+		ParamString ps(m_prop.c_str());
+		m_propIndex = ps.Index();
+		mat = dynamic_cast<FEDamageElasticFiber*>(domMat->GetProperty(ps));
+	}
+	if (mat == nullptr) return false;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		double gamma = 0.0;
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEMaterialPoint* pt = mp.GetPointData(m_propIndex);
+
+			double gammaj = mat->gamma(*pt);
+
+			gamma += gammaj;
+		}
+		gamma /= (double)nint;
+
+		a << gamma;
+	}
+
+	return true;
+}
