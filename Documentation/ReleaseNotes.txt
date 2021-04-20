@@ -41,6 +41,20 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.3.3   4/20/2021
+
+===========================================================================
+
+* Added "porosity" log variable.
+* Added "fluid pressure" surface load as an alternative to prescribing (or fixing) the fluid dilatation. User manual was updated to include description.
+* Changed default constitutive model for fluid pressure from p = - K ef to p = K (1/(1+ef)-1), which is valid for finite dilatation.
+* Generic math expressions (e.g. as used in the force parameter of nonlinear springs) can now use model parameters in the math expression.
+* Added three new interpolation types for load curves: cubic spline, control points, approximation.
+* Fixed logic in setting debug mode from febio command prompt.
+* Removed dependency on GSL.
+
+===========================================================================
+
  R E L E A S E   3.3.2   4/6/2021
 
 ===========================================================================
