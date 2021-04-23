@@ -105,6 +105,7 @@ BEGIN_FECORE_CLASS(FEDamageElasticFiber, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_D2_b, "D2_b");
 
 	ADD_PARAMETER(m_D3_xb  , "D3_xb");
+	ADD_PARAMETER(m_D3_binf, "D3_binf");
 	ADD_PARAMETER(m_D3_g0  , "D3_g0");
 	ADD_PARAMETER(m_D3_ginf, "D3_ginf");
 	ADD_PARAMETER(m_D3_xg  , "D3_xg");
@@ -133,6 +134,7 @@ FEDamageElasticFiber::FEDamageElasticFiber(FEModel* fem) : FEElasticFiberMateria
 
 	// initial values for D3 term
 	m_D3_xb = 1.0;
+	m_D3_binf = 0.0;
 	m_D3_xg = 1.0;
 	m_D3_g0 = 0.0;
 	m_D3_ginf = 0.0;
@@ -229,7 +231,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 
 		// D3 term
 		double D3s = m_D3_ginf / (1.0 + exp(-(gamma - m_D3_g0) / m_D3_xg));
-		double D3 = D3s * (beta * (1.0 - exp(-m_D3_xb * beta)));
+		double D3 = D3s * (m_D3_binf * (1.0 - exp(-m_D3_xb * beta)));
 
 		D = D1 + D2 + D3;
 
@@ -293,8 +295,8 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	double dD2_dbeta = m_D2_a * exp((beta - m_D2_beta0) / m_D2_x1) / m_D2_x1 + m_D2_b * exp((beta - m_D2_beta0) / m_D2_x2) / m_D2_x2;
 	
 	double D3s = m_D3_ginf / (1.0 + exp(-(gamma - m_D3_g0) / m_D3_xg));
-	double dD3_dDs = beta * (1.0 - exp(-m_D3_xb*beta));
-	double dD3_dbeta = D3s * (1.0 + exp(-m_D3_xb * beta)*(m_D3_xb*beta - 1.0));
+	double dD3_dDs = m_D3_binf * (1.0 - exp(-m_D3_xb*beta));
+	double dD3_dbeta = D3s * (m_D3_binf*m_D3_xb*exp(-m_D3_xb * beta));
 	
 	double dD_dbeta = dD1_dbeta + dD2_dbeta + dD3_dbeta;
 

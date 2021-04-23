@@ -81,6 +81,7 @@ protected:
 
 	// D3 parameters
 	double	m_D3_xb;
+	double	m_D3_binf;
 	double	m_D3_g0;
 	double	m_D3_ginf;
 	double	m_D3_xg;
