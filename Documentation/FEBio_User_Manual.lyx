@@ -8181,16 +8181,16 @@ max_retries
 parameter determines the maximum number of times a timestep may be retried
  before FEBio error terminates.
  The new time step size is determined by the ratio of the previous time
- step size and the 
+ step size and 
 \shape italic
-max_retries
+max_retries+1
 \shape default
- parameter.
+.
  For example, if the last time step size is 0.1 and 
 \shape italic
 max_retries 
 \shape default
-is set to 5, then the time step size is adjusted by 0.02: The first retry
+is set to 4, then the time step size is adjusted by 0.02: The first retry
  will have a step size of 0.08; the next will be 0.06, and so on.
 \end_layout
 
