@@ -285,7 +285,7 @@ int enumValue(const char* val, const char* szenum)
 			nval = atoi(ce + 1);
 		}
 
-		if ((L==l) && (_strnicmp(ch, val, l) == 0))
+		if ((L==l) && (strnicmp(ch, val, l) == 0))
 		{
 			return nval;
 		}
@@ -419,7 +419,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		if (pp) throw XMLReader::InvalidTag(tag);
 
 		// add a new user parameter
-		pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, _strdup(szname));
+		pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, strdup(szname));
 		pp->SetFlags(FEParamFlag::FE_PARAM_USER);
 	}
 	else
