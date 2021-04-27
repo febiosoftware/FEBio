@@ -39,7 +39,10 @@ SOFTWARE.*/
 #include <iostream>
 
 #ifdef WIN32
-#include <filesystem>
+// TODO: This is deprecated and <filesystem> should be used instead when switching to C++17. At that point, also remove this define.
+// #include <filesystem>
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
 #endif
 
 #ifndef WIN32

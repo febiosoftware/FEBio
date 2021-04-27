@@ -62,7 +62,7 @@ FEMesh* FEEdgeList::GetMesh()
 
 struct edge_less
 {
-	bool operator ()(const pair<int, int>& lhs, const pair<int, int>& rhs)
+	bool operator ()(const pair<int, int>& lhs, const pair<int, int>& rhs) const
 	{
 		int na0 = lhs.first;
 		int na1 = lhs.second;
@@ -79,7 +79,7 @@ struct edge_less
 
 struct EDGE_less
 {
-	bool operator ()(const FEEdgeList::EDGE& lhs, const FEEdgeList::EDGE& rhs)
+	bool operator ()(const FEEdgeList::EDGE& lhs, const FEEdgeList::EDGE& rhs) const
 	{
 		int na0 = lhs.node[0];
 		int na1 = lhs.node[1];

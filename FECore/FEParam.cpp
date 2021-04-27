@@ -422,7 +422,7 @@ void FEParam::Serialize(DumpStream& ar)
 			assert(m_type == FE_PARAM_DOUBLE);
 			char sz[512] = { 0 };
 			ar >> sz;
-			m_szname = strdup(sz);
+			m_szname = _strdup(sz);
 			m_pv = new double(0);
 		}
 

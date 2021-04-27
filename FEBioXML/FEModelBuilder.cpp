@@ -674,7 +674,7 @@ void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const ch
 	MappedParameter mp;
 	mp.pp = p;
 	mp.pc = parent;
-	mp.szname = strdup(szmap);
+	mp.szname = _strdup(szmap);
 	mp.index = index;
 
 	m_mappedParams.push_back(mp);

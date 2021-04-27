@@ -108,7 +108,7 @@ void FEBioGlobalsSection::ParseVariables(XMLTag& tag)
 		{
 			const char* szname = tag.AttributeValue("name");
 			double v = 0; tag.value(v);
-			fem.AddParameter(*(new double(v)), strdup(szname));
+			fem.AddParameter(*(new double(v)), _strdup(szname));
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

@@ -350,7 +350,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 	++tag;
 	int id, rb, rbp = -1;
 	FERigidNodeSet* prn = 0;
-	FENodeSet* ns;
+	FENodeSet* ns = nullptr;
 	for (int i=0; i<nrn; ++i)
 	{
 		id = atoi(tag.AttributeValue("id"))-1;
@@ -373,7 +373,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 			GetBuilder()->AddRigidNodeSet(prn);
 			rbp = rb;
 		}
-		ns->Add(id);
+		if (ns) ns->Add(id);
 
 		++tag;
 	}

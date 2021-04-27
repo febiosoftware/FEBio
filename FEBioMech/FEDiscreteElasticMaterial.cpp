@@ -76,7 +76,7 @@ mat3d FECompositeDiscreteMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 
 double FECompositeDiscreteMaterial::StrainEnergy(FEDiscreteMaterialPoint& mp)
 {
-	double energy; 
+	double energy = 0; 
 
 	for(auto mat : m_mats)
 	{

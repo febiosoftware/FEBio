@@ -197,7 +197,7 @@ void XMLTag::value(std::string& val)
 void XMLTag::value(vector<int>& l)
 {
 	int i, n = 0, n0, n1, nn;
-	char* szval = strdup(m_szval.c_str());
+	char* szval = _strdup(m_szval.c_str());
 	char* ch;
 	char* sz = szval;
 	int nread;
