@@ -167,8 +167,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 endif()
 
 # Add openMP flags for macOS if found.
-if(APPLE AND ${OpenMP_C_FOUND})
-    add_compile_options(-Xpreprocessor -fopenmp)
+if(APPLE)
+    if(${OpenMP_C_FOUND})
+        add_compile_options(-Xpreprocessor -fopenmp)
+    endif()
 endif()
 
 ##### Find Source Files #####
