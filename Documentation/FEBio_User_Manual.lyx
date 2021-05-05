@@ -56933,7 +56933,7 @@ The fiber strain energy density is given by
 \Psi_{n}\left(I_{n}\right)=\begin{cases}
 0 & I_{n}<1\\
 \frac{\xi}{\beta}\left(I_{n}-1\right)^{\beta} & 1\leqslant I_{n}\leqslant I_{0}\\
-E\left(I_{0}^{1/2}-I_{n}^{1/2}\right)+B\left(I_{n}-I_{0}\right)+\Psi_{0} & I_{0}<I_{n}
+B\left(I_{n}-I_{0}\right)-E\left(I_{n}^{1/2}-I_{0}^{1/2}\right)+\frac{\xi}{\beta}\left(I_{0}-1\right)^{\beta} & I_{0}<I_{n}
 \end{cases}\,,
 \]
 
@@ -56946,7 +56946,7 @@ where
 , 
 \begin_inset Formula 
 \[
-\xi=\frac{E}{4\left(\beta-1\right)}I_{0}^{-3/2}\left(I_{0}-1\right)^{2-\beta},\,B=\frac{E}{2}\left[\frac{I_{0}^{-3/2}}{2\left(\beta-1\right)}+I_{0}^{-1/2}\right],\,\Psi_{0}=\frac{\xi}{2\beta}\left(I_{0}-1\right)^{\beta}
+\xi=\frac{E}{4\left(\beta-1\right)}I_{0}^{-3/2}\left(I_{0}-1\right)^{2-\beta},\,B=\xi\left(I_{0}-1\right)^{\beta-1}+\frac{E}{2}I_{0}^{-1/2}
 \]
 
 \end_inset
