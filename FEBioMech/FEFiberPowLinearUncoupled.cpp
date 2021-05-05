@@ -84,7 +84,7 @@ mat3ds FEFiberPowLinearUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3
         // calculate the fiber stress magnitude
         double sn = (In < m_I0) ?
         2*In*m_ksi*pow(In-1, m_beta-1) :
-        2*m_b*In - m_E/2;
+        2*m_b*In - m_E*sqrt(In);
         
         // calculate the fiber stress
         s = N*(sn/J);
@@ -128,7 +128,7 @@ tens4ds FEFiberPowLinearUncoupled::DevFiberTangent(FEMaterialPoint& mp, const ve
         // calculate the fiber stress magnitude
         double sn = (In < m_I0) ?
         2*In*m_ksi*pow(In-1, m_beta-1) :
-        2*m_b*In - m_E/2;
+        2*m_b*In - m_E*sqrt(In);
         
         // calculate the fiber stress
         s = N*(sn/J);
@@ -136,7 +136,7 @@ tens4ds FEFiberPowLinearUncoupled::DevFiberTangent(FEMaterialPoint& mp, const ve
         // calculate modulus
         double cn = (In < m_I0) ?
         4*In*In*m_ksi*(m_beta-1)*pow(In-1, m_beta-2) :
-        m_E;
+        m_E*sqrt(In);
         
         // calculate the fiber tangent
         c = NxN*(cn/J);
@@ -175,7 +175,7 @@ double FEFiberPowLinearUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& m
         // calculate strain energy density
         sed = (In < m_I0) ?
         m_ksi/m_beta*pow(In-1, m_beta) :
-        m_b*(In-m_I0) - m_E/4*log(In/m_I0) + m_ksi/m_beta*pow(m_I0-1, m_beta);
+        m_b*(In-m_I0) - m_E*(sqrt(In) - sqrt(m_I0)) + m_ksi/m_beta*pow(m_I0-1, m_beta);
     }
     
     return sed;
