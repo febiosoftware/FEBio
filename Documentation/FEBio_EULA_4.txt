@@ -1,0 +1,27 @@
+FEBIO SOFTWARE LICENSE
+Version 4.0 
+
+
+THIS AGREEMENT, between you the licensee, hereinafter referred to as "Recipient," and the University of Utah, having an address at the University of Utah, Technology Commercialization Office, 615 Arapeen Drive, Suite 310, Salt Lake City, Utah 84108, hereinafter referred to as "University," shall govern the conditions of disclosure by University to Recipient of certain software (SOFTWARE) named: FEBio, developed by Steve Maas and Jeff Weiss of the University of Utah, and Gerard Ateshian, of Columbia University. SOFTWARE, as used herein, includes all such software actually provided to Recipient, including, as the case may be, any binaries or executables thereof, plus any software derived directly therefrom, but excludes the source code and the Software Development Kit (SDK). 
+
+1.  LICENSE.  University grants to you a non-exclusive, non-transferable right to use the SOFTWARE in a single installation on a single machine in a single geographic location. It is further agreed that the furnishing of SOFTWARE to Recipient shall not constitute any grant of license to Recipient under any legal rights now or hereinafter held by University.
+
+2.  TERMINATION.  The use of the SOFTWARE by Recipient is conditioned upon Recipient’s compliance with the terms of this Agreement.  When this Agreement terminates, Recipient is required to remove all copies of the SOFTWARE and discontinue all use.  Recipient agrees that Recipient will only copy the SOFTWARE into any machine readable or printed form as necessary to use it in accordance with this Agreement or for backup purposes in support of Recipients use of the SOFTWARE. This Agreement is effective until terminated. Recipient may terminate it at any point by destroying the SOFTWARE together with all copies of the SOFTWARE.  Also, University has the option to terminate if Recipient fails to comply with any term or condition of this Agreement or upon 30 days written notice.  Recipient agrees upon such termination to destroy the SOFTWARE together with all copies of the SOFTWARE.
+
+3.  COPYRIGHT.  The SOFTWARE is protected by United States copyright law and international treaty provisions.  Recipient acknowledges that no title to the intellectual property in the SOFTWARE is transferred to Recipient.  Recipient further acknowledge that title and full ownership rights to the SOFTWARE will remain the exclusive property of University or its suppliers, and Recipient will not acquire any rights to the SOFTWARE except as expressly set forth in this Agreement.
+
+4.  LIMITATIONS.  Recipient may modify the SOFTWARE or create derivative works based upon the SOFTWARE for their own internal or personal use. Recipient may not rent, lease, distribute, transfer or sublicense the SOFTWARE or any derivative works thereof to any third parties, without first negotiating in good faith with University a separate license agreement.  Recipient may not export the SOFTWARE or any derivative works thereof into any country prohibited by the United States Export Administration Act and the regulations there under.
+
+5.  LIMITED WARRANTIES.  University warrants that the media on which the SOFTWARE is furnished will be free from defects in materials and workmanship under normal use. 
+
+6.  DISCLAIMER OF WARRANTY: EXCEPT AS SET FORTH HEREIN, SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, UNIVERISTY FURTHER DISCLAIMS ALL EXPRESSED AND IMPLIED WARRANTIES, INCLUDING WITHOUT LIMITATIONS ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS DISCLAIMER OF WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS AGREEMENT.
+
+7.  GOVERNING LAW.  This Agreement will be governed by the internal laws of the State of Utah without regard to conflict of laws.
+
+8.  ENTIRE AGREEMENT.  This is the entire agreement between Recipient and University, which supersedes any prior agreement or understanding, whether written, or oral, relating to the subject matter of this license.
+
+9.  NO LIABILITY FOR CONSEQUENTIAL DAMAGES: IN NO EVENT SHALL UNIVERSITY BE LIABLE TO RECIPIENT FOR ANY CONSEQUENTIAL, SPECIAL, INCIDENTAL OR INDIRECT DAMAGES OF ANY KIND ARISING OUT OF THE DELIVERY, PERFORMANCE OR USE OF THE SOFTWARE, EVEN IF UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+10.  BASIS OF BARGAIN.  The limited warranty, exclusive remedies, and limited liability set forth above are fundamental elements of the basis of the agreement between University and Recipient.  University would not be able to provide the SOFTWARE on an economic basis without such limitations.
+
+11. PRIVACY. The SOFTWARE adheres to the privacy policy set out by the University of Utah (https://www.utah.edu/privacy/gdpr.php). The SOFTWARE does not collect, distribute, or share any personal data. Upon launch, the SOFTWARE does connect to a remote server, managed by University of Utah personnel, and passes a Universally Unique ID (UUID), which was generated upon first use after installation of the SOFTWARE and stored on the Recipient's local computer, to the remote server. This UUID is used as part of a process that accumulates general usage statistics, but is otherwise not distributed or shared with any third party. 
