@@ -198,7 +198,14 @@ void FEMechModel::InitShells()
 				{
 					FEElement& el = dom.ElementRef(i);
 					int n = el.Nodes();
-					for (int j = 0; j<n; ++j) mesh.Node(el.m_node[j]).m_nstate |= FENode::SHELL;
+					for (int j = 0; j < n; ++j)
+					{
+						mesh.Node(el.m_node[j]).m_nstate |= FENode::SHELL;
+
+						// TODO: Not sure why, but it looks like this is needed otherwise
+						//       the rigid bodies lock. 
+						mesh.Node(el.m_node[j]).m_nstate |= FENode::RIGID_CLAMP;
+					}
 				}
 			}
 		}
