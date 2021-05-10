@@ -169,13 +169,13 @@ status open
 
 \end_inset
 
-User's Manual Version 3.3
+User's Manual Version 3.4
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: March 26, 2021
+Last Updated: May 10, 2021
 \end_layout
 
 \begin_layout Standard
@@ -45628,7 +45628,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigMooneyRivlinVonMises.pdf
+	filename Figures/FigMooneyRivlinVonMises.png
 
 \end_inset
 
@@ -91976,7 +91976,7 @@ _inf_ A very large number (= 1e308)
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 btprint "btPrintCited"
-bibfiles "../../../GitHub/FEBio/Documentation/FEBio3"
+bibfiles "FEBio3"
 options "bibtotoc,plain"
 
 \end_inset

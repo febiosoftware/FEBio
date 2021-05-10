@@ -170,7 +170,7 @@ figs-within-sections
 
 \begin_layout Title
 \begin_inset Graphics
-	filename Figures/FigFEBioTitle.pdf
+	filename Figures/FigFEBioTitle.png
 	width 4.88in
 
 \end_inset
@@ -194,11 +194,11 @@ status open
 
 
 \series default
-Theory Manual Version 3.3 
+Theory Manual Version 3.4 
 \end_layout
 
 \begin_layout Date
-Last Updated: March 26, 2021
+Last Updated: May 10, 2021
 \end_layout
 
 \begin_layout Paragraph*
@@ -1717,7 +1717,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigDeformationMap.pdf
+	filename Figures/FigDeformationMap.png
 
 \end_inset
 
@@ -9268,7 +9268,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigCentrifugalBodyForce.pdf
+	filename Figures/FigCentrifugalBodyForce.png
 
 \end_inset
 
@@ -21231,7 +21231,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSolidElementsTM.pdf
+	filename Figures/FigSolidElementsTM.png
 
 \end_inset
 
@@ -22535,7 +22535,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigQuadraticTetrahedralElements.pdf
+	filename Figures/FigQuadraticTetrahedralElements.png
 
 \end_inset
 
@@ -24485,7 +24485,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigShellElementsTM.pdf
+	filename Figures/FigShellElementsTM.png
 
 \end_inset
 
@@ -24891,7 +24891,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigShellElementTypesTM.pdf
+	filename Figures/FigShellElementTypesTM.png
 
 \end_inset
 
@@ -25051,7 +25051,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigShellElementsFB.pdf
+	filename Figures/FigShellElementsFB.png
 	lyxscale 45
 	scale 45
 
@@ -35544,7 +35544,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigTwoBodyContactProblem.pdf
+	filename Figures/FigTwoBodyContactProblem.png
 
 \end_inset
 
