@@ -1530,8 +1530,7 @@ bool FEModel::DoCallback(unsigned int nevent)
 	}
 	catch (std::exception e)
 	{
-		feLogError("Exception detected: %s\n", e.what());
-		return false;
+		throw;
 	}
 	catch (...)
 	{
