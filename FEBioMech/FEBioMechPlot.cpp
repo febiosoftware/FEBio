@@ -96,6 +96,53 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, FEDataStream& a)
 //! Store nodal reaction forces
 bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 {
+	int NN = m.Nodes();
+	vector<vec3d> F(NN, vec3d(0, 0, 0));
+
+	for (int i = 0; i < m.Domains(); ++i)
+	{
+		FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&m.Domain(i));
+		if (dom)
+		{
+			int NE = dom->Elements();
+			for (int i = 0; i < NE; ++i)
+			{
+				// get the element
+				FESolidElement& el = dom->Element(i);
+
+				if (el.isActive()) {
+					// element force vector
+					vector<double> fe;
+					vector<int> lm;
+
+					// get the element force vector and initialize it to zero
+					int ndof = 3 * el.Nodes();
+					fe.assign(ndof, 0);
+
+					// calculate internal force vector
+					dom->ElementInternalForce(el, fe);
+
+					// assemble into F
+					for (size_t j = 0; j < el.Nodes(); ++j)
+					{
+						vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
+						F[el.m_node[j]] += rj;
+					}
+				}
+			}
+		}
+	}
+
+	// write nodal forces
+	for (int i = 0; i < m.Nodes(); ++i)
+	{
+		a << F[i];
+	}
+
+/*
+	// NOTE: The problem with the original code below is that for nodes attached 
+	//       to rigid bodies the reaction forces will actually be the rigid reaction forces. 
+	//       That's why I'm trying something else above. 
 	FEModel& fem = *GetFEModel();
 	int dofX = fem.GetDOFIndex("x");
 	int dofY = fem.GetDOFIndex("y");
@@ -103,6 +150,7 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
 		return node.get_load3(dofX, dofY, dofZ);
 	});
+*/
 	return true;
 }
 
