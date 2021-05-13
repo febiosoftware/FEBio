@@ -41,17 +41,18 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
- R E L E A S E   3.4   5/12/2021
+ R E L E A S E   3.4   5/14/2021
 
 ===========================================================================
 
 * This version has an updated EULA (EULA version 4). This EULA adds a PRIVACY clause that details how and what information the software (i.e. FEBio Studio) communicates with an external server. 
-* On Windows, this version was built with a new version of Visual Studio (Visual Studio 2019). As a result, a new SDK has been released and it is highly recommended to rebuild any plugins against this new version. 
+* On Windows, this version was built with a newer version of Visual Studio (Visual Studio 2019). As a result, a new SDK has been released and it is highly recommended to rebuild any plugins against this new version. 
 * A bug was fixed for shells that are directly attached to rigid bodies (i.e. shells that share nodes with rigid bodies). 
 * The formulation of strain energy density for fiber-pow-linear-uncoupled material was fixed. In addition, a bug was that which produced discontinuous stress and elasticity at transition from toe region to linear region. The user manual was updated to reflect these changes. 
 * A bug was fixed in CMakeLists that caused an error on Windows if not using MKL.
 * A bug was fixed in the "porosity" element log variable.
 * The description of the max_retries control parameter in the user manual was corrected.
+* The "reaction forces" plot variable now produces the equivalent nodal reaction forces for all nodes, even constrained nodes (fixed, prescribed, rigid). 
 
 ===========================================================================
 
