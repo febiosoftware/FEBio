@@ -1,9 +1,7 @@
 /**
 \page plugin_log Accessing the FEBio Log file
 By default FEBio writes all output to a log file. More precisely, it uses the Logfile class which writes to both the standard output as well as to a file. FEBio also
-defines a felog variable, an instance of Logfile, that developers can use to write to the log file. Although plugins also define an felog variable (by including FECore\log.h)
-it is important to realize that this is not the same log file that is being used by FEBio. Instead, it is a variable that is only local to the plugin. 
-Although a plugin could use this variable to output information, that information will not be stored to the FEBio log file.
+provides special macros that can be used to write to the log file, whithout the need to know the specifics of how the logging mechanism works. 
 
 In order to access the FEBio log file, you must call the FECoreKernel::SetInstance during the PluginInitialize function. 
 
@@ -16,18 +14,35 @@ FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
 
 This ensures that the plugin and FEBio use the same kernel and consequently the same resources (e.g. the logfile). 
 
-Writing to the logfile can be done by including the file <FECore\log.h> and using the felog variable. This variable has two member function for writing data to the log file.
-
-The <c>printf</c> function works just like the c printf function and can be used to write formatted text to the screen and the log file. 
+Writing to the logfile can be done by including the file <FECore\log.h> and using the log macros.
 
 \code
-felog.printf("A negative Jacobian was detected at integration point %d of element %d", 1, 123);
+#include <FECore/log.h>
 \endcode
 
-The <c>printbox</c> function is similar, but prints the message in a box. It takes at least two arguments: The first argument is a string that is the title of the 
-message box, the second is a formatted text string. 
+It is important to understand that a log file is associated with each model. 
+
+For classes derived from FECoreBase, you can use the following macros in any member function. 
+
+The <c>feLog</c> macro works just like the c printf function and can be used to write formatted text to the screen and the log file. 
 
 \code
-felog.printbox("FATAL ERROR", "Your library book %s is overdue (fine = $%d)", "FEBio for beginners", 5.0);
+feLog("A negative Jacobian was detected at integration point %d of element %d", 1, 123);
+\endcode
+
+For producing a warning or an error message, you can use the following two macros. The message will be shown in a box with a title of either "Warning" or "Error". 
+
+\code
+feLogWarning("This will print a warning to the screen.");
+feLogError("This will print an error message to the screen.");
+\endcode
+
+For classes that do not inherit from FECoreBase, or in non-member functions, you must use the extended macros, which take a pointer to the FEModel as its first argument. 
+
+\code
+FEModel* fem;
+FELogEx(fem, "So far, things are looking good.");
+FELogWarningEx(fem, "Hmm, that shouldn't happen.");
+FELogErrorEx(fem, "Oh no! Exit the building!");
 \endcode
 */

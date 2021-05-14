@@ -2,7 +2,7 @@
 \page create_plugin_vs Creating a plugin project with Visual Studio
 
 \section vs_sec1_1 Creating the Visual Studio Project
-As of FEBio 3.0, Visual Studio 2017 is the recommend IDE for developing plugins on Windows. 
+As of FEBio 3.4, Visual Studio 2019 is the recommended IDE for developing plugins on Windows. Since VS2019 is fully compatible with VS2017, you should be able to run plugins developed with VS2017 with FEBio 3.4 as well. 
 
 To create a plugin for FEBio in Visual Studio, you need to create a new dll project. To do this, open Visual Studio and select File->New->Project from the menu. 
 
