@@ -64785,6 +64785,117 @@ Example:
 <criterion type="DC max normal Lagrange strain"/>
 \end_layout
 
+\begin_layout Subsubsection
+Drucker Shear Stress
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Drucker-Shear-Stress"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for the Drucker shear stress criterion is 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+DC Drucker shear stress
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+ It is based on the yield criterion for plasticity introduced in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Drucker49"
+literal "false"
+
+\end_inset
+
+.
+ For this criterion,
+\begin_inset Formula 
+\[
+\Xi\left(\mathbf{F}\right)=k=\left(J_{2}^{3}-cJ_{3}^{2}\right)^{1/6}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $J_{2}=\frac{1}{2}\dev\boldsymbol{\sigma}_{0}:\dev\boldsymbol{\sigma}_{0}$
+\end_inset
+
+, 
+\begin_inset Formula $J_{3}=\det\left(\dev\boldsymbol{\sigma}_{0}\right)$
+\end_inset
+
+, 
+\begin_inset Formula $k$
+\end_inset
+
+ is the yield limit in simple shear and 
+\begin_inset Formula $c$
+\end_inset
+
+ is a user-specified non-dimensional material constant which must lie in
+ the range 
+\begin_inset Formula $-\frac{27}{8}\le c\le\frac{9}{4}$
+\end_inset
+
+.
+ To better understand the meaning of 
+\begin_inset Formula $k$
+\end_inset
+
+, consider uniaxial loading of a bar which yields at the normal stress value
+ of 
+\begin_inset Formula $\sigma_{y}$
+\end_inset
+
+.
+ In this case,
+\begin_inset Formula 
+\[
+k=\frac{\sigma_{y}}{\sqrt{3}}\left(1-\frac{4}{27}c\right)^{1/6}\quad\frac{\sigma_{y}}{\sqrt{3}}\left(\frac{2}{3}\right)^{1/6}\le k\le\frac{\sigma_{y}}{\sqrt{3}}\left(\frac{3}{2}\right)^{1/6}
+\]
+
+\end_inset
+
+In the special case when 
+\begin_inset Formula $c=0$
+\end_inset
+
+ the Drucker criterion reduces to the von Mises criterion, with 
+\begin_inset Formula $k=\sigma_{y}/\sqrt{3}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<criterion type="DC Drucker shear stress">
+\end_layout
+
+\begin_layout LyX-Code
+  <c>2.25</c>
+\end_layout
+
+\begin_layout LyX-Code
+</criterion>
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
