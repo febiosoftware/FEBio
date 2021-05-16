@@ -98,6 +98,41 @@ mat3ds FEDamageCriterionVMS::CriterionStressTangent(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+// Drucker yield criterion
+BEGIN_FECORE_CLASS(FEDamageCriterionDrucker, FEDamageCriterion)
+    ADD_PARAMETER(m_c, FE_RANGE_CLOSED(-27.0/8.0,9.0/4.0), "c");
+END_FECORE_CLASS();
+
+double FEDamageCriterionDrucker::DamageCriterion(FEMaterialPoint& pt)
+{
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
+    mat3ds sdev = s.dev();
+    double J2 = (sdev*sdev).trace()/2;
+    double J3 = sdev.det();
+    double c = m_c(pt);
+    double tau = pow(pow(J2,3) - c*pow(J3,2),1./6.);
+    
+    return tau;
+}
+
+//-----------------------------------------------------------------------------
+//! criterion tangent with respect to stress
+mat3ds FEDamageCriterionDrucker::CriterionStressTangent(FEMaterialPoint& pt)
+{
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
+    mat3ds sdev = s.dev();
+    double J2 = (sdev*sdev).trace()/2;
+    double J3 = sdev.det();
+    double c = m_c(pt);
+    double tau = pow(pow(J2,3) - c*pow(J3,2),1./6.);
+    return (s.dev()*(pow(J2,2)/2) - (sdev.inverse()).dev()*(pow(J3, 2)*c/3))/pow(tau, 5);
+}
+
+//-----------------------------------------------------------------------------
 // max shear stress damage criterion
 double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
 {

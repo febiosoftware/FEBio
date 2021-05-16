@@ -444,6 +444,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionSED, "DC strain energy density");
 	REGISTER_FECORE_CLASS(FEDamageCriterionSSE, "DC specific strain energy");
 	REGISTER_FECORE_CLASS(FEDamageCriterionVMS, "DC von Mises stress");
+    REGISTER_FECORE_CLASS(FEDamageCriterionDrucker, "DC Drucker shear stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMSS, "DC max shear stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNS, "DC max normal stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
