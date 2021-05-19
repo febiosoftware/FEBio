@@ -511,5 +511,9 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 
 		++tag;
 	}
+
+	s.InitSurface();
+	s.CreateMaterialPointData();
+
 	return true;
 }
