@@ -18,5 +18,5 @@ mkdir FEBioFluid
 mkdir FEBioXML
 mkdir FECore
 mkdir NumCore
-
+mkdir FEAMR
 
