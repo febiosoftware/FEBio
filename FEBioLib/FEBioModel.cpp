@@ -1634,27 +1634,12 @@ bool FEBioModel::Solve()
 		double init_time    = m_InitTime.GetTime (); total_time += init_time;
 		double solve_time   = m_SolveTime.GetTime(); total_time += solve_time;
 		double io_time      = m_IOTimer.GetTime  ();
-		double total_linsol = 0.0;
-		double total_reform = 0.0;
-		double total_stiff  = 0.0;
-		double total_rhs    = 0.0;
-		double total_update = 0.0;
-		double total_qn     = 0.0;
-		int NS = Steps();
-		for (int i = 0; i<NS; ++i)
-		{
-			FEAnalysis* pstep = GetStep(i);
-			FESolver* psolve = pstep->GetFESolver();
-			if (psolve) 
-			{
-				total_linsol += GetTimer(TimerID::Timer_Solve    )->GetTime();
-				total_reform += GetTimer(TimerID::Timer_Reform   )->GetTime();
-				total_stiff  += GetTimer(TimerID::Timer_Stiffness)->GetTime();
-				total_rhs    += GetTimer(TimerID::Timer_Residual )->GetTime();
-				total_update += GetTimer(TimerID::Timer_Update   )->GetTime();
-				total_qn     += GetTimer(TimerID::Timer_QNUpdate )->GetTime();
-			}
-		}
+		double total_linsol = GetTimer(TimerID::Timer_Solve    )->GetTime();
+		double total_reform = GetTimer(TimerID::Timer_Reform   )->GetTime();
+		double total_stiff  = GetTimer(TimerID::Timer_Stiffness)->GetTime();
+		double total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime();
+		double total_update = GetTimer(TimerID::Timer_Update   )->GetTime();
+		double total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime();
 
 		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
 		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );
