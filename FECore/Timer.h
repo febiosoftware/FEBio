@@ -39,7 +39,7 @@ SOFTWARE.*/
 //! function stops it and the GetTime function returns the time elapsed between
 //! the call to start and stop
 
-class FECORE_API Timer  
+class FECORE_API Timer
 {
 public:
 	//! constructor
@@ -69,6 +69,9 @@ public:
 	//! check the elapsed time
 	double peek();
 
+	//! see if the timer is running
+	bool isRunning() const { return m_brunning; }
+
 public:
 	static void time_str(double fsec, char* sz);
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
@@ -84,11 +87,16 @@ private:
 // This is helper class that can be used to ensure that a timer is stopped when
 // the function that is being timed exits. That way, the Timer::stop member does not 
 // have to be called at every exit point of a function.
+// In addition, it will also check if the timer is already running (e.g. from a function
+// higher in the call stack) in which case it will track the timer. 
 class FECORE_API TimerTracker
 {
 public:
-	TimerTracker(Timer* timer) : m_timer(timer) { timer->start(); };
-	~TimerTracker() { m_timer->stop(); }
+	TimerTracker(Timer* timer) { 
+		if (timer && (timer->isRunning() == false)) { m_timer = timer; timer->start(); }
+		else m_timer = nullptr; 
+	};
+	~TimerTracker() { if (m_timer) m_timer->stop(); }
 
 private:
 	Timer*	m_timer;
