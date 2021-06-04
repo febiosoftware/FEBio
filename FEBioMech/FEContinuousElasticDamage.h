@@ -41,6 +41,7 @@ public:
 	FEDamageElasticFiber(FEModel* fem);
 
 	double Damage(FEMaterialPoint& mp);
+	double Damage(FEMaterialPoint& mp, int n);
 	double beta(FEMaterialPoint& mp);
 	double gamma(FEMaterialPoint& mp);
 

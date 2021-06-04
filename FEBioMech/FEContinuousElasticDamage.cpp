@@ -41,6 +41,9 @@ public:
 	FEFiberDamagePoint(FEMaterialPoint* pm) : FEMaterialPoint(pm)
 	{
 		m_D = 0.0;
+		m_D1 = m_D2 = m_D3 = 0.0;
+		m_P = 0.0;
+		m_D3s = 0.0;
 		m_psi_f0_ini = 0.0;
 		m_psi_f0 = 0.0;
 		m_psi_f0_prev = 0.0;
@@ -56,6 +59,9 @@ public:
 	void Init() override
 	{
 		m_D = 0.0;
+		m_D1 = m_D2 = m_D3 = 0.0;
+		m_P = 0.0;
+		m_D3s = 0.0;
 		m_psi_f0_ini = m_psf_c;// we set this to the initial value
 		m_psi_f0 = m_psf_c;		// we set this to the initial value
 		m_psi_f0_prev = m_psf_c; // we set this to the initial value
@@ -79,6 +85,8 @@ public:
 public:
 	bool	m_init;	// initialization flag
 	double	m_D;		// accumulated damage
+	double	m_D1, m_D2, m_D3;	// damage components
+	double	m_P, m_D3s;
 
 	double	m_psi_f0_ini, m_psf_c;
 	double	m_psi_f0, m_psi_f0_prev;
@@ -146,6 +154,17 @@ double FEDamageElasticFiber::Damage(FEMaterialPoint& mp)
 	return damagePoint.m_D;
 }
 
+double FEDamageElasticFiber::Damage(FEMaterialPoint& mp, int n)
+{
+	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
+	if (n == 0) return damagePoint.m_D1;
+	if (n == 1) return damagePoint.m_D2;
+	if (n == 2) return damagePoint.m_D3;
+	if (n == 3) return damagePoint.m_P;
+	if (n == 4) return damagePoint.m_D3s;
+	return 0.0;
+}
+
 double FEDamageElasticFiber::beta(FEMaterialPoint& mp)
 {
 	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
@@ -167,6 +186,7 @@ double FEDamageElasticFiber::FiberStrainEnergyDensity(FEMaterialPoint& mp, const
 	double D = damagePoint.m_D;
 	double psi0 = Psi0(mp, a0);
 	double P = (1.0 - D)*psi0 - damagePoint.m_psf_c;
+	if (P < 0) P = 0;
 	double psi = m(P);
 
 	return psi;
@@ -185,6 +205,12 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 	double bt_prev = damagePoint.m_bt_prev;
 	double psi_f0_prev = damagePoint.m_psi_f0_prev;
 	double gamma_prev = damagePoint.m_gamma_prev;
+
+	damagePoint.m_D1 = 0.0;
+	damagePoint.m_D2 = 0.0;
+	damagePoint.m_D3 = 0.0;
+	damagePoint.m_P = 0.0;
+	damagePoint.m_D3s = 0.0;
 
 	// get current simulation time.
 	double t = GetFEModel()->GetTime().currentTime;
@@ -234,6 +260,10 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 		double D3 = D3s * (m_D3_binf * (1.0 - exp(-m_D3_xb * beta)));
 
 		D = D1 + D2 + D3;
+		damagePoint.m_D1 = D1;
+		damagePoint.m_D2 = D2;
+		damagePoint.m_D3 = D3;
+		damagePoint.m_D3s = D3s;
 
 		// update internal variables
 		damagePoint.m_bt = bt;
@@ -244,6 +274,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 
 	double P = (1.0 - D)*(psi_f0) - damagePoint.m_psf_c;
 	if (P < 0.0) P = 0.0;
+	damagePoint.m_P = P;
 	double dm = dm_dP(P);
 
 	mat3ds S0 = dPsi0_dC(mp, a0)*2.0;
@@ -267,6 +298,7 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	double psi0 = Psi0(mp, a0);
 	double P = (1.0 - D)*(psi0)-damagePoint.m_psf_c;
 	if (P < 0) P = 0.0;
+
 	double dm = dm_dP(P);
 	double d2m = d2m_dP(P);
 
@@ -573,7 +605,11 @@ double FEDamageFiberExpLinear::m(double P)
 	else
 	{
 		double c6 = m_c3 * (exp(m_c4*Pmax) - 1) - (Pmax + 1.0) * m_c5;
-		m = m_c5 * P + c6 * log(P + 1.0);
+
+		// constant offset for ensuring continuity of strain-energy
+		double d0 = m_c3* (exp(-m_c4) * (Ei(m_c4 * (Pmax + 1.0)) - Ei(m_c4)) - log(Pmax + 1)) - m_c5 * Pmax - c6 * log(Pmax + 1.0);
+
+		m = m_c5 * P + c6 * log(P + 1.0) + d0;
 	}
 
 	return m;

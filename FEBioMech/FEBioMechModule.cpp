@@ -588,6 +588,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementAcceleration, "acceleration");
 	REGISTER_FECORE_CLASS(FEPlotDensity, "density");
 	REGISTER_FECORE_CLASS(FEPlotElementStress, "stress");
+	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
 	REGISTER_FECORE_CLASS(FEPlotRelativeVolume, "relative volume");
@@ -675,6 +676,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce, "discrete element force");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStrainEnergy, "discrete element strain energy");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage, "continuous damage");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_1, "continuous damage 1");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_2, "continuous damage 2");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_3, "continuous damage 3");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_P, "continuous damage P");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D3s, "continuous damage D3s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageBeta, "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageGamma, "continuous damage gamma");
 
