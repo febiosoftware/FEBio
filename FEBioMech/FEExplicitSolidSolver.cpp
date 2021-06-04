@@ -221,7 +221,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 			}
 			else
 			{
-				return false;
+//				return false;
 			}
 		}
 	}
@@ -348,8 +348,8 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 	// Also, make sure the lumped masses are positive.
 	for (int i = 0; i < m_Mi.size(); ++i)
 	{
-		if (m_Mi[i] <= 0.0) return false;
-		m_Mi[i] = 1.0 / m_Mi[i];
+//		if (m_Mi[i] <= 0.0) return false;
+		if (m_Mi[i] != 0.0) m_Mi[i] = 1.0 / m_Mi[i];
 	}
 
 	return true;
@@ -874,9 +874,9 @@ bool FEExplicitSolidSolver::DoSolve()
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSU[0], m_ui[n]); node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSU[1], m_ui[n]); node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSU[2], m_ui[n]); node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
 	}
 
 	// do minor iterations callbacks
