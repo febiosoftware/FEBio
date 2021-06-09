@@ -33698,7 +33698,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="129" columns="3">
+<lyxtabular version="3" rows="128" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -35345,14 +35345,14 @@ reference "eq:bs-fluxes-w-j"
 
 \end_inset
 
-, and triphasic/multiphasic materials, Eq.
+, triphasic/multiphasic, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mp-fluxes-w-j"
 
 \end_inset
 
- 
+, fluid-FSI and biphasic-FSI materials.
 \end_layout
 
 \end_inset
@@ -36307,7 +36307,7 @@ nodal fluid flux
 \begin_inset Text
 
 \begin_layout Plain Layout
-Element 
+Node 
 \end_layout
 
 \end_inset
@@ -36316,7 +36316,8 @@ Element
 \begin_inset Text
 
 \begin_layout Plain Layout
-Fluid flux in biphasic, biphasic-solute, triphasic, and multiphasic materials
+Fluid flux in biphasic, biphasic-solute, triphasic, multiphasic, fluid-FSI
+ and biphasic-FSI materials
 \end_layout
 
 \end_inset
@@ -36347,39 +36348,6 @@ Node
 \begin_layout Plain Layout
 Fluid velocity 
 \begin_inset Formula $\mathbf{v}^{f}$
-\end_inset
-
- in fluid and fluid-FSI materials
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-nodal relative fluid velocity 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Node 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fluid velocity relative to mesh 
-\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  in fluid and fluid-FSI materials
