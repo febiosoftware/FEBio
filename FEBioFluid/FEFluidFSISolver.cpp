@@ -376,7 +376,25 @@ bool FEFluidFSISolver::InitEquations()
         if (n.m_ID[m_dofW[2] ] != -1) m_nveq++;
         if (n.m_ID[m_dofEF[0]] != -1) m_nfeq++;
     }
-    
+
+    // Next, we add any Lagrange Multipliers
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* lmc = fem.NonlinearConstraint(i);
+        if (lmc->IsActive())
+        {
+            m_neq += lmc->InitEquations(m_neq);
+        }
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive())
+        {
+            m_neq += spc->InitEquations(m_neq);
+        }
+    }
+
     // All initialization is done
     return true;
 }
