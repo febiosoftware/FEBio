@@ -44,7 +44,6 @@ SOFTWARE.*/
 #include "FEBiphasicContactSurface.h"
 #include "FEBioMech/FEDonnanEquilibrium.h"
 #include "FEBioMech/FEElasticMixture.h"
-#include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/FEModel.h>
 #include <FECore/writeplot.h>
 #include <FEBioFluid/FEFluidSolutes.h>

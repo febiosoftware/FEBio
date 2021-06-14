@@ -41,7 +41,6 @@ SOFTWARE.*/
 #include "FEMultiphasicFSIDomain.h"
 #include "FEMultiphasicFSI.h"
 #include "FEThermoFluid.h"
-#include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/FEModel.h>
 #include <FECore/FESurface.h>
 #include <FECore/writeplot.h>

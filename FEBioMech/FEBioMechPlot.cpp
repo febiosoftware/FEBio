@@ -42,7 +42,6 @@ SOFTWARE.*/
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEUT4Domain.h"
-#include "FEBioPlot/FEBioPlotFile.h"
 #include "FEContactSurface.h"
 #include "FERigidBody.h"
 #include <FECore/FESPRProjection.h>
