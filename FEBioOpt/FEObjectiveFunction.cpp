@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEObjectiveFunction.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
-#include <FEBioMech/FEElasticMaterial.h>
 
 //=============================================================================
 
