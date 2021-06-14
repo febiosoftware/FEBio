@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEResetTest.h"
-#include <FEBioLib/FEBioModel.h>
+#include <FECore/FEModel.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ FEResetTest::FEResetTest(FEModel*pfem) : FECoreTask(pfem)
 // initialize the diagnostic
 bool FEResetTest::Init(const char* sz)
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 
 	// do the FE initialization
 	return fem.Init();
@@ -50,7 +50,7 @@ bool FEResetTest::Init(const char* sz)
 // run the diagnostic
 bool FEResetTest::Run()
 {
-	FEBioModel* fem = dynamic_cast<FEBioModel*>(GetFEModel());
+	FEModel* fem = GetFEModel();
 
 	// try to run the model
 	if (fem->Solve() == false)

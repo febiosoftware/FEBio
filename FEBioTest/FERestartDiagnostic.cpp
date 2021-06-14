@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FERestartDiagnostics.h"
-#include <FEBioLib/FEBioModel.h>
+#include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/DumpFile.h>
 #include <FECore/log.h>
@@ -82,7 +82,7 @@ bool restart_test_cb(FEModel* pfem, unsigned int nwen, void* pd)
 // initialize the diagnostic
 bool FERestartDiagnostic::Init(const char* sz)
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 
 	// copy the file name (if any)
 	if (sz && (sz[0] != 0)) strcpy(m_szdmp, sz);
@@ -90,7 +90,8 @@ bool FERestartDiagnostic::Init(const char* sz)
 	// Make sure that restart flag is off.
 	// This is because we are hijacking restart and we don't
 	// want regular restart to interfere.
-	fem.SetDumpLevel(FE_DUMP_NEVER);
+	// TODO: is this really necessary? This creates a circular link between FEBioTest and FEBioLib
+//	fem.SetDumpLevel(FE_DUMP_NEVER);
 
 	// Add the restart callback
 	fem.AddCallback(restart_test_cb, CB_MAJOR_ITERS, this);
@@ -103,7 +104,7 @@ bool FERestartDiagnostic::Init(const char* sz)
 // run the diagnostic
 bool FERestartDiagnostic::Run()
 {
-	FEBioModel* fem = dynamic_cast<FEBioModel*>(GetFEModel());
+	FEModel* fem = GetFEModel();
 
 	while (fem->Solve() == false)
 	{
