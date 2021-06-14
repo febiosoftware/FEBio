@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include "FEFluidP.h"
 #include "FENewtonianFluid.h"
+#include "FEBinghamFluid.h"
 #include "FECarreauFluid.h"
 #include "FECarreauYasudaFluid.h"
 #include "FEPowellEyringFluid.h"
@@ -110,6 +111,7 @@ REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
 REGISTER_FECORE_CLASS(FEFluid             , "fluid"         );
 REGISTER_FECORE_CLASS(FEFluidP            , "fluidP"        );
 REGISTER_FECORE_CLASS(FENewtonianFluid    , "Newtonian fluid");
+REGISTER_FECORE_CLASS(FEBinghamFluid      , "Bingham"       )
 REGISTER_FECORE_CLASS(FECarreauFluid      , "Carreau"       );
 REGISTER_FECORE_CLASS(FECarreauYasudaFluid, "Carreau-Yasuda");
 REGISTER_FECORE_CLASS(FEPowellEyringFluid , "Powell-Eyring" );
