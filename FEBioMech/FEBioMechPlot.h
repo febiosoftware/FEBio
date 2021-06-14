@@ -277,15 +277,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element norm for G
-class FEPlotElementGnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementGnorm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Element stresses
 class FEPlotElementStress : public FEPlotDomainData
 {
@@ -321,33 +312,6 @@ class FEPlotElementsnorm : public FEPlotDomainData
 {
 public:
 	FEPlotElementsnorm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK1 stress
-class FEPlotElementPK1norm : public FEPlotDomainData
-{
-public:
-	FEPlotElementPK1norm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK1 stress moment
-class FEPlotElementQK1norm : public FEPlotDomainData
-{
-public:
-	FEPlotElementQK1norm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element micro energy
-class FEPlotElementMicroEnergy : public FEPlotDomainData
-{
-public:
-	FEPlotElementMicroEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

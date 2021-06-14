@@ -49,8 +49,6 @@ SOFTWARE.*/
 #include "FEUncoupledElasticMixture.h"
 #include "FERigidMaterial.h"
 #include "FEVolumeConstraint.h"
-#include "FEMicroMaterial.h"
-#include "FEMicroMaterial2O.h"
 #include "FEFacet2FacetSliding.h"
 #include "FEMortarSlidingContact.h"
 #include "FEMechModel.h"
@@ -696,29 +694,6 @@ bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-//! Store the average deformation Hessian (G) for each element. 
-
-class FEMicro2OG
-{
-public:
-	tens3drs operator()(const FEMaterialPoint& mp)
-	{
-		const FEElasticMaterialPoint2O& pt2O = *(mp.ExtractData<FEElasticMaterialPoint2O>());
-		return pt2O.m_G;
-	}
-};
-
-bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEElasticMaterial2O* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial2O>();
-	if (pme == 0) return false;
-
-	writeAverageElementValue<tens3drs, double>(dom, a, FEMicro2OG(), [](const tens3drs& m) { return m.tripledot(m); });
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 //! Store the norm of the average Cauchy stress for each element. 
 bool FEPlotElementsnorm::Save(FEDomain& dom, FEDataStream& a)
 {
@@ -728,94 +703,6 @@ bool FEPlotElementsnorm::Save(FEDomain& dom, FEDataStream& a)
 	writeAverageElementValue<mat3ds, double>(dom, a, FEStress(), [](const mat3ds& s) { return sqrt(s.dotdot(s)); });
 	
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Store the norm of the average PK1 stress for each element.
-
-class FEMicro1OPK1Stress
-{
-public:
-	FEMicro1OPK1Stress(FEMicroMaterial* pm) : m_mat(pm) {}
-	mat3d operator()(const FEMaterialPoint& mp)
-	{
-		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		FEMicroMaterialPoint* mmppt = mp_noconst.ExtractData<FEMicroMaterialPoint>();
-		return m_mat->AveragedStressPK1(mmppt->m_rve, mp_noconst);
-	}
-
-private:
-	FEMicroMaterial*	m_mat;
-};
-
-class FEMicro2OPK1Stress
-{
-public:
-	mat3d operator()(const FEMaterialPoint& mp)
-	{
-		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		FEMicroMaterialPoint2O* mmppt = mp_noconst.ExtractData<FEMicroMaterialPoint2O>();
-		return mmppt->m_rve.AveragedStressPK1(mp_noconst);
-	}
-};
-
-bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial());
-	if (pm1O)
-	{
-		writeAverageElementValue<mat3d, double>(dom, a, FEMicro1OPK1Stress(pm1O), [](const mat3d& m) {return m.dotdot(m); });
-		return true;
-	}
-
-	FEMicroMaterial2O* pm2O = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial());
-	if (pm2O == 0)
-	{
-		writeAverageElementValue<mat3d, double>(dom, a, FEMicro2OPK1Stress(), [](const mat3d& m) {return m.dotdot(m); });
-		return true;
-	}
-
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-//! Store the norm of the average PK1 stress moment for each element. 
-
-class FEMicro2OQK1
-{
-public:
-	tens3drs operator()(const FEMaterialPoint& mp)
-	{
-		const FEElasticMaterialPoint2O& pt2O = *(mp.ExtractData<FEElasticMaterialPoint2O>());
-		return pt2O.m_Q;
-	}
-};
-
-bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial());
-	if (pme == 0) return false;
-	
-	// write solid element data
-	writeAverageElementValue<tens3drs, double>(dom, a, FEMicro2OQK1(), [](const tens3drs& m) { return m.tripledot(m); });
-	
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Element macro energy
-bool FEPlotElementMicroEnergy::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial());
-	if (pm1O)
-	{
-		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-			const FEMicroMaterialPoint& mmpt = *(mp.ExtractData<FEMicroMaterialPoint>());
-			return mmpt.m_micro_energy;
-		});
-		return true;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
