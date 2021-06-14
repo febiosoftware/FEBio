@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FileImport.h"
-#include "XMLReader.h"
+#include <XML/XMLReader.h>
 #include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
 #include "FECore/DataStore.h"

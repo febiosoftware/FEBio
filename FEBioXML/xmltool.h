@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "XMLReader.h"
+#include <XML/XMLReader.h>
 #include <FECore/FECoreBase.h>
 #include <FECore/ClassDescriptor.h>
 #include "febioxml_api.h"

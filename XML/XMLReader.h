@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include <string>
 #include <vector>
 #include <stdexcept>
-#include "febioxml_api.h"
 using namespace std;
 
 //-------------------------------------------------------------------------
@@ -43,7 +42,7 @@ class XMLReader;
 
 //-------------------------------------------------------------------------
 //! This class represents a xml-attribute
-class FEBIOXML_API XMLAtt
+class XMLAtt
 {
 	//! max buffer size for attribute name and value
 	enum { MAX_TAG = 128 };
@@ -73,7 +72,7 @@ public:
 //! \todo I would like to get rid of the m_szroot element and replace it with a 
 //!       parent tag. The root element can then be identified by the tag that 
 //!       does not have a parent
-class FEBIOXML_API XMLTag
+class XMLTag
 {
 public:
 	enum {MAX_TAG   = 128};
@@ -143,7 +142,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! This class implements a reader for XML files
-class FEBIOXML_API XMLReader
+class XMLReader
 {
 public:
 	enum {MAX_TAG   = 128};
@@ -152,7 +151,7 @@ public:
 
 public:
 	// Base class for Exceptions
-	class FEBIOXML_API Error : public std::runtime_error
+	class Error : public std::runtime_error
 	{
 	public:
 		Error(const std::string& err) : std::runtime_error(err) {}
@@ -160,61 +159,61 @@ public:
 	};
 
 	// End of file was discovered 
-	class FEBIOXML_API EndOfFile : public Error {
+	class EndOfFile : public Error {
 	public: 
 		EndOfFile() : Error("End of file") {}
 	};
 
 	// the end of file was detected unexpectedly.
-	class FEBIOXML_API UnexpectedEOF : public Error {
+	class UnexpectedEOF : public Error {
 	public:
 		UnexpectedEOF() : Error("Unexpected end of file") {}
 	};
 
 	// A syntax error was found
-	class FEBIOXML_API XMLSyntaxError : public Error
+	class XMLSyntaxError : public Error
 	{
 	public:
 		XMLSyntaxError(int line_number = -1);
 	};
 
 	// an end tag was not matched
-	class FEBIOXML_API UnmatchedEndTag : public Error
+	class UnmatchedEndTag : public Error
 	{
 	public:
 		UnmatchedEndTag(XMLTag& t);
 	};
 
 	// an unknown tag was encountered 
-	class FEBIOXML_API InvalidTag : public Error
+	class InvalidTag : public Error
 	{
 	public:
 		InvalidTag(XMLTag& t);
 	};
 
 	// The value of a tag was invald 
-	class FEBIOXML_API InvalidValue : public Error
+	class InvalidValue : public Error
 	{
 	public:
 		InvalidValue(XMLTag& t);
 	};
 
 	// the value of an attribute was invalid 
-	class FEBIOXML_API InvalidAttributeValue : public Error
+	class InvalidAttributeValue : public Error
 	{
 	public:
 		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
 	};
 
 	// an attribute is invalid
-	class FEBIOXML_API InvalidAttribute : public Error
+	class InvalidAttribute : public Error
 	{
 	public:
 		InvalidAttribute(XMLTag& t, const char* sza);
 	};
 
 	// an attribute was missing
-	class FEBIOXML_API MissingAttribute : public Error
+	class MissingAttribute : public Error
 	{
 	public:
 		MissingAttribute(XMLTag& t, const char* sza);

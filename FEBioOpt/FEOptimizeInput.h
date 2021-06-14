@@ -27,7 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FEBioXML/XMLReader.h>
 #include <FEBioXML/FileImport.h>
 #include <FECore/FEModel.h>
 
