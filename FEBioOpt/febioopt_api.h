@@ -23,16 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 
-#include "FECore/LinearSolver.h"
-#include "numcore_api.h"
-
-namespace NumCore {
-
-	NUMCORE_API void InitModule();
-
-} // namespace NumCore
+#ifdef WIN32
+	#ifdef FECORE_DLL
+		#ifdef FEBIOOTP_EXPORTS
+			#define FEBIOOPT_API __declspec(dllexport)
+		#else
+			#define FEBIOOPT_API __declspec(dllimport)
+		#endif
+	#else
+		#define FEBIOOPT_API
+	#endif
+#else
+	#define FEBIOOPT_API
+#endif

@@ -28,11 +28,17 @@ SOFTWARE.*/
 
 #pragma once
 
-#include "FECore/LinearSolver.h"
-#include "numcore_api.h"
+#ifdef WIN32
+	#ifdef FECORE_DLL
+		#ifdef NUMCORE_EXPORTS
+			#define NUMCORE_API __declspec(dllexport)
+		#else
+			#define NUMCORE_API __declspec(dllimport)
+		#endif
+	#else
+		#define NUMCORE_API
+	#endif
+#else
+	#define NUMCORE_API
+#endif
 
-namespace NumCore {
-
-	NUMCORE_API void InitModule();
-
-} // namespace NumCore
