@@ -64,9 +64,6 @@ namespace febio
 	// print hello message
 	FEBIOLIB_API int Hello(LogStream& log);
 
-	// set the number of OMP threads
-	FEBIOLIB_API void SetOMPThreads(int n);
-
 	// run an FEBioModel
 	FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask = nullptr, const char* szctrl = nullptr);
 

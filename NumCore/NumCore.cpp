@@ -45,10 +45,11 @@ SOFTWARE.*/
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
 #include "FEASTEigenSolver.h"
+#include "numcore_api.h"
 
 //=============================================================================
 // Call this to initialize the NumCore module
-void NumCore::InitModule()
+NUMCORE_API void NumCore::InitModule()
 {
 	// register linear solvers
 	REGISTER_FECORE_CLASS(PardisoSolver  , "pardiso");

@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "xmltool.h"
 #include <FECore/FECoreKernel.h>
-#include "FileImport.h"
 
 int enumValue(const char* val, const char* szenum);
 bool is_number(const char* sz);

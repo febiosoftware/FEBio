@@ -50,12 +50,6 @@ SOFTWARE.*/
 #endif
 
 
-#ifdef WIN32
-extern "C" void __cdecl omp_set_num_threads(int);
-#else
-extern "C" void omp_set_num_threads(int);
-#endif
-
 namespace febio {
 
 	//-----------------------------------------------------------------------------
@@ -64,7 +58,6 @@ namespace febio {
 	bool parse_import(XMLTag& tag);
 	bool parse_import_folder(XMLTag& tag);
 	bool parse_set(XMLTag& tag);
-	bool parse_omp_num_threads(XMLTag& tag);
 	bool parse_output_negative_jacobians(XMLTag& tag);
 
 	// create a map for the variables (defined with set)
@@ -181,10 +174,6 @@ namespace febio {
 		{
 			if (parse_import_folder(tag) == false) return false;
 		}
-		else if (tag == "omp_num_threads")
-		{
-			if (parse_omp_num_threads(tag) == false) return false;
-		}
 		else if (tag == "output_negative_jacobians")
 		{
 			if (parse_output_negative_jacobians(tag) == false) return false;
@@ -203,15 +192,6 @@ namespace febio {
 		string key(szname);
 		string val(tag.szvalue());
 		vars[key] = val;
-		return true;
-	}
-
-	//-----------------------------------------------------------------------------
-	bool parse_omp_num_threads(XMLTag& tag)
-	{
-		int n;
-		tag.value(n);
-		omp_set_num_threads(n);
 		return true;
 	}
 
@@ -404,12 +384,6 @@ void ImportPluginFolder(const char* szfolder)
 {
 }
 #endif
-
-//-----------------------------------------------------------------------------
-void SetOMPThreads(int n)
-{
-	omp_set_num_threads(n);
-}
 
 //-----------------------------------------------------------------------------
 // run an FEBioModel
