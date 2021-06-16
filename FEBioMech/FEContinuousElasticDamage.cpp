@@ -273,8 +273,8 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 	}
 
 	double P = (1.0 - D)*(psi_f0) - damagePoint.m_psf_c;
-	if (P < 0.0) P = 0.0;
 	damagePoint.m_P = P;
+	if (P < 0.0) P = 0.0;
 	double dm = dm_dP(P);
 
 	mat3ds S0 = dPsi0_dC(mp, a0)*2.0;
