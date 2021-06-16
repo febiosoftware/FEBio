@@ -27,8 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
-#include "FEBioMix/FESolutesMaterialPoint.h"
 #include "FEReaction.h"
 #include "febiomix_api.h"
 
@@ -39,7 +37,7 @@ class FEBIOMIX_API FEReactionRate : public FEMaterial
 {
 public:
     //! constructor
-    FEReactionRate(FEModel* pfem) : FEMaterial(pfem) {}
+    FEReactionRate(FEModel* pfem) : FEMaterial(pfem), m_pReact(nullptr) {}
     
     //! reaction rate at material point
     virtual double ReactionRate(FEMaterialPoint& pt) = 0;

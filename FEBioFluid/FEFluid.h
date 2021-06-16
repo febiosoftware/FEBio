@@ -32,11 +32,16 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEFluidMaterialPoint.h"
 #include "FEViscousFluid.h"
+#include <FEBioMix/FEBiphasic.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for fluid materials.
 
-class FEBIOFLUID_API FEFluid : public FEFluidMaterial
+//! NOTE: This inherits from FEBiphasicInterface in order to override the GetActualFluidPressure, 
+//!       which is used in FEReactionRateExpSED and FEReactionRateHuiskes. 
+//!       Note sure yet if there is a better alternative.
+
+class FEBIOFLUID_API FEFluid : public FEFluidMaterial, public FEBiphasicInterface
 {
 public:
 	FEFluid(FEModel* pfem);
@@ -78,6 +83,12 @@ public:
 
     //! evaluate dilatation from pressure
     bool Dilatation(const double T, const double p, const double c, double& e) override;
+
+public: // from FEBiphasicInterface
+    double GetActualFluidPressure(const FEMaterialPoint& mp) override {
+        const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+        return pt->m_pf;
+    }
     
 public:
     double      m_k;        //!< bulk modulus at J=1

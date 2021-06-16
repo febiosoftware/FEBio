@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPermExpIso.h"
+#include "FEBiphasic.h"
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPermExpIso, FEHydraulicPermeability)
@@ -47,19 +48,15 @@ FEPermExpIso::FEPermExpIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 //! Permeability tensor.
 mat3ds FEPermExpIso::Permeability(FEMaterialPoint& mp)
 {
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
     FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-    
+
     // relative volume
     double J = et.m_J;
+
     // referential solid volume fraction
-    double phi0 = 0.0;
-    if(pt)
-        phi0 = pt->m_phi0;
-    else if (bpt)
-        phi0 = bpt->m_phi0;
-    
+    double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
+
     // --- strain-dependent isotropic permeability ---
     double k0 = m_perm*exp(m_M*(J-1)/(J-phi0));
     
@@ -70,19 +67,14 @@ mat3ds FEPermExpIso::Permeability(FEMaterialPoint& mp)
 //! Tangent of permeability
 tens4dmm FEPermExpIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
     FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint* bpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
     
     // relative volume
     double J = et.m_J;
     
     // referential solid volume fraction
-    double phi0 = 0.0;
-    if(pt)
-        phi0 = pt->m_phi0;
-    else if (bpt)
-        phi0 = bpt->m_phi0;
+    double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
 
     mat3dd I(1);    // Identity
     

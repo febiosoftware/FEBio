@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBiphasic.h"
-#include <FEBioFluid/FEBiphasicFSI.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a poroelastic material that has a strain-dependent

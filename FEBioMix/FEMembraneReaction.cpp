@@ -88,8 +88,8 @@ bool FEMembraneReaction::Init()
     //************* reactants and products in multiphasic domain **************
     
     // initialize the reaction coefficients
-    const int nsol = m_pMP->Solutes();
-    const int nsbm = m_pMP->SBMs();
+    const int nsol = m_psm->Solutes();
+    const int nsbm = m_psm->SBMs();
     const int ntot = nsol + nsbm;
     
     // initialize the stoichiometric coefficients to zero
@@ -104,7 +104,7 @@ bool FEMembraneReaction::Init()
     intmap solR = m_solR;
     intmap solP = m_solP;
     for (int isol = 0; isol<nsol; ++isol) {
-        int sid = m_pMP->GetSolute(isol)->GetSoluteID() - 1;
+        int sid = m_psm->GetSolute(isol)->GetSoluteID() - 1;
         it = solR.find(sid);
         if (it != solR.end()) m_vR[isol] = it->second;
         it = solP.find(sid);
@@ -116,7 +116,7 @@ bool FEMembraneReaction::Init()
     intmap sbmR = m_sbmR;
     intmap sbmP = m_sbmP;
     for (int isbm = 0; isbm<nsbm; ++isbm) {
-        int sid = m_pMP->GetSBM(isbm)->GetSBMID() - 1;
+        int sid = m_psm->GetSBM(isbm)->GetSBMID() - 1;
         it = sbmR.find(sid);
         if (it != sbmR.end()) m_vR[nsol + isbm] = it->second;
         it = sbmP.find(sid);
@@ -164,9 +164,9 @@ bool FEMembraneReaction::Init()
     if (!m_Vovr) {
         m_Vbar = 0;
         for (int isol = 0; isol<nsol; ++isol)
-            m_Vbar += m_v[isol] * m_pMP->GetSolute(isol)->MolarMass() / m_pMP->GetSolute(isol)->Density();
+            m_Vbar += m_v[isol] * m_psm->GetSolute(isol)->MolarMass() / m_psm->GetSolute(isol)->Density();
         for (int isbm = 0; isbm<nsbm; ++isbm)
-            m_Vbar += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->MolarMass() / m_pMP->GetSBM(isbm)->Density();
+            m_Vbar += m_v[nsol + isbm] * m_psm->GetSBM(isbm)->MolarMass() / m_psm->GetSBM(isbm)->Density();
         for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
             FESoluteData* sd = FindSoluteData(ISOL);
             m_Vbar += m_vi[ISOL] * sd->m_M / sd->m_rhoT;
@@ -177,9 +177,9 @@ bool FEMembraneReaction::Init()
     // check that the reaction satisfies electroneutrality
     int znet = 0;
     for (int isol = 0; isol<nsol; ++isol)
-        znet += m_v[isol] * m_pMP->GetSolute(isol)->ChargeNumber();
+        znet += m_v[isol] * m_psm->GetSolute(isol)->ChargeNumber();
     for (int isbm = 0; isbm<nsbm; ++isbm)
-        znet += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->ChargeNumber();
+        znet += m_v[nsol + isbm] * m_psm->GetSBM(isbm)->ChargeNumber();
     for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
         FESoluteData* sd = FindSoluteData(ISOL);
         znet += m_vi[ISOL] * sd->m_z;

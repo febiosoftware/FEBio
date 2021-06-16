@@ -27,10 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
-#include "FEBioFluid/FEFluidSolutes.h"
-#include "FEBioFluid/FESolutesMaterial.h"
-#include "FEBioFluid/FEMultiphasicFSI.h"
+#include "FEChemicalReaction.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward chemical reaction.
@@ -38,7 +35,7 @@ class FEBIOMIX_API FEMassActionForward : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEMassActionForward(FEModel* pfem) : FEChemicalReaction(pfem) {}
+	FEMassActionForward(FEModel* pfem);
 		
 	//! molar supply at material point
 	double ReactionSupply(FEMaterialPoint& pt);

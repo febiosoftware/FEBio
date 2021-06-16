@@ -75,12 +75,6 @@ public:
     //! calculate inner stress at material point
     mat3ds Stress(FEMaterialPoint& pt);
     
-    //! solid referential apparent density
-    double SolidReferentialApparentDensity(FEMaterialPoint& pt);
-    
-    //! solid referential volume fraction
-    double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
-    
     //! return the permeability tensor as a matrix
     void Permeability(double k[3][3], FEMaterialPoint& pt);
     
@@ -126,6 +120,12 @@ public: // overridden from FEBiphasicInterface
         const FEBiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEBiphasicFSIMaterialPoint>());
         return pt->m_phi0;
     }
+
+    //! solid referential apparent density
+    double SolidReferentialApparentDensity(FEMaterialPoint& pt) override;
+
+    //! solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
 public: // material parameters
     double      m_rhoTw; //!< true fluid density

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEReactionRateExpSED.h"
 #include "FEBioMech/FERemodelingElasticMaterial.h"
+#include "FEBiphasic.h"
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateExpSED, FEMaterial)
@@ -37,14 +38,18 @@ BEGIN_FECORE_CLASS(FEReactionRateExpSED, FEMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEReactionRateExpSED::FEReactionRateExpSED(FEModel* pfem) : FEReactionRate(pfem) 
+{ 
+    m_B = m_Psi0 = 0; 
+}
+
+//-----------------------------------------------------------------------------
 //! reaction rate at material point
 double FEReactionRateExpSED::ReactionRate(FEMaterialPoint& pt)
 {
-    double phir = 0;
-    if (m_pReact->m_pMP)
-        phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
-    else if (m_pReact->m_pMF)
-        phir = m_pReact->m_pMF->SolidReferentialVolumeFraction(pt);
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+
+    double phir = pbm->SolidReferentialVolumeFraction(pt);
     
     FERemodelingMaterialPoint& rpt = *(pt.ExtractData<FERemodelingMaterialPoint>());
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
@@ -58,32 +63,11 @@ double FEReactionRateExpSED::ReactionRate(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEReactionRateExpSED::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
-    FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    FEFluidMaterialPoint& ft = *pt.ExtractData<FEFluidMaterialPoint>();
-    FEMultiphasicFSIMaterialPoint& mt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
-    double phir = 0;
-    double p = 0;
-    
-    if (m_pReact->m_pMP)
-    {
-        phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
-        p = bt.m_pa;
-    }
-    else if (m_pReact->m_pFS)
-    {
-        p = ft.m_pf;
-    }
-    else if (m_pReact->m_pSM)
-    {
-        p = ft.m_pf;
-    }
-    else if (m_pReact->m_pMF)
-    {
-        phir = m_pReact->m_pMF->SolidReferentialVolumeFraction(pt);
-        p = mt.m_pe;
-    }
+    double phir = pbm->SolidReferentialVolumeFraction(pt);
+    double p = pbm->GetActualFluidPressure(pt);
     
     double J = et.m_J;
     double zhat = ReactionRate(pt);

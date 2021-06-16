@@ -27,10 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
-#include "FEBioFluid/FEFluidSolutes.h"
-#include "FEBioFluid/FESolutesMaterial.h"
-#include "FEBioFluid/FEMultiphasicFSI.h"
+#include "FEChemicalReaction.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for reversible chemical reaction
@@ -39,7 +36,7 @@ class FEBIOMIX_API FEMassActionReversibleEffective : public FEChemicalReaction
 {
 public:
     //! constructor
-    FEMassActionReversibleEffective(FEModel* pfem) : FEChemicalReaction(pfem) {}
+    FEMassActionReversibleEffective(FEModel* pfem);
     
     //! molar supply at material point
     double ReactionSupply(FEMaterialPoint& pt);

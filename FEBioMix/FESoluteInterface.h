@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/vec3d.h>
 
 class FESolute;
+class FESolidBoundMolecule;
 class FEOsmoticCoefficient;
 class FEMaterialPoint;
 
@@ -90,6 +91,15 @@ public:
 	// get first derivative of k (partition coefficient) w.r.p. J
 	virtual double dkdJ(const FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
+	// return the number of solid-bound molecules
+	virtual int SBMs() const { return 0; }
+
+	// return the solid-bound modlecule
+	virtual FESolidBoundMolecule* GetSBM(int i) { return nullptr; }
+
+	//! SBM actual concentration (molar concentration in current configuration)
+	virtual double SBMConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
+
 // additional member functions
 public:
 	// return the local index of a global solute ID (or -1, if the solute is not in this material)
@@ -98,7 +108,7 @@ public:
 
 
 template <typename T>
-class FEBIOMIX_API FESoluteInterface_T : public FESoluteInterface
+class FESoluteInterface_T : public FESoluteInterface
 {
 public:
 	double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {

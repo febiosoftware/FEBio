@@ -116,13 +116,6 @@ FEMaterialPoint* FESolutesMaterial::CreateMaterialPointData()
 // initialize
 bool FESolutesMaterial::Init()
 {
-    // we first have to set the parent material
-    // TODO: This seems redundant since each material already has a pointer to its parent
-    for (int i=0; i<Reactions(); ++i)
-    {
-        m_pReact[i]->m_pSM = this;
-    }
-    
     // set the solute IDs first, since they are referenced in FESolute::Init()
     for (int i = 0; i<Solutes(); ++i) {
         m_pSolute[i]->SetSoluteLocalID(i);

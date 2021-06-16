@@ -320,17 +320,6 @@ int FEMultiphasic::FindLocalSBMID(int nid)
 //-----------------------------------------------------------------------------
 bool FEMultiphasic::Init()
 {
-	// we first have to set the parent material
-	// TODO: This seems redundant since each material already has a pointer to its parent
-	for (int i=0; i<Reactions(); ++i)
-	{
-		m_pReact[i]->m_pMP = this;
-	}
-    for (int i=0; i<MembraneReactions(); ++i)
-    {
-        m_pMReact[i]->m_pMP = this;
-    }
-
 	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i = 0; i<Solutes(); ++i) {
 		m_pSolute[i]->SetSoluteLocalID(i);
@@ -373,13 +362,6 @@ void FEMultiphasic::Serialize(DumpStream& ar)
 
 	ar & m_Rgas & m_Tabs & m_Fc;
 	ar & m_zmin & m_ndeg;
-
-	if (ar.IsLoading())
-	{
-		// restore the m_pMP pointers for reactions
-		int NR = (int) m_pReact.size();
-		for (int i=0; i<NR; ++i) m_pReact[i]->m_pMP = this;
-	}
 }
 
 //-----------------------------------------------------------------------------

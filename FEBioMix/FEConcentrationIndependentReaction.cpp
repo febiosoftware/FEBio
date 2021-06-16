@@ -48,7 +48,7 @@ double FEConcentrationIndependentReaction::ReactionSupply(FEMaterialPoint& pt)
 	for (int i=0; i<nsbm; ++i) {
 		int vR = m_vR[nsol+i];
 		if (vR > 0) {
-			double c = m_pMP->SBMConcentration(pt, i);
+			double c = m_psm->SBMConcentration(pt, i);
 			zhat *= pow(c, vR);
 		}
 	}

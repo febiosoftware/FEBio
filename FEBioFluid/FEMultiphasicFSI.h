@@ -167,6 +167,12 @@ public:
         return spt->m_cF;
     }
 
+public: // from FEBiphasicInterface
+    double GetActualFluidPressure(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return pt->m_pe;
+    }
+
 public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     

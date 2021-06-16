@@ -27,15 +27,14 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBiphasic.h"
-#include <FEBioFluid/FEBiphasicFSI.h>
+#include "FEHydraulicPermeability.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a poroelastic material that has a strain-dependent
 // permeability which varies exponentially as a function of the
 // volume ratio J, producing zero permeability in the limit as J->phi0.
 
-class FEBIOMIX_API FEPermExpIso :    public FEHydraulicPermeability
+class FEBIOMIX_API FEPermExpIso : public FEHydraulicPermeability
 {
 public:
     //! constructor

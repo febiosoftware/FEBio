@@ -27,15 +27,12 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
-#include "FEBioMix/FESolutesMaterialPoint.h"
+#include <FECore/FEMaterial.h>
+#include "febiomix_api.h"
 #include <map>
 
 //-----------------------------------------------------------------------------
-class FEMultiphasic;
-class FEFluidSolutes;
-class FESolutesMaterial;
-class FEMultiphasicFSI;
+class FESoluteInterface;
 
 //-----------------------------------------------------------------------------
 //! Base class for reactions.
@@ -55,10 +52,7 @@ public:
 public:
     //! set stoichiometric coefficient
     void SetStoichiometricCoefficient(intmap& RP, int id, int v) { RP.insert(std::pair<int, int>(id, v)); }
-    
-public:
-    FEMultiphasic*    m_pMP;        //!< pointer to multiphasic material where reaction occurs
-    FEFluidSolutes*    m_pFS;        //!< pointer to fluid solutes material where reaction occurs
-    FESolutesMaterial* m_pSM;       //!< pointer to solute (split) material where reaction occurs
-    FEMultiphasicFSI* m_pMF;       //!< pointer to multiphasic fsi material where reaction occurs
+
+protected:
+    FESoluteInterface* m_psm;   //!< solute interface to parent class
 };

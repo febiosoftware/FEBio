@@ -80,6 +80,16 @@ public:
 
 public:
 	virtual double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) { return 0.0; }
+
+	// TODO: These are only used by multiphasic materials. Perhapse move to separate interface class? 
+	//! solid referential apparent density
+	virtual double SolidReferentialApparentDensity(FEMaterialPoint& pt) { return 0.0; }
+
+	//! solid referential volume fraction
+	virtual double SolidReferentialVolumeFraction(FEMaterialPoint& pt) { return 0.0; };
+
+	// TODO: This is a bit of a hack to get the fluid pressure. 
+	virtual double GetActualFluidPressure(const FEMaterialPoint& pt) { return 0.0; }
 };
 
 //-----------------------------------------------------------------------------
@@ -138,6 +148,11 @@ public: // overridden from FEBiphasicInterface
 	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 		return pt->m_phi0;
+	}
+
+	double GetActualFluidPressure(const FEMaterialPoint& mp) override { 
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+		return pt->m_pa;
 	}
 
 public: // material parameters

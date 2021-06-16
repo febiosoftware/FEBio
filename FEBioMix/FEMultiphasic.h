@@ -39,7 +39,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
 
-class FEBIOMIX_API FEMultiphasic : public FEMaterial, public FESoluteInterface_T<FESolutesMaterialPoint>
+class FEBIOMIX_API FEMultiphasic : public FEMaterial, public FEBiphasicInterface, public FESoluteInterface_T<FESolutesMaterialPoint>
 {
 public:
 	//! constructor
@@ -88,12 +88,6 @@ public:
                                        vector< vector<double> >& dkdJr,
                                        vector< vector< vector<double> > >& dkdrc);
 	
-	//! solid referential apparent density
-	double SolidReferentialApparentDensity(FEMaterialPoint& pt);
-	
-	//! solid referential volume fraction
-	double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
-
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
 	
@@ -130,14 +124,6 @@ public:
 	//! SBM charge number
 	int SBMChargeNumber(const int sbm) { return m_pSBM[sbm]->ChargeNumber(); }
 	
-	//! SBM actual concentration (molar concentration in current configuration)
-	double SBMConcentration(FEMaterialPoint& pt, const int sbm) {
-		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
-		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm]/(ept.m_J-bpt.m_phi0)/SBMMolarMass(sbm);
-	}
-
 	//! SBM referential volume fraction
 	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
@@ -167,15 +153,31 @@ public:
 		return spt->m_cF;
 	}
 
+	int SBMs() const override { return (int)m_pSBM.size(); }
+	FESolidBoundMolecule* GetSBM(int i) override { return m_pSBM[i]; }
+	//! SBM actual concentration (molar concentration in current configuration)
+	double SBMConcentration(FEMaterialPoint& pt, const int sbm) override {
+		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+		return spt.m_sbmr[sbm] / (ept.m_J - bpt.m_phi0) / SBMMolarMass(sbm);
+	}
+
+// biphasic interface
+public:
+	//! solid referential apparent density
+	double SolidReferentialApparentDensity(FEMaterialPoint& pt) override;
+
+	//! solid referential volume fraction
+	double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
+
 public:
 	FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
 	FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
 	FESolventSupply*			GetSolventSupply()		{ return m_pSupp;  }
-	FESolidBoundMolecule*		GetSBM				(int i) { return m_pSBM[i];    }
 	FEChemicalReaction*			GetReaction			(int i) { return m_pReact[i];  }
     FEMembraneReaction*         GetMembraneReaction (int i) { return m_pMReact[i]; }
 
-	int SBMs		     () { return (int) m_pSBM.size();	}
 	int Reactions	     () { return (int) m_pReact.size();	}
     int MembraneReactions() { return (int) m_pMReact.size();}
 
