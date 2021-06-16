@@ -112,23 +112,37 @@ public:
 
 	// solute interface
 public:
+    typedef FESolutesMaterial::Point SolutesMaterial_t;
+
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
+    double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_c[soluteIndex];
+    };
     double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
-        FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
         return spt->m_ca[soluteIndex];
     };
     double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
-        FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
         return spt->m_k[soluteIndex];
     };
     vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
-        FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
         return spt->m_j[soluteIndex];
     };
     double GetOsmolarity(const FEMaterialPoint& mp) override {
-        const FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        const SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
         return spt->Osmolarity();
+    }
+    double dkdc(const FEMaterialPoint& mp, int i, int j) override {
+        const SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_dkdc[i][j];
+    }
+    double dkdJ(const FEMaterialPoint& mp, int soluteIndex) override {
+        const SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_dkdJ[soluteIndex];
     }
     FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 

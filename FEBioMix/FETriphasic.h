@@ -33,7 +33,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for triphasic materials.
 
-class FEBIOMIX_API FETriphasic : public FEMaterial, public FESoluteInterface
+class FEBIOMIX_API FETriphasic : public FEMaterial, public FESoluteInterface_T<FESolutesMaterialPoint>
 {
 public:
 	FETriphasic(FEModel* pfem);
@@ -111,36 +111,12 @@ public:
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-	double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
-		FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->m_ca[soluteIndex];
-	};
-	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
-		FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->m_k[soluteIndex];
-	}
-	vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
-		FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->m_j[soluteIndex];
-	};
-	double GetOsmolarity(const FEMaterialPoint& mp) override {
-		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->Osmolarity();
-	}
-	double GetElectricPotential(const FEMaterialPoint& mp) override {
-		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->m_psi;
-	}
-	vec3d GetCurrentDensity(const FEMaterialPoint& mp) override {
-		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->m_Ie;
-	}
+	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
 		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
 		return spt->m_cF;
 	}
-	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
-	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 
 public:
     FEElasticMaterial*			GetSolid()				{ return m_pSolid; }

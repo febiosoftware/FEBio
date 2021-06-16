@@ -30,9 +30,6 @@ SOFTWARE.*/
 #include "FESolubManning.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>
-#include "FEBioFluid/FEFluidSolutes.h"
-#include "FEBioFluid/FESolutesMaterial.h"
-#include "FEBioFluid/FEMultiphasicFSI.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -50,10 +47,6 @@ FESolubManning::FESolubManning(FEModel* pfem) : FESoluteSolubility(pfem)
     m_sol = -1;
     m_lsol = -1;
     m_bcoi = false;
-    m_pMP = nullptr;
-    m_pFS = nullptr;
-    m_pSM = nullptr;
-    m_pMF = nullptr;
 	m_solub = nullptr;
 }
 
@@ -72,25 +65,15 @@ bool FESolubManning::Init()
         m_bcoi = false;
     
     // get the ancestor material which must be a multiphasic material
-    m_pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
-    m_pFS = dynamic_cast<FEFluidSolutes*> (GetAncestor());
-    m_pSM = dynamic_cast<FESolutesMaterial*> (GetAncestor());
-    m_pMF = dynamic_cast<FEMultiphasicFSI*> (GetAncestor());
-    if ((m_pMP == nullptr) && (m_pFS == nullptr) && (m_pSM == nullptr) && (m_pMF == nullptr)) {
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+    if (psm == nullptr) {
         feLogError("Ancestor material must have solutes");
         return false;
     }
     
     // extract the local id of the solute from the global id
     // m_sol must be zero-based
-    if (m_pMP)
-        m_lsol = m_pMP->FindLocalSoluteID(m_sol);
-    if (m_pFS)
-        m_lsol = m_pFS->FindLocalSoluteID(m_sol);
-    if (m_pSM)
-        m_lsol = m_pSM->FindLocalSoluteID(m_sol);
-    if (m_pMF)
-        m_lsol = m_pMF->FindLocalSoluteID(m_sol);
+    m_lsol = psm->FindLocalSoluteID(m_sol);
     if (m_lsol == -1) {
         feLogError("Invalid value for sol");
         return false;
@@ -169,32 +152,11 @@ double FESolubManning::Tangent_Solubility_Concentration_Concentration(FEMaterial
 //! Solubility
 double FESolubManning::Solubility_Manning(FEMaterialPoint& mp)
 {
-    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
-    
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+   
     // evaluate X = FCD/co-ion actual concentration
-    double ca = 0;
-    double cF = 0;
-    if (m_pMP)
-    {
-        ca = spt.m_ca[m_lsol];
-        cF = fabs(spt.m_cF);
-    }
-    else if (m_pFS)
-    {
-        ca = fspt.m_ca[m_lsol];
-    }
-    else if (m_pSM)
-    {
-        ca = smpt.m_ca[m_lsol];
-    }
-    else if (m_pMF)
-    {
-        ca = mfpt.m_ca[m_lsol];
-        cF = fabs(mfpt.m_cF);
-    }
+    double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
+    double cF = psm->GetFixedChargeDensity(mp);
     
     double X = 0;
     if (ca > 0) X = cF/ca;
@@ -221,54 +183,23 @@ double FESolubManning::Solubility_Manning(FEMaterialPoint& mp)
 //! Tangent of solubility with respect to strain
 double FESolubManning::Tangent_Solubility_Strain_Manning(FEMaterialPoint &mp)
 {
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEBiphasicMaterialPoint& bpt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint& bfpt = *mp.ExtractData<FEBiphasicFSIMaterialPoint>();
-    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     // evaluate X = FCD/co-ion actual concentration
-    double ca = 0.0;
-    double cF = 0.0;
-    double kt = 0.0;
-    double dktdJ = 0.0;
-    if (m_pMP)
-    {
-        ca = spt.m_ca[m_lsol];
-        cF = fabs(spt.m_cF);
-        kt = spt.m_k[m_lsol];
-        dktdJ = spt.m_dkdJ[m_lsol];
-    }
-    else if (m_pFS)
-    {
-        ca = fspt.m_ca[m_lsol];
-        kt = fspt.m_k[m_lsol];
-        dktdJ = fspt.m_dkdJ[m_lsol];
-    }
-    else if (m_pSM)
-    {
-        ca = smpt.m_ca[m_lsol];
-        kt = smpt.m_k[m_lsol];
-    }
-    else if (m_pMF)
-    {
-        ca = mfpt.m_ca[m_lsol];
-        cF = fabs(mfpt.m_cF);
-        kt = mfpt.m_k[m_lsol];
-        dktdJ = mfpt.m_dkdJ[m_lsol];
-    }
+    double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
+    double cF = fabs(psm->GetFixedChargeDensity(mp));
+    double kt = psm->GetPartitionCoefficient(mp, m_lsol);
+    double dktdJ = psm->dkdJ(mp, m_lsol);
+
     double X = 0;
     if (ca > 0) X = cF/ca;
     
     // evaluate dX/dJ
     double J = pt.m_J;
-    double phisr = 0.0;
-    if (m_pMP)
-        phisr = bpt.m_phi0;
-    if (m_pMF)
-        phisr = bfpt.m_phi0;
+    double phisr = pbm->GetReferentialSolidVolumeFraction(mp);
     
     double dXdJ = -(1./(J-phisr)+dktdJ/kt)*X;
     
@@ -296,47 +227,15 @@ double FESolubManning::Tangent_Solubility_Strain_Manning(FEMaterialPoint &mp)
 //! Tangent of solubility with respect to concentration
 double FESolubManning::Tangent_Solubility_Concentration_Manning(FEMaterialPoint &mp, const int isol)
 {
-    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
     
     // evaluate X = FCD/co-ion actual concentration
-    double ca = 0;
-    double cF = 0;
-    double kta = 0;
-    double kt = 0;
-    int zt = 0;
-    if (m_pMP)
-    {
-        ca = spt.m_ca[m_lsol];
-        cF = fabs(spt.m_cF);
-        kta = spt.m_k[m_lsol];
-        kt = spt.m_k[isol];
-        zt = m_pMP->GetSolute(isol)->ChargeNumber();
-    }
-    else if (m_pFS)
-    {
-        ca = fspt.m_ca[m_lsol];
-        kta = fspt.m_k[m_lsol];
-        kt = fspt.m_k[isol];
-        zt = m_pFS->GetSolute(isol)->ChargeNumber();
-    }
-    else if (m_pSM)
-    {
-        ca = smpt.m_ca[m_lsol];
-        kta = smpt.m_k[m_lsol];
-        kt = smpt.m_k[isol];
-        zt = m_pSM->GetSolute(isol)->ChargeNumber();
-    }
-    else if (m_pMF)
-    {
-        ca = mfpt.m_ca[m_lsol];
-        cF = fabs(mfpt.m_cF);
-        kta = mfpt.m_k[m_lsol];
-        kt = mfpt.m_k[isol];
-        zt = m_pMF->GetSolute(isol)->ChargeNumber();
-    }
+    double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
+    double cF = fabs(psm->GetFixedChargeDensity(mp));
+    double kta = psm->GetPartitionCoefficient(mp, m_lsol);
+    double kt = psm->GetPartitionCoefficient(mp, isol);
+    int zt = psm->GetSolute(isol)->ChargeNumber();
+
     double X = 0;
     if (ca > 0) X = cF/ca;
     
@@ -367,70 +266,24 @@ double FESolubManning::Tangent_Solubility_Concentration_Manning(FEMaterialPoint 
 //-----------------------------------------------------------------------------
 double FESolubManning::Solubility_Wells(FEMaterialPoint& mp)
 {
-    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
-    
-    double ca = 0;
-    if (m_pMP)
-    {
-        ca = spt.m_ca[m_lsol];
-    }
-    else if (m_pFS)
-    {
-        ca = fspt.m_ca[m_lsol];
-    }
-    else if (m_pSM)
-    {
-        ca = smpt.m_ca[m_lsol];
-    }
-    else if (m_pMF)
-    {
-        ca = mfpt.m_ca[m_lsol];
-    }
-    
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+    double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
     double solub = m_solub->value(ca);
-    
     assert(solub>0);
-    
     return solub;
 }
 
 //-----------------------------------------------------------------------------
 double FESolubManning::Tangent_Solubility_Strain_Wells(FEMaterialPoint& mp)
 {
-    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
     
-    double f = 0;
-    double ca = 0;
-    if (m_pMP)
-    {
-        ca = spt.m_ca[m_lsol];
-        f = spt.m_dkdJ[m_lsol]*spt.m_c[m_lsol];
-    }
-    else if (m_pFS)
-    {
-        ca = fspt.m_ca[m_lsol];
-        f = fspt.m_dkdJ[m_lsol]*fspt.m_c[m_lsol];
-    }
-    else if (m_pSM)
-    {
-        ca = smpt.m_ca[m_lsol];
-        f = smpt.m_dkdJ[m_lsol]*smpt.m_c[m_lsol];
-    }
-    else if (m_pMF)
-    {
-        ca = mfpt.m_ca[m_lsol];
-        f = mfpt.m_dkdJ[m_lsol]*mfpt.m_c[m_lsol];
-    }
-    
+    double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
     double dsolub = m_solub->derive(ca);
     
-    dsolub *= f;
+    double c = psm->GetEffectiveSoluteConcentration(mp, m_lsol);
+    double dkdJ = psm->dkdJ(mp, m_lsol);
+    dsolub *= dkdJ * c;
     
     return dsolub;
 }
@@ -438,41 +291,17 @@ double FESolubManning::Tangent_Solubility_Strain_Wells(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 double FESolubManning::Tangent_Solubility_Concentration_Wells(FEMaterialPoint& mp, const int isol)
 {
-    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *mp.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
     
-    double ca = 0;
-    double f = 0;
-    if (m_pMP)
-    {
-        ca = spt.m_ca[m_lsol];
-        f = spt.m_dkdc[m_lsol][isol]*spt.m_c[m_lsol];
-        if (isol == m_lsol) f += spt.m_k[m_lsol];
-    }
-    else if (m_pFS)
-    {
-        ca = fspt.m_ca[m_lsol];
-        f = fspt.m_dkdc[m_lsol][isol]*fspt.m_c[m_lsol];
-        if (isol == m_lsol) f += fspt.m_k[m_lsol];
-    }
-    else if (m_pSM)
-    {
-        ca = smpt.m_ca[m_lsol];
-        f = smpt.m_dkdc[m_lsol][isol]*smpt.m_c[m_lsol];
-        if (isol == m_lsol) f += smpt.m_k[m_lsol];
-    }
-    else if (m_pMF)
-    {
-        ca = mfpt.m_ca[m_lsol];
-        f = mfpt.m_dkdc[m_lsol][isol]*mfpt.m_c[m_lsol];
-        if (isol == m_lsol) f += mfpt.m_k[m_lsol];
-    }
+    double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
+    double c = psm->GetEffectiveSoluteConcentration(mp, m_lsol);
+    double k = psm->GetPartitionCoefficient(mp, m_lsol);
+    double dkdc = psm->dkdc(mp, m_lsol, isol);
+   
+    double f = dkdc*c;
+    if (isol == m_lsol) f += k;
     
     double dsolub = m_solub->derive(ca);
-    
-    
     dsolub *= f;
     
     return dsolub;

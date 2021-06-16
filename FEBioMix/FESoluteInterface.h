@@ -54,6 +54,9 @@ public:
 	// return a solute material
 	virtual FESolute* GetSolute(int i) = 0;
 
+	//! return the effective solute concentration
+	virtual double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+
 	// return the actual solution concentration at this material point
 	virtual double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
@@ -81,8 +84,57 @@ public:
 	// get the referential fixed charge density
 	virtual double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) { return 0.0; }
 
+	// get first derivative of k (partition coefficient) w.r.p. concentration
+	virtual double dkdc(const FEMaterialPoint& mp, int i, int j) { return 0.0; }
+
+	// get first derivative of k (partition coefficient) w.r.p. J
+	virtual double dkdJ(const FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+
 // additional member functions
 public:
 	// return the local index of a global solute ID (or -1, if the solute is not in this material)
 	int FindLocalSoluteID(int soluteID);
+};
+
+
+template <typename T>
+class FEBIOMIX_API FESoluteInterface_T : public FESoluteInterface
+{
+public:
+	double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+		T* spt = mp.ExtractData<T>();
+		return spt->m_c[soluteIndex];
+	};
+	double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+		T* spt = mp.ExtractData<T>();
+		return spt->m_ca[soluteIndex];
+	};
+	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
+		T* spt = mp.ExtractData<T>();
+		return spt->m_k[soluteIndex];
+	}
+	vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
+		T* spt = mp.ExtractData<T>();
+		return spt->m_j[soluteIndex];
+	};
+	double GetOsmolarity(const FEMaterialPoint& mp) override {
+		const T* spt = mp.ExtractData<T>();
+		return spt->Osmolarity();
+	}
+	double GetElectricPotential(const FEMaterialPoint& mp) override {
+		const T* spt = mp.ExtractData<T>();
+		return spt->m_psi;
+	}
+	vec3d GetCurrentDensity(const FEMaterialPoint& mp) override {
+		const T* spt = mp.ExtractData<T>();
+		return spt->m_Ie;
+	}
+	double dkdc(const FEMaterialPoint& mp, int i, int j) override {
+		const T* spt = mp.ExtractData<T>();
+		return spt->m_dkdc[i][j];
+	}
+	double dkdJ(const FEMaterialPoint& mp, int soluteIndex) override {
+		const T* spt = mp.ExtractData<T>();
+		return spt->m_dkdJ[soluteIndex];
+	}
 };

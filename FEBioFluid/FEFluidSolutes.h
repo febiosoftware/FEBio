@@ -78,7 +78,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface
+class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface_T<FEFluidSolutesMaterialPoint>
 {
 public:
     FEFluidSolutes(FEModel* pfem);
@@ -132,32 +132,11 @@ public:
     
     // solute interface
 public:
+
+    typedef FEFluidSolutesMaterialPoint SoluteMaterialPoint_t;
+
     int Solutes() override { return (int)m_pSolute.size(); }
     FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override { 
-        FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        return spt->m_ca[soluteIndex];
-    };
-    double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
-        FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        return spt->m_k[soluteIndex];
-    };
-    vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
-        FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        return spt->m_j[soluteIndex];
-    };
-    double GetOsmolarity(const FEMaterialPoint& mp) override {
-        const FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        return spt->Osmolarity();
-    }
-    double GetElectricPotential(const FEMaterialPoint& mp) override {
-        const FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        return spt->m_psi;
-    }
-    vec3d GetCurrentDensity(const FEMaterialPoint& mp) override {
-        const FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        return spt->m_Ie;
-    }
     FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC;  }
 
 public:
