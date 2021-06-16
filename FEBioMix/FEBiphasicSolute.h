@@ -37,7 +37,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
-class FEBIOMIX_API FEBiphasicSolute : public FEMaterial, public FESoluteInterface_T<FESolutesMaterialPoint>
+class FEBIOMIX_API FEBiphasicSolute : public FEMaterial, public FEBiphasicInterface, public FESoluteInterface_T<FESolutesMaterialPoint>
 {
 public:
 	FEBiphasicSolute(FEModel* pfem);
@@ -70,6 +70,17 @@ public:
 
 	//! Get the osmotic coefficient
 	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
+
+public: // overridden from FEBiphasicInterface
+	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+		return pt->m_phi0;
+	}
+
+	double GetActualFluidPressure(const FEMaterialPoint& mp) override {
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+		return pt->m_pa;
+	}
 
 public:
 	bool Init() override;
