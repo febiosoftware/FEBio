@@ -28,13 +28,16 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEModel.h>
-#include <FEBioMech/RigidBC.h>
 #include "febioxml_api.h"
 #include "FEBModel.h"
 #include <string>
 
 class FESolver;
 class FEPointFunction;
+class FERigidBodyFixedBC;
+class FERigidBodyDisplacement;
+class FERigidIC;
+class FERigidNodeSet;
 
 // This is a helper class for building the FEModel from file input. 
 class FEBIOXML_API FEModelBuilder

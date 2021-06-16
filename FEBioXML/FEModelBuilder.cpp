@@ -37,15 +37,15 @@ SOFTWARE.*/
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELoadCurve.h>
-#include <FEBioMech/RigidBC.h>
-#include <FEBioMech/FEUDGHexDomain.h>
-#include <FEBioMech/FEUT4Domain.h>
-#include <FEBioMech/FEMechModel.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEEdge.h>
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/log.h>
+#include <FEBioMech/RigidBC.h>
+#include <FEBioMech/FEUDGHexDomain.h>
+#include <FEBioMech/FEUT4Domain.h>
+#include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FESSIShellDomain.h>
 #include <sstream>
 

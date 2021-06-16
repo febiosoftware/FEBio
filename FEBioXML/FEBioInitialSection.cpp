@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidMaterial.h>
 #include <FEBioMech/FEInitialVelocity.h>
+#include <FEBioMech/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 void FEBioInitialSection::Parse(XMLTag& tag)

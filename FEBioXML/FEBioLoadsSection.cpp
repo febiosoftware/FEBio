@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>
+#include <FECore/FEBoundaryCondition.h>
 #include <FECore/log.h>
 
 //=============================================================================

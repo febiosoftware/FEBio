@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEMechModel.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FEBioMech/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection3::Parse(XMLTag& tag)

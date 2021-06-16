@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FEBioMech/FERigidForce.h>
 #include <FEBioMech/FERigidFollowerForce.h>
 #include <FEBioMech/FERigidFollowerMoment.h>
+#include <FEBioMech/RigidBC.h>
 
 void FEBioRigidSection::Parse(XMLTag& tag)
 {
