@@ -72,9 +72,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEBIOMIX_API FEBiphasicInterface
+{
+public:
+	FEBiphasicInterface() {}
+	virtual ~FEBiphasicInterface() {}
+
+public:
+	virtual double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) { return 0.0; }
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for biphasic materials.
 
-class FEBIOMIX_API FEBiphasic : public FEMaterial
+class FEBIOMIX_API FEBiphasic : public FEMaterial, public FEBiphasicInterface
 {
 public:
 	FEBiphasic(FEModel* pfem);
@@ -121,6 +132,13 @@ public:
 
 	//! Get the active momentum supply
 	FEActiveMomentumSupply* GetActiveMomentumSupply() { return m_pAmom; }
+
+public: // overridden from FEBiphasicInterface
+
+	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+		return pt->m_phi0;
+	}
 
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density

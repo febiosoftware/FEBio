@@ -335,3 +335,12 @@ void FEBiphasicSolute::PartitionCoefficientFunctions(FEMaterialPoint& mp, double
     dkdJ = m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
     dkdc = m_pSolute->m_pSolub->Tangent_Solubility_Concentration(mp,0);
 }
+
+double FEBiphasicSolute::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
+}

@@ -47,6 +47,9 @@ public:
     
 	//! Initialize material point data
 	void Init();
+
+public:
+	double Osmolarity() const;
 	
 public:
 	// solutes material data

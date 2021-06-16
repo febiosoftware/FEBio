@@ -29,8 +29,11 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/fecore_api.h>
 #include "febiomix_api.h"
+#include <FECore/vec3d.h>
 
 class FESolute;
+class FEOsmoticCoefficient;
+class FEMaterialPoint;
 
 //------------------------------------------------------------------------
 // This class should be used by all materials that support solutes
@@ -50,6 +53,33 @@ public:
 
 	// return a solute material
 	virtual FESolute* GetSolute(int i) = 0;
+
+	// return the actual solution concentration at this material point
+	virtual double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+
+	// return the partition coefficient at this material point
+	virtual double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+
+	// return the solute flux at this material point
+	virtual vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) { return vec3d(0,0,0); }
+
+	// get the osmotic coefficient
+	virtual FEOsmoticCoefficient* GetOsmoticCoefficient() { return nullptr; }
+
+	// get the osmolarity
+	virtual double GetOsmolarity(const FEMaterialPoint& mp) { return 0.0; }
+
+	// get the electric potential
+	virtual double GetElectricPotential(const FEMaterialPoint& mp) { return 0.0; }
+
+	// get the current density
+	virtual vec3d GetCurrentDensity(const FEMaterialPoint& mp) { return vec3d(0,0,0); }
+
+	// get the fixed charge density
+	virtual double GetFixedChargeDensity(const FEMaterialPoint& mp) { return 0.0; }
+
+	// get the referential fixed charge density
+	virtual double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) { return 0.0; }
 
 // additional member functions
 public:

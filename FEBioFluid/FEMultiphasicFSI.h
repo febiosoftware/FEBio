@@ -55,6 +55,9 @@ public:
     
     //! Data initialization
     void Init();
+
+public:
+    double Osmolarity() const;
     
 public:
     // Multiphasic FSI material data
@@ -157,7 +160,38 @@ public:
 public:
     int Solutes() override { return (int)m_pSolute.size(); }
     FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+        FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_ca[soluteIndex];
+    };
+    double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
+        FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_k[soluteIndex];
+    };
+    vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
+        FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_j[soluteIndex];
+    };
+    double GetOsmolarity(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->Osmolarity();
+    }
+    double GetElectricPotential(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_psi;
+    }
+    vec3d GetCurrentDensity(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_Ie;
+    }
+    double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_cF;
+    }
+    double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+    FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC;  }
+
+public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     
     int Reactions         () { return (int) m_pReact.size();    }

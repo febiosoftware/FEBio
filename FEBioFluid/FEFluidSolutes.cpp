@@ -301,6 +301,17 @@ void FEFluidSolutesMaterialPoint::Init()
     FEMaterialPoint::Init();
 }
 
+//-----------------------------------------------------------------------------
+double FEFluidSolutesMaterialPoint::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
+}
+
 //============================================================================
 // FEFluidSolutes
 //============================================================================

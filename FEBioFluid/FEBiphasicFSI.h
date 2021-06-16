@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEElasticMaterial.h>
 #include "FEFluidFSI.h"
 #include <FEBioMix/FEHydraulicPermeability.h>
+#include <FEBioMix/FEBiphasic.h>
 #include <FEBioMech/FEBodyForce.h>
 
 //-----------------------------------------------------------------------------
@@ -59,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEBiphasicFSI : public FEFluidFSI
+class FEBIOFLUID_API FEBiphasicFSI : public FEFluidFSI, public FEBiphasicInterface
 {
 public:
     FEBiphasicFSI(FEModel* pfem);
@@ -119,6 +120,13 @@ public:
     //! fluid density
     double FluidDensity(FEMaterialPoint& mp);
     
+public: // overridden from FEBiphasicInterface
+
+    double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
+        const FEBiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEBiphasicFSIMaterialPoint>());
+        return pt->m_phi0;
+    }
+
 public: // material parameters
     double      m_rhoTw; //!< true fluid density
     FEParamDouble      m_phi0;  //!< solid volume fraction in reference configuration

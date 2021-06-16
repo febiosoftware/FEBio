@@ -301,6 +301,17 @@ void FEMultiphasicFSIMaterialPoint::Init()
     FEMaterialPoint::Init();
 }
 
+//-----------------------------------------------------------------------------
+double FEMultiphasicFSIMaterialPoint::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
+}
+
 //============================================================================
 // FEFluidFSI
 //============================================================================
@@ -785,4 +796,14 @@ vec3d FEMultiphasicFSI::SoluteFlux(FEMaterialPoint& pt, const int sol)
 void FEMultiphasicFSI::AddChemicalReaction(FEChemicalReaction* pcr)
 {
     m_pReact.push_back(pcr);
+}
+
+//-----------------------------------------------------------------------------
+double FEMultiphasicFSI::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+    const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+    const FEMultiphasicFSIMaterialPoint* mfspt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    const FEBiphasicFSIMaterialPoint* bfspt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+    double cf = (ept->m_J - bfspt->m_phi0) * mfspt->m_cF / (1 - bfspt->m_phi0);
+    return cf;
 }

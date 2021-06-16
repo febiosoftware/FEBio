@@ -111,11 +111,40 @@ public:
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
+	double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+		FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_ca[soluteIndex];
+	};
+	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
+		FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_k[soluteIndex];
+	}
+	vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
+		FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_j[soluteIndex];
+	};
+	double GetOsmolarity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->Osmolarity();
+	}
+	double GetElectricPotential(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_psi;
+	}
+	vec3d GetCurrentDensity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_Ie;
+	}
+	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_cF;
+	}
+	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 
 public:
     FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
     FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
-    FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
     
 public: // material parameters
 	FEParamDouble				m_phi0;			//!< solid volume fraction in reference configuration

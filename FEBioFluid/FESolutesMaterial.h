@@ -52,6 +52,9 @@ public:
 		//! Data initialization
 		void Init();
 
+        //! Osmolarity        
+        double Osmolarity() const;
+
 	public:
 		vec3d	m_vft;		// fluid velocity at integration point
 		double	m_JfdotoJf;		// divergence of fluid velocity
@@ -111,7 +114,25 @@ public:
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        return spt->m_ca[soluteIndex];
+    };
+    double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        return spt->m_k[soluteIndex];
+    };
+    vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        return spt->m_j[soluteIndex];
+    };
+    double GetOsmolarity(const FEMaterialPoint& mp) override {
+        const FESolutesMaterial::Point* spt = (mp.ExtractData<FESolutesMaterial::Point>());
+        return spt->Osmolarity();
+    }
+    FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
+
+public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     
     int Reactions         () { return (int) m_pReact.size();    }

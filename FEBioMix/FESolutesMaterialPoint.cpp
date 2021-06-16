@@ -100,3 +100,14 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 	ar & m_ce & m_ide;
 	ar & m_ci & m_idi;
 }
+
+//-----------------------------------------------------------------------------
+double FESolutesMaterialPoint::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
+}

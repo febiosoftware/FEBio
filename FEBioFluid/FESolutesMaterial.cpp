@@ -79,6 +79,18 @@ void FESolutesMaterial::Point::Init()
     FEMaterialPoint::Init();
 }
 
+//-----------------------------------------------------------------------------
+double FESolutesMaterial::Point::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
+}
+
+
 //============================================================================
 // FESolutesMaterial
 //============================================================================
