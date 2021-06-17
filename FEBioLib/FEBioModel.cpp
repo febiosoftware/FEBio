@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FEBioMech/FERigidSpring.h>
 #include <FEBioMech/FERigidAngularDamper.h>
 #include <FEBioMech/FERigidContractileForce.h>
+#include "FEBioModelBuilder.h"
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"
@@ -331,6 +332,9 @@ bool FEBioModel::Input(const char* szfile)
 
 	// create file reader
 	FEBioImport fim;
+
+	// override the default model builder
+	fim.SetModelBuilder(new FEBioModelBuilder(*this));
 
 	feLog("Reading file %s ...", szfile);
 

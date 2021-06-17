@@ -32,8 +32,8 @@ SOFTWARE.*/
 #include <FECore/DataStore.h>
 #include <FEBioPlot/PlotFile.h>
 #include <FECore/FECoreKernel.h>
-#include "febiolib_api.h"
 #include <FEBioLib/Logfile.h>
+#include "febiolib_api.h"
 
 //-----------------------------------------------------------------------------
 // Dump level determines the times the restart file is written

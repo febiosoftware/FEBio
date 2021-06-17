@@ -42,12 +42,6 @@ SOFTWARE.*/
 #include <FECore/FEEdge.h>
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/log.h>
-#include <FEBioMech/RigidBC.h>
-#include <FEBioMech/FEUDGHexDomain.h>
-#include <FEBioMech/FEUT4Domain.h>
-#include <FEBioMech/FEMechModel.h>
-#include <FEBioMech/FESSIShellDomain.h>
-#include <FEBioMech/FEUncoupledMaterial.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -89,6 +83,12 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 
 	// UDG hourglass parameter
 	m_udghex_hg = 1.0;
+}
+
+//-----------------------------------------------------------------------------
+FEModelBuilder::~FEModelBuilder() 
+{
+
 }
 
 //-----------------------------------------------------------------------------
@@ -168,26 +168,6 @@ FEDomain* FEModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FEDomain* pdom = febio.CreateDomain(espec, &m_fem.GetMesh(), mat);
-
-	// Handle dome special cases
-	// TODO: Find a better way of dealing with these special cases
-	FEUDGHexDomain* udg = dynamic_cast<FEUDGHexDomain*>(pdom);
-	if (udg)
-	{
-		udg->SetHourGlassParameter(m_udghex_hg);
-	}
-
-	FEUT4Domain* ut4 = dynamic_cast<FEUT4Domain*>(pdom);
-	if (ut4)
-	{
-		ut4->SetUT4Parameters(m_ut4_alpha, m_ut4_bdev);
-	}
-    
-    FESSIShellDomain* ssi = dynamic_cast<FESSIShellDomain*>(pdom);
-    if (ssi) {
-        ssi->m_bnodalnormals = espec.m_shell_norm_nodal;
-    }
-
 	return pdom;
 }
 
@@ -207,33 +187,9 @@ FEAnalysis* FEModelBuilder::GetStep()
 	return m_pStep;
 }
 
-// In FEBio 3, the bulk modulus k must be defined at the top-level.
-// However, this could break backward compatibility, so for older file version
-// we apply this hack that collects the child moduli and assigns it to the top-level
-void FixUncoupledMaterial(FEUncoupledMaterial* mat)
-{
-	double K = mat->m_K;
-	for (int i = 0; i < mat->Properties(); ++i)
-	{
-		FEUncoupledMaterial* mati = dynamic_cast<FEUncoupledMaterial*>(mat->GetProperty(i));
-		if (mati)
-		{
-			FixUncoupledMaterial(mati);
-			K += mati->m_K;
-			mati->m_K = 0.0;
-		}
-	}
-	mat->m_K = K;
-}
-
 void FEModelBuilder::AddMaterial(FEMaterial* pmat)
 {
 	m_fem.AddMaterial(pmat);
-
-	// For uncoupled materials, we collect the bulk moduli of child materials
-	// and assign it to the top-level material (this one)
-	FEUncoupledMaterial* pucm = dynamic_cast<FEUncoupledMaterial*>(pmat);
-	if (pucm) FixUncoupledMaterial(pucm);
 }
 
 //-----------------------------------------------------------------------------
@@ -303,36 +259,10 @@ void FEModelBuilder::AddNonlinearConstraint(FENLConstraint* pnc)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidFixedBC(FEModelComponent* pmc)
-{
-	FERigidBodyFixedBC* prc = dynamic_cast<FERigidBodyFixedBC*>(pmc); assert(prc);
-	static_cast<FEMechModel&>(m_fem).AddRigidFixedBC(prc);
-	AddComponent(prc);
-}
-
-//-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidPrescribedBC(FEModelComponent* pmc)
-{
-	FERigidBodyDisplacement* prc = dynamic_cast<FERigidBodyDisplacement*>(pmc);
-	static_cast<FEMechModel&>(m_fem).AddRigidPrescribedBC(prc);
-	AddComponent(prc);	
-}
-
-//-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidIC(FEModelComponent* pmc)
-{
-	FERigidIC* ric = dynamic_cast<FERigidIC*>(pmc);
-	static_cast<FEMechModel&>(m_fem).AddRigidInitialCondition(ric);
-	AddComponent(ric);
-}
-
-//-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidNodeSet(FEModelComponent* pmc)
-{
-	FERigidNodeSet* prns = dynamic_cast<FERigidNodeSet*>(pmc); assert(prns);
-	static_cast<FEMechModel&>(m_fem).AddRigidNodeSet(prns);
-	AddComponent(prns);
-}
+void FEModelBuilder::AddRigidFixedBC(FEModelComponent* pmc) { assert(false); }
+void FEModelBuilder::AddRigidPrescribedBC(FEModelComponent* pmc) { assert(false); }
+void FEModelBuilder::AddRigidIC(FEModelComponent* pmc) { assert(false); }
+void FEModelBuilder::AddRigidNodeSet(FEModelComponent* pmc) { assert(false); }
 
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions

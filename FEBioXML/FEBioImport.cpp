@@ -307,6 +307,14 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
+//! set a custom model builder 
+void FEBioImport::SetModelBuilder(FEModelBuilder* modelBuilder)
+{
+	delete m_builder;
+	m_builder = modelBuilder;
+}
+
+//-----------------------------------------------------------------------------
 // This function parses the XML input file. The broot parameter is used to indicate
 // if this is the main control file or an included file. 
 bool FEBioImport::ReadFile(const char* szfile, bool broot)

@@ -34,10 +34,6 @@ SOFTWARE.*/
 
 class FESolver;
 class FEPointFunction;
-class FERigidBodyFixedBC;
-class FERigidBodyDisplacement;
-class FERigidIC;
-class FERigidNodeSet;
 
 // This is a helper class for building the FEModel from file input. 
 class FEBIOXML_API FEModelBuilder
@@ -86,6 +82,7 @@ public:
 public:
 	//! constructor
 	FEModelBuilder(FEModel& fem);
+	virtual ~FEModelBuilder();
 
 	//! set the module name
 	void SetModuleName(const std::string& moduleName);
@@ -109,7 +106,7 @@ public:
 	void NextStep();
 
 	//! Create a domain
-	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat);
+	virtual FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat);
 
 	//! Get the mesh
 	FEMesh& GetMesh();
@@ -128,7 +125,7 @@ public:
 	void SetDefaultVariables();
 
 public:
-	void AddMaterial(FEMaterial* pmat);
+	virtual void AddMaterial(FEMaterial* pmat);
 
 	void AddBC(FEBoundaryCondition* pbc);
 	void AddNodalLoad(FENodalLoad* pfc);
@@ -139,10 +136,11 @@ public:
 	void AddModelLoad(FEModelLoad* pml);
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 
-	void AddRigidFixedBC            (FEModelComponent* prc);
-	void AddRigidPrescribedBC       (FEModelComponent* prc);
-	void AddRigidIC					(FEModelComponent* prv);
-	void AddRigidNodeSet            (FEModelComponent* rs);
+	// TODO: Try to remove these
+	virtual void AddRigidFixedBC     (FEModelComponent* prc);
+	virtual void AddRigidPrescribedBC(FEModelComponent* prc);
+	virtual void AddRigidIC			 (FEModelComponent* prv);
+	virtual void AddRigidNodeSet     (FEModelComponent* rs);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
