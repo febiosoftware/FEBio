@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEAugLagLinearConstraint.h"
+#include <FECore/FEAugLagLinearConstraint.h>
 #include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------

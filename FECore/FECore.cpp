@@ -56,6 +56,7 @@ SOFTWARE.*/
 #include "FaceDataRecord.h"
 #include "ElementDataRecord.h"
 #include "NLConstraintDataRecord.h"
+#include "FEAugLagLinearConstraint.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -97,6 +98,9 @@ REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 
 // initial conditions
 REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     );
+
+// linear constraints
+REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
 
 // plot field
 REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");

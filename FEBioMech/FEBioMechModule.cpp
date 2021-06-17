@@ -173,7 +173,6 @@ SOFTWARE.*/
 #include "FEMortarSlidingContact.h"
 #include "FEMortarTiedContact.h"
 
-#include "FEAugLagLinearConstraint.h"
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
 #include "FEGenericRigidJoint.h"
@@ -505,7 +504,6 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// constraint classes
 	REGISTER_FECORE_CLASS(FEPointConstraint, "point");
-	REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
 	REGISTER_FECORE_CLASS(FESymmetryPlane, "symmetry plane");
 	REGISTER_FECORE_CLASS(FERigidJoint, "rigid joint");
 	REGISTER_FECORE_CLASS(FEGenericRigidJoint, "generic rigid joint");

@@ -38,7 +38,7 @@ SOFTWARE.*/
 #include <FEBioMech/RigidBC.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
-#include <FEBioMech/FEPeriodicLinearConstraint.h>
+#include <FECore/FEPeriodicLinearConstraint.h>
 #include <FEBioMech/FEPeriodicLinearConstraint2O.h>
 #include <FECore/FEMergedConstraint.h>
 #include <FECore/FEFacetSet.h>

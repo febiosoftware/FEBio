@@ -29,11 +29,11 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMesh.h>
 #include <FECore/FENodeList.h>
-#include "febiomech_api.h"
+#include "fecore_api.h"
 
 class FEModel;
 
-class FEBIOMECH_API FEPeriodicLinearConstraint
+class FECORE_API FEPeriodicLinearConstraint
 {
 	struct NodeSetPair
 	{
