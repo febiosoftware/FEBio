@@ -29,8 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include "FEBioImport.h"
 
-class FEUncoupledMaterial;
-
 //-----------------------------------------------------------------------------
 // Material Section
 class FEBIOXML_API FEBioMaterialSection : public FEFileSection
