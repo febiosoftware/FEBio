@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioBoundarySection3.h"
 #include <FECore/FEBoundaryCondition.h>
-#include <FEBioMech/FEMechModel.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FEBioMech/RigidBC.h>
@@ -121,7 +120,7 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 // (Used to be defined in the Contact section)
 void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	FEModelBuilder* feb = GetBuilder();
 	int NMAT = fem.Materials();
@@ -136,13 +135,10 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 
 	prn->SetNodeSet(nodeSet);
 
-	fem.AddRigidNodeSet(prn);
-
 	// the default shell bc depends on the shell formulation
 	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
 
-	// add it to the current step
-	GetBuilder()->AddComponent(prn);
+	feb->AddRigidNodeSet(prn);
 
 	// read the parameter list
 	ReadParameterList(tag, prn);

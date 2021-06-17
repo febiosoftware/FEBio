@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FEBioMech/FERigidSurface.h>
-#include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidMaterial.h>
 #include <FEBioMech/FERigidForce.h>
 #include <FEBioMech/FERigidFollowerForce.h>
@@ -42,13 +41,11 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-
 	++tag;
 	do
 	{
-		if (tag == "rigid_constraint") ParseRigidBC(tag);
-		else if (tag == "rigid_connector") ParseRigidConnector(tag);
+		if      (tag == "rigid_constraint") ParseRigidBC(tag);
+		else if (tag == "rigid_connector" ) ParseRigidConnector(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} 
@@ -57,7 +54,8 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 
 void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FEModel* fem = GetFEModel();
+	FEModelBuilder& feb = *GetBuilder();
 
 	// get the type
 	const char* sztype = tag.AttributeValue("type");
@@ -65,63 +63,46 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	if (strcmp(sztype, "fix") == 0)
 	{
 		// create the fixed dof
-		FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed", &fem));
-		fem.AddRigidFixedBC(pBC);
-
-		// add this boundary condition to the current step
-		GetBuilder()->AddComponent(pBC);
-
-		// read parameters
+		FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed", fem));
+		feb.AddRigidFixedBC(pBC);
 		ReadParameterList(tag, pBC);
 	}
 	else if (strcmp(sztype, "prescribe") == 0)
 	{
 		// create the rigid displacement constraint
-		FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
-		fem.AddRigidPrescribedBC(pDC);
-
-		GetBuilder()->AddComponent(pDC);
-
-		// read parameters
+		FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", fem));
+		feb.AddRigidPrescribedBC(pDC);
 		ReadParameterList(tag, pDC);
 	}
 	else if (strcmp(sztype, "force") == 0)
 	{
 		// create the rigid body force
-		FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", &fem));
-
-		// add it to the model
-		GetBuilder()->AddModelLoad(pFC);
-
-		// read the parameterlist
+		FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", fem));
+		feb.AddModelLoad(pFC);
 		ReadParameterList(tag, pFC);
 	}
 	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{
-		FERigidBodyVelocity* rc = fecore_alloc(FERigidBodyVelocity, &fem);
-		GetBuilder()->AddRigidIC(rc);
-
+		FERigidBodyVelocity* rc = fecore_alloc(FERigidBodyVelocity, fem);
+		feb.AddRigidIC(rc);
 		ReadParameterList(tag, rc);
 	}
 	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
 	{
-		FERigidBodyAngularVelocity* rc = fecore_alloc(FERigidBodyAngularVelocity, &fem);
-		GetBuilder()->AddRigidIC(rc);
-
+		FERigidBodyAngularVelocity* rc = fecore_alloc(FERigidBodyAngularVelocity, fem);
+		feb.AddRigidIC(rc);
 		ReadParameterList(tag, rc);
 	}
     else if (strcmp(sztype, "follower force") == 0)
     {
-        FERigidFollowerForce* rc = fecore_alloc(FERigidFollowerForce, &fem);
-        GetBuilder()->AddModelLoad(rc);
-        
+        FERigidFollowerForce* rc = fecore_alloc(FERigidFollowerForce, fem);
+        feb.AddModelLoad(rc);
         ReadParameterList(tag, rc);
     }
     else if (strcmp(sztype, "follower moment") == 0)
     {
-        FERigidFollowerMoment* rc = fecore_alloc(FERigidFollowerMoment, &fem);
-        GetBuilder()->AddModelLoad(rc);
-        
+        FERigidFollowerMoment* rc = fecore_alloc(FERigidFollowerMoment, fem);
+        feb.AddModelLoad(rc);
         ReadParameterList(tag, rc);
     }
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);

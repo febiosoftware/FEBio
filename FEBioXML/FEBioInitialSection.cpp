@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
-#include <FEBioMech/FERigidMaterial.h>
 #include <FEBioMech/FEInitialVelocity.h>
 #include <FEBioMech/RigidBC.h>
 
@@ -242,10 +241,6 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			const char* szm = tag.AttributeValue("mat");
 			int nmat = atoi(szm);
 			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
-			// make sure this is a valid rigid material
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat - 1));
-			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 			++tag;
 			do

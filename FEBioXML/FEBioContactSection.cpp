@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
-#include <FEBioMech/FEMechModel.h>
 
 //-----------------------------------------------------------------------------
 FEBioContactSection::MissingPrimarySurface::MissingPrimarySurface()
@@ -334,7 +333,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 // --- R I G I D   B O D Y   I N T E R F A C E ---
 void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEModelBuilder* feb = GetBuilder();
 
 	int NMAT = fem.Materials();

@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioConstraintsSection.h"
-#include "FEBioMech/FERigidMaterial.h"
 #include "FEBioMech/FERigidForce.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
@@ -371,10 +370,6 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 	int nmat = atoi(szm);
 	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
-	// make sure this is a valid rigid material
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
-	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
 	++tag;
 	do
 	{
@@ -541,10 +536,6 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 	// get the material ID
 	int nmat = atoi(szm);
 	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
-	// make sure this is a valid rigid material
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
-	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	++tag;
 	do

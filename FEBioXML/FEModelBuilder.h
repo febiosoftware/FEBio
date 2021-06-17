@@ -128,6 +128,8 @@ public:
 	void SetDefaultVariables();
 
 public:
+	void AddMaterial(FEMaterial* pmat);
+
 	void AddBC(FEBoundaryCondition* pbc);
 	void AddNodalLoad(FENodalLoad* pfc);
 	void AddEdgeLoad(FEEdgeLoad* pel);

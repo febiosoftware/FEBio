@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEUT4Domain.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FESSIShellDomain.h>
+#include <FEBioMech/FEUncoupledMaterial.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -204,6 +205,35 @@ FEAnalysis* FEModelBuilder::GetStep()
 		}
 	}
 	return m_pStep;
+}
+
+// In FEBio 3, the bulk modulus k must be defined at the top-level.
+// However, this could break backward compatibility, so for older file version
+// we apply this hack that collects the child moduli and assigns it to the top-level
+void FixUncoupledMaterial(FEUncoupledMaterial* mat)
+{
+	double K = mat->m_K;
+	for (int i = 0; i < mat->Properties(); ++i)
+	{
+		FEUncoupledMaterial* mati = dynamic_cast<FEUncoupledMaterial*>(mat->GetProperty(i));
+		if (mati)
+		{
+			FixUncoupledMaterial(mati);
+			K += mati->m_K;
+			mati->m_K = 0.0;
+		}
+	}
+	mat->m_K = K;
+}
+
+void FEModelBuilder::AddMaterial(FEMaterial* pmat)
+{
+	m_fem.AddMaterial(pmat);
+
+	// For uncoupled materials, we collect the bulk moduli of child materials
+	// and assign it to the top-level material (this one)
+	FEUncoupledMaterial* pucm = dynamic_cast<FEUncoupledMaterial*>(pmat);
+	if (pucm) FixUncoupledMaterial(pucm);
 }
 
 //-----------------------------------------------------------------------------
