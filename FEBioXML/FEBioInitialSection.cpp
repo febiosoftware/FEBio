@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
-#include <FEBioMech/FEInitialVelocity.h>
 #include <FEBioMech/RigidBC.h>
 
 //-----------------------------------------------------------------------------
@@ -54,7 +53,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "velocity")
 		{
-			FEInitialVelocity* pic = dynamic_cast<FEInitialVelocity*>(fecore_new<FEInitialCondition>("velocity", &fem));
+			FENodalIC* pic = fecore_new<FENodalIC>("velocity", &fem);
 
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
@@ -82,7 +81,9 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			while (!tag.isend());
 
 			// TODO: Fix this! I need to add a mechanism again for setting mapped data.
-			pic->SetValue(values[0]);
+			FEParam* param = pic->GetParameter("value"); assert(param);
+			FEParamVec3& val = param->value<FEParamVec3>();
+			val = values[0];
 //			for (int i = 0; i < values.size(); ++i) pic->SetValue(i, values[i]);
 
 		}

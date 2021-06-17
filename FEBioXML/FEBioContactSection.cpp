@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
-#include <FEBioMech/FERigidSlidingContact.h>
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
@@ -316,7 +315,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FERigidSlidingContact* ps = fecore_new<FERigidSlidingContact>("rigid sliding", GetFEModel());
+	FESurfacePairConstraint* ps = fecore_new<FESurfacePairConstraint>("rigid sliding", GetFEModel());
 	fem.AddSurfacePairConstraint(ps);
 
 	// get and build the surface

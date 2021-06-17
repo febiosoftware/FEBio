@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FEBioMech/RigidBC.h>
-#include <FEBioMech/FEDiscreteContact.h>
 #include <FECore/FESurfaceConstraint.h>
 #include <FECore/FENodeSetConstraint.h>
 #include <FECore/FESurfacePairConstraintNL.h>
@@ -291,26 +290,6 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
 					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 					if (GetBuilder()->BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
-				}
-
-				// get the nodeset (this is needed by FEDiscreteContact)
-				if (dynamic_cast<FEDiscreteContact*>(plc))
-				{
-					FEDiscreteContact* pdc = dynamic_cast<FEDiscreteContact*>(plc);
-					const char* szdset = tag.AttributeValue("discrete_set");
-					FEDiscreteSet* pset = mesh.FindDiscreteSet(szdset);
-					if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szdset);
-					pdc->SetDiscreteSet(pset);
-				}
-
-				// get the nodeset (this is needed by FEDiscreteContact2)
-				if (dynamic_cast<FEDiscreteContact2*>(plc))
-				{
-					FEDiscreteContact2* pdc = dynamic_cast<FEDiscreteContact2*>(plc);
-					const char* szdset = tag.AttributeValue("discrete_set");
-					FEDeformableSpringDomain2* pdom = dynamic_cast<FEDeformableSpringDomain2*>(mesh.FindDomain(szdset));
-					if (pdom == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szdset);
-					pdc->SetDiscreteDomain(pdom);
 				}
 
                 // get the nodeset for other constraints
