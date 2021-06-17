@@ -25,11 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioContactSection.h"
-#include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include <FEBioMech/FERigidSlidingContact.h>
-#include <FEBioMech/FESlidingInterface.h>
-#include <FEBioMech/FEFacet2FacetSliding.h>
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
@@ -95,8 +92,8 @@ void FEBioContactSection2::Parse(XMLTag& tag)
 					else
 					{
 						// check for some older obsolete names
-						if      (strcmp(sztype, "facet-to-facet sliding") == 0) pci = fecore_alloc(FEFacet2FacetSliding, &fem);
-						else if (strcmp(sztype, "sliding_with_gaps"     ) == 0) pci = fecore_alloc(FESlidingInterface, &fem);
+						if      (strcmp(sztype, "facet-to-facet sliding") == 0) pci = fecore_new_class<FESurfacePairConstraint>("FEFacet2FacetSliding", &fem);
+						else if (strcmp(sztype, "sliding_with_gaps"     ) == 0) pci = fecore_new_class<FESurfacePairConstraint>("FESlidingInterface", &fem);
 
 						if (pci)
 						{
@@ -146,8 +143,8 @@ void FEBioContactSection25::Parse(XMLTag& tag)
 				if (pci == nullptr)
 				{
 					// check for some older obsolete names
-					if      (strcmp(sztype, "facet-to-facet sliding") == 0) pci = fecore_alloc(FEFacet2FacetSliding, &fem);
-					else if (strcmp(sztype, "sliding_with_gaps"     ) == 0) pci = fecore_alloc(FESlidingInterface, &fem);
+					if (strcmp(sztype, "facet-to-facet sliding") == 0) pci = fecore_new_class<FESurfacePairConstraint>("FEFacet2FacetSliding", &fem);
+					else if (strcmp(sztype, "sliding_with_gaps") == 0) pci = fecore_new_class<FESurfacePairConstraint>("FESlidingInterface", &fem);
 				}
 
 				if (pci)
@@ -264,7 +261,7 @@ void FEBioContactSection2::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
-	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel()));
+	FESurfacePairConstraint* ps = fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel());
 	fem.AddSurfacePairConstraint(ps);
 
 	++tag;
@@ -274,13 +271,13 @@ void FEBioContactSection2::ParseRigidWall(XMLTag& tag)
 		{
 			if (tag == "surface")
 			{
-				FERigidWallSurface& s = ps->m_ss;
+				FESurface& s = *ps->GetPrimarySurface();
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
 				if (szfmt)
 				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					if      (strcmp(szfmt, "face nodes"  ) == 0) nfmt = 0;
 					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
 				}
 
@@ -302,14 +299,14 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel()));
+	FESurfacePairConstraint* ps = fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel());
 	fem.AddSurfacePairConstraint(ps);
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	if (GetBuilder()->BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (GetBuilder()->BuildSurface(*ps->GetPrimarySurface(), *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
 	ReadParameterList(tag, ps);
 }

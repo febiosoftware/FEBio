@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/NodeDataRecord.h>
 #include <FECore/FaceDataRecord.h>
 #include <FECore/ElementDataRecord.h>
-#include <FEBioMech/ObjectDataRecord.h>
+//#include <FEBioMech/ObjectDataRecord.h>
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>

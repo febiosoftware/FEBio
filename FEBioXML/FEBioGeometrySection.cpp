@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEDomain2D.h"
 #include "FECore/FEModel.h"
-#include "FEBioMech/FEElasticMaterial.h"
+#include "FECore/FEMaterial.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FENodeNodeList.h>
 
@@ -287,9 +287,9 @@ void set_element_fiber(FEElement& el, const vec3d& v, int ncomp)
 	for (int i = 0; i<el.GaussPoints(); ++i)
 	{
 		FEMaterialPoint* mp = (ncomp == -1) ? el.GetMaterialPoint(i) : el.GetMaterialPoint(i)->GetPointData(ncomp);
-
+/*
 		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-/*		mat3d& m = pt.m_Q;
+		mat3d& m = pt.m_Q;
 		m.zero();
 		m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
 		m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
@@ -317,7 +317,7 @@ void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int n
 	{
         FEMaterialPoint* mp = (ncomp == -1) ? el.GetMaterialPoint(i) : el.GetMaterialPoint(i)->GetPointData(ncomp);
 
-		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
+//		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
 //		pt.m_Q = mat3d(a, b, c);
 	}
 }

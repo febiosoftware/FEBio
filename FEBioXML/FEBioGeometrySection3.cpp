@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEDomain2D.h"
 #include "FECore/FEModel.h"
-#include "FEBioMech/FEElasticMaterial.h"
+#include "FECore/FEMaterial.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FENodeNodeList.h>
 

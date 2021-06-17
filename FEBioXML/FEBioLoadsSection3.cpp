@@ -28,9 +28,9 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
-#include "FEBioMech/FEPointBodyForce.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEBodyLoad.h>
+#include <FECore/FEModel.h>
+#include <FECore/FECoreKernel.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>

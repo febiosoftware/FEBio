@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioConstraintsSection.h"
 #include "FEBioMech/FERigidMaterial.h"
-#include "FEBioMech/FEPointConstraint.h"
 #include "FEBioMech/FERigidForce.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

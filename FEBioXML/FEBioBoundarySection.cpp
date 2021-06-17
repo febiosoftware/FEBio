@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEDiscreteMaterial.h>
 #include <FECore/FEDiscreteDomain.h>
-#include <FEBioMech/FERigidWallInterface.h>
 #include <FEBioMech/FEAugLagLinearConstraint.h>
 #include <FEBioMech/FERigidForce.h>
 #include <FECore/FEPrescribedDOF.h>
@@ -1085,7 +1084,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   W A L L   I N T E R F A C E ---
 
-		FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(szt, GetFEModel()));
+		FESurfacePairConstraint* ps = fecore_new<FESurfacePairConstraint>(szt, GetFEModel());
 		if (ps)
 		{
 			fem.AddSurfacePairConstraint(ps);
@@ -1097,7 +1096,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				{
 					if (tag == "surface")
 					{
-						FERigidWallSurface& s = ps->m_ss;
+						FESurface& s = *ps->GetPrimarySurface();
 
 						int nfmt = 0;
 						const char* szfmt = tag.AttributeValue("format", true);
@@ -1212,7 +1211,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// If we get here, we try to create a contact interface
 		// using the FEBio kernel. 
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(szt, GetFEModel()));
+		FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(szt, GetFEModel());
 		if (pci)
 		{
 			// add it to the model
