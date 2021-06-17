@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEPeriodicLinearConstraint.h>
-#include <FEBioMech/FEPeriodicLinearConstraint2O.h>
+#include <FECore/FEPeriodicLinearConstraint2O.h>
 #include <FECore/FEMergedConstraint.h>
 #include <FECore/FEFacetSet.h>
 #include <FECore/log.h>

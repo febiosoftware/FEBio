@@ -28,12 +28,12 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEMesh.h>
-#include "febiomech_api.h"
+#include "fecore_api.h"
 #include <vector>
 
 class FEModel;
 
-class FEBIOMECH_API FEPeriodicLinearConstraint2O
+class FECORE_API FEPeriodicLinearConstraint2O
 {
 	class NodeSetSet
 	{
