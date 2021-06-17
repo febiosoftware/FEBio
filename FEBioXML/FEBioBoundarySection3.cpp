@@ -28,7 +28,6 @@ SOFTWARE.*/
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearConstraintManager.h>
-#include <FEBioMech/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection3::Parse(XMLTag& tag)
@@ -131,12 +130,14 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FERigidNodeSet* prn = fecore_alloc(FERigidNodeSet, &fem);
+	FEModelComponent* prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
 
 	prn->SetNodeSet(nodeSet);
 
 	// the default shell bc depends on the shell formulation
-	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+	// hinged shell = 0
+	// clamped shell = 1
+	prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 
 	feb->AddRigidNodeSet(prn);
 

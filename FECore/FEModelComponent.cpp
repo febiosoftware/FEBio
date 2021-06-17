@@ -92,3 +92,6 @@ void FEModelComponent::Serialize(DumpStream& ar)
 	ar & m_nID;
 	ar & m_bactive;
 }
+
+//-----------------------------------------------------------------------------
+void FEModelComponent::SetNodeSet(FENodeSet* ns) {}

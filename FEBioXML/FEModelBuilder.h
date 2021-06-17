@@ -139,10 +139,10 @@ public:
 	void AddModelLoad(FEModelLoad* pml);
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 
-	void AddRigidFixedBC            (FERigidBodyFixedBC* prc);
-	void AddRigidPrescribedBC       (FERigidBodyDisplacement* prc);
-	void AddRigidIC					(FERigidIC* prv);
-	void AddRigidNodeSet            (FERigidNodeSet* rs);
+	void AddRigidFixedBC            (FEModelComponent* prc);
+	void AddRigidPrescribedBC       (FEModelComponent* prc);
+	void AddRigidIC					(FEModelComponent* prv);
+	void AddRigidNodeSet            (FEModelComponent* rs);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }

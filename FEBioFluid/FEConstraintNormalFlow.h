@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FEBioMech/FEAugLagLinearConstraint.h>
+#include <FECore/FEAugLagLinearConstraint.h>
 #include <FECore/FESurface.h>
 #include "febiofluid_api.h"
 

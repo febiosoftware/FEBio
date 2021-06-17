@@ -34,6 +34,7 @@ SOFTWARE.*/
 //! All classes inherited from FEModelComponent should take the model as a parameter
 //! to the constructor.
 class FEModel;
+class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! This class serves as a base class for many of the FECore classes. It defines
@@ -70,6 +71,10 @@ public:
 	//! Update the component
 	//! This is called whenever the model is updated, i.e. the primary variables were updated.
 	virtual void Update();
+
+	// TODO: This is a bit of a hack so that derived class can set their item lists
+	//       through the model component. None of these functions do anything by default
+	virtual void SetNodeSet(FENodeSet* ns);
 
 public:
 	//! Get the ID

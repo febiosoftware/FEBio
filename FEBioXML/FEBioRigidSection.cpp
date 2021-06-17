@@ -30,12 +30,8 @@ SOFTWARE.*/
 #include "FEBioRigidSection.h"
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
-#include <FEBioMech/FERigidSurface.h>
-#include <FEBioMech/FERigidMaterial.h>
-#include <FEBioMech/FERigidForce.h>
-#include <FEBioMech/FERigidFollowerForce.h>
-#include <FEBioMech/FERigidFollowerMoment.h>
-#include <FEBioMech/RigidBC.h>
+#include <FECore/FEModelComponent.h>
+#include <FECore/FEModelLoad.h>
 
 void FEBioRigidSection::Parse(XMLTag& tag)
 {
@@ -63,45 +59,45 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	if (strcmp(sztype, "fix") == 0)
 	{
 		// create the fixed dof
-		FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed", fem));
+		FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC", fem);
 		feb.AddRigidFixedBC(pBC);
 		ReadParameterList(tag, pBC);
 	}
 	else if (strcmp(sztype, "prescribe") == 0)
 	{
 		// create the rigid displacement constraint
-		FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", fem));
+		FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", fem);
 		feb.AddRigidPrescribedBC(pDC);
 		ReadParameterList(tag, pDC);
 	}
 	else if (strcmp(sztype, "force") == 0)
 	{
 		// create the rigid body force
-		FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", fem));
+		FEModelLoad* pFC = fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", fem);
 		feb.AddModelLoad(pFC);
 		ReadParameterList(tag, pFC);
 	}
 	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{
-		FERigidBodyVelocity* rc = fecore_alloc(FERigidBodyVelocity, fem);
-		feb.AddRigidIC(rc);
-		ReadParameterList(tag, rc);
+		FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyVelocity", fem);
+		feb.AddRigidIC(pic);
+		ReadParameterList(tag, pic);
 	}
 	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
 	{
-		FERigidBodyAngularVelocity* rc = fecore_alloc(FERigidBodyAngularVelocity, fem);
-		feb.AddRigidIC(rc);
-		ReadParameterList(tag, rc);
+		FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyAngularVelocity", fem);
+		feb.AddRigidIC(pic);
+		ReadParameterList(tag, pic);
 	}
     else if (strcmp(sztype, "follower force") == 0)
     {
-        FERigidFollowerForce* rc = fecore_alloc(FERigidFollowerForce, fem);
+        FEModelLoad* rc = fecore_new_class<FEModelLoad>("FERigidFollowerForce", fem);
         feb.AddModelLoad(rc);
         ReadParameterList(tag, rc);
     }
     else if (strcmp(sztype, "follower moment") == 0)
     {
-        FERigidFollowerMoment* rc = fecore_alloc(FERigidFollowerMoment, fem);
+		FEModelLoad* rc = fecore_new_class<FEModelLoad>("FERigidFollowerMoment", fem);
         feb.AddModelLoad(rc);
         ReadParameterList(tag, rc);
     }

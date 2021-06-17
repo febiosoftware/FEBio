@@ -65,9 +65,10 @@ public:
 
 	void SetRigidMaterialID(int rid);
 
-	void SetNodeSet(FENodeSet* ns);
-
 	void SetShellBC(SHELL_BC bc);
+
+public: // from FEModelComponent
+	void SetNodeSet(FENodeSet* ns) override;
 
 private: // parameters
 	int			m_rigidMat;		//!< rigid body's material

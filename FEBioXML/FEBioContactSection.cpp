@@ -28,7 +28,6 @@ SOFTWARE.*/
 #include <FECore/FEAugLagLinearConstraint.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
-#include <FEBioMech/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 FEBioContactSection::MissingPrimarySurface::MissingPrimarySurface()
@@ -344,7 +343,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 
 	++tag;
 	int id, rb, rbp = -1;
-	FERigidNodeSet* prn = 0;
+	FEModelComponent* prn = 0;
 	FENodeSet* ns = nullptr;
 	for (int i=0; i<nrn; ++i)
 	{
@@ -356,14 +355,16 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 
 		if ((prn == 0) || (rb != rbp))
 		{
-			prn = fecore_alloc(FERigidNodeSet, &fem);
+			prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
 			ns = new FENodeSet(&fem);
 			prn->SetNodeSet(ns);
 
 			// the default shell bc depends on the shell formulation
-			prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+			// hinged shell = 0
+			// clamped shell = 1
+			prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 
-			prn->SetRigidMaterialID(rb);
+			prn->SetParameter("rb", rb);
 
 			GetBuilder()->AddRigidNodeSet(prn);
 			rbp = rb;

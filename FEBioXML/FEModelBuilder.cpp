@@ -303,31 +303,35 @@ void FEModelBuilder::AddNonlinearConstraint(FENLConstraint* pnc)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidFixedBC(FERigidBodyFixedBC* prc)
+void FEModelBuilder::AddRigidFixedBC(FEModelComponent* pmc)
 {
+	FERigidBodyFixedBC* prc = dynamic_cast<FERigidBodyFixedBC*>(pmc); assert(prc);
 	static_cast<FEMechModel&>(m_fem).AddRigidFixedBC(prc);
 	AddComponent(prc);
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidPrescribedBC(FERigidBodyDisplacement* prc)
+void FEModelBuilder::AddRigidPrescribedBC(FEModelComponent* pmc)
 {
+	FERigidBodyDisplacement* prc = dynamic_cast<FERigidBodyDisplacement*>(pmc);
 	static_cast<FEMechModel&>(m_fem).AddRigidPrescribedBC(prc);
 	AddComponent(prc);	
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidIC(FERigidIC* ric)
+void FEModelBuilder::AddRigidIC(FEModelComponent* pmc)
 {
+	FERigidIC* ric = dynamic_cast<FERigidIC*>(pmc);
 	static_cast<FEMechModel&>(m_fem).AddRigidInitialCondition(ric);
 	AddComponent(ric);
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidNodeSet(FERigidNodeSet* rs)
+void FEModelBuilder::AddRigidNodeSet(FEModelComponent* pmc)
 {
-	static_cast<FEMechModel&>(m_fem).AddRigidNodeSet(rs);
-	AddComponent(rs);
+	FERigidNodeSet* prns = dynamic_cast<FERigidNodeSet*>(pmc); assert(prns);
+	static_cast<FEMechModel&>(m_fem).AddRigidNodeSet(prns);
+	AddComponent(prns);
 }
 
 //---------------------------------------------------------------------------------

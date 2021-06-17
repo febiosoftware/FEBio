@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
-#include <FEBioMech/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 void FEBioInitialSection::Parse(XMLTag& tag)
@@ -253,9 +252,9 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, v);
 
 					// create the initial condition
-					FERigidBodyVelocity* pic = fecore_alloc(FERigidBodyVelocity, &fem);
-					pic->m_rid = nmat;
-					pic->m_vel = v;
+					FEModelComponent* pic = fecore_new_class< FEModelComponent>("FERigidBodyVelocity", &fem);
+					pic->SetParameter("rb", nmat);
+					pic->SetParameter("value", v);
 
 					// add this initial condition to the current step
 					GetBuilder()->AddRigidIC(pic);
@@ -267,9 +266,9 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, w);
 
 					// create the initial condition
-					FERigidBodyAngularVelocity* pic = fecore_alloc(FERigidBodyAngularVelocity, &fem);
-					pic->m_rid = nmat;
-					pic->m_w = w;
+					FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyAngularVelocity", &fem);
+					pic->SetParameter("rb", nmat);
+					pic->SetParameter("value", w);
 
 					// add this initial condition to the current step
 					GetBuilder()->AddRigidIC(pic);

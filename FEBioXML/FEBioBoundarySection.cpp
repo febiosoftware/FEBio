@@ -32,10 +32,8 @@ SOFTWARE.*/
 #include <FECore/FEDiscreteMaterial.h>
 #include <FECore/FEDiscreteDomain.h>
 #include <FECore/FEAugLagLinearConstraint.h>
-#include <FEBioMech/FERigidForce.h>
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEFixedBC.h>
-#include <FEBioMech/RigidBC.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEPeriodicLinearConstraint.h>
@@ -43,6 +41,7 @@ SOFTWARE.*/
 #include <FECore/FEMergedConstraint.h>
 #include <FECore/FEFacetSet.h>
 #include <FECore/log.h>
+#include <FECore/FEModelLoad.h>
 
 //---------------------------------------------------------------------------------
 void FEBioBoundarySection::BuildNodeSetMap()
@@ -1126,7 +1125,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 		++tag;
 		int id, rb, rbp = -1;
-		FERigidNodeSet* prn = 0;
+		FEModelComponent* prn = 0;
 		FENodeSet* ns = 0;
 		for (int i=0; i<nrn; ++i)
 		{
@@ -1135,13 +1134,17 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			if ((prn == 0) || (rb != rbp))
 			{
-				prn = fecore_alloc(FERigidNodeSet, &fem);
-				prn->SetRigidMaterialID(rb);
+				prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
+
+				prn->SetParameter("rb", rb);
+
 				ns = new FENodeSet(&fem);
 				prn->SetNodeSet(ns);
 
 				// the default shell bc depends on the shell formulation
-				prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+				// hinged shell = 0
+				// clamped shell = 1
+				prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 
 				feb->AddRigidNodeSet(prn);
 				rbp = rb;
@@ -1254,12 +1257,11 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FERigidNodeSet* prn = fecore_alloc(FERigidNodeSet, &fem);
+	FEModelComponent* prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
 
 	// the default shell bc depends on the shell formulation
-	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
-
-	prn->SetRigidMaterialID(rb);
+	prn->SetParameter("clamped_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
+	prn->SetParameter("rb", rb);
 	prn->SetNodeSet(nodeSet);
 
 	// add it to the model
@@ -1315,17 +1317,17 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 				else throw XMLReader::InvalidAttributeValue(tag, "type", szrel);
 			}
 
-			// create the rigid displacement constraint
-			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
-			feb.AddRigidPrescribedBC(pDC);
-
-			pDC->SetID(nmat);
-			pDC->SetBC(bc);
-			pDC->SetRelativeFlag(brel);
-
 			double val = 0.0;
 			value(tag, val);
-			pDC->SetValue(val);
+
+			// create the rigid displacement constraint
+			FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", &fem);
+			feb.AddRigidPrescribedBC(pDC);
+
+			pDC->SetParameter("rb", nmat);
+			pDC->SetParameter("dof", bc);
+			pDC->SetParameter("relative", brel);
+			pDC->SetParameter("value", val);
 
 			// assign a load curve
 			if (lc >= 0)
@@ -1349,12 +1351,12 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// get the type
-			int ntype = FERigidBodyForce::FORCE_LOAD;
+			int ntype = 0; // FERigidBodyForce::FORCE_LOAD;
 			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype)
 			{
-				if      (strcmp(sztype, "ramp"  ) == 0) ntype = FERigidBodyForce::FORCE_TARGET;
-				else if (strcmp(sztype, "follow") == 0) ntype = FERigidBodyForce::FORCE_FOLLOW;
+				if      (strcmp(sztype, "ramp"  ) == 0) ntype = 2; //FERigidBodyForce::FORCE_TARGET;
+				else if (strcmp(sztype, "follow") == 0) ntype = 1; //FERigidBodyForce::FORCE_FOLLOW;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 
@@ -1366,15 +1368,17 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			// make sure there is a loadcurve for type=0 forces
 			if ((ntype == 0)&&(lc==-1)) throw XMLReader::MissingAttribute(tag, "lc");
 
-			// create the rigid body force
-			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-			pFC->SetLoadType(ntype);
-			pFC->SetRigidMaterialID(nmat);
-			pFC->SetDOF(bc);
-
 			double val = 0.0;
 			value(tag, val);
-			pFC->SetForce(val);
+
+			// create the rigid body force
+			FEModelLoad* pFC = fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem);
+			feb.AddModelLoad(pFC);
+
+			pFC->SetParameter("load_type", ntype);
+			pFC->SetParameter("rb", nmat);
+			pFC->SetParameter("dof", bc);
+			pFC->SetParameter("value", val);
 
 			if (lc >= 0)
 			{
@@ -1382,9 +1386,6 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 				if (p == nullptr) throw XMLReader::InvalidTag(tag);
 				GetFEModel()->AttachLoadController(p, lc);
 			}
-
-			// add it to the model
-			feb.AddModelLoad(pFC);
 		}
 		else if (tag == "fixed")
 		{
@@ -1400,11 +1401,14 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// create the fixed dof
-			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
-			pBC->m_rigidMat = nmat;
-			pBC->m_dofs.push_back(bc);
-
+			FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC",  &fem);
 			feb.AddRigidFixedBC(pBC);
+
+			pBC->SetParameter("rb", nmat);
+
+			vector<int> dofs; dofs.push_back(bc);
+			pBC->SetParameter("dofs", dofs);
+
 		}
 		else if (tag == "initial_velocity")
 		{
@@ -1413,9 +1417,9 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			value(tag, v);
 
 			// create the initial condition
-			FERigidBodyVelocity* pic = fecore_alloc(FERigidBodyVelocity, &fem);
-			pic->m_rid = nmat;
-			pic->m_vel = v;
+			FEModelComponent* pic = fecore_new_class< FEModelComponent>("FERigidBodyVelocity", &fem);
+			pic->SetParameter("rb", nmat);
+			pic->SetParameter("value", v);
 
 			// add to model
 			feb.AddRigidIC(pic);
@@ -1427,9 +1431,9 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			value(tag, w);
 
 			// create the initial condition
-			FERigidBodyAngularVelocity* pic = fecore_alloc(FERigidBodyAngularVelocity, &fem);
-			pic->m_rid = nmat;
-			pic->m_w = w;
+			FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyAngularVelocity", &fem);
+			pic->SetParameter("rb", nmat);
+			pic->SetParameter("value", w);
 
 			// add to model
 			feb.AddRigidIC(pic);
