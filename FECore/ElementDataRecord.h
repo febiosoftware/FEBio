@@ -62,6 +62,8 @@ public:
 	int Size() const;
 	void SetElementSet(FEElementSet* pg);
 
+	void SetItemList(FEItemList* itemList, const vector<int>& selection) override;
+
 protected:
 	void BuildELT();
 

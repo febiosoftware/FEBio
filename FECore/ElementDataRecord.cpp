@@ -169,3 +169,11 @@ void ElementDataRecord::SetElementSet(FEElementSet* pg)
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = (*pg)[i];
 }
+
+//-----------------------------------------------------------------------------
+void ElementDataRecord::SetItemList(FEItemList* itemList, const vector<int>& selection)
+{
+	FEElementSet* pg = dynamic_cast<FEElementSet*>(itemList);
+	assert(selection.empty());
+	SetElementSet(pg);
+}

@@ -262,7 +262,10 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 //-----------------------------------------------------------------------------
 bool FEBioImport::Load(FEModel& fem, const char* szfile)
 {
-	m_builder = new FEModelBuilder(fem);
+	if (m_builder == nullptr)
+	{
+		m_builder = new FEModelBuilder(fem);
+	}
 
 	// intialize some variables
 	m_szdmp[0] = 0;
