@@ -32,14 +32,14 @@ SOFTWARE.*/
 #include <FECore/matrix.h>
 #include <FECore/FESurfaceConstraint.h>
 #include <FECore/FENodeSetConstraint.h>
-#include "febiomech_api.h"
+#include "fecore_api.h"
 #include <list>
 using namespace std;
 
 //-----------------------------------------------------------------------------
 //! linear constraint enforced using augmented lagrangian
 
-class FEBIOMECH_API FEAugLagLinearConstraint
+class FECORE_API FEAugLagLinearConstraint
 {
 public:
 	// this class describes a degree of freedom (dof) that
@@ -71,7 +71,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FEBIOMECH_API FELinearConstraintSet : public FESurfaceConstraint
+class FECORE_API FELinearConstraintSet : public FESurfaceConstraint
 {
 public:
 	//! constructor
@@ -119,7 +119,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FEBIOMECH_API FENodeConstraintSet : public FENodeSetConstraint
+class FECORE_API FENodeConstraintSet : public FENodeSetConstraint
 {
 public:
     //! constructor

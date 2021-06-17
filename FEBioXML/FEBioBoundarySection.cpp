@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEDiscreteMaterial.h>
 #include <FECore/FEDiscreteDomain.h>
-#include <FEBioMech/FEAugLagLinearConstraint.h>
+#include <FECore/FEAugLagLinearConstraint.h>
 #include <FEBioMech/FERigidForce.h>
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEFixedBC.h>

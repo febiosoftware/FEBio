@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioContactSection.h"
-#include "FEBioMech/FEAugLagLinearConstraint.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEAugLagLinearConstraint.h>
+#include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
 
