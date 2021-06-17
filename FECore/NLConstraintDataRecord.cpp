@@ -45,7 +45,7 @@ void NLConstraintDataRecord::SetData(const char* szexpr)
     {
         ch = strchr(sz, ';');
         if (ch) *ch++ = 0;
-        FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(sz, m_pfem);
+        FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(sz, GetFEModel());
         if (pdata) m_Data.push_back(pdata);
         else throw UnknownDataField(sz);
         sz = ch;
@@ -54,7 +54,7 @@ void NLConstraintDataRecord::SetData(const char* szexpr)
 }
 
 //-----------------------------------------------------------------------------
-NLConstraintDataRecord::NLConstraintDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NLC) {}
+NLConstraintDataRecord::NLConstraintDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NLC) {}
 
 //-----------------------------------------------------------------------------
 int NLConstraintDataRecord::Size() const { return (int)m_Data.size(); }
@@ -62,17 +62,19 @@ int NLConstraintDataRecord::Size() const { return (int)m_Data.size(); }
 //-----------------------------------------------------------------------------
 double NLConstraintDataRecord::Evaluate(int item, int ndata)
 {
+    FEModel* fem = GetFEModel();
     int nc = item - 1;
-    if ((nc < 0) || (nc >= m_pfem->NonlinearConstraints())) return 0;
+    if ((nc < 0) || (nc >= fem->NonlinearConstraints())) return 0;
     
-	FENLConstraint& nlc = *m_pfem->NonlinearConstraint(nc);
+	FENLConstraint& nlc = *fem->NonlinearConstraint(nc);
 	return m_Data[ndata]->value(nlc);
 }
 
 //-----------------------------------------------------------------------------
 void NLConstraintDataRecord::SelectAllItems()
 {
-	int n = m_pfem->NonlinearConstraints();
+    FEModel* fem = GetFEModel();
+    int n = fem->NonlinearConstraints();
 	m_item.resize(n);
 	for (int i = 0; i<n; ++i) m_item[i] = i + 1;
 }

@@ -835,6 +835,10 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidConnectorRotationZ, "RCthz");
 
 	//-----------------------------------------------------------------------------
+	// Derived from DataRecord
+	REGISTER_FECORE_CLASS(ObjectDataRecord, "rigid_body_data");
+
+	//-----------------------------------------------------------------------------
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");

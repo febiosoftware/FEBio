@@ -55,7 +55,7 @@ class FECORE_API ElementDataRecord : public DataRecord
 	};
 
 public:
-	ElementDataRecord(FEModel* pfem, const char* szfile);
+	ElementDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
 	void SetData(const char* sz);
 	void SelectAllItems();

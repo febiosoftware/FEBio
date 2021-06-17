@@ -51,12 +51,13 @@ public:
 class FECORE_API NodeDataRecord : public DataRecord
 {
 public:
-	NodeDataRecord(FEModel* pfem, const char* szfile);
+	NodeDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
 	void SetData(const char* sz);
 	void SelectAllItems();
-	void SetNodeSet(FENodeSet* pns);
 	int Size() const;
+
+	void SetItemList(FEItemList* items, const std::vector<int>& selection) override;
 
 private:
 	vector<FENodeLogData*>	m_Data;

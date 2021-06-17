@@ -28,11 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioOutputSection.h"
-#include <FECore/NodeDataRecord.h>
-#include <FECore/FaceDataRecord.h>
-#include <FECore/ElementDataRecord.h>
-//#include <FEBioMech/ObjectDataRecord.h>
-#include <FECore/NLConstraintDataRecord.h>
+#include <FECore/DataRecord.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
@@ -175,20 +171,17 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			else if (strcmp(szcomment, "off") == 0) bcomment = false;
 		}
 
+		// get the data attribute
+		const char* szdata = tag.AttributeValue("data");
 
+		// get the name attribute
+		const char* szname = tag.AttributeValue("name", true);
+
+		// allocate data record
+		DataRecord* pdr = nullptr;
 		if (tag == "node_data")
 		{
-			NodeDataRecord* prec = new NodeDataRecord(&fem, szfile);
-
-			const char* szdata = tag.AttributeValue("data");
-			prec->SetData(szdata);
-
-			const char* szname = tag.AttributeValue("name", true);
-			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-			if (szdelim  != 0) prec->SetDelim(szdelim);
-			if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
-
+			pdr = fecore_new<DataRecord>("node_data", &fem);
 			const char* sztmp = "set";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
 			const char* sz = tag.AttributeValue(sztmp, true);
@@ -196,29 +189,25 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			{
 				FENodeSet* pns = mesh.FindNodeSet(sz);
 				if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
-				prec->SetNodeSet(pns);
+
+				vector<int> items;
+				int n = pns->Size();
+				assert(n);
+				items.resize(n);
+				for (int i = 0; i < n; ++i) items[i] = (*pns)[i] + 1;
+
+				pdr->SetItemList(items);
 			}
 			else
 			{
 				std::vector<int> items;
 				string_to_int_vector(tag.szvalue(), items);
-				prec->SetItemList(items);
+				pdr->SetItemList(items);
 			}
-
-			GetFEBioImport()->AddDataRecord(prec);
 		}
 		else if (tag == "face_data")
 		{
-			FaceDataRecord* prec = new FaceDataRecord(&fem, szfile);
-
-			const char* szdata = tag.AttributeValue("data");
-			prec->SetData(szdata);
-
-			const char* szname = tag.AttributeValue("name", true);
-			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-			if (szdelim  != 0) prec->SetDelim(szdelim);
-			if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
+			pdr = fecore_new<DataRecord>("face_data", &fem);
 
 			const char* sz = tag.AttributeValue("surface");
 			FESurface* surf = mesh.FindSurface(sz);
@@ -227,22 +216,14 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
 
-			prec->SetSurface(surf, items);
-
-			GetFEBioImport()->AddDataRecord(prec);
+			// TODO: This is a bit of a hack, because the face data record needs an FEItemList, but FESurface is derived from that.
+			FEFacetSet* fset = surf->GetFacetSet();
+			fset->SetSurface(surf);
+			pdr->SetItemList(fset, items);
 		}
 		else if (tag == "element_data")
 		{
-			ElementDataRecord* prec = new ElementDataRecord(&fem, szfile);
-
-			const char* szdata = tag.AttributeValue("data");
-			prec->SetData(szdata);
-
-			const char* szname = tag.AttributeValue("name", true);
-			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-			if (szdelim  != 0) prec->SetDelim(szdelim);
-			if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
+			pdr = fecore_new<DataRecord>("element_data", &fem);
 
 			const char* sztmp = "elset";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "elem_set";
@@ -250,58 +231,50 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			const char* sz = tag.AttributeValue(sztmp, true);
 			if (sz)
 			{
+				vector<int> dummy;
 				FEElementSet* pes = mesh.FindElementSet(sz);
 				if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
-				prec->SetElementSet(pes);
+				pdr->SetItemList(pes, dummy);
 			}
 			else
 			{
 				std::vector<int> items;
 				string_to_int_vector(tag.szvalue(), items);
-				prec->SetItemList(items);
+				pdr->SetItemList(items);
 			}
-
-			GetFEBioImport()->AddDataRecord(prec);
 		}
 		else if (tag == "rigid_body_data")
 		{
-			ObjectDataRecord* prec = new ObjectDataRecord(&fem, szfile);
-
-			const char* szdata = tag.AttributeValue("data");
-			prec->SetData(szdata);
-
-			const char* szname = tag.AttributeValue("name", true);
-			if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-			if (szdelim  != 0) prec->SetDelim(szdelim);
-			if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
+			pdr = fecore_new<DataRecord>("rigid_body_data", &fem);
 
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
-			prec->SetItemList(items);
-
-			GetFEBioImport()->AddDataRecord(prec);
+			pdr->SetItemList(items);
 		}
         else if (tag == "rigid_connector_data")
         {
-            NLConstraintDataRecord* prec = new NLConstraintDataRecord(&fem, szfile);
+			pdr = fecore_new<DataRecord>("rigid_connector_data", &fem);
             
-            const char* szdata = tag.AttributeValue("data");
-            prec->SetData(szdata);
-            
-            const char* szname = tag.AttributeValue("name", true);
-            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-            if (szdelim  != 0) prec->SetDelim(szdelim);
-            if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
-
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
-			prec->SetItemList(items);
-            
-			GetFEBioImport()->AddDataRecord(prec);
+			pdr->SetItemList(items);
         }
 		else throw XMLReader::InvalidTag(tag);
+
+		// add to model
+		assert(pdr);
+		if (pdr)
+		{
+			// set additional properties
+			pdr->SetFileName(szfile);
+			pdr->SetData(szdata);
+			if (szname   != 0) pdr->SetName(szname); else pdr->SetName(szdata);
+			if (szdelim  != 0) pdr->SetDelim(szdelim);
+			if (szformat != 0) pdr->SetFormat(szformat);
+			pdr->SetComments(bcomment);
+
+			GetFEBioImport()->AddDataRecord(pdr);
+		}
 
 		++tag;
 	}

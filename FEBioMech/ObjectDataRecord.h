@@ -47,7 +47,7 @@ public:
 class FEBIOMECH_API ObjectDataRecord : public DataRecord
 {
 public:
-	ObjectDataRecord(FEModel* pfem, const char* szfile);
+	ObjectDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
 	void SetData(const char* sz);
 	void SelectAllItems();

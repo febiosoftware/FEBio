@@ -1361,11 +1361,11 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 			DataRecord* pd = 0;
 			switch(ntype)
 			{
-			case FE_DATA_NODE: pd = new NodeDataRecord        (this, 0); break;
-			case FE_DATA_FACE: pd = new FaceDataRecord        (this, 0); break;
-			case FE_DATA_ELEM: pd = new ElementDataRecord     (this, 0); break;
-			case FE_DATA_RB  : pd = new ObjectDataRecord      (this, 0); break;
-			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this, 0); break;
+			case FE_DATA_NODE: pd = new NodeDataRecord        (this); break;
+			case FE_DATA_FACE: pd = new FaceDataRecord        (this); break;
+			case FE_DATA_ELEM: pd = new ElementDataRecord     (this); break;
+			case FE_DATA_RB  : pd = new ObjectDataRecord      (this); break;
+			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this); break;
 			}
 			assert(pd);
 			pd->Serialize(ar);

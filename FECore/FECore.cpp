@@ -52,6 +52,10 @@ SOFTWARE.*/
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
 #include "FEConstValueVec3.h"
+#include "NodeDataRecord.h"
+#include "FaceDataRecord.h"
+#include "ElementDataRecord.h"
+#include "NLConstraintDataRecord.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -155,4 +159,10 @@ REGISTER_FECORE_CLASS(FEFacetSet  , "surface" );
 REGISTER_FECORE_CLASS(FEElementSet, "elem_set");
 
 REGISTER_FECORE_CLASS(FESurface, "surface");
+
+// data records
+REGISTER_FECORE_CLASS(NodeDataRecord, "node_data");
+REGISTER_FECORE_CLASS(FaceDataRecord, "face_data");
+REGISTER_FECORE_CLASS(ElementDataRecord, "element_data");
+REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
 }

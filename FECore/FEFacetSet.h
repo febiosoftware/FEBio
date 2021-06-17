@@ -77,7 +77,7 @@ public:
 	void Create(const FESurface& surf);
 
 	// return the size of the facet ste
-	int Faces() const { return (int)m_Face.size(); }
+	int Faces() const;
 
 	// return a facet
 	FACET& Face(int i);
@@ -92,6 +92,11 @@ public:
 	// serialize
 	void Serialize(DumpStream& ar);
 
+	// TODO: This is a hack used to convert between a surface and a facet set when reading face data records
+	void SetSurface(FESurface* surf);
+	FESurface* GetSurface();
+
 private:
 	std::vector<FACET>	m_Face;	// the list of facets
+	FESurface*			m_surface;		// the surface this facet list refers to (can be zero!)
 };

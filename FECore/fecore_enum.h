@@ -265,7 +265,8 @@ enum SUPER_CLASS_ID {
 	FEITEMLIST_ID,                  // derived from FEItemList (NOTE: work in progress!)
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
-    FESURFACEPAIRINTERACTIONNL_ID   // derived from FESurfacePairInteraction
+    FESURFACEPAIRINTERACTIONNL_ID,  // derived from FESurfacePairInteraction
+	FEDATARECORD_ID					// derived from DataRecord
 };
 
 ///////////////////////////////////////////////////////////////////////////////

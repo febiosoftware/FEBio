@@ -38,7 +38,7 @@ FEFaceLogData::FEFaceLogData(FEModel* fem) : FECoreBase(fem) {}
 FEFaceLogData::~FEFaceLogData() {}
 
 //-----------------------------------------------------------------------------
-FaceDataRecord::FaceDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_FACE) 
+FaceDataRecord::FaceDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_FACE) 
 {
 	m_surface = nullptr;
 }
@@ -58,7 +58,7 @@ void FaceDataRecord::SetData(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FEFaceLogData* pdata = fecore_new<FEFaceLogData>(sz, m_pfem);
+		FEFaceLogData* pdata = fecore_new<FEFaceLogData>(sz, GetFEModel());
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;
@@ -85,23 +85,18 @@ void FaceDataRecord::SelectAllItems()
 	assert(false);
 }
 
-//-----------------------------------------------------------------------------
-// This sets the item list based on a surface.
-void FaceDataRecord::SetSurface(FESurface* surface)
+void FaceDataRecord::SetItemList(FEItemList* itemList, const std::vector<int>& selection)
 {
-	assert(surface);
-	m_surface = surface;
-	int n = surface->Elements();
-	m_item.resize(n);
-	for (int i = 0; i < n; ++i) m_item[i] = i + 1;
-}
-
-void FaceDataRecord::SetSurface(FESurface* surface, const std::vector<int>& items)
-{
-	assert(surface);
-	if (items.empty()) SetSurface(surface);
-	else {
-		m_surface = surface;
-		m_item = items;
+	FEFacetSet* facetSet = dynamic_cast<FEFacetSet*>(itemList); assert(facetSet);
+	m_surface = facetSet->GetSurface(); assert(m_surface);
+	int n = m_surface->Elements();
+	if (selection.empty())
+	{
+		m_item.resize(n);
+		for (int i = 0; i < n; ++i) m_item[i] = i + 1;
+	}
+	else
+	{
+		m_item = selection;
 	}
 }
