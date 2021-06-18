@@ -851,12 +851,11 @@ void FEBioMech::InitModule()
 	febio.SetModuleDependency("solid");
 	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 
+	//-----------------------------------------------------------------------------
+	// Derived from FELogNLConstraintData
+	REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
+	REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
+
 
 	febio.SetActiveModule(0);
 }
-
-//-----------------------------------------------------------------------------
-// Derived from FELogNLConstraintData
-REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
-REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
-
