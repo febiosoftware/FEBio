@@ -55,6 +55,9 @@ namespace febio
 	// load all the plugins in a folder
 	FEBIOLIB_API void ImportPluginFolder(const char* szfolder);
 
+	// get the name of the plugin from its allocator Id
+	FEBIOLIB_API const char* GetPluginName(int allocId);
+
 	// call this to clean up all FEBio data
 	FEBIOLIB_API void FinishLibrary();
 
@@ -63,6 +66,9 @@ namespace febio
 
 	// print hello message
 	FEBIOLIB_API int Hello(LogStream& log);
+
+	// set the number of OMP threads
+	FEBIOLIB_API void SetOMPThreads(int n);
 
 	// run an FEBioModel
 	FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask = nullptr, const char* szctrl = nullptr);

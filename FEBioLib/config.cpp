@@ -386,6 +386,22 @@ void ImportPluginFolder(const char* szfolder)
 #endif
 
 //-----------------------------------------------------------------------------
+FEBIOLIB_API const char* GetPluginName(int allocId)
+{
+	FEBioPluginManager& pm = *FEBioPluginManager::GetInstance();
+
+	for (int i = 0; i < pm.Plugins(); ++i)
+	{
+		const FEBioPlugin& pi = pm.GetPlugin(i);
+		if (pi.GetAllocatorID() == allocId)
+		{
+			return pi.GetName();
+		}
+	}
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 // run an FEBioModel
 FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* szctrl)
 {
