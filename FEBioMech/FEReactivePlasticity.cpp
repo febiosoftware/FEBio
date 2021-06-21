@@ -50,6 +50,7 @@ BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
     ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "r"   );
     ADD_PARAMETER(m_isochrc, "isochoric");
     ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
+    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 
 END_FECORE_CLASS();
 

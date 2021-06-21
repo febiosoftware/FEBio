@@ -48,6 +48,9 @@ FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem),
     m_alpham = 2;
 	m_update_dynamic = true; // default for backward compatibility
 
+	m_secant_stress = false;
+	m_secant_tangent = false;
+
 	// TODO: Move this elsewhere since there is no error checking
 	if (pfem)
 	{
@@ -351,7 +354,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 
 		// get the 'D' matrix
 //		tens4ds C = m_pMat->Tangent(mp);
-        tens4dmm C = m_pMat->SolidTangent(mp);
+        tens4dmm C = (m_secant_tangent ? m_pMat->SecantTangent(mp) : m_pMat->SolidTangent(mp));
 		C.extract(D);
 
 		// we only calculate the upper triangular part
@@ -645,7 +648,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         
 		// calculate the stress at this material point
 //		pt.m_s = m_pMat->Stress(mp);
-		pt.m_s = m_pMat->SolidStress(mp);
+		pt.m_s = (m_secant_stress ? m_pMat->SecantStress(mp) : m_pMat->Stress(mp));
         
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5) 

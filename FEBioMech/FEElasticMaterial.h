@@ -53,13 +53,9 @@ public:
 
 public:
 	//! evaluates approximation to Cauchy stress using forward difference
-	mat3ds SecantStress(FEMaterialPoint& pt);
-
-	mat3ds SolidStress(FEMaterialPoint& pt) override;
+	mat3ds SecantStress(FEMaterialPoint& pt) override;
 
 protected:
-	bool	m_secant_stress;	//!< use secant approximation to stress
-
 	DECLARE_FECORE_CLASS();
 };
 

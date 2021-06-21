@@ -69,6 +69,8 @@ public:
     
     // evaluate reactive heat supply
     void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
+
+    bool UseSecantTangent() override { return m_secant_tangent; }
     
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
@@ -88,6 +90,8 @@ public:
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
     double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
+
+    bool    m_secant_tangent;
 
     DECLARE_FECORE_CLASS();
 };

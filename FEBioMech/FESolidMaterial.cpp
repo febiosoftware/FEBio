@@ -33,12 +33,10 @@ SOFTWARE.*/
 // Material parameters for FEElasticMaterial
 BEGIN_FECORE_CLASS(FESolidMaterial, FEMaterial)
 	ADD_PARAMETER(m_density, "density");
-    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 END_FECORE_CLASS();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem)
 {
-	m_secant_tangent = false;
 }
 
 //! set the material density
@@ -53,14 +51,16 @@ double FESolidMaterial::Density(FEMaterialPoint& pt)
 	return m_density(pt);
 }
 
-mat3ds FESolidMaterial::SolidStress(FEMaterialPoint& pt)
-{
-	return Stress(pt);
-}
-
 tens4dmm FESolidMaterial::SolidTangent(FEMaterialPoint& mp)
 {
-	return m_secant_tangent ? SecantTangent(mp) : Tangent(mp);
+	return (UseSecantTangent() ? SecantTangent(mp) : Tangent(mp));
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FESolidMaterial::SecantStress(FEMaterialPoint& pt)
+{
+    assert(false);
+    return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------

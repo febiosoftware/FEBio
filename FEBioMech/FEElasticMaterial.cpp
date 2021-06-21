@@ -31,13 +31,11 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 
 BEGIN_FECORE_CLASS(FEElasticMaterial, FESolidMaterial)
-	ADD_PARAMETER(m_secant_stress, "secant_stress");
 END_FECORE_CLASS();
 
 FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 { 
 	m_density = 1;
-	m_secant_stress = false;
 	AddDomainParameter(new FEElasticStress());
 }
 
@@ -45,12 +43,6 @@ FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 FEElasticMaterial::~FEElasticMaterial()
 { 
 	
-}
-
-//-----------------------------------------------------------------------------
-mat3ds FEElasticMaterial::SolidStress(FEMaterialPoint& pt)
-{
-	return (m_secant_stress ? SecantStress(pt) : Stress(pt));
 }
 
 //-----------------------------------------------------------------------------
