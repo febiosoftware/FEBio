@@ -180,6 +180,8 @@
 		D58DDE0123233A8E007A490A /* FESolutesMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58DDDF923233A8E007A490A /* FESolutesMaterial.cpp */; };
 		D58DDE0223233A8E007A490A /* FESolutesSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58DDDFA23233A8E007A490A /* FESolutesSolver.cpp */; };
 		D58DDE0323233A8E007A490A /* FESolutesDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58DDDFB23233A8E007A490A /* FESolutesDomainFactory.cpp */; };
+		D59368F926755C3700AF7D0A /* FEBinghamFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59368F726755C3700AF7D0A /* FEBinghamFluid.cpp */; };
+		D59368FA26755C3700AF7D0A /* FEBinghamFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D59368F826755C3700AF7D0A /* FEBinghamFluid.h */; };
 		D5AB624322028A3900AAF141 /* FEFluidPDomain3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB624122028A3900AAF141 /* FEFluidPDomain3D.cpp */; };
 		D5AB624422028A3900AAF141 /* FEFluidPDomain3D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624222028A3900AAF141 /* FEFluidPDomain3D.h */; };
 		D5AB62472202A52C00AAF141 /* FEBioFluidP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62452202A52C00AAF141 /* FEBioFluidP.cpp */; };
@@ -390,6 +392,8 @@
 		D58DDDF923233A8E007A490A /* FESolutesMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolutesMaterial.cpp; sourceTree = "<group>"; };
 		D58DDDFA23233A8E007A490A /* FESolutesSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolutesSolver.cpp; sourceTree = "<group>"; };
 		D58DDDFB23233A8E007A490A /* FESolutesDomainFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolutesDomainFactory.cpp; sourceTree = "<group>"; };
+		D59368F726755C3700AF7D0A /* FEBinghamFluid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEBinghamFluid.cpp; sourceTree = "<group>"; };
+		D59368F826755C3700AF7D0A /* FEBinghamFluid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBinghamFluid.h; sourceTree = "<group>"; };
 		D5AB624122028A3900AAF141 /* FEFluidPDomain3D.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidPDomain3D.cpp; sourceTree = "<group>"; };
 		D5AB624222028A3900AAF141 /* FEFluidPDomain3D.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidPDomain3D.h; sourceTree = "<group>"; };
 		D5AB62452202A52C00AAF141 /* FEBioFluidP.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluidP.cpp; sourceTree = "<group>"; };
@@ -459,6 +463,8 @@
 				D5EBDC7724AE9A6E0007B220 /* FEBackFlowFSIStabilization.h */,
 				D53231F82142AE3D008DE511 /* FEBackFlowStabilization.cpp */,
 				D53232032142AE3D008DE511 /* FEBackFlowStabilization.h */,
+				D59368F726755C3700AF7D0A /* FEBinghamFluid.cpp */,
+				D59368F826755C3700AF7D0A /* FEBinghamFluid.h */,
 				D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */,
 				D53232102142AE3D008DE511 /* FEBioFluid.cpp */,
 				D53232152142AE3D008DE511 /* FEBioFluid.h */,
@@ -752,6 +758,7 @@
 				D532323C2142AE3D008DE511 /* FECarreauYasudaFluid.h in Headers */,
 				D532325D2142AE3E008DE511 /* FEFluidNormalTraction.h in Headers */,
 				D5C13EF42405D419005897E1 /* FEIdealGas.h in Headers */,
+				D59368FA26755C3700AF7D0A /* FEBinghamFluid.h in Headers */,
 				693FEF6725645FC3004F9ACF /* FEFluidSolutesNaturalFlux.h in Headers */,
 				D509D28022F32408007DFC44 /* FESoluteBackflowStabilization.h in Headers */,
 				D5AB624422028A3900AAF141 /* FEFluidPDomain3D.h in Headers */,
@@ -922,6 +929,7 @@
 				D532326C2142AE3E008DE511 /* FETiedFluidInterface.cpp in Sources */,
 				D53232692142AE3E008DE511 /* FEPowellEyringFluid.cpp in Sources */,
 				D57C2A5324087BE40043C2A7 /* FEThermoFluidDomainFactory.cpp in Sources */,
+				D59368F926755C3700AF7D0A /* FEBinghamFluid.cpp in Sources */,
 				691BD30C2412B187002BC4A1 /* FEFluidMixtureTractionLoad.cpp in Sources */,
 				694948DF2476D5220031BD24 /* FETemperatureBackFlowStabilization.cpp in Sources */,
 				D57C2A6F240EFF610043C2A7 /* FEFluidMaterial.cpp in Sources */,

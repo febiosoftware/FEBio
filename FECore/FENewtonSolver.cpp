@@ -844,10 +844,7 @@ bool FENewtonSolver::QNInit()
 	}
 
 	// calculate initial residual
-	{
-		TRACK_TIME(TimerID::Timer_Residual);
-		if (m_qnstrategy->Residual(m_R0, true) == false) return false;
-	}
+	if (m_qnstrategy->Residual(m_R0, true) == false) return false;
 
 	// add the contribution from prescribed dofs
 	m_R0 += m_Fd;
@@ -954,16 +951,10 @@ double FENewtonSolver::DoLineSearch()
 	else
 	{
 		// Update geometry
-		{
-			TRACK_TIME(TimerID::Timer_Update);
-			Update(m_ui);
-		}
+		Update(m_ui);
 
 		// calculate residual at this point
-		{
-			TRACK_TIME(TimerID::Timer_Residual);
-			m_qnstrategy->Residual(m_R1, false);
-		}
+		m_qnstrategy->Residual(m_R1, false);
 	}
 
 	// return line search
@@ -1072,6 +1063,7 @@ bool FENewtonSolver::DoAugmentations()
 		// for incompressible materials
 		UpdateModel();
 		{
+			// TODO: Why is this not calling strategy->Residual? 
 			TRACK_TIME(TimerID::Timer_Residual);
 			Residual(m_R0);
 		}
@@ -1095,6 +1087,8 @@ bool FENewtonSolver::DoAugmentations()
 //! Update the state of the model
 void FENewtonSolver::Update(std::vector<double>& ui)
 {
+	TRACK_TIME(TimerID::Timer_Update);
+
 	// get the mesh
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

@@ -266,6 +266,24 @@ bool FEFluidSolutesSolver::InitEquations()
 		return false;
 	}
 
+    // Next, we add any Lagrange Multipliers
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* lmc = fem.NonlinearConstraint(i);
+        if (lmc->IsActive())
+        {
+            m_neq += lmc->InitEquations(m_neq);
+        }
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive())
+        {
+            m_neq += spc->InitEquations(m_neq);
+        }
+    }
+
 	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
 	{
 		// repartition the equations so that we only have two partitions,

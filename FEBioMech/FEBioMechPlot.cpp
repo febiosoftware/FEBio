@@ -631,6 +631,54 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //=============================================================================
+FEPlotElementMixtureStress::FEPlotElementMixtureStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) 
+{
+	m_comp = -1;
+}
+
+bool FEPlotElementMixtureStress::SetFilter(const char* szfilter)
+{
+	sscanf(szfilter, "solid[%d]", &m_comp);
+	return true;
+}
+
+bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
+{
+	// make sure we start from the elastic component
+	FEElasticMaterial* pmat = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pmat == nullptr) return false;
+
+	// make sure this is a mixture
+	FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pmat);
+	if (pmm == nullptr) return false;
+
+	// get the mixture component
+	if (m_comp < 0) return false;
+
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		mat3ds savg; savg.zero();
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+			if (mmp)
+			{
+				FEElasticMaterialPoint& ep = *mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
+				savg += ep.m_s;
+			}
+		}
+		savg /= (double)el.GaussPoints();
+
+		a << savg;
+	}
+
+	return true;
+}
+
+//=============================================================================
 //! Store the uncoupled pressure for each element.
 bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
 {
@@ -3396,6 +3444,60 @@ bool FEPlotContinuousDamage::Save(FEDomain& dom, FEDataStream& a)
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEMaterialPoint* pt = mp.GetPointData(m_propIndex);
 			double Dj = mat->Damage(*pt);
+
+			D += Dj;
+		}
+		D /= (double)nint;
+
+		a << D;
+	}
+
+	return true;
+}
+
+//=================================================================================================
+FEPlotContinuousDamage_::FEPlotContinuousDamage_(FEModel* fem, int n) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM)
+{
+	m_propIndex = 0;
+	m_comp = n;
+}
+
+bool FEPlotContinuousDamage_::SetFilter(const char* sz)
+{
+	m_prop = sz;
+	return true;
+}
+
+bool FEPlotContinuousDamage_::Save(FEDomain& dom, FEDataStream& a)
+{
+	// get the material
+	FEMaterial* domMat = dom.GetMaterial();
+	if (domMat == nullptr) return false;
+
+	// get the fiber damage component
+	FEDamageElasticFiber* mat = nullptr;
+	if (m_prop.empty()) mat = dynamic_cast<FEDamageElasticFiber*>(domMat);
+	else
+	{
+		ParamString ps(m_prop.c_str());
+		m_propIndex = ps.Index();
+		mat = dynamic_cast<FEDamageElasticFiber*>(domMat->GetProperty(ps));
+	}
+	if (mat == nullptr) return false;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		double D = 0.0;
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEMaterialPoint* pt = mp.GetPointData(m_propIndex);
+			double Dj = mat->Damage(*pt, m_comp);
 
 			D += Dj;
 		}

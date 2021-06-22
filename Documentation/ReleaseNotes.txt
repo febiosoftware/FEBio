@@ -41,7 +41,7 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
- R E L E A S E   3.4   5/14/2021
+ R E L E A S E   3.4   5/17/2021
 
 ===========================================================================
 
@@ -53,6 +53,7 @@ at https://forums.febio.org/.
 * A bug was fixed in the "porosity" element log variable.
 * The description of the max_retries control parameter in the user manual was corrected.
 * The "reaction forces" plot variable now produces the equivalent nodal reaction forces for all nodes, even constrained nodes (fixed, prescribed, rigid). 
+* Chapter on multi-step analysis was added back to user manual and several broken links were fixed. 
 
 ===========================================================================
 

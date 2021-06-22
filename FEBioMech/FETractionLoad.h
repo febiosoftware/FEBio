@@ -57,6 +57,7 @@ protected:
 	double			m_scale;	//!< scale factor for traction
 	FEParamVec3		m_traction;	//!< vector traction
 	bool			m_bshellb;
+	bool			m_blinear;
 
 	DECLARE_FECORE_CLASS();
 };

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include "FEFluidP.h"
 #include "FENewtonianFluid.h"
+#include "FEBinghamFluid.h"
 #include "FECarreauFluid.h"
 #include "FECarreauYasudaFluid.h"
 #include "FEPowellEyringFluid.h"
@@ -110,6 +111,7 @@ REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
 REGISTER_FECORE_CLASS(FEFluid             , "fluid"         );
 REGISTER_FECORE_CLASS(FEFluidP            , "fluidP"        );
 REGISTER_FECORE_CLASS(FENewtonianFluid    , "Newtonian fluid");
+REGISTER_FECORE_CLASS(FEBinghamFluid      , "Bingham"       )
 REGISTER_FECORE_CLASS(FECarreauFluid      , "Carreau"       );
 REGISTER_FECORE_CLASS(FECarreauYasudaFluid, "Carreau-Yasuda");
 REGISTER_FECORE_CLASS(FEPowellEyringFluid , "Powell-Eyring" );
@@ -160,11 +162,10 @@ REGISTER_FECORE_CLASS(FEPlotFluidDensity               , "fluid density"        
 REGISTER_FECORE_CLASS(FEPlotFluidDensityRate           , "fluid density rate"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVelocity              , "fluid velocity"           );
 REGISTER_FECORE_CLASS(FEPlotBFSISolidVolumeFraction    , "solid volume fraction"    );
-REGISTER_FECORE_CLASS(FEPlotBFSIPorosity               , "fluid volume fraction"    );
 REGISTER_FECORE_CLASS(FEPlotFluidTemperature           , "fluid temperature"        );
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVelocity      , "relative fluid velocity"  );
 REGISTER_FECORE_CLASS(FEPlotFSIFluidFlux               , "fluid flux"               );
-REGISTER_FECORE_CLASS(FEPlotPermeability               , "bfsi permeability"  );
+REGISTER_FECORE_CLASS(FEPlotPermeability               , "permeability"             );
 REGISTER_FECORE_CLASS(FEPlotGradJ                      , "dilatation gradient"      );
 REGISTER_FECORE_CLASS(FEPlotGradPhiF                   , "fluid volume ratio gradient");
 REGISTER_FECORE_CLASS(FEPlotFluidAcceleration          , "fluid acceleration"       );
@@ -199,6 +200,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidSpecificStrainEnergy  , "fluid specific strain 
 REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
 REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity , "fluid isobaric specific heat capacity");
 REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity   , "fluid thermal conductivity"    );
+REGISTER_FECORE_CLASS(FEPlotBFSIPorosity               , "porosity"                 );
 REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"             );
 REGISTER_FECORE_CLASS(FEPlotFluidShearStressError      , "fluid shear stress error");
 

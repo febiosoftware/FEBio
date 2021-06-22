@@ -555,6 +555,8 @@ void FEModel::IncrementUpdateCounter()
 //-----------------------------------------------------------------------------
 void FEModel::Update()
 {
+	TRACK_TIME(TimerID::Timer_Update);
+
 	// update model counter
 	m_imp->m_nupdates++;
 	

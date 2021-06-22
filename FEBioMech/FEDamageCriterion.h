@@ -96,6 +96,26 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// Drucker yield criterion
+
+class FEDamageCriterionDrucker : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionDrucker(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt) override;
+    
+    //! criterion tangent with respect to stress
+    mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
+    
+public:
+    FEParamDouble   m_c;    //!< Drucker material parameter
+    
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
 // max shear stress as damage criterion
 
 class FEDamageCriterionMSS : public FEDamageCriterion
