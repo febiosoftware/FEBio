@@ -156,6 +156,7 @@ macro(addLib name)
     string(TOLOWER ${name} lname)
 	add_library(${lname} SHARED ${HDR_${name}} ${SRC_${name}})
 	set_property(TARGET ${lname} PROPERTY AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/CMakeFiles/AutoGen/${name}_autogen)
+    target_link_libraries(${lname} PRIVATE "-undefined dynamic_lookup")
 endmacro()
 
 foreach(name IN LISTS FEBIO_LIBS)
