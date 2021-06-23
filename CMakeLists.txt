@@ -220,22 +220,6 @@ endif()
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
 
-# Link FEBio libraries
-if(WIN32 OR APPLE)
-	target_link_libraries(febio4 fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml)
-else()
-	target_link_libraries(febio4 -Wl,--start-group fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml -Wl,--end-group)
-        
-    target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
-    
-    # Extra compiler flags for intel compiler
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-        target_link_libraries(febio4 -static-intel)
-    endif()
-endif()
-
 # Link LEVMAR
 if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
@@ -290,6 +274,24 @@ if(WIN32)
 	target_link_libraries(febio4 psapi.lib ws2_32.lib)
 else()
     target_link_libraries(febio4 -ldl)
+endif()
+
+# Link Libraies into FEBioLib
+target_link_libraries(febiolib PRIVATE febioplot febiomech 
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml)
+
+# Link FEBio libraries
+if(WIN32 OR APPLE)
+	target_link_libraries(febio4 fecore febiolib)
+else()
+	target_link_libraries(febio4 -Wl,--start-group fecore febiolib -Wl,--end-group)
+        
+    target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
+    
+    # Extra compiler flags for intel compiler
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+        target_link_libraries(febio4 -static-intel)
+    endif()
 endif()
 
 ##### Create febio.xml #####
