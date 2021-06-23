@@ -35,7 +35,7 @@ SOFTWARE.*/
 class FEArrudaBoyce : public FEUncoupledMaterial
 {
 public:
-	FEArrudaBoyce(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+	FEArrudaBoyce(FEModel* pfem);
 
 public:
 	FEParamDouble	m_mu;	//!< shear modulus
