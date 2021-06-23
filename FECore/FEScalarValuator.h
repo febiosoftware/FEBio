@@ -37,6 +37,7 @@ SOFTWARE.*/
 class FECORE_API FEScalarValuator : public FEValuator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEScalarValuator)
 
 public:
 	FEScalarValuator(FEModel* fem) : FEValuator(fem) {};
@@ -48,8 +49,6 @@ public:
 	virtual bool isConst() { return false; }
 
 	virtual double* constValue() { return nullptr; }
-
-public: static const char* BaseClassName() { return "FEScalarValuator"; }
 };
 
 //---------------------------------------------------------------------------------------

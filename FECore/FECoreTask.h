@@ -38,6 +38,7 @@ class FEModel;
 class FECORE_API FECoreTask : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FECoreTask)
 
 public:
 	FECoreTask(FEModel* fem);
@@ -49,6 +50,4 @@ public:
 
 	//! Run the task.
 	virtual bool Run() = 0;
-
-public: static const char* BaseClassName() { return "FECoreTask"; }
 };

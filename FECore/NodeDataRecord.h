@@ -38,12 +38,12 @@ class FENodeSet;
 class FECORE_API FENodeLogData : public FECoreBase
 { 
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FENodeLogData)
 
 public:
 	FENodeLogData(FEModel* fem);
 	virtual ~FENodeLogData();
 	virtual double value(int node) = 0; 
-public: static const char* BaseClassName() { return "FENodeLogData"; }
 };
 
 //-----------------------------------------------------------------------------

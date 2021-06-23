@@ -36,6 +36,7 @@ SOFTWARE.*/
 class FECORE_API FEVec3dValuator : public FEValuator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEVec3dValuator)
 
 public:
 	FEVec3dValuator(FEModel* fem);
@@ -52,6 +53,4 @@ public:
 
 	// return the const value
 	virtual vec3d* constValue() { return nullptr; }
-
-public: static const char* BaseClassName() { return "FEVec3dValuator"; }
 };

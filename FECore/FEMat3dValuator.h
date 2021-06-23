@@ -36,6 +36,7 @@ class FEDataMap;
 class FECORE_API FEMat3dValuator : public FEValuator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMat3dValuator)
 
 public:
 	FEMat3dValuator(FEModel* fem) : FEValuator(fem) {};
@@ -47,8 +48,6 @@ public:
 	virtual bool isConst() { return false; }
 
 	virtual mat3d* constValue() { return nullptr; }
-
-public: static const char* BaseClassName() { return "FEMat3dValuator"; }
 };
 
 //-----------------------------------------------------------------------------

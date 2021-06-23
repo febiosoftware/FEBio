@@ -37,7 +37,7 @@ private:
 	T**	m_pc;	//!< pointer to pointer of property
 
 public:
-	FEPropertyT(T** ppc) : FEProperty(T::classID()) 
+	FEPropertyT(T** ppc) : FEProperty(T::superClassID())
 	{ 
 		m_pc = ppc; 
 		m_className = typeid(T).name();
@@ -93,7 +93,7 @@ private:
 	Y*	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT(Y* p) : FEProperty(T::classID()) { m_pmp = p; }
+	FEVecPropertyT(Y* p) : FEProperty(T::superClassID()) { m_pmp = p; }
 	T* operator [] (int i) { return (*m_pmp)[i]; }
 	const T* operator [] (int i) const { return (*m_pmp)[i]; }
 

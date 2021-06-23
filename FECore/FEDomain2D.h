@@ -33,6 +33,8 @@ SOFTWARE.*/
 //! Abstract base class for shell elements
 class FECORE_API FEDomain2D : public FEDomain
 {
+    FECORE_BASE_CLASS(FEDomain2D)
+
 public:
     //! constructor
     FEDomain2D(FEModel* fem) : FEDomain(FE_DOMAIN_2D, fem) {}
@@ -100,6 +102,4 @@ public:
     
 protected:
     vector<FEElement2D>	m_Elem;	//!< array of elements
-
-public: static const char* BaseClassName() { return "FEDomain2D"; }
 };

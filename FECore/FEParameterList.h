@@ -218,6 +218,9 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 	public: static const char* BaseClassName(); \
 	protected: void BuildParamList() override;
 
+#define FECORE_BASE_CLASS(theClass) \
+	public: static const char* BaseClassName() { return typeid(theClass).name(); } \
+
 // the BEGIN_FECORE_CLASS defines the beginning of a parameter list
 #define BEGIN_FECORE_CLASS(theClass, baseClass) \
 	const char* theClass::BaseClassName() { return typeid(baseClass).name(); } \

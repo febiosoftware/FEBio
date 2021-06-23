@@ -190,7 +190,7 @@ public:
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
 #define REGISTER_FECORE_CLASS(theClass, ...) \
-	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::classID(), #theClass, theClass::BaseClassName(), __VA_ARGS__);
+	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::superClassID(), #theClass, theClass::BaseClassName(), __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
@@ -200,12 +200,12 @@ public:
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T(theClass, theArg, theName) \
-	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), 0, 0, theName);
+	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::superClassID(), 0, 0, theName);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T2(theClass, theArg1, theArg2, theName) \
-	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::classID(), 0, 0, theName);
+	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::superClassID(), 0, 0, theName);
 
 //-----------------------------------------------------------------------------
 // Create an instance of a class.
@@ -213,7 +213,7 @@ public:
 template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	return static_cast<TBase*>(fecore.Create(TBase::classID(), sztype, pfem));
+	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
 }
 
 //-----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* 
 template <typename TBase> inline TBase* fecore_new(int classIndex, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	const FECoreFactory* f = fecore.GetFactoryClass(TBase::classID(), classIndex);
+	const FECoreFactory* f = fecore.GetFactoryClass(TBase::superClassID(), classIndex);
 	if (f) return static_cast<TBase*>(f->Create(pfem));
 	else return nullptr;
 }

@@ -187,7 +187,7 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
 			const char* sztype = tag.AttributeValue("type");
 
 			// try to allocate the class
-			FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, pc->GetFEModel());
+			FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
 			if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 			prop->SetProperty(pp);

@@ -49,6 +49,7 @@ class FEElementSet;
 class FECORE_API FEMeshPartition : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMeshPartition)
 
 public:
 	//! constructor
@@ -149,6 +150,4 @@ protected:
 
 private:
 	vector<FEDataExport*>	m_Data;	//!< list of data export classes
-	
-public: static const char* BaseClassName() { return "FEMeshPartition"; }
 };

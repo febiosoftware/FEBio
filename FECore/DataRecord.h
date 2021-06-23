@@ -62,6 +62,7 @@ public:
 class FECORE_API DataRecord : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(DataRecord)
 
 public:
 	enum {MAX_DELIM=16, MAX_STRING=1024};
@@ -108,5 +109,4 @@ protected:
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
 	FILE*		m_fp;
-public: static const char* BaseClassName() { return "DataRecord"; }
 };

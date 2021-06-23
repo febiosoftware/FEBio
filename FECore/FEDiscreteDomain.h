@@ -33,6 +33,8 @@ SOFTWARE.*/
 //! domain for discrete elements
 class FECORE_API FEDiscreteDomain : public FEDomain
 {
+	FECORE_BASE_CLASS(FEDiscreteDomain)
+
 public:
 	FEDiscreteDomain(FEModel* fem) : FEDomain(FE_DOMAIN_DISCRETE, fem) {}
 
@@ -50,5 +52,4 @@ public:
 
 protected:
 	vector<FEDiscreteElement>	m_Elem;
-public: static const char* BaseClassName() { return "FEDiscreteDomain"; }
 };

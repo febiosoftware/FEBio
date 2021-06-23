@@ -31,6 +31,8 @@ SOFTWARE.*/
 //! Abstract base class for shell element domains
 class FECORE_API FEShellDomain : public FEDomain
 {
+	FECORE_BASE_CLASS(FEShellDomain)
+
 public:
 	//! constructor
 	FEShellDomain(FEModel* fem);
@@ -67,9 +69,6 @@ public:
     
 public:
 	void ForEachShellElement(std::function<void(FEShellElement& el)> f);
-
-public: static const char* BaseClassName() { return "FEShellDomain"; }
-
 };
 
 //-----------------------------------------------------------------------------

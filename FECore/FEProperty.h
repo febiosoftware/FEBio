@@ -118,7 +118,7 @@ public: // these functions have to be implemented by derived classes
 	virtual void SetParent(FECoreBase* parent) { m_pParent = parent; }
 
 	//! Get the class ID
-	SUPER_CLASS_ID GetClassID() const { return m_classID; }
+	SUPER_CLASS_ID GetSuperClassID() const { return m_superClassID; }
 
 protected:
 	//! some helper functions for reading, writing properties
@@ -132,5 +132,5 @@ protected:
 
 protected:
 	FECoreBase*		m_pParent;	//!< pointer to the "parent" material
-	SUPER_CLASS_ID	m_classID;	//!< The class ID
+	SUPER_CLASS_ID	m_superClassID;	//!< The super class ID
 };

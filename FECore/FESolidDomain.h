@@ -46,6 +46,8 @@ typedef std::function<void(FEMaterialPoint& mp, int node_a, int node_b, matrix& 
 //! abstract base class for 3D volumetric elements
 class FECORE_API FESolidDomain : public FEDomain
 {
+    FECORE_BASE_CLASS(FESolidDomain)
+
 public:
     //! constructor
     FESolidDomain(FEModel* pfem);
@@ -284,6 +286,4 @@ protected:
 
 	FEDofList	m_dofU;
 	FEDofList	m_dofSU;
-
-public: static const char* BaseClassName() { return "FESolidDomain"; }
 };

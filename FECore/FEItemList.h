@@ -36,6 +36,7 @@ class FEMesh;
 class FECORE_API FEItemList : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEItemList)
 
 public:
 	FEItemList(FEModel* fem);
@@ -47,6 +48,4 @@ public:
 
 protected:
 	FEMesh*		m_mesh;
-
-public: static const char* BaseClassName() { return "FEItemList"; }
 };

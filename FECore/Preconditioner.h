@@ -39,6 +39,8 @@ class CompactMatrix;
 // used as a preconditioner for iterative linear solvers
 class FECORE_API Preconditioner : public LinearSolver
 {
+	FECORE_BASE_CLASS(Preconditioner)
+
 public: 
 	Preconditioner(FEModel* fem) : LinearSolver(fem), m_A(nullptr) {}
 
@@ -59,8 +61,6 @@ protected:
 
 private:
 	SparseMatrix*	m_A;
-
-public: static const char* BaseClassName() { return "Preconditioner"; }
 };
 
 //-----------------------------------------------------------------------------

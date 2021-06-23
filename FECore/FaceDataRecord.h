@@ -35,12 +35,12 @@ class FESurfaceElement;
 class FECORE_API FEFaceLogData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEFaceLogData)
 
 public:
 	FEFaceLogData(FEModel* fem);
 	virtual ~FEFaceLogData();
 	virtual double value(FESurfaceElement& el) = 0;
-public:	static const char* BaseClassName() { return "FEFaceLogData"; }
 };
 
 //-----------------------------------------------------------------------------
