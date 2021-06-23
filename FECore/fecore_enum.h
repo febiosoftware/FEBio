@@ -229,6 +229,7 @@ enum SUPER_CLASS_ID {
 	FETASK_ID,                   	// derived from FECoreTask
 	FESOLVER_ID,                 	// derived from FESolver
 	FEMATERIAL_ID,               	// derived from FEMaterial
+	FEMATERIALPROP_ID,				// derived from FEMaterialProperty
 	FEBODYLOAD_ID,               	// derived from FEBodyLoad
 	FESURFACELOAD_ID,            	// derived from FESurfaceLoad
 	FEEDGELOAD_ID,					// derived from FEEdgeLoad
