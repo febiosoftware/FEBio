@@ -284,4 +284,6 @@ protected:
 
 	FEDofList	m_dofU;
 	FEDofList	m_dofSU;
+
+public: static const char* BaseClassName() { return "FESolidDomain"; }
 };

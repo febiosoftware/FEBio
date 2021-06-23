@@ -67,6 +67,9 @@ public:
     
 public:
 	void ForEachShellElement(std::function<void(FEShellElement& el)> f);
+
+public: static const char* BaseClassName() { return "FEShellDomain"; }
+
 };
 
 //-----------------------------------------------------------------------------

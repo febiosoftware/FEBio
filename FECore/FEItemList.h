@@ -47,4 +47,6 @@ public:
 
 protected:
 	FEMesh*		m_mesh;
+
+public: static const char* BaseClassName() { return "FEItemList"; }
 };

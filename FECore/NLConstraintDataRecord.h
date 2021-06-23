@@ -41,6 +41,7 @@ public:
     FELogNLConstraintData(FEModel* fem) : FECoreBase(fem) {}
     virtual ~FELogNLConstraintData(){}
     virtual double value(FENLConstraint& rc) = 0;
+public: static const char* BaseClassName() { return "FELogNLConstraintData"; }
 };
 
 //-----------------------------------------------------------------------------

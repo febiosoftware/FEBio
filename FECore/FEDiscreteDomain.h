@@ -50,4 +50,5 @@ public:
 
 protected:
 	vector<FEDiscreteElement>	m_Elem;
+public: static const char* BaseClassName() { return "FEDiscreteDomain"; }
 };

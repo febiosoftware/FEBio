@@ -35,10 +35,10 @@ SOFTWARE.*/
 //! Base class for the viscous part of the fluid response.
 //! These materials provide the viscous stress and its tangents.
 //!
-class FEBIOFLUID_API FEElasticFluid : public FEMaterial
+class FEBIOFLUID_API FEElasticFluid : public FEMaterialProperty
 {
 public:
-    FEElasticFluid(FEModel* pfem) : FEMaterial(pfem) {}
+    FEElasticFluid(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEElasticFluid() {}
     
     //! gage pressure

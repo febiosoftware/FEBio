@@ -33,11 +33,11 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for reaction rates.
 
-class FEBIOMIX_API FEReactionRate : public FEMaterial
+class FEBIOMIX_API FEReactionRate : public FEMaterialProperty
 {
 public:
     //! constructor
-    FEReactionRate(FEModel* pfem) : FEMaterial(pfem), m_pReact(nullptr) {}
+    FEReactionRate(FEModel* pfem) : FEMaterialProperty(pfem), m_pReact(nullptr) {}
     
     //! reaction rate at material point
     virtual double ReactionRate(FEMaterialPoint& pt) = 0;

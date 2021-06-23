@@ -100,4 +100,6 @@ public:
     
 protected:
     vector<FEElement2D>	m_Elem;	//!< array of elements
+
+public: static const char* BaseClassName() { return "FEDomain2D"; }
 };

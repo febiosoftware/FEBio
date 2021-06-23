@@ -36,11 +36,11 @@ SOFTWARE.*/
 //! Base class for solute diffusivity.
 //! These materials need to define the diffusivity and tangent diffusivity functions.
 //!
-class FEBIOMIX_API FESoluteDiffusivity : public FEMaterial
+class FEBIOMIX_API FESoluteDiffusivity : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESoluteDiffusivity(FEModel* pfem) : FEMaterial(pfem) {}
+	FESoluteDiffusivity(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solute diffusivity
 	virtual mat3ds Diffusivity(FEMaterialPoint& pt) = 0;
@@ -72,11 +72,11 @@ private:
 //! Base class for solute solubility.
 //! These materials need to define the solubility and tangent solubility functions.
 //!
-class FEBIOMIX_API FESoluteSolubility : public FEMaterial
+class FEBIOMIX_API FESoluteSolubility : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESoluteSolubility(FEModel* pfem) : FEMaterial(pfem) {}
+	FESoluteSolubility(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solute solubility
 	virtual double Solubility(FEMaterialPoint& pt) = 0;
@@ -113,11 +113,11 @@ private:
 //! These materials need to define the solute supply and tangent supply functions.
 //! The solute supply has units of moles/(referential mixture volume)/time
 //!
-class FEBIOMIX_API FESoluteSupply : public FEMaterial
+class FEBIOMIX_API FESoluteSupply : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESoluteSupply(FEModel* pfem) : FEMaterial(pfem) {}
+	FESoluteSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solute supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;
@@ -167,7 +167,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solute materials.
 
-class FESolute : public FEMaterial
+class FESolute : public FEMaterialProperty
 {
 public:
 	FESolute(FEModel* pfem);
@@ -240,7 +240,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solid-bound molecules.
 
-class FESolidBoundMolecule : public FEMaterial
+class FESolidBoundMolecule : public FEMaterialProperty
 {
 public:
 	FESolidBoundMolecule(FEModel* pfem);

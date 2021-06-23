@@ -34,11 +34,11 @@ SOFTWARE.*/
 //! Base class for osmotic coefficient.
 //! These materials need to define the osmotic coefficient and tangent functions.
 //!
-class FEBIOMIX_API FEOsmoticCoefficient : public FEMaterial
+class FEBIOMIX_API FEOsmoticCoefficient : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FEOsmoticCoefficient(FEModel* pfem) : FEMaterial(pfem) {}
+	FEOsmoticCoefficient(FEModel* pfem) : FEMaterialProperty(pfem) {}
     
 	//! osmotic coefficient
 	virtual double OsmoticCoefficient(FEMaterialPoint& pt) = 0;

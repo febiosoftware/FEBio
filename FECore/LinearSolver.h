@@ -127,6 +127,8 @@ protected:
 
 private:
 	LinearSolverStats	m_stats;	//!< stats on how often linear solver was called.
+
+public: static const char* BaseClassName() { return "LinearSolver"; }
 };
 
 //-----------------------------------------------------------------------------

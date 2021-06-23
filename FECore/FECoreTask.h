@@ -49,4 +49,6 @@ public:
 
 	//! Run the task.
 	virtual bool Run() = 0;
+
+public: static const char* BaseClassName() { return "FECoreTask"; }
 };

@@ -43,6 +43,8 @@ public:
 	FELogElemData(FEModel* fem);
 	virtual ~FELogElemData();
 	virtual double value(FEElement& el) = 0;
+
+	static const char* BaseClassName() { return "FELogElemData"; }
 };
 
 //-----------------------------------------------------------------------------

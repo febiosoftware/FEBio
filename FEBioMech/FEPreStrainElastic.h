@@ -70,10 +70,10 @@ protected:
 //! Base class for algorithms that will be used to calculate a pre-strain gradient.
 //! This is used by the FEPrestrainElastic class to calculate the initial pre-strain
 //! gradient.
-class FEPrestrainGradient : public FEMaterial
+class FEPrestrainGradient : public FEMaterialProperty
 {
 public:
-	FEPrestrainGradient(FEModel* pfem) : FEMaterial(pfem) {}
+	FEPrestrainGradient(FEModel* pfem) : FEMaterialProperty(pfem) {}
 	virtual ~FEPrestrainGradient(){}
 
 	// evaluate the pre-strain deformation gradient

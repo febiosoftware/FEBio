@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FESoluteInterface.h"
 
 //-----------------------------------------------------------------------------
-FEReaction::FEReaction(FEModel* pfem) : FEMaterial(pfem)
+FEReaction::FEReaction(FEModel* pfem) : FEMaterialProperty(pfem)
 {
     m_psm = nullptr;
 }
@@ -49,5 +49,5 @@ bool FEReaction::Init()
     }
     
     // now call base class
-    return FEMaterial::Init();
+    return FEMaterialProperty::Init();
 }

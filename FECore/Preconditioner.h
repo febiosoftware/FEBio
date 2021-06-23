@@ -59,6 +59,8 @@ protected:
 
 private:
 	SparseMatrix*	m_A;
+
+public: static const char* BaseClassName() { return "Preconditioner"; }
 };
 
 //-----------------------------------------------------------------------------

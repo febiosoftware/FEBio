@@ -59,10 +59,16 @@ private:
 	const char*		m_szname;
 	unsigned int	m_flags;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
 
+protected:
+	const char* m_className;	// name of class that can be assigned to this
+
 public:
 	// Set\Get the name of the property
 	FEProperty& SetName(const char* sz);
 	const char* GetName() const;
+
+	// get the class name
+	const char* GetClassName() const { return m_className; }
 
 	// is the property required
 	bool IsRequired() const { return (m_flags & Required) != 0; }

@@ -290,7 +290,7 @@ bool FEMembraneReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 //! Data serialization
 void FEMembraneReaction::Serialize(DumpStream& ar)
 {
-    FEMaterial::Serialize(ar);
+    FEReaction::Serialize(ar);
     
     if (ar.IsShallow() == false)
     {

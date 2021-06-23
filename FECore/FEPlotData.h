@@ -121,6 +121,8 @@ private:
 
 	int				m_arraySize;	//!< size of arrays (used by arrays)
 	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)
+
+public: static const char* BaseClassName() { return "FEPlotData"; }
 };
 
 //-----------------------------------------------------------------------------

@@ -149,4 +149,6 @@ protected:
 
 private:
 	vector<FEDataExport*>	m_Data;	//!< list of data export classes
+	
+public: static const char* BaseClassName() { return "FEMeshPartition"; }
 };

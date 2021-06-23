@@ -41,7 +41,7 @@ SOFTWARE.*/
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FEDamageCDF, FEMaterial)
+BEGIN_FECORE_CLASS(FEDamageCDF, FEMaterialProperty)
 	ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_FECORE_CLASS();
 

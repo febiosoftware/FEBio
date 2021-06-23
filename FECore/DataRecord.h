@@ -108,4 +108,5 @@ protected:
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
 	FILE*		m_fp;
+public: static const char* BaseClassName() { return "DataRecord"; }
 };

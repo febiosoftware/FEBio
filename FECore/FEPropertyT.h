@@ -37,7 +37,11 @@ private:
 	T**	m_pc;	//!< pointer to pointer of property
 
 public:
-	FEPropertyT(T** ppc) : FEProperty(T::classID()) { m_pc = ppc; }
+	FEPropertyT(T** ppc) : FEProperty(T::classID()) 
+	{ 
+		m_pc = ppc; 
+		m_className = typeid(T).name();
+	}
 
 	bool IsArray() const override { return false; }
 	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }

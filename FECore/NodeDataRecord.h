@@ -43,6 +43,7 @@ public:
 	FENodeLogData(FEModel* fem);
 	virtual ~FENodeLogData();
 	virtual double value(int node) = 0; 
+public: static const char* BaseClassName() { return "FENodeLogData"; }
 };
 
 //-----------------------------------------------------------------------------

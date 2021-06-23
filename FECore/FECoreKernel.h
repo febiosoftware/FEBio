@@ -174,7 +174,7 @@ private:
 template <typename T> class FERegisterClass_T : public FECoreFactory
 {
 public:
-	FERegisterClass_T(SUPER_CLASS_ID sid, const char* szclass, const char* szalias, int spec = -1) : FECoreFactory(sid, szclass, szalias, spec)
+	FERegisterClass_T(SUPER_CLASS_ID sid, const char* szclass, const char* szbase, const char* szalias, int spec = -1) : FECoreFactory(sid, szclass, szbase, szalias, spec)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);
@@ -190,22 +190,22 @@ public:
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
 #define REGISTER_FECORE_CLASS(theClass, ...) \
-	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::classID(), #theClass, __VA_ARGS__);
+	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::classID(), #theClass, theClass::BaseClassName(), __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
 #define REGISTER_FECORE_CLASS_EXPLICIT(theClass, theID, ...) \
-	static FERegisterClass_T<theClass> _##theClass##_rc(theID, #theClass, __VA_ARGS__);
+	static FERegisterClass_T<theClass> _##theClass##_rc(theID, #theClass, theClass::BaseClassName(), __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T(theClass, theArg, theName) \
-	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), 0, theName);
+	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), 0, 0, theName);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T2(theClass, theArg1, theArg2, theName) \
-	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::classID(), 0, theName);
+	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::classID(), 0, 0, theName);
 
 //-----------------------------------------------------------------------------
 // Create an instance of a class.

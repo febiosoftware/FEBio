@@ -39,11 +39,31 @@ class FEDomain;
 class DumpStream;
 
 //-----------------------------------------------------------------------------
-//! Abstract base class for material types
+class FECORE_API FEMaterialBase : public FECoreBase
+{
+public:
+	FEMaterialBase(FEModel* fem);
 
+	//! returns a pointer to a new material point object
+	virtual FEMaterialPoint* CreateMaterialPointData();
+
+	//! Update specialized material points at each iteration
+	virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp);
+
+	// evaluate local coordinate system at material point
+	mat3d GetLocalCS(const FEMaterialPoint& mp);
+
+private:
+	FEParamMat3d	m_Q;			//!< local material coordinate system
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+//! Abstract base class for material types
 //! From this class all other material classes are derived.
 
-class FECORE_API FEMaterial : public FECoreBase
+class FECORE_API FEMaterial : public FEMaterialBase
 {
 	FECORE_SUPER_CLASS
 
@@ -51,21 +71,11 @@ public:
 	FEMaterial(FEModel* fem);
 	virtual ~FEMaterial();
 
-	//! returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() { return 0; };
-
 	//! performs initialization
 	bool Init() override;
 
-    //! Update specialized material points at each iteration
-    virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) {}
-
 	//! get a domain parameter
 	FEDomainParameter* FindDomainParameter(const std::string& paramName);
-
-public:
-	// evaluate local coordinate system at material point
-	mat3d GetLocalCS(const FEMaterialPoint& mp);
 
 public:
 	//! Assign a domain to this material
@@ -78,10 +88,17 @@ protected:
 	void AddDomainParameter(FEDomainParameter* p);
 
 private:
-	FEParamMat3d	m_Q;			//!< local material coordinate system
 	FEDomainList	m_domList;		//!< list of domains that use this material
 
 	std::vector<FEDomainParameter*>	m_param;	//!< list of domain variables
+};
 
-	DECLARE_FECORE_CLASS();
+//-----------------------------------------------------------------------------
+// Material properties are classes that can only be defined as properties of other materials
+class FECORE_API FEMaterialProperty : public FEMaterialBase
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FEMaterialProperty(FEModel* fem);
 };

@@ -48,6 +48,8 @@ public:
 	virtual bool isConst() { return false; }
 
 	virtual double* constValue() { return nullptr; }
+
+public: static const char* BaseClassName() { return "FEScalarValuator"; }
 };
 
 //---------------------------------------------------------------------------------------

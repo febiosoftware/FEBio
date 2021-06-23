@@ -40,6 +40,7 @@ public:
 	FEFaceLogData(FEModel* fem);
 	virtual ~FEFaceLogData();
 	virtual double value(FESurfaceElement& el) = 0;
+public:	static const char* BaseClassName() { return "FEFaceLogData"; }
 };
 
 //-----------------------------------------------------------------------------

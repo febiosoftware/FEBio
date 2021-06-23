@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEBioMech/FERemodelingElasticMaterial.h"
 
 // Material parameters for the FEMultiphasic material
-BEGIN_FECORE_CLASS(FEReactionRateHuiskes, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateHuiskes, FEReactionRate)
 	ADD_PARAMETER(m_B, "B");
 	ADD_PARAMETER(m_psi0, FE_RANGE_GREATER_OR_EQUAL(0.0), "psi0");
 END_FECORE_CLASS();

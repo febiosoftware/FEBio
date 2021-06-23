@@ -47,6 +47,8 @@ public:
 	virtual bool isConst() { return false; }
 
 	virtual mat3d* constValue() { return nullptr; }
+
+public: static const char* BaseClassName() { return "FEMat3dValuator"; }
 };
 
 //-----------------------------------------------------------------------------

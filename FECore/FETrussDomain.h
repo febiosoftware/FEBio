@@ -55,4 +55,5 @@ public:
 
 protected:
 	vector<FETrussElement>	m_Elem;
+public: static const char* BaseClassName() { return "FETrussDomain"; }
 };

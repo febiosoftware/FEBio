@@ -40,7 +40,7 @@ class FESoluteInterface;
 typedef std::map<int,int> intmap;
 typedef std::map<int,int>::iterator itrmap;
 
-class FEBIOMIX_API FEReaction : public FEMaterial
+class FEBIOMIX_API FEReaction : public FEMaterialProperty
 {
 public:
     //! constructor

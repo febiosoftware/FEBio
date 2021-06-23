@@ -52,4 +52,6 @@ public:
 
 	// return the const value
 	virtual vec3d* constValue() { return nullptr; }
+
+public: static const char* BaseClassName() { return "FEVec3dValuator"; }
 };

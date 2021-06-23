@@ -33,10 +33,10 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for fluid thermal conductivity materials.
 
-class FEBIOFLUID_API FEFluidThermalConductivity : public FEMaterial
+class FEBIOFLUID_API FEFluidThermalConductivity : public FEMaterialProperty
 {
 public:
-    FEFluidThermalConductivity(FEModel* pfem) : FEMaterial(pfem) {}
+    FEFluidThermalConductivity(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEFluidThermalConductivity() {}
     
 public:

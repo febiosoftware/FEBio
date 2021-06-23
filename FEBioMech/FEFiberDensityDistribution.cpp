@@ -58,7 +58,7 @@ double FEEllipsodialFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, 
 
 //-----------------------------------------------------------------------------
 // define the 3d von Mises fiber density distribution material parameters
-BEGIN_FECORE_CLASS(FEVonMises3DFiberDensityDistribution, FEMaterial)
+BEGIN_FECORE_CLASS(FEVonMises3DFiberDensityDistribution, FEFiberDensityDistribution)
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_FECORE_CLASS();
 
@@ -73,7 +73,7 @@ double FEVonMises3DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
 
 //-----------------------------------------------------------------------------
 // define the 3d 2-fiber family axisymmetric von Mises fiber density distribution material parameters
-BEGIN_FECORE_CLASS(FEVonMises3DTwoFDDAxisymmetric, FEMaterial)
+BEGIN_FECORE_CLASS(FEVonMises3DTwoFDDAxisymmetric, FEFiberDensityDistribution)
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 	ADD_PARAMETER(m_c, FE_RANGE_CLOSED(0, 1), "cosg" );
 END_FECORE_CLASS();
@@ -101,7 +101,7 @@ double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(FEMaterialPoint& mp, const v
 
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
-BEGIN_FECORE_CLASS(FEEllipticalFiberDensityDistribution, FEMaterial)
+BEGIN_FECORE_CLASS(FEEllipticalFiberDensityDistribution, FEFiberDensityDistribution)
 	ADD_PARAMETER(m_spa[0], FE_RANGE_GREATER_OR_EQUAL(0.0), "spa1" );
 	ADD_PARAMETER(m_spa[1], FE_RANGE_GREATER_OR_EQUAL(0.0), "spa2" );
 END_FECORE_CLASS();
@@ -118,7 +118,7 @@ double FEEllipticalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
 
 //-----------------------------------------------------------------------------
 // define the 2d von Mises fiber density distribution material parameters
-BEGIN_FECORE_CLASS(FEVonMises2DFiberDensityDistribution, FEMaterial)
+BEGIN_FECORE_CLASS(FEVonMises2DFiberDensityDistribution, FEFiberDensityDistribution)
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_FECORE_CLASS();
 
