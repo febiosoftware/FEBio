@@ -33,10 +33,11 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! constructor
-FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* szclass, const char* szalias, int nspec) : m_scid(scid)
+FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* szclass, const char* szbase, const char* szalias, int nspec) : m_scid(scid)
 { 
 	m_szclass = szclass;
-	m_szalias = szalias; 
+	m_szalias = szalias;
+	m_szbase = szbase;
 	m_module = 0; 
 	m_spec = nspec;
 	m_alloc_id = -1;

@@ -49,6 +49,7 @@ class FEElementSet;
 class FECORE_API FEMeshPartition : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMeshPartition)
 
 public:
 	//! constructor

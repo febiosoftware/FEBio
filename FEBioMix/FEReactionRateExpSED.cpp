@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEBiphasic.h"
 
 // Material parameters for the FEMultiphasic material
-BEGIN_FECORE_CLASS(FEReactionRateExpSED, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateExpSED, FEReactionRate)
 	ADD_PARAMETER(m_B   , "B");
 	ADD_PARAMETER(m_Psi0, FE_RANGE_NOT_EQUAL(0.0), "Psi0");
 END_FECORE_CLASS();

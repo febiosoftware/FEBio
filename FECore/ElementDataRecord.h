@@ -38,11 +38,13 @@ class FEElementSet;
 class FECORE_API FELogElemData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FELogElemData)
 
 public:
 	FELogElemData(FEModel* fem);
 	virtual ~FELogElemData();
 	virtual double value(FEElement& el) = 0;
+
 };
 
 //-----------------------------------------------------------------------------

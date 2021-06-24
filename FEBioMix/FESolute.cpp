@@ -81,7 +81,7 @@ bool FESoluteData::Init()
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_FECORE_CLASS(FESolute, FEMaterial)
+BEGIN_FECORE_CLASS(FESolute, FEMaterialProperty)
 	ADD_PARAMETER(m_rhoT, "density");
 	ADD_PARAMETER(m_M, "molar_mass");
 	ADD_PARAMETER(m_z, "charge_number");
@@ -99,7 +99,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FESolute constructor
 
-FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
+FESolute::FESolute(FEModel* pfem) : FEMaterialProperty(pfem)
 {
 	m_rhoT = 0;
 	m_M = 0;
@@ -128,7 +128,7 @@ FESoluteData* FESolute::FindSoluteData(int nid)
 //-----------------------------------------------------------------------------
 bool FESolute::Init()
 {
-	if (FEMaterial::Init() == false) return false;
+	if (FEMaterialProperty::Init() == false) return false;
 
 	FESoluteData* psd = FindSoluteData(m_ID);
 	if (psd == 0) {
@@ -150,7 +150,7 @@ bool FESolute::Init()
 //! Data serialization
 void FESolute::Serialize(DumpStream& ar)
 {
-	FEMaterial::Serialize(ar);
+	FEMaterialProperty::Serialize(ar);
 	ar & m_ID & m_LID;
 }
 
@@ -179,7 +179,7 @@ FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 //=============================================================================
 
 // Material parameters for the FESolidBoundMolecule material
-BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterial)
+BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterialProperty)
 	ADD_PARAMETER(m_rho0  , "rho0"  );
 	ADD_PARAMETER(m_rhomin, "rhomin");
 	ADD_PARAMETER(m_rhomax, "rhomax");
@@ -191,7 +191,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FESolidBoundMolecule constructor
 
-FESolidBoundMolecule::FESolidBoundMolecule(FEModel* pfem) : FEMaterial(pfem)
+FESolidBoundMolecule::FESolidBoundMolecule(FEModel* pfem) : FEMaterialProperty(pfem)
 {
 	m_ID = -1;
 	m_rhoT = 1;
@@ -218,7 +218,7 @@ FESBMData* FESolidBoundMolecule::FindSBMData(int nid)
 //-----------------------------------------------------------------------------
 bool FESolidBoundMolecule::Init()
 {
-	if (FEMaterial::Init() == false) return false;
+	if (FEMaterialProperty::Init() == false) return false;
 	
 	FESBMData* psd = FindSBMData(m_ID);
 	if (psd == 0) {
@@ -240,7 +240,7 @@ bool FESolidBoundMolecule::Init()
 //! Data serialization
 void FESolidBoundMolecule::Serialize(DumpStream& ar)
 {
-	FEMaterial::Serialize(ar);
+	FEMaterialProperty::Serialize(ar);
 	ar & m_ID;
 	ar & m_rhoT & m_M & m_z & m_rho0;
 	ar & m_rhomin & m_rhomax;

@@ -36,6 +36,7 @@ SOFTWARE.*/
 class FECORE_API FEVec3dValuator : public FEValuator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEVec3dValuator)
 
 public:
 	FEVec3dValuator(FEModel* fem);

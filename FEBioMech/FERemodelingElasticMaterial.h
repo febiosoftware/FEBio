@@ -35,11 +35,11 @@ SOFTWARE.*/
 //! The solid supply has units of mass/(referential volume)/time
 //!
 
-class FEBIOMECH_API FESolidSupply : public FEMaterial
+class FEBIOMECH_API FESolidSupply : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESolidSupply(FEModel* pfem) : FEMaterial(pfem) {}
+	FESolidSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solid supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;

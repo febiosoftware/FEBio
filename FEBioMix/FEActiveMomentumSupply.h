@@ -34,10 +34,10 @@ SOFTWARE.*/
 //! Base class for active momentum supply.
 //! These materials need to define the momentum supply and its tangents.
 //!
-class FEBIOMIX_API FEActiveMomentumSupply : public FEMaterial
+class FEBIOMIX_API FEActiveMomentumSupply : public FEMaterialProperty
 {
 public:
-    FEActiveMomentumSupply(FEModel* pfem) : FEMaterial(pfem) {}
+    FEActiveMomentumSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEActiveMomentumSupply(){}
     
     //! active momentum supply

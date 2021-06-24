@@ -1052,7 +1052,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				FEMesh& mesh = GetFEModel()->GetMesh();
 
 				// This property should reference an existing class
-				SUPER_CLASS_ID classID = prop->GetClassID();
+				SUPER_CLASS_ID classID = prop->GetSuperClassID();
 				if (classID == FEITEMLIST_ID)
 				{
 					FENodeSet* nodeSet = mesh.FindNodeSet(szref);
@@ -1104,7 +1104,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					else
 					{
 						// try to allocate the class
-						FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+						FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, GetFEModel());
 						if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 						prop->SetProperty(pp);

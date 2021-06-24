@@ -36,6 +36,7 @@ SOFTWARE.*/
 class FEBIOMECH_API FELogObjectData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FELogObjectData)
 
 public:
 	FELogObjectData(FEModel* fem) : FECoreBase(fem) {}

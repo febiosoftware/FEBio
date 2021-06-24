@@ -34,10 +34,10 @@ SOFTWARE.*/
 //! Base class for solvent supply.
 //! These materials need to define the supply and tangent supply functions.
 //!
-class FEBIOMIX_API FESolventSupply : public FEMaterial
+class FEBIOMIX_API FESolventSupply : public FEMaterialProperty
 {
 public:
-	FESolventSupply(FEModel* pfem) : FEMaterial(pfem) {}
+	FESolventSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
 	virtual ~FESolventSupply(){}
 	
 	//! solvent supply

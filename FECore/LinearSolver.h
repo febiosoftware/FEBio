@@ -53,6 +53,7 @@ struct FECORE_API LinearSolverStats
 class FECORE_API LinearSolver : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(LinearSolver)
 
 public:
 	//! constructor

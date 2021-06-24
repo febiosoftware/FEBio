@@ -38,6 +38,7 @@ class FEModel;
 class FECORE_API FECoreTask : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FECoreTask)
 
 public:
 	FECoreTask(FEModel* fem);

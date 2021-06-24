@@ -38,6 +38,7 @@ class FENodeSet;
 class FECORE_API FENodeLogData : public FECoreBase
 { 
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FENodeLogData)
 
 public:
 	FENodeLogData(FEModel* fem);

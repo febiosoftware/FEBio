@@ -37,6 +37,7 @@ SOFTWARE.*/
 class FECORE_API FEScalarValuator : public FEValuator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEScalarValuator)
 
 public:
 	FEScalarValuator(FEModel* fem) : FEValuator(fem) {};

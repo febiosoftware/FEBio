@@ -42,7 +42,7 @@ class FECORE_API FECoreFactory : public FEParamContainer
 {
 public:
 	//! constructor
-	FECoreFactory(SUPER_CLASS_ID scid, const char* szclass, const char* szalias, int nspec = -1);
+	FECoreFactory(SUPER_CLASS_ID scid, const char* szclass, const char* szbase, const char* szalias, int nspec = -1);
 
 	//! virtual constructor
 	virtual ~FECoreFactory();
@@ -53,6 +53,9 @@ public:
 public:
 	// return the class name
 	const char* GetClassName() const { return m_szclass; }
+
+	// return the base class name
+	const char* GetBaseClassName() const { return m_szbase; }
 
 	// return the type string identifier
 	const char* GetTypeStr() const { return m_szalias; }
@@ -81,6 +84,7 @@ public:
 
 private:
 	const char*		m_szclass;	//!< class name
+	const char*		m_szbase;	//!< base class name
 	const char*		m_szalias;	//!< class alias string
 	int				m_spec;		//!< The max spec number for which this feature is defined (-1 is don't care)
 	unsigned int	m_module;	//!< ID of module this class belongs to

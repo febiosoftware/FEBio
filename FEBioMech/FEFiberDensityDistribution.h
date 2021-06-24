@@ -33,10 +33,10 @@ SOFTWARE.*/
 //---------------------------------------------------------------------------
 // Base class for fiber density distribution functions
 //
-class FEFiberDensityDistribution : public FEMaterial
+class FEFiberDensityDistribution : public FEMaterialProperty
 {
 public:
-    FEFiberDensityDistribution(FEModel* pfem) : FEMaterial(pfem) {}
+    FEFiberDensityDistribution(FEModel* pfem) : FEMaterialProperty(pfem) {}
     
     // Evaluation of fiber density along n0
     virtual double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) = 0;

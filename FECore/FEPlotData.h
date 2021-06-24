@@ -62,6 +62,7 @@ class FEElement;
 class FECORE_API FEPlotData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEPlotData)
 
 public:
 	FEPlotData(FEModel* fem);

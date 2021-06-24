@@ -37,6 +37,12 @@ BEGIN_FECORE_CLASS(FEArrudaBoyce, FEUncoupledMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEArrudaBoyce::FEArrudaBoyce(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+	m_N = 1;
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

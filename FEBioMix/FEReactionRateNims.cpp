@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 // Material parameters for the FEMultiphasic material
-BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateNims, FEReactionRate)
 	ADD_PARAMETER(m_sol, "sol");
 	ADD_PARAMETER(m_k0, "k0");
 	ADD_PARAMETER(m_kc, "kc");
@@ -60,7 +60,7 @@ FEReactionRateNims::FEReactionRateNims(FEModel* pfem) : FEReactionRate(pfem)
 //-----------------------------------------------------------------------------
 bool FEReactionRateNims::Init()
 {
-	if (FEMaterial::Init() == false) return false;
+	if (FEReactionRate::Init() == false) return false;
 	
     // do only once
     if (m_lid == -1) {

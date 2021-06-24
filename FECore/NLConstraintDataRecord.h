@@ -36,6 +36,7 @@ SOFTWARE.*/
 class FECORE_API FELogNLConstraintData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+    FECORE_BASE_CLASS(FELogNLConstraintData)
 
 public:
     FELogNLConstraintData(FEModel* fem) : FECoreBase(fem) {}

@@ -173,7 +173,7 @@ bool FECoreBase::SetParameters(const ClassDescriptor::ClassVariable& cv)
 			if (prop == nullptr) return false;
 
 			// allocate a new child class
-			FECoreBase* pc = fecore_new<FECoreBase>(prop->GetClassID(), ci->m_type.c_str(), GetFEModel()); assert(pc);
+			FECoreBase* pc = fecore_new<FECoreBase>(prop->GetSuperClassID(), ci->m_type.c_str(), GetFEModel()); assert(pc);
 			if (pc == nullptr) return false;
 
 			// assign the property

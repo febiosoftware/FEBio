@@ -36,6 +36,7 @@ class FEDataMap;
 class FECORE_API FEMat3dsValuator : public FEValuator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMat3dsValuator)
 
 public:
 	FEMat3dsValuator(FEModel* fem) : FEValuator(fem) {};

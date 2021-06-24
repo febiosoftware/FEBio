@@ -62,6 +62,7 @@ public:
 class FECORE_API DataRecord : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(DataRecord)
 
 public:
 	enum {MAX_DELIM=16, MAX_STRING=1024};

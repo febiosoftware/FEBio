@@ -33,10 +33,10 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Virtual base class for damage cumulative distribution functions
 
-class FEDamageCDF : public FEMaterial
+class FEDamageCDF : public FEMaterialProperty
 {
 public:
-    FEDamageCDF(FEModel* pfem) : FEMaterial(pfem) { m_Dmax = 1; }
+    FEDamageCDF(FEModel* pfem) : FEMaterialProperty(pfem) { m_Dmax = 1; }
     
 	//! damage
 	double Damage(FEMaterialPoint& pt);

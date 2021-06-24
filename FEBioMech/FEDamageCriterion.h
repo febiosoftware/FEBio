@@ -32,10 +32,10 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Virtual base class for damage criterion
 
-class FEDamageCriterion : public FEMaterial
+class FEDamageCriterion : public FEMaterialProperty
 {
 public:
-	FEDamageCriterion(FEModel* pfem) : FEMaterial(pfem) {}
+	FEDamageCriterion(FEModel* pfem) : FEMaterialProperty(pfem) {}
     
 	//! damage
 	virtual double DamageCriterion(FEMaterialPoint& pt) = 0;

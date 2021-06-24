@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-FEProperty::FEProperty(SUPER_CLASS_ID classID) : m_szname(nullptr), m_flags(0), m_classID(classID) {}
+FEProperty::FEProperty(SUPER_CLASS_ID superClassID) : m_szname(nullptr), m_className(nullptr), m_flags(0), m_superClassID(superClassID) {}
 
 //-----------------------------------------------------------------------------
 FEProperty::~FEProperty(){}
