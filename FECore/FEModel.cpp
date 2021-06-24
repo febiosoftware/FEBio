@@ -535,8 +535,19 @@ bool FEModel::Init()
 		feLogWarning("Model has %d unreferenced load controllers.", unused);
 	}
 
+	bool ret = false;
+	try
+	{
+		ret = DoCallback(CB_INIT);
+	}
+	catch (std::exception c)
+	{
+		ret = false;
+		feLogError(c.what());
+	}
+
 	// do the callback
-	return DoCallback(CB_INIT);
+	return ret;
 }
 
 //-----------------------------------------------------------------------------
