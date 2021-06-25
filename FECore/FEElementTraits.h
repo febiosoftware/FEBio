@@ -772,7 +772,7 @@ protected:
 //=============================================================================
 // This class defines the traits for surface elements and serves as a
 // base class for the specific surface element formulations.
-class FESurfaceElementTraits : public FEElementTraits
+class FECORE_API FESurfaceElementTraits : public FEElementTraits
 {
 public:
 	FESurfaceElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
