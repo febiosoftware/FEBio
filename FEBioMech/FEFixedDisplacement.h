@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,54 +23,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEBoundaryCondition.h"
+#include <FECore/FEFixedBC.h>
 
-//-----------------------------------------------------------------------------
-class FENodeSet;
-
-//-----------------------------------------------------------------------------
-//! This class represents a fixed degree of freedom
-//! This boundary conditions sets the BC attribute of the nodes in the nodeset
-//! to DOF_FIXED when activated.
-class FECORE_API FEFixedBC : public FEBoundaryCondition
+class FEFixedDisplacement : public FEFixedBC
 {
 public:
-	//! constructors
-	FEFixedBC(FEModel* pfem);
-	FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset);
-
-	//! initialization
+	FEFixedDisplacement(FEModel* fem);
 	bool Init() override;
 
-	//! activation
-	void Activate() override;
-
-	//! deactivation
-	void Deactivate() override;
-
-	void CopyFrom(FEBoundaryCondition* bc) override;
-
-public:
-	// set the dof list
-	void SetDOF(int ndof);
-	void SetDOFList(const std::vector<int>& dofs);
-
-	// get the dof list
-	const std::vector<int> GetDOFList();
-
-	// Set the node set
-	void SetNodeSet(FENodeSet* nodeSet);
-
-	// Get the node set
-	FENodeSet* GetNodeSet();
-
-protected:
-	std::vector<int>	m_dofs;		//!< dof list
-	FENodeSet*			m_nodeSet;
-
 	DECLARE_FECORE_CLASS();
+
+private:
+	bool	m_b[3];
 };

@@ -218,6 +218,8 @@ SOFTWARE.*/
 #include "FEDiscreteElasticDomain.h"
 #include "FEDeformableSpringDomain.h"
 #include "RigidBC.h"
+#include "FEFixedDisplacement.h"
+#include "FEPrescribedDisplacement.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEBCRigidDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
@@ -477,6 +479,8 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBoundaryCondition
+	REGISTER_FECORE_CLASS(FEFixedDisplacement, "fixed displacement");
+	REGISTER_FECORE_CLASS(FEPrescribedDisplacement, "prescribed displacement");
 	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation, "prescribed deformation");
 	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O, "prescribed deformation 2O");
 	REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement");

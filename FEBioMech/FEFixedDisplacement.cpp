@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,54 +23,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEFixedDisplacement.h"
+#include <FECore/FEModel.h>
 
+BEGIN_FECORE_CLASS(FEFixedDisplacement, FEBoundaryCondition)
+	ADD_PARAMETER(m_b[0], "fix_x");
+	ADD_PARAMETER(m_b[1], "fix_y");
+	ADD_PARAMETER(m_b[2], "fix_z");
+	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
+END_FECORE_CLASS();
 
-
-#pragma once
-#include "FEBoundaryCondition.h"
-
-//-----------------------------------------------------------------------------
-class FENodeSet;
-
-//-----------------------------------------------------------------------------
-//! This class represents a fixed degree of freedom
-//! This boundary conditions sets the BC attribute of the nodes in the nodeset
-//! to DOF_FIXED when activated.
-class FECORE_API FEFixedBC : public FEBoundaryCondition
+FEFixedDisplacement::FEFixedDisplacement(FEModel* fem) : FEFixedBC(fem)
 {
-public:
-	//! constructors
-	FEFixedBC(FEModel* pfem);
-	FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset);
+	m_b[0] = false;
+	m_b[1] = false;
+	m_b[2] = false;
+}
 
-	//! initialization
-	bool Init() override;
-
-	//! activation
-	void Activate() override;
-
-	//! deactivation
-	void Deactivate() override;
-
-	void CopyFrom(FEBoundaryCondition* bc) override;
-
-public:
-	// set the dof list
-	void SetDOF(int ndof);
-	void SetDOFList(const std::vector<int>& dofs);
-
-	// get the dof list
-	const std::vector<int> GetDOFList();
-
-	// Set the node set
-	void SetNodeSet(FENodeSet* nodeSet);
-
-	// Get the node set
-	FENodeSet* GetNodeSet();
-
-protected:
-	std::vector<int>	m_dofs;		//!< dof list
-	FENodeSet*			m_nodeSet;
-
-	DECLARE_FECORE_CLASS();
-};
+bool FEFixedDisplacement::Init()
+{
+	FEModel* fem = GetFEModel();
+	DOFS& dofs = fem->GetDOFS();
+	m_dofs.clear();
+	if (m_b[0]) m_dofs.push_back(dofs.GetDOF("x"));
+	if (m_b[1]) m_dofs.push_back(dofs.GetDOF("y"));
+	if (m_b[2]) m_dofs.push_back(dofs.GetDOF("z"));
+	return FEFixedBC::Init();
+}

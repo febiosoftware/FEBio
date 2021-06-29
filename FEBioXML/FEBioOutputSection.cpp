@@ -72,6 +72,8 @@ bool string_to_int_vector(const char* szlist, std::vector<int>& list)
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::Parse(XMLTag& tag)
 {
+	if (tag.isleaf()) return;
+
 	++tag;
 	do
 	{
