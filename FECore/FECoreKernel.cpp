@@ -38,6 +38,7 @@ class FECoreKernel::Module
 {
 public:
 	const char*		m_szname;	// name of module
+	const char*		m_szdesc;	// description of module (optional, can be null)
 	unsigned int	m_id;		// unqiue ID (starting at one)
 	int				m_alloc_id;	// ID of allocator
 	vector<int>		m_depMods;	// module dependencies
@@ -432,7 +433,7 @@ int FECoreKernel::Modules() const
 
 //-----------------------------------------------------------------------------
 //! create a module
-bool FECoreKernel::CreateModule(const char* szmod)
+bool FECoreKernel::CreateModule(const char* szmod, const char* description)
 {
 	m_activeModule = -1;
 	if (szmod == 0) return false;
@@ -445,6 +446,7 @@ bool FECoreKernel::CreateModule(const char* szmod)
 		Module* newModule = new Module;
 		newModule->m_szname = szmod;
 		newModule->m_id = newID;
+		newModule->m_szdesc = description;
 		m_modules.push_back(newModule);
 
 		// make this the active module
@@ -460,6 +462,12 @@ const char* FECoreKernel::GetModuleName(int i) const
 {
 	if ((i<0) || (i >= m_modules.size())) return nullptr;
 	return m_modules[i]->m_szname;
+}
+
+const char* FECoreKernel::GetModuleDescription(int i) const
+{
+	if ((i < 0) || (i >= m_modules.size())) return nullptr;
+	return m_modules[i]->m_szdesc;
 }
 
 //! Get a module

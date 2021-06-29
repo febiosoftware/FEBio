@@ -106,7 +106,7 @@ public: // Modules
 	int Modules() const;
 
 	//! Create a module (also makes it the active module)
-	bool CreateModule(const char* szmodule);
+	bool CreateModule(const char* szmodule, const char* description = nullptr);
 
 	//! set the active module
 	bool SetActiveModule(const char* szmodule);
@@ -117,6 +117,7 @@ public: // Modules
 	//! Get a module's name
 	const char* GetModuleName(int i) const;
 	const char* GetModuleNameFromId(int id) const;
+	const char* GetModuleDescription(int i) const;
 
 	//! Get a module's dependencies
 	vector<int> GetModuleDependencies(int i) const;

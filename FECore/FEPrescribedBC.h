@@ -78,7 +78,7 @@ public:
 	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
 	virtual void GetNodalValues(int nodelid, std::vector<double>& val) = 0;
 
-private:
+protected:
 	bool	m_brelative;		//!< relative flag
 
 private:

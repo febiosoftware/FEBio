@@ -53,8 +53,8 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
 	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
 
-	ADD_PROPERTY(m_psolver, "solver");
 	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional);
+	ADD_PROPERTY(m_psolver, "solver");
 
 END_FECORE_CLASS()
 

@@ -51,7 +51,7 @@ public:
 
 	void GetNodalValues(int n, std::vector<double>& val) override;
 
-private:
+protected:
 	int				m_dof;		//!< degree of freedom to prescribe
 	FEParamDouble	m_scale;	//!< overall scale factor
 

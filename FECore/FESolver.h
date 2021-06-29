@@ -182,7 +182,7 @@ public:
 	double ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const;
 
 public: //TODO Move these parameters elsewhere
-	int					m_bwopt;	    //!< bandwidth optimization flag
+	bool				m_bwopt;	    //!< bandwidth optimization flag
 	int					m_msymm;		//!< matrix symmetry flag for linear solver allocation
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	int					m_eq_order;		//!< normal or reverse ordering

@@ -254,8 +254,9 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Solver classes
-	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
+	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
+	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 	//-----------------------------------------------------------------------------
@@ -846,10 +847,6 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// Derived from FEDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
-
-	febio.CreateModule("explicit-solid");
-	febio.SetModuleDependency("solid");
-	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogNLConstraintData
