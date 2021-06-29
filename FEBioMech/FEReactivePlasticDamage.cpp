@@ -46,10 +46,10 @@ BEGIN_FECORE_CLASS(FEReactivePlasticDamage, FEElasticMaterial)
     // set material properties
     ADD_PROPERTY(m_pBase,   "elastic");
     ADD_PROPERTY(m_pCrit,   "yield_criterion");
-    ADD_PROPERTY(m_pYDamg,  "yield_damage"           , FEProperty::Optional);
-    ADD_PROPERTY(m_pYDCrit, "yield_damage_criterion" , FEProperty::Optional);
-    ADD_PROPERTY(m_pIDamg,  "intact_damage"          , FEProperty::Optional);
-    ADD_PROPERTY(m_pIDCrit, "intact_damage_criterion", FEProperty::Optional);
+    ADD_PROPERTY(m_pYDamg,  "plastic_damage"          , FEProperty::Optional);
+    ADD_PROPERTY(m_pYDCrit, "plastic_damage_criterion", FEProperty::Optional);
+    ADD_PROPERTY(m_pIDamg,  "elastic_damage"          , FEProperty::Optional);
+    ADD_PROPERTY(m_pIDCrit, "elastic_damage_criterion", FEProperty::Optional);
 
     ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  );
     ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax");
@@ -407,13 +407,14 @@ double FEReactivePlasticDamage::StrainEnergyDensity(FEMaterialPoint& pt)
     for (int i=0; i<m_n; ++i) {
         // get the elastic deformation gradient
         mat3d Fv = pe.m_F*pp.m_Fvsi[i];
-        
+        double Jvsi = m_isochrc ? 1 : pp.m_Fvsi[i].det();
+
         // store safe copy of total deformation gradient
         mat3d Fs = pe.m_F; double Js = pe.m_J;
         pe.m_F = Fv; pe.m_J = Fv.det();
         
         // evaluate the tangent using the elastic deformation gradient
-        sed += m_pBase->StrainEnergyDensity(pt)*pp.m_wy[i];
+        sed += m_pBase->StrainEnergyDensity(pt)*pp.m_wy[i]/Jvsi;
         
         // restore the original deformation gradient
         pe.m_F = Fs; pe.m_J = Js;

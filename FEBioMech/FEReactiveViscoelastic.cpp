@@ -285,7 +285,7 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
             // evaluate bond stress
             sb = m_pBond->Stress(mp);
             // add bond stress to total stress
-            s += sb*(w*pt.m_Ji[ig]);
+            s += sb*w;
         }
         
         // restore safe copy of deformation gradient
@@ -340,7 +340,7 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
             // evaluate bond tangent
             cb = m_pBond->Tangent(mp);
             // add bond tangent to total tangent
-            c += cb*(w*pt.m_Ji[ig]);
+            c += cb*w;
         }
         
         // restore safe copy of deformation gradient
@@ -396,8 +396,8 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
             w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond stress
             sedb = m_pBond->StrainEnergyDensity(mp);
-            // add bond stress to total stress
-            sed += sedb*w;
+            // add bond strain energy density to total
+            sed += sedb*w/pt.m_Ji[ig];
         }
         
         // restore safe copy of deformation gradient
