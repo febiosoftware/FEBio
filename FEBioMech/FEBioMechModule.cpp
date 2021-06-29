@@ -250,7 +250,11 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// create module
-	febio.CreateModule("solid");
+	febio.CreateModule("solid",
+		"{"
+		"   \"title\" : \"Structural Mechanics\","
+		"   \"info\"  : \"Quasi-static or dynamical structural mechanics analysis.\""
+		"}");
 
 	//-----------------------------------------------------------------------------
 	// Solver classes

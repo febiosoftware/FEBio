@@ -138,7 +138,12 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "biphasic" module
-	febio.CreateModule("biphasic");
+	febio.CreateModule("biphasic", 
+		"{"
+		"   \"title\" : \"Biphasic Analysis\","
+		"   \"info\"  : \"Transient or quasi-static biphasic analysis.\""
+		"}");
+
 	febio.SetModuleDependency("solid");
 
 	//-----------------------------------------------------------------------------
@@ -308,7 +313,12 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "multiphasic" module
-	febio.CreateModule("multiphasic");
+	febio.CreateModule("multiphasic",
+		"{"
+		"   \"title\" : \"Multiphasic Analysis\","
+		"   \"info\"  : \"Transient or quasi-static analysis with solutes.\""
+		"}");
+
 	febio.SetModuleDependency("solute");
 
 	//-----------------------------------------------------------------------------

@@ -99,7 +99,12 @@ void FEBioFluid::InitModule()
 	febio.RegisterDomain(new FEFluidDomainFactory);
 
 	// define the fluid module
-	febio.CreateModule("fluid");
+	febio.CreateModule("fluid", 
+		"{"
+		"   \"title\" : \"Fluid Mechanics\","
+		"   \"info\"  : \"Steady-state or transient fluid dynamics analysis.\""
+		"}");
+
 	febio.SetModuleDependency("solid");	// for body-loads (e.g. see fl08)
 
 //-----------------------------------------------------------------------------

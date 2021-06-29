@@ -71,7 +71,12 @@ void FEBioFSI::InitModule()
 	febio.RegisterDomain(new FEFluidFSIDomainFactory);
 
 	// define the fsi module
-	febio.CreateModule("fluid-FSI");
+	febio.CreateModule("fluid-FSI",
+		"{"
+		"   \"title\" : \"Fluid-Structure Interaction\","
+		"   \"info\"  : \"FSI analysis where a fluid interacts with a rigid, solid or biphasic structure.\""
+		"}");
+
 	febio.SetModuleDependency("fluid");
 	febio.SetModuleDependency("biphasic");	// also pulls in "solid"
 
