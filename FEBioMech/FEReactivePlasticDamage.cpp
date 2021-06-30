@@ -286,8 +286,8 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
     pp.m_D = 0.0;
     
     // get intact damage criterion
-    if (m_pIDCrit) pp.m_Eit = m_pIDCrit->DamageCriterion(pt);
-    double Es = max(pp.m_Eit, pp.m_Eim);
+    if (m_pIDCrit) pp.m_Etrial = m_pIDCrit->DamageCriterion(pt);
+    double Es = max(pp.m_Etrial, pp.m_Emax);
     
     for (int i=0; i<m_n; ++i) {
         if (pp.m_yld[i] == 0)

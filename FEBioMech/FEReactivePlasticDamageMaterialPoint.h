@@ -26,7 +26,7 @@
 
 
 #pragma once
-#include "FECore/FEMaterialPoint.h"
+#include "FEDamageMaterialPoint.h"
 #include "FEReactivePlasticDamage.h"
 #include <vector>
 
@@ -34,11 +34,11 @@ class FEReactivePlasticDamage;
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the damage and plasticity variables.
-class FEReactivePlasticDamageMaterialPoint : public FEMaterialPoint
+class FEReactivePlasticDamageMaterialPoint : public FEDamageMaterialPoint
 {
 public:
     //! constructor
-    FEReactivePlasticDamageMaterialPoint(FEMaterialPoint *pt, FEReactivePlasticDamage* pmat) : FEMaterialPoint(pt) { m_pMat = pmat; }
+    FEReactivePlasticDamageMaterialPoint(FEMaterialPoint *pt, FEReactivePlasticDamage* pmat) : FEDamageMaterialPoint(pt) { m_pMat = pmat; }
     
     FEMaterialPoint* Copy();
     
@@ -75,8 +75,5 @@ public:
     vector<double>          m_dy;       //!< individual family yield damage (0 = no damage, 1 = complete damage)
     vector<double>          m_d;        //!< total damage for individual family (0 = no damage, 1 = complete damage)
     vector<int>             m_yld;      //!< yielded flag (true = yielded)
-    double                  m_D;        //!< weighted overall damage (0 = no damage, 1 = complete damage)
-    double                  m_Eit;      //!< trial intact damage criterion at current time
-    double                  m_Eim;      //!< max intact damage criterion up to current time
     FEReactivePlasticDamage*   m_pMat;     //!< parent material
 };

@@ -250,11 +250,8 @@ double FEDamageCriterionOSS::DamageCriterion(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     mat3ds E = pt.Strain();
     
-    // evaluate principal normal plastic strains
-    double ps[3];
-    E.eigen2(ps);
-    
-    double oss = sqrt((2.0/3.0)*(SQR(ps[0])+SQR(ps[1])+SQR(ps[2])));
-    
+    mat3ds devE = E.dev();
+    double oss = sqrt(devE.dotdot(devE)*(2./3.));
+
     return oss;
 }
