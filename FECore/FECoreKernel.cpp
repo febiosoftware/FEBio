@@ -386,6 +386,22 @@ const FECoreFactory* FECoreKernel::GetFactoryClass(int classID, int i)
 }
 
 //-----------------------------------------------------------------------------
+//! return a factory class
+int FECoreKernel::GetFactoryIndex(int superClassId, const char* sztype)
+{
+	for (int j = 0; j < m_Fac.size(); ++j)
+	{
+		FECoreFactory* fac = m_Fac[j];
+		if (fac->GetSuperClassID() == superClassId)
+		{
+			if (strcmp(sztype, fac->GetTypeStr()) == 0) return j;
+		}
+	}
+	return -1;
+}
+
+
+//-----------------------------------------------------------------------------
 FECoreFactory* FECoreKernel::FindFactoryClass(int classID, const char* sztype)
 {
 	for (size_t i=0; i<m_Fac.size(); ++i)

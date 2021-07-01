@@ -83,7 +83,10 @@ public:
 	const FECoreFactory* GetFactoryClass(int i);
 
 	//! return a factory class
-	const FECoreFactory* GetFactoryClass(int classID, int i);
+	const FECoreFactory* GetFactoryClass(int superClassID, int i);
+
+	//! Get the index of a class factory (NOTE: this is a slow function!)
+	int GetFactoryIndex(int superClassId, const char* sztype);
 
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
