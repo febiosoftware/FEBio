@@ -108,6 +108,9 @@ SOFTWARE.*/
 #include "FESBMPointSource.h"
 #include "FESolutePointSource.h"
 
+#include "FEFixedFluidPressure.h"
+#include "FEPrescribedFluidPressure.h"
+
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
 {
@@ -166,6 +169,11 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPermRefTransIso      , "perm-ref-trans-iso");
 	REGISTER_FECORE_CLASS(FESolventSupplyStarling, "Starling");
 	REGISTER_FECORE_CLASS(FEActiveConstantSupply , "active-const-supply");
+
+	//-----------------------------------------------------------------------------
+	// Boundary conditions
+	REGISTER_FECORE_CLASS(FEFixedFluidPressure, "zero fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure, "prescribed fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// Surface loads
