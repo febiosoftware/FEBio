@@ -67,6 +67,20 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
+{
+	FEModel* fem = GetFEModel();
+	const int dof_X = fem->GetDOFIndex("x");
+	const int dof_Y = fem->GetDOFIndex("y");
+	const int dof_Z = fem->GetDOFIndex("z");
+
+	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+		return node.get_vec3d(dof_X, dof_Y, dof_Z);
+		});
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 {
 	FEModel* fem = GetFEModel();

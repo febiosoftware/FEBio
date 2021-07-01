@@ -645,6 +645,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotCurrentElementCenterOfMass, "current element center of mass");
 	REGISTER_FECORE_CLASS(FEPlotCurrentElementLinearMomentum, "current element linear momentum");
 	REGISTER_FECORE_CLASS(FEPlotCurrentElementAngularMomentum, "current element angular momentum");
+	REGISTER_FECORE_CLASS(FEPlotNodeDisplacement, "displacement");
 	REGISTER_FECORE_CLASS(FEPlotNodeVelocity, "nodal velocity");
 	REGISTER_FECORE_CLASS(FEPlotNodeAcceleration, "nodal acceleration");
 	REGISTER_FECORE_CLASS(FEPlotNodeReactionForces, "reaction forces");

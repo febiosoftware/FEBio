@@ -35,6 +35,16 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+//! Nodal displacements
+//!
+class FEPlotNodeDisplacement : public FEPlotNodeData
+{
+public:
+	FEPlotNodeDisplacement(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) {}
+	bool Save(FEMesh& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
 class FEPlotNodeVelocity : public FEPlotNodeData
