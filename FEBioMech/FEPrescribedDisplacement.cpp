@@ -31,7 +31,7 @@ SOFTWARE.*/
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FEPrescribedNodeSet)
+BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FEBoundaryCondition)
 	ADD_PARAMETER(m_comp, "dof", 0, "x-displacement\0y-displacement\0z-displacement\0");
 	ADD_PARAMETER(m_scale, "value");
 	ADD_PARAMETER(m_brelative, "relative");

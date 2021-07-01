@@ -28,9 +28,9 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedDisplacement, FEBoundaryCondition)
-	ADD_PARAMETER(m_b[0], "fix_x");
-	ADD_PARAMETER(m_b[1], "fix_y");
-	ADD_PARAMETER(m_b[2], "fix_z");
+	ADD_PARAMETER(m_b[0], "x_displacement");
+	ADD_PARAMETER(m_b[1], "y_displacement");
+	ADD_PARAMETER(m_b[2], "z_displacement");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
