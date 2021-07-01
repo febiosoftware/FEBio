@@ -113,6 +113,10 @@ public: // Modules
 
 	//! set the active module
 	bool SetActiveModule(const char* szmodule);
+	bool SetActiveModule(int moduleId);
+
+	// return the active module's ID
+	int GetActiveModule();
 
 	//! set a dependency on a module
 	bool SetModuleDependency(const char* szmodule);

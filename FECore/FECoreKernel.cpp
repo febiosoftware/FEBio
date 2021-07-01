@@ -441,6 +441,36 @@ bool FECoreKernel::SetActiveModule(const char* szmod)
 }
 
 //-----------------------------------------------------------------------------
+bool FECoreKernel::SetActiveModule(int moduleId)
+{
+	if (moduleId < 0) return false;
+	if (GetActiveModule() == moduleId) return true;
+
+	// see if the module exists or not
+	for (size_t i = 0; i < m_modules.size(); ++i)
+	{
+		Module& mi = *m_modules[i];
+		if (mi.m_id == moduleId)
+		{
+			m_activeModule = (int)i;
+			return true;
+		}
+	}
+
+	// couldn't find it
+	m_activeModule = -1;
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// return the active module's ID
+int FECoreKernel::GetActiveModule()
+{
+	if (m_activeModule == -1) return -1;
+	return m_modules[m_activeModule]->m_id;
+}
+
+//-----------------------------------------------------------------------------
 //! count modules
 int FECoreKernel::Modules() const
 {
