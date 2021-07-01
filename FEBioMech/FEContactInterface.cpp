@@ -78,8 +78,13 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
         // get a material point
         FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-        
-        // setup the material point
+
+		// backup the material point
+		mat3d F0 = pt.m_F;
+		double J0 = pt.m_J;
+		mat3ds s0 = pt.m_s;
+
+        // override the material point
         pt.m_F = mat3dd(1.0);
         pt.m_J = 1;
         pt.m_s.zero();
@@ -88,6 +93,11 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
         tens4ds S = pme->Tangent(mp);
         tens4ds C = S.inverse();
         
+		// restore the material point
+		pt.m_F = F0;
+		pt.m_J = J0;
+		pt.m_s = s0;
+
         // evaluate element surface normal at parametric center
         vec3d t[2];
         s.CoBaseVectors0(el, 0, 0, t);
