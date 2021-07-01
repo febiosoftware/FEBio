@@ -342,13 +342,14 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
         if (pp.m_w[i] > 0) {
             // get the elastic deformation gradient
             mat3d Fv = pe.m_F*pp.m_Fvsi[i];
+            double Jvsi = m_isochrc ? 1 : pp.m_Fvsi[i].det();
             
             // store safe copy of total deformation gradient
             mat3d Fs = pe.m_F; double Js = pe.m_J;
             pe.m_F = Fv; pe.m_J = Fv.det();
 
             // evaluate the tangent using the elastic deformation gradient
-            sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i];
+            sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i]/Jvsi;
             
             // restore the original deformation gradient
             pe.m_F = Fs; pe.m_J = Js;

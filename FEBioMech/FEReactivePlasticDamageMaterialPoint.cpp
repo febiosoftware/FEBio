@@ -73,9 +73,6 @@ void FEReactivePlasticDamageMaterialPoint::Init()
     m_dy.resize(n, 0);
     m_d.resize(n, 0);
     m_yld.resize(n, 0);
-    m_D = 0.0;
-    m_Eit = 0.0;
-    m_Eim = 0.0;
     
     // Need to check this now that wmax/bias exist
     
@@ -138,7 +135,7 @@ void FEReactivePlasticDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
         m_gpp[i] = m_gp[i];
         m_Eym[i] = max(m_Eym[i], m_Eyt[i]);
     }
-    m_Eim = max(m_Eim, m_Eit);
+    m_Emax = max(m_Emax, m_Etrial);
     m_Fp = pt.m_F;
     
     // don't forget to update the base class
@@ -154,7 +151,7 @@ void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
     
     if (ar.IsSaving())
     {
-        ar << m_Fp << m_D << m_Eit << m_Eim;
+        ar << m_Fp << m_D << m_Etrial << m_Emax;
         for (int i=0; i<n; ++i) {
             ar << m_Fusi[i] << m_Fvsi[i] << m_Ku[i] << m_Kv[i] << m_gp[i] << m_gpp[i];
             ar << m_wi[i] << m_wy[i] << m_Eyt[i] << m_Eym[i];
@@ -163,7 +160,7 @@ void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
     }
     else
     {
-        ar >> m_Fp >> m_D >> m_Eit >> m_Eim;
+        ar >> m_Fp >> m_D >> m_Etrial >> m_Emax;
         for (int i=0; i<n; ++i) {
             ar >> m_Fusi[i] >> m_Fvsi[i] >> m_Ku[i] >> m_Kv[i] >> m_gp[i] >> m_gpp[i];
             ar >> m_wi[i] >> m_wy[i] >> m_Eyt[i] >> m_Eym[i];

@@ -6,16 +6,9 @@
 \origin unavailable
 \textclass extbook
 \begin_preamble
-% Converted from Microsoft Word to LaTeX
-% by Chikrii Softlab Word2TeX converter (version 5.0)
-% Copyright (C) 1999-2011 Chikrii Softlab. All rights reserved.
-% http://www.chikrii.com
-% mailto: support@chikrii.com
-% License: CSL#005010
-
-\usepackage{latexsym}
+\usepackage{hyperref}
 \end_preamble
-\use_default_options false
+\use_default_options true
 \begin_modules
 theorems-ams
 eqs-within-sections
@@ -23,9 +16,9 @@ figs-within-sections
 \end_modules
 \maintain_unincluded_children false
 \language english
-\language_package none
+\language_package default
 \inputencoding auto
-\fontencoding default
+\fontencoding global
 \font_roman "default" "default"
 \font_sans "helvet" "default"
 \font_typewriter "default" "default"
@@ -45,37 +38,28 @@ figs-within-sections
 \index_command default
 \paperfontsize 11
 \spacing single
-\use_hyperref true
-\pdf_bookmarks true
-\pdf_bookmarksnumbered false
-\pdf_bookmarksopen false
-\pdf_bookmarksopenlevel 1
-\pdf_breaklinks false
-\pdf_pdfborder true
-\pdf_colorlinks false
-\pdf_backref false
-\pdf_pdfusetitle true
+\use_hyperref false
 \papersize default
 \use_geometry true
 \use_package amsmath 2
 \use_package amssymb 2
-\use_package cancel 0
-\use_package esint 1
-\use_package mathdots 1
-\use_package mathtools 1
-\use_package mhchem 0
-\use_package stackrel 0
-\use_package stmaryrd 0
+\use_package cancel 2
+\use_package esint 2
+\use_package mathdots 2
+\use_package mathtools 2
+\use_package mhchem 2
+\use_package stackrel 2
+\use_package stmaryrd 2
 \use_package undertilde 0
 \cite_engine natbib
 \cite_engine_type numerical
-\biblio_style plain
+\biblio_style plainnat
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
 \justification true
-\use_refstyle 0
+\use_refstyle 1
 \use_minted 0
 \index Index
 \shortcut idx
@@ -1326,7 +1310,7 @@ Higher order tensors can be constructed from second order tensors in a similar
 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{A}\,\underline{\otimes}\,\mathbf{B}\right):\mathbf{X}=\mathbf{A}\cdot\mathbf{X}\cdot\mathbf{B}^{T}\,,\label{eq18}
+\left(\mathbf{A}\oslash\mathbf{B}\right):\mathbf{X}=\mathbf{A}\cdot\mathbf{X}\cdot\mathbf{B}^{T}\,,\label{eq18}
 \end{equation}
 
 \end_inset
@@ -1334,7 +1318,7 @@ Higher order tensors can be constructed from second order tensors in a similar
 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{A}\,\overline{\otimes}\,\mathbf{B}\right):\mathbf{X}=\mathbf{A}\cdot\mathbf{X}^{T}\cdot\mathbf{B}^{T}\,,\label{eq19}
+\left(\mathbf{A}\obslash\mathbf{B}\right):\mathbf{X}=\mathbf{A}\cdot\mathbf{X}^{T}\cdot\mathbf{B}^{T}\,,\label{eq19}
 \end{equation}
 
 \end_inset
@@ -1342,7 +1326,7 @@ Higher order tensors can be constructed from second order tensors in a similar
 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{A}\,\underline{\overline{\otimes}}\,\mathbf{B}\right):\mathbf{X}=\frac{1}{2}\left(\mathbf{A}\cdot\mathbf{X}\cdot\mathbf{B}^{T}+\mathbf{A}\cdot\mathbf{X}^{T}\cdot\mathbf{B}^{T}\right)\,.\label{eq20}
+\left(\mathbf{A}\odot\mathbf{B}\right):\mathbf{X}=\frac{1}{2}\left(\mathbf{A}\cdot\mathbf{X}\cdot\mathbf{B}^{T}+\mathbf{A}\cdot\mathbf{X}^{T}\cdot\mathbf{B}^{T}\right)\,.\label{eq20}
 \end{equation}
 
 \end_inset
@@ -1352,15 +1336,15 @@ The Cartesian component forms of the operators
 \end_inset
 
 , 
-\begin_inset Formula $\underline{\otimes}$
+\begin_inset Formula $\oslash$
 \end_inset
 
 , 
-\begin_inset Formula $\overline{\otimes}$
+\begin_inset Formula $\obslash$
 \end_inset
 
  and 
-\begin_inset Formula $\underline{\overline{\otimes}}$
+\begin_inset Formula $\odot$
 \end_inset
 
  are defined as follows: 
@@ -1374,7 +1358,7 @@ The Cartesian component forms of the operators
 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{A}\,\underline{\otimes}\,\mathbf{B}\right)_{ijkl}=\mathbf{A}_{ik}\mathbf{B}_{jl}\,,\label{eq22}
+\left(\mathbf{A}\oslash\mathbf{B}\right)_{ijkl}=\mathbf{A}_{ik}\mathbf{B}_{jl}\,,\label{eq22}
 \end{equation}
 
 \end_inset
@@ -1382,7 +1366,7 @@ The Cartesian component forms of the operators
 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{A}\,\overline{\otimes}\,\mathbf{B}\right)_{ijkl}=A_{il}B_{jk}\,,\label{eq23}
+\left(\mathbf{A}\obslash\mathbf{B}\right)_{ijkl}=A_{il}B_{jk}\,,\label{eq23}
 \end{equation}
 
 \end_inset
@@ -1390,7 +1374,7 @@ The Cartesian component forms of the operators
 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{A}\,\underline{\overline{\otimes}}\,\mathbf{B}\right)_{ijkl}=\frac{1}{2}\left(A_{ik}B_{jl}+A_{il}B_{jk}\right)\,.\label{eq24}
+\left(\mathbf{A}\odot\mathbf{B}\right)_{ijkl}=\frac{1}{2}\left(A_{ik}B_{jl}+A_{il}B_{jk}\right)\,.\label{eq24}
 \end{equation}
 
 \end_inset
@@ -1398,7 +1382,7 @@ The Cartesian component forms of the operators
 The fourth order identity tensors are defined as: 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{A} & =\mathcal{I}:\mathbf{A}\,,\\
+\begin{aligned}\mathbf{A} & =\underline{\text{\mathcal{I}}}:\mathbf{A}\,,\\
 \mathbf{A}^{T} & =\overline{\mathcal{I}}:\mathbf{A}\,,
 \end{aligned}
 \label{eq25}
@@ -1407,18 +1391,18 @@ The fourth order identity tensors are defined as:
 \end_inset
 
 where 
-\begin_inset Formula $\boldsymbol{\mathcal{I}}=\mathbf{I}\,\underline{\otimes}\,\mathbf{I}$
+\begin_inset Formula $\underline{\text{\mathcal{I}}}=\mathbf{I}\oslash\mathbf{I}$
 \end_inset
 
  and 
-\begin_inset Formula $\overline{\boldsymbol{\mathcal{I}}}=\mathbf{I}\,\overline{\otimes}\,\mathbf{I}$
+\begin_inset Formula $\overline{\boldsymbol{\mathcal{I}}}=\mathbf{I}\obslash\mathbf{I}$
 \end_inset
 
 .
  The components are given by: 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathcal{I}_{ijkl} & =\delta_{ik}\delta_{jl}\,,\\
+\begin{aligned}\mathcal{\underline{I}}_{ijkl} & =\delta_{ik}\delta_{jl}\,,\\
 \overline{\mathcal{I}}_{ijkl} & =\delta_{il}\delta_{jk}\,.
 \end{aligned}
 \label{eq26}
@@ -1426,7 +1410,28 @@ where
 
 \end_inset
 
+We may also define 
+\begin_inset Formula $\boldsymbol{\mathcal{I}}=\frac{1}{2}\left(\underline{\boldsymbol{\mathcal{I}}}+\overline{\boldsymbol{\mathcal{I}}}\right)$
+\end_inset
 
+, such that 
+\begin_inset Formula $\boldsymbol{\mathcal{I}}:\mathbf{A}=\frac{1}{2}\left(\mathbf{A}+\mathbf{A}^{T}\right)$
+\end_inset
+
+ returns the symmetric part of 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+.
+ In the special case when 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ is symmetric it follows that 
+\begin_inset Formula $\underline{\text{\mathcal{I}}}:\mathbf{A}=\boldsymbol{\mathcal{I}}:\mathbf{A}=\mathbf{A}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -2274,14 +2279,13 @@ Here,
 material elasticity tensor
 \emph default
 .
- Its components are given by, 
-\begin_inset Formula $\sum$
-\end_inset
-
-
+ Its components are given by
 \begin_inset Formula 
 \begin{equation}
-\mathbb{C}_{IJKL}=\frac{\partial S_{IJ}}{\partial E_{KL}}=\frac{4\partial^{2}\Psi}{\partial C_{IJ}\partial C_{KL}}\,,\label{eq55}
+\begin{aligned}\mathbb{C}_{IJKL} & =\frac{\partial S_{IJ}}{\partial E_{KL}}=\frac{4\partial^{2}\Psi}{\partial C_{IJ}\partial C_{KL}}\\
+\boldsymbol{\mathbb{C}} & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\frac{4\partial^{2}\Psi}{\partial\mathbf{C}\partial\mathbf{C}}
+\end{aligned}
+\,,\label{eq55}
 \end{equation}
 
 \end_inset
@@ -2299,10 +2303,13 @@ spatial elasticity tensor
 \begin_inset Formula $\boldsymbol{\mathcal{C}}$
 \end_inset
 
- – can be obtained by, 
+ – can be obtained from 
 \begin_inset Formula 
 \begin{equation}
-\mathcal{C}_{ijkl}=\frac{1}{J}F_{iI}F_{jJ}F_{kK}F_{lL}\mathcal{C}_{IJKL}.\label{eq56}
+\begin{aligned}\mathcal{C}_{ijkl} & =\frac{1}{J}F_{iI}F_{jJ}F_{kK}F_{lL}\mathbb{C}_{IJKL}\\
+\boldsymbol{\mathcal{C}} & =\frac{1}{J}\left(\mathbf{F}\oslash\mathbf{F}\right):\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)
+\end{aligned}
+.\label{eq56}
 \end{equation}
 
 \end_inset
@@ -2702,7 +2709,7 @@ S_{i}=2\frac{\partial\Psi}{\partial\lambda_{i}^{2}}\,.\label{eq70}
 To evaluate the material elasticity tensor, recognize that 
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\mathbf{A}_{i}}{\partial\mathbf{C}}=\frac{1}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{A}_{i}\,\underline{\overline{\otimes}}\,\mathbf{A}_{j}+\mathbf{A}_{j}\,\underline{\overline{\otimes}}\,\mathbf{A}_{i}\right)+\frac{1}{\lambda_{i}^{2}-\lambda_{k}^{2}}\left(\mathbf{A}_{i}\,\underline{\overline{\otimes}}\,\mathbf{A}_{k}+\mathbf{A}_{k}\,\underline{\overline{\otimes}}\,\mathbf{A}_{i}\right)\,,\label{eq71}
+\frac{\partial\mathbf{A}_{i}}{\partial\mathbf{C}}=\frac{1}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{A}_{i}\odot\mathbf{A}_{j}+\mathbf{A}_{j}\odot\mathbf{A}_{i}\right)+\frac{1}{\lambda_{i}^{2}-\lambda_{k}^{2}}\left(\mathbf{A}_{i}\odot\mathbf{A}_{k}+\mathbf{A}_{k}\odot\mathbf{A}_{i}\right)\,,\label{eq71}
 \end{equation}
 
 \end_inset
@@ -2721,7 +2728,7 @@ where
 \begin{equation}
 \begin{aligned}\boldsymbol{\mathbb{C}} & =\sum\limits _{i=1}^{3}4\frac{\partial^{2}\Psi}{\partial\lambda_{i}^{2}\partial\lambda_{i}^{2}}\mathbf{A}_{i}\otimes\mathbf{A}_{i}\\
  & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}4\frac{\partial^{2}\Psi}{\partial\lambda_{i}^{2}\partial\lambda_{j}^{2}}\left(\mathbf{A}_{i}\otimes\mathbf{A}_{j}+\mathbf{A}_{j}\otimes\mathbf{A}_{i}\right)\\
- & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{S_{i}-S_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{A}_{i}\,\overline{\underline{\otimes}}\,\mathbf{A}_{j}+\mathbf{A}_{j}\,\overline{\underline{\otimes}}\,\mathbf{A}_{i}\right)
+ & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{S_{i}-S_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{A}_{i}\odot\mathbf{A}_{j}+\mathbf{A}_{j}\odot\mathbf{A}_{i}\right)
 \end{aligned}
 \,.\label{eq72}
 \end{equation}
@@ -2787,7 +2794,7 @@ The spatial elasticity tensor is given by
 \begin{equation}
 \begin{aligned}\boldsymbol{\mathcal{C}} & =\sum\limits _{i=1}^{3}\left(J^{-1}\lambda_{i}^{2}\frac{\partial^{2}\Psi}{\partial\lambda_{i}^{2}}-\sigma_{i}\right)\mathbf{a}_{i}\otimes\mathbf{a}_{i}\\
  & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}J^{-1}\lambda_{i}\lambda_{j}\frac{\partial^{2}\Psi}{\partial\lambda_{i}\partial\lambda_{j}}\left(\mathbf{a}_{i}\otimes\mathbf{a}_{j}+\mathbf{a}_{j}\otimes\mathbf{a}_{i}\right)\\
- & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{\lambda_{j}^{2}\sigma_{i}-\lambda_{i}^{2}\sigma_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{a}_{i}\,\overline{\underline{\otimes}}\,\mathbf{a}_{j}+\mathbf{a}_{j}\,\overline{\underline{\otimes}}\,\mathbf{a}_{i}\right)
+ & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{\lambda_{j}^{2}\sigma_{i}-\lambda_{i}^{2}\sigma_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{a}_{i}\odot\mathbf{a}_{j}+\mathbf{a}_{j}\odot\mathbf{a}_{i}\right)
 \end{aligned}
 \,.\label{eq:IEPD-elasticity}
 \end{equation}
@@ -3051,7 +3058,10 @@ The following expression will be useful in the following development.
  
 \begin_inset Formula 
 \begin{equation}
-\frac{d\tilde{C}_{IJ}}{dC_{KL}}=J^{-2/3}\left(\frac{1}{2}\left(\delta_{IK}\delta_{JL}+\delta_{IL}\delta_{JK}\right)-\frac{1}{3}\tilde{C}_{IJ}\tilde{C}_{KL}^{-1}\right)\,.\label{eq89}
+\begin{aligned}\frac{d\tilde{C}_{IJ}}{dC_{KL}} & =J^{-2/3}\left(\frac{1}{2}\left(\delta_{IK}\delta_{JL}+\delta_{IL}\delta_{JK}\right)-\frac{1}{3}\tilde{C}_{IJ}\tilde{C}_{KL}^{-1}\right)\\
+\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}} & =J^{-2/3}\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}\right)
+\end{aligned}
+\,.\label{eq89}
 \end{equation}
 
 \end_inset
@@ -3067,7 +3077,10 @@ Notice that the contraction with a symmetric tensor
  results in, 
 \begin_inset Formula 
 \begin{equation}
-\frac{d\tilde{C}_{IJ}}{dC_{KL}}A_{IJ}=J^{-2/3}\Dev A_{KL}\,.\label{eq90}
+\begin{aligned}\frac{d\tilde{C}_{IJ}}{dC_{KL}}A_{IJ} & =J^{-2/3}\Dev A_{KL}\\
+\mathbf{A}:\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}} & =J^{-2/3}\Dev\mathbf{A}
+\end{aligned}
+\,.\label{eq90}
 \end{equation}
 
 \end_inset
@@ -3085,7 +3098,10 @@ reference "eq55"
 \begin{equation}
 \begin{aligned}\mathbb{C}_{IJKL} & =\left(J^{2}\frac{dp}{dJ}+Jp\right)C_{IJ}^{-1}C_{KL}^{-1}-2pJ\mathcal{I}_{IJKL}\\
  & -\frac{2}{3}J^{-2/3}\left(\Dev\tilde{S}_{IJ}C_{KL}^{-1}+C_{IJ}^{-1}\Dev\tilde{S}_{KL}\right)\\
- & +\frac{2}{3}\tilde{S}_{RS}\tilde{C}_{RS}\left(\mathcal{I}_{IJKL}-\frac{1}{3}C_{KL}^{-1}C_{IJ}^{-1}\right)+J^{-4/3}\hat{\mathbb{C}}_{IJKL}
+ & +\frac{2}{3}\tilde{S}_{RS}\tilde{C}_{RS}\left(\mathcal{I}_{IJKL}-\frac{1}{3}C_{KL}^{-1}C_{IJ}^{-1}\right)+J^{-4/3}\hat{\mathbb{C}}_{IJKL}\\
+\boldsymbol{\mathbb{C}} & =\left(J^{2}\frac{dp}{dJ}+Jp\right)\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}-2pJ\boldsymbol{\mathcal{I}}\\
+ & -\frac{2}{3}J^{-2/3}\left(\Dev\tilde{\mathbf{S}}\otimes\mathbf{C}^{-1}+\mathbf{C}^{-1}\otimes\Dev\tilde{\mathbf{S}}\right)\\
+ & +\frac{2}{3}\left(\tilde{\mathbf{S}}:\tilde{\mathbf{C}}\right)\left(\boldsymbol{\mathcal{I}}-\frac{1}{3}\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}\right)+J^{-4/3}\hat{\boldsymbol{\mathbb{C}}}
 \end{aligned}
 \,,\label{eq91}
 \end{equation}
@@ -3095,17 +3111,20 @@ reference "eq55"
 where 
 \begin_inset Formula 
 \begin{equation}
-\hat{\mathcal{\mathbb{C}}}_{IJKL}=\tilde{\mathcal{\mathbb{C}}}_{IJKL}-\frac{1}{3}\left(\tilde{\mathcal{\mathbb{C}}}_{IJRS}\tilde{C}_{RS}\tilde{C}_{KL}^{-1}+\tilde{\mathcal{\mathbb{C}}}_{RSKL}C_{RS}C_{IJ}^{-1}\right)+\frac{1}{9}\tilde{C}_{IJ}^{-1}\tilde{C}_{RS}\tilde{\mathbb{C}}_{RSMN}\tilde{C}_{MN}\tilde{C}_{KL}^{-1}\,.\label{eq92}
+\begin{aligned}\hat{\mathcal{\mathbb{C}}}_{IJKL} & =\tilde{\mathcal{\mathbb{C}}}_{IJKL}-\frac{1}{3}\left(\tilde{\mathcal{\mathbb{C}}}_{IJRS}\tilde{C}_{RS}\tilde{C}_{KL}^{-1}+\tilde{\mathcal{\mathbb{C}}}_{RSKL}\tilde{C}_{RS}\tilde{C}_{IJ}^{-1}\right)+\frac{1}{9}\tilde{C}_{IJ}^{-1}\tilde{C}_{RS}\tilde{\mathbb{C}}_{RSMN}\tilde{C}_{MN}\tilde{C}_{KL}^{-1}\\
+\hat{\mathcal{\boldsymbol{\mathbb{C}}}} & =\tilde{\mathcal{\boldsymbol{\mathbb{C}}}}-\frac{1}{3}\left(\tilde{\mathcal{\boldsymbol{\mathbb{C}}}}:\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}+\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathcal{\mathbb{C}}}}\right)+\frac{1}{9}\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathbb{C}}}:\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}
+\end{aligned}
+\,.\label{eq92}
 \end{equation}
 
 \end_inset
 
-The spatial elasticity tensor follows from, 
+The spatial elasticity tensor follows from
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathcal{C}_{ijkl} & =\left(J\frac{dp}{dJ}+p\right)\delta_{ij}\delta_{kl}-p\left(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}\right)\\
- & -\frac{2}{3}\left(\dev\tilde{\sigma}_{ij}\delta_{kl}+\delta_{ij}\dev\tilde{\sigma}_{kl}\right)\\
- & +\frac{1}{3}\tilde{\sigma}_{rs}\delta_{rs}\left(\left(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}\right)-\frac{2}{3}\delta_{ij}\delta_{kl}\right)+\hat{\mathcal{C}}_{ijkl}
+\begin{aligned}\boldsymbol{\mathcal{C}} & =\left(J\frac{dp}{dJ}+p\right)\mathbf{I}\otimes\mathbf{I}-2p\mathbf{I}\odot\mathbf{I}\\
+ & -\frac{2}{3}\left(\dev\tilde{\boldsymbol{\sigma}}\otimes\mathbf{I}+\mathbf{I}\otimes\dev\tilde{\boldsymbol{\sigma}}\right)\\
+ & +\frac{2}{3}\left(\tilde{\boldsymbol{\sigma}}:\mathbf{I}\right)\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)+\hat{\mathcal{\boldsymbol{C}}}
 \end{aligned}
 \,,\label{eq93}
 \end{equation}
@@ -3115,7 +3134,10 @@ The spatial elasticity tensor follows from,
 where 
 \begin_inset Formula 
 \begin{equation}
-\hat{\mathcal{C}}_{ijkl}=\frac{1}{J}\tilde{F}_{iI}\tilde{F}_{jJ}\tilde{F}_{kK}\tilde{F}_{lL}\hat{\mathcal{\mathbb{C}}}_{IJKL}\,.\label{eq94}
+\begin{aligned}\hat{\mathcal{C}}_{ijkl} & =\frac{1}{J}\tilde{F}_{iI}\tilde{F}_{jJ}\tilde{F}_{kK}\tilde{F}_{lL}\hat{\mathcal{\mathbb{C}}}_{IJKL}\\
+\hat{\boldsymbol{\mathcal{C}}} & =\frac{1}{J}\left(\tilde{\mathbf{F}}\oslash\tilde{\mathbf{F}}\right):\hat{\boldsymbol{\mathbb{C}}}:\left(\tilde{\mathbf{F}}^{T}\oslash\tilde{\mathbf{F}}^{T}\right)
+\end{aligned}
+\,.\label{eq94}
 \end{equation}
 
 \end_inset
@@ -5044,7 +5066,7 @@ solutes) in the mixture.
 \end_layout
 
 \begin_layout Section
-Mixture of Solids
+Constrained Reactive Mixture of Solids
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Mixture-of-Solids"
@@ -5057,190 +5079,924 @@ name "sec:Mixture-of-Solids"
 \begin_layout Standard
 A solid material may consist of a heterogeneous mixture of various solid
  constituents that are constrained to move together.
- If each constituent is denoted by the superscript 
+ In this section we describe fundamental considerations for such constrained
+ mixtures.
+\end_layout
+
+\begin_layout Subsection
+Mixture Kinematics
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Mixture-Kinematics"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider a constrained mixture of multiple solid constituents 
 \begin_inset Formula $\sigma$
 \end_inset
 
-, a constrained mixture satisfies 
-\begin_inset Formula $\mathbf{v}^{\sigma}=\mathbf{v}^{s}$
-\end_inset
-
- for all 
-\begin_inset Formula $\sigma$
+.
+ The motion of each constituent is given by 
+\begin_inset Formula $\boldsymbol{\chi}^{\sigma}\left(\mathbf{X}^{\sigma},t\right)$
 \end_inset
 
 , where 
-\begin_inset Formula $\mathbf{v}^{s}$
+\begin_inset Formula $\mathbf{X}^{\sigma}$
 \end_inset
 
- is the velocity of the solid mixture.
- For example, a fiber-reinforced material may consist of a mixture of fibers
- and a ground matrix.
- In general, the constitutive relation for such a constrained mixture of
- solids may be a complex function of the mass fraction of each constituent
- as well as the ultrastructure of the constituents and their mutual interactions.
- The mass fraction of each constituent may be represented by the apparent
- density 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+ denotes a material point in the reference configuration of that constituent.
+ At the current time 
+\begin_inset Formula $t$
 \end_inset
 
-, which is the ratio of the mass of 
+, various constituents 
 \begin_inset Formula $\sigma$
 \end_inset
 
- to the volume of the mixture in the reference configuration, in an elemental
- region.
- In the framework of hyperelasticity, the general representation for the
- strain energy density for such a solid mixture may have the form 
+ which occupy an elemental region with a spatial position 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ may have originated from distinct referential positions 
+\begin_inset Formula $\mathbf{X}^{\sigma}$
+\end_inset
+
+.
+ We often label a convenient constituent as the 
+\shape italic
+master constituent
+\shape default
+ 
+\begin_inset Formula $s$
+\end_inset
+
+ (e.g., the oldest constituent in a reactive mixture with evolving composition)
+ and call the reference configuration 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+ the 
+\shape italic
+master reference configuration
+\shape default
+.
+ All the referential mass densities and mass density supplies (see below)
+ are evaluated relative to the master reference configuration 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+.
+ The kinematics of each constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ may be related to the kinematics of the master constituent 
+\begin_inset Formula $s$
+\end_inset
+
+ through
 \begin_inset Formula 
 \begin{equation}
-\Psi=\Psi\left(\mathbf{F}^{\left(1\right)},\cdots,\mathbf{F}^{\left(n\right)},\rho_{r}^{\left(1\right)},\cdots,\rho_{r}^{\left(n\right)}\right)\,,\label{eq135}
+\mathbf{x}=\boldsymbol{\chi}^{s}\left(\mathbf{X}^{s},t\right)=\boldsymbol{\chi}^{\sigma}\left(\mathbf{X}^{\sigma},t\right)\,.\label{eq:general-mixture-kinematics}
+\end{equation}
+
+\end_inset
+
+Taking the material time derivative of this relation in the material frame
+ and recognizing that this relation must hold for all 
+\begin_inset Formula $t$
+\end_inset
+
+ in the case of a constrained mixture establishes that all constituents
+ share the same velocity 
+\begin_inset Formula $\mathbf{v}^{\sigma}=\mathbf{v}^{s}$
+\end_inset
+
+.
+ However, as detailed previously 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10,Nims17"
+literal "false"
+
+\end_inset
+
+, constituents may have distinct deformation gradients 
+\begin_inset Formula $\mathbf{F}^{\sigma}=\partial\boldsymbol{\chi}^{\sigma}/\partial\mathbf{X}^{\sigma}$
+\end_inset
+
+.
+ When a reaction converts a reactant 
+\begin_inset Formula $\sigma=a$
+\end_inset
+
+ into a product 
+\begin_inset Formula $\sigma=b$
+\end_inset
+
+, these constituents may have distinct reference configurations.
+ The deformation gradient of the master constituent 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+, which also serves as the total deformation gradient, may be related to
+ the 
+\shape italic
+relative deformation gradient
+\shape default
+ 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+ of constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ by applying the chain rule to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mixture-kinematics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, producing
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{s}\left(\mathbf{X}^{s},t\right)=\frac{\partial\boldsymbol{\chi}^{s}\left(\mathbf{X}^{s},t\right)}{\partial\mathbf{X}^{\sigma}}\cdot\frac{\partial\mathbf{X}^{\sigma}\left(\mathbf{X}^{s}\right)}{\partial\mathbf{X}^{s}}=\mathbf{F}^{\sigma}\left(\mathbf{X}^{s},t\right)\cdot\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)\,.\label{eq:general-total-def-grad}
+\end{equation}
+
+\end_inset
+
+In this expression, 
+\begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)$
+\end_inset
+
+ is the deformation gradient of 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ relative to 
+\begin_inset Formula $s$
+\end_inset
+
+, which must be 
+\emph on
+postulated by constitutive assumption
+\emph default
+.
+ The relationship between 
+\begin_inset Formula $\mathbf{X}^{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+ is time-invariant; consequently, 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ is a time-invariant spatial mapping.
+ It follows that only one deformation gradient represents an independent
+ state variable in a constrained mixture framework, whereas all others are
+ related to it via Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+; any of the 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+'s may be selected, based on convenience.
+ In Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ the spatio-temporal arguments have been written explicitly for clarity.
+ These dependencies are implied in the forthcoming sections and henceforth
+ those arguments may be selectively suppressed.
+ Taking the determinant of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ produces a relation between the volume ratios 
+\begin_inset Formula $J^{\sigma}=\det\mathbf{F}^{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{s}=\det\mathbf{F}^{s}$
+\end_inset
+
+ ,
+\begin_inset Formula 
+\begin{equation}
+J^{s}=J^{\sigma}J^{\sigma s}\,,\label{eq:general-jacobian-relation}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{F}^{\sigma}$
+\begin_inset Formula $J^{\sigma s}=\det\mathbf{F}^{\sigma s}$
 \end_inset
 
- is the deformation gradient of constituent 
+.
+\end_layout
+
+\begin_layout Subsection
+Mixture Composition
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Mixture-Composition"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ has an 
+\shape italic
+apparent mass density
+\shape default
+ 
+\begin_inset Formula $\rho^{\sigma}$
+\end_inset
+
+ which may evolve due to deformation, or due to reactive processes which
+ alter the mixture composition.
+ Following 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bowen69,Ateshian07"
+literal "false"
+
+\end_inset
+
+, we define the 
+\shape italic
+referential apparent mass density
+\shape default
+ 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ of each constituent as
+\begin_inset Formula 
+\begin{equation}
+\rho_{r}^{\sigma}=J^{s}\rho^{\sigma}\,.\label{eq:general-referential-mass-density}
+\end{equation}
+
+\end_inset
+
+Equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-referential-mass-density"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ expresses the mass of constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ per referential volume of the master constituent 
+\begin_inset Formula $s$
+\end_inset
+
+; thus 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ may only evolve if the mass content changes via reactions, making it a
+ suitable state variable for tracking composition in a reactive framework.
+ The axiom of mass balance for each constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ may be written as
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho}_{r}^{\sigma}=\hat{\rho}_{r}^{\sigma}\,,\label{eq:mass-balance-alpha-1}
+\end{equation}
+
+\end_inset
+
+where the dot operator represents the material time derivative and 
+\begin_inset Formula $\hat{\rho}_{r}^{\sigma}$
+\end_inset
+
+ is the 
+\shape italic
+referential mass supply density
+\shape default
+ for constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+, representing the rate at which mass (per referential volume) is added
+ to 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ due to reactions with all other mixture constituents 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10,Nims17"
+literal "false"
+
+\end_inset
+
+.
+ A constitutive relation must be provided for 
+\begin_inset Formula $\hat{\rho}_{r}^{\sigma}$
+\end_inset
+
+ for various types of reactions.
+ The mixture referential mass density 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\rho_{r}=\sum_{\sigma}\rho_{r}^{\sigma}\,.\label{eq:general-mass-balance}
+\end{equation}
+
+\end_inset
+
+This summation is carried out over all constituents.
+ When a constrained mixture of solid constituents represents a closed system,
+ 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ remains constant over time.
+ Taking the material time derivative of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and using Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-alpha-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows that the referential mass density supplies must satisfy
+\begin_inset Formula 
+\begin{equation}
+\sum_{\sigma}\hat{\rho}_{r}^{\sigma}=0\,.\label{eq:mass-balance-constraint}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Mixture Free Energy and Stress
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Mixture-Free-Energy"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+referential free energy density
+\shape default
+ of the mixture is obtained as
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\rho_{r}\psi=\sum_{\sigma}\rho_{r}^{\sigma}\psi^{\sigma}\,,\label{eq:general-free-energy}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+ is the 
+\shape italic
+specific free energy
+\shape default
+ of constituent 
 \begin_inset Formula $\sigma$
 \end_inset
 
  and 
-\begin_inset Formula $n$
+\begin_inset Formula $\psi$
 \end_inset
 
- is the number of solid constituents in the mixture.
- Though the solid constituents are constrained to move together, their deformati
-on gradients are not necessarily the same, depending on how the various
- solid constituents of a constrained mixture were assembled 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Ateshian10a"
-literal "true"
-
+ is the specific free energy of the mixture.
+ An important function of state which arises later in our treatment is the
+ 
+\shape italic
+chemical potential
+\shape default
+ of constituent 
+\begin_inset Formula $\sigma$
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Standard
-With no loss of generality, it may be assumed that the strain energy density
- of the mixture is the summation of the strain energy densities of all the
- constituents, 
+, given by
 \begin_inset Formula 
 \begin{equation}
-\Psi\left(\mathbf{F}^{\left(1\right)},\cdots,\mathbf{F}^{\left(n\right)},\rho_{r}^{\left(1\right)},\cdots,\rho_{r}^{\left(n\right)}\right)=\sum\limits _{\sigma=1}^{n}\Psi^{\sigma}\left(\mathbf{F}^{\left(1\right)},\cdots,\mathbf{F}^{\left(n\right)},\rho_{r}^{\left(1\right)},\cdots,\rho_{r}^{\left(n\right)}\right)\,,\label{eq136}
+\mu^{\sigma}=\frac{\partial\Psi_{r}}{\partial\rho_{r}^{\sigma}}\,.\label{eq:general-chemical-potential}
+\end{equation}
+
+\end_inset
+
+The mixture Cauchy stress is given by
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\frac{1}{J^{s}}\frac{\partial\Psi_{r}}{\partial\mathbf{F}^{s}}\cdot\left(\mathbf{F}^{s}\right)^{T}=\frac{2}{J^{s}}\mathbf{F}^{s}\cdot\frac{\partial\Psi_{r}}{\partial\mathbf{C}^{s}}\cdot\left(\mathbf{F}^{s}\right)^{T}\,,\label{eq:general-mixture-stress}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\Psi^{\sigma}$
+\begin_inset Formula $\mathbf{C}^{s}=\mathbf{F}^{s}\cdot\left(\mathbf{F}^{s}\right)^{T}$
 \end_inset
 
- is the strain energy density of constituent 
-\begin_inset Formula $\sigma$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Now, 
-\emph on
-as a special case
-\emph default
-, we may assume that the simplest form of the constitutive relation for
- a mixture of constrained solids is 
+ is the right Cauchy-Green tensor.
+ The spatial elasticity tensor may be evaluated from
 \begin_inset Formula 
 \begin{equation}
-\Psi\left(\mathbf{F}^{\left(1\right)},\cdots,\mathbf{F}^{\left(n\right)},\rho_{r}^{\left(1\right)},\cdots,\rho_{r}^{\left(n\right)}\right)=\sum\limits _{\sigma=1}^{n}\Psi^{\sigma}\left(\mathbf{F}^{\sigma},\rho_{r}^{\sigma}\right)\,.\label{eq137}
+\boldsymbol{\mathcal{C}}=\frac{4}{J^{s}}\left(\mathbf{F}^{s}\oslash\mathbf{F}^{s}\right):\frac{\partial^{2}\Psi_{r}}{\partial\mathbf{C}^{s}\partial\mathbf{C}^{s}}:\left(\left(\mathbf{F}^{s}\right)^{T}\oslash\left(\mathbf{F}^{s}\right)^{T}\right)\,.\label{eq:general-mixture-elasticity}
 \end{equation}
 
 \end_inset
 
-This special form assumes that there are no explicit dependencies among
- the various solid constituents of the mixture.
- Thus, 
-\begin_inset Formula $\Psi^{\sigma}$
+
+\end_layout
+
+\begin_layout Standard
+In reactive frameworks where 
+\begin_inset Formula $\rho_{r}^{\sigma}$
 \end_inset
 
- depends only on the deformation gradient and mass content of 
+ evolves according to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-alpha-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it may be convenient to define the mass fraction
+\begin_inset Formula 
+\begin{equation}
+w^{\sigma}=\frac{\rho_{r}^{\sigma}}{\rho_{r}}\,,\label{eq:mass-fraction}
+\end{equation}
+
+\end_inset
+
+in which case we may rewrite Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-free-energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as 
+\begin_inset Formula $\Psi_{r}=\sum_{\sigma}w^{\sigma}\Psi_{r}^{\sigma}$
+\end_inset
+
+ where 
+\begin_inset Formula $\Psi_{r}^{\sigma}\equiv\rho_{r}\psi^{\sigma}$
+\end_inset
+
+ is the referential strain energy density of solid 
 \begin_inset Formula $\sigma$
+\end_inset
+
+ under the assumption that it is the sole mixture constituent, normalized
+ by the referential volume of the master constituent 
+\begin_inset Formula $s$
+\end_inset
+
+.
+ Based on Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ the mass fractions satisfy 
+\begin_inset Formula $\sum_{\sigma}w^{\sigma}=1$
+\end_inset
+
+.
+ In this case, when 
+\begin_inset Formula $\mathbf{X}^{\sigma}\ne\mathbf{X}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+ is most conveniently expressed as a function of 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+, we may use Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to evaluate 
+\begin_inset Formula $\partial\mathbf{F}^{s}/\partial\mathbf{F}^{\sigma}=\mathbf{I}\oslash\left(\mathbf{F}^{\sigma s}\right)^{-T}$
+\end_inset
+
+ and calculate the mixture stress using the alternative form
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\frac{1}{J^{s}}\sum_{\sigma}w^{\sigma}\frac{\partial\Psi_{r}^{\sigma}}{\partial\mathbf{F}^{\sigma}}\cdot\left(\mathbf{F}^{\sigma}\right)^{T}\,.\label{eq:general-mixture-stress-redux}
+\end{equation}
+
+\end_inset
+
+This expression shows that the mixture stress may evolve not only due to
+ temporal changes in the state of strain but also due to reactive changes
+ in the mass fractions 
+\begin_inset Formula $w^{\sigma}$
 \end_inset
 
 .
 \end_layout
 
 \begin_layout Standard
-Furthermore, if we assume that 
-\begin_inset Formula $\mathbf{F}^{\sigma}=\mathbf{F}$
+In FEBio the referential strain energy density for any solid mixture constituent
+ 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is evaluated from the same library of constitutive models used in single-consti
+tuent solids.
+ In this library the calculation of the referential strain energy density
+ is based on the assumption that the reference configuration corresponds
+ to the configuration when the deformation gradient passed to those functions
+ is equal to the identity tensor.
+ Thus, passing 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+ to those functions returns the correct 
+\begin_inset Formula $\Psi_{r}^{\sigma}$
+\end_inset
+
+.
+ However, when passing 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+ as an argument to those functions, the referential volume is based on the
+ configuration 
+\begin_inset Formula $\mathbf{X}^{\sigma}$
+\end_inset
+
+.
+ Let the referential free energy density returned by FEBio for an argument
+ 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+ be denoted by 
+\begin_inset Formula $\Psi_{0}^{\sigma}$
+\end_inset
+
+.
+ We may similarly denote the corresponding Cauchy stress and spatial elasticity
+ tensors by 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}^{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}_{0}^{\sigma}$
+\end_inset
+
+.
+ Here, the subscript 
+\begin_inset Formula $0$
+\end_inset
+
+ has two meanings: First it emphasizes that the corresponding function is
+ evaluated using 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+ for the mixture constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+; second it emphasizes that the calculation returns the corresponding measure
+ under the assumption that the mixture consists entirely of that constituent,
+ so that its multiplication by the scale factor 
+\begin_inset Formula $w^{\sigma}$
+\end_inset
+
+ returns the actual contribution of that measure to the entire mixture.
+ Based on Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-jacobian-relation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we find that 
+\begin_inset Formula $\Psi_{r}^{\sigma}=J^{\sigma s}\Psi_{0}^{\sigma}$
+\end_inset
+
+ so that the mixture free energy density may be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\sum_{\sigma}w^{\sigma}J^{\sigma s}\Psi_{0}^{\sigma}\left(\mathbf{F}^{\sigma}\right)\,,\label{eq:febio-mixture-sed}
+\end{equation}
+
+\end_inset
+
+whereas the mixture Cauchy stress and spatial elasticity are given by
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\sum_{\sigma}w^{\sigma}\boldsymbol{\sigma}_{0}^{\sigma}\,,\quad\boldsymbol{\mathcal{C}}=\sum_{\sigma}w^{\sigma}\boldsymbol{\mathcal{C}}_{0}^{\sigma}\,,\label{eq:febio-mixture-stress}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}_{0}^{\sigma}=\frac{1}{J^{\sigma}}\frac{\partial\Psi_{0}^{\sigma}}{\partial\mathbf{F}^{\sigma}}\cdot\left(\mathbf{F}^{\sigma}\right)^{T}=\frac{1}{J^{s}}\frac{\partial\Psi_{r}^{\sigma}}{\partial\mathbf{F}^{\sigma}}\cdot\left(\mathbf{F}^{\sigma}\right)^{T}\label{eq:febio-stress-function}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}_{0}^{\sigma}=\frac{4}{J^{\sigma}}\left(\mathbf{F}^{\sigma}\oslash\mathbf{F}^{\sigma}\right):\frac{\partial^{2}\Psi_{0}^{\sigma}}{\partial\mathbf{C}^{\sigma}\partial\mathbf{C}^{\sigma}}:\left(\left(\mathbf{F}^{\sigma}\right)^{T}\oslash\left(\mathbf{F}^{\sigma}\right)^{T}\right)\,.\label{eq:febio-elasticity-function}
+\end{equation}
+
+\end_inset
+
+These relations show that the Cauchy stress and spatial elasticity tensor
+ of constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be evaluated using existing FEBio functions without needing to adjust
+ for the choice of reference configuration 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mathbf{X}^{\sigma}$
+\end_inset
+
+, as evidenced by Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-stress-function"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in the case of the stress.
+ However the referential strain energy density needs to be properly scaled
+ by 
+\begin_inset Formula $J^{\sigma s}$
+\end_inset
+
+ as shown in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-mixture-sed"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The calculation of the 2nd Piola-Kirchhoff stress 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ for each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is more elaborate.
+ When using the master reference configuration 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+, this stress is given by
+\begin_inset Formula 
+\[
+\mathbf{S}^{\sigma}\left(\mathbf{F}^{s}\right)=2\frac{\partial\Psi_{r}^{\sigma}\left(\mathbf{F}^{s}\right)}{\partial\mathbf{C}^{s}}\,.
+\]
+
+\end_inset
+
+When using the reference configuration 
+\begin_inset Formula $\mathbf{X}^{\sigma}$
+\end_inset
+
+, the stress is evaluated from a similar relation
+\begin_inset Formula 
+\[
+\mathbf{S}_{0}^{\sigma}\left(\mathbf{F}^{\sigma}\right)=2\frac{\partial\Psi_{0}^{\sigma}\left(\mathbf{F}^{\sigma}\right)}{\partial\mathbf{C}^{\sigma}}\,.
+\]
+
+\end_inset
+
+It can be shown that these stresses are related according to
+\begin_inset Formula 
+\[
+\mathbf{S}^{\sigma}\left(\mathbf{F}^{s}\right)=J^{\sigma s}\left(\mathbf{F}^{\sigma s}\right)^{-1}\cdot\mathbf{S}_{0}^{\sigma}\left(\mathbf{F}^{\sigma}\right)\cdot\left(\mathbf{F}^{\sigma s}\right)^{-T}\,.
+\]
+
+\end_inset
+
+FEBio does not use this calculation for solid mixtures, as all internal
+ calculations employ the Cauchy stress.
+\end_layout
+
+\begin_layout Subsection
+Simple Solid Mixtures
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Simple-Solid-Mixtures"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the simplest type of non-reactive constrained mixtures of solids all
+ constituents 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ share the same reference configuration 
+\begin_inset Formula $\mathbf{X}^{\sigma}=\mathbf{X}^{s}$
+\end_inset
+
+, in which case 
+\begin_inset Formula $\mathbf{F}^{\sigma}=\mathbf{F}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{\sigma s}=1$
+\end_inset
+
+.
+ For this type of mixture where 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ does not evolve, it is convenient to set 
+\begin_inset Formula $w^{\sigma}=1$
 \end_inset
 
  for all 
 \begin_inset Formula $\sigma$
 \end_inset
 
- (implying no residual stresses in the solid mixture), then the general
- form for 
-\begin_inset Formula $\Psi$
+ and scale the material properties of 
+\begin_inset Formula $\Psi_{r}^{\sigma}$
 \end_inset
 
- further reduces to 
-\begin_inset Formula 
-\begin{equation}
-\Psi=\sum\limits _{\sigma=1}^{n}\Psi^{\sigma}\left(\mathbf{F},\rho_{r}^{\sigma}\right)\,.\label{eq138}
-\end{equation}
-
-\end_inset
-
-Consequently, the stress tensor for the mixture becomes 
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}=J^{-1}\frac{\partial\Psi}{\partial\mathbf{F}}\cdot\mathbf{F}^{T}=\sum\limits _{\sigma=1}^{n}J^{-1}\frac{\partial\Psi^{\sigma}}{\partial\mathbf{F}}\cdot\mathbf{F}^{T}=\sum\limits _{\sigma=1}^{n}\boldsymbol{\sigma}^{\sigma}\,.\label{eq139}
-\end{equation}
-
-\end_inset
-
-In other words, the stress in the solid mixture may be evaluated from the
- sum of the stresses in each mixture constituent using the same hyperelasticity
- relation as for a single, pure solid constituent.
- The fact that 
-\begin_inset Formula $\Psi^{\sigma}$
-\end_inset
-
- also depends on 
-\begin_inset Formula $\rho_{r}^{\sigma}$
-\end_inset
-
- implies that the material properties appearing in the constitutive relation
- for 
-\begin_inset Formula $\boldsymbol{\sigma}^{\sigma}$
-\end_inset
-
- are dependent on the mass content of solid 
+ to properly reflect the contribution of each constituent 
 \begin_inset Formula $\sigma$
 \end_inset
 
- in the mixture.
-\end_layout
-
-\begin_layout Standard
-For nearly-incompressible solids, using a reasoning similar to that which
- led to 
+ to the mixture.
+ Thus, the relation of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq138"
+reference "eq:febio-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-, the uncoupled strain energy density for the solid mixture may be of the
- form 
+ reduces to
 \begin_inset Formula 
 \begin{equation}
-\Psi=U\left(J\right)+\sum\limits _{\sigma=1}^{n}\tilde{\Psi}^{\sigma}\left(\mathbf{\tilde{F}},\rho_{r}^{\sigma}\right)\,,\label{eq140}
+\boldsymbol{\sigma}=\sum_{\sigma}\boldsymbol{\sigma}_{0}^{\sigma}\,.\label{eq:simple-mixture-stress}
+\end{equation}
+
+\end_inset
+
+This type of non-reactive mixture of solids is represented in FEBio using
+ the material 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+solid mixture
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When each constituent of a solid mixture is modeled using an uncoupled formulati
+on to enforce nearly isochoric responses, the strain energy density of this
+ type of mixture is given by
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=U\left(J\right)+\sum\limits _{\sigma}\tilde{\Psi}_{r}^{\sigma}\left(\mathbf{\tilde{F}}^{s},\rho_{r}^{\sigma}\right)\,,\label{eq140}
 \end{equation}
 
 \end_inset
@@ -5250,11 +6006,11 @@ where
 \end_inset
 
  is the volumetric energy component, 
-\begin_inset Formula $\tilde{\Psi}=\sum\nolimits _{\sigma}\tilde{\Psi}^{\sigma}$
+\begin_inset Formula $\tilde{\Psi}_{r}=\sum\nolimits _{\sigma}\tilde{\Psi}_{r}^{\sigma}$
 \end_inset
 
  is the distortional energy component, and 
-\begin_inset Formula $\mathbf{\tilde{F}}$
+\begin_inset Formula $\mathbf{\tilde{F}}^{s}$
 \end_inset
 
  is the distortional part of the deformation gradient, as described in Section
@@ -5266,6 +6022,482 @@ where
 LatexCommand ref
 reference "subsec:Nearly-Incompressible-Hyperelast"
 
+\end_inset
+
+.
+ This type of non-reactive mixture of uncoupled solids is represented in
+ FEBio using the material 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+uncoupled solid mixture
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Multigenerational Interstitial Growth
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Multigen-Interstitial-Growth"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Multigenerational interstitial growth mechanics may be modeled using a reactive
+ mixture of constrained solids as described in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10a"
+literal "false"
+
+\end_inset
+
+.
+ In this framework it is assumed that a porous solid matrix may gain mass
+ via interstitial growth, such that the porosity of the solid decreases
+ with increasing solid mass content.
+ The history of growth is discretized temporally into generations 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ such that the mass added in the time interval 
+\begin_inset Formula $t^{\sigma}\le t<t^{\sigma+1}$
+\end_inset
+
+ has a reference configuration 
+\begin_inset Formula $\mathbf{X}^{\sigma}$
+\end_inset
+
+.
+ This model assumes that each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ gets deposited into the existing mixture in a stress-free state.
+ This can be achieved by adopting the constitutive assumption that 
+\begin_inset Formula $\mathbf{X}^{\sigma}=\boldsymbol{\chi}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+\end_inset
+
+.
+ In other words, the reference configuration of generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is the current configuration of the solid mixture at time 
+\begin_inset Formula $t^{\sigma}$
+\end_inset
+
+.
+ An alternative form of this constitutive model is that 
+\begin_inset Formula $\mathbf{F}^{\sigma}\left(\mathbf{X}^{s},t^{\sigma}\right)=\mathbf{I}$
+\end_inset
+
+ while the new generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is being deposited, or equivalently 
+\begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)=\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+\end_inset
+
+ according to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The underlying assumption of multigenerational growth is that 
+\begin_inset Formula $\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+\end_inset
+
+ evolves for each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ either due to load-induced deformations or deformations produced by swelling
+ processes, such as cell growth or Donnan swelling.
+\end_layout
+
+\begin_layout Standard
+This type of multigenerational growth material is implemented in FEBio as
+ 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+multigeneration
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ for mixtures of elastic solids, and as 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+multiphasic-multigeneration
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ for reactive multiphasic mixtures whose solid constituent is a multigenerationa
+l growth material.
+ In this type of material the user needs to prescribe the generation birth
+ times 
+\begin_inset Formula $t^{\sigma}$
+\end_inset
+
+ and the properties of the material of each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ The code automatically prescribes 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ based on the constitutive model given above, for each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ For example, one may use a material model whose response depends on the
+ evolving composition 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ of that generation.
+ The composition 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ may evolve either due to chemical reactions modeled in a multiphasic framework,
+ or by associating a user-defined load curve with 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+.
+ Thus, the material properties (and the stress response) of generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ need not remain constant over the generation time interval 
+\begin_inset Formula $t^{\sigma}\le t<t^{\sigma+1}$
+\end_inset
+
+, even though 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ remains constant during that generation.
+ 
+\end_layout
+
+\begin_layout Standard
+When the growth process is negative (
+\begin_inset Formula $\hat{\rho}_{r}^{\sigma}<0$
+\end_inset
+
+), it implies that the solid constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is losing mass (solid resorption); this loss of mass terminates when 
+\begin_inset Formula $\rho_{r}^{\sigma}=0$
+\end_inset
+
+.
+ A material model that depends on 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ may exhibit evolving material properties during this resorption process
+ until that generation produces zero stress when 
+\begin_inset Formula $\rho_{r}^{\sigma}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+As a result of these evolving growth processes, this multigeneration mixture
+ may exhibit residual stresses.
+\end_layout
+
+\begin_layout Subsection
+Prescribed Pre-Stretch
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prescribed-Deposition-Stretch"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An alternative approach to multigenerational growth is to prescribe 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ as a user-defined function.
+ For isotropic stretching we may define
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{\sigma s}=\lambda^{\sigma s}\mathbf{I}\,,\label{eq:prescribed-defgrad-isotropic}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda^{\sigma s}>0$
+\end_inset
+
+ is the stretch ratio.
+ A value greater than unity causes swelling whereas a value less than unity
+ causes contraction; 
+\begin_inset Formula $\lambda^{\sigma s}=1$
+\end_inset
+
+ produces 
+\begin_inset Formula $\mathbf{F}^{\sigma s}=\mathbf{I}$
+\end_inset
+
+, which recovers the simple solid mixture described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Simple-Solid-Mixtures"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In FEBio a load curve may be associated with 
+\begin_inset Formula $\lambda^{\sigma s}$
+\end_inset
+
+ to ramp up the prescribed deposition stretch.
+\end_layout
+
+\begin_layout Standard
+For orthotropic stretching we define mutually orthogonal symmetry planes
+ with unit normals 
+\begin_inset Formula $\mathbf{a}_{i}$
+\end_inset
+
+ (
+\begin_inset Formula $i=1,2,3$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{a}_{i}\cdot\mathbf{a}_{j}=\delta_{ij}$
+\end_inset
+
+).
+ Then,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{\sigma s}=\sum_{i=1}^{3}\lambda_{i}^{\sigma s}\mathbf{a}_{i}\otimes\mathbf{a}_{i}\,,\label{eq:prescribed-defgrad-orthotropic}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{i}^{\sigma s}$
+\end_inset
+
+ is the stretch ratio for the prescribed stretch along 
+\begin_inset Formula $\mathbf{a}_{i}$
+\end_inset
+
+; in general, 
+\begin_inset Formula $\lambda_{1}^{\sigma s}\ne\lambda_{2}^{\sigma s}\ne\lambda_{3}^{\sigma s}$
+\end_inset
+
+, though this model can be specialized to transversely isotropic stretch
+ by setting two of these stretch ratios equal to each other.
+\end_layout
+
+\begin_layout Standard
+At lower symmetries the constitutive model for 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ must necessarily combine stretch and rotation.
+ For monoclinic materials, deformations may be prescribed along three unit
+ vectors 
+\begin_inset Formula $\mathbf{a}_{i}$
+\end_inset
+
+ that satisfy 
+\begin_inset Formula $\mathbf{a}_{1}\cdot\mathbf{a}_{2}=0$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{a}_{1}\cdot\mathbf{a}_{3}=0$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{a}_{2}\cdot\mathbf{a}_{3}\ne0$
+\end_inset
+
+, such that 
+\begin_inset Formula $\mathbf{a}_{1}$
+\end_inset
+
+ defines the single plane of symmetry.
+ In this case,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{F}^{\sigma s} & =\lambda_{1}^{\sigma s}\mathbf{a}_{1}\otimes\mathbf{a}_{1}+\frac{\lambda_{2}^{\sigma s}}{1-\alpha_{23}^{2}}\mathbf{a}_{2}\otimes\left(\mathbf{a}_{2}-\alpha_{23}\mathbf{a}_{3}\right)\\
+ & +\frac{\lambda_{3}^{\sigma s}}{1-\alpha_{23}^{2}}\mathbf{a}_{3}\otimes\left(\mathbf{a}_{3}-\alpha_{23}\mathbf{a}_{2}\right)
+\end{aligned}
+\,,\label{eq:prescribed-defgrad-monoclinic}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{i}^{\sigma s}$
+\end_inset
+
+ is the stretch along 
+\begin_inset Formula $\mathbf{a}_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{23}=\mathbf{a}_{2}\cdot\mathbf{a}_{3}$
+\end_inset
+
+.
+ Under general conditions (i.e., when 
+\begin_inset Formula $\lambda_{1}^{\sigma s}\ne\lambda_{2}^{\sigma s}\ne\lambda_{3}^{\sigma s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{23}\ne0$
+\end_inset
+
+), the polar decomposition theorem shows that this deformation gradient
+ is not a pure stretch, as it also involves a rotation.
+\end_layout
+
+\begin_layout Standard
+The deformation gradient for expansion of a triclinic material may be similarly
+ constructed by finding 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ such that 
+\begin_inset Formula $\mathbf{F}^{\sigma s}\cdot\mathbf{a}_{i}=\lambda_{i}^{\sigma s}\mathbf{a}_{i}$
+\end_inset
+
+ (no sum) for non-orthogonal and non-collinear unit vectors 
+\begin_inset Formula $\mathbf{a}_{i}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{F}^{\sigma s} & =\frac{\lambda_{1}^{\sigma s}}{d}\mathbf{a}_{1}\otimes\left(\left(1-\alpha_{23}^{2}\right)\mathbf{a}_{1}-\left(\alpha_{12}-\alpha_{13}\alpha_{23}\right)\mathbf{a}_{2}-\left(\alpha_{13}-\alpha_{12}\alpha_{23}\right)\mathbf{a}_{3}\right)\\
+ & +\frac{\lambda_{2}^{\sigma s}}{d}\mathbf{a}_{2}\otimes\left(-\left(\alpha_{12}-\alpha_{13}\alpha_{23}\right)\mathbf{a}_{1}+\left(1-\alpha_{13}^{2}\right)\mathbf{a}_{2}-\left(\alpha_{23}-\alpha_{12}\alpha_{13}\right)\mathbf{a}_{3}\right)\\
+ & +\frac{\lambda_{3}^{\sigma s}}{d}\mathbf{a}_{3}\otimes\left(-\left(\alpha_{13}-\alpha_{12}\alpha_{23}\right)\mathbf{a}_{1}-\left(\alpha_{23}-\alpha_{12}\alpha_{13}\right)\mathbf{a}_{2}+\left(1-\alpha_{12}^{2}\right)\mathbf{a}_{3}\right)
+\end{aligned}
+\label{eq:prescribed-defgrad-triclinic}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+d=1-\alpha_{12}^{2}-\alpha_{13}^{2}-\alpha_{23}^{2}+2\alpha_{23}\alpha_{13}\alpha_{12}\label{eq:triclinic-defgrad-denominator}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\alpha_{ij}=\mathbf{a}_{i}\cdot\mathbf{a}_{j}$
+\end_inset
+
+ is the cosine of the angle between 
+\begin_inset Formula $\mathbf{a}_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{a}_{j}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This type of elastic solid with prescribed pre-stretch is modeled in FEBio
+ using the materials 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+prestretch elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+prestretch uncoupled elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In the uncoupled version each solid constituent in the mixture has a deformatio
+n gradient 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+ which produces nearly isochoric responses (
+\begin_inset Formula $J^{\sigma}=1$
+\end_inset
+
+), whereas no constraint is placed on the volumetric strain of the pre-stretch
+ 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
 \end_inset
 
 .
@@ -5339,7 +6571,7 @@ where
 
  results exclusively from osmotic effects and ambient conditions (i.e., it
  does not depend on the loading history).
- Thus, in analogy to 
+ Thus, in analogy to Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq118"
@@ -5387,7 +6619,7 @@ The osmotic pressure
 \begin_inset Formula $\mathbf{t}=\mathbf{0}$
 \end_inset
 
-, the relation of 
+, the relation of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq141"
@@ -5438,7 +6670,7 @@ where
 \begin_inset Formula $\varphi_{r}^{s}$
 \end_inset
 
- depend on the solid matrix deformation, thus 
+ depend on the solid matrix deformation, thus Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -5460,7 +6692,7 @@ reference "eq142"
 \begin_inset Formula $-p\mathbf{I}$
 \end_inset
 
- in 
+ in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq141"
@@ -5550,7 +6782,7 @@ Consider a porous medium with an interstitial fluid that consists of a solvent
 \end_inset
 
 is the osmolarity of the external environment.
- Using 
+ Using Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -5587,7 +6819,7 @@ The reference configuration (the stress-free configuration of the solid)
 \end_inset
 
  in the reference state.
- Therefore 
+ Therefore Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq144"
@@ -5602,7 +6834,7 @@ p=R\theta c^{\ast}\left(\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}\frac{c_{0}^{
 
 \end_inset
 
-and this expression may be substituted into 
+and this expression may be substituted into Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq143"
@@ -5624,7 +6856,7 @@ A perfect osmometer is a porous material whose interstitial fluid behaves
 \begin_inset Formula $p=0$
 \end_inset
 
- and 
+ and Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq145"
@@ -5655,7 +6887,7 @@ This equation is known as the Boyle-van't Hoff relation for a perfect osmometer.
 \end_layout
 
 \begin_layout Standard
-FEBio implements the relation of 
+FEBio implements the relation of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq145"
@@ -5711,7 +6943,7 @@ perfect osmometer
 
  framework by simply increasing the mass of the intracellular solid matrix
  and membrane-impermeant solute.
- This is achieved by using 
+ This is achieved by using Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq144"
@@ -5802,7 +7034,7 @@ where
 \end_inset
 
 .
- Though this expression may be equated with 
+ Though this expression may be equated with Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -5819,7 +7051,7 @@ reference "eq142"
 
 \begin_layout Standard
 However, since the number of charges fixed to the solid matrix is invariant,
- we may manipulate 
+ we may manipulate Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -5852,7 +7084,7 @@ p=R\theta\left(\sqrt{\left(\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}c_{r}^{F}\
 
 \end_inset
 
-This expression may be substituted into 
+This expression may be substituted into Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq143"
@@ -5928,14 +7160,14 @@ In a mixture containing a solid constituent (denoted by
 
 \end_inset
 
-Substituting 
+Substituting Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq152"
 
 \end_inset
 
- into 
+ into Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq150"
@@ -6028,7 +7260,7 @@ For constituents constrained to move with the solid (denoted generically
 \begin_inset Formula $\forall\sigma)$
 \end_inset
 
-, the statement of mass balance in 
+, the statement of mass balance in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq153"
@@ -6049,7 +7281,7 @@ This representation makes it easy to see that alterations in
 
  can occur only as a result of chemical reactions (such as synthesis, degradatio
 n, or binding).
- In contrast, as seen in 
+ In contrast, as seen in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq153"
@@ -6123,7 +7355,7 @@ where
 
  is the referential solid volume fraction of solid constituents not explicitly
  modeled by solid-bound molecules (a user-defined parameter).
- According to 
+ According to Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq154"
@@ -6263,7 +7495,7 @@ where it may be noted that
 \end_inset
 
 .
- Combining these relations with 
+ Combining these relations with Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq153"
@@ -6315,7 +7547,7 @@ The volume fraction of each constituent is given by
 \begin_inset Formula $\rho^{\alpha}=\varphi^{\alpha}\rho_{T}^{\alpha}$
 \end_inset
 
- into 
+ into Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq150"
@@ -6346,14 +7578,14 @@ This mass balance relation for the mixture expresses the fact that the mixture
 \begin_inset Formula $\alpha$
 \end_inset
 
- would nullify the right-hand-side of 
+ would nullify the right-hand-side of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq162"
 
 \end_inset
 
- based on 
+ based on Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq151"
@@ -6395,7 +7627,7 @@ In the special case of the solvent (
 \begin_inset Formula $\hat{\varphi}^{w}=\hat{\rho}^{w}/\hat{\rho}_{T}^{w}$
 \end_inset
 
-, which may be incorporated in 
+, which may be incorporated in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq163"
@@ -6535,7 +7767,7 @@ Thus, formulating constitutive relations for
 
 \end_inset
 
-the relations of 
+the relations of Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq166"
@@ -6557,7 +7789,7 @@ reference "eq167"
 \end_layout
 
 \begin_layout Standard
-Using the relations of 
+Using the relations of Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq159"
@@ -6582,7 +7814,7 @@ reference "eq166"
 \begin_inset Formula $\hat{\rho}^{\alpha}=\left(1-\varphi^{s}\right)M^{\alpha}\nu^{\alpha}\hat{\zeta}$
 \end_inset
 
-, so that the constraint of 
+, so that the constraint of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq151"
@@ -6601,7 +7833,7 @@ Thus, properly balancing a chemical reaction satisfies this constraint.
 \end_layout
 
 \begin_layout Standard
-The mixture mass balance in 
+The mixture mass balance in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq163b"
@@ -6641,21 +7873,21 @@ where
 \begin_inset Formula $\overline{\mathcal{V}}$
 \end_inset
 
- in 
+ in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq170"
 
 \end_inset
 
-; therefore, if one desires to model chemical reactions, 
+; therefore, if one desires to model chemical reactions, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq165"
 
 \end_inset
 
- or 
+ or Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq168"
@@ -6667,7 +7899,7 @@ reference "eq168"
 \begin_inset Formula $\hat{\varphi}^{w}=\left(1-\varphi^{s}\right)\hat{\zeta}\nu^{w}\mathcal{V}^{w}$
 \end_inset
 
-.) Similarly, the solute mass balance in 
+.) Similarly, the solute mass balance in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq161"
@@ -6817,7 +8049,7 @@ Let
 \begin_inset Formula $\dot{J}=J\mathbf{F}^{-T}:\dot{\mathbf{F}}$
 \end_inset
 
- which, when combined with eq.
+ which, when combined with Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:F-dot"
@@ -7072,7 +8304,7 @@ where
 \begin_inset Formula $\mathbf{v}_{-}=\mathbf{v}_{\Gamma}$
 \end_inset
 
- for the solid, such that eq.
+ for the solid, such that Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-jump"
@@ -7141,7 +8373,7 @@ In our finite element treatment we use
 \end_inset
 
 .
- Based on eqs.
+ Based on Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-balance-integrated"
@@ -7165,7 +8397,7 @@ reference "eq:elastic-pressure"
 \end_inset
 
 .
- Thus, the mass jump in eq.
+ Thus, the mass jump in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-jump"
@@ -7314,7 +8546,7 @@ For the specialized conditions of a viscous fluid at constant temperature
 \begin_inset Formula $\boldsymbol{\sigma}$
 \end_inset
 
- must have the form of 
+ must have the form of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stress"
@@ -7325,7 +8557,7 @@ reference "eq:stress"
 \begin_inset Formula $p$
 \end_inset
 
- is given by
+ is given by Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:elastic-pressure"
@@ -7383,7 +8615,7 @@ For the conditions adopted here (isothermal viscous fluid), the axiom of
 \begin_inset Formula $J$
 \end_inset
 
-, this expression may be further simplified using 
+, this expression may be further simplified using Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:divv-kinematic-relation"
@@ -7408,7 +8640,7 @@ reference "eq:elastic-pressure"
 \end_inset
 
  (heat leaving the system).
- Now, the integral form of the energy balance in 
+ Now, the integral form of the energy balance in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:energy-integral-redux"
@@ -7424,7 +8656,7 @@ reference "eq:energy-integral-redux"
 \end_inset
 
 A comparison of this statement with the statement of virtual work, presented
- below in 
+ below in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:virtual work"
@@ -7775,7 +9007,7 @@ where
 \begin_inset Formula $\mathbf{a}^{f}$
 \end_inset
 
- is given in 
+ is given in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:fsi-fluid-acceleration-redux"
@@ -8415,10 +9647,10 @@ mixture
 \begin_inset Formula $e^{f}$
 \end_inset
 
-, and its simplest form is
+, and the form adopted in FEBio is
 \begin_inset Formula 
 \begin{equation}
-p=-Ke^{f}\,,\label{eq:bfsi-pressure-state}
+p=K\left(\frac{1}{J^{f}}-1\right)=-\frac{Ke^{f}}{1+e^{f}}\,,\label{eq:bfsi-pressure-state}
 \end{equation}
 
 \end_inset
@@ -8477,7 +9709,7 @@ Since the finite element implementation requires all material time derivatives
 \begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
- is not a nodal degree of freedom, we use 
+ is not a nodal degree of freedom, we use Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-flux"
@@ -8679,7 +9911,7 @@ also implying that
 \end_inset
 
 .
- Given 
+ Given Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-Jf"
@@ -8766,7 +9998,7 @@ Finally, another relation which is sufficient to satisfy the jump condition
 
 \end_inset
 
-This jump condition 
+This jump condition Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-mtm-jump"
@@ -8815,7 +10047,7 @@ noprefix "false"
 \begin_inset Formula $\varphi^{f}\to0$
 \end_inset
 
-), in which case the mixture momentum jump in 
+), in which case the mixture momentum jump in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-mix-mtm-jump"
@@ -8845,7 +10077,7 @@ Letting
 \begin_inset Formula $J^{f}$
 \end_inset
 
- be nodal DOFs automatically enforces the jump conditions 
+ be nodal DOFs automatically enforces the jump conditions Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-Jf-jump"
@@ -8855,7 +10087,7 @@ noprefix "false"
 
 \end_inset
 
- and 
+ and Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-flux-jump"
@@ -8871,7 +10103,7 @@ noprefix "false"
 \end_inset
 
 .
- Finally, subtracting 
+ Finally, subtracting Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-mtm-jump"
@@ -8881,7 +10113,7 @@ noprefix "false"
 
 \end_inset
 
- from 
+ from Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-mix-mtm-jump"
@@ -8928,7 +10160,7 @@ However, when the biphasic domain interfaces with a non-porous solid domain
 \begin_inset Formula $\Gamma^{bs}$
 \end_inset
 
-, the jump conditions 
+, the jump conditions Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-Jf-jump"
@@ -8942,7 +10174,7 @@ noprefix "false"
 \begin_inset Formula $J^{f}$
 \end_inset
 
- and 
+ and Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-solid-mtm-jump"
@@ -8957,7 +10189,7 @@ noprefix "false"
 \end_inset
 
  don't apply.
- In that case, the jump condition 
+ In that case, the jump condition Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-flux-jump"
@@ -9095,7 +10327,7 @@ reference "eq171"
 
 \begin_layout Standard
 To linearize the finite element equations, the directional derivative of
- the virtual work in equation 
+ the virtual work in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq171"
@@ -26266,7 +27498,7 @@ Note that these equations are similar to the corresponding equations in
  The material elasticity tensor is then given by, 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathbb{C}}=\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\lambda\mathbf{I}\otimes\mathbf{I}+2\mu\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\,.\label{eq413}
+\boldsymbol{\mathbb{C}}=\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\lambda\mathbf{I}\otimes\mathbf{I}+2\mu\mathbf{I}\odot\mathbf{I}\,.\label{eq413}
 \end{equation}
 
 \end_inset
@@ -26294,7 +27526,7 @@ where
  , whereas the spatial elasticity tensor is 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=\frac{\lambda}{J}\mathbf{b}\otimes\mathbf{b}+\frac{2}{J}\mu\mathbf{b}\,\overline{\underline{\otimes}}\,\mathbf{b}\,.\label{eq415}
+\boldsymbol{\mathcal{C}}=\frac{\lambda}{J}\mathbf{b}\otimes\mathbf{b}+\frac{2}{J}\mu\mathbf{b}\odot\mathbf{b}\,.\label{eq415}
 \end{equation}
 
 \end_inset
@@ -26424,7 +27656,7 @@ Note that these equations are similar to the corresponding equations in
  The material elasticity tensor is then given by, 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathbb{C}}=\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\sum\limits _{a=1}^{3}\mu_{a}\left(\mathbf{A}_{a}^{0}\,\overline{\underline{\otimes}}\,\mathbf{I}+\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{A}_{a}^{0}\right)+\frac{1}{2}\sum\limits _{b=1}^{3}\lambda_{ab}\left(\mathbf{A}_{a}^{0}\otimes\mathbf{A}_{b}^{0}+\mathbf{A}_{b}^{0}\otimes\mathbf{A}_{a}^{0}\right)\,.\label{eq419}
+\boldsymbol{\mathbb{C}}=\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\sum\limits _{a=1}^{3}\mu_{a}\left(\mathbf{A}_{a}^{0}\odot\mathbf{I}+\mathbf{I}\odot\mathbf{A}_{a}^{0}\right)+\frac{1}{2}\sum\limits _{b=1}^{3}\lambda_{ab}\left(\mathbf{A}_{a}^{0}\otimes\mathbf{A}_{b}^{0}+\mathbf{A}_{b}^{0}\otimes\mathbf{A}_{a}^{0}\right)\,.\label{eq419}
 \end{equation}
 
 \end_inset
@@ -26455,7 +27687,7 @@ where
  and the spatial elasticity tensor is 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=\sum\limits _{a=1}^{3}\frac{\mu_{a}}{J}\left(\mathbf{A}_{a}\,\overline{\underline{\otimes}}\,\mathbf{b}+\mathbf{b}\,\overline{\underline{\otimes}}\,\mathbf{A}_{a}\right)+\frac{1}{2}\sum\limits _{b=1}^{3}\frac{\lambda_{ab}}{J}\left({\mathbf{A}_{a}\otimes\mathbf{A}_{b}+\mathbf{A}_{b}\otimes\mathbf{A}_{a}}\right)\,.\label{eq421}
+\boldsymbol{\mathcal{C}}=\sum\limits _{a=1}^{3}\frac{\mu_{a}}{J}\left(\mathbf{A}_{a}\odot\mathbf{b}+\mathbf{b}\odot\mathbf{A}_{a}\right)+\frac{1}{2}\sum\limits _{b=1}^{3}\frac{\lambda_{ab}}{J}\left({\mathbf{A}_{a}\otimes\mathbf{A}_{b}+\mathbf{A}_{b}\otimes\mathbf{A}_{a}}\right)\,.\label{eq421}
 \end{equation}
 
 \end_inset
@@ -26517,7 +27749,7 @@ The Cauchy stress is given by,
 and the spatial elasticity tensor is given by
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=\frac{\lambda}{J}\mathbf{I}\otimes\mathbf{I}+\frac{2}{J}\left(\mu-\lambda\ln J\right)\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\,.\label{eq424}
+\boldsymbol{\mathcal{C}}=\frac{\lambda}{J}\mathbf{I}\otimes\mathbf{I}+\frac{2}{J}\left(\mu-\lambda\ln J\right)\mathbf{I}\odot\mathbf{I}\,.\label{eq424}
 \end{equation}
 
 \end_inset
@@ -26920,7 +28152,7 @@ Similarly, the spatial elasticity tensor is given by
 \begin{equation}
 \begin{aligned}\boldsymbol{\mathcal{C}} & =\sum\limits _{i=1}^{3}\left(c_{p}+\sum\limits _{k=1}^{N}\frac{1}{J}\frac{c_{k}}{m_{k}}\left[\left(m_{k}-2\right)\lambda_{i}^{m_{k}}+2\right]\right)\mathbf{a}_{i}\otimes\mathbf{a}_{i}\\
  & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}c_{p}\left(2J-1\right)\left(\mathbf{a}_{i}\otimes\mathbf{a}_{j}+\mathbf{a}_{j}\otimes\mathbf{a}_{i}\right)\\
- & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{\lambda_{j}^{2}\sigma_{i}-\lambda_{i}^{2}\sigma_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{a}_{i}\,\overline{\underline{\otimes}}\,\mathbf{a}_{j}+\mathbf{a}_{j}\,\overline{\underline{\otimes}}\,\mathbf{a}_{i}\right)\,,
+ & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{\lambda_{j}^{2}\sigma_{i}-\lambda_{i}^{2}\sigma_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{a}_{i}\odot\mathbf{a}_{j}+\mathbf{a}_{j}\odot\mathbf{a}_{i}\right)\,,
 \end{aligned}
 \label{eq427}
 \end{equation}
@@ -26951,7 +28183,7 @@ where
 In the reference configuration the elasticity tensor reduces to 
 \begin_inset Formula 
 \begin{equation}
-\left.\boldsymbol{\mathcal{C}}\right|_{\mathbf{b}=\mathbf{I}}=c_{p}\mathbf{I}\otimes\mathbf{I}+\left(\sum\limits _{k=1}^{N}c_{k}\right)\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\,,\label{eq429}
+\left.\boldsymbol{\mathcal{C}}\right|_{\mathbf{b}=\mathbf{I}}=c_{p}\mathbf{I}\otimes\mathbf{I}+\left(\sum\limits _{k=1}^{N}c_{k}\right)\mathbf{I}\odot\mathbf{I}\,,\label{eq429}
 \end{equation}
 
 \end_inset
@@ -27053,7 +28285,7 @@ and
 and the spatial elasticity tensor is 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=\frac{4\beta}{\lambda+2\mu}Je^{-Q}\boldsymbol{\sigma}\otimes\boldsymbol{\sigma}+J^{-1}e^{Q}\left[\lambda\left(\mathbf{b}\otimes\mathbf{b}-\mathbf{b}\,\overline{\underline{\otimes}}\,\mathbf{b}\right)+\left(\lambda+2\mu\right)\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\right]\,.\label{eq433}
+\boldsymbol{\mathcal{C}}=\frac{4\beta}{\lambda+2\mu}Je^{-Q}\boldsymbol{\sigma}\otimes\boldsymbol{\sigma}+J^{-1}e^{Q}\left[\lambda\left(\mathbf{b}\otimes\mathbf{b}-\mathbf{b}\odot\mathbf{b}\right)+\left(\lambda+2\mu\right)\mathbf{I}\odot\mathbf{I}\right]\,.\label{eq433}
 \end{equation}
 
 \end_inset
@@ -27158,7 +28390,7 @@ The material constants are the three shear moduli
 The material elasticity tensor is then given by, 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned} & \boldsymbol{\mathbb{C}}=\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\sum\limits _{a=1}^{3}\mu_{a}\left(\mathbf{A}_{a}^{0}\,\overline{\underline{\otimes}}\,\mathbf{I}+\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{A}_{a}^{0}\right)\\
+\begin{aligned} & \boldsymbol{\mathbb{C}}=\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\sum\limits _{a=1}^{3}\mu_{a}\left(\mathbf{A}_{a}^{0}\odot\mathbf{I}+\mathbf{I}\odot\mathbf{A}_{a}^{0}\right)\\
  & +\lambda_{aa}\left[\mathbf{A}_{a}^{0}:\mathbf{E}\right]\mathbf{A}_{a}^{0}\otimes\mathbf{A}_{a}^{0}+\sum\limits _{b=1,\,b\ne a}^{3}\lambda_{ab}\mathbf{A}_{a}^{0}\otimes\mathbf{A}_{b}^{0}
 \end{aligned}
 \,.\label{eq437}
@@ -27192,7 +28424,7 @@ where
  The spatial elasticity tensor is 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=J^{-1}\left(\sum\limits _{a=1}^{3}\mu_{a}\left(\mathbf{A}_{a}\,\overline{\underline{\otimes}}\,\mathbf{b}+\mathbf{b}\,\overline{\underline{\otimes}}\,\mathbf{A}_{a}\right)+\lambda_{aa}\left[K_{a}\right]\mathbf{A}_{a}\otimes\mathbf{A}_{a}+\sum\limits _{b=1,\,b\ne a}^{3}\lambda_{ab}\mathbf{A}_{a}\otimes\mathbf{A}_{b}\right)\,.\label{eq439}
+\boldsymbol{\mathcal{C}}=J^{-1}\left(\sum\limits _{a=1}^{3}\mu_{a}\left(\mathbf{A}_{a}\odot\mathbf{b}+\mathbf{b}\odot\mathbf{A}_{a}\right)+\lambda_{aa}\left[K_{a}\right]\mathbf{A}_{a}\otimes\mathbf{A}_{a}+\sum\limits _{b=1,\,b\ne a}^{3}\lambda_{ab}\mathbf{A}_{a}\otimes\mathbf{A}_{b}\right)\,.\label{eq439}
 \end{equation}
 
 \end_inset
@@ -27324,7 +28556,7 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\boldsymbol{\mathcal{C}} & =\frac{R\theta J\left(c^{F}\right)^{2}}{\left(J-1+\varphi_{0}^{w}\right)\sqrt{\left(c^{F}\right)^{2}+\left(\bar{c}^{\ast}\right)^{2}}}\mathbf{I}\otimes\mathbf{I}\\
- & +R\theta\left[\sqrt{\left(c^{F}\right)^{2}+\left(\bar{c}^{\ast}\right)^{2}}-\bar{c}^{\ast}\right]\left(2\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}-\mathbf{I}\otimes\mathbf{I}\right)\,.
+ & +R\theta\left[\sqrt{\left(c^{F}\right)^{2}+\left(\bar{c}^{\ast}\right)^{2}}-\bar{c}^{\ast}\right]\left(2\mathbf{I}\odot\mathbf{I}-\mathbf{I}\otimes\mathbf{I}\right)\,.
 \end{aligned}
 \label{eq444}
 \end{equation}
@@ -27427,7 +28659,7 @@ Though this material is porous, this is not a full-fledged poroelastic material.
  The corresponding spatial elasticity tensor is 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=R\theta\left[\frac{J\,\bar{c}}{J-1+\varphi_{0}^{w}}\mathbf{I}\otimes\mathbf{I}+\left(\bar{c}-\bar{c}^{\ast}\right)\left(2\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}-\mathbf{I}\otimes\mathbf{I}\right)\right]\,.\label{eq448}
+\boldsymbol{\mathcal{C}}=R\theta\left[\frac{J\,\bar{c}}{J-1+\varphi_{0}^{w}}\mathbf{I}\otimes\mathbf{I}+\left(\bar{c}-\bar{c}^{\ast}\right)\left(2\mathbf{I}\odot\mathbf{I}-\mathbf{I}\otimes\mathbf{I}\right)\right]\,.\label{eq448}
 \end{equation}
 
 \end_inset
@@ -27648,7 +28880,7 @@ such that
 so that
 \begin_inset Formula 
 \[
-\frac{\partial\bar{\mathbf{C}}}{\partial\mathbf{C}}=\left(\frac{\bar{J}}{J}\right)^{2/3}\left(\frac{\varphi_{r}^{s}}{3\left(J-\varphi_{r}^{s}\right)}\mathbf{C}\otimes\mathbf{C}^{-1}+\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.
+\frac{\partial\bar{\mathbf{C}}}{\partial\mathbf{C}}=\left(\frac{\bar{J}}{J}\right)^{2/3}\left(\frac{\varphi_{r}^{s}}{3\left(J-\varphi_{r}^{s}\right)}\mathbf{C}\otimes\mathbf{C}^{-1}+\mathbf{I}\odot\mathbf{I}\right)\,.
 \]
 
 \end_inset
@@ -27715,7 +28947,7 @@ The material elasticity tensor is given by
 \[
 \begin{aligned}\mathbb{C} & =2\frac{\partial\mathbf{S}}{\partial\mathbf{C}}\\
  & =\frac{2}{3}g\left(J\right)\left(\mathbf{I}\otimes\mathbf{C}^{-1}+\mathbf{C}^{-1}\otimes\mathbf{I}\right)+\left(J\frac{dg}{dJ}\frac{I_{1}}{3}+J\frac{dh}{dJ}\right)\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}\\
- & -2\left[g\left(J\right)\frac{I_{1}}{3}+h\left(J\right)\right]\mathbf{C}^{-1}\,\underline{\overline{\otimes}}\,\mathbf{C}^{-1}
+ & -2\left[g\left(J\right)\frac{I_{1}}{3}+h\left(J\right)\right]\mathbf{C}^{-1}\odot\mathbf{C}^{-1}
 \end{aligned}
 \,,
 \]
@@ -27748,7 +28980,7 @@ J\frac{dh}{dJ} & =\mu\frac{J\varphi_{r}^{s}}{\left(J-\varphi_{r}^{s}\right)^{2}}
 Then, the spatial elasticity tensor may be evaluated as
 \begin_inset Formula 
 \[
-\boldsymbol{\mathcal{C}}=J^{-1}\left[\frac{2}{3}g\left(J\right)\left(\mathbf{b}\otimes\mathbf{I}+\mathbf{I}\otimes\mathbf{b}\right)+\left(J\frac{dg}{dJ}\frac{I_{1}}{3}+J\frac{dh}{dJ}\right)\mathbf{I}\otimes\mathbf{I}-2\left[g\left(J\right)\frac{I_{1}}{3}+h\left(J\right)\right]\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right]\,.
+\boldsymbol{\mathcal{C}}=J^{-1}\left[\frac{2}{3}g\left(J\right)\left(\mathbf{b}\otimes\mathbf{I}+\mathbf{I}\otimes\mathbf{b}\right)+\left(J\frac{dg}{dJ}\frac{I_{1}}{3}+J\frac{dh}{dJ}\right)\mathbf{I}\otimes\mathbf{I}-2\left[g\left(J\right)\frac{I_{1}}{3}+h\left(J\right)\right]\mathbf{I}\odot\mathbf{I}\right]\,.
 \]
 
 \end_inset
@@ -27779,7 +29011,7 @@ h\left(J\right) & =-\mu\frac{1}{1-\varphi_{r}^{s}}\mu
 and
 \begin_inset Formula 
 \[
-\boldsymbol{\mathcal{C}}=\frac{2\mu}{3}\left(\frac{1}{\left(\varphi_{r}^{w}\right)^{2}}-1\right)\mathbf{I}\otimes\mathbf{I}+2\mu\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\,.
+\boldsymbol{\mathcal{C}}=\frac{2\mu}{3}\left(\frac{1}{\left(\varphi_{r}^{w}\right)^{2}}-1\right)\mathbf{I}\otimes\mathbf{I}+2\mu\mathbf{I}\odot\mathbf{I}\,.
 \]
 
 \end_inset
@@ -27950,7 +29182,7 @@ Here,
 The spatial elasticity tensor associated with this osmotic pressure is
 \begin_inset Formula 
 \[
-\boldsymbol{\Pi}=-\left(\pi+J\frac{\partial\pi}{\partial J}\right)\mathbf{I}\otimes\mathbf{I}+2\pi\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\,,
+\boldsymbol{\Pi}=-\left(\pi+J\frac{\partial\pi}{\partial J}\right)\mathbf{I}\otimes\mathbf{I}+2\pi\mathbf{I}\odot\mathbf{I}\,,
 \]
 
 \end_inset
@@ -28091,7 +29323,7 @@ The Cauchy stress is given by
 The spatial elasticity tensor is given by 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=p\left(\mathbf{I}\otimes\mathbf{I}-2\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\right)-\frac{2}{3}\left(\dev\boldsymbol{\sigma}\otimes\mathbf{I}+\mathbf{I}\otimes\dev\boldsymbol{\sigma}\right)+\boldsymbol{\mathcal{C}}_{w}\,,\label{eq451}
+\boldsymbol{\mathcal{C}}=p\left(\mathbf{I}\otimes\mathbf{I}-2\mathbf{I}\odot\mathbf{I}\right)-\frac{2}{3}\left(\dev\boldsymbol{\sigma}\otimes\mathbf{I}+\mathbf{I}\otimes\dev\boldsymbol{\sigma}\right)+\boldsymbol{\mathcal{C}}_{w}\,,\label{eq451}
 \end{equation}
 
 \end_inset
@@ -28099,7 +29331,7 @@ The spatial elasticity tensor is given by
 where, 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\boldsymbol{\mathcal{C}}_{w} & =\frac{4}{3J}\left(c_{1}\tilde{I}_{1}+2c_{2}\tilde{I}_{2}\right)\left(\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}-\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)+\frac{4c_{2}}{J}\left(\mathbf{\tilde{b}}\otimes\mathbf{\tilde{b}}-\mathbf{\tilde{b}}\,\overline{\underline{\otimes}}\,\mathbf{\tilde{b}}\right)\\
+\begin{aligned}\boldsymbol{\mathcal{C}}_{w} & =\frac{4}{3J}\left(c_{1}\tilde{I}_{1}+2c_{2}\tilde{I}_{2}\right)\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)+\frac{4c_{2}}{J}\left(\mathbf{\tilde{b}}\otimes\mathbf{\tilde{b}}-\mathbf{\tilde{b}}\odot\mathbf{\tilde{b}}\right)\\
  & -\frac{4c_{2}}{3J}\left[\left(\tilde{I}_{1}\mathbf{\tilde{b}}-\mathbf{\tilde{b}}^{2}\right)\otimes\mathbf{I}+\mathbf{I}\otimes\left(\tilde{I}_{1}\mathbf{\tilde{b}}-\mathbf{\tilde{b}}^{2}\right)\right]+\frac{8c_{2}\tilde{I}_{2}}{9J}\mathbf{I}\otimes\mathbf{I}\,.
 \end{aligned}
 \label{eq452}
@@ -29135,6 +30367,21 @@ literal "true"
 \end_inset
 
 .
+ This framework is based on constrained reactive mixtures of solids (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Mixture-of-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
  Strong bonds produce the equilibrium elastic response, whereas weak bonds
  produce the transient viscous response.
  Strong bonds are in a stress-free state when in their reference configuration
@@ -29203,7 +30450,7 @@ The strain energy density
  in a reactive viscoelastic material is given by 
 \begin_inset Formula 
 \begin{equation}
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq493}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}J^{us}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq493}
 \end{equation}
 
 \end_inset
@@ -29218,6 +30465,25 @@ where
 
  is the strain energy density of weak bonds, when they all belong to the
  same generation.
+ The scale factor 
+\begin_inset Formula $J^{us}$
+\end_inset
+
+ emerges as explained in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Mixture-Free-Energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
  In this expression, 
 \begin_inset Formula $w^{u}\left(\mathbf{X},t\right)$
 \end_inset
@@ -29236,24 +30502,34 @@ generation weak bonds, which evolves over time as described below.
 \end_inset
 
 .
- The Cauchy stress 
+ Based on Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the mixture Cauchy stress 
 \begin_inset Formula $\sigma$
 \end_inset
 
  in a reactive viscoelastic material is similarly given by 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}\left(\mathbf{F}\right)=\boldsymbol{\sigma}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}\boldsymbol{\sigma}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq494}
+\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\boldsymbol{\sigma}^{e}\left(\mathbf{F}^{s}\right)+\sum\limits _{u}w^{u}\boldsymbol{\sigma}_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq494}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\sigma^{e}$
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
 \end_inset
 
  is the stress in the strong bonds and 
-\begin_inset Formula $\sigma^{b}$
+\begin_inset Formula $\boldsymbol{\sigma}_{0}^{b}$
 \end_inset
 
  is the stress in the weak bonds.
@@ -29261,7 +30537,7 @@ where
  strong and weak bonds according to 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}^{e}\left(\mathbf{F}\right)=\frac{1}{J}\frac{\partial\Psi_{r}^{e}\left(\mathbf{F}\right)}{\partial\mathbf{F}}\cdot\mathbf{F}^{T},\quad\boldsymbol{\sigma}^{b}\left(\mathbf{F}^{u}\right)=\frac{1}{J}\frac{\partial\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)}{\partial\mathbf{F}^{u}}\cdot\left(\mathbf{F}^{u}\right)^{T}\,.\label{eq495}
+\boldsymbol{\sigma}^{e}\left(\mathbf{F}^{s}\right)=\frac{1}{J^{s}}\frac{\partial\Psi_{r}^{e}\left(\mathbf{F}^{s}\right)}{\partial\mathbf{F}^{s}}\cdot\left(\mathbf{F}^{s}\right)^{T},\quad\boldsymbol{\sigma}_{0}^{b}\left(\mathbf{F}^{u}\right)=\frac{1}{J^{u}}\frac{\partial\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)}{\partial\mathbf{F}^{u}}\cdot\left(\mathbf{F}^{u}\right)^{T}\,.\label{eq495}
 \end{equation}
 
 \end_inset
@@ -29377,7 +30653,7 @@ and
 \end_inset
 
 generation.
- In the recursive expression of 
+ In the recursive expression of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq498"
@@ -29460,7 +30736,7 @@ The finite element implementation of reactive viscoelasticity stores the
 \begin_inset Formula $\mathbf{F}^{u}\left(\mathbf{X},t\right)$
 \end_inset
 
- using 
+ using Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq492"
@@ -29488,14 +30764,14 @@ reference "eq492"
 \begin_inset Formula $t>v$
 \end_inset
 
- when using Type I bond kinetics, using the expressions of 
+ when using Type I bond kinetics, using the expressions of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq498"
 
 \end_inset
 
- and 
+ and Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq499"
@@ -29503,7 +30779,7 @@ reference "eq499"
 \end_inset
 
 .
- These measures are then used to evaluate the stress from 
+ These measures are then used to evaluate the stress from Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq494"
@@ -29546,7 +30822,21 @@ literal "false"
 \end_inset
 
 .
- It is used to model damage in an elastic solid as a reaction that transforms
+ It is based on constrained reactive mixtures of solids (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Mixture-of-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and used to model damage in an elastic solid as a reaction that transforms
  intact (elastic) bonds into broken bonds,
 \begin_inset Formula 
 \begin{equation}
@@ -30117,17 +31407,18 @@ noprefix "false"
 \end_layout
 
 \begin_layout Subsection
-Constitutive Models
+Constitutive Models for Damage and Yield Criteria
 \end_layout
 
 \begin_layout Standard
-Constitutive models for the damage measure 
+Constitutive models for the damage or yield measure 
 \begin_inset Formula $\Xi\left(\mathbf{U}\right)$
 \end_inset
 
- may be derived from energy-based potentials or strain measures.
- A summary of constitutive models currently implemented in FEBio is presented
- below.
+ may be derived from energy- or stress-based potentials or (less commonly)
+ strain measures.
+ A summary of constitutive models for damage or yield criteria currently
+ implemented in FEBio is presented below.
 \end_layout
 
 \begin_layout Subsubsection
@@ -30314,8 +31605,8 @@ Von Mises Stress
 \end_layout
 
 \begin_layout Standard
-For this criterion it is assumed that damage is initiated by increases in
- the von Mises (or effective) stress, 
+For this criterion it is assumed that damage or yield is initiated by increases
+ in the von Mises (or effective) stress, 
 \begin_inset Formula $\sigma_{Y}$
 \end_inset
 
@@ -30359,7 +31650,7 @@ noprefix "false"
  it can be shown that
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\boldsymbol{\sigma}}{\partial\mathbf{F}}=\left(\boldsymbol{\mathcal{C}}+\mathbf{I}\,\underline{\otimes}\,\boldsymbol{\sigma}+\boldsymbol{\sigma}\,\overline{\otimes}\mathbf{I}-\boldsymbol{\sigma}\otimes\mathbf{I}\right)\cdot\mathbf{F}^{-T}\,,\label{eq:dmg-stress-tangent}
+\frac{\partial\boldsymbol{\sigma}}{\partial\mathbf{F}}=\left(\boldsymbol{\mathcal{C}}+\mathbf{I}\oslash\boldsymbol{\sigma}+\boldsymbol{\sigma}\obslash\mathbf{I}-\boldsymbol{\sigma}\otimes\mathbf{I}\right)\cdot\mathbf{F}^{-T}\,,\label{eq:dmg-stress-tangent}
 \end{equation}
 
 \end_inset
@@ -30588,6 +31879,109 @@ Here,
 \end_layout
 
 \begin_layout Subsubsection
+Drucker Shear Stress
+\end_layout
+
+\begin_layout Standard
+This criterion is based on the yield criterion for plasticity introduced
+ in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Drucker49"
+literal "false"
+
+\end_inset
+
+.
+ Its damage (or yield) measure takes the form
+\begin_inset Formula 
+\begin{equation}
+\Xi\left(\mathbf{U}\right)=k=\left(J_{2}^{3}-cJ_{3}^{2}\right)^{1/6}\,,\label{eq:dmg-model-Drucker}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $J_{2}=\frac{1}{2}\dev\boldsymbol{\sigma}:\dev\boldsymbol{\sigma}$
+\end_inset
+
+, 
+\begin_inset Formula $J_{3}=\det\left(\dev\boldsymbol{\sigma}\right)$
+\end_inset
+
+, 
+\begin_inset Formula $k$
+\end_inset
+
+ is the yield limit in simple shear and 
+\begin_inset Formula $c$
+\end_inset
+
+ is a user-specified non-dimensional material constant which must lie in
+ the range 
+\begin_inset Formula $-\frac{27}{8}\le c\le\frac{9}{4}$
+\end_inset
+
+.
+ To better understand the meaning of 
+\begin_inset Formula $k$
+\end_inset
+
+, consider uniaxial loading of a bar which yields at the normal stress value
+ of 
+\begin_inset Formula $\sigma_{y}$
+\end_inset
+
+.
+ In this case,
+\begin_inset Formula 
+\begin{equation}
+k=\frac{\sigma_{y}}{\sqrt{3}}\left(1-\frac{4}{27}c\right)^{1/6}\quad\frac{\sigma_{y}}{\sqrt{3}}\left(\frac{2}{3}\right)^{1/6}\le k\le\frac{\sigma_{y}}{\sqrt{3}}\left(\frac{3}{2}\right)^{1/6}\,.\label{eq:dmg-Drucker-range}
+\end{equation}
+
+\end_inset
+
+In the special case when 
+\begin_inset Formula $c=0$
+\end_inset
+
+ the Drucker criterion reduces to the von Mises criterion, with 
+\begin_inset Formula $k=\sigma_{y}/\sqrt{3}$
+\end_inset
+
+.
+ To evaluate the damage or yield surface normal, we may use Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:dmg-N-redux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:dmg-N-M"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\Xi}{\partial\boldsymbol{\sigma}}=\frac{1}{k^{5}}\left(\frac{J_{2}^{2}}{2}\dev\boldsymbol{\sigma}-\frac{cJ_{3}^{2}}{3}\dev\left(\dev\boldsymbol{\sigma}\right)^{-1}\right)\,.\label{eq:dmg-Drucker-tangent}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Maximum Normal Lagrange Strain
 \end_layout
 
@@ -30706,12 +32100,3055 @@ where we used
 and
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\mathbf{E}}{\partial\mathbf{U}}=\frac{1}{2}\frac{\partial\mathbf{U}^{2}}{\partial\mathbf{U}}=\frac{1}{2}\left(\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{U}+\mathbf{U}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.\label{eq:dmg-E-U-tangent}
+\frac{\partial\mathbf{E}}{\partial\mathbf{U}}=\frac{1}{2}\frac{\partial\mathbf{U}^{2}}{\partial\mathbf{U}}=\frac{1}{2}\left(\mathbf{I}\odot\mathbf{U}+\mathbf{U}\odot\mathbf{I}\right)\,.\label{eq:dmg-E-U-tangent}
 \end{equation}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Plasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Plasticity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reactive plasticity models a material as a mixture of bonds that break in
+ response to loading and reform in a stressed state 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+.
+ This framework is based on constrained reactive mixtures of solids (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Mixture-of-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Elastic-Perfectly Plastic Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Elastic-Perfectly-Plastic-Response"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section describes a reactive framework in which all loaded bonds in
+ an elemental region break and reform simultaneously into a stressed state
+ with a new reference configuration, resulting in elastic-perfectly plastic
+ behavior.
+ The theory outlined here is similar to reactive viscoelasticity (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian15,Nims17"
+literal "false"
+
+\end_inset
+
+, although bonds now reform in a stressed rather than a stress-free state.
+\end_layout
+
+\begin_layout Standard
+The elastic response of this material is achieved when bonds have not yet
+ failed in response to loading.
+ In this case it is assumed that the bonds belong to generation 
+\begin_inset Formula $s$
+\end_inset
+
+ (the master constituent) whose reference configuration is represented by
+ material points located at 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+.
+ When bonds break and reform at time 
+\begin_inset Formula $t^{\sigma}$
+\end_inset
+
+, a new 
+\begin_inset Formula $\sigma-$
+\end_inset
+
+generation is formed.
+ Consider that bonds of the 
+\begin_inset Formula $\sigma-$
+\end_inset
+
+generation yield based on a scalar 
+\shape italic
+yield measure
+\shape default
+ 
+\begin_inset Formula $\Phi\left(\mathbf{U}^{\sigma}\right)$
+\end_inset
+
+ (e.g., the von Mises stress), where 
+\begin_inset Formula $\mathbf{U}^{\sigma}$
+\end_inset
+
+ is the right stretch tensor from the polar decomposition 
+\begin_inset Formula $\mathbf{F}^{\sigma}=\mathbf{R}\cdot\mathbf{U}^{\sigma}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is the rotation tensor, assumed to also be the rotation tensor of 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+.
+ Thus, according to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{U}^{s}=\mathbf{U}^{\sigma}\cdot\mathbf{F}^{\sigma s}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let the 
+\shape italic
+yield threshold
+\shape default
+ for the 
+\begin_inset Formula $\sigma-$
+\end_inset
+
+generation be given by 
+\begin_inset Formula $\Phi_{m}$
+\end_inset
+
+, which represents the threshold value at which yielding begins.
+ For 
+\begin_inset Formula $\sigma-$
+\end_inset
+
+generation bonds the 
+\shape italic
+yield criterion
+\shape default
+ may thus be defined as
+\begin_inset Formula 
+\begin{equation}
+\varphi\left(\mathbf{U}^{\sigma}\right)=\Phi\left(\mathbf{U}^{\sigma}\right)-\Phi_{m}\le0\,,\label{eq:plasticity-yield-criterion}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varphi\left(\mathbf{U}^{\sigma}\right)$
+\end_inset
+
+ represents the 
+\shape italic
+yield surface
+\shape default
+ of 
+\begin_inset Formula $\sigma-$
+\end_inset
+
+generation bonds whose 
+\shape italic
+tensorial normal
+\shape default
+ is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{N}^{\sigma}=\frac{\partial\varphi}{\partial\mathbf{U}^{\sigma}}=\frac{\partial\Phi\left(\mathbf{U}^{\sigma}\right)}{\partial\mathbf{U}^{\sigma}}\,.\label{eq:plasticity-yield-surface-normal}
+\end{equation}
+
+\end_inset
+
+When yield thresholds are formulated in stress space, the dependence on
+ the deformation takes the form 
+\begin_inset Formula $\Phi=\Phi\left(\boldsymbol{\sigma}^{\sigma}\left(\mathbf{U}^{\sigma}\right)\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Consider two consecutive generations 
+\begin_inset Formula $\sigma$
+\end_inset
+
+, denoted by 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, such that the bond-breaking-and-reforming reaction is 
+\begin_inset Formula $\mathcal{E}^{u}\to\mathcal{E}^{v}$
+\end_inset
+
+.
+ Upon breaking of the 
+\begin_inset Formula $u-$
+\end_inset
+
+generation to form the 
+\begin_inset Formula $v-$
+\end_inset
+
+generation the plastic consistency condition is given by 
+\begin_inset Formula $d\varphi=0$
+\end_inset
+
+, which reduces to
+\begin_inset Formula 
+\begin{equation}
+\mathbf{N}^{u}\left(u\right):\left(\mathbf{U}^{v}\left(v\right)-\mathbf{U}^{u}\left(u\right)\right)=0\,.\label{eq:plastic-consistency-condition}
+\end{equation}
+
+\end_inset
+
+The constitutive model for 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\left(\mathbf{F}^{vs}\right)^{-1}=\left(\mathbf{F}^{us}\right)^{-1}\cdot\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)\label{eq:plasticity-Fvsi-normality}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\hat{\mathbf{N}}^{v}=\frac{\mathbf{N}^{v}}{\sqrt{\mathbf{N}^{v}:\mathbf{N}^{v}}}\,
+\end{equation}
+
+\end_inset
+
+is the unit tensor along 
+\begin_inset Formula $\mathbf{N}^{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is a non-dimensional scalar which may be determined analytically by enforcing
+ the plastic consistency condition in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plastic-consistency-condition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ When the plastic deformation is assumed to be isochoric the solution for
+ 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is obtained while enforcing 
+\begin_inset Formula $\det\mathbf{F}^{\sigma s}=1$
+\end_inset
+
+.
+ For the earliest yielded generation 
+\begin_inset Formula $u$
+\end_inset
+
+, the preceding 
+\begin_inset Formula $s-$
+\end_inset
+
+generation is in the elastic regime; therefore, 
+\begin_inset Formula $\mathbf{F}^{us}=\mathbf{I}$
+\end_inset
+
+ at the start of the recursive relation in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-normality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The stress response of this solid mixture is given generically by Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mixture-stress-redux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, specialized to the case where each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is assumed to have the same constitutive model 
+\begin_inset Formula $\Psi_{0}$
+\end_inset
+
+ for its strain energy density, 
+\begin_inset Formula $\Psi_{r}^{\sigma}=J^{\sigma s}\Psi_{0}$
+\end_inset
+
+.
+ For example, in the case of the three consecutive 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ generations 
+\begin_inset Formula $s$
+\end_inset
+
+, 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, the strain energy density is 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{F}^{s}\right)=\sum_{\sigma}w^{\sigma}J^{\sigma s}\Psi_{0}\left(\mathbf{U}^{\sigma}\right)$
+\end_inset
+
+ and the stress is
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=w^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{U}^{s}\right)+w^{u}\boldsymbol{\sigma}_{0}\left(\mathbf{U}^{u}\right)+w^{v}\boldsymbol{\sigma}_{0}\left(\mathbf{U}^{v}\right)\,,\label{eq:epp-mixture-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{U}^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}^{v}$
+\end_inset
+
+ are evaluated from 
+\begin_inset Formula $\mathbf{U}^{s}\cdot\left(\mathbf{F}^{\sigma s}\right)^{-1}=\mathbf{U}^{\sigma}$
+\end_inset
+
+ (
+\begin_inset Formula $\sigma=u,v$
+\end_inset
+
+) and Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-normality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}$
+\end_inset
+
+ is given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-stress-function"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ For an elastic-perfectly plastic response the bond mass fractions are constitut
+ively assumed to satisfy
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}w^{s} & =1-H\left(t-t^{u}\right)\end{aligned}
+\,,\quad w^{u}=H\left(t-t^{u}\right)-H\left(t-t^{v}\right)\,,\quad\begin{aligned}w^{v} & =H\left(t-t^{v}\right)\,,\end{aligned}
+\label{eq:epp-mass-fractions}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $H\left(\cdot\right)$
+\end_inset
+
+ is the Heaviside unit step function.
+ The corresponding constitutive models for 
+\begin_inset Formula $\hat{\rho}_{r}^{\sigma}$
+\end_inset
+
+ may be obtained by substituting these expressions into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-alpha-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The onset of yielding of generations 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ is the time 
+\begin_inset Formula $t$
+\end_inset
+
+ when 
+\begin_inset Formula $\varphi\left(\mathbf{U}^{s}\right)=0$
+\end_inset
+
+ (
+\begin_inset Formula $\mathcal{E}^{s}\to\mathcal{E}^{u}$
+\end_inset
+
+, 
+\begin_inset Formula $t=t^{u}$
+\end_inset
+
+) and 
+\begin_inset Formula $\varphi\left(\mathbf{U}^{u}\right)=0$
+\end_inset
+
+ (
+\begin_inset Formula $\mathcal{E}^{u}\to\mathcal{E}^{v}$
+\end_inset
+
+, 
+\begin_inset Formula $t=t^{v}$
+\end_inset
+
+), respectively.
+ In summary 
+\begin_inset Formula $w^{\sigma}=1$
+\end_inset
+
+ during the lifetime of generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ (
+\begin_inset Formula $t^{\sigma}\le t<t^{\sigma+1}$
+\end_inset
+
+) and 
+\begin_inset Formula $0$
+\end_inset
+
+ at other times 
+\begin_inset Formula $t$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Kinematic 
+\begin_inset Quotes eld
+\end_inset
+
+Hardening
+\begin_inset Quotes erd
+\end_inset
+
+ Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Kinematic-Hardening-Response"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The framework presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Elastic-Perfectly-Plastic-Response"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ has considered an elastic-perfectly plastic response, i.e., all the bonds
+ yield when a single yield threshold 
+\begin_inset Formula $\Phi_{m}$
+\end_inset
+
+ is met.
+ However, a wealth of experimental results show a more progressive yielding,
+ rather than a sudden onset, and an increase in the stress with increasing
+ plastic deformation, a phenomenon alternately termed strain hardening or
+ work hardening.
+ Real materials typically exhibit the Bauschinger effect, where loading
+ to yield in one direction changes the yield threshold in the reverse direction.
+ The hardening behavior that accounts for this effect is known as kinematic
+ hardening; for a load reversal, it predicts yielding occurs when the change
+ in load achieves twice the monotonic yield strength.
+ The reactive plasticity framework can be extended to allow for kinematic
+ hardening by introducing multiple families of bonds.
+ In the current FEBio implementation each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ shares the same yield criterion 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ but distinct associated yield thresholds 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+, and it follows the elastic-perfectly plastic behavior for multiple generations
+ outlined in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Elastic-Perfectly-Plastic-Response"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The superposition of multiple bond families 
+\begin_inset Formula $\beta$
+\end_inset
+
+ in parallel naturally develops behavior consistent with kinematic hardening,
+ as different bond families yield at different thresholds.
+\end_layout
+
+\begin_layout Standard
+We consider 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ 
+\shape italic
+bond families
+\shape default
+ 
+\begin_inset Formula $\beta=0,\dots,n_{f}-1$
+\end_inset
+
+, which may yield under different thresholds, where each bond family may
+ evolve over multiple generations 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ This framework requires us to update our notation to include a subscript
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+ for suitable variables introduced in the presentation above.
+ In particular, the reference configuration of generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ in bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is now denoted by 
+\begin_inset Formula $\mathbf{X}_{\beta}^{\sigma}$
+\end_inset
+
+ and the corresponding deformation gradient is 
+\begin_inset Formula $\mathbf{F}_{\beta}^{\sigma}$
+\end_inset
+
+.
+ We assume that the free energy density of each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is 
+\begin_inset Formula $\Psi_{\beta r}=J_{\beta}^{\sigma s}\Psi_{0}\left(\mathbf{F}_{\beta}^{\sigma}\right)$
+\end_inset
+
+, when the mixture consists entirely of bonds of family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ in generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ The master reference configuration of all bond families remains 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+ and the associated (total) deformation gradient is still 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+.
+ Therefore, each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ requires a constitutive relation for the function of state 
+\begin_inset Formula $\mathbf{F}_{\beta}^{\sigma s}$
+\end_inset
+
+ in the updated form of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, such as that given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-normality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where each term should now include a subscript 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The referential mass density of bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is 
+\begin_inset Formula $\rho_{r\beta}$
+\end_inset
+
+, such that the mixture referential mass density is given by 
+\begin_inset Formula $\rho_{r}=\sum_{\beta}\rho_{r\beta}$
+\end_inset
+
+.
+ The referential mass density of generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ in bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is 
+\begin_inset Formula $\rho_{r\beta}^{\sigma}$
+\end_inset
+
+, which satisfies 
+\begin_inset Formula $\sum_{\sigma}\rho_{r\beta}^{\sigma}=\rho_{r\beta}$
+\end_inset
+
+, as per Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ For convenience, we define
+\begin_inset Formula 
+\begin{equation}
+w_{\beta}\equiv\frac{\rho_{r\beta}}{\rho_{r}}\,,\quad\sum_{\beta}w_{\beta}=1\,,\label{eq:multiplebonds-family-mass-balance}
+\end{equation}
+
+\end_inset
+
+which represents the mass fraction of each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ within the constrained solid mixture, and
+\begin_inset Formula 
+\begin{equation}
+w_{\beta}^{\sigma}=\frac{\rho_{r\beta}^{\sigma}}{\rho_{r\beta}}\,,\quad\sum_{\sigma}w_{\beta}^{\sigma}=1\,,\label{eq:multiplebonds-bond-species-mass-fractions}
+\end{equation}
+
+\end_inset
+
+which represents the mass fraction of each generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ within the bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ From these definitions, it follows that bond family mass fractions 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ are time-invariant (thus user-selected for a particular material response),
+ whereas generation mass fractions 
+\begin_inset Formula $w_{\beta}^{\sigma}$
+\end_inset
+
+ evolve with bond-breaking-and-reforming reactions.
+\end_layout
+
+\begin_layout Standard
+The mixture strain energy density 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ is now given by
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\sum_{\beta}w_{\beta}\sum_{\sigma}w_{\beta}^{\sigma}J_{\beta}^{\sigma s}\Psi_{0}\left(\mathbf{F}_{\beta}^{\sigma}\right)\,,\label{eq:multiplebonds-mixture-energy}
+\end{equation}
+
+\end_inset
+
+whereas the mixture stress is
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\sum_{\beta}w_{\beta}\underbrace{\sum_{\sigma}w_{\beta}^{\sigma}\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{\sigma}\right)}_{\boldsymbol{\sigma}_{\beta}}\,,\quad\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{\sigma}\right)=\frac{1}{J_{\beta}^{\sigma}}\frac{\partial\Psi_{0}}{\partial\mathbf{F}_{\beta}^{\sigma}}\cdot\left(\mathbf{F}_{\beta}^{\sigma}\right)^{T}\,.\label{eq:multiplebonds-mixture-stress}
+\end{equation}
+
+\end_inset
+
+To simplify the remainder of this presentation, we introduce the concept
+ of 
+\shape italic
+yielded bonds
+\shape default
+, denoted by 
+\begin_inset Formula $y$
+\end_inset
+
+, to represent bonds of the current extant generation in a plasticity formulatio
+n.
+ The yielded bond fraction for each family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+w_{\beta}^{y}=\sum_{\sigma\neq s}w_{\beta}^{\sigma}=1-w_{\beta}^{s}\label{eq:hardening-yielded-mass-fraction}
+\end{equation}
+
+\end_inset
+
+where the summation runs over all possible yielded generations 
+\begin_inset Formula $\sigma\neq s$
+\end_inset
+
+.
+ In particular, at time 
+\begin_inset Formula $t=u$
+\end_inset
+
+, Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-yielded-mass-fraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to the statement 
+\begin_inset Formula $w_{\beta}^{y}=w_{\beta}^{u}$
+\end_inset
+
+.
+ We then define the relative deformation gradient of yielded bonds as 
+\begin_inset Formula $\mathbf{F}_{\beta}^{y}$
+\end_inset
+
+, which equals 
+\begin_inset Formula $\mathbf{F}_{\beta}^{\sigma}$
+\end_inset
+
+ for the extant generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ in family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ With these notational changes, we may write the yielding reactions in the
+ form
+\begin_inset Formula 
+\begin{equation}
+\mathcal{E}^{s}\to\underbrace{\mathcal{E}^{u}\rightarrow\mathcal{E}^{v}\rightarrow\dots}_{\mathcal{E}^{y}}\,.\label{eq:hardening-yielded-rxn}
+\end{equation}
+
+\end_inset
+
+Then the mixture stress in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:multiplebonds-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be rewritten as 
+\begin_inset Formula $\boldsymbol{\sigma}=\sum_{\beta}w_{\beta}\boldsymbol{\sigma}_{\beta}$
+\end_inset
+
+ where 
+\begin_inset Formula $\boldsymbol{\sigma}_{\beta}=w_{\beta}^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+\left(1-w_{\beta}^{s}\right)\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)$
+\end_inset
+
+.
+ We may also define the total fraction 
+\begin_inset Formula $w^{s}$
+\end_inset
+
+ of intact bonds in the mixture as 
+\begin_inset Formula $w^{s}=\sum_{\beta}w_{\beta}w_{\beta}^{s}$
+\end_inset
+
+, and the total fraction of yielded bonds as 
+\begin_inset Formula $w^{y}=\sum_{\beta}w_{\beta}w_{\beta}^{y}=1-w^{s}$
+\end_inset
+
+, such that 
+\begin_inset Formula $w^{s}+w^{y}=1$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $\boldsymbol{\sigma}=w^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+\sum_{\beta}w_{\beta}\left(1-w_{\beta}^{s}\right)\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)$
+\end_inset
+
+.
+ The summation in this last expression does not simplify further since 
+\begin_inset Formula $\mathbf{F}_{\beta}^{y}$
+\end_inset
+
+ is different for each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ exhibit an elastic-perfectly plastic response, following the model of Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Elastic-Perfectly-Plastic-Response"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Once the yield threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ is reached, all the intact bonds of that family yield at once, such that
+ 
+\begin_inset Formula $w_{\beta}^{s}=0$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{y}=1$
+\end_inset
+
+ as shown for the mixture stress response in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-families-superposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-c.
+ Now consider that there are three bond families, 
+\begin_inset Formula $\beta=0,1,2$
+\end_inset
+
+ which are weighted evenly, 
+\begin_inset Formula $w_{\beta}=1/3\,\forall\beta$
+\end_inset
+
+.
+ The stress response for this illustrative example is shown in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-families-superposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+d-f.
+ Though each bond family is elastic-perfectly plastic, their superposition
+ develops 
+\begin_inset Quotes eld
+\end_inset
+
+hardening
+\begin_inset Quotes erd
+\end_inset
+
+-like behavior.
+ At the onset of yielding, when family 
+\begin_inset Formula $\beta=0$
+\end_inset
+
+ yields, its bond mass fractions are 
+\begin_inset Formula $w_{0}^{s}=0$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{0}^{y}=1$
+\end_inset
+
+, implying that this entire family has yielded.
+ However, since the family has a mass fraction 
+\begin_inset Formula $w_{0}=1/3$
+\end_inset
+
+ in the solid mixture, two-thirds of the bonds in the mixture remain intact
+ at this juncture, 
+\begin_inset Formula $1-w_{0}^{s}=2/3$
+\end_inset
+
+.
+ As subsequent families 
+\begin_inset Formula $\beta$
+\end_inset
+
+ yield, their bonds transition from intact to yielded generations in the
+ same manner.
+ Though the resulting stress response in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-families-superposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+d is classically described as a 
+\begin_inset Quotes eld
+\end_inset
+
+hardening
+\begin_inset Quotes erd
+\end_inset
+
+ behavior, the reactive plasticity mixture framework proposes a different
+ interpretation, namely that there are multiple elastic-perfectly plastic
+ bond families in the material, each with a different threshold of yielding.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigReactivePlasticityStress.png
+	lyxscale 50
+	width 6in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The phenomenon described as 
+\begin_inset Quotes eld
+\end_inset
+
+kinematic hardening
+\begin_inset Quotes erd
+\end_inset
+
+ in classical plasticity may be represented by the superposition of multiple
+ elastic-perfectly plastic bond families with different yield thresholds.
+ The elastic-perfectly plastic stress response of a single bond family 
+\begin_inset Formula $\beta=0$
+\end_inset
+
+ in the reactive framework is presented in (a), with the initial linear
+ response contributed by the intact bonds 
+\begin_inset Formula $s$
+\end_inset
+
+; upon yielding at the threshold 
+\begin_inset Formula $\Phi_{m0}$
+\end_inset
+
+, the perfectly plastic response consists of multiple generations of breaking
+ and reforming bonds 
+\begin_inset Formula $\sigma=u,v,\dots$
+\end_inset
+
+.
+ The evolution of mass fractions 
+\begin_inset Formula $w_{0}^{s}$
+\end_inset
+
+ of intact and 
+\begin_inset Formula $w_{0}^{y}$
+\end_inset
+
+ of yielded bonds is presented in (b) and (c), respectively.
+ The stress response obtained from the superposition of three bond families
+ 
+\begin_inset Formula $\beta=0,1,2$
+\end_inset
+
+ is shown in (d), where each family occupies the same mass fraction 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ in the mixture, 
+\begin_inset Formula $w_{0}=w_{1}=w_{2}=\frac{1}{3}$
+\end_inset
+
+, reproducing the classical kinematic hardening behavior.
+ Green dashed lines help indicate changes in slope due to yielding of each
+ bond family.
+ The corresponding mixture mass fractions of (e) intact bonds 
+\begin_inset Formula $w^{s}$
+\end_inset
+
+, and (f) yielded bonds 
+\begin_inset Formula $w^{y}=1-w^{s}$
+\end_inset
+
+ further illustrates the occurence of each yielding reaction.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:hardening-families-superposition"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+, the family mass fraction 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ and the associated yield threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ must be provided by constitutive assumption, along with a single constitutive
+ model for 
+\begin_inset Formula $\Psi_{0}$
+\end_inset
+
+ which applies to all generations of all bond families.
+ The total number 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ of bond families must also be provided.
+ Parameters 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ w_{\beta},\Phi_{m\beta}\right\} ,\,\beta\in\left[0,n_{f}-1\right]$
+\end_inset
+
+ suffice to define an elastoplastic material which exhibits classical kinematic
+ hardening behavior, for a given elastic response 
+\begin_inset Formula $\Psi_{0}$
+\end_inset
+
+ and yield criterion 
+\begin_inset Formula $\Phi$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Constitutive Modeling of Yield Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Yield-Constitutive-Modeling"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, we provide basic constitutive relations for the parameters 
+\begin_inset Formula $\left\{ w_{\beta},\Phi_{m\beta}\right\} ,\,\beta\in\left[0,n_{f}-1\right]$
+\end_inset
+
+ which define an elastoplastic material.
+ We also demonstrate how these various parameters affect the uniaxial stress-str
+ain response of a material.
+ The example in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-families-superposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+d shows how superposition of multiple elastic-perfectly plastic bond families
+ may create a hardening-like curve.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigReactivePlasticityYieldThresholds.png
+	lyxscale 30
+	width 3in
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Schematic stress-strain curve illustrating derivation of constitutive models
+ for 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $E$
+\end_inset
+
+ is Young's modulus of the elastic solid (whose value does not matter here),
+ 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+ are the effective yield thresholds for the global material (given), 
+\begin_inset Formula $\varepsilon_{\beta}$
+\end_inset
+
+ are the yield strains and 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ are the true yield thresholds for each bond family, which need to be determined
+, and 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ are the family mass fractions (given).
+\color black
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:hardening-constitutive-diagram"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+In particular, we present a constitutive modeling framework that requires
+ at most six scalar parameters, regardless of the value of 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since each family behaves elastically until it yields, a family's yield
+ threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ is generally not the value recorded on a stress-strain curve when the slope
+ changes (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-constitutive-diagram"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ That value may be called the 
+\shape italic
+apparent yield threshold
+\shape default
+ 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+, which can be related to the true yield threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ by assuming a linear elastic stress-strain relationship prior to yielding.
+ For simplicity, we assume that 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+ values are evenly distributed between an 
+\shape italic
+initial yield threshold
+\shape default
+ 
+\begin_inset Formula $\Upsilon_{\text{0}}$
+\end_inset
+
+ and a 
+\shape italic
+final yield threshold
+\shape default
+ 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+, parameters which may be identified from a stress strain curve (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b).
+ Beyond 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+, the material either behaves as if it is perfectly plastic (a scenario
+ which may be valid around the ultimate strength, for example), or it transition
+s to a linear hardening regime.
+ The constitutive model thus specifies
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\Upsilon_{\beta} & =\Upsilon_{\text{0}}+\beta\frac{\Upsilon_{\text{max}}-\Upsilon_{\text{0}}}{n_{f}-1}, & \beta & =0,\ldots,n_{f}-1\\
+\Phi_{m\beta} & =\Phi_{m,\beta-1}+\frac{\Upsilon_{\beta}-\Upsilon_{\beta-1}}{1-\sum_{b=0}^{\beta-1}w_{b}}, & \Phi_{m0} & =\Upsilon_{0}
+\end{aligned}
+\label{eq:hardening-phi-model-no-r}
+\end{equation}
+
+\end_inset
+
+The relationships between 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ embodied in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-phi-model-no-r"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ are illustrated graphically in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-constitutive-diagram"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Through this relationship, only the values of 
+\begin_inset Formula $\Upsilon_{\text{0}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+ must be specified, along with 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The family mass fractions 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ govern the influence of each family on the overall material response.
+ The simplest model for 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ involves specifying the mass fraction of the first yielding family 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+, which controls the slope of the initial post-yield response (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a), and then evenly weighting the rest of the bond families, 
+\begin_inset Formula $w_{\beta}=\left(1-w_{0}\right)/\left(n_{f}-1\right)$
+\end_inset
+
+.
+ However, in cases where the material transitions to a linear hardening
+ regime, we can recover this behavior by adding one more bond family, 
+\begin_inset Formula $\beta=n_{f}$
+\end_inset
+
+, that never yields, thus remaining elastic.
+ The associated mass fraction 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+
+\shape italic
+\emph on
+ for 
+\begin_inset Formula $\beta=n_{f}$
+\end_inset
+
+ is called the 
+\emph default
+elastic mass fraction
+\shape default
+ and denoted 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+; a non-zero value for this parameter may be specified whenever we wish
+ to include linear hardening behavior (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b).
+ Given initial and elastic mass fractions 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+, the simplest constitutive assumption for the remaining 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+'s assumes the remaining mass is evenly divided, such that
+\begin_inset Formula 
+\begin{equation}
+w_{\beta}=\frac{1-w_{e}-w_{0}}{n_{f}-1},\,\beta\in\left[1,n_{f}-1\right]\,.\label{eq:hardening-m-model-no-r}
+\end{equation}
+
+\end_inset
+
+The effect of the mass fraction parameters 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ is explored parametrically in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+c and Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+d, respectively.
+ In general, most ductile materials have 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ very close to unity, which provides hardening behavior over a finite strain
+ range.
+ As 
+\begin_inset Formula $w_{0}\to1$
+\end_inset
+
+ the stress-strain behavior approaches perfect plasticity.
+ In contrast, when 
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+, the material response becomes perfectly plastic once the final yield threshold
+ 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+ has been exceeded.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigReactivePlasticityYieldModel.png
+	lyxscale 20
+	width 6in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Modeling uniaxial stress-strain curves using the constitutive model for
+ scalar bond family parameters given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Yield-Constitutive-Modeling"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Identification of parameters on idealized stress-strain curves showing
+ (a) a plateau in the stress, or (b) exhibiting a region of linear hardening.
+ The yielding behavior is fully described by the set of parameters 
+\begin_inset Formula $\left\{ n_{f},\Upsilon_{0},\Upsilon_{\text{max}},w_{0},w_{e},r\right\} $
+\end_inset
+
+.
+ Parametric variations of (c) 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ and (d) 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ illustrate their influence on the stress-strain response; other parameters
+ are held fixed.
+ In (c-d) 
+\begin_inset Formula $n_{f}=10$
+\end_inset
+
+, 
+\begin_inset Formula $\Upsilon_{0}=600$
+\end_inset
+
+ MPa, 
+\begin_inset Formula $\Upsilon_{\text{max}}=1000$
+\end_inset
+
+ MPa, and 
+\begin_inset Formula $r=1$
+\end_inset
+
+.
+ In (c), 
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+ and in (d) 
+\begin_inset Formula $w_{0}=0.75$
+\end_inset
+
+.
+\color black
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:hardening-family-parametric-curves"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+As 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ increases, a region of linear hardening is seen on a plot of the true stress
+ against strain.
+ For most ductile materials, 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ is usually 
+\begin_inset Formula $0$
+\end_inset
+
+ or on the order of 
+\begin_inset Formula $0.001$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is also possible to refine the constitutive relations of Eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-phi-model-no-r"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-m-model-no-r"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ by introducing a 
+\shape italic
+bias factor
+\shape default
+ 
+\begin_inset Formula $r$
+\end_inset
+
+, which allows a geometric progression rather than uniform spacing of the
+ apparent yield thresholds and family mass fractions.
+ The bias factor 
+\begin_inset Formula $r$
+\end_inset
+
+ has the effect of modifying the shape of the hardening region between 
+\begin_inset Formula $\Upsilon_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Upsilon_{\text{max }}$
+\end_inset
+
+ (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b).
+ The modified constitutive relations for 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ take the form
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}c & =\frac{1-r}{1-r^{n_{f}-1}} & \Phi_{m0} & =\Upsilon_{0}\\
+\Upsilon_{1} & =\Upsilon_{0}+c\left(\Upsilon_{\text{max}}-\Upsilon_{0}\right), & \Phi_{m1} & =\Upsilon_{0}+\frac{\Upsilon_{1}-\Upsilon_{0}}{1-w_{0}}\\
+\Upsilon_{\beta} & =\Upsilon_{\beta-1}+r\left(\Upsilon_{\beta-1}-\Upsilon_{\beta-2}\right), & \Phi_{m\beta} & =\Phi_{m,\beta-1}+\frac{\Upsilon_{\beta}-\Upsilon_{\beta-1}}{1-\sum_{b=0}^{\beta-1}w_{b}}
+\end{aligned}
+\label{eq:hardening-phi-model-bias}
+\end{equation}
+
+\end_inset
+
+The mass fractions 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ are similarly biased, where 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ are specified and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}w_{1} & =c\left(1-w_{e}-w_{0}\right)\\
+w_{\beta} & =w_{\beta-1}r
+\end{aligned}
+\label{eq:hardening-m-bias}
+\end{equation}
+
+\end_inset
+
+The full set of parameters is then given by 
+\begin_inset Formula $\left\{ n_{f},\Upsilon_{0},\Upsilon_{\text{max}},w_{0},w_{e},r\right\} $
+\end_inset
+
+.
+ Setting 
+\begin_inset Formula $r=1$
+\end_inset
+
+ recovers the uniform distribution presented in Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-phi-model-no-r"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-m-model-no-r"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b graphically describes the influence of each parameter on simplified
+ stress-strain curves, showing how these parameters may be extracted from
+ experimental data.
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Elastoplastic Damage Mechanics
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Plasticity-with-damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plastic deformation (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is often coupled with damage, as the finite deformation and plastic flow
+ of a loaded material typically induces some amount of failure.
+ Within the constrained reactive mixture framework adopted in FEBio (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Mixture-of-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), damage is produced by bonds breaking permanently (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), which reduces the generation mass fractions 
+\begin_inset Formula $w_{\beta}^{\sigma}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+.
+ In our treatment of elastoplastic damage we assume that both intact and
+ yielded bonds may become damaged.
+ Damage to intact bonds may represent some initial damage value for a material
+ with defects, or damage due to intermolecular failure of bonds that never
+ yielded; we refer to this as 
+\emph on
+elastic damage
+\emph default
+.
+ Damage to yielded bonds represents 
+\emph on
+plastic damage
+\emph default
+.
+ The mechanism of damage and the failure measure may be different for these
+ two types of bonds, particularly since a stress- or energy-based failure
+ measure may not be appropriate for plastic damage.
+ Intact bonds belong to the 
+\begin_inset Formula $s-$
+\end_inset
+
+generation which is present at 
+\begin_inset Formula $t=-\infty$
+\end_inset
+
+.
+ Once yielding occurs, all successive generations of that family are labeled
+ as yielded bonds 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ This distinction is necessary so we can then distinguish between damage
+ to intact bonds (elastic damage) and damage to yielded bonds (plastic damage),
+ since intact bonds which get damaged never have the ability to yield.
+ It is important to note that the nature of the plastic deformation described
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ remains unchanged.
+ Damage modifies the material behavior by reducing the fraction of bonds
+ in various generations, which scales the response accordingly.
+\end_layout
+
+\begin_layout Standard
+In a reactive constrained mixture framework the insertion of damage into
+ the reactive plasticity formulation is straightforward.
+ Since bonds break permanently in a damage reaction, there is no need to
+ define a function of state 
+\begin_inset Formula $\mathbf{F}_{\beta}^{\sigma s}$
+\end_inset
+
+ to describe a (non-existing) reformed configuration.
+ Furthermore, the specific free energy of broken bonds is zero.
+ The scalar 
+\shape italic
+elastic damage criterion
+\shape default
+ 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+, which is taken to have the same functional form for all bond families
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+, is the analog to the yield criterion 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ for plasticity.
+ As shown in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the main contrast with reactive plasticity is that not all bonds in the
+ family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ break simultaneously at a single 
+\shape italic
+elastic damage threshold
+\shape default
+ 
+\begin_inset Formula $\Xi_{m\beta}^{e}$
+\end_inset
+
+.
+ Instead, the fraction of broken bonds varies as a function of 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+, denoted by 
+\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+, such that 
+\begin_inset Formula $0\le F^{e}\left(\Xi_{\beta}^{e}\right)\le1$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+ is a function of state; it must be a monotonically increasing function
+ of its argument to satisfy the Clausius-Duhem inequality 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Nims16"
+literal "false"
+
+\end_inset
+
+.
+ We may view 
+\begin_inset Formula $F^{e}$
+\end_inset
+
+ as a cumulative distribution function (CDF), whose corresponding probability
+ distribution function (PDF) represents the probability of damage at a particula
+r value of 
+\begin_inset Formula $\Xi_{\beta}^{e}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Theoretical Formulation
+\end_layout
+
+\begin_layout Standard
+We first briefly sketch the structure of the elastoplastic damage theory
+ in FEBio for a single bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ Since each bond family in reactive plasticity yields all at once, we can
+ easily split an elastoplastic damage theory into two parts to represent
+ elastic and plastic damage regimes.
+ Assume that the first yielding reaction for bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ occurs at time 
+\begin_inset Formula $t=u_{\beta}$
+\end_inset
+
+.
+ Prior to this initial yielding, the damage behavior described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ applies, and the material composition is generally a mixture of intact
+ (
+\begin_inset Formula $\sigma=s$
+\end_inset
+
+) and broken (
+\begin_inset Formula $\sigma=b$
+\end_inset
+
+) bonds satisfying the reaction 
+\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+.
+ The corresponding bond mass fractions satisfy 
+\begin_inset Formula $1=w_{\beta}^{s}+w_{\beta}^{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{y}=0$
+\end_inset
+
+, where 
+\begin_inset Formula $w_{\beta}^{b}=F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+ is the elastic damage in bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ At 
+\begin_inset Formula $t=u_{\beta}$
+\end_inset
+
+, the remaining intact bonds 
+\begin_inset Formula $w_{\beta}^{s}=1-w_{\beta}^{b}$
+\end_inset
+
+ all yield, following the reaction in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hardening-yielded-rxn"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The family mass balance is then given as 
+\begin_inset Formula $1=w_{\beta}^{y}+w_{\beta}^{b}$
+\end_inset
+
+, since 
+\begin_inset Formula $w_{\beta}^{s}=0$
+\end_inset
+
+ after yielding.
+ The mass fraction of broken bonds 
+\begin_inset Formula $w^{b}=\sum_{\beta}w_{\beta}w_{\beta}^{b}$
+\end_inset
+
+ is equal to the elastic damage variable 
+\begin_inset Formula $D$
+\end_inset
+
+ as defined in classical damage mechanics.
+\end_layout
+
+\begin_layout Standard
+For time 
+\begin_inset Formula $t>u_{\beta}$
+\end_inset
+
+, yielded bonds may continue to yield, but they may also sustain damage
+ according to the reaction 
+\begin_inset Formula $\mathcal{E}_{\beta}^{y}\to\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+, which reduces their mass fraction 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+.
+ Damage to yielded bonds may occur based on a function of state (often described
+ as a plastic strain, though it is not an observable kinematic variable),
+ which is distinct from the measure of elastic damage.
+ Therefore, we denote the 
+\shape italic
+plastic damage measure
+\shape default
+ as 
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\end_inset
+
+ and its cumulative distribution function by 
+\begin_inset Formula $F^{p}\left(\Xi_{\beta}^{p}\right)$
+\end_inset
+
+, under the assumption that all bond families 
+\begin_inset Formula $\beta$
+\end_inset
+
+ share the same functional forms for 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $F^{p}$
+\end_inset
+
+.
+ For each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+, only the remaining undamaged fraction 
+\begin_inset Formula $1-F^{p}\left(\Xi_{\beta}^{p}\right)$
+\end_inset
+
+ of yielded bonds may break and reform as the next yielded generation.
+\end_layout
+
+\begin_layout Standard
+The modern understanding is that plastic strain is ill-defined and not a
+ suitable state variable.
+ It must be recognized that, just as 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ is a constitutively-prescribed function of state and does not carry the
+ meaning of a plastic deformation gradient, the plastic damage measure 
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\end_inset
+
+ is also a function of state.
+ This quantity is called a plastic strain for convenience only.
+\end_layout
+
+\begin_layout Standard
+When plastic deformation occurs simultaneously with damage, the mass fraction
+ of each successive yielded generation will have decreased.
+ The following treatment now considers the superposition of multiple plastic
+ bond families, as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Kinematic-Hardening-Response"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Damage to Intact Bonds
+\end_layout
+
+\begin_layout Standard
+At any given time 
+\begin_inset Formula $t$
+\end_inset
+
+, there is a maximum value of 
+\begin_inset Formula $\Xi^{e}$
+\end_inset
+
+ that has been achieved over the past deformation history.
+ This maximum value may be distinct for each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+, since intact bond families may yield at different values of 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+; it is thus denoted by 
+\begin_inset Formula $\Xi_{m\beta}^{e}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\Xi_{m\beta}^{e}=\max_{\begin{aligned}-\infty<\tau\le t<u_{\beta}\end{aligned}
+}\Xi^{e}\left(\mathbf{F}^{s}\left(\tau\right)\right)\,.\label{eq:plasticdmg-intact-ximax-family}
+\end{equation}
+
+\end_inset
+
+Any damage sustained by intact bonds reduces their mass fraction, such that
+\begin_inset Formula 
+\begin{equation}
+\left\{ \begin{aligned}w_{\beta}^{s} & =1-F^{e}\left(\Xi_{m\beta}^{e}\right)\\
+w_{\beta}^{y} & =0\\
+w_{\beta}^{b} & =F^{e}\left(\Xi_{m\beta}^{e}\right)
+\end{aligned}
+\right.\,,\quad t<u_{\beta}\,,\label{eq:plasticdmg-massfraction-pre-yield}
+\end{equation}
+
+\end_inset
+
+and hence the mass balance of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:multiplebonds-bond-species-mass-fractions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is satisfied.
+ Since all remaining intact bonds yield at 
+\begin_inset Formula $t=u_{\beta}$
+\end_inset
+
+ and thus no intact bonds are left to sustain damage, 
+\begin_inset Formula $F^{e}\left(\Xi_{m\beta}^{e}\right)$
+\end_inset
+
+ remains constant constant for bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $t\geq u_{\beta}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Damage to Yielded Bonds
+\end_layout
+
+\begin_layout Standard
+At time 
+\begin_inset Formula $t=u_{\beta}$
+\end_inset
+
+, the yield threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ for family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is reached and all remaining intact bonds in family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ yield such that
+\begin_inset Formula 
+\begin{equation}
+\left\{ \begin{aligned}w_{\beta}^{s} & =0\\
+w_{\beta}^{y} & =1-F^{e}\left(\Xi_{m\beta}^{e}\right)\\
+w_{\beta}^{b} & =F^{e}\left(\Xi_{m\beta}^{e}\right)
+\end{aligned}
+\right.\,,\quad t=u_{\beta}\,.\label{eq:plasticdmg-mass-fraction-yield}
+\end{equation}
+
+\end_inset
+
+Once they have formed, yielded bonds may sustain plastic damage.
+ The maximum value of the plastic damage measure 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+ experienced by family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ up until the current time 
+\begin_inset Formula $t$
+\end_inset
+
+ is denoted by 
+\begin_inset Formula $\Xi_{m\beta}^{p}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\Xi_{m\beta}^{p}=\max_{\begin{aligned}u_{\beta}\leq\tau<t\end{aligned}
+}\Xi^{p}\left(\mathbf{F}_{\beta}^{y}\left(\tau\right)\right)\,.\label{eq:plasticdmg-yielded-ximax-family}
+\end{equation}
+
+\end_inset
+
+For 
+\begin_inset Formula $t>u_{\beta}$
+\end_inset
+
+, yielded bonds may continue to yield, breaking and reforming into successive
+ generations.
+ However, in contrast to Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the mass fraction 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+ of yielded bonds in family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ no longer remains constant over successive yield generations, due to the
+ plastic damage reaction.
+ Each time a yielded bond breaks and reforms into a new generation, 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+ is given by the undamaged fraction of yielded bonds,
+\begin_inset Formula 
+\begin{equation}
+\left\{ \begin{aligned}w_{\beta}^{s} & =0\\
+w_{\beta}^{y} & =\left(1-F^{p}\left(\Xi_{m\beta}^{p}\right)\right)\left(1-F^{e}\left(\Xi_{m\beta}^{e}\right)\right)\\
+w_{\beta}^{b} & =F^{e}\left(\Xi_{m\beta}^{e}\right)+F^{p}\left(\Xi_{m\beta}^{p}\right)\left(1-F^{e}\left(\Xi_{m\beta}^{e}\right)\right)
+\end{aligned}
+\right.\,,\quad t>u_{\beta}\,.\label{eq:plasticdmg-mass-fraction-post-yield}
+\end{equation}
+
+\end_inset
+
+Equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticdmg-massfraction-pre-yield"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+,
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticdmg-mass-fraction-yield"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticdmg-mass-fraction-post-yield"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ govern the temporal behavior of the bond species mass fractions.
+\end_layout
+
+\begin_layout Subsubsection
+Strain Energy Density, Stress, and Damage
+\end_layout
+
+\begin_layout Standard
+Recognizing that damaged (broken) bonds do not store free energy, the referentia
+l mixture free energy density in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:multiplebonds-mixture-energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be rewritten as
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\sum_{\beta}w_{\beta}\left(w_{\beta}^{s}\Psi_{0}\left(\mathbf{F}^{s}\right)+w_{\beta}^{y}J^{ys}\Psi_{0}\left(\mathbf{F}_{\beta}^{y}\right)\right)\,,\label{eq:plasticdmg-free-energy}
+\end{equation}
+
+\end_inset
+
+where the bond mass fractions 
+\begin_inset Formula $w_{\beta}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+ are given in Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticdmg-massfraction-pre-yield"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticdmg-mass-fraction-post-yield"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ prior to, during, and after yielding of each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ Similarly, the mixture stress may be evaluated from Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:multiplebonds-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\sum_{\beta}w_{\beta}\left(w_{\beta}^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w_{\beta}^{y}\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)\right)\,,\label{eq:plasticdmg-mixture-stress}
+\end{equation}
+
+\end_inset
+
+where the stresses 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}$
+\end_inset
+
+ are given by the standard hyperelasticity relation in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:multiplebonds-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ These expressions may be simplified further when assuming that the functional
+ form of 
+\begin_inset Formula $\psi_{\beta}$
+\end_inset
+
+ remains the same for all bond families 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ Finally, the reactive mixture equivalent of the damage variable 
+\begin_inset Formula $D$
+\end_inset
+
+ may be evaluated for elastoplastic damage as the fraction of all bonds
+ that are broken,
+\begin_inset Formula 
+\begin{equation}
+D=w^{b}=\sum_{\beta}w_{\beta}w_{\beta}^{b}\,.\label{eq:plasticdmg-damage-variable}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Damage Measures
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Yielded-damage-reaction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For elastic damage, we may use the same functional measure as proposed for
+ plastic yielding (e.g., the von Mises stress); this implies that the functions
+ 
+\begin_inset Formula $\Xi^{e}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ have the same form.
+ For plastic damage, experimental results show that during plastic flow
+ damage is coupled with measures of plastic strain 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Lemaitre05"
+literal "false"
+
+\end_inset
+
+, necessitating a (pseudo-)strain-based plastic damage measure 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+.
+ For yielded bonds in a bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+, we can use the constitutively-determined mapping 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ to define plastic right Cauchy-Green and Lagrange strain tensors through
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{C}_{\beta}^{ys} & =\left(\mathbf{F}_{\beta}^{ys}\right)^{T}\cdot\mathbf{F}_{\beta}^{ys}\\
+\mathbf{E}_{\beta}^{ys} & =\frac{1}{2}\left(\mathbf{C}_{\beta}^{ys}-\mathbf{I}\right)
+\end{aligned}
+\,.
+\end{equation}
+
+\end_inset
+
+One possible constitutive relation for 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+, which remains valid for general deformations, is to set it equal to the
+ 
+\shape italic
+effective plastic strain
+\shape default
+ 
+\begin_inset Formula $e_{\beta}^{p}$
+\end_inset
+
+ for the various bond families 
+\begin_inset Formula $\beta$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+e_{\beta}^{p}=\sqrt{\frac{2}{3}\dev\mathbf{E}_{\beta}^{ys}:\dev\mathbf{E}_{\beta}^{ys}}\,.\label{eq:plasticdmg-effective-plastic-strain}
+\end{equation}
+
+\end_inset
+
+In a numerical implementation, the effective plastic strain 
+\begin_inset Formula $e_{0}^{p}$
+\end_inset
+
+ of the first bond family to yield may be reported as the effective plastic
+ strain in the entire material, for consistency with plastic strain measures
+ in classical models of plasticity.
+\end_layout
+
+\begin_layout Standard
+Quantities in this section do not represent plastic strains or plastic strain
+ tensors, though we adopt the terminology due to similarities.
+ Recall that the non-observable function of state 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}=\mathbf{F}_{\beta}^{ys}\left(\mathbf{F}^{s},\rho_{r\beta}^{\alpha}\right)$
+\end_inset
+
+ is a time-invariant mapping providing the reference configuration of a
+ yielded bond 
+\begin_inset Formula $y$
+\end_inset
+
+ with respect to the reference configuration of the master constituent 
+\begin_inset Formula $s$
+\end_inset
+
+, for family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ The quantities 
+\begin_inset Formula $\mathbf{C}_{\beta}^{ys}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{E}_{\beta}^{ys}$
+\end_inset
+
+ then also represent non-observable functions of state calculated as strain
+ tensors.
+ Consequently, 
+\begin_inset Formula $e_{\beta}^{p}$
+\end_inset
+
+ is a measure of the relative motion of the reference configuration of bond
+ family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ , expressed as a scalar 
+\begin_inset Quotes eld
+\end_inset
+
+strain
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Physically, this amounts to the modeling assumption that once the breaking-and-
+reforming process takes a bond family out of a local neighborhood centered
+ about its original position, the bond begins to degrade with further breaking-a
+nd-reforming processes.
+ That each of these quantities exists for every bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ emphasizes the lack of any true or unique plastic strain measure in this
+ framework.
+\end_layout
+
+\begin_layout Subsubsection
+Cumulative Damage Distribution Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Cumulative-Damage-Distribution"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The final set of constitutive relations required to fully define an elastoplasti
+c damage material are the two CDFs, 
+\begin_inset Formula $F^{e}\left(\Xi_{m\beta}^{e}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $F^{p}\left(\Xi_{m\beta}^{p}\right)$
+\end_inset
+
+.
+ As shown by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Nims16"
+literal "false"
+
+\end_inset
+
+, the only requirement imposed by the Clausius-Duhem inequality is that
+ these be monotonically increasing functions.
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigReactivePlasticityDamage.png
+	lyxscale 20
+	width 6in
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Parametric study of the effect of the damage parameter 
+\begin_inset Formula $\gamma^{p}$
+\end_inset
+
+ for a Weibull distribution, with no intact damage taking place.
+ (a) As 
+\begin_inset Formula $\gamma^{p}$
+\end_inset
+
+ increases, the onset of noticeable damage shifts to higher strains and
+ becomes more rapid.
+ (b) Plot of the damage variable 
+\begin_inset Formula $D=\sum_{\beta}w_{\beta}F^{p}\left(\Xi_{m\beta}^{p}\right)$
+\end_inset
+
+.
+ The response becomes more nonlinear as 
+\begin_inset Formula $\gamma^{p}$
+\end_inset
+
+ deviates from unity.
+ Other plasticity and damage parameters are 
+\begin_inset Formula $n_{f}=20$
+\end_inset
+
+, 
+\begin_inset Formula $\Upsilon_{0}=600$
+\end_inset
+
+ MPa, 
+\begin_inset Formula $\Upsilon_{\text{max}}=1000$
+\end_inset
+
+ MPa, 
+\begin_inset Formula $w_{0}=0.75$
+\end_inset
+
+, 
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+, 
+\begin_inset Formula $r=1$
+\end_inset
+
+, and 
+\begin_inset Formula $\kappa^{p}=0.3$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:damage-parametric"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Whereas these CDFs may be characterized directly from experimental data,
+ here we illustrate the FEBio elastoplastic damage framework using a Weibull
+ distribution of the form
+\begin_inset Formula 
+\begin{equation}
+F\left(\Xi\right)=1-\exp\left(-\left(\frac{\Xi}{\kappa}\right)^{\gamma}\right)\,,\label{eq:Weibull-cdf}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+) is the value of 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ at which the fraction 
+\begin_inset Formula $1-e^{-1}$
+\end_inset
+
+ of bonds have failed and the exponent 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ (unitless) controls the slope of the response, such that 
+\begin_inset Formula $F\left(\Xi\right)$
+\end_inset
+
+ approaches a step function with a jump at 
+\begin_inset Formula $\Xi=\kappa$
+\end_inset
+
+ as 
+\begin_inset Formula $\gamma\to\infty$
+\end_inset
+
+.
+ Therefore, each damage function has two free parameters 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma$
+\end_inset
+
+.
+ Based on experimental evidence, we may let 
+\begin_inset Formula $\Xi^{e}$
+\end_inset
+
+ be given by the von Mises (effective) stress, while 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+ is taken to be the effective plastic strain (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Yielded-damage-reaction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:damage-parametric"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows the effect of the Weibull parameter 
+\begin_inset Formula $\gamma^{p}$
+\end_inset
+
+ on the stress-strain and damage-strain responses, with 
+\begin_inset Formula $\kappa^{p}$
+\end_inset
+
+ fixed.
+ The damage response as a function of plastic strain is identically the
+ prescribed CDF (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:damage-parametric"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b).
+ The shape of the CDF changes from logarithmic-like to exponential as 
+\begin_inset Formula $\gamma^{p}$
+\end_inset
+
+ increases, demonstrating the ability of this formulation to recover a broad
+ variety of experimentally measured damage-strain behaviors 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonora97"
+literal "false"
+
+\end_inset
+
+.]
 \end_layout
 
 \begin_layout Standard
@@ -32168,7 +36605,7 @@ reference "eq:stress-tangent-D"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\boldsymbol{\mathcal{C}}^{\tau} & =\left(\kappa-\frac{2}{3}\mu\right)\mathbf{I}\otimes\mathbf{I}+\frac{2}{\dot{\gamma}}\left(\frac{\partial\kappa}{\partial\dot{\gamma}}-\frac{2}{3}\frac{\partial\mu}{\partial\dot{\gamma}}\right)\left(\tr\mathbf{D}\right)\mathbf{I}\otimes\mathbf{D}\\
- & +2\left(\frac{2}{\dot{\gamma}}\frac{\partial\mu}{\partial\dot{\gamma}}\mathbf{D}\otimes\mathbf{D}+\mu\,\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.
+ & +2\left(\frac{2}{\dot{\gamma}}\frac{\partial\mu}{\partial\dot{\gamma}}\mathbf{D}\otimes\mathbf{D}+\mu\,\mathbf{I}\odot\mathbf{I}\right)\,.
 \end{aligned}
 \label{eq:viscous-tangent-D}
 \end{equation}
@@ -33301,7 +37738,7 @@ Therefore, following the standard approach in solid mechanics, the linearization
 \begin{equation}
 \begin{aligned}D\mathbf{S}\left[\Delta\mathbf{u}\right] & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}:D\mathbf{E}\left[\Delta\mathbf{u}\right]\\
  & =\alpha_{f}\boldsymbol{\mathbb{C}}:\frac{1}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\\
- & =\alpha_{f}\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right):\Delta\boldsymbol{\varepsilon}
+ & =\alpha_{f}\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right):\Delta\boldsymbol{\varepsilon}
 \end{aligned}
 \,,\label{eq:edy-solid-stress-linearization}
 \end{equation}
