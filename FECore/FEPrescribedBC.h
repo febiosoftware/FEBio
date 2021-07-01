@@ -103,7 +103,7 @@ public:
 
 	void Activate() override;
 
-private:
+protected:
 	FENodeSet*	m_nodeSet;
 
 	DECLARE_FECORE_CLASS();
