@@ -206,10 +206,10 @@ private:
 	FESoluteData* FindSoluteData(int nid);
 	
 private:
-	int						m_ID;		//!< solute ID in global table
     int                     m_LID;      //!< solute local ID in parent material
 	
 public: // material parameters
+	int						m_ID;		//!< solute ID in global table
 	double					m_rhoT;		//!< true solute density
 	double					m_M;		//!< solute molecular weight
 	int						m_z;		//!< charge number of solute
@@ -218,7 +218,15 @@ public: // material properties
 	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
 	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
+};
 
+//-----------------------------------------------------------------------------
+// This class was introduced so that solutes fall in the same paradigm as any other
+// material property.
+class FESoluteMaterial : public FESolute
+{
+public:
+	FESoluteMaterial(FEModel* fem);
 	DECLARE_FECORE_CLASS();
 };
 

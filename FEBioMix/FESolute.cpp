@@ -81,12 +81,15 @@ bool FESoluteData::Init()
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_FECORE_CLASS(FESolute, FEMaterialProperty)
-	ADD_PARAMETER(m_rhoT, "density");
-	ADD_PARAMETER(m_M, "molar_mass");
-	ADD_PARAMETER(m_z, "charge_number");
+BEGIN_FECORE_CLASS(FESoluteMaterial, FESolute)
 
-	ADD_PARAMETER(m_ID, "sol", FE_PARAM_ATTRIBUTE, 0);
+	// These parameters cannot (or should not) be set in the input file since
+	// they are copied from the FESoluteData class. 
+//	ADD_PARAMETER(m_rhoT, "density");
+//	ADD_PARAMETER(m_M, "molar_mass");
+//	ADD_PARAMETER(m_z, "charge_number");
+
+	ADD_PARAMETER(m_ID, "sol", FE_PARAM_ATTRIBUTE, "$(Solutes)");
 
 	// set material properties
 	ADD_PROPERTY(m_pDiff , "diffusivity");
@@ -95,6 +98,11 @@ BEGIN_FECORE_CLASS(FESolute, FEMaterialProperty)
 
 END_FECORE_CLASS();
 
+//-----------------------------------------------------------------------------
+FESoluteMaterial::FESoluteMaterial(FEModel* fem) : FESolute(fem)
+{
+
+}
 
 //-----------------------------------------------------------------------------
 //! FESolute constructor

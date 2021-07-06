@@ -217,7 +217,12 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
-	febio.CreateModule("solute");
+	febio.CreateModule("solute",
+		"{"
+		"   \"title\" : \"Biphasic Solute Analysis\","
+		"   \"info\"  : \"Transient or quasi-static biphasic analysis with a single solute.\""
+		"}");
+
 	febio.SetModuleDependency("biphasic");
 
 	//-----------------------------------------------------------------------------
@@ -237,7 +242,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Materials
 	REGISTER_FECORE_CLASS(FEBiphasicSolute        , "biphasic-solute");
-	REGISTER_FECORE_CLASS(FESolute                , "solute");
+	REGISTER_FECORE_CLASS(FESoluteMaterial        , "solute");
 	REGISTER_FECORE_CLASS(FETriphasic             , "triphasic");
 	REGISTER_FECORE_CLASS(FEDiffConstIso          , "diff-const-iso");
 	REGISTER_FECORE_CLASS(FEDiffConstOrtho        , "diff-const-ortho");
