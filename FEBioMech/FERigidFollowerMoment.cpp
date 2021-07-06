@@ -35,13 +35,13 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidFollowerMoment, FEModelLoad);
+BEGIN_FECORE_CLASS(FERigidFollowerMoment, FERigidLoad);
     ADD_PARAMETER(m_rid      , "rb"       );
     ADD_PARAMETER(m_m        , "moment"   );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidFollowerMoment::FERigidFollowerMoment(FEModel* pfem) : FEModelLoad(pfem)
+FERigidFollowerMoment::FERigidFollowerMoment(FEModel* pfem) : FERigidLoad(pfem)
 {
     m_rid = -1;
     m_m = vec3d(0,0,0);

@@ -34,8 +34,10 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include <FECore/FELinearSystem.h>
 
+REGISTER_SUPER_CLASS(FERigidLoad, FERIGIDLOAD_ID);
+
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
+BEGIN_FECORE_CLASS(FERigidAxialForce, FERigidLoad);
 	ADD_PARAMETER(m_ida      , "rbA"     );
 	ADD_PARAMETER(m_idb      , "rbB"     );
 	ADD_PARAMETER(m_ra0      , "ra"      );
@@ -45,7 +47,7 @@ BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEModelLoad(pfem)
+FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FERigidLoad(pfem)
 {
 	m_ida = m_idb = -1;
 	m_ra0 = m_rb0 = vec3d(0,0,0);
@@ -239,14 +241,14 @@ void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 
 //=============================================================================
 
-BEGIN_FECORE_CLASS(FERigidBodyForce, FEModelLoad)
+BEGIN_FECORE_CLASS(FERigidBodyForce, FERigidLoad)
 	ADD_PARAMETER(m_rigidMat, "rb");
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_force, "value");
 	ADD_PARAMETER(m_ntype, "load_type");
 END_FECORE_CLASS();
 
-FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(pfem)
+FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FERigidLoad(pfem)
 {
 	m_ntype = FORCE_LOAD;
 	m_trg = 0.0;

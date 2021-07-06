@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidFollowerForce, FEModelLoad);
+BEGIN_FECORE_CLASS(FERigidFollowerForce, FERigidLoad);
     ADD_PARAMETER(m_rid      , "rb"       );
     ADD_PARAMETER(m_X        , "insertion");
     ADD_PARAMETER(m_f        , "force"    );
@@ -43,7 +43,7 @@ BEGIN_FECORE_CLASS(FERigidFollowerForce, FEModelLoad);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidFollowerForce::FERigidFollowerForce(FEModel* pfem) : FEModelLoad(pfem)
+FERigidFollowerForce::FERigidFollowerForce(FEModel* pfem) : FERigidLoad(pfem)
 {
     m_rid = -1;
     m_X = m_f = vec3d(0,0,0);

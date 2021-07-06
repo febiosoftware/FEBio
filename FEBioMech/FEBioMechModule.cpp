@@ -567,18 +567,18 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FEModelLoad
 	// TODO: define another SUPER_CLASS_ID for this
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidAxialForce, FEBC_ID, "rigid_axial_force");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyForce, FEBC_ID, "rigid_force");
-    REGISTER_FECORE_CLASS_EXPLICIT(FERigidFollowerForce, FEBC_ID, "rigid_follower_force");
-    REGISTER_FECORE_CLASS_EXPLICIT(FERigidFollowerMoment, FEBC_ID, "rigid_follower_moment");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyFixedBC, FERIGIDBC_ID, "rigid_fixed");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement, FERIGIDBC_ID, "rigid_prescribed");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyVelocity, FERIGIDBC_ID, "rigid_velocity");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyAngularVelocity, FERIGIDBC_ID, "rigid_angular_velocity");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidNodeSet, FERIGIDBC_ID, "rigid_node_set");
+	REGISTER_FECORE_CLASS(FERigidAxialForce, "rigid_axial_force");
+	REGISTER_FECORE_CLASS(FERigidBodyForce, "rigid_force");
+    REGISTER_FECORE_CLASS(FERigidFollowerForce, "rigid_follower_force");
+    REGISTER_FECORE_CLASS(FERigidFollowerMoment, "rigid_follower_moment");
+	REGISTER_FECORE_CLASS(FERigidBodyFixedBC, "rigid_fixed");
+	REGISTER_FECORE_CLASS(FERigidBodyDisplacement, "rigid_prescribed");
+	REGISTER_FECORE_CLASS(FERigidBodyVelocity, "rigid_velocity");
+	REGISTER_FECORE_CLASS(FERigidBodyAngularVelocity, "rigid_angular_velocity");
+	REGISTER_FECORE_CLASS(FERigidNodeSet, "rigid_node_set");
 
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable, FEBC_ID, "rigid_cable");
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCablePoint, FEOBJECT_ID, "rigid_cable_point");
+//	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable, FEBC_ID, "rigid_cable");
+//	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCablePoint, FEOBJECT_ID, "rigid_cable_point");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData

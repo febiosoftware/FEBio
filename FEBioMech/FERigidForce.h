@@ -31,8 +31,17 @@ SOFTWARE.*/
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
+class FERigidLoad : public FEModelLoad
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FERigidLoad(FEModel* fem) : FEModelLoad(fem) {}
+};
+
+//-----------------------------------------------------------------------------
 //! an axial force between two rigid bodies
-class FEBIOMECH_API FERigidAxialForce : public FEModelLoad
+class FEBIOMECH_API FERigidAxialForce : public FERigidLoad
 {
 public:
 	//! constructor
@@ -66,7 +75,7 @@ public:
 //!       were the force is const, and one where the force is a follower force.
 //!       Perhaps I can derive the const force from FENodalLoad since it applies
 //!       a force directly to the rigid "node".
-class FEBIOMECH_API FERigidBodyForce : public FEModelLoad
+class FEBIOMECH_API FERigidBodyForce : public FERigidLoad
 {
 public:
 	enum { FORCE_LOAD, FORCE_FOLLOW, FORCE_TARGET };	// values for m_ntype

@@ -28,10 +28,11 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEModelLoad.h"
+#include "FERigidForce.h"
 
 //-----------------------------------------------------------------------------
 //! a follower moment on a rigid body
-class FERigidFollowerMoment : public FEModelLoad
+class FERigidFollowerMoment : public FERigidLoad
 {
 public:
     //! constructor
