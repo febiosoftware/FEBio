@@ -110,6 +110,8 @@ SOFTWARE.*/
 
 #include "FEFixedFluidPressure.h"
 #include "FEPrescribedFluidPressure.h"
+#include "FEFixedConcentration.h"
+#include "FEPrescribedConcentration.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -172,7 +174,7 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Boundary conditions
-	REGISTER_FECORE_CLASS(FEFixedFluidPressure, "zero fluid pressure");
+	REGISTER_FECORE_CLASS(FEFixedFluidPressure     , "zero fluid pressure");
 	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure, "prescribed fluid pressure");
 
 	//-----------------------------------------------------------------------------
@@ -260,6 +262,11 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
+
+	//-----------------------------------------------------------------------------
+	// boundary conditions
+	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
+	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
