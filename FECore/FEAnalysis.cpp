@@ -71,9 +71,9 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 	m_badaptorReSolve = true;
 
 	// --- Time Step Data ---
-	m_ntime = -1;
+	m_ntime = 10;
 	m_final_time = 0.0;
-	m_dt0 = 0;
+	m_dt0 = 0.1;
 	m_dt = 0;
 
 	// initialize counters
