@@ -35,7 +35,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFluid, FEFluidMaterial)
 
 	// material parameters
-    ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+    ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
 
 END_FECORE_CLASS();
 

@@ -35,7 +35,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFluidMaterial, FEMaterial)
 
     // material parameters
-    ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
+    ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density")->setUnits(UNIT_DENSITY);
 
     // material properties
     ADD_PROPERTY(m_pViscous, "viscous");
