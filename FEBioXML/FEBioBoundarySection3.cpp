@@ -111,7 +111,8 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 	GetBuilder()->AddBC(pbc);
 
 	// Read the parameter list
-	ReadParameterList(tag, pbc);
+	if (tag.isleaf() == false)
+		ReadParameterList(tag, pbc);
 }
 
 //-----------------------------------------------------------------------------

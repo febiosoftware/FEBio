@@ -58,20 +58,18 @@ SOFTWARE.*/
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidRCBC.h"
-
 #include "FETiedFluidInterface.h"
-
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
-
 #include "FEBioFluidPlot.h"
 #include "FEBioFluidData.h"
-
 #include "FEFluidDomainFactory.h"
-
 #include "FEFSIErosionVolumeRatio.h"
-
 #include "FEFluidStressCriterion.h"
+#include "FEFixedFluidVelocity.h"
+#include "FEPrescribedFluidVelocity.h"
+#include "FEFixedFluidDilatation.h"
+#include "FEPrescribedFluidDilatation.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
@@ -105,7 +103,8 @@ void FEBioFluid::InitModule()
 		"   \"info\"  : \"Steady-state or transient fluid dynamics analysis.\""
 		"}");
 
-	febio.SetModuleDependency("solid");	// for body-loads (e.g. see fl08)
+	// TODO: Find a better way, since this pulls in all the boundary conditions, etc. from solid.
+//	febio.SetModuleDependency("solid");	// for body-loads (e.g. see fl08)
 
 //-----------------------------------------------------------------------------
 // solver classes
@@ -137,14 +136,21 @@ REGISTER_FECORE_CLASS(FEFluidMixtureTractionLoad   , "fluid mixture viscous trac
 REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction");
 REGISTER_FECORE_CLASS(FEFluidNormalVelocity        , "fluid normal velocity");
 REGISTER_FECORE_CLASS(FEFluidVelocity              , "fluid velocity");
-REGISTER_FECORE_CLASS(FEFluidRotationalVelocity    , "fluid rotational velocity");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC          , "fluid resistance");
 REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
 REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
 REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
-    
+
+//-----------------------------------------------------------------------------
+// boundary conditions
+REGISTER_FECORE_CLASS(FEFixedFluidVelocity          , "zero fluid velocity");
+REGISTER_FECORE_CLASS(FEPrescribedFluidVelocity     , "prescribed fluid velocity");
+REGISTER_FECORE_CLASS(FEFixedFluidDilatation        , "zero fluid dilatation");
+REGISTER_FECORE_CLASS(FEPrescribedFluidDilatation   , "prescribed fluid dilatation");
+REGISTER_FECORE_CLASS(FEFluidRotationalVelocity     , "fluid rotational velocity");
+
 //-----------------------------------------------------------------------------
 // Contact interfaces
 REGISTER_FECORE_CLASS(FETiedFluidInterface, "tied-fluid");
