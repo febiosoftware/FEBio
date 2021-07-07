@@ -30,13 +30,13 @@ SOFTWARE.*/
 #include "FEOgdenUnconstrained.h"
 
 BEGIN_FECORE_CLASS(FEOgdenUnconstrained, FEElasticMaterial);
-	ADD_PARAMETER(m_p   , "cp");
-	ADD_PARAMETER(m_c[0], "c1");
-	ADD_PARAMETER(m_c[1], "c2");
-	ADD_PARAMETER(m_c[2], "c3");
-	ADD_PARAMETER(m_c[3], "c4");
-	ADD_PARAMETER(m_c[4], "c5");
-	ADD_PARAMETER(m_c[5], "c6");
+	ADD_PARAMETER(m_p   , "cp")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c[0], "c1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c[1], "c2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c[2], "c3")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c[3], "c4")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c[4], "c5")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c[5], "c6")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_m[0], FE_RANGE_NOT_EQUAL(0.0), "m1");
 	ADD_PARAMETER(m_m[1], FE_RANGE_NOT_EQUAL(0.0), "m2");
 	ADD_PARAMETER(m_m[2], FE_RANGE_NOT_EQUAL(0.0), "m3");

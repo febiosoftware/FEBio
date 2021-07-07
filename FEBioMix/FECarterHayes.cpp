@@ -34,8 +34,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FECarterHayes, FEElasticMaterial)
-	ADD_PARAMETER(m_E0  , FE_RANGE_GREATER(0.0)         , "E0"   );
-	ADD_PARAMETER(m_rho0, FE_RANGE_GREATER(0.0)         , "rho0" );
+	ADD_PARAMETER(m_E0  , FE_RANGE_GREATER(0.0)         , "E0"   )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_rho0, FE_RANGE_GREATER(0.0)         , "rho0" )->setUnits(UNIT_DENSITY);
 	ADD_PARAMETER(m_g   , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
 	ADD_PARAMETER(m_v   , FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v"    );
 	ADD_PARAMETER(m_sbm , "sbm");

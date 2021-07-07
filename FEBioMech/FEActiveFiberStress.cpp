@@ -34,7 +34,7 @@ SOFTWARE.*/
 //=====================================================================================
 
 BEGIN_FECORE_CLASS(FEActiveFiberStress, FEMaterial);
-	ADD_PARAMETER(m_smax, "smax");
+	ADD_PARAMETER(m_smax, "smax")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_ac, "activation");
 
 	ADD_PROPERTY(m_stl, "stl", FEProperty::Optional);

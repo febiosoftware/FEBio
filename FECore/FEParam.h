@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <vector>
 #include "fecore_api.h"
 #include "ParamString.h"
+#include "units.h"
 
 //-----------------------------------------------------------------------------
 class FEParamValidator;
@@ -132,6 +133,7 @@ private:
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
+	const char* m_szunit;	// unit string
 
 	// parameter validator
 	FEParamValidator*	m_pvalid;
@@ -156,6 +158,10 @@ public:
 
 	// return the enum values
 	const char* enums() const;
+
+	// get the unit string
+	const char* units() const;
+	void setUnits(const char* szunit);
 
 	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
 	void SetEnums(const char* sz);

@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEArrudaBoyce, FEUncoupledMaterial)
-	ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu");
+	ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_N , FE_RANGE_GREATER(0.0), "N" );
 END_FECORE_CLASS();
 

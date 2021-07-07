@@ -33,7 +33,7 @@ SOFTWARE.*/
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FEBoundaryCondition)
 	ADD_PARAMETER(m_comp, "dof", 0, "x-displacement\0y-displacement\0z-displacement\0");
-	ADD_PARAMETER(m_scale, "value");
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH);
 	ADD_PARAMETER(m_brelative, "relative");
 
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);

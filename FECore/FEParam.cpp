@@ -93,6 +93,8 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, b
 	m_pvalid = 0;	// no default validator
 
 	m_parent = 0;
+
+	m_szunit = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,6 +110,8 @@ FEParam::FEParam(const FEParam& p)
 	m_szname = p.m_szname;
 	m_szenum = 0;
 	m_parent = p.m_parent;
+
+	m_szunit = p.m_szunit;
 
 	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
 }
@@ -137,6 +141,8 @@ FEParam& FEParam::operator=(const FEParam& p)
 	m_szenum = 0;
 	m_parent = p.m_parent;
 
+	m_szunit = p.m_szunit;
+
 	if (m_pvalid) delete m_pvalid;
 	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
 
@@ -162,6 +168,18 @@ const char* FEParam::name() const
 const char* FEParam::enums() const 
 { 
 	return m_szenum; 
+}
+
+//-----------------------------------------------------------------------------
+const char* FEParam::units() const
+{
+	return m_szunit;
+}
+
+//-----------------------------------------------------------------------------
+void FEParam::setUnits(const char* szunit)
+{
+	m_szunit = szunit;
 }
 
 //-----------------------------------------------------------------------------

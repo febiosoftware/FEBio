@@ -33,8 +33,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianViscousSolidUC, FEUncoupledMaterial)
-	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa");
-	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   );
+	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   )->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

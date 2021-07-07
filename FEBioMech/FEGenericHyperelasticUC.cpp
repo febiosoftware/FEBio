@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEGenericHyperelasticUC, FEUncoupledMaterial)
-	ADD_PARAMETER(m_exp, "W");
+	ADD_PARAMETER(m_exp, "W")->setUnits(UNIT_ENERGY);
 	ADD_PARAMETER(m_printDerivs, "print_derivs");
 END_FECORE_CLASS();
 

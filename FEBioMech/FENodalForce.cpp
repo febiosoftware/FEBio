@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
-	ADD_PARAMETER(m_f, "value");
+	ADD_PARAMETER(m_f, "value")->setUnits(UNIT_FORCE);
 END_FECORE_CLASS();
 
 FENodalForce::FENodalForce(FEModel* fem) : FENodalLoad(fem)

@@ -156,44 +156,44 @@ public:
 	FEParam* AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
 
 public:
-	void AddParameter(int&                 v, const char* sz);
-	void AddParameter(bool&                v, const char* sz);
-	void AddParameter(double&              v, const char* sz);
-	void AddParameter(vec2d&               v, const char* sz);
-	void AddParameter(vec3d&               v, const char* sz);
-	void AddParameter(mat3d&               v, const char* sz);
-	void AddParameter(mat3ds&              v, const char* sz);
-	void AddParameter(FEParamDouble&       v, const char* sz);
-	void AddParameter(FEParamVec3&         v, const char* sz);
-	void AddParameter(FEParamMat3d&        v, const char* sz);
-	void AddParameter(FEParamMat3ds&       v, const char* sz);
-	void AddParameter(FEDataArray&         v, const char* sz);
-	void AddParameter(tens3drs& 		   v, const char* sz);
-	void AddParameter(std::string&         v, const char* sz);
-	void AddParameter(std::vector<int>& v   , const char* sz);
-	void AddParameter(std::vector<double>& v, const char* sz);
-	void AddParameter(std::vector<vec2d>&  v, const char* sz);
-	void AddParameter(std::vector<std::string>& v, const char* sz);
-	void AddParameter(FEMaterialPointProperty& v, const char* sz);
-	void AddParameter(MSimpleExpression& m, const char* sz);
-	void AddParameter(Image& im           , const char* sz);
+	FEParam* AddParameter(int&                 v, const char* sz);
+	FEParam* AddParameter(bool&                v, const char* sz);
+	FEParam* AddParameter(double&              v, const char* sz);
+	FEParam* AddParameter(vec2d&               v, const char* sz);
+	FEParam* AddParameter(vec3d&               v, const char* sz);
+	FEParam* AddParameter(mat3d&               v, const char* sz);
+	FEParam* AddParameter(mat3ds&              v, const char* sz);
+	FEParam* AddParameter(FEParamDouble&       v, const char* sz);
+	FEParam* AddParameter(FEParamVec3&         v, const char* sz);
+	FEParam* AddParameter(FEParamMat3d&        v, const char* sz);
+	FEParam* AddParameter(FEParamMat3ds&       v, const char* sz);
+	FEParam* AddParameter(FEDataArray&         v, const char* sz);
+	FEParam* AddParameter(tens3drs& 		   v, const char* sz);
+	FEParam* AddParameter(std::string&         v, const char* sz);
+	FEParam* AddParameter(std::vector<int>& v   , const char* sz);
+	FEParam* AddParameter(std::vector<double>& v, const char* sz);
+	FEParam* AddParameter(std::vector<vec2d>&  v, const char* sz);
+	FEParam* AddParameter(std::vector<std::string>& v, const char* sz);
+	FEParam* AddParameter(FEMaterialPointProperty& v, const char* sz);
+	FEParam* AddParameter(MSimpleExpression& m, const char* sz);
+	FEParam* AddParameter(Image& im           , const char* sz);
 
-	void AddParameter(int&           v, RANGE rng, const char* sz);
-	void AddParameter(double&        v, RANGE rng, const char* sz);
-	void AddParameter(FEParamDouble& v, RANGE rng, const char* sz);
+	FEParam* AddParameter(int&           v, RANGE rng, const char* sz);
+	FEParam* AddParameter(double&        v, RANGE rng, const char* sz);
+	FEParam* AddParameter(FEParamDouble& v, RANGE rng, const char* sz);
 
-	void AddParameter(double& v, const char* sz, bool& watch);
+	FEParam* AddParameter(double& v, const char* sz, bool& watch);
 
-	void AddParameter(int*           v, int ndim, const char* sz);
-	void AddParameter(double*        v, int ndim, const char* sz);
-	void AddParameter(FEParamDouble* v, int ndim, const char* sz);
+	FEParam* AddParameter(int*           v, int ndim, const char* sz);
+	FEParam* AddParameter(double*        v, int ndim, const char* sz);
+	FEParam* AddParameter(FEParamDouble* v, int ndim, const char* sz);
 
-	void AddParameter(int*           v, int ndim, RANGE rng, const char* sz);
-	void AddParameter(double*        v, int ndim, RANGE rng, const char* sz);
-	void AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz);
+	FEParam* AddParameter(int*           v, int ndim, RANGE rng, const char* sz);
+	FEParam* AddParameter(double*        v, int ndim, RANGE rng, const char* sz);
+	FEParam* AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz);
 
-	void AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
-	void AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum);
+	FEParam* AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
+	FEParam* AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum);
 
 	template <typename T> void SetParameter(const char* sz, T v);
 
@@ -229,7 +229,7 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 
 // the ADD_PARAMETER macro adds a parameter to the parameter list
 #define ADD_PARAMETER(...) \
-	AddParameter(__VA_ARGS__);
+	AddParameter(__VA_ARGS__)
 
 // the END_FECORE_CLASS defines the end of a parameter list
 #define END_FECORE_CLASS() \

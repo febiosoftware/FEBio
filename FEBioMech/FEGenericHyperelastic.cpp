@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEGenericHyperelastic, FEElasticMaterial)
-	ADD_PARAMETER(m_exp, "W");
+	ADD_PARAMETER(m_exp, "W")->setUnits(UNIT_ENERGY);
 END_FECORE_CLASS();
 
 FEGenericHyperelastic::FEGenericHyperelastic(FEModel* fem) : FEElasticMaterial(fem)

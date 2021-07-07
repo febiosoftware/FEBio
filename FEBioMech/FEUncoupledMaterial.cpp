@@ -33,7 +33,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
 BEGIN_FECORE_CLASS(FEUncoupledMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_npmodel, "pressure_model" );
 END_FECORE_CLASS();
 

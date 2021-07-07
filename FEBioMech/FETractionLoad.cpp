@@ -34,7 +34,7 @@ SOFTWARE.*/
 //=============================================================================
 BEGIN_FECORE_CLASS(FETractionLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scale   , "scale");
-	ADD_PARAMETER(m_traction, "traction");
+	ADD_PARAMETER(m_traction, "traction")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
 	ADD_PARAMETER(m_blinear, "linear");
 END_FECORE_CLASS();

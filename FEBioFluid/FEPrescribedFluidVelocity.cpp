@@ -33,7 +33,7 @@ SOFTWARE.*/
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedFluidVelocity, FEBoundaryCondition)
 	ADD_PARAMETER(m_comp, "dof", 0, "x-fluid velocity\0y-fluid velocity\0z-fluid velocity\0");
-	ADD_PARAMETER(m_scale, "value");
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_VELOCITY);
 	ADD_PARAMETER(m_brelative, "relative");
 
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);

@@ -33,8 +33,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDiffAlbroIso, FESoluteDiffusivity)
-	ADD_PARAMETER(m_diff0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
-	ADD_PARAMETER(m_cdinv , FE_RANGE_GREATER_OR_EQUAL(0.0), "cdinv"    );
+	ADD_PARAMETER(m_diff0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff")->setUnits(UNIT_DIFFUSIVITY);
+	ADD_PARAMETER(m_cdinv , FE_RANGE_GREATER_OR_EQUAL(0.0), "cdinv"    )->setUnits("L^3/n");
 	ADD_PARAMETER(m_alphad, FE_RANGE_GREATER_OR_EQUAL(0.0), "alphad"   );
 END_FECORE_CLASS();
 

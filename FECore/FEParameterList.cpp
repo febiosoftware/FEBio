@@ -290,57 +290,59 @@ FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, R
 }
 
 //-----------------------------------------------------------------------------
-void FEParamContainer::AddParameter(int&                 v, const char* sz) { AddParameter(&v, FE_PARAM_INT, 1, sz); }
-void FEParamContainer::AddParameter(bool&                v, const char* sz) { AddParameter(&v, FE_PARAM_BOOL, 1, sz); }
-void FEParamContainer::AddParameter(double&              v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE, 1, sz); }
-void FEParamContainer::AddParameter(vec2d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC2D, 1, sz); }
-void FEParamContainer::AddParameter(vec3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D, 1, sz); }
-void FEParamContainer::AddParameter(mat3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D, 1, sz); }
-void FEParamContainer::AddParameter(mat3ds&              v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS, 1, sz); }
-void FEParamContainer::AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, sz); }
-void FEParamContainer::AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED, 1, sz); }
-void FEParamContainer::AddParameter(FEParamMat3d&        v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D_MAPPED, 1, sz); }
-void FEParamContainer::AddParameter(FEParamMat3ds&       v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS_MAPPED, 1, sz); }
-void FEParamContainer::AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY, 1, sz); }
-void FEParamContainer::AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS, 1, sz); }
-void FEParamContainer::AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING, 1, sz); }
-void FEParamContainer::AddParameter(std::vector<int>&    v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_INT, 1, sz); }
-void FEParamContainer::AddParameter(std::vector<double>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz); }
-void FEParamContainer::AddParameter(std::vector<vec2d>&  v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D, 1, sz); }
-void FEParamContainer::AddParameter(std::vector<std::string>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_STRING, 1, sz); }
-void FEParamContainer::AddParameter(FEMaterialPointProperty& v, const char* sz) { AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
-void FEParamContainer::AddParameter(Image& v                  , const char* sz) { AddParameter(&v, FE_PARAM_IMAGE_3D, 1, sz); }
+FEParam* FEParamContainer::AddParameter(int&                      v, const char* sz) { return AddParameter(&v, FE_PARAM_INT, 1, sz); }
+FEParam* FEParamContainer::AddParameter(bool&                     v, const char* sz) { return AddParameter(&v, FE_PARAM_BOOL, 1, sz); }
+FEParam* FEParamContainer::AddParameter(double&                   v, const char* sz) { return AddParameter(&v, FE_PARAM_DOUBLE, 1, sz); }
+FEParam* FEParamContainer::AddParameter(vec2d&                    v, const char* sz) { return AddParameter(&v, FE_PARAM_VEC2D, 1, sz); }
+FEParam* FEParamContainer::AddParameter(vec3d&                    v, const char* sz) { return AddParameter(&v, FE_PARAM_VEC3D, 1, sz); }
+FEParam* FEParamContainer::AddParameter(mat3d&                    v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3D, 1, sz); }
+FEParam* FEParamContainer::AddParameter(mat3ds&                   v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3DS, 1, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamDouble&            v, const char* sz) { return AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamVec3&              v, const char* sz) { return AddParameter(&v, FE_PARAM_VEC3D_MAPPED, 1, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamMat3d&             v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3D_MAPPED, 1, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamMat3ds&            v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3DS_MAPPED, 1, sz); }
+FEParam* FEParamContainer::AddParameter(FEDataArray&              v, const char* sz) { return AddParameter(&v, FE_PARAM_DATA_ARRAY, 1, sz); }
+FEParam* FEParamContainer::AddParameter(tens3drs& 		          v, const char* sz) { return AddParameter(&v, FE_PARAM_TENS3DRS, 1, sz); }
+FEParam* FEParamContainer::AddParameter(std::string&              v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_STRING, 1, sz); }
+FEParam* FEParamContainer::AddParameter(std::vector<int>&         v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_VECTOR_INT, 1, sz); }
+FEParam* FEParamContainer::AddParameter(std::vector<double>&      v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz); }
+FEParam* FEParamContainer::AddParameter(std::vector<vec2d>&       v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D, 1, sz); }
+FEParam* FEParamContainer::AddParameter(std::vector<std::string>& v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_VECTOR_STRING, 1, sz); }
+FEParam* FEParamContainer::AddParameter(FEMaterialPointProperty&  v, const char* sz) { return AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
+FEParam* FEParamContainer::AddParameter(Image& v                   , const char* sz) { return AddParameter(&v, FE_PARAM_IMAGE_3D, 1, sz); }
 
-void FEParamContainer::AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT, 1, rng, sz); }
-void FEParamContainer::AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE, 1, rng, sz); }
-void FEParamContainer::AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
+FEParam* FEParamContainer::AddParameter(int&           v, RANGE rng, const char* sz) { return AddParameter(&v, FE_PARAM_INT, 1, rng, sz); }
+FEParam* FEParamContainer::AddParameter(double&        v, RANGE rng, const char* sz) { return AddParameter(&v, FE_PARAM_DOUBLE, 1, rng, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { return AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
 
-void FEParamContainer::AddParameter(double&        v, const char* sz, bool& watch) { AddParameter(&v, FE_PARAM_DOUBLE, 1, sz, &watch); }
+FEParam* FEParamContainer::AddParameter(double&        v, const char* sz, bool& watch) { return AddParameter(&v, FE_PARAM_DOUBLE, 1, sz, &watch); }
 
-void FEParamContainer::AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT, ndim, sz); }
-void FEParamContainer::AddParameter(double*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE, ndim, sz); }
-void FEParamContainer::AddParameter(FEParamDouble* v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, sz); }
+FEParam* FEParamContainer::AddParameter(int*           v, int ndim, const char* sz) { return AddParameter(v, FE_PARAM_INT, ndim, sz); }
+FEParam* FEParamContainer::AddParameter(double*        v, int ndim, const char* sz) { return AddParameter(v, FE_PARAM_DOUBLE, ndim, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamDouble* v, int ndim, const char* sz) { return AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, sz); }
 
-void FEParamContainer::AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_INT, ndim, rng, sz); }
-void FEParamContainer::AddParameter(double*        v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE, ndim, rng, sz); }
-void FEParamContainer::AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, rng, sz); }
+FEParam* FEParamContainer::AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { return AddParameter(v, FE_PARAM_INT, ndim, rng, sz); }
+FEParam* FEParamContainer::AddParameter(double*        v, int ndim, RANGE rng, const char* sz) { return AddParameter(v, FE_PARAM_DOUBLE, ndim, rng, sz); }
+FEParam* FEParamContainer::AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz) { return AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, rng, sz); }
 
 //-----------------------------------------------------------------------------
-void FEParamContainer::AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum)
+FEParam* FEParamContainer::AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum)
 {
 	FEParam* p = AddParameter(&v, FE_PARAM_INT, 1, sz);
 	p->setParent(this);
 	p->SetFlags(flags);
 	p->SetEnums(szenum);
+	return p;
 }
 
 //-----------------------------------------------------------------------------
-void FEParamContainer::AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum)
+FEParam* FEParamContainer::AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum)
 {
 	FEParam* p = AddParameter(&v, FE_PARAM_STD_VECTOR_INT, 1, sz);
 	p->setParent(this);
 	p->SetFlags(flags);
 	p->SetEnums(szenum);
+	return p;
 }
 
 //-----------------------------------------------------------------------------

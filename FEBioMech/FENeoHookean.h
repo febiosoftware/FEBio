@@ -37,7 +37,7 @@ SOFTWARE.*/
 class FEBIOMECH_API FENeoHookean : public FEElasticMaterial
 {
 public:
-	FENeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FENeoHookean(FEModel* pfem);
 
 public:
 	FEParamDouble		m_E;	//!< Young's modulus

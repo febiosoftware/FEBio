@@ -226,7 +226,7 @@ vec3d FESphericalVectorGenerator::operator () (const FEMaterialPoint& mp)
 //=================================================================================================
 BEGIN_FECORE_CLASS(FECylindricalVectorGenerator, FEVec3dValuator)
 	ADD_PARAMETER(m_center, "center");
-	ADD_PARAMETER(m_axis, "axis")
+	ADD_PARAMETER(m_axis, "axis");
 	ADD_PARAMETER(m_vector, "vector");
 END_FECORE_CLASS();
 

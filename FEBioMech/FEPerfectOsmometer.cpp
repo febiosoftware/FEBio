@@ -34,8 +34,8 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPerfectOsmometer, FEElasticMaterial)
 	ADD_PARAMETER(m_phiwr, FE_RANGE_CLOSED(0.0, 1.0), "phiw0");
-	ADD_PARAMETER(m_iosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm");
-	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
+	ADD_PARAMETER(m_iosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm")->setUnits("n/L^3");
+	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm")->setUnits("n/L^3");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEHolmesMow, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
 END_FECORE_CLASS();

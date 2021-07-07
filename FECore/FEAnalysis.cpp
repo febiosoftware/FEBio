@@ -43,7 +43,7 @@ REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
 
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
-	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
+	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME);
 	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
 	ADD_PARAMETER(m_bplotZero   , "plot_zero_state");
 	ADD_PARAMETER(m_nplotRange  , 2, "plot_range");

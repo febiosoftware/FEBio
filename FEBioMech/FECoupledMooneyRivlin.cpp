@@ -32,9 +32,9 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FECoupledMooneyRivlin, FEElasticMaterial)
-	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, "c2");
-	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "k" );
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c2, "c2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "k" )->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

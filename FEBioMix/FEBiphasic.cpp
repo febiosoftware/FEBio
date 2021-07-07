@@ -34,7 +34,7 @@ SOFTWARE.*/
 // Material parameters for the FEBiphasic material
 BEGIN_FECORE_CLASS(FEBiphasic, FEMaterial)
 	ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
-	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
+	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density")->setUnits(UNIT_DENSITY);
     ADD_PARAMETER(m_tau  , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
 
 	// set material properties

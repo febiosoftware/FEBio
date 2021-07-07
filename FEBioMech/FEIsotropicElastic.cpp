@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEIsotropicElastic, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 END_FECORE_CLASS();
 

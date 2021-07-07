@@ -35,7 +35,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPorousNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E    , FE_RANGE_GREATER   (      0.0), "E"       );
+	ADD_PARAMETER(m_E    , FE_RANGE_GREATER   (      0.0), "E"       )->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_phisr, FE_RANGE_CLOSED    (0.0 , 1.0), "phi0"    );
 END_FECORE_CLASS();
 

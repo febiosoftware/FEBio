@@ -240,7 +240,7 @@ BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FERigidBC)
 	ADD_PARAMETER(m_rigidMat, "rb");
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_val, "value");
-	ADD_PARAMETER(m_brel, "relative")
+	ADD_PARAMETER(m_brel, "relative");
 END_FECORE_CLASS();
 
 FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FERigidBC(pfem)

@@ -33,10 +33,10 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FECubicCLE, FEElasticMaterial)
-	ADD_PARAMETER(m_lp1, "lp1");
-	ADD_PARAMETER(m_lm1, "lm1");
-	ADD_PARAMETER(m_l2 , "l2");
-	ADD_PARAMETER(m_mu , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+	ADD_PARAMETER(m_lp1, "lp1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_lm1, "lm1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_l2 , "l2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_mu , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
