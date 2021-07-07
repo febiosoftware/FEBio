@@ -73,7 +73,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	else if (strcmp(sztype, "force") == 0)
 	{
 		// create the rigid body force
-		FEModelLoad* pFC = fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", fem);
+		FEModelLoad* pFC = fecore_new<FEModelLoad>(FERIGIDLOAD_ID, "rigid_force", fem);
 		feb.AddModelLoad(pFC);
 		ReadParameterList(tag, pFC);
 	}
