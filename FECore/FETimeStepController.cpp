@@ -62,7 +62,8 @@ FETimeStepController::FETimeStepController(FEModel* fem) : FECoreBase(fem)
 	m_next_must = -1;
 	m_nmplc = -1;
 	m_iteopt = 11;
-	m_dtmax = m_dtmin = 0;
+	m_dtmin = 0;
+	m_dtmax = 0.1;
 
 	m_ddt = 0;
 	m_dtp = 0;
