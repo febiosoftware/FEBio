@@ -31,7 +31,7 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberPowLinearUncoupled, FEElasticFiberMaterialUC)
-	ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    );
+	ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    )->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
 END_FECORE_CLASS();
@@ -39,7 +39,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEFiberPowLinearUncoupled::FEFiberPowLinearUncoupled(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
 { 
-
+    m_E = 0.0;
+    m_lam0 = 1.0;
+    m_beta = 2.0;
 }
 
 //-----------------------------------------------------------------------------

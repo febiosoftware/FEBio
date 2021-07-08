@@ -35,9 +35,20 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FECellGrowth, FEElasticMaterial)
 	ADD_PARAMETER(m_phir, FE_RANGE_GREATER(0.0), "phir");
-	ADD_PARAMETER(m_cr  , FE_RANGE_GREATER(0.0), "cr");
-	ADD_PARAMETER(m_ce  , FE_RANGE_GREATER(0.0), "ce");
+	ADD_PARAMETER(m_cr  , FE_RANGE_GREATER(0.0), "cr")->setUnits(UNIT_CONCENTRATION);
+	ADD_PARAMETER(m_ce  , FE_RANGE_GREATER(0.0), "ce")->setUnits(UNIT_CONCENTRATION);
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FECellGrowth::FECellGrowth(FEModel* pfem) : FEElasticMaterial(pfem) 
+{ 
+	m_Rgas = 0; 
+	m_Tabs = 0; 
+
+	m_phir = 0;
+	m_cr = 0;
+	m_ce = 0;
+}
 
 //-----------------------------------------------------------------------------
 bool FECellGrowth::Init()

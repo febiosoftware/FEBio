@@ -35,8 +35,8 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFiberExpPow, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
-	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
-	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"  );
+	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"  )->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_epsf , "epsilon_scale");
 END_FECORE_CLASS();
 
@@ -84,7 +84,7 @@ mat3ds FEFiberExpPow::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 		mat3ds N = dyad(nt);
 		
 		// calculate strain energy derivative
-		double Wl = m_ksi(mp)*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -93,7 +93,7 @@ mat3ds FEFiberExpPow::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 		if (mu != 0.0)
 		{
 			mat3ds BmI = pt.LeftCauchyGreen() - mat3dd(1);
-			s += (N*BmI).sym()*(m_mu(mp) / J);
+			s += (N*BmI).sym()*(mu / J);
 		}
 	}
 	else

@@ -72,10 +72,8 @@ void FEDonnanEquilibriumMaterialPoint::Serialize(DumpStream& ar)
 BEGIN_FECORE_CLASS(FEDonnanEquilibrium, FEElasticMaterial)
 	ADD_PARAMETER(m_phiwr, FE_RANGE_LEFT_OPEN(0.0, 1.0), "phiw0");
     ADD_PARAMETER(m_phisr, "phis0");
-	ADD_PARAMETER(m_cFr  , "cF0");
-	ADD_PARAMETER(m_Rgas , "R");
-	ADD_PARAMETER(m_Tabs , "T");
-	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
+	ADD_PARAMETER(m_cFr  , "cF0")->setUnits(UNIT_CONCENTRATION);
+	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm")->setUnits(UNIT_CONCENTRATION);
     ADD_PARAMETER(m_Phi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "Phi");
 END_FECORE_CLASS();
 

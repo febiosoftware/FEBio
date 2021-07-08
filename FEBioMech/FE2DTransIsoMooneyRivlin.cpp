@@ -40,7 +40,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c5, "c5");
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
 	ADD_PARAMETER(m_a, 2, "a");
-	ADD_PARAMETER(m_ac, "active_contraction");
+	ADD_PARAMETER(m_ac, "active_contraction")->setUnits(UNIT_PRESSURE);;
 	ADD_PARAMETER(m_fiber, "fiber");
 	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();

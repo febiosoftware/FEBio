@@ -31,7 +31,7 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberNHUC, FEElasticFiberMaterialUC)
-	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
