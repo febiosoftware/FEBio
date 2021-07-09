@@ -131,7 +131,7 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FEModelComponent* prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
+	FEBoundaryCondition* prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
 
 	prn->SetNodeSet(nodeSet);
 
@@ -140,7 +140,7 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	// clamped shell = 1
 	prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 
-	feb->AddRigidNodeSet(prn);
+	feb->AddBC(prn);
 
 	// read the parameter list
 	ReadParameterList(tag, prn);

@@ -23,25 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEFixedFluidDilatation.h"
-#include <FECore/FEModel.h>
+#pragma once
+#include <FECore/FEPrescribedDOF.h>
 
-BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEBoundaryCondition)
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
-END_FECORE_CLASS();
-
-
-FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
+class FEPrescribedShellDisplacement : public FEPrescribedDOF
 {
+public:
+	FEPrescribedShellDisplacement(FEModel* fem);
+	bool Init() override;
 
-}
+	DECLARE_FECORE_CLASS();
 
-bool FEFixedFluidDilatation::Init()
-{
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("ef"));
-	return FEFixedBC::Init();
-}
+private:
+	int	m_comp;
+};
+

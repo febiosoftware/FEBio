@@ -36,7 +36,6 @@ SOFTWARE.*/
 class FEModel;
 class FERigidBody;
 class FEModelComponent;
-class FERigidNodeSet;
 class FERigidBodyFixedBC;
 class FERigidBodyDisplacement;
 class FERigidIC;
@@ -90,10 +89,6 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
 public:
-	int RigidNodeSets() { return (int) m_RN.size(); }
-	FERigidNodeSet* RigidNodeSet(int i) { return m_RN[i]; }
-	void AddRigidNodeSet(FERigidNodeSet* prn) { m_RN.push_back(prn); }
-
 	int FixedBCs() { return (int) m_RBC.size(); }
 	FERigidBodyFixedBC* FixedBC(int i) { return m_RBC[i]; }
 	void AddFixedBC(FERigidBodyFixedBC* pbc) { m_RBC.push_back(pbc); }
@@ -117,7 +112,6 @@ protected:
 protected:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
-	vector<FERigidNodeSet*>				m_RN;	//!< rigid node sets
 	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 	vector<FERigidIC*>					m_RIC;	//!< rigid body initial conditions

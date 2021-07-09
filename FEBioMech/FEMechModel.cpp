@@ -140,13 +140,6 @@ void FEMechModel::AddRigidInitialCondition(FERigidIC* pIC)
 }
 
 //-----------------------------------------------------------------------------
-// add a rigid nodeset
-void FEMechModel::AddRigidNodeSet(FERigidNodeSet* rns)
-{
-	m_prs->AddRigidNodeSet(rns);
-}
-
-//-----------------------------------------------------------------------------
 // model activation
 void FEMechModel::Activate()
 {

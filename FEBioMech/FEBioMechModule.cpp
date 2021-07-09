@@ -218,8 +218,13 @@ SOFTWARE.*/
 #include "FEDiscreteElasticDomain.h"
 #include "FEDeformableSpringDomain.h"
 #include "RigidBC.h"
+#include "FERigidNodeSet.h"
 #include "FEFixedDisplacement.h"
+#include "FEFixedRotation.h"
+#include "FEFixedShellDisplacement.h"
 #include "FEPrescribedDisplacement.h"
+#include "FEPrescribedShellDisplacement.h"
+#include "FEPrescribedRotation.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEBCRigidDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
@@ -479,12 +484,17 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBoundaryCondition
-	REGISTER_FECORE_CLASS(FEFixedDisplacement, "fixed displacement");
-	REGISTER_FECORE_CLASS(FEPrescribedDisplacement, "prescribed displacement");
-	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation, "prescribed deformation");
-	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O, "prescribed deformation 2O");
+	REGISTER_FECORE_CLASS(FEFixedDisplacement           , "zero displacement");
+	REGISTER_FECORE_CLASS(FEFixedRotation               , "zero rotation");
+	REGISTER_FECORE_CLASS(FEFixedShellDisplacement      , "zero shell displacement");
+	REGISTER_FECORE_CLASS(FEPrescribedDisplacement      , "prescribed displacement");
+	REGISTER_FECORE_CLASS(FEPrescribedRotation          , "prescribed rotation");
+	REGISTER_FECORE_CLASS(FEPrescribedShellDisplacement , "prescribed shell displacement");
+	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation     , "prescribed deformation");
 	REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement");
-	REGISTER_FECORE_CLASS(FEBCRigidDeformation, "rigid deformation");
+	REGISTER_FECORE_CLASS(FEBCRigidDeformation          , "rigid deformation");
+	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O   , "prescribed deformation 2O");
+	REGISTER_FECORE_CLASS(FERigidNodeSet                , "rigid");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEInitialCondition
@@ -565,8 +575,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERigidEllipsoid, "ellipsoid");
 
 	//-----------------------------------------------------------------------------
-	// classes derived directly from FEModelLoad
-	// TODO: define another SUPER_CLASS_ID for this
+	// classes derived directly from FERigidLoad
 	REGISTER_FECORE_CLASS(FERigidAxialForce, "rigid_axial_force");
 	REGISTER_FECORE_CLASS(FERigidBodyForce, "rigid_force");
     REGISTER_FECORE_CLASS(FERigidFollowerForce, "rigid_follower_force");
@@ -575,8 +584,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERigidBodyDisplacement, "rigid_prescribed");
 	REGISTER_FECORE_CLASS(FERigidBodyVelocity, "rigid_velocity");
 	REGISTER_FECORE_CLASS(FERigidBodyAngularVelocity, "rigid_angular_velocity");
-	REGISTER_FECORE_CLASS(FERigidNodeSet, "rigid_node_set");
-
+	
 //	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable, FEBC_ID, "rigid_cable");
 //	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCablePoint, FEOBJECT_ID, "rigid_cable_point");
 

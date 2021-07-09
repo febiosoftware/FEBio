@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include <FECore/FEBoundaryCondition.h>
 #include "febiomech_api.h"
 
-class FENodeSet;
-
 //-----------------------------------------------------------------------------
 class FEBIOMECH_API FERigidBC : public FEModelComponent
 {
@@ -39,45 +37,6 @@ class FEBIOMECH_API FERigidBC : public FEModelComponent
 
 public:
 	FERigidBC(FEModel* fem) : FEModelComponent(fem) {}
-};
-
-//-----------------------------------------------------------------------------
-//! rigid node set
-class FEBIOMECH_API FERigidNodeSet : public FERigidBC
-{
-public:
-	enum SHELL_BC {
-		HINGED_SHELL,
-		CLAMPED_SHELL
-	};
-
-public:
-	FERigidNodeSet(FEModel* pfem);
-	FERigidNodeSet(const FERigidNodeSet& rs);
-	void operator = (const FERigidNodeSet& rs);
-
-	bool Init() override;
-
-	void Serialize(DumpStream& ar) override;
-
-	void Activate() override;
-	void Deactivate() override;
-
-	void SetRigidMaterialID(int rid);
-
-	void SetShellBC(SHELL_BC bc);
-
-public: // from FEModelComponent
-	void SetNodeSet(FENodeSet* ns) override;
-
-private: // parameters
-	int			m_rigidMat;		//!< rigid body's material
-	int			m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
-
-private:
-	FENodeSet*	m_nodeSet;
-
-	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

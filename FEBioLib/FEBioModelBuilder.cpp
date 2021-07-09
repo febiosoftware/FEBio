@@ -124,12 +124,3 @@ void FEBioModelBuilder::AddRigidIC(FEModelComponent* pmc)
 	fem.AddRigidInitialCondition(ric);
 	AddComponent(ric);
 }
-
-//-----------------------------------------------------------------------------
-void FEBioModelBuilder::AddRigidNodeSet(FEModelComponent* pmc)
-{
-	FEMechModel& fem = static_cast<FEMechModel&>(GetFEModel());
-	FERigidNodeSet* prns = dynamic_cast<FERigidNodeSet*>(pmc); assert(prns);
-	fem.AddRigidNodeSet(prns);
-	AddComponent(prns);
-}

@@ -24,24 +24,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEFixedFluidDilatation.h"
+#include "FEPrescribedShellDisplacement.h"
 #include <FECore/FEModel.h>
+#include <FECore/DOFS.h>
 
-BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEBoundaryCondition)
+//=======================================================================================
+// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
+//       in the parameters of FEPrescribedDOF. 
+BEGIN_FECORE_CLASS(FEPrescribedShellDisplacement, FEBoundaryCondition)
+	ADD_PARAMETER(m_comp, "dof", 0, "sx-displacement\0sy-displacement\0sz-displacement\0");
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH);
+	ADD_PARAMETER(m_brelative, "relative");
+
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
-
-FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
+FEPrescribedShellDisplacement::FEPrescribedShellDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
 {
-
+	m_comp = 0;
 }
 
-bool FEFixedFluidDilatation::Init()
+bool FEPrescribedShellDisplacement::Init()
 {
 	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("ef"));
-	return FEFixedBC::Init();
+	int ndof = -1;
+	switch (m_comp)
+	{
+	case 0: ndof = fem->GetDOFIndex("sx"); break;
+	case 1: ndof = fem->GetDOFIndex("sy"); break;
+	case 2: ndof = fem->GetDOFIndex("sz"); break;
+	}
+	assert(ndof >= 0);
+	SetDOF(ndof);
+	return FEPrescribedDOF::Init();
 }

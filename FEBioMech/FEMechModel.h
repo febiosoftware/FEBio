@@ -104,9 +104,6 @@ public:
 	// add a rigid initial condition
 	void AddRigidInitialCondition(FERigidIC* pIC);
 
-	// add a rigid nodeset
-	void AddRigidNodeSet(FERigidNodeSet* rns);
-
 private:
 	FERigidSystem*	m_prs;
 

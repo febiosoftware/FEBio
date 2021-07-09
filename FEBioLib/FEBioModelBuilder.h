@@ -39,6 +39,5 @@ public:
 	void AddRigidFixedBC(FEModelComponent* prc) override;
 	void AddRigidPrescribedBC(FEModelComponent* prc) override;
 	void AddRigidIC(FEModelComponent* prv) override;
-	void AddRigidNodeSet(FEModelComponent* rs) override;
 };
 

@@ -24,24 +24,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEFixedFluidDilatation.h"
+#include "FEPrescribedRotation.h"
 #include <FECore/FEModel.h>
+#include <FECore/DOFS.h>
 
-BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEBoundaryCondition)
+//=======================================================================================
+// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
+//       in the parameters of FEPrescribedDOF. 
+BEGIN_FECORE_CLASS(FEPrescribedRotation, FEBoundaryCondition)
+	ADD_PARAMETER(m_comp, "dof", 0, "x-rotation\0y-rotation\0z-rotation\0");
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH);
+	ADD_PARAMETER(m_brelative, "relative");
+
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
-
-FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
+FEPrescribedRotation::FEPrescribedRotation(FEModel* fem) : FEPrescribedDOF(fem)
 {
-
+	m_comp = 0;
 }
 
-bool FEFixedFluidDilatation::Init()
+bool FEPrescribedRotation::Init()
 {
 	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("ef"));
-	return FEFixedBC::Init();
+	int ndof = -1;
+	switch (m_comp)
+	{
+	case 0: ndof = fem->GetDOFIndex("u"); break;
+	case 1: ndof = fem->GetDOFIndex("v"); break;
+	case 2: ndof = fem->GetDOFIndex("w"); break;
+	}
+	assert(ndof >= 0);
+	SetDOF(ndof);
+	return FEPrescribedDOF::Init();
 }

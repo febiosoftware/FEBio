@@ -31,4 +31,6 @@ class FEFixedFluidDilatation : public FEFixedBC
 public:
 	FEFixedFluidDilatation(FEModel* fem);
 	bool Init() override;
+
+	DECLARE_FECORE_CLASS();
 };

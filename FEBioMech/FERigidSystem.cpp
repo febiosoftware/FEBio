@@ -80,7 +80,6 @@ FERigidBody* FERigidSystem::Object(int i)
 void FERigidSystem::Clear()
 {
 	for (int i=0; i<(int)m_RB.size (); ++i) delete m_RB [i]; m_RB.clear ();
-	for (int i=0; i<(int)m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
 	for (int i=0; i<(int)m_RBC.size(); ++i) delete m_RBC[i]; m_RBC.clear();
 	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
 	for (int i=0; i<(int)m_RIC.size(); ++i) delete m_RIC[i]; m_RIC.clear();
@@ -102,9 +101,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			int nrb = Objects();
 			ar << nrb;
 			for (int i=0; i<nrb; ++i) Object(i)->Serialize(ar);
-
-			// rigid nodes
-			ar & m_RN;
 
 			// fixed rigid body dofs
 			ar & m_RBC;
@@ -129,9 +125,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 				AddRigidBody(prb);
 			}
 
-			// rigid nodes
-			ar & m_RN;
-
 			// fixed rigid body dofs
 			ar & m_RBC;
 
@@ -147,13 +140,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FERigidSystem::Activate()
 {
-	// rigid nodes
-	for (int i=0; i<(int) m_RN.size(); ++i)
-	{
-		FERigidNodeSet& rn = *m_RN[i];
-		if (rn.IsActive()) rn.Activate();
-	}
-
 	// rigid body displacements
 	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
@@ -201,12 +187,7 @@ bool FERigidSystem::Init()
 		FERigidIC& IC = *m_RIC[i];
 		if (IC.Init() == false) return false;
 	}
-	// assign correct rigid body ID's to rigid nodes
-	for (int i = 0; i<(int)m_RN.size(); ++i)
-	{
-		FERigidNodeSet& rn = *m_RN[i];
-		if (rn.Init() == false) return false;
-	}
+
 	return true;
 }
 

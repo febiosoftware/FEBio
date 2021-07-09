@@ -23,25 +23,50 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEFixedFluidDilatation.h"
-#include <FECore/FEModel.h>
+#pragma once
+#include <FECore/FEBoundaryCondition.h>
+#include "febiomech_api.h"
 
-BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEBoundaryCondition)
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
-END_FECORE_CLASS();
+class FENodeSet;
 
-
-FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
+//-----------------------------------------------------------------------------
+//! rigid node set
+class FEBIOMECH_API FERigidNodeSet : public FEBoundaryCondition
 {
+public:
+	enum SHELL_BC {
+		HINGED_SHELL,
+		CLAMPED_SHELL
+	};
 
-}
+public:
+	FERigidNodeSet(FEModel* pfem);
+	FERigidNodeSet(const FERigidNodeSet& rs);
+	void operator = (const FERigidNodeSet& rs);
 
-bool FEFixedFluidDilatation::Init()
-{
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("ef"));
-	return FEFixedBC::Init();
-}
+	bool Init() override;
+
+	void Serialize(DumpStream& ar) override;
+
+	void Activate() override;
+	void Deactivate() override;
+
+	void SetRigidMaterialID(int rid);
+
+	void SetShellBC(SHELL_BC bc);
+
+	// copy data from another class
+	void CopyFrom(FEBoundaryCondition* pbc) override;
+
+public: // from FEModelComponent
+	void SetNodeSet(FENodeSet* ns) override;
+
+private: // parameters
+	int			m_rigidMat;		//!< rigid body's material
+	int			m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
+
+private:
+	FENodeSet* m_nodeSet;
+
+	DECLARE_FECORE_CLASS();
+};

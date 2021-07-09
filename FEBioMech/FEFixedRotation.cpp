@@ -24,24 +24,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEFixedFluidDilatation.h"
+#include "FEFixedRotation.h"
 #include <FECore/FEModel.h>
 
-BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FEFixedRotation, FEBoundaryCondition)
+	ADD_PARAMETER(m_b[0], "x_rotation");
+	ADD_PARAMETER(m_b[1], "y_rotation");
+	ADD_PARAMETER(m_b[2], "z_rotation");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
-
-FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
+FEFixedRotation::FEFixedRotation(FEModel* fem) : FEFixedBC(fem)
 {
-
+	m_b[0] = false;
+	m_b[1] = false;
+	m_b[2] = false;
 }
 
-bool FEFixedFluidDilatation::Init()
+bool FEFixedRotation::Init()
 {
 	FEModel* fem = GetFEModel();
 	DOFS& dofs = fem->GetDOFS();
 	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("ef"));
+	if (m_b[0]) m_dofs.push_back(dofs.GetDOF("u"));
+	if (m_b[1]) m_dofs.push_back(dofs.GetDOF("v"));
+	if (m_b[2]) m_dofs.push_back(dofs.GetDOF("w"));
 	return FEFixedBC::Init();
 }

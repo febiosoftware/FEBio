@@ -34,6 +34,8 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedFluidDilatation, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "value");
 	ADD_PARAMETER(m_brelative, "relative");
+
+	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedFluidDilatation::FEPrescribedFluidDilatation(FEModel* fem) : FEPrescribedDOF(fem)

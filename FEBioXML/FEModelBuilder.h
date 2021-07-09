@@ -140,7 +140,6 @@ public:
 	virtual void AddRigidFixedBC     (FEModelComponent* prc);
 	virtual void AddRigidPrescribedBC(FEModelComponent* prc);
 	virtual void AddRigidIC			 (FEModelComponent* prv);
-	virtual void AddRigidNodeSet     (FEModelComponent* rs);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }

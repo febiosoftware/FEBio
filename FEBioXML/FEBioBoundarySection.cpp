@@ -1125,7 +1125,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 		++tag;
 		int id, rb, rbp = -1;
-		FEModelComponent* prn = 0;
+		FEBoundaryCondition* prn = 0;
 		FENodeSet* ns = 0;
 		for (int i=0; i<nrn; ++i)
 		{
@@ -1134,7 +1134,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			if ((prn == 0) || (rb != rbp))
 			{
-				prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
+				prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
 
 				prn->SetParameter("rb", rb);
 
@@ -1146,7 +1146,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				// clamped shell = 1
 				prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 
-				feb->AddRigidNodeSet(prn);
+				feb->AddBC(prn);
 				rbp = rb;
 			}
 			ns->Add(id);
@@ -1257,7 +1257,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FEModelComponent* prn = fecore_new_class<FEModelComponent>("FERigidNodeSet", &fem);
+	FEBoundaryCondition* prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
 
 	// the default shell bc depends on the shell formulation
 	prn->SetParameter("clamped_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
@@ -1265,7 +1265,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	prn->SetNodeSet(nodeSet);
 
 	// add it to the model
-	feb->AddRigidNodeSet(prn);
+	feb->AddBC(prn);
 	
 	// read the parameter list
 	ReadParameterList(tag, prn);
