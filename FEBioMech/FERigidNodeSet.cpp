@@ -30,7 +30,7 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FERigidNodeSet, FEModelComponent)
 	ADD_PARAMETER(m_rigidMat, "rb");
-	ADD_PARAMETER(m_nshellBC, "clamp_shells");
+	ADD_PARAMETER(m_bshellBC, "clamp_shells");
 
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
@@ -39,14 +39,8 @@ END_FECORE_CLASS();
 FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_rigidMat = -1;
-	m_nshellBC = CLAMPED_SHELL;
+	m_bshellBC = true;
 	m_nodeSet = nullptr;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidNodeSet::SetShellBC(SHELL_BC bc)
-{
-	m_nshellBC = bc;
 }
 
 //-----------------------------------------------------------------------------
@@ -101,7 +95,7 @@ void FERigidNodeSet::Activate()
 	for (size_t i=0; i<nset.Size(); ++i)
 	{
 		FENode& node = mesh.Node(nset[i]);
-		if (m_nshellBC == CLAMPED_SHELL)
+		if (m_bshellBC)
 		{
 			if (node.HasFlags(FENode::SHELL)) 
 				node.SetFlags(FENode::RIGID_CLAMP);
@@ -131,7 +125,7 @@ void FERigidNodeSet::Deactivate()
 	for (size_t i=0; i<nset.Size(); ++i)
 	{
 		FENode& node = mesh.Node(nset[i]);
-		if (m_nshellBC == CLAMPED_SHELL)
+		if (m_bshellBC)
 		{
 			if (node.HasFlags(FENode::SHELL))
 				node.UnsetFlags(FENode::RIGID_CLAMP);
@@ -145,5 +139,5 @@ void FERigidNodeSet::Serialize(DumpStream& ar)
 {
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_nodeSet & m_rigidMat & m_nshellBC;
+	ar & m_nodeSet & m_rigidMat & m_bshellBC;
 }

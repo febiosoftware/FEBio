@@ -34,12 +34,6 @@ class FENodeSet;
 class FEBIOMECH_API FERigidNodeSet : public FEBoundaryCondition
 {
 public:
-	enum SHELL_BC {
-		HINGED_SHELL,
-		CLAMPED_SHELL
-	};
-
-public:
 	FERigidNodeSet(FEModel* pfem);
 	FERigidNodeSet(const FERigidNodeSet& rs);
 	void operator = (const FERigidNodeSet& rs);
@@ -53,8 +47,6 @@ public:
 
 	void SetRigidMaterialID(int rid);
 
-	void SetShellBC(SHELL_BC bc);
-
 	// copy data from another class
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
@@ -63,7 +55,7 @@ public: // from FEModelComponent
 
 private: // parameters
 	int			m_rigidMat;		//!< rigid body's material
-	int			m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
+	bool		m_bshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
 
 private:
 	FENodeSet* m_nodeSet;
