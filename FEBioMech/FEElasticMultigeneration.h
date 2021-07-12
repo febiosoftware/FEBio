@@ -31,19 +31,19 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Material defining a single generation of a multi-generation material
-class FEGenerationMaterial : public FEElasticMaterial
+class FEGenerationMaterial : public FEMaterialProperty
 {
 public:
 	FEGenerationMaterial(FEModel* pfem);
 
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) override;
+	mat3ds Stress(FEMaterialPoint& pt);
 		
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt) override;
+	tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+	double StrainEnergyDensity(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
     FEMaterialPoint* CreateMaterialPointData() override {
@@ -51,7 +51,7 @@ public:
     }
     
     //! Get the elastic component
-    FEElasticMaterial* GetElasticMaterial() override { return m_pMat; }
+    FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
     
 public:
 	double	btime;	//!< generation birth time

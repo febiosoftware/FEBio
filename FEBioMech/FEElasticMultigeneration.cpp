@@ -34,7 +34,7 @@ SOFTWARE.*/
 
 //=============================================================================
 // define the material parameters
-BEGIN_FECORE_CLASS(FEGenerationMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEGenerationMaterial, FEMaterialProperty)
 	
 	// material parameters
 	ADD_PARAMETER(btime, "start_time");
@@ -45,7 +45,7 @@ BEGIN_FECORE_CLASS(FEGenerationMaterial, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
+FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEMaterialProperty(pfem)
 {
 	m_pMat = 0;
 }

@@ -316,10 +316,10 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
 	REGISTER_FECORE_CLASS(FEDamageFiberExponential, "damage fiber exponential");
 	REGISTER_FECORE_CLASS(FEDamageFiberExpLinear, "damage fiber exp-linear");
+	REGISTER_FECORE_CLASS(FEGenerationMaterial, "generation");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
-	REGISTER_FECORE_CLASS(FEGenerationMaterial, "generation");
 	REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial, "reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterial, "elastic damage");
 	REGISTER_FECORE_CLASS(FERVEDamageMaterial, "reactive viscoelastic damage");
