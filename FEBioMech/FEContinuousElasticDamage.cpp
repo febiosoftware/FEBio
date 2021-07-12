@@ -103,7 +103,7 @@ BEGIN_FECORE_CLASS(FEDamageElasticFiber, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_tinit, FE_RANGE_GREATER_OR_EQUAL(0.0), "t0");
 	ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 	ADD_PARAMETER(m_beta_s, FE_RANGE_GREATER(0.0), "beta_s");
-	ADD_PARAMETER(m_gamma_max, FE_RANGE_GREATER(0.0), "gamma_max");
+	ADD_PARAMETER(m_gamma_max, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma_max");
 
 	ADD_PARAMETER(m_D2_D0, "D2_D0");
 	ADD_PARAMETER(m_D2_beta0, "D2_beta0");
@@ -244,7 +244,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 		assert(gamma >= gamma_prev);
 
 		// compute damage saturation value
-		double Ds = m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max));
+		double Ds = (m_gamma_max == 0.0 ? m_Dmax : m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max)));
 
 		// (iv) compute internal variable
 		double beta = MB(bt - damagePoint.m_bt_ini);
@@ -316,7 +316,7 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	// damage stiffness
 	double bt = damagePoint.m_bt;
 	double gamma = damagePoint.m_gamma;
-	double Ds = m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max));
+	double Ds = (m_gamma_max == 0.0 ? m_Dmax : m_Dmax * (1.0 - exp(log(1.0 - m_r_inf)*gamma / m_gamma_max)));
 	double beta = MB(bt - damagePoint.m_bt_ini);
 
 	double psi0_prev = damagePoint.m_psi_f0_prev;
@@ -332,7 +332,7 @@ tens4ds FEDamageElasticFiber::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 	
 	double dD_dbeta = dD1_dbeta + dD2_dbeta + dD3_dbeta;
 
-	double dDs_dgamma = -m_Dmax * (log(1 - m_r_inf) / m_gamma_max)*exp(log(1 - m_r_inf)*gamma / m_gamma_max);
+	double dDs_dgamma = (m_gamma_max ==0.0 ? 0.0 : -m_Dmax * (log(1 - m_r_inf) / m_gamma_max)*exp(log(1 - m_r_inf)*gamma / m_gamma_max));
 
 	double tmp = exp(-(gamma - m_D3_g0) / m_D3_xg);
 	double dD3s_dgamma = (m_D3_ginf / m_D3_xg)*(tmp / ((1.0 + tmp)*(1.0 + tmp)));
