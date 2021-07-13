@@ -28,14 +28,14 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEThermoFluid.h"
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FESurfaceConstraint.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FEConstraintNormalFlow class implements a fluid surface with zero
 //! tangential velocity as a linear constraint.
 
-class FEBIOFLUID_API FEThermoFluidPressureLoad : public FESurfaceLoad
+class FEBIOFLUID_API FEThermoFluidPressureLoad : public FESurfaceConstraint
 {
 public:
     //! constructor
@@ -45,10 +45,10 @@ public:
     ~FEThermoFluidPressureLoad() {}
     
     //! calculate traction stiffness (there is none for this load)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
     
     //! calculate load vector (there is none for this load)
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override {}
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! set the dilatation
     void Update() override;
@@ -56,16 +56,34 @@ public:
     //! initialize
     bool Init() override;
     
-    //! activate
-    void Activate() override;
+    // allocate equations
+    int InitEquations(int neq) override;
     
     //! serialization
     void Serialize(DumpStream& ar) override;
+
+    // return the surface
+    FESurface* GetSurface() override { return &m_surf; }
+
+protected:
+    void UnpackLM(vector<int>& lm, int n);
+    
+    // Build the matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
+    
+    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
+    
+    void PrepStep() override;
     
 protected:
     int             m_dofT;
     int             m_dofEF;
-    FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
+    vector<int>     m_EQ;
+    vector<double>  m_Lm, m_Lmp;
+    FESurface       m_surf;
+    
+    FEThermoFluid*    m_pfluid;   //!< pointer to thermo-fluid material
 
 public:
     double  m_p0;       // prescribed pressure

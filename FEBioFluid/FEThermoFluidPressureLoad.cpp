@@ -28,59 +28,108 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEThermoFluidPressureLoad.h"
-#include "FECore/FECoreKernel.h"
 #include "FEBioThermoFluid.h"
 #include <FECore/FEModel.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEThermoFluidPressureLoad, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEThermoFluidPressureLoad, FESurfaceConstraint)
     ADD_PARAMETER(m_p0    , "pressure");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
+FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem)
 {
     m_pfluid = nullptr;
     m_p0 = 0;
     
     m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
     m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
-
-    m_dof.Clear();
-    m_dof.AddDof(m_dofEF);
-    m_dof.AddDof(m_dofT);
 }
 
 //-----------------------------------------------------------------------------
 bool FEThermoFluidPressureLoad::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
+    if (FESurfaceConstraint::Init() == false) return false;
+    
+    m_surf.Init();
     
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = m_psurf->Element(0);
+    FESurfaceElement& el = m_surf.Element(0);
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
     
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    m_pfluid = pm->ExtractProperty<FEFluidMaterial>();
+    m_pfluid = pm->ExtractProperty<FEThermoFluid>();
     if (m_pfluid == nullptr) return false;
     
+    m_EQ.resize(m_surf.Nodes(), -1);
+    m_Lm.resize(m_surf.Nodes(), 0.0);
+    m_Lmp.resize(m_surf.Nodes(), 0.0);
+
     return true;
 }
 
 //-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEThermoFluidPressureLoad::Activate()
+// allocate equations
+int FEThermoFluidPressureLoad::InitEquations(int neq)
 {
-    FESurface* ps = &GetSurface();
+    int n = neq;
+    for (int i = 0; i < m_surf.Nodes(); ++i) m_EQ[i] = n++;
+
+    return n - neq;
+}
+
+//-----------------------------------------------------------------------------
+void FEThermoFluidPressureLoad::UnpackLM(vector<int>& lm, int n)
+{
+    int ndof = 3;
     
-    for (int i=0; i<ps->Nodes(); ++i)
+    // add the dofs of rigid body A
+    lm.reserve(ndof);
+    FENode& node = m_surf.Node(n);
+    lm.push_back(node.m_ID[m_dofEF]);
+    lm.push_back(node.m_ID[m_dofT]);
+    lm.push_back(m_EQ[n]);
+}
+
+//-----------------------------------------------------------------------------
+// Build the matrix profile
+void FEThermoFluidPressureLoad::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+    for (int i=0; i<m_surf.Nodes(); ++i) {
+        vector<int> lm;
+        UnpackLM(lm, i);
+        
+        // add it to the pile
+        M.build_add(lm);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEThermoFluidPressureLoad::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+{
+    for (int i = 0; i < m_surf.Nodes(); ++i)
     {
-        FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        node.set_bc(m_dofEF, DOF_PRESCRIBED);
+        if (m_EQ[i] != -1) m_Lm[i] = m_Lmp[i] + Ui[m_EQ[i]] + ui[m_EQ[i]];
+    }
+}
+
+void FEThermoFluidPressureLoad::PrepStep()
+{
+    for (int i = 0; i < m_surf.Nodes(); ++i)
+    {
+        m_Lmp[i] = m_Lm[i];
+    }
+}
+
+void FEThermoFluidPressureLoad::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+    for (int i = 0; i < m_surf.Nodes(); ++i)
+    {
+        if (m_EQ[i] != -1) Ui[m_EQ[i]] += ui[m_EQ[i]];
     }
 }
 
@@ -88,32 +137,76 @@ void FEThermoFluidPressureLoad::Activate()
 //! Evaluate and prescribe the resistance pressure
 void FEThermoFluidPressureLoad::Update()
 {
-    // prescribe this dilatation at the nodes
-    FESurface* ps = &GetSurface();
-    
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        if (ps->Node(i).m_ID[m_dofEF] < -1)
-        {
-            FENode& node = ps->Node(i);
-            // get the temperature at this node
-            double T = node.get(m_dofT);
-            // calculate the dilatation
-            double e = node.get(m_dofEF);
-            bool good = m_pfluid->Dilatation(T,m_p0,0,e);
-            assert(good);
-            // set node as having prescribed DOF
-            node.set(m_dofEF, e);
-        }
-    }
-    
-    GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
 //! serialization
 void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
 {
-    FESurfaceLoad::Serialize(ar);
+    FESurfaceConstraint::Serialize(ar);
     ar & m_pfluid;
+    ar & m_Lm & m_Lmp;
+}
+
+//-----------------------------------------------------------------------------
+//! \todo Why is this class not using the FESolver for assembly?
+void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+{
+    int ndof = 3;
+    vector<double> fe(ndof, 0.0);
+
+    double alpha = tp.alphaf;
+    
+    for (int i=0; i<m_surf.Nodes(); ++i) {
+        FENode& node = m_surf.Node(i);
+        double e = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1-alpha);
+        double T = node.get(m_dofT)*alpha + node.get_prev(m_dofT)*(1-alpha);
+        double p = m_pfluid->GetElastic()->Pressure(e, T);
+        double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
+        double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
+        double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+        fe[0] = lam*dpJ;
+        fe[1] = lam*dpT;
+        fe[2] = p - m_p0;
+        vector<int> lm;
+        UnpackLM(lm,i);
+        R.Assemble(lm, fe);
+    }
+    
+}
+
+//-----------------------------------------------------------------------------
+//! \todo Why is this class not using the FESolver for assembly?
+void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+{
+    int ndof = 3;
+    FEElementMatrix ke;
+    ke.resize(ndof, ndof);
+    double alpha = tp.alphaf;
+    
+    for (int i=0; i<m_surf.Nodes(); ++i) {
+        ke.zero();
+        FENode& node = m_surf.Node(i);
+        double e = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1-alpha);
+        double T = node.get(m_dofT)*alpha + node.get_prev(m_dofT)*(1-alpha);
+        double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
+        double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
+        double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+        double dpJ2 = m_pfluid->GetElastic()->Tangent_Strain_Strain(e, T);
+        double dpJT = m_pfluid->GetElastic()->Tangent_Strain_Temperature(e, T);
+        double dpT2 = m_pfluid->GetElastic()->Tangent_Temperature_Temperature(e, T);
+        
+        mat3d Kab(lam*dpJ2, lam*dpJT, dpJ,
+                  lam*dpJT, lam*dpT2, dpT,
+                  dpJ, dpT, 0);
+        ke.sub(0, 0, Kab);
+
+        // unpack LM
+        vector<int> lm;
+        UnpackLM(lm, i);
+        ke.SetIndices(lm);
+        
+        // assemle into global stiffness matrix
+        LS.Assemble(ke);
+    }
 }
