@@ -148,7 +148,7 @@ void FEBiphasicFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
                 FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
                 et.m_Wp = et.m_Wt;
                 
-                if ((pt.m_Jf <= 0) || (et.m_J <= 0)) {
+                if ((pt.m_ef <= -1) || (et.m_J <= 0)) {
                     feLogError("Negative jacobian was detected.");
                     throw DoRunningRestart();
                 }
@@ -276,7 +276,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         sv = m_pMat->Fluid()->GetViscous()->Stress(mp);
         se = m_pMat->Solid()->Stress(mp);
         // get the gradient of the elastic pressure
-        gradp = pt.m_gradJf*m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
+        gradp = pt.m_gradef*m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         // get inverse of permeability tensor
         km1 = m_pMat->InvPermeability(mp);
         //get pI
@@ -296,7 +296,8 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         // Jfdot wrt fluid
         double phif = m_pMat->Porosity(mp);
         double phis = m_pMat->SolidVolumeFrac(mp);
-        double dJfdotf = pt.m_Jfdot + pt.m_gradJf*ft.m_w/phif;
+        double dJfdotf = pt.m_efdot + pt.m_gradef*ft.m_w/phif;
+        double Jf = 1 + pt.m_ef;
         // Jsdot/Js
         double dJsoJ = ft.m_Jdot/et.m_J;
         
@@ -304,7 +305,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         {
             vec3d fs = ((se-sv*phis)*gradN[i] + (sv*bt.m_gradJ/(phif*et.m_J)*phis - km1*ft.m_w)*H[i])*detJ;
             vec3d ff = (sv*gradN[i] + (gradp + km1*ft.m_w - sv*bt.m_gradJ*phis/(phif*et.m_J))*H[i])*detJ;
-            double fJ = (H[i]*(dJfdotf*phif/pt.m_Jf - dJsoJ) + gradN[i]*ft.m_w)*detJ;
+            double fJ = (H[i]*(dJfdotf*phif/Jf - dJsoJ) + gradN[i]*ft.m_w)*detJ;
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -416,6 +417,7 @@ void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        double Jf = 1 + pt.m_ef;
         
         // calculate the jacobian
         detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
@@ -451,8 +453,8 @@ void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                kwJ = ff*(-H[i]*H[j]/pt.m_Jf);
-                kuJ = ff*(H[i]*H[j]*phis/pt.m_Jf);
+                kwJ = ff*(-H[i]*H[j]/Jf);
+                kuJ = ff*(H[i]*H[j]*phis/Jf);
                 Kwu = (ff & gradN[j])*H[i];
                 Kuu = mat3d(0.0);
                 
@@ -533,6 +535,7 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
         FEBiphasicFSIMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
+        double Jf = 1 + pt.m_ef;
 
         // get the tangents
         mat3ds se = m_pMat->Solid()->Stress(mp);
@@ -542,7 +545,7 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
         tens4ds cv = m_pMat->Fluid()->Tangent_RateOfDeformation(mp);
         double dp = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         double d2p = m_pMat->Fluid()->Tangent_Pressure_Strain_Strain(mp);
-        vec3d gradp = pt.m_gradJf*dp;
+        vec3d gradp = pt.m_gradef*dp;
         // Jsdot/Js = div(vs)
         double dJsoJ = fpt.m_Jdot/et.m_J;
         mat3ds km1 = m_pMat->InvPermeability(mp);
@@ -587,10 +590,10 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
                 
                 mat3d Kww = ((vdotTdotv(bpt.m_gradJ, cv, (gradphif*H[j]/phif-gradN[j]))*phis/(phif*phif*et.m_J) + km1*H[j])*H[i] + vdotTdotv(gradN[i], cv, (-gradphif*H[j]/phif+gradN[j]))/phif)*detJ; //fluid adjusted visc stress
                 
-                vec3d kwJ = ((svJ*gradN[i])*H[j] +(gradN[j]*dp+(pt.m_gradJf*d2p - svJ*bpt.m_gradJ*phis/(phif*et.m_J))*H[j])*H[i])*detJ; //fluid adjusted visc stress
-                vec3d kJu = (((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w)) * gradN[i] + ((gradN[j]*pt.m_Jfdot + ((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w))*pt.m_gradJf)/pt.m_Jf - gradN[j]*(dJsoJ + a*dtrans) + et.m_L.transpose()*gradN[j]*dtrans)*H[i])*detJ;
-                vec3d kJw = ((pt.m_gradJf*(H[i]/pt.m_Jf) + gradN[i])*H[j])*detJ;
-                double kJJ = ((c*phif*dtrans - (pt.m_Jfdot*phif + pt.m_gradJf*fpt.m_w)/pt.m_Jf)*H[j] + gradN[j]*fpt.m_w)*H[i]/pt.m_Jf*detJ;
+                vec3d kwJ = ((svJ*gradN[i])*H[j] +(gradN[j]*dp+(pt.m_gradef*d2p - svJ*bpt.m_gradJ*phis/(phif*et.m_J))*H[j])*H[i])*detJ; //fluid adjusted visc stress
+                vec3d kJu = (((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w)) * gradN[i] + ((gradN[j]*pt.m_efdot + ((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w))*pt.m_gradef)/Jf - gradN[j]*(dJsoJ + a*dtrans) + et.m_L.transpose()*gradN[j]*dtrans)*H[i])*detJ;
+                vec3d kJw = ((pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j])*detJ;
+                double kJJ = ((c*phif*dtrans - (pt.m_efdot*phif + pt.m_gradef*fpt.m_w)/Jf)*H[j] + gradN[j]*fpt.m_w)*H[i]/Jf*detJ;
 
                 ke[i7  ][j7  ] += Kuu(0,0); ke[i7  ][j7+1] += Kuu(0,1); ke[i7  ][j7+2] += Kuu(0,2);
                 ke[i7+1][j7  ] += Kuu(1,0); ke[i7+1][j7+1] += Kuu(1,1); ke[i7+1][j7+2] += Kuu(1,2);
@@ -794,6 +797,7 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
         FEBiphasicFSIMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
+        double Jf = 1 + pt.m_ef;
 
         double denss = m_pMat->SolidDensity(mp);
         double densTf = m_pMat->TrueFluidDensity(mp);
@@ -829,10 +833,10 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
                 
                 mat3d Kuw = ((mat3dd(c*dtrans-phis/phif*dJsoJ-(gradphif*fpt.m_w)/(phif*phif))+pt.m_Lf)*H[j] + mat3dd(gradN[j]*fpt.m_w)/phif)*(-H[i]*densTf/phif*phis*detJ); //mixture 2
                 
-                vec3d kuJ = pt.m_aft*(densTf/pt.m_Jf*H[i]*H[j]*phis*detJ); //mixture 2
+                vec3d kuJ = pt.m_aft*(densTf/Jf*H[i]*H[j]*phis*detJ); //mixture 2
                 mat3d Kwu = (((et.m_a&gradN[j])*phis + mat3dd(b*phif*H[j]*dtrans) - ((fpt.m_w&gradN[j]) * (-1.0/phif*dJsoJ + a*dtrans) - (fpt.m_w&(et.m_L.transpose()*gradN[j]*dtrans)))*phis/phif + mat3dd(gradN[j]*fpt.m_w*a*dtrans) - ((bpt.m_Lw*fpt.m_w)&gradN[j])*phis/(phif*phif) + ((fpt.m_w&gradN[j])*((gradphif*2.0/phif + bpt.m_gradJ/et.m_J)*fpt.m_w) - (fpt.m_w&(gradgradN[j].transpose()*fpt.m_w)))*phis/(phif*phif) - pt.m_Lf*mat3dd(gradN[j]*fpt.m_w))*(H[i]*densTf/phif) + (pt.m_aft&gradN[j])*H[i]*densTf*(1.0-phis/phif))*detJ;
                 mat3d Kww = ((mat3dd(c*dtrans-phis/phif*dJsoJ-(gradphif*fpt.m_w)/(phif*phif))+pt.m_Lf)*H[j] + mat3dd(gradN[j]*fpt.m_w)/phif)*(H[i]*densTf/phif*detJ);
-                vec3d kwJ = pt.m_aft*(-densTf/pt.m_Jf*H[i]*H[j]*detJ);
+                vec3d kwJ = pt.m_aft*(-densTf/Jf*H[i]*H[j]*detJ);
 
                 ke[i7+0][j7  ] += Kuu(0,0); ke[i7+0][j7+1] += Kuu(0,1); ke[i7+0][j7+2] += Kuu(0,2);
                 ke[i7+1][j7  ] += Kuu(1,0); ke[i7+1][j7+1] += Kuu(1,1); ke[i7+1][j7+2] += Kuu(1,2);
@@ -978,14 +982,14 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         double phif = m_pMat->Porosity(mp);
         double phis = m_pMat->SolidVolumeFrac(mp);
         vec3d gradphif = m_pMat->gradPorosity(mp);
-        pt.m_Jfdot = el.Evaluate(ae, n)*dtrans;
+        pt.m_efdot = el.Evaluate(ae, n)*dtrans;
         pt.m_vft = ept.m_v + ft.m_w/phif;
         mat3d Gradw = Gradient(el, w, n);
         bt.m_Lw = Gradw*Fi;
         pt.m_Lf = ept.m_L + bt.m_Lw/phif - (ft.m_w & gradphif)/(phif*phif);
-        pt.m_Jf = 1 + el.Evaluate(e, n);
+        pt.m_ef = el.Evaluate(e, n);
         vec3d GradJf = Gradient(el, e, n);
-        pt.m_gradJf = Fi.transpose()*GradJf;
+        pt.m_gradef = Fi.transpose()*GradJf;
         
         // fluid acceleration
         pt.m_aft = (ft.m_aw + ept.m_a*phif - ft.m_w*ft.m_Jdot*phis/phif/ept.m_J + pt.m_Lf*ft.m_w)/phif;

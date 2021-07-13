@@ -229,7 +229,7 @@ void FEFluidSolutesSolver2::MapVelocitySolution()
 				FESolutesMaterial::Point& sp = *mp.ExtractData<FESolutesMaterial::Point>();
 
 				sp.m_vft = fp.m_vft;
-				sp.m_JfdotoJf = fp.m_Jfdot / fp.m_Jf;
+				sp.m_JfdotoJf = fp.m_efdot / (fp.m_ef+1);
 			}			
 		}
 	}

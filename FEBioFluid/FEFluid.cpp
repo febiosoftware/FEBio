@@ -63,7 +63,7 @@ FEMaterialPoint* FEFluid::CreateMaterialPointData()
 double FEFluid::BulkModulus(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
-    return -vt.m_Jf*Tangent_Pressure_Strain(mp);
+    return -(vt.m_ef+1)*Tangent_Pressure_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,23 +71,20 @@ double FEFluid::BulkModulus(FEMaterialPoint& mp)
 double FEFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double e = fp.m_Jf - 1;
-
-    return Pressure(e);
+    return Pressure(fp.m_ef);
 }
 
 //-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
 double FEFluid::Pressure(const double e, const double T)
 {
-    return m_k*(1/(1+e)-1);
+    return -m_k*e;
 }
 
 //-----------------------------------------------------------------------------
 double FEFluid::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 {
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    return -m_k/pow(fp.m_Jf,2);
+    return -m_k;
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +129,7 @@ mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
 double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double sed = m_k*(fp.m_Jf-1-log(fp.m_Jf));
+    double sed = m_k*(fp.m_ef-log(fp.m_ef+1));
     return sed;
 }
 
@@ -140,12 +137,14 @@ double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 //! invert pressure-dilatation relation
 bool FEFluid::Dilatation(const double T, const double p, const double c, double& e)
 {
-    e = 1/(1+p/m_k)-1;
-    //for solute cases
+//    e = 1/(1+p/m_k)-1;
+    e = -p/m_k;
+
+    // for solute cases, assume that p = actual pressure and c = Phi*R*c_effective
     if (c != 0)
     {
-        e = 1/(1+(p-T*c)/m_k)-1;
-//        e = -(p-T*c)/m_k;
+//        e = 1/(1+(p-T*c)/m_k)-1;
+        e = -(p-T*c)/m_k;
     }
     
     return true;
