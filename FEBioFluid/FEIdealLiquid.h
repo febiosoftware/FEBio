@@ -86,7 +86,7 @@ public:
     bool Dilatation(const double T, const double p, const double c, double& e) override;
     
     //! fluid pressure from state variables
-    double Pressure(const double ef, const double T) override;
+    double Pressure(const double ef, const double T);
 
 public:
     double      m_R;        //!< universal gas constant
