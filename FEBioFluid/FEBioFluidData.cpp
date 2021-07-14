@@ -125,7 +125,7 @@ double FELogFluidVolumeRatio::value(FEElement& el)
     for (int i=0; i<nint; ++i)
     {
         FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
-        if (ppt) val += ppt->m_Jf;
+        if (ppt) val += ppt->m_ef + 1;
     }
     return val / (double) nint;
 }

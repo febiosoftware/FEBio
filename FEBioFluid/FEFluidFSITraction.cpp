@@ -71,30 +71,27 @@ bool FEFluidFSITraction::Init()
 	FEModel* fem = GetFEModel();
 	int NF = surf.Elements();
 	m_elem.resize(NF);
-	m_K.resize(NF, 0);
 	m_s.resize(NF, 1);
-	m_bself.resize(NF, false);
 	for (int j = 0; j<NF; ++j)
 	{
+        bool bself = false;
 		FESurfaceElement& el = surf.Element(j);
 		// extract the first of two elements on this interface
 		m_elem[j] = el.m_elem[0];
-		if (el.m_elem[1] == nullptr) m_bself[j] = true;
+		if (el.m_elem[1] == nullptr) bself = true;
 		// get its material and check if FluidFSI
 		FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
 		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
 		if (pfsi) {
-			m_K[j] = pfsi->Fluid()->m_k;
             m_s[j] = (double)el.m_order;
 		}
-		else if (!m_bself[j]) {
+		else if (!bself) {
 			// extract the second of two elements on this interface
 			m_elem[j] = el.m_elem[1];
 			pm = fem->GetMaterial(m_elem[j]->GetMatID());
 			pfsi = dynamic_cast<FEFluidFSI*>(pm);
 			if (pfsi == nullptr) return false;
             m_s[j] = -(double)el.m_order;
-			m_K[j] = pfsi->Fluid()->m_k;
 		}
 		else
 			return false;
@@ -154,24 +151,28 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		// get the surface element
 		FESurfaceElement& el = *mp.SurfaceElement();
 		int iel = el.m_lid;
+        FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(GetFEModel()->GetMaterial(m_elem[iel]->GetMatID()));
 
 		// nodal coordinates
 		vec3d rt[FEElement::MAX_NODES];
 		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
 
 		// evaluate covariant basis vectors at integration point
-		vec3d gr = el.eval_deriv1(rt, mp.m_index);
-		vec3d gs = el.eval_deriv2(rt, mp.m_index);
+		vec3d gr = el.eval_deriv1(rt, mp.m_index)*m_s[iel];
+		vec3d gs = el.eval_deriv2(rt, mp.m_index)*m_s[iel];
 		vec3d gt = gr ^ gs;
 
-		// Get the fluid stress at integration point
+		// Get the fluid viscous stress at integration point
+        // necessarily using the attached solid element
 		mat3ds sv = GetFluidStress(mp);
 
 		// fluid dilatation at integration point
+        // only from surface element
 		double ef = GetFluidDilatation(mp, tp.alphaf);
+        double p = pfsi->Fluid()->Pressure(ef);
 
 		// evaluate traction
-		vec3d f = (sv*gt + gt*(m_K[iel] * ef))*(-m_s[iel]);
+		vec3d f = gt*p - sv*gt;
 
 		double H = dof_a.shape;
 		fa[0] = H * f.x;
@@ -240,21 +241,21 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 		double ef = GetFluidDilatation(mp, tp.alphaf);
 
 		// covariant basis vectors
-		vec3d gr = el.eval_deriv1(rt, mp.m_index);
-		vec3d gs = el.eval_deriv2(rt, mp.m_index);
+		vec3d gr = el.eval_deriv1(rt, mp.m_index)*m_s[iel];
+		vec3d gs = el.eval_deriv2(rt, mp.m_index)*m_s[iel];
 		vec3d gt = gr ^ gs;
 
 		// evaluate fluid pressure
-		double p = m_K[iel] * ef * m_s[iel];
+        double p = pfsi->Fluid()->Pressure(ef);
 
-		vec3d f = gt*(-m_K[iel] * m_s[iel]);
+        vec3d f = gt*pfsi->Fluid()->Tangent_Pressure_Strain(mp);
 
 		vec3d gcnt[2], gcntp[2];
 		ps->ContraBaseVectors(el, mp.m_index, gcnt);
 		ps->ContraBaseVectorsP(el, mp.m_index, gcntp);
 		for (int i = 0; i<neln; ++i)
-			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
-			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
+			gradN[i] = ((gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
+			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i])*m_s[iel];
 
 		// calculate stiffness component
 		int i = dof_a.index;
@@ -263,9 +264,9 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 		mat3d A; A.skew(v);
 		mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
 
-		mat3d Kuu = (sv*A + Kv*M)*(-N[i] *  m_s[iel]) - A*(N[i] * p); Kuu *= alpha;
-		mat3d Kuw = Kv*(-N[i] * m_s[iel]); Kuw *= alpha;
-		vec3d kuJ = svJ*gt*(-N[i] * N[j] * m_s[iel]) + f*(N[i] * N[j]); kuJ *= alpha;
+        mat3d Kuu = (sv*A + Kv*M)*N[i] - A*(N[i] * p); Kuu *= -alpha;
+        mat3d Kuw = Kv*N[i]; Kuw *= -alpha;
+        vec3d kuJ = svJ*gt*(N[i] * N[j]) - f*(N[i] * N[j]); kuJ *= -alpha;
 
 		Kab.zero();
 		Kab.sub(0, 0, Kuu);
@@ -282,9 +283,7 @@ void FEFluidFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
 
-	ar & m_K;
 	ar & m_s;
-	ar & m_bself;
 
 	if (ar.IsShallow() == false)
 	{

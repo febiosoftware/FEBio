@@ -66,3 +66,69 @@ double FEElasticFluid::SpecificFreeEnthalpy(FEMaterialPoint& mp)
     
     return g;
 }
+
+//-----------------------------------------------------------------------------
+//! pressure from state variables
+double FEElasticFluid::Pressure(const double ef, const double T)
+{
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = ef;
+    ft->m_T = T;
+    return Pressure(*ft);
+}
+
+//-----------------------------------------------------------------------------
+//! dp/dJ
+double FEElasticFluid::Tangent_Strain(const double ef, const double T)
+{
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = ef;
+    ft->m_T = T;
+    return Tangent_Strain(*ft);
+}
+
+//-----------------------------------------------------------------------------
+//! dp/dT
+double FEElasticFluid::Tangent_Temperature(const double ef, const double T)
+{
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = ef;
+    ft->m_T = T;
+    return Tangent_Temperature(*ft);
+}
+
+//-----------------------------------------------------------------------------
+//! d2p/dJ2
+double FEElasticFluid::Tangent_Strain_Strain(const double ef, const double T)
+{
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = ef;
+    ft->m_T = T;
+    return Tangent_Strain_Strain(*ft);
+}
+
+//-----------------------------------------------------------------------------
+//! d2p/dJdT
+double FEElasticFluid::Tangent_Strain_Temperature(const double ef, const double T)
+{
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = ef;
+    ft->m_T = T;
+    return Tangent_Strain_Temperature(*ft);
+}
+
+//-----------------------------------------------------------------------------
+//! d2p/dT2
+double FEElasticFluid::Tangent_Temperature_Temperature(const double ef, const double T)
+{
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = ef;
+    ft->m_T = T;
+    return Tangent_Temperature_Temperature(*ft);
+}

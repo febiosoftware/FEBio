@@ -54,9 +54,7 @@ private:
     mat3ds GetFluidStress(FESurfaceMaterialPoint& mp);
     
 protected:
-    vector<double>      m_K;        //!< fluid bulk modulus
     vector<double>      m_s;        //!< scale factor
-    vector<bool>        m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
     vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements
     
     // degrees of freedom

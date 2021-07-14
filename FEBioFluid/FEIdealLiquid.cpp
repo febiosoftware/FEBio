@@ -77,7 +77,7 @@ double FEIdealLiquid::Pressure(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double p = m_k*(1-fp.m_Jf) + m_beta*(tf.m_T);
+    double p = m_k*(-fp.m_ef) + m_beta*(tf.m_T);
 
     return p;
 }
@@ -124,7 +124,7 @@ double FEIdealLiquid::SpecificFreeEnergy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
     double Tr = m_Tr;
     
@@ -141,7 +141,7 @@ double FEIdealLiquid::SpecificEntropy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
     double Tr = m_Tr;
     
@@ -158,7 +158,7 @@ double FEIdealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     
     // strain-dependent contribution
     double a = m_k/(2*m_rhor)*pow(J - 1, 2) - m_beta/m_rhor*tf.m_T*(J - 1);

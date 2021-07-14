@@ -474,7 +474,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 			{
 				FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
 				FEFluidMaterialPoint* ptf = mp.ExtractData<FEFluidMaterialPoint>();
-				if (ptf) w += ptf->m_vft / ptf->m_Jf;
+				if (ptf) w += ptf->m_vft / (ptf->m_ef + 1);
 			}
 			w /= nint;
 

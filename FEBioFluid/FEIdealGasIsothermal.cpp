@@ -80,7 +80,7 @@ double FEIdealGasIsothermal::Pressure(const double e, const double T)
 double FEIdealGasIsothermal::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double dp = -m_Pr/J;
     return dp;
 }
@@ -90,7 +90,7 @@ double FEIdealGasIsothermal::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 double FEIdealGasIsothermal::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double d2p = 2*m_Pr/(J*J);
     return d2p;
 }
@@ -107,7 +107,7 @@ double FEIdealGasIsothermal::Temperature(FEMaterialPoint& mp)
 double FEIdealGasIsothermal::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double sed = m_Pr*(J-1-log(J));
     return sed;
 }

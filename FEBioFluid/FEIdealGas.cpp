@@ -39,13 +39,16 @@ BEGIN_FECORE_CLASS(FEIdealGas, FEElasticFluid)
     ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M");
     ADD_PARAMETER(m_ar  , "ar");
     ADD_PARAMETER(m_sr  , "sr");
-    ADD_PARAMETER(m_C[0], "C0");
-    ADD_PARAMETER(m_C[1], "C1");
-    ADD_PARAMETER(m_C[2], "C2");
-    ADD_PARAMETER(m_C[3], "C3");
-    ADD_PARAMETER(m_C[4], "C4");
+    ADD_PROPERTY (m_ao  , "ao");
+    ADD_PROPERTY (m_cp  , "cp");
 
 END_FECORE_CLASS();
+
+FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
+{
+    m_R = m_Pr = m_Tr = m_ar = m_sr = 0;
+    m_ao = m_cp = nullptr;
+}
 
 //-----------------------------------------------------------------------------
 //! initialization
@@ -64,6 +67,9 @@ bool FEIdealGas::Init()
         feLogWarning("The referential absolute pressure P is calculated internally as %g\n",m_Pr);
     }
     
+    m_ao->Init();
+    m_cp->Init();
+    
     return true;
 }
 
@@ -74,8 +80,9 @@ double FEIdealGas::Pressure(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double T = m_Tr + tf.m_T;
-    
-    double p = m_Pr*(T/(fp.m_Jf*m_Tr) - 1);
+    double Jf = 1 + fp.m_ef;
+
+    double p = m_Pr*(T/(Jf*m_Tr) - 1);
 
     return p;
 }
@@ -87,8 +94,9 @@ double FEIdealGas::Tangent_Strain(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double T = m_Tr + tf.m_T;
+    double Jf = 1 + fp.m_ef;
 
-    double dp = -m_Pr*T/(fp.m_Jf*fp.m_Jf*m_Tr);
+    double dp = -m_Pr*T/(Jf*Jf*m_Tr);
 
     return dp;
 }
@@ -100,8 +108,9 @@ double FEIdealGas::Tangent_Strain_Strain(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double T = m_Tr + tf.m_T;
+    double Jf = 1 + fp.m_ef;
 
-    double d2p = 2*m_Pr*T/(pow(fp.m_Jf,3)*m_Tr);
+    double d2p = 2*m_Pr*T/(pow(Jf,3)*m_Tr);
 
     return d2p;
 }
@@ -111,8 +120,9 @@ double FEIdealGas::Tangent_Strain_Strain(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    
-    double dp = m_Pr/(fp.m_Jf*m_Tr);
+    double Jf = 1 + fp.m_ef;
+
+    double dp = m_Pr/(Jf*m_Tr);
 
     return dp;
 }
@@ -129,8 +139,9 @@ double FEIdealGas::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_Strain_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    
-    double d2p = -m_Pr/(fp.m_Jf*fp.m_Jf*m_Tr);
+    double Jf = 1 + fp.m_ef;
+
+    double d2p = -m_Pr/(Jf*Jf*m_Tr);
 
     return d2p;
 }
@@ -142,18 +153,15 @@ double FEIdealGas::SpecificFreeEnergy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
     double Tr = m_Tr;
     
     // referential free energy
     double a = m_ar - m_sr*(T-Tr);
     
-    // add a circle
-    a += m_R/m_M*(m_C[0]*(T-Tr-T*log(T/Tr))
-                  +pow(T-Tr, 2)/2*(m_C[1]+m_C[2]/3*(T+2*Tr)
-                                   +m_C[3]/6*(T*T+2*Tr*T+3*Tr*Tr)
-                                   +m_C[4]/10*(pow(T, 3)+2*Tr*T*T+3*Tr*Tr*T+4*pow(Tr, 3))));
+    // add a_circle
+    a += m_ao->value(T);
     
     // add strain-dependent contribution
     a += m_R/m_M*(J*Tr-T+T*log(T/(J*Tr)));
@@ -168,16 +176,15 @@ double FEIdealGas::SpecificEntropy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
     double Tr = m_Tr;
     
     // referential entropy
     double s = m_sr;
     
-    // add s circle
-    s += m_R/m_M*(m_C[0]*log(T/Tr) + (T-Tr)*(m_C[1]+m_C[3]/3*(T*T+Tr*T+Tr*Tr))
-                  +(T*T-Tr*Tr)/2*(m_C[2]+m_C[4]/2*(T*T+Tr*Tr)));
+    // add s_circle
+    s -= m_ao->derive(T);
     
     // add strain-dependent contribution
     s += -m_R/m_M*log(T/(J*Tr));
@@ -192,7 +199,7 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double T = tf.m_T;
     double Tr = m_Tr;
     
@@ -207,10 +214,9 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
 double FEIdealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T;
+    double T = tf.m_T + m_Tr;
     
-    double cp = m_C[0] + m_C[1]*T + m_C[2]*pow(T, 2) + m_C[3]*pow(T, 3) + m_C[4]*pow(T, 4);
-    cp *= m_R/m_M;
+    double cp = m_cp->value(T);
     
     return cp;
 }
@@ -236,10 +242,9 @@ double FEIdealGas::Tangent_cv_Strain(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T;
+    double T = tf.m_T + m_Tr;
     
-    double dcv = m_C[1] + 2*m_C[2]*T + 3*m_C[3]*pow(T, 2) + 4*m_C[4]*pow(T, 3);
-    dcv *= m_R/m_M;
+    double dcv = m_cp->derive(T);
     
     return dcv;
 }
@@ -251,16 +256,4 @@ bool FEIdealGas::Dilatation(const double T, const double p, const double c, doub
     double J = (T+m_Tr)/m_Tr/(1+p/m_Pr);
     e = J - 1;
     return true;
-}
-
-//-----------------------------------------------------------------------------
-//! pressure from state variables
-double FEIdealGas::Pressure(const double ef, const double T)
-{
-    double J = 1 + ef;
-    double Tabs = m_Tr + T;
-    
-    double p = m_Pr*(Tabs/(J*m_Tr) - 1);
-
-    return p;
 }

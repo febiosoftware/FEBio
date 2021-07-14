@@ -83,9 +83,14 @@ public:
     //! calculate dilatation for given pressure and temperature
     virtual bool Dilatation(const double T, const double p, const double c, double& e) = 0;
     
-    //! calculate fluid pressure from state variables
-    virtual double Pressure(const double ef, const double T) = 0;
-    
+    //! calculate fluid pressure and its derivatives from state variables
+    double Pressure(const double ef, const double T);
+    double Tangent_Strain(const double ef, const double T);
+    double Tangent_Temperature(const double ef, const double T);
+    double Tangent_Strain_Strain(const double ef, const double T);
+    double Tangent_Strain_Temperature(const double ef, const double T);
+    double Tangent_Temperature_Temperature(const double ef, const double T);
+
 public:
     //! specific internal energy
     double SpecificInternalEnergy(FEMaterialPoint& mp);

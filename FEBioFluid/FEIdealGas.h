@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFluid.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for the viscous part of the fluid response.
@@ -36,7 +37,7 @@ SOFTWARE.*/
 class FEBIOFLUID_API FEIdealGas : public FEElasticFluid
 {
 public:
-    FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem) { m_R = m_Pr = m_Tr = m_ar = m_sr = 0; }
+    FEIdealGas(FEModel* pfem);
     ~FEIdealGas() {}
     
     //! initialization
@@ -84,18 +85,15 @@ public:
     //! dilatation from temperature and pressure
     bool Dilatation(const double T, const double p, const double c, double& e) override;
 
-    //! fluid pressure from state variables
-    double Pressure(const double ef, const double T) override;
-
 public:
     double      m_R;        //!< universal gas constant
     double      m_Pr;       //!< referential absolute pressure
     double      m_Tr;       //!< referential absolute temperature
     double      m_M;        //!< molar mass
-    double      m_C[5];     //!< polynomial coefficients of isobaric specific heat capacity
     double      m_ar;       //!< referential specific free energy
     double      m_sr;       //!< referential specific entropy
-    
+    FEFunction1D*   m_cp;   //!< isobaric specific heat capacity
+    FEFunction1D*   m_ao;   //!< specific free energy a-circle
     // declare parameter list
     DECLARE_FECORE_CLASS();
 
