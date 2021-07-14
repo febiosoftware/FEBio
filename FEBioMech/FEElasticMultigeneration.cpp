@@ -33,9 +33,37 @@ SOFTWARE.*/
 #include "FEElasticMultigeneration.h"
 
 //=============================================================================
+FEGenerationBase::FEGenerationBase(FEModel* fem) : FEMaterialProperty(fem) 
+{
+	btime = 0;
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate stress at material point
+mat3ds FEGenerationBase::Stress(FEMaterialPoint& pt)
+{
+	return m_pMat->Stress(pt);
+}
+		
+//-----------------------------------------------------------------------------
+//! calculate tangent stiffness at material point
+tens4ds FEGenerationBase::Tangent(FEMaterialPoint& pt)
+{
+	return m_pMat->Tangent(pt);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEGenerationBase::StrainEnergyDensity(FEMaterialPoint& pt)
+{
+	return m_pMat->StrainEnergyDensity(pt);
+}
+
+//=============================================================================
 // define the material parameters
-BEGIN_FECORE_CLASS(FEGenerationMaterial, FEMaterialProperty)
-	
+BEGIN_FECORE_CLASS(FEGenerationMaterial, FEGenerationBase)
+
 	// material parameters
 	ADD_PARAMETER(btime, "start_time");
 
@@ -45,30 +73,8 @@ BEGIN_FECORE_CLASS(FEGenerationMaterial, FEMaterialProperty)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEMaterialProperty(pfem)
+FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEGenerationBase(pfem)
 {
-	m_pMat = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! calculate stress at material point
-mat3ds FEGenerationMaterial::Stress(FEMaterialPoint& pt)
-{
-	return m_pMat->Stress(pt);
-}
-		
-//-----------------------------------------------------------------------------
-//! calculate tangent stiffness at material point
-tens4ds FEGenerationMaterial::Tangent(FEMaterialPoint& pt)
-{
-	return m_pMat->Tangent(pt);
-}
-
-//-----------------------------------------------------------------------------
-//! calculate strain energy density at material point
-double FEGenerationMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
-{
-	return m_pMat->StrainEnergyDensity(pt);
 }
 
 //=============================================================================

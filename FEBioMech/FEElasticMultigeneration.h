@@ -30,34 +30,39 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! Material defining a single generation of a multi-generation material
-class FEGenerationMaterial : public FEMaterialProperty
+// TODO: This was introduced so that the FEGenerationMaterial fits in the current
+//       framework, which assumes that all features classes are derived from base-classes.
+class FEGenerationBase : public FEMaterialProperty
 {
 public:
-	FEGenerationMaterial(FEModel* pfem);
+	FEGenerationBase(FEModel* fem);
 
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
-		
+
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt);
-    
-    // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override {
-        return m_pMat->CreateMaterialPointData();
-    }
-    
-    //! Get the elastic component
-    FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
-    
+
+	// returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData() override {
+		return m_pMat->CreateMaterialPointData();
+	}
+
 public:
 	double	btime;	//!< generation birth time
 
-	FEElasticMaterial*	m_pMat;	//!< pointer to elastic material
+	FEElasticMaterial* m_pMat;	//!< pointer to elastic material
+};
 
+//-----------------------------------------------------------------------------
+//! Material defining a single generation of a multi-generation material
+class FEGenerationMaterial : public FEGenerationBase
+{
+public:
+	FEGenerationMaterial(FEModel* pfem);
 	DECLARE_FECORE_CLASS();
 };
 
@@ -114,10 +119,8 @@ public:
     int Materials() { return (int)m_MG.size(); }
     
     // return a generation material component
-    FEGenerationMaterial* GetMaterial(int i) { return m_MG[i]; }
+	FEGenerationBase* GetMaterial(int i) { return m_MG[i]; }
     
-	void AddMaterial(FEElasticMaterial* pmat);
-	
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;
@@ -131,7 +134,7 @@ public:
 	int CheckGeneration(const double t);
 
 public:
-	std::vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
+	std::vector<FEGenerationBase*>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
