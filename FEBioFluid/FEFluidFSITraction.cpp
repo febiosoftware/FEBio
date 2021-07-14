@@ -83,7 +83,9 @@ bool FEFluidFSITraction::Init()
 		FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
 		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
 		if (pfsi) {
-            m_s[j] = (double)el.m_order;
+            double s = m_psurf->FacePointing(el, *m_elem[j]);
+            m_s[j] = bself ? -s : s;
+            if (m_s[j] == 0) return false;
 		}
 		else if (!bself) {
 			// extract the second of two elements on this interface
@@ -91,7 +93,8 @@ bool FEFluidFSITraction::Init()
 			pm = fem->GetMaterial(m_elem[j]->GetMatID());
 			pfsi = dynamic_cast<FEFluidFSI*>(pm);
 			if (pfsi == nullptr) return false;
-            m_s[j] = -(double)el.m_order;
+            m_s[j] = m_psurf->FacePointing(el, *m_elem[j]);
+            if (m_s[j] == 0) return false;
 		}
 		else
 			return false;
@@ -159,7 +162,7 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		// evaluate covariant basis vectors at integration point
 		vec3d gr = el.eval_deriv1(rt, mp.m_index)*m_s[iel];
-		vec3d gs = el.eval_deriv2(rt, mp.m_index)*m_s[iel];
+		vec3d gs = el.eval_deriv2(rt, mp.m_index);
 		vec3d gt = gr ^ gs;
 
 		// Get the fluid viscous stress at integration point
@@ -242,20 +245,20 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 
 		// covariant basis vectors
 		vec3d gr = el.eval_deriv1(rt, mp.m_index)*m_s[iel];
-		vec3d gs = el.eval_deriv2(rt, mp.m_index)*m_s[iel];
+		vec3d gs = el.eval_deriv2(rt, mp.m_index);
 		vec3d gt = gr ^ gs;
 
 		// evaluate fluid pressure
         double p = pfsi->Fluid()->Pressure(ef);
 
-        vec3d f = gt*pfsi->Fluid()->Tangent_Pressure_Strain(mp);
+        vec3d f = gt*pfsi->Fluid()->GetElastic()->Tangent_Strain(ef,0);
 
 		vec3d gcnt[2], gcntp[2];
 		ps->ContraBaseVectors(el, mp.m_index, gcnt);
 		ps->ContraBaseVectorsP(el, mp.m_index, gcntp);
 		for (int i = 0; i<neln; ++i)
-			gradN[i] = ((gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
-			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i])*m_s[iel];
+			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*(Gr[i]*m_s[iel]) +
+			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
 
 		// calculate stiffness component
 		int i = dof_a.index;
