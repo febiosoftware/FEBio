@@ -365,7 +365,8 @@ int FECoreKernel::FactoryClasses()
 //-----------------------------------------------------------------------------
 const FECoreFactory* FECoreKernel::GetFactoryClass(int i)
 {
-	return m_Fac[i];
+	if ((i < 0) || (i >= m_Fac.size())) return nullptr;
+	else return m_Fac[i];
 }
 
 //-----------------------------------------------------------------------------
