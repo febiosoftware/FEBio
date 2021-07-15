@@ -466,6 +466,7 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
                 if (iter > maxiter) done = true;
             } while (!done);
             
+            delete ft;
             return convgd;
         }
             break;

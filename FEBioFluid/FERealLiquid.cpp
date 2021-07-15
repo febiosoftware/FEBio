@@ -241,6 +241,8 @@ double FERealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
     fmp->m_ef = e;
     fmt->m_T = tf.m_T;
     double a0 = SpecificFreeEnergy(*fmt);
+    
+    delete fmt;
 
     // the specific strain energy is the difference between these two values
     return a - a0;
@@ -325,6 +327,7 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
     if (p == psat) { e = esat; return true; }
     switch (m_nvc) {
         case 0:
+            delete ft;
             return false;
             break;
         case 1:
@@ -332,6 +335,7 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
             double B0 = m_B[0]->value(q);
             if (B0 == 0) { e = esat; return true; }
             e = (p/m_Pr - psat)/B0 + esat;
+            delete ft;
             return true;
         }
             break;
@@ -345,6 +349,7 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
             det = sqrt(det);
             // only one root of this quadratic equation is valid.
             e = esat - (B0+det)/(2*B1);
+            delete ft;
             return true;
         }
             break;
@@ -366,10 +371,12 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
                 if (iter > maxiter) done = true;
             } while (!done);
             
+            delete ft;
             return convgd;
         }
             break;
     }
+    delete ft;
     return false;
 }
 
@@ -381,5 +388,7 @@ double FERealLiquid::Pressure(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Pressure(*ft);
+    double p = Pressure(*ft);
+    delete ft;
+    return p;
 }
