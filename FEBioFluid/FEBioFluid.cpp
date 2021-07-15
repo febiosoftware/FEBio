@@ -40,6 +40,8 @@ SOFTWARE.*/
 #include "FEBiphasicFSI.h"
 #include "FEIdealGasIsentropic.h"
 #include "FEIdealGasIsothermal.h"
+#include "FELinearElasticFluid.h"
+#include "FENonlinearElasticFluid.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
@@ -122,6 +124,8 @@ REGISTER_FECORE_CLASS(FEPowellEyringFluid , "Powell-Eyring" );
 REGISTER_FECORE_CLASS(FECrossFluid        , "Cross"         );
 REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
 REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
+REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
+REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
 
 //-----------------------------------------------------------------------------
 // Domain classes

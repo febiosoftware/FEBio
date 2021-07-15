@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEFluidMaterialPoint.h"
 #include "FEViscousFluid.h"
 #include <FEBioMix/FEBiphasic.h>
+#include "FEElasticFluid.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for fluid materials.
@@ -51,10 +52,7 @@ public:
 	
 public:
     //! initialization
-    bool Init() override {
-        m_Tr = GetFEModel()->GetGlobalConstant("T");
-        return true;
-    }
+    bool Init() override;
     
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;
@@ -83,6 +81,13 @@ public:
 
     //! evaluate dilatation from pressure
     bool Dilatation(const double T, const double p, const double c, double& e) override;
+    
+    //! return elastic fluid
+    FEElasticFluid* GetElastic() { return m_pElastic; }
+    
+private: // material properties
+    FEElasticFluid*             m_pElastic;     //!< pointer to elastic part of fluid material
+    
 
 public: // from FEBiphasicInterface
     double GetActualFluidPressure(const FEMaterialPoint& mp) override {
