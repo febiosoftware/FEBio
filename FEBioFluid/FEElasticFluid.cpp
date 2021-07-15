@@ -75,7 +75,9 @@ double FEElasticFluid::Pressure(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Pressure(*ft);
+    double p = Pressure(*ft);
+    delete ft;
+    return p;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,7 +88,9 @@ double FEElasticFluid::Tangent_Strain(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Tangent_Strain(*ft);
+    double dpJ = Tangent_Strain(*ft);
+    delete ft;
+    return dpJ;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,7 +101,9 @@ double FEElasticFluid::Tangent_Temperature(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Tangent_Temperature(*ft);
+    double dpT = Tangent_Temperature(*ft);
+    delete ft;
+    return dpT;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +114,9 @@ double FEElasticFluid::Tangent_Strain_Strain(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Tangent_Strain_Strain(*ft);
+    double dpJ2 = Tangent_Strain_Strain(*ft);
+    delete ft;
+    return dpJ2;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,7 +127,9 @@ double FEElasticFluid::Tangent_Strain_Temperature(const double ef, const double 
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Tangent_Strain_Temperature(*ft);
+    double dpJT = Tangent_Strain_Temperature(*ft);
+    delete ft;
+    return dpJT;
 }
 
 //-----------------------------------------------------------------------------
@@ -130,5 +140,7 @@ double FEElasticFluid::Tangent_Temperature_Temperature(const double ef, const do
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    return Tangent_Temperature_Temperature(*ft);
+    double dpT2 = Tangent_Temperature_Temperature(*ft);
+    delete ft;
+    return dpT2;
 }
