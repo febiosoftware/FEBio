@@ -57,8 +57,8 @@ const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASI
         case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
         case FLUID_VELOCITY              : return "fluid velocity"             ; break;
         case FLUID_ACCELERATION          : return "fluid acceleration"         ; break;
-        case FLUID_DILATATION            : return "fluid dilation"             ; break;
-        case FLUID_DILATATION_TDERIV     : return "fluid dilation tderiv"      ; break;
+        case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+        case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
         case FLUID_CONCENTRATION         : return "concentration"              ; break;
         case FLUID_CONCENTRATION_TDERIV  : return "concentration tderiv"       ; break;
     }

@@ -344,17 +344,20 @@ int DOFS::GetDOF(int nvar, int n)
 //! Return the DOF index from a dof symbol.
 //! This index is used in the FENode::get(), FENode::set() functions to set 
 //! the values of nodal values. This index is also used in the FENode::m_ID and FENode::m_BC arrays.
-int DOFS::GetDOF(const char* szdof)
+int DOFS::GetDOF(const char* szdof, const char* szvarName)
 {
 	const int NVAR = (int)m_var.size();
 	for (int i=0; i<NVAR; ++i)
 	{
 		Var& var = m_var[i];
-		int ndof = (int)var.m_dof.size();
-		for (int j=0; j<ndof; ++j)
+		if ((szvarName == nullptr) || (var.m_name == std::string(szvarName)))
 		{
-			DOF_ITEM& it = var.m_dof[j];
-			if (strcmp(it.sz, szdof) == 0) return it.ndof;
+			int ndof = (int)var.m_dof.size();
+				for (int j = 0; j < ndof; ++j)
+				{
+					DOF_ITEM& it = var.m_dof[j];
+						if (strcmp(it.sz, szdof) == 0) return it.ndof;
+				}
 		}
 	}
 	return -1;
@@ -398,7 +401,7 @@ void DOFS::GetDOFList(int nvar, std::vector<int>& dofs)
 }
 
 //-----------------------------------------------------------------------------
-bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
+bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs, const char* szvar)
 {
 	const char* ch = sz;
 	char szdof[8] = {0}, *c = szdof;
@@ -407,7 +410,7 @@ bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 		if ((*ch==',')||(*ch==0))
 		{
 			*c = 0;
-			int ndof = GetDOF(szdof);
+			int ndof = GetDOF(szdof, szvar);
 			if (ndof != -1) dofs.push_back(ndof); else return false;
 			c = szdof;
 			if (*ch != 0) ch++; else ch = 0;

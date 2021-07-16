@@ -114,7 +114,7 @@ void FENodalIC::Serialize(DumpStream& ar)
 
 //======================================================================================
 BEGIN_FECORE_CLASS(FEInitialDOF, FENodalIC)
-	ADD_PARAMETER(m_dof, "dof", 0, "@dof_list");
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 

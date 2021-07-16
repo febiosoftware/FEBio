@@ -30,10 +30,5 @@ class FEFixedShellDisplacement : public FEFixedBC
 {
 public:
 	FEFixedShellDisplacement(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	bool	m_b[3];
 };

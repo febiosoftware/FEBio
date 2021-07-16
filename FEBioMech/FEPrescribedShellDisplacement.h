@@ -30,11 +30,6 @@ class FEPrescribedShellDisplacement : public FEPrescribedDOF
 {
 public:
 	FEPrescribedShellDisplacement(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	int	m_comp;
 };
 

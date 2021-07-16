@@ -32,7 +32,7 @@ SOFTWARE.*/
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedConcentration, FEBoundaryCondition)
-	ADD_PARAMETER(m_sol, "solute", 0, "$(Solutes)");
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
 	ADD_PARAMETER(m_scale, "value");
 	ADD_PARAMETER(m_brelative, "relative");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
@@ -40,19 +40,4 @@ END_FECORE_CLASS();
 
 FEPrescribedConcentration::FEPrescribedConcentration(FEModel* fem) : FEPrescribedDOF(fem)
 {
-	m_sol = -1;
-}
-
-bool FEPrescribedConcentration::Init()
-{
-	int nsol = m_sol - 1;
-	if (nsol < 0) return false;
-
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	int nvar = dofs.GetVariableIndex("concentration");
-	int ndof = dofs.GetDOF(nvar, nsol);
-	assert(ndof >= 0);
-	SetDOF(ndof);
-	return FEPrescribedDOF::Init();
 }

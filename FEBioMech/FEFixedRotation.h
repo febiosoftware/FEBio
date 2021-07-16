@@ -30,10 +30,5 @@ class FEFixedRotation : public FEFixedBC
 {
 public:
 	FEFixedRotation(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	bool	m_b[3];
 };

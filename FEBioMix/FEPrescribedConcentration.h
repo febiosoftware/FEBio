@@ -31,10 +31,5 @@ class FEBIOMIX_API FEPrescribedConcentration : public FEPrescribedDOF
 {
 public:
 	FEPrescribedConcentration(FEModel* fem);
-	bool Init() override;
 	DECLARE_FECORE_CLASS();
-
-private:
-	int	m_sol;
 };
-

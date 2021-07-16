@@ -36,7 +36,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_scale, "scale");
-	ADD_PARAMETER(m_dof  , "dof", 0, "@dof_list");
+	ADD_PARAMETER(m_dof  , "dof", 0, "$(dof_list)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

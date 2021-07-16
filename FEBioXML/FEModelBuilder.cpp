@@ -466,9 +466,9 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varAF, 0, "afx");
 	dofs.SetDOFName(varAF, 1, "afy");
 	dofs.SetDOFName(varAF, 2, "afz");
-	int varEF = dofs.AddVariable("fluid dilation");
+	int varEF = dofs.AddVariable("fluid dilatation");
 	dofs.SetDOFName(varEF, 0, "ef");
-	int varAEF = dofs.AddVariable("fluid dilation tderiv");
+	int varAEF = dofs.AddVariable("fluid dilatation tderiv");
 	dofs.SetDOFName(varAEF, 0, "aef");
 	int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
 	dofs.SetDOFName(varQV, 0, "svx");

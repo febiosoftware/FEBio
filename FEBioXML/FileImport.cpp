@@ -309,31 +309,42 @@ bool is_number(const char* sz)
 bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 {
 	// get the enums
-	const char* ch = pp->enums();
-	if (ch == nullptr) return false;
+	const char* szenums = pp->enums();
+	if (szenums == nullptr) return false;
 
 	// special cases
-	if (strcmp(ch, "@dof_list") == 0)
+	if (szenums[0] == '$')
 	{
-		DOFS& dofs = GetFEModel()->GetDOFS();
-		if (pp->type() == FE_PARAM_INT)
-		{
-			int ndof = dofs.GetDOF(val);
-			if (ndof < 0) return false;
+		char var[256] = { 0 };
+		const char* chl = strchr(szenums, '('); assert(chl);
+		const char* chr = strchr(szenums, ')'); assert(chr);
+		strncpy(var, chl + 1, chr - chl - 1);
 
-			pp->value<int>() = ndof;
-			return true;
-		}
-		else if (pp->type() == FE_PARAM_STD_VECTOR_INT)
+		if (strncmp(var, "dof_list", 8) == 0)
 		{
-			std::vector<int>& v = pp->value<std::vector<int> >();
-			return dofs.ParseDOFString(val, v);
+			DOFS& dofs = GetFEModel()->GetDOFS();
+			const char* szvar = nullptr;
+			if (var[8] == ':') szvar = var + 9;
+
+			if (pp->type() == FE_PARAM_INT)
+			{
+				int ndof = dofs.GetDOF(val, szvar);
+				if (ndof < 0) return false;
+				pp->value<int>() = ndof;
+				return true;
+			}
+			else if (pp->type() == FE_PARAM_STD_VECTOR_INT)
+			{
+				std::vector<int>& v = pp->value<std::vector<int> >();
+				return dofs.ParseDOFString(val, v, szvar);
+			}
+			else return false;
 		}
 		else return false;
 	}
-	else if (strncmp(ch, "@factory_list", 13) == 0)
+	else if (strncmp(szenums, "@factory_list", 13) == 0)
 	{
-		int classID = atoi(ch + 14);
+		int classID = atoi(szenums + 14);
 
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		for (int i = 0; i < fecore.FactoryClasses(); ++i)
@@ -355,7 +366,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 	{
 	case FE_PARAM_INT:
 	{
-		int n = enumValue(val, ch);
+		int n = enumValue(val, szenums);
 		if (n != -1) pp->value<int>() = n;
 		else
 		{
@@ -376,7 +387,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		const char* tmp = val;
 		while (tmp)
 		{
-			int n = enumValue(tmp, ch);
+			int n = enumValue(tmp, szenums);
 			v.push_back(n);
 			tmp = strchr(tmp, ',');
 			if (tmp) tmp++;

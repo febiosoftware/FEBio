@@ -154,7 +154,7 @@ void FENodalLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalDOFLoad, FENodalLoad)
-	ADD_PARAMETER(m_dof, "dof", 0, "@dof_list");
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_scale, "scale");
 END_FECORE_CLASS();
 

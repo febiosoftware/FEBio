@@ -30,11 +30,5 @@ class FEPrescribedFluidVelocity : public FEPrescribedDOF
 {
 public:
 	FEPrescribedFluidVelocity(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	int	m_comp;
 };
-

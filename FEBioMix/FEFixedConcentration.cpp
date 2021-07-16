@@ -28,24 +28,10 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedConcentration, FEBoundaryCondition)
-	ADD_PARAMETER(m_sol, "solute", 0, "$(Solutes)");
+	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:concentration)");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEFixedConcentration::FEFixedConcentration(FEModel* fem) : FEFixedBC(fem)
 {
-	m_sol = 0;
-}
-
-bool FEFixedConcentration::Init()
-{
-	int nsol = m_sol - 1;
-	if (nsol < 0) return false;
-
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	int nvar = dofs.GetVariableIndex("concentration");
-	m_dofs.push_back(dofs.GetDOF(nvar, nsol));
-	return FEFixedBC::Init();
 }

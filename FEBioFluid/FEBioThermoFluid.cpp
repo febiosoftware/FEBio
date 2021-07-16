@@ -51,8 +51,8 @@ const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARI
     case DISPLACEMENT                : return "displacement"               ; break;
     case RELATIVE_FLUID_VELOCITY     : return "relative fluid velocity"    ; break;
     case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
-    case FLUID_DILATATION            : return "fluid dilation"             ; break;
-    case FLUID_DILATATION_TDERIV     : return "fluid dilation tderiv"      ; break;
+    case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+    case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
     case TEMPERATURE                 : return "temperature"                ; break;
     case TEMPERATURE_TDERIV          : return "temperature tderiv"         ; break;
     }

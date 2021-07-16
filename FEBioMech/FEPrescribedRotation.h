@@ -30,10 +30,5 @@ class FEPrescribedRotation : public FEPrescribedDOF
 {
 public:
 	FEPrescribedRotation(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	int	m_comp;
 };

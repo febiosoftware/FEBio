@@ -30,10 +30,5 @@ class FEPrescribedDisplacement : public FEPrescribedDOF
 {
 public:
 	FEPrescribedDisplacement(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	int	m_comp;
 };

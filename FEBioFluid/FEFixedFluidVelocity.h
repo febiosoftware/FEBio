@@ -30,11 +30,5 @@ class FEFixedFluidVelocity : public FEFixedBC
 {
 public:
 	FEFixedFluidVelocity(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	bool	m_b[3];
 };
-

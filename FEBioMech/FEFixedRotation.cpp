@@ -28,26 +28,10 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedRotation, FEBoundaryCondition)
-	ADD_PARAMETER(m_b[0], "x_rotation");
-	ADD_PARAMETER(m_b[1], "y_rotation");
-	ADD_PARAMETER(m_b[2], "z_rotation");
+	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:shell rotation)");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEFixedRotation::FEFixedRotation(FEModel* fem) : FEFixedBC(fem)
 {
-	m_b[0] = false;
-	m_b[1] = false;
-	m_b[2] = false;
-}
-
-bool FEFixedRotation::Init()
-{
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	if (m_b[0]) m_dofs.push_back(dofs.GetDOF("u"));
-	if (m_b[1]) m_dofs.push_back(dofs.GetDOF("v"));
-	if (m_b[2]) m_dofs.push_back(dofs.GetDOF("w"));
-	return FEFixedBC::Init();
 }

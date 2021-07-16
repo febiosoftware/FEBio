@@ -56,8 +56,8 @@ const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
 	case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
 	case FLUID_VELOCITY              : return "fluid velocity"             ; break;
 	case FLUID_ACCELERATION          : return "fluid acceleration"         ; break;
-	case FLUID_DILATATION            : return "fluid dilation"             ; break;
-	case FLUID_DILATATION_TDERIV     : return "fluid dilation tderiv"      ; break;
+	case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+	case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
 	}
 	assert(false);
 	return nullptr;

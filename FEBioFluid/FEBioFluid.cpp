@@ -80,9 +80,9 @@ const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
 	{
 	case DISPLACEMENT                    : return "displacement"                        ; break;
 	case RELATIVE_FLUID_VELOCITY         : return "relative fluid velocity"             ; break;
-	case FLUID_DILATATION                : return "fluid dilation"                      ; break;
+	case FLUID_DILATATION                : return "fluid dilatation"                    ; break;
 	case RELATIVE_FLUID_ACCELERATION     : return "relative fluid acceleration"         ; break;
-	case FLUID_DILATATION_TDERIV         : return "fluid dilation tderiv"               ; break;
+	case FLUID_DILATATION_TDERIV         : return "fluid dilatation tderiv"             ; break;
 	}
 	assert(false);
 	return nullptr;

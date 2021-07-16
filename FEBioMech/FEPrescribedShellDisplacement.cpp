@@ -32,7 +32,7 @@ SOFTWARE.*/
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedShellDisplacement, FEBoundaryCondition)
-	ADD_PARAMETER(m_comp, "dof", 0, "sx-displacement\0sy-displacement\0sz-displacement\0");
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:shell displacement)");
 	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH);
 	ADD_PARAMETER(m_brelative, "relative");
 
@@ -41,20 +41,4 @@ END_FECORE_CLASS();
 
 FEPrescribedShellDisplacement::FEPrescribedShellDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
 {
-	m_comp = 0;
-}
-
-bool FEPrescribedShellDisplacement::Init()
-{
-	FEModel* fem = GetFEModel();
-	int ndof = -1;
-	switch (m_comp)
-	{
-	case 0: ndof = fem->GetDOFIndex("sx"); break;
-	case 1: ndof = fem->GetDOFIndex("sy"); break;
-	case 2: ndof = fem->GetDOFIndex("sz"); break;
-	}
-	assert(ndof >= 0);
-	SetDOF(ndof);
-	return FEPrescribedDOF::Init();
 }

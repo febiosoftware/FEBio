@@ -30,10 +30,5 @@ class FEFixedDisplacement : public FEFixedBC
 {
 public:
 	FEFixedDisplacement(FEModel* fem);
-	bool Init() override;
-
 	DECLARE_FECORE_CLASS();
-
-private:
-	bool	m_b[3];
 };

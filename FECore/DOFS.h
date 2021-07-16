@@ -131,7 +131,7 @@ public:
 
 	//! return a dof index from the dof symbol
 	//! this function returns -1 if the symbol is not recognized
-	int GetDOF(const char* szdof);
+	int GetDOF(const char* szdof, const char* varName = nullptr);
 
 	//! return a list of dofs for a variable
 	void GetDOFList(const char* varName, std::vector<int>& dofs);
@@ -140,7 +140,7 @@ public:
 	void GetDOFList(int nvar, std::vector<int>& dofs);
 
 	//! return a list of dofs from comma seperated list dof symbols
-	bool ParseDOFString(const char* sz, std::vector<int>& dofs);
+	bool ParseDOFString(const char* sz, std::vector<int>& dofs, const char* varName = nullptr);
 
 	//! return a dof index from a variable
 	//! this function returns -1 if the symbol is not recognized

@@ -31,9 +31,5 @@ class FEBIOMIX_API FEFixedConcentration : public FEFixedBC
 {
 public:
 	FEFixedConcentration(FEModel* fem);
-	bool Init() override;
 	DECLARE_FECORE_CLASS();
-
-private:
-	int	m_sol;	// solute ID
 };

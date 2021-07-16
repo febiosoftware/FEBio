@@ -28,26 +28,10 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedShellDisplacement, FEBoundaryCondition)
-	ADD_PARAMETER(m_b[0], "x_shell_displacement");
-	ADD_PARAMETER(m_b[1], "y_shell_displacement");
-	ADD_PARAMETER(m_b[2], "z_shell_displacement");
+	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:shell displacement)");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEFixedShellDisplacement::FEFixedShellDisplacement(FEModel* fem) : FEFixedBC(fem)
 {
-	m_b[0] = false;
-	m_b[1] = false;
-	m_b[2] = false;
-}
-
-bool FEFixedShellDisplacement::Init()
-{
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
-	m_dofs.clear();
-	if (m_b[0]) m_dofs.push_back(dofs.GetDOF("sx"));
-	if (m_b[1]) m_dofs.push_back(dofs.GetDOF("sy"));
-	if (m_b[2]) m_dofs.push_back(dofs.GetDOF("sz"));
-	return FEFixedBC::Init();
 }
