@@ -38,6 +38,13 @@ BEGIN_FECORE_CLASS(FENewtonianViscousSolid, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FENewtonianViscousSolid::FENewtonianViscousSolid(FEModel* pfem) : FEElasticMaterial(pfem) 
+{
+    m_kappa = 0.0;
+    m_mu = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FENewtonianViscousSolid::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

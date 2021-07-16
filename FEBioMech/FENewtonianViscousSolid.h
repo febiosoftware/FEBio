@@ -32,7 +32,7 @@ SOFTWARE.*/
 class FENewtonianViscousSolid : public FEElasticMaterial
 {
 public:
-    FENewtonianViscousSolid(FEModel* pfem) : FEElasticMaterial(pfem) {}
+    FENewtonianViscousSolid(FEModel* pfem);
     
 public:
     double	m_kappa;	//!< bulk viscosity
