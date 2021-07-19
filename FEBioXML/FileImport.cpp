@@ -340,6 +340,12 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 			}
 			else return false;
 		}
+		else if (strcmp(var, "Solutes") == 0)
+		{
+			int n = atoi(val);
+			pp->value<int>() = n;
+			return true;
+		}
 		else return false;
 	}
 	else if (strncmp(szenums, "@factory_list", 13) == 0)
