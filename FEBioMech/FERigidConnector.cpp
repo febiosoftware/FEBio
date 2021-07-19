@@ -33,8 +33,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidConnector, FENLConstraint);
-	ADD_PARAMETER(m_nRBa, "body_a"        );
-	ADD_PARAMETER(m_nRBb, "body_b"        );
+	// NOTE: We hide these parameters since FEBio Studio already implements
+	// a mechanism for assigning the rigid bodies.
+	ADD_PARAMETER(m_nRBa, "body_a"        )->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_nRBb, "body_b"        )->SetFlags(FE_PARAM_HIDDEN);
 END_FECORE_CLASS();
 
 int FERigidConnector::m_ncount = 0;

@@ -30,13 +30,29 @@ SOFTWARE.*/
 #include <FECore/FEBoundaryCondition.h>
 #include "febiomech_api.h"
 
+class FERigidBody;
+
 //-----------------------------------------------------------------------------
 class FEBIOMECH_API FERigidBC : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
 
 public:
-	FERigidBC(FEModel* fem) : FEModelComponent(fem) {}
+	FERigidBC(FEModel* fem);
+
+	bool Init() override;
+
+	void Activate() override;
+
+	void Serialize(DumpStream& ar);
+
+	FERigidBody& GetRigidBody();
+
+private:
+	int		m_rigidMat;		// rigid material ID
+	int		m_rb;			// rigid body ID
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -55,12 +71,10 @@ public:
 	void Deactivate() override;
 
 public:
-	int				m_rigidMat;	//!< rigid body material ID
 	vector<int>		m_dofs;		//!< constrained dof list
 
 private:
 	bool	m_binit;
-	int		m_rb;		//!< rigid body's ID
 
 	DECLARE_FECORE_CLASS();
 };
@@ -85,9 +99,6 @@ public:
 
 	void Deactivate() override;
 
-	void SetID(int id) { m_rigidMat = id; }
-	int GetID() const { return m_rigidMat; }
-
 	void SetBC(int bc) { m_dof = bc; }
 	int GetBC() const { return m_dof; }
 
@@ -97,7 +108,6 @@ public:
 	void SetValue(double v) { m_val = v; }
 
 private:
-	int		m_rigidMat;		//!< rigid body material id
 	int		m_dof;		//!< displacement direction
 	double	m_val;	//!< displacement value
 	double	m_ref;	//!< reference value for relative displacement
@@ -124,12 +134,9 @@ class FEBIOMECH_API FERigidBodyVelocity : public FERigidIC
 public:
 	FERigidBodyVelocity(FEModel* pfem);
 
-	bool Init() override;
-
 	void Activate() override;
 
 public:
-	int		m_rid;	//!< rigid body ID
 	vec3d	m_vel;	//!< initial velocity
 
 	DECLARE_FECORE_CLASS();
@@ -142,12 +149,9 @@ class FEBIOMECH_API FERigidBodyAngularVelocity : public FERigidIC
 public:
 	FERigidBodyAngularVelocity(FEModel* pfem);
 
-	bool Init() override;
-
 	void Activate() override;
 
 public:
-	int		m_rid;	//!< rigid body ID
 	vec3d	m_w;	//!< value
 
 	DECLARE_FECORE_CLASS();

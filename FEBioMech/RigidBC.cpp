@@ -37,27 +37,65 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FERigidBC, FERIGIDBC_ID);
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FERigidBC, FEModelComponent)
+	// NOTE: This parameter is hidden, since FEBio Studio implements its own mechanism
+	//       for assigning the rigid material ID.
+	ADD_PARAMETER(m_rigidMat, "rb")->SetFlags(FE_PARAM_HIDDEN);
+END_FECORE_CLASS();
+
+FERigidBC::FERigidBC(FEModel* fem) : FEModelComponent(fem)
+{
+	m_rigidMat = -1;
+	m_rb = -1;
+}
+
+bool FERigidBC::Init()
+{
+	// Make sure the rigid material ID is valid
+	FEModel& fem = *GetFEModel();
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
+	if (pm == nullptr) return false;
+
+	return FEModelComponent::Init();
+}
+
+void FERigidBC::Activate()
+{
+	// Get the Rigidbody ID
+	FEModel& fem = *GetFEModel();
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1)); assert(pm);
+	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
+
+	FEModelComponent::Activate();
+}
+
+void FERigidBC::Serialize(DumpStream& ar)
+{
+	ar & m_rb;
+	FEModelComponent::Serialize(ar);
+}
+
+FERigidBody& FERigidBC::GetRigidBody()
+{
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidBody& RB = *fem.GetRigidBody(m_rb);
+	return RB;
+}
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FERigidBodyFixedBC, FERigidBC)
-	ADD_PARAMETER(m_rigidMat, "rb");
 	ADD_PARAMETER(m_dofs, "dofs", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidBodyFixedBC::FERigidBodyFixedBC(FEModel* pfem) : FERigidBC(pfem)
 {
-	m_rigidMat = -1;
-	m_rb = -1;
 	m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
 bool FERigidBodyFixedBC::Init()
 {
-	// Make sure the rigid material ID is valid
-	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat -1));
-	if (pm == 0) return false;
-
 	// make sure we have a valid dof
 	for (int i = 0; i < m_dofs.size(); ++i)
 	{
@@ -74,16 +112,10 @@ void FERigidBodyFixedBC::Activate()
 {
 	FERigidBC::Activate();
 
-	// Get the Rigidbody ID
-	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1)); assert(pm);
-	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
-
 	if (m_binit == false) Init();
 	if (m_binit)
 	{
-		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidBody& RB = *fem.GetRigidBody(m_rb);
+		FERigidBody& RB = GetRigidBody();
 
 		// we only fix the open dofs. If a user accidentally applied a fixed and prescribed
 		// rigid degree of freedom, then we make sure the prescribed takes precedence.
@@ -100,8 +132,7 @@ void FERigidBodyFixedBC::Deactivate()
 {
 	if (m_binit)
 	{
-		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidBody& RB = *fem.GetRigidBody(m_rb);
+		FERigidBody& RB = GetRigidBody();
 
 		// Since fixed rigid dofs can be overwritten by prescribed dofs, 
 		// we have to make sure that this dof is actually a fixed dof.
@@ -111,20 +142,21 @@ void FERigidBodyFixedBC::Deactivate()
 			if (RB.m_BC[dof_i] == DOF_FIXED) RB.m_BC[dof_i] = DOF_OPEN;
 		}
 	}
+
+	FERigidBC::Deactivate();
 }
 
 //-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FERigidBC::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_dofs & m_rigidMat & m_binit & m_rb;
+	ar & m_dofs & m_binit;
 }
 
 //-----------------------------------------------------------------------------
 
 BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FERigidBC)
-	ADD_PARAMETER(m_rigidMat, "rb");
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_val, "value");
 	ADD_PARAMETER(m_brel, "relative");
@@ -132,7 +164,6 @@ END_FECORE_CLASS();
 
 FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FERigidBC(pfem)
 {
-	m_rigidMat = -1;
 	m_dof = -1;
 	m_val = 0.0;
 	m_ref= 0.0; 
@@ -143,29 +174,22 @@ FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FERigidBC(pfem
 //-----------------------------------------------------------------------------
 bool FERigidBodyDisplacement::Init()
 {
-	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
-	if (pm == 0) return false;
-	m_rigidMat = pm->GetRigidBodyID(); if (m_rigidMat < 0) return false;
-
 	// make sure we have a valid dof
 	if ((m_dof < 0)||(m_dof >=6)) return false;
-
 	m_binit = true;
-	return true;
+	return FERigidBC::Init();
 }
 
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Activate()
 {
 	// don't forget to call the base class
-	FEModelComponent::Activate();
+	FERigidBC::Activate();
 
 	if (m_binit == false) Init();
 
 	// get the rigid body
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidBody& RB = *fem.GetRigidBody(m_rigidMat);
+	FERigidBody& RB = GetRigidBody();
 
 	// set some stuff
 	RB.m_pDC[m_dof] = this;
@@ -194,15 +218,14 @@ void FERigidBodyDisplacement::Activate()
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Deactivate()
 {
-	FEModelComponent::Deactivate();
+	FERigidBC::Deactivate();
 
 	// get the rigid body
 	// Since Deactivate is called before Init (for multi-step analysis; in the FEBio input)
 	// we have to make sure the data is initialized
 	if (m_binit)
 	{
-		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-		FERigidBody& RB = *fem.GetRigidBody(m_rigidMat);
+		FERigidBody& RB = GetRigidBody();
 
 		// turn off the prescribed displacement
 		RB.m_pDC[m_dof] = 0;
@@ -215,7 +238,7 @@ void FERigidBodyDisplacement::Serialize(DumpStream& ar)
 {
 	FERigidBC::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_dof & m_rigidMat & m_ref & m_binit & m_brel;
+	ar & m_dof & m_ref & m_binit & m_brel;
 }
 
 //-----------------------------------------------------------------------------
@@ -227,8 +250,7 @@ double FERigidBodyDisplacement::Value()
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::InitTimeStep()
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidBody& RB = *fem.GetRigidBody(GetID());
+	FERigidBody& RB = GetRigidBody();
 	int I = GetBC();
 	RB.m_dul[I] = Value() - RB.m_Ut[I];
 }
@@ -241,63 +263,38 @@ FERigidIC::FERigidIC(FEModel* fem) : FERigidBC(fem)
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidBodyVelocity, FERigidBC)
-	ADD_PARAMETER(m_rid, "rb");
 	ADD_PARAMETER(m_vel, "value");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidBodyVelocity::FERigidBodyVelocity(FEModel* pfem) : FERigidIC(pfem) 
 {
-	m_rid = -1;
 	m_vel = vec3d(0, 0, 0);
-}
-
-//-----------------------------------------------------------------------------
-bool FERigidBodyVelocity::Init()
-{
-	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rid - 1));
-	if (pm == 0) return false;
-	m_rid = pm->GetRigidBodyID(); if (m_rid < 0) return false;
-	return true;
 }
 
 //-----------------------------------------------------------------------------
 void FERigidBodyVelocity::Activate()
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidBody& RB = *fem.GetRigidBody(m_rid);
-
+	FERigidIC::Activate();
+	FERigidBody& RB = GetRigidBody();
 	RB.m_vp = RB.m_vt = m_vel;
 }
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidBodyAngularVelocity, FERigidBC)
-	ADD_PARAMETER(m_rid, "rb");
 	ADD_PARAMETER(m_w, "value");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidBodyAngularVelocity::FERigidBodyAngularVelocity(FEModel* pfem) : FERigidIC(pfem)
 {
-	m_rid = -1;
 	m_w = vec3d(0, 0, 0);
-}
-
-//-----------------------------------------------------------------------------
-bool FERigidBodyAngularVelocity::Init()
-{
-	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rid - 1));
-	if (pm == 0) return false;
-	m_rid = pm->GetRigidBodyID(); if (m_rid < 0) return false;
-	return true;
 }
 
 //-----------------------------------------------------------------------------
 void FERigidBodyAngularVelocity::Activate()
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FERigidBody& RB = *fem.GetRigidBody(m_rid);
+	FERigidIC::Activate();
+	FERigidBody& RB = GetRigidBody();
 	RB.m_wp = RB.m_wt = m_w;
 }

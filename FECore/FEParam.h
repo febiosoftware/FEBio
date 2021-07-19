@@ -71,7 +71,8 @@ enum FEParamType {
 // Parameter flags
 enum FEParamFlag {
 	FE_PARAM_ATTRIBUTE = 0x01,		// parameter will be read as attribute
-	FE_PARAM_USER      = 0x02		// user parameter (owned by parameter list)	
+	FE_PARAM_USER      = 0x02,		// user parameter (owned by parameter list)	
+	FE_PARAM_HIDDEN	   = 0x04		// Hides parameter (in FEBio Studio)
 };
 
 class FEParam;
