@@ -180,6 +180,9 @@ public:
 	// set the valuator
 	void setValuator(FEMat3dsValuator* val);
 
+	// get the valuator
+	FEMat3dsValuator* valuator();
+
 	// evaluate the parameter at a material point
 	mat3ds operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
 

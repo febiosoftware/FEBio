@@ -214,6 +214,11 @@ void FEParamMat3ds::setValuator(FEMat3dsValuator* val)
 	if (val) val->SetModelParam(this);
 }
 
+FEMat3dsValuator* FEParamMat3ds::valuator()
+{
+	return m_val;
+}
+
 void FEParamMat3ds::Serialize(DumpStream& ar)
 {
 	FEModelParam::Serialize(ar);

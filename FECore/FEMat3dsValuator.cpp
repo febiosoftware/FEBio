@@ -59,6 +59,10 @@ FEMat3dsValuator* FEConstValueMat3ds::copy()
 // FEMappedValueMat3ds
 //-----------------------------------------------------------------------------
 
+BEGIN_FECORE_CLASS(FEMappedValueMat3ds, FEMat3dsValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
+
 FEMappedValueMat3ds::FEMappedValueMat3ds(FEModel* fem) : FEMat3dsValuator(fem)
 {
 	m_val = nullptr;
