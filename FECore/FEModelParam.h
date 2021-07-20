@@ -111,6 +111,7 @@ public:
 
 	// set the valuator
 	void setValuator(FEVec3dValuator* val);
+	FEVec3dValuator* valuator();
 
 	// evaluate the parameter at a material point
 	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }

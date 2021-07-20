@@ -222,5 +222,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 private:
-	FEDataMap*	m_val;
+	std::string	m_mapName;
+
+private:
+	FEDataMap* m_val;
+
+	DECLARE_FECORE_CLASS();
 };

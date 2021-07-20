@@ -132,6 +132,11 @@ void FEParamVec3::setValuator(FEVec3dValuator* val)
 	if (val) val->SetModelParam(this);
 }
 
+FEVec3dValuator* FEParamVec3::valuator()
+{
+	return m_val;
+}
+
 void FEParamVec3::Serialize(DumpStream& ar)
 {
 	FEModelParam::Serialize(ar);

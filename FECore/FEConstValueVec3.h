@@ -90,7 +90,12 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 private:
+	std::string		m_mapName;
+
+private:
 	FEDataMap*		m_val;
+
+	DECLARE_FECORE_CLASS();
 };
 
 

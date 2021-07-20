@@ -469,6 +469,11 @@ void FEMat3dVectorMap::Serialize(DumpStream &ar)
 // FEMappedValueMat3d
 //-----------------------------------------------------------------------------
 
+BEGIN_FECORE_CLASS(FEMappedValueMat3d, FEMat3dValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
+
+
 FEMappedValueMat3d::FEMappedValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 {
 	m_val = nullptr;

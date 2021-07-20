@@ -106,6 +106,9 @@ FEVec3dValuator* FEMathValueVec3::copy()
 }
 
 //---------------------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEMappedValueVec3, FEVec3dValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
 
 FEMappedValueVec3::FEMappedValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
