@@ -140,10 +140,17 @@ bool FEFluidNormalVelocity::Init()
             }
         }
         
-        // count number of non-boundary nodes
+        // store boundary nodes for which the velocity DOFs are fixed
+        // which defines the rim on which the dilatation needs to be prescribed
         m_rim.reserve(ps->Nodes());
         for (int i=0; i<ps->Nodes(); ++i)
-            if (boundary[i]) m_rim.push_back(i);
+            if (boundary[i]) {
+                FENode& node = ps->Node(i);
+                if ((node.get_bc(m_dofW[0]) == DOF_FIXED) &&
+                    (node.get_bc(m_dofW[1]) == DOF_FIXED) &&
+                    (node.get_bc(m_dofW[2]) == DOF_FIXED))
+                    m_rim.push_back(i);
+            }
         
         if (m_rim.size() == ps->Nodes())
         {
@@ -287,6 +294,16 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
             }
         }
     }
+
+    // only consider nodes with completely fixed fluid velocity as boundary nodes
+    for (int i=0; i<ps->Nodes(); ++i)
+        if (boundary[i]) {
+            FENode& node = ps->Node(i);
+            if ((node.get_bc(m_dofW[0]) != DOF_FIXED) ||
+                (node.get_bc(m_dofW[1]) != DOF_FIXED) ||
+                (node.get_bc(m_dofW[2]) != DOF_FIXED))
+                boundary[i] = false;
+        }
     
     // count number of non-boundary nodes
     int neq = 0;
