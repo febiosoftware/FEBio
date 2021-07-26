@@ -117,48 +117,6 @@ bool FEFluidNormalVelocity::Init()
     m_dof.AddDofs(m_dofW);
     m_dof.AddDof(m_dofEF);
 
-    
-    // Set up data structure for setting rim pressure
-    if (m_brim) {
-        // find rim nodes (rim)
-        FEElemElemList EEL;
-        FESurface* ps = &GetSurface();
-        EEL.Create(ps);
-        
-        vector<bool> boundary(ps->Nodes(), false);
-        for (int i=0; i<ps->Elements(); ++i) {
-            FESurfaceElement& el = ps->Element(i);
-            for (int j=0; j<el.facet_edges(); ++j) {
-                FEElement* nel = EEL.Neighbor(i, j);
-                if (nel == nullptr) {
-                    int en[3] = {-1,-1,-1};
-                    el.facet_edge(j, en);
-                    boundary[en[0]] = true;
-                    boundary[en[1]] = true;
-                    if (en[2] > -1) boundary[en[2]] = true;
-                }
-            }
-        }
-        
-        // store boundary nodes for which the velocity DOFs are fixed
-        // which defines the rim on which the dilatation needs to be prescribed
-        m_rim.reserve(ps->Nodes());
-        for (int i=0; i<ps->Nodes(); ++i)
-            if (boundary[i]) {
-                FENode& node = ps->Node(i);
-                if ((node.get_bc(m_dofW[0]) == DOF_FIXED) &&
-                    (node.get_bc(m_dofW[1]) == DOF_FIXED) &&
-                    (node.get_bc(m_dofW[2]) == DOF_FIXED))
-                    m_rim.push_back(i);
-            }
-        
-        if (m_rim.size() == ps->Nodes())
-        {
-            feLogError("Unable to set rim pressure\n");
-            return false;
-        }
-    }
-
     return true;
 }
 
@@ -226,6 +184,46 @@ void FEFluidNormalVelocity::Activate()
 		m_VN[i] /= nf[i];
 	}
 
+    // Set up data structure for setting rim pressure
+    if (m_brim) {
+        // find rim nodes (rim)
+        FEElemElemList EEL;
+        FESurface* ps = &GetSurface();
+        EEL.Create(ps);
+        
+        vector<bool> boundary(ps->Nodes(), false);
+        for (int i=0; i<ps->Elements(); ++i) {
+            FESurfaceElement& el = ps->Element(i);
+            for (int j=0; j<el.facet_edges(); ++j) {
+                FEElement* nel = EEL.Neighbor(i, j);
+                if (nel == nullptr) {
+                    int en[3] = {-1,-1,-1};
+                    el.facet_edge(j, en);
+                    boundary[en[0]] = true;
+                    boundary[en[1]] = true;
+                    if (en[2] > -1) boundary[en[2]] = true;
+                }
+            }
+        }
+        
+        // store boundary nodes for which the velocity DOFs are fixed
+        // which defines the rim on which the dilatation needs to be prescribed
+        m_rim.reserve(ps->Nodes());
+        for (int i=0; i<ps->Nodes(); ++i)
+            if (boundary[i]) {
+                FENode& node = ps->Node(i);
+                if ((node.get_bc(m_dofW[0]) == DOF_FIXED) &&
+                    (node.get_bc(m_dofW[1]) == DOF_FIXED) &&
+                    (node.get_bc(m_dofW[2]) == DOF_FIXED))
+                    m_rim.push_back(i);
+            }
+        
+        if (m_rim.size() == ps->Nodes())
+        {
+            feLogError("Unable to set rim pressure\n");
+        }
+    }
+    
 	// Set parabolic velocity profile if requested.
 	// This will override velocity boundary cards in m_VC
 	// and nodal cards in m_VN
@@ -295,7 +293,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
         }
     }
 
-    // only consider nodes with completely fixed fluid velocity as boundary nodes
+    // only consider nodes with fixed fluid velocity as boundary nodes
     for (int i=0; i<ps->Nodes(); ++i)
         if (boundary[i]) {
             FENode& node = ps->Node(i);
