@@ -9650,7 +9650,7 @@ mixture
 , and the form adopted in FEBio is
 \begin_inset Formula 
 \begin{equation}
-p=K\left(\frac{1}{J^{f}}-1\right)=-\frac{Ke^{f}}{1+e^{f}}\,,\label{eq:bfsi-pressure-state}
+p=-Ke^{f}\,,\label{eq:bfsi-pressure-state}
 \end{equation}
 
 \end_inset
@@ -13803,7 +13803,7 @@ where
  is the spatial elasticity tensor of the mixture, 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}=\boldsymbol{\mathcal{C}}^{e}-\left(\tilde{p}+R\theta\,\Phi\sum\limits _{\beta}\tilde{\kappa}^{\beta}\tilde{c}^{\beta}\right)\left(\mathbf{I}\otimes\mathbf{I}-2\mathbf{I}\,\overline{\underline{\otimes}}\,\mathbf{I}\right)-R\theta\sum\limits _{\beta}\tilde{c}^{\beta}\,J\frac{\partial\left(\Phi\tilde{\kappa}^{\beta}\right)}{\partial J}\mathbf{I}\otimes\mathbf{I}\,,\label{eq293}
+\boldsymbol{\mathcal{C}}=\boldsymbol{\mathcal{C}}^{e}-\left(\tilde{p}+R\theta\,\Phi\sum\limits _{\beta}\tilde{\kappa}^{\beta}\tilde{c}^{\beta}\right)\left(\mathbf{I}\otimes\mathbf{I}-2\mathbf{I}\odot\mathbf{I}\right)-R\theta\sum\limits _{\beta}\tilde{c}^{\beta}\,J\frac{\partial\left(\Phi\tilde{\kappa}^{\beta}\right)}{\partial J}\mathbf{I}\otimes\mathbf{I}\,,\label{eq293}
 \end{equation}
 
 \end_inset
@@ -13815,7 +13815,7 @@ and
  is the spatial elasticity tensor of the solid matrix, 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{C}}^{e}=J^{-1}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):2\frac{\partial\mathbf{S}^{e}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right)\,.\label{eq294}
+\boldsymbol{\mathcal{C}}^{e}=J^{-1}\left(\mathbf{F}\oslash\mathbf{F}\right):2\frac{\partial\mathbf{S}^{e}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)\,.\label{eq294}
 \end{equation}
 
 \end_inset
@@ -13831,7 +13831,7 @@ D\left(\mathbf{W}\cdot\Grad\delta\tilde{p}\right)\left[\Delta\mathbf{u}\right]\,
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{w}_{u}^{\prime} & \equiv J-\left(\tilde{\boldsymbol{\mathcal{K}}}:\Delta\boldsymbol{\varepsilon}\right)\cdot\left(\grad\tilde{p}+R\theta\sum\limits _{\beta}\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\mathbf{d}^{\beta}\cdot\grad\tilde{c}^{\beta}\right)\\
+\begin{aligned}\mathbf{w}_{u}^{\prime} & \equiv-\left(\tilde{\boldsymbol{\mathcal{K}}}:\Delta\boldsymbol{\varepsilon}\right)\cdot\left(\grad\tilde{p}+R\theta\sum\limits _{\beta}\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\mathbf{d}^{\beta}\cdot\grad\tilde{c}^{\beta}\right)\\
  & -\tilde{\mathbf{k}}\cdot R\theta\sum\limits _{\beta}\left(\left[J\frac{\partial}{\partial J}\left(\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\right)-\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\right]\left(\divg\Delta\mathbf{u}\right)\mathbf{d}^{\beta}+\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\left(2\Delta\boldsymbol{\varepsilon}\cdot\mathbf{d}^{\beta}+\boldsymbol{\mathcal{D}}^{\beta}:\Delta\boldsymbol{\varepsilon}\right)\right)\cdot\grad\tilde{c}^{\beta}
 \end{aligned}
 \label{eq296}
@@ -13842,8 +13842,8 @@ where
 with 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\tilde{\boldsymbol{\mathcal{K}}} & =J^{-1}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):2\frac{\partial\tilde{\mathbf{K}}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right)\,,\\
-\boldsymbol{\mathcal{D}}^{\alpha} & =J^{-1}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):2\frac{\partial\mathbf{D}^{\alpha}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right)\,,
+\begin{aligned}\tilde{\boldsymbol{\mathcal{K}}} & =J^{-1}\left(\mathbf{F}\oslash\mathbf{F}\right):2\frac{\partial\tilde{\mathbf{K}}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)\,,\\
+\boldsymbol{\mathcal{D}}^{\alpha} & =J^{-1}\left(\mathbf{F}\oslash\mathbf{F}\right):2\frac{\partial\mathbf{D}^{\alpha}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)\,,
 \end{aligned}
 \label{eq297}
 \end{equation}
@@ -13895,7 +13895,7 @@ reference "eq231"
  is rather involved and it can be shown that 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\boldsymbol{\mathcal{K}}}=2\left(\tilde{\mathbf{k}}\otimes\mathbf{I}-2\tilde{\mathbf{k}}\,\overline{\underline{\otimes}}\,\mathbf{I}\right)-\left(\tilde{\mathbf{k}}\,\underline{\otimes}\,\tilde{\mathbf{k}}\right):\boldsymbol{\mathcal{G}}\,,\label{eq298}
+\tilde{\boldsymbol{\mathcal{K}}}=\left(\tilde{\mathbf{k}}\oslash\tilde{\mathbf{k}}\right):\left[\left(\mathbf{k}^{-1}\oslash\mathbf{k}^{-1}\right):\boldsymbol{\mathcal{K}}+\boldsymbol{\mathcal{G}}\right]\,,\label{eq298}
 \end{equation}
 
 \end_inset
@@ -13903,11 +13903,7 @@ reference "eq231"
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\boldsymbol{\mathcal{G}} & =2\left(\mathbf{k}^{-1}\otimes\mathbf{I}-2\mathbf{k}^{-1}\,\overline{\underline{\otimes}}\,\mathbf{I}\right)-\left(\mathbf{k}^{-1}\,\underline{\otimes}\,\mathbf{k}^{-1}\right):\boldsymbol{\mathcal{K}}\\
- & +R\theta\sum\limits _{\beta}\frac{\tilde{c}^{\beta}}{d_{0}^{\beta}}J\frac{\partial}{\partial J}\left(\frac{\tilde{\kappa}^{\beta}}{\varphi^{w}}\right)\left(\mathbf{I}-\frac{\mathbf{d}^{\beta}}{d_{0}^{\beta}}\right)\otimes\mathbf{I}\\
- & +R\theta\sum\limits _{\beta}\frac{\tilde{c}^{\beta}}{d_{0}}\frac{\tilde{\kappa}^{\beta}}{\varphi^{w}}\left(\mathbf{I}\otimes\mathbf{I}-2\mathbf{I}\,\underline{\otimes}\,\mathbf{I}-\frac{1}{d_{0}^{\beta}}\boldsymbol{\mathcal{D}}^{\beta}\right)
-\end{aligned}
-\label{eq299}
+\boldsymbol{\mathcal{K}}=J^{-1}\left(\mathbf{F}\oslash\mathbf{F}\right):2\frac{\partial\mathbf{K}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)\,,\label{eq300}
 \end{equation}
 
 \end_inset
@@ -13915,7 +13911,11 @@ where
 and 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{K}}=J^{-1}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):2\frac{\partial\mathbf{K}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right)\,.\label{eq300}
+\boldsymbol{\mathcal{G}}=\frac{R\theta}{\varphi^{w}}\sum_{\alpha}\frac{\tilde{\kappa}^{\alpha}\tilde{c}^{\alpha}}{d_{0}^{\alpha}}\left(\begin{aligned}\left(\frac{1}{\varphi^{w}}-\frac{J}{\tilde{\kappa}^{\alpha}}\frac{\partial\tilde{\kappa}^{\alpha}}{\partial J}\right)\left(\mathbf{I}-\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\right)\otimes\mathbf{I}\\
++2\left(\mathbf{I}\odot\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}+\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\odot\mathbf{I}-\mathbf{I}\odot\mathbf{I}\right)\\
+-\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\otimes\mathbf{I}+\frac{\boldsymbol{\mathcal{D}}^{\alpha}}{d_{0}^{\alpha}}
+\end{aligned}
+\right)\,.\label{eq299}
 \end{equation}
 
 \end_inset
@@ -14590,11 +14590,40 @@ n along
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{j}_{b}^{\alpha u} & =J\frac{\partial\tilde{\kappa}^{\alpha}}{\partial J}\mathbf{d}^{\alpha}\cdot\mathbf{g}^{\alpha}\otimes\grad N_{b}+\tilde{\kappa}^{\alpha}\mathbf{g}^{\alpha}\cdot\mathbf{d}^{\alpha}\cdot\grad N_{b}\\
- & +\tilde{\kappa}^{\alpha}\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\cdot\tilde{c}^{\alpha}\left(\grad N_{b}\otimes\mathbf{w}-\mathbf{w}\otimes\grad N_{b}+\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}+\mathbf{w}_{b}^{u}\right)\\
+\begin{aligned}\mathbf{w}_{b}^{u} & =\mathbf{g}^{p}\cdot\tilde{\boldsymbol{\mathcal{K}}}\cdot\grad N_{b}\\
+ & -R\theta\sum_{\beta}\frac{1}{d_{0}^{\beta}}\left(J\frac{\partial\tilde{\kappa}^{\beta}}{\partial J}-\tilde{\kappa}^{\beta}\right)\tilde{\mathbf{k}}\cdot\mathbf{d}^{\beta}\cdot\left(\grad\tilde{c}^{\beta}\otimes\grad N_{b}\right)\\
+ & -R\theta\sum_{\beta}\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\left[\tilde{\mathbf{k}}\cdot\left(\grad N_{b}\otimes\grad\tilde{c}^{\beta}\right)\cdot\mathbf{d}^{\beta}+\left(\grad N_{b}\cdot\mathbf{d}^{\beta}\cdot\grad\tilde{c}^{\beta}\right)\tilde{\mathbf{k}}\right]\\
+ & -R\theta\sum_{\beta}\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\tilde{\mathbf{k}}\cdot\left(\grad\tilde{c}^{\beta}\cdot\boldsymbol{\mathcal{D}}^{\beta}\cdot\grad N_{b}\right)\,,
+\end{aligned}
+\label{eq330b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}^{p}=-\grad\tilde{p}-R\theta\sum\limits _{\beta}\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\mathbf{d}^{\beta}\cdot\grad\tilde{c}^{\beta}\,.\label{eq344}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{j}_{b}^{\alpha u} & =J\frac{\partial\tilde{\kappa}^{\alpha}}{\partial J}\mathbf{d}^{\alpha}\cdot\left(\mathbf{g}^{\alpha}\otimes\grad N_{b}\right)+\tilde{\kappa}^{\alpha}\mathbf{g}^{\alpha}\cdot\boldsymbol{\mathcal{D}}^{\alpha}\cdot\grad N_{b}\\
+ & +\tilde{\kappa}^{\alpha}\mathbf{d}^{\alpha}\cdot\left(\grad N_{b}\otimes\mathbf{w}-\mathbf{w}\otimes\grad N_{b}+\left(\grad N_{b}\cdot\mathbf{w}\right)\mathbf{I}+\mathbf{w}_{b}^{u}\right)\frac{\tilde{c}^{\alpha}}{d_{0}^{\alpha}}\\
  & -\varphi^{s}\tilde{\kappa}^{\alpha}\mathbf{d}^{\alpha}\cdot\grad\tilde{c}^{\alpha}\otimes\grad N_{b}\,,
 \end{aligned}
 \label{eq331}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}^{\alpha}=-\varphi^{w}\grad\tilde{c}^{\alpha}+\frac{\tilde{c}^{\alpha}}{d_{0}^{\alpha}}\mathbf{w}\,,\label{eq331b}
 \end{equation}
 
 \end_inset
@@ -14704,7 +14733,7 @@ where
 
 \end_inset
 
-
+and
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{j}_{b}^{\alpha\gamma} & =N_{b}\left(\frac{\partial\tilde{\kappa}^{\alpha}}{\partial\tilde{c}^{\gamma}}\mathbf{d}^{\alpha}+\tilde{\kappa}^{\alpha}\mathbf{d}_{c}^{\alpha\gamma}\right)\cdot\mathbf{g}^{\alpha}\\
@@ -14718,15 +14747,7 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-q_{b}^{\alpha\gamma}=-N_{b}\frac{\varphi^{w}}{\Delta t}\left(\frac{\partial\tilde{\kappa}^{\alpha}}{\partial\tilde{c}^{\gamma}}\tilde{c}^{\alpha}+\delta_{\alpha\gamma}\tilde{\kappa}^{\alpha}\right)\,,\label{eq343}
-\end{equation}
-
-\end_inset
-
-and 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{g}^{p}=-\grad\tilde{p}-R\theta\sum\limits _{\beta}\frac{\tilde{\kappa}^{\beta}}{d_{0}^{\beta}}\mathbf{d}^{\beta}\cdot\grad\tilde{c}^{\beta}\,.\label{eq344}
+q_{b}^{\alpha\gamma}=-N_{b}\frac{\varphi^{w}}{\Delta t}\left(\frac{\partial\tilde{\kappa}^{\alpha}}{\partial\tilde{c}^{\gamma}}\tilde{c}^{\alpha}+\delta_{\alpha\gamma}\tilde{\kappa}^{\alpha}\right)\,.\label{eq343}
 \end{equation}
 
 \end_inset
@@ -18719,7 +18740,7 @@ These integrals are evaluated in the current configuration of
 where
 \begin_inset Formula 
 \begin{equation}
-\mathbf{t}^{\sigma}=-\phi^{s}\mathbf{t}^{\tau}+\mathbf{t}^{e}\,.\label{eq:bfsi-sigma-traction}
+\mathbf{t}^{\sigma}=-\varphi^{s}\mathbf{t}^{\tau}+\mathbf{t}^{e}\,.\label{eq:bfsi-sigma-traction}
 \end{equation}
 
 \end_inset
@@ -18823,7 +18844,7 @@ noprefix "false"
 
 \begin_layout Standard
 In this formulation, the mixture traction is defined as 
-\begin_inset Formula $\mathbf{t}=-p\mathbf{n}+\mathbf{t}^{e}+\phi^{f}\mathbf{t}^{\tau}$
+\begin_inset Formula $\mathbf{t}=-p\mathbf{n}+\mathbf{t}^{e}+\varphi^{f}\mathbf{t}^{\tau}$
 \end_inset
 
 , which may also be written as 
@@ -19602,7 +19623,7 @@ As discussed in Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Governing-Equations-FSI"
+reference "subsec:CFD-Mass-Momentum"
 plural "false"
 caps "false"
 noprefix "false"
@@ -19783,7 +19804,7 @@ Now, the discretized form of
 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:int-virtual-work-1"
+reference "eq:bfsi-int-virtual-work"
 plural "false"
 caps "false"
 noprefix "false"
@@ -19992,7 +20013,7 @@ k_{ab}^{JJ}= & \int_{\Omega^{b}}\alpha_{f}N_{a}\frac{1}{J^{f}}\left(\left(\varph
 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:ext-virtual-work"
+reference "eq:bfsi-ext-virtual-work"
 plural "false"
 caps "false"
 noprefix "false"
@@ -35001,7 +35022,7 @@ Parametric study of the effect of the damage parameter
 \end_inset
 
 , and 
-\begin_inset Formula $\kappa^{p}=0.3$
+\begin_inset Formula $\kappa^{p}=0.03$
 \end_inset
 
 .
