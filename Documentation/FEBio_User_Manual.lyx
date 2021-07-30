@@ -24615,9 +24615,8 @@ The
 \shape italic
 search_radius
 \shape default
- is a scale factor which multiplies the diagonal length of the model's bounding
- box to produce a dimensional search radius used by the algorithm that projects
- points onto facets.
+ is a dimensional search radius used by the algorithm that projects points
+ onto facets.
  When the distance between the point and the facet exceeds the dimensional
  search radius, that projection is ignored.
  This can alleviate convergence problems when surfaces have multiple folds
