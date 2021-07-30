@@ -721,13 +721,11 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 	double ps[FEElement::MAX_NODES], p1;
 
-	double R = m_srad*mesh.GetBoundingBox().radius();
-
     double psf = GetPenaltyScaleFactor();
     
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
-	np.SetSearchRadius(R);
+	np.SetSearchRadius(m_srad);
 	np.Init();
 
 	// if we need to project the nodes onto the secondary surface,
@@ -852,9 +850,9 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 				Ln = pt.m_Lmd + eps*g;
 
-				pt.m_gap = (g <= R? g : 0);
+				pt.m_gap = (g <= m_srad? g : 0);
 
-				if ((Ln >= 0) && (g <= R))
+				if ((Ln >= 0) && (g <= m_srad))
 				{
 
 					// calculate the pressure gap function
@@ -901,8 +899,6 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 void FESlidingInterface2::Update()
 {	
 	double rs[2];
-
-	double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
 
 	static int naug = 0;
 	static int biter = 0;
@@ -981,7 +977,7 @@ void FESlidingInterface2::Update()
 		if (ms.m_bporo && ((npass == 1) || m_bdupr)) {
 			FENormalProjection np(ss);
 			np.SetTolerance(m_stol);
-			np.SetSearchRadius(R);
+			np.SetSearchRadius(m_srad);
 			np.Init();
 
 			for (int n=0; n<ms.Nodes(); ++n)
@@ -1001,7 +997,7 @@ void FESlidingInterface2::Update()
 					// calculate the gap function
 					double g = ms.m_nn[n]*(node.m_rt - q);
 					
-					if (fabs(g) <= R)
+					if (fabs(g) <= m_srad)
 					{
 						// we found an element so let's calculate the nodal traction values for this element
 						// get the normal tractions at the nodes
