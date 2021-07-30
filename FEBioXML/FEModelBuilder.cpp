@@ -733,6 +733,21 @@ void FEModelBuilder::ApplyParameterMaps()
 			v.setValuator(map);
 			v.SetItemList(itemList);
 		}
+        else if (p.type() == FE_PARAM_MAT3DS_MAPPED)
+        {
+            FEParamMat3ds& v = p.value<FEParamMat3ds>();
+            FEMappedValueMat3ds* map = fecore_alloc(FEMappedValueMat3ds, &m_fem);
+            if (data->DataType() != FE_MAT3DS)
+            {
+                std::stringstream ss;
+                ss << "Cannot assign map \"" << data->GetName() << "\" to parameter \"" << p.name() << "\" : bad data type";
+                string err = ss.str();
+                throw std::runtime_error(err.c_str());
+            }
+            map->setDataMap(data);
+            v.setValuator(map);
+            v.SetItemList(itemList);
+        }
 		else if (p.type() == FE_PARAM_MAT3D_MAPPED)
 		{
 			FEParamMat3d& v = p.value<FEParamMat3d>();

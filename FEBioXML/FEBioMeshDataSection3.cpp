@@ -59,6 +59,7 @@ FEDataType str2datatype(const char* szdataType)
 	if      (strcmp(szdataType, "scalar") == 0) dataType = FEDataType::FE_DOUBLE;
 	else if (strcmp(szdataType, "vec2"  ) == 0) dataType = FEDataType::FE_VEC2D;
 	else if (strcmp(szdataType, "vec3"  ) == 0) dataType = FEDataType::FE_VEC3D;
+    else if (strcmp(szdataType, "mat3s" ) == 0) dataType = FEDataType::FE_MAT3DS;
 	else if (strcmp(szdataType, "mat3"  ) == 0) dataType = FEDataType::FE_MAT3D;
 	return dataType;
 }
