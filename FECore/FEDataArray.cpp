@@ -103,6 +103,7 @@ FEDataType intToDataType(int i)
 	case FE_VEC2D : return FE_VEC2D; break;
 	case FE_VEC3D : return FE_VEC3D; break;
 	case FE_MAT3D : return FE_MAT3D; break;
+    case FE_MAT3DS: return FE_MAT3DS; break;
 	default:
 		assert(false);
 		break;

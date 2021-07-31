@@ -69,6 +69,7 @@ bool FEDataGenerator::Generate(FENodeDataMap& map)
 		case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, d); } break;
 		case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, d); } break;
 		case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, d); } break;
+        case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, d); } break;
 		}
 	}
 
@@ -101,6 +102,7 @@ bool FEDataGenerator::Generate(FESurfaceMap& map)
 			case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
 			case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
 			case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+            case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
 			}
 		}
 	}
@@ -131,9 +133,10 @@ bool FEDataGenerator::Generate(FEDomainMap& map)
 				switch (dataType)
 				{
 				case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+                case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
 				}
 			}
 		}
@@ -150,9 +153,10 @@ bool FEDataGenerator::Generate(FEDomainMap& map)
 			switch (dataType)
 			{
 			case FE_DOUBLE: { double d; value(r, d); map.setValue(i, d); } break;
-			case FE_VEC2D: { vec2d  d; value(r, d); map.setValue(i, d); } break;
-			case FE_VEC3D: { vec3d  d; value(r, d); map.setValue(i, d); } break;
-			case FE_MAT3D: { mat3d  d; value(r, d); map.setValue(i, d); } break;
+			case FE_VEC2D : { vec2d  d; value(r, d); map.setValue(i, d); } break;
+			case FE_VEC3D : { vec3d  d; value(r, d); map.setValue(i, d); } break;
+			case FE_MAT3D : { mat3d  d; value(r, d); map.setValue(i, d); } break;
+            case FE_MAT3DS: { mat3ds d; value(r, d); map.setValue(i, d); } break;
 			}
 		}
 		break;
@@ -166,9 +170,10 @@ bool FEDataGenerator::Generate(FEDomainMap& map)
 				switch (dataType)
 				{
 				case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+                case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
 				}
 			}
 		}

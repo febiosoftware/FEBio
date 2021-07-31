@@ -67,4 +67,5 @@ public:
 	virtual void value(const vec3d& r, vec2d& data) {}
 	virtual void value(const vec3d& r, vec3d& data) {}
 	virtual void value(const vec3d& r, mat3d& data) {}
+    virtual void value(const vec3d& r, mat3ds& data) {}
 };

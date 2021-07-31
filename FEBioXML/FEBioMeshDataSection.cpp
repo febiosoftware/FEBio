@@ -134,6 +134,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					if (szfmt)
 					{
 						if (szcmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
+                        else if (szcmp(szfmt, "ITEM") == 0) fmt = Storage_Fmt::FMT_ITEM;
 						else throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
 					}
 
@@ -808,7 +809,8 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEDomainMap& map)
 			case FE_DOUBLE:	map.setValue(n, v[0]); break;
 			case FE_VEC2D:	map.setValue(n, vec2d(v[0], v[1])); break;
 			case FE_VEC3D:	map.setValue(n, vec3d(v[0], v[1], v[2])); break;
-			case FE_MAT3D: map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+			case FE_MAT3D:  map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+            case FE_MAT3DS: map.setValue(n, mat3ds(v[0], v[1], v[2], v[3], v[4], v[5])); break;
 			default:
 				assert(false);
 			}
