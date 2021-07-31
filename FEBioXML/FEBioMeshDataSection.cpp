@@ -127,7 +127,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdatatype);
 
 					// default format
-					Storage_Fmt fmt = (dataType == FE_MAT3D ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
+					Storage_Fmt fmt = (((dataType == FE_MAT3D) || (dataType == FE_MAT3DS)) ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
 
 					// format overrider?
 					const char* szfmt = tag.AttributeValue("format", true);
