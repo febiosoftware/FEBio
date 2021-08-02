@@ -106,6 +106,7 @@ public:
 	FEParamValue(vec2d&  v) : FEParamValue(0, &v, FE_PARAM_VEC2D) {}
 	FEParamValue(vec3d&  v) : FEParamValue(0, &v, FE_PARAM_VEC3D) {}
 	FEParamValue(mat3ds& v) : FEParamValue(0, &v, FE_PARAM_MAT3DS) {}
+    FEParamValue(mat3d&  v) : FEParamValue(0, &v, FE_PARAM_MAT3D ) {}
 
 	bool isValid() const { return (m_pv != 0); }
 

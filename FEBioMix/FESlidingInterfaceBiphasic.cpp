@@ -770,12 +770,11 @@ double FESlidingInterfaceBiphasic::AutoPressurePenalty(FESurfaceElement& el, FES
 void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FESlidingSurfaceBiphasic& ms, bool bupseg, bool bmove)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
-    double R = m_srad*mesh.GetBoundingBox().radius();
-    
+
     // initialize projection data
     FENormalProjection np(ms);
     np.SetTolerance(m_stol);
-    np.SetSearchRadius(R);
+    np.SetSearchRadius(m_srad);
     np.Init();
     double psf = GetPenaltyScaleFactor();
     
@@ -903,12 +902,12 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
                 
                 double Ln = pt.m_Lmd + eps*g;
                 
-                pt.m_gap = (g <= R? g : 0);
+                pt.m_gap = (g <= m_srad? g : 0);
                 
                 // calculate the pressure gap function
                 bool mporo = ms.m_poro[pme->m_lid];
                 
-                if ((Ln >= 0) && (g <= R))
+                if ((Ln >= 0) && (g <= m_srad))
                 {
                     
                     // get the pressure at the projection point
@@ -961,8 +960,6 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
 
 void FESlidingInterfaceBiphasic::Update()
 {
-    double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
-    
     static int naug = 0;
     static int biter = 0;
     
@@ -1051,7 +1048,7 @@ void FESlidingInterfaceBiphasic::Update()
         if (ms.m_bporo) {
             FENormalProjection np(ss);
             np.SetTolerance(m_stol);
-            np.SetSearchRadius(R);
+            np.SetSearchRadius(m_srad);
             np.Init();
             
             for (int n=0; n<ms.Nodes(); ++n)
@@ -1072,7 +1069,7 @@ void FESlidingInterfaceBiphasic::Update()
                     // calculate the gap function
                     double g = ms.m_nn[n]*(node.m_rt - q);
                     
-                    if (fabs(g) <= R)
+                    if (fabs(g) <= m_srad)
                     {
                         // we found an element so let's calculate the nodal traction values for this element
                         // get the normal tractions at the nodes

@@ -49,13 +49,12 @@ public:
 		
 public:
 	FEParamDouble	m_perm0;		//!< permeability for I term
-	FEParamDouble	m_perm1[3];		//!< permeability for b term
-	FEParamDouble	m_perm2[3];		//!< permeability for b^2 term
-	double	m_phi0;			//!< solid volume fraction in reference state
-	double	m_M0;			//!< nonlinear exponential coefficient
-	double	m_alpha0;		//!< nonlinear power exponent
-	double	m_M[3];			//!< nonlinear exponential coefficient
-	double	m_alpha[3];		//!< nonlinear power exponent
+	FEParamVec3 	m_perm1;		//!< permeability for b term
+	FEParamVec3     m_perm2;		//!< permeability for b^2 term
+	FEParamDouble	m_M0;			//!< nonlinear exponential coefficient
+	FEParamDouble	m_alpha0;		//!< nonlinear power exponent
+	FEParamVec3     m_M;			//!< nonlinear exponential coefficient
+	FEParamVec3     m_alpha;		//!< nonlinear power exponent
 		
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

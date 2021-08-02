@@ -60,6 +60,7 @@ FEDataType str2datatype(const char* szdataType)
 	else if (strcmp(szdataType, "vec2"  ) == 0) dataType = FEDataType::FE_VEC2D;
 	else if (strcmp(szdataType, "vec3"  ) == 0) dataType = FEDataType::FE_VEC3D;
 	else if (strcmp(szdataType, "mat3"  ) == 0) dataType = FEDataType::FE_MAT3D;
+    else if (strcmp(szdataType, "mat3s" ) == 0) dataType = FEDataType::FE_MAT3DS;
 	return dataType;
 }
 
@@ -123,6 +124,7 @@ void FEBioMeshDataSection3::ParseNodalData(XMLTag& tag)
 			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double>(&fem);
 			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d>(&fem);
 			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d>(&fem);
+            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds>(&fem);
 		}
 		else
 		{
@@ -186,6 +188,7 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag)
 			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double>(&fem);
 			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d>(&fem);
 			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d>(&fem);
+            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds>(&fem);
 		}
 		else
 		{
@@ -248,13 +251,14 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	}
 
 	// default format
-	Storage_Fmt fmt = (dataType == FE_MAT3D ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
+	Storage_Fmt fmt = (((dataType == FE_MAT3D) || (dataType == FE_MAT3DS)) ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
 
 	// format overrider?
 	const char* szfmt = tag.AttributeValue("format", true);
 	if (szfmt)
 	{
 		if (szcmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
+        else if (szcmp(szfmt, "ITEM") == 0) fmt = Storage_Fmt::FMT_ITEM;
 		else throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
 	}
 
@@ -295,6 +299,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double>(&fem);
 			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d>(&fem);
 			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d>(&fem);
+            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds>(&fem);
 		}
 		else
 		{
@@ -1091,6 +1096,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
 			case FE_VEC2D :	map.setValue(n, vec2d(v[0], v[1])); break;
 			case FE_VEC3D :	map.setValue(n, vec3d(v[0], v[1], v[2])); break;
 			case FE_MAT3D : map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+            case FE_MAT3DS: map.setValue(n, mat3ds(v[0], v[1], v[2], v[3], v[4], v[5])); break;
 			default:
 				assert(false);
 			}

@@ -383,7 +383,7 @@ void FEBioMech::InitModule()
 
 	// Fiber density distributions for CFD materials
 	REGISTER_FECORE_CLASS(FESphericalFiberDensityDistribution, "spherical");
-	REGISTER_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, "ellipsoidal");
+	REGISTER_FECORE_CLASS(FEEllipsoidalFiberDensityDistribution, "ellipsoidal");
 	REGISTER_FECORE_CLASS(FEVonMises3DFiberDensityDistribution, "von-Mises-3d");
 	REGISTER_FECORE_CLASS(FEVonMises3DTwoFDDAxisymmetric, "von-Mises-3d-two-axisym");
 	REGISTER_FECORE_CLASS(FECircularFiberDensityDistribution, "circular");
