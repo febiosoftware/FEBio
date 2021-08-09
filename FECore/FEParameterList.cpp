@@ -331,7 +331,7 @@ FEParam* FEParamContainer::AddParameter(int& v, const char* sz, unsigned int fla
 	FEParam* p = AddParameter(&v, FE_PARAM_INT, 1, sz);
 	p->setParent(this);
 	p->SetFlags(flags);
-	p->SetEnums(szenum);
+	p->setEnums(szenum);
 	return p;
 }
 
@@ -341,7 +341,7 @@ FEParam* FEParamContainer::AddParameter(std::vector<int>& v, const char* sz, uns
 	FEParam* p = AddParameter(&v, FE_PARAM_STD_VECTOR_INT, 1, sz);
 	p->setParent(this);
 	p->SetFlags(flags);
-	p->SetEnums(szenum);
+	p->setEnums(szenum);
 	return p;
 }
 

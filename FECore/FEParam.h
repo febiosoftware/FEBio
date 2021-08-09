@@ -136,6 +136,7 @@ private:
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
 	const char* m_szunit;	// unit string
+	const char* m_szlongname;	// a longer, more descriptive name (optional)
 
 	// parameter validator
 	FEParamValidator*	m_pvalid;
@@ -158,6 +159,9 @@ public:
 	// return the name of the parameter
 	const char* name() const;
 
+	// return the long name of the parameter
+	const char* longName() const;
+
 	// return the enum values
 	const char* enums() const;
 
@@ -166,7 +170,10 @@ public:
 	void setUnits(const char* szunit);
 
 	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
-	void SetEnums(const char* sz);
+	FEParam* setEnums(const char* sz);
+
+	// set the long name
+	FEParam* setLongName(const char* sz);
 
 	// parameter dimension
 	int dim() const;

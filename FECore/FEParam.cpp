@@ -87,6 +87,7 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, b
 	// this is okay as long as the name strings are defined
 	// as literal strings
 	m_szname = szname;
+	m_szlongname = szname;
 
 	m_szenum = 0;
 
@@ -108,6 +109,8 @@ FEParam::FEParam(const FEParam& p)
 	m_flag = p.m_flag;
 
 	m_szname = p.m_szname;
+	m_szlongname = p.m_szlongname;
+
 	m_szenum = 0;
 	m_parent = p.m_parent;
 
@@ -164,6 +167,12 @@ const char* FEParam::name() const
 }
 
 //-----------------------------------------------------------------------------
+const char* FEParam::longName() const
+{
+	return m_szlongname;
+}
+
+//-----------------------------------------------------------------------------
 // return the enum values
 const char* FEParam::enums() const 
 { 
@@ -184,7 +193,14 @@ void FEParam::setUnits(const char* szunit)
 
 //-----------------------------------------------------------------------------
 // set the enum values (\0 separated. Make sure the end of the string has two \0's)
-void FEParam::SetEnums(const char* sz) { m_szenum = sz; }
+FEParam* FEParam::setEnums(const char* sz) { m_szenum = sz; return this; }
+
+//-----------------------------------------------------------------------------
+FEParam* FEParam::setLongName(const char* sz)
+{
+	m_szlongname = sz; 
+	return this;
+}
 
 //-----------------------------------------------------------------------------
 // parameter dimension
