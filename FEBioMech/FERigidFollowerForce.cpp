@@ -36,7 +36,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidFollowerForce, FERigidLoad);
-    ADD_PARAMETER(m_rid      , "rb"       );
+    ADD_PARAMETER(m_rid      , "rb"       )->setEnums("$(rigid_materials)");
     ADD_PARAMETER(m_X        , "insertion");
     ADD_PARAMETER(m_f        , "force"    );
     ADD_PARAMETER(m_brelative, "relative" );

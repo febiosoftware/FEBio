@@ -38,8 +38,8 @@ REGISTER_SUPER_CLASS(FERigidLoad, FERIGIDLOAD_ID);
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidAxialForce, FERigidLoad);
-	ADD_PARAMETER(m_ida      , "rbA"     );
-	ADD_PARAMETER(m_idb      , "rbB"     );
+	ADD_PARAMETER(m_ida      , "rbA"     )->setEnums("$(rigid_materials)");
+	ADD_PARAMETER(m_idb      , "rbB"     )->setEnums("$(rigid_materials)");
 	ADD_PARAMETER(m_ra0      , "ra"      );
 	ADD_PARAMETER(m_rb0      , "rb"      );
 	ADD_PARAMETER(m_s        , "force"   );
@@ -242,10 +242,10 @@ void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 //=============================================================================
 
 BEGIN_FECORE_CLASS(FERigidBodyForce, FERigidLoad)
-	ADD_PARAMETER(m_rigidMat, "rb");
+	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_force, "value");
-	ADD_PARAMETER(m_ntype, "load_type");
+	ADD_PARAMETER(m_ntype, "load_type")->setEnums("LOAD\0FOLLOW\0TARGET");
 END_FECORE_CLASS();
 
 FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FERigidLoad(pfem)
@@ -253,6 +253,8 @@ FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FERigidLoad(pfem)
 	m_ntype = FORCE_LOAD;
 	m_trg = 0.0;
 	m_rid = -1;
+	m_force = 0.0;
+	m_dof = 0;
 }
 
 void FERigidBodyForce::SetRigidMaterialID(int nid) { m_rigidMat = nid; }
@@ -292,10 +294,10 @@ void FERigidBodyForce::Activate()
 		{
 		case 0: m_trg = rb.m_Fr.x; break;
 		case 1: m_trg = rb.m_Fr.y; break;
-		case 2: m_trg= rb.m_Fr.z; break;
+		case 2: m_trg = rb.m_Fr.z; break;
 		case 3: m_trg = rb.m_Mr.x; break;
 		case 4: m_trg = rb.m_Mr.y; break;
-		case 5: m_trg= rb.m_Mr.z; break;
+		case 5: m_trg = rb.m_Mr.z; break;
 		}
 	}
 }

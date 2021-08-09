@@ -36,7 +36,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidFollowerMoment, FERigidLoad);
-    ADD_PARAMETER(m_rid      , "rb"       );
+    ADD_PARAMETER(m_rid      , "rb"       )->setEnums("$(rigid_materials)");
     ADD_PARAMETER(m_m        , "moment"   );
 END_FECORE_CLASS();
 
