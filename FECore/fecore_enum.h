@@ -281,14 +281,6 @@ enum FE_Analysis_Type {
 	FE_STEADY_STATE	= 2
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// ENUM: rigid surfaces
-
-enum FE_Rigid_Surface_Type {
-	FE_RIGID_PLANE,
-	FE_RIGID_SPHERE
-};
-
 //-----------------------------------------------------------------------------
 // Plot level sets the frequency of writes to the plot file.
 enum FE_Plot_Level {
