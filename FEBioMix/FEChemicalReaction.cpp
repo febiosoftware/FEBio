@@ -41,11 +41,6 @@ BEGIN_FECORE_CLASS(FEChemicalReaction, FEReaction)
 	ADD_PARAMETER(m_Vbar , "Vbar");
 	ADD_PARAMETER(m_vRtmp, "vR"  );
 	ADD_PARAMETER(m_vPtmp, "vP"  );
-
-	// set material properties
-	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
-	ADD_PROPERTY(m_pRev, "reverse_rate", FEProperty::Optional);
-
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

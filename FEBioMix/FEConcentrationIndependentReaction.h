@@ -36,7 +36,7 @@ class FEBIOMIX_API FEConcentrationIndependentReaction : public FEChemicalReactio
 {
 public:
 	//! constructor
-	FEConcentrationIndependentReaction(FEModel* pfem) : FEChemicalReaction(pfem) {}
+	FEConcentrationIndependentReaction(FEModel* pfem);
 		
 	//! molar supply at material point
 	double ReactionSupply(FEMaterialPoint& pt);
@@ -49,4 +49,6 @@ public:
 	
 	//! tangent of molar supply with effective concentration at material point
 	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol);
+
+	DECLARE_FECORE_CLASS();
 };

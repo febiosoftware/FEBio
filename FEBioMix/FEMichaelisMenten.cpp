@@ -36,6 +36,10 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEMichaelisMenten, FEChemicalReaction)
 	ADD_PARAMETER(m_Km, "Km");
 	ADD_PARAMETER(m_c0, "c0");
+
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 #ifndef SQR

@@ -31,6 +31,11 @@ SOFTWARE.*/
 #include "FESoluteInterface.h"
 #include "FEBiphasic.h"
 
+BEGIN_FECORE_CLASS(FEMassActionForwardEffective, FEChemicalReaction)
+    // set material properties
+    ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+END_FECORE_CLASS();
+
 //! constructor
 //-----------------------------------------------------------------------------
 FEMassActionForwardEffective::FEMassActionForwardEffective(FEModel* pfem) : FEChemicalReaction(pfem) 

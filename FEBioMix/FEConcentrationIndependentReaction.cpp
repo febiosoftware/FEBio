@@ -30,6 +30,17 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEConcentrationIndependentReaction.h"
 
+BEGIN_FECORE_CLASS(FEConcentrationIndependentReaction, FEChemicalReaction)
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEConcentrationIndependentReaction::FEConcentrationIndependentReaction(FEModel* pfem) : FEChemicalReaction(pfem) 
+{
+
+}
+
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEConcentrationIndependentReaction::ReactionSupply(FEMaterialPoint& pt)

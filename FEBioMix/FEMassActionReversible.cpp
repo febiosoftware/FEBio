@@ -31,6 +31,12 @@ SOFTWARE.*/
 #include "FESoluteInterface.h"
 #include "FEBiphasic.h"
 
+BEGIN_FECORE_CLASS(FEMassActionReversible, FEChemicalReaction)
+    // set material properties
+    ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+    ADD_PROPERTY(m_pRev, "reverse_rate", FEProperty::Optional);
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEMassActionReversible::FEMassActionReversible(FEModel* pfem) : FEChemicalReaction(pfem)
 {

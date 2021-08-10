@@ -54,5 +54,7 @@ public:
     double FwdReactionSupply(FEMaterialPoint& pt);
     
     //! molar supply at material point
-    double RevReactionSupply(FEMaterialPoint& pt);	
+    double RevReactionSupply(FEMaterialPoint& pt);
+
+    DECLARE_FECORE_CLASS();
 };
