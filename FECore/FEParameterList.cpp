@@ -407,11 +407,6 @@ bool FEParamContainer::Validate()
 }
 
 //-----------------------------------------------------------------------------
-//! This function is called after the parameter was read in from the input file.
-//! It can be used to do additional processing when a parameter is read in.
-void FEParamContainer::SetParameter(FEParam& p) {}
-
-//-----------------------------------------------------------------------------
 //! If a parameter has attributes, this function will be called
 bool FEParamContainer::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
 

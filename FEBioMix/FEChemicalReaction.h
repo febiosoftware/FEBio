@@ -70,8 +70,6 @@ public:
 	bool Init() override;
 
 public:
-	void SetParameter(FEParam& p) override;
-
 	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
 
     //! set the forward reaction rate

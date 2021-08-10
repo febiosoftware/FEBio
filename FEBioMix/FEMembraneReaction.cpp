@@ -39,7 +39,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMembraneReaction, FEReaction)
-	ADD_PARAMETER(m_Vbar  , "Vbar");
+	ADD_PARAMETER(&m_Vbar  , FE_PARAM_DOUBLE, 1, "Vbar", &m_Vovr);
 	ADD_PARAMETER(m_vRtmp , "vR"  );
 	ADD_PARAMETER(m_vPtmp , "vP"  );
 	ADD_PARAMETER(m_vRitmp, "vRi");
@@ -191,15 +191,6 @@ bool FEMembraneReaction::Init()
 	}
     
     return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEMembraneReaction::SetParameter(FEParam& p)
-{
-    if (strcmp(p.name(), "Vbar") == 0)
-    {
-        m_Vovr = true;
-    }
 }
 
 //-----------------------------------------------------------------------------
