@@ -257,6 +257,31 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Step"       ] = new FEBioStepSection3        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
+
+	// version 4.0
+	if (nversion == 0x0400)
+	{
+		// we no longer allow unknown attributes
+		SetStopOnUnknownAttribute(true);
+
+		m_map["Control"    ] = new FEBioControlSection3     (this);
+		m_map["Material"   ] = new FEBioMaterialSection3    (this);
+		m_map["Mesh"       ] = new FEBioMeshSection         (this);
+		m_map["MeshDomains"] = new FEBioMeshDomainsSection  (this);
+		m_map["Include"    ] = new FEBioIncludeSection      (this);
+		m_map["Initial"    ] = new FEBioInitialSection3     (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
+		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
+		m_map["Contact"    ] = new FEBioContactSection25    (this);
+		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
+		m_map["Constraints"] = new FEBioConstraintsSection25(this);
+		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
+		m_map["MeshData"   ] = new FEBioMeshDataSection3    (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
+		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 3.0
+		m_map["Step"       ] = new FEBioStepSection3        (this);
+		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -343,12 +368,13 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio3 only supports file version 1.2, 2.0, 2.5, and 3.0
+		// FEBio3 only supports file version 1.2, 2.0, 2.5, 3.0, and 4.0
 		int nversion = GetFileVersion();
 		if ((nversion != 0x0102) && 
 			(nversion != 0x0200) && 
 			(nversion != 0x0205) && 
-			(nversion != 0x0300)) throw InvalidVersion();
+			(nversion != 0x0300) && 
+			(nversion != 0x0400)) throw InvalidVersion();
 
 		// build the file section map based on the version number
 		BuildFileSectionMap(nversion);
