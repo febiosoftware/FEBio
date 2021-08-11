@@ -33,7 +33,7 @@ SOFTWARE.*/
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedShellDisplacement, FEBoundaryCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:shell displacement)");
-	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH);
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
 
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);

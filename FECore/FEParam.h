@@ -72,7 +72,8 @@ enum FEParamType {
 enum FEParamFlag {
 	FE_PARAM_ATTRIBUTE = 0x01,		// parameter will be read as attribute
 	FE_PARAM_USER      = 0x02,		// user parameter (owned by parameter list)	
-	FE_PARAM_HIDDEN	   = 0x04		// Hides parameter (in FEBio Studio)
+	FE_PARAM_HIDDEN	   = 0x04,		// Hides parameter (in FEBio Studio)
+	FE_PARAM_ADDLC     = 0x08		// parameter should get a default load curve in FEBio Studio
 };
 
 class FEParam;
@@ -167,7 +168,7 @@ public:
 
 	// get the unit string
 	const char* units() const;
-	void setUnits(const char* szunit);
+	FEParam* setUnits(const char* szunit);
 
 	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
 	FEParam* setEnums(const char* sz);
@@ -194,7 +195,7 @@ public:
 	void setParent(FEParamContainer* pc);
 	FEParamContainer* parent();
 
-	void SetFlags(unsigned int flags);
+	FEParam* SetFlags(unsigned int flags);
 	unsigned int GetFlags() const;
 
 	void SetWatch(bool b);

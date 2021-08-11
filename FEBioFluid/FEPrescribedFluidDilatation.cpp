@@ -32,7 +32,7 @@ SOFTWARE.*/
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedFluidDilatation, FEBoundaryCondition)
-	ADD_PARAMETER(m_scale, "value");
+	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
 
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);

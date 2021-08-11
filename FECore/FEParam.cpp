@@ -186,10 +186,7 @@ const char* FEParam::units() const
 }
 
 //-----------------------------------------------------------------------------
-void FEParam::setUnits(const char* szunit)
-{
-	m_szunit = szunit;
-}
+FEParam* FEParam::setUnits(const char* szunit) { m_szunit = szunit; return this; }
 
 //-----------------------------------------------------------------------------
 // set the enum values (\0 separated. Make sure the end of the string has two \0's)
@@ -582,7 +579,7 @@ void FEParam::SetWatch(bool b)
 }
 
 //-----------------------------------------------------------------------------
-void FEParam::SetFlags(unsigned int flags) { m_flag = flags; }
+FEParam* FEParam::SetFlags(unsigned int flags) { m_flag = flags; return this; }
 unsigned int FEParam::GetFlags() const { return m_flag; }
 
 //-----------------------------------------------------------------------------
