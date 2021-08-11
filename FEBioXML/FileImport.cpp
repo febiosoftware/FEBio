@@ -1132,6 +1132,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						{
 							if ((tag.szvalue() != nullptr) && (tag.szvalue()[0] != 0))
 							{
+								// parse attributes first
+								ReadAttributes(tag, pp);
+
 								// There should be a parameter with the same name as the type
 								if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
 									throw XMLReader::InvalidValue(tag);

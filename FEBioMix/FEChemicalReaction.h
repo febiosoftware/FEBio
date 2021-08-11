@@ -58,6 +58,51 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEBIOMIX_API FEReactionSpeciesRef : public FEMaterialProperty
+{
+public:
+    enum SpeciesType { UnknownSpecies, SoluteSpecies, SBMSpecies };
+
+public:
+    FEReactionSpeciesRef(FEModel* fem);
+
+    bool Init() override;
+
+    int GetSpeciesType() const;
+
+    bool IsSolute() const;
+    bool IsSBM() const;
+
+public:
+    int     m_speciesID;        // the species ID
+    int     m_v;                // stoichiometric coefficient
+
+private:
+    int     m_speciesType;  // solute or sbm?
+
+    DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMIX_API FEReactantSpeciesRefBase : public FEReactionSpeciesRef {
+public: FEReactantSpeciesRefBase(FEModel* fem) : FEReactionSpeciesRef(fem){}
+};
+
+class FEBIOMIX_API FEReactantSpeciesRef : public FEReactantSpeciesRefBase
+{
+public: FEReactantSpeciesRef(FEModel* fem) : FEReactantSpeciesRefBase(fem) {}
+      DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMIX_API FEProductSpeciesRefBase : public FEReactionSpeciesRef {
+public: FEProductSpeciesRefBase(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+};
+
+class FEBIOMIX_API FEProductSpeciesRef : public FEProductSpeciesRefBase {
+public: FEProductSpeciesRef(FEModel* fem) : FEProductSpeciesRefBase(fem) {}
+      DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for chemical reactions.
 
 class FEBIOMIX_API FEChemicalReaction : public FEReaction
@@ -70,8 +115,6 @@ public:
 	bool Init() override;
 
 public:
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
-
     //! set the forward reaction rate
     void SetForwardReactionRate(FEReactionRate* pfwd) { m_pFwd = pfwd; }
     
@@ -114,6 +157,9 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 public:
+    vector<FEReactantSpeciesRefBase*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
+    vector<FEProductSpeciesRefBase*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
+
     FEReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
     FEReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
     
@@ -130,8 +176,6 @@ public:
 	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products
     double          m_Vbar;     //!< weighted molar volume of reactants and products
     bool            m_Vovr;     //!< override flag for m_Vbar
-	int				m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
-	int				m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
 
 	DECLARE_FECORE_CLASS();
 };

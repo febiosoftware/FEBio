@@ -36,11 +36,85 @@ SOFTWARE.*/
 #include "FESolute.h"
 #include <stdlib.h>
 
+//=============================================================================
+BEGIN_FECORE_CLASS(FEReactionSpeciesRef, FEMaterialProperty)
+	ADD_PARAMETER(m_speciesID, "species", FE_PARAM_ATTRIBUTE, "$(species)");
+END_FECORE_CLASS();
+
+FEReactionSpeciesRef::FEReactionSpeciesRef(FEModel* fem) : FEMaterialProperty(fem) 
+{
+    m_speciesID = -1;
+    m_v = 0;
+
+    m_speciesType = UnknownSpecies;
+}
+
+int FEReactionSpeciesRef::GetSpeciesType() const
+{
+    assert(m_speciesType != UnknownSpecies);
+    return m_speciesType;
+}
+
+bool FEReactionSpeciesRef::IsSolute() const
+{
+    return (m_speciesType == SoluteSpecies);
+}
+
+bool FEReactionSpeciesRef::IsSBM() const
+{
+    return (m_speciesType == SBMSpecies);
+}
+
+bool FEReactionSpeciesRef::Init()
+{
+    // make sure the species ID is valid
+    if (m_speciesID == -1) return false;
+
+    // figure out if this is a solute or sbm
+    if (m_speciesType == UnknownSpecies)
+    {
+        FEModel& fem = *GetFEModel();
+        int id = m_speciesID - 1;
+        int n = 0;
+        for (int i = 0; i < fem.GlobalDataItems(); ++i)
+        {
+            FESoluteData* sol = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+            FESBMData* sbm = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+            if (sol || sbm)
+            {
+                if (i == n)
+                {
+                    if (sol) { m_speciesType = SoluteSpecies; m_speciesID = sol->GetID(); }
+                    if (sbm) { m_speciesType = SBMSpecies; m_speciesID = sbm->GetID(); }
+
+                    break;
+                }
+                else n++;
+            }
+        }
+        assert(m_speciesType != UnknownSpecies);
+        if (m_speciesType == UnknownSpecies) return false;
+    }
+
+    return FEMaterialProperty::Init();
+}
+
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEReactantSpeciesRef, FEReactantSpeciesRefBase)
+    ADD_PARAMETER(m_v, "vR");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEProductSpeciesRef, FEProductSpeciesRefBase)
+    ADD_PARAMETER(m_v, "vP");
+END_FECORE_CLASS();
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FEChemicalReaction, FEReaction)
 	ADD_PARAMETER(&m_Vbar , FE_PARAM_DOUBLE, 1, "Vbar", &m_Vovr);
-	ADD_PARAMETER(m_vRtmp, "vR"  );
-	ADD_PARAMETER(m_vPtmp, "vP"  );
+
+	ADD_PROPERTY(m_vRtmp, "vR", FEProperty::Optional);
+    ADD_PROPERTY(m_vPtmp, "vP", FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -74,6 +148,20 @@ bool FEChemicalReaction::Init()
 	m_vR.assign(ntot, 0);
 	m_vP.assign(ntot, 0);
 	m_v.assign(ntot, 0);
+
+    // create the intmaps
+    for (int i = 0; i < m_vRtmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRtmp[i];
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solR, pvr->m_speciesID - 1, pvr->m_v);
+        if (pvr->IsSBM()   ) SetStoichiometricCoefficient(m_sbmR, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPtmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPtmp[i];
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solP, pvp->m_speciesID - 1, pvp->m_v);
+        if (pvp->IsSBM()   ) SetStoichiometricCoefficient(m_sbmP, pvp->m_speciesID - 1, pvp->m_v);
+    }
 
 	// cycle through all the solutes in the mixture and determine
 	// if they participate in this reaction
@@ -137,50 +225,6 @@ bool FEChemicalReaction::Init()
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    // get number of DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-    if (strcmp(p.name(), "vR") == 0)
-    {
-        if (strcmp(szatt, "sbm") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if (id < 0) return false;
-            SetStoichiometricCoefficient(m_sbmR, id, m_vRtmp);
-            return true;
-        }
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solR, id, m_vRtmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vP") == 0)
-    {
-        if (strcmp(szatt, "sbm") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if (id < 0) return false;
-            SetStoichiometricCoefficient(m_sbmP, id, m_vPtmp);
-            return true;
-        }
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solP, id, m_vPtmp);
-            return true;
-        }
-    }
-    return false;
 }
 
 //-----------------------------------------------------------------------------

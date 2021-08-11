@@ -377,6 +377,9 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-action-reversible");
 	REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 	REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );
+
+	REGISTER_FECORE_CLASS(FEReactantSpeciesRef, "vR");
+	REGISTER_FECORE_CLASS(FEProductSpeciesRef , "vP");
     
 	//-----------------------------------------------------------------------------
 	// Surface loads
