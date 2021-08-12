@@ -144,6 +144,21 @@ bool FEReactivePlasticDamage::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEReactivePlasticDamage::Serialize(DumpStream& ar)
+{
+    if (ar.IsSaving())
+    {
+        ar << Ky << w;
+    }
+    else
+    {
+        ar >> Ky >> w;
+    }
+
+    FEElasticMaterial::Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEReactivePlasticDamage::CreateMaterialPointData()
 {
