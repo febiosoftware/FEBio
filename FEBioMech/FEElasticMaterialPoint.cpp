@@ -61,6 +61,8 @@ void FEElasticMaterialPoint::Init()
     m_L.zero();
     
     m_Wt = m_Wp = 0;
+
+	m_rt = m_r0;
     
 	// don't forget to initialize the base class
     FEMaterialPoint::Init();

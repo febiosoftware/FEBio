@@ -77,7 +77,7 @@ public:
     void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
 
     bool UseSecantTangent() override { return m_secant_tangent; }
-   
+    void Serialize(DumpStream& ar);
 public:
     FEElasticMaterial*  m_pBase;     // base elastic material
     FEDamageCriterion*  m_pCrit;     // yield criterion
