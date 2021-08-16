@@ -61,6 +61,7 @@ SOFTWARE.*/
 #include "FEFiberEFDNeoHookean.h"
 #include "FEFiberExponentialPowerUC.h"
 #include "FEFiberNHUC.h"
+#include "FEFiberKiousisUncoupled.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEHolmesMow.h"
@@ -366,6 +367,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
+    REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-Kiousis-uncoupled");
 
 	// obsolete fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExponentialPower, "fiber-exponential-power-law");
