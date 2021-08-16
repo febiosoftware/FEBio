@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include "RigidBC.h"
 #include <FECore/FEGlobalMatrix.h>
-#include "FERigidSurface.h"
 #include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -83,7 +82,6 @@ void FERigidSystem::Clear()
 	for (int i=0; i<(int)m_RBC.size(); ++i) delete m_RBC[i]; m_RBC.clear();
 	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
 	for (int i=0; i<(int)m_RIC.size(); ++i) delete m_RIC[i]; m_RIC.clear();
-	for (int i=0; i<(int)m_RS.size (); ++i) delete m_RS [i]; m_RS.clear ();
 }
 
 //-----------------------------------------------------------------------------
@@ -470,21 +468,4 @@ void FERigidSystem::BuildMatrixProfile(FEGlobalMatrix& G)
 			G.build_add(lm);
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FERigidSystem::AddRigidSurface(FERigidSurface* rs)
-{
-	m_RS.push_back(rs);
-}
-
-//-----------------------------------------------------------------------------
-FERigidSurface* FERigidSystem::FindRigidSurface(const std::string& name)
-{
-	for (size_t i=0; i<m_RS.size(); ++i)
-	{
-		FERigidSurface* rs = m_RS[i];
-		if (name == rs->GetName()) return rs;
-	}
-	return 0;
 }

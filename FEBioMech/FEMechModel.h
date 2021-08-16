@@ -33,7 +33,6 @@ class FERigidBody;
 class FERigidBodyDisplacement;
 class FERigidBodyFixedBC;
 class FERigidIC;
-class FERigidSurface;
 class FERigidNodeSet;
 
 //---------------------------------------------------------------------------------------
@@ -82,9 +81,6 @@ public:
 
 	// get a rigid body
 	FERigidBody* GetRigidBody(int n);
-
-	// find a rigid surface
-	FERigidSurface* FindRigidSurface(const std::string& name);
 
 	// find a rigid body from a material ID
 	int FindRigidbodyFromMaterialID(int matId);

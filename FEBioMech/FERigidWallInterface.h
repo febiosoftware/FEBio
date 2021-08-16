@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include <FECore/vec3d.h>
 #include <FECore/vec2d.h>
 #include <FECore/FENNQuery.h>
-#include "FERigidSurface.h"
 
 //-----------------------------------------------------------------------------
 class FERigidWallSurface : public FESurface
@@ -75,6 +74,31 @@ public:
 	int	m_dofZ;
 
 	FENNQuery		m_NQ;		//!< used in finding the secondary surface element that corresponds to a primary surface node
+};
+
+//-----------------------------------------------------------------------------
+//! This class implements a rigid plane
+
+//! The FEPlane is used to describe the (moving) rigid wall in a FERigidWallInterface
+class FERigidPlane : public FECoreBase
+{
+public:
+	//! constructor
+	FERigidPlane(FEModel* fem);
+
+	//! return plane normal
+	vec3d Normal(const vec3d& r);
+
+	//! project node onto plane
+	vec3d Project(const vec3d& r);
+
+	//! get the initial plane equation
+	double* GetEquation() { return a; }
+
+public:
+	double	a[4];	//!< plane equation
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

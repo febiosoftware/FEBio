@@ -85,13 +85,6 @@ FERigidBody* FEMechModel::GetRigidBody(int n)
 }
 
 //-----------------------------------------------------------------------------
-// find a rigid surface
-FERigidSurface* FEMechModel::FindRigidSurface(const std::string& name)
-{
-	return m_prs->FindRigidSurface(name);
-}
-
-//-----------------------------------------------------------------------------
 // find a rigid body from a material ID
 int FEMechModel::FindRigidbodyFromMaterialID(int matId)
 {

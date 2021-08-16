@@ -36,6 +36,33 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FERigidPlane, FECoreBase)
+	ADD_PARAMETER(a, 4, "plane");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FERigidPlane::FERigidPlane(FEModel* pfem) : FECoreBase(pfem)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Initializes data for FEPlane
+vec3d FERigidPlane::Normal(const vec3d& r)
+{
+	vec3d n(a[0], a[1], a[2]);
+	n.unit();
+	return n;
+}
+
+vec3d FERigidPlane::Project(const vec3d& r)
+{
+	double d = a[3];
+
+	double l = a[0] * r.x + a[1] * r.y + a[2] * r.z - d;
+	return vec3d(r.x - l * a[0], r.y - l * a[1], r.z - l * a[2]);
+}
+
+//-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FERigidWallInterface, FEContactInterface)
 	ADD_PARAMETER(m_atol   , "tolerance"   );

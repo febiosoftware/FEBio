@@ -39,7 +39,6 @@ class FEModelComponent;
 class FERigidBodyFixedBC;
 class FERigidBodyDisplacement;
 class FERigidIC;
-class FERigidSurface;
 class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
@@ -101,11 +100,6 @@ public:
 
 	std::vector<FERigidBody*>& RigidBodyList();
 
-public:
-	void AddRigidSurface(FERigidSurface* prs);
-
-	FERigidSurface* FindRigidSurface(const std::string& name);
-
 protected:
 	bool CreateObjects();
 
@@ -117,7 +111,6 @@ protected:
 	vector<FERigidIC*>					m_RIC;	//!< rigid body initial conditions
 
 private:
-	FEModel&					m_fem;	//!< the FE model this system is attached to
+	FEModel&				m_fem;	//!< the FE model this system is attached to
 	vector<FERigidBody*>	m_RB;	//!< the list of rigid bodies in this system
-	vector<FERigidSurface*>	m_RS;	//!< rigid surfaces
 };

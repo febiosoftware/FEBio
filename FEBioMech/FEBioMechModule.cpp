@@ -157,7 +157,6 @@ SOFTWARE.*/
 #include "FEPeriodicBoundary1O.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FERigidWallInterface.h"
-#include "FERigidSlidingContact.h"
 #include "FESlidingInterface.h"
 #include "FESlidingElasticInterface.h"
 #include "FEPeriodicSurfaceConstraint.h"
@@ -563,18 +562,10 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPeriodicBoundary1O, "periodic boundary1O");
 	REGISTER_FECORE_CLASS(FEPeriodicBoundary2O, "periodic boundary2O");
 	REGISTER_FECORE_CLASS(FERigidWallInterface, "rigid_wall");
-	REGISTER_FECORE_CLASS(FERigidSlidingContact, "rigid sliding");
 	REGISTER_FECORE_CLASS(FEPeriodicSurfaceConstraint, "surface constraint");
 	REGISTER_FECORE_CLASS(FEStickyInterface, "sticky");
 	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding");
 	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied");
-
-	//-----------------------------------------------------------------------------
-	// classes derived from FERigidSurface
-	REGISTER_FECORE_CLASS(FERigidPlane, "plane");
-	REGISTER_FECORE_CLASS(FERigidSphere, "sphere");
-	REGISTER_FECORE_CLASS(FERigidCylinder, "cylinder");
-	REGISTER_FECORE_CLASS(FERigidEllipsoid, "ellipsoid");
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidLoad
