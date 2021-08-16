@@ -40,6 +40,7 @@
 #include "FEMultiphasicFSIPressure.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEMultiphasicFSISoluteBackflowStabilization.h"
+#include "FEFluidModule.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASIC_FSI_VARIABLE var)
@@ -74,7 +75,7 @@ void FEBioMultiphasicFSI::InitModule()
     febio.RegisterDomain(new FEMultiphasicFSIDomainFactory);
     
     // define the fsi module
-    febio.CreateModule("multiphasic-FSI");
+    febio.CreateModule(new FEMultiphasicFSIModule, "multiphasic-FSI");
     febio.SetModuleDependency("fluid");
     febio.SetModuleDependency("multiphasic");    // also pulls in solid, biphasic, solutes
     

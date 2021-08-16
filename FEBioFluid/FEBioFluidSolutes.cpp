@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "FEFluidSolutesSolver2.h"
 #include "FEFluidSolutesMaterial2.h"
 #include "FEFluidSolutesDomain2.h"
+#include "FEFluidModule.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_VARIABLE var)
@@ -73,7 +74,7 @@ void FEBioFluidSolutes::InitModule()
     febio.RegisterDomain(new FEFluidSolutesDomainFactory);
     
     // define the fsi module
-    febio.CreateModule("fluid-solutes");
+    febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes");
 	febio.SetModuleDependency("fluid");
     febio.SetModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
@@ -96,7 +97,7 @@ void FEBioFluidSolutes::InitModule()
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
 	febio.SetActiveModule(0);
 
-	febio.CreateModule("fluid-solutes2");
+	febio.CreateModule(new FEFluidSolutes2Module, "fluid-solutes2");
 	febio.SetModuleDependency("fluid-solutes");
 
 	// segragated fluid-solutes solver

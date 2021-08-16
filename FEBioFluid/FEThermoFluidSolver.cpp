@@ -98,35 +98,6 @@ FEThermoFluidSolver::FEThermoFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), 
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
 
-    // Allocate degrees of freedom
-    DOFS& dofs = pfem->GetDOFS();
-    int varD = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::DISPLACEMENT), VAR_VEC3);
-    dofs.SetDOFName(varD, 0, "x");
-    dofs.SetDOFName(varD, 1, "y");
-    dofs.SetDOFName(varD, 2, "z");
-
-    int nW = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY), VAR_VEC3);
-    dofs.SetDOFName(nW, 0, "wx");
-    dofs.SetDOFName(nW, 1, "wy");
-    dofs.SetDOFName(nW, 2, "wz");
-
-    int nE = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), VAR_SCALAR);
-    dofs.SetDOFName(nE, 0, "ef");
-    
-    int nT = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), VAR_SCALAR);
-    dofs.SetDOFName(nT, 0, "T");
-    
-    int nAW = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
-    dofs.SetDOFName(nAW, 0, "awx");
-    dofs.SetDOFName(nAW, 1, "awy");
-    dofs.SetDOFName(nAW, 2, "awz");
-
-    int nAE = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION_TDERIV), VAR_SCALAR);
-    dofs.SetDOFName(nAE, 0, "aef");
-    
-    int nAT = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), VAR_SCALAR);
-    dofs.SetDOFName(nAT, 0, "aT");
-    
     // get the dof indices
     m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
     m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));

@@ -47,5 +47,5 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
-	GetBuilder()->SetModuleName(szt);
+	GetBuilder()->SetActiveModule(szt);
 }

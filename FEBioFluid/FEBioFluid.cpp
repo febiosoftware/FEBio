@@ -73,6 +73,8 @@ SOFTWARE.*/
 #include "FEFixedFluidDilatation.h"
 #include "FEPrescribedFluidDilatation.h"
 
+#include "FEFluidModule.h"
+
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
 {
@@ -99,7 +101,7 @@ void FEBioFluid::InitModule()
 	febio.RegisterDomain(new FEFluidDomainFactory);
 
 	// define the fluid module
-	febio.CreateModule("fluid", 
+	febio.CreateModule(new FEFluidModule, "fluid", 
 		"{"
 		"   \"title\" : \"Fluid Mechanics\","
 		"   \"info\"  : \"Steady-state or transient fluid dynamics analysis.\""

@@ -23,12 +23,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
-#include "FEBioStepSection3.h"
-#include "FEBioControlSection3.h"
+#include "FEBioStepSection4.h"
+#include "FEBioControlSection4.h"
 #include "FEBioInitialSection3.h"
 #include "FEBioBoundarySection3.h"
 #include "FEBioLoadsSection.h"
@@ -38,15 +35,15 @@ SOFTWARE.*/
 #include "FEBioMeshAdaptorSection.h"
 
 //-----------------------------------------------------------------------------
-FEBioStepSection3::FEBioStepSection3(FEFileImport* pim) : FEFileSection(pim) {}
+FEBioStepSection4::FEBioStepSection4(FEFileImport* pim) : FEFileSection(pim) {}
 
 //-----------------------------------------------------------------------------
-void FEBioStepSection3::Parse(XMLTag& tag)
+void FEBioStepSection4::Parse(XMLTag& tag)
 {
 	// Build the file section map
 	FEFileImport* imp = GetFileReader();
 	FEFileSectionMap Map;
-	Map["Control"    ] = new FEBioControlSection3(imp);
+	Map["Control"    ] = new FEBioControlSection4(imp);
 	Map["Initial"    ] = new FEBioInitialSection3(imp);
 	Map["Boundary"   ] = new FEBioBoundarySection3(imp);
 	Map["Loads"      ] = new FEBioLoadsSection3(imp);

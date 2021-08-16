@@ -96,37 +96,6 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	m_al_inc = 0.0;
 	m_al_ds = 0.0;
 
-	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT), VAR_VEC3);
-	dofs.SetDOFName(varD, 0, "x");
-	dofs.SetDOFName(varD, 1, "y");
-	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION), VAR_VEC3);
-	dofs.SetDOFName(varQ, 0, "u");
-	dofs.SetDOFName(varQ, 1, "v");
-	dofs.SetDOFName(varQ, 2, "w");
-	int varQR = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION), VAR_VEC3);
-	dofs.SetDOFName(varQR, 0, "Ru");
-	dofs.SetDOFName(varQR, 1, "Rv");
-	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
-	dofs.SetDOFName(varV, 0, "vx");
-	dofs.SetDOFName(varV, 1, "vy");
-	dofs.SetDOFName(varV, 2, "vz");
-	int varSU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
-    dofs.SetDOFName(varSU, 0, "sx");
-    dofs.SetDOFName(varSU, 1, "sy");
-    dofs.SetDOFName(varSU, 2, "sz");
-    int varSV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
-    dofs.SetDOFName(varSV, 0, "svx");
-    dofs.SetDOFName(varSV, 1, "svy");
-    dofs.SetDOFName(varSV, 2, "svz");
-    int varSA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
-    dofs.SetDOFName(varSA, 0, "sax");
-    dofs.SetDOFName(varSA, 1, "say");
-    dofs.SetDOFName(varSA, 2, "saz");
-    
     // get the DOF indices
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));

@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include <FECore/FEEdge.h>
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/log.h>
+#include <FECore/FEModule.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -92,10 +93,15 @@ FEModelBuilder::~FEModelBuilder()
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::SetModuleName(const std::string& moduleName)
+void FEModelBuilder::SetActiveModule(const std::string& moduleName)
 {
 	m_fem.SetModuleName(moduleName);
-	FECoreKernel::GetInstance().SetActiveModule(moduleName.c_str());
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	fecore.SetActiveModule(moduleName.c_str());
+
+	FEModel& fem = m_fem;
+	FEModule* pmod = fecore.GetActiveModule();
+	pmod->InitModel(&fem);
 }
 
 //-----------------------------------------------------------------------------
@@ -106,13 +112,13 @@ std::string FEModelBuilder::GetModuleName() const
 }
 
 //-----------------------------------------------------------------------------
-FEAnalysis* FEModelBuilder::CreateNewStep()
+FEAnalysis* FEModelBuilder::CreateNewStep(bool allocSolver)
 {
 	FEAnalysis* pstep = fecore_new<FEAnalysis>("analysis", &m_fem);
 
 	// make sure we have a solver defined
 	FESolver* psolver = pstep->GetFESolver();
-	if (psolver == 0)
+	if ((psolver == 0) && allocSolver)
 	{
 		psolver = BuildSolver(m_fem);
 		if (psolver == 0) return 0;
@@ -172,11 +178,11 @@ FEDomain* FEModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat)
 }
 
 //-----------------------------------------------------------------------------
-FEAnalysis* FEModelBuilder::GetStep()
+FEAnalysis* FEModelBuilder::GetStep(bool allocSolver)
 {
 	if (m_pStep == 0)
 	{
-		m_pStep = CreateNewStep();
+		m_pStep = CreateNewStep(allocSolver);
 		m_fem.AddStep(m_pStep);
 		if (m_fem.Steps() == 1)
 		{

@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEBioModuleSection.h"
 #include "FEBioControlSection.h"
 #include "FEBioControlSection3.h"
+#include "FEBioControlSection4.h"
 #include "FEBioGlobalsSection.h"
 #include "FEBioMaterialSection.h"
 #include "FEBioGeometrySection.h"
@@ -46,6 +47,7 @@ SOFTWARE.*/
 #include "FEBioLoadDataSection.h"
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
+#include "FEBioStepSection4.h"
 #include "FEBioDiscreteSection.h"
 #include "FEBioMeshDataSection.h"
 #include "FEBioCodeSection.h"
@@ -264,7 +266,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		// we no longer allow unknown attributes
 		SetStopOnUnknownAttribute(true);
 
-		m_map["Control"    ] = new FEBioControlSection3     (this);
+		m_map["Control"    ] = new FEBioControlSection4     (this);
 		m_map["Material"   ] = new FEBioMaterialSection3    (this);
 		m_map["Mesh"       ] = new FEBioMeshSection         (this);
 		m_map["MeshDomains"] = new FEBioMeshDomainsSection  (this);
@@ -279,7 +281,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["MeshData"   ] = new FEBioMeshDataSection3    (this);
 		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 3.0
-		m_map["Step"       ] = new FEBioStepSection3        (this);
+		m_map["Step"       ] = new FEBioStepSection4        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
 }
@@ -386,7 +388,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		if (broot && (nversion < 0x0205))
 		{
 			// We need to define a default Module type since before 2.5 this tag is optional for structural mechanics model definitions.
-			GetBuilder()->SetModuleName("solid");
+			GetBuilder()->SetActiveModule("solid");
 
 			// set default variables for older files.
 			GetBuilder()->SetDefaultVariables();
@@ -416,7 +418,8 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			// Creating an analysis step will allocate a solver class (based on the module) 
 			// and this in turn will allocate the degrees of freedom.
 			// TODO: This is kind of a round-about way and I really want to find a better solution.
-			GetBuilder()->GetStep();
+			// NOTE: For version 4.0 we do not allocate the solver by default
+			GetBuilder()->GetStep(nversion >= 0x0400 ? false : true);
 
 			// let's get the next tag
 			++tag;

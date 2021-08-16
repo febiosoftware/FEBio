@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,30 +25,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
+#pragma once
+#include "FEBioImport.h"
 
-#include "stdafx.h"
-#include "FEBioFluidP.h"
-#include <FECore/FECoreKernel.h>
-#include "FEFluidSolver.h"
-#include "FEFluidPDomain3D.h"
-#include "FEFluidPDomainFactory.h"
-#include "FEFluidPResistanceBC.h"
-#include "FEFluidModule.h"
-
-void FEBioFluidP::InitModule()
+//-----------------------------------------------------------------------------
+// Control Section
+class FEBioControlSection4 : public FEFileSection
 {
-    FECoreKernel& febio = FECoreKernel::GetInstance();
-    
-    // register domain
-    febio.RegisterDomain(new FEFluidPDomainFactory);
-    
-    // define the fluidP module
-    febio.CreateModule(new FEFluidPModule, "fluidP");
-    febio.SetModuleDependency("fluid");
-
-    REGISTER_FECORE_CLASS(FEFluidPDomain3D, "fluidP-3D");
-    
-    REGISTER_FECORE_CLASS(FEFluidPResistanceBC, "fluidP resistance");
-    
-    febio.SetActiveModule(0);
-}
+public:
+	FEBioControlSection4(FEFileImport* pim);
+	void Parse(XMLTag& tag);
+};

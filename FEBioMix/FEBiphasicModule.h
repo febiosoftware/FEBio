@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,32 +23,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include <FECore/FEModule.h>
+#include <FEBioMech/FESolidModule.h>
+#include "febiomix_api.h"
 
-
-
-#include "stdafx.h"
-#include "FEBioFluidP.h"
-#include <FECore/FECoreKernel.h>
-#include "FEFluidSolver.h"
-#include "FEFluidPDomain3D.h"
-#include "FEFluidPDomainFactory.h"
-#include "FEFluidPResistanceBC.h"
-#include "FEFluidModule.h"
-
-void FEBioFluidP::InitModule()
+class FEBIOMIX_API FEBiphasicModule : public FESolidModule
 {
-    FECoreKernel& febio = FECoreKernel::GetInstance();
-    
-    // register domain
-    febio.RegisterDomain(new FEFluidPDomainFactory);
-    
-    // define the fluidP module
-    febio.CreateModule(new FEFluidPModule, "fluidP");
-    febio.SetModuleDependency("fluid");
+public:
+	FEBiphasicModule();
+	void InitModel(FEModel* fem) override;
+};
 
-    REGISTER_FECORE_CLASS(FEFluidPDomain3D, "fluidP-3D");
-    
-    REGISTER_FECORE_CLASS(FEFluidPResistanceBC, "fluidP resistance");
-    
-    febio.SetActiveModule(0);
-}
+class FEBIOMIX_API FEBiphasicSoluteModule : public FEBiphasicModule
+{
+public:
+	FEBiphasicSoluteModule();
+	void InitModel(FEModel* fem) override;
+};
+
+class FEBIOMIX_API FEMultiphasicModule : public FEBiphasicSoluteModule
+{
+public:
+	FEMultiphasicModule();
+	void InitModel(FEModel* fem) override;
+};

@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "LinearSolver.h"
 #include "Timer.h"
+#include "FEModule.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -42,6 +43,7 @@ public:
 	unsigned int	m_id;		// unqiue ID (starting at one)
 	int				m_alloc_id;	// ID of allocator
 	vector<int>		m_depMods;	// module dependencies
+	FEModule*		m_module;	// module class needed for initialization model properties
 
 	void AddDependency(Module& mod)
 	{
@@ -445,7 +447,7 @@ bool FECoreKernel::SetActiveModule(const char* szmod)
 bool FECoreKernel::SetActiveModule(int moduleId)
 {
 	if (moduleId < 0) return false;
-	if (GetActiveModule() == moduleId) return true;
+	if (GetActiveModuleID() == moduleId) return true;
 
 	// see if the module exists or not
 	for (size_t i = 0; i < m_modules.size(); ++i)
@@ -465,10 +467,17 @@ bool FECoreKernel::SetActiveModule(int moduleId)
 
 //-----------------------------------------------------------------------------
 // return the active module's ID
-int FECoreKernel::GetActiveModule()
+int FECoreKernel::GetActiveModuleID()
 {
 	if (m_activeModule == -1) return -1;
 	return m_modules[m_activeModule]->m_id;
+}
+
+//-----------------------------------------------------------------------------
+FEModule* FECoreKernel::GetActiveModule()
+{
+	if (m_activeModule == -1) return nullptr;
+	return m_modules[m_activeModule]->m_module;
 }
 
 //-----------------------------------------------------------------------------
@@ -480,7 +489,7 @@ int FECoreKernel::Modules() const
 
 //-----------------------------------------------------------------------------
 //! create a module
-bool FECoreKernel::CreateModule(const char* szmod, const char* description)
+bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char* description)
 {
 	m_activeModule = -1;
 	if (szmod == 0) return false;
@@ -494,6 +503,7 @@ bool FECoreKernel::CreateModule(const char* szmod, const char* description)
 		newModule->m_szname = szmod;
 		newModule->m_id = newID;
 		newModule->m_szdesc = description;
+		newModule->m_module = pmodule;
 		m_modules.push_back(newModule);
 
 		// make this the active module

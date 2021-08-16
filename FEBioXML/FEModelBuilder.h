@@ -84,20 +84,20 @@ public:
 	FEModelBuilder(FEModel& fem);
 	virtual ~FEModelBuilder();
 
-	//! set the module name
-	void SetModuleName(const std::string& moduleName);
+	//! set the active module
+	void SetActiveModule(const std::string& moduleName);
 
 	//! Get the module name
 	std::string GetModuleName() const;
 
 	// create a new analysis step
-	FEAnalysis* CreateNewStep();
+	FEAnalysis* CreateNewStep(bool allocSolver = true);
 
 	// create a material
 	FEMaterial* CreateMaterial(const char* sztype);
 
 	// get the current step (will create a new one if no step was defined yet)
-	FEAnalysis*	GetStep();
+	FEAnalysis*	GetStep(bool allocSolver = true);
 
 	// add module component to current step
 	void AddComponent(FEModelComponent* mc);

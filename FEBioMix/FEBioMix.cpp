@@ -112,6 +112,7 @@ SOFTWARE.*/
 #include "FEPrescribedFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
+#include "FEBiphasicModule.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -143,7 +144,7 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "biphasic" module
-	febio.CreateModule("biphasic", 
+	febio.CreateModule(new FEBiphasicModule, "biphasic", 
 		"{"
 		"   \"title\" : \"Biphasic Analysis\","
 		"   \"info\"  : \"Transient or quasi-static biphasic analysis.\""
@@ -219,7 +220,7 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
-	febio.CreateModule("solute",
+	febio.CreateModule(new FEBiphasicSoluteModule, "solute",
 		"{"
 		"   \"title\" : \"Biphasic Solute Analysis\","
 		"   \"info\"  : \"Transient or quasi-static biphasic analysis with a single solute.\""
@@ -333,7 +334,7 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "multiphasic" module
-	febio.CreateModule("multiphasic",
+	febio.CreateModule(new FEMultiphasicModule, "multiphasic",
 		"{"
 		"   \"title\" : \"Multiphasic Analysis\","
 		"   \"info\"  : \"Transient or quasi-static analysis with solutes.\""

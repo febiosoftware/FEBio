@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include "FETempDependentConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
+#include "FEFluidModule.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
@@ -68,7 +69,7 @@ void FEBioThermoFluid::InitModule()
     febio.RegisterDomain(new FEThermoFluidDomainFactory);
 
     // define the thermo-fluid module
-    febio.CreateModule("thermo-fluid");
+    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
     febio.SetModuleDependency("fluid");
 
     REGISTER_FECORE_CLASS(FEThermoFluidSolver, "thermo-fluid");

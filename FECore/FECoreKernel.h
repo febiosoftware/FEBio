@@ -38,6 +38,7 @@ SOFTWARE.*/
 // Forward declarations
 class FEModel;
 class LinearSolver;
+class FEModule;
 
 //-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
@@ -109,14 +110,15 @@ public: // Modules
 	int Modules() const;
 
 	//! Create a module (also makes it the active module)
-	bool CreateModule(const char* szmodule, const char* description = nullptr);
+	bool CreateModule(FEModule* pmodule, const char* szmodule, const char* description = nullptr);
 
 	//! set the active module
 	bool SetActiveModule(const char* szmodule);
 	bool SetActiveModule(int moduleId);
 
 	// return the active module's ID
-	int GetActiveModule();
+	int GetActiveModuleID();
+	FEModule* GetActiveModule();
 
 	//! set a dependency on a module
 	bool SetModuleDependency(const char* szmodule);

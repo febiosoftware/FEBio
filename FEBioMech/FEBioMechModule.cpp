@@ -246,6 +246,8 @@ SOFTWARE.*/
 
 #include "FEDeformationMapGenerator.h"
 
+#include "FESolidModule.h"
+
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
 void FEBioMech::InitModule()
@@ -257,7 +259,7 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// create module
-	febio.CreateModule("solid",
+	febio.CreateModule(new FESolidModule, "solid",
 		"{"
 		"   \"title\" : \"Structural Mechanics\","
 		"   \"info\"  : \"Quasi-static or dynamical structural mechanics analysis.\""

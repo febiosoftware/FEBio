@@ -80,25 +80,6 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
 
 	m_rigidSolver.AllowMixedBCs(true);
 
-	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT), VAR_VEC3);
-	dofs.SetDOFName(varU, 0, "x");
-	dofs.SetDOFName(varU, 1, "y");
-	dofs.SetDOFName(varU, 2, "z");
-	int varSQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION), VAR_VEC3);
-	dofs.SetDOFName(varSQ, 0, "u");
-	dofs.SetDOFName(varSQ, 1, "v");
-	dofs.SetDOFName(varSQ, 2, "w");
-	int varRQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION), VAR_VEC3);
-	dofs.SetDOFName(varRQ, 0, "Ru");
-	dofs.SetDOFName(varRQ, 1, "Rv");
-	dofs.SetDOFName(varRQ, 2, "Rw");
-	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
-	dofs.SetDOFName(varV, 0, "vx");
-	dofs.SetDOFName(varV, 1, "vy");
-	dofs.SetDOFName(varV, 2, "vz");
-
 	// get the DOF indices
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));

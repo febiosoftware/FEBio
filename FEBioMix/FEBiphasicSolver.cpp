@@ -65,13 +65,6 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem), m_dofP
 	// set default formulation (full shape functions)
 	m_biphasicFormulation = 0;
     
-	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varP = dofs.AddVariable("fluid pressure");
-	dofs.SetDOFName(varP, 0, "p");
-    int varQ = dofs.AddVariable("shell fluid pressure");
-    dofs.SetDOFName(varQ, 0, "q");
-    
 	// get pressure dof
 	m_dofP.AddDof(pfem->GetDOFIndex("p"));
     m_dofQ.AddDof(pfem->GetDOFIndex("q"));

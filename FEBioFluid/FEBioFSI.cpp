@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEBiphasicFSITraction.h"
 #include "FEBiphasicFSI.h"
 #include "FEBiphasicFSIDomain3D.h"
+#include "FEFluidModule.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
@@ -71,7 +72,7 @@ void FEBioFSI::InitModule()
 	febio.RegisterDomain(new FEFluidFSIDomainFactory);
 
 	// define the fsi module
-	febio.CreateModule("fluid-FSI",
+	febio.CreateModule(new FEFluidFSIModule, "fluid-FSI",
 		"{"
 		"   \"title\" : \"Fluid-Structure Interaction\","
 		"   \"info\"  : \"FSI analysis where a fluid interacts with a rigid, solid or biphasic structure.\""

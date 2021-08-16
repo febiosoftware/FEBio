@@ -159,7 +159,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		fem.Serialize(ar);
 
 		// set the module name
-		GetBuilder()->SetModuleName(fem.GetModuleName());
+		GetBuilder()->SetActiveModule(fem.GetModuleName());
 
 		// read the rest of the restart input file
 		ret = ParseFile(tag);

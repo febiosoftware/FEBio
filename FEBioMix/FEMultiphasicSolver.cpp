@@ -67,15 +67,6 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 
 	m_forcePositive = true;	// force all concentrations to remain positive
 
-	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varP = dofs.AddVariable("fluid pressure");
-	dofs.SetDOFName(varP, 0, "p");
-    int varQ = dofs.AddVariable("shell fluid pressure");
-    dofs.SetDOFName(varQ, 0, "q");
-    int varC = dofs.AddVariable("concentration", VAR_ARRAY);
-    int varD = dofs.AddVariable("shell concentration", VAR_ARRAY);
-    
     // get pressure dof
     m_dofP = pfem->GetDOFIndex("p");
     m_dofQ = pfem->GetDOFIndex("q");
