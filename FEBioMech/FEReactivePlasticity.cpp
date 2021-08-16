@@ -170,8 +170,14 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             continue;
         }
         
+        // check if i-th bond family is yielding
         if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+m_rtol)))
             pp.m_w[i] = w[i];
+        // if not, and if this bond family has not yielded at previous times,
+        // reset the mass fraction of yielded bonds to zero (in case m_w[i] was
+        // set to w[i] during a prior iteration at current time)
+        else if (pp.m_byld[i] == false)
+            pp.m_w[i] = 0;
         
         // find Fv
         bool conv = false;
