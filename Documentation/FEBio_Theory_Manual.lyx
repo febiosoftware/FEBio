@@ -33824,6 +33824,15 @@ noprefix "false"
 \end_inset
 
 .
+ For all cases, 
+\begin_inset Formula $E=200\,\text{GPa}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu=0.3$
+\end_inset
+
+.
 \color black
 
 \begin_inset CommandInset label

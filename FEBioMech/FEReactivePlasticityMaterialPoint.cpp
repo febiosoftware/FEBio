@@ -44,6 +44,7 @@ FEMaterialPoint* FEReactivePlasticityMaterialPoint::Copy()
 	pt->m_gp = m_gp;
 	pt->m_gpp = m_gpp;
 	pt->m_gc = m_gc;
+    pt->m_byld = m_byld;
 
     return pt;
 }
@@ -57,19 +58,20 @@ void FEReactivePlasticityMaterialPoint::Init()
     int n = prp ? prp->m_n : 1;
     
     // intialize data
-    m_Fusi.resize(n, mat3d(1,0,0,
+    m_Fusi.assign(n, mat3d(1,0,0,
                            0,1,0,
                            0,0,1));
-    m_Fvsi.resize(n, mat3d(1,0,0,
+    m_Fvsi.assign(n, mat3d(1,0,0,
                            0,1,0,
                            0,0,1));
     m_Fp = mat3dd(1);
-    m_Ku.resize(n);
-    m_Kv.resize(n);
-    m_w.resize(n,0);
-    m_gp.resize(n, 0);
-    m_gpp.resize(n, 0);
-    m_gc.resize(n, 0);
+    m_Ku.assign(n, 0);
+    m_Kv.assign(n, 0);
+    m_w.assign(n,0);
+    m_gp.assign(n, 0);
+    m_gpp.assign(n, 0);
+    m_gc.assign(n, 0);
+    m_byld.assign(n,false);
     m_Rhat = 0;
 
     // don't forget to initialize the base class
@@ -85,6 +87,7 @@ void FEReactivePlasticityMaterialPoint::Update(const FETimeInfo& timeInfo)
         m_Ku[i] = m_Kv[i];
         m_gc[i] += fabs(m_gp[i] - m_gpp[i]);
         m_gpp[i] = m_gp[i];
+        if (m_w[i] > 0) m_byld[i] = true;
     }
     m_Fp = pt.m_F;
     
@@ -96,22 +99,18 @@ void FEReactivePlasticityMaterialPoint::Update(const FETimeInfo& timeInfo)
 void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPoint::Serialize(ar);
-    FEReactivePlasticity* prp = dynamic_cast<FEReactivePlasticity*>(m_pMat);
-    int n = prp ? prp->m_n : 1;
 
     if (ar.IsSaving())
     {
-        ar << m_Fp;
-        for (int i=0; i<n; ++i) {
-            ar << m_Fusi[i] << m_Fvsi[i] << m_Ku[i] << m_Kv[i] << m_gp[i] << m_gpp[i];
-        }
+        ar << m_Rhat << m_Fp;
+        ar << m_w << m_Fusi << m_Fvsi << m_Ku << m_Kv << m_gp << m_gpp << m_gc;
+        ar << m_byld;
     }
     else
     {
-        ar >> m_Fp;
-        for (int i=0; i<n; ++i) {
-            ar >> m_Fusi[i] >> m_Fvsi[i] >> m_Ku[i] >> m_Kv[i] >> m_gp[i] >> m_gpp[i];
-        }
+        ar >> m_Rhat >> m_Fp;
+        ar >> m_w >> m_Fusi >> m_Fvsi >> m_Ku >> m_Kv >> m_gp >> m_gpp >> m_gc;
+        ar >> m_byld;
     }
 }
 
