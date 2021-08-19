@@ -42,7 +42,7 @@ void FEDomainDataRecord::SetData(const char* szexpr)
     {
         ch = strchr(sz, ';');
         if (ch) *ch++ = 0;
-        FELogDomainData* pdata = fecore_new<FELogDomainData>(sz, m_pfem);
+        FELogDomainData* pdata = fecore_new<FELogDomainData>(sz, GetFEModel());
         if (pdata) m_Data.push_back(pdata);
         else throw UnknownDataField(sz);
         sz = ch;
@@ -50,7 +50,7 @@ void FEDomainDataRecord::SetData(const char* szexpr)
 }
 
 //-----------------------------------------------------------------------------
-FEDomainDataRecord::FEDomainDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_DOMAIN) {}
+FEDomainDataRecord::FEDomainDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_DOMAIN) {}
 
 //-----------------------------------------------------------------------------
 int FEDomainDataRecord::Size() const { return (int)m_Data.size(); }
@@ -58,7 +58,7 @@ int FEDomainDataRecord::Size() const { return (int)m_Data.size(); }
 //-----------------------------------------------------------------------------
 double FEDomainDataRecord::Evaluate(int item, int ndata)
 {
-    FEMesh& mesh = m_pfem->GetMesh();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     int nd = item - 1;
     if ((nd < 0) || (nd >= mesh.Domains())) return 0;
 
@@ -76,7 +76,7 @@ void FEDomainDataRecord::SetDomain(int domainIndex)
 //-----------------------------------------------------------------------------
 void FEDomainDataRecord::SelectAllItems()
 {
-    FEMesh& mesh = m_pfem->GetMesh();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     int n = mesh.Domains();
     m_item.resize(n);
     for (int i = 0; i < n; ++i) m_item[i] = i + 1;

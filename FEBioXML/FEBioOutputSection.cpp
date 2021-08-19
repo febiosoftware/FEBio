@@ -265,23 +265,14 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
             
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
-			prec->SetItemList(items);
+			pdr->SetItemList(items);
             
-			GetFEBioImport()->AddDataRecord(prec);
+			GetFEBioImport()->AddDataRecord(pdr);
         }
         else if (tag == "surface_data")
         {
-            FESurfaceDataRecord* prec = new FESurfaceDataRecord(&fem, szfile);
+            FESurfaceDataRecord* prec = new FESurfaceDataRecord(&fem);
             
-            const char* szdata = tag.AttributeValue("data");
-            prec->SetData(szdata);
-            
-            const char* szname = tag.AttributeValue("name", true);
-            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-            if (szdelim  != 0) prec->SetDelim(szdelim);
-            if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
-
 			const char* sz = tag.AttributeValue("surface");
 			if (sz)
 			{
@@ -294,17 +285,8 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
         }
         else if (tag == "domain_data")
         {
-            FEDomainDataRecord* prec = new FEDomainDataRecord(&fem, szfile);
+            FEDomainDataRecord* prec = new FEDomainDataRecord(&fem);
             
-            const char* szdata = tag.AttributeValue("data");
-            prec->SetData(szdata);
-            
-            const char* szname = tag.AttributeValue("name", true);
-            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
-            if (szdelim  != 0) prec->SetDelim(szdelim);
-            if (szformat != 0) prec->SetFormat(szformat);
-			prec->SetComments(bcomment);
-
 			const char* sz = tag.AttributeValue("domain");
 			if (sz)
 			{

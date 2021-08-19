@@ -268,6 +268,7 @@ enum SUPER_CLASS_ID {
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
     FESURFACEPAIRINTERACTIONNL_ID,  // derived from FESurfacePairInteraction
+	FEDATARECORD_ID,				// derived from DataRecord
 	FELOGSURFACEDATA_ID,			// derived from FELogSurfaceData
 	FELOGDOMAINDATA_ID				// derived from FELogDomainData
 };

@@ -45,7 +45,7 @@ public:
 class FECORE_API FESurfaceDataRecord : public DataRecord
 {
 public:
-    FESurfaceDataRecord(FEModel* pfem, const char* szfile);
+    FESurfaceDataRecord(FEModel* pfem);
     double Evaluate(int item, int ndata);
     void SetData(const char* sz);
     void SetSurface(int surfIndex);
@@ -62,4 +62,6 @@ class FECORE_API FELogEnclosedVolume : public FELogSurfaceData
 public:
     FELogEnclosedVolume(FEModel* fem) : FELogSurfaceData(fem) {}
     double value(FESurface& surface) override;
+
+    DECLARE_FECORE_CLASS();
 };

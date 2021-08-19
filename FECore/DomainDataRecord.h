@@ -45,7 +45,7 @@ public:
 class FECORE_API FEDomainDataRecord : public DataRecord
 {
 public:
-    FEDomainDataRecord(FEModel* pfem, const char* szfile);
+    FEDomainDataRecord(FEModel* pfem);
     double Evaluate(int item, int ndata);
     void SetData(const char* sz);
     void SelectAllItems();
