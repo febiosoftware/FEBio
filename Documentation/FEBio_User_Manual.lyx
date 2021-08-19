@@ -90042,7 +90042,7 @@ E
 v
 \emph default
 ) are the names of the material parameters.
- See Appendix A for more information how to reference model parameters.
+ See Appendix B for more information on how to reference model parameters.
 \end_layout
 
 \begin_layout Subsection
@@ -90302,6 +90302,7 @@ parameter
 \emph default
 , a child element defines the parameter that will act as the data source
  for the objective function.
+ (See Appendix B on more information on referencing model parameters.)
 \end_layout
 
 \begin_layout LyX-Code
@@ -96987,11 +96988,27 @@ fem.mesh.node[0].position.x
 \end_layout
 
 \begin_layout Standard
-Element data can also be accessed.
+In certain applications (e.g.
+ optimization), it is also possible to reference output data, i.e.
+ data that is normally used in the logfile section of the input file.
+ This data is considered read-only.
+ For example, the following references the 'sx' (xx-stress) of element with
+ id 1.
+ 
 \end_layout
 
 \begin_layout LyX-Code
-fem.mesh.elem[0].var('stress').xx
+fem.element_data('sx', 1)
+\end_layout
+
+\begin_layout Standard
+Another example evaluates the enclosed volume of a surface (assuming the
+ surface is closed).
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.surface_data('volume', 'SomeSurface1')
 \end_layout
 
 \begin_layout Chapter
