@@ -57,6 +57,7 @@ SOFTWARE.*/
 #include "ElementDataRecord.h"
 #include "NLConstraintDataRecord.h"
 #include "FEAugLagLinearConstraint.h"
+#include "SurfaceDataRecord.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -169,4 +170,7 @@ REGISTER_FECORE_CLASS(NodeDataRecord, "node_data");
 REGISTER_FECORE_CLASS(FaceDataRecord, "face_data");
 REGISTER_FECORE_CLASS(ElementDataRecord, "element_data");
 REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
+
+// log classes
+REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
 }

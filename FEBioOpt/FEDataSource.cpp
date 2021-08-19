@@ -30,7 +30,10 @@ SOFTWARE.*/
 #include "FEDataSource.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FECore/NodeDataRecord.h>
 #include <FECore/ElementDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
 
 //=================================================================================================
 FEDataSource::FEDataSource(FEModel* fem) : m_fem(*fem)
@@ -101,7 +104,30 @@ bool FEDataParameter::Init()
 	if (val.isValid() == false) {
 
 		// see if it's a data parameter
-		if (strstr(m_param.c_str(), "fem.element_data"))
+		if (strstr(m_param.c_str(), "fem.node_data"))
+		{
+			char buf[256] = { 0 };
+			strcpy(buf, m_param.c_str());
+			char* sz = buf + 17;
+			char* c1 = strchr(sz, ',');
+			*c1++ = 0;
+
+			int nid = atoi(c1);
+
+			c1 = strrchr(sz, '\'');
+			if (sz[0] == '\'') sz++;
+			*c1 = 0;
+
+			FENodeLogData* pd = fecore_new<FENodeLogData>(sz, fem);
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+
+			FEMesh& mesh = fem->GetMesh();
+			FENode* pn = mesh.FindNodeFromID(nid);
+			if (pn == nullptr) { feLogErrorEx(fem, "Invalid node id"); return false; }
+
+			m_fy = [=]() { return pd->value(nid - 1); };
+		}
+		else if (strstr(m_param.c_str(), "fem.element_data"))
 		{
 			char buf[256] = { 0 };
 			strcpy(buf, m_param.c_str());
@@ -123,6 +149,62 @@ bool FEDataParameter::Init()
 			if (pe == nullptr) { feLogErrorEx(fem, "Invalid element id"); return false; }
 
 			m_fy = [=]() { return pd->value(*pe); };
+		}
+		else if (strstr(m_param.c_str(), "fem.surface_data"))
+		{
+			char buf[256] = { 0 };
+			strcpy(buf, m_param.c_str());
+			char* sz = buf + 17;
+			char* c1 = strchr(sz, ',');
+			*c1++ = 0;
+
+			char* szsurf = strchr(c1, '\'');
+			if (szsurf == 0) { feLogErrorEx(fem, "Syntax error in parameter name %s", m_param.c_str()); return false; }
+			szsurf++;
+
+			c1 = strrchr(sz, '\'');
+			if (sz[0] == '\'') sz++;
+			*c1 = 0;
+
+			c1 = strrchr(szsurf, '\'');
+			if (c1) *c1 = 0;
+
+			FELogSurfaceData* pd = fecore_new<FELogSurfaceData>(sz, fem);
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+
+			FEMesh& mesh = fem->GetMesh();
+			FESurface* surf = mesh.FindSurface(szsurf);
+			if (surf == nullptr) { feLogErrorEx(fem, "Invalid surface name %s", szsurf); return false; }
+
+			m_fy = [=]() { return pd->value(*surf); };
+		}
+		else if (strstr(m_param.c_str(), "fem.domain_data"))
+		{
+			char buf[256] = { 0 };
+			strcpy(buf, m_param.c_str());
+			char* sz = buf + 17;
+			char* c1 = strchr(sz, ',');
+			*c1++ = 0;
+
+			char* szdom = strchr(c1, '\'');
+			if (szdom == 0) { feLogErrorEx(fem, "Syntax error in parameter name %s", m_param.c_str()); return false; }
+			szdom++;
+
+			c1 = strrchr(sz, '\'');
+			if (sz[0] == '\'') sz++;
+			*c1 = 0;
+
+			c1 = strrchr(szdom, '\'');
+			if (c1) *c1 = 0;
+
+			FELogDomainData* pd = fecore_new<FELogDomainData>(sz, fem);
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+
+			FEMesh& mesh = fem->GetMesh();
+			FEDomain* dom = mesh.FindDomain(szdom);
+			if (dom == nullptr) { feLogErrorEx(fem, "Invalid domain name %s", szdom); return false; }
+
+			m_fy = [=]() { return pd->value(*dom); };
 		}
 		else
 		{

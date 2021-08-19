@@ -471,6 +471,15 @@ FESurface* FEMesh::FindSurface(const std::string& name)
 }
 
 //-----------------------------------------------------------------------------
+//! Find a surface set set by name and returns its index
+
+int FEMesh::FindSurfaceIndex(const std::string& name)
+{
+	for (size_t i = 0; i < m_Surf.size(); ++i) if (m_Surf[i]->GetName() == name) return i;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
 //! Find a discrete element set set by name
 
 FEDiscreteSet* FEMesh::FindDiscreteSet(const std::string& name)
@@ -524,6 +533,12 @@ FEDomain* FEMesh::FindDomain(const std::string& name)
 {
 	for (size_t i = 0; i<m_Domain.size(); ++i) if (m_Domain[i]->GetName() == name) return m_Domain[i];
 	return 0;
+}
+
+int FEMesh::FindDomainIndex(const std::string& name)
+{
+	for (size_t i = 0; i < m_Domain.size(); ++i) if (m_Domain[i]->GetName() == name) return i;
+	return -1;
 }
 
 FEDomain* FEMesh::FindDomain(int domId)

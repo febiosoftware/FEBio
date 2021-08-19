@@ -170,6 +170,7 @@ public:
 	void AddDomain(FEDomain* pd);
 
 	FEDomain* FindDomain(const std::string& name);
+	int FindDomainIndex(const std::string& name);
 	FEDomain* FindDomain(int domId);
 
 	//! clear all domains
@@ -183,6 +184,7 @@ public:
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 	FESurface* FindSurface(const std::string& name);
+	int FindSurfaceIndex(const std::string& name);
 
 	// --- EDGES ---
 	int Edges() { return (int) m_Edge.size(); }

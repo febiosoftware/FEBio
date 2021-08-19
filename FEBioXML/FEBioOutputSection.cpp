@@ -28,7 +28,13 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioOutputSection.h"
-#include <FECore/DataRecord.h>
+#include <FECore/NodeDataRecord.h>
+#include <FECore/FaceDataRecord.h>
+#include <FECore/ElementDataRecord.h>
+#include <FEBioMech/ObjectDataRecord.h>
+#include <FECore/NLConstraintDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
@@ -259,24 +265,57 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
             
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
-			pdr->SetItemList(items);
+			prec->SetItemList(items);
+            
+			GetFEBioImport()->AddDataRecord(prec);
+        }
+        else if (tag == "surface_data")
+        {
+            FESurfaceDataRecord* prec = new FESurfaceDataRecord(&fem, szfile);
+            
+            const char* szdata = tag.AttributeValue("data");
+            prec->SetData(szdata);
+            
+            const char* szname = tag.AttributeValue("name", true);
+            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+            if (szdelim  != 0) prec->SetDelim(szdelim);
+            if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			const char* sz = tag.AttributeValue("surface");
+			if (sz)
+			{
+				int surfIndex = mesh.FindSurfaceIndex(sz);
+				if (surfIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+				prec->SetSurface(surfIndex);
+			}
+           
+			GetFEBioImport()->AddDataRecord(prec);
+        }
+        else if (tag == "domain_data")
+        {
+            FEDomainDataRecord* prec = new FEDomainDataRecord(&fem, szfile);
+            
+            const char* szdata = tag.AttributeValue("data");
+            prec->SetData(szdata);
+            
+            const char* szname = tag.AttributeValue("name", true);
+            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+            if (szdelim  != 0) prec->SetDelim(szdelim);
+            if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			const char* sz = tag.AttributeValue("domain");
+			if (sz)
+			{
+				int domainIndex = mesh.FindDomainIndex(sz);
+				if (domainIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "domain", sz);
+				prec->SetDomain(domainIndex);
+			}
+           
+			GetFEBioImport()->AddDataRecord(prec);
         }
 		else throw XMLReader::InvalidTag(tag);
-
-		// add to model
-		assert(pdr);
-		if (pdr)
-		{
-			// set additional properties
-			pdr->SetFileName(szfile);
-			pdr->SetData(szdata);
-			if (szname   != 0) pdr->SetName(szname); else pdr->SetName(szdata);
-			if (szdelim  != 0) pdr->SetDelim(szdelim);
-			if (szformat != 0) pdr->SetFormat(szformat);
-			pdr->SetComments(bcomment);
-
-			GetFEBioImport()->AddDataRecord(pdr);
-		}
 
 		++tag;
 	}
