@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include <FECore/ElementDataRecord.h>
 #include <FEBioMech/ObjectDataRecord.h>
 #include <FECore/NLConstraintDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
@@ -299,6 +301,52 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			string_to_int_vector(tag.szvalue(), items);
 			prec->SetItemList(items);
             
+			GetFEBioImport()->AddDataRecord(prec);
+        }
+        else if (tag == "surface_data")
+        {
+            FESurfaceDataRecord* prec = new FESurfaceDataRecord(&fem, szfile);
+            
+            const char* szdata = tag.AttributeValue("data");
+            prec->SetData(szdata);
+            
+            const char* szname = tag.AttributeValue("name", true);
+            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+            if (szdelim  != 0) prec->SetDelim(szdelim);
+            if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			const char* sz = tag.AttributeValue("surface");
+			if (sz)
+			{
+				int surfIndex = mesh.FindSurfaceIndex(sz);
+				if (surfIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+				prec->SetSurface(surfIndex);
+			}
+           
+			GetFEBioImport()->AddDataRecord(prec);
+        }
+        else if (tag == "domain_data")
+        {
+            FEDomainDataRecord* prec = new FEDomainDataRecord(&fem, szfile);
+            
+            const char* szdata = tag.AttributeValue("data");
+            prec->SetData(szdata);
+            
+            const char* szname = tag.AttributeValue("name", true);
+            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+            if (szdelim  != 0) prec->SetDelim(szdelim);
+            if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			const char* sz = tag.AttributeValue("domain");
+			if (sz)
+			{
+				int domainIndex = mesh.FindDomainIndex(sz);
+				if (domainIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "domain", sz);
+				prec->SetDomain(domainIndex);
+			}
+           
 			GetFEBioImport()->AddDataRecord(prec);
         }
 		else throw XMLReader::InvalidTag(tag);
