@@ -152,6 +152,7 @@ SOFTWARE.*/
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
 #include "FESurfaceAttractionBodyForce.h"
+#include "FEMassDamping.h"
 
 #include "FEFacet2FacetSliding.h"
 #include "FEPeriodicBoundary.h"
@@ -172,6 +173,7 @@ SOFTWARE.*/
 #include "FE2OMicroConstraint.h"
 #include "FEMortarSlidingContact.h"
 #include "FEMortarTiedContact.h"
+#include "FEContactPotential.h"
 
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
@@ -374,7 +376,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
-    REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-Kiousis-uncoupled");
+    REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-kiousis");
 
 	// obsolete fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExponentialPower, "fiber-exponential-power-law");
@@ -522,6 +524,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FECentrifugalBodyForce, "centrifugal");
 	REGISTER_FECORE_CLASS(FEPointBodyForce, "point");
 	REGISTER_FECORE_CLASS(FESurfaceAttractionBodyForce, "surface attraction");
+	REGISTER_FECORE_CLASS(FEMassDamping, "mass damping");
 
 	//-----------------------------------------------------------------------------
 	// constraint classes
@@ -568,6 +571,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEStickyInterface, "sticky");
 	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding");
 	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied");
+	REGISTER_FECORE_CLASS(FEContactPotential, "contact potential");
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidLoad
