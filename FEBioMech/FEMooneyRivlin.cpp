@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(m_c1, "c1");
 	ADD_PARAMETER(m_c2, "c2");
 END_FECORE_CLASS();
 
