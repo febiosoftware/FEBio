@@ -389,6 +389,10 @@
 		D5B9E60F213F67DE0008B38A /* ElementDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */; };
 		D5B9E610213F67DE0008B38A /* tens5ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */; };
 		D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FE213F67DE0008B38A /* FEOctree.h */; };
+		D5BC9F5526D07B29003BBF6E /* DomainDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BC9F5126D07B29003BBF6E /* DomainDataRecord.h */; };
+		D5BC9F5626D07B29003BBF6E /* DomainDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5BC9F5226D07B29003BBF6E /* DomainDataRecord.cpp */; };
+		D5BC9F5726D07B29003BBF6E /* SurfaceDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BC9F5326D07B29003BBF6E /* SurfaceDataRecord.h */; };
+		D5BC9F5826D07B29003BBF6E /* SurfaceDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5BC9F5426D07B29003BBF6E /* SurfaceDataRecord.cpp */; };
 		D5BE6F812423B4FB009AE76F /* FENodeSetConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5BE6F7F2423B4FB009AE76F /* FENodeSetConstraint.cpp */; };
 		D5BE6F822423B4FB009AE76F /* FENodeSetConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BE6F802423B4FB009AE76F /* FENodeSetConstraint.h */; };
 		D5D56E872355239E0078BCC4 /* ClassDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E842355239E0078BCC4 /* ClassDescriptor.h */; };
@@ -797,6 +801,10 @@
 		D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementDataRecord.h; sourceTree = "<group>"; };
 		D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5ds.hpp; sourceTree = "<group>"; };
 		D5B9E4FE213F67DE0008B38A /* FEOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctree.h; sourceTree = "<group>"; };
+		D5BC9F5126D07B29003BBF6E /* DomainDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DomainDataRecord.h; sourceTree = "<group>"; };
+		D5BC9F5226D07B29003BBF6E /* DomainDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DomainDataRecord.cpp; sourceTree = "<group>"; };
+		D5BC9F5326D07B29003BBF6E /* SurfaceDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SurfaceDataRecord.h; sourceTree = "<group>"; };
+		D5BC9F5426D07B29003BBF6E /* SurfaceDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SurfaceDataRecord.cpp; sourceTree = "<group>"; };
 		D5BE6F7F2423B4FB009AE76F /* FENodeSetConstraint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeSetConstraint.cpp; sourceTree = "<group>"; };
 		D5BE6F802423B4FB009AE76F /* FENodeSetConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FENodeSetConstraint.h; sourceTree = "<group>"; };
 		D5D56E842355239E0078BCC4 /* ClassDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassDescriptor.h; sourceTree = "<group>"; };
@@ -874,6 +882,8 @@
 				D5F1946821908645000F738D /* DenseMatrix.h */,
 				D5B9E4BA213F67DE0008B38A /* DOFS.cpp */,
 				D5B9E4BF213F67DE0008B38A /* DOFS.h */,
+				D5BC9F5226D07B29003BBF6E /* DomainDataRecord.cpp */,
+				D5BC9F5126D07B29003BBF6E /* DomainDataRecord.h */,
 				D5B9E49B213F67DE0008B38A /* DumpFile.cpp */,
 				D5B9E454213F67DE0008B38A /* DumpFile.h */,
 				D5B9E448213F67DE0008B38A /* DumpMemStream.cpp */,
@@ -1220,6 +1230,8 @@
 				D5B9E3EF213F67DE0008B38A /* SparseMatrix.h */,
 				D5B9E4C9213F67DE0008B38A /* stdafx.cpp */,
 				D5B9E406213F67DE0008B38A /* stdafx.h */,
+				D5BC9F5426D07B29003BBF6E /* SurfaceDataRecord.cpp */,
+				D5BC9F5326D07B29003BBF6E /* SurfaceDataRecord.h */,
 				D5B9E412213F67DE0008B38A /* svd.cpp */,
 				D5B9E4A6213F67DE0008B38A /* sys.h */,
 				D5B9E4AF213F67DE0008B38A /* table.h */,
@@ -1311,6 +1323,7 @@
 				D5B9E519213F67DE0008B38A /* stdafx.h in Headers */,
 				D5A37D2A2286167300867D77 /* FEOctreeSearch.h in Headers */,
 				D510616D217CDD1600CF1690 /* FEPropertyT.h in Headers */,
+				D5BC9F5726D07B29003BBF6E /* SurfaceDataRecord.h in Headers */,
 				D54E21E921517EEE008A9DD3 /* MMath.h in Headers */,
 				D54E21AF2149BB56008A9DD3 /* FESurfacePair.h in Headers */,
 				D5B9E5CA213F67DE0008B38A /* FEBoundaryCondition.h in Headers */,
@@ -1476,6 +1489,7 @@
 				D5B9E502213F67DE0008B38A /* SparseMatrix.h in Headers */,
 				D5B9E608213F67DE0008B38A /* NLConstraintDataRecord.h in Headers */,
 				D5B9E586213F67DE0008B38A /* FESolidDomain.h in Headers */,
+				D5BC9F5526D07B29003BBF6E /* DomainDataRecord.h in Headers */,
 				D5B9E5C2213F67DE0008B38A /* table.h in Headers */,
 				D5B9E551213F67DE0008B38A /* vec2d.h in Headers */,
 				D5B9E588213F67DE0008B38A /* FEBodyLoad.h in Headers */,
@@ -1558,6 +1572,7 @@
 				D5B9E5AE213F67DE0008B38A /* DumpFile.cpp in Sources */,
 				D5B9E5A5213F67DE0008B38A /* JFNKStrategy.cpp in Sources */,
 				D5B9E584213F67DE0008B38A /* vector.cpp in Sources */,
+				D5BC9F5626D07B29003BBF6E /* DomainDataRecord.cpp in Sources */,
 				D5B9E601213F67DE0008B38A /* FECore.cpp in Sources */,
 				D54E21B82149BB56008A9DD3 /* FENodeSet.cpp in Sources */,
 				D51EBF9F217E3AED006F73C4 /* FEPIDController.cpp in Sources */,
@@ -1584,6 +1599,7 @@
 				D5B9E5B1213F67DE0008B38A /* DumpStream.cpp in Sources */,
 				D5B9E5F9213F67DE0008B38A /* FEBox.cpp in Sources */,
 				D5B9E52F213F67DE0008B38A /* LinearSolver.cpp in Sources */,
+				D5BC9F5826D07B29003BBF6E /* SurfaceDataRecord.cpp in Sources */,
 				D5F1948121908646000F738D /* Preconditioner.cpp in Sources */,
 				D5B9E5D3213F67DE0008B38A /* FECorePlot.cpp in Sources */,
 				D54E21B12149BB56008A9DD3 /* FEFacetSet.cpp in Sources */,
