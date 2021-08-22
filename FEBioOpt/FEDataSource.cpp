@@ -108,7 +108,7 @@ bool FEDataParameter::Init()
 		{
 			char buf[256] = { 0 };
 			strcpy(buf, m_param.c_str());
-			char* sz = buf + 17;
+			char* sz = buf + 14;
 			char* c1 = strchr(sz, ',');
 			*c1++ = 0;
 
@@ -226,7 +226,30 @@ bool FEDataParameter::Init()
 	if (val.isValid() == false) {
 
 		// see if it's a data parameter
-		if (strstr(m_ord.c_str(), "fem.element_data"))
+        if (strstr(m_ord.c_str(), "fem.node_data"))
+        {
+            char buf[256] = { 0 };
+            strcpy(buf, m_ord.c_str());
+            char* sz = buf + 14;
+            char* c1 = strchr(sz, ',');
+            *c1++ = 0;
+            
+            int nid = atoi(c1);
+            
+            c1 = strrchr(sz, '\'');
+            if (sz[0] == '\'') sz++;
+            *c1 = 0;
+            
+            FENodeLogData* pd = fecore_new<FENodeLogData>(sz, fem);
+            if (pd == nullptr) { feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str()); return false; }
+            
+            FEMesh& mesh = fem->GetMesh();
+            FENode* pn = mesh.FindNodeFromID(nid);
+            if (pn == nullptr) { feLogErrorEx(fem, "Invalid node id"); return false; }
+            
+            m_fx = [=]() { return pd->value(nid - 1); };
+        }
+		else if (strstr(m_ord.c_str(), "fem.element_data"))
 		{
 			char buf[256] = { 0 };
 			strcpy(buf, m_ord.c_str());
@@ -241,7 +264,7 @@ bool FEDataParameter::Init()
 			*c1 = 0;
 
 			FELogElemData* pd = fecore_new<FELogElemData>(sz, fem);
-			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_ord.c_str()); return false; }
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str()); return false; }
 
 			FEMesh& mesh = fem->GetMesh();
 			FEElement* pe = mesh.FindElementFromID(eid);
