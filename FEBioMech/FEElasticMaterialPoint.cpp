@@ -216,6 +216,36 @@ mat3ds FEElasticMaterialPoint::LeftStretchInverse() const
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the right stretch tensor at the current material point
+
+mat3ds FEElasticMaterialPoint::RightHencky() const
+{
+    // get the right stretch tensor
+    mat3ds C = RightCauchyGreen();
+    double l2[3];
+    vec3d v[3];
+    C.eigen2(l2, v);
+    mat3ds H = dyad(v[0])*log(l2[0])/2 + dyad(v[1])*log(l2[1])/2 + dyad(v[2])*log(l2[2])/2;
+    
+    return H;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the left stretch tensor at the current material point
+
+mat3ds FEElasticMaterialPoint::LeftHencky() const
+{
+    // get the left stretch tensor
+    mat3ds B = LeftCauchyGreen();
+    double l2[3];
+    vec3d v[3];
+    B.eigen2(l2, v);
+    mat3ds h = dyad(v[0])*log(l2[0])/2 + dyad(v[1])*log(l2[1])/2 + dyad(v[2])*log(l2[2])/2;
+    
+    return h;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the Lagrangian strain at the current material point
 
 mat3ds FEElasticMaterialPoint::Strain() const
