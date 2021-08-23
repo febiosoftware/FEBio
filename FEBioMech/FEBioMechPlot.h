@@ -829,6 +829,23 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Right stretch
+class FEPlotRightStretch : public FEPlotDomainData
+{
+public:
+    FEPlotRightStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Right Hencky
+class FEPlotRightHencky : public FEPlotDomainData
+{
+public:
+    FEPlotRightHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Rigid body reaction force

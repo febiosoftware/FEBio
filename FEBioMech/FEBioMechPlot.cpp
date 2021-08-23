@@ -1922,6 +1922,52 @@ bool FEPlotSPRLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+//=============================================================================
+//! Store the average right stretch
+class FERightStretch
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->RightStretch();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotRightStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FERightStretch());
+    return true;
+}
+
+//=============================================================================
+//! Store the average right Hencky
+class FERightHencky
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->RightHencky();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotRightHencky::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FERightHencky());
+    return true;
+}
+
 //-----------------------------------------------------------------------------
 //! Store shell thicknesses
 bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
