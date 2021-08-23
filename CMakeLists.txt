@@ -324,4 +324,4 @@ endif()
 
 
 get_target_property(LINKEDLIBS febio3 LINK_LIBRARIES)
-file(WRITE test.txt "${LINKEDLIBS}")
+
