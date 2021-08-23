@@ -39,6 +39,23 @@ FEMaterialPoint* FEReactivePlasticDamageMaterialPoint::Copy()
 {
     FEReactivePlasticDamageMaterialPoint* pt = new FEReactivePlasticDamageMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
+
+    pt->m_Fusi = m_Fusi;
+    pt->m_Fvsi = m_Fvsi;
+    pt->m_Kv = m_Kv;
+    pt->m_Ku = m_Ku;
+    pt->m_gp = m_gp;
+    pt->m_gpp = m_gpp;
+    pt->m_gc = m_gc;
+    pt->m_wy = m_wy;
+    pt->m_Eyt = m_Eyt;
+    pt->m_Eym = m_Eym;
+    pt->m_di = m_di;
+    pt->m_dy = m_dy;
+    pt->m_d = m_d;
+    pt->m_byld = m_byld;
+    pt->m_byldt = m_byldt;
+
     return pt;
 }
 
@@ -58,67 +75,21 @@ void FEReactivePlasticDamageMaterialPoint::Init()
                            0,1,0,
                            0,0,1));
     m_Fp = mat3dd(1);
-    m_Ku.resize(n);
-    m_Kv.resize(n);
+    m_Ku.assign(n, 0);
+    m_Kv.assign(n, 0);
     m_gp.assign(n, 0);
     m_gpp.assign(n, 0);
     m_gc.assign(n, 0);
     m_Rhat = 0;
-    m_wi.assign(n, 0);
     m_wy.assign(n,0);
     m_gp.assign(n, 0);
     m_Eyt.assign(n, 0);
     m_Eym.assign(n, 0);
-    m_di.assign(n, 0);
+    m_di.assign(n+1, 0);
     m_dy.assign(n, 0);
-    m_d.assign(n, 0);
-    m_yld.assign(n, 0);
-    
-    // Need to check this now that wmax/bias exist
-    
-    // initialize initial intact bond fraction values
-    if (n == 1) {
-        m_wi[0] = m_pMat->m_wmin;
-    }
-    else {
-        m_wi[0] = m_pMat->m_wmin;
-        double sw = m_wi[0];
-        for (int i=1; i<n; ++i) {
-            m_wi[i] = (1 - m_pMat->m_wmin)/(n-1);
-            sw += m_wi[i];
-        }
-    }
-    
-    if (n == 1) {
-        m_wi[0] = m_pMat->m_wmin;
-    }
-    else {
-        // use bias r to reduce intervals in Ky and w as they increase proportionally
-        double r = m_pMat->m_bias;
-        // r= 1 uses uniform intervals
-        if (r == 1) {
-            m_wi[0] = m_pMat->m_wmin;
-            double sw = m_wi[0];
-            for (int i=1; i<n; ++i) {
-                m_wi[i] = (m_pMat->m_wmax - m_pMat->m_wmin)/(n-1);
-                sw += m_wi[i];
-            }
-        }
-        else {
-            double c = (1-r)/(1-pow(r, n-1));
-            m_wi[0] = m_pMat->m_wmin;
-            m_wi[1] = c*(m_pMat->m_wmax-m_pMat->m_wmin);
-            double sw = m_wi[0];
-            sw += m_wi[1];
-            for (int i=2; i<n; ++i) {
-                m_wi[i] = m_wi[i-1]*r;
-                sw += m_wi[i];
-            }
-        }
-    }
-    
-    
-    
+    m_d.assign(n+1, 0);
+    m_byld.assign(n, false);
+    m_byldt.assign(n, false);
     
     // don't forget to initialize the base class
     FEDamageMaterialPoint::Init();
@@ -133,6 +104,7 @@ void FEReactivePlasticDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
         m_Ku[i] = m_Kv[i];
         m_gc[i] += fabs(m_gp[i] - m_gpp[i]);
         m_gpp[i] = m_gp[i];
+        if (m_wy[i] > 0) m_byld[i] = true;
         m_Eym[i] = max(m_Eym[i], m_Eyt[i]);
     }
     m_Emax = max(m_Emax, m_Etrial);
@@ -146,22 +118,20 @@ void FEReactivePlasticDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPoint::Serialize(ar);
-    FEReactivePlasticDamage* prp = dynamic_cast<FEReactivePlasticDamage*>(m_pMat);
-    int n = prp ? prp->m_n : 1;
     
     if (ar.IsSaving())
     {
         ar << m_Fp << m_D << m_Etrial << m_Emax;
         ar << m_Fusi << m_Fvsi << m_Ku << m_Kv << m_gp << m_gpp << m_gc;
-        ar << m_wi << m_wy << m_Eyt << m_Eym;
-        ar << m_di << m_dy << m_d << m_yld;
+        ar << m_wy << m_Eyt << m_Eym;
+        ar << m_di << m_dy << m_d << m_byld << m_byldt;
     }
     else
     {
         ar >> m_Fp >> m_D >> m_Etrial >> m_Emax;
         ar >> m_Fusi >> m_Fvsi >> m_Ku >> m_Kv >> m_gp >> m_gpp >> m_gc;
-        ar >> m_wi >> m_wy >> m_Eyt >> m_Eym;
-        ar >> m_di >> m_dy >> m_d >> m_yld;
+        ar >> m_wy >> m_Eyt >> m_Eym;
+        ar >> m_di >> m_dy >> m_d >> m_byld >> m_byldt;
     }
 }
 
@@ -177,7 +147,9 @@ double FEReactivePlasticDamageMaterialPoint::YieldedBonds()
 double FEReactivePlasticDamageMaterialPoint::IntactBonds()
 {
     double w = 0;
-    for (int i=0; i<m_wi.size(); ++i) w += m_wy[i] + m_d[i];
+    int n = (int) m_wy.size();
+    for (int i=0; i<n; ++i) w += m_wy[i] + m_d[i];
+    w += m_d[n];
     return 1.0-w;
 }
 

@@ -95,12 +95,15 @@ bool FEReactivePlasticDamage::Init()
         return false;
     }
     if (m_wmax < m_wmin) {
-        feLogError("wmax must be ≥ wmin");
+        if (m_n ==1)
+            feLogError("w0 + we = 1 must be satisfied");
+        else
+            feLogError("w0 + we < 1 must be satisfied");
         return false;
     }
     
     Ky.resize(m_n);
-    w.resize(m_n);
+    w.resize(m_n+1);
     vector<double> Kp(m_n,0);
     
     if (m_n == 1) {
@@ -141,7 +144,8 @@ bool FEReactivePlasticDamage::Init()
             }
         }
     }
-    
+    w[m_n] = m_we;
+
     return FEElasticMaterial::Init();
 }
 
@@ -200,15 +204,21 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
             continue;
         }
         
-        if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+m_rtol))){
-            // if this is the first yield, set the flag to true and initialize yielded mass fraction
-            if (pp.m_yld[i] == 0) {
-                pp.m_yld[i] = 1;
+        // check if i-th bond family is yielding
+        if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+m_rtol))) {
+            if (pp.m_byldt[i] == false) {
+                pp.m_byldt[i] = true;
                 pp.m_wy[i] = (1.0-pp.m_di[i])*w[i];
-                pp.m_wi[i] = 0.0;
             }
         }
-        
+        // if not, and if this bond family has not yielded at previous times,
+        // reset the mass fraction of yielded bonds to zero (in case m_wy[i] was
+        // set to non-zero during a prior iteration at current time)
+        else if (pp.m_byld[i] == false) {
+            pp.m_byldt[i] = false;
+            pp.m_wy[i] = 0;
+        }
+
         // find Fv
         bool conv = false;
         int iter = 0;
@@ -311,10 +321,9 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
     double Es = max(pp.m_Etrial, pp.m_Emax);
     
     for (int i=0; i<m_n; ++i) {
-        if (pp.m_yld[i] == 0)
+        if (pp.m_byldt[i] == false)
         {
             pp.m_di[i] = m_pIDamg ? m_pIDamg->cdf(Es) : 0;
-            pp.m_wi[i] = (1.0-pp.m_di[i])*w[i];
             pp.m_d[i] = pp.m_di[i]*w[i];
             // what if we iterate here, update damage, then the next iteration decides we actually are yielding?
             // no mechanism to undo the extra damage we've added
@@ -345,6 +354,10 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
         // sum the damage over all bond families
         pp.m_D += pp.m_d[i];
     }
+    // add damage to persistent elastic bonds
+    pp.m_di[m_n] = m_pIDamg ? m_pIDamg->cdf(Es) : 0;
+    pp.m_d[m_n] = pp.m_di[m_n]*w[m_n];
+    pp.m_D += pp.m_d[m_n];
 }
 
 
