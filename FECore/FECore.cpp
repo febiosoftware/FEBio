@@ -53,6 +53,7 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "FEConstValueVec3.h"
 #include "FELogEnclosedVolume.h"
+#include "FELogElementVolume.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -159,4 +160,5 @@ REGISTER_FECORE_CLASS(FESurface, "surface");
 
 // log classes
 REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
+REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 }

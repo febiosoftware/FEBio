@@ -48,8 +48,11 @@ public:
 	int GetElementType() { return ElementRef(0).Type(); };
 
 public:
-	// evaluate volume of element
+	// evaluate volume of element in reference frame
 	virtual double Volume(FEShellElement& el) { return 0.0; }
+
+	// evaluate volume of element in current frame
+	virtual double CurrentVolume(FEShellElement& el) { return 0.0; }
 
 	// Initialize shell data (Called from FEMesh::InitShells)
 	virtual void InitShells();
