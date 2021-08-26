@@ -56,7 +56,7 @@ at https://forums.febio.org/.
 * Modified FEEllipsoidalFiberDensityDistribution to accept mappable semi-principal axes for ellipsoid.  Fixed spelling in class name.
 * Add ability to map 'mat3s' symmetric 3x3 matrix in MeshData section.
 * Updated perm-ref-ortho to use all mappable  material parameters.
-* Modified sliding-elastic, sliding-biphasic, sliding-biphasic-ixed" to use search_radius as length value instead of scale factor, for consistency with other sliding and tied interfaces.
+* Modified sliding-elastic, sliding-biphasic, sliding-biphasic-mixed to use search_radius as length value instead of scale factor, for consistency with other sliding and tied interfaces.
 * Fixed bug in "fluid normal velocity" load where rim pressure was not initialized properly.
 * Updated "fluid normal velocity" load to set parabolic velocity distribution to zero only on sections of the rim where the user has prescribed zero fluid velocity.  This change makes it possible to prescribe parabolic velocity profiles on cross-sections with symmetry planes, and on rectangular faces.
 * Created linear and nonlinear elastic fluid materials to allow alternating between linear and nonlinear pressure-dilatation models.  Default setting is linear.  Updated fluid-FSI traction and biphasic-FSI traction algorithms to better identify orientation of surface normal of the interface relative to solid elements with fluid-FSI or biphasic-FSI materials.
