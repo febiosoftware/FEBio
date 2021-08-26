@@ -24,34 +24,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FECoreBase.h"
-#include "DataRecord.h"
+#include "SurfaceDataRecord.h"
 
-class FESurface;
-
-//-----------------------------------------------------------------------------
-//! Base class for surface log data
-class FECORE_API FELogSurfaceData : public FECoreBase
-{
-    FECORE_SUPER_CLASS
-
-public:
-    FELogSurfaceData(FEModel* fem) : FECoreBase(fem) {}
-    virtual ~FELogSurfaceData() {}
-    virtual double value(FESurface& surface) = 0;
-};
-
-//-----------------------------------------------------------------------------
-class FECORE_API FESurfaceDataRecord : public DataRecord
+class FECORE_API FELogEnclosedVolume : public FELogSurfaceData
 {
 public:
-    FESurfaceDataRecord(FEModel* pfem, const char* szfile);
-    double Evaluate(int item, int ndata);
-    void SetData(const char* sz);
-    void SetSurface(int surfIndex);
-    void SelectAllItems();
-    int Size() const;
-
-private:
-    vector<FELogSurfaceData*>	m_Data;
+    FELogEnclosedVolume(FEModel* fem) : FELogSurfaceData(fem) {}
+    double value(FESurface& surface) override;
 };

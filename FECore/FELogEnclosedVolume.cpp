@@ -23,35 +23,47 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "FECoreBase.h"
-#include "DataRecord.h"
+#include "stdafx.h"
+#include "FELogEnclosedVolume.h"
+#include "FESurface.h"
+#include "FENode.h"
 
-class FESurface;
-
-//-----------------------------------------------------------------------------
-//! Base class for surface log data
-class FECORE_API FELogSurfaceData : public FECoreBase
+double FELogEnclosedVolume::value(FESurface& surface)
 {
-    FECORE_SUPER_CLASS
+	// loop over all elements
+	double vol = 0.0;
+	int NE = surface.Elements();
+	vec3d x[FEElement::MAX_NODES];
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the next element
+		FESurfaceElement& el = surface.Element(i);
 
-public:
-    FELogSurfaceData(FEModel* fem) : FECoreBase(fem) {}
-    virtual ~FELogSurfaceData() {}
-    virtual double value(FESurface& surface) = 0;
-};
+		// get the nodal coordinates
+		int neln = el.Nodes();
+		for (int j = 0; j < neln; ++j) x[j] = surface.Node(el.m_lnode[j]).m_rt;
 
-//-----------------------------------------------------------------------------
-class FECORE_API FESurfaceDataRecord : public DataRecord
-{
-public:
-    FESurfaceDataRecord(FEModel* pfem, const char* szfile);
-    double Evaluate(int item, int ndata);
-    void SetData(const char* sz);
-    void SetSurface(int surfIndex);
-    void SelectAllItems();
-    int Size() const;
+		// loop over integration points
+		double* w = el.GaussWeights();
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// evaluate the position vector at this point
+			vec3d r = el.eval(x, n);
 
-private:
-    vector<FELogSurfaceData*>	m_Data;
-};
+			// calculate the tangent vectors
+			double* Gr = el.Gr(n);
+			double* Gs = el.Gs(n);
+			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
+			for (int j = 0; j < neln; ++j)
+			{
+				dxr += x[j] * Gr[j];
+				dxs += x[j] * Gs[j];
+			}
+
+			// update volume
+			vol += w[n] * (r * (dxr ^ dxs));
+		}
+	}
+	return vol / 3.0;
+}

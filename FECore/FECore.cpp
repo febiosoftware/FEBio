@@ -52,7 +52,7 @@ SOFTWARE.*/
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
 #include "FEConstValueVec3.h"
-#include "SurfaceDataRecord.h"
+#include "FELogEnclosedVolume.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
