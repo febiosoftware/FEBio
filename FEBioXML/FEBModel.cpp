@@ -463,7 +463,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		vector<int> elist = eset.ElementList();
 
 		int ne = (int) elist.size();
-		FEElementSet* feset = new FEElementSet(&fem);
+		FEElementSet* feset = fecore_alloc(FEElementSet, &fem);
 		string name = partName + eset.Name();
 		feset->SetName(name);
 

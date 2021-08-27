@@ -73,7 +73,7 @@ double FEThermoFluid::Temperature(FEMaterialPoint& mp)
 double FEThermoFluid::BulkModulus(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
-    return -vt.m_Jf*Tangent_Pressure_Strain(mp);
+    return -(vt.m_ef+1)*Tangent_Pressure_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------

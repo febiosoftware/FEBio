@@ -26,7 +26,7 @@
 
 
 #pragma once
-#include "FECore/FEMaterialPoint.h"
+#include "FEDamageMaterialPoint.h"
 #include "FEReactivePlasticDamage.h"
 #include <vector>
 
@@ -34,11 +34,11 @@ class FEReactivePlasticDamage;
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the damage and plasticity variables.
-class FEReactivePlasticDamageMaterialPoint : public FEMaterialPoint
+class FEReactivePlasticDamageMaterialPoint : public FEDamageMaterialPoint
 {
 public:
     //! constructor
-    FEReactivePlasticDamageMaterialPoint(FEMaterialPoint *pt, FEReactivePlasticDamage* pmat) : FEMaterialPoint(pt) { m_pMat = pmat; }
+    FEReactivePlasticDamageMaterialPoint(FEMaterialPoint *pt, FEReactivePlasticDamage* pmat) : FEDamageMaterialPoint(pt) { m_pMat = pmat; }
     
     FEMaterialPoint* Copy();
     
@@ -67,16 +67,13 @@ public:
     vector<double>          m_gc;       //!< cumulative value of octahedral plastic shear strain
     mat3d                   m_Fp;       //!< deformation gradient at previous time
     double                  m_Rhat;     //!< reactive heat supply density
-    vector<double>          m_wi;       //!< mass fraction of intact bonds
     vector<double>          m_wy;       //!< mass fraction of yielded bonds
     vector<double>          m_Eyt;      //!< trial yield damage criterion at current time
     vector<double>          m_Eym;      //!< max yield damage criterion up to current time
     vector<double>          m_di;       //!< individual family intact damage (0 = no damage, 1 = complete damage)
     vector<double>          m_dy;       //!< individual family yield damage (0 = no damage, 1 = complete damage)
     vector<double>          m_d;        //!< total damage for individual family (0 = no damage, 1 = complete damage)
-    vector<int>             m_yld;      //!< yielded flag (true = yielded)
-    double                  m_D;        //!< weighted overall damage (0 = no damage, 1 = complete damage)
-    double                  m_Eit;      //!< trial intact damage criterion at current time
-    double                  m_Eim;      //!< max intact damage criterion up to current time
+    vector<bool>            m_byld;     //!< flag on which bonds have already yielded at start of current time
+    vector<bool>            m_byldt;    //!< trial value of m_byld
     FEReactivePlasticDamage*   m_pMat;     //!< parent material
 };

@@ -162,6 +162,10 @@ public:
 
 	//! Get the nodal coordinates of an element
 	void NodalCoordinates(FESurfaceElement& el, vec3d* re);
+    
+    //! Determine if a face on this surface is pointing away or into a specified element
+    double FacePointing(FESurfaceElement& se, FEElement& el);
+    
 
 public:
 	//! calculate the surface area of a surface element

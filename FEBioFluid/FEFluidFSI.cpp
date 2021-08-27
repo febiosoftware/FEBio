@@ -93,6 +93,8 @@ FEMaterialPoint* FEFluidFSI::CreateMaterialPointData()
 // initialize
 bool FEFluidFSI::Init()
 {
+    m_pFluid->Init();
+    m_pSolid->Init();
     // set the solid density to zero (required for the solid of a FSI domain)
     m_pSolid->SetDensity(0.0);
     

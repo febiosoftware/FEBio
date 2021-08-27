@@ -115,8 +115,11 @@ public:
 	//! Reset the mesh data
 	void Reset();
 
-	//! Calculates an elements volume
+	//! Calculates an elements volume in reference configuration
 	double ElementVolume(FEElement& el);
+
+	//! calculates element volume in current configuration
+	double CurrentElementVolume(FEElement& el);
 
 	//! Finds a node from a given ID
 	FENode* FindNodeFromID(int nid);
@@ -170,6 +173,7 @@ public:
 	void AddDomain(FEDomain* pd);
 
 	FEDomain* FindDomain(const std::string& name);
+	int FindDomainIndex(const std::string& name);
 	FEDomain* FindDomain(int domId);
 
 	//! clear all domains
@@ -183,6 +187,7 @@ public:
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 	FESurface* FindSurface(const std::string& name);
+	int FindSurfaceIndex(const std::string& name);
 
 	// --- EDGES ---
 	int Edges() { return (int) m_Edge.size(); }
@@ -254,10 +259,6 @@ public: // data maps
 
 	int DataMaps() const;
 	FEDataMap* GetDataMap(int i);
-
-protected:
-	double SolidElementVolume(FESolidElement& el);
-	double ShellElementVolume(FEShellElement& el);
 
 private:
 	vector<FENode>		m_Node;		//!< nodes

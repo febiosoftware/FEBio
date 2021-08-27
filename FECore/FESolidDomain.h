@@ -241,8 +241,11 @@ public:
     //! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
     double ShapeGradient0(FESolidElement& el, double r, double s, double t, vec3d* GradH);
 
-	//! calculate the volume of an element
+	//! calculate the volume of an element in reference frame
 	double Volume(FESolidElement& el);
+
+	//! calculate the volume of an element in current frame
+	double CurrentVolume(FESolidElement& el);
 
 public:
 	//! get the current nodal coordinates

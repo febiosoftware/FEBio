@@ -479,12 +479,11 @@ void FESlidingElasticInterface::CalcAutoPenalty(FESlidingElasticSurface& s)
 void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESlidingElasticSurface& ms, bool bupseg, bool bmove)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
-    double R = m_srad*mesh.GetBoundingBox().radius();
     
     // initialize projection data
     FENormalProjection np(ms);
     np.SetTolerance(m_stol);
-    np.SetSearchRadius(R);
+    np.SetSearchRadius(m_srad);
     np.Init();
     
     double psf = GetPenaltyScaleFactor();
@@ -618,9 +617,9 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
                 
                 double Ln = data.m_Lmd + eps*g;
                 
-                data.m_gap = (g <= R? g : 0);
+                data.m_gap = (g <= m_srad? g : 0);
                 
-                if ((g > R) || ((!m_btension) && (Ln < 0)) ) {
+                if ((g > m_srad) || ((!m_btension) && (Ln < 0)) ) {
                     data.m_Lmd = 0;
                     data.m_pme = 0;
                     data.m_gap = 0;

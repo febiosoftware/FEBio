@@ -326,8 +326,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DUSE_MPI",
-					"-Xpreprocessor",
-					"-fopenmp",
 				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";

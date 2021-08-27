@@ -234,7 +234,7 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
         epi.m_J = Js*Ji;
         
         // evaluate stress for this generation
-        s += epi.m_s = Ji*m_MG[i]->Stress(*pt.m_mp[i]);
+        s += epi.m_s = m_MG[i]->Stress(*pt.m_mp[i]);
         
         // restore the material point deformation gradient
         epi.m_F = Fi;
@@ -274,7 +274,7 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
         epi.m_J = Js*Ji;
         
 		// evaluate tangent for this generation
-		c += Ji*m_MG[i]->Tangent(*pt.m_mp[i]);
+		c += m_MG[i]->Tangent(*pt.m_mp[i]);
 
         // restore the material point deformation gradient
         epi.m_F = Fi;
@@ -314,8 +314,7 @@ double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
         epi.m_J = Js*Ji;
         
         // evaluate strain energy density for this generation
-//        sed += Ji*m_MG[i]->StrainEnergyDensity(*pt.m_mp[i]);
-        double dsed = Ji*m_MG[i]->StrainEnergyDensity(*pt.m_mp[i]);
+        double dsed = m_MG[i]->StrainEnergyDensity(*pt.m_mp[i])/Ji;
         sed += dsed;
         
         // restore the material point deformation gradient

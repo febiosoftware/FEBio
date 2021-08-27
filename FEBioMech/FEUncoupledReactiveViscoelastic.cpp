@@ -265,7 +265,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
             // evaluate bond stress
             sb = m_pBond->DevStress(mp);
             // add bond stress to total stress
-            s += sb*(w*pt.m_Ji[ig]);
+            s += sb*w;
         }
         
         // restore safe copy of deformation gradient
@@ -320,7 +320,7 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
             // evaluate bond tangent
             cb = m_pBond->DevTangent(mp);
             // add bond tangent to total tangent
-            c += cb*(w*pt.m_Ji[ig]);
+            c += cb*w;
         }
         
         // restore safe copy of deformation gradient
@@ -376,7 +376,7 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
             // evaluate bond stress
             sedb = m_pBond->DevStrainEnergyDensity(mp);
             // add bond stress to total stress
-            sed += sedb*w;
+            sed += sedb*w/pt.m_Ji[ig];
         }
         
         // restore safe copy of deformation gradient

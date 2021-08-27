@@ -90,7 +90,7 @@ public:
     bool Dilatation(const double T, const double p, const double c, double& e) override;
     
     //! fluid pressure from state variables
-    double Pressure(const double ef, const double T) override;
+    double Pressure(const double ef, const double T);
     
 public:
     double      m_R;        //!< universal gas constant
@@ -100,7 +100,7 @@ public:
     FEFunction1D*   m_psat;         //!< normalized gage pressure on saturation curve (multiply by m_Pr to get actual value)
     FEFunction1D*   m_asat;         //!< normalized specific free energy on saturation curve (multiply by m_rhor/m_Pr to get actual value)
     FEFunction1D*   m_ssat;         //!< normalized specific entropy on saturation curve (multiply by m_rhor*m_Tr/m_Pr to get actual value)
-    FEFunction1D*   m_Jsat;         //!< volume ratio on saturation curve
+    FEFunction1D*   m_esat;         //!< dilatation on saturation curve
     int             m_nvc;          //!< number of virial coefficients for pressure constitutive relation
     FEFunction1D*   m_B[MAX_NVC];   //!< non-dimensional virial coefficients for pressure constitutive relation
 

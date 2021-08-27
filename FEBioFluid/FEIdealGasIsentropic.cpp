@@ -83,7 +83,7 @@ double FEIdealGasIsentropic::Pressure(const double e, const double T)
 double FEIdealGasIsentropic::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double dp = -m_gamma*m_Pr*pow(J, -m_gamma-1);
     return dp;
 }
@@ -93,7 +93,7 @@ double FEIdealGasIsentropic::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 double FEIdealGasIsentropic::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1+ fp.m_ef;
     double d2p = m_gamma*(m_gamma+1)*m_Pr*pow(J, -m_gamma-2);
     return d2p;
 }
@@ -103,7 +103,7 @@ double FEIdealGasIsentropic::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
 double FEIdealGasIsentropic::Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double T = m_Tr*pow(J, 1-m_gamma);
     return T;
 }
@@ -113,7 +113,7 @@ double FEIdealGasIsentropic::Temperature(FEMaterialPoint& mp)
 double FEIdealGasIsentropic::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double sed = m_Pr*(J-1+(pow(J, 1-m_gamma)-1)/(m_gamma-1));
     return sed;
 }
