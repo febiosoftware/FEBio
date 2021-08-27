@@ -60,7 +60,7 @@ FEFluidMaterial::FEFluidMaterial(FEModel* pfem) : FEMaterial(pfem)
 double FEFluidMaterial::Density(FEMaterialPoint& pt)
 {
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
-    return m_rhor/vt.m_Jf;
+    return m_rhor/(vt.m_ef+1);
 }
 
 //-----------------------------------------------------------------------------

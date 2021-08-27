@@ -66,6 +66,10 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 	m_ntri7  = FE_TRI7G7;
 	m_ntri10 = FE_TRI10G7;
 
+	m_nquad4 = FE_QUAD4G4;
+	m_nquad8 = FE_QUAD8G9;
+	m_nquad9 = FE_QUAD9G9;
+
 	// 3-field formulation flags
 	m_b3field_hex = true;
 	m_b3field_tet = false;
@@ -319,7 +323,7 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
 		// set the element type/integration rule
 		if (bnodal)
 		{
-			if (fi.ntype == 4) el.SetType(FE_QUAD4NI);
+			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
 			else if (fi.ntype == 3) el.SetType(FE_TRI3NI);
 			else if (fi.ntype == 6) el.SetType(FE_TRI6NI);
 			else if (fi.ntype == 8) el.SetType(FE_QUAD8NI);
@@ -328,13 +332,13 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
 		}
 		else
 		{
-			if (fi.ntype == 4) el.SetType(FE_QUAD4G4);
-			else if (fi.ntype == 3) el.SetType(m_ntri3);
-			else if (fi.ntype == 6) el.SetType(m_ntri6);
-			else if (fi.ntype == 7) el.SetType(m_ntri7);
+			if      (fi.ntype ==  3) el.SetType(m_ntri3);
+			else if (fi.ntype ==  4) el.SetType(m_nquad4);
+			else if (fi.ntype ==  6) el.SetType(m_ntri6);
+			else if (fi.ntype ==  7) el.SetType(m_ntri7);
 			else if (fi.ntype == 10) el.SetType(m_ntri10);
-			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
-			else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+			else if (fi.ntype ==  8) el.SetType(m_nquad8);
+			else if (fi.ntype ==  9) el.SetType(m_nquad9);
 			else return false;
 		}
 
@@ -744,6 +748,21 @@ void FEModelBuilder::ApplyParameterMaps()
 			v.setValuator(map);
 			v.SetItemList(itemList);
 		}
+        else if (p.type() == FE_PARAM_MAT3DS_MAPPED)
+        {
+            FEParamMat3ds& v = p.value<FEParamMat3ds>();
+            FEMappedValueMat3ds* map = fecore_alloc(FEMappedValueMat3ds, &m_fem);
+            if (data->DataType() != FE_MAT3DS)
+            {
+                std::stringstream ss;
+                ss << "Cannot assign map \"" << data->GetName() << "\" to parameter \"" << p.name() << "\" : bad data type";
+                string err = ss.str();
+                throw std::runtime_error(err.c_str());
+            }
+            map->setDataMap(data);
+            v.setValuator(map);
+            v.SetItemList(itemList);
+        }
 		else
 		{
 			assert(false);

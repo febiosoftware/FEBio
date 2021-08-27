@@ -36,6 +36,7 @@ BEGIN_FECORE_CLASS(FETractionLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scale   , "scale");
 	ADD_PARAMETER(m_traction, "traction");
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
+	ADD_PARAMETER(m_blinear, "linear");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -45,6 +46,7 @@ FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_scale = 1.0;
 	m_traction = vec3d(0, 0, 0);
 	m_bshellb = false;
+	m_blinear = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,7 +84,7 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// evaluate the integral
 	FETractionLoad* load = this;
-	surf.LoadVector(R, m_dof, true, [=](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
+	surf.LoadVector(R, m_dof, m_blinear, [=](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 
 		// evaluate traction at this material point
 		vec3d t = m_traction(pt)*m_scale;
@@ -102,4 +104,5 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 void FETractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// Nothing to do here.
+	// TODO: I think if the linear flag is false, I do need to evaluate a stiffness.
 }

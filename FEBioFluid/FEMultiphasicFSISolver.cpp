@@ -430,7 +430,25 @@ bool FEMultiphasicFSISolver::InitEquations()
     // get the total concentration equations
     m_nseq = 0;
     for (int i = 0; i < MAX_CDOFS; ++i) m_nseq += m_nceq[i];
-    
+
+    // Next, we add any Lagrange Multipliers
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* lmc = fem.NonlinearConstraint(i);
+        if (lmc->IsActive())
+        {
+            m_neq += lmc->InitEquations(m_neq);
+        }
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive())
+        {
+            m_neq += spc->InitEquations(m_neq);
+        }
+    }
+
     // All initialization is done
     return true;
 }

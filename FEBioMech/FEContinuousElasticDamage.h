@@ -41,6 +41,7 @@ public:
 	FEDamageElasticFiber(FEModel* fem);
 
 	double Damage(FEMaterialPoint& mp);
+	double Damage(FEMaterialPoint& mp, int n);
 	double beta(FEMaterialPoint& mp);
 	double gamma(FEMaterialPoint& mp);
 
@@ -72,12 +73,17 @@ protected:
 	double	m_r_s, m_r_inf;
 
 	// D2 parameters
-	double m_D2_D0;
-	double m_D2_beta0;
-	double m_D2_x1;
-	double m_D2_x2;
+//	double m_D2_D0;
+//	double m_D2_beta0;
+//	double m_D2_x1;
+//	double m_D2_x2;
 	double m_D2_a;
 	double m_D2_b;
+	double m_D2_c;
+	double m_D2_d;
+	double m_D2_ginf;
+	double m_D2_g0;
+	double m_D2_xg;
 
 	// D3 parameters
 	double	m_D3_xb;

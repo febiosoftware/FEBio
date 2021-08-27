@@ -30,12 +30,15 @@ SOFTWARE.*/
 #include "FEFluidMaterialPoint.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>
+#include "FELinearElasticFluid.h"
+#include "FENonlinearElasticFluid.h"
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFluid, FEFluidMaterial)
 
 	// material parameters
     ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+    ADD_PROPERTY(m_pElastic, "elastic", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -49,6 +52,28 @@ END_FECORE_CLASS();
 FEFluid::FEFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 { 
     m_k = 0;
+    m_pElastic = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! FEFluid initialization
+bool FEFluid::Init()
+{
+    m_Tr = GetFEModel()->GetGlobalConstant("T");
+    if (m_pElastic == nullptr) {
+        m_pElastic = new FELinearElasticFluid(GetFEModel());
+    }
+    FELinearElasticFluid* pLN = dynamic_cast<FELinearElasticFluid*>(m_pElastic);
+    FENonlinearElasticFluid* pNL = dynamic_cast<FENonlinearElasticFluid*>(m_pElastic);
+    if (pLN) {
+        pLN->m_k = m_k;
+        pLN->m_rhor = m_rhor;
+    }
+    else if (pNL) {
+        pNL->m_k = m_k;
+        pNL->m_rhor = m_rhor;
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,31 +88,27 @@ FEMaterialPoint* FEFluid::CreateMaterialPointData()
 double FEFluid::BulkModulus(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
-    return -vt.m_Jf*Tangent_Pressure_Strain(mp);
+    return -(vt.m_ef+1)*Tangent_Pressure_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------
 //! elastic pressure
 double FEFluid::Pressure(FEMaterialPoint& mp)
 {
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double e = fp.m_Jf - 1;
-
-    return Pressure(e);
+    return m_pElastic->Pressure(mp);
 }
 
 //-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
 double FEFluid::Pressure(const double e, const double T)
 {
-    return m_k*(1/(1+e)-1);
+    return m_pElastic->Pressure(e, T);
 }
 
 //-----------------------------------------------------------------------------
 double FEFluid::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 {
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    return -m_k/pow(fp.m_Jf,2);
+    return m_pElastic->Tangent_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +153,7 @@ mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
 double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double sed = m_k*(fp.m_Jf-1-log(fp.m_Jf));
+    double sed = m_k*(fp.m_ef-log(fp.m_ef+1));
     return sed;
 }
 
@@ -140,12 +161,14 @@ double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 //! invert pressure-dilatation relation
 bool FEFluid::Dilatation(const double T, const double p, const double c, double& e)
 {
-    e = 1/(1+p/m_k)-1;
-    //for solute cases
+//    e = 1/(1+p/m_k)-1;
+    e = -p/m_k;
+
+    // for solute cases, assume that p = actual pressure and c = Phi*R*c_effective
     if (c != 0)
     {
-        e = 1/(1+(p-T*c)/m_k)-1;
-//        e = -(p-T*c)/m_k;
+//        e = 1/(1+(p-T*c)/m_k)-1;
+        e = -(p-T*c)/m_k;
     }
     
     return true;

@@ -57,6 +57,10 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceBiphasic, FEContactInterface)
 	ADD_PARAMETER(m_phi      , "contact_frac"       );
 	ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
     ADD_PARAMETER(m_bsmfls   , "smooth_fls"         );
+    ADD_PARAMETER(m_bflips   , "flip_primary"       );
+    ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
+    ADD_PARAMETER(m_bshellbs , "shell_bottom_primary"  );
+    ADD_PARAMETER(m_bshellbm , "shell_bottom_secondary");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -546,7 +550,9 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
     m_naugmax = 10;
     
     m_bfreeze = false;
-    
+    m_bflipm = m_bflips = false;
+    m_bshellbm = m_bshellbs = false;
+
     m_dofP = pfem->GetDOFIndex("p");
     
     m_ss.SetSibling(&m_ms);
@@ -565,6 +571,15 @@ bool FESlidingInterfaceBiphasic::Init()
     // initialize surface data
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
+    
+    // Flip secondary and primary surfaces, if requested.
+    // Note that we turn off those flags because otherwise we keep flipping, each time we get here (e.g. in optimization)
+    // TODO: Of course, we shouldn't get here more than once. I think we also get through the FEModel::Reset, so I'll have
+    //       look into that.
+    if (m_bflips) { m_ss.Invert(); m_bflips = false; }
+    if (m_bflipm) { m_ms.Invert(); m_bflipm = false; }
+    if (m_bshellbs) { m_ss.SetShellBottom(m_bshellbs); m_bshellbs = false; }
+    if (m_bshellbm) { m_ms.SetShellBottom(m_bshellbm); m_bshellbm = false; }
     
     return true;
 }
@@ -770,12 +785,11 @@ double FESlidingInterfaceBiphasic::AutoPressurePenalty(FESurfaceElement& el, FES
 void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FESlidingSurfaceBiphasic& ms, bool bupseg, bool bmove)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
-    double R = m_srad*mesh.GetBoundingBox().radius();
-    
+
     // initialize projection data
     FENormalProjection np(ms);
     np.SetTolerance(m_stol);
-    np.SetSearchRadius(R);
+    np.SetSearchRadius(m_srad);
     np.Init();
     double psf = GetPenaltyScaleFactor();
     
@@ -903,12 +917,12 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
                 
                 double Ln = pt.m_Lmd + eps*g;
                 
-                pt.m_gap = (g <= R? g : 0);
+                pt.m_gap = (g <= m_srad? g : 0);
                 
                 // calculate the pressure gap function
                 bool mporo = ms.m_poro[pme->m_lid];
                 
-                if ((Ln >= 0) && (g <= R))
+                if ((Ln >= 0) && (g <= m_srad))
                 {
                     
                     // get the pressure at the projection point
@@ -961,8 +975,6 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
 
 void FESlidingInterfaceBiphasic::Update()
 {
-    double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
-    
     static int naug = 0;
     static int biter = 0;
     
@@ -1051,7 +1063,7 @@ void FESlidingInterfaceBiphasic::Update()
         if (ms.m_bporo) {
             FENormalProjection np(ss);
             np.SetTolerance(m_stol);
-            np.SetSearchRadius(R);
+            np.SetSearchRadius(m_srad);
             np.Init();
             
             for (int n=0; n<ms.Nodes(); ++n)
@@ -1072,7 +1084,7 @@ void FESlidingInterfaceBiphasic::Update()
                     // calculate the gap function
                     double g = ms.m_nn[n]*(node.m_rt - q);
                     
-                    if (fabs(g) <= R)
+                    if (fabs(g) <= m_srad)
                     {
                         // we found an element so let's calculate the nodal traction values for this element
                         // get the normal tractions at the nodes

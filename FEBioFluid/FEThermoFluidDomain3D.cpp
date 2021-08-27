@@ -116,7 +116,7 @@ void FEThermoFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
             
-            if (pt.m_Jf <= 0) {
+            if (pt.m_ef <= -1) {
                 feLogError("Negative jacobian was detected.");
                 throw DoRunningRestart();
             }
@@ -197,7 +197,7 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         sv = m_pMat->GetViscous()->Stress(mp);
         // get the gradient of the elastic pressure
         gradp = tf.m_gradT*m_pMat->Tangent_Pressure_Temperature(mp) +
-                pt.m_gradJf*m_pMat->Tangent_Pressure_Strain(mp);
+                pt.m_gradef*m_pMat->Tangent_Pressure_Strain(mp);
         // get the heat flux
         q = m_pMat->HeatFlux(mp);
         // get the derivative of the elastic pressure with respect to temperature
@@ -221,7 +221,7 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         }
         
         // Jdot/J
-        double dJoJ = pt.m_Jfdot/pt.m_Jf;
+        double dJoJ = pt.m_efdot/(pt.m_ef+1);
         
         for (i=0; i<neln; ++i)
         {
@@ -421,7 +421,7 @@ void FEThermoFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                k = f*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
+                k = f*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
                 ke[ndof*i  ][ndof*j+3] += k.x;
                 ke[ndof*i+1][ndof*j+3] += k.y;
                 ke[ndof*i+2][ndof*j+3] += k.z;
@@ -452,6 +452,7 @@ void FEThermoFluidDomain3D::ElementHeatSupplyStiffness(FEFluidHeatSupply& BF, FE
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        double Jf = 1 + pt.m_ef;
 
         // calculate the jacobian
         detJ = detJ0(el, n)*gw[n]*tp.alphaf;
@@ -469,8 +470,8 @@ void FEThermoFluidDomain3D::ElementHeatSupplyStiffness(FEFluidHeatSupply& BF, FE
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                ke[ndof*i+4][ndof*j+3] -= H[i]*H[j]*dens*r/pt.m_Jf*detJ;
-                ke[ndof*i+4][ndof*j+4] += H[i]*H[j]*dens*drT/pt.m_Jf*detJ;
+                ke[ndof*i+4][ndof*j+3] -= H[i]*H[j]*dens*r/Jf*detJ;
+                ke[ndof*i+4][ndof*j+4] += H[i]*H[j]*dens*drT/Jf*detJ;
             }
         }
     }
@@ -521,6 +522,7 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEThermoFluidMaterialPoint& tf = *(mp.ExtractData<FEThermoFluidMaterialPoint>());
+        double Jf = 1 + pt.m_ef;
 
         // get the tangents
         mat3ds sv   = m_pMat->GetViscous()->Stress(mp);
@@ -533,7 +535,7 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
         double dpTT = m_pMat->GetElastic()->Tangent_Temperature_Temperature(mp);
         double dpJT = m_pMat->GetElastic()->Tangent_Strain_Temperature(mp);
         // Jdot/J
-        double dJoJ = pt.m_Jfdot/pt.m_Jf;
+        double dJoJ = pt.m_efdot/Jf;
         double rho  = m_pMat->Density(mp);
         double cv   = m_pMat->GetElastic()->IsochoricSpecificHeatCapacity(mp);
         double dcvT = m_pMat->GetElastic()->Tangent_cv_Temperature(mp);
@@ -553,15 +555,15 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
             for (j=0, j5 = 0; j<neln; ++j, j5 += 5)
             {
                 mat3d Kvv = vdotTdotv(gradN[i], Cv, gradN[j]);
-                vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dpJ+pt.m_gradJf*(H[j]*dpJJ))*H[i];
-                vec3d kvT = (svT*gradN[i])*H[j] + (gradN[j]*dpT+(pt.m_gradJf*dpJT+tf.m_gradT*dpTT)*H[j])*H[i];
-                vec3d kJv = (pt.m_gradJf*(H[i]/pt.m_Jf) + gradN[i])*H[j];
-                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/pt.m_Jf;
+                vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dpJ+(tf.m_gradT*dpJT+pt.m_gradef*dpJJ)*H[j])*H[i];
+                vec3d kvT = (svT*gradN[i])*H[j] + (gradN[j]*dpT+(tf.m_gradT*dpTT+pt.m_gradef*dpJT)*H[j])*H[i];
+                vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
+                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
                 double kJT = 0;
-                vec3d kTv = ((Cv.dot(pt.m_Lf) + sv - mat3dd(T*dpT))*gradN[j])*H[i];
+                vec3d kTv = ((Cv.dot(pt.m_Lf) + sv - mat3dd(T*dpT))*gradN[j] - tf.m_gradT*(rho*cv*H[j]))*H[i];
                 double kTJ = -dkJ*H[j]*(gradN[i]*tf.m_gradT)
                 + H[i]*H[j]*((svJ - mat3dd(T*dpJT))*pt.m_Lf).trace()
-                + H[i]*H[j]*rho*(cv/pt.m_Jf - dcvJ)*tf.m_Tdot;
+                + H[i]*H[j]*rho*(cv/Jf - dcvJ)*tf.m_Tdot;
                 double kTT = -(tf.m_gradT*(dkT*H[j]) + gradN[j]*k)*gradN[i]
                 + H[i]*H[j]*((svT - mat3dd(dpT+T*dpTT))*pt.m_Lf).trace()
                 - H[i]*H[j]*rho*(dcvT*tf.m_Tdot+ksi*cv/dt)
@@ -784,7 +786,7 @@ void FEThermoFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, co
             for (j=0, j5 = 0; j<neln; ++j, j5 += 5)
             {
                 mat3d Mv = ((mat3dd(ksi/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
-                vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
+                vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
                 
                 ke[i5  ][j5  ] += Mv(0,0);
                 ke[i5  ][j5+1] += Mv(0,1);
@@ -884,10 +886,10 @@ void FEThermoFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         pt.m_Lf = gradient(el, v, n);
         pt.m_aft = pt.m_Lf*pt.m_vft;
         if (m_btrans) pt.m_aft += el.Evaluate(a, n);
-        pt.m_Jf = 1 + el.Evaluate(e, n);
-        pt.m_gradJf = gradient(el, e, n);
-        pt.m_Jfdot = pt.m_gradJf*pt.m_vft;
-        if (m_btrans) pt.m_Jfdot += el.Evaluate(ae, n);
+        pt.m_ef = el.Evaluate(e, n);
+        pt.m_gradef = gradient(el, e, n);
+        pt.m_efdot = pt.m_gradef*pt.m_vft;
+        if (m_btrans) pt.m_efdot += el.Evaluate(ae, n);
         tf.m_T = el.Evaluate(T, n);
         tf.m_gradT = gradient(el, T, n);
         tf.m_Tdot = tf.m_gradT*pt.m_vft;

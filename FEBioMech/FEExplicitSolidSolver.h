@@ -108,6 +108,7 @@ public:
 
 protected:
 	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
+	FEDofList	m_dofSU, m_dofSV, m_dofSA;
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

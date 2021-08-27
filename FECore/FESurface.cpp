@@ -419,8 +419,8 @@ void FESurface::FindElements(FESurfaceElement& el)
                     }
                 }
                 if (found != 0) {
-                    if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; el.m_order = found; }
-                    else el.m_elem[1] = &sel;
+                    if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; }
+                    else if (el.m_elem[0] != &sel) el.m_elem[1] = &sel;
                 }
             }
         }
@@ -706,6 +706,49 @@ void FESurface::NodalCoordinates(FESurfaceElement& el, vec3d* re)
 	int ne = el.Nodes();
 	if (!m_bshellb) for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rt;
     else for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_st();
+}
+
+//-----------------------------------------------------------------------------
+//! detect face normal relative to element:
+//! return +1 if face points away from element, -1 if face points into element, 0 if invalid solution found
+double FESurface::FacePointing(FESurfaceElement& se, FEElement& el)
+{
+    FEMesh& mesh = GetFEModel()->GetMesh();
+    // get point on surface element
+    vec3d sp = Position(se, 0,0);
+    
+    // get surface normal at that point;
+    vec3d sn = SurfaceNormal(se, 0,0);
+    
+    // check if element attached to this surface element is solid or shell
+    FESolidElement* sel = dynamic_cast<FESolidElement*>(&el);
+    FEShellElement* shl = dynamic_cast<FEShellElement*>(&el);
+    
+    // get centroid of element el
+    vec3d c(0,0,0);
+    if (sel) {
+        for (int i=0; i<sel->Nodes(); ++i) {
+            FENode& node = mesh.Node(sel->m_node[i]);
+            c += node.m_rt;
+        }
+        c /= sel->Nodes();
+    }
+    else if (shl) {
+        for (int i=0; i<sel->Nodes(); ++i) {
+            FENode& node = mesh.Node(sel->m_node[i]);
+            c += node.m_rt;
+            c += node.m_st();
+        }
+        c /= (2*sel->Nodes());
+    }
+    else
+        return 0;
+    
+    // project vector from centroid to surface point onto surface normal
+    double d = (sp - c)*sn;
+    if (d > 0) return 1.0;
+    else if (d < 0) return -1.0;
+    else return 0.0;
 }
 
 //-----------------------------------------------------------------------------

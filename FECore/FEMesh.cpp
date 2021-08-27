@@ -408,30 +408,44 @@ double FEMesh::ElementVolume(FEElement &el)
 	double V = 0;
 	switch (el.Class())
 	{
-	case FE_ELEM_SOLID: V = SolidElementVolume(static_cast<FESolidElement&>(el)); break;
-	case FE_ELEM_SHELL: V = ShellElementVolume(static_cast<FEShellElement&>(el)); break;
+	case FE_ELEM_SOLID:
+	{
+		FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition()); assert(dom);
+		if (dom) V = dom->Volume(static_cast<FESolidElement&>(el));
+	}
+	break;
+	case FE_ELEM_SHELL: 
+	{
+		FEShellDomain* dom = dynamic_cast<FEShellDomain*>(el.GetMeshPartition()); assert(dom);
+		if (dom) V = dom->Volume(static_cast<FEShellElement&>(el));
+	}
+	break;
 	}
 	return V;
 }
 
 //-----------------------------------------------------------------------------
-double FEMesh::SolidElementVolume(FESolidElement& el)
+//! This function calculates the (initial) volume of an element. In some case, the volume
+//! may only be approximate.
+double FEMesh::CurrentElementVolume(FEElement& el)
 {
-	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition()); assert(dom);
-	if (dom)
-		return dom->Volume(el);
-	else
-		return 0.0;
-}
-
-//-----------------------------------------------------------------------------
-double FEMesh::ShellElementVolume(FEShellElement& el)
-{
-	FEShellDomain* dom = dynamic_cast<FEShellDomain*>(el.GetMeshPartition()); assert(dom);
-	if (dom)
-		return dom->Volume(el);
-	else
-		return 0.0;
+	double V = 0;
+	switch (el.Class())
+	{
+	case FE_ELEM_SOLID:
+	{
+		FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition()); assert(dom);
+		if (dom) V =dom->CurrentVolume(static_cast<FESolidElement&>(el));
+	}
+	break;
+	case FE_ELEM_SHELL:
+	{
+		FEShellDomain* dom = dynamic_cast<FEShellDomain*>(el.GetMeshPartition()); assert(dom);
+		if (dom) return dom->CurrentVolume(static_cast<FEShellElement&>(el));
+	}
+	break;
+	}
+	return V;
 }
 
 //-----------------------------------------------------------------------------
@@ -468,6 +482,15 @@ FESurface* FEMesh::FindSurface(const std::string& name)
 {
 	for (size_t i=0; i<m_Surf.size(); ++i) if (m_Surf[i]->GetName() == name) return m_Surf[i];
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Find a surface set set by name and returns its index
+
+int FEMesh::FindSurfaceIndex(const std::string& name)
+{
+	for (size_t i = 0; i < m_Surf.size(); ++i) if (m_Surf[i]->GetName() == name) return i;
+	return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -524,6 +547,12 @@ FEDomain* FEMesh::FindDomain(const std::string& name)
 {
 	for (size_t i = 0; i<m_Domain.size(); ++i) if (m_Domain[i]->GetName() == name) return m_Domain[i];
 	return 0;
+}
+
+int FEMesh::FindDomainIndex(const std::string& name)
+{
+	for (size_t i = 0; i < m_Domain.size(); ++i) if (m_Domain[i]->GetName() == name) return i;
+	return -1;
 }
 
 FEDomain* FEMesh::FindDomain(int domId)

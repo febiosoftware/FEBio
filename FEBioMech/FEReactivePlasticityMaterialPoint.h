@@ -61,6 +61,7 @@ public:
     vector<double>          m_gp;       //!< current value of octahedral plastic shear strain
     vector<double>          m_gpp;      //!< previous value of octahedral plastic shear strain
     vector<double>          m_gc;       //!< cumulative value of octahedral plastic shear strain
+    vector<bool>            m_byld;     //!< flag on which bonds have already yielded at start of current time
     mat3d                   m_Fp;       //!< deformation gradient at previous time
     double                  m_Rhat;     //!< reactive heat supply density
     FEElasticMaterial*      m_pMat;     //!< parent material

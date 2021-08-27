@@ -92,7 +92,7 @@ double FERealGas::Pressure(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double dq = tf.m_T/m_Tr;
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double x = (1+dq)/J - 1;
     double p = 0;
     for (int k=1; k<=m_nvc; ++k)
@@ -110,7 +110,7 @@ double FERealGas::Tangent_Strain(FEMaterialPoint& mp)
     
     double dq = tf.m_T/m_Tr;
     double q = 1 + dq;
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double x = q/J - 1;
     double dpJ = m_A[0]->value(dq);
     for (int k=2; k<=m_nvc; ++k)
@@ -128,7 +128,7 @@ double FERealGas::Tangent_Strain_Strain(FEMaterialPoint& mp)
     
     double dq = tf.m_T/m_Tr;
     double q = 1 + dq;
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double x = q/J - 1;
     double dpJ2 = 2*m_A[0]->value(dq);
     for (int k=2; k<=m_nvc; ++k)
@@ -146,7 +146,7 @@ double FERealGas::Tangent_Temperature(FEMaterialPoint& mp)
     
     double dq = tf.m_T/m_Tr;
     double q = 1 + dq;
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double x = q/J - 1;
     double dpT = 0;
     for (int k=1; k<=m_nvc; ++k)
@@ -164,7 +164,7 @@ double FERealGas::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
     
     double dq = tf.m_T/m_Tr;
     double q = 1 + dq;
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double x = q/J - 1;
     double dpT2 = m_A[0]->deriv2(dq)*x + 2/J*m_A[0]->derive(dq);
     for (int k=2; k<=m_nvc; ++k)
@@ -183,7 +183,7 @@ double FERealGas::Tangent_Strain_Temperature(FEMaterialPoint& mp)
     
     double dq = tf.m_T/m_Tr;
     double q = 1 + dq;
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double x = q/J - 1;
     double dpJT = m_A[0]->value(dq) + q*m_A[0]->derive(dq);
     for (int k=2; k<=m_nvc; ++k)
@@ -203,7 +203,7 @@ double FERealGas::SpecificFreeEnergy(FEMaterialPoint& mp)
     double q = 1 + dq;
     double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
     double lnq = log(q);
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
     double lnJ = log(J);
     double A[MAX_NVC];
@@ -237,7 +237,7 @@ double FERealGas::SpecificEntropy(FEMaterialPoint& mp)
     double q = 1 + dq;
     double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
     double lnq = log(q);
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
     double lnJ = log(J);
     double A[MAX_NVC], dA[MAX_NVC];
@@ -296,7 +296,7 @@ double FERealGas::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
     double q = 1 + dq;
     double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
     double lnq = log(q);
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
     double lnJ = log(J);
     double A[MAX_NVC], dA[MAX_NVC], d2A[MAX_NVC];
@@ -348,7 +348,7 @@ double FERealGas::Tangent_cv_Strain(FEMaterialPoint& mp)
     double q = 1 + dq;
     double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
     double lnq = log(q);
-    double J = fp.m_Jf;
+    double J = 1 + fp.m_ef;
     double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
     double lnJ = log(J);
     double A[MAX_NVC], dA[MAX_NVC], d2A[MAX_NVC];
@@ -456,7 +456,7 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             int iter = 0;
             do {
                 ++iter;
-                fp->m_Jf = 1 + e;
+                fp->m_ef = e;
                 double f = Pressure(*ft) - p;
                 double df = Tangent_Strain(*ft);
                 double de = (df != 0) ? -f/df : 0;
@@ -466,20 +466,10 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
                 if (iter > maxiter) done = true;
             } while (!done);
             
+            delete ft;
             return convgd;
         }
             break;
     }
     return false;
-}
-
-//-----------------------------------------------------------------------------
-//! pressure from state variables
-double FERealGas::Pressure(const double ef, const double T)
-{
-    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
-    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
-    fp->m_Jf = 1 + ef;
-    ft->m_T = T;
-    return Pressure(*ft);
 }

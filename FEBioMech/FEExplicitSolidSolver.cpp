@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEExplicitSolidSolver.h"
 #include "FEElasticSolidDomain.h"
+#include "FEElasticShellDomain.h"
 #include "FERigidMaterial.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
@@ -52,7 +53,10 @@ BEGIN_FECORE_CLASS(FEExplicitSolidSolver, FESolver)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem), m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
+FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : 
+	FESolver(pfem), 
+	m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem),
+	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
 	m_dyn_damping = 0.99;
 	m_niter = 0;
@@ -78,12 +82,27 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem), m_
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
+	int varSU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
+	dofs.SetDOFName(varSU, 0, "sx");
+	dofs.SetDOFName(varSU, 1, "sy");
+	dofs.SetDOFName(varSU, 2, "sz");
+	int varSV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
+	dofs.SetDOFName(varSV, 0, "svx");
+	dofs.SetDOFName(varSV, 1, "svy");
+	dofs.SetDOFName(varSV, 2, "svz");
+	int varSA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
+	dofs.SetDOFName(varSA, 0, "sax");
+	dofs.SetDOFName(varSA, 1, "say");
+	dofs.SetDOFName(varSA, 2, "saz");
 
 	// get the DOF indices
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
 	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
 	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
+	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -166,10 +185,43 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					Mi.Assemble(el.m_node, lm, el_lumped_mass);
 				} // loop over elements
 			}
+			else if (dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd)))
+			{
+				FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(psd->GetMaterial());
+				// loop over all the elements
+				for (int iel = 0; iel < psd->Elements(); ++iel)
+				{
+					FEShellElement& el = psd->Element(iel);
+					psd->UnpackLM(el, lm);
+
+					// create the element's stiffness matrix
+					FEElementMatrix ke(el);
+					int neln = el.Nodes();
+					int ndof = 6 * el.Nodes();
+					ke.resize(ndof, ndof);
+					ke.zero();
+
+					// calculate inertial stiffness
+					psd->ElementMassMatrix(el, ke, 1.0);
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(ndof, 0.0);
+					for (int i = 0; i < ndof; ++i)
+					{
+						for (int j = 0; j < ndof; ++j)
+						{
+							double kab = ke[i][j];
+							el_lumped_mass[i] += kab;
+						}
+					}
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				}
+			}
 			else
 			{
-				// TODO: we can only do solid domains right now.
-				return false;
+//				return false;
 			}
 		}
 	}
@@ -232,6 +284,53 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					Mi.Assemble(el.m_node, lm, el_lumped_mass);
 				} // loop over elements
 			}
+			else if(dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd)))
+			{
+				FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(psd->GetMaterial());
+				// loop over all the elements
+				for (int iel = 0; iel < psd->Elements(); ++iel)
+				{
+					FEShellElement& el = psd->Element(iel);
+					psd->UnpackLM(el, lm);
+
+					// create the element's stiffness matrix
+					FEElementMatrix ke(el);
+					int neln = el.Nodes();
+					int ndof = 6 * el.Nodes();
+					ke.resize(ndof, ndof);
+					ke.zero();
+
+					// calculate inertial stiffness
+					psd->ElementMassMatrix(el, ke, 1.0);
+
+					// calculate the element mass
+					double Me = 0.0;
+					double* w = el.GaussWeights();
+					for (int n = 0; n < el.GaussPoints(); ++n)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+						double d = pme->Density(mp);
+						double detJ0 = psd->detJ0(el, n) * el.GaussWeights()[n];
+						Me += d * detJ0 * w[n];
+					}
+
+					// calculate sum of diagonals
+					double S = 0.0;
+					for (int i = 0; i < ndof; ++i) S += ke[i][i] / 3.0;
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(ndof, 0.0);
+					for (int i = 0; i < ndof; ++i)
+					{
+						double mab = ke[i][i] * Me / S;
+						el_lumped_mass[i] = mab;
+					}
+
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				}
+			}
 			else
 			{
 				// TODO: we can only do solid domains right now.
@@ -249,8 +348,8 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 	// Also, make sure the lumped masses are positive.
 	for (int i = 0; i < m_Mi.size(); ++i)
 	{
-		if (m_Mi[i] <= 0.0) return false;
-		m_Mi[i] = 1.0 / m_Mi[i];
+//		if (m_Mi[i] <= 0.0) return false;
+		if (m_Mi[i] != 0.0) m_Mi[i] = 1.0 / m_Mi[i];
 	}
 
 	return true;
@@ -271,6 +370,8 @@ bool FEExplicitSolidSolver::Init()
 	m_Ut.assign(neq, 0);
 	m_Mi.assign(neq, 0.0);
 
+	GetFEModel()->Update();
+
 	// we need to fill the total displacement vector m_Ut
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -280,9 +381,16 @@ bool FEExplicitSolidSolver::Init()
 	gather(m_Ut, mesh, m_dofSQ[0]);
 	gather(m_Ut, mesh, m_dofSQ[1]);
 	gather(m_Ut, mesh, m_dofSQ[2]);
+	gather(m_Ut, mesh, m_dofSU[0]);
+	gather(m_Ut, mesh, m_dofSU[1]);
+	gather(m_Ut, mesh, m_dofSU[2]);
 
 	// calculate the inverse mass vector for the explicit analysis
-	CalculateMassMatrix();
+	if (CalculateMassMatrix() == false)
+	{
+		feLogError("Failed building mass matrix.");
+		return false;
+	}
 
 	// Calculate initial residual to be used on the first time step
 	if (Residual(m_R0) == false) return false;
@@ -295,6 +403,20 @@ bool FEExplicitSolidSolver::Init()
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+	}
+
+	// set the dynamic update flag only if we are running a dynamic analysis
+	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+		FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
+		if (d) d->SetDynamicUpdateFlag(b);
+		if (s) s->SetDynamicUpdateFlag(b);
 	}
 
 	return true;
@@ -339,6 +461,10 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	scatter(U, mesh, m_dofSQ[0]);
 	scatter(U, mesh, m_dofSQ[1]);
 	scatter(U, mesh, m_dofSQ[2]);
+	// shell displacement
+	scatter(U, mesh, m_dofSU[0]);
+	scatter(U, mesh, m_dofSU[1]);
+	scatter(U, mesh, m_dofSU[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -545,6 +671,7 @@ void FEExplicitSolidSolver::PrepStep()
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
+		ni.UpdateValues();
 	}
 
 	const FETimeInfo& tp = fem.GetTime();
@@ -700,6 +827,10 @@ bool FEExplicitSolidSolver::DoSolve()
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) { un[n] = node.m_rt.x - node.m_r0.x; vn[n] = vt.x; an[n] = node.m_at.x; }
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) { un[n] = node.m_rt.y - node.m_r0.y; vn[n] = vt.y; an[n] = node.m_at.y; }
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) { un[n] = node.m_rt.z - node.m_r0.z; vn[n] = vt.z; an[n] = node.m_at.z; }
+
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { un[n] = node.get(m_dofSU[0]); vn[n] = node.get(m_dofSV[0]); an[n] = node.get(m_dofSA[0]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { un[n] = node.get(m_dofSU[1]); vn[n] = node.get(m_dofSV[1]); an[n] = node.get(m_dofSA[1]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { un[n] = node.get(m_dofSU[2]); vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
 	}
 
 	// velocity predictor
@@ -742,6 +873,10 @@ bool FEExplicitSolidSolver::DoSolve()
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
+
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
 	}
 
 	// do minor iterations callbacks
@@ -838,11 +973,18 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		node.set_load(m_dofU[0], 0);
 		node.set_load(m_dofU[1], 0);
 		node.set_load(m_dofU[2], 0);
+		node.set_load(m_dofSU[0], 0);
+		node.set_load(m_dofSU[1], 0);
+		node.set_load(m_dofSU[2], 0);
 
 		int n;
 		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+
+		if ((n = -node.m_ID[m_dofSU[0]] - 2) >= 0) node.set_load(m_dofSU[0], -m_Fr[n]);
+		if ((n = -node.m_ID[m_dofSU[1]] - 2) >= 0) node.set_load(m_dofSU[1], -m_Fr[n]);
+		if ((n = -node.m_ID[m_dofSU[2]] - 2) >= 0) node.set_load(m_dofSU[2], -m_Fr[n]);
 	}
 
 	// increase RHS counter

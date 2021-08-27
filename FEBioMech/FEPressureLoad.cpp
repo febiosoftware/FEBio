@@ -47,6 +47,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_pressure = 0.0;
 	m_bsymm = true;
 	m_bshellb = false;
+	m_blinear = false;
 }
 
 //-----------------------------------------------------------------------------

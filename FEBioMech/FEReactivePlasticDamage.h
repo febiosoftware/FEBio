@@ -75,7 +75,7 @@ public:
     
     // evaluate reactive heat supply
     void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
-    
+    void Serialize(DumpStream& ar);
 public:
     FEElasticMaterial*  m_pBase;     // base elastic material
     FEDamageCriterion*  m_pCrit;     // yield criterion

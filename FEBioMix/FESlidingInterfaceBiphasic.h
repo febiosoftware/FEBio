@@ -207,7 +207,11 @@ public:
     
     double          m_mu;           //!< friction coefficient
     bool            m_bfreeze;      //!< freeze stick/slip status
-    
+    bool            m_bflips;       //!< flip primary surface normal
+    bool            m_bflipm;       //!< flip secondary surface normal
+    bool            m_bshellbs;     //!< flag for prescribing pressure on shell bottom for primary surface
+    bool            m_bshellbm;     //!< flag for prescribing pressure on shell bottom for secondary surface
+
     // biphasic contact parameters
     double	        m_epsp;		    //!< flow rate penalty
     double          m_phi;          //!< solid-solid contact fraction

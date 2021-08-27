@@ -295,6 +295,18 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element stresses for mixture components
+class FEPlotElementMixtureStress : public FEPlotDomainData
+{
+public:
+	FEPlotElementMixtureStress(FEModel* pfem);
+	bool SetFilter(const char* szfilter) override;
+	bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+	int		m_comp;
+};
+
+//-----------------------------------------------------------------------------
 //! Element uncoupled pressure
 class FEPlotElementUncoupledPressure : public FEPlotDomainData
 {
@@ -817,6 +829,23 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Right stretch
+class FEPlotRightStretch : public FEPlotDomainData
+{
+public:
+    FEPlotRightStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Right Hencky
+class FEPlotRightHencky : public FEPlotDomainData
+{
+public:
+    FEPlotRightHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Rigid body reaction force
@@ -947,6 +976,43 @@ public:
 private:
 	std::string	m_prop;
 	int			m_propIndex;
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotContinuousDamage_ : public FEPlotDomainData
+{
+public:
+	FEPlotContinuousDamage_(FEModel* fem, int n);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
+	bool SetFilter(const char* sz) override;
+private:
+	std::string	m_prop;
+	int			m_propIndex;
+	int			m_comp;
+};
+
+class FEPlotContinuousDamage_1 : public FEPlotContinuousDamage_ {
+	public: FEPlotContinuousDamage_1(FEModel* fem) : FEPlotContinuousDamage_(fem, 0) {}
+};
+
+class FEPlotContinuousDamage_2 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_2(FEModel* fem) : FEPlotContinuousDamage_(fem, 1) {}
+};
+
+class FEPlotContinuousDamage_3 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_3(FEModel* fem) : FEPlotContinuousDamage_(fem, 2) {}
+};
+
+class FEPlotContinuousDamage_P : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_P(FEModel* fem) : FEPlotContinuousDamage_(fem, 3) {}
+};
+
+class FEPlotContinuousDamage_D3s : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D3s(FEModel* fem) : FEPlotContinuousDamage_(fem, 4) {}
+};
+
+class FEPlotContinuousDamage_Ds : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_Ds(FEModel* fem) : FEPlotContinuousDamage_(fem, 5) {}
 };
 
 //-----------------------------------------------------------------------------

@@ -854,7 +854,22 @@ FEBio Basics
 \begin_layout Standard
 This section provides a brief overview of how FEBio works.
  For more details regarding the algorithms in FEBio, please consult the
- FEBio Theory Manual.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
  
 \end_layout
 
@@ -20984,8 +20999,11 @@ value
  The parabolic profile is calculated under the assumption of steady Poiseuille
  flow in an infinite tube whose cross-section has the shape of the named
  surface.
- All nodes located along the curve boundary of this surface are prescribed
- zero normal velocity.
+ The parabolic velocity distribution reduces to zero only on portions of
+ the boundary curve of the named surface where the user has fixed all three
+ components of the fluid velocity (no-slip condition).
+ On remaining portions of this boundary curve, symmetry conditions are assumed
+ for the three-dimensional parabolic normal velocity profile.
 \end_layout
 
 \begin_layout LyX-Code
@@ -21002,15 +21020,6 @@ value
 
 \begin_layout LyX-Code
 </surface_load>
-\end_layout
-
-\begin_layout Standard
-Note that this 
-\emph on
-parabolic 
-\emph default
-option will not work if the mesh of the boundary surface has no internal
- nodes.
 \end_layout
 
 \begin_layout Standard
@@ -22179,7 +22188,15 @@ literal "true"
 
 \end_inset
 
-.
+ for the frictionless case, and in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21a"
+literal "false"
+
+\end_inset
+
+ for the frictional algorithm.
  
 \end_layout
 
@@ -22260,13 +22277,14 @@ The following table lists the properties that are defined for sliding interfaces
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="19" columns="7">
+<lyxtabular version="3" rows="25" columns="8">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
+<column alignment="center" valignment="top" width="0.38in">
 <column alignment="center" valignment="top" width="0.38in">
 <column alignment="left" valignment="top">
 <row>
@@ -22325,13 +22343,24 @@ SE
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+SBP
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \series bold
-SBP SBS SMP
+SBS SMP
 \end_layout
 
 \end_inset
@@ -22412,6 +22441,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -22545,6 +22595,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -22626,6 +22697,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -22759,6 +22851,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -22852,6 +22965,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -22986,6 +23120,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -23079,6 +23234,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -23212,6 +23388,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -23293,6 +23490,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -23402,6 +23620,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -23471,6 +23710,15 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -23568,6 +23816,15 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -23637,6 +23894,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -23746,6 +24024,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -23772,6 +24071,178 @@ bullet$
 
 \begin_layout Plain Layout
 0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+smooth_fls
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+smoothed fluid load support for friction calculation (7)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact_frac
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid-on-solid contact area fraction for friction calculation (5)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -23835,6 +24306,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -23860,7 +24352,7 @@ bullet$
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 
+0 (off)
 \end_layout
 
 \end_inset
@@ -23928,6 +24420,27 @@ bullet$
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -24049,6 +24562,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -24081,7 +24615,7 @@ bullet$
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -24090,11 +24624,391 @@ tension
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 tension flag (11)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+flip_primary
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+flip normal on primary surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+flip_secondary
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+flip normal on secondary surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell_bottom_primary
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact with back of shell on primary surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell_bottom_secondary
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact with back of shell on secondary surface
 \end_layout
 
 \end_inset
@@ -24138,6 +25052,27 @@ bullet$
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -24147,11 +25082,11 @@ bullet$
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 
+0 (off)
 \end_layout
 
 \end_inset
@@ -24473,14 +25408,16 @@ minaug
 \begin_layout Enumerate
 The 
 \shape italic
-sliding-node-on-facet 
+sliding-node-on-facet, 
 \shape default
-and 
 \emph on
-sliding-elastic 
+sliding-elastic
 \emph default
-contact implementations are currently the only contact algorithms that supports
- friction.
+, and 
+\emph on
+sliding-biphasic 
+\emph default
+contact implementations support friction.
  For 
 \emph on
 node-on-facet
@@ -24510,11 +25447,36 @@ is a scale factor for the tangential stiffness matrix.
 \emph on
 sliding-elastic
 \emph default
-, only 
+ and 
+\emph on
+sliding-biphasic
+\emph default
+ only 
 \emph on
 fric_coeff
 \emph default
  is needed to use frictional contact.
+ In addition, for 
+\emph on
+sliding-biphasic
+\emph default
+, the friction algorithm requires the specification of the solid-on-solid
+ contact area fraction, which is a number between 0 and 1 (see 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+).
  Frictional contact is inherently dissipative and thus history-dependent.
  The solution may vary with the size of time increments, the cycle of loading,
  or Lagrangian augmentations (when 
@@ -24559,6 +25521,19 @@ The augmented Lagrangian method may produce a non-smooth contact pressure
  TET15G11, TET15G15, PYRA5G8).
 \end_layout
 
+\begin_deeper
+\begin_layout Standard
+In the 
+\emph on
+sliding-biphasic
+\emph default
+ friction algorithm the friction coefficient depends on the fluid pressure
+ and load support.
+ Smoothing this fluid load support may produce a smoother distribution of
+ the friction coefficient over the contact interface.
+\end_layout
+
+\end_deeper
 \begin_layout Enumerate
 The 
 \shape italic
@@ -24621,9 +25596,8 @@ The
 \shape italic
 search_radius
 \shape default
- is a scale factor which multiplies the diagonal length of the model's bounding
- box to produce a dimensional search radius used by the algorithm that projects
- points onto facets.
+ is a dimensional search radius used by the algorithm that projects points
+ onto facets.
  When the distance between the point and the facet exceeds the dimensional
  search radius, that projection is ignored.
  This can alleviate convergence problems when surfaces have multiple folds
@@ -24670,7 +25644,7 @@ implementation for sliding interfaces can deal with biphasic contact surfaces
  
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian10b"
+key "Ateshian10b,Zimmerman21a"
 literal "true"
 
 \end_inset
@@ -24737,8 +25711,118 @@ When either contact surface is biphasic, the surface outside the contact
 \end_layout
 
 \begin_layout Standard
-When performing biphasic-solute-on-rigid contact, a two-pass analysis should
- not be used; the biphasic-solute surface should be the primary surface.
+As detailed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21a"
+literal "false"
+
+\end_inset
+
+ and the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+, the 
+\emph on
+sliding-biphasic
+\emph default
+ contact algorithm can include frictional contact.
+ The effective friction coefficient 
+\begin_inset Formula $\mu_{\text{eff}}$
+\end_inset
+
+ in this frictional contact algorithm depends on the temporally evolving
+ local fluid load support (the ratio of fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ to the normal component of the mixture contact traction 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+), according to
+\begin_inset Formula 
+\[
+\mu_{\text{eff}}=\mu_{\text{eq}}\left(1+\left(1-\varphi\right)\frac{p}{t_{n}}\right)\,.
+\]
+
+\end_inset
+
+Recall that 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ is negative whereas 
+\begin_inset Formula $p$
+\end_inset
+
+ is positive in compression.
+ Here, 
+\begin_inset Formula $\mu_{\text{eq}}$
+\end_inset
+
+ (
+\emph on
+fric_coeff
+\emph default
+) is the friction coefficient in the limit when the fluid load support has
+ reduced to zero, and 
+\begin_inset Formula $\varphi$
+\end_inset
+
+ (
+\emph on
+contact_frac
+\emph default
+) is the fraction of the apparent contact area over which the solid matrix
+ of the primary surface contacts that of the secondary surface.
+ Thus, 
+\begin_inset Formula $1-\varphi$
+\end_inset
+
+ is the fraction of the apparent contact area where fluid contacts fluid
+ or solid.
+ For perfectly smooth contact surfaces one may assume that 
+\begin_inset Formula $\varphi=\varphi_{1}^{s}\varphi_{2}^{s}$
+\end_inset
+
+, where 
+\begin_inset Formula $\varphi_{1}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi_{2}^{s}$
+\end_inset
+
+ are the solid area (or volume) fractions of the primary and secondary contact
+ surfaces, respectively.
+ For example, when both contact surfaces are non-porous (
+\begin_inset Formula $\varphi_{1}^{s}=\varphi_{2}^{s}=1$
+\end_inset
+
+), the effective friction coefficient reduces to 
+\begin_inset Formula $\mu_{\text{eff}}=\mu_{\text{eq}}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+When performing biphasic-on-rigid contact a two-pass analysis should not
+ be used; the rigid surface should be the secondary surface.
 \end_layout
 
 \begin_layout Subsection
@@ -30464,7 +31548,7 @@ element or for all nodes if no list is defined.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="56" columns="2">
+<lyxtabular version="3" rows="80" columns="2">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -30909,6 +31993,486 @@ E3
 
 \begin_layout Plain Layout
 third eigenvalue of Green-Lagrange strain tensor 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ex
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xx-component of the infinitesimal strain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ey
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yy-component of the infinitesimal strain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ez
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+zz-component of the infinitesimal strain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+exy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xy-component of the infinitesimal strain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+eyz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yz-component of the infinitesimal strain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+exz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xz-component of the infinitesimal strain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ux
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xx-component of the right stretch tensor 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yy-component of the right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+zz-component of the right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uxy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xy-component of the right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uyz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yz-component of the right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uxz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xz-component of the right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+U1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+first eigenvalue of right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+U2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+second eigenvalue of right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+U3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+third eigenvalue of right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xx-component of the right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yy-component of the right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+zz-component of the right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hxy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xy-component of the right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hyz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yz-component of the right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hxz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xz-component of the right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+H1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+first eigenvalue of right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+H2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+second eigenvalue of right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+H3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+third eigenvalue of right Hencky strain
 \end_layout
 
 \end_inset
@@ -33698,7 +35262,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="129" columns="3">
+<lyxtabular version="3" rows="130" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -35345,14 +36909,14 @@ reference "eq:bs-fluxes-w-j"
 
 \end_inset
 
-, and triphasic/multiphasic materials, Eq.
+, triphasic/multiphasic, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mp-fluxes-w-j"
 
 \end_inset
 
- 
+, fluid-FSI and biphasic-FSI materials.
 \end_layout
 
 \end_inset
@@ -36307,7 +37871,7 @@ nodal fluid flux
 \begin_inset Text
 
 \begin_layout Plain Layout
-Element 
+Node 
 \end_layout
 
 \end_inset
@@ -36316,7 +37880,8 @@ Element
 \begin_inset Text
 
 \begin_layout Plain Layout
-Fluid flux in biphasic, biphasic-solute, triphasic, and multiphasic materials
+Fluid flux in biphasic, biphasic-solute, triphasic, multiphasic, fluid-FSI
+ and biphasic-FSI materials
 \end_layout
 
 \end_inset
@@ -36347,39 +37912,6 @@ Node
 \begin_layout Plain Layout
 Fluid velocity 
 \begin_inset Formula $\mathbf{v}^{f}$
-\end_inset
-
- in fluid and fluid-FSI materials
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-nodal relative fluid velocity 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Node 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fluid velocity relative to mesh 
-\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  in fluid and fluid-FSI materials
@@ -36801,6 +38333,72 @@ Relative volume
 \end_inset
 
  
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right Hencky
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right Hencky strain 
+\begin_inset Formula $\mathbf{H}=\ln\mathbf{U}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right stretch tensor 
+\begin_inset Formula $\mathbf{U}=\mathbf{C}^{1/2}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -38060,7 +39658,7 @@ name "sec:Elastic-Solids"
 
 \begin_layout Standard
 This section describes the elastic materials, which are materials defined
- by a hyperelastic strain-enerygy function.
+ by a hyperelastic strain-energy function.
  A distinction will be made between so-called 
 \shape italic
 unconstrained 
@@ -44546,7 +46144,20 @@ name "subsec:Uncoupled-Solid-Mixture"
 \end_layout
 
 \begin_layout Standard
-This material describes a mixture of quasi-incompressible elastic solids.
+The material type for for a constrained mixture of uncoupled solids is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+uncoupled solid mixture
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ This material describes a mixture of quasi-incompressible elastic solids.
  It is a container for any combination of the materials described in Section
 \begin_inset space ~
 \end_inset
@@ -53429,8 +55040,21 @@ name "subsec:Porous-Neo-Hookean"
 \end_layout
 
 \begin_layout Standard
-This material describes a porous neo-Hookean material with referential solid
- volume fraction 
+The material type for a porous neo-Hookean solid is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+porous neo-Hookean
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This material describes a porous neo-Hookean material with referential
+ solid volume fraction 
 \begin_inset Formula $\varphi_{r}^{s}$
 \end_inset
 
@@ -53734,8 +55358,23 @@ name "subsec:Solid-Mixture"
 \end_layout
 
 \begin_layout Standard
-This material describes a mixture of unconstrained elastic solids.
- It is a container for any combination of the materials described in Section
+The material type for a constrained mixture of solids is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+solid mixture
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This material describes a mixture of elastic solids that share the same
+ reference configuration and same deformation gradient.
+ It is a container for any combination of the unconstrained elastic materials
+ described in Section
 \begin_inset space ~
 \end_inset
 
@@ -57546,10 +59185,10 @@ Two fibers in the plane orthogonal to
 \end_layout
 
 \begin_layout Subsubsection
-Fiber with Neo-Hookean Law Uncoupled
+Fiber Kiousis Uncoupled
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Fiber-Neo-Hookean-Uncoupled"
+name "subsec:Fiber-Kiousus-Uncoupled"
 
 \end_inset
 
@@ -57563,13 +59202,27 @@ This material type is
 
 
 \shape italic
-fiber-NH-uncoupled
+fiber-Kiousis-uncoupled
 \shape default
 
 \begin_inset Quotes erd
 \end_inset
 
 .
+ It is based on the material model proposed by Kiousis et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Kiousis08,Kiousis09"
+literal "false"
+
+\end_inset
+
+ for modeling the balloon in a balloon-stent 
+\end_layout
+
+\begin_layout Standard
++system.
  The following material parameters need to be defined:
 \end_layout
 
@@ -57580,34 +59233,34 @@ fiber-NH-uncoupled
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="1" columns="3">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-<mu>
+<d1>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\mu,$
+\begin_inset Formula $d_{1},$
 \end_inset
 
- representing a measure of the fiber modulus
+ represents a measure of the fiber modulus
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -57616,6 +59269,70 @@ fiber-NH-uncoupled
 P
 \series default
 ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<d2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $d_{2},$
+\end_inset
+
+ square of the stretch ratio when the fiber engages
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $n,$
+\end_inset
+
+ power exponent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -57636,16 +59353,23 @@ P
 The fiber strain energy density is given by 
 \begin_inset Formula 
 \[
-\tilde{\Psi}_{n}\left(I_{n}\right)=\frac{\mu}{4}\left(\tilde{I}_{n}-1\right)^{2}\,,
+\tilde{\Psi}_{n}\left(I_{n}\right)=\begin{cases}
+\frac{d_{1}}{n}\left(\tilde{I}_{n}-d_{2}\right)^{n} & \tilde{I}_{n}\ge d_{2}\\
+0 & \tilde{I}_{n}<d_{2}
+\end{cases}\,,
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $\mu>0$
+\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{\tilde{C}}\cdot\mathbf{n}_{r}$
 \end_inset
 
-.
+ is the square of the fiber stretch and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the unit vector along the fiber direction in its reference configuration.
 \end_layout
 
 \begin_layout Standard
@@ -57672,11 +59396,19 @@ reference "subsec:Uncoupled-Continuous-Fiber"
 \end_layout
 
 \begin_layout LyX-Code
-<fibers type="fiber-NH-uncoupled">
+<fibers type="fiber-Kiousis-uncoupled">
 \end_layout
 
 \begin_layout LyX-Code
-  <mu>1</mu>
+  <d1>500</d1>
+\end_layout
+
+\begin_layout LyX-Code
+  <d2>2.25</d2>
+\end_layout
+
+\begin_layout LyX-Code
+  <n>3</n>
 \end_layout
 
 \begin_layout LyX-Code
@@ -57694,7 +59426,7 @@ reference "subsec:Uncoupled-Continuous-Fiber"
 Fiber with Toe-Linear Response, Uncoupled Formulation
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:fiber-pow-linear-uncoupled"
+name "subsec:fiber-toe-linear-uncoupled"
 
 \end_inset
 
@@ -63089,7 +64821,7 @@ reference "subsec:Cumulative-Distribution-Function"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Damage-Criterion"
+reference "subsec:Damage-Yield-Criterion"
 
 \end_inset
 
@@ -64401,10 +66133,10 @@ Example:
 \end_layout
 
 \begin_layout Subsection
-Damage Criterion
+Damage or Yield Criterion
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Damage-Criterion"
+name "subsec:Damage-Yield-Criterion"
 
 \end_inset
 
@@ -64417,7 +66149,8 @@ The damage criterion provides the functional form of
 \end_inset
 
  that determines the evolution of damage.
- There are no material parameters associated with these functions.
+ It can also be used to define the yield criterion in the reactive plasticity
+ framework.
  All the functions currently modeled in FEBio are defined over the range
  
 \begin_inset Formula $\Xi\in\left[0,\infty\right[$
@@ -64580,7 +66313,7 @@ name "subsec:Von-Mises-Stress"
 \end_layout
 
 \begin_layout Standard
-The material type for von Mises stress damage criterion is 
+The material type for von Mises stress damage or yield criterion is 
 \shape italic
 
 \begin_inset Quotes eld
@@ -64596,7 +66329,7 @@ DC von Mises stress
  For this criterion, 
 \begin_inset Formula 
 \[
-\Xi\left(\mathbf{F}\right)=\sqrt{\frac{1}{2}\left[\left(\sigma_{1}-\sigma_{2}\right)^{2}+\left(\sigma_{2}-\sigma_{3}\right)^{2}+\left(\sigma_{3}-\sigma_{1}\right)^{2}\right]}
+\Xi\left(\mathbf{F}\right)=\sqrt{\frac{3}{2}\dev\boldsymbol{\sigma}:\dev\boldsymbol{\sigma}}=\sqrt{\frac{1}{2}\left[\left(\sigma_{1}-\sigma_{2}\right)^{2}+\left(\sigma_{2}-\sigma_{3}\right)^{2}+\left(\sigma_{3}-\sigma_{1}\right)^{2}\right]}
 \]
 
 \end_inset
@@ -64634,7 +66367,8 @@ name "subsec:Maximum-Shear-Stress"
 \end_layout
 
 \begin_layout Standard
-The material type for maximum shear stress damage criterion is 
+The material type for maximum shear stress damage or yield criterion is
+ 
 \shape italic
 
 \begin_inset Quotes eld
@@ -64688,7 +66422,8 @@ name "subsec:Maximum-Normal-Stress"
 \end_layout
 
 \begin_layout Standard
-The material type for maximum normal stress damage criterion is 
+The material type for maximum normal stress damage or yield criterion is
+ 
 \shape italic
 
 \begin_inset Quotes eld
@@ -64728,61 +66463,6 @@ Example:
 
 \begin_layout LyX-Code
 <criterion type="DC max normal stress"/>
-\end_layout
-
-\begin_layout Subsubsection
-Maximum Normal Lagrange Strain
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Maximum-Normal-Lagrange"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for maximum normal Lagrange strain damage criterion is
- 
-\shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
-DC max normal Lagrange strain
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
-.
- For this criterion, 
-\begin_inset Formula 
-\[
-\Xi\left(\mathbf{F}\right)=\max\left(E_{1},E_{2},E_{3}\right)
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $E_{1},E_{2},E_{3}$
-\end_inset
-
- are the principal values of 
-\begin_inset Formula $\mathbf{E}=\left(\mathbf{F}^{T}\cdot\mathbf{F}-\mathbf{I}\right)/2$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example:
-\end_layout
-
-\begin_layout LyX-Code
-<criterion type="DC max normal Lagrange strain"/>
 \end_layout
 
 \begin_layout Subsubsection
@@ -64894,6 +66574,2985 @@ Example:
 
 \begin_layout LyX-Code
 </criterion>
+\end_layout
+
+\begin_layout Subsubsection
+Maximum Normal Lagrange Strain
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Maximum-Normal-Lagrange"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for maximum normal Lagrange strain damage criterion is
+ 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+DC max normal Lagrange strain
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ For this criterion, 
+\begin_inset Formula 
+\[
+\Xi\left(\mathbf{F}\right)=\max\left(E_{1},E_{2},E_{3}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $E_{1},E_{2},E_{3}$
+\end_inset
+
+ are the principal values of 
+\begin_inset Formula $\mathbf{E}=\left(\mathbf{F}^{T}\cdot\mathbf{F}-\mathbf{I}\right)/2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<criterion type="DC max normal Lagrange strain"/>
+\end_layout
+
+\begin_layout Subsubsection
+Octahedral Shear Strain
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Octahedral-Shear-Strain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for octahedral strain damage criterion is 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+DC octahedral shear strain
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ For this criterion,
+\begin_inset Formula 
+\[
+\Xi\left(\mathbf{F}\right)=\sqrt{\frac{2}{3}\dev\mathbf{E}:\dev\mathbf{E}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ is the Lagrange strain tensor.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Plasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Plasticity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Kinematic 
+\begin_inset Quotes eld
+\end_inset
+
+Hardening
+\begin_inset Quotes erd
+\end_inset
+
+ Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Kinematic-Hardening-Response"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reactive plasticity models a material as a mixture of bonds that break in
+ response to loading and reform in a stressed state 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+.
+ This framework is based on constrained reactive mixtures of solids 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10a"
+literal "false"
+
+\end_inset
+
+.
+ A reactively plastic solid consists of a mixture of 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ bond families, all of which share the same elastic response characterized
+ by the user-defined strain energy density 
+\begin_inset Formula $\Psi_{0}$
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), each of which yields at a different threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ of a user-defined yield measure 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ (such as the von Mises stress, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ When all 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ bond families have yielded, the response becomes perfectly plastic, implying
+ that the yield measure no longer increases with increasing strain.
+ When 
+\begin_inset Formula $n^{f}>1$
+\end_inset
+
+ the stress-strain response exhibits the characteristic kinematic 
+\begin_inset Quotes eld
+\end_inset
+
+hardening
+\begin_inset Quotes erd
+\end_inset
+
+ response consistent with the Bauschinger effect of classical plasticity
+ theory 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Skelton97"
+literal "false"
+
+\end_inset
+
+.
+ Optionally, an additional bond family may be included that never yields,
+ remaining elastic over the entire loading history and imparting a linear
+ 
+\begin_inset Quotes eld
+\end_inset
+
+hardening
+\begin_inset Quotes erd
+\end_inset
+
+ regime.
+\end_layout
+
+\begin_layout Standard
+The deformation gradient of a reactive plasticity material is 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+ and its associated mixture stress 
+\begin_inset Formula $\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+ is evaluated as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\sum_{\beta}w_{\beta}\left(w_{\beta}^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w_{\beta}^{y}\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)\right)\,,\label{eq:rp-mixture-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ is the user-defined mass fraction of each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ in the mixture, 
+\begin_inset Formula $w_{\beta}^{s}$
+\end_inset
+
+ is the evolving mass fraction of intact bonds in family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ which still exhibit an elastic response, and 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+ is the evolving mass fraction of bonds in family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ which have yielded (broken and reformed in a new reference configuration).
+ These mass fractions satisfy 
+\begin_inset Formula $\sum_{\beta}w_{\beta}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{s}+w_{\beta}^{y}=1$
+\end_inset
+
+.
+ The bond breaking-and-reforming reaction is denoted by 
+\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{y}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathcal{E}_{\beta}^{s}$
+\end_inset
+
+ is the species associated with intact bonds while 
+\begin_inset Formula $\mathcal{E}_{\beta}^{y}$
+\end_inset
+
+ is associated with yielded bonds, in bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ The mass fractions of bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ satisfy 
+\begin_inset Formula $w_{\beta}^{s}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{y}=0$
+\end_inset
+
+ prior to yielding, and 
+\begin_inset Formula $w_{\beta}^{s}=0$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{y}=1$
+\end_inset
+
+ after yielding.
+ Here, 
+\begin_inset Formula $\mathbf{F}_{\beta}^{y}$
+\end_inset
+
+ is the deformation gradient of yielded bonds 
+\begin_inset Formula $\beta$
+\end_inset
+
+ relative to the deformation when the yield threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ was first reached; it is calculated from the relation 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{F}_{\beta}^{y}\cdot\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ is a function of state that maps the yielded configuration 
+\begin_inset Formula $\mathbf{X}^{y}$
+\end_inset
+
+ relative to the global reference configuration 
+\begin_inset Formula $\mathbf{X}^{s}$
+\end_inset
+
+.
+ The specific form of the constitutive model for 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ used in FEBio can be found in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+ and the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
+ Currently that constitutive model is not user-definable, though the user
+ has the option to enforce isochoric plastic flow, implying that 
+\begin_inset Formula $\det\mathbf{F}_{\beta}^{ys}=1$
+\end_inset
+
+.
+ The stress 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}$
+\end_inset
+
+ in the above relation for 
+\begin_inset Formula $\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+ may be evaluated for any argument 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}_{0}\left(\mathbf{F}\right)=\frac{1}{J}\frac{\partial\Psi_{0}}{\partial\mathbf{F}}\cdot\mathbf{F}^{T}\,,\label{eq:rp-hyperelasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $J=\det\mathbf{F}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since each bond family behaves elastically until it yields, a family's yield
+ threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ is generally not the value recorded on a stress-strain curve when the slope
+ changes.
+ That value may be called the 
+\shape italic
+apparent yield threshold
+\shape default
+ 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+, which can be related to the true yield threshold 
+\begin_inset Formula $\Phi_{m\beta}$
+\end_inset
+
+ by assuming a linear elastic stress-strain relationship prior to yielding.
+ For simplicity, we assume that 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+ values are evenly distributed between an 
+\shape italic
+initial yield threshold
+\shape default
+ 
+\begin_inset Formula $\Upsilon_{\text{0}}$
+\end_inset
+
+ and a 
+\shape italic
+final yield threshold
+\shape default
+ 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+, parameters which may be identified from a stress strain curve (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b).
+ Beyond 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+, the material either behaves as if it is perfectly plastic (a scenario
+ which may be valid around the ultimate strength, for example), or it transition
+s to a linear hardening regime.
+ 
+\end_layout
+
+\begin_layout Standard
+The family mass fractions 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ govern the influence of each family on the overall material response.
+ The simplest model for 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+ involves specifying the mass fraction of the first yielding family 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+, which controls the slope of the initial post-yield response (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a), and then evenly weighting the rest of the bond families.
+ However, in cases where the material transitions to a linear hardening
+ regime, we can recover this behavior by adding one more bond family, 
+\begin_inset Formula $\beta=n_{f}$
+\end_inset
+
+, that never yields, thus remaining elastic.
+ The associated mass fraction 
+\begin_inset Formula $w_{\beta}$
+\end_inset
+
+
+\shape italic
+\emph on
+ for 
+\begin_inset Formula $\beta=n_{f}$
+\end_inset
+
+ is called the 
+\emph default
+elastic mass fraction
+\shape default
+ and denoted 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+; a non-zero value for this parameter may be specified whenever we wish
+ to include linear hardening behavior (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b).
+ The effect of the mass fraction parameters 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ is explored parametrically in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+c and Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+d, respectively.
+ In general, most ductile materials have 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ very close to unity, which provides hardening behavior over a finite strain
+ range.
+ As 
+\begin_inset Formula $w_{0}\to1$
+\end_inset
+
+ the stress-strain behavior approaches perfect plasticity.
+ In contrast, when 
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+, the material response becomes perfectly plastic once the final yield threshold
+ 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+ has been exceeded.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigReactivePlasticityYieldModel.png
+	lyxscale 20
+	width 6in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Modeling uniaxial stress-strain curves using the parameters given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Kinematic-Hardening-Response"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Identification of parameters on idealized stress-strain curves showing
+ (a) a plateau in the stress, or (b) exhibiting a region of linear hardening.
+ The yielding behavior is fully described by the set of parameters 
+\begin_inset Formula $\left\{ n_{f},\Upsilon_{0},\Upsilon_{\text{max}},w_{0},w_{e},r\right\} $
+\end_inset
+
+.
+ Parametric variations of (c) 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ and (d) 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ illustrate their influence on the stress-strain response; other parameters
+ are held fixed.
+ In (c-d) 
+\begin_inset Formula $n_{f}=10$
+\end_inset
+
+, 
+\begin_inset Formula $\Upsilon_{0}=600$
+\end_inset
+
+ MPa, 
+\begin_inset Formula $\Upsilon_{\text{max}}=1000$
+\end_inset
+
+ MPa, and 
+\begin_inset Formula $r=1$
+\end_inset
+
+.
+ In (c), 
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+ and in (d) 
+\begin_inset Formula $w_{0}=0.75$
+\end_inset
+
+.
+\color black
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:hardening-family-parametric-curves"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+As 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ increases, a region of linear hardening is seen on a plot of the true stress
+ against strain.
+ For most ductile materials, 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ is usually 
+\begin_inset Formula $0$
+\end_inset
+
+ or on the order of 
+\begin_inset Formula $0.001$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is also possible to introduce a 
+\shape italic
+bias factor
+\shape default
+ 
+\begin_inset Formula $r$
+\end_inset
+
+, which allows a geometric progression rather than uniform spacing of the
+ apparent yield thresholds and family mass fractions.
+ The bias factor 
+\begin_inset Formula $r$
+\end_inset
+
+ has the effect of modifying the shape of the hardening region between 
+\begin_inset Formula $\Upsilon_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Upsilon_{\text{max }}$
+\end_inset
+
+ (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b).
+ The full set of material parameters is then given by 
+\begin_inset Formula $\left\{ n_{f},\Upsilon_{0},\Upsilon_{\text{max}},w_{0},w_{e},r\right\} $
+\end_inset
+
+.
+ Setting 
+\begin_inset Formula $r=1$
+\end_inset
+
+ recovers the uniform distribution.
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b graphically describes the influence of each parameter on simplified
+ stress-strain curves, showing how these parameters may be extracted from
+ experimental data.
+\end_layout
+
+\begin_layout Subsection
+Specification of Reactive Elasto-Plastic Solid
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Reactive-Elastoplastic-Solid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type of a reactive elasto-plastic solid with kinematic hardening
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plasticity
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<yield_criterion>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the yield criterion 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<nf>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of bond families 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ (
+\begin_inset Formula $n_{f}>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Y0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lowest yield threshold 
+\begin_inset Formula $\Upsilon_{0}$
+\end_inset
+
+ (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Phi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Ymax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Highest yield threshold 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+ (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Phi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<w0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fraction 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ of bonds that yield at 
+\begin_inset Formula $\Upsilon_{0}$
+\end_inset
+
+ (
+\begin_inset Formula $0\le w_{0}\le1$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<we>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fraction 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ of bonds than never yield (
+\begin_inset Formula $0\le w_{e}\le1$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<r>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bias factor 
+\begin_inset Formula $r$
+\end_inset
+
+ for consecutive increments of 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+ over the range 
+\begin_inset Formula $\left[\Upsilon_{0},\Upsilon_{\text{max}}\right]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<isochoric>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag (0 or 1) for enforcing isochoric plastic flow (1 implies 
+\begin_inset Formula $\det\mathbf{F}_{\beta}^{ys}=1,\,\forall\beta$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The <elastic> tag encloses a description of the constitutive relation of
+ the intact elastic material and associated material properties, as may
+ be selected from the list provided in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+
+\end_inset
+
+ for unconstrained materials.
+ The <yield_criterion> tag encloses a description of the yield criterion
+ 
+\begin_inset Formula $\Phi$
+\end_inset
+
+, as may be selected from the list presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+
+\end_inset
+
+.
+ Default values in FEBio are 
+\begin_inset Formula $n_{f}=1$
+\end_inset
+
+, 
+\begin_inset Formula $w_{0}=1$
+\end_inset
+
+,
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+, 
+\begin_inset Formula $\Upsilon_{0}=\Upsilon_{\text{max}}=0$
+\end_inset
+
+, 
+\begin_inset Formula $r=0.9$
+\end_inset
+
+, and isochoric=1.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Idealized elastic-perfectly plastic response of steel (mm-N-s units)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>8.05e-9</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>200e3</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.30</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <yield_criterion type="
+\shape italic
+\emph on
+DC von Mises stress
+\shape default
+\emph default
+"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <Y0>450</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Annealed mild steel (mm-N-s units)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>7.85e-9</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>205e3</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.29</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <yield_criterion type="
+\shape italic
+\emph on
+DC von Mises stress
+\shape default
+\emph default
+"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+  <Y0>220</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ymax>490</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+  <w0>0.973</w0>
+\end_layout
+
+\begin_layout LyX-Code
+  <we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+  <r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+  <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Annealed copper (mm-N-s units)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>7.764e-9</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>120e3</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.34</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <yield_criterion type="
+\shape italic
+\emph on
+DC von Mises stress
+\shape default
+\emph default
+"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+  <Y0>60</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ymax>288</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+  <w0>0.988</w0>
+\end_layout
+
+\begin_layout LyX-Code
+  <we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+  <r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+  <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Unaged maraging steel (mm-N-s units)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>8.00e-9</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>165e3</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.33</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <yield_criterion type="
+\shape italic
+\emph on
+DC von Mises stress
+\shape default
+\emph default
+"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <nf>22</nf>
+\end_layout
+
+\begin_layout LyX-Code
+  <Y0>398</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ymax>1010</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+  <w0>0</w0>
+\end_layout
+
+\begin_layout LyX-Code
+  <we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+  <r>0.9</r>
+\end_layout
+
+\begin_layout LyX-Code
+  <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Annealed aluminum 1100 (mm-N-s units)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>2.71e-9</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>68e3</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.33</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <yield_criterion type="
+\shape italic
+\emph on
+DC von Mises stress
+\shape default
+\emph default
+"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <nf>18</nf>
+\end_layout
+
+\begin_layout LyX-Code
+  <Y0>63</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ymax>112</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+  <w0>0.994</w0>
+\end_layout
+
+\begin_layout LyX-Code
+  <we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+  <r>0.6</r>
+\end_layout
+
+\begin_layout LyX-Code
+  <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Elasto-Plastic Damage Mechanics
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Plasticity-with-damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plastic deformation (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is often coupled with damage, as the finite deformation and plastic flow
+ of a loaded material typically induces some amount of failure.
+ Within the constrained reactive mixture framework adopted in FEBio, damage
+ is produced by bonds breaking permanently (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), which reduces the generation mass fractions 
+\begin_inset Formula $w_{\beta}^{s}$
+\end_inset
+
+ or 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+.
+ In our treatment of elastoplastic damage we assume that both intact and
+ yielded bonds may become damaged.
+ Intact bonds belong to the 
+\begin_inset Formula $s-$
+\end_inset
+
+generation which is present at 
+\begin_inset Formula $t=-\infty$
+\end_inset
+
+.
+ Once yielding occurs, all successive generations of that family are labeled
+ as yielded bonds 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ This distinction is necessary so we can then distinguish between damage
+ to intact bonds (elastic damage) and damage to yielded bonds (plastic damage),
+ since intact bonds which get damaged never have the ability to yield.
+ Damage to intact bonds is represented by the reaction
+\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+ is the species associated with broken bonds in bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ It may represent some initial damage value for a material with defects,
+ or damage due to intermolecular failure of bonds that never yielded; this
+ damage alters the value of 
+\begin_inset Formula $w_{\beta}^{s}$
+\end_inset
+
+ and we refer to it as 
+\emph on
+elastic damage
+\emph default
+.
+ Damage to yielded bonds represents 
+\emph on
+plastic damage
+\emph default
+; it is represented by the reaction 
+\begin_inset Formula $\mathcal{E}_{\beta}^{y}\to\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+ and it alters the value of 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+.
+ The mechanism of damage and the failure measure may be different for these
+ two types of bonds, particularly since a stress- or energy-based failure
+ measure may not be appropriate for plastic damage.
+ It is important to note that the nature of the plastic deformation described
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ remains unchanged.
+ Damage modifies the material behavior by reducing the fraction of bonds
+ in various generations, which scales the response accordingly.
+\end_layout
+
+\begin_layout Standard
+In a reactive constrained mixture framework the insertion of damage into
+ the reactive plasticity formulation is straightforward.
+ Since bonds break permanently in a damage reaction, there is no need to
+ define a function of state 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ to describe a (non-existing) reformed configuration.
+ Furthermore, the specific free energy of broken bonds is zero.
+ The scalar 
+\shape italic
+elastic damage criterion
+\shape default
+ 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+, which is taken to have the same functional form for all bond families
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+, is the analog to the yield criterion 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ for plasticity.
+ As shown in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the main contrast with reactive plasticity is that not all bonds in the
+ family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ break simultaneously at a single 
+\shape italic
+elastic damage threshold
+\shape default
+ 
+\begin_inset Formula $\Xi_{m\beta}^{e}$
+\end_inset
+
+.
+ Instead, the fraction of broken bonds varies as a function of 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+, denoted by 
+\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+, such that 
+\begin_inset Formula $0\le F^{e}\left(\Xi_{\beta}^{e}\right)\le1$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+ is a function of state; it must be a monotonically increasing function
+ of its argument to satisfy the Clausius-Duhem inequality 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Nims16"
+literal "false"
+
+\end_inset
+
+.
+ We may view 
+\begin_inset Formula $F^{e}$
+\end_inset
+
+ as a cumulative distribution function (CDF), whose corresponding probability
+ distribution function (PDF) represents the probability of damage at a particula
+r value of 
+\begin_inset Formula $\Xi_{\beta}^{e}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Theoretical Formulation
+\end_layout
+
+\begin_layout Standard
+Here, we sketch the structure of the elastoplastic damage theory in FEBio.
+ Since each bond family in reactive plasticity yields all at once, we can
+ easily split an elastoplastic damage theory into two parts to represent
+ elastic and plastic damage regimes.
+ Assume that the first yielding reaction for bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ occurs at time 
+\begin_inset Formula $t=u_{\beta}$
+\end_inset
+
+.
+ Prior to this initial yielding, the damage behavior described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ applies, and the material composition is generally a mixture of intact
+ (
+\begin_inset Formula $\text{\ensuremath{\mathcal{E}_{\beta}^{s}}}$
+\end_inset
+
+) and broken (
+\begin_inset Formula $\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+) bonds satisfying the reaction 
+\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+.
+ The corresponding bond mass fractions satisfy 
+\begin_inset Formula $1=w_{\beta}^{s}+w_{\beta}^{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{\beta}^{y}=0$
+\end_inset
+
+, where 
+\begin_inset Formula $w_{\beta}^{b}=F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+ is the elastic damage in bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ At 
+\begin_inset Formula $t=u_{\beta}$
+\end_inset
+
+, the remaining intact bonds 
+\begin_inset Formula $w_{\beta}^{s}=1-w_{\beta}^{b}$
+\end_inset
+
+ all yield, following the reaction 
+\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{y}$
+\end_inset
+
+.
+ The family mass balance is then given as 
+\begin_inset Formula $1=w_{\beta}^{y}+w_{\beta}^{b}$
+\end_inset
+
+, since 
+\begin_inset Formula $w_{\beta}^{s}=0$
+\end_inset
+
+ after yielding.
+ 
+\end_layout
+
+\begin_layout Standard
+For time 
+\begin_inset Formula $t>u_{\beta}$
+\end_inset
+
+, yielded bonds may continue to yield, but they may also sustain damage
+ according to the reaction 
+\begin_inset Formula $\mathcal{E}_{\beta}^{y}\to\mathcal{E}_{\beta}^{b}$
+\end_inset
+
+, which reduces their mass fraction 
+\begin_inset Formula $w_{\beta}^{y}$
+\end_inset
+
+.
+ Damage to yielded bonds may occur based on a function of state (often described
+ as a plastic strain, though it is not an observable kinematic variable),
+ which is distinct from the measure of elastic damage.
+ Therefore, we denote the 
+\shape italic
+plastic damage measure
+\shape default
+ as 
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\end_inset
+
+ and its cumulative distribution function by 
+\begin_inset Formula $F^{p}\left(\Xi_{\beta}^{p}\right)$
+\end_inset
+
+, under the assumption that all bond families 
+\begin_inset Formula $\beta$
+\end_inset
+
+ share the same functional forms for 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $F^{p}$
+\end_inset
+
+.
+ For each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+, only the remaining undamaged fraction 
+\begin_inset Formula $1-F^{p}\left(\Xi_{\beta}^{p}\right)$
+\end_inset
+
+ of yielded bonds may break and reform as the next yielded generation.
+\end_layout
+
+\begin_layout Standard
+It must be recognized that, just as 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ is a constitutively-prescribed function of state and does not carry the
+ meaning of a plastic deformation gradient, the plastic damage measure 
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\end_inset
+
+ is also a function of state.
+ This quantity is called a plastic strain for convenience only.
+\end_layout
+
+\begin_layout Subsubsection
+Stress and Damage
+\end_layout
+
+\begin_layout Standard
+Recognizing that damaged (broken) bonds do not store free energy, the mixture
+ stress is given by
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\sum_{\beta}w_{\beta}\left(w_{\beta}^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w_{\beta}^{y}\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)\right)\,,\label{eq:plasticdmg-mixture-stress}
+\end{equation}
+
+\end_inset
+
+where the stresses 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}$
+\end_inset
+
+ are given by the standard hyperelasticity relation in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rp-hyperelasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The reactive mixture equivalent of the damage variable 
+\begin_inset Formula $D$
+\end_inset
+
+ may be evaluated for elastoplastic damage as the fraction of all bonds
+ that are broken,
+\begin_inset Formula 
+\begin{equation}
+D=w^{b}=\sum_{\beta}w_{\beta}w_{\beta}^{b}\,.\label{eq:plasticdmg-damage-variable}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Damage Measures
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Yielded-damage-reaction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For elastic damage, we may use the same functional measure as proposed for
+ plastic yielding (e.g., the von Mises stress); this implies that the functions
+ 
+\begin_inset Formula $\Xi^{e}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ have the same form.
+ For plastic damage of bonds in family 
+\begin_inset Formula $\beta$
+\end_inset
+
+, we use the constitutively-determined mapping 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\end_inset
+
+ to define plastic right Cauchy-Green and Lagrange strain tensors through
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{C}_{\beta}^{ys} & =\left(\mathbf{F}_{\beta}^{ys}\right)^{T}\cdot\mathbf{F}_{\beta}^{ys}\\
+\mathbf{E}_{\beta}^{ys} & =\frac{1}{2}\left(\mathbf{C}_{\beta}^{ys}-\mathbf{I}\right)
+\end{aligned}
+\,.
+\end{equation}
+
+\end_inset
+
+One possible constitutive relation for 
+\begin_inset Formula $\Xi^{p}$
+\end_inset
+
+, which remains valid for general deformations, is to set it equal to the
+ 
+\shape italic
+effective plastic strain
+\shape default
+ 
+\begin_inset Formula $e_{\beta}^{p}$
+\end_inset
+
+ for the various bond families 
+\begin_inset Formula $\beta$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+e_{\beta}^{p}=\sqrt{\frac{2}{3}\dev\mathbf{E}_{\beta}^{ys}:\dev\mathbf{E}_{\beta}^{ys}}\,.\label{eq:plasticdmg-effective-plastic-strain}
+\end{equation}
+
+\end_inset
+
+In a numerical implementation, the effective plastic strain 
+\begin_inset Formula $e_{0}^{p}$
+\end_inset
+
+ of the first bond family to yield may be reported as the effective plastic
+ strain in the entire material, for consistency with plastic strain measures
+ in classical models of plasticity.
+\end_layout
+
+\begin_layout Standard
+Quantities in this section do not represent plastic strains or plastic strain
+ tensors, though we adopt the terminology due to similarities.
+ Recall that the non-observable function of state 
+\begin_inset Formula $\mathbf{F}_{\beta}^{ys}=\mathbf{F}_{\beta}^{ys}\left(\mathbf{F}^{s},\rho_{r\beta}^{\alpha}\right)$
+\end_inset
+
+ is a time-invariant mapping providing the reference configuration of a
+ yielded bond 
+\begin_inset Formula $y$
+\end_inset
+
+ with respect to the reference configuration of the master constituent 
+\begin_inset Formula $s$
+\end_inset
+
+, for family 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ The quantities 
+\begin_inset Formula $\mathbf{C}_{\beta}^{ys}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{E}_{\beta}^{ys}$
+\end_inset
+
+ then also represent non-observable functions of state calculated as strain
+ tensors.
+ Consequently, 
+\begin_inset Formula $e_{\beta}^{p}$
+\end_inset
+
+ is a measure of the relative motion of the reference configuration of bond
+ family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ , expressed as a scalar 
+\begin_inset Quotes eld
+\end_inset
+
+strain
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Physically, this amounts to the modeling assumption that once the breaking-and-
+reforming process takes a bond family out of a local neighborhood centered
+ about its original position, the bond begins to degrade with further breaking-a
+nd-reforming processes.
+ That each of these quantities exists for every bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ emphasizes the lack of any true or unique plastic strain measure in this
+ framework.
+\end_layout
+
+\begin_layout Subsection
+Specification of Reactive Elasto-Plastic Damage Solid
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Reactive-Elastoplastic-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type of a reactive elasto-plastic damage solid with kinematic
+ hardening is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="13" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<yield_criterion>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the yield criterion 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<plastic_damage>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the plastic damage CDF 
+\begin_inset Formula $F^{p}\left(\Xi_{\beta}^{p}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<plastic_damage_criterion>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the plastic damage criterion 
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic_damage>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic damage CDF 
+\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic_damage_criterion>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic damage criterion 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}^{s}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<nf>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of bond families 
+\begin_inset Formula $n_{f}$
+\end_inset
+
+ (
+\begin_inset Formula $n_{f}>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Y0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lowest yield threshold 
+\begin_inset Formula $\Upsilon_{0}$
+\end_inset
+
+ (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Phi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Ymax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Highest yield threshold 
+\begin_inset Formula $\Upsilon_{\text{max}}$
+\end_inset
+
+ (Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:hardening-family-parametric-curves"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a-b)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Phi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<w0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fraction 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ of bonds that yield at 
+\begin_inset Formula $\Upsilon_{0}$
+\end_inset
+
+ (
+\begin_inset Formula $0\le w_{0}\le1$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<we>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fraction 
+\begin_inset Formula $w_{e}$
+\end_inset
+
+ of bonds than never yield (
+\begin_inset Formula $0\le w_{e}\le1$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<r>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bias factor 
+\begin_inset Formula $r$
+\end_inset
+
+ for consecutive increments of 
+\begin_inset Formula $\Upsilon_{\beta}$
+\end_inset
+
+ over the range 
+\begin_inset Formula $\left[\Upsilon_{0},\Upsilon_{\text{max}}\right]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<isochoric>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag (0 or 1) for enforcing isochoric plastic flow (1 implies 
+\begin_inset Formula $\det\mathbf{F}_{\beta}^{ys}=1,\,\forall\beta$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The <elastic> tag encloses a description of the constitutive relation of
+ the intact elastic material and associated material properties, as may
+ be selected from the list provided in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+
+\end_inset
+
+ for unconstrained materials.
+ The <yield_criterion> tag encloses a description of the yield criterion
+ 
+\begin_inset Formula $\Phi$
+\end_inset
+
+, as may be selected from the list presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+
+\end_inset
+
+.
+ The plastic and elastic damage CDFs, in the <plastic_damage> and <elastic_damag
+e> tags respectively, may be selected from Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Cumulative-Distribution-Function"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, whereas the corresponding damage criteria <plastic_damage_criterion> and
+ <elastic_damage_criterion> may be selected from Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+
+\end_inset
+
+.
+ Default values are 
+\begin_inset Formula $n_{f}=1$
+\end_inset
+
+, 
+\begin_inset Formula $w_{0}=1$
+\end_inset
+
+,
+\begin_inset Formula $w_{e}=0$
+\end_inset
+
+, 
+\begin_inset Formula $\Upsilon_{0}=\Upsilon_{\text{max}}=0$
+\end_inset
+
+, 
+\begin_inset Formula $r=0.9$
+\end_inset
+
+, and isochoric=1.
+ If only plastic damage needs to be modeled, the tags <elastic_damage> and
+ <elastic_damage_criterion> may be omitted.
+ If <plastic_damage> and <plastic_damage_criterion> are also omitted the
+ material response becomes identical to the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plasticity
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Reactive-Elastoplastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: 
+\shape default
+\emph on
+A-533 Grade B class 1 nuclear pressure vessel steel
+\shape italic
+\emph default
+ (mm-N-s units)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>8.00e-9</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>206.9e3</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.29</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <yield_criterion type="
+\shape italic
+\emph on
+DC von Mises stress
+\shape default
+\emph default
+"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <plastic_damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+    <mu>3.3</mu>
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>3</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+  </plastic_damage>
+\end_layout
+
+\begin_layout LyX-Code
+  <plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <nf>10</nf>
+\end_layout
+
+\begin_layout LyX-Code
+  <Y0>458</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ymax>730</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+  <w0>0.985</w0>
+\end_layout
+
+\begin_layout LyX-Code
+  <we>0.00072</we>
+\end_layout
+
+\begin_layout LyX-Code
+  <r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+  <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
 \end_layout
 
 \begin_layout Standard
@@ -65095,7 +69754,7 @@ multigeneration
 status collapsed
 
 \begin_layout Plain Layout
- As of FEBio version 2.0, the format for definining multi-generation materials
+As of FEBio version 2.0, the format for definining multi-generation materials
  has changed.
  The previous format where the generations are defined in the 
 \shape italic
@@ -79547,6 +84206,290 @@ Example:
 \end_layout
 
 \begin_layout Subsubsection
+Bingham Fluid
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Bingham-Fluid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a Bingham fluid 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Papanastasiou87"
+literal "true"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Bingham
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shear viscosity at infinite shear rate, 
+\begin_inset Formula $\mu_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tauy>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yield stress, 
+\begin_inset Formula $\tau_{y}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+exponent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\mu_{\infty}+\frac{\tau_{y}}{\dot{\gamma}}\left(1-e^{-n\dot{\gamma}}\right)
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+ In the limit as 
+\begin_inset Formula $\dot{\gamma}\to0$
+\end_inset
+
+ the viscosity is given by 
+\begin_inset Formula $\mu=\mu_{\infty}+n\tau_{y}$
+\end_inset
+
+.
+ If we define the scalar shear stress 
+\begin_inset Formula $\tau=\sqrt{\boldsymbol{\tau}:\boldsymbol{\tau}/2}$
+\end_inset
+
+, if follows that 
+\begin_inset Formula $\tau=\mu_{\infty}\dot{\gamma}+\tau_{y}\left(1-e^{-n\dot{\gamma}}\right)$
+\end_inset
+
+.
+ Effectively, this constitutive model represents a bilinear response for
+ 
+\begin_inset Formula $\tau$
+\end_inset
+
+ versus 
+\begin_inset Formula $\dot{\gamma}$
+\end_inset
+
+, with a slope of 
+\begin_inset Formula $\mu_{\infty}+n\tau_{y}$
+\end_inset
+
+ when 
+\begin_inset Formula $\tau<\tau_{y}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu=\mu_{\infty}$
+\end_inset
+
+ when 
+\begin_inset Formula $\tau>\tau_{y}$
+\end_inset
+
+.
+ The exponential function rounds the corner at the intersection of these
+ two lines.
+ For an ideal Bingham fluid one would need to let 
+\begin_inset Formula $n\to\infty$
+\end_inset
+
+.
+ In practice, values of 
+\begin_inset Formula $n$
+\end_inset
+
+ between 5 and 50 work well, with the lower end of this range producing
+ faster convergence of the finite element solution.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<viscous type="Bingham">
+\end_layout
+
+\begin_layout LyX-Code
+	<mu>1</mu>
+\end_layout
+
+\begin_layout LyX-Code
+	<tauy>40</tauy>
+\end_layout
+
+\begin_layout LyX-Code
+	<n>40</n>
+\end_layout
+
+\begin_layout LyX-Code
+</viscous>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Carreau Model
 \begin_inset CommandInset label
 LatexCommand label
@@ -81493,10 +86436,6 @@ is itself given by the multiplicative decomposition
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 where 
 \begin_inset Formula $\mathbf{F}_{0}$
 \end_inset
@@ -84263,437 +89202,350 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
-
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
-
 <febio_spec version="3.0">
 \end_layout
 
 \begin_layout Verbatim
-
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
-
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
-
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
-
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
-
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
-
 		</material>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		<bc type="fix" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
-
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
-
 			<points>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
-
 			</points>
 \end_layout
 
 \begin_layout Verbatim
-
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
-
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 				<bc type="prescribe" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
-
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
-
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
-
 </febio_spec>
 \end_layout
 
@@ -85649,7 +90501,7 @@ E
 v
 \emph default
 ) are the names of the material parameters.
- See Appendix A for more information how to reference model parameters.
+ See Appendix B for more information on how to reference model parameters.
 \end_layout
 
 \begin_layout Subsection
@@ -85909,6 +90761,7 @@ parameter
 \emph default
 , a child element defines the parameter that will act as the data source
  for the objective function.
+ (See Appendix B on more information on referencing model parameters.)
 \end_layout
 
 \begin_layout LyX-Code
@@ -92594,11 +97447,27 @@ fem.mesh.node[0].position.x
 \end_layout
 
 \begin_layout Standard
-Element data can also be accessed.
+In certain applications (e.g.
+ optimization), it is also possible to reference output data, i.e.
+ data that is normally used in the logfile section of the input file.
+ This data is considered read-only.
+ For example, the following references the 'sx' (xx-stress) of element with
+ id 1.
+ 
 \end_layout
 
 \begin_layout LyX-Code
-fem.mesh.elem[0].var('stress').xx
+fem.element_data('sx', 1)
+\end_layout
+
+\begin_layout Standard
+Another example evaluates the enclosed volume of a surface (assuming the
+ surface is closed).
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.surface_data('volume', 'SomeSurface1')
 \end_layout
 
 \begin_layout Chapter

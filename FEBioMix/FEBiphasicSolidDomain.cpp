@@ -261,7 +261,7 @@ void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 		int nel_p = el.ShapeFunctions(degree_p);
 
 		// get the element force vector and initialize it to zero
-		int ndof = 3*nel_d + nel_p;
+		int ndof = 4*nel_d;
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector

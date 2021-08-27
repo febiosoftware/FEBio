@@ -170,8 +170,14 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             continue;
         }
         
+        // check if i-th bond family is yielding
         if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < Ky[i]*(1+m_rtol)))
             pp.m_w[i] = w[i];
+        // if not, and if this bond family has not yielded at previous times,
+        // reset the mass fraction of yielded bonds to zero (in case m_w[i] was
+        // set to w[i] during a prior iteration at current time)
+        else if (pp.m_byld[i] == false)
+            pp.m_w[i] = 0;
         
         // find Fv
         bool conv = false;
@@ -341,13 +347,14 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
         if (pp.m_w[i] > 0) {
             // get the elastic deformation gradient
             mat3d Fv = pe.m_F*pp.m_Fvsi[i];
+            double Jvsi = m_isochrc ? 1 : pp.m_Fvsi[i].det();
             
             // store safe copy of total deformation gradient
             mat3d Fs = pe.m_F; double Js = pe.m_J;
             pe.m_F = Fv; pe.m_J = Fv.det();
 
             // evaluate the tangent using the elastic deformation gradient
-            sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i];
+            sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i]/Jvsi;
             
             // restore the original deformation gradient
             pe.m_F = Fs; pe.m_J = Js;

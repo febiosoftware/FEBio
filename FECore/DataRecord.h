@@ -44,7 +44,9 @@ enum FEDataRecordType {
 	FE_DATA_FACE,
 	FE_DATA_ELEM,
 	FE_DATA_RB,
-	FE_DATA_NLC
+	FE_DATA_NLC,
+	FE_DATA_SURFACE,
+	FE_DATA_DOMAIN
 };
 
 //-----------------------------------------------------------------------------

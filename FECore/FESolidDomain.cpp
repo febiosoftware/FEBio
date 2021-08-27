@@ -2468,6 +2468,53 @@ double FESolidDomain::Volume(FESolidElement& el)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate the volume of an element
+double FESolidDomain::CurrentVolume(FESolidElement& el)
+{
+    vec3d rt[FEElement::MAX_NODES];
+
+    int neln = el.Nodes();
+    for (int i = 0; i < neln; ++i) rt[i] = Node(el.m_lnode[i]).m_rt;
+
+    int nint = el.GaussPoints();
+    double* w = el.GaussWeights();
+    double V = 0;
+    for (int n = 0; n < nint; ++n)
+    {
+        // shape function derivatives
+        double* Grn = el.Gr(n);
+        double* Gsn = el.Gs(n);
+        double* Gtn = el.Gt(n);
+
+        // jacobian matrix
+        double J[3][3] = { 0 };
+        for (int i = 0; i < neln; ++i)
+        {
+            const double& Gri = Grn[i];
+            const double& Gsi = Gsn[i];
+            const double& Gti = Gtn[i];
+
+            const double& x = rt[i].x;
+            const double& y = rt[i].y;
+            const double& z = rt[i].z;
+
+            J[0][0] += Gri * x; J[0][1] += Gsi * x; J[0][2] += Gti * x;
+            J[1][0] += Gri * y; J[1][1] += Gsi * y; J[1][2] += Gti * y;
+            J[2][0] += Gri * z; J[2][1] += Gsi * z; J[2][2] += Gti * z;
+        }
+
+        // calculate the determinant
+        double detJ0 = J[0][0] * (J[1][1] * J[2][2] - J[1][2] * J[2][1])
+            + J[0][1] * (J[1][2] * J[2][0] - J[2][2] * J[1][0])
+            + J[0][2] * (J[1][0] * J[2][1] - J[1][1] * J[2][0]);
+
+        V += detJ0 * w[n];
+    }
+
+    return V;
+}
+
+//-----------------------------------------------------------------------------
 //! return the degrees of freedom of an element for this domain
 int FESolidDomain::GetElementDofs(FESolidElement& el)
 {

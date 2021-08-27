@@ -68,29 +68,30 @@ bool FEBiphasicFSITraction::Init()
     FEModel* fem = GetFEModel();
     int NF = surf.Elements();
     m_elem.resize(NF);
-    m_K.resize(NF, 0);
     m_s.resize(NF, 1);
-    m_bself.resize(NF, false);
     for (int j = 0; j<NF; ++j)
     {
+        bool bself = false;
         FESurfaceElement& el = surf.Element(j);
         // extract the first of two elements on this interface
         m_elem[j] = el.m_elem[0];
-        if (el.m_elem[1] == nullptr) m_bself[j] = true;
-        // get its material and check if FluidFSI
+        if (el.m_elem[1] == nullptr) bself = true;
+        // get its material and check if FEBiphasicFSI
         FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
         FEBiphasicFSI* pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
         if (pfsi) {
-            m_K[j] = pfsi->Fluid()->m_k;
+            double s = m_psurf->FacePointing(el, *m_elem[j]);
+            m_s[j] = bself ? -s : s;
+            if (m_s[j] == 0) return false;
         }
-        else if (!m_bself[j]) {
+        else if (!bself) {
             // extract the second of two elements on this interface
             m_elem[j] = el.m_elem[1];
             pm = fem->GetMaterial(m_elem[j]->GetMatID());
             pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
             if (pfsi == nullptr) return false;
-            m_s[j] = -1;
-            m_K[j] = pfsi->Fluid()->m_k;
+            m_s[j] = m_psurf->FacePointing(el, *m_elem[j]);
+            if (m_s[j] == 0) return false;
         }
         else
             return false;
@@ -148,24 +149,28 @@ void FEBiphasicFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
         // get the surface element
         FESurfaceElement& el = *mp.SurfaceElement();
         int iel = el.m_lid;
-        
+        FEBiphasicFSI* pfsi = dynamic_cast<FEBiphasicFSI*>(GetFEModel()->GetMaterial(m_elem[iel]->GetMatID()));
+
         // nodal coordinates
         vec3d rt[FEElement::MAX_NODES];
         m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
         
         // evaluate covariant basis vectors at integration point
-        vec3d gr = el.eval_deriv1(rt, mp.m_index);
+        vec3d gr = el.eval_deriv1(rt, mp.m_index)*m_s[iel];
         vec3d gs = el.eval_deriv2(rt, mp.m_index);
         vec3d gt = gr ^ gs;
         
         // Get the fluid stress at integration point
+        // necessarily using the attached solid element
         mat3ds sv = GetFluidStress(mp);
         
         // fluid dilatation at integration point
+        // only from surface element
         double ef = GetFluidDilatation(mp, tp.alphaf);
-        
+        double p = pfsi->Fluid()->Pressure(ef);
+
         // evaluate traction
-        vec3d f = (sv*gt + gt*(m_K[iel] * ef))*(-m_s[iel]);
+        vec3d f = gt*p - sv*gt;
         
         double H = dof_a.shape;
         fa[0] = H * f.x;
@@ -253,23 +258,23 @@ void FEBiphasicFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
         double ef = GetFluidDilatation(mp, tp.alphaf);
         
         // covariant basis vectors
-        vec3d gr = el.eval_deriv1(rt, mp.m_index);
+        vec3d gr = el.eval_deriv1(rt, mp.m_index)*m_s[iel];
         vec3d gs = el.eval_deriv2(rt, mp.m_index);
         vec3d gt = gr ^ gs;
         
         // evaluate fluid pressure
-        double p = m_K[iel] * ef * m_s[iel];
-        
-        vec3d f = gt*(-m_K[iel] * m_s[iel]);
-        
+        double p = pfsi->Fluid()->Pressure(ef);
+
+        vec3d f = gt*pfsi->Fluid()->GetElastic()->Tangent_Strain(ef, 0);
+
         //TODO include second order gradgrad term for surface
         
         vec3d gcnt[2], gcntp[2];
         ps->ContraBaseVectors(el, mp.m_index, gcnt);
         ps->ContraBaseVectorsP(el, mp.m_index, gcntp);
         for (int i = 0; i<neln; ++i)
-            gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
-            (gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
+            gradN[i] = ((gcnt[0] * alpha + gcntp[0] * (1 - alpha))*(Gr[i]*m_s[iel]) +
+            (gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i]);
         
         // calculate stiffness component
         int i = dof_a.index;
@@ -280,9 +285,9 @@ void FEBiphasicFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
         mat3d Kv2 = vdotTdotv(gt, cv, gradN[j]);
         mat3d Kw = vdotTdotv(gt, cv, (gradN[j]-gradphif*N[j]/phif)/phif);
         
-        mat3d Kuu = (sv*A + Kv1*(-Dw*phis/(phif*phif)+M) + Kv2*((gradphif&gradN[j])*2.0*phis/(phif*phif*phif)+(gradN[j]&gradphif)/(phif*phif)) - Kv2*(-gradJ&gradN[j])/J*phis/(phif*phif) - ((sv*gt)&gradN[j])*phis/phif)*(-N[i] *  m_s[iel]) - A*(N[i] * p); Kuu *= alpha;
-        mat3d Kuw = Kw*(-N[i] * m_s[iel]); Kuw *= alpha;
-        vec3d kuJ = svJ*gt*(-N[i] * N[j] * m_s[iel]) + f*(N[i] * N[j]); kuJ *= alpha;
+        mat3d Kuu = (sv*A + Kv1*(-Dw*phis/(phif*phif)+M) + Kv2*((gradphif&gradN[j])*2.0*phis/(phif*phif*phif)+(gradN[j]&gradphif)/(phif*phif)) - Kv2*(-gradJ&gradN[j])/J*phis/(phif*phif) - ((sv*gt)&gradN[j])*phis/phif)*N[i] - A*(N[i] * p); Kuu *= -alpha;
+        mat3d Kuw = Kw*N[i]; Kuw *= -alpha;
+        vec3d kuJ = svJ*gt*(N[i] * N[j]) - f*(N[i] * N[j]); kuJ *= -alpha;
         
         Kab.zero();
         Kab.sub(0, 0, Kuu);
@@ -299,9 +304,7 @@ void FEBiphasicFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
     
-    ar & m_K;
     ar & m_s;
-    ar & m_bself;
     
     if (ar.IsShallow() == false)
     {
