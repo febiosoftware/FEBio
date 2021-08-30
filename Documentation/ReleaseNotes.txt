@@ -41,10 +41,18 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
- R E L E A S E   3.5   8/27/2021
+ R E L E A S E   3.5   8/30/2021
 
 ===========================================================================
 
+* Implemented new "Kamensky" material, an isotropic Fung-type material from Kamensky, CMAME 2018.
+* Added log variable for element volume (variable name "V").
+* Fix issue with penalty computation and plot (github issue #30)
+* Added ability to output log data for octahedral plastic strain, right stretch tensor components, and right Hencky strain tensor components. Added ability to add plot variables for right stretch tensor and right Hencky strain tensor.
+* Fixed bug in FEBioOpt/FEDataSource where node_data variables used as optimization parameters were not being read correctly. Added ability to specify node_data variables as ordinates in parameter optimization.
+* Updated reactive plastic damage material to (a) include elastic damage of non-yielding bonds, and (b) keep better track yielded bond fraction in the iterative solution process. 
+* Fixed recently introduced bug in the plotting of intact bond fraction in reactive plastic damage materials.
+* Added new material "fiber-Kiousis-uncoupled".
 * Added "contact potential" contact interface and "mass damping" body load features.
 * Removed c1 > 0 restriction from Mooney-Rivlin material.
 * Added surface_data and domain_data log features. Added support for using these features in optimization module.
