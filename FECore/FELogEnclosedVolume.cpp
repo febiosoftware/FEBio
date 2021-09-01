@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,32 +23,50 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "febiolib_api.h"
+#include "stdafx.h"
+#include "FELogEnclosedVolume.h"
+#include "FESurface.h"
+#include "FENode.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// FEBio version numbers
-// VERSION is the main version number. This number is only incremented when
-// major modifications or additions where added to the code
-// SUBVERSION is only incremented when minor modifications or 
-// additions where added to the code.
-// SUBSUBVERSION is incremented when bugs are fixed.
+BEGIN_FECORE_CLASS(FELogEnclosedVolume, FELogSurfaceData)
+END_FECORE_CLASS();
 
-#define VERSION			3
-#define SUBVERSION		5
-#define SUBSUBVERSION	0
-
-///////////////////////////////////////////////////////////////////////////////
-// Restart file version
-// This is the version number of the restart dump file format.
-// It is incremented when the structure of this file is modified.
-//
-
-#define RSTRTVERSION		0x06
-
-namespace febio
+double FELogEnclosedVolume::value(FESurface& surface)
 {
+	// loop over all elements
+	double vol = 0.0;
+	int NE = surface.Elements();
+	vec3d x[FEElement::MAX_NODES];
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the next element
+		FESurfaceElement& el = surface.Element(i);
 
-FEBIOLIB_API char* getVersionString();
+		// get the nodal coordinates
+		int neln = el.Nodes();
+		for (int j = 0; j < neln; ++j) x[j] = surface.Node(el.m_lnode[j]).m_rt;
 
+		// loop over integration points
+		double* w = el.GaussWeights();
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// evaluate the position vector at this point
+			vec3d r = el.eval(x, n);
+
+			// calculate the tangent vectors
+			double* Gr = el.Gr(n);
+			double* Gs = el.Gs(n);
+			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
+			for (int j = 0; j < neln; ++j)
+			{
+				dxr += x[j] * Gr[j];
+				dxs += x[j] * Gs[j];
+			}
+
+			// update volume
+			vol += w[n] * (r * (dxr ^ dxs));
+		}
+	}
+	return vol / 3.0;
 }

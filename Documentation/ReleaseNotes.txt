@@ -41,6 +41,47 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.5   8/30/2021
+
+===========================================================================
+
+* Implemented new "Kamensky" material, an isotropic Fung-type material from Kamensky, CMAME 2018.
+* Added log variable for element volume (variable name "V").
+* Fix issue with penalty computation and plot (github issue #30)
+* Added ability to output log data for octahedral plastic strain, right stretch tensor components, and right Hencky strain tensor components. Added ability to add plot variables for right stretch tensor and right Hencky strain tensor.
+* Fixed bug in FEBioOpt/FEDataSource where node_data variables used as optimization parameters were not being read correctly. Added ability to specify node_data variables as ordinates in parameter optimization.
+* Updated reactive plastic damage material to (a) include elastic damage of non-yielding bonds, and (b) keep better track yielded bond fraction in the iterative solution process. 
+* Fixed recently introduced bug in the plotting of intact bond fraction in reactive plastic damage materials.
+* Added new material "fiber-Kiousis-uncoupled".
+* Added "contact potential" contact interface and "mass damping" body load features.
+* Removed c1 > 0 restriction from Mooney-Rivlin material.
+* Added surface_data and domain_data log features. Added support for using these features in optimization module.
+* Added yield flags in reactive plasticity material to allow resetting yielded bond mass fraction to zero during an iterative process.
+* Fixed some issues with init and serialize of reactive plastic damage material that were causing problems with optimization.
+* Added flip_primary, flip_secondary, shell_bottom_primary and shell_bottom_secondary to sliding-biphasic interfaces (included mixed).
+* Changed default format for FEParamMat3ds to be ITEM.
+* Made additional changes to allow mapped FEParamMat3ds variables.
+* Modified FEEllipsoidalFiberDensityDistribution to accept mappable semi-principal axes for ellipsoid.  Fixed spelling in class name.
+* Add ability to map 'mat3s' symmetric 3x3 matrix in MeshData section.
+* Updated perm-ref-ortho to use all mappable  material parameters.
+* Modified sliding-elastic, sliding-biphasic, sliding-biphasic-mixed to use search_radius as length value instead of scale factor, for consistency with other sliding and tied interfaces.
+* Fixed bug in "fluid normal velocity" load where rim pressure was not initialized properly.
+* Updated "fluid normal velocity" load to set parabolic velocity distribution to zero only on sections of the rim where the user has prescribed zero fluid velocity.  This change makes it possible to prescribe parabolic velocity profiles on cross-sections with symmetry planes, and on rectangular faces.
+* Created linear and nonlinear elastic fluid materials to allow alternating between linear and nonlinear pressure-dilatation models.  Default setting is linear.  Updated fluid-FSI traction and biphasic-FSI traction algorithms to better identify orientation of surface normal of the interface relative to solid elements with fluid-FSI or biphasic-FSI materials.
+* Reverted constitutive model for fluid pressure to linear model p = -k*ef where k=bulk modulus, because nonlinear model broke the FSI problems from the published paper. 
+* Improved efficiency of calculation of octahedral shear strain. Reactive-plastic damage material now works with erosion tool.
+* Added Bingham fluid.
+* Renamed some biphasic-FSI plot variables to be consistent with biphasic plot variables. Added missing nonlinear and surface pair constraints in fluid, fluid-FSI, fluid-solutes and multiphasic-FSI solvers.
+* Added several new plot variables related to continuous damage formulation. Also added a "mixture stress", which can be used to look at stress of the mixture components.
+* Allowing some zeroes on lumped mass matrix for explicit solver (as can be the case if corresponding dof is fixed).
+* Added "linear" flag to traction load, similar to pressure load.
+* Fixed issue with under-timing model updates.
+* Fixed bug in reporting timing info for multistep analyses.
+* Added support for shells to explicit solver.
+* Fixed issue with initializing contact surfaces for febio 2.0 format.
+
+===========================================================================
+
  R E L E A S E   3.4   5/17/2021
 
 ===========================================================================

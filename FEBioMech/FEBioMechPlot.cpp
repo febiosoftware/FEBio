@@ -60,6 +60,7 @@ SOFTWARE.*/
 #include "FEContinuousElasticDamage.h"
 #include <FECore/FEMeshAdaptor.h> // for projectToNodes
 #include "FESlidingInterface.h"
+#include "FESlidingElasticInterface.h"
 #include "FETiedContactSurface.h"
 
 //=============================================================================
@@ -457,6 +458,10 @@ bool FEPlotContactArea::Save(FESurface &surf, FEDataStream& a)
 // Plot contact penalty parameter
 bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 {
+
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+	if (pcs == 0) return false;
+
 	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
 	if (ps)
 	{
@@ -466,6 +471,17 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 		});
 		return true;
 	}
+
+	FESlidingElasticSurface* pse = dynamic_cast<FESlidingElasticSurface*>(&surf);
+	if (pse)
+	{
+		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+			const FESlidingElasticSurface::Data& pt = *mp.ExtractData<FESlidingElasticSurface::Data>();
+			return pt.m_epsn;
+			});
+		return true;
+	}
+
 	return false;
 }
 

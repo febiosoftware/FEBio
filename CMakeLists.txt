@@ -320,3 +320,7 @@ else()
     string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"skyline\"" filedata "${filedata}")
     file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "${filedata}")
 endif()
+
+
+get_target_property(LINKEDLIBS febio3 LINK_LIBRARIES)
+

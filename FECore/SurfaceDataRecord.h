@@ -55,13 +55,3 @@ public:
 private:
     vector<FELogSurfaceData*>	m_Data;
 };
-
-//================================================================================
-class FECORE_API FELogEnclosedVolume : public FELogSurfaceData
-{
-public:
-    FELogEnclosedVolume(FEModel* fem) : FELogSurfaceData(fem) {}
-    double value(FESurface& surface) override;
-
-    DECLARE_FECORE_CLASS();
-};

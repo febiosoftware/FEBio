@@ -115,8 +115,11 @@ public:
 	//! Reset the mesh data
 	void Reset();
 
-	//! Calculates an elements volume
+	//! Calculates an elements volume in reference configuration
 	double ElementVolume(FEElement& el);
+
+	//! calculates element volume in current configuration
+	double CurrentElementVolume(FEElement& el);
 
 	//! Finds a node from a given ID
 	FENode* FindNodeFromID(int nid);
@@ -256,10 +259,6 @@ public: // data maps
 
 	int DataMaps() const;
 	FEDataMap* GetDataMap(int i);
-
-protected:
-	double SolidElementVolume(FESolidElement& el);
-	double ShellElementVolume(FEShellElement& el);
 
 private:
 	vector<FENode>		m_Node;		//!< nodes
