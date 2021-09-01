@@ -323,6 +323,7 @@ public:
 		  double a20, double a21, double a22);
 
 	mat3d(double m[3][3]);
+	mat3d(double a[9]);
 
 	mat3d(const mat3dd& m);
 	mat3d(const mat3ds& m);

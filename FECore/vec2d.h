@@ -35,6 +35,8 @@ public:
 	explicit vec2d(double v) { r[0] = r[1] = v; }
 	vec2d(double x, double y) { r[0] = x; r[1] = y; }
 
+	bool operator == (const vec2d& r) const { return (r[0] == r.r[0]) && (r[1] == r.r[1]); }
+
 	// access operators
 	double operator [] (int i) const { return r[i]; }
 	double& operator [] (int i) { return r[i]; }
