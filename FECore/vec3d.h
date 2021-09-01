@@ -82,5 +82,35 @@ public:
 	double norm2() const { return (x*x + y*y + z*z); }
 
 public:
+	// NOTE: Added to simplify integration with FEBio Studio
+	vec3d Normalize() { unit(); return *this; }
+	vec3d Normalized() const { vec3d v(x, y, z); v.unit(); return v; }
+	double Length() const { return norm(); }
+	double SqrLength() const { return norm2(); }
+	bool operator == (const vec3d& a) const { return ((a.x == x) && (a.y == y) && (a.z == z)); }
+
+    double& operator() (int i)
+    {
+        switch(i)
+        {
+            case 0: {return x; break;}
+            case 1: {return y; break;}
+            case 2: {return z; break;}
+            default: {return x; break;}
+        }
+    }
+
+    double operator() (int i) const
+    {
+        switch(i)
+        {
+            case 0: {return x; break;}
+            case 1: {return y; break;}
+            case 2: {return z; break;}
+            default: {return x; break;}
+        }
+    }
+
+public:
 	double x, y, z;
 };

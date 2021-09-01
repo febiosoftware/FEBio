@@ -141,7 +141,6 @@ void FESoluteConvectiveFlow::Update()
             }
             // if solid element is not found, project x onto the solute inlet surface
             else {
-                vec2d r2;
                 FESurfaceElement* pme;
                 vec3d n = x - X;
                 n.unit();

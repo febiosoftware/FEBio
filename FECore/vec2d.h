@@ -23,10 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
+#include <math.h>
 #include "fecore_api.h"
 
 class vec2d
@@ -47,19 +45,24 @@ public:
 	double x() const { return r[0]; }
 	double y() const { return r[1]; }
 
+	double norm() const { return sqrt(r[0] * r[0] + r[1] * r[1]); }
+	double norm2() const { return r[0] * r[0] + r[1] * r[1]; }
+
+	double unit() { double R = norm(); if (R != 0) { r[0] /= R; r[1] /= R; }; return R; }
+
 public: // arithmetic operators
 
-	vec2d operator + (const vec2d& v) { return vec2d(r[0]+v.r[0], r[1]+v.r[1]); }
-	vec2d operator - (const vec2d& v) { return vec2d(r[0]-v.r[0], r[1]-v.r[1]); }
-	vec2d operator * (double g) { return vec2d(r[0]*g, r[1]*g); }
-	vec2d operator / (double g) { return vec2d(r[0]/g, r[1]/g); }
+	vec2d operator + (const vec2d& v) const { return vec2d(r[0]+v.r[0], r[1]+v.r[1]); }
+	vec2d operator - (const vec2d& v) const { return vec2d(r[0]-v.r[0], r[1]-v.r[1]); }
+	vec2d operator * (double g) const { return vec2d(r[0]*g, r[1]*g); }
+	vec2d operator / (double g) const { return vec2d(r[0]/g, r[1]/g); }
 
 	vec2d& operator += (const vec2d& v) { r[0] += v.r[0]; r[1] += v.r[1]; return *this; }
 	vec2d& operator -= (const vec2d& v) { r[0] -= v.r[0]; r[1] -= v.r[1]; return *this; }
 	vec2d& operator *= (double g) { r[0] *= g; r[1] *= g; return *this; }
 	vec2d& operator /= (double g) { r[0] /= g; r[1] /= g; return *this; }
 
-    vec2d operator - () { return vec2d(-r[0], -r[1]); }
+    vec2d operator - () const { return vec2d(-r[0], -r[1]); }
     
 	// dot product
 	double operator * (const vec2d& v) const { return r[0]*v[0] + r[1]*v[1]; }
