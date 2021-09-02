@@ -358,8 +358,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageMaterialUC, "uncoupled elastic damage");
 	REGISTER_FECORE_CLASS(FEGenericHyperelasticUC, "uncoupled hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, "uncoupled trans-iso hyperelastic");
-	REGISTER_FECORE_CLASS(FEKamensky, "Fung isotropic");
-	REGISTER_FECORE_CLASS(FEKamenskyUncoupled, "Fung isotropic uncoupled");
+	REGISTER_FECORE_CLASS(FEKamensky, "Kamensky");
+	REGISTER_FECORE_CLASS(FEKamenskyUncoupled, "Kamensky uncoupled");
 
 	// Fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExpPow, "fiber-exp-pow");
