@@ -694,6 +694,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_P, "continuous damage P");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D3s, "continuous damage D3s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_Ds, "continuous damage Ds");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2s, "continuous damage D2s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageBeta, "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageGamma, "continuous damage gamma");
 
