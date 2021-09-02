@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "FELeastSquaresInterpolator.h"
 #include <FECore/FENNQuery.h>
 #include <algorithm>
+using namespace std;
 
 class KDTree
 {

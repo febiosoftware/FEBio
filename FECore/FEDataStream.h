@@ -94,12 +94,12 @@ public:
 
 	float& operator [] (int i) { return m_a[i]; }
 
-	vector<float>& data() { return m_a; }
+	std::vector<float>& data() { return m_a; }
 
 	template <class T> T get(int i);
 
 private:
-	vector<float>	m_a;
+	std::vector<float>	m_a;
 };
 
 template <class T> inline T FEDataStream::get(int i) { return T(0.0);  }

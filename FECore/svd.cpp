@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "matrix.h"
 #include <math.h>
+using namespace std;
 
 #define SQR(a) ((a)*(a))
 #define FMAX(a, b) ((a)>(b)?(a):(b))

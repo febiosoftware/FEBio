@@ -38,10 +38,10 @@ class FELeastSquaresInterpolator : public FEMeshDataInterpolator
 
 	public:
 		matrix			A;
-		vector<int>		index;
-		vector<double>	W;
-		vector<vec3d>	X;
-		vector<int>		cpl;
+		std::vector<int>		index;
+		std::vector<double>	W;
+		std::vector<vec3d>	X;
+		std::vector<int>		cpl;
 	};
 
 public:
@@ -59,10 +59,10 @@ public:
 	void SetCheckForMatch(bool b);
 
 	//! set the source points
-	void SetSourcePoints(const vector<vec3d>& srcPoints);
+	void SetSourcePoints(const std::vector<vec3d>& srcPoints);
 
 	//! set the target points
-	void SetTargetPoints(const vector<vec3d>& trgPoints);
+	void SetTargetPoints(const std::vector<vec3d>& trgPoints);
 	bool SetTargetPoint(const vec3d& trgPoint) override;
 
 	//! initialize MLQ data
@@ -71,11 +71,11 @@ public:
 	//! map source data onto target data
 	//! input: sval - values of the source points
 	//! output: tval - values at the target points
-	bool Map(std::vector<double>& tval, function<double(int sourceNode)> src) override;
+	bool Map(std::vector<double>& tval, std::function<double(int sourceNode)> src) override;
 
 	// evaluate map
-	double Map(int inode, function<double(int sourceNode)> src) override;
-	vec3d MapVec3d(int inode, function<vec3d(int sourceNode)> src) override;
+	double Map(int inode, std::function<double(int sourceNode)> src) override;
+	vec3d MapVec3d(int inode, std::function<vec3d(int sourceNode)> src) override;
 
 private:
 	int		m_dim;
@@ -84,5 +84,5 @@ private:
 	std::vector<vec3d>	m_src;	// source points
 	std::vector<vec3d>	m_trg;	// target points
 
-	vector< Data >			m_data;
+	std::vector< Data >			m_data;
 };

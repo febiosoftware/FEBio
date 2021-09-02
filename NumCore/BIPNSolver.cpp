@@ -499,7 +499,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 
 		// solve for the coefficients
 		vector<double> a(m);
-		Q.solve(q, a);
+		Q.solve(a, q);
 		for (int i = 0; i <= n; ++i)
 		{
 			au[i] = a[i];

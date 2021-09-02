@@ -230,7 +230,7 @@ bool BSpline::fit(int korder, int ncoef, std::vector<vec2d>p)
             rhs[k] += p[j].y()*wk1(j,k);
 
     // solve the system of equations
-    wk2.solve(rhs, m_coeff);
+    wk2.solve(m_coeff, rhs);
     
     return true;
 }
