@@ -64,6 +64,9 @@ public:
 	//! validates all properties and parameters
 	bool Validate() override;
 
+	//! call this after the parameters are changed
+	virtual bool UpdateParams();
+
 public:
 	//! return the super class id
 	SUPER_CLASS_ID GetSuperClassID();

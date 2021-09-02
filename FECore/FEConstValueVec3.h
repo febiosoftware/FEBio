@@ -67,6 +67,8 @@ public:
 
 	FEVec3dValuator* copy() override;
 
+	bool UpdateParams() override;
+
 private:
 	std::string			m_expr;
 	MSimpleExpression	m_math[3];

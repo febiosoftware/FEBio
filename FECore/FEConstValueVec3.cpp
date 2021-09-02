@@ -51,6 +51,8 @@ END_FECORE_CLASS();
 
 FEMathValueVec3::FEMathValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
+	m_expr = "0,0,0";
+	Init();
 }
 
 //---------------------------------------------------------------------------------------
@@ -69,6 +71,8 @@ bool FEMathValueVec3::Init()
 //---------------------------------------------------------------------------------------
 bool FEMathValueVec3::create(const std::string& sx, const std::string& sy, const std::string& sz)
 {
+	for (int i = 0; i < 3; ++i) m_math[i].Clear();
+
 	for (int i = 0; i < 3; ++i)
 	{
 		m_math[i].AddVariable("X");
@@ -81,6 +85,11 @@ bool FEMathValueVec3::create(const std::string& sx, const std::string& sy, const
 	b = m_math[2].Create(sz); assert(b);
 
 	return true;
+}
+
+bool FEMathValueVec3::UpdateParams()
+{
+	return Init();
 }
 
 vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)

@@ -571,3 +571,9 @@ bool FECoreBase::BuildClass()
 	}
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FECoreBase::UpdateParams()
+{
+	return true;
+}
