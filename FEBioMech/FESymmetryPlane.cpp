@@ -43,20 +43,10 @@ void FESymmetryPlane::Activate()
 {
     // don't forget to call base class
     FELinearConstraintSet::Activate();
-}
-
-//-----------------------------------------------------------------------------
-bool FESymmetryPlane::Init()
-{
-	// initialize surface
-	if (m_surf.Init() == false) return true;
 
     FEModel& fem = *FELinearConstraintSet::GetFEModel();
     DOFS& dofs = fem.GetDOFS();
     
-	if (m_binit) return true;
-	m_binit = true;
-
     // evaluate the nodal normals
     int N = m_surf.Nodes();
     vec3d nu(0,0,0);
@@ -75,7 +65,7 @@ bool FESymmetryPlane::Init()
     // nx*ux + ny*uy + nz*uz = 0
     for (int i=0; i<N; ++i) {
         FENode node = m_surf.Node(i);
-        if (node.HasFlags(FENode::EXCLUDE) == false) {
+        if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
             FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
             for (int j=0; j<3; ++j) {
                 FEAugLagLinearConstraint::DOF dof;
@@ -106,7 +96,7 @@ bool FESymmetryPlane::Init()
     // for nodes that belong to shells, also constraint the shell bottom face displacements
     for (int i=0; i<N; ++i) {
         FENode node = m_surf.Node(i);
-        if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.HasFlags(FENode::SHELL))) {
+        if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.HasFlags(FENode::SHELL)) && (node.m_rid == -1)) {
             FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
             for (int j=0; j<3; ++j) {
                 FEAugLagLinearConstraint::DOF dof;
@@ -133,6 +123,11 @@ bool FESymmetryPlane::Init()
             add(pLC);
         }
     }
+}
 
-    return true;
+//-----------------------------------------------------------------------------
+bool FESymmetryPlane::Init()
+{
+	// initialize surface
+    return m_surf.Init();
 }

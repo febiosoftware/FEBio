@@ -150,10 +150,10 @@ void FEMechModel::AddRigidNodeSet(FERigidNodeSet* rns)
 // model activation
 void FEMechModel::Activate()
 {
+    // activate rigid components
+    m_prs->Activate();
+    
 	FEModel::Activate();
-
-	// activate rigid components
-	m_prs->Activate();
 }
 
 //-----------------------------------------------------------------------------
