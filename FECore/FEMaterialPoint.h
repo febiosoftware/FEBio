@@ -85,6 +85,9 @@ public:
 	//! in other words, it makes this the parent of the passed pointer
 	void SetNext(FEMaterialPoint* pt);
 
+	//! append a material point
+	void Append(FEMaterialPoint* pt);
+
 	// serialization
 	virtual void Serialize(DumpStream& ar);
 

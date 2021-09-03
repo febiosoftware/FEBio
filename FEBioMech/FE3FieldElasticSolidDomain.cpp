@@ -448,7 +448,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();
-	#pragma omp parallel for shared(NE, berr)
+//	#pragma omp parallel for shared(NE, berr)
 	for (int i=0; i<NE; ++i)
 	{
 		try
@@ -554,14 +554,6 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
         pt.m_v = el.Evaluate(vel, n);
         pt.m_a = el.Evaluate(acc, n);
 
-        // evaluate deviatoric strain energy at current and previous time
-        FEElasticMaterialPoint et = pt;
-		et.m_elem = mp.m_elem;
-		et.m_index = mp.m_index;
-		et.m_r0 = pt.m_r0;
-		et.m_rt = pt.m_rt;
-        et.m_F = Ft; et.m_J = Jt;
-
         // update specialized material points
         m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
         
@@ -574,8 +566,17 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 		pt.m_s = mat.DevStress(mp);
         
         // adjust stress for strain energy conservation
-        if (m_alphaf == 0.5) {
-			double Wt = mat.DevStrainEnergyDensity(et);
+        if (m_alphaf == 0.5) 
+		{
+			// evaluate deviatoric strain energy at current and previous time
+			mat3d Ftmp = pt.m_F;
+			double Jtmp = pt.m_J;
+			pt.m_F = Ft;
+			pt.m_J = Jt;
+			double Wt = mat.DevStrainEnergyDensity(mp);
+			pt.m_F = Ftmp;
+			pt.m_J = Jtmp;
+
 			// store total strain energy density at current time
 			pt.m_Wt = Wt + eUt;
 
