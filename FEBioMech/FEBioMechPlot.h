@@ -301,7 +301,7 @@ class FEPlotElementMixtureStress : public FEPlotDomainData
 public:
 	FEPlotElementMixtureStress(FEModel* pfem);
 	bool SetFilter(const char* szfilter) override;
-	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
 protected:
 	int		m_comp;
 };
@@ -844,6 +844,15 @@ class FEPlotRightHencky : public FEPlotDomainData
 {
 public:
     FEPlotRightHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Left Hencky
+class FEPlotLeftHencky : public FEPlotDomainData
+{
+public:
+    FEPlotLeftHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

@@ -48,11 +48,7 @@ mat3ds FENaturalNeoHookean::Stress(FEMaterialPoint& mp)
     double mu = m_G(mp);
     
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds b = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    b.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate amount of dilatation
     double K1 = h.tr();
@@ -146,11 +142,7 @@ double FENaturalNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
     double mu = m_G(mp);
     
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds b = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    b.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate amount of dilatation
     double K1 = h.tr();

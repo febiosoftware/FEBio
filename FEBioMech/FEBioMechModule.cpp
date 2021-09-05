@@ -639,6 +639,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
     REGISTER_FECORE_CLASS(FEPlotRightStretch, "right stretch");
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");
+    REGISTER_FECORE_CLASS(FEPlotLeftHencky, "left Hencky");
 	REGISTER_FECORE_CLASS(FEPlotMortarContactGap, "mortar-gap");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceTraction, "surface traction");
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
@@ -771,6 +772,16 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogElemRightHencky1, "H1");
     REGISTER_FECORE_CLASS(FELogElemRightHencky2, "H2");
     REGISTER_FECORE_CLASS(FELogElemRightHencky3, "H3");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyX, "hx");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyY, "hy");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyZ, "hz");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyXY, "hxy");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyYZ, "hyz");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyXZ, "hxz");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyEffective, "effective left Hencky");
+    REGISTER_FECORE_CLASS(FELogElemLeftHencky1, "h1");
+    REGISTER_FECORE_CLASS(FELogElemLeftHencky2, "h2");
+    REGISTER_FECORE_CLASS(FELogElemLeftHencky3, "h3");
 	REGISTER_FECORE_CLASS(FELogElemStressX, "sx");
 	REGISTER_FECORE_CLASS(FELogElemStressY, "sy");
 	REGISTER_FECORE_CLASS(FELogElemStressZ, "sz");

@@ -1984,6 +1984,29 @@ bool FEPlotRightHencky::Save(FEDomain& dom, FEDataStream& a)
     return true;
 }
 
+//=============================================================================
+//! Store the average right Hencky
+class FELeftHencky
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->LeftHencky();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotLeftHencky::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FELeftHencky());
+    return true;
+}
+
 //-----------------------------------------------------------------------------
 //! Store shell thicknesses
 bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
