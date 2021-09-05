@@ -673,6 +673,158 @@ double FELogElemRightStretchEffective::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemLeftStretchX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        val += V.xx();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretchY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        val += V.yy();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretchZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        val += V.zz();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretchXY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        val += V.xy();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretchYZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        val += V.yz();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretchXZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        val += V.xz();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretch1::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        V.exact_eigen(l);
+        val += l[0];
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretch2::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        V.exact_eigen(l);
+        val += l[1];
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretch3::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3ds V = pt.LeftStretch();
+        V.exact_eigen(l);
+        val += l[2];
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemLeftStretchEffective::value(FEElement& el)
+{
+    int nint = el.GaussPoints();
+    mat3ds Vavg; Vavg.zero();
+    for (int n = 0; n < nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+        
+        mat3ds V = ep.LeftStretch();
+        
+        Vavg += V;
+    }
+    Vavg /= (double)nint;
+    double val = Vavg.effective_norm();
+    
+    return val;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemRightHenckyX::value(FEElement& el)
 {
     double val = 0.0;

@@ -423,6 +423,86 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemLeftStretchX : public FELogElemData
+{
+public:
+    FELogElemLeftStretchX(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretchY : public FELogElemData
+{
+public:
+    FELogElemLeftStretchY(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretchZ : public FELogElemData
+{
+public:
+    FELogElemLeftStretchZ(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretchXY : public FELogElemData
+{
+public:
+    FELogElemLeftStretchXY(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretchYZ : public FELogElemData
+{
+public:
+    FELogElemLeftStretchYZ(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretchXZ : public FELogElemData
+{
+public:
+    FELogElemLeftStretchXZ(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretch1 : public FELogElemData
+{
+public:
+    FELogElemLeftStretch1(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretch2 : public FELogElemData
+{
+public:
+    FELogElemLeftStretch2(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretch3 : public FELogElemData
+{
+public:
+    FELogElemLeftStretch3(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemLeftStretchEffective : public FELogElemData
+{
+public:
+    FELogElemLeftStretchEffective(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemRightHenckyX : public FELogElemData
 {
 public:
