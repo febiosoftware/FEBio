@@ -42,7 +42,7 @@ class FECORE_API quatd
 {
 public:
 	// constructors
-	quatd () { x = y = z = w = 0.f; }
+	quatd() { x = y = z = 0.0;  w = 1.0; }
 
 	quatd( const double angle, vec3d v)
 	{
@@ -88,7 +88,7 @@ public:
 
 	}
 
-	quatd(const double qx, const double qy, const double qz, const double qw = 0.0)
+	quatd(const double qx, const double qy, const double qz, const double qw = 1.0)
 	{
 		w = qw;
 		x = qx;
