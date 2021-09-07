@@ -1862,6 +1862,29 @@ bool FEPlotRightStretch::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //=============================================================================
+//! Store the average right stretch
+class FELeftStretch
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+            return pt->LeftStretch();
+            }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotLeftStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FELeftStretch());
+    return true;
+}
+
+//=============================================================================
 //! Store the average right Hencky
 class FERightHencky
 {
@@ -1881,6 +1904,29 @@ bool FEPlotRightHencky::Save(FEDomain& dom, FEDataStream& a)
     FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
     if (pme == nullptr) return false;
     writeAverageElementValue<mat3ds>(dom, a, FERightHencky());
+    return true;
+}
+
+//=============================================================================
+//! Store the average right Hencky
+class FELeftHencky
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->LeftHencky();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotLeftHencky::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FELeftHencky());
     return true;
 }
 

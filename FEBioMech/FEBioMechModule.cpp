@@ -365,8 +365,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageMaterialUC, "uncoupled elastic damage");
 	REGISTER_FECORE_CLASS(FEGenericHyperelasticUC, "uncoupled hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, "uncoupled trans-iso hyperelastic");
-	REGISTER_FECORE_CLASS(FEKamensky, "Fung isotropic");
-	REGISTER_FECORE_CLASS(FEKamenskyUncoupled, "Fung isotropic uncoupled");
+	REGISTER_FECORE_CLASS(FEKamensky, "Kamensky");
+	REGISTER_FECORE_CLASS(FEKamenskyUncoupled, "Kamensky uncoupled");
 
 	// Fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExpPow, "fiber-exp-pow");
@@ -637,7 +637,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotLagrangeStrain, "Lagrange strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
     REGISTER_FECORE_CLASS(FEPlotRightStretch, "right stretch");
+    REGISTER_FECORE_CLASS(FEPlotLeftStretch, "left stretch");
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");
+    REGISTER_FECORE_CLASS(FEPlotLeftHencky, "left Hencky");
 	REGISTER_FECORE_CLASS(FEPlotMortarContactGap, "mortar-gap");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceTraction, "surface traction");
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
@@ -694,6 +696,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_P, "continuous damage P");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D3s, "continuous damage D3s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_Ds, "continuous damage Ds");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2s, "continuous damage D2s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageBeta, "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageGamma, "continuous damage gamma");
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "stress norm");
@@ -753,6 +756,16 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogElemRightStretch1, "U1");
     REGISTER_FECORE_CLASS(FELogElemRightStretch2, "U2");
     REGISTER_FECORE_CLASS(FELogElemRightStretch3, "U3");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchX, "Vx");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchY, "Vy");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchZ, "Vz");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchXY, "Vxy");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchYZ, "Vyz");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchXZ, "Vxz");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretchEffective, "effective left stretch");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretch1, "V1");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretch2, "V2");
+    REGISTER_FECORE_CLASS(FELogElemLeftStretch3, "V3");
     REGISTER_FECORE_CLASS(FELogElemRightHenckyX, "Hx");
     REGISTER_FECORE_CLASS(FELogElemRightHenckyY, "Hy");
     REGISTER_FECORE_CLASS(FELogElemRightHenckyZ, "Hz");
@@ -763,6 +776,16 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogElemRightHencky1, "H1");
     REGISTER_FECORE_CLASS(FELogElemRightHencky2, "H2");
     REGISTER_FECORE_CLASS(FELogElemRightHencky3, "H3");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyX, "hx");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyY, "hy");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyZ, "hz");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyXY, "hxy");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyYZ, "hyz");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyXZ, "hxz");
+    REGISTER_FECORE_CLASS(FELogElemLeftHenckyEffective, "effective left Hencky");
+    REGISTER_FECORE_CLASS(FELogElemLeftHencky1, "h1");
+    REGISTER_FECORE_CLASS(FELogElemLeftHencky2, "h2");
+    REGISTER_FECORE_CLASS(FELogElemLeftHencky3, "h3");
 	REGISTER_FECORE_CLASS(FELogElemStressX, "sx");
 	REGISTER_FECORE_CLASS(FELogElemStressY, "sy");
 	REGISTER_FECORE_CLASS(FELogElemStressZ, "sz");

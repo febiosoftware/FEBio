@@ -560,8 +560,9 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
         
         // get the stress and elasticity for this integration point
         mat3ds s = pt.m_s;
-        tens4ds C = m_pMat->Tangent(mp);
-        
+//        tens4ds C = m_pMat->Tangent(mp);
+        tens4dmm C = m_pMat->SolidTangent(mp);
+
         eta = el.gt(n);
         
         Mr = el.Hr(n);
@@ -862,8 +863,9 @@ void FEElasticShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
 
         // calculate the stress at this material point
-        pt.m_s = m_pMat->Stress(mp);
-        
+//        pt.m_s = m_pMat->Stress(mp);
+        pt.m_s = m_pMat->SolidStress(mp);
+
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5)
         {

@@ -90,11 +90,7 @@ double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const doub
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds B = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    B.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
@@ -214,11 +210,7 @@ double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const dou
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds B = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    B.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
@@ -291,11 +283,7 @@ double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const do
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds B = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    B.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();

@@ -136,10 +136,10 @@ void FEMechModel::AddRigidInitialCondition(FERigidIC* pIC)
 // model activation
 void FEMechModel::Activate()
 {
+    // activate rigid components
+    m_prs->Activate();
+    
 	FEModel::Activate();
-
-	// activate rigid components
-	m_prs->Activate();
 }
 
 //-----------------------------------------------------------------------------

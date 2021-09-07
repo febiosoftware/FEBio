@@ -653,14 +653,16 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5) 
 		{
-			// evaluate strain energy at current time
-			FEElasticMaterialPoint et = pt;
-			et.m_F = Ft;
-			et.m_J = Jt;
-
-			// evaluate strain-energy density
 			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
-			pt.m_Wt = pme->StrainEnergyDensity(et);
+
+			// evaluate strain energy at current time
+			mat3d Ftmp = pt.m_F;
+			double Jtmp = pt.m_J;
+			pt.m_F = Ft;
+			pt.m_J = Jt;
+			pt.m_Wt = pme->StrainEnergyDensity(mp);
+			pt.m_F = Ftmp;
+			pt.m_J = Jtmp;
 
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);
