@@ -46,6 +46,9 @@ FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FESSIShellDomain(pfe
     m_alpham = 2;
     m_update_dynamic = true; // default for backward compatibility
 
+    m_secant_stress = false;
+    m_secant_tangent = false;
+
 	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
 	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
 	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
@@ -561,7 +564,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
         // get the stress and elasticity for this integration point
         mat3ds s = pt.m_s;
 //        tens4ds C = m_pMat->Tangent(mp);
-        tens4dmm C = m_pMat->SolidTangent(mp);
+        tens4dmm C = (m_secant_tangent ? m_pMat->SecantTangent(mp) : m_pMat->SolidTangent(mp));
 
         eta = el.gt(n);
         
@@ -864,7 +867,7 @@ void FEElasticShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 
         // calculate the stress at this material point
 //        pt.m_s = m_pMat->Stress(mp);
-        pt.m_s = m_pMat->SolidStress(mp);
+        pt.m_s = (m_secant_stress ? m_pMat->SecantStress(mp) : m_pMat->Stress(mp));
 
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5)
