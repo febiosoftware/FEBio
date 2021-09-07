@@ -54231,7 +54231,7 @@ natural neo-Hookean
 \begin_inset Text
 
 \begin_layout Plain Layout
-<G>
+<E>
 \end_layout
 
 \end_inset
@@ -54240,7 +54240,11 @@ natural neo-Hookean
 \begin_inset Text
 
 \begin_layout Plain Layout
-shear modulus
+Young's modulus 
+\begin_inset Formula $E$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -54264,7 +54268,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-<k>
+<v>
 \end_layout
 
 \end_inset
@@ -54273,7 +54277,11 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-bulk modulus
+Poisson's ratio 
+\begin_inset Formula $\nu$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -54282,11 +54290,7 @@ bulk modulus
 \begin_inset Text
 
 \begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
+[ ]
 \end_layout
 
 \end_inset
@@ -54323,7 +54327,23 @@ and
  It is derived from the following hyperelastic strain-energy function: 
 \begin_inset Formula 
 \[
-W=\frac{\kappa}{2}K_{1}^{2}+\mu K_{2}^{2}.
+W=\frac{\kappa}{2}K_{1}^{2}+\mu K_{2}^{2},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is the bulk modulus and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the shear modulus,
+\begin_inset Formula 
+\[
+\kappa=\frac{E}{3\left(1-2\nu\right)}\,,\quad\mu=\frac{E}{2\left(1+\nu\right)}
 \]
 
 \end_inset
@@ -54389,11 +54409,11 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <G>500.0</G>
+  <E>200e3</E>
 \end_layout
 
 \begin_layout LyX-Code
-  <k>333.3</k>
+  <v>0.3</v>
 \end_layout
 
 \begin_layout LyX-Code
