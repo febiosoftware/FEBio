@@ -36,8 +36,6 @@ public:
 public:
 	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat) override;
 	void AddMaterial(FEMaterial* mat) override;
-	void AddRigidFixedBC(FEModelComponent* prc) override;
-	void AddRigidPrescribedBC(FEModelComponent* prc) override;
-	void AddRigidIC(FEModelComponent* prv) override;
+	void AddRigidBC(FEModelComponent* prc) override;
 };
 

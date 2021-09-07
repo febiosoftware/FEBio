@@ -99,28 +99,23 @@ FEDomain* FEBioModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat
 }
 
 //-----------------------------------------------------------------------------
-void FEBioModelBuilder::AddRigidFixedBC(FEModelComponent* pmc)
+void FEBioModelBuilder::AddRigidBC(FEModelComponent* pmc)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(GetFEModel());
-	FERigidBodyFixedBC* prc = dynamic_cast<FERigidBodyFixedBC*>(pmc); assert(prc);
-	fem.AddRigidFixedBC(prc);
-	AddComponent(prc);
-}
 
-//-----------------------------------------------------------------------------
-void FEBioModelBuilder::AddRigidPrescribedBC(FEModelComponent* pmc)
-{
-	FEMechModel& fem = static_cast<FEMechModel&>(GetFEModel());
-	FERigidBodyDisplacement* prc = dynamic_cast<FERigidBodyDisplacement*>(pmc); assert(prc);
-	fem.AddRigidPrescribedBC(prc);
-	AddComponent(prc);
-}
+	AddComponent(pmc);
 
-//-----------------------------------------------------------------------------
-void FEBioModelBuilder::AddRigidIC(FEModelComponent* pmc)
-{
-	FEMechModel& fem = static_cast<FEMechModel&>(GetFEModel());
-	FERigidIC* ric = dynamic_cast<FERigidIC*>(pmc); assert(ric);
-	fem.AddRigidInitialCondition(ric);
-	AddComponent(ric);
+	FERigidBodyFixedBC* prc = dynamic_cast<FERigidBodyFixedBC*>(pmc);
+	if (prc) { fem.AddRigidFixedBC(prc); return; }
+
+	FERigidBodyDisplacement* prf = dynamic_cast<FERigidBodyDisplacement*>(pmc);
+	if (prf) { fem.AddRigidPrescribedBC(prf); return; }
+
+	FERigidIC* ric = dynamic_cast<FERigidIC*>(pmc);
+	if (ric) { fem.AddRigidInitialCondition(ric); return; }
+
+	FEModelLoad* pml = dynamic_cast<FEModelLoad*>(pmc);
+	if (pml) AddModelLoad(pml);
+
+	assert(false);
 }

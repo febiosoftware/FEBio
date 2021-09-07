@@ -257,7 +257,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					pic->SetParameter("value", v);
 
 					// add this initial condition to the current step
-					GetBuilder()->AddRigidIC(pic);
+					GetBuilder()->AddRigidBC(pic);
 				}
 				else if (tag == "initial_angular_velocity")
 				{
@@ -271,7 +271,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					pic->SetParameter("value", w);
 
 					// add this initial condition to the current step
-					GetBuilder()->AddRigidIC(pic);
+					GetBuilder()->AddRigidBC(pic);
 				}
 
 				++tag;

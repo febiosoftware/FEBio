@@ -265,9 +265,7 @@ void FEModelBuilder::AddNonlinearConstraint(FENLConstraint* pnc)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidFixedBC(FEModelComponent* pmc) { assert(false); }
-void FEModelBuilder::AddRigidPrescribedBC(FEModelComponent* pmc) { assert(false); }
-void FEModelBuilder::AddRigidIC(FEModelComponent* pmc) { assert(false); }
+void FEModelBuilder::AddRigidBC(FEModelComponent* pmc) { assert(false); }
 
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions

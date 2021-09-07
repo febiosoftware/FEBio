@@ -137,9 +137,7 @@ public:
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 
 	// TODO: Try to remove these
-	virtual void AddRigidFixedBC     (FEModelComponent* prc);
-	virtual void AddRigidPrescribedBC(FEModelComponent* prc);
-	virtual void AddRigidIC			 (FEModelComponent* prv);
+	virtual void AddRigidBC(FEModelComponent* prc);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }

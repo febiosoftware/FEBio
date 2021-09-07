@@ -60,33 +60,33 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	{
 		// create the fixed dof
 		FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC", fem);
-		feb.AddRigidFixedBC(pBC);
+		feb.AddRigidBC(pBC);
 		ReadParameterList(tag, pBC);
 	}
 	else if (strcmp(sztype, "prescribe") == 0)
 	{
 		// create the rigid displacement constraint
 		FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", fem);
-		feb.AddRigidPrescribedBC(pDC);
+		feb.AddRigidBC(pDC);
 		ReadParameterList(tag, pDC);
 	}
 	else if (strcmp(sztype, "force") == 0)
 	{
 		// create the rigid body force
 		FEModelLoad* pFC = fecore_new<FEModelLoad>(FERIGIDLOAD_ID, "rigid_force", fem);
-		feb.AddModelLoad(pFC);
+		feb.AddRigidBC(pFC);
 		ReadParameterList(tag, pFC);
 	}
 	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{
 		FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyVelocity", fem);
-		feb.AddRigidIC(pic);
+		feb.AddRigidBC(pic);
 		ReadParameterList(tag, pic);
 	}
 	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
 	{
 		FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyAngularVelocity", fem);
-		feb.AddRigidIC(pic);
+		feb.AddRigidBC(pic);
 		ReadParameterList(tag, pic);
 	}
     else if (strcmp(sztype, "follower force") == 0)
@@ -106,7 +106,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 		// create the rigid constraint
 		FEModelComponent* pBC = fecore_new<FEModelComponent>(FERIGIDBC_ID, sztype, fem);
 		if (pBC == nullptr)  throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		feb.AddRigidFixedBC(pBC);
+		feb.AddRigidBC(pBC);
 		ReadParameterList(tag, pBC);
 	}
 }

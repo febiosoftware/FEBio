@@ -380,7 +380,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				value(tag, val);
 
 				FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", &fem);
-				feb.AddRigidPrescribedBC(pDC);
+				feb.AddRigidBC(pDC);
 
 				pDC->SetParameter("rb", nmat);
 				pDC->SetParameter("dof", bc);
@@ -421,7 +421,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			else if (strcmp(szt, "fixed") == 0)
 			{
 				FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC", &fem);
-				feb.AddRigidFixedBC(pBC);
+				feb.AddRigidBC(pBC);
 
 				pBC->SetParameter("rb", nmat);
 
@@ -449,7 +449,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				value(tag, val);
 
 				FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", &fem);
-				feb.AddRigidPrescribedBC(pDC);
+				feb.AddRigidBC(pDC);
 
 				pDC->SetParameter("rb", nmat);
 				pDC->SetParameter("dof", bc);
@@ -480,7 +480,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			else if (strcmp(szt, "fixed") == 0)
 			{
 				FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC", &fem);
-				feb.AddRigidFixedBC(pBC);
+				feb.AddRigidBC(pBC);
 
 				pBC->SetParameter("rb", nmat);
 
@@ -542,7 +542,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			value(tag, val);
 
 			FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", &fem);
-			feb.AddRigidPrescribedBC(pDC);
+			feb.AddRigidBC(pDC);
 
 			pDC->SetParameter("rb", nmat);
 			pDC->SetParameter("dof", bc);
@@ -620,7 +620,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC", &fem);
-			feb.AddRigidFixedBC(pBC);
+			feb.AddRigidBC(pBC);
 
 			pBC->SetParameter("rb", nmat);
 
@@ -639,7 +639,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			pic->SetParameter("value", v);
 
 			// add this initial condition to the current step
-			feb.AddRigidIC(pic);
+			feb.AddRigidBC(pic);
 		}
 		else if (tag == "initial_angular_velocity")
 		{
@@ -653,7 +653,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			pic->SetParameter("value", w);
 
 			// add to model
-			feb.AddRigidIC(pic);
+			feb.AddRigidBC(pic);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
