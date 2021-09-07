@@ -101,7 +101,14 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
         feb.AddModelLoad(rc);
         ReadParameterList(tag, rc);
     }
-	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	else
+	{
+		// create the rigid constraint
+		FEModelComponent* pBC = fecore_new<FEModelComponent>(FERIGIDBC_ID, sztype, fem);
+		if (pBC == nullptr)  throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		feb.AddRigidFixedBC(pBC);
+		ReadParameterList(tag, pBC);
+	}
 }
 
 void FEBioRigidSection::ParseRigidConnector(XMLTag& tag)
