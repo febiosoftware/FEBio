@@ -32,7 +32,7 @@ SOFTWARE.*/
 // conversion factor from degrees to radians (= PI / 180)
 #define DEG_TO_RAD 0.01745329252
 
-FETransform::FETransform() : m_pos(0,0,0), m_rot(0, 0, 1)
+FETransform::FETransform() : m_pos(0,0,0), m_rot(0, 0, 0)
 {
 	m_scl[0] = m_scl[1] = m_scl[2] = 1.0;
 }
