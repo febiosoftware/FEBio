@@ -574,8 +574,9 @@ void FEElasticANSShellDomain::ElementStiffness(int iel, matrix& ke)
         
         // evaluate the material tangent
         matrix CC(6,6);
-        tens4ds c = m_pMat->MaterialTangent(mp, el.m_E[n]);
-        tens4dsCntMat66(c, Gcnt, CC);
+        tens4dmm c = m_pMat->MaterialTangent(mp, el.m_E[n]);
+        tens4dmmCntMat66(c, Gcnt, CC);
+//        tens4dsCntMat66(c, Gcnt, CC);
         
         // ------------ constitutive component --------------
         
@@ -947,6 +948,36 @@ void FEElasticANSShellDomain::mat3dsCntMat61(const mat3ds s, const vec3d* Gcnt, 
 //! Evaluate contravariant components of tens4ds tensor
 //! Cijkl = Gj.(Gi.c.Gl).Gk
 void FEElasticANSShellDomain::tens4dsCntMat66(const tens4ds c, const vec3d* Gcnt, matrix& C)
+{
+    C.resize(6, 6);
+    C(0,0) =          Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[0])*Gcnt[0]);  // i=0, j=0, k=0, l=0
+    C(0,1) = C(1,0) = Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[1])*Gcnt[1]);  // i=0, j=0, k=1, l=1
+    C(0,2) = C(2,0) = Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[2])*Gcnt[2]);  // i=0, j=0, k=2, l=2
+    C(0,3) = C(3,0) = Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[1])*Gcnt[0]);  // i=0, j=0, k=0, l=1
+    C(0,4) = C(4,0) = Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[2])*Gcnt[1]);  // i=0, j=0, k=1, l=2
+    C(0,5) = C(5,0) = Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[2])*Gcnt[0]);  // i=0, j=0, k=0, l=2
+    C(1,1) =          Gcnt[1]*(vdotTdotv(Gcnt[1], c, Gcnt[1])*Gcnt[1]);  // i=1, j=1, k=1, l=1
+    C(1,2) = C(2,1) = Gcnt[1]*(vdotTdotv(Gcnt[1], c, Gcnt[2])*Gcnt[2]);  // i=1, j=1, k=2, l=2
+    C(1,3) = C(3,1) = Gcnt[1]*(vdotTdotv(Gcnt[1], c, Gcnt[1])*Gcnt[0]);  // i=1, j=1, k=0, l=1
+    C(1,4) = C(4,1) = Gcnt[1]*(vdotTdotv(Gcnt[1], c, Gcnt[2])*Gcnt[1]);  // i=1, j=1, k=1, l=2
+    C(1,5) = C(5,1) = Gcnt[1]*(vdotTdotv(Gcnt[1], c, Gcnt[2])*Gcnt[0]);  // i=1, j=1, k=0, l=2
+    C(2,2) =          Gcnt[2]*(vdotTdotv(Gcnt[2], c, Gcnt[2])*Gcnt[2]);  // i=2, j=2, k=2, l=2
+    C(2,3) = C(3,2) = Gcnt[2]*(vdotTdotv(Gcnt[2], c, Gcnt[1])*Gcnt[0]);  // i=2, j=2, k=0, l=1
+    C(2,4) = C(4,2) = Gcnt[2]*(vdotTdotv(Gcnt[2], c, Gcnt[2])*Gcnt[1]);  // i=2, j=2, k=1, l=2
+    C(2,5) = C(5,2) = Gcnt[2]*(vdotTdotv(Gcnt[2], c, Gcnt[2])*Gcnt[0]);  // i=2, j=2, k=0, l=2
+    C(3,3) =          Gcnt[1]*(vdotTdotv(Gcnt[0], c, Gcnt[1])*Gcnt[0]);  // i=0, j=1, k=0, l=1
+    C(3,4) = C(4,3) = Gcnt[1]*(vdotTdotv(Gcnt[0], c, Gcnt[2])*Gcnt[1]);  // i=0, j=1, k=1, l=2
+    C(3,5) = C(5,3) = Gcnt[1]*(vdotTdotv(Gcnt[0], c, Gcnt[2])*Gcnt[0]);  // i=0, j=1, k=0, l=2
+    C(4,4) =          Gcnt[2]*(vdotTdotv(Gcnt[1], c, Gcnt[2])*Gcnt[1]);  // i=1, j=2, k=1, l=2
+    C(4,5) = C(5,4) = Gcnt[2]*(vdotTdotv(Gcnt[1], c, Gcnt[2])*Gcnt[0]);  // i=1, j=2, k=0, l=2
+    C(5,5) =          Gcnt[2]*(vdotTdotv(Gcnt[0], c, Gcnt[2])*Gcnt[0]);  // i=0, j=2, k=0, l=2
+    
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate contravariant components of tens4dm tensor
+//! Cijkl = Gj.(Gi.c.Gl).Gk
+void FEElasticANSShellDomain::tens4dmmCntMat66(const tens4dmm c, const vec3d* Gcnt, matrix& C)
 {
     C.resize(6, 6);
     C(0,0) =          Gcnt[0]*(vdotTdotv(Gcnt[0], c, Gcnt[0])*Gcnt[0]);  // i=0, j=0, k=0, l=0

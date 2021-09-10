@@ -41,8 +41,8 @@ public:
     FENaturalNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}
     
 public:
-    FEParamDouble        m_k;    //!< bulk modulus
-    FEParamDouble        m_G;    //!< shear modulus
+    FEParamDouble        m_E;    //!< bulk modulus
+    FEParamDouble        m_v;    //!< shear modulus
     
 public:
     //! calculate stress at material point

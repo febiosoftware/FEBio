@@ -62,6 +62,50 @@ void FEFunction1D::Serialize(DumpStream& ar)
 	}
 }
 
+// Invert the function f(x) = f0: given f0, return x.
+// On input, x is the initial guess.
+// On output, x is the solution.
+// Function returns true if solution has converged, false otherwise.
+// Uses Newton's method.
+bool FEFunction1D::invert(const double f0, double &x)
+{
+    const int maxiter = 100;
+    const double errabs = 1e-15;
+    const double errrel = 1e-6;
+    
+    bool cnvgd = false;
+    bool done = false;
+    int iter = 0;
+    double dx;
+    while (!done) {
+        double f = value(x) - f0;
+        double df = derive(x);
+        // check if slope is zero
+        if (fabs(df) <= errabs) {
+            if (fabs(f) > errabs) {
+                // if function not zero, this is a local minimum
+                done = true;
+            }
+            else {
+                // if function is zero, this is a valid solution
+                done = cnvgd = true;
+            }
+        }
+        // if slope is not zero proceed with iterative scheme
+        else {
+            dx = -f/df;
+            x += dx;
+            // check for relative or absolute convergence
+            if ((fabs(dx) <= errrel*fabs(x)) || (fabs(f) <= errabs)) {
+                done = cnvgd = true;
+            }
+        }
+        ++iter;
+        if (iter > maxiter) done = true;
+    }
+    
+    return cnvgd;
+}
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FELinearFunction, FEFunction1D)
@@ -191,3 +235,4 @@ double FEMathFunction::deriv2(double t) const
 	evalParams(v, t);
 	return m_d2exp.value_s(v);
 }
+

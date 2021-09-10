@@ -44,6 +44,7 @@ public:
 		m_D1 = m_D2 = m_D3 = 0.0;
 		m_P = 0.0;
 		m_Ds = 0.0;
+		m_D2s = 0.0;
 		m_D3s = 0.0;
 		m_psi_f0_ini = 0.0;
 		m_psi_f0 = 0.0;
@@ -62,8 +63,9 @@ public:
 		m_D = 0.0;
 		m_D1 = m_D2 = m_D3 = 0.0;
 		m_P = 0.0;
-		m_D3s = 0.0;
 		m_Ds = 0.0;
+		m_D2s = 0.0;
+		m_D3s = 0.0;
 		m_psi_f0_ini = m_psf_c;// we set this to the initial value
 		m_psi_f0 = m_psf_c;		// we set this to the initial value
 		m_psi_f0_prev = m_psf_c; // we set this to the initial value
@@ -88,7 +90,7 @@ public:
 	bool	m_init;	// initialization flag
 	double	m_D;		// accumulated damage
 	double	m_D1, m_D2, m_D3;	// damage components
-	double	m_P, m_Ds, m_D3s;
+	double	m_P, m_Ds, m_D2s, m_D3s;
 
 	double	m_psi_f0_ini, m_psf_c;
 	double	m_psi_f0, m_psi_f0_prev;
@@ -175,6 +177,7 @@ double FEDamageElasticFiber::Damage(FEMaterialPoint& mp, int n)
 	if (n == 3) return damagePoint.m_P;
 	if (n == 4) return damagePoint.m_D3s;
 	if (n == 5) return damagePoint.m_Ds;
+	if (n == 6) return damagePoint.m_D2s;
 	return 0.0;
 }
 
@@ -224,6 +227,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 	damagePoint.m_D3 = 0.0;
 	damagePoint.m_P = 0.0;
 	damagePoint.m_D3s = 0.0;
+	damagePoint.m_D2s = 0.0;
 	damagePoint.m_Ds = 0.0;
 
 	// get current simulation time.
@@ -280,6 +284,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 		damagePoint.m_D2 = D2;
 		damagePoint.m_D3 = D3;
 		damagePoint.m_D3s = D3s;
+		damagePoint.m_D2s = D2s;
 		damagePoint.m_Ds = Ds;
 
 		// update internal variables

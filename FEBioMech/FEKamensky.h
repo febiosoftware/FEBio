@@ -26,10 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "FEElasticMaterial.h"
 
-class FEFungIsotropic : public FEElasticMaterial
+class FEKamensky : public FEElasticMaterial
 {
 public:
-	FEFungIsotropic(FEModel* pfem);
+	FEKamensky(FEModel* pfem);
 
 	//! calculate deviatoric stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;

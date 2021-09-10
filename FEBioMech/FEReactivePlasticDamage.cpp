@@ -46,17 +46,12 @@ BEGIN_FECORE_CLASS(FEReactivePlasticDamage, FEElasticMaterial)
     // set material properties
     ADD_PROPERTY(m_pBase,   "elastic");
     ADD_PROPERTY(m_pCrit,   "yield_criterion");
+    ADD_PROPERTY(m_pFlow,   "flow_curve");
     ADD_PROPERTY(m_pYDamg,  "plastic_damage"          , FEProperty::Optional);
     ADD_PROPERTY(m_pYDCrit, "plastic_damage_criterion", FEProperty::Optional);
     ADD_PROPERTY(m_pIDamg,  "elastic_damage"          , FEProperty::Optional);
     ADD_PROPERTY(m_pIDCrit, "elastic_damage_criterion", FEProperty::Optional);
 
-    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  );
-    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax");
-    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)     , "w0"  );
-    ADD_PARAMETER(m_we     , FE_RANGE_CLOSED(0.0, 1.0)     , "we"  );
-    ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
-    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "r"   );
     ADD_PARAMETER(m_isochrc, "isochoric");
     ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 
@@ -67,18 +62,15 @@ END_FECORE_CLASS();
 FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_n = 1;
-    m_wmin = m_wmax = 1;
-    m_we = 0;
-    m_Ymin = m_Ymax = 0;
     m_isochrc = true;
     m_rtol = 1e-4;
     m_pBase = nullptr;
     m_pCrit = nullptr;
+    m_pFlow = nullptr;
     m_pYDamg = nullptr;
     m_pYDCrit = nullptr;
     m_pIDamg = nullptr;
     m_pIDCrit = nullptr;
-    m_bias = 0.9;
     m_secant_tangent = true;
 }
 
@@ -86,63 +78,10 @@ FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMater
 //! Initialization.
 bool FEReactivePlasticDamage::Init()
 {
-    m_wmax = 1 - m_we;
-    FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
-    if (m_pMat != nullptr) {
-        feLogError("Elastic material should not be of type uncoupled");
-        return false;
-    }
-    if (m_wmax < m_wmin) {
-        if (m_n ==1)
-            feLogError("w0 + we = 1 must be satisfied");
-        else
-            feLogError("w0 + we < 1 must be satisfied");
-        return false;
-    }
-    
-    Ky.resize(m_n);
-    w.resize(m_n+1);
-    vector<double> Kp(m_n,0);
-    
-    if (m_n == 1) {
-        Ky[0] = m_Ymin;
-        w[0] = m_wmin;
-    }
-    else {
-        // use bias r to reduce intervals in Ky and w as they increase proportionally
-        double r = m_bias;
-        // r= 1 uses uniform intervals
-        if (r == 1) {
-            w[0] = m_wmin;
-            Kp[0] = m_Ymin;
-            Ky[0] = Kp[0];
-            double sw = w[0];
-            for (int i=1; i<m_n; ++i) {
-                w[i] = (m_wmax - m_wmin)/(m_n-1);
-                Kp[i] = m_Ymin + (m_Ymax - m_Ymin)*i/(m_n-1);
-                Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
-                sw += w[i];
-            }
-        }
-        else {
-            double c = (1-r)/(1-pow(r, m_n-1));
-            w[0] = m_wmin;
-            w[1] = c*(m_wmax-m_wmin);
-            Kp[0] = m_Ymin;
-            Kp[1] = Kp[0] + c*(m_Ymax - m_Ymin);
-            double sw = w[0];
-            Ky[0] = Kp[0];
-            Ky[1] = Ky[0] + (Kp[1]-Kp[0])/(1-sw);
-            sw += w[1];
-            for (int i=2; i<m_n; ++i) {
-                w[i] = w[i-1]*r;
-                Kp[i] = Kp[i-1] + (Kp[i-1]-Kp[i-2])*r;
-                Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
-                sw += w[i];
-            }
-        }
-    }
-    w[m_n] = m_we;
+    if (m_pFlow->Init() == false) return false;
+    m_n = (int)m_pFlow->BondFamilies();
+    Ky = m_pFlow->BondYieldMeasures();
+    w = m_pFlow->BondMassFractions();
 
     return FEElasticMaterial::Init();
 }
@@ -177,10 +116,20 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
     FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();
     // extract inverse of plastic deformation gradient and evaluate elastic deformation gradient
     FEReactivePlasticDamageMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-    
+    FEShellElementNew* sel = dynamic_cast<FEShellElementNew*>(pt.m_elem);
+
     for (int i=0; i<m_n; ++i) {
         mat3d Fs = pe.m_F;
         mat3d R = pe.m_F*pe.RightStretchInverse();
+        // for EAS and ANS shells, adjust calculation of Fs using enhanced strain Es
+        if (sel) {
+            mat3ds Cs = mat3dd(1) + sel->m_E[pt.m_index]*2;
+            double eval[3];
+            vec3d evec[3];
+            Cs.eigen2(eval,evec);
+            mat3ds Us = dyad(evec[0])*sqrt(eval[0]) + dyad(evec[1])*sqrt(eval[1]) + dyad(evec[2])*sqrt(eval[2]);
+            Fs = R*Us;
+        }
         mat3d Fe = Fs*pp.m_Fusi[i];
         
         // store safe copy of total deformation gradient

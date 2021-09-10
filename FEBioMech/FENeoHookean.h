@@ -57,7 +57,7 @@ public:
     mat3ds PK2Stress(FEMaterialPoint& pt, const mat3ds E) override;
     
     //! calculate material tangent stiffness at material point
-    tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E) override;
+    tens4dmm MaterialTangent(FEMaterialPoint& pt, const mat3ds E) override;
     
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

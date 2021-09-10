@@ -84,15 +84,9 @@ tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
 	double lam1 = lam / detF;
 	double mu1  = (mu - lam*log(detF)) / detF;
 	
-	double D[6][6] = {0};
-	D[0][0] = lam1+2.*mu1; D[0][1] = lam1       ; D[0][2] = lam1       ;
-	D[1][0] = lam1       ; D[1][1] = lam1+2.*mu1; D[1][2] = lam1       ;
-	D[2][0] = lam1       ; D[2][1] = lam1       ; D[2][2] = lam1+2.*mu1;
-	D[3][3] = mu1;
-	D[4][4] = mu1;
-	D[5][5] = mu1;
+    mat3dd I(1);
 
-	return tens4ds(D);
+	return dyad1s(I)*lam1 + dyad4s(I)*(2*mu1);
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +142,7 @@ mat3ds FENeoHookean::PK2Stress(FEMaterialPoint& pt, const mat3ds ES)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FENeoHookean::MaterialTangent(FEMaterialPoint& pt, const mat3ds ES)
+tens4dmm FENeoHookean::MaterialTangent(FEMaterialPoint& pt, const mat3ds ES)
 {
     // calculate right Cauchy-Green tensor
     mat3ds C = mat3dd(1) + ES*2;
@@ -163,7 +157,7 @@ tens4ds FENeoHookean::MaterialTangent(FEMaterialPoint& pt, const mat3ds ES)
     double lam = v*E/((1+v)*(1-2*v));
     double mu  = 0.5*E/(1+v);
     
-    tens4ds c = dyad1s(Ci)*lam + dyad4s(Ci)*(2*(mu-lam*log(J)));
+    tens4dmm c = dyad1s(Ci)*lam + dyad4s(Ci)*(2*(mu-lam*log(J)));
     
     return c;
 }

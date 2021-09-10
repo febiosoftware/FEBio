@@ -163,13 +163,13 @@ status open
 
 \end_inset
 
-User's Manual Version 3.4
+User's Manual Version 3.5
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: May 10, 2021
+Last Updated: August 30, 2021
 \end_layout
 
 \begin_layout Standard
@@ -31510,7 +31510,7 @@ element or for all nodes if no list is defined.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="80" columns="2">
+<lyxtabular version="3" rows="98" columns="2">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -32254,7 +32254,187 @@ U3
 \begin_inset Text
 
 \begin_layout Plain Layout
-third eigenvalue of right Hencky strain
+third eigenvalue of right stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xx-component of the left stretch tensor 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yy-component of the left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+zz-component of the left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vxy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xy-component of the left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vyz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yz-component of the left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vxz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xz-component of the left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+V1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+first eigenvalue of left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+V2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+second eigenvalue of left stretch tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+V3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+third eigenvalue of left stretch tensor
 \end_layout
 
 \end_inset
@@ -32435,6 +32615,186 @@ H3
 
 \begin_layout Plain Layout
 third eigenvalue of right Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xx-component of the left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yy-component of the left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+zz-component of the left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hxy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xy-component of the left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+yz-component of the rileft Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hxz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xz-component of the left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+h1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+first eigenvalue of left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+h2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+second eigenvalue of left Hencky strain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+h3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+third eigenvalue of left Hencky strain
 \end_layout
 
 \end_inset
@@ -35224,7 +35584,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="130" columns="3">
+<lyxtabular version="3" rows="132" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -37679,6 +38039,76 @@ The average Lagrange strain in an element
 \begin_inset Text
 
 \begin_layout Plain Layout
+left Hencky
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left Hencky strain 
+\begin_inset Formula $\mathbf{h}=\frac{1}{2}\ln\mathbf{b}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{b}=\mathbf{F}\cdot\mathbf{F}^{T}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+left stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left stretch tensor 
+\begin_inset Formula $\mathbf{V}=\mathbf{b}^{1/2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 nested damage 
 \end_layout
 
@@ -38324,7 +38754,7 @@ Element
 
 \begin_layout Plain Layout
 Right Hencky strain 
-\begin_inset Formula $\mathbf{H}=\ln\mathbf{U}$
+\begin_inset Formula $\mathbf{H}=\frac{1}{2}\ln\mathbf{C}$
 \end_inset
 
 
@@ -47477,6 +47907,275 @@ This example defines a thin soft tissue material where fibers are distributed
 </material>
 \end_layout
 
+\begin_layout Subsubsection
+Kamensky uncoupled
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Kamensky-uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material implements a Fung-type material, as presented in Kamensy,
+ CMAME 2018.
+ The material formulation is selected by setting the type attribute to "
+\family typewriter
+Kamensky uncoupled
+\family default
+".
+ It defines the following parameters: 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shear-modulus of neo-Hookean matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c1 parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c2 parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tangent_scale>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scale factor for c0 when used in tangent (default = 1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bulk modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The strain-energy density function for this material combines a neo-Hookean
+ matrix with a Fung-type exponential term, and is defined as follows.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi=\frac{c_{0}}{2}\left(I_{1}-3\right)+\frac{c_{1}}{2}\left(e^{c_{2}\left(I_{1}-3\right)^{2}}-1\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As reported in Kamensky, the exponential term may cause convergence difficulties
+ under certain loading conditions.
+ It was reported that increasing the value of 
+\begin_inset Formula $c_{0}$
+\end_inset
+
+during the stiffness evaluation may improve convergence.
+ The default value for 
+\emph on
+tangent_scale 
+\emph default
+is 1, and thus tangent scaling is not applied.
+ A tangent scale factor of 20 was used in Kamensky.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="material1" type="Kamensky uncoupled">
+\end_layout
+
+\begin_layout LyX-Code
+  <k>1000</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <c0>10</c0>
+\end_layout
+
+\begin_layout LyX-Code
+  <c1>0.209</c1>
+\end_layout
+
+\begin_layout LyX-Code
+  <c2>9.046</c2>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -53455,7 +54154,7 @@ natural neo-Hookean
 \begin_inset Text
 
 \begin_layout Plain Layout
-<G>
+<E>
 \end_layout
 
 \end_inset
@@ -53464,7 +54163,11 @@ natural neo-Hookean
 \begin_inset Text
 
 \begin_layout Plain Layout
-shear modulus
+Young's modulus 
+\begin_inset Formula $E$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -53488,7 +54191,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-<k>
+<v>
 \end_layout
 
 \end_inset
@@ -53497,7 +54200,11 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-bulk modulus
+Poisson's ratio 
+\begin_inset Formula $\nu$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -53506,11 +54213,7 @@ bulk modulus
 \begin_inset Text
 
 \begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
+[ ]
 \end_layout
 
 \end_inset
@@ -53546,7 +54249,23 @@ and
  It is derived from the following hyperelastic strain-energy function: 
 \begin_inset Formula 
 \[
-W=\frac{\kappa}{2}K_{1}^{2}+\mu K_{2}^{2}.
+W=\frac{\kappa}{2}K_{1}^{2}+\mu K_{2}^{2},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is the bulk modulus and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the shear modulus,
+\begin_inset Formula 
+\[
+\kappa=\frac{E}{3\left(1-2\nu\right)}\,,\quad\mu=\frac{E}{2\left(1+\nu\right)}
 \]
 
 \end_inset
@@ -53612,11 +54331,11 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <G>500.0</G>
+  <E>200e3</E>
 \end_layout
 
 \begin_layout LyX-Code
-  <k>333.3</k>
+  <v>0.3</v>
 \end_layout
 
 \begin_layout LyX-Code

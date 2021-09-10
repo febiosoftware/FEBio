@@ -246,6 +246,14 @@ mat3ds FEElasticMaterialPoint::LeftHencky() const
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the rotation tensor at the current material point
+
+mat3d FEElasticMaterialPoint::Rotation() const
+{
+    return m_F*RightStretchInverse();
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the Lagrangian strain at the current material point
 
 mat3ds FEElasticMaterialPoint::Strain() const

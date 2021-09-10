@@ -295,13 +295,22 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element stresses
+class FEPlotElementPK2Stress : public FEPlotDomainData
+{
+public:
+	FEPlotElementPK2Stress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element stresses for mixture components
 class FEPlotElementMixtureStress : public FEPlotDomainData
 {
 public:
 	FEPlotElementMixtureStress(FEModel* pfem);
 	bool SetFilter(const char* szfilter) override;
-	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
 protected:
 	int		m_comp;
 };
@@ -839,11 +848,29 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Left stretch
+class FEPlotLeftStretch : public FEPlotDomainData
+{
+public:
+    FEPlotLeftStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Right Hencky
 class FEPlotRightHencky : public FEPlotDomainData
 {
 public:
     FEPlotRightHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Left Hencky
+class FEPlotLeftHencky : public FEPlotDomainData
+{
+public:
+    FEPlotLeftHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -1013,6 +1040,10 @@ public: FEPlotContinuousDamage_D3s(FEModel* fem) : FEPlotContinuousDamage_(fem, 
 
 class FEPlotContinuousDamage_Ds : public FEPlotContinuousDamage_ {
 public: FEPlotContinuousDamage_Ds(FEModel* fem) : FEPlotContinuousDamage_(fem, 5) {}
+};
+
+class FEPlotContinuousDamage_D2s : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D2s(FEModel* fem) : FEPlotContinuousDamage_(fem, 6) {}
 };
 
 //-----------------------------------------------------------------------------

@@ -24,89 +24,84 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEFungIsotropic.h"
+#include "FEKamenskyUncoupled.h"
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFungIsotropic, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEKamenskyUncoupled, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c0, "c0");
 	ADD_PARAMETER(m_c1, "c1");
 	ADD_PARAMETER(m_c2, "c2");
-	ADD_PARAMETER(m_k , "k");
-	ADD_PARAMETER(m_tangent_scale , "tangent_scale");
+	ADD_PARAMETER(m_tangent_scale, "tangent_scale")
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFungIsotropic::FEFungIsotropic(FEModel* pfem) : FEElasticMaterial(pfem)
+FEKamenskyUncoupled::FEKamenskyUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	m_c0 = 0.0;
 	m_c1 = 0.0;
 	m_c2 = 0.0;
-	m_k = 0.0;
 	m_tangent_scale = 1.0;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the strain energy density
-double FEFungIsotropic::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEKamenskyUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// calculate right Cauchy-Green tensor and Lagrange strain tensor
-	mat3ds b = pt.LeftCauchyGreen();
-	double J = pt.m_J;
+	// calculate left Cauchy-Green tensor and invariants
+	mat3ds b = pt.DevLeftCauchyGreen();
 	double I1 = b.tr();
-
-	// evaluate volumetric strain energy
-	double lnJ = log(J);
-	double U = 0.5 * m_k * pow(lnJ, 2);
 
 	// Evaluate exp(Q)
 	double Q = m_c2 * (I1 - 3.0) * (I1 - 3.0);
 	double eQ = exp(Q);
 
 	// Evaluate the strain energy density
-	double sed = m_c0*(0.5*(I1 - 3) - lnJ) + 0.5*m_c1*(eQ - 1.0) + U;
+	double sed = 0.5*m_c0*(I1 - 3.0) + 0.5*m_c1*(eQ - 1.0);
 
 	return sed;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
-mat3ds FEFungIsotropic::Stress(FEMaterialPoint& mp)
+mat3ds FEKamenskyUncoupled::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// calculate deviatoric
-	mat3ds b = pt.LeftCauchyGreen();
-	double J = pt.m_J;
+	// calculate left Cauchy-Green tensor and invariants
+	mat3ds b = pt.DevLeftCauchyGreen();
 	double I1 = b.tr();
-
-	// evaluate volumetric strain energy
-	double p = m_k * log(J)/J;
-	mat3dd I(1.0);
+	double J = pt.m_J;
 
 	// Evaluate exp(Q)
 	double Q = m_c2 * (I1 - 3.0) * (I1 - 3.0);
 	double eQ = exp(Q);
 
-	mat3ds s = I * p + (b - I)*(m_c0/J) + b*(2.0*m_c1*m_c2*(I1 - 3)*eQ/J);
-
+	// evaluate deviatoric stress
+	mat3ds T = b * (m_c0 + 2.0 * m_c1 * m_c2 * (I1 - 3) * eQ);
+	mat3ds s = T.dev() / J;
 	return s;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric tangent
-tens4ds FEFungIsotropic::Tangent(FEMaterialPoint& mp)
+tens4ds FEKamenskyUncoupled::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// apply tangent scale
 	double c0 = m_c0 * m_tangent_scale;
 
-	// calculate deviatoric
-	mat3ds b = pt.LeftCauchyGreen();
-	double J = pt.m_J;
+	// calculate left Cauchy-Green tensor and invariants
+	mat3ds b = pt.DevLeftCauchyGreen();
 	double I1 = b.tr();
+	double J = pt.m_J;
+
+	// Evaluate exp(Q)
+	double Q = m_c2 * (I1 - 3.0) * (I1 - 3.0);
+	double eQ = exp(Q);
+	double g = 4.0 * m_c1 * m_c2 * eQ * (1.0 + 2.0 * m_c2 * (I1 - 3.0) * (I1 - 3.0));
 
 	// we'll need these tensors
 	mat3dd I(1.0);
@@ -114,21 +109,17 @@ tens4ds FEFungIsotropic::Tangent(FEMaterialPoint& mp)
 	tens4ds IxI = dyad1s(I);
 	tens4ds bxb = dyad1s(b);
 
-	// evaluate volumetric tangent
-	double lnJ = log(J);
-	double p = m_k * lnJ / J;
-	double pJ = m_k * (1.0 - lnJ) / (J*J);
+	// evaluate stress tensor T = F*S*F^t
+	mat3ds T = b * (c0 + 2.0 * m_c1 * m_c2 * (I1 - 3) * eQ);
 
-	tens4ds cp = IxI * (p + J * pJ) + IoI * (2.0 * c0/J -2.0 * p);
+	// evaluate tangents
+	tens4ds cT = (IoI - IxI / 3.0) * (2.0 * T.tr() / 3.0) - dyad1s(T.dev(), I)*(2.0/3.0);
 
-	// evaluate strain tangent
-	double Q = m_c2 * (I1 - 3.0) * (I1 - 3.0);
-	double eQ = exp(Q);
+	tens4ds cw = bxb * g;
+	mat3ds chat = b * (g * I1);
+	double cbar = g * I1 * I1;
 
-	tens4ds cw = bxb*(4.0*m_c1*m_c2*eQ*(1.0+2.0*m_c2*(I1 - 3.0)*(I1 - 3.0)) / J);
+	tens4ds c = cT + cw - dyad1s(chat, I) / 3.0 + IxI*(cbar / 9.0);
 
-	// put it together
-	tens4ds c = cw + cp;
-
-	return c;
+	return c / J;
 }
