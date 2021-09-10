@@ -161,6 +161,8 @@ public:
 
     double deriv2(double t) const override;
 
+	void SetMathString(const std::string& s);
+
 private:
 	void evalParams(std::vector<double>& val, double t) const;
 

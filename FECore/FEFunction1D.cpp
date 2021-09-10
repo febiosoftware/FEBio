@@ -130,6 +130,11 @@ FEMathFunction::FEMathFunction(FEModel* fem) : FEFunction1D(fem)
 	m_s = "0";
 }
 
+void FEMathFunction::SetMathString(const std::string& s)
+{
+	m_s = s;
+}
+
 bool FEMathFunction::Init()
 {
 	// process the string
