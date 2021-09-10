@@ -614,6 +614,23 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average stresses for each element. 
+bool FEPlotElementPK2Stress::Save(FEDomain& dom, FEDataStream& a)
+{
+	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+	if ((pme == 0) || pme->IsRigid()) return false;
+
+	writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+		const FEElasticMaterialPoint& ep = *mp.ExtractData< FEElasticMaterialPoint>();
+		mat3ds s = ep.m_s;
+		mat3ds S = ep.pull_back(s);
+		return S;
+		});
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSPRStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	// For now, this is only available for solid domains

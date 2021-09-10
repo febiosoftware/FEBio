@@ -604,6 +604,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementAcceleration, "acceleration");
 	REGISTER_FECORE_CLASS(FEPlotDensity, "density");
 	REGISTER_FECORE_CLASS(FEPlotElementStress, "stress");
+	REGISTER_FECORE_CLASS(FEPlotElementPK2Stress, "PK2 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
