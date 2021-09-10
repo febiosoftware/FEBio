@@ -130,7 +130,7 @@ mat3ds FEIsotropicElastic::PK2Stress(FEMaterialPoint& pt, const mat3ds E)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEIsotropicElastic::MaterialTangent(FEMaterialPoint& pt, const mat3ds E)
+tens4dmm FEIsotropicElastic::MaterialTangent(FEMaterialPoint& pt, const mat3ds E)
 {
 	double mE = m_E(pt);
 	double mv = m_v(pt);
@@ -142,7 +142,7 @@ tens4ds FEIsotropicElastic::MaterialTangent(FEMaterialPoint& pt, const mat3ds E)
     // Identity
     mat3dd I(1);
     
-    tens4ds c = dyad1s(I)*lam + dyad4s(I)*(2*mu);
+    tens4dmm c = dyad1s(I)*lam + dyad4s(I)*(2*mu);
     
     return c;
 }

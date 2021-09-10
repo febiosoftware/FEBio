@@ -68,6 +68,8 @@ public:
     mat3ds RightHencky() const;
     mat3ds LeftHencky () const;
     
+    mat3d Rotation() const;
+    
     mat3ds RateOfDeformation() const { return m_L.sym(); }
 
 	mat3ds pull_back(const mat3ds& A) const;

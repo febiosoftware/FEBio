@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageCDF.h"
+#include "FEPlasticFlowCurve.h"
 #include "FEReactivePlasticityMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
@@ -73,21 +74,16 @@ public:
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion
+    FEPlasticFlowCurve* m_pFlow;    // plastic flow curve
     
 private:
     vector<double> Ky;
     vector<double> w;
     
 public:
-    double      m_wmin;     // initial fraction of yielding bonds
-    double      m_wmax;     // final fraction of yielding bonds
-    double      m_we;       // fraction of unyielding bonds
-    double      m_Ymin;     // initial yield measure
-    double      m_Ymax;     // yield measure when all bonds have yielded
     int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
-    double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
 
     DECLARE_FECORE_CLASS();
 };

@@ -129,6 +129,7 @@ SOFTWARE.*/
 #include "FERVEDamageMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
+#include "FEPlasticFlowCurve.h"
 #include "FEFiberExpLinear.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include "FEPrescribedActiveContractionUniaxial.h"
@@ -447,7 +448,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
 
-	// damage criterion (used by damage materials)
+	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");
 	REGISTER_FECORE_CLASS(FEDamageCriterionSED, "DC strain energy density");
 	REGISTER_FECORE_CLASS(FEDamageCriterionSSE, "DC specific strain energy");
@@ -457,6 +458,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNS, "DC max normal stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
+
+    // plastic flow curve (used by plastic materials)
+    REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");
+    REGISTER_FECORE_CLASS(FEPlasticFlowCurveUser , "PFC user");
+    REGISTER_FECORE_CLASS(FEPlasticFlowCurveMath , "PFC math");
 
 	// prestrain materials
 	REGISTER_FECORE_CLASS(FEPrestrainElastic, "prestrain elastic");

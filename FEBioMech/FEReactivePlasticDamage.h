@@ -29,6 +29,7 @@
 #include "FEElasticMaterial.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageCDF.h"
+#include "FEPlasticFlowCurve.h"
 #include "FEReactivePlasticDamageMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
@@ -77,27 +78,22 @@ public:
     void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
     void Serialize(DumpStream& ar) override;
 public:
-    FEElasticMaterial*  m_pBase;     // base elastic material
-    FEDamageCriterion*  m_pCrit;     // yield criterion
-    FEDamageCDF*        m_pYDamg;    // yield damage model
-    FEDamageCriterion*  m_pYDCrit;   // yield damage criterion
-    FEDamageCDF*        m_pIDamg;    // intact damage model
-    FEDamageCriterion*  m_pIDCrit;   // intact damage criterion
+    FEElasticMaterial*  m_pBase;    // base elastic material
+    FEDamageCriterion*  m_pCrit;    // yield criterion
+    FEPlasticFlowCurve* m_pFlow;    // plastic flow curve
+    FEDamageCDF*        m_pYDamg;   // yield damage model
+    FEDamageCriterion*  m_pYDCrit;  // yield damage criterion
+    FEDamageCDF*        m_pIDamg;   // intact damage model
+    FEDamageCriterion*  m_pIDCrit;  // intact damage criterion
     
 private:
     vector<double>      Ky;
     vector<double>      w;
     
 public:
-    double      m_wmin;     // initial fraction of yielding bonds
-    double      m_wmax;     // final fraction of yielding bonds
-    double      m_we;       // fraction of unyielding bonds
-    double      m_Ymin;     // initial yield measure
-    double      m_Ymax;     // yield measure when all bonds have yielded
     int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
-    double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
     
     DECLARE_FECORE_CLASS();
 };
