@@ -493,6 +493,8 @@
 		D5D8C9E026E2776D00C193C3 /* FEKamensky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D8C9DC26E2776C00C193C3 /* FEKamensky.cpp */; };
 		D5D8C9E126E2776D00C193C3 /* FEKamenskyUncoupled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D8C9DD26E2776C00C193C3 /* FEKamenskyUncoupled.cpp */; };
 		D5D8C9E226E2776D00C193C3 /* FEKamenskyUncoupled.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D8C9DE26E2776D00C193C3 /* FEKamenskyUncoupled.h */; };
+		D5D8C9E526E6AF8E00C193C3 /* FEPlasticFlowCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D8C9E326E6AF8E00C193C3 /* FEPlasticFlowCurve.cpp */; };
+		D5D8C9E626E6AF8E00C193C3 /* FEPlasticFlowCurve.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D8C9E426E6AF8E00C193C3 /* FEPlasticFlowCurve.h */; };
 		D5DA95A023D3540200D38BF2 /* FEDiscreteElementMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DA959C23D3540200D38BF2 /* FEDiscreteElementMaterial.cpp */; };
 		D5DA95A123D3540200D38BF2 /* FEDiscreteElementMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DA959D23D3540200D38BF2 /* FEDiscreteElementMaterial.h */; };
 		D5DAB6D022A954F1004C4213 /* FERVEDamageMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DAB6CE22A954F1004C4213 /* FERVEDamageMaterial.cpp */; };
@@ -997,6 +999,8 @@
 		D5D8C9DC26E2776C00C193C3 /* FEKamensky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEKamensky.cpp; sourceTree = "<group>"; };
 		D5D8C9DD26E2776C00C193C3 /* FEKamenskyUncoupled.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEKamenskyUncoupled.cpp; sourceTree = "<group>"; };
 		D5D8C9DE26E2776D00C193C3 /* FEKamenskyUncoupled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEKamenskyUncoupled.h; sourceTree = "<group>"; };
+		D5D8C9E326E6AF8E00C193C3 /* FEPlasticFlowCurve.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEPlasticFlowCurve.cpp; sourceTree = "<group>"; };
+		D5D8C9E426E6AF8E00C193C3 /* FEPlasticFlowCurve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEPlasticFlowCurve.h; sourceTree = "<group>"; };
 		D5DA959C23D3540200D38BF2 /* FEDiscreteElementMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiscreteElementMaterial.cpp; sourceTree = "<group>"; };
 		D5DA959D23D3540200D38BF2 /* FEDiscreteElementMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiscreteElementMaterial.h; sourceTree = "<group>"; };
 		D5DAB6CE22A954F1004C4213 /* FERVEDamageMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FERVEDamageMaterial.cpp; sourceTree = "<group>"; };
@@ -1352,6 +1356,8 @@
 				D5322F372142ACD8008DE511 /* FEPeriodicLinearConstraint2O.h */,
 				D5322FA42142ACD8008DE511 /* FEPeriodicSurfaceConstraint.cpp */,
 				D5322F232142ACD8008DE511 /* FEPeriodicSurfaceConstraint.h */,
+				D5D8C9E326E6AF8E00C193C3 /* FEPlasticFlowCurve.cpp */,
+				D5D8C9E426E6AF8E00C193C3 /* FEPlasticFlowCurve.h */,
 				D5322E7A2142ACD7008DE511 /* FEPointBodyForce.cpp */,
 				D5322FD92142ACD8008DE511 /* FEPointBodyForce.h */,
 				D5322FA02142ACD8008DE511 /* FEPointConstraint.cpp */,
@@ -1732,6 +1738,7 @@
 				D53230762142ACD9008DE511 /* FERemodelingElasticDomain.h in Headers */,
 				D5322FF42142ACD9008DE511 /* FERigidWallInterface.h in Headers */,
 				D53230812142ACD9008DE511 /* FEMortarInterface.h in Headers */,
+				D5D8C9E626E6AF8E00C193C3 /* FEPlasticFlowCurve.h in Headers */,
 				D53230322142ACD9008DE511 /* FETractionLoad.h in Headers */,
 				D53230DB2142ACD9008DE511 /* FEFiberEFDNeoHookean.h in Headers */,
 				D532313D2142ACD9008DE511 /* FEResidualVector.h in Headers */,
@@ -2019,6 +2026,7 @@
 				D53230902142ACD9008DE511 /* FEGentMaterial.cpp in Sources */,
 				D5709D8E22832FD2007CAB0A /* FEMaxDamageCriterion.cpp in Sources */,
 				D532311F2142ACD9008DE511 /* FEReactiveVEMaterialPoint.cpp in Sources */,
+				D5D8C9E526E6AF8E00C193C3 /* FEPlasticFlowCurve.cpp in Sources */,
 				D53230012142ACD9008DE511 /* FEEFDNeoHookean.cpp in Sources */,
 				D53230972142ACD9008DE511 /* FEEFDVerondaWestmann.cpp in Sources */,
 				D53230112142ACD9008DE511 /* FEFiberIntegrationTrapezoidal.cpp in Sources */,
