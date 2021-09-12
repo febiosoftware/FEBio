@@ -145,7 +145,8 @@ bool FEPlasticFlowCurveUser::Init()
                 w[i] = 1 - (Kp[i+1]-Kp[i])/(Ky[i+1]-Ky[i]) - sw;
                 sw += w[i];
             }
-            w[m_n] = 1 - sw;
+            w[m_n-1] = 1 - sw;
+            w[m_n] = 0;
         }
         m_binit = true;
     }
@@ -159,7 +160,7 @@ bool FEPlasticFlowCurveUser::Init()
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPlasticFlowCurveMath, FEPlasticFlowCurve)
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
-    ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "emin");
+    ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "e0"  );
     ADD_PARAMETER(m_emax   , FE_RANGE_GREATER(0)           , "emax");
     ADD_PARAMETER(m_Ymath, "plastic_response");
 END_FECORE_CLASS();
@@ -189,7 +190,7 @@ bool FEPlasticFlowCurveMath::Init()
         if (m_n == 1) {
             w[0] = 1;
             w[m_n] = 0;
-            Ky[0] = Y.value(m_emin);
+            Kp[0] = Ky[0] = Y.value(m_emin);
         }
         else {
             // set uniform increments in Kp and find corresponding strains
