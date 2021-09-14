@@ -141,6 +141,13 @@ int FEAnalysis::ModelComponents() const
 }
 
 //-----------------------------------------------------------------------------
+//! get a model component
+FEModelComponent* FEAnalysis::GetModelComponent(int i)
+{
+	return m_MC[i];
+}
+
+//-----------------------------------------------------------------------------
 //! sets the plot level
 void FEAnalysis::SetPlotLevel(int n) { m_nplot = n; }
 

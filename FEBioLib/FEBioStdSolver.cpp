@@ -91,9 +91,6 @@ bool FEBioRestart::Init(const char *szfile)
 		// By default, we are not going to append the log and plot file
 		fem.SetAppendOnRestart(false);
 
-		// keep track of initial steps (since user can add new steps)
-		int steps = fem.Steps();
-
 		// the file is assumed to be a xml-text input file
 		FERestartImport file;
 		if (file.Load(fem, szfile) == false)
@@ -104,8 +101,23 @@ bool FEBioRestart::Init(const char *szfile)
 			return false;
 		}
 
+		// get the number of new steps added
+		int newSteps = file.StepsAdded();
+		int step = fem.Steps() - newSteps;
+
 		// Any additional steps that were created must be initialized
-		for (int i = steps; i<fem.Steps(); ++i) fem.GetStep(i)->Init();
+		for (int i = step; i < fem.Steps(); ++i)
+		{
+			FEAnalysis* step = fem.GetStep(i);
+			if (step->Init() == false) return false;
+
+			// also initialize all the model components
+			for (int j = 0; j < step->ModelComponents(); ++j)
+			{
+				FEModelComponent* pc = step->GetModelComponent(j);
+				if (pc->Init() == false) return false;
+			}
+		}
 
 		// see if user redefined restart file name
 		if (file.m_szdmp[0]) fem.SetDumpFilename(file.m_szdmp);
