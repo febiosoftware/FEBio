@@ -255,3 +255,17 @@ double FEDamageCriterionOSS::DamageCriterion(FEMaterialPoint& mp)
 
     return oss;
 }
+
+//-----------------------------------------------------------------------------
+// octahedral natural shear strain damage criterion
+double FEDamageCriterionONS::DamageCriterion(FEMaterialPoint& mp)
+{
+    // evaluate strain tensor
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3ds h = pt.LeftHencky();
+    
+    mat3ds devh = h.dev();
+    double ons = sqrt(devh.dotdot(devh)*(2./3.));
+    
+    return ons;
+}

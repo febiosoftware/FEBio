@@ -458,6 +458,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNS, "DC max normal stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
+    REGISTER_FECORE_CLASS(FEDamageCriterionONS, "DC octahedral natural strain");
 
     // plastic flow curve (used by plastic materials)
     REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");
