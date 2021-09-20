@@ -40,6 +40,10 @@ public:
 
 	void SetSBM(int id, double val);
 
+	void SetValue(double val);
+
+	void SetWeighVolume(bool b);
+
 private:
 	void ResetSBM();
 

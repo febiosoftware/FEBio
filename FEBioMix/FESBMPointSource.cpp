@@ -112,6 +112,16 @@ void FESBMPointSource::SetSBM(int id, double val)
 	m_val = val;
 }
 
+void FESBMPointSource::SetValue(double val)
+{
+	m_val = val;
+}
+
+void FESBMPointSource::SetWeighVolume(bool b)
+{
+	m_weighVolume = b;
+}
+
 void FESBMPointSource::ResetSBM()
 {
 	FEModel& fem = *GetFEModel();

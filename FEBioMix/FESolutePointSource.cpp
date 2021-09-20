@@ -46,6 +46,21 @@ FESolutePointSource::FESolutePointSource(FEModel* fem) : FEBodyLoad(fem), m_sear
 	m_rate = 0.0;
 }
 
+void FESolutePointSource::SetPosition(const vec3d& v)
+{
+	m_pos = v;
+}
+
+void FESolutePointSource::SetSoluteID(int soluteID)
+{
+	m_soluteId = soluteID;
+}
+
+void FESolutePointSource::SetRate(double rate)
+{
+	m_rate = rate;
+}
+
 bool FESolutePointSource::Init()
 {
 	// see if the solute exists
