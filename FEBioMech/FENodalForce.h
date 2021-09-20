@@ -38,6 +38,9 @@ class FEBIOMECH_API FENodalForce : public FENodalLoad
 public:
 	FENodalForce(FEModel* fem);
 
+	// set the value
+	void SetValue(const vec3d& v);
+
 protected: // required functions of FENodalLoad
 
 	// Set the dof list
@@ -45,9 +48,6 @@ protected: // required functions of FENodalLoad
 
 	// get the nodal values
 	void GetNodalValues(int inode, std::vector<double>& val) override;
-
-	// set the value
-	void SetValue(const vec3d& v);
 
 private:
 	FEParamVec3		m_f;		//!< the applied force
