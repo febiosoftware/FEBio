@@ -58532,7 +58532,7 @@ reference "subsec:Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="4" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -58606,7 +58606,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58615,7 +58615,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58627,7 +58627,39 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<lam0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{0},$
+\end_inset
+
+ stretch threshold for tensile response
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58673,7 +58705,7 @@ reference "subsec:Specifying-Fiber-Orientation"
  The Cauchy stress for this fibrous material is given by 
 \begin_inset Formula 
 \[
-\boldsymbol{\sigma}=H\left(I_{n}-1\right)\frac{2I_{n}}{J}\frac{\partial\Psi}{\partial I_{n}}\mathbf{n}\otimes\mathbf{n},
+\boldsymbol{\sigma}=H\left(I_{n}-I_{0}\right)\frac{2I_{n}}{J}\frac{\partial\Psi}{\partial I_{n}}\mathbf{n}\otimes\mathbf{n},
 \]
 
 \end_inset
@@ -58686,7 +58718,15 @@ where
 \begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}/\lambda_{n}$
 \end_inset
 
-, and 
+, 
+\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\end_inset
+
+ is the square of the stretch threshold for the tensile response (
+\begin_inset Formula $\lambda_{0}=1$
+\end_inset
+
+ by default) and 
 \begin_inset Formula $H\left(.\right)$
 \end_inset
 
@@ -58694,7 +58734,7 @@ where
  The fiber strain energy density is given by 
 \begin_inset Formula 
 \[
-\Psi=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right)\,,
+\Psi=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-I_{0}\right)^{\beta}\right]-1\right)\,,
 \]
 
 \end_inset
@@ -58722,7 +58762,7 @@ Note: In the limit when
 , this expressions produces a power law, 
 \begin_inset Formula 
 \[
-\lim\limits _{\alpha\to0}\,\Psi=\frac{\xi}{\beta}\left(I_{n}-1\right)^{\beta}
+\lim\limits _{\alpha\to0}\,\Psi=\frac{\xi}{\beta}\left(I_{n}-I_{0}\right)^{\beta}
 \]
 
 \end_inset
@@ -58732,7 +58772,7 @@ Note: When
 \end_inset
 
 , the fiber modulus is zero at the strain origin (
-\begin_inset Formula $I_{n}=1)$
+\begin_inset Formula $I_{n}=I_{0})$
 \end_inset
 
 .
@@ -59086,6 +59126,246 @@ reference "subsec:Unconstrained-Continuous-Fiber"
 
 \begin_layout LyX-Code
 </fibers>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Natural Neo-Hookean Law
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-with-Neo-Hookean-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-natural-NH
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi,$
+\end_inset
+
+ fiber modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<lam0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{0},$
+\end_inset
+
+ stretch threshold for tensile response
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\Psi_{n}\left(\lambda_{n}\right)=\frac{\xi}{2}H\left(\ln\frac{\lambda_{n}}{\lambda_{0}}\right)\left(\ln\frac{\lambda_{n}}{\lambda_{0}}\right)^{2}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\xi>0$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{0}\ge1$
+\end_inset
+
+.
+ The tensile response engages at the tensile stretch ratio 
+\begin_inset Formula $\lambda_{0}$
+\end_inset
+
+ (
+\begin_inset Formula $\lambda_{0}=1$
+\end_inset
+
+ by default).The natural (logarithmic or Hencky) strain along the fiber is
+ 
+\begin_inset Formula $\ln\lambda_{n}$
+\end_inset
+
+, whereas 
+\begin_inset Formula $\ln\frac{\lambda_{n}}{\lambda_{0}}=\ln\lambda_{n}-\ln\lambda_{0}$
+\end_inset
+
+ is the natural strain relative to the tensile stretch threshold.
+ This model produces a stress response which varies linearly with the natural
+ strain.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a solid mixture (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+  <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>0.13</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="fiber-natural-NH">
+\end_layout
+
+\begin_layout LyX-Code
+    <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+    <lam0>1.25</lam0>
+\end_layout
+
+\begin_layout LyX-Code
+    <fiber type="vector">0,0,1</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
 \end_layout
 
 \begin_layout Standard

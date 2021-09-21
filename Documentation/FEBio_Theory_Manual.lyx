@@ -29252,6 +29252,358 @@ In the reference configuration, when
 .
 \end_layout
 
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}=\tilde{\boldsymbol{\sigma}}_{m}+\tilde{\boldsymbol{\sigma}}_{f}\,.\label{eq471-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Fiber with Exponential Power Law
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Exponential-Power"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material model describes a constitutive model for fibers, where a single
+ fiber family follows an exponential power law strain energy function.
+ The Cauchy stress is given by: 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=2J^{-1}H\left(I_{n}-I_{0}\right)I_{n}\frac{\partial\Psi_{r}}{\partial I_{n}}\mathbf{n}\otimes\mathbf{n}\,,\label{eq:fepl-stress}
+\end{equation}
+
+\end_inset
+
+and the corresponding spatial elasticity tensor is 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}=4J^{-1}H\left(I_{n}-I_{0}\right)I_{n}^{2}\frac{\partial^{2}\Psi_{r}}{\partial I_{n}^{2}}\mathbf{n}\otimes\mathbf{n}\otimes\mathbf{n}\otimes\mathbf{n}\,,\label{eq:fepl-elasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the square of the fiber stretch, 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the fiber orientation in the reference configuration, 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{n}_{r}=\sin\varphi\cos\theta\,\mathbf{e}_{1}+\sin\varphi\sin\theta\,\mathbf{e}_{2}+\cos\varphi\,\mathbf{e}_{3}\,,\label{eq:fepl-fiber-nr}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}/\lambda_{n}$
+\end_inset
+
+.
+ The function 
+\begin_inset Formula $H\left(\cdot\right)$
+\end_inset
+
+ is the unit step function that enforces the tension-only contribution.
+ Thus, the stress and elasticity tensors are non-zero only when 
+\begin_inset Formula $I_{n}>I_{0}$
+\end_inset
+
+, where 
+\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\end_inset
+
+ is the square of the stretch at which the fiber's tensile response engages.
+ By default we may take 
+\begin_inset Formula $I_{0}=1$
+\end_inset
+
+, though the actual value of 
+\begin_inset Formula $I_{0}$
+\end_inset
+
+ may be set by the user.
+ The fiber strain energy density is given by 
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-I_{0}\right)^{\beta}\right]-1\right)\,,\label{eq:fepl-fiber-Psi}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\xi>0$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha\geqslant0$
+\end_inset
+
+and 
+\begin_inset Formula $\beta\geqslant2$
+\end_inset
+
+.
+ From this expression we get
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial\Psi_{r}}{\partial I_{n}} & =\xi\left(I_{n}-I_{0}\right)^{\beta-1}\exp\left[\alpha\left(I_{n}-I_{0}\right)^{\beta}\right]\\
+\frac{\partial^{2}\Psi_{r}}{\partial I_{n}^{2}} & =\xi\left(\beta\left(1+\alpha\left(I_{n}-I_{0}\right)^{\beta}\right)-1\right)\left(I_{n}-I_{0}\right)^{\beta-2}\exp\left[\alpha\left(I_{n}-I_{0}\right)^{\beta}\right]
+\end{aligned}
+\,.\label{eq:fepl-fiber-dPsi}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note: In the limit when 
+\begin_inset Formula $\alpha\to0$
+\end_inset
+
+, this expression produces a power law, 
+\begin_inset Formula 
+\begin{equation}
+\lim\limits _{\alpha\to0}\Psi_{r}=\frac{\xi}{\beta}\left(I_{n}-I_{0}\right)^{\beta}\,.\label{eq:fepl-Psi-alpha0}
+\end{equation}
+
+\end_inset
+
+Note: According to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fepl-elasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fepl-fiber-dPsi"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, when 
+\begin_inset Formula $\beta>2$
+\end_inset
+
+ the fiber modulus is zero at the strain origin (
+\begin_inset Formula $I_{n}=I_{0})$
+\end_inset
+
+.
+ Therefore, use 
+\begin_inset Formula $\beta>2$
+\end_inset
+
+ when a smooth transition in the stress is desired from compression to tension.
+\end_layout
+
+\begin_layout Standard
+There is an option to also add a shear modulus 
+\begin_inset Formula $\mu$
+\end_inset
+
+ to account for the interaction of a fiber with the ground matrix.
+ This additional contribution does not depend on whether the fiber is in
+ tension.
+ It has a strain energy density
+\begin_inset Formula 
+\begin{equation}
+W=\frac{\mu}{4}\left(K_{n}-1-2\left(I_{n}-1\right)\right)\,,\quad K_{n}=\mathbf{n}_{r}\cdot\mathbf{C}^{2}\cdot\mathbf{n}_{r}\label{eq:fepl-shear-sed}
+\end{equation}
+
+\end_inset
+
+The corresponding stress is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\sigma} & =2\frac{I_{n}}{J}\left(\frac{\partial W}{\partial I_{n}}\mathbf{n}\otimes\mathbf{n}+\frac{\partial W}{\partial K_{n}}\left(\mathbf{n}\otimes\mathbf{n}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{n}\otimes\mathbf{n}\right)\right)\\
+ & =\frac{\mu}{2}\frac{I_{n}}{J}\left(\mathbf{n}\otimes\mathbf{n}\cdot\left(\mathbf{b}-\mathbf{I}\right)+\left(\mathbf{b}-\mathbf{I}\right)\cdot\mathbf{n}\otimes\mathbf{n}\right)
+\end{aligned}
+\label{eq:fepl-shear-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{b}=\mathbf{F}\cdot\mathbf{F}^{T}$
+\end_inset
+
+ is the left Cauchy-Green tensor.
+ The elasticity tensor is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\mathcal{C}} & =4\frac{I_{n}^{2}}{J}\left(\frac{\partial^{2}W}{\partial I_{n}^{2}}\mathbf{N}\otimes\mathbf{N}+\frac{\partial^{2}W}{\partial K_{n}^{2}}\left(\mathbf{N}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{N}\right)\otimes\left(\mathbf{N}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{N}\right)\right)\\
+ & +4\frac{I_{n}^{2}}{J}\frac{\partial^{2}W}{\partial I_{n}\partial K_{n}}\left(\mathbf{N}\otimes\left(\mathbf{N}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{N}\right)+\left(\mathbf{N}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{N}\right)\otimes\mathbf{N}\right)\\
+ & +\frac{4I_{n}}{J}\frac{\partial W}{\partial K_{n}}\left(\mathbf{N}\odot\mathbf{b}+\mathbf{b}\odot\mathbf{N}\right)\\
+ & =\mu\frac{I_{n}}{J}\left(\mathbf{N}\odot\mathbf{b}+\mathbf{b}\odot\mathbf{N}\right)
+\end{aligned}
+\,,\label{eq:fepl-shear-elasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{N}=\mathbf{n}\otimes\mathbf{n}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Fiber with Natural Neo-Hookean Response
+\end_layout
+
+\begin_layout Standard
+This model is an adaptation of the natural neo-Hookean material presented
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "subsec:Natural-Neo-Hookean"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Consider that the state of strain in a fiber is given by the unidirectional
+ natural (left Hencky) strain along the fiber,
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\eta}=\ln\lambda_{n}\,\mathbf{n}\otimes\mathbf{n}\label{eq:fnh-strain}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ is the stretch ratio along the current fiber unit vector 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ For this special state of strain the invariants 
+\begin_inset Formula $K_{i}$
+\end_inset
+
+ of the natural strain tensor reduce to 
+\begin_inset Formula $K_{1}=\ln\lambda_{n}$
+\end_inset
+
+, 
+\begin_inset Formula $K_{2}=\sqrt{3/2}\ln\lambda_{n}$
+\end_inset
+
+, and 
+\begin_inset Formula $K_{3}=1$
+\end_inset
+
+.
+ In this case, a natural neo-Hookean fiber response is given by
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\frac{\xi}{2}H\left(\ln\lambda_{n}\right)\left(\ln\lambda_{n}\right)^{2}\,.\label{eq:fnh-sed}
+\end{equation}
+
+\end_inset
+
+The corresponding Cauchy stress is
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\xi J^{-1}H\left(\ln\lambda_{n}\right)\ln\lambda_{n}\mathbf{n}\otimes\mathbf{n}\label{eq:fnh-stress}
+\end{equation}
+
+\end_inset
+
+and the elasticity tensor is
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}=\xi J^{-1}H\left(\ln\lambda_{n}\right)\left(1-2\ln\lambda_{n}\right)\mathbf{N}\otimes\mathbf{N}\label{eq:fnh-elasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\xi$
+\end_inset
+
+ is the fiber modulus.
+ This expression shows that the components of the elasticity tensor become
+ negative when 
+\begin_inset Formula $1-2\ln\lambda_{n}<0$
+\end_inset
+
+, or equivalently when 
+\begin_inset Formula $\lambda_{n}>e^{\frac{1}{2}}$
+\end_inset
+
+.
+ However, the stress always remains positive.
+\end_layout
+
+\begin_layout Standard
+If we want the tensile response to engage only beyond a threshold stretch
+ ratio 
+\begin_inset Formula $\lambda_{0}$
+\end_inset
+
+, we may rewrite the strain energy density as
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\frac{\xi}{2}H\left(\ln\lambda_{n}-\ln\lambda_{0}\right)\left(\ln\lambda_{n}-\ln\lambda_{0}\right)^{2}=\frac{\xi}{2}H\left(\ln\frac{\lambda_{n}}{\lambda_{0}}\right)\left(\ln\frac{\lambda_{n}}{\lambda_{0}}\right)^{2}\,.\label{eq:fnh-sed-redux}
+\end{equation}
+
+\end_inset
+
+Then
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\xi J^{-1}H\left(\ln\frac{\lambda_{n}}{\lambda_{0}}\right)\ln\frac{\lambda_{n}}{\lambda_{0}}\mathbf{n}\otimes\mathbf{n}\,,\label{eq:fnh-stress-redux}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}=\xi J^{-1}H\left(\ln\frac{\lambda_{n}}{\lambda_{0}}\right)\left(1-2\ln\frac{\lambda_{n}}{\lambda_{0}}\right)\mathbf{N}\otimes\mathbf{N}\,.\label{eq:fnh-elasticity-redux}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Nearly-Incompressible Materials
 \begin_inset CommandInset label
@@ -29886,10 +30238,10 @@ Since fibers can only sustain tension, this material is not stable on its
 \end_layout
 
 \begin_layout Subsection
-Fiber with Exponential Power law
+Fiber with Exponential Power Law Uncoupled
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Fiber-Exponential-Power"
+name "subsec:Fiber-Exponential-Power-UC"
 
 \end_inset
 

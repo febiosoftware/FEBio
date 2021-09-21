@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include "FEFatigueMaterial.h"
 #include "FEFiberExpPow.h"
 #include "FEFiberExpPowUncoupled.h"
+#include "FEFiberNaturalNeoHookean.h"
 #include "FEFiberNeoHookean.h"
 #include "FEFiberPowLinear.h"
 #include "FEFiberPowLinearUncoupled.h"
@@ -369,7 +370,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowLinear, "fiber-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberPowLinearUncoupled, "fiber-pow-linear-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC, "fiber-exponential-power-law-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
+    REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
+	REGISTER_FECORE_CLASS(FEFiberNaturalNH, "fiber-natural-NH");
 	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
@@ -458,6 +460,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNS, "DC max normal stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
+    REGISTER_FECORE_CLASS(FEDamageCriterionONS, "DC octahedral natural strain");
 
     // plastic flow curve (used by plastic materials)
     REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");

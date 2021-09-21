@@ -38,6 +38,12 @@ public:
 
 	void Update() override;
 
+	void SetPosition(const vec3d& v);
+
+	void SetSoluteID(int soluteID);
+
+	void SetRate(double rate);
+
 	//! Evaluate force vector
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 

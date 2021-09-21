@@ -520,6 +520,12 @@ int FEAnalysis::SolveTimeStep()
 			if (bconv)
 			{
 				FEModel& fem = *GetFEModel();
+
+				if (fem.DoCallback(CB_TIMESTEP_SOLVED) == false)
+				{
+					return false;
+				}
+
 				if (fem.MeshAdaptors())
 				{
 					fem.GetTime().augmentation = niter;
