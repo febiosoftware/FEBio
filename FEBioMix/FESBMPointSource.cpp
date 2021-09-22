@@ -106,10 +106,9 @@ void FESBMPointSource::SetPosition(const vec3d& pos)
 	m_pos = pos;
 }
 
-void FESBMPointSource::SetSBM(int id, double val)
+void FESBMPointSource::SetSBMID(int id)
 {
 	m_sbm = id;	
-	m_val = val;
 }
 
 void FESBMPointSource::SetValue(double val)

@@ -38,7 +38,7 @@ public:
 
 	void SetPosition(const vec3d& pos);
 
-	void SetSBM(int id, double val);
+	void SetSBMID(int id);
 
 	void SetValue(double val);
 
