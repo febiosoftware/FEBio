@@ -72,7 +72,7 @@ void FEViscoElasticMaterialPoint::Init()
 	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
 
 	// intialize data to zero
-	m_se.zero();
+	m_Se.zero();
 	m_Sep.zero();
 //	m_sed = 0.0;
 //  m_sedp = 0.0;
@@ -95,7 +95,7 @@ void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 	// the elastic stress stored in pt is the Cauchy stress.
 	// however, we need to store the 2nd PK stress
-	m_Sep = pt.pull_back(m_se);
+	m_Sep = m_Se;
 //  m_sedp = m_sed;
 
 	// copy previous data
@@ -113,7 +113,7 @@ void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
 void FEViscoElasticMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
-	ar & m_se;
+	ar & m_Se;
 	ar & m_Sep;
 	ar & m_H & m_Hp;
 }
@@ -167,10 +167,10 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
 
 	// Calculate the new elastic Cauchy stress
-	pt.m_se = m_Base->Stress(mp);
+	mat3ds se = m_Base->Stress(mp);
 
 	// pull-back to get PK2 stress
-	mat3ds Se = ep.pull_back(pt.m_se);
+	mat3ds Se = pt.m_Se = ep.pull_back(se);
 
 	// get elastic PK2 stress of previous timestep
 	mat3ds Sep = pt.m_Sep;
