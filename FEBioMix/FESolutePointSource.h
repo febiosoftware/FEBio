@@ -40,9 +40,15 @@ public:
 
 	void SetPosition(const vec3d& v);
 
+	vec3d GetPosition() const;
+
 	void SetSoluteID(int soluteID);
 
+	int GetSoluteID() const;
+
 	void SetRate(double rate);
+
+	double GetRate() const;
 
 	//! Evaluate force vector
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
