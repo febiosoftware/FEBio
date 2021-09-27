@@ -77,6 +77,7 @@ public:
 	int		m_iteopt;		//!< optimum nr of iterations
 	double	m_dtmin;		//!< min time step size
 	double	m_dtmax;		//!< max time step size
+	double	m_cutback;		//!< cut back factor used in aggressive time stepping
 
 	std::vector<double>	m_must_points;	//!< the list of must-points
 

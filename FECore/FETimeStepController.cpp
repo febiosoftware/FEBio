@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_dtmin     , "dtmin");
 	ADD_PARAMETER(m_dtmax     , "dtmax");
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
+	ADD_PARAMETER(m_cutback   , "cutback");
 	ADD_PARAMETER(m_dtforce   , "dtforce");
 	ADD_PARAMETER(m_must_points, "must_points");
 END_FECORE_CLASS();
@@ -58,6 +59,7 @@ FETimeStepController::FETimeStepController(FEModel* fem) : FECoreBase(fem)
 	m_nretries = 0;
 	m_maxretries = 5;
 	m_naggr = 0;
+	m_cutback = 0.5;
 	m_nmust = -1;
 	m_next_must = -1;
 	m_nmplc = -1;
@@ -87,6 +89,7 @@ void FETimeStepController::CopyFrom(FETimeStepController* tc)
 	m_iteopt = tc->m_iteopt;
 	m_dtmin = tc->m_dtmin;
 	m_dtmax = tc->m_dtmax;
+	m_cutback = tc->m_cutback;
 
 	m_ddt = tc->m_ddt;
 	m_dtp = tc->m_dtp;
@@ -156,7 +159,7 @@ void FETimeStepController::Retry()
 
 	double dtn;
 	if (m_naggr == 0) dtn = dt - m_ddt;
-	else dtn = dt*0.5;
+	else dtn = dt*m_cutback;
 
 	feLogEx(fem, "\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);
 
