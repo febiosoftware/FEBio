@@ -118,7 +118,8 @@ public:
     
     // Evaluate contravariant components of tens4ds tensor
     void tens4dsCntMat66(const tens4ds c, const vec3d* Gcnt, matrix& C);
-    
+    void tens4dmmCntMat66(const tens4dmm c, const vec3d* Gcnt, matrix& C);
+
     // Evaluate the strain using the ANS method
 	void CollocationStrainsANS(FEShellElementNew& el, vector<double>& E, vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW, matrix& NS, matrix& NN);
     

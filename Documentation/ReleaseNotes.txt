@@ -41,6 +41,34 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.5.1   9/28/2021
+
+===========================================================================
+
+* Added "cutback" parameter that controls the reduction factor when using aggressive time stepping. (default is 0.5)
+* A bug was fixed in the "kinetic energy density" plot variable. 
+* Added domain log variable "volume" for calculating domain volume.
+* An issue with tangent evaluation of Mooney-Rivlin and Veronda-Westmann materials was fixed. This fix may improve convergence of nested materials (e.g. visco-elastic, mixtures, etc.) that use these materials as a component. 
+* Updated Theory and User Manuals to describe parameter lam0 in fiber-exp-pow, and new material fiber-natural-NH
+* Added fiber with natural neo-Hookean response. Modified fiber-exp-pow to allow tensile response to engage at any stretch ratio greater than unity. Modified parameters alpha and beta of fiber-exp-pow to FEParamDouble.
+* Added "DC Octahedral natural strain" as a damage criterion.
+* Fixed a bug in closest-point projection algorithm.
+* Fixed some issues with restart and added a new version for restart input file that uses the 3.0 format.
+* Updated User Manual to reflect specification of plastic flow curve in reactive plasticity and reactive plastic damage materials
+* Fixed small bug in newly introduced user-defined plastic flow curve. Changed name of parameter emin to e0 in math plastic flow curve.
+* The definition of reactive plastic and reactive plastic damage materials was modified. It now requires the definition of a "flow_curve" property that. This change is incompatible with the previous version so older files will need to be updated. 
+* Implemented "PK2 stress" plot variable, which exports the second Piola-Kirchoff stress.
+* updated User Manual to use Young's modulus and Poisson's ratio as material parameters for natural neo-Hookean material
+* Changed the material parameters of natural neo-Hookean from bulk and shear moduli to Young's modulus and Poisson's ratio.
+* Added left stretch tensor as plot and log variable
+* Added left Hencky plot and log variables to User Manual
+* Added ability to specify element type in shell domain section.
+* Modified shell domain classes to allow using secant stress and secant tangent calculations for shell domains.
+* Modified symmetry plane constraint to work properly if symmetry plane includes some nodes that belong to a rigid body (such as a rigid interface).
+* Changed type strings for Kamensky materials.
+
+===========================================================================
+
  R E L E A S E   3.5   8/30/2021
 
 ===========================================================================

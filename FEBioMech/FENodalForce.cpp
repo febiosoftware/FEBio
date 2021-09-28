@@ -41,6 +41,12 @@ FENodalForce::FENodalForce(FEModel* fem) : FENodalLoad(fem)
 	m_f = vec3d(0, 0, 0);
 }
 
+// set the value
+void FENodalForce::SetValue(const vec3d& v)
+{
+	m_f = v;
+}
+
 bool FENodalForce::SetDofList(FEDofList& dofList)
 {
 	return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));

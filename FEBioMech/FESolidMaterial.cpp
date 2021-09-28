@@ -87,7 +87,7 @@ mat3ds FESolidMaterial::PK2Stress(FEMaterialPoint& mp, const mat3ds E)
     pt.m_J = J;
     
     // Evaluate Cauchy stress
-    mat3ds s = Stress(mp);
+    mat3ds s = SolidStress(mp);
     
     // Restore original F
     pt.m_F = Fsafe;
@@ -103,7 +103,7 @@ mat3ds FESolidMaterial::PK2Stress(FEMaterialPoint& mp, const mat3ds E)
 //-----------------------------------------------------------------------------
 //! calculate material tangent stiffness at material point, using prescribed Lagrange strain
 //! needed for EAS analyses where the compatible strain (calculated from displacements) is enhanced
-tens4ds FESolidMaterial::MaterialTangent(FEMaterialPoint& mp, const mat3ds E)
+tens4dmm FESolidMaterial::MaterialTangent(FEMaterialPoint& mp, const mat3ds E)
 {
     // Evaluate right Cauchy-Green tensor from E
     mat3ds C = mat3dd(1) + E*2;
@@ -124,7 +124,7 @@ tens4ds FESolidMaterial::MaterialTangent(FEMaterialPoint& mp, const mat3ds E)
     pt.m_J = J;
     
     // Evaluate Cauchy stress
-    tens4ds c = Tangent(mp);
+    tens4dmm c = SolidTangent(mp);
     
     // Restore original F
     pt.m_F = Fsafe;
@@ -132,7 +132,7 @@ tens4ds FESolidMaterial::MaterialTangent(FEMaterialPoint& mp, const mat3ds E)
     
     // Convert spatial tangent to material tangent
     mat3d Ui = dyad(v[0])/lam[0] + dyad(v[1])/lam[1] + dyad(v[2])/lam[2];
-    tens4ds Cm = c.pp(Ui)*J;
+    tens4dmm Cm = c.pp(Ui)*J;
     
     return Cm;
 }

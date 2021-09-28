@@ -372,6 +372,30 @@ inline tens4dmm tens4dmm::operator - () const
 }
 
 //-----------------------------------------------------------------------------
+// vdotTdotv_jk = a_i T_ijkl b_l
+inline mat3d vdotTdotv(const vec3d& a, const tens4dmm& T, const vec3d& b)
+{
+    return mat3d(a.x*b.x*T.d[0] + a.y*b.x*T.d[3] + a.z*b.x*T.d[5] + a.x*b.y*T.d[18] + a.y*b.y*T.d[21] +
+                 a.z*b.y*T.d[23] + a.x*b.z*T.d[30] + a.y*b.z*T.d[33] + a.z*b.z*T.d[35],
+                 a.x*b.y*T.d[6] + a.y*b.y*T.d[9] + a.z*b.y*T.d[11] + a.x*b.x*T.d[18] + a.y*b.x*T.d[21] + a.z*b.x*T.d[23] +
+                 a.x*b.z*T.d[24] + a.y*b.z*T.d[27] + a.z*b.z*T.d[29],
+                 a.x*b.z*T.d[12] + a.y*b.z*T.d[15] + a.z*b.z*T.d[17] + a.x*b.y*T.d[24] + a.y*b.y*T.d[27] + a.z*b.y*T.d[29] +
+                 a.x*b.x*T.d[30] + a.y*b.x*T.d[33] + a.z*b.x*T.d[35],
+                 a.y*b.x*T.d[1] + a.x*b.x*T.d[3] + a.z*b.x*T.d[4] + a.y*b.y*T.d[19] + a.x*b.y*T.d[21] + a.z*b.y*T.d[22] +
+                 a.y*b.z*T.d[31] + a.x*b.z*T.d[33] + a.z*b.z*T.d[34],
+                 a.y*b.y*T.d[7] + a.x*b.y*T.d[9] + a.z*b.y*T.d[10] + a.y*b.x*T.d[19] + a.x*b.x*T.d[21] + a.z*b.x*T.d[22] +
+                 a.y*b.z*T.d[25] + a.x*b.z*T.d[27] + a.z*b.z*T.d[28],
+                 a.y*b.z*T.d[13] + a.x*b.z*T.d[15] + a.z*b.z*T.d[16] + a.y*b.y*T.d[25] + a.x*b.y*T.d[27] + a.z*b.y*T.d[28] +
+                 a.y*b.x*T.d[31] + a.x*b.x*T.d[33] + a.z*b.x*T.d[34],
+                 a.z*b.x*T.d[2] + a.y*b.x*T.d[4] + a.x*b.x*T.d[5] + a.z*b.y*T.d[20] + a.y*b.y*T.d[22] + a.x*b.y*T.d[23] +
+                 a.z*b.z*T.d[32] + a.y*b.z*T.d[34] + a.x*b.z*T.d[35],
+                 a.z*b.y*T.d[8] + a.y*b.y*T.d[10] + a.x*b.y*T.d[11] + a.z*b.x*T.d[20] + a.y*b.x*T.d[22] + a.x*b.x*T.d[23] +
+                 a.z*b.z*T.d[26] + a.y*b.z*T.d[28] + a.x*b.z*T.d[29],
+                 a.z*b.z*T.d[14] + a.y*b.z*T.d[16] + a.x*b.z*T.d[17] + a.z*b.y*T.d[26] + a.y*b.y*T.d[28] + a.x*b.y*T.d[29] +
+                 a.z*b.x*T.d[32] + a.y*b.x*T.d[34] + a.x*b.x*T.d[35]);
+}
+
+//-----------------------------------------------------------------------------
 // double contraction of general 4th-order tensor with a general 2nd-order tensor
 // Aij = Dijkl Mkl
 inline mat3ds tens4dmm::dot(const mat3ds &m) const

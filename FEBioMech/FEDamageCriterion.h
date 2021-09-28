@@ -168,3 +168,15 @@ public:
     //! damage
     double DamageCriterion(FEMaterialPoint& pt);
 };
+
+//-----------------------------------------------------------------------------
+// max octahedral natural strain as damage criterion
+
+class FEDamageCriterionONS : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionONS(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt);
+};

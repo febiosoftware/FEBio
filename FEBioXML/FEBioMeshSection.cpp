@@ -528,6 +528,22 @@ void FEBioMeshDomainsSection::ParseShellDomainSection(XMLTag& tag)
 	// set the material name
 	partDomain->SetMaterialName(szmat);
 
+    // see if the element type is specified
+    const char* szelem = tag.AttributeValue("elem_type", true);
+    if (szelem)
+    {
+        FE_Element_Spec elemSpec = partDomain->ElementSpec();
+        FE_Element_Spec newSpec = GetBuilder()->ElementSpec(szelem);
+        
+        // make sure it's valid
+        if ((FEElementLibrary::IsValid(newSpec) == false) || (elemSpec.eshape != newSpec.eshape))
+        {
+            throw XMLReader::InvalidAttributeValue(tag, "elem_type", szelem);
+        }
+        
+        partDomain->SetElementSpec(newSpec);
+    }
+    
 	// see if the three_field flag is defined
 	const char* sz3field = tag.AttributeValue("three_field", true);
 	if (sz3field)

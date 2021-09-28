@@ -195,7 +195,7 @@ FESurfaceElement* FEClosestPointProjection::Project(const vec3d& x, vec3d& q, ve
 	//
 	if (m_bspecial)
 	{
-		ProjectSpecial(mn, x, q, r);
+		return ProjectSpecial(mn, x, q, r);
 	}
 
 	return nullptr;

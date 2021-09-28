@@ -53,7 +53,7 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	mat3ds	m_se;	//!< elastic Cauchy stress
+	mat3ds	m_Se;	//!< elastic PK2 stress
 	mat3ds	m_Sep;	//!< elastic 2nd PK stress at previous time
 
 	mat3ds	m_H[MAX_TERMS];		//!< internal variables

@@ -72,6 +72,9 @@ public:
 	virtual double integrate(double a, double b) const;
     
 	virtual void Clear() {}
+    
+    // invert function
+    virtual bool invert(const double f0, double &x);
 };
 
 //-----------------------------------------------------------------------------
@@ -129,6 +132,9 @@ public:
 		return 0.0;
 	}
 
+    // invert function has no unique solution
+    bool invert(const double f0, double &x) override { return false; }
+    
 private:
 	double	m_x0;
 	double	m_leftVal;
@@ -154,6 +160,8 @@ public:
 	double derive(double t) const override;
 
     double deriv2(double t) const override;
+
+	void SetMathString(const std::string& s);
 
 private:
 	void evalParams(std::vector<double>& val, double t) const;

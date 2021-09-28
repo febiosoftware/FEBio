@@ -101,6 +101,9 @@ public:
 	//! return number of model components
 	int ModelComponents() const;
 
+	//! get a model component
+	FEModelComponent* GetModelComponent(int i);
+
 public:
 	//! sets the plot level
 	void SetPlotLevel(int n);

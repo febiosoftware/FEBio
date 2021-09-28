@@ -32,8 +32,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FENaturalNeoHookean, FEElasticMaterial)
-ADD_PARAMETER(m_G, FE_RANGE_GREATER_OR_EQUAL(0.0), "G");
-ADD_PARAMETER(m_k, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+    ADD_PARAMETER(m_E, FE_RANGE_GREATER_OR_EQUAL(0.0), "E");
+    ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -44,15 +44,13 @@ mat3ds FENaturalNeoHookean::Stress(FEMaterialPoint& mp)
     double J = pt.m_J;
     
     // get the material parameters
-    double k = m_k(mp);
-    double mu = m_G(mp);
+    double E = m_E(mp);
+    double v = m_v(mp);
+    double k = E/3/(1-2*v);
+    double mu = E/2/(1+v);
     
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds b = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    b.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate amount of dilatation
     double K1 = h.tr();
@@ -81,9 +79,11 @@ tens4ds FENaturalNeoHookean::Tangent(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // get the material parameters
-    double k = m_k(mp);
-    double mu = m_G(mp);
-    
+    double E = m_E(mp);
+    double v = m_v(mp);
+    double k = E/3/(1-2*v);
+    double mu = E/2/(1+v);
+
     // jacobian
     double J = pt.m_J;
     
@@ -142,15 +142,13 @@ double FENaturalNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // get the material parameters
-    double k = m_k(mp);
-    double mu = m_G(mp);
-    
+    double E = m_E(mp);
+    double v = m_v(mp);
+    double k = E/3/(1-2*v);
+    double mu = E/2/(1+v);
+
     // evaluate spatial Hencky (logarithmic) strain
-    mat3ds b = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    b.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    mat3ds h = pt.LeftHencky();
     
     // evaluate amount of dilatation
     double K1 = h.tr();

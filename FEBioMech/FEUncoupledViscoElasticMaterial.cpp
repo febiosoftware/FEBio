@@ -102,10 +102,10 @@ mat3ds FEUncoupledViscoElasticMaterial::DevStress(FEMaterialPoint& mp)
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
 	
 	// Calculate the new elastic Cauchy stress
-	pt.m_se = m_pBase->DevStress(mp);
+	mat3ds se = m_pBase->DevStress(mp);
 	
 	// pull-back to get PK2 stress
-	mat3ds Se = ep.pull_back(pt.m_se);
+	mat3ds Se = pt.m_Se = ep.pull_back(se);
 	
 	// get elastic PK2 stress of previous timestep
 	mat3ds Sep = pt.m_Sep;
