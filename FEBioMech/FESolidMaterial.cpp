@@ -87,7 +87,7 @@ mat3ds FESolidMaterial::PK2Stress(FEMaterialPoint& mp, const mat3ds E)
     pt.m_J = J;
     
     // Evaluate Cauchy stress
-    mat3ds s = SolidStress(mp);
+    mat3ds s = Stress(mp);
     
     // Restore original F
     pt.m_F = Fsafe;

@@ -34,6 +34,7 @@ class FEDomain;
 class FECORE_API FELogDomainData : public FECoreBase
 {
     FECORE_SUPER_CLASS
+    FECORE_BASE_CLASS(FELogDomainData)
 
 public:
     FELogDomainData(FEModel* fem) : FECoreBase(fem) {}
