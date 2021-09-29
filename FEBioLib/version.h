@@ -36,7 +36,7 @@ SOFTWARE.*/
 
 #define VERSION			3
 #define SUBVERSION		5
-#define SUBSUBVERSION	0
+#define SUBSUBVERSION	1
 
 ///////////////////////////////////////////////////////////////////////////////
 // Restart file version

@@ -51,14 +51,29 @@ void FESolutePointSource::SetPosition(const vec3d& v)
 	m_pos = v;
 }
 
+vec3d FESolutePointSource::GetPosition() const
+{
+	return m_pos;
+}
+
 void FESolutePointSource::SetSoluteID(int soluteID)
 {
 	m_soluteId = soluteID;
 }
 
+int FESolutePointSource::GetSoluteID() const
+{
+	return m_soluteId;
+}
+
 void FESolutePointSource::SetRate(double rate)
 {
 	m_rate = rate;
+}
+
+double FESolutePointSource::GetRate() const
+{
+	return m_rate;
 }
 
 bool FESolutePointSource::Init()
