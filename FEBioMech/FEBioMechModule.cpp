@@ -578,15 +578,18 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEContactPotential, "contact potential");
 
 	//-----------------------------------------------------------------------------
-	// classes derived directly from FERigidLoad
-	REGISTER_FECORE_CLASS(FERigidAxialForce, "rigid_axial_force");
-	REGISTER_FECORE_CLASS(FERigidBodyForce, "rigid_force");
-    REGISTER_FECORE_CLASS(FERigidFollowerForce, "rigid_follower_force");
-    REGISTER_FECORE_CLASS(FERigidFollowerMoment, "rigid_follower_moment");
-	REGISTER_FECORE_CLASS(FERigidBodyFixedBC, "rigid_fixed");
-	REGISTER_FECORE_CLASS(FERigidBodyDisplacement, "rigid_prescribed");
-	REGISTER_FECORE_CLASS(FERigidBodyVelocity, "rigid_velocity");
+	// classes derived directly from FERigidBC
+	REGISTER_FECORE_CLASS(FERigidBodyFixedBC        , "rigid_fixed"           );
+	REGISTER_FECORE_CLASS(FERigidBodyDisplacement   , "rigid_prescribed"      );
+	REGISTER_FECORE_CLASS(FERigidBodyVelocity       , "rigid_velocity"        );
 	REGISTER_FECORE_CLASS(FERigidBodyAngularVelocity, "rigid_angular_velocity");
+
+	//-----------------------------------------------------------------------------
+	// classes derived directly from FERigidLoad
+	REGISTER_FECORE_CLASS(FERigidAxialForce    , "rigid_axial_force"    );
+	REGISTER_FECORE_CLASS(FERigidBodyForce     , "rigid_force"          );
+    REGISTER_FECORE_CLASS(FERigidFollowerForce , "rigid_follower_force" );
+    REGISTER_FECORE_CLASS(FERigidFollowerMoment, "rigid_follower_moment");
 	
 //	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable, FEBC_ID, "rigid_cable");
 //	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCablePoint, FEOBJECT_ID, "rigid_cable_point");
