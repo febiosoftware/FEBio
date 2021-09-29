@@ -49,11 +49,11 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 //! Initializes material point data.
 void FEReactiveVEMaterialPoint::Init()
 {
-	// initialize data to include first generation (initially intact bonds)
-    m_Fi.resize(1,mat3dd(1));
-    m_Ji.resize(1,1);
-    m_v.resize(1,0);
-    m_w.resize(1,1);
+	// initialize data to zero
+	m_Fi.clear();
+	m_Ji.clear();
+	m_v.clear();
+	m_w.clear();
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
@@ -61,7 +61,7 @@ void FEReactiveVEMaterialPoint::Init()
 
 //-----------------------------------------------------------------------------
 //! Update material point data.
-void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
+void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
 {
     FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
 
@@ -69,20 +69,22 @@ void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
 	// the last generation, in which case store the current state
 	if (m_pRve) {
 	    if (m_pRve->NewGeneration(*this)) {
-		    m_Fi.push_back(pt.m_F.inverse());
-	        m_Ji.push_back(1./pt.m_J);
-			m_v.push_back(timeInfo.currentTime);
-			double w = m_pRve->ReformingBondMassFraction(*this);
+            m_v.push_back(timeInfo.currentTime);
+            m_Fi.push_back(pt.m_F.inverse());
+            m_Ji.push_back(1./pt.m_J);
+            double w = (m_v.size() > 0) ? m_pRve->ReformingBondMassFraction(*this) : 1;
 			m_w.push_back(w);
+            m_pRve->CullGenerations(*this);
 		}
 	}
 	else {
 		if (m_pRuc->NewGeneration(*this)) {
-			m_Fi.push_back(pt.m_F.inverse());
-			m_Ji.push_back(1./pt.m_J);
-			m_v.push_back(timeInfo.currentTime);
-			double w = m_pRuc->ReformingBondMassFraction(*this);
-			m_w.push_back(w);
+            m_v.push_back(timeInfo.currentTime);
+            m_Fi.push_back(pt.m_F.inverse());
+            m_Ji.push_back(1./pt.m_J);
+            double w = (m_v.size() > 0) ? m_pRuc->ReformingBondMassFraction(*this) : 1;
+            m_w.push_back(w);
+            m_pRve->CullGenerations(*this);
 		}
 	}
     

@@ -79,7 +79,10 @@ public:
     
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
-    
+
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEElasticMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
