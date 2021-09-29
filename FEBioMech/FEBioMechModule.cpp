@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include "FEFatigueMaterial.h"
 #include "FEFiberExpPow.h"
 #include "FEFiberExpPowUncoupled.h"
+#include "FEFiberNaturalNeoHookean.h"
 #include "FEFiberNeoHookean.h"
 #include "FEFiberPowLinear.h"
 #include "FEFiberPowLinearUncoupled.h"
@@ -127,6 +128,7 @@ SOFTWARE.*/
 #include "FERVEDamageMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
+#include "FEPlasticFlowCurve.h"
 #include "FEFiberExpLinear.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include "FEPrescribedActiveContractionUniaxial.h"
@@ -375,7 +377,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowLinear, "fiber-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberPowLinearUncoupled, "fiber-pow-linear-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC, "fiber-exponential-power-law-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
+    REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
+	REGISTER_FECORE_CLASS(FEFiberNaturalNH, "fiber-natural-NH");
 	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
@@ -453,7 +456,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
 
-	// damage criterion (used by damage materials)
+	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");
 	REGISTER_FECORE_CLASS(FEDamageCriterionSED, "DC strain energy density");
 	REGISTER_FECORE_CLASS(FEDamageCriterionSSE, "DC specific strain energy");
@@ -463,6 +466,12 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNS, "DC max normal stress");
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
+    REGISTER_FECORE_CLASS(FEDamageCriterionONS, "DC octahedral natural strain");
+
+    // plastic flow curve (used by plastic materials)
+    REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");
+    REGISTER_FECORE_CLASS(FEPlasticFlowCurveUser , "PFC user");
+    REGISTER_FECORE_CLASS(FEPlasticFlowCurveMath , "PFC math");
 
 	// prestrain materials
 	REGISTER_FECORE_CLASS(FEPrestrainElastic, "prestrain elastic");
@@ -600,6 +609,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementAcceleration, "acceleration");
 	REGISTER_FECORE_CLASS(FEPlotDensity, "density");
 	REGISTER_FECORE_CLASS(FEPlotElementStress, "stress");
+	REGISTER_FECORE_CLASS(FEPlotElementPK2Stress, "PK2 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");

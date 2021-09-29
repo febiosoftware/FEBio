@@ -625,6 +625,23 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average stresses for each element. 
+bool FEPlotElementPK2Stress::Save(FEDomain& dom, FEDataStream& a)
+{
+	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+	if ((pme == 0) || pme->IsRigid()) return false;
+
+	writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+		const FEElasticMaterialPoint& ep = *mp.ExtractData< FEElasticMaterialPoint>();
+		mat3ds s = ep.m_s;
+		mat3ds S = ep.pull_back(s);
+		return S;
+		});
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSPRStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	// For now, this is only available for solid domains
@@ -894,33 +911,39 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
         {
             FEShellElement& el = bd->Element(i);
             double* gw = el.GaussWeights();
-            
-            // get nodal velocities
-            vec3d vt[FEElement::MAX_NODES];
-            vec3d wt[FEElement::MAX_NODES];
-            vec3d vn[FEElement::MAX_NODES];
-            for (int j=0; j<el.Nodes(); ++j) {
-                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
-                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
-            }
-            
-            // evaluate velocities at integration points
-            for (int j=0; j<el.GaussPoints(); ++j)
-                vn[j] = bd->evaluate(el, vt, wt, j);
-            
-            // integrate kinetic energy
-            double ew = 0;
-            double V = 0;
-            for (int j=0; j<el.GaussPoints(); ++j)
-            {
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 
-                double detJ = bd->detJ0(el, j)*gw[j];
-                V += detJ;
-                ew += vn[j]*vn[j]*(pme->Density(mp)/2*detJ);
-            }
-            
-            a << ew/V;
+			double ew = 0.0;
+			if ((dof_VU >= 0) && (dof_VV >= 0) && (dof_VW >= 0))
+			{
+				// get nodal velocities
+				vec3d vt[FEElement::MAX_NODES];
+				vec3d wt[FEElement::MAX_NODES];
+				vec3d vn[FEElement::MAX_NODES];
+				for (int j = 0; j < el.Nodes(); ++j) {
+					vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+					wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
+				}
+
+				// evaluate velocities at integration points
+				for (int j = 0; j < el.GaussPoints(); ++j)
+					vn[j] = bd->evaluate(el, vt, wt, j);
+
+				// integrate kinetic energy
+				double ew = 0;
+				double V = 0;
+				for (int j = 0; j < el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+					double detJ = bd->detJ0(el, j) * gw[j];
+					V += detJ;
+					ew += vn[j] * vn[j] * (pme->Density(mp) / 2 * detJ);
+				}
+
+				// normalize by volume
+				ew /= V;
+			}
+            a << ew;
         }
         return true;
     }

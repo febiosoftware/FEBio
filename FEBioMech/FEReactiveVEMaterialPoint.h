@@ -45,16 +45,16 @@ public:
     FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEUncoupledReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = 0; m_pRuc = pe; }
     
     //! copy material point data
-    FEMaterialPoint* Copy();
+    FEMaterialPoint* Copy() override;
     
     //! Initialize material point data
-    void Init();
+    void Init() override;
 
     //! Update material point data
-    void Update(const FETimeInfo& timeInfo);
+    void UpdateGenerations(const FETimeInfo& timeInfo);
     
     //! Serialize data to archive
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
 public:
     // multigenerational material data

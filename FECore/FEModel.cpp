@@ -1887,6 +1887,11 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 
 		ar & m_moduleName;
 
+		if (ar.IsLoading())
+		{
+			FECoreKernel::GetInstance().SetActiveModule(m_moduleName.c_str());
+		}
+
 		ar & m_timeInfo;
 		ar & m_dofs;
 		ar & m_Const;

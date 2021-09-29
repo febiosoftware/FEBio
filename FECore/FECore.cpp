@@ -60,6 +60,7 @@ SOFTWARE.*/
 #include "SurfaceDataRecord.h"
 #include "FELogEnclosedVolume.h"
 #include "FELogElementVolume.h"
+#include "FELogDomainVolume.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -176,4 +177,5 @@ REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
 // log classes
 REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
 REGISTER_FECORE_CLASS(FELogElementVolume, "V");
+REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 }

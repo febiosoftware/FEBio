@@ -38,6 +38,9 @@ class FEBIOMECH_API FENodalForce : public FENodalLoad
 public:
 	FENodalForce(FEModel* fem);
 
+	// set the value
+	void SetValue(const vec3d& v);
+
 protected: // required functions of FENodalLoad
 
 	// Set the dof list

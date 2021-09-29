@@ -51,7 +51,7 @@ public:
 	virtual mat3ds PK2Stress(FEMaterialPoint& pt, const mat3ds E);
 
 	//! calculate material tangent stiffness at material point
-	virtual tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
+	virtual tens4dmm MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
 
     //! calculate secant tangent stiffness at material point
     virtual tens4dmm SecantTangent(FEMaterialPoint& pt);

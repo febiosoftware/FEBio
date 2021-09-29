@@ -106,10 +106,34 @@ void FESBMPointSource::SetPosition(const vec3d& pos)
 	m_pos = pos;
 }
 
-void FESBMPointSource::SetSBM(int id, double val)
+vec3d FESBMPointSource::GetPosition() const
+{
+	return m_pos;
+}
+
+void FESBMPointSource::SetSBMID(int id)
 {
 	m_sbm = id;	
+}
+
+int FESBMPointSource::GetSBMID() const
+{
+	return m_sbm;
+}
+
+void FESBMPointSource::SetValue(double val)
+{
 	m_val = val;
+}
+
+double FESBMPointSource::GetValue() const
+{
+	return m_val;
+}
+
+void FESBMPointSource::SetWeighVolume(bool b)
+{
+	m_weighVolume = b;
 }
 
 void FESBMPointSource::ResetSBM()

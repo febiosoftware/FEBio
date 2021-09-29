@@ -70,7 +70,7 @@ double FEDomainDataRecord::Evaluate(int item, int ndata)
 void FEDomainDataRecord::SetDomain(int domainIndex)
 {
     m_item.clear();
-    m_item.push_back(domainIndex);
+    m_item.push_back(domainIndex + 1);
 }
 
 //-----------------------------------------------------------------------------

@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FECore/DumpFile.h"
 #include "FEBioLoadDataSection.h"
 #include "FEBioStepSection.h"
+#include "FEBioStepSection3.h"
 
 void FERestartControlSection::Parse(XMLTag& tag)
 {
@@ -93,7 +94,7 @@ void FERestartControlSection::Parse(XMLTag& tag)
 
 FERestartImport::FERestartImport()
 {
-	
+	m_newSteps = 0;
 }
 
 FERestartImport::~FERestartImport()
@@ -101,8 +102,12 @@ FERestartImport::~FERestartImport()
 	
 }
 
-//-----------------------------------------------------------------------------
+int FERestartImport::StepsAdded() const
+{
+	return m_newSteps;
+}
 
+//-----------------------------------------------------------------------------
 bool FERestartImport::Load(FEModel& fem, const char* szfile)
 {
 	// open the XML file
@@ -111,17 +116,9 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 	m_builder = new FEModelBuilder(fem);
 
 	m_szdmp[0] = 0;
+	m_newSteps = 0;
 
 	m_map["Control" ] = new FERestartControlSection(this);
-
-	// make sure we can redefine curves in the LoadData section
-	FEBioLoadDataSection* lcSection = new FEBioLoadDataSection(this);
-	lcSection->SetRedefineCurvesFlag(true);
-
-	m_map["LoadData"] = lcSection;
-
-	// set the file version to make sure we are using the correct format
-	SetFileVerion(0x0205);
 
 	// loop over child tags
 	bool ret = true;
@@ -136,13 +133,35 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		int nversion = -1;
 		if      (strcmp(szversion, "1.0") == 0) nversion = 1;
 		else if (strcmp(szversion, "2.0") == 0) nversion = 2;
+		else if (strcmp(szversion, "3.0") == 0) nversion = 3;
 
 		if (nversion == -1) return errf("FATAL ERROR: Incorrect restart file version\n");
 
 		// Add the Step section for version 2
 		if (nversion == 2)
 		{
+			// set the file version to make sure we are using the correct format
+			SetFileVerion(0x0205);
+
+			// make sure we can redefine curves in the LoadData section
+			FEBioLoadDataSection* lcSection = new FEBioLoadDataSection(this);
+			lcSection->SetRedefineCurvesFlag(true);
+			m_map["LoadData"] = lcSection;
+
 			m_map["Step"] = new FEBioStepSection25(this);
+		}
+
+		// Add the Step section for version 3
+		if (nversion == 3)
+		{
+			// set the file version to make sure we are using the correct format
+			SetFileVerion(0x0300);
+
+			// make sure we can redefine curves in the LoadData section
+			FEBioLoadDataSection3* lcSection = new FEBioLoadDataSection3(this);
+			m_map["LoadData"] = lcSection;
+
+			m_map["Step"] = new FEBioStepSection3(this);
 		}
 
 		// the first section has to be the archive
@@ -161,8 +180,15 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		// set the module name
 		GetBuilder()->SetActiveModule(fem.GetModuleName());
 
+		// keep track of the number of steps
+		int steps0 = fem.Steps();
+
 		// read the rest of the restart input file
 		ret = ParseFile(tag);
+
+		// count nr of newly added steps
+		int steps1 = fem.Steps();
+		m_newSteps = steps1 - steps0;
 	}
 	catch (XMLReader::Error& e)
 	{
