@@ -108,8 +108,8 @@ bool FEReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
     // the last generation, in which case store the current state
     // evaluate the relative deformation gradient
     mat3d F = pe.m_F;
-    int lg = (int)pt.m_Fi.size() - 1;
-    mat3d Fi = (lg > -1) ? pt.m_Fi[lg] : mat3d(mat3dd(1));
+    int lg = (int)pt.m_Fv.size() - 1;
+    mat3d Fi = (lg > -1) ? pt.m_Fv[lg].inverse() : mat3d(mat3dd(1));
     mat3d Fu = F*Fi;
 
     switch (m_ttype) {
@@ -173,7 +173,7 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
             double v = pt.m_v[ig];
             
             if (time >= v)
-                w = pt.m_w[ig]*m_pRelx->Relaxation(mp, time - v, D);
+                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, time - v, D);
         }
             break;
         case 2:
@@ -218,15 +218,15 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
     double J = ep.m_J;
     
     // get current number of generations
-    int ng = (int)pt.m_Fi.size();
+    int ng = (int)pt.m_Fv.size();
     
     double w = 1;
     
     for (int ig=0; ig<ng-1; ++ig)
     {
         // evaluate relative deformation gradient for this generation Fu(v)
-        ep.m_F = (ig > 0) ? pt.m_Fi[ig].inverse()*pt.m_Fi[ig-1] : pt.m_Fi[ig].inverse();
-        ep.m_J = (ig > 0) ? pt.m_Ji[ig-1]/pt.m_Ji[ig] : 1.0/pt.m_Ji[ig];
+        ep.m_F = (ig > 0) ? pt.m_Fv[ig]*pt.m_Fv[ig-1].inverse() : pt.m_Fv[ig];
+        ep.m_J = (ig > 0) ? pt.m_Jv[ig]/pt.m_Jv[ig-1] : pt.m_Jv[ig];
         // evaluate the breaking bond mass fraction for this generation
         w -= BreakingBondMassFraction(mp, ig, D);
     }
@@ -260,7 +260,7 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
 	mat3ds s = m_pBase->Stress(mp);
     
     // current number of breaking generations
-    int ng = (int)pt.m_Fi.size();
+    int ng = (int)pt.m_Fv.size();
     
     // no bonds have broken
     if (ng == 0) {
@@ -278,14 +278,14 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
         // calculate the bond stresses for breaking generations
         for (int ig=0; ig<ng; ++ig) {
             // evaluate relative deformation gradient for this generation
-            ep.m_F = (ig > 0) ? F*pt.m_Fi[ig-1] : F;
-            ep.m_J = (ig > 0) ? J*pt.m_Ji[ig-1] : J;
+            ep.m_F = (ig > 0) ? F*pt.m_Fv[ig-1].inverse() : F;
+            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond mass fraction for this generation
             w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond stress
             sb = m_pBond->Stress(mp);
             // add bond stress to total stress
-            s += (ig > 0) ? sb*w*pt.m_Ji[ig-1] : sb*w;
+            s += (ig > 0) ? sb*w/pt.m_Jv[ig-1] : sb*w;
         }
         
         // restore safe copy of deformation gradient
@@ -313,7 +313,7 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
 	tens4ds c = m_pBase->Tangent(mp);
     
     // current number of breaking generations
-    int ng = (int)pt.m_Fi.size();
+    int ng = (int)pt.m_Fv.size();
     
     // no bonds have broken
     if (ng == 0) {
@@ -331,14 +331,14 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
         // calculate the bond tangents for breaking generations
         for (int ig=0; ig<ng; ++ig) {
             // evaluate relative deformation gradient for this generation
-            ep.m_F = (ig > 0) ? F*pt.m_Fi[ig-1] : F;
-            ep.m_J = (ig > 0) ? J*pt.m_Ji[ig-1] : J;
+            ep.m_F = (ig > 0) ? F*pt.m_Fv[ig-1].inverse() : F;
+            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond mass fraction for this generation
             w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond tangent
             cb = m_pBond->Tangent(mp);
             // add bond tangent to total tangent
-            c += (ig > 0) ? cb*w*pt.m_Ji[ig-1] : cb*w;
+            c += (ig > 0) ? cb*w/pt.m_Jv[ig-1] : cb*w;
         }
         
         // restore safe copy of deformation gradient
@@ -370,7 +370,7 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
     double sed = m_pBase->StrainEnergyDensity(mp);
     
     // current number of breaking generations
-    int ng = (int)pt.m_Fi.size();
+    int ng = (int)pt.m_Fv.size();
     
     // no bonds have broken
     if (ng == 0) {
@@ -388,8 +388,8 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
         // calculate the strain energy density for breaking generations
         for (int ig=0; ig<ng; ++ig) {
             // evaluate relative deformation gradient for this generation
-            ep.m_F = (ig > 0) ? F*pt.m_Fi[ig-1] : F;
-            ep.m_J = (ig > 0) ? J*pt.m_Ji[ig-1] : J;
+            ep.m_F = (ig > 0) ? F*pt.m_Fv[ig-1].inverse() : F;
+            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond mass fraction for this generation
             w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond stress
@@ -419,24 +419,22 @@ void FEReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
     
     mat3ds D = ep.RateOfDeformation();
     
-    if (pt.m_Fi.size() < 3) return;
+    if (pt.m_Fv.size() < 3) return;
 
-    // culling termination flag
-    bool done = false;
-    
     // always check oldest generation
-    while (!done) {
-        double w = BreakingBondMassFraction(mp, 0, D);
-        if ((w > m_wmin) || (pt.m_Fi.size() == 1))
-            done = true;
-        else {
-            pt.m_Fi.pop_front();
-            pt.m_Ji.pop_front();
-            pt.m_v.pop_front();
-            pt.m_w.pop_front();
-        }
+    double w0 = BreakingBondMassFraction(mp, 0, D);
+    if (w0 < m_wmin) {
+        double w1 = BreakingBondMassFraction(mp, 1, D);
+        pt.m_v[1] = (w0*pt.m_v[0] + w1*pt.m_v[1])/(w0+w1);
+        pt.m_Fv[1] = (pt.m_Fv[0]*w0 + pt.m_Fv[1]*w1)/(w0+w1);
+        pt.m_Jv[1] = pt.m_Fv[1].det();
+        pt.m_f[1] = (w0*pt.m_f[0] + w1*pt.m_f[1])/(w0+w1);
+        pt.m_Fv.pop_front();
+        pt.m_Jv.pop_front();
+        pt.m_v.pop_front();
+        pt.m_f.pop_front();
     }
-    
+
     return;
 }
 

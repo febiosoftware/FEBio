@@ -50,14 +50,26 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 void FEReactiveVEMaterialPoint::Init()
 {
 	// initialize data to zero
-	m_Fi.clear();
-	m_Ji.clear();
+	m_Fv.clear();
+	m_Jv.clear();
 	m_v.clear();
-	m_w.clear();
+	m_f.clear();
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
 }
+
+//-----------------------------------------------------------------------------
+//! Update material point data
+void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+    if (m_pRve) m_pRve->CullGenerations(*this);
+    else if (m_pRuc) m_pRuc->CullGenerations(*this);
+    
+    // don't forget to initialize the base class
+    FEMaterialPoint::Update(timeInfo);
+}
+
 
 //-----------------------------------------------------------------------------
 //! Update material point data.
@@ -70,26 +82,21 @@ void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
 	if (m_pRve) {
 	    if (m_pRve->NewGeneration(*this)) {
             m_v.push_back(timeInfo.currentTime);
-            m_Fi.push_back(pt.m_F.inverse());
-            m_Ji.push_back(1./pt.m_J);
-            double w = (m_v.size() > 0) ? m_pRve->ReformingBondMassFraction(*this) : 1;
-			m_w.push_back(w);
-            m_pRve->CullGenerations(*this);
+            m_Fv.push_back(pt.m_F);
+            m_Jv.push_back(pt.m_J);
+            double f = (!m_v.empty()) ? m_pRve->ReformingBondMassFraction(*this) : 1;
+			m_f.push_back(f);
 		}
 	}
 	else {
 		if (m_pRuc->NewGeneration(*this)) {
             m_v.push_back(timeInfo.currentTime);
-            m_Fi.push_back(pt.m_F.inverse());
-            m_Ji.push_back(1./pt.m_J);
-            double w = (m_v.size() > 0) ? m_pRuc->ReformingBondMassFraction(*this) : 1;
-            m_w.push_back(w);
-            m_pRve->CullGenerations(*this);
+            m_Fv.push_back(pt.m_F);
+            m_Jv.push_back(pt.m_J);
+            double f = (!m_v.empty()) ? m_pRuc->ReformingBondMassFraction(*this) : 1;
+            m_f.push_back(f);
 		}
 	}
-    
-    // don't forget to initialize the base class
-    FEMaterialPoint::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,18 +107,18 @@ void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
     
     if (ar.IsSaving())
     {
-        int n = (int)m_Fi.size();
+        int n = (int)m_Fv.size();
         ar << n;
-        for (int i=0; i<n; ++i) ar << m_Fi[i] << m_Ji[i] << m_v[i] << m_w[i];
+        for (int i=0; i<n; ++i) ar << m_Fv[i] << m_Jv[i] << m_v[i] << m_f[i];
     }
     else
     {
         int n;
         ar >> n;
-		m_Fi.resize(n);
-		m_Ji.resize(n);
+		m_Fv.resize(n);
+		m_Jv.resize(n);
 		m_v.resize(n);
-		m_w.resize(n);
-        for (int i=0; i<n; ++i) ar >> m_Fi[i] >> m_Ji[i] >> m_v[i] >> m_w[i];
+		m_f.resize(n);
+        for (int i=0; i<n; ++i) ar >> m_Fv[i] >> m_Jv[i] >> m_v[i] >> m_f[i];
     }
 }
