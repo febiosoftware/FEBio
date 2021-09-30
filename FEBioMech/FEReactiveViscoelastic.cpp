@@ -165,28 +165,23 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
     
     // current time
     double time = GetFEModel()->GetTime().currentTime;
-    
+    double tv = time - pt.m_v[ig];
+
     switch (m_btype) {
         case 1:
         {
-            // time when this generation started breaking
-            double v = pt.m_v[ig];
-            
-            if (time >= v)
-                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, time - v, D);
+            if (tv >= 0)
+                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, tv, D);
         }
             break;
         case 2:
         {
-            double tu, tv;
             if (ig == 0) {
-                tv = time - pt.m_v[ig];
                 w = m_pRelx->Relaxation(mp, tv, D);
             }
             else
             {
-                tu = time - pt.m_v[ig-1];
-                tv = time - pt.m_v[ig];
+                double tu = time - pt.m_v[ig-1];
                 w = m_pRelx->Relaxation(mp, tv, D) - m_pRelx->Relaxation(mp, tu, D);
             }
         }
