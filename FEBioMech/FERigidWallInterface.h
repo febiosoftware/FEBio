@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/vector.h>
-#include "FEContactInterface.h"
+#include <FECore/FESurfaceConstraint.h>
 #include <FECore/FESurface.h>
 #include <FECore/vec3d.h>
 #include <FECore/vec2d.h>
@@ -107,11 +107,13 @@ public:
 //! This class is a specialization of the general sliding interface where
 //! the secondary surface is a rigid wall
 
-class FERigidWallInterface : public FEContactInterface
+class FERigidWallInterface : public FESurfaceConstraint
 {
 public:
 	//! constructor
 	FERigidWallInterface(FEModel* pfem);
+
+	~FERigidWallInterface();
 
 	//! intializes rigid wall interface
 	bool Init() override;
@@ -119,18 +121,15 @@ public:
 	//! interface activation
 	void Activate() override;
 
-	//! project surface nodes onto plane
-	void ProjectSurface(FERigidWallSurface& s);
-
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
 	//! return the primary and secondary surface
-	FESurface* GetPrimarySurface() override { return &m_ss; }
-	FESurface* GetSecondarySurface() override { return nullptr; }
+	FESurface* GetSurface() override { return m_ss; }
 
 	//! return integration rule class
-	bool UseNodalIntegration() override { return true; }
+	//! TODO: Need to fix this! Maybe move to FESurfaceConstraint?
+//	bool UseNodalIntegration() override { return true; }
 
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
@@ -148,10 +147,16 @@ public:
 	//! update
 	void Update() override;
 
+private:
+	//! project surface nodes onto plane
+	void ProjectSurface(FERigidWallSurface& s);
+
 public:
-	FERigidWallSurface	m_ss;		//!< primary surface
+	FERigidWallSurface*	m_ss;		//!< primary surface
+
 	FERigidPlane		m_plane;	//!< secondary surface
 
+	int			m_laugon;	//!< augmentation flag
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor
 	double		m_d;		//!< normal offset
