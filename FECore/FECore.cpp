@@ -94,7 +94,7 @@ REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
 REGISTER_FECORE_CLASS(FETimeStepController, "time_stepper");
 
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedBC      , "fix"      );
+REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
 
 // nodal loads

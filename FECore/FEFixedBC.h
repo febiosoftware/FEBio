@@ -71,6 +71,14 @@ public:
 protected:
 	std::vector<int>	m_dofs;		//!< dof list
 	FENodeSet*			m_nodeSet;
+};
 
+//-----------------------------------------------------------------------------
+// This class is obsolete, but provides a direct parameterization of the base class.
+// This is maintained for backward compatibility with older feb files.
+class FEFixedDOF : public FEFixedBC
+{
+public:
+	FEFixedDOF(FEModel* fem);
 	DECLARE_FECORE_CLASS();
 };

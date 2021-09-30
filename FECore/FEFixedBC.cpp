@@ -32,11 +32,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "DumpStream.h"
 
-BEGIN_FECORE_CLASS(FEFixedBC, FEBoundaryCondition)
-	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list)");
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
-END_FECORE_CLASS();
-
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
@@ -146,4 +141,15 @@ void FEFixedBC::SetNodeSet(FENodeSet* nodeSet)
 FENodeSet* FEFixedBC::GetNodeSet()
 {
 	return m_nodeSet;
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEFixedDOF, FEFixedBC)
+	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list)");
+	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
+END_FECORE_CLASS();
+
+FEFixedDOF::FEFixedDOF(FEModel* fem) : FEFixedBC(fem)
+{
+
 }

@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include "FEFixedFluidDilatation.h"
 #include <FECore/FEModel.h>
 
-BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEFixedBC)
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 

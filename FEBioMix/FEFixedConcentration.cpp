@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include "FEFixedConcentration.h"
 #include <FECore/FEModel.h>
 
-BEGIN_FECORE_CLASS(FEFixedConcentration, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FEFixedConcentration, FEFixedBC)
 	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:concentration)");
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
