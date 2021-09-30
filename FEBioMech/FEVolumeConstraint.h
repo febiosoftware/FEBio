@@ -65,6 +65,8 @@ public:
 	//! constructor
 	FEVolumeConstraint(FEModel* pfem);
 
+	~FEVolumeConstraint();
+
 	void Activate() override;
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
@@ -86,7 +88,9 @@ public:
 	FESurface* GetSurface() override;
 
 public:
-	FEVolumeSurface m_s;	//!< the bounding surface
+	double EnclosedVolume() const;
+
+	double Pressure() const;
 
 public:
 	double	m_eps;		//!< penalty parameter
@@ -102,6 +106,8 @@ private:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
+
+	FEVolumeSurface* m_s;	//!< the bounding surface
 
 	DECLARE_FECORE_CLASS();
 };

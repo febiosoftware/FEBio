@@ -1797,12 +1797,12 @@ double FELogRigidConnectorRotationZ::value(FENLConstraint& rc)
 double FELogVolumeConstraint::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
-    return (prc ? prc->m_s.m_Vt : 0);
+    return (prc ? prc->EnclosedVolume() : 0);
 }
 
 //-----------------------------------------------------------------------------
 double FELogVolumePressure::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
-    return (prc ? prc->m_s.m_p : 0);
+    return (prc ? prc->Pressure() : 0);
 }
