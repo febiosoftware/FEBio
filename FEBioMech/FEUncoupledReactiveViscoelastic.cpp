@@ -43,6 +43,7 @@ BEGIN_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin"    );
 	ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1, 2), "kinetics");
 	ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0, 2), "trigger" );
+    ADD_PARAMETER(m_emin , FE_RANGE_GREATER_OR_EQUAL(0.0), "emin");
 
 	// set material properties
 	ADD_PROPERTY(m_pBase, "elastic");
@@ -58,6 +59,9 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
     m_wmin = 0;
     m_btype = 0;
     m_ttype = 0;
+    m_emin = 0;
+
+    m_nmax = 0;
 
 	m_pBase = 0;
 	m_pBond = 0;
@@ -76,8 +80,8 @@ FEMaterialPoint* FEUncoupledReactiveViscoelasticMaterial::CreateMaterialPointDat
 bool FEUncoupledReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
 {
     double d;
-    double eps = 10*std::numeric_limits<double>::epsilon();
-    
+    double eps = max(m_emin, 10*std::numeric_limits<double>::epsilon());
+
     // get the elastic material point data
     FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -145,28 +149,23 @@ double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMater
     
     // current time
     double time = GetFEModel()->GetTime().currentTime;
-    
+    double tv = time - pt.m_v[ig];
+
     switch (m_btype) {
         case 1:
         {
-            // time when this generation started breaking
-            double v = pt.m_v[ig];
-            
-            if (time >= v)
-                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, time - v, D);
+            if (tv >= 0)
+                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, tv, D);
         }
             break;
         case 2:
         {
-            double tu, tv;
             if (ig == 0) {
-                tv = time - pt.m_v[ig];
                 w = m_pRelx->Relaxation(mp, tv, D);
             }
             else
             {
-                tu = time - pt.m_v[ig-1];
-                tv = time - pt.m_v[ig];
+                double tu = time - pt.m_v[ig-1];
                 w = m_pRelx->Relaxation(mp, tv, D) - m_pRelx->Relaxation(mp, tu, D);
             }
         }
@@ -398,7 +397,14 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
     
     mat3ds D = ep.RateOfDeformation();
     
-    if (pt.m_Fv.size() < 3) return;
+    int ng = (int)pt.m_v.size();
+    m_nmax = max(m_nmax, ng);
+    
+    // don't cull if we have too few generations
+    if (ng < 3) return;
+    
+    // don't reduce number of generations to less than max value achieved so far
+    if (ng < m_nmax) return;
 
     // always check oldest generation
     double w0 = BreakingBondMassFraction(mp, 0, D);

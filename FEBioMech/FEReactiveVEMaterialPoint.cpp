@@ -60,18 +60,6 @@ void FEReactiveVEMaterialPoint::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Update material point data
-void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
-{
-    if (m_pRve) m_pRve->CullGenerations(*this);
-    else if (m_pRuc) m_pRuc->CullGenerations(*this);
-    
-    // don't forget to initialize the base class
-    FEMaterialPoint::Update(timeInfo);
-}
-
-
-//-----------------------------------------------------------------------------
 //! Update material point data.
 void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
 {
@@ -86,6 +74,7 @@ void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
             m_Jv.push_back(pt.m_J);
             double f = (!m_v.empty()) ? m_pRve->ReformingBondMassFraction(*this) : 1;
 			m_f.push_back(f);
+            m_pRve->CullGenerations(*this);
 		}
 	}
 	else {
@@ -95,6 +84,7 @@ void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
             m_Jv.push_back(pt.m_J);
             double f = (!m_v.empty()) ? m_pRuc->ReformingBondMassFraction(*this) : 1;
             m_f.push_back(f);
+            m_pRuc->CullGenerations(*this);
 		}
 	}
 }

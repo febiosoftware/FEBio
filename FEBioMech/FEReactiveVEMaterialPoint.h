@@ -51,9 +51,6 @@ public:
     void Init() override;
 
     //! Update material point data
-    void Update(const FETimeInfo& timeInfo) override;
-    
-    //! Update material point data
     void UpdateGenerations(const FETimeInfo& timeInfo);
     
     //! Serialize data to archive

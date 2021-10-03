@@ -365,8 +365,11 @@ END_FECORE_CLASS();
 //! Constructor.
 FEBondRelaxationProny::FEBondRelaxationProny(FEModel* pfem) : FEBondRelaxation(pfem)
 {
-    m_t[0] = m_t[1] = m_t[2] = m_t[3] = m_t[4] = m_t[5] = 1.0;
-    m_g[0] = m_g[1] = m_g[2] = m_g[3] = m_g[4] = m_g[5] = 0.0;
+    for (int i=0; i<MAX_TERMS; ++i)
+    {
+        m_t[i] = 1;
+        m_g[i] = 0;
+    }
     m_sg = 0.0;
 }
 
@@ -375,6 +378,7 @@ FEBondRelaxationProny::FEBondRelaxationProny(FEModel* pfem) : FEBondRelaxation(p
 bool FEBondRelaxationProny::Validate()
 {
     if (FEBondRelaxation::Validate() == false) return false;
+    m_sg = 0;
     for (int i=0; i<MAX_TERMS; ++i) m_sg += m_g[i];
     if (m_sg <= 0) return false;
     return true;
