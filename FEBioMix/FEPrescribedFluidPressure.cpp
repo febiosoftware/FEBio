@@ -25,8 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPrescribedFluidPressure.h"
-#include <FECore/FEModel.h>
-#include <FECore/DOFS.h>
 
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
@@ -34,19 +32,21 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedFluidPressure, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
+	ADD_PARAMETER(m_shellBottom, "shell_bottom");
+	
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedFluidPressure::FEPrescribedFluidPressure(FEModel* fem) : FEPrescribedDOF(fem)
 {
-	
+	m_shellBottom = false;
 }
 
 bool FEPrescribedFluidPressure::Init()
 {
-	FEModel* fem = GetFEModel();
-	int ndof = fem->GetDOFIndex("p");
-	assert(ndof >= 0);
-	SetDOF(ndof);
+	if (m_shellBottom == false)
+		if (SetDOF("p") == false) return false;
+	else
+		if (SetDOF("q") == false) return false;
 	return FEPrescribedDOF::Init();
 }

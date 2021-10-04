@@ -35,10 +35,13 @@ BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FEBoundaryCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:displacement)");
 	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
+	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedDisplacement::FEPrescribedDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
 {
+	// TODO: Need to figure out how to actually get to the shell dofs!
+	m_shellBottom = false;
 }

@@ -23,15 +23,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEFixedShellDisplacement.h"
-#include <FECore/FEModel.h>
+#pragma once
+#include <FECore/FEInitialCondition.h>
 
-BEGIN_FECORE_CLASS(FEFixedShellDisplacement, FEFixedBC)
-	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:shell displacement)");
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
-END_FECORE_CLASS();
-
-FEFixedShellDisplacement::FEFixedShellDisplacement(FEModel* fem) : FEFixedBC(fem)
+class FEInitialConcentration : public FEInitialDOF
 {
-}
+public:
+	FEInitialConcentration(FEModel* fem);
+	DECLARE_FECORE_CLASS();
+
+private:
+	bool	m_shellBottom;
+};

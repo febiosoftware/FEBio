@@ -30,5 +30,9 @@ class FEPrescribedDisplacement : public FEPrescribedDOF
 {
 public:
 	FEPrescribedDisplacement(FEModel* fem);
+
+private:
+	bool	m_shellBottom;
+
 	DECLARE_FECORE_CLASS();
 };

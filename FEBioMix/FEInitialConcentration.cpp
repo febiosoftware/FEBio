@@ -23,13 +23,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEPrescribedDOF.h>
+#include "FEInitialConcentration.h"
 
-class FEPrescribedShellDisplacement : public FEPrescribedDOF
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
+	ADD_PARAMETER(m_data, "value");
+	ADD_PARAMETER(m_shellBottom, "shell_bottom");
+END_FECORE_CLASS();
+
+FEInitialConcentration::FEInitialConcentration(FEModel* fem) : FEInitialDOF(fem)
 {
-public:
-	FEPrescribedShellDisplacement(FEModel* fem);
-	DECLARE_FECORE_CLASS();
-};
-
+	// TODO: I need to figure out a way to actually select the bottom concentration dofs!
+	m_shellBottom = false;
+}

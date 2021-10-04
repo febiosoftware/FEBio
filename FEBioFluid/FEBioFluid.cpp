@@ -72,6 +72,7 @@ SOFTWARE.*/
 #include "FEPrescribedFluidVelocity.h"
 #include "FEFixedFluidDilatation.h"
 #include "FEPrescribedFluidDilatation.h"
+#include "FEInitialFluidDilatation.h"
 
 #include "FEFluidModule.h"
 
@@ -156,6 +157,10 @@ REGISTER_FECORE_CLASS(FEPrescribedFluidVelocity     , "prescribed fluid velocity
 REGISTER_FECORE_CLASS(FEFixedFluidDilatation        , "zero fluid dilatation");
 REGISTER_FECORE_CLASS(FEPrescribedFluidDilatation   , "prescribed fluid dilatation");
 REGISTER_FECORE_CLASS(FEFluidRotationalVelocity     , "fluid rotational velocity");
+
+//-----------------------------------------------------------------------------
+// initial conditions
+REGISTER_FECORE_CLASS(FEInitialFluidDilatation, "initial fluid dilatation");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

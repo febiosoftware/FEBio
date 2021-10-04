@@ -24,17 +24,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEPrescribedDOF.h>
-#include "febiomix_api.h"
+#include <FECore/FEInitialCondition.h>
 
-class FEBIOMIX_API FEPrescribedFluidPressure : public FEPrescribedDOF
+class FEInitialFluidPressure : public FEInitialDOF
 {
 public:
-	FEPrescribedFluidPressure(FEModel* fem);
+	FEInitialFluidPressure(FEModel* fem);
 	bool Init() override;
+
+	DECLARE_FECORE_CLASS();
 
 private:
 	bool	m_shellBottom;
-
-	DECLARE_FECORE_CLASS();
 };

@@ -23,18 +23,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEPrescribedDOF.h>
-#include "febiomix_api.h"
+#include "FEInitialFluidPressure.h"
 
-class FEBIOMIX_API FEPrescribedFluidPressure : public FEPrescribedDOF
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialFluidPressure, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
+	ADD_PARAMETER(m_shellBottom, "shell_bottom");
+END_FECORE_CLASS();
+
+FEInitialFluidPressure::FEInitialFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
-public:
-	FEPrescribedFluidPressure(FEModel* fem);
-	bool Init() override;
+	m_shellBottom = false;
+}
 
-private:
-	bool	m_shellBottom;
+bool FEInitialFluidPressure::Init()
+{
+	if (m_shellBottom == false)
+		if (SetDOF("p") == false) return false;
+	else
+		if (SetDOF("q") == false) return false;
 
-	DECLARE_FECORE_CLASS();
-};
+	return FEInitialDOF::Init();
+}

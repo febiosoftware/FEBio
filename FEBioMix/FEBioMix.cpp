@@ -112,6 +112,10 @@ SOFTWARE.*/
 #include "FEPrescribedFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
+
+#include "FEInitialFluidPressure.h"
+#include "FEInitialConcentration.h"
+
 #include "FEBiphasicModule.h"
 
 //-----------------------------------------------------------------------------
@@ -177,6 +181,11 @@ void FEBioMix::InitModule()
 	// Boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedFluidPressure     , "zero fluid pressure");
 	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure, "prescribed fluid pressure");
+
+	//-----------------------------------------------------------------------------
+	// Initial conditions
+	REGISTER_FECORE_CLASS(FEInitialFluidPressure     , "initial fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
 
 	//-----------------------------------------------------------------------------
 	// Surface loads

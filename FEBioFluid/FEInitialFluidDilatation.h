@@ -24,11 +24,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEFixedBC.h>
+#include <FECore/FEInitialCondition.h>
 
-class FEFixedShellDisplacement : public FEFixedBC
+class FEInitialFluidDilatation : public FEInitialDOF
 {
 public:
-	FEFixedShellDisplacement(FEModel* fem);
+	FEInitialFluidDilatation(FEModel* fem);
+	bool Init() override;
+
 	DECLARE_FECORE_CLASS();
 };

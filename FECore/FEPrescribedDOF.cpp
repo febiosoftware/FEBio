@@ -61,6 +61,17 @@ void FEPrescribedDOF::SetDOF(int ndof)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPrescribedDOF::SetDOF(const char* szdof)
+{
+	FEModel* fem = GetFEModel();
+	int ndof = fem->GetDOFIndex(szdof);
+	assert(ndof >= 0);
+	if (ndof < 0) return false;
+	SetDOF(ndof);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Sets the displacement scale factor. An optional load curve index can be given
 // of the load curve that will control the scale factor.
 FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)

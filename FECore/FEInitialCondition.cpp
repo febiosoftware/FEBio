@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "FEMaterialPoint.h"
 #include "FENode.h"
+#include "FEModel.h"
 
 REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
 
@@ -135,6 +136,17 @@ FEInitialDOF::FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset) : FENodalIC(
 
 //-----------------------------------------------------------------------------
 void FEInitialDOF::SetDOF(int ndof) { m_dof = ndof; }
+
+//-----------------------------------------------------------------------------
+bool FEInitialDOF::SetDOF(const char* szdof)
+{
+	FEModel* fem = GetFEModel();
+	int ndof = fem->GetDOFIndex(szdof);
+	assert(ndof >= 0);
+	if (ndof < 0) return false;
+	SetDOF(ndof);
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 bool FEInitialDOF::Init()

@@ -23,22 +23,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEPrescribedShellDisplacement.h"
-#include <FECore/FEModel.h>
-#include <FECore/DOFS.h>
+#include "FEInitialFluidDilatation.h"
 
-//=======================================================================================
-// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
-//       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedShellDisplacement, FEBoundaryCondition)
-	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:shell displacement)");
-	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
-	ADD_PARAMETER(m_brelative, "relative");
-
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialFluidDilatation, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEPrescribedShellDisplacement::FEPrescribedShellDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
+FEInitialFluidDilatation::FEInitialFluidDilatation(FEModel* fem) : FEInitialDOF(fem)
 {
+}
+
+bool FEInitialFluidDilatation::Init()
+{
+	if (SetDOF("ef") == false) return false;
+	return FEInitialDOF::Init();
 }

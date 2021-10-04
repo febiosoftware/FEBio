@@ -39,6 +39,7 @@ public:
 	FEPrescribedDOF(FEModel* pfem, int dof, FENodeSet* nset);
 
 	void SetDOF(int ndof);
+	bool SetDOF(const char* szdof);
 
 	FEPrescribedDOF& SetScale(double s, int lc = -1);
 

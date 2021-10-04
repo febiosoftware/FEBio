@@ -89,6 +89,7 @@ public:
 	FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset);
 
 	void SetDOF(int ndof);
+	bool SetDOF(const char* szdof);
 
 	void Serialize(DumpStream& ar) override;
 
@@ -99,7 +100,7 @@ public:
 
 	void SetValue(double v);
 
-private:
+protected:
 	int				m_dof;		//!< degree of freedom
 	FEParamDouble	m_data;		//!< nodal values
 

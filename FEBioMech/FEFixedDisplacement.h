@@ -30,5 +30,9 @@ class FEFixedDisplacement : public FEFixedBC
 {
 public:
 	FEFixedDisplacement(FEModel* fem);
+
+private:
+	bool	m_shellBottom;
+
 	DECLARE_FECORE_CLASS();
 };
