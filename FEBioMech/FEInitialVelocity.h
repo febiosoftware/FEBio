@@ -45,6 +45,7 @@ public:
 
 private:
 	FEParamVec3		m_v0;
+	bool			m_shellBottom;
 
 	DECLARE_FECORE_CLASS();
 };

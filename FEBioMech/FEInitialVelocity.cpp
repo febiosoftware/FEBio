@@ -33,11 +33,13 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEInitialVelocity, FENodalIC)
 	ADD_PARAMETER(m_v0, "value");
+	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
 
 FEInitialVelocity::FEInitialVelocity(FEModel* fem) : FENodalIC(fem)
 {
 	m_v0 = vec3d(0, 0, 0);
+	m_shellBottom = false;
 }
 
 // set the initial value
@@ -49,8 +51,9 @@ void FEInitialVelocity::SetValue(const vec3d& v0)
 // initialization
 bool FEInitialVelocity::Init()
 {
+	FEBioMech::MECH_VARIABLE var = (m_shellBottom ? FEBioMech::SHELL_VELOCITY : FEBioMech::VELOCTIY);
 	FEDofList dofs(GetFEModel());
-	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY)) == false) return false;
+	if (dofs.AddVariable(FEBioMech::GetVariableName(var)) == false) return false;
 	SetDOFList(dofs);
 	return true;
 }
