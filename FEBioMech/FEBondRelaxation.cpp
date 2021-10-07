@@ -144,6 +144,8 @@ double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t, con
     else
         g = 1;
     
+    if (g < 0) g = 0;
+    
     return g;
 }
 
@@ -332,6 +334,64 @@ double FEBondRelaxationCarreau::Relaxation(FEMaterialPoint& mp, const double t, 
     double tau = m_tau0*pow(1+pow(m_lam*gdot,2),(m_n-1)/2.);
     
     g = exp(-t/tau);
+    
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationProny
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRelaxationProny, FEBondRelaxation)
+    // material parameters
+    ADD_PARAMETER(m_t[0], FE_RANGE_GREATER_OR_EQUAL(0.0), "t1");
+    ADD_PARAMETER(m_t[1], FE_RANGE_GREATER_OR_EQUAL(0.0), "t2");
+    ADD_PARAMETER(m_t[2], FE_RANGE_GREATER_OR_EQUAL(0.0), "t3");
+    ADD_PARAMETER(m_t[3], FE_RANGE_GREATER_OR_EQUAL(0.0), "t4");
+    ADD_PARAMETER(m_t[4], FE_RANGE_GREATER_OR_EQUAL(0.0), "t5");
+    ADD_PARAMETER(m_t[5], FE_RANGE_GREATER_OR_EQUAL(0.0), "t6");
+    ADD_PARAMETER(m_g[0], FE_RANGE_CLOSED(0.0, 1.0)     , "g1");
+    ADD_PARAMETER(m_g[1], FE_RANGE_CLOSED(0.0, 1.0)     , "g2");
+    ADD_PARAMETER(m_g[2], FE_RANGE_CLOSED(0.0, 1.0)     , "g3");
+    ADD_PARAMETER(m_g[3], FE_RANGE_CLOSED(0.0, 1.0)     , "g4");
+    ADD_PARAMETER(m_g[4], FE_RANGE_CLOSED(0.0, 1.0)     , "g5");
+    ADD_PARAMETER(m_g[5], FE_RANGE_CLOSED(0.0, 1.0)     , "g6");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationProny::FEBondRelaxationProny(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+    for (int i=0; i<MAX_TERMS; ++i)
+    {
+        m_t[i] = 1;
+        m_g[i] = 0;
+    }
+    m_sg = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialization.
+bool FEBondRelaxationProny::Validate()
+{
+    if (FEBondRelaxation::Validate() == false) return false;
+    m_sg = 0;
+    for (int i=0; i<MAX_TERMS; ++i) m_sg += m_g[i];
+    if (m_sg <= 0) return false;
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationProny::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    // --- Prony series ---
+    double g = 0;
+    for (int i=0; i<MAX_TERMS; ++i) g += m_g[i]*exp(-t/m_t[i]);
+    g /= m_sg;
     
     return g;
 }

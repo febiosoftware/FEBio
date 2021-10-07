@@ -216,3 +216,31 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+// This class implements Prony series exponential relaxation with constant relaxation time
+
+class FEBondRelaxationProny : public FEBondRelaxation
+{
+public:
+    enum { MAX_TERMS = 6 };
+
+public:
+    //! constructor
+    FEBondRelaxationProny(FEModel* pfem);
+    
+    //! data initialization and checking
+    bool Validate() override;
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
+    
+public:
+    double  m_g[MAX_TERMS];     //!< viscoelastic coefficients
+    double  m_t[MAX_TERMS];     //!< relaxation times
+    double  m_sg;               //!< sum of viscoelastic coefficients
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+

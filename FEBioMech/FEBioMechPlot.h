@@ -1043,3 +1043,13 @@ private:
 	std::string	m_prop;
 	int			m_propIndex;
 };
+
+//-----------------------------------------------------------------------------
+//! Number of generations in reactive viscoelastic material point
+class FEPlotRVEgenerations : public FEPlotDomainData
+{
+public:
+    FEPlotRVEgenerations(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

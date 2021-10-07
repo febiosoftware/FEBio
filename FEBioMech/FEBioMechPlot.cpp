@@ -62,6 +62,7 @@ SOFTWARE.*/
 #include "FESlidingInterface.h"
 #include "FESlidingElasticInterface.h"
 #include "FETiedContactSurface.h"
+#include "FEReactiveVEMaterialPoint.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -3647,4 +3648,27 @@ bool FEPlotContinuousDamageGamma::Save(FEDomain& dom, FEDataStream& a)
 	}
 
 	return true;
+}
+
+//=============================================================================
+//! Store the number of reactive viscoelasticity generations
+class FERVEgenerations
+{
+public:
+    double operator()(const FEMaterialPoint& mp)
+    {
+        const FEReactiveVEMaterialPoint* pt = mp.ExtractData<FEReactiveVEMaterialPoint>();
+        if (pt == 0) return 0;
+            
+        return pt->m_v.size();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotRVEgenerations::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<double>(dom, a, FERVEgenerations());
+    return true;
 }

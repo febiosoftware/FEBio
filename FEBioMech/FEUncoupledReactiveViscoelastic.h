@@ -91,6 +91,9 @@ public:
     double	m_wmin;		//!< minimum value of relaxation
     int     m_btype;    //!< bond kinetics type
     int     m_ttype;    //!< bond breaking trigger type
+    double  m_emin;     //!< strain threshold for triggering new generation
+
+    int     m_nmax;     //!< highest number of generations achieved in analysis
     
     DECLARE_FECORE_CLASS();
 };

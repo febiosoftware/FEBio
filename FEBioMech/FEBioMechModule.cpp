@@ -444,6 +444,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEBondRelaxationPower, "relaxation-power");
 	REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistortion, "relaxation-power-distortion");
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
+    REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
 
 	// damage cumulative distribution functions (used by damage materials)
 	REGISTER_FECORE_CLASS(FEDamageCDFSimo, "CDF Simo");
@@ -708,6 +709,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2s, "continuous damage D2s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageBeta, "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageGamma, "continuous damage gamma");
+	REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "stress norm");
 
 	//-----------------------------------------------------------------------------
