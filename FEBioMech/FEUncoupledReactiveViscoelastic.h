@@ -57,13 +57,19 @@ public:
     
     //! stress function
     mat3ds DevStress(FEMaterialPoint& pt) override;
-    
+    mat3ds DevStressStrongBonds(FEMaterialPoint& pt);
+    mat3ds DevStressWeakBonds(FEMaterialPoint& pt);
+
     //! tangent function
     tens4ds DevTangent(FEMaterialPoint& pt) override;
-    
+    tens4ds DevTangentStrongBonds(FEMaterialPoint& pt);
+    tens4ds DevTangentWeakBonds(FEMaterialPoint& pt);
+
     //! strain energy density function
     double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
-    
+    double DevStrainEnergyDensityStrongBonds(FEMaterialPoint& pt);
+    double DevStrainEnergyDensityWeakBonds(FEMaterialPoint& pt);
+
     //! cull generations
     void CullGenerations(FEMaterialPoint& pt);
     

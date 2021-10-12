@@ -92,9 +92,9 @@ bool FEUncoupledReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
     // the last generation, in which case store the current state
     // evaluate the relative deformation gradient
     mat3d F = pe.m_F;
-    int lg = (int)pt.m_Fv.size() - 1;
-    mat3d Fi = (lg > -1) ? pt.m_Fv[lg].inverse() : mat3d(mat3dd(1));
-    mat3d Fu = F*Fi;
+    int lg = (int)pt.m_Uv.size() - 1;
+    mat3ds Ui = (lg > -1) ? pt.m_Uv[lg].inverse() : mat3dd(1);
+    mat3d Fu = F*Ui;
     
     switch (m_ttype) {
         case 0:
@@ -197,15 +197,15 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
     double J = ep.m_J;
     
     // get current number of generations
-    int ng = (int)pt.m_Fv.size();
+    int ng = (int)pt.m_Uv.size();
     
     double w = 1;
     
     for (int ig=0; ig<ng-1; ++ig)
     {
-        // evaluate relative deformation gradient for this generation Fu(v)
-        ep.m_F = (ig > 0) ? pt.m_Fv[ig]*pt.m_Fv[ig-1].inverse() : pt.m_Fv[ig];
-        ep.m_J = (ig > 0) ? pt.m_Jv[ig]/pt.m_Jv[ig-1] : pt.m_Jv[ig];
+        // evaluate deformation gradient when this generation starts breaking
+        ep.m_F = pt.m_Uv[ig];
+        ep.m_J = pt.m_Jv[ig];
         // evaluate the breaking bond mass fraction for this generation
         w -= BreakingBondMassFraction(mp, ig, D);
     }
@@ -221,11 +221,19 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
 }
 
 //-----------------------------------------------------------------------------
-//! Stress function
-mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
+//! Stress function in strong bonds
+mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStressStrongBonds(FEMaterialPoint& mp)
 {
-	double dt = GetFEModel()->GetTime().timeIncrement;
-	if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+    // calculate the base material Cauchy stress
+    return m_pBase->DevStress(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! Stress function in weak bonds
+mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStressWeakBonds(FEMaterialPoint& mp)
+{
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -236,10 +244,10 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
     mat3ds D = ep.RateOfDeformation();
     
     // calculate the base material Cauchy stress
-    mat3ds s = m_pBase->DevStress(mp);
+    mat3ds s; s.zero();
     
     // current number of breaking generations
-    int ng = (int)pt.m_Fv.size();
+    int ng = (int)pt.m_Uv.size();
     
     // no bonds have broken
     if (ng == 0) {
@@ -256,11 +264,13 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
         
         // calculate the bond stresses for breaking generations
         for (int ig=0; ig<ng; ++ig) {
-            // evaluate relative deformation gradient for this generation
-            ep.m_F = (ig > 0) ? F*pt.m_Fv[ig-1].inverse() : F;
-            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond mass fraction for this generation
+            ep.m_F = pt.m_Uv[ig];
+            ep.m_J = pt.m_Jv[ig];
             w = BreakingBondMassFraction(mp, ig, D);
+            // evaluate relative deformation gradient for this generation
+            ep.m_F = (ig > 0) ? F*pt.m_Uv[ig-1].inverse() : F;
+            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond stress
             sb = m_pBond->DevStress(mp);
             // add bond stress to total stress
@@ -272,13 +282,32 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
         ep.m_J = J;
     }
     
+    return s;
+}
+
+//-----------------------------------------------------------------------------
+//! Stress function
+mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
+{
+    // calculate the base material Cauchy stress
+    mat3ds s = DevStressStrongBonds(mp);
+    s+= DevStressWeakBonds(mp);
+    
     // return the total Cauchy stress
     return s;
 }
 
 //-----------------------------------------------------------------------------
-//! Material tangent
-tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
+//! Material tangent in strong bonds
+tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangentStrongBonds(FEMaterialPoint& mp)
+{
+    // calculate the base material tangent
+    return m_pBase->DevTangent(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! Material tangent in weak bonds
+tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangentWeakBonds(FEMaterialPoint& mp)
 {
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -289,10 +318,10 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
     mat3ds D = ep.RateOfDeformation();
     
     // calculate the base material tangent
-    tens4ds c = m_pBase->DevTangent(mp);
+    tens4ds c; c.zero();
     
     // current number of breaking generations
-    int ng = (int)pt.m_Fv.size();
+    int ng = (int)pt.m_Uv.size();
     
     // no bonds have broken
     if (ng == 0) {
@@ -309,11 +338,13 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
         
         // calculate the bond tangents for breaking generations
         for (int ig=0; ig<ng; ++ig) {
-            // evaluate relative deformation gradient for this generation
-            ep.m_F = (ig > 0) ? F*pt.m_Fv[ig-1].inverse() : F;
-            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond mass fraction for this generation
+            ep.m_F = pt.m_Uv[ig];
+            ep.m_J = pt.m_Jv[ig];
             w = BreakingBondMassFraction(mp, ig, D);
+            // evaluate relative deformation gradient for this generation
+            ep.m_F = (ig > 0) ? F*pt.m_Uv[ig-1].inverse() : F;
+            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond tangent
             cb = m_pBond->DevTangent(mp);
             // add bond tangent to total tangent
@@ -325,16 +356,34 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
         ep.m_J = J;
     }
     
+    return c;
+}
+
+//-----------------------------------------------------------------------------
+//! Material tangent
+tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
+{
+    tens4ds c = DevTangentStrongBonds(mp);
+    c+= DevTangentWeakBonds(mp);
+    
     // return the total tangent
     return c;
 }
 
 //-----------------------------------------------------------------------------
-//! strain energy density function
-double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
+//! strain energy density function for weak bonds
+double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensityStrongBonds(FEMaterialPoint& mp)
 {
-	double dt = GetFEModel()->GetTime().timeIncrement;
-	if (dt == 0) return 0;
+    // calculate the base material strain energy density
+    return m_pBase->DevStrainEnergyDensity(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! strain energy density function
+double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensityWeakBonds(FEMaterialPoint& mp)
+{
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    if (dt == 0) return 0;
     
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -344,11 +393,10 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
     
     mat3ds D = ep.RateOfDeformation();
     
-    // calculate the base material Cauchy stress
-    double sed = m_pBase->DevStrainEnergyDensity(mp);
+    double sed = 0;
     
     // current number of breaking generations
-    int ng = (int)pt.m_Fv.size();
+    int ng = (int)pt.m_Uv.size();
     
     // no bonds have broken
     if (ng == 0) {
@@ -365,11 +413,13 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
         
         // calculate the strain energy density for breaking generations
         for (int ig=0; ig<ng; ++ig) {
-            // evaluate relative deformation gradient for this generation
-            ep.m_F = (ig > 0) ? F*pt.m_Fv[ig-1].inverse() : F;
-            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond mass fraction for this generation
+            ep.m_F = pt.m_Uv[ig];
+            ep.m_J = pt.m_Jv[ig];
             w = BreakingBondMassFraction(mp, ig, D);
+            // evaluate relative deformation gradient for this generation
+            ep.m_F = (ig > 0) ? F*pt.m_Uv[ig-1].inverse() : F;
+            ep.m_J = (ig > 0) ? J/pt.m_Jv[ig-1] : J;
             // evaluate bond stress
             sedb = m_pBond->DevStrainEnergyDensity(mp);
             // add bond stress to total stress
@@ -381,7 +431,17 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
         ep.m_J = J;
     }
     
-    // return the total Cauchy stress
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! strain energy density function
+double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = DevStrainEnergyDensityStrongBonds(mp);
+    sed += DevStrainEnergyDensityWeakBonds(mp);
+    
+    // return the total strain energy density
     return sed;
 }
 
@@ -411,10 +471,10 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
     if (w0 < m_wmin) {
         double w1 = BreakingBondMassFraction(mp, 1, D);
         pt.m_v[1] = (w0*pt.m_v[0] + w1*pt.m_v[1])/(w0+w1);
-        pt.m_Fv[1] = (pt.m_Fv[0]*w0 + pt.m_Fv[1]*w1)/(w0+w1);
-        pt.m_Jv[1] = pt.m_Fv[1].det();
+        pt.m_Uv[1] = (pt.m_Uv[0]*w0 + pt.m_Uv[1]*w1)/(w0+w1);
+        pt.m_Jv[1] = pt.m_Uv[1].det();
         pt.m_f[1] = (w0*pt.m_f[0] + w1*pt.m_f[1])/(w0+w1);
-        pt.m_Fv.pop_front();
+        pt.m_Uv.pop_front();
         pt.m_Jv.pop_front();
         pt.m_v.pop_front();
         pt.m_f.pop_front();
@@ -429,8 +489,6 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
 {
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
-    
-    // if new generation not already created for current time, check if it should
-    if (pt.m_v.empty() || (pt.m_v.back() < tp.currentTime))
-        pt.UpdateGenerations(tp);
+
+    pt.UpdateGenerations(tp);
 }
