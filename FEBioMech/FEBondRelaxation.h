@@ -27,7 +27,8 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for bond relaxation of reactive viscoelastic materials.
@@ -76,9 +77,29 @@ public:
     double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
-    double	m_tau0;     //!< relaxation time
-    double	m_tau1;     //!< relaxation time coeff. of 2nd term
+    double  m_tau0;     //!< relaxation time
+    double  m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_alpha;    //!< exponent of 2nd term for tau
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements exponential relaxation with a relaxation
+// time that is a function of the distortional strain
+
+class FEBondRelaxationExpDistUser : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationExpDistUser(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
+    
+public:
+    FEFunction1D*   m_tau;      //!< relaxation time
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
@@ -141,11 +162,32 @@ public:
     double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
-    double	m_tau0;      //!< relaxation time
-    double	m_tau1;     //!< relaxation time coeff. of 2nd term
+    double  m_tau0;      //!< relaxation time
+    double  m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_beta0;     //!< exponent
     double  m_beta1;    //!< coefficient of 2nd for beta
     double  m_alpha;    //!< exponent of 2nd term for tau and beta
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements Park's relaxation with a relaxation
+// time that is a function of the distortional strain
+
+class FEBondRelaxationParkDistUser : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationParkDistUser(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
+    
+public:
+    FEFunction1D*   m_tau;      //!< relaxation time
+    FEFunction1D*   m_beta;     //!< exponent
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
@@ -185,11 +227,32 @@ public:
     double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
-    double	m_tau0;      //!< relaxation time at zero strain
+    double  m_tau0;      //!< relaxation time at zero strain
     double  m_beta0;     //!< exponent of relaxation power law
-    double	m_tau1;     //!< relaxation time coeff. of 2nd term
+    double  m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_beta1;    //!< coefficient of 2nd for beta
     double  m_alpha;    //!< exponent of 2nd term
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements a power-law relaxation with a relaxation
+// time that is a function of the distortional strain
+
+class FEBondRelaxationPowerDistUser : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationPowerDistUser(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
+    
+public:
+    FEFunction1D*   m_tau;      //!< relaxation time
+    FEFunction1D*   m_beta;     //!< exponent
     
     // declare parameter list
     DECLARE_FECORE_CLASS();

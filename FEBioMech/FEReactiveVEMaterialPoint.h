@@ -58,9 +58,9 @@ public:
     
 public:
     // multigenerational material data
-    deque <mat3d>  m_Fv;	//!< relative deformation gradient
-    deque <double> m_Jv;	//!< determinant of Fv (store for efficiency)
-    deque <double> m_v;     //!< time when generation starts breaking
+    deque <mat3ds> m_Uv;	//!< right stretch tensor at tv (when generation u starts breaking)
+    deque <double> m_Jv;	//!< determinant of Uv (store for efficiency)
+    deque <double> m_v;     //!< time tv when generation starts breaking
     deque <double> m_f;     //!< mass fraction when generation starts breaking
     FEReactiveViscoelasticMaterial*  m_pRve; //!< pointer to parent material
     FEUncoupledReactiveViscoelasticMaterial*  m_pRuc; //!< pointer to parent material

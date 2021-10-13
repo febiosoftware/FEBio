@@ -438,11 +438,14 @@ void FEBioMech::InitModule()
 	// bond relaxation materials (used by reactive visco-elastic materials)
 	REGISTER_FECORE_CLASS(FEBondRelaxationExponential, "relaxation-exponential");
 	REGISTER_FECORE_CLASS(FEBondRelaxationExpDistortion, "relaxation-exp-distortion");
+    REGISTER_FECORE_CLASS(FEBondRelaxationExpDistUser, "relaxation-exp-dist-user");
 	REGISTER_FECORE_CLASS(FEBondRelaxationFung, "relaxation-Fung");
 	REGISTER_FECORE_CLASS(FEBondRelaxationPark, "relaxation-Park");
 	REGISTER_FECORE_CLASS(FEBondRelaxationParkDistortion, "relaxation-Park-distortion");
+    REGISTER_FECORE_CLASS(FEBondRelaxationParkDistUser, "relaxation-Park-dist-user");
 	REGISTER_FECORE_CLASS(FEBondRelaxationPower, "relaxation-power");
 	REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistortion, "relaxation-power-distortion");
+    REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistUser, "relaxation-power-dist-user");
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
     REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
 
@@ -709,8 +712,15 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2s, "continuous damage D2s");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageBeta, "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamageGamma, "continuous damage gamma");
-	REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
-	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "stress norm");
+    REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
+    REGISTER_FECORE_CLASS(FEPlotRVEStrongBondSED, "RVE strong bond SED");
+    REGISTER_FECORE_CLASS(FEPlotRVEWeakBondSED, "RVE weak bond SED");
+    REGISTER_FECORE_CLASS(FEPlotRVEStrongBondDevSED, "RVE strong bond deviatoric SED");
+    REGISTER_FECORE_CLASS(FEPlotRVEWeakBondDevSED, "RVE weak bond deviatoric SED");
+
+
+	// 2O continuum fields
+	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FENodeLogData
