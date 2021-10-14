@@ -526,9 +526,12 @@ bool FECoreKernel::SetModuleDependency(const char* szmodule)
 
 //-----------------------------------------------------------------------------
 //! Register a new domain class
-void FECoreKernel::RegisterDomain(FEDomainFactory* pf)
+void FECoreKernel::RegisterDomain(FEDomainFactory* pf, bool pushFront)
 {
-	m_Dom.push_back(pf); 
+	if (pushFront)
+		m_Dom.insert(m_Dom.begin(), pf);
+	else
+		m_Dom.push_back(pf); 
 }
 
 //-----------------------------------------------------------------------------
