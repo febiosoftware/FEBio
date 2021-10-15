@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR FEBioRVE)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -181,8 +182,6 @@ macro(findHdrSrc name)
 endmacro()
 
 findHdrSrc(FEBioStudio)
-
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR FEBioRVE)
 
 foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
