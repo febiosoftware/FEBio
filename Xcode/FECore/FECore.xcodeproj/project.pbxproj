@@ -419,6 +419,8 @@
 		D5F1947F21908646000F738D /* CompactMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946E21908646000F738D /* CompactMatrix.cpp */; };
 		D5F1948121908646000F738D /* Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1947021908646000F738D /* Preconditioner.cpp */; };
 		D5F1948221908646000F738D /* Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1947121908646000F738D /* Preconditioner.h */; };
+		D5FAD69C26FF93420043FC69 /* FELogDomainVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FAD69A26FF93420043FC69 /* FELogDomainVolume.cpp */; };
+		D5FAD69D26FF93420043FC69 /* FELogDomainVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FAD69B26FF93420043FC69 /* FELogDomainVolume.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -835,6 +837,8 @@
 		D5F1946E21908646000F738D /* CompactMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactMatrix.cpp; sourceTree = "<group>"; };
 		D5F1947021908646000F738D /* Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Preconditioner.cpp; sourceTree = "<group>"; };
 		D5F1947121908646000F738D /* Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preconditioner.h; sourceTree = "<group>"; };
+		D5FAD69A26FF93420043FC69 /* FELogDomainVolume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELogDomainVolume.cpp; sourceTree = "<group>"; };
+		D5FAD69B26FF93420043FC69 /* FELogDomainVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELogDomainVolume.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1032,6 +1036,8 @@
 				D5613D47217B604E007CAB89 /* FELoadController.h */,
 				D5613D49217B604E007CAB89 /* FELoadCurve.cpp */,
 				D5613D4F217B604F007CAB89 /* FELoadCurve.h */,
+				D5FAD69A26FF93420043FC69 /* FELogDomainVolume.cpp */,
+				D5FAD69B26FF93420043FC69 /* FELogDomainVolume.h */,
 				D50D879326D930DC0034E121 /* FELogElementVolume.cpp */,
 				D50D879026D930DB0034E121 /* FELogElementVolume.h */,
 				D50D879226D930DC0034E121 /* FELogEnclosedVolume.cpp */,
@@ -1349,6 +1355,7 @@
 				D5F1947421908646000F738D /* CompactMatrix.h in Headers */,
 				D5613D5D217B604F007CAB89 /* FELoadController.h in Headers */,
 				D5B9E5FA213F67DE0008B38A /* tens3dls.hpp in Headers */,
+				D5FAD69D26FF93420043FC69 /* FELogDomainVolume.h in Headers */,
 				D5B9E512213F67DE0008B38A /* FELinearSystem.h in Headers */,
 				D5613D5E217B604F007CAB89 /* FEConstDataGenerator.h in Headers */,
 				D5B9E506213F67DE0008B38A /* NodeDataRecord.h in Headers */,
@@ -1715,6 +1722,7 @@
 				D5F1947F21908646000F738D /* CompactMatrix.cpp in Sources */,
 				D5B9E59C213F67DE0008B38A /* FESurfaceLoad.cpp in Sources */,
 				D565CDE0215D290C00E08ED6 /* FEDomainList.cpp in Sources */,
+				D5FAD69C26FF93420043FC69 /* FELogDomainVolume.cpp in Sources */,
 				D565CDE1215D290C00E08ED6 /* FEDomainMap.cpp in Sources */,
 				D5613D56217B604F007CAB89 /* FELoadController.cpp in Sources */,
 				D5B9E56C213F67DE0008B38A /* FEModel.cpp in Sources */,
@@ -1884,6 +1892,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

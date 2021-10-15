@@ -145,7 +145,8 @@ bool FEPlasticFlowCurveUser::Init()
                 w[i] = 1 - (Kp[i+1]-Kp[i])/(Ky[i+1]-Ky[i]) - sw;
                 sw += w[i];
             }
-            w[m_n] = 1 - sw;
+            w[m_n-1] = 1 - sw;
+            w[m_n] = 0;
         }
         m_binit = true;
     }
@@ -159,9 +160,9 @@ bool FEPlasticFlowCurveUser::Init()
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPlasticFlowCurveMath, FEPlasticFlowCurve)
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
-    ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "emin");
+    ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "e0"  );
     ADD_PARAMETER(m_emax   , FE_RANGE_GREATER(0)           , "emax");
-    ADD_PROPERTY(m_Y  , "plastic_response");
+    ADD_PARAMETER(m_Ymath, "plastic_response");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -171,7 +172,6 @@ FEPlasticFlowCurveMath::FEPlasticFlowCurveMath(FEModel* pfem) : FEPlasticFlowCur
     m_n = 1;
     m_emin = 0;
     m_emax = 1;
-    m_Y = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -179,7 +179,10 @@ FEPlasticFlowCurveMath::FEPlasticFlowCurveMath(FEModel* pfem) : FEPlasticFlowCur
 bool FEPlasticFlowCurveMath::Init()
 {
     if (m_binit == false) {
-        m_Y->Init();
+
+        FEMathFunction Y(GetFEModel());
+        Y.SetMathString(m_Ymath);
+        if (Y.Init() == false) return false;
         
         Ky.assign(m_n,0);
         w.assign(m_n+1,0);
@@ -187,13 +190,13 @@ bool FEPlasticFlowCurveMath::Init()
         if (m_n == 1) {
             w[0] = 1;
             w[m_n] = 0;
-            Ky[0] = m_Y->value(m_emin);
+            Kp[0] = Ky[0] = Y.value(m_emin);
         }
         else {
             // set uniform increments in Kp and find corresponding strains
             // then evaluate Ky at those strains
-            Kp[0] = Ky[0] = m_Y->value(m_emin);
-            Kp[m_n-1] = m_Y->value(m_emax);
+            Kp[0] = Ky[0] = Y.value(m_emin);
+            Kp[m_n-1] = Y.value(m_emax);
             // Extract Young's modulus
             double Ey = Kp[0]/m_emin;
             double dKp = (Kp[m_n-1] - Kp[0])/(m_n-1);
@@ -202,7 +205,7 @@ bool FEPlasticFlowCurveMath::Init()
             enat[0] = m_emin;
             for (int i=1; i<m_n; ++i) {
                 Kp[i] = Kp[0] + i*dKp;
-                if (m_Y->invert(Kp[i], e) == false) return false;
+                if (Y.invert(Kp[i], e) == false) return false;
                 Ky[i] = Ey*e;
                 enat[i] = e;
             }
@@ -220,6 +223,6 @@ bool FEPlasticFlowCurveMath::Init()
         m_binit = true;
     }
     
-    return true;
+    return FEPlasticFlowCurve::Init();
 }
 

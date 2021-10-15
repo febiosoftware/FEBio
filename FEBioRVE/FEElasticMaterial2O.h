@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEBioMech/FEElasticMaterial.h"
 #include <FECore/tens3d.h>
 #include <FECore/tens4d.h>
 #include <FECore/tens5d.h>

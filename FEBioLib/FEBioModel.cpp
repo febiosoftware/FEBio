@@ -723,6 +723,23 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 }
 
 //-----------------------------------------------------------------------------
+
+class FEPlotRigidBodyPosition : public FEPlotObjectData
+{
+public:
+	FEPlotRigidBodyPosition(FEModel* fem, FERigidBody* prb) : FEPlotObjectData(fem), m_rb(prb) {}
+
+	bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+	{
+		assert(m_rb);
+		ar << m_rb->m_rt;
+		return true;
+	}
+
+private:
+	FERigidBody* m_rb;
+};
+
 class FEPlotRigidBodyForce : public FEPlotObjectData
 {
 public:
@@ -883,6 +900,7 @@ void FEBioModel::UpdatePlotObjects()
 			po->m_pos = rb->m_r0;
 			po->m_rot = quatd(0, vec3d(1,0,0));
 
+			po->AddData("Position", PLT_VEC3F, new FEPlotRigidBodyPosition(this, rb));
 			po->AddData("Force" , PLT_VEC3F, new FEPlotRigidBodyForce(this, rb));
 			po->AddData("Moment", PLT_VEC3F, new FEPlotRigidBodyMoment(this, rb));
 

@@ -58,13 +58,19 @@ public:
     
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt) override;
-    
+    mat3ds StressStrongBonds(FEMaterialPoint& pt);
+    mat3ds StressWeakBonds(FEMaterialPoint& pt);
+
 	//! tangent function
 	tens4ds Tangent(FEMaterialPoint& pt) override;
-    
+    tens4ds TangentStrongBonds(FEMaterialPoint& pt);
+    tens4ds TangentWeakBonds(FEMaterialPoint& pt);
+
     //! strain energy density function
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
+    double StrainEnergyDensityStrongBonds(FEMaterialPoint& pt);
+    double StrainEnergyDensityWeakBonds(FEMaterialPoint& pt);
+
     //! cull generations
     void CullGenerations(FEMaterialPoint& pt);
     
@@ -79,7 +85,10 @@ public:
     
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
-    
+
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEElasticMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
@@ -89,6 +98,9 @@ public:
     double	m_wmin;		//!< minimum value of relaxation
     int     m_btype;    //!< bond kinetics type
     int     m_ttype;    //!< bond breaking trigger type
+    double  m_emin;     //!< strain threshold for triggering new generation
+    
+    int     m_nmax;     //!< highest number of generations achieved in analysis
     
     DECLARE_FECORE_CLASS();
 };

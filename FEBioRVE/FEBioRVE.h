@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,42 +23,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FEMesh.h>
-#include "febiomech_api.h"
-#include <vector>
+#include "febiorve_api.h"
 
-class FEModel;
+//-----------------------------------------------------------------------------
+//! The FEBioRVE module
+//! This module defines classes for dealing with homogenization problems
 
-class FEBIOMECH_API FEPeriodicLinearConstraint2O
+namespace FEBioRVE
 {
-	class NodeSetSet
-	{
-	public:
-		NodeSetSet();
-		NodeSetSet(const NodeSetSet& nss);
-		void operator = (const NodeSetSet& nns);
-
-	public:
-		FENodeList	primary;
-		FENodeList	secondary;
-	};
-
-public:
-	FEPeriodicLinearConstraint2O();
-	~FEPeriodicLinearConstraint2O();
-
-	void AddNodeSetPair(const FENodeList& ms, const FENodeList& ss, bool push_back = true);
-
-	bool GenerateConstraints(FEModel* fem);
-
-private:
-	int closestNode(FEMesh& mesh, const FENodeList& set, const vec3d& r);
-	void addLinearConstraint(FEModel& fem, int parent, int child);
-
-private:
-	std::vector<NodeSetSet>	m_set;	// list of node set pairs
-};
+	//! Initialize the FEBioMech module
+	FEBIORVE_API void InitModule();
+}

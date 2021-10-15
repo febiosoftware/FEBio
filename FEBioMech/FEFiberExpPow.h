@@ -48,10 +48,11 @@ public:
 	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
     
 protected:
-	double	m_alpha;	// coefficient of (In-1) in exponential
-	double	m_beta;		// power of (In-1) in exponential
+	FEParamDouble       m_alpha;	// coefficient of (In-I0) in exponential
+	FEParamDouble       m_beta;		// power of (In-I0) in exponential
 	FEParamDouble		m_ksi;		// fiber modulus
 	FEParamDouble		m_mu;       // shear modulus
+    FEParamDouble       m_lam0;     // stretch threshold for tensile response
 	double	m_epsf;
 
 	// declare the parameter list
@@ -80,10 +81,11 @@ public:
 	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
-	double	m_alpha;	// coefficient of (In-1) in exponential
-	double	m_beta;		// power of (In-1) in exponential
+	FEParamDouble	m_alpha;	// coefficient of (In-I0) in exponential
+	FEParamDouble	m_beta;		// power of (In-I0) in exponential
 	FEParamDouble	m_ksi;		// measure of fiber modulus
-	double  m_mu;       // shear modulus
+	FEParamDouble   m_mu;       // shear modulus
+    FEParamDouble   m_lam0;     // stretch threshold for tensile response
 
 	double	m_epsf;
 

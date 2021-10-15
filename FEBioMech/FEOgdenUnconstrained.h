@@ -50,7 +50,7 @@ protected:
 	double	m_eps;
 	
 public:
-	double	m_c[MAX_TERMS];		//!< coefficients mu
+	FEParamDouble	m_c[MAX_TERMS];		//!< coefficients mu
 	double	m_m[MAX_TERMS];		//!< powers
 	double	m_p;				//!< coefficient mu prime
 	

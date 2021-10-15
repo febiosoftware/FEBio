@@ -1648,6 +1648,35 @@ void FEModel::UpdateModelData()
 }
 
 //-----------------------------------------------------------------------------
+FEMaterial* CopyMaterial(FEMaterial* pmat, FEModel* fem)
+{
+	const char* sztype = pmat->GetTypeStr();
+
+	// create a new material
+	FEMaterial* pnew = fecore_new<FEMaterial>(sztype, fem);
+	assert(pnew);
+
+	pnew->SetID(pmat->GetID());
+
+	// copy parameters
+	pnew->GetParameterList() = pmat->GetParameterList();
+
+	// copy properties
+	for (int i = 0; i < pmat->Properties(); ++i)
+	{
+		FEProperty* prop = pmat->PropertyClass(i);
+		FEMaterial* mati = dynamic_cast<FEMaterial*>(prop->get(0));
+		if (mati)
+		{
+			FEMaterial* newMati = CopyMaterial(mati, fem);
+			bool b = pnew->SetProperty(i, newMati); assert(b);
+		}
+	}
+
+	return pnew;
+}
+
+//-----------------------------------------------------------------------------
 //! This function copies the model data from the fem object. Note that it only copies
 //! the model definition, i.e. mesh, bc's, contact interfaces, etc..
 void FEModel::CopyFrom(FEModel& fem)
@@ -1703,21 +1732,15 @@ void FEModel::CopyFrom(FEModel& fem)
 	{
 		// get the type info from the old material
 		FEMaterial* pmat = fem.GetMaterial(i);
-		const char* sztype = pmat->GetTypeStr();
 
-		// create a new material
-		FEMaterial* pnew = fecore_new<FEMaterial>(sztype, this);
-		assert(pnew);
+		// copy the material
+		FEMaterial* pnew = CopyMaterial(pmat, this);
 
-		pnew->SetID(pmat->GetID());
-
-		// copy material data
-		// we only copy material parameters
-		pnew->GetParameterList() = pmat->GetParameterList();
+		// copy the name
+		pnew->SetName(pmat->GetName());
 
 		// add the material
 		AddMaterial(pnew);
-
 	}
 	assert(m_imp->m_MAT.size() == fem.m_imp->m_MAT.size());
 
@@ -1886,6 +1909,11 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		if (ar.IsLoading()) m_fem->Clear();
 
 		ar & m_moduleName;
+
+		if (ar.IsLoading())
+		{
+			FECoreKernel::GetInstance().SetActiveModule(m_moduleName.c_str());
+		}
 
 		ar & m_timeInfo;
 		ar & m_dofs;

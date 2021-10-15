@@ -141,6 +141,13 @@ int FEAnalysis::ModelComponents() const
 }
 
 //-----------------------------------------------------------------------------
+//! get a model component
+FEModelComponent* FEAnalysis::GetModelComponent(int i)
+{
+	return m_MC[i];
+}
+
+//-----------------------------------------------------------------------------
 //! sets the plot level
 void FEAnalysis::SetPlotLevel(int n) { m_nplot = n; }
 
@@ -513,6 +520,12 @@ int FEAnalysis::SolveTimeStep()
 			if (bconv)
 			{
 				FEModel& fem = *GetFEModel();
+
+				if (fem.DoCallback(CB_TIMESTEP_SOLVED) == false)
+				{
+					return false;
+				}
+
 				if (fem.MeshAdaptors())
 				{
 					fem.GetTime().augmentation = niter;

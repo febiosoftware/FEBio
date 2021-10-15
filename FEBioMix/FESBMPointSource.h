@@ -38,7 +38,17 @@ public:
 
 	void SetPosition(const vec3d& pos);
 
-	void SetSBM(int id, double val);
+	vec3d GetPosition() const;
+
+	void SetSBMID(int id);
+
+	int GetSBMID() const;
+
+	void SetValue(double val);
+
+	double GetValue() const;
+
+	void SetWeighVolume(bool b);
 
 private:
 	void ResetSBM();

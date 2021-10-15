@@ -30,15 +30,13 @@ SOFTWARE.*/
 #include "FEMicroMaterial.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
-#include "FESolidSolver2.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioMech/FESolidSolver2.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
-#ifndef FEBIOMECH_EXPORTS
 #include "FEBioXML/FEBioImport.h"
-#endif
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
-#include "FEBCPrescribedDeformation.h"
+#include "FEBioMech/FEBCPrescribedDeformation.h"
 #include <sstream>
 
 //=============================================================================

@@ -51,8 +51,8 @@ protected:
 	double	m_eps;
 
 public:
-	double	m_c[MAX_TERMS];	//!< coefficients
-	double	m_m[MAX_TERMS];	//!< powers
+	FEParamDouble	m_c[MAX_TERMS];	//!< coefficients
+	double			m_m[MAX_TERMS];	//!< powers
 
 	DECLARE_FECORE_CLASS();
 };

@@ -28,21 +28,18 @@ SOFTWARE.*/
 
 #pragma once
 
-#include "FEContactInterface.h"
-#include "FEPeriodicBoundary.h"
-#include "FEContactSurface.h"
+#include "FEBioMech/FEContactInterface.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FEContactSurface.h"
 #include <FECore/tens3d.h>
 
 //-----------------------------------------------------------------------------
 
-class FEPeriodicBoundary2O : public FEContactInterface
+class FEPeriodicBoundary1O : public FEContactInterface
 {
 public:
 	//! constructor
-	FEPeriodicBoundary2O(FEModel* pfem);
-
-	//! destructor
-	virtual ~FEPeriodicBoundary2O(void) {}
+	FEPeriodicBoundary1O(FEModel* pfem);
 
 	//! initialization
 	bool Init() override;
@@ -95,7 +92,6 @@ public:
 	vec3d	m_off;			//!< relative displacement offset
 
 	mat3d		m_Fmacro;		//!< Macroscopic deformation gradient
-	tens3drs	m_Gmacro;		//!< Macroscopic deformation Hessian
 	
 	DECLARE_FECORE_CLASS();
 };

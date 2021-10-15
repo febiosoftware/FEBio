@@ -49,11 +49,11 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 //! Initializes material point data.
 void FEReactiveVEMaterialPoint::Init()
 {
-	// initialize data to include first generation (initially intact bonds)
-    m_Fi.resize(1,mat3dd(1));
-    m_Ji.resize(1,1);
-    m_v.resize(1,0);
-    m_w.resize(1,1);
+	// initialize data to zero
+	m_Uv.clear();
+	m_Jv.clear();
+	m_v.clear();
+	m_f.clear();
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
@@ -61,33 +61,45 @@ void FEReactiveVEMaterialPoint::Init()
 
 //-----------------------------------------------------------------------------
 //! Update material point data.
-void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
+void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
 {
     FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-
-	// check if the current deformation gradient is different from that of
-	// the last generation, in which case store the current state
-	if (m_pRve) {
-	    if (m_pRve->NewGeneration(*this)) {
-		    m_Fi.push_back(pt.m_F.inverse());
-	        m_Ji.push_back(1./pt.m_J);
-			m_v.push_back(timeInfo.currentTime);
-			double w = m_pRve->ReformingBondMassFraction(*this);
-			m_w.push_back(w);
-		}
-	}
-	else {
-		if (m_pRuc->NewGeneration(*this)) {
-			m_Fi.push_back(pt.m_F.inverse());
-			m_Ji.push_back(1./pt.m_J);
-			m_v.push_back(timeInfo.currentTime);
-			double w = m_pRuc->ReformingBondMassFraction(*this);
-			m_w.push_back(w);
-		}
-	}
     
-    // don't forget to initialize the base class
-    FEMaterialPoint::Update(timeInfo);
+    // if new generation not already created for current time, check if it should
+    if (m_v.empty() || (m_v.back() < timeInfo.currentTime)) {
+        // check if the current deformation gradient is different from that of
+        // the last generation, in which case store the current state
+        if (m_pRve) {
+            if (m_pRve->NewGeneration(*this)) {
+                m_v.push_back(timeInfo.currentTime);
+                m_Uv.push_back(pt.RightStretch());
+                m_Jv.push_back(pt.m_J);
+                double f = (!m_v.empty()) ? m_pRve->ReformingBondMassFraction(*this) : 1;
+                m_f.push_back(f);
+                m_pRve->CullGenerations(*this);
+            }
+        }
+        else {
+            if (m_pRuc->NewGeneration(*this)) {
+                m_v.push_back(timeInfo.currentTime);
+                m_Uv.push_back(pt.RightStretch());
+                m_Jv.push_back(pt.m_J);
+                double f = (!m_v.empty()) ? m_pRuc->ReformingBondMassFraction(*this) : 1;
+                m_f.push_back(f);
+                m_pRuc->CullGenerations(*this);
+            }
+        }
+    }
+    // otherwise, if we already have a generation for the current time, update the stored values
+    else if (m_v.back() == timeInfo.currentTime) {
+        m_Uv.back() = pt.RightStretch();
+        m_Jv.back() = pt.m_J;
+        if (m_pRve)
+            m_f.back() = m_pRve->ReformingBondMassFraction(*this);
+        else if (m_pRuc)
+            m_f.back() = m_pRuc->ReformingBondMassFraction(*this);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -98,18 +110,18 @@ void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
     
     if (ar.IsSaving())
     {
-        int n = (int)m_Fi.size();
+        int n = (int)m_Uv.size();
         ar << n;
-        for (int i=0; i<n; ++i) ar << m_Fi[i] << m_Ji[i] << m_v[i] << m_w[i];
+        for (int i=0; i<n; ++i) ar << m_Uv[i] << m_Jv[i] << m_v[i] << m_f[i];
     }
     else
     {
         int n;
         ar >> n;
-		m_Fi.resize(n);
-		m_Ji.resize(n);
+		m_Uv.resize(n);
+		m_Jv.resize(n);
 		m_v.resize(n);
-		m_w.resize(n);
-        for (int i=0; i<n; ++i) ar >> m_Fi[i] >> m_Ji[i] >> m_v[i] >> m_w[i];
+		m_f.resize(n);
+        for (int i=0; i<n; ++i) ar >> m_Uv[i] >> m_Jv[i] >> m_v[i] >> m_f[i];
     }
 }

@@ -101,7 +101,7 @@ public:
     int                 m_n;    //!< number of yield levels
     double              m_emin; //!< min true strain
     double              m_emax; //!< max true strain
-    FEFunction1D*       m_Y;    //!< true stress-true strain flow curve
+    std::string         m_Ymath;    //!< true stress-true strain flow curve
     
     DECLARE_FECORE_CLASS();
 };

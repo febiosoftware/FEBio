@@ -277,15 +277,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element norm for G
-class FEPlotElementGnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementGnorm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Element stresses
 class FEPlotElementStress : public FEPlotDomainData
 {
@@ -330,33 +321,6 @@ class FEPlotElementsnorm : public FEPlotDomainData
 {
 public:
 	FEPlotElementsnorm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK1 stress
-class FEPlotElementPK1norm : public FEPlotDomainData
-{
-public:
-	FEPlotElementPK1norm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK1 stress moment
-class FEPlotElementQK1norm : public FEPlotDomainData
-{
-public:
-	FEPlotElementQK1norm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element micro energy
-class FEPlotElementMicroEnergy : public FEPlotDomainData
-{
-public:
-	FEPlotElementMicroEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -1069,3 +1033,49 @@ private:
 	std::string	m_prop;
 	int			m_propIndex;
 };
+
+//-----------------------------------------------------------------------------
+//! Number of generations in reactive viscoelastic material point
+class FEPlotRVEgenerations : public FEPlotDomainData
+{
+public:
+    FEPlotRVEgenerations(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of strong bonds in reactive viscoelastic material point
+class FEPlotRVEStrongBondSED : public FEPlotDomainData
+{
+public:
+    FEPlotRVEStrongBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of weak bonds in reactive viscoelastic material point
+class FEPlotRVEWeakBondSED : public FEPlotDomainData
+{
+public:
+    FEPlotRVEWeakBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of strong bonds in reactive viscoelastic material point
+class FEPlotRVEStrongBondDevSED : public FEPlotDomainData
+{
+public:
+    FEPlotRVEStrongBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of weak bonds in reactive viscoelastic material point
+class FEPlotRVEWeakBondDevSED : public FEPlotDomainData
+{
+public:
+    FEPlotRVEWeakBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

@@ -31,12 +31,12 @@ SOFTWARE.*/
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEElemElemList.h"
 #include <FECore/FEPrescribedDOF.h>
-#include "FEElasticMaterial.h"
+#include "FEBioMech/FEElasticMaterial.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FECore/FEAnalysis.h"
-#include "FESolidSolver2.h"
-#include "FEElasticSolidDomain.h"
-#include "FEBCPrescribedDeformation.h"
+#include "FEBioMech/FESolidSolver2.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBioMech/FEBCPrescribedDeformation.h"
 #include "FEPeriodicLinearConstraint2O.h"
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FECube.h>
