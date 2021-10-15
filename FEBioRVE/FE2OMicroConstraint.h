@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceConstraint.h>
 #include <FECore/FESurface.h>
 #include <FECore/tens3d.h>
-#include "FEElasticMaterial.h"
+#include <FEBioMech/FEElasticMaterial.h>
 
 //-----------------------------------------------------------------------------
 class FEMicroFlucSurface : public FESurface

@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FE2OMicroConstraint.h"
 #include <FECore/log.h>
-#include "FEBioMech.h"
+#include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------

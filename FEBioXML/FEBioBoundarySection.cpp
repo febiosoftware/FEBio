@@ -40,7 +40,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FEBioMech/FEPeriodicLinearConstraint.h>
-#include <FEBioMech/FEPeriodicLinearConstraint2O.h>
+#include <FEBioRVE/FEPeriodicLinearConstraint2O.h>
 #include <FEBioMech/FEMergedConstraint.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidMaterial.h>

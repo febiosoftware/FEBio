@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,23 +23,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEElasticSolidDomain.h"
-#include "FECore/tens3d.h"
+#include "febiorve_api.h"
 
 //-----------------------------------------------------------------------------
-//! This class implements a domain used in an elastic remodeling problem.
-//! It differs from the FEElasticSolidDomain in that it adds a stiffness matrix
-//! due to the deformation dependent density.
-class FEElasticMultiscaleDomain1O : public FEElasticSolidDomain
-{
-public:
-	//! constructor
-	FEElasticMultiscaleDomain1O(FEModel* pfem);
+//! The FEBioRVE module
+//! This module defines classes for dealing with homogenization problems
 
-	//! initialize class
-	bool Init();
-};
+namespace FEBioRVE
+{
+	//! Initialize the FEBioMech module
+	FEBIORVE_API void InitModule();
+}

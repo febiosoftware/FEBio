@@ -27,38 +27,17 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEMesh.h>
-#include "febiomech_api.h"
-#include <vector>
 
-class FEModel;
-
-class FEBIOMECH_API FEPeriodicLinearConstraint2O
-{
-	class NodeSetSet
-	{
-	public:
-		NodeSetSet();
-		NodeSetSet(const NodeSetSet& nss);
-		void operator = (const NodeSetSet& nns);
-
-	public:
-		FENodeList	primary;
-		FENodeList	secondary;
-	};
-
-public:
-	FEPeriodicLinearConstraint2O();
-	~FEPeriodicLinearConstraint2O();
-
-	void AddNodeSetPair(const FENodeList& ms, const FENodeList& ss, bool push_back = true);
-
-	bool GenerateConstraints(FEModel* fem);
-
-private:
-	int closestNode(FEMesh& mesh, const FENodeList& set, const vec3d& r);
-	void addLinearConstraint(FEModel& fem, int parent, int child);
-
-private:
-	std::vector<NodeSetSet>	m_set;	// list of node set pairs
-};
+#ifdef WIN32
+	#ifdef FECORE_DLL
+		#ifdef FEBIORVE_EXPORTS
+			#define FEBIORVE_API __declspec(dllexport)
+		#else
+			#define FEBIORVE_API __declspec(dllimport)
+		#endif
+	#else
+		#define FEBIORVE_API
+	#endif
+#else
+	#define FEBIORVE_API
+#endif

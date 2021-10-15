@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include "FEPeriodicBoundary1O.h"

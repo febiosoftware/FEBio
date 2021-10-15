@@ -182,7 +182,7 @@ endmacro()
 
 findHdrSrc(FEBioStudio)
 
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR)
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR FEBioRVE)
 
 foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
@@ -258,10 +258,10 @@ endif()
 # Link FEBio libraries
 if(WIN32 OR APPLE)
 	target_link_libraries(febio3 fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr febiorve)
 else()
 	target_link_libraries(febio3 -Wl,--start-group fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr -Wl,--end-group)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr febiorve -Wl,--end-group)
 endif()
 
 # Link LEVMAR
