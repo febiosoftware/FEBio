@@ -68,6 +68,9 @@ bool FEElasticMultiscaleDomain1O::Init()
 			mmpt.m_F_prev = pt.m_F;	// TODO: I think I can remove this line
 			mmpt.m_rve.CopyFrom(rve);
 			if (mmpt.m_rve.Init() == false) return false;
+
+			// initialize RCI solve
+			if (mmpt.m_rve.RCI_Init() == false) return false;
 		}
 	}
 

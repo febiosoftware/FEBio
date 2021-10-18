@@ -108,6 +108,9 @@ void FEMicroMaterialPoint::Update(const FETimeInfo& timeInfo)
 	FEMaterialPoint::Update(timeInfo);
 	FEElasticMaterialPoint& pt = *ExtractData<FEElasticMaterialPoint>();
 	m_F_prev = pt.m_F;
+
+	// clear rewind stack so the next rewind won't overwrite current state
+	m_rve.RCI_ClearRewindStack();
 }
 
 //-----------------------------------------------------------------------------
@@ -123,12 +126,12 @@ FEMaterialPoint* FEMicroMaterialPoint::Copy()
 void FEMicroMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
-	if (ar.IsSaving())
-	{
-	}
-	else
-	{
-	}
+	ar & m_S & m_F_prev;
+	ar & m_macro_energy;
+	ar & m_micro_energy;
+	ar & m_energy_diff;
+	ar & m_macro_energy_inc;
+	ar & m_micro_energy_inc;
 }
 
 //=============================================================================
@@ -230,12 +233,15 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
+
+	// rewind the RCI
+	mmpt.m_rve.RCI_Rewind();
 	
 	// update the BC's
 	mmpt.m_rve.Update(F);
 
-	// solve the RVE
-	bool bret = mmpt.m_rve.Solve();
+	// advance the RVE solution
+	bool bret = mmpt.m_rve.RCI_Advance();
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException(-1, -1);

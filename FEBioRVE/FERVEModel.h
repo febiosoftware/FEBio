@@ -91,6 +91,11 @@ protected:
 	bool PrepPeriodicLC();
 
 private:
+	// Hide the solve function so we can't call it. 
+	// (We use the RCI solution method)
+	bool Solve() override;
+
+private:
 	double			m_V0;				//!< initial volume
 	int				m_bctype;			//!< RVE type
 	FEBoundingBox	m_bb;				//!< bounding box of mesh

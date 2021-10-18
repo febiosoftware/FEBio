@@ -645,3 +645,6 @@ tens4ds FERVEModel::StiffnessAverage(FEMaterialPoint &mp)
 
 	return c;
 }
+
+// this function is hidden
+bool FERVEModel::Solve() { assert(false); return false; }

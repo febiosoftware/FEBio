@@ -118,6 +118,30 @@ public:
 
 	void Serialize(DumpStream& ar);
 
+	void PushState()
+	{
+		DumpMemStream& ar = m_dmp;
+		ar.clear(); // this also prepares the stream for writing
+		m_fem->Serialize(ar);
+	}
+
+	bool PopState()
+	{
+		// get the dump stream
+		DumpMemStream& ar = m_dmp;
+
+		// make sure we have data to rewind
+		if (ar.size() == 0) return false;
+
+		// prepare the archive for reading
+		ar.Open(false, true);
+
+		// restore the previous state
+		m_fem->Serialize(m_dmp);
+
+		return true;
+	}
+
 public: // TODO: Find a better place for these parameters
 	FETimeInfo	m_timeInfo;			//!< current time value
 	double		m_ftime0;			//!< start time of current step
@@ -1078,9 +1102,14 @@ bool FEModel::Solve()
 //-----------------------------------------------------------------------------
 bool FEModel::RCI_Rewind()
 {
-	// restore the previous state
-	m_imp->m_dmp.Open(false, true);
-	Serialize(m_imp->m_dmp);
+	return m_imp->PopState();
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::RCI_ClearRewindStack()
+{
+	if (m_imp->m_dmp.size() == 0) return false;
+	m_imp->m_dmp.clear();
 	return true;
 }
 
@@ -1154,8 +1183,7 @@ bool FEModel::RCI_Advance()
 	}
 
 	// store current state in case we need to rewind
-	m_imp->m_dmp.clear();
-	Serialize(m_imp->m_dmp);
+	m_imp->PushState();
 
 	// Inform that the time is about to change. (Plugins can use 
 	// this callback to modify time step)

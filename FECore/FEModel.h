@@ -132,6 +132,7 @@ public: // reverse control solver interface
 	bool RCI_Rewind();
 	bool RCI_Advance();
 	bool RCI_Finish();
+	bool RCI_ClearRewindStack();
 
 public:
 	// get the FE mesh
