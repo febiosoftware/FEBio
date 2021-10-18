@@ -226,7 +226,7 @@ bool FENewtonSolver::ReformStiffness()
     if (bret)
     {
         {
-			TRACK_TIME(TimerID::Timer_Solve);
+			TRACK_TIME(TimerID::Timer_LinSolve);
 			// factorize the stiffness matrix
 			if (m_plinsolve->Factor() == false)
 			{
@@ -301,7 +301,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME(TimerID::Timer_Solve);
+		TRACK_TIME(TimerID::Timer_LinSolve);
 		if (!m_plinsolve->PreProcess())
 		{
 			feLogError("An error occurred during preprocessing of linear solver");
@@ -866,7 +866,7 @@ bool FENewtonSolver::QNInit()
 void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>& R)
 {
 	// call the strategy to solve the linear equations
-	TRACK_TIME(TimerID::Timer_Solve);
+	TRACK_TIME(TimerID::Timer_LinSolve);
 
 	// for iterative solvers, we pass the last solution as the initial guess
 	if (m_plinsolve->IsIterative())

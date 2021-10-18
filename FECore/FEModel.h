@@ -71,11 +71,12 @@ struct FEMODEL_MEMORY_STATS {
 // Timer IDs
 enum TimerID {
 	Timer_Update,
-	Timer_Solve,
+	Timer_LinSolve,
 	Timer_Reform,
 	Timer_Residual,
 	Timer_Stiffness,
-	Timer_QNUpdate
+	Timer_QNUpdate,
+	Timer_ModelSolve
 };
 
 //-----------------------------------------------------------------------------
@@ -125,6 +126,12 @@ public:
 
 	//! will return true if the model solved succussfully
 	bool IsSolved() const;
+
+public: // reverse control solver interface
+	bool RCI_Init();
+	bool RCI_Rewind();
+	bool RCI_Advance();
+	bool RCI_Finish();
 
 public:
 	// get the FE mesh

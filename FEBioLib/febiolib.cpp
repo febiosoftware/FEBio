@@ -60,7 +60,8 @@ FECoreKernel* GetFECoreKernel()
 void InitLibrary()
 {
 	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
-	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
+	REGISTER_FECORE_CLASS(FEBioRestart  , "restart");
+	REGISTER_FECORE_CLASS(FEBioRCISolver, "rci_solve");
 
 	FECore::InitModule();
 	FEAMR::InitModule();

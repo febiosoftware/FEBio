@@ -80,25 +80,22 @@ public:
 	//! Resets data structures
 	bool Reset() override;
 
-	//! Solves the problem
-	bool Solve() override;
-
 public: // --- I/O functions ---
 
 	//! input data from file
 	bool Input(const char* szfile);
 
-	//! write to plot file
+	//! handle output
 	void Write(unsigned int nwhen);
 
-	//! Write log data
-	void WriteLog(unsigned int nwhen);
+	// write to plot file
+	void WritePlot(unsigned int nevent);
 
 	//! write data to log file
-	void WriteData();
+	void WriteData(unsigned int nevent);
 
 	//! dump data to archive for restart
-	void DumpData();
+	void DumpData(int nevent);
 
 	//! add to log 
 	void Log(int ntag, const char* szmsg) override;
@@ -117,6 +114,13 @@ public: //! --- serialization for restarts ---
 	
 	//! Write or read data from archive
 	void Serialize(DumpStream& ar) override;
+
+private:
+	static bool handleCB(FEModel* fem, unsigned int nwhen, void* pd);
+	bool processEvent(int nevent);
+
+	void on_cb_solved();
+	void on_cb_stepSolved();
 
 protected:
 	// helper functions for serialization
@@ -192,7 +196,6 @@ private:
 	void UpdatePlotObjects();
 
 private:
-	Timer		m_SolveTime;	//!< timer to track total time to solve problem
 	Timer		m_InputTime;	//!< timer to track time to read model
 	Timer		m_InitTime;		//!< timer to track model initialization
 	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)

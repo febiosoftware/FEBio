@@ -57,6 +57,7 @@ SOFTWARE.*/
 #include "LinearSolver.h"
 #include "FETimeStepController.h"
 #include "Timer.h"
+#include "DumpMemStream.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -90,7 +91,7 @@ public:
 	};
 
 public:
-	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem)
+	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem), m_dmp(*fem)
 	{
 		// --- Analysis Data ---
 		m_pStep = 0;
@@ -112,7 +113,7 @@ public:
 
 		// allocate timers
 		// Make sure enough timers are allocated for all the TimerIds!
-		m_timers.resize(6);
+		m_timers.resize(7);
 	}
 
 	void Serialize(DumpStream& ar);
@@ -169,6 +170,8 @@ public:
 	FELinearConstraintManager*	m_LCM;
 
 	DataStore	m_dataStore;			//!< the data store used for data logging
+
+	DumpMemStream	m_dmp;	// only used by incremental solver
 
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
@@ -1022,6 +1025,8 @@ bool FEModel::InitBodyLoads()
 //! This function solves the FE problem by calling the solve method for each step.
 bool FEModel::Solve()
 {
+	TRACK_TIME(Timer_ModelSolve);
+
 	// error flag
 	bool bok = true;
 
@@ -1068,6 +1073,143 @@ bool FEModel::Solve()
 	DoCallback(CB_SOLVED);
 
 	return bok;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::RCI_Rewind()
+{
+	// restore the previous state
+	m_imp->m_dmp.Open(false, true);
+	Serialize(m_imp->m_dmp);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::RCI_Init()
+{
+	// start the timer
+	GetTimer(Timer_ModelSolve)->start();
+
+	// reset solver status flag
+	m_imp->m_bsolved = false;
+
+	// loop over all analysis steps
+	int nstep = m_imp->m_nStep;
+	m_imp->m_pStep = m_imp->m_Step[(int)nstep];
+
+	FEAnalysis* step = m_imp->m_pStep;
+
+	// intitialize step data
+	if (step->Activate() == false)
+	{
+		return false;
+	}
+
+	// do callback
+	DoCallback(CB_STEP_ACTIVE);
+
+	// initialize the step's solver
+	if (step->InitSolver() == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool FEModel::RCI_Advance()
+{
+	// get the current step
+	FEAnalysis* step = m_imp->m_pStep;
+	if (step == nullptr) return false;
+
+	// first see if the step has finished
+	const double eps = step->m_tend * 1e-7;
+	double currentTime = GetCurrentTime();
+	if (step->m_tend - currentTime <= eps)
+	{
+		// TODO: not sure why this is needed.
+		SetStartTime(GetCurrentTime());
+
+		// wrap it up
+		DoCallback(CB_STEP_SOLVED);
+		step->Deactivate();
+
+		// go to the next step
+		int nstep = ++m_imp->m_nStep;
+		if (nstep >= m_imp->m_Step.size())
+		{
+			// we're done
+			m_imp->m_bsolved = true;
+			return true;
+		}
+		else
+		{
+			// go to the next step
+			step = m_imp->m_pStep = m_imp->m_Step[nstep];
+			if (step->Activate() == false) return false;
+			DoCallback(CB_STEP_ACTIVE);
+			if (step->InitSolver() == false) return false;
+		}
+	}
+
+	// store current state in case we need to rewind
+	m_imp->m_dmp.clear();
+	Serialize(m_imp->m_dmp);
+
+	// Inform that the time is about to change. (Plugins can use 
+	// this callback to modify time step)
+	DoCallback(CB_UPDATE_TIME);
+
+	// update time
+	FETimeInfo& tp = GetTime();
+	double newTime = tp.currentTime + step->m_dt;
+	tp.currentTime = newTime;
+	tp.timeIncrement = step->m_dt;
+	feLog("\n===== beginning time step %d : %lg =====\n", step->m_ntimesteps + 1, newTime);
+
+	// initialize the solver step
+	// (This basically evaluates all the parameter lists, but let's the solver
+	//  customize this process to the specific needs of the solver)
+	if (step->GetFESolver()->InitStep(newTime) == false) return false;
+
+	// Solve the time step
+	int ierr = step->SolveTimeStep();
+	if (ierr != 0) return false;
+
+	// update counters
+	FESolver* psolver = step->GetFESolver();
+	step->m_ntotref += psolver->m_ntotref;
+	step->m_ntotiter += psolver->m_niter;
+	step->m_ntotrhs += psolver->m_nrhs;
+
+	// update model's data
+	UpdateModelData();
+
+	// Yes! We have converged!
+	feLog("\n------- converged at time : %lg\n\n", GetCurrentTime());
+
+	// update nr of completed timesteps
+	step->m_ntimesteps++;
+
+	// call callback function
+	if (DoCallback(CB_MAJOR_ITERS) == false)
+	{
+		feLogWarning("Early termination on user's request");
+		return false;
+	}
+
+	return true;
+}
+
+bool FEModel::RCI_Finish()
+{
+	// stop the timer
+	GetTimer(Timer_ModelSolve)->stop();
+
+	// do the callbacks
+	DoCallback(CB_SOLVED);
+	return true;
 }
 
 //-----------------------------------------------------------------------------
