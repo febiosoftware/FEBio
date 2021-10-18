@@ -108,11 +108,8 @@ bool FEElasticMultiscaleDomain2O::Init()
 		}
 	}
 
-	// create the probes
-	int NP = pmat->Probes();
-	for (int i=0; i<NP; ++i)
-	{
-		FEMicroProbe& p = pmat->Probe(i);
+		// TODO: I need to move the code below to FERVEProbe::Init.
+/*
 		if (p.m_neid > 0)
 		{
 			FEElement* pel = FindElementFromID(p.m_neid);
@@ -169,7 +166,7 @@ bool FEElasticMultiscaleDomain2O::Init()
 			p.m_probe = prve;
 			prve->SetDebugFlag(p.m_bdebug);
 		}
-	}
+*/
 
 	return true;
 }
@@ -189,8 +186,8 @@ void FEElasticMultiscaleDomain2O::Update(const FETimeInfo& timeInfo)
 		int NP = pmat->Probes();
 		for (int i=0; i<NP; ++i)
 		{
-			FEMicroProbe& p = pmat->Probe(i);
-			if (p.m_probe && p.m_bdebug) p.m_probe->Save();
+			FERVEProbe& p = pmat->Probe(i);
+			if (p.GetDebugFlag()) p.Save();
 		}
 
 		// retrhow

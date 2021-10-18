@@ -40,18 +40,78 @@ SOFTWARE.*/
 #include <sstream>
 
 //=============================================================================
-FERVEProbe::FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallBack(&fem, CB_ALWAYS), m_rve(rve), m_file(szfile) 
+BEGIN_FECORE_CLASS(FERVEProbe, FECallBack)
+	ADD_PARAMETER(m_neid, "element_id");
+	ADD_PARAMETER(m_ngp, "gausspt");
+	ADD_PARAMETER(m_file, "file");
+	ADD_PARAMETER(m_bdebug, "debug");
+END_FECORE_CLASS();
+
+FERVEProbe::FERVEProbe(FEModel* fem) : FECallBack(fem, CB_ALWAYS)
 {
+	m_rve = nullptr;
+	m_neid = -1;	// invalid element - this must be defined by user
+	m_ngp = -1;		// invalid gauss point
+	m_file = "rve.xplt";
 	m_bdebug = false;
+}
+
+bool FERVEProbe::Init()
+{
+	// get the (parent) model
+	FEModel& fem = *GetFEModel();
+
+	// get the micro-material
+	FEMicroMaterial* mat = dynamic_cast<FEMicroMaterial*>(GetParent());
+	if (mat == nullptr)
+	{
+		feLogError("The RVE probe must be a property of a micro-material.");
+		return false;
+	}
+
+	// find the element from the ID
+	FEMesh& mesh = fem.GetMesh();
+	FEElement* pel = mesh.FindElementFromID(m_neid);
+	if (pel == nullptr)
+	{
+		feLogError("Invalid Element ID for micro probe %d in material %d (%s)", m_neid, mat->GetID(), mat->GetName().c_str());
+		return false;
+	}
+
+	// make sure the element's parent domain has this material
+	FEDomain* dom = dynamic_cast<FEDomain*>(pel->GetMeshPartition());
+	if ((dom == nullptr) || (dom->GetMaterial() != mat))
+	{
+		feLogError("The specified element does not belong to this material's domain.");
+		return false;
+	}
+
+	int nint = pel->GaussPoints();
+	if ((m_ngp >= 0) && (m_ngp < nint))
+	{
+		FEMaterialPoint& mp = *pel->GetMaterialPoint(m_ngp);
+		FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+		m_rve = &mmpt.m_rve;
+	}
+	else
+	{
+		feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", m_ngp, mat->GetID(), mat->GetName().c_str());
+		return false;
+	}
+
+	return true;
 }
 
 bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 {
 	if (nwhen == CB_INIT)	// initialize the plot file
 	{
+		assert(m_rve);
+		if (m_rve == nullptr) return false;
+
 		// create a plot file
 		m_xplt = new FEBioPlotFile(m_rve);
-		if (m_xplt->Open(m_rve, m_file.c_str()) == false)
+		if (m_xplt->Open(m_file.c_str()) == false)
 		{
 			feLog("Failed creating probe.\n\n");
 			delete m_xplt; m_xplt = 0;
@@ -79,7 +139,11 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 
 void FERVEProbe::Save()
 {
-	if (m_xplt) m_xplt->Write(m_rve, (float) m_rve.GetCurrentTime());
+	assert(m_rve);
+	if (m_rve)
+	{
+		if (m_xplt) m_xplt->Write((float)m_rve->GetCurrentTime());
+	}
 }
 
 //=============================================================================
@@ -135,29 +199,6 @@ void FEMicroMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEMicroProbe, FEMaterial)
-	ADD_PARAMETER(m_neid  , "element_id");
-	ADD_PARAMETER(m_ngp   , "gausspt"   );
-	ADD_PARAMETER(m_szfile, "file"      );
-	ADD_PARAMETER(m_bdebug, "debug"     );
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-FEMicroProbe::FEMicroProbe(FEModel* pfem) : FEMaterial(pfem)
-{
-	m_neid = -1;	// invalid element - this must be defined by user
-	m_ngp = 1;		// by default, first gauss point (note is one-based!)
-	m_szfile = "rve.xplt";
-	m_probe = 0;
-	m_bdebug = false;
-}
-
-FEMicroProbe::~FEMicroProbe()
-{
-	if (m_probe) delete m_probe;
-}
-
-//=============================================================================
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -208,6 +249,9 @@ bool FEMicroMaterial::Init()
 	return false;
 #endif
 
+	// set the parent FEM
+	m_mrve.SetParentModel(GetFEModel());
+
 	// We don't want to output anything from the RVE
 	m_mrve.BlockLog();
 
@@ -234,20 +278,8 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
 
-	// rewind the RCI
-	mmpt.m_rve.RCI_Rewind();
-	
-	// update the BC's
-	mmpt.m_rve.Update(F);
-
-	// advance the RVE solution
-	bool bret = mmpt.m_rve.RCI_Advance();
-
-	// make sure it converged
-	if (bret == false) throw FEMultiScaleException(-1, -1);
-
 	// calculate the averaged Cauchy stress
-	mat3ds sa = mmpt.m_rve.StressAverage(mp);
+	mat3ds sa = mmpt.m_rve.StressAverage(F, mp);
 	
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	mmpt.m_micro_energy = micro_energy(mmpt.m_rve);	

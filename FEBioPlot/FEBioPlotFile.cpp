@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FESurface.h>
+#include <FECore/FEPlotDataStore.h>
+#include <FECore/log.h>
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 {
@@ -121,10 +123,10 @@ private:
 };
 
 
-class FEPlotVariable : public FEPlotNodeData
+class FEBioPlotVariable : public FEPlotNodeData
 {
 public:
-	FEPlotVariable(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(fem, itype, fmt) { strcpy(m_szname, szname); }
+	FEBioPlotVariable(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(fem, itype, fmt) { strcpy(m_szname, szname); }
 	bool Save(FEMesh& mesh, FEDataStream& str)
 	{
 		// get the DOFS
@@ -434,12 +436,12 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 			int vartype = dofs.GetVariableType(nvar);
 			if (vartype == VAR_SCALAR)
 			{
-				ps = new FEPlotVariable(pfem, sz, PLT_FLOAT, FMT_NODE);
+				ps = new FEBioPlotVariable(pfem, sz, PLT_FLOAT, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (vartype == VAR_VEC3)
 			{
-				ps = new FEPlotVariable(pfem, sz, PLT_VEC3F, FMT_NODE);
+				ps = new FEBioPlotVariable(pfem, sz, PLT_VEC3F, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (vartype == VAR_ARRAY)
@@ -582,7 +584,7 @@ void FEBioPlotFile::PlotObject::AddData(const char* szname, Var_Type type, FEPlo
 
 //=============================================================================
 
-FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
+FEBioPlotFile::FEBioPlotFile(FEModel* fem) : PlotFile(fem)
 {
 	m_ncompress = 0;
 	m_meshesWritten = 0;
@@ -636,7 +638,7 @@ bool FEBioPlotFile::AddVariable(const char* sz)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::AddVariable(const char* sz, vector<int>& item, const char* szdom)
 { 
-	return m_dic.AddVariable(&m_fem, sz, item, szdom); 
+	return m_dic.AddVariable(GetFEModel(), sz, item, szdom); 
 }
 
 //-----------------------------------------------------------------------------
@@ -711,18 +713,39 @@ void FEBioPlotFile::Close()
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
+bool FEBioPlotFile::Open(const char *szfile)
 {
+	FEModel* fem = GetFEModel();
+
 	// open the archive
 	m_ar.Create(szfile);
+
+	// set compression
+	FEPlotDataStore& pltData = fem->GetPlotDataStore();
+	SetCompression(pltData.GetPlotCompression());
+
+	// add plot variables
+	for (int n = 0; n < pltData.PlotVariables(); ++n)
+	{
+		FEPlotVariable& vi = pltData.GetPlotVariable(n);
+		const std::string& varName = vi.Name();
+		const std::string& domName = vi.DomainName();
+
+		// add the plot output variable
+		if (AddVariable(varName.c_str(), vi.m_item, domName.c_str()) == false)
+		{
+			feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", varName.c_str());
+			throw "FATAL ERROR";
+		}
+	}
 
 	try
 	{
 		// write the root element
-		if (WriteRoot(fem) == false) return false;
+		if (WriteRoot(*fem) == false) return false;
 
 		// write the mesh section
-		if (WriteMeshSection(fem) == false) return false;
+		if (WriteMeshSection(*fem) == false) return false;
 	}
 	catch (...)
 	{
@@ -1224,7 +1247,9 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::BuildSurfaceTable()
 {
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+
+	FEMesh& mesh = fem.GetMesh();
 	m_Surf.clear();
 	for (int ns = 0; ns < mesh.Surfaces(); ++ns)
 	{
@@ -1391,10 +1416,9 @@ void FEBioPlotFile::WriteObject(PlotObject* po)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Write(FEModel &fem, float ftime, int flag)
+bool FEBioPlotFile::Write(float ftime, int flag)
 {
-	// store the fem pointer
-	m_pfem = &fem;
+	FEModel& fem = *GetFEModel();
 
 	// compress these sections if requested
 	m_ar.SetCompression(m_ncompress);
@@ -1692,10 +1716,27 @@ void FEBioPlotFile::WriteDomainDataField(FEModel &fem, FEPlotData* pd)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Append(FEModel& fem, const char *szfile)
+bool FEBioPlotFile::Append(const char *szfile)
 {
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;
+
+	// add plot variables
+	FEModel* fem = GetFEModel();
+	FEPlotDataStore& pltData = fem->GetPlotDataStore();
+	for (int n = 0; n < pltData.PlotVariables(); ++n)
+	{
+		FEPlotVariable& vi = pltData.GetPlotVariable(n);
+		const std::string& varName = vi.Name();
+		const std::string& domName = vi.DomainName();
+
+		// add the plot output variable
+		if (AddVariable(varName.c_str(), vi.m_item, domName.c_str()) == false)
+		{
+			feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", varName.c_str());
+			throw "FATAL ERROR";
+		}
+	}
 
 	// open the root element
 	m_ar.OpenChunk();

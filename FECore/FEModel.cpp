@@ -58,6 +58,7 @@ SOFTWARE.*/
 #include "FETimeStepController.h"
 #include "Timer.h"
 #include "DumpMemStream.h"
+#include "FEPlotDataStore.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -195,6 +196,8 @@ public:
 
 	DataStore	m_dataStore;			//!< the data store used for data logging
 
+	FEPlotDataStore	m_plotData;		//!< Output request for plot file
+
 	DumpMemStream	m_dmp;	// only used by incremental solver
 
 public: // Global Data
@@ -250,6 +253,12 @@ DataStore& FEModel::GetDataStore()
 {
 	return m_imp->m_dataStore;
 }
+
+//-----------------------------------------------------------------------------
+FEPlotDataStore& FEModel::GetPlotDataStore() { return m_imp->m_plotData; }
+
+//-----------------------------------------------------------------------------
+const FEPlotDataStore& FEModel::GetPlotDataStore() const { return m_imp->m_plotData; }
 
 //-----------------------------------------------------------------------------
 //! will return true if the model solved succussfully
@@ -1413,6 +1422,13 @@ double FEModel::GetCurrentTime() const { return m_imp->m_timeInfo.currentTime; }
 //-----------------------------------------------------------------------------
 void FEModel::SetCurrentTime(double t) { m_imp->m_timeInfo.currentTime = t; }
 
+//-----------------------------------------------------------------------------
+void FEModel::SetCurrentTimeStep(double dt)
+{ 
+	FEAnalysis* step = GetCurrentStep(); assert(step);
+	if (step) step->m_dt = dt;
+}
+
 //=============================================================================
 //    P A R A M E T E R   F U N C T I O N S
 //=============================================================================
@@ -2047,6 +2063,9 @@ void FEModel::CopyFrom(FEModel& fem)
 		m_imp->m_LCM = new FELinearConstraintManager(this);
 		m_imp->m_LCM->CopyFrom(*fem.m_imp->m_LCM);
 	}
+
+	// copy output data
+	m_imp->m_plotData = fem.m_imp->m_plotData;
 
 	// TODO: copy all the properties
 //	assert(false);

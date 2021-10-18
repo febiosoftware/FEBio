@@ -49,7 +49,7 @@ void FEBioRVE::InitModule()
 	REGISTER_FECORE_CLASS(FEMicroMaterial2O, "micro-material2O");
 	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic");
 
-	REGISTER_FECORE_CLASS(FEMicroProbe, "probe");
+	REGISTER_FECORE_CLASS(FERVEProbe, "probe");
 
 	REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, "elastic-mm-solid");
 	REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, "elastic-mm-solid2O");

@@ -56,6 +56,7 @@ SOFTWARE.*/
 #include <FECore/LinearSolver.h>
 #include <FECore/FEDomain.h>
 #include <FECore/FEMaterial.h>
+#include <FECore/FEPlotDataStore.h>
 #include "febio.h"
 #include "version.h"
 #include <iostream>
@@ -65,39 +66,6 @@ SOFTWARE.*/
 #ifdef WIN32
 size_t FEBIOLIB_API GetPeakMemory();	// in memory.cpp
 #endif
-
-FEBioModel::FEPlotVariable::FEPlotVariable()
-{
-
-}
-
-FEBioModel::FEPlotVariable::FEPlotVariable(const std::string& varName, const std::vector<int>& itemList, const std::string& domainName)
-{
-	m_var = varName;
-	m_item = itemList;
-	m_domName = domainName;
-}
-
-FEBioModel::FEPlotVariable::FEPlotVariable(const FEBioModel::FEPlotVariable& v)
-{
-	m_var = v.m_var;
-	m_item = v.m_item;
-	m_domName = v.m_domName;
-}
-
-void FEBioModel::FEPlotVariable::operator = (const FEBioModel::FEPlotVariable& v)
-{
-	m_var = v.m_var;
-	m_item = v.m_item;
-	m_domName = v.m_domName;
-}
-
-void FEBioModel::FEPlotVariable::Serialize(DumpStream& ar)
-{
-	ar & m_var;
-	ar & m_item;
-	ar & m_domName;
-}
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEBioModel, FEMechModel)
@@ -150,7 +118,6 @@ FEBioModel::FEBioModel()
 	m_ntotalRHS = 0;
 	m_ntotalReforms = 0;
 
-	m_pltCompression = 0;
 	m_pltAppendOnRestart = true;
 
 	m_lastUpdate = -1;
@@ -361,37 +328,6 @@ bool FEBioModel::Input(const char* szfile)
 	if (fim.m_szlog[0]) SetLogFilename (fim.m_szlog);
 	if (fim.m_szplt[0]) SetPlotFilename(fim.m_szplt);
 
-	// set the plot file
-	if (strcmp(fim.m_szplot_type, "febio") == 0)
-	{
-		m_pltData.clear();
-
-		// set compression
-		m_pltCompression = fim.m_nplot_compression;
-
-		// define the plot file variables
-		FEModel& fem = *GetFEModel();
-		int NP = (int) fim.m_plot.size();
-		for (int i=0; i<NP; ++i)
-		{
-			FEBioImport::PlotVariable& var = fim.m_plot[i];
-
-			vector<int> item = var.m_item;
-			if (item.empty() == false)
-			{
-				// TODO: currently, this is only supported for domain variables, where
-				//       the list is a list of materials
-				vector<int> lmat = var.m_item;
-
-				// convert the material list to a domain list
-				DomainListFromMaterial(lmat, item);
-			}
-
-			FEPlotVariable pltvar(var.m_szvar, item, var.m_szdom);
-			m_pltData.push_back(pltvar);
-		}
-	}
-
 	// add the data records
 	int ND = (int)fim.m_data.size();
 	for (int i=0; i<ND; ++i) AddDataRecord(fim.m_data[i]);
@@ -470,7 +406,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				// Add the plot objects
 				UpdatePlotObjects();
 
-				if (m_plot->Open(*this, m_splot.c_str()) == false)
+				if (m_plot->Open(m_splot.c_str()) == false)
 				{
 					feLog("ERROR : Failed creating PLOT database\n");
 					delete m_plot;
@@ -492,7 +428,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 
 					// store initial time step (i.e. time step zero)
 					double time = GetTime().currentTime;
-					if (bout) m_plot->Write(*this, (float)time);
+					if (bout) m_plot->Write((float)time);
 				}
 			}
 		}
@@ -606,7 +542,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 
 				// write the state section
 				double time = GetTime().currentTime;
-				if (m_plot) m_plot->Write(*this, (float)time, statusFlag);
+				if (m_plot) m_plot->Write((float)time, statusFlag);
 
 				// make sure to reset write mesh flag
 				m_writeMesh = false;
@@ -1234,8 +1170,7 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		int npltfmt = 2;
 		ar << npltfmt;
 
-		ar << m_pltCompression;
-		ar << m_pltData;
+		SerializePlotData(ar);
 
 		// data records
 		SerializeDataStore(ar);
@@ -1264,20 +1199,19 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		ar >> npltfmt;
 		assert(npltfmt == 2);
 
-		ar >> m_pltCompression;
-		ar >> m_pltData;
+		SerializePlotData(ar);
 
 		// remove the plot file (if any)
 		if (m_plot) { delete m_plot; m_plot = 0; }
 
 		// create the plot file
-		FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+		FEBioPlotFile* pplt = new FEBioPlotFile(this);
 		m_plot = pplt;
 
 		if (m_pltAppendOnRestart)
 		{
 			// Open for appending
-			if (m_plot->Append(*this, m_splot.c_str()) == false)
+			if (m_plot->Append(m_splot.c_str()) == false)
 			{
 				printf("FATAL ERROR: Failed reopening plot database %s\n", m_splot.c_str());
 				throw "FATAL ERROR";
@@ -1285,30 +1219,22 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		}
 		else
 		{
-			// create a new plot file
-			pplt->SetCompression(m_pltCompression);
-
 			// set the software string
 			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
 			sprintf(szbuf, "FEBio %s", szver);
 			pplt->SetSoftwareString(szbuf);
-
-			// add plot variables
-			for (FEPlotVariable& vi : m_pltData)
-			{
-				// add the plot output variable
-				if (pplt->AddVariable(vi.m_var.c_str(), vi.m_item, vi.m_domName.c_str()) == false)
-				{
-					feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", vi.m_var.c_str());
-					throw "FATAL ERROR";
-				}
-			}
 		}
 
 		// data records
 		SerializeDataStore(ar);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::SerializePlotData(DumpStream& ar)
+{
+	GetPlotDataStore().Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1382,28 +1308,14 @@ bool FEBioModel::Init()
 	{
 		if (m_plot == 0) 
 		{
-			pplt = new FEBioPlotFile(*this);
+			pplt = new FEBioPlotFile(this);
 			m_plot = pplt;
-
-			// set compression
-			pplt->SetCompression(m_pltCompression);
 
 			// set the software string
 			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
 			sprintf(szbuf, "FEBio %s", szver);
 			pplt->SetSoftwareString(szbuf);
-
-			// add plot variables
-			for (FEPlotVariable& vi : m_pltData)
-			{
-				// add the plot output variable
-				if (pplt->AddVariable(vi.m_var.c_str(), vi.m_item, vi.m_domName.c_str()) == false)
-				{
-					feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", vi.m_var.c_str());
-					return false;
-				}
-			}
 		}
 
 		// see if a valid plot file name is defined.
@@ -1541,13 +1453,13 @@ bool FEBioModel::Reset()
 		int hint = step->GetPlotHint();
 		if (m_plot == 0) 
 		{
-			m_plot = new FEBioPlotFile(*this);
+			m_plot = new FEBioPlotFile(this);
 			hint = 0;
 		}
 
 		if (hint != FE_PLOT_APPEND)
 		{
-			if (m_plot->Open(*this, m_splot.c_str()) == false)
+			if (m_plot->Open(m_splot.c_str()) == false)
 			{
 				feLogError("Failed creating PLOT database.");
 				return false;

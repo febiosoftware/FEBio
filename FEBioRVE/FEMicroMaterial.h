@@ -43,7 +43,9 @@ class FERVEProbe : public FECallBack
 public:
 	// The first FEModel (fem) is the macro-problem, i.e. the model that will generate the callbacks
 	// The second FEModel (rve) is the micro-problem that needs to be tracked.
-	FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile);
+	FERVEProbe(FEModel* fem);
+
+	bool Init();
 
 	bool Execute(FEModel& fem, int nwhen);
 
@@ -53,10 +55,16 @@ public:
 	bool GetDebugFlag() const { return m_bdebug; }
 
 private:
-	FEModel&			m_rve;		//!< The RVE model to keep track of
+	int			m_neid;			//!< element Id
+	int			m_ngp;			//!< Gauss-point (one-based!)
+	std::string	m_file;			//!< file name
+	bool		m_bdebug;		//!< debug flag
+
+private:
 	FEBioPlotFile*		m_xplt;		//!< the actual plot file
-	std::string			m_file;		//!< file name
-	bool				m_bdebug;
+	FEModel*			m_rve;		//!< the RVE model
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -91,27 +99,6 @@ public:
 	double	   m_micro_energy_inc;	// Microscopic strain energy increment
 
 	FERVEModel	m_rve;				// Local copy of the parent rve
-};
-
-//-----------------------------------------------------------------------------
-// The FEMicroProbe class is not really a material, but we abuse the framework
-// here in order to read in the probe information. 
-class FEMicroProbe : public FEMaterial
-{
-	enum { MAX_FILE = 128 };
-
-public:
-	FEMicroProbe(FEModel* pfem);
-	~FEMicroProbe();
-
-public:
-	int			m_neid;			//!< element Id
-	int			m_ngp;			//!< Gauss-point (one-based!)
-	std::string	m_szfile;		//!< file name
-	bool		m_bdebug;		//!< debug flag
-	FERVEProbe*	m_probe;
-
-	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -156,10 +143,10 @@ public:
 
 public:
 	int Probes() { return (int) m_probe.size(); }
-	FEMicroProbe& Probe(int i) { return *m_probe[i]; }
+	FERVEProbe& Probe(int i) { return *m_probe[i]; }
 
 protected:
-	std::vector<FEMicroProbe*>	m_probe;
+	std::vector<FERVEProbe*>	m_probe;
 
 public:
 	// declare the parameter list

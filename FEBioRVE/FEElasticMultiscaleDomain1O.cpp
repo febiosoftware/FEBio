@@ -74,35 +74,5 @@ bool FEElasticMultiscaleDomain1O::Init()
 		}
 	}
 
-	// create the probes
-	int NP = pmat->Probes();
-	for (int i=0; i<NP; ++i)
-	{
-		FEMicroProbe& p = pmat->Probe(i);
-		FEElement* pel = FindElementFromID(p.m_neid);
-		if (pel)
-		{
-			int nint = pel->GaussPoints();
-			int ngp = p.m_ngp - 1;
-			if ((ngp>=0)&&(ngp<nint))
-			{
-				FEMaterialPoint& mp = *pel->GetMaterialPoint(ngp);
-				FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
-				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile.c_str());
-				prve->SetDebugFlag(p.m_bdebug);
-			}
-			else
-			{
-				feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
-				return false;
-			}
-		}
-		else
-		{
-			feLogError("Invalid Element ID for micro probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
-			return false;
-		}
-	}
-
 	return true;
 }

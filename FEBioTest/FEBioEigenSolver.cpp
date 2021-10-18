@@ -83,13 +83,13 @@ bool FEBioEigenSolver::Run()
 	FEMesh& mesh = fem->GetMesh();
 
 	// write eigen values and eigen vectors
-	FEBioPlotFile plt(*fem);
+	FEBioPlotFile plt(fem);
 
 	if (plt.AddVariable("displacement") == false) return false;
 
-	if (plt.Open(*fem, "eigen.xplt") == false) return false;
+	if (plt.Open("eigen.xplt") == false) return false;
 
-	plt.Write(*fem, 0.0f);
+	plt.Write(0.0f);
 
 	int n = -1;
 	for (int i = 0; i < eigenValues.size(); ++i)
@@ -105,7 +105,7 @@ bool FEBioEigenSolver::Run()
 			n = node.m_ID[2]; if (n >= 0) node.m_rt.z += eigenVectors[i][n];
 		}
 
-		plt.Write(*fem, eigenValues[i]);
+		plt.Write(eigenValues[i]);
 	}
 
 	plt.Close();

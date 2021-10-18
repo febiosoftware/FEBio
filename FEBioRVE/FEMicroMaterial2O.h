@@ -89,10 +89,10 @@ public:
 
 public:
 	int Probes() { return (int) m_probe.size(); }
-	FEMicroProbe& Probe(int i) { return *m_probe[i]; }
+	FERVEProbe& Probe(int i) { return *m_probe[i]; }
 
 protected:
-	std::vector<FEMicroProbe*>	m_probe;
+	std::vector<FERVEProbe*>	m_probe;
 
 public:
 	// declare the parameter list

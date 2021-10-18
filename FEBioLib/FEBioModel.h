@@ -51,22 +51,6 @@ enum FE_Dump_Level {
 //!
 class FEBIOLIB_API FEBioModel : public FEMechModel
 {
-	class FEPlotVariable
-	{
-	public:
-		FEPlotVariable();
-		FEPlotVariable(const std::string& varName, const std::vector<int>& itemList, const std::string& domainName);
-		FEPlotVariable(const FEPlotVariable& v);
-		void operator = (const FEPlotVariable& v);
-
-		void Serialize(DumpStream& ar);
-
-	public:
-		std::string			m_var;
-		std::vector<int>	m_item;
-		std::string			m_domName;
-	};
-
 public:
 	//! constructor
 	FEBioModel();
@@ -126,6 +110,7 @@ protected:
 	// helper functions for serialization
 	void SerializeIOData   (DumpStream& ar);
 	void SerializeDataStore(DumpStream& ar);
+	void SerializePlotData (DumpStream& ar);
 
 	bool InitLogFile();
 	bool InitPlotFile();
@@ -226,8 +211,6 @@ protected: // file names
 	std::string	m_title;	//!< model title
 
 protected:
-	vector<FEPlotVariable>	m_pltData;
-	int						m_pltCompression;
 	bool					m_pltAppendOnRestart;
 	int						m_lastUpdate;
 

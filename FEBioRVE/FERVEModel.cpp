@@ -54,6 +54,12 @@ FERVEModel::~FERVEModel()
 }
 
 //-----------------------------------------------------------------------------
+void FERVEModel::SetParentModel(FEModel* fem)
+{
+	m_parentfem = fem;
+}
+
+//-----------------------------------------------------------------------------
 // copy from the parent RVE
 void FERVEModel::CopyFrom(FERVEModel& rve)
 {
@@ -61,6 +67,7 @@ void FERVEModel::CopyFrom(FERVEModel& rve)
 	FEModel::CopyFrom(rve);
 
 	// copy the rest
+	m_parentfem = rve.m_parentfem;
 	m_bctype = rve.m_bctype;
 	m_V0 = rve.m_V0;
 	m_bb = rve.m_bb;
@@ -68,12 +75,32 @@ void FERVEModel::CopyFrom(FERVEModel& rve)
 }
 
 //-----------------------------------------------------------------------------
+bool FERVEModel::Init()
+{
+	// the RVE should only have one step
+	if (Steps() != 1) return false;
+	FEAnalysis* step = GetStep(0);
+
+	// match the end time with the parent's
+	FEAnalysis* parentStep = m_parentfem->GetStep(0);
+	double tend = parentStep->m_ntime * parentStep->m_dt0;
+	step->m_ntime = parentStep->m_ntime;
+	step->m_dt0   = parentStep->m_dt0;
+	step->m_tend  = tend;
+
+	return FEModel::Init();
+}
+
+//-----------------------------------------------------------------------------
 //! Initializes the RVE model and evaluates some useful quantities.
 bool FERVEModel::InitRVE(int rveType, const char* szbc)
 {
+	// the RVE should only have one step
+	if (Steps() != 1) return false;
+	FEAnalysis* step = GetStep(0);
+
 	// make sure the RVE problem doesn't output anything to a plot file
-	for (int i=0; i<Steps(); ++i)
-		GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
+	step->SetPlotLevel(FE_PLOT_NEVER);
 
 	// Center the RVE about the origin.
 	// This also calculates the bounding box
@@ -433,6 +460,32 @@ double FERVEModel::CurrentVolume()
 	}
 
 	return V;
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FERVEModel::StressAverage(mat3d& F, FEMaterialPoint& mp)
+{
+	// rewind the RCI
+	RCI_Rewind();
+
+	// update the BC's
+	Update(F);
+
+	// match the time step
+	FEModel& parent = *m_parentfem;
+	FETimeInfo& ti = parent.GetTime();
+	SetCurrentTimeStep(ti.timeIncrement);
+
+	// advance the RVE solution
+	bool bret = RCI_Advance();
+
+	assert(ti.currentTime == GetCurrentTime());
+
+	// make sure it converged
+	if (bret == false) throw FEMultiScaleException(-1, -1);
+
+	// calculate and return the (Cuachy) stress average
+	return StressAverage(mp);
 }
 
 //-----------------------------------------------------------------------------

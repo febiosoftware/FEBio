@@ -57,6 +57,7 @@ class FEModelData;
 class FEDataArray;
 class FEMeshAdaptor;
 class Timer;
+class FEPlotDataStore;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel
@@ -283,6 +284,9 @@ public: // --- Analysis steps functions ---
 	//! Set the current time
 	void SetCurrentTime(double t);
 
+	//! set the current time step
+	void SetCurrentTimeStep(double dt);
+
 public: // --- Contact interface functions ---
 
 	//! return number of surface pair constraints
@@ -417,6 +421,10 @@ public: // Data retrieval
 
 	//! return the data store
 	DataStore& GetDataStore();
+
+	//! return plot data
+	FEPlotDataStore& GetPlotDataStore();
+	const FEPlotDataStore& GetPlotDataStore() const;
 
 public:
 	// reset all the timers

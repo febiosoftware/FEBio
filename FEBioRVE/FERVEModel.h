@@ -49,7 +49,10 @@ public:
 	FERVEModel();
 	~FERVEModel();
 
-	//! one time initialization
+	//! initialization
+	bool Init() override;
+
+	//! one time initialization (only called on the master RVE)
 	bool InitRVE(int rveType, const char* szbc);
 
 	//! Return the initial volume (calculated in Init)
@@ -67,10 +70,14 @@ public:
 	//! Update the RVE (before it is solved)
 	void Update(const mat3d& F);
 
-	// copy from the parent RVE
+	// copy from the master RVE
 	void CopyFrom(FERVEModel& rve);
 
+	// set the parent FEModel
+	void SetParentModel(FEModel* fem);
+
 	//! Calculate the stress average
+	mat3ds StressAverage(mat3d& F, FEMaterialPoint& mp);
 	mat3ds StressAverage(FEMaterialPoint& mp);
 
 	//! Calculate the stiffness average
@@ -96,6 +103,7 @@ private:
 	bool Solve() override;
 
 private:
+	FEModel*		m_parentfem;		//!< parent FEModel
 	double			m_V0;				//!< initial volume
 	int				m_bctype;			//!< RVE type
 	FEBoundingBox	m_bb;				//!< bounding box of mesh
