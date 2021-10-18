@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMicroMaterial.h"
 #include "FECore/FEElemElemList.h"
@@ -34,117 +31,10 @@ SOFTWARE.*/
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
-#include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
 #include "FEBioMech/FEBCPrescribedDeformation.h"
+#include "FERVEProbe.h"
 #include <sstream>
-
-//=============================================================================
-BEGIN_FECORE_CLASS(FERVEProbe, FECallBack)
-	ADD_PARAMETER(m_neid, "element_id");
-	ADD_PARAMETER(m_ngp, "gausspt");
-	ADD_PARAMETER(m_file, "file");
-	ADD_PARAMETER(m_bdebug, "debug");
-END_FECORE_CLASS();
-
-FERVEProbe::FERVEProbe(FEModel* fem) : FECallBack(fem, CB_ALWAYS)
-{
-	m_rve = nullptr;
-	m_neid = -1;	// invalid element - this must be defined by user
-	m_ngp = -1;		// invalid gauss point
-	m_file = "rve.xplt";
-	m_bdebug = false;
-}
-
-bool FERVEProbe::Init()
-{
-	// get the (parent) model
-	FEModel& fem = *GetFEModel();
-
-	// get the micro-material
-	FEMicroMaterial* mat = dynamic_cast<FEMicroMaterial*>(GetParent());
-	if (mat == nullptr)
-	{
-		feLogError("The RVE probe must be a property of a micro-material.");
-		return false;
-	}
-
-	// find the element from the ID
-	FEMesh& mesh = fem.GetMesh();
-	FEElement* pel = mesh.FindElementFromID(m_neid);
-	if (pel == nullptr)
-	{
-		feLogError("Invalid Element ID for micro probe %d in material %d (%s)", m_neid, mat->GetID(), mat->GetName().c_str());
-		return false;
-	}
-
-	// make sure the element's parent domain has this material
-	FEDomain* dom = dynamic_cast<FEDomain*>(pel->GetMeshPartition());
-	if ((dom == nullptr) || (dom->GetMaterial() != mat))
-	{
-		feLogError("The specified element does not belong to this material's domain.");
-		return false;
-	}
-
-	int nint = pel->GaussPoints();
-	if ((m_ngp >= 0) && (m_ngp < nint))
-	{
-		FEMaterialPoint& mp = *pel->GetMaterialPoint(m_ngp);
-		FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
-		m_rve = &mmpt.m_rve;
-	}
-	else
-	{
-		feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", m_ngp, mat->GetID(), mat->GetName().c_str());
-		return false;
-	}
-
-	return true;
-}
-
-bool FERVEProbe::Execute(FEModel& fem, int nwhen)
-{
-	if (nwhen == CB_INIT)	// initialize the plot file
-	{
-		assert(m_rve);
-		if (m_rve == nullptr) return false;
-
-		// create a plot file
-		m_xplt = new FEBioPlotFile(m_rve);
-		if (m_xplt->Open(m_file.c_str()) == false)
-		{
-			feLog("Failed creating probe.\n\n");
-			delete m_xplt; m_xplt = 0;
-		}
-
-		// write the initial state
-		Save();
-	}
-	else if (nwhen == CB_MINOR_ITERS)
-	{
-		if (m_bdebug) Save();
-	}
-	else if (nwhen == CB_MAJOR_ITERS)	// store the current state
-	{
-		Save();
-	}
-	else if (nwhen == CB_SOLVED)	// clean up
-	{
-		if (m_xplt) delete m_xplt;
-		m_xplt = 0;
-	}
-
-	return true;
-}
-
-void FERVEProbe::Save()
-{
-	assert(m_rve);
-	if (m_rve)
-	{
-		if (m_xplt) m_xplt->Write((float)m_rve->GetCurrentTime());
-	}
-}
 
 //=============================================================================
 FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)

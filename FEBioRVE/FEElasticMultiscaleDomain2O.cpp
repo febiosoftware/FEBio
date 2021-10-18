@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticMultiscaleDomain2O.h"
 #include "FEMicroMaterial2O.h"
+#include "FERVEProbe.h"
 #include "FECore/mat3d.h"
 #include "FECore/tens6d.h"
 #include <FECore/log.h>

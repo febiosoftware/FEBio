@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FEElasticMultiscaleDomain2O.h"
 #include "FEMultiscaleDomainFactory.h"
 #include "FEBioRVEPlot.h"
+#include "FERVEProbe.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.

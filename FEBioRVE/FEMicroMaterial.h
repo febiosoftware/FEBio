@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FEModel.h"
@@ -34,38 +31,7 @@ SOFTWARE.*/
 #include "FECore/FECallBack.h"
 #include "FERVEModel.h"
 
-//-----------------------------------------------------------------------------
-class FEBioPlotFile;
-
-//-----------------------------------------------------------------------------
-class FERVEProbe : public FECallBack
-{
-public:
-	// The first FEModel (fem) is the macro-problem, i.e. the model that will generate the callbacks
-	// The second FEModel (rve) is the micro-problem that needs to be tracked.
-	FERVEProbe(FEModel* fem);
-
-	bool Init();
-
-	bool Execute(FEModel& fem, int nwhen);
-
-	void Save();
-
-	void SetDebugFlag(bool b) { m_bdebug = b; }
-	bool GetDebugFlag() const { return m_bdebug; }
-
-private:
-	int			m_neid;			//!< element Id
-	int			m_ngp;			//!< Gauss-point (one-based!)
-	std::string	m_file;			//!< file name
-	bool		m_bdebug;		//!< debug flag
-
-private:
-	FEBioPlotFile*		m_xplt;		//!< the actual plot file
-	FEModel*			m_rve;		//!< the RVE model
-
-	DECLARE_FECORE_CLASS();
-};
+class FERVEProbe;
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material

@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include <FECore/tens4d.h>
 
-class FEBCPrescribedDeformation;
-
 //-----------------------------------------------------------------------------
 // Class describing the RVE model.
 // This is used by the homogenization code.
@@ -102,7 +100,7 @@ private:
 	// (We use the RCI solution method)
 	bool Solve() override;
 
-private:
+protected:
 	FEModel*		m_parentfem;		//!< parent FEModel
 	double			m_V0;				//!< initial volume
 	int				m_bctype;			//!< RVE type

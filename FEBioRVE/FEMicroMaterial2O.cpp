@@ -36,6 +36,7 @@ SOFTWARE.*/
 //#include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/tens3d.h"
 #include "FEPeriodicBoundary2O.h"
+#include "FERVEProbe.h"
 
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
