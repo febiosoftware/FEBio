@@ -23,46 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FECore/FEMesh.h"
-#include "FECore/FEPlotData.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FECore/tens3d.h"
 
 //-----------------------------------------------------------------------------
-class FEModel;
-
-//-----------------------------------------------------------------------------
-//! This class implements the facilities to write to a plot database. 
-//!
-class PlotFile
+//! This class implements a domain used in an elastic remodeling problem.
+//! It differs from the FEElasticSolidDomain in that it adds a stiffness matrix
+//! due to the deformation dependent density.
+class FEElasticMultiscaleDomain1O : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	PlotFile(FEModel* fem);
+	FEElasticMultiscaleDomain1O(FEModel* pfem);
 
-	//! descructor
-	virtual ~PlotFile();
-
-	//! close the plot database
-	virtual void Close();
-
-	//! Open the plot database
-	virtual bool Open(const char* szfile) = 0;
-
-	//! Open for appending
-	virtual bool Append(const char* szfile) = 0;
-
-	//! Write current FE state to plot database
-	virtual bool Write(float ftime, int flag = 0) = 0;
-
-	//! see if the plot file is valid
-	virtual bool IsValid() const = 0;
-
-protected:
-	FEModel* GetFEModel() { return m_pfem; }
-
-private:
-	FEModel*	m_pfem;		//!< pointer to FE model
+	//! initialize class
+	bool Init();
 };

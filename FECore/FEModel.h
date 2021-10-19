@@ -57,6 +57,7 @@ class FEModelData;
 class FEDataArray;
 class FEMeshAdaptor;
 class Timer;
+class FEPlotDataStore;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel
@@ -71,11 +72,12 @@ struct FEMODEL_MEMORY_STATS {
 // Timer IDs
 enum TimerID {
 	Timer_Update,
-	Timer_Solve,
+	Timer_LinSolve,
 	Timer_Reform,
 	Timer_Residual,
 	Timer_Stiffness,
-	Timer_QNUpdate
+	Timer_QNUpdate,
+	Timer_ModelSolve
 };
 
 //-----------------------------------------------------------------------------
@@ -125,6 +127,13 @@ public:
 
 	//! will return true if the model solved succussfully
 	bool IsSolved() const;
+
+public: // reverse control solver interface
+	bool RCI_Init();
+	bool RCI_Rewind();
+	bool RCI_Advance();
+	bool RCI_Finish();
+	bool RCI_ClearRewindStack();
 
 public:
 	// get the FE mesh
@@ -275,6 +284,9 @@ public: // --- Analysis steps functions ---
 	//! Set the current time
 	void SetCurrentTime(double t);
 
+	//! set the current time step
+	void SetCurrentTimeStep(double dt);
+
 public: // --- Contact interface functions ---
 
 	//! return number of surface pair constraints
@@ -409,6 +421,10 @@ public: // Data retrieval
 
 	//! return the data store
 	DataStore& GetDataStore();
+
+	//! return plot data
+	FEPlotDataStore& GetPlotDataStore();
+	const FEPlotDataStore& GetPlotDataStore() const;
 
 public:
 	// reset all the timers

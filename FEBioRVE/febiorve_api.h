@@ -27,42 +27,17 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMesh.h"
-#include "FECore/FEPlotData.h"
 
-//-----------------------------------------------------------------------------
-class FEModel;
-
-//-----------------------------------------------------------------------------
-//! This class implements the facilities to write to a plot database. 
-//!
-class PlotFile
-{
-public:
-	//! constructor
-	PlotFile(FEModel* fem);
-
-	//! descructor
-	virtual ~PlotFile();
-
-	//! close the plot database
-	virtual void Close();
-
-	//! Open the plot database
-	virtual bool Open(const char* szfile) = 0;
-
-	//! Open for appending
-	virtual bool Append(const char* szfile) = 0;
-
-	//! Write current FE state to plot database
-	virtual bool Write(float ftime, int flag = 0) = 0;
-
-	//! see if the plot file is valid
-	virtual bool IsValid() const = 0;
-
-protected:
-	FEModel* GetFEModel() { return m_pfem; }
-
-private:
-	FEModel*	m_pfem;		//!< pointer to FE model
-};
+#ifdef WIN32
+	#ifdef FECORE_DLL
+		#ifdef FEBIORVE_EXPORTS
+			#define FEBIORVE_API __declspec(dllexport)
+		#else
+			#define FEBIORVE_API __declspec(dllimport)
+		#endif
+	#else
+		#define FEBIORVE_API
+	#endif
+#else
+	#define FEBIORVE_API
+#endif

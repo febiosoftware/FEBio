@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
+#include <FECore/FEPlotDataStore.h>
 
 bool string_to_int_vector(const char* szlist, std::vector<int>& list)
 {
@@ -309,6 +310,8 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
 
+	FEPlotDataStore& plotData = fem.GetPlotDataStore();
+
 	// get the plot file type. Must be "febio"!
 	const char* sz = tag.AttributeValue("type", true);
 	if (sz)
@@ -316,7 +319,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		if ((strcmp(sz, "febio") != 0) && (strcmp(sz, "febio2") != 0)) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	else sz = "febio";
-	strcpy(GetFEBioImport()->m_szplot_type, sz);
+	plotData.SetPlotFileType(sz);
 
 	// get the optional plot file name
 	const char* szplt = tag.AttributeValue("file", true);
@@ -377,21 +380,21 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 
                         // Add the plot variable
                         const std::string& surfName = psurf->GetName();
-						GetFEBioImport()->AddPlotVariable(szt, item, surfName.c_str());
+						plotData.AddPlotVariable(szt, item, surfName.c_str());
                     }
                     else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
                 }
                 else
                 {
                     // Add the plot variable
-					GetFEBioImport()->AddPlotVariable(szt, item);
+					plotData.AddPlotVariable(szt, item);
                 }
 			}
 			else if (tag=="compression")
 			{
 				int ncomp;
 				tag.value(ncomp);
-				GetFEBioImport()->SetPlotCompression(ncomp);
+				plotData.SetPlotCompression(ncomp);
 			}
 			++tag;
 		}

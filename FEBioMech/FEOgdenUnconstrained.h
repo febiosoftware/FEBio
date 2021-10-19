@@ -50,9 +50,9 @@ protected:
 	double	m_eps;
 	
 public:
-	double	m_c[MAX_TERMS];		//!< coefficients mu
-	double	m_m[MAX_TERMS];		//!< powers
-	double	m_p;				//!< coefficient mu prime
+	FEParamDouble	m_cp;				//!< coefficient mu prime
+	FEParamDouble	m_c[MAX_TERMS];		//!< coefficients mu
+	double	m_m[MAX_TERMS];				//!< powers
 	
 	DECLARE_FECORE_CLASS();
 };

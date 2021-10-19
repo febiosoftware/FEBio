@@ -139,7 +139,6 @@ SOFTWARE.*/
 #include "FEPrescribedActiveContractionIsotropicUC.h"
 #include "FEGentMaterial.h"
 #include "FEWrinkleOgdenMaterial.h"
-#include "FEMindlinElastic2O.h"
 #include "FEGenericHyperelastic.h"
 #include "FEGenericHyperelasticUC.h"
 #include "FEGenericTransIsoHyperelastic.h"
@@ -160,8 +159,6 @@ SOFTWARE.*/
 
 #include "FEFacet2FacetSliding.h"
 #include "FEPeriodicBoundary.h"
-#include "FEPeriodicBoundary1O.h"
-#include "FEPeriodicBoundary2O.h"
 #include "FERigidWallInterface.h"
 #include "FESlidingInterface.h"
 #include "FESlidingElasticInterface.h"
@@ -174,7 +171,6 @@ SOFTWARE.*/
 #include "FEFacet2FacetTied.h"
 #include "FEVolumeConstraint.h"
 #include "FEDistanceConstraint.h"
-#include "FE2OMicroConstraint.h"
 #include "FEMortarSlidingContact.h"
 #include "FEMortarTiedContact.h"
 #include "FEContactPotential.h"
@@ -316,7 +312,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEContinuousFiberDistribution, "continuous fiber distribution");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, "coupled trans-iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, "coupled trans-iso Mooney-Rivlin");
-	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelastic, "trans-iso hyperelastic");
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
@@ -559,7 +554,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDiscreteContact, "discrete contact");
 	REGISTER_FECORE_CLASS(FEDiscreteContact2, "discrete contact2");
 	REGISTER_FECORE_CLASS(FEDistanceConstraint, "node distance");
-	REGISTER_FECORE_CLASS(FE2OMicroConstraint, "2O microfluc");
 	REGISTER_FECORE_CLASS(FEGPAConstraint, "prestrain");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint, "in-situ stretch");
 	REGISTER_FECORE_CLASS(FEAzimuthConstraint, "azimuth constraint");
@@ -577,8 +571,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFacet2FacetTied, "tied-facet-on-facet");
 	REGISTER_FECORE_CLASS(FETiedElasticInterface, "tied-elastic");
 	REGISTER_FECORE_CLASS(FEPeriodicBoundary, "periodic boundary");
-	REGISTER_FECORE_CLASS(FEPeriodicBoundary1O, "periodic boundary1O");
-	REGISTER_FECORE_CLASS(FEPeriodicBoundary2O, "periodic boundary2O");
 	REGISTER_FECORE_CLASS(FERigidWallInterface, "rigid_wall");
 	REGISTER_FECORE_CLASS(FEPeriodicSurfaceConstraint, "surface constraint");
 	REGISTER_FECORE_CLASS(FEStickyInterface, "sticky");

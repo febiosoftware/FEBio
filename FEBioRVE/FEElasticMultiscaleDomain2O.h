@@ -27,42 +27,25 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMesh.h"
-#include "FECore/FEPlotData.h"
+#include "FEElasticSolidDomain2O.h"
+#include <FECore/tens3d.h>
+#include <FECore/tens5d.h>
+#include <FECore/tens6d.h>
+#include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------
-class FEModel;
-
-//-----------------------------------------------------------------------------
-//! This class implements the facilities to write to a plot database. 
-//!
-class PlotFile
+//! This class implements a domain used in an elastic remodeling problem.
+//! It differs from the FEElasticSolidDomain in that it adds a stiffness matrix
+//! due to the deformation dependent density.
+class FEElasticMultiscaleDomain2O : public FEElasticSolidDomain2O
 {
 public:
 	//! constructor
-	PlotFile(FEModel* fem);
+	FEElasticMultiscaleDomain2O(FEModel* pfem);
+	
+	//! initialize class
+	bool Init() override;
 
-	//! descructor
-	virtual ~PlotFile();
-
-	//! close the plot database
-	virtual void Close();
-
-	//! Open the plot database
-	virtual bool Open(const char* szfile) = 0;
-
-	//! Open for appending
-	virtual bool Append(const char* szfile) = 0;
-
-	//! Write current FE state to plot database
-	virtual bool Write(float ftime, int flag = 0) = 0;
-
-	//! see if the plot file is valid
-	virtual bool IsValid() const = 0;
-
-protected:
-	FEModel* GetFEModel() { return m_pfem; }
-
-private:
-	FEModel*	m_pfem;		//!< pointer to FE model
+	//! Update 
+	void Update(const FETimeInfo& timeInfo) override;
 };

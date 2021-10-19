@@ -135,7 +135,6 @@ public:
 	// initialize the solver
 	bool InitSolver();
 
-private:
 	// Call the FE Solver to solve the time step
 	// Returns an error code
 	// 0 = all is well, continue

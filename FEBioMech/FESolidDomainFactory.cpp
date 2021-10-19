@@ -44,7 +44,6 @@ SOFTWARE.*/
 #include "FECore/FEDiscreteMaterial.h"
 #include "FEDiscreteElementMaterial.h"
 #include "FESRIElasticSolidDomain.h"
-#include "FEElasticMaterial2O.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
@@ -66,7 +65,6 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		else return 0;
 	}
 	else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
-	else if (dynamic_cast<FEElasticMaterial2O*        >(pmat)) sztype = "elastic-solid2O";
 	else if (dynamic_cast<FESolidMaterial*>(pmat))
 	{
 		// structural elements

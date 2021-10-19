@@ -39,21 +39,35 @@ public:
 	FEBioStdSolver(FEModel* pfem);
 
 	//! initialization
-	bool Init(const char* szfile);
+	bool Init(const char* szfile) override;
 
 	//! Run the FE model
-	bool Run();
+	bool Run() override;
 };
 
 //-----------------------------------------------------------------------------
 class FEBioRestart : public FECoreTask
 {
 public:
-	FEBioRestart(FEModel* pfem) : FECoreTask(pfem){}
+	FEBioRestart(FEModel* pfem);
 
 	//! initialization
-	bool Init(const char* szfile);
+	bool Init(const char* szfile) override;
 
 	//! Run the FE model
-	virtual bool Run();
+	bool Run() override;
+};
+
+//-----------------------------------------------------------------------------
+// class for testing reverse communication interface of FEModel
+class FEBioRCISolver : public FECoreTask
+{
+public:
+	FEBioRCISolver(FEModel* fem);
+
+	//! initialization
+	bool Init(const char* szfile) override;
+
+	//! Run the FE model
+	bool Run() override;
 };

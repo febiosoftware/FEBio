@@ -37,8 +37,10 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEPeriodicLinearConstraint.h>
-#include <FECore/FEPeriodicLinearConstraint2O.h>
+//#include <FEBioRVE/FEPeriodicLinearConstraint2O.h>
 #include <FECore/FEMergedConstraint.h>
+#include <FEBioMech/FEMechModel.h>
+#include <FEBioMech/FERigidMaterial.h>
 #include <FECore/FEFacetSet.h>
 #include <FECore/log.h>
 #include <FECore/FEModelLoad.h>
@@ -981,7 +983,10 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 
 void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 {
-	FEModel* fem = GetFEModel();
+	assert(false);
+	throw XMLReader::InvalidTag(tag);
+
+/*	FEModel* fem = GetFEModel();
 	FEMesh& mesh = fem->GetMesh();
 	FEPeriodicLinearConstraint2O plc;
 
@@ -1014,6 +1019,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 	{
 		throw XMLReader::InvalidTag(tag);
 	}
+	*/
 }
 
 //-----------------------------------------------------------------------------

@@ -26,43 +26,53 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "FECore/FEMesh.h"
-#include "FECore/FEPlotData.h"
+#include "stdafx.h"
+#include "FEElasticMultiscaleDomain1O.h"
+#include "FEMicroMaterial.h"
+#include "FECore/mat3d.h"
+#include "FECore/tens6d.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
-class FEModel;
-
-//-----------------------------------------------------------------------------
-//! This class implements the facilities to write to a plot database. 
-//!
-class PlotFile
+//! constructor
+FEElasticMultiscaleDomain1O::FEElasticMultiscaleDomain1O(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
-public:
-	//! constructor
-	PlotFile(FEModel* fem);
+}
 
-	//! descructor
-	virtual ~PlotFile();
+//-----------------------------------------------------------------------------
+//! intialize domain
+bool FEElasticMultiscaleDomain1O::Init()
+{
+	if (FEElasticSolidDomain::Init() == false) return false;
 
-	//! close the plot database
-	virtual void Close();
+	// get the material
+	FEModel& fem = *GetFEModel();
+	FEMicroMaterial* pmat = dynamic_cast<FEMicroMaterial*>(m_pMat);
+	if (m_pMat == 0) return false;
 
-	//! Open the plot database
-	virtual bool Open(const char* szfile) = 0;
+	// get the parent RVE
+	FERVEModel& rve = pmat->m_mrve;
 
-	//! Open for appending
-	virtual bool Append(const char* szfile) = 0;
+	// loop over all elements
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j) 
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 
-	//! Write current FE state to plot database
-	virtual bool Write(float ftime, int flag = 0) = 0;
+			// create the material point RVEs
+			mmpt.m_F_prev = pt.m_F;	// TODO: I think I can remove this line
+			mmpt.m_rve.CopyFrom(rve);
+			if (mmpt.m_rve.Init() == false) return false;
 
-	//! see if the plot file is valid
-	virtual bool IsValid() const = 0;
+			// initialize RCI solve
+			if (mmpt.m_rve.RCI_Init() == false) return false;
+		}
+	}
 
-protected:
-	FEModel* GetFEModel() { return m_pfem; }
-
-private:
-	FEModel*	m_pfem;		//!< pointer to FE model
-};
+	return true;
+}

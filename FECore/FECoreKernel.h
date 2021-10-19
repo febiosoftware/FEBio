@@ -137,7 +137,7 @@ public: // Modules
 
 public:
 	//! Register a new domain class
-	void RegisterDomain(FEDomainFactory* pf);
+	void RegisterDomain(FEDomainFactory* pf, bool pushFront = false);
 
 	//! Create a domain of a certain type
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
