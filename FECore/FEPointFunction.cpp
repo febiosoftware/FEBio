@@ -567,7 +567,7 @@ double FEPointFunction::integrate(double a, double b) const
 	int neg = 1;
 	if(a > b)
 	{
-		int temp = a;
+		double temp = a;
 		a = b;
 		b = temp;
 		neg = -1;
