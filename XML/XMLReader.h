@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include <string>
 #include <vector>
 #include <stdexcept>
-using namespace std;
+#include <assert.h>
 
 //-------------------------------------------------------------------------
 // forward declaration
@@ -51,8 +51,9 @@ public:
 	//! constructor
 	XMLAtt();
 
-	//! assignment operator
+	//! comparison operators
 	bool operator == (const char* sz);
+	bool operator != (const char* szval);
 
 	//! Get the attribute name
 	const char* name() { return m_szatt; }
@@ -61,10 +62,19 @@ public:
 	const char* cvalue() { return m_szatv; }
 
 public:
+	void value(int& val) { val = atoi(m_szatv); }
+	int value(double* v, int n);
+	template <typename T> T value() { return T(0); }
+
+public:
 	char	m_szatt[MAX_TAG];	//!< attribute name
 	char	m_szatv[MAX_TAG];	//!< attribute value
 	bool	m_bvisited;			//!< was the attribute processed or not?
 };
+
+template <> inline int XMLAtt::value<int>() { return atoi(m_szatv); }
+template <> inline double XMLAtt::value<double>() { return atof(m_szatv); }
+template <> inline std::string XMLAtt::value<std::string>() { return m_szatv; }
 
 //-------------------------------------------------------------------------
 //! This class implements a xml-tag. The value and attributes of this tag
@@ -75,7 +85,7 @@ public:
 class XMLTag
 {
 public:
-	enum {MAX_TAG   = 128};
+	enum {MAX_TAG   = 512};
 	enum {MAX_ATT   =   8};
 	enum {MAX_LEVEL =  16};
 
@@ -103,6 +113,8 @@ public:
 
 	void clear();
 
+	int currentLine() const { return m_ncurrent_line; }
+
 	bool operator == (const char* sztag) { return (strcmp(sztag, m_sztag) == 0); }
 	bool operator != (const char* sztag) { return (strcmp(sztag, m_sztag) != 0); }
 	void operator ++ ();
@@ -115,8 +127,11 @@ public:
 	int children();
 
 	const char* AttributeValue(const char* szat, bool bopt = false);
+	XMLAtt* AttributePtr(const char* szat);
 	XMLAtt* Attribute(const char* szat, bool bopt);
 	XMLAtt& Attribute(const char* szat);
+
+	template <typename T> T AttributeValue(const char* szatt, const T& def_val) { return def_val; }
 
 	bool AttributeValue(const char* szat, int&    n, bool bopt = false);
 	bool AttributeValue(const char* szat, double& d, bool bopt = false);
@@ -131,22 +146,47 @@ public:
 	int value(double* pf, int n);
 	int value(float* pf, int n);
 	int value(int* pi, int n);
-	int value(std::vector<string>& stringList, int n);
+	int value(std::vector<std::string>& stringList, int n);
 	void value(bool& val);
 	void value(char* szstr);
 	void value(std::string& val);
-	void value(vector<int>& l);
+	void value(std::vector<int>& l);
+	void value(std::vector<double>& l);
+
+	template <class T> void value(T& v);
 
 	const char* szvalue() { return m_szval.c_str(); }
+
+	const std::string& comment();
 };
+
+
+template <> inline int XMLTag::AttributeValue<int>(const char* szatt, const int& def_val)
+{
+	XMLAtt* pa = AttributePtr(szatt);
+	if (pa) return pa->value<int>();
+	else return def_val;
+}
+
+template <> inline double XMLTag::AttributeValue<double >(const char* szatt, const double& def_val)
+{
+	XMLAtt* pa = AttributePtr(szatt);
+	if (pa) return pa->value<double>();
+	else return def_val;
+}
+
+template <> inline std::string XMLTag::AttributeValue<std::string>(const char* szatt, const std::string& def_val)
+{
+	XMLAtt* pa = AttributePtr(szatt);
+	if (pa) return pa->value<std::string>();
+	else return def_val;
+}
 
 //-----------------------------------------------------------------------------
 //! This class implements a reader for XML files
 class XMLReader
 {
 public:
-	enum {MAX_TAG   = 128};
-
 	enum {BUF_SIZE = 32768};
 
 public:
@@ -203,6 +243,7 @@ public:
 	{
 	public:
 		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
+		InvalidAttributeValue(XMLTag& t, XMLAtt& att);
 	};
 
 	// an attribute is invalid
@@ -218,6 +259,12 @@ public:
 	public:
 		MissingAttribute(XMLTag& t, const char* sza);
 	};
+
+	class MissingTag : public Error
+	{
+	public:
+		MissingTag(XMLTag& t, const char* szt);
+	};
 	//------------------------
 
 public:
@@ -225,11 +272,16 @@ public:
 	XMLReader();
 	virtual ~XMLReader();
 
+	FILE* GetFilePtr();
+
 	//! Open the xml file
 	bool Open(const char* szfile);
 
 	//! Close the xml file
 	void Close();
+
+	// Attach a file to this reader. Reader does not take ownership of file pointer
+	bool Attach(FILE* fp);
 
 	//! Find a tag
 	bool FindTag(const char* xpath, XMLTag& tag);
@@ -238,10 +290,12 @@ public:
 	void NextTag(XMLTag& tag);
 
 	//! return the current line
-	int GetCurrentLine() { return m_nline; }
+	int GetCurrentLine();
 
 	//! Skip a tag
 	void SkipTag(XMLTag& tag);
+
+	const std::string& GetLastComment();
 
 protected: // helper functions
 
@@ -266,16 +320,30 @@ protected: // helper functions
 	//! move the file pointer
     void rewind(int64_t nstep);
 
+	// only used for processing comments
+	char GetNextChar();
+	
 protected:
 	FILE*	m_fp;			//!< the file pointer
+	bool	m_ownFile;		//!< flag that inidicates whether the reader owns the file pointer or not
+
 	int		m_nline;		//!< current line (used only as temp storage)
     int64_t	m_currentPos;	//!< current file position
 
-	char	m_buf[BUF_SIZE];
+	std::string	m_comment;	// last comment that was read
+
+	char		m_buf[BUF_SIZE];
     int64_t    m_bufIndex, m_bufSize;
-	bool	m_eof;
+	bool		m_eof;
 };
 
 //-----------------------------------------------------------------------------
 // some inline functions
 inline void XMLTag::operator ++ () { m_preader->NextTag(*this); }
+
+inline const std::string& XMLTag::comment() { return m_preader->GetLastComment(); }
+
+//-----------------------------------------------------------------------------
+// mechanism for using custom types with XMLReader. 
+template <class T> void string_to_type(const std::string& s, T& v) { assert(false); }
+template <class T> void XMLTag::value(T& v) { string_to_type(m_szval, v); }

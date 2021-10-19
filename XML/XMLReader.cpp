@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "XMLReader.h"
 #include <assert.h>
 #include <stdarg.h>
+using namespace std;
 
 //=============================================================================
 // XMLAtt
@@ -46,6 +47,28 @@ XMLAtt::XMLAtt()
 bool XMLAtt::operator == (const char* sz)
 {
 	return (strcmp(m_szatv, sz) == 0);
+}
+
+bool XMLAtt::operator != (const char* szval) 
+{ 
+	return (strcmp(szval, m_szatv) != 0); 
+}
+
+int XMLAtt::value(double* pf, int n)
+{
+	char* sz = m_szatv;
+	int nr = 0;
+	for (int i = 0; i < n; ++i)
+	{
+		char* sze = strchr(sz, ',');
+
+		pf[i] = atof(sz);
+		nr++;
+
+		if (sze) sz = sze + 1;
+		else break;
+	}
+	return nr;
 }
 
 //=============================================================================
@@ -260,6 +283,25 @@ void XMLTag::value(vector<int>& l)
 }
 
 //-----------------------------------------------------------------------------
+void XMLTag::value(vector<double>& l)
+{
+	l.clear();
+	char* sz = m_sztag;
+	int nr = 0;
+	while (sz && *sz)
+	{
+		char* sze = strchr(sz, ',');
+
+		double f = atof(sz);
+		l.push_back(f);
+		nr++;
+
+		if (sze) sz = sze + 1;
+		else break;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Return the number of children of a tag
 int XMLTag::children()
 {
@@ -289,6 +331,12 @@ const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 }
 
 //-----------------------------------------------------------------------------
+XMLAtt* XMLTag::AttributePtr(const char* szat)
+{
+	return Attribute(szat, true);
+}
+
+//-----------------------------------------------------------------------------
 //! return the attribute
 XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 {
@@ -304,7 +352,7 @@ XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
 
 	// we didn't find it
-	return 0;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -388,6 +436,9 @@ XMLReader::Error(tag, "invalid value") {}
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, const char* sza, const char* szv) : \
 XMLReader::Error(tag, format_string("invalid value for attribute \"%s\"", sza)) {}
 
+XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, XMLAtt& att) : \
+XMLReader::Error(tag, format_string("invalid value for attribute \"%s\"", att.cvalue())) {}
+
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttribute::InvalidAttribute(XMLTag& tag, const char* sza) :\
 XMLReader::Error(tag, format_string("invalid attribute \"%s\"", sza)) {}
@@ -395,6 +446,10 @@ XMLReader::Error(tag, format_string("invalid attribute \"%s\"", sza)) {}
 //-----------------------------------------------------------------------------
 XMLReader::MissingAttribute::MissingAttribute(XMLTag& tag, const char* sza) : \
 XMLReader::Error(tag, format_string("missing attribute \"%s\"", sza)) {}
+
+//-----------------------------------------------------------------------------
+XMLReader::MissingTag::MissingTag(XMLTag& tag, const char* sza) : \
+XMLReader::Error(tag, format_string("missing tag \"%s\"", sza)) {}
 
 //=============================================================================
 // XMLReader
@@ -420,7 +475,7 @@ XMLReader::~XMLReader()
 //-----------------------------------------------------------------------------
 void XMLReader::Close()
 {
-	if (m_fp)
+	if (m_ownFile && (m_fp != 0))
 	{
 		fclose(m_fp);
 	}
@@ -431,6 +486,29 @@ void XMLReader::Close()
 	m_bufSize = 0;
 	m_eof = false;
 	m_currentPos = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Attach a file to this reader. Reader does not take ownership of file pointer
+bool XMLReader::Attach(FILE* fp)
+{
+	// keep a copy of the file pointer
+	m_fp = fp;
+	m_ownFile = false;
+
+	// read the first line
+	char szline[256] = { 0 };
+	fgets(szline, 255, m_fp);
+
+	// make sure it is correct
+	if (strncmp(szline, "<?xml", 5) != 0)
+	{
+		// This file is not an XML file
+		return false;
+	}
+
+	// This file is ready to be processed
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -798,7 +876,6 @@ void XMLReader::ReadValue(XMLTag& tag)
 		{ 
 			tag.m_szval.push_back(ch);
 		}
-		tag.m_szval.push_back(0);
 	}
 	else while ((ch=GetChar())!='<');
 }
@@ -945,4 +1022,27 @@ void XMLReader::SkipTag(XMLTag& tag)
 	while (!tag.isend());
 
 	++tag;
+}
+
+//-----------------------------------------------------------------------------
+char XMLReader::GetNextChar()
+{
+	char ch;
+	do
+	{
+		ch = readNextChar();
+		if (ch == '\n') ++m_nline;
+	} while (ch == '\r');
+	return ch;
+}
+
+FILE* XMLReader::GetFilePtr() { return m_fp; }
+
+//! return the current line
+int XMLReader::GetCurrentLine() { return m_nline; }
+
+
+const std::string& XMLReader::GetLastComment()
+{
+	return m_comment;
 }
