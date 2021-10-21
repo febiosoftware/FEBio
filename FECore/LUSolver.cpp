@@ -23,16 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "LUSolver.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-LUSolver::LUSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
+LUSolver::LUSolver(FEModel* fem) : LinearSolver(fem), m_pA(nullptr)
 {
+
 }
 
 //-----------------------------------------------------------------------------
@@ -40,6 +38,12 @@ LUSolver::LUSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 SparseMatrix* LUSolver::CreateSparseMatrix(Matrix_Type ntype)
 { 
 	return (m_pA = new FECore::DenseMatrix()); 
+}
+
+//-----------------------------------------------------------------------------
+void LUSolver::SetMatrix(FECore::DenseMatrix* pA) 
+{ 
+	m_pA = pA; 
 }
 
 //-----------------------------------------------------------------------------
@@ -122,28 +126,26 @@ bool LUSolver::BackSolve(double* x, double* b)
 {
 	FECore::DenseMatrix& a = *m_pA;
 
-	x = b;
-
-	int i, ii=0, ip, j;
-	double sum;
-
 	int n = a.Rows();
-	for (i=0; i<n; ++i)
+	for (int i=0; i<n; i++) x[i] = b[i];
+
+	int ii=0;
+	for (int i=0; i<n; ++i)
 	{
-		ip = indx[i];
-		sum = x[ip];
+		int ip = indx[i];
+		double sum = x[ip];
 		x[ip] = x[i];
 		if (ii != 0)
-			for (j=ii-1;j<i;++j) sum -= a(i,j)*x[j];
+			for (int j=ii-1;j<i;++j) sum -= a(i,j)*x[j];
 		else if (sum != 0)
 			ii = i+1;
 		x[i] = sum;
 	}
 
-	for (i=n-1; i>=0; --i)
+	for (int i=n-1; i>=0; --i)
 	{
-		sum = x[i];
-		for (j=i+1; j<n; ++j) sum -= a(i,j)*x[j];
+		double sum = x[i];
+		for (int j=i+1; j<n; ++j) sum -= a(i,j)*x[j];
 		x[i] = sum/a(i,i);
 	}
 

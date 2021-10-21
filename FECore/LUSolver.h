@@ -27,8 +27,9 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/LinearSolver.h>
-#include <FECore/DenseMatrix.h>
+#include "LinearSolver.h"
+#include "DenseMatrix.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 //! LU decomposition solver
@@ -39,11 +40,11 @@ SOFTWARE.*/
 //! solver. It should only be used for small problems and only when the other
 //! solvers are not adequate.
 
-class LUSolver : public LinearSolver
+class FECORE_API LUSolver : public LinearSolver
 {
 public:
 	//! constructor
-	LUSolver(FEModel* fem);
+	LUSolver(FEModel* fem = nullptr);
 
 	//! Pre-process data
 	bool PreProcess() override;
@@ -60,7 +61,10 @@ public:
 	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
+	//! Set the matrix
+	void SetMatrix(FECore::DenseMatrix* pA);
+
 protected:
-	vector<int>				indx;	//!< indices
+	std::vector<int>		indx;	//!< indices
 	FECore::DenseMatrix*	m_pA;	//!< sparse matrix
 };

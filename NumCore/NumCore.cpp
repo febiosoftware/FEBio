@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "NumCore.h"
 #include "SkylineSolver.h"
-#include "LUSolver.h"
 #include "PardisoSolver.h"
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
@@ -54,7 +53,6 @@ NUMCORE_API void NumCore::InitModule()
 	// register linear solvers
 	REGISTER_FECORE_CLASS(PardisoSolver  , "pardiso");
 	REGISTER_FECORE_CLASS(SkylineSolver  , "skyline");
-	REGISTER_FECORE_CLASS(LUSolver       , "LU"     );
 	REGISTER_FECORE_CLASS(FGMRESSolver        , "fgmres"   );
 	REGISTER_FECORE_CLASS(BoomerAMGSolver     , "boomeramg");
 	REGISTER_FECORE_CLASS(RCICGSolver         , "cg"    );

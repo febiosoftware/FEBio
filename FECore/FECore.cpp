@@ -61,6 +61,7 @@ SOFTWARE.*/
 #include "FELogEnclosedVolume.h"
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
+#include "LUSolver.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -178,4 +179,8 @@ REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
 REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
 REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
+
+// linear solvers
+REGISTER_FECORE_CLASS(LUSolver, "LU");
+
 }
