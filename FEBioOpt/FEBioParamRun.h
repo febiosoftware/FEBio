@@ -23,22 +23,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
-#include "stdafx.h"
-#include "FEBioOpt.h"
-#include "FEOptimize.h"
-#include "FEParameterSweep.h"
-#include "FEBioParamRun.h"
-#include <FECore/FECoreKernel.h>
+#pragma once
+#include <FECore/FECoreTask.h>
+#include "FEOptimizeData.h"
 
 //-----------------------------------------------------------------------------
-//! Initialization of the FEBioOpt module. This function registers all the classes
-//! in this module with the FEBio framework.
-void FEBioOpt::InitModule()
+// This task runs FEBio, but sets overwrites the values of some parameters
+// of the input model and prints out an output parameter to a file. 
+class FEBioParamRun : public FECoreTask
 {
-REGISTER_FECORE_CLASS(FEOptimize      , "optimize");
-REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
-REGISTER_FECORE_CLASS(FEBioParamRun   , "param_run");
-}
+public:
+	//! class constructor
+	FEBioParamRun(FEModel* pfem);
+
+	//! initialization
+	bool Init(const char* szfile);
+
+	//! Run the task
+	bool Run();
+
+private:
+	//! read control file
+	bool Input(const char* szfile);
+
+private:
+	std::vector<FEModelParameter*>	    m_inVar;
+	std::vector<FEModelParameter*>	    m_outVar;
+	std::string	m_outFile;
+};
