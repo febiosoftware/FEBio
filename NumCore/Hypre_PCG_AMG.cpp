@@ -223,7 +223,7 @@ public:
 		HYPRE_BoomerAMGSetNumFunctions(precond, nfunc);
 
 		// set the dof map
-		HYPRE_BoomerAMGSetDofFunc(precond, dof_func);
+		HYPRE_BoomerAMGSetDofFunc(precond, (HYPRE_Int*)dof_func);
 
 		return true;
 	}
