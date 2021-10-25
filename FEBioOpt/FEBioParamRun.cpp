@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/log.h>
-#include <FEBioXML/XMLReader.h>
+#include <XML/XMLReader.h>
 
 //! class constructor
 FEBioParamRun::FEBioParamRun(FEModel* pfem) : FECoreTask(pfem)
