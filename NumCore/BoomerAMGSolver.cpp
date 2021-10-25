@@ -269,7 +269,7 @@ public:
 			HYPRE_BoomerAMGSetNumFunctions(m_solver, nfunc);
 
 			// set the dof map
-			HYPRE_BoomerAMGSetDofFunc(m_solver, m_dofMap);
+			HYPRE_BoomerAMGSetDofFunc(m_solver, (HYPRE_Int*)m_dofMap);
 		}
 
 		// NOTE: Turning this option on seems to worsen convergence!
@@ -294,7 +294,7 @@ public:
 		HYPRE_BoomerAMGSolve(m_solver, par_A, par_b, par_x);
 
 		/* Run info - needed logging turned on */
-		HYPRE_BoomerAMGGetNumIterations(m_solver, &m_num_iterations);
+		HYPRE_BoomerAMGGetNumIterations(m_solver, (HYPRE_Int*)&m_num_iterations);
 		HYPRE_BoomerAMGGetFinalRelativeResidualNorm(m_solver, &m_final_res_norm);
 
 		// see if we converged

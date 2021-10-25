@@ -292,7 +292,8 @@ enum FE_Plot_Level {
 	FE_PLOT_MUST_POINTS,	// output only on must-points
 	FE_PLOT_FINAL,			// only output final converged state
 	FE_PLOT_AUGMENTATIONS,	// plot state before augmentations
-	FE_PLOT_STEP_FINAL		// output the final step of a step
+	FE_PLOT_STEP_FINAL,		// output the final step of a step
+	FE_PLOT_USER1			// plot will only happen on CB_USER1 callback
 };
 
 //-----------------------------------------------------------------------------
