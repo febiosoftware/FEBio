@@ -50,6 +50,8 @@ public:
 
 	void SetWeighVolume(bool b);
 
+	void SetResetFlag(bool b);
+
 private:
 	void ResetSBM();
 
@@ -58,6 +60,7 @@ private:
 	vec3d	m_pos;	// the position (in reference coordinates)
 	double	m_val;	// density value at point source
 	bool	m_reset;
+	bool	m_doReset;
 	bool	m_weighVolume;
 
 private:
