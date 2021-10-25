@@ -48,7 +48,7 @@ public:
 
 	int Dim() { return (int)m_Var.size(); }
 
-	MVariable* AddVariable(const std::string& var);
+	MVariable* AddVariable(const std::string& var, double initVal = 0.0);
 	void AddVariables(const std::vector<std::string>& varList);
 
 	void AddVariable(MVariable* pv);
@@ -89,6 +89,9 @@ public:
 	// These functions are not thread safe since variable values can be overridden by different threads
 	// In multithreaded applications, use the thread safe functions below.
 	double value() const { return value(m_item.ItemPtr());  }
+
+	// combines Create and value. Not efficient usage! 
+	double value(const std::string& s);
 
 	// This is a thread safe function to evaluate the expression
 	// The values of the variables are passed as an argument. This function

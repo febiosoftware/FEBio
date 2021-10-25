@@ -58,7 +58,7 @@ enum Item_Type {
 class MVariable
 {
 public:
-	MVariable(const std::string& s) : m_v(0), m_name(s), m_index(-1) {}
+	MVariable(const std::string& s, double initVal = 0.0) : m_v(initVal), m_name(s), m_index(-1) {}
 	MVariable(const MVariable& v) : m_v(0), m_name(v.m_name), m_index(-1) {}
 	void operator = (const MVariable& v) { m_name = v.m_name; m_index = v.m_index; }
 	double value() const { return m_v; }
