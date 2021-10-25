@@ -44,6 +44,7 @@ FESBMPointSource::FESBMPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fe
 	m_pos = vec3d(0,0,0);
 	m_val = 0.0;
 	m_reset = bfirst;
+	m_doReset = true;
 	m_weighVolume = true;
 	bfirst = false;
 }
@@ -57,7 +58,7 @@ bool FESBMPointSource::Init()
 
 void FESBMPointSource::Update()
 {
-	if (m_reset) ResetSBM();
+	if (m_reset && m_doReset) ResetSBM();
 
 	// find the element in which the point lies
 	double rt[3] = { 0, 0, 0 };
@@ -134,6 +135,11 @@ double FESBMPointSource::GetValue() const
 void FESBMPointSource::SetWeighVolume(bool b)
 {
 	m_weighVolume = b;
+}
+
+void FESBMPointSource::SetResetFlag(bool b)
+{
+	m_doReset = b;
 }
 
 void FESBMPointSource::ResetSBM()
