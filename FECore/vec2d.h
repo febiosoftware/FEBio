@@ -72,3 +72,25 @@ public: // arithmetic operators
 public:
 	double r[2];
 };
+
+//-----------------------------------------------------------------------------
+class vec2i
+{
+public:
+	vec2i() { x = y = 0; }
+	vec2i(int X, int Y) { x = X; y = Y; }
+
+public:
+	int		x, y;
+};
+
+//-----------------------------------------------------------------------------
+class vec2f
+{
+public:
+	vec2f() { x = y = 0.f; }
+	vec2f(float rx, float ry) { x = rx; y = ry; }
+
+public:
+	float	x, y;
+};

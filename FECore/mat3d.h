@@ -481,5 +481,18 @@ inline mat3d skew(const vec3d& a)
                  -a.y,  a.x,    0);
 }
 
+//-----------------------------------------------------------------------------
+// This class stores a 2nd order diagonal tensor
+class mat3fd
+{
+public:
+	mat3fd() { x = y = z = 0.f; }
+	mat3fd(float X, float Y, float Z) { x = X; y = Y; z = Z; }
+
+public:
+	float x, y, z;
+};
+
+
 // The following file contains the actual definition of the class functions
 #include "mat3d.hpp"
