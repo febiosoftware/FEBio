@@ -433,6 +433,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistUser, "relaxation-power-dist-user");
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
     REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
+    REGISTER_FECORE_CLASS(FEBondRelaxationExpPow, "relaxation-exp-pow");
 
 	// damage cumulative distribution functions (used by damage materials)
 	REGISTER_FECORE_CLASS(FEDamageCDFSimo, "CDF Simo");
