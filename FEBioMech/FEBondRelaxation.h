@@ -307,3 +307,24 @@ public:
     DECLARE_FECORE_CLASS();
 };
 
+//-----------------------------------------------------------------------------
+// This class implements a exponential-power-law relaxation with constant relaxation time
+
+class FEBondRelaxationExpPow : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationExpPow(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
+    
+public:
+    double  m_tau;      //!< exponential relaxation time
+    double  m_beta;     //!< exponent
+    double  m_gamma;    //!< fractional contribution of exponential
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+

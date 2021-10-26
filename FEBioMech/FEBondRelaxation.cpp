@@ -518,3 +518,32 @@ double FEBondRelaxationProny::Relaxation(FEMaterialPoint& mp, const double t, co
     
     return g;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationExpPow
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRelaxationExpPow, FEBondRelaxation)
+    ADD_PARAMETER(m_tau  , FE_RANGE_GREATER(0.0)    , "tau" );
+    ADD_PARAMETER(m_beta , FE_RANGE_GREATER(0.0)    , "beta" );
+    ADD_PARAMETER(m_gamma, FE_RANGE_CLOSED(0.0, 1.0), "gamma");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationExpPow::FEBondRelaxationExpPow(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationExpPow::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    double g = m_gamma*exp(-t/m_tau) + (1-m_gamma)*exp(-pow(t/m_tau,m_beta));
+
+    return g;
+}
+

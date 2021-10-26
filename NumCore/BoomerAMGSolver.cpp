@@ -58,7 +58,7 @@ public:
 	vector<double>		rhs;	// right-hand side 
 
 	HYPRE_Solver	m_solver;
-	int				m_num_iterations;
+	HYPRE_Int		m_num_iterations;
 	double			m_final_res_norm;
 
 	int			m_print_level;
@@ -77,7 +77,7 @@ public:
 	bool		m_jacobi_pc;
 	bool		m_failMaxIters;
 
-	int*	m_dofMap;
+	HYPRE_Int*	m_dofMap;
 
 public:
 	Implementation()
@@ -260,7 +260,7 @@ public:
 			// allocate dof map
 			// (We need to copy it here since Hypre will deallocate it)
 			int neq = (int)dofMap.size();
-			m_dofMap = (int*)malloc(neq * sizeof(int));
+			m_dofMap = (HYPRE_Int*)malloc(neq * sizeof(HYPRE_Int));
 			for (size_t i = 0; i < neq; ++i) m_dofMap[i] = dofMap[i];
 
 			printf("\tNumber of functions : %d\n", nfunc);
@@ -269,7 +269,7 @@ public:
 			HYPRE_BoomerAMGSetNumFunctions(m_solver, nfunc);
 
 			// set the dof map
-			HYPRE_BoomerAMGSetDofFunc(m_solver, (HYPRE_Int*)m_dofMap);
+			HYPRE_BoomerAMGSetDofFunc(m_solver, m_dofMap);
 		}
 
 		// NOTE: Turning this option on seems to worsen convergence!
@@ -294,7 +294,7 @@ public:
 		HYPRE_BoomerAMGSolve(m_solver, par_A, par_b, par_x);
 
 		/* Run info - needed logging turned on */
-		HYPRE_BoomerAMGGetNumIterations(m_solver, (HYPRE_Int*)&m_num_iterations);
+		HYPRE_BoomerAMGGetNumIterations(m_solver, &m_num_iterations);
 		HYPRE_BoomerAMGGetFinalRelativeResidualNorm(m_solver, &m_final_res_norm);
 
 		// see if we converged
