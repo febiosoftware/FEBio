@@ -163,7 +163,7 @@ void FEBioGeometrySection3::ParseInstanceSection(XMLTag& tag)
 	newPart->SetName(szname);
 
 	// parse any child tags
-	FETransform transform;
+	Transform transform;
 	if (tag.isleaf() == false)
 	{
 		++tag;
@@ -178,7 +178,7 @@ void FEBioGeometrySection3::ParseInstanceSection(XMLTag& tag)
 					{
 						double r[3];
 						tag.value(r, 3);
-						transform.SetTranslation(vec3d(r[0], r[1], r[2]));
+						transform.SetPosition(vec3d(r[0], r[1], r[2]));
 					}
 					else if (tag == "rotate")
 					{

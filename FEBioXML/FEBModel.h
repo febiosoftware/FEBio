@@ -260,7 +260,7 @@ public:
 
 	Part* FindPart(const string& name);
 
-	bool BuildPart(FEModel& fem, Part& part, bool buildDomains = true, const FETransform& T = FETransform());
+	bool BuildPart(FEModel& fem, Part& part, bool buildDomains = true, const Transform& T = Transform());
 
 private:
 	std::vector<Part*>	m_Part;

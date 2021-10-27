@@ -260,7 +260,7 @@ FEBModel::Part* FEBModel::FindPart(const string& name)
 	return 0;
 }
 
-bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETransform& T)
+bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Transform& T)
 {
 	// we'll need the kernel for creating domains
 	FECoreKernel& febio = FECoreKernel::GetInstance();
@@ -322,7 +322,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		FENode& meshNode = mesh.Node(N0 + n++);
 
 		meshNode.SetID(++nid);
-		meshNode.m_r0 = T.Transform(partNode.r);
+		meshNode.m_r0 = T.Apply(partNode.r);
 		meshNode.m_rt = meshNode.m_r0;
 	}
 	assert(n == NN);

@@ -29,47 +29,55 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FETransform.h"
 
-// conversion factor from degrees to radians (= PI / 180)
-#define DEG_TO_RAD 0.01745329252
-
-FETransform::FETransform() : m_pos(0,0,0), m_rot(0, 0, 0)
+Transform::Transform()
 {
-	m_scl[0] = m_scl[1] = m_scl[2] = 1.0;
+	Reset();
 }
 
-void FETransform::SetTranslation(const vec3d& t)
+void Transform::Reset()
+{
+	m_scl = vec3d(1, 1, 1);
+	m_pos = vec3d(0, 0, 0);
+	m_rot = quatd(0, 0, 0, 1);
+	m_roti = quatd(0, 0, 0, 1);
+}
+
+void Transform::SetPosition(const vec3d& t)
 {
 	m_pos = t;
 }
 
-void FETransform::SetScale(double sx, double sy, double sz)
+void Transform::SetScale(double sx, double sy, double sz)
 {
-	m_scl[0] = sx;
-	m_scl[1] = sy;
-	m_scl[2] = sz;
+	m_scl.x = sx;
+	m_scl.y = sy;
+	m_scl.z = sz;
 }
 
-void FETransform::SetRotation(const quatd& q)
+void Transform::SetRotation(const quatd& q)
 {
 	m_rot = q;
+	m_roti = m_rot.Inverse();
 }
 
-void FETransform::SetRotation(const vec3d& r)
+void Transform::SetRotation(const vec3d& r)
 {
-	m_rot = quatd(r*DEG_TO_RAD);
+	m_rot = quatd(r*DEG2RAD);
+	m_roti = m_rot.Inverse();
 }
 
-void FETransform::SetRotation(double X, double Y, double Z)
+void Transform::SetRotation(double X, double Y, double Z)
 {
-	X *= DEG_TO_RAD;
-	Y *= DEG_TO_RAD;
-	Z *= DEG_TO_RAD;
+	X *= DEG2RAD;
+	Y *= DEG2RAD;
+	Z *= DEG2RAD;
 	m_rot.SetEuler(X, Y, Z);
+	m_roti = m_rot.Inverse();
 }
 
-vec3d FETransform::Transform(const vec3d& r) const
+vec3d Transform::Apply(const vec3d& r) const
 {
-	vec3d p(m_scl[0] * r.x, m_scl[1] * r.y, m_scl[2] * r.z);
+	vec3d p(m_scl.x * r.x, m_scl.y * r.y, m_scl.z * r.z);
 	m_rot.RotateVector(p);
 	p += m_pos;
 	return p;

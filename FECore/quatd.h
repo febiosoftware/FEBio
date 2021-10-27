@@ -94,9 +94,9 @@ public:
 
 	quatd(const mat3d& a);
 
-	bool operator != (const quatd& q) { return ((x!=q.x) || (y!=q.y) || (z!=q.z) || (w!=q.w)); }
+	bool operator != (const quatd& q) const { return ((x!=q.x) || (y!=q.y) || (z!=q.z) || (w!=q.w)); }
 
-	bool operator == (const quatd& q) { return ((x == q.x) && (y == q.y) && (z == q.z) && (w == q.w)); }
+	bool operator == (const quatd& q) const { return ((x == q.x) && (y == q.y) && (z == q.z) && (w == q.w)); }
 
 	quatd operator - () { return quatd(-x, -y, -z, -w); }
 
