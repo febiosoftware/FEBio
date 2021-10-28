@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FESBMPointSource.h"
 #include "FEMultiphasic.h"
 #include <FECore/FEModel.h>
+#include <algorithm>
 
 BEGIN_FECORE_CLASS(FESBMPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_sbm, "sbm");
@@ -97,8 +98,15 @@ void FESBMPointSource::Update()
 	{
 		FEMaterialPoint* mp = el->GetMaterialPoint(i);
 		FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
-		pd.m_sbmr[sbmid] = val;
-		pd.m_sbmrp[sbmid] = val;
+		if (m_accumulate) {
+			pd.m_sbmr[sbmid] = std::max(0.0, pd.m_sbmr[sbmid] + val); // prevent negative concentrations
+			pd.m_sbmrp[sbmid] = pd.m_sbmr[sbmid];
+		}
+		else {
+			pd.m_sbmr[sbmid] = val;
+			pd.m_sbmrp[sbmid] = val;
+		}
+		
 	}
 }
 
@@ -140,6 +148,11 @@ void FESBMPointSource::SetWeighVolume(bool b)
 void FESBMPointSource::SetResetFlag(bool b)
 {
 	m_doReset = b;
+}
+
+void FESBMPointSource::SetAccumulateFlag(bool b)
+{
+	m_accumulate = b;
 }
 
 void FESBMPointSource::ResetSBM()
