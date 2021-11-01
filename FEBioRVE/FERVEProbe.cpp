@@ -31,67 +31,18 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/log.h>
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FERVEProbe, FECallBack)
-	ADD_PARAMETER(m_neid, "element_id");
-	ADD_PARAMETER(m_ngp, "gausspt");
-	ADD_PARAMETER(m_file, "file");
-	ADD_PARAMETER(m_bdebug, "debug");
-END_FECORE_CLASS();
-
 FERVEProbe::FERVEProbe(FEModel* fem) : FECallBack(fem, CB_ALWAYS)
 {
 	m_rve = nullptr;
-	m_neid = -1;	// invalid element - this must be defined by user
-	m_ngp = -1;		// invalid gauss point
 	m_file = "rve.xplt";
 	m_bdebug = false;
 }
 
 bool FERVEProbe::Init()
 {
-	// get the (parent) model
-	FEModel& fem = *GetFEModel();
-
-	// get the micro-material
-	FEMicroMaterial* mat = dynamic_cast<FEMicroMaterial*>(GetParent());
-	if (mat == nullptr)
-	{
-		feLogError("The RVE probe must be a property of a micro-material.");
-		return false;
-	}
-
-	// find the element from the ID
-	FEMesh& mesh = fem.GetMesh();
-	FEElement* pel = mesh.FindElementFromID(m_neid);
-	if (pel == nullptr)
-	{
-		feLogError("Invalid Element ID for micro probe %d in material %d (%s)", m_neid, mat->GetID(), mat->GetName().c_str());
-		return false;
-	}
-
-	// make sure the element's parent domain has this material
-	FEDomain* dom = dynamic_cast<FEDomain*>(pel->GetMeshPartition());
-	if ((dom == nullptr) || (dom->GetMaterial() != mat))
-	{
-		feLogError("The specified element does not belong to this material's domain.");
-		return false;
-	}
-
-	int nint = pel->GaussPoints();
-	if ((m_ngp >= 0) && (m_ngp < nint))
-	{
-		FEMaterialPoint& mp = *pel->GetMaterialPoint(m_ngp);
-		FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
-		m_rve = &mmpt.m_rve;
-	}
-	else
-	{
-		feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", m_ngp, mat->GetID(), mat->GetName().c_str());
-		return false;
-	}
-
-	return true;
+	// make sure we have an RVE
+	if (m_rve == nullptr) return false;
+	return FECallBack::Init();
 }
 
 bool FERVEProbe::Execute(FEModel& fem, int nwhen)
@@ -136,4 +87,72 @@ void FERVEProbe::Save()
 	{
 		if (m_xplt) m_xplt->Write((float)m_rve->GetCurrentTime());
 	}
+}
+
+void FERVEProbe::SetRVEModel(FEModel* rve)
+{
+	m_rve = rve;
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEMicroProbe, FERVEProbe)
+	ADD_PARAMETER(m_neid  , "element_id");
+	ADD_PARAMETER(m_ngp   , "gausspt"   );
+	ADD_PARAMETER(m_file  , "file"      );
+	ADD_PARAMETER(m_bdebug, "debug"     );
+END_FECORE_CLASS();
+
+FEMicroProbe::FEMicroProbe(FEModel* fem) : FERVEProbe(fem)
+{
+	m_neid = -1;	// invalid element - this must be defined by user
+	m_ngp = -1;		// invalid gauss point
+}
+
+bool FEMicroProbe::Init()
+{
+	// get the (parent) model
+	FEModel& fem = *GetFEModel();
+
+	// get the micro-material
+	FEMicroMaterial* mat = dynamic_cast<FEMicroMaterial*>(GetParent());
+	if (mat == nullptr)
+	{
+		feLogError("The RVE probe must be a property of a micro-material.");
+		return false;
+	}
+
+	// find the element from the ID
+	FEMesh& mesh = fem.GetMesh();
+	FEElement* pel = mesh.FindElementFromID(m_neid);
+	if (pel == nullptr)
+	{
+		feLogError("Invalid Element ID for micro probe %d in material %d (%s)", m_neid, mat->GetID(), mat->GetName().c_str());
+		return false;
+	}
+
+	// make sure the element's parent domain has this material
+	FEDomain* dom = dynamic_cast<FEDomain*>(pel->GetMeshPartition());
+	if ((dom == nullptr) || (dom->GetMaterial() != mat))
+	{
+		feLogError("The specified element does not belong to this material's domain.");
+		return false;
+	}
+
+	// get the gauss-point
+	int nint = pel->GaussPoints();
+	if ((m_ngp >= 0) && (m_ngp < nint))
+	{
+		FEMaterialPoint* mp = pel->GetMaterialPoint(m_ngp);
+		FEMicroMaterialPoint* mmp = mp->ExtractData<FEMicroMaterialPoint>();
+		if (mmp == nullptr) return false;
+		SetRVEModel(&mmp->m_rve);
+	}
+	else
+	{
+		feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", m_ngp, mat->GetID(), mat->GetName().c_str());
+		return false;
+	}
+
+
+	return FERVEProbe::Init();
 }

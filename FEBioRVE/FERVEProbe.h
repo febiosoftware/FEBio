@@ -29,8 +29,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 class FEBioPlotFile;
+class FEMaterialPoint;
 
 //-----------------------------------------------------------------------------
+// Base class for RVE probes
 class FERVEProbe : public FECallBack
 {
 public:
@@ -38,25 +40,38 @@ public:
 	// The second FEModel (rve) is the micro-problem that needs to be tracked.
 	FERVEProbe(FEModel* fem);
 
-	bool Init();
+	bool Init() override;
 
-	bool Execute(FEModel& fem, int nwhen);
+	bool Execute(FEModel& fem, int nwhen) override;
 
 	void Save();
 
 	void SetDebugFlag(bool b) { m_bdebug = b; }
 	bool GetDebugFlag() const { return m_bdebug; }
 
-private:
-	int			m_neid;			//!< element Id
-	int			m_ngp;			//!< Gauss-point (one-based!)
+	void SetRVEModel(FEModel* rve);
+
+protected:
 	std::string	m_file;			//!< file name
 	bool		m_bdebug;		//!< debug flag
 
 private:
 	FEBioPlotFile* m_xplt;		//!< the actual plot file
 	FEModel* m_rve;		//!< the RVE model
+};
+
+//-----------------------------------------------------------------------------
+// Probe used by FEMicroMaterial
+class FEMicroProbe : public FERVEProbe
+{
+public:
+	FEMicroProbe(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	int			m_neid;			//!< element Id
+	int			m_ngp;			//!< Gauss-point (one-based!)
 
 	DECLARE_FECORE_CLASS();
 };
-
