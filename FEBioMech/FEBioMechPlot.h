@@ -1020,6 +1020,10 @@ class FEPlotContinuousDamage_D2s : public FEPlotContinuousDamage_ {
 public: FEPlotContinuousDamage_D2s(FEModel* fem) : FEPlotContinuousDamage_(fem, 6) {}
 };
 
+class FEPlotContinuousDamage_Psi0 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_Psi0(FEModel* fem) : FEPlotContinuousDamage_(fem, 7) {}
+};
+
 //-----------------------------------------------------------------------------
 class FEPlotContinuousDamageBeta : public FEPlotDomainData
 {

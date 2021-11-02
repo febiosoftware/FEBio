@@ -1089,7 +1089,7 @@ bool FEModel::Solve()
 		if (nstep + 1 == Steps())
 		{
 			// set the solved flag
-			m_imp->m_bsolved = true;
+			m_imp->m_bsolved = bok;
 		}
 
 		// do callbacks

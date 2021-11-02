@@ -96,6 +96,9 @@ public: // interface for getting/setting properties
 	//! Set a property
 	bool SetProperty(int nid, FECoreBase* pm);
 
+	//! Set a property via name
+	bool SetProperty(const char* sz, FECoreBase* pm);
+
 	//! return a property
 	virtual FECoreBase* GetProperty(int i);
 

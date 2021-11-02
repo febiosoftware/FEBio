@@ -52,6 +52,8 @@ public:
 
 	void SetResetFlag(bool b);
 
+	void SetAccumulateFlag(bool b);
+
 private:
 	void ResetSBM();
 
@@ -62,6 +64,7 @@ private:
 	bool	m_reset;
 	bool	m_doReset;
 	bool	m_weighVolume;
+	bool	m_accumulate;	// accumulate species flag for the update
 
 private:
 	FEOctreeSearch		m_search;
