@@ -178,13 +178,14 @@ double FEDamageElasticFiber::Damage(FEMaterialPoint& mp, int n)
 	if (n == 4) return damagePoint.m_D3s;
 	if (n == 5) return damagePoint.m_Ds;
 	if (n == 6) return damagePoint.m_D2s;
+	if (n == 7) return damagePoint.m_psi_f0;
 	return 0.0;
 }
 
 double FEDamageElasticFiber::beta(FEMaterialPoint& mp)
 {
 	FEFiberDamagePoint& damagePoint = *mp.ExtractData<FEFiberDamagePoint>();
-	return damagePoint.m_bt;
+	return MB(damagePoint.m_bt - damagePoint.m_bt_ini);
 }
 
 double FEDamageElasticFiber::gamma(FEMaterialPoint& mp)
