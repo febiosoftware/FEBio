@@ -958,18 +958,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEPlotContinuousDamage : public FEPlotDomainData
-{
-public:
-	FEPlotContinuousDamage(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a) override;
-	bool SetFilter(const char* sz) override;
-private:
-	std::string	m_prop;
-	int			m_propIndex;
-};
-
-//-----------------------------------------------------------------------------
 class FEPlotContinuousDamage_ : public FEPlotDomainData
 {
 public:
@@ -982,60 +970,40 @@ private:
 	int			m_comp;
 };
 
-class FEPlotContinuousDamage_1 : public FEPlotContinuousDamage_ {
-	public: FEPlotContinuousDamage_1(FEModel* fem) : FEPlotContinuousDamage_(fem, 0) {}
+class FEPlotContinuousDamage_D : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D(FEModel* fem) : FEPlotContinuousDamage_(fem, 0) {}
 };
 
-class FEPlotContinuousDamage_2 : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_2(FEModel* fem) : FEPlotContinuousDamage_(fem, 1) {}
-};
-
-class FEPlotContinuousDamage_3 : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_3(FEModel* fem) : FEPlotContinuousDamage_(fem, 2) {}
-};
-
-class FEPlotContinuousDamage_P : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_P(FEModel* fem) : FEPlotContinuousDamage_(fem, 3) {}
-};
-
-class FEPlotContinuousDamage_D3s : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_D3s(FEModel* fem) : FEPlotContinuousDamage_(fem, 4) {}
+class FEPlotContinuousDamage_D1 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D1(FEModel* fem) : FEPlotContinuousDamage_(fem, 1) {}
 };
 
 class FEPlotContinuousDamage_Ds : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_Ds(FEModel* fem) : FEPlotContinuousDamage_(fem, 5) {}
+public: FEPlotContinuousDamage_Ds(FEModel* fem) : FEPlotContinuousDamage_(fem, 2) {}
 };
 
-class FEPlotContinuousDamage_D2s : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_D2s(FEModel* fem) : FEPlotContinuousDamage_(fem, 6) {}
+class FEPlotContinuousDamage_D2 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D2(FEModel* fem) : FEPlotContinuousDamage_(fem, 3) {}
+};
+
+class FEPlotContinuousDamage_D3 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D3(FEModel* fem) : FEPlotContinuousDamage_(fem, 4) {}
+};
+
+class FEPlotContinuousDamage_P : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_P(FEModel* fem) : FEPlotContinuousDamage_(fem, 5) {}
 };
 
 class FEPlotContinuousDamage_Psi0 : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_Psi0(FEModel* fem) : FEPlotContinuousDamage_(fem, 7) {}
+public: FEPlotContinuousDamage_Psi0(FEModel* fem) : FEPlotContinuousDamage_(fem, 6) {}
 };
 
-//-----------------------------------------------------------------------------
-class FEPlotContinuousDamageBeta : public FEPlotDomainData
-{
-public:
-	FEPlotContinuousDamageBeta(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a) override;
-	bool SetFilter(const char* sz) override;
-private:
-	std::string	m_prop;
-	int			m_propIndex;
+class FEPlotContinuousDamage_beta : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_beta(FEModel* fem) : FEPlotContinuousDamage_(fem, 7) {}
 };
 
-//-----------------------------------------------------------------------------
-class FEPlotContinuousDamageGamma : public FEPlotDomainData
-{
-public:
-	FEPlotContinuousDamageGamma(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a) override;
-	bool SetFilter(const char* sz) override;
-private:
-	std::string	m_prop;
-	int			m_propIndex;
+class FEPlotContinuousDamage_gamma : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_gamma(FEModel* fem) : FEPlotContinuousDamage_(fem, 8) {}
 };
 
 //-----------------------------------------------------------------------------
