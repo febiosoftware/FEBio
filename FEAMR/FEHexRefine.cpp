@@ -547,7 +547,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 	for (int i = 0; i < LCM.LinearConstraints();)
 	{
 		FELinearConstraint& lc = LCM.LinearConstraint(i);
-		int nodeID = lc.m_parentDof.node;
+		int nodeID = lc.GetParentNode();
 		if (mesh.Node(nodeID).HasFlags(FENode::HANGING) == false)
 		{
 			LCM.RemoveLinearConstraint(i);
@@ -582,10 +582,10 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 					// setup a linear constraint for this node
 					for (int k = 0; k < MAX_DOFS; ++k)
 					{
-						FELinearConstraint lc(&fem);
-						lc.SetParentDof(k, nodeId);
-						lc.AddChildDof(k, edge.node[0], 0.5);
-						lc.AddChildDof(k, edge.node[1], 0.5);
+						FELinearConstraint* lc = new FELinearConstraint(&fem);
+						lc->SetParentDof(k, nodeId);
+						lc->AddChildDof(k, edge.node[0], 0.5);
+						lc->AddChildDof(k, edge.node[1], 0.5);
 
 						LCM.AddLinearConstraint(lc);
 						nadded++;
@@ -626,12 +626,12 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 					// setup a linear constraint for this node
 					for (int k = 0; k < MAX_DOFS; ++k)
 					{
-						FELinearConstraint lc(&fem);
-						lc.SetParentDof(k, nodeId);
-						lc.AddChildDof(k, face.node[0], 0.25);
-						lc.AddChildDof(k, face.node[1], 0.25);
-						lc.AddChildDof(k, face.node[2], 0.25);
-						lc.AddChildDof(k, face.node[3], 0.25);
+						FELinearConstraint* lc = new FELinearConstraint(&fem);
+						lc->SetParentDof(k, nodeId);
+						lc->AddChildDof(k, face.node[0], 0.25);
+						lc->AddChildDof(k, face.node[1], 0.25);
+						lc->AddChildDof(k, face.node[2], 0.25);
+						lc->AddChildDof(k, face.node[3], 0.25);
 
 						LCM.AddLinearConstraint(lc);
 						nadded++;
@@ -662,10 +662,10 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 					// setup a linear constraint for this node
 					for (int k = 0; k < MAX_DOFS; ++k)
 					{
-						FELinearConstraint lc(&fem);
-						lc.SetParentDof(k, nodeId);
-						lc.AddChildDof(k, edge.node[0], 0.5);
-						lc.AddChildDof(k, edge.node[1], 0.5);
+						FELinearConstraint* lc = new FELinearConstraint(&fem);
+						lc->SetParentDof(k, nodeId);
+						lc->AddChildDof(k, edge.node[0], 0.5);
+						lc->AddChildDof(k, edge.node[1], 0.5);
 
 						LCM.AddLinearConstraint(lc);
 						nadded++;

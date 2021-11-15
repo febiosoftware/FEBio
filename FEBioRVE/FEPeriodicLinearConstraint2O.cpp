@@ -92,10 +92,9 @@ void FEPeriodicLinearConstraint2O::addLinearConstraint(FEModel& fem, int parent,
 	// do one constraint for x, y, z
 	for (int j = 0; j<3; ++j)
 	{
-		FELinearConstraint lc(&fem);
-		lc.SetParentDof(j, parent);
-
-		lc.AddChildDof(j, child, 1.0);
+		FELinearConstraint* lc = new FELinearConstraint(&fem);
+		lc->SetParentDof(j, parent);
+		lc->AddChildDof(j, child, 1.0);
 
 		LCM.AddLinearConstraint(lc);
 	}

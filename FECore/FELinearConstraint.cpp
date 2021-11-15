@@ -32,53 +32,149 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "DumpStream.h"
 
+FELinearConstraint::DOF::DOF()
+{
+	node = dof = -1;
+	val = 0.0;
+
+	GetParameterList();
+	AddParameter(val, "value");
+}
+
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint() : FEModelComponent(nullptr)
 {
+	m_parentDof = nullptr;
 	m_off = 0.0;
 }
 
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(pfem) 
 {
+	m_parentDof = new DOF;
 	m_off = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+FELinearConstraint::~FELinearConstraint()
+{
+	Clear();
+}
+
+//-----------------------------------------------------------------------------
+// return offset
+double FELinearConstraint::GetOffset() const
+{
+	return m_off;
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraint::Clear()
+{
+	if (m_parentDof) delete m_parentDof; m_parentDof = nullptr;
+	for (size_t i = 0; i < m_childDof.size(); ++i) delete m_childDof[i];
+	m_childDof.clear();
 }
 
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(LC.GetFEModel())
 {
-	m_parentDof = LC.m_parentDof;
-	m_off = LC.m_off;
-	int n = (int) LC.m_childDof.size();
-	vector<DOF>::const_iterator it = LC.m_childDof.begin();
-	for (int i=0; i<n; ++i, ++it) m_childDof.push_back(*it);
+	m_parentDof = nullptr;
+	CopyFrom(LC);
 }
 
 //-----------------------------------------------------------------------------
 void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
 {
-	m_parentDof = LC.m_parentDof;
+	Clear();
+	if (LC.m_parentDof)
+	{
+		m_parentDof = new DOF;
+		m_parentDof->node = LC.m_parentDof->node;
+		m_parentDof->dof  = LC.m_parentDof->dof;
+		m_parentDof->val  = LC.m_parentDof->val;
+	}
 	m_off = LC.m_off;
 	int n = (int)LC.m_childDof.size();
-	vector<DOF>::const_iterator it = LC.m_childDof.begin();
-	for (int i = 0; i<n; ++i, ++it) m_childDof.push_back(*it);
+	vector<DOF*>::const_iterator it = LC.m_childDof.begin();
+	for (int i = 0; i < n; ++i, ++it)
+	{
+		DOF* d = new DOF;
+		d->node = (*it)->node;
+		d->dof  = (*it)->dof;
+		d->val  = (*it)->val;
+		m_childDof.push_back(d);
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentDof(int dof, int node)
 {
-	m_parentDof.dof = dof;
-	m_parentDof.node = node;
+	if (m_parentDof == nullptr) m_parentDof = new DOF;
+	m_parentDof->dof = dof;
+	m_parentDof->node = node;
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraint::SetParentNode(int node)
+{
+	if (m_parentDof == nullptr) m_parentDof = new DOF;
+	m_parentDof->node = node;
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraint::SetParentDof(int dof)
+{
+	if (m_parentDof == nullptr) m_parentDof = new DOF;
+	m_parentDof->dof = dof;
+}
+
+//-----------------------------------------------------------------------------
+// get the parent dof
+int FELinearConstraint::GetParentDof() const
+{
+	return m_parentDof->dof;
+}
+
+//-----------------------------------------------------------------------------
+int FELinearConstraint::GetParentNode() const
+{
+	return m_parentDof->node;
+}
+
+//-----------------------------------------------------------------------------
+// get the child DOF
+const FELinearConstraint::DOF& FELinearConstraint::GetChildDof(int n) const
+{
+	return *m_childDof[n];
+}
+
+//-----------------------------------------------------------------------------
+size_t FELinearConstraint::Size() const
+{
+	return m_childDof.size();
+}
+
+//-----------------------------------------------------------------------------
+FELinearConstraint::dof_iterator FELinearConstraint::begin()
+{
+	return m_childDof.begin();
 }
 
 //-----------------------------------------------------------------------------
 void FELinearConstraint::AddChildDof(int dof, int node, double v)
 {
-	DOF d;
-	d.dof = dof;
-	d.node = node;
-	d.val = v;
+	DOF* d = new DOF;
+	d->dof = dof;
+	d->node = node;
+	d->val = v;
 	m_childDof.push_back(d);
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraint::AddChildDof(FELinearConstraint::DOF* dof)
+{
+	m_childDof.push_back(dof);
 }
 
 //-----------------------------------------------------------------------------
@@ -86,11 +182,12 @@ void FELinearConstraint::AddChildDof(int dof, int node, double v)
 // Make sure the parent dof does not appear as a child dof
 bool FELinearConstraint::Init()
 {
+	if (m_parentDof == nullptr) return false;
 	int n = (int)m_childDof.size();
 	for (int i=0; i<n; ++i)
 	{
-		DOF& childNode = m_childDof[i];
-		if ((childNode.node == m_parentDof.node) && (childNode.dof == m_parentDof.dof)) return false;
+		DOF& childNode = *m_childDof[i];
+		if ((childNode.node == m_parentDof->node) && (childNode.dof == m_parentDof->dof)) return false;
 	}
 	return true;
 }
@@ -104,8 +201,8 @@ void FELinearConstraint::Activate()
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	// we need the parent node to be fixed so that no equation is allocated
-	FENode& node = mesh.Node(m_parentDof.node);
-	node.set_bc(m_parentDof.dof, DOF_FIXED);
+	FENode& node = mesh.Node(m_parentDof->node);
+	node.set_bc(m_parentDof->dof, DOF_FIXED);
 }
 
 //-----------------------------------------------------------------------------
@@ -114,8 +211,8 @@ void FELinearConstraint::Deactivate()
 	FEModelComponent::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
-	FENode& node = mesh.Node(m_parentDof.node);
-	node.set_bc(m_parentDof.dof, DOF_OPEN);
+	FENode& node = mesh.Node(m_parentDof->node);
+	node.set_bc(m_parentDof->dof, DOF_OPEN);
 }
 
 //-----------------------------------------------------------------------------
@@ -125,22 +222,23 @@ void FELinearConstraint::Serialize(DumpStream& ar)
 
 	if (ar.IsSaving())
 	{
-		ar.write(&m_parentDof, sizeof(DOF), 1);
+		ar.write(m_parentDof, sizeof(DOF), 1);
 		int n = (int)m_childDof.size();
 		ar << n;
-		vector<DOF>::iterator it = m_childDof.begin();
-		for (int i=0; i<n; ++i, ++it) ar << it->val << it->node << it->dof;
+		vector<DOF*>::iterator it = m_childDof.begin();
+		for (int i=0; i<n; ++i, ++it) ar << (*it)->val << (*it)->node << (*it)->dof;
 	}
 	else
 	{
 		m_childDof.clear();
-		ar.read(&m_parentDof, sizeof(DOF), 1);
+		if (m_parentDof == nullptr) m_parentDof = new DOF;
+		ar.read(m_parentDof, sizeof(DOF), 1);
 		int n;
 		ar >> n;
 		for (int i=0; i<n; ++i)
 		{
-			DOF dof;
-			ar >> dof.val >> dof.node >> dof.dof;
+			DOF* dof = new DOF;
+			ar >> dof->val >> dof->node >> dof->dof;
 			m_childDof.push_back(dof);
 		}
 	}
