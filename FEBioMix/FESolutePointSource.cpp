@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEMultiphasic.h"
 #include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
+#include <algorithm>
 
 BEGIN_FECORE_CLASS(FESolutePointSource, FEBodyLoad)
 	ADD_PARAMETER(m_soluteId, "solute");
@@ -103,8 +104,7 @@ bool FESolutePointSource::Init()
 	return FEBodyLoad::Init();
 }
 
-void FESolutePointSource::Update()
-{
+void FESolutePointSource::Accumulate(double dc) {
 	// find the element in which the point lies
 	m_q[0] = m_q[1] = m_q[2] = 0.0;
 	m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
@@ -115,19 +115,75 @@ void FESolutePointSource::Update()
 	FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
 	if (mat == nullptr) return;
 
+	const int nint = m_el->GaussPoints();
+
 	// Make sure the material has the correct solute
 	int solid = -1;
 	int sols = mat->Solutes();
-	for (int j = 0; j<sols; ++j)
+	for (int j = 0; j < sols; ++j)
 	{
-		int sbmj = mat->GetSolute(j)->GetSoluteID();
-		if (sbmj == m_soluteId)
+		int solj = mat->GetSolute(j)->GetSoluteID();
+		if (solj == m_soluteId)
 		{
 			solid = j;
 			break;
 		}
 	}
 	if (solid == -1) return;
+
+	m_rate = dc + m_rate;
+	m_accumulate = true;
+
+}
+
+void FESolutePointSource::Update()
+{
+	// find the element in which the point lies
+	m_q[0] = m_q[1] = m_q[2] = 0.0;
+	m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
+	if (m_el == nullptr) return;
+
+	//// make sure this element is part of a multiphasic domain
+	//FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
+	//FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+	//if (mat == nullptr) return;
+
+	//const int nint = m_el->GaussPoints();
+
+	//// Make sure the material has the correct solute
+	//int solid = -1;
+	//int sols = mat->Solutes();
+	//for (int j = 0; j < sols; ++j)
+	//{
+	//	int solj = mat->GetSolute(j)->GetSoluteID();
+	//	if (solj == m_soluteId)
+	//	{
+	//		solid = j;
+	//		break;
+	//	}
+	//}
+	//if (solid == -1) return;
+
+	//// set the concentration of all the integration points
+	//for (int i = 0; i < nint; ++i)
+	//{
+	//	FEMaterialPoint* mp = m_el->GetMaterialPoint(i);
+	//	FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
+	//	// if this point source has not yet been added to the integration points do it then turn off the flag
+	//	if (m_accumulate) {
+	//		pd.m_ca[solid] = std::max(0.0, pd.m_crp[solid] + m_rate); // prevent negative concentrations
+	//		pd.m_crp[solid] = pd.m_ca[solid];
+	//	}
+	//	else {
+	//		pd.m_crp[solid] = pd.m_crp[solid];
+	//		pd.m_ca[solid] = pd.m_ca[solid];
+	//	}
+
+
+
+	//}
+	//m_accumulate = false;
+	//m_rate = 0;
 }
 
 //! Evaluate force vector
@@ -153,9 +209,13 @@ void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	// assemble the element load vector
 	vector<double> fe(neln, 0.0);
 	for (int i = 0; i < neln; ++i)
+	//{
+	//	fe[i] = -H[i] * m_rate * dt;
+	//}
 	{
-		fe[i] = -H[i] * m_rate * dt;
+		fe[i] = m_rate * dt / neln;
 	}
+	//if (m_accumulate) { m_rate = 0; m_accumulate = false; }
 
 	// get the LM vector
 	vector<int> lm(neln, -1);
@@ -204,4 +264,8 @@ void FESolutePointSource::StiffnessMatrix(FELinearSystem& S, const FETimeInfo& t
 	ke.SetIndices(lm);
 	ke.SetNodes(nodes);
 	S.Assemble(ke);
+}
+
+void FESolutePointSource::SetAccumulateFlag(bool b) {
+	m_accumulate = b;
 }

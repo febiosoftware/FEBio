@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FEMultiphasic.h"
 #include <FECore/FEModel.h>
 #include <algorithm>
+#include <iostream>
 
 BEGIN_FECORE_CLASS(FESBMPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_sbm, "sbm");
@@ -55,6 +56,34 @@ bool FESBMPointSource::Init()
 	if (m_sbm == -1) return false;
 	if (m_search.Init() == false) return false;
 	return FEBodyLoad::Init();
+}
+
+// allow species to accumulate at the point source
+void FESBMPointSource::Accumulate(double dc) {
+	double rt[3] = { 0, 0, 0 };
+	FEElement* el = m_search.FindElement(m_pos, rt);
+	if (el == nullptr) return;
+
+	// make sure this element is part of a multiphasic domain
+	FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
+	FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+	if (mat == nullptr) return;
+
+	int sbmid = -1;
+	int sbms = mat->SBMs();
+	for (int j = 0; j < sbms; ++j)
+	{
+		int sbmj = mat->GetSBM(j)->GetSBMID();
+		if (sbmj == m_sbm)
+		{
+			sbmid = j;
+			break;
+		}
+	}
+	if (sbmid == -1) return;
+
+	m_val = dc + m_val; // prevent negative concentrations
+	m_accumulate = true;
 }
 
 void FESBMPointSource::Update()
@@ -94,20 +123,29 @@ void FESBMPointSource::Update()
 	if (sbmid == -1) return;
 
 	// set the concentration of all the integration points
+	double H[FEElement::MAX_NODES];
+	double m_q[3];
+	m_q[0] = m_q[1] = m_q[2] = 0.0;
+	FESolidElement* m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
+	if (m_el == nullptr) return;
+	m_el->shape_fnc(H, m_q[0], m_q[1], m_q[2]);
 	for (int i=0; i<nint; ++i)
 	{
 		FEMaterialPoint* mp = el->GetMaterialPoint(i);
 		FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
+		// if this point source has not yet been added to the integration points do it then turn off the flag so we don't double count
 		if (m_accumulate) {
-			pd.m_sbmr[sbmid] = std::max(0.0, pd.m_sbmr[sbmid] + val); // prevent negative concentrations
+
+			pd.m_sbmr[sbmid] = std::max(0.0, H[i] * val + pd.m_sbmrp[sbmid]);
 			pd.m_sbmrp[sbmid] = pd.m_sbmr[sbmid];
 		}
 		else {
-			pd.m_sbmr[sbmid] = val;
-			pd.m_sbmrp[sbmid] = val;
+			pd.m_sbmr[sbmid] = pd.m_sbmr[sbmid];
+			pd.m_sbmrp[sbmid] = pd.m_sbmrp[sbmid];
 		}
-		
 	}
+	m_accumulate = false; // don't double count a point source
+	m_val = 0;
 }
 
 void FESBMPointSource::SetPosition(const vec3d& pos)
