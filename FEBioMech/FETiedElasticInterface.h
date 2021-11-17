@@ -73,6 +73,9 @@ public:
     //! evaluate net contact force
     vec3d GetContactForce() override;
 
+    //! evaluate net contact area
+    double GetContactArea() override;
+
 public:
     vector<vec3d>           m_nn;   //!< node normals
     vector<vec3d>           m_Fn;   //!< nodal forces

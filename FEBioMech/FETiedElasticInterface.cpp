@@ -192,6 +192,46 @@ vec3d FETiedElasticSurface::GetContactForce()
 }
 
 //-----------------------------------------------------------------------------
+//! evaluate net contact area
+double FETiedElasticSurface::GetContactArea()
+{
+    // initialize contact area
+    double a = 0;
+
+    // loop over all elements of the primary surface
+    for (int n = 0; n < Elements(); ++n)
+    {
+        FESurfaceElement& el = Element(n);
+        int nint = el.GaussPoints();
+
+        // evaluate the contact force for that element
+        for (int i = 0; i < nint; ++i)
+        {
+            // get data for this integration point
+            Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            double T = data.m_tr.norm2();
+            if (data.m_pme && (T != 0.0))
+            {
+                // get the base vectors
+                vec3d g[2];
+                CoBaseVectors(el, i, g);
+
+                // normal (magnitude = area)
+                vec3d n = g[0] ^ g[1];
+
+                // gauss weight
+                double w = el.GaussWeights()[i];
+
+                // contact force
+                a += n.norm() * w;
+            }
+        }
+    }
+
+    return a;
+}
+
+//-----------------------------------------------------------------------------
 // FETiedElasticInterface
 //-----------------------------------------------------------------------------
 
