@@ -94,6 +94,9 @@ bool FETiedElasticSurface::Init()
     // allocate node normals
     m_nn.assign(Nodes(), vec3d(0,0,0));
     
+    // initialize nodal force vector
+    m_Fn.assign(Nodes(), vec3d(0, 0, 0));
+
     return true;
 }
 
@@ -145,7 +148,7 @@ FEMaterialPoint* FETiedElasticSurface::CreateMaterialPoint()
 void FETiedElasticSurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
-	ar & m_nn;
+	ar & m_nn & m_Fn;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,6 +177,18 @@ void FETiedElasticSurface::GetContactTraction(int nface, vec3d& pt)
 		pt += data.m_tr;
 	}
     pt /= ni;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FETiedElasticSurface::GetContactForce()
+{
+    // initialize contact force
+    vec3d f(0, 0, 0);
+
+    // loop over all elements of the primary surface
+    for (int i = 0; i < m_Fn.size(); ++i) f += m_Fn[i];
+
+    return f;
 }
 
 //-----------------------------------------------------------------------------
@@ -460,7 +475,11 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN];
     double N[8*MN];
-    
+
+    // zero nodal forces
+    m_ss.m_Fn.assign(m_ss.Nodes(), vec3d(0, 0, 0));
+    m_ms.m_Fn.assign(m_ms.Nodes(), vec3d(0, 0, 0));
+
     // Update auto-penalty if requested
     if (m_bupdtpen && (GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter == 0))
         UpdateAutoPenalty();
@@ -584,7 +603,10 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     }
                     
                     for (k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
-                    
+
+                    for (int k = 0; k < nseln; ++k) ss.m_Fn[se.m_lnode[k]] += vec3d(fe[3 * k], fe[3 * k + 1], fe[3 * k + 2]);
+                    for (int k = 0; k < nmeln; ++k) ms.m_Fn[me.m_lnode[k]] += vec3d(fe[3 * nseln + 3 * k], fe[3 * nseln + 3 * k + 1], fe[3 * nseln + 3 * k + 2]);
+
                     // assemble the global residual
                     R.Assemble(en, LM, fe);
                 }
