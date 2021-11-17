@@ -129,6 +129,7 @@ void FESBMPointSource::Update()
 	FESolidElement* m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
 	if (m_el == nullptr) return;
 	m_el->shape_fnc(H, m_q[0], m_q[1], m_q[2]);
+	double tot_conc = 0.0;
 	for (int i=0; i<nint; ++i)
 	{
 		FEMaterialPoint* mp = el->GetMaterialPoint(i);
@@ -136,7 +137,10 @@ void FESBMPointSource::Update()
 		// if this point source has not yet been added to the integration points do it then turn off the flag so we don't double count
 		if (m_accumulate) {
 
-			pd.m_sbmr[sbmid] = std::max(0.0, H[i] * val + pd.m_sbmrp[sbmid]);
+			//pd.m_sbmr[sbmid] = std::max(0.0, (1.0/8.0) * val + pd.m_sbmrp[sbmid]);
+			//pd.m_sbmr[sbmid] = std::max(0.0, val + pd.m_sbmrp[sbmid]);
+			pd.m_sbmr[sbmid] = std::max(0.0, nint*H[i] * val + pd.m_sbmrp[sbmid]);
+			tot_conc += pd.m_sbmr[sbmid];
 			pd.m_sbmrp[sbmid] = pd.m_sbmr[sbmid];
 		}
 		else {

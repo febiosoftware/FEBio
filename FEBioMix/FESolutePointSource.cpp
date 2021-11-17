@@ -208,13 +208,27 @@ void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// assemble the element load vector
 	vector<double> fe(neln, 0.0);
-	for (int i = 0; i < neln; ++i)
+	//for (int i = 0; i < neln; ++i)
 	//{
 	//	fe[i] = -H[i] * m_rate * dt;
 	//}
+	int nint = m_el->GaussPoints();
+	double* w = m_el->GaussWeights();
+	for (int n = 0; n < nint; ++n)
 	{
-		fe[i] = m_rate * dt / neln;
+		double* H_int = m_el->H(n);
+
+		// loop over all nodes
+		for (int j = 0; j < neln; ++j)
+		{
+			// get the value of the integrand for this node
+
+			// add it all up
+				fe[j] += m_rate * H_int[j] * dt * w[n];
+		}
 	}
+
+
 	//if (m_accumulate) { m_rate = 0; m_accumulate = false; }
 
 	// get the LM vector
@@ -228,7 +242,6 @@ void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! evaluate stiffness matrix
 void FESolutePointSource::StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp)
 {
-	return;
 
 	// get time increment
 	double dt = tp.timeIncrement;
