@@ -39,6 +39,7 @@ class FECORE_API FELinearConstraintManager
 {
 public:
 	FELinearConstraintManager(FEModel* fem);
+	~FELinearConstraintManager();
 
 	// Clear all constraints
 	void Clear();
@@ -53,7 +54,7 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
 	// add the linear constraint
-	void AddLinearConstraint(FELinearConstraint& lc);
+	void AddLinearConstraint(FELinearConstraint* lc);
 
 	// return number of linear constraints
 	int LinearConstraints() const;
@@ -91,7 +92,7 @@ protected:
 
 private:
 	FEModel* m_fem;
-	vector<FELinearConstraint>	m_LinC;		//!< linear constraints data
+	vector<FELinearConstraint*>	m_LinC;		//!< linear constraints data
 	table<int>					m_LCT;		//!< linear constraint table
 	vector<double>				m_up;		//!< the inhomogenous component of the linear constraint
 };

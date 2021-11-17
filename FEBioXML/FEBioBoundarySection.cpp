@@ -861,20 +861,20 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	int ndofs = (int) dofList.size();
 
 	// allocate linear constraints
-	vector<FELinearConstraint> LC(ndofs, FELinearConstraint(&fem));
+	vector<FELinearConstraint*> LC;
 	for (int i=0; i<ndofs; ++i)
 	{
 		int dof = dofList[i];
 		if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-		LC[i].m_parentDof.dof = dof;
-		LC[i].m_parentDof.node = parentNode;
+
+		LC[i] = new FELinearConstraint(&fem);
+		LC[i]->SetParentDof(dof, parentNode);
 	}
 
 	// read the child nodes
 	++tag;
 	do
 	{
-		FELinearConstraint::DOF dof;
 		if (tag == "node")
 		{
 			// get the node
@@ -897,10 +897,8 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 			// add it to the list
 			for (int i=0; i<ndofs; ++i)
 			{
-				dof.node = childNode;
-				dof.dof  = (childDOF < 0 ? LC[i].m_parentDof.dof : childDOF);
-				dof.val  = val;
-				LC[i].m_childDof.push_back(dof);
+				int ndof = (childDOF < 0 ? LC[i]->GetParentDof() : childDOF);
+				LC[i]->AddChildDof(ndof, childNode, val);
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -912,8 +910,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	for (int i=0; i<ndofs; ++i)
 	{
 		fem.GetLinearConstraintManager().AddLinearConstraint(LC[i]);
-
-		GetBuilder()->AddComponent(&LC[i]);
+		GetBuilder()->AddComponent(LC[i]);
 	}
 }
 

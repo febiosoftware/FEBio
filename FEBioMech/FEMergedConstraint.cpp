@@ -96,9 +96,9 @@ bool FEMergedConstraint::Merge(FEFacetSet* surf1, FEFacetSet* surf2, const vecto
 		for (int j=0; j<ndofs; ++j)
 		{
 			int dof = dofList[j];
-			FELinearConstraint lc(&m_fem);
-			lc.SetParentDof(dof, set1[i]);
-			lc.AddChildDof(dof, set2[tag[i]], 1.0);
+			FELinearConstraint* lc = new FELinearConstraint(&m_fem);
+			lc->SetParentDof(dof, set1[i]);
+			lc->AddChildDof(dof, set2[tag[i]], 1.0);
 
 			LCM.AddLinearConstraint(lc);
 		}

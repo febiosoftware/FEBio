@@ -1271,6 +1271,90 @@ double FELogElemStress3::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemPK2StressX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3ds S = pt.pull_back(pt.m_s);
+		val += S.xx();
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK2StressY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3ds S = pt.pull_back(pt.m_s);
+		val += S.yy();
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK2StressZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3ds S = pt.pull_back(pt.m_s);
+		val += S.zz();
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK2StressXY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3ds S = pt.pull_back(pt.m_s);
+		val += S.xy();
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK2StressYZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3ds S = pt.pull_back(pt.m_s);
+		val += S.yz();
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK2StressXZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3ds S = pt.pull_back(pt.m_s);
+		val += S.xz();
+	}
+	return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemStressEigenVector::value(FEElement& el)
 {
 	assert(m_eigenVector >= 0);

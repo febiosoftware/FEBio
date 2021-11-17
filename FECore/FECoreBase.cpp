@@ -397,6 +397,22 @@ bool FECoreBase::SetProperty(int i, FECoreBase* pb)
 }
 
 //-----------------------------------------------------------------------------
+//! Set a property via name
+bool FECoreBase::SetProperty(const char* sz, FECoreBase* pb)
+{
+	FEProperty* prop = FindProperty(sz);
+	if (prop == nullptr) return false;
+
+	if (prop->IsType(pb))
+	{
+		prop->SetProperty(pb);
+		if (pb) pb->SetParent(this);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! number of parameters
 int FECoreBase::Parameters() const
 {

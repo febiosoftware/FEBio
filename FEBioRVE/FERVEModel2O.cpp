@@ -465,8 +465,8 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 		{
 			FELinearConstraint& lc = LM.LinearConstraint(i);
 
-			FENode& parentNode = m.Node(lc.m_parentDof.node);
-			FENode& childNode = m.Node(lc.m_childDof[0].node);
+			FENode& parentNode = m.Node(lc.GetParentNode());
+			FENode& childNode = m.Node(lc.GetChildDof(0).node);
 
 			vec3d Xp = parentNode.m_r0;
 			vec3d Xm = childNode.m_r0;
@@ -476,11 +476,11 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 
 			vec3d d = U*(Xp - Xm) + (G.contract2s(XXp - XXm))*0.5;
 
-			switch (lc.m_parentDof.dof)
+			switch (lc.GetParentDof())
 			{
-			case 0: lc.m_off = d.x; break;
-			case 1: lc.m_off = d.y; break;
-			case 2: lc.m_off = d.z; break;
+			case 0: lc.SetOffset(d.x); break;
+			case 1: lc.SetOffset(d.y); break;
+			case 2: lc.SetOffset(d.z); break;
 			}
 		}
 	}
