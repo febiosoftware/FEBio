@@ -134,15 +134,13 @@ public:
 	void add_leaf(const char* szn, const char* szv);
 	void add_leaf(const char* szn, const std::string& s);
 
-	void add_leaf(const char* szn, int    n){ char szv[256]; sprintf(szv, "%d" , n); add_leaf(szn, szv); }
-	void add_leaf(const char* szn, bool   b){ char szv[256]; sprintf(szv, "%d" , b); add_leaf(szn, szv); }
-	void add_leaf(const char* szn, double g){ char szv[256]; sprintf(szv, "%lg", g); add_leaf(szn, szv); }
+	void add_leaf(const char* szn, int    n){ char szv[256]; sprintf(szv, "%d" , n); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, bool   b){ char szv[256]; sprintf(szv, "%d" , b); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, double g){ char szv[256]; sprintf(szv, "%lg", g); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, float  g){ char szv[256]; sprintf(szv, "%g" , g); write_leaf(szn, szv); }
 	void add_leaf(const char* szn, int *pi, int n);
 	void add_leaf(const char* szn, float* pg, int n);
 	void add_leaf(const char* szn, double* pg, int n);
-//	void add_leaf(const char* szn, const vec3d& r){ char szv[256]; sprintf(szv, "%g,%g,%g", r.x, r.y, r.z); add_leaf(szn, szv); }
-//	void add_leaf(const char* szn, const quatd& q){ char szv[256]; sprintf(szv, "%g,%g,%g,%g", q.x, q.y, q.z, q.w); add_leaf(szn, szv); }
-//	void add_leaf(const char* szn, const GLColor& c) { char szv[256]; sprintf(szv, "%d,%d,%d", c.r, c.g, c.b); }
 	void add_leaf(XMLElement& el, const std::vector<int>& A);
 
 	template <class T> void add_leaf(const char* szname, const T& v);
@@ -159,6 +157,8 @@ protected:
 	void inc_level();
 	void dec_level();
 
+	void write_leaf(const char* sztag, const char* szval);
+
 protected:
 	FILE*	m_fp;
 	int		m_level;
@@ -171,8 +171,7 @@ protected:
 
 template <class T> std::string type_to_string(const T& v)
 {
-	assert(false);
-	return std::string();
+	return std::string(v);
 }
 
 template <class T> void XMLElement::value(const T& v)

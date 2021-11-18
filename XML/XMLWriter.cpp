@@ -335,19 +335,24 @@ void XMLWriter::add_leaf(XMLElement& el, bool bclear)
 	if (bclear) el.clear();
 }
 
-void XMLWriter::add_leaf(const char* szn, const char* szv)
+void XMLWriter::write_leaf(const char* sztag, const char* szval)
 {
-	char szformat[256] = {0};
+	char szformat[256] = { 0 };
 	sprintf(szformat, "%s<%%s", m_sztab);
 
-	fprintf(m_fp, szformat, szn);
+	fprintf(m_fp, szformat, sztag);
 
-	fprintf(m_fp, ">%s</%s>\n", szv, szn);
+	fprintf(m_fp, ">%s</%s>\n", szval, sztag);
+}
+
+void XMLWriter::add_leaf(const char* szn, const char* szv)
+{
+	write_leaf(szn, szv);
 }
 
 void XMLWriter::add_leaf(const char* szn, const std::string& s)
 {
-	add_leaf(szn, s.c_str());
+	write_leaf(szn, s.c_str());
 }
 
 void XMLWriter::add_leaf(const char* szn, double* pg, int n)
