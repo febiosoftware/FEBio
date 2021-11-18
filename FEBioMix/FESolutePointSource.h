@@ -36,6 +36,8 @@ public:
 
 	bool Init() override;
 
+	void Accumulate(double dc);
+
 	void Update() override;
 
 	void SetPosition(const vec3d& v);
@@ -50,6 +52,8 @@ public:
 
 	double GetRate() const;
 
+	void SetAccumulateFlag(bool b);
+
 	//! Evaluate force vector
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
@@ -60,6 +64,7 @@ private:
 	int		m_soluteId;	//!< solute ID
 	double	m_rate;		//!< production rate
 	vec3d	m_pos;		//!< position of source
+	bool	m_accumulate; //!< accumulate flag
 
 private:
 	FEOctreeSearch		m_search;

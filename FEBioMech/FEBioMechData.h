@@ -743,6 +743,54 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemPK2StressX : public FELogElemData
+{
+public:
+	FELogElemPK2StressX(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressY : public FELogElemData
+{
+public:
+	FELogElemPK2StressY(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressZ : public FELogElemData
+{
+public:
+	FELogElemPK2StressZ(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressXY : public FELogElemData
+{
+public:
+	FELogElemPK2StressXY(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressYZ : public FELogElemData
+{
+public:
+	FELogElemPK2StressYZ(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressXZ : public FELogElemData
+{
+public:
+	FELogElemPK2StressXZ(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemStressEigenVector : public FELogElemData
 {
 public:

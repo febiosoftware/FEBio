@@ -161,7 +161,7 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 
 	FEModelBuilder* feb = GetBuilder();
 
-	FELinearConstraint lc(&fem);
+	FELinearConstraint* lc = new FELinearConstraint(&fem);
 
 	++tag;
 	do
@@ -170,15 +170,15 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 		{
 			int nodeId;
 			tag.value(nodeId);
-			lc.m_parentDof.node = feb->FindNodeFromID(nodeId);
+			lc->SetParentNode(feb->FindNodeFromID(nodeId));
 		}
 		else if (tag == "dof")
 		{
-			lc.m_parentDof.dof = dofs.GetDOF(tag.szvalue());
+			lc->SetParentDof(dofs.GetDOF(tag.szvalue()));
 		}
 		else if (tag == "child_dof")
 		{
-			FELinearConstraint::DOF dof;
+			FELinearConstraint::DOF* dof = new FELinearConstraint::DOF;
 			++tag;
 			do
 			{
@@ -186,24 +186,32 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 				{
 					int nodeId;
 					tag.value(nodeId);
-					dof.node = feb->FindNodeFromID(nodeId);
+					dof->node = feb->FindNodeFromID(nodeId);
 				}
 				else if (tag == "dof")
 				{
-					dof.dof = dofs.GetDOF(tag.szvalue());
+					dof->dof = dofs.GetDOF(tag.szvalue());
 				}
 				else if (tag == "value")
 				{
 					double v;
 					tag.value(v);
-					dof.val = v;
+					dof->val = v;
+
+					const char* szlc = tag.AttributeValue("lc", true);
+					if (szlc)
+					{
+						int lc = atoi(szlc) - 1;
+						FEParam* pp = dof->FindParameter("value"); assert(pp);
+						if (pp) fem.AttachLoadController(pp, lc);
+					}
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
 			} 
 			while (!tag.isend());
 
-			lc.m_childDof.push_back(dof);
+			lc->AddChildDof(dof);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
@@ -212,5 +220,5 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 
 	// add the linear constraint to the system
 	fem.GetLinearConstraintManager().AddLinearConstraint(lc);
-	GetBuilder()->AddComponent(&lc);
+	GetBuilder()->AddComponent(lc);
 }

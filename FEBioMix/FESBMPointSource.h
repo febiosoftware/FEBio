@@ -36,6 +36,8 @@ public:
 
 	void Update() override;
 
+	void Accumulate(double dc);
+
 	void SetPosition(const vec3d& pos);
 
 	vec3d GetPosition() const;
