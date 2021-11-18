@@ -36,7 +36,7 @@ using namespace std;
 class FECORE_API FELinearConstraint : public FEModelComponent
 {
 public:
-	class DOF : public FEParamContainer
+	class FECORE_API DOF : public FEParamContainer
 	{
 	public:
 		DOF();
