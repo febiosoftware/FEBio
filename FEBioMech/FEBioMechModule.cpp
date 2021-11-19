@@ -696,6 +696,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_Psi0 , "continuous damage Psi0");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_beta , "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_gamma, "continuous damage gamma");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2beta, "continuous damage D2beta");
     REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
     REGISTER_FECORE_CLASS(FEPlotRVEStrongBondSED, "RVE strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotRVEWeakBondSED, "RVE weak bond SED");

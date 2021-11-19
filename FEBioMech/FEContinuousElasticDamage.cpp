@@ -59,7 +59,7 @@ public:
 	void Init() override
 	{
 		m_D = 0.0;
-		m_D1 = m_D2 = m_D3 = 0.0;
+		m_D1 = m_D2 = m_D2f = m_D3 = 0.0;
 		m_P = 0.0;
 		m_Ds = 0.0;
 		m_psi_f0_ini = m_psf_c;// we set this to the initial value
@@ -86,7 +86,7 @@ public:
 public:
 	bool	m_init;	// initialization flag
 	double	m_D;		// accumulated damage
-	double	m_D1, m_D2, m_D3;	// damage components
+	double	m_D1, m_D2, m_D2f, m_D3;	// damage components
 	double	m_P, m_Ds;
 
 	double	m_psi_f0_ini, m_psf_c;
@@ -157,6 +157,7 @@ double FEDamageElasticFiber::Damage(FEMaterialPoint& mp, int n)
 	case 6: return damagePoint.m_psi_f0; break;
 	case 7: return damagePoint.m_beta; break;
 	case 8: return damagePoint.m_gamma; break;
+	case 9: return damagePoint.m_D2f; break;
 	}
 	return 0.0;
 }
@@ -192,6 +193,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 
 	damagePoint.m_D1 = 0.0;
 	damagePoint.m_D2 = 0.0;
+	damagePoint.m_D2f = 0.0;
 	damagePoint.m_D3 = 0.0;
 	damagePoint.m_P = 0.0;
 	damagePoint.m_Ds = 0.0;
@@ -238,7 +240,8 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 
 		// D2 term
 		double D3 = (m_D3_rg != 0 ? m_D3_inf / (1.0 + exp(-(gamma - m_D3_g0) / m_D3_rg)) : m_D3_inf);
-		double D2 = D3*(m_D2_a*(exp(m_D2_b*beta) - 1) + m_D2_c*(exp(m_D2_d*beta) - 1));
+		double D2f = (m_D2_a*(exp(m_D2_b*beta) - 1) + m_D2_c*(exp(m_D2_d*beta) - 1));
+		double D2 = D3*D2f;
 
 		// Add the damage
 		D = D1 + D2;
@@ -248,6 +251,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 		damagePoint.m_D1 = D1;
 		damagePoint.m_Ds = Ds;
 		damagePoint.m_D2 = D2;
+		damagePoint.m_D2f = D2f;
 		damagePoint.m_D3 = D3;
 
 		damagePoint.m_bt = bt;

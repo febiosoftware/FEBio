@@ -1006,6 +1006,10 @@ class FEPlotContinuousDamage_gamma : public FEPlotContinuousDamage_ {
 public: FEPlotContinuousDamage_gamma(FEModel* fem) : FEPlotContinuousDamage_(fem, 8) {}
 };
 
+class FEPlotContinuousDamage_D2beta : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D2beta(FEModel* fem) : FEPlotContinuousDamage_(fem, 9) {}
+};
+
 //-----------------------------------------------------------------------------
 //! Number of generations in reactive viscoelastic material point
 class FEPlotRVEgenerations : public FEPlotDomainData
