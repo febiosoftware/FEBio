@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <cwctype>
 #include "FEDataSource.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
