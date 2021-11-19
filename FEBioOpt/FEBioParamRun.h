@@ -48,6 +48,6 @@ private:
 
 private:
 	std::vector<FEModelParameter*>	    m_inVar;
-	std::vector<FEModelParameter*>	    m_outVar;
+	std::vector<FEDataParameter*>	    m_outVar;
 	std::string	m_outFile;
 };

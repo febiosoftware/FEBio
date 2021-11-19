@@ -78,6 +78,9 @@ public:
 	// Evaluate the model parameter at x
 	double Evaluate(double x) override;
 
+	// evaluate the current value
+	double value() { return m_fy(); }
+
 private:
 	static bool update(FEModel* pmdl, unsigned int nwhen, void* pd);
 	void update();

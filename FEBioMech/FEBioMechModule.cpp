@@ -912,6 +912,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidConnectorRotationZ, "RCthz");
 
 	//-----------------------------------------------------------------------------
+	// Derived from FELogNLConstraintData
+	REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
+	REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
+
+	//-----------------------------------------------------------------------------
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
@@ -929,9 +934,3 @@ void FEBioMech::InitModule()
 
 	febio.SetActiveModule(0);
 }
-
-//-----------------------------------------------------------------------------
-// Derived from FELogNLConstraintData
-REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
-REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
-
