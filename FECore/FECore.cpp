@@ -179,6 +179,8 @@ REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
 REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
 REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
+REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
+REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");

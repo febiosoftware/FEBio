@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -37,6 +37,8 @@ figs-within-sections
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -75,6 +77,7 @@ figs-within-sections
 \suppress_date false
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -87,7 +90,10 @@ figs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 2
 \paperpagestyle default
@@ -633,6 +639,7 @@ emph{FEBioStudio}}
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Maker95"
+literal "true"
 
 \end_inset
 
@@ -7194,6 +7201,7 @@ Comments:
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gee09"
+literal "true"
 
 \end_inset
 
@@ -11027,6 +11035,7 @@ le to element locking when the shell thickness is much smaller than the
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Hou18"
+literal "true"
 
 \end_inset
 
@@ -11085,6 +11094,7 @@ The element-locking limitation of compatible strain shell formulations has
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bischoff18"
+literal "true"
 
 \end_inset
 
@@ -11094,6 +11104,7 @@ key "Bischoff18"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "MacNeal78,Bathe86"
+literal "true"
 
 \end_inset
 
@@ -11101,6 +11112,7 @@ key "MacNeal78,Bathe86"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Betsch95,Bischoff97"
+literal "true"
 
 \end_inset
 
@@ -11110,6 +11122,7 @@ key "Betsch95,Bischoff97"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo90"
+literal "true"
 
 \end_inset
 
@@ -11117,6 +11130,7 @@ key "Simo90"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Klinkel99,Vu-Quoc03,Simo93"
+literal "true"
 
 \end_inset
 
@@ -11133,6 +11147,7 @@ q4eas
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Vu-Quoc03"
+literal "true"
 
 \end_inset
 
@@ -11143,6 +11158,7 @@ key "Vu-Quoc03"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Klinkel99"
+literal "true"
 
 \end_inset
 
@@ -22070,6 +22086,7 @@ sliding-node-on-facet
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Laursen95"
+literal "true"
 
 \end_inset
 
@@ -22152,6 +22169,7 @@ sliding-elastic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10b"
+literal "true"
 
 \end_inset
 
@@ -22159,7 +22177,7 @@ key "Ateshian10b"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21a"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -22188,6 +22206,7 @@ sliding-biphasic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian12"
+literal "true"
 
 \end_inset
 
@@ -22218,6 +22237,7 @@ sliding-biphasic-solute
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian12"
+literal "true"
 
 \end_inset
 
@@ -25611,6 +25631,7 @@ implementation for sliding interfaces can deal with biphasic contact surfaces
 LatexCommand citep
 key "Ateshian10b,Zimmerman21a"
 literal "true"
+
 \end_inset
 
 .
@@ -25679,7 +25700,7 @@ As detailed in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21a"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -25817,6 +25838,7 @@ sliding-multiphasic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian12"
+literal "true"
 
 \end_inset
 
@@ -26208,6 +26230,7 @@ A tied interface can be used to connect two non-conforming meshes
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Laursen93"
+literal "true"
 
 \end_inset
 
@@ -41123,6 +41146,7 @@ Uncoupled, nearly-incompressible hyperelastic materials are described by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -41230,6 +41254,7 @@ All of these materials make use of the three-field element described by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -41483,6 +41508,7 @@ This material describes an incompressible Arruda-Boyce model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Arruda93"
+literal "true"
 
 \end_inset
 
@@ -41643,6 +41669,7 @@ This material model was proposed by Arruda and Boyce
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Arruda93"
+literal "true"
 
 \end_inset
 
@@ -41857,6 +41884,7 @@ The stress
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -42661,6 +42689,7 @@ The material type for orthotropic Fung elasticity
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Fung79,Fung93"
+literal "true"
 
 \end_inset
 
@@ -43087,6 +43116,7 @@ The hyperelastic strain energy function is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09"
+literal "true"
 
 \end_inset
 
@@ -43279,6 +43309,7 @@ The material type for the uncoupled Holzapfel-Gasser-Ogden material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gasser06"
+literal "true"
 
 \end_inset
 
@@ -43630,6 +43661,7 @@ periodic von Mises fiber distribution, as described in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gasser06"
+literal "true"
 
 \end_inset
 
@@ -43894,6 +43926,7 @@ This material model uses a three-field element formulation, interpolating
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -43965,6 +43998,7 @@ This material model implements the constitutive model developed by Silvia
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Blemker04"
+literal "true"
 
 \end_inset
 
@@ -44290,6 +44324,7 @@ The main difference between this material formulation compared to other
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Criscione01"
+literal "true"
 
 \end_inset
 
@@ -44298,6 +44333,7 @@ key "Criscione01"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Spencer84"
+literal "true"
 
 \end_inset
 
@@ -44469,6 +44505,7 @@ This material describes an incompressible hyperelastic Ogden material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -44693,6 +44730,7 @@ tendon material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Blemker04"
+literal "true"
 
 \end_inset
 
@@ -45268,6 +45306,7 @@ This material is based on the following uncoupled hyperelastic strain energy
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian07c"
+literal "true"
 
 \end_inset
 
@@ -45688,6 +45727,7 @@ This constitutive model can be used to represent a material that has a single
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98,Quapp98,Weiss96"
+literal "true"
 
 \end_inset
 
@@ -45820,6 +45860,7 @@ This material model uses a three-field element formulation, interpolating
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -46129,6 +46170,7 @@ trans iso Veronda-Westmann
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss2002"
+literal "true"
 
 \end_inset
 
@@ -46756,6 +46798,7 @@ Veronda-Westmann
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Veronda70"
+literal "true"
 
 \end_inset
 
@@ -46899,6 +46942,7 @@ The dilatational term is identical to the one used in the Mooney-Rivlin
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Veronda70"
+literal "true"
 
 \end_inset
 
@@ -47520,6 +47564,7 @@ Transversely Isotropic Mooney-Rivlin
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Girard09"
+literal "true"
 
 \end_inset
 
@@ -47643,6 +47688,7 @@ von-Mises distribution describing in-plane collagen fiber alignment.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gouget12"
+literal "true"
 
 \end_inset
 
@@ -48440,6 +48486,7 @@ This model describes an unconstrained neo-Hookean material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -48477,6 +48524,7 @@ Young's modulus depends on
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Carter76,Carter77"
+literal "true"
 
 \end_inset
 
@@ -48700,6 +48748,7 @@ cell growth
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian2012"
+literal "true"
 
 \end_inset
 
@@ -49234,6 +49283,7 @@ This bimodular elastic material is specialized from the orthotropic conewise
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Curnier94"
+literal "true"
 
 \end_inset
 
@@ -49354,6 +49404,7 @@ m, assuming that the material is porous, with a charged solid matrix, and
 \begin_inset CommandInset citation
 LatexCommand citep
 key "OVERBEEK56,Lai91"
+literal "true"
 
 \end_inset
 
@@ -49574,6 +49625,7 @@ The Cauchy stress for this material is the stress from the Donnan equilibrium
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -50232,6 +50284,7 @@ The Cauchy stress for this fibrous material is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -51058,6 +51111,7 @@ The material type for unconstrained orthotropic Fung elasticity
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Fung79,Fung93"
+literal "true"
 
 \end_inset
 
@@ -51489,6 +51543,7 @@ The hyperelastic strain energy function is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09"
+literal "true"
 
 \end_inset
 
@@ -51681,6 +51736,7 @@ The material type for the Holmes-Mow material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -51694,6 +51750,7 @@ Holmes-Mow
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90,Ateshian97"
+literal "true"
 
 \end_inset
 
@@ -51701,6 +51758,7 @@ key "Holmes90,Ateshian97"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Iatridis98"
+literal "true"
 
 \end_inset
 
@@ -51828,6 +51886,7 @@ The coupled hyperelastic strain-energy function for this material is given
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -51933,6 +51992,7 @@ The material type for the unconstrained Holzapfel-Gasser-Ogden material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gasser06"
+literal "true"
 
 \end_inset
 
@@ -52269,6 +52329,7 @@ periodic von Mises fiber distribution, as described in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gasser06"
+literal "true"
 
 \end_inset
 
@@ -53573,6 +53634,7 @@ This bimodular elastic material is the orthotropic conewise linear elastic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Curnier94"
+literal "true"
 
 \end_inset
 
@@ -54236,6 +54298,7 @@ This model describes an unconstrained Neo-Hookean material using the natural
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Criscione00"
+literal "true"
 
 \end_inset
 
@@ -54459,6 +54522,7 @@ This model describes an unconstrained Neo-Hookean material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -55071,6 +55135,7 @@ This material describes an unconstrained hyperelastic Ogden material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -56379,6 +56444,7 @@ The Cauchy stress for this fibrous material is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -56837,6 +56903,7 @@ The Cauchy stress for this fibrous material is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -57382,6 +57449,7 @@ The first three terms define the coupled Mooney-Rivlin matrix response.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss96"
+literal "true"
 
 \end_inset
 
@@ -57746,6 +57814,7 @@ The first two terms define the coupled Veronda-Westmann matrix response.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss96"
+literal "true"
 
 \end_inset
 
@@ -57837,6 +57906,7 @@ This material describes a coupled, transversely isotropic material that
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Swedberg2014"
+literal "true"
 
 \end_inset
 
@@ -58218,6 +58288,7 @@ However, it should be noted that some authors have expressed concerns about
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Sansour08,Helfenstein10,Gultekin19"
+literal "true"
 
 \end_inset
 
@@ -58236,6 +58307,7 @@ key "Sansour08,Helfenstein10,Gultekin19"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Helfenstein10"
+literal "true"
 
 \end_inset
 
@@ -58249,6 +58321,7 @@ The solution advocated by these investigators has been to use an uncoupled
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Sansour08,Helfenstein10,Gultekin19"
+literal "true"
 
 \end_inset
 
@@ -60125,7 +60198,7 @@ fiber-Kiousis-uncoupled
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Kiousis08,Kiousis09"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -60635,6 +60708,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Hou2016"
+literal "true"
 
 \end_inset
 
@@ -61573,6 +61647,7 @@ von-Mises-3d
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gasser06"
+literal "true"
 
 \end_inset
 
@@ -62227,6 +62302,7 @@ fibers-3d-gkt
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Hou16"
+literal "true"
 
 \end_inset
 
@@ -62969,6 +63045,7 @@ For a uncoupled viscoelastic material, the second Piola Kirchhoff stress
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98"
+literal "true"
 
 \end_inset
 
@@ -63373,6 +63450,7 @@ For a viscoelastic material, the second Piola Kirchhoff stress can be written
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98"
+literal "true"
 
 \end_inset
 
@@ -63519,6 +63597,7 @@ Reactive viscoelasticity models a material as a mixture of strong bonds,
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian15"
+literal "true"
 
 \end_inset
 
@@ -66124,6 +66203,7 @@ name "para:mylabel47"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo87"
+literal "true"
 
 \end_inset
 
@@ -67344,6 +67424,7 @@ The material type for Simo's damage criterion
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo87"
+literal "true"
 
 \end_inset
 
@@ -67662,7 +67743,7 @@ DC Drucker shear stress
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Drucker49"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -67882,7 +67963,7 @@ Reactive plasticity models a material as a mixture of bonds that break in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -67891,7 +67972,7 @@ literal "false"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10a"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -67965,7 +68046,7 @@ hardening
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Skelton97"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -68109,7 +68190,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -68236,7 +68317,7 @@ More details can be found in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -68679,7 +68760,7 @@ This custom method for specifying the flow curve was provided in the paper
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -70255,7 +70336,7 @@ noprefix "false"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Zimmerman21"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -70418,7 +70499,7 @@ elastic damage threshold
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Nims16"
-literal "false"
+literal "true"
 
 \end_inset
 
@@ -71398,6 +71479,7 @@ This type of material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10a"
+literal "true"
 
 \end_inset
 
@@ -72455,6 +72537,7 @@ This isotropic material model uses the biphasic theory for describing the
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Mow80"
+literal "true"
 
 \end_inset
 
@@ -72966,6 +73049,7 @@ This isotropic material is similar to the constant isotropic permeability
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -77513,6 +77597,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Albro09"
+literal "true"
 
 \end_inset
 
@@ -80631,6 +80716,7 @@ If you use these capabilities in your published research, we request that
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian2011"
+literal "true"
 
 \end_inset
 
@@ -82536,6 +82622,7 @@ To reproduce the interstitial solid remodeling theory proposed by Weinans
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weinans92"
+literal "true"
 
 \end_inset
 
@@ -85969,6 +86056,7 @@ Stokes' condition is a constitutive assumption that sets
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Panton06"
+literal "true"
 
 \end_inset
 
@@ -86310,6 +86398,7 @@ The material type for a Carreau model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -86581,6 +86670,7 @@ The material type for a Carreau-Yasuda model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -86885,6 +86975,7 @@ The material type for a Powell-Eyring model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -87968,6 +88059,7 @@ g paper that details the theoretical framework and the implementation in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Maas2016"
+literal "true"
 
 \end_inset
 
@@ -88779,72 +88871,18 @@ name "sec:Continuous-Damage-1"
 \end_layout
 
 \begin_layout Standard
-A material may accumulate damage over a single cycle or multiple cycles
- of loading which alters its properties.
- In the classical framework of damage mechanics this attenuation of the
- material properties is described by a single scalar damage variable 
-\begin_inset Formula $D$
-\end_inset
-
- when the material is isotropic (
-\begin_inset Formula $0\leqslant D\leqslant1)$
-\end_inset
-
-.
- For anisotropic materials however, classical frameworks require that we
- introduce a function of the fourth-order damage tensor 
-\begin_inset Formula $\mathcal{D}$
-\end_inset
-
- to account for anisotropic damage.
- In FEBio's Continuous Damage model, the elastic response of the fibers
- chosen for the material is mathematically related (which is material dependent)
- to the total number of intact bonds in the material.
- At any given time in the loading history, 
-\begin_inset Formula $D$
-\end_inset
-
- represents some mass fraction of bonds that have broken in the fibers.
- In this framework, it is possible to also model damage in anisotropic materials
- by assuming that multiple bond types exist in the material, each of which
- may get damaged under different circumstances.
- Each bond type 
-\begin_inset Formula $b$
-\end_inset
-
- may be described by a distinct solid constituent (see Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Uncoupled-Solid-Mixture"
+In the continuous damage formulation, the damage variable D is embedded
+ inside the strain-energy function.
+ The implementation follows largely the formulation in Balzani [
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BALZANI2012139"
+literal "false"
 
 \end_inset
 
- , e.g.
- to describe the matrix) in conjunction with a Continuous Damage solid constitue
-nt (See sub-sections 
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Continuous-Damage"
-
-\end_inset
-
-, e.g.
- to describe the fibers) within a solid mixture (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Solid-Mixture"
-
-\end_inset
-
-) of a material, each having its own scalar damage variable 
-\begin_inset Formula $D^{b}$
-\end_inset
-
-.
+].
+ 
 \end_layout
 
 \begin_layout Standard
@@ -88878,10 +88916,9 @@ The following material damage parameters must be defined:
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
+<lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -88902,19 +88939,10 @@ Parameter
 \end_inset
 
 (
-\begin_inset Formula $0\leqslant D_{\infty}\leqslant1000)$
+\begin_inset Formula $0\leqslant D_{\infty}\leqslant1)$
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
 \end_layout
 
 \end_inset
@@ -88939,19 +88967,10 @@ Parameter
 \end_inset
 
  (
-\begin_inset Formula $0\leqslant\beta_{s}\leqslant1)$
+\begin_inset Formula $\beta_{s}>0)$
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
 \end_layout
 
 \end_inset
@@ -88984,15 +89003,6 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
-\end_layout
-
-\end_inset
-</cell>
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -89017,15 +89027,6 @@ Parameter
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[t]
 \end_layout
 
 \end_inset
@@ -89061,7 +89062,7 @@ The scalar damage variable
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $\mathit{D(\beta)=D_{s}\left[1-\exp\left(\frac{\ln(1-r_{s})}{\beta_{s}}\right)\beta\right]},$
+\begin_inset Formula $\mathit{D(\beta)=D_{s}\left[1-\exp\left(\frac{\ln(1-r_{s})}{\beta_{s}}\beta\right)\right]},$
 \end_inset
 
 
@@ -89211,7 +89212,7 @@ To make sure damage evolution begins to accumulate only when damage is accrued,
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $\mathit{D_{s}(\gamma)=D_{\infty}\left[1-\exp\left(\frac{\ln(1-r_{\infty})}{\gamma_{\infty}}\right)\gamma\right],}$
+\begin_inset Formula $\mathit{D_{s}(\gamma)=D_{\infty}\left[1-\exp\left(\frac{\ln(1-r_{\infty})}{\gamma_{\infty}}\gamma\right)\right],}$
 \end_inset
 
 
@@ -89287,168 +89288,6 @@ and the time associated with the current loading situation is represented
 .
 \end_layout
 
-\begin_layout Subsection
-Damage Fiber Power
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Damage-Fiber-Power"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for Damage Fiber Power is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-damage fiber power
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
-.
- The following material parameters must be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<a1>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\alpha_{1}$
-\end_inset
-
- (
-\begin_inset Formula $\alpha_{1}>0)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<a2>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\alpha_{2}$
-\end_inset
-
- (
-\begin_inset Formula $\alpha_{2}>1)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<kappa>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\kappa$
-\end_inset
-
- (
-\begin_inset Formula $0\leqslant\kappa\leqslant2/3)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
 The strain energy is assumed to be of the following form,
 \end_layout
@@ -89463,27 +89302,20 @@ The strain energy is assumed to be of the following form,
 
 \begin_layout Standard
 where the modified internal energy function 
-\begin_inset Formula $\mathit{P(C,D)}=(1-D)\Psi^{0}-c$
+\begin_inset Formula $\mathit{P(C,D)}=(1-D)\bar{P}-c$
 \end_inset
 
  with the scalar damage variable 
 \begin_inset Formula $\mathit{D}$
 \end_inset
 
- (defined in section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Continuous-Damage"
-
-\end_inset
-
-).
+ (defined above).
  
 \begin_inset Formula $m(P(C,D))$
 \end_inset
 
- is the arbitrary convex and monotonically increasing function, whose first
- derivative is zero in the origin.
+ is a convex and monotonically increasing function, whose first derivative
+ is zero in the origin.
  Possible functions of 
 \begin_inset Formula $\bar{P}$
 \end_inset
@@ -89526,6 +89358,37 @@ where
 \end_inset
 
  denotes the direction of the fibers.
+ In this formulation we take 
+\begin_inset Formula $\bar{P}=\varPsi^{0}$
+\end_inset
+
+.
+ Note The fifth invariant is not polyconvex, therefore alternative polyconvex
+ invariant functions are defined as
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{1}^{(a)}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J_{5}^{(a)}-I_{1}J_{4}^{(a)}+I_{2}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{2}^{(a)}=tr\left[C(I-M_{(a)})\right]=I_{1}-J_{4}^{(a)}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{3}^{(a)}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J_{4}^{(a)}+J_{5}^{(a)}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -89561,6 +89424,140 @@ The subtraction of
  
 \end_layout
 
+\begin_layout Subsection
+Damage Fiber Power
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Damage-Fiber-Power"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for Damage Fiber Power is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+damage fiber power
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<a1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha_{1}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha_{1}>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<a2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha_{2}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha_{2}>1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kappa>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ (
+\begin_inset Formula $0\leqslant\kappa\leqslant2/3)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 By setting, 
 \end_layout
@@ -89584,35 +89581,6 @@ the strain-energy form above can be made suitable for modeling damage,
 \begin_layout Standard
 \align center
 \begin_inset Formula $\varPsi(C,D)=\alpha_{1}\left(\left(1-D\right)\left[\kappa I_{1}+\left(1-\frac{3}{2}\kappa\right)K_{3}\right]-c\right)^{\alpha_{2}}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The fifth invariant is not polyconvex, therefore alternative polyconvex
- invariant functions are defined as
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $K_{1}^{(a)}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J_{5}^{(a)}-I_{1}J_{4}^{(a)}+I_{2}$
-\end_inset
-
-,
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $K_{2}^{(a)}=tr\left[C(I-M_{(a)})\right]=I_{1}-J_{4}^{(a)}$
-\end_inset
-
-,
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $K_{3}^{(a)}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J_{4}^{(a)}+J_{5}^{(a)}$
 \end_inset
 
 .
@@ -89723,10 +89691,9 @@ damage fiber exponential
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="3" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -89751,15 +89718,6 @@ Parameter
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
 \end_layout
 
 \end_inset
@@ -89792,15 +89750,6 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -89829,15 +89778,6 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
 </row>
 </lyxtabular>
 
@@ -89851,22 +89791,7 @@ Parameter
 \end_layout
 
 \begin_layout Standard
-with the scalar damage variable 
-\begin_inset Formula $\mathit{D}$
-\end_inset
-
- (defined in section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Continuous-Damage"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-The strain-energy function is given by,
+The effective strain-energy function is given by,
 \end_layout
 
 \begin_layout Standard
@@ -89887,43 +89812,6 @@ and
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-where possible functions of 
-\begin_inset Formula $\bar{P}$
-\end_inset
-
- are given by
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $\bar{P}_{1}:=J_{4}^{(a)}$
-\end_inset
-
-,
-\begin_inset Formula $\bar{P}_{3}:=K_{1}^{(a)}$
-\end_inset
-
-,
-\begin_inset Formula $\bar{P}_{2}:=K_{2}^{(a)}$
-\end_inset
-
-,
-\begin_inset Formula $\bar{P}_{4}:=K_{3}^{(a)}$
-\end_inset
-
-,
-\end_layout
-
-\begin_layout Standard
-\align center
-(
-\begin_inset Formula $\bar{P}_{5}:=I_{1},\bar{P}_{6}:=I_{2},\bar{P}_{7}:=I_{3}$
-\end_inset
-
-),
 \end_layout
 
 \begin_layout Standard
@@ -90014,6 +89902,987 @@ Example:
 
 \begin_layout LyX-Code
 </solid>
+\end_layout
+
+\begin_layout Subsection
+Damage Fiber exp-linear
+\end_layout
+
+\begin_layout Standard
+This continuous damage formulation uses a slightly modified damage formulation.
+ The total damage is here defined as,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D=D_{1}+D_{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $D_{1}$
+\end_inset
+
+defines the same damage term as defined above.
+ The 
+\begin_inset Formula $D_{2}$
+\end_inset
+
+is defined as follows,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D_{2}=D_{3}\left[a\left(\mathrm{exp}\left(b\beta\right)-1\right)+c\left(\mathrm{exp}\left(d\beta\right)-1\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material parameters 
+\emph on
+a
+\emph default
+ and 
+\emph on
+c
+\emph default
+ control the magnitude of the continuous damage of the two phenomena: 1)
+ slow, constant increased in damage, 2) sharp jump in damage near failure.
+ The other material parameters, 
+\emph on
+b
+\emph default
+ and 
+\emph on
+d
+\emph default
+, control the rate of continuous damage accumulation for the two phenomena
+ mentioned above, and is a function of the collagen discontinuous damage.
+ Furthermore, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D_{3}\left(\gamma\right)=\frac{D_{3\infty}}{1+exp\left(-\left(\gamma-\gamma_{0}\right)/r_{\gamma}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $D_{3\infty}$
+\end_inset
+
+ is the maximum achievable discontinuous damage possible for the model,
+ 
+\begin_inset Formula $\gamma_{0}$
+\end_inset
+
+ determines the shape of the curve, and 
+\begin_inset Formula $r_{\gamma}$
+\end_inset
+
+ controls the rate of discontinuous damage accumulation.
+\end_layout
+
+\begin_layout Standard
+The additional damage parameters to define the 
+\begin_inset Formula $D_{2}$
+\end_inset
+
+ term, are as follows.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $a$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_d
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $d$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D3_inf
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $D_{3\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D3_g0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $\gamma_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D3_rg
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $r_{\gamma}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The effective strain-energy function is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi^{0}=\sqrt{I_{4}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+m\left(P\right)=\left\{ \begin{array}{cc}
+c_{3}\left(\exp\left(-c_{4}\right)\left(Ei\left(c_{4}\left(P+1\right)\right)-Ei\left(c_{4}\right)\right)-\log\left(P+1\right)\right), & P\leqq\lambda^{*}+1\\
+c_{5}P+c_{6}\log\left(P+1\right)+d & P>\lambda^{*}+1
+\end{array}\right.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\emph on
+d
+\emph default
+ is determined by requiring continuity at 
+\begin_inset Formula $\lambda^{*}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The (elastic) material parameters for this material are as follows.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{5}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lambda
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $\lambda^{*},$
+\end_inset
+
+the transition between exponential and linear regions.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+First-Order Homogenization
+\end_layout
+
+\begin_layout Standard
+This document describes how to use the first-order homogenization feature
+ in FEBio.
+ Homogenization refers to the process of evaluating the physical response
+ of a macro model by explicitly solving a separate finite element model
+ that represents the micro structure of the material.
+ This micro-model is referred to as the Representative Volume Element (RVE).
+ In the first-order approach it is assumed that the macro and micro scales
+ are separated, which implies that the size of the RVE is negligible compared
+ to the size of the macro model.
+\end_layout
+
+\begin_layout Subsection
+Macro model definition
+\end_layout
+
+\begin_layout Standard
+For the most part, the definition of the macro-model is a standard finite
+ element model with properly chosen boundary conditions.
+ The use of first-order homogenization is controlled entirely by the material
+ definition.
+ 
+\end_layout
+
+\begin_layout Standard
+To use the first-order homogenization formulation use the “micro-material”
+ material.
+ This material has the following parameters.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RVE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The file name of the RVE model (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+N/A
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rve_type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The type of RVE model (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bc_set
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The name of the nodeset (in the RVE) that defines the outside surface (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(optional)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+probe
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defines a point in the macro model where the RVE will be tracked.
+ (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(none)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Standard
+1.
+ The RVE parameter defines the file name of the RVE model.
+ The RVE is a standard FE model, although somewhat slimmed down.
+ See the rve_type parameter definition and the section RVE model definition
+ below.
+\end_layout
+
+\begin_layout Standard
+2.
+ This parameter determines the type of RVE (and its assumed boundary conditions)
+ that will be used and must be one of the following values.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+rve_type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribed displacement RVE: The position of all RVE boundary nodes is fully
+ prescribed
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Periodic RVE: RVE with periodic boundary constraints.
+ Constraints are enforced with linear constraints.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+3.
+ The bc_set defines the name of the nodeset (defined in the RVE model),
+ that defines the outside surface.
+ In general, this parameter does not need to be defined.
+ It is only needed for problems using rve_type = 0, and for which the RVE
+ geometry is not a closed cube.
+ 
+\end_layout
+
+\begin_layout Standard
+4.
+ By default, FEBio will only output the deformation of the macro model to
+ the plot file.
+ It will not output any results from the RVE models.
+ (Given there could be thousands of RVE models, this would be too cumbersome
+ to do.) However, users can request FEBio to output the deformation of the
+ RVE model at specific points in the model using the probe option.
+ The probe tag requires the following child tags.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+probe parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+element_id
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the ID of the element to probe
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gausspt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the index of the integration point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+file
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+output file name for RVE model
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+RVE model definition
+\end_layout
+
+\begin_layout Standard
+The RVE model is a standard FE model, with a few caveats.
+\end_layout
+
+\begin_layout Itemize
+The time stepping parameters will be ignored, since the macro model controls
+ the time stepping of the RVE to make sure that both models advance in sync.
+ 
+\end_layout
+
+\begin_layout Itemize
+The boundary conditions of the RVE depend on the rve_type parameter: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+rve_type = 0: The RVE model should not have any boundary conditions applied.
+ The RVE may define a nodeset that defines the outside surface of the RVE.
+ This is generally not needed, but must be defined when the RVE geometry
+ is not a closed cube.
+ 
+\end_layout
+
+\begin_layout Itemize
+rve_type = 1: The RVE should have periodic constraints applied for all opposing
+ surfaces.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The RVE model does not need an Output section, but may define the plotfile
+ section.
+ This will be used to define the conents of the probe's plotfiles.
+ 
+\end_layout
+
+\begin_layout Itemize
+The size of the RVE is assumed to be much smaller than the macro model.
+ It is allowed to use a different length unit for the coordinates of the
+ RVE nodes.
+ However, the unit of stress must be the same for both the macro model and
+ the RVE model.
+ 
 \end_layout
 
 \begin_layout Chapter
@@ -90994,350 +91863,437 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="3.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="fix" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribe" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 

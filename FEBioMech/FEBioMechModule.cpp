@@ -704,6 +704,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_Psi0 , "continuous damage Psi0");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_beta , "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_gamma, "continuous damage gamma");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2beta, "continuous damage D2beta");
     REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
     REGISTER_FECORE_CLASS(FEPlotRVEStrongBondSED, "RVE strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotRVEWeakBondSED, "RVE weak bond SED");
@@ -920,6 +921,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidConnectorRotationZ, "RCthz");
 
 	//-----------------------------------------------------------------------------
+	// Derived from FELogNLConstraintData
+	REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
+	REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
+
+	//-----------------------------------------------------------------------------
 	// Derived from DataRecord
 	REGISTER_FECORE_CLASS(ObjectDataRecord, "rigid_body_data");
 
@@ -939,6 +945,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
 	REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
 
+	febio.CreateModule("explicit-solid");
+	febio.SetModuleDependency("solid");
+	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 
 	febio.SetActiveModule(0);
 }

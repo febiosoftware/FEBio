@@ -69,7 +69,7 @@ bool FEBioParamRun::Init(const char* szfile)
 		// set the initial value
 		v->SetValue(v->InitValue());
 	}
-	for (FEModelParameter* v : m_outVar)
+	for (FEDataParameter* v : m_outVar)
 	{
 		if (v->Init() == false) return false;
 	}
@@ -131,11 +131,11 @@ bool FEBioParamRun::Input(const char* szfile)
 				else if (tag == "param")
 				{
 					// read parameter
-					FEModelParameter* var = new FEModelParameter(fem);
+					FEDataParameter* var = new FEDataParameter(fem);
 
 					// get the variable name
 					const char* sz = tag.AttributeValue("name");
-					var->SetName(sz);
+					var->SetParameterName(sz);
 
 					m_outVar.push_back(var);
 				}
@@ -167,9 +167,9 @@ bool FEBioParamRun::Run()
 
 	// output the values
 	FILE* fp = fopen(m_outFile.c_str(), "wt");
-	for (FEModelParameter* p : m_outVar)
+	for (FEDataParameter* p : m_outVar)
 	{
-		double v = p->GetValue();
+		double v = p->value();
 		fprintf(fp, "%lg\n", v);
 	}
 	fclose(fp);
