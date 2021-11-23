@@ -88871,72 +88871,18 @@ name "sec:Continuous-Damage-1"
 \end_layout
 
 \begin_layout Standard
-A material may accumulate damage over a single cycle or multiple cycles
- of loading which alters its properties.
- In the classical framework of damage mechanics this attenuation of the
- material properties is described by a single scalar damage variable 
-\begin_inset Formula $D$
-\end_inset
-
- when the material is isotropic (
-\begin_inset Formula $0\leqslant D\leqslant1)$
-\end_inset
-
-.
- For anisotropic materials however, classical frameworks require that we
- introduce a function of the fourth-order damage tensor 
-\begin_inset Formula $\mathcal{D}$
-\end_inset
-
- to account for anisotropic damage.
- In FEBio's Continuous Damage model, the elastic response of the fibers
- chosen for the material is mathematically related (which is material dependent)
- to the total number of intact bonds in the material.
- At any given time in the loading history, 
-\begin_inset Formula $D$
-\end_inset
-
- represents some mass fraction of bonds that have broken in the fibers.
- In this framework, it is possible to also model damage in anisotropic materials
- by assuming that multiple bond types exist in the material, each of which
- may get damaged under different circumstances.
- Each bond type 
-\begin_inset Formula $b$
-\end_inset
-
- may be described by a distinct solid constituent (see Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Uncoupled-Solid-Mixture"
+In the continuous damage formulation, the damage variable D is embedded
+ inside the strain-energy function.
+ The implementation follows largely the formulation in Balzani [
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BALZANI2012139"
+literal "false"
 
 \end_inset
 
- , e.g.
- to describe the matrix) in conjunction with a Continuous Damage solid constitue
-nt (See sub-sections 
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Continuous-Damage"
-
-\end_inset
-
-, e.g.
- to describe the fibers) within a solid mixture (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Solid-Mixture"
-
-\end_inset
-
-) of a material, each having its own scalar damage variable 
-\begin_inset Formula $D^{b}$
-\end_inset
-
-.
+].
+ 
 \end_layout
 
 \begin_layout Standard
@@ -88970,10 +88916,9 @@ The following material damage parameters must be defined:
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
+<lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -88994,19 +88939,10 @@ Parameter
 \end_inset
 
 (
-\begin_inset Formula $0\leqslant D_{\infty}\leqslant1000)$
+\begin_inset Formula $0\leqslant D_{\infty}\leqslant1)$
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
 \end_layout
 
 \end_inset
@@ -89031,19 +88967,10 @@ Parameter
 \end_inset
 
  (
-\begin_inset Formula $0\leqslant\beta_{s}\leqslant1)$
+\begin_inset Formula $\beta_{s}>0)$
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
 \end_layout
 
 \end_inset
@@ -89076,15 +89003,6 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
-\end_layout
-
-\end_inset
-</cell>
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -89109,15 +89027,6 @@ Parameter
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[t]
 \end_layout
 
 \end_inset
@@ -89153,7 +89062,7 @@ The scalar damage variable
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $\mathit{D(\beta)=D_{s}\left[1-\exp\left(\frac{\ln(1-r_{s})}{\beta_{s}}\right)\beta\right]},$
+\begin_inset Formula $\mathit{D(\beta)=D_{s}\left[1-\exp\left(\frac{\ln(1-r_{s})}{\beta_{s}}\beta\right)\right]},$
 \end_inset
 
 
@@ -89303,7 +89212,7 @@ To make sure damage evolution begins to accumulate only when damage is accrued,
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $\mathit{D_{s}(\gamma)=D_{\infty}\left[1-\exp\left(\frac{\ln(1-r_{\infty})}{\gamma_{\infty}}\right)\gamma\right],}$
+\begin_inset Formula $\mathit{D_{s}(\gamma)=D_{\infty}\left[1-\exp\left(\frac{\ln(1-r_{\infty})}{\gamma_{\infty}}\gamma\right)\right],}$
 \end_inset
 
 
@@ -89379,168 +89288,6 @@ and the time associated with the current loading situation is represented
 .
 \end_layout
 
-\begin_layout Subsection
-Damage Fiber Power
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Damage-Fiber-Power"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for Damage Fiber Power is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-damage fiber power
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
-.
- The following material parameters must be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<a1>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\alpha_{1}$
-\end_inset
-
- (
-\begin_inset Formula $\alpha_{1}>0)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<a2>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\alpha_{2}$
-\end_inset
-
- (
-\begin_inset Formula $\alpha_{2}>1)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<kappa>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\kappa$
-\end_inset
-
- (
-\begin_inset Formula $0\leqslant\kappa\leqslant2/3)$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
 The strain energy is assumed to be of the following form,
 \end_layout
@@ -89555,27 +89302,20 @@ The strain energy is assumed to be of the following form,
 
 \begin_layout Standard
 where the modified internal energy function 
-\begin_inset Formula $\mathit{P(C,D)}=(1-D)\Psi^{0}-c$
+\begin_inset Formula $\mathit{P(C,D)}=(1-D)\bar{P}-c$
 \end_inset
 
  with the scalar damage variable 
 \begin_inset Formula $\mathit{D}$
 \end_inset
 
- (defined in section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Continuous-Damage"
-
-\end_inset
-
-).
+ (defined above).
  
 \begin_inset Formula $m(P(C,D))$
 \end_inset
 
- is the arbitrary convex and monotonically increasing function, whose first
- derivative is zero in the origin.
+ is a convex and monotonically increasing function, whose first derivative
+ is zero in the origin.
  Possible functions of 
 \begin_inset Formula $\bar{P}$
 \end_inset
@@ -89618,6 +89358,37 @@ where
 \end_inset
 
  denotes the direction of the fibers.
+ In this formulation we take 
+\begin_inset Formula $\bar{P}=\varPsi^{0}$
+\end_inset
+
+.
+ Note The fifth invariant is not polyconvex, therefore alternative polyconvex
+ invariant functions are defined as
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{1}^{(a)}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J_{5}^{(a)}-I_{1}J_{4}^{(a)}+I_{2}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{2}^{(a)}=tr\left[C(I-M_{(a)})\right]=I_{1}-J_{4}^{(a)}$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $K_{3}^{(a)}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J_{4}^{(a)}+J_{5}^{(a)}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -89653,6 +89424,140 @@ The subtraction of
  
 \end_layout
 
+\begin_layout Subsection
+Damage Fiber Power
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Damage-Fiber-Power"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for Damage Fiber Power is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+damage fiber power
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<a1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha_{1}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha_{1}>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<a2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha_{2}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha_{2}>1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kappa>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ (
+\begin_inset Formula $0\leqslant\kappa\leqslant2/3)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 By setting, 
 \end_layout
@@ -89676,35 +89581,6 @@ the strain-energy form above can be made suitable for modeling damage,
 \begin_layout Standard
 \align center
 \begin_inset Formula $\varPsi(C,D)=\alpha_{1}\left(\left(1-D\right)\left[\kappa I_{1}+\left(1-\frac{3}{2}\kappa\right)K_{3}\right]-c\right)^{\alpha_{2}}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The fifth invariant is not polyconvex, therefore alternative polyconvex
- invariant functions are defined as
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $K_{1}^{(a)}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J_{5}^{(a)}-I_{1}J_{4}^{(a)}+I_{2}$
-\end_inset
-
-,
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $K_{2}^{(a)}=tr\left[C(I-M_{(a)})\right]=I_{1}-J_{4}^{(a)}$
-\end_inset
-
-,
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $K_{3}^{(a)}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J_{4}^{(a)}+J_{5}^{(a)}$
 \end_inset
 
 .
@@ -89815,10 +89691,9 @@ damage fiber exponential
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="3" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -89843,15 +89718,6 @@ Parameter
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[M]
 \end_layout
 
 \end_inset
@@ -89884,15 +89750,6 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -89921,15 +89778,6 @@ Parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
 </row>
 </lyxtabular>
 
@@ -89943,22 +89791,7 @@ Parameter
 \end_layout
 
 \begin_layout Standard
-with the scalar damage variable 
-\begin_inset Formula $\mathit{D}$
-\end_inset
-
- (defined in section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Continuous-Damage"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-The strain-energy function is given by,
+The effective strain-energy function is given by,
 \end_layout
 
 \begin_layout Standard
@@ -89979,43 +89812,6 @@ and
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-where possible functions of 
-\begin_inset Formula $\bar{P}$
-\end_inset
-
- are given by
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Formula $\bar{P}_{1}:=J_{4}^{(a)}$
-\end_inset
-
-,
-\begin_inset Formula $\bar{P}_{3}:=K_{1}^{(a)}$
-\end_inset
-
-,
-\begin_inset Formula $\bar{P}_{2}:=K_{2}^{(a)}$
-\end_inset
-
-,
-\begin_inset Formula $\bar{P}_{4}:=K_{3}^{(a)}$
-\end_inset
-
-,
-\end_layout
-
-\begin_layout Standard
-\align center
-(
-\begin_inset Formula $\bar{P}_{5}:=I_{1},\bar{P}_{6}:=I_{2},\bar{P}_{7}:=I_{3}$
-\end_inset
-
-),
 \end_layout
 
 \begin_layout Standard
@@ -90106,6 +89902,492 @@ Example:
 
 \begin_layout LyX-Code
 </solid>
+\end_layout
+
+\begin_layout Subsection
+Damage Fiber exp-linear
+\end_layout
+
+\begin_layout Standard
+This continuous damage formulation uses a slightly modified damage formulation.
+ The total damage is here defined as,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D=D_{1}+D_{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $D_{1}$
+\end_inset
+
+defines the same damage term as defined above.
+ The 
+\begin_inset Formula $D_{2}$
+\end_inset
+
+is defined as follows,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D_{2}=D_{3}\left[a\left(\mathrm{exp}\left(b\beta\right)-1\right)+c\left(\mathrm{exp}\left(d\beta\right)-1\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material parameters 
+\emph on
+a
+\emph default
+ and 
+\emph on
+c
+\emph default
+ control the magnitude of the continuous damage of the two phenomena: 1)
+ slow, constant increased in damage, 2) sharp jump in damage near failure.
+ The other material parameters, 
+\emph on
+b
+\emph default
+ and 
+\emph on
+d
+\emph default
+, control the rate of continuous damage accumulation for the two phenomena
+ mentioned above, and is a function of the collagen discontinuous damage.
+ Furthermore, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D_{3}\left(\gamma\right)=\frac{D_{3\infty}}{1+exp\left(-\left(\gamma-\gamma_{0}\right)/r_{\gamma}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $D_{3\infty}$
+\end_inset
+
+ is the maximum achievable discontinuous damage possible for the model,
+ 
+\begin_inset Formula $\gamma_{0}$
+\end_inset
+
+ determines the shape of the curve, and 
+\begin_inset Formula $r_{\gamma}$
+\end_inset
+
+ controls the rate of discontinuous damage accumulation.
+\end_layout
+
+\begin_layout Standard
+The additional damage parameters to define the 
+\begin_inset Formula $D_{2}$
+\end_inset
+
+ term, are as follows.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $a$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D2_d
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $d$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D3_inf
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $D_{3\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D3_g0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $\gamma_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D3_rg
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $r_{\gamma}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The effective strain-energy function is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi^{0}=\sqrt{I_{4}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+m\left(P\right)=\left\{ \begin{array}{cc}
+c_{3}\left(\exp\left(-c_{4}\right)\left(Ei\left(c_{4}\left(P+1\right)\right)-Ei\left(c_{4}\right)\right)-\log\left(P+1\right)\right), & P\leqq\lambda^{*}+1\\
+c_{5}P+c_{6}\log\left(P+1\right)+d & P>\lambda^{*}+1
+\end{array}\right.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\emph on
+d
+\emph default
+ is determined by requiring continuity at 
+\begin_inset Formula $\lambda^{*}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The (elastic) material parameters for this material are as follows.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{5}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+c6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $c_{6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lambda
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameter 
+\begin_inset Formula $\lambda^{*},$
+\end_inset
+
+the transition between exponential and linear regions.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
