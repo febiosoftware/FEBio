@@ -119,6 +119,8 @@ public:
 	bool operator != (const char* sztag) { return (strcmp(sztag, m_sztag) != 0); }
 	void operator ++ ();
 
+	void skip();
+
 	bool isend() { return m_bend; }
 	bool isleaf() { return m_bleaf; }
 	bool isempty() { return m_bempty; }
@@ -151,6 +153,7 @@ public:
 	void value(char* szstr);
 	void value(std::string& val);
 	void value(std::vector<int>& l);
+	void value2(std::vector<int>& l);
 	void value(std::vector<double>& l);
 
 	template <class T> void value(T& v);
@@ -275,7 +278,7 @@ public:
 	FILE* GetFilePtr();
 
 	//! Open the xml file
-	bool Open(const char* szfile);
+	bool Open(const char* szfile, bool checkForXMLTag = true);
 
 	//! Close the xml file
 	void Close();
@@ -340,6 +343,8 @@ protected:
 //-----------------------------------------------------------------------------
 // some inline functions
 inline void XMLTag::operator ++ () { m_preader->NextTag(*this); }
+
+inline void XMLTag::skip() { m_preader->SkipTag(*this); }
 
 inline const std::string& XMLTag::comment() { return m_preader->GetLastComment(); }
 

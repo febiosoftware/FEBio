@@ -286,18 +286,44 @@ void XMLTag::value(vector<int>& l)
 void XMLTag::value(vector<double>& l)
 {
 	l.clear();
-	char* sz = m_sztag;
-	int nr = 0;
+	const char *sz = m_szval.c_str();
 	while (sz && *sz)
 	{
-		char* sze = strchr(sz, ',');
+		// skip space
+		while (*sz == ' ') ++sz;
 
-		double f = atof(sz);
-		l.push_back(f);
-		nr++;
+		// read the value
+		if (sz && *sz)
+		{
+			double v = atof(sz);
+			l.push_back(v);
 
-		if (sze) sz = sze + 1;
-		else break;
+			// find next space or comma
+			while (*sz && (*sz != ' ') && (*sz != ',')) sz++;
+			if (*sz == ',') sz++;
+		}
+	}
+}
+
+void XMLTag::value2(std::vector<int>& l)
+{
+	l.clear();
+	const char* sz = m_szval.c_str();
+	while (sz && *sz)
+	{
+		// skip space
+		while (*sz == ' ') ++sz;
+
+		// read the value
+		if (sz && *sz)
+		{
+			int v = (int)atoi(sz);
+			l.push_back(v);
+
+			// find next space or comma
+			while (*sz && (*sz != ' ') && (*sz != ',')) sz++;
+			if (*sz == ',') sz++;
+		}
 	}
 }
 
@@ -512,7 +538,7 @@ bool XMLReader::Attach(FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-bool XMLReader::Open(const char* szfile)
+bool XMLReader::Open(const char* szfile, bool checkForXMLTag)
 {
 	// make sure this reader has not been attached to a file yet
 	if (m_fp != 0) return false;
@@ -522,14 +548,17 @@ bool XMLReader::Open(const char* szfile)
 	if (m_fp == 0) return false;
 
 	// read the first line
-	char szline[256] = {0};
-	fgets(szline, 255, m_fp);
-
-	// make sure it is correct
-	if (strncmp(szline,"<?xml", 5) != 0)
+	if (checkForXMLTag)
 	{
-		// This file is not an XML file
-		return false;
+		char szline[256] = { 0 };
+		fgets(szline, 255, m_fp);
+
+		// make sure it is correct
+		if (strncmp(szline, "<?xml", 5) != 0)
+		{
+			// This file is not an XML file
+			return false;
+		}
 	}
 
 	m_currentPos = 0;
