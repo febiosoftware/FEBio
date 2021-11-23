@@ -940,14 +940,5 @@ void FEBioMech::InitModule()
 	// Derived from FEDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
 
-	//-----------------------------------------------------------------------------
-	// Derived from FELogNLConstraintData
-	REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
-	REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
-
-	febio.CreateModule("explicit-solid");
-	febio.SetModuleDependency("solid");
-	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
-
 	febio.SetActiveModule(0);
 }
