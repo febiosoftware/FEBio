@@ -419,18 +419,21 @@ void XMLWriter::add_leaf(XMLElement& el, const std::vector<int>& A)
 		fprintf(m_fp, " %s=\"%s\"", att.name(), att.value());
 	}
 
+	inc_level();
 	fprintf(m_fp, ">\n%s", m_sztab);
 
 	int n = (int) A.size(), l = 0;
 	for (int i=0; i<n; ++i)
 	{
-		l += fprintf(m_fp, "%5d", A[i]);
+		l += fprintf(m_fp, "%d", A[i]);
 		if (i < n-1)
 		{
-			fprintf(m_fp, ",");
-			if (l > 80) { fprintf(m_fp, "\n%s", m_sztab); l=0; }
+//			if (l > 80) { fprintf(m_fp, ",\n%s", m_sztab); l=0; }
+			if ((i+1) % 8 == 0) { fprintf(m_fp, ",\n%s", m_sztab); l=0; }
+			else fprintf(m_fp, ", ");
 		}
 	}
+	dec_level();
 	fprintf(m_fp,"\n%s</%s>\n", m_sztab, el.m_tag.c_str());
 }
 

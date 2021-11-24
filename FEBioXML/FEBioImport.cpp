@@ -54,6 +54,7 @@ SOFTWARE.*/
 #include "FEBioRigidSection.h"
 #include "FEBioMeshAdaptorSection.h"
 #include "FEBioMeshSection.h"
+#include "FEBioMeshSection4.h"
 #include "FEBioStepSection3.h"
 #include "FECore/DataStore.h"
 #include "FECore/FEModel.h"
@@ -253,7 +254,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 
 		m_map["Control"    ] = new FEBioControlSection4     (this);
 		m_map["Material"   ] = new FEBioMaterialSection3    (this);
-		m_map["Mesh"       ] = new FEBioMeshSection         (this);
+		m_map["Mesh"       ] = new FEBioMeshSection4        (this);
 		m_map["MeshDomains"] = new FEBioMeshDomainsSection  (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
