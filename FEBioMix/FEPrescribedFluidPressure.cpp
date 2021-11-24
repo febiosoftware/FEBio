@@ -45,8 +45,12 @@ FEPrescribedFluidPressure::FEPrescribedFluidPressure(FEModel* fem) : FEPrescribe
 bool FEPrescribedFluidPressure::Init()
 {
 	if (m_shellBottom == false)
+	{
 		if (SetDOF("p") == false) return false;
+	}
 	else
+	{
 		if (SetDOF("q") == false) return false;
+	}
 	return FEPrescribedDOF::Init();
 }
