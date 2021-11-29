@@ -80315,10 +80315,10 @@ Example:
 \end_layout
 
 \begin_layout Section
-Continuous Damage
+Balzani Damage
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Continuous-Damage-1"
+name "sec:Balzani-Damage-1"
 
 \end_inset
 
@@ -80375,7 +80375,7 @@ reference "subsec:Uncoupled-Solid-Mixture"
 nt (See sub-sections 
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Continuous-Damage"
+name "sec:Balzani-Damage"
 
 \end_inset
 
@@ -80818,6 +80818,73 @@ and the time associated with the current loading situation is represented
 .
 \end_layout
 
+\begin_layout Standard
+The total strain energy function with the damage included is described as
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $\Psi\left(C,M_{(1)},M_{(2)}\right)=\Psi^{vol}(detC)+$
+\end_inset
+
+
+\begin_inset Formula $\Psi^{iso}(C)+\stackrel[a=1]{2}{\sum}\Psi_{(a)}^{ti}(C,M_{(a)})$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\varPsi^{iso}$
+\end_inset
+
+is the isotropic part representing the matrix material or ground substance.
+ 
+\begin_inset Formula $\Psi_{(a)}^{ti}$
+\end_inset
+
+is the transversely isotropic energy for the fiber reinforcement in the
+ direction A
+\begin_inset Formula $_{(a)}$
+\end_inset
+
+and 
+\begin_inset Formula $\varPsi^{vol}$
+\end_inset
+
+is a function controlloing the volumetric behavior, it should be set large
+ for anything violating the incompressibility contraint 
+\begin_inset Formula $J=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The transversely isotropic strain energy is defined by 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $\Psi(C,D)=m(P(C,D))$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+with 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $\mathit{P(C,D)}=(1-D)\Psi^{0}-c$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
 Damage Fiber Power
 \begin_inset CommandInset label
@@ -81004,7 +81071,7 @@ where the modified internal energy function
  (defined in section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Continuous-Damage"
+reference "sec:Balzani-Damage"
 
 \end_inset
 
@@ -81389,7 +81456,7 @@ with the scalar damage variable
  (defined in section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Continuous-Damage"
+reference "sec:Balzani-Damage"
 
 \end_inset
 
