@@ -45,4 +45,7 @@ void FEDiscreteMaterialPoint::Serialize(DumpStream& ar)
 
 
 //=============================================================================
+
+REGISTER_SUPER_CLASS(FEDiscreteMaterial, FEDISCRETEMATERIAL_ID);
+
 FEDiscreteMaterial::FEDiscreteMaterial(FEModel* pfem) : FEMaterial(pfem) {}

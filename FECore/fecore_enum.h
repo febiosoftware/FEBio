@@ -230,6 +230,7 @@ enum SUPER_CLASS_ID {
 	FESOLVER_ID,                 	// derived from FESolver
 	FEMATERIAL_ID,               	// derived from FEMaterial
 	FEMATERIALPROP_ID,				// derived from FEMaterialProperty
+	FEDISCRETEMATERIAL_ID,			// derived from FEDiscreteMaterial
 	FEBODYLOAD_ID,               	// derived from FEBodyLoad
 	FESURFACELOAD_ID,            	// derived from FESurfaceLoad
 	FEEDGELOAD_ID,					// derived from FEEdgeLoad
@@ -263,6 +264,7 @@ enum SUPER_CLASS_ID {
 	FEMESHADAPTORCRITERION_ID,		// derived from FEMeshAdaptorCriterion
 	FERIGIDBC_ID,					// derived from FERigidBC
 	FERIGIDLOAD_ID,					// derived from FERigidLoad
+	FERIGIDCONNECTOR_ID,			// derived from FERigidConnector
 	FENEWTONSTRATEGY_ID,			// derived from FENewtonStrategy
 	FEITEMLIST_ID,                  // derived from FEItemList (NOTE: work in progress!)
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
