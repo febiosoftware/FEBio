@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! a follower moment on a rigid body
-class FERigidFollowerMoment : public FERigidLoad
+class FEBIOMECH_API FERigidFollowerMoment : public FERigidLoad
 {
 public:
     //! constructor
