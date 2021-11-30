@@ -108,7 +108,7 @@ namespace febio {
 							if (parse_tags(tag) == false) return false;
 							++tag;
 #else
-							xml.SkipTag(tag);
+							tag.skip();
 #endif // DEBUG
 						}
 						else if (tag == "if_release")
@@ -118,19 +118,21 @@ namespace febio {
 							if (parse_tags(tag) == false) return false;
 							++tag;
 #else
-							xml.SkipTag(tag);
+							tag.skip();
 #endif // !_DEBUG
 						}
 						else if (tag == "print_model_params")
 						{
 							tag.value(config.m_printParams);
-							++tag;
 						}
 						else
 						{
 							if (parse_tags(tag) == false) return false;
 						}
-					} while (!tag.isend());
+
+						++tag;
+					} 
+					while (!tag.isend());
 				}
 			}
 			else
@@ -180,7 +182,6 @@ namespace febio {
 		}
 		else throw XMLReader::InvalidTag(tag);
 
-		++tag;
 		return true;
 	}
 

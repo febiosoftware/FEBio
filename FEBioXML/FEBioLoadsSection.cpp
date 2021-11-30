@@ -340,7 +340,7 @@ void FEBioLoadsSection2::ParseSurfaceLoad(XMLTag& tag)
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}
-		else ++tag;
+		++tag;
 	} 
 	while (!tag.isend());
 
@@ -407,10 +407,9 @@ void FEBioLoadsSection2::ParseSurfaceLoadSurface(XMLTag& tag, FESurface* psurf)
 
 				psurf->CreateMaterialPointData();
 			}
-
-			++tag2;
 		}
-		else tag2.m_preader->SkipTag(tag2);
+		else tag2.skip();
+		++tag2;
 	}
 	while (!tag2.isend());
 }

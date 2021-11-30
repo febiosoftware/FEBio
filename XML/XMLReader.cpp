@@ -333,7 +333,7 @@ int XMLTag::children()
 {
 	XMLTag tag(*this); ++tag;
 	int ncount = 0;
-	while (!tag.isend()) { ncount++; m_preader->SkipTag(tag); }
+	while (!tag.isend()) { ncount++; tag.skip(); ++tag; }
 	return ncount;
 }
 
@@ -698,19 +698,20 @@ bool XMLReader::FindTag(const char* xpath, XMLTag& tag)
 	try
 	{
 		// get the next tag
-		NextTag(tag);
+		++tag;
 		do
 		{
 			// check for match
 			if (path.match(tag))
 			{
 				path.next();
-				if (path.valid()) NextTag(tag);
+				if (path.valid()) ++tag;
 				bfound = true;
 			}
 			else
 			{
-				SkipTag(tag);
+				tag.skip();
+				++tag;
 				bfound = false;
 			}
 		}
@@ -1039,18 +1040,17 @@ char XMLReader::GetChar()
 void XMLReader::SkipTag(XMLTag& tag)
 {
 	// if this tag is a leaf we just return
-	if (tag.isleaf()) { ++tag; return; }
+	if (tag.isleaf()) { return; }
 
 	// if it is not a leaf we have to loop over all 
 	// the children, skipping each child in turn
-	NextTag(tag);
+	++tag;
 	do
 	{
 		SkipTag(tag);
+		++tag;
 	}
 	while (!tag.isend());
-
-	++tag;
 }
 
 //-----------------------------------------------------------------------------
