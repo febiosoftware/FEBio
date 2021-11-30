@@ -10599,7 +10599,7 @@ The following solid element types are defined:
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="2">
+<lyxtabular version="3" rows="10" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -10718,6 +10718,26 @@ pyra5
 
 \begin_layout Plain Layout
 5-node linear pyramidal element
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pyra13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13-node quadratic pyramidal element
 \end_layout
 
 \end_inset
@@ -25503,7 +25523,7 @@ The augmented Lagrangian method may produce a non-smooth contact pressure
  face.
  This feature only works with some element types (HEX8G8, HEX8G1, TET4G4,
  TET4G1, PENTA6G6, TET10G1, TET10G4, TET10G8, TET10GL11, TET15G4, TET15G8,
- TET15G11, TET15G15, PYRA5G8).
+ TET15G11, TET15G15, PYRA5G8, PYRA13G8).
 \end_layout
 
 \begin_deeper
