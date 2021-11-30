@@ -839,6 +839,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Rate of deformation
+class FEPlotRateOfDeformation : public FEPlotDomainData
+{
+public:
+    FEPlotRateOfDeformation(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Rigid body reaction force
 class FEPlotRigidReactionForce : public FEPlotDomainData
 {
