@@ -260,7 +260,6 @@ void FEBioMech::InitModule()
 	// Solver classes
 	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
-	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 	//-----------------------------------------------------------------------------
 	// material classes
@@ -931,6 +930,10 @@ void FEBioMech::InitModule()
 	febio.CreateModule("explicit-solid");
 	febio.SetModuleDependency("solid");
 	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
+
+	febio.CreateModule("CG-solid");
+	febio.SetModuleDependency("solid");
+	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 
 	febio.SetActiveModule(0);

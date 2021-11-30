@@ -179,15 +179,29 @@ bool FECGSolidSolver::InitEquations()
 	int neq = 0;
 
 	// give all free dofs an equation number
-	for (int i = 0; i<mesh.Nodes(); ++i)
+	m_dofMap.clear();
+	DOFS& dofs = fem.GetDOFS();
+	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j = 0; j<(int)node.m_ID.size(); ++j)
-		{
-			if (node.m_ID[j] == DOF_FIXED) { node.m_ID[j] = -1; }
-			else if (node.m_ID[j] == DOF_OPEN) { node.m_ID[j] = neq++; }
-			else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
-			else { assert(false); return false; }
+		if (node.HasFlags(FENode::EXCLUDE) == false) {
+			for (int nv = 0; nv < dofs.Variables(); ++nv)
+			{
+				int n = dofs.GetVariableSize(nv);
+				for (int l = 0; l < n; ++l)
+				{
+					int nl = dofs.GetDOF(nv, l);
+					if (node.is_active(nl))
+					{
+						int bcj = node.get_bc(nl);
+						if      (bcj == DOF_OPEN      ) { node.m_ID[nl] = neq++; m_dofMap.push_back(nl); }
+						else if (bcj == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+						else if (bcj == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_dofMap.push_back(nl); }
+						else { assert(false); return false; }
+					}
+					else node.m_ID[nl] = -1;
+				}
+			}
 		}
 	}
 
@@ -478,7 +492,7 @@ bool FECGSolidSolver::SolveStep()
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
 
-	m_R0 += m_Fd;
+//	m_R0 += m_Fd;
 
 	// TODO: I can check here if the residual is zero.
 	// If it is than there is probably no force acting on the system
@@ -684,6 +698,12 @@ bool FECGSolidSolver::SolveStep()
 	}
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+void FECGSolidSolver::Update(std::vector<double>& u)
+{
+	UpdateKinematics(u);
 }
 
 //-----------------------------------------------------------------------------

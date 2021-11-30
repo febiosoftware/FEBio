@@ -50,6 +50,9 @@ public:
 	//! Performs a CG step
 	bool SolveStep() override;
 
+	//! update model
+	void Update(std::vector<double>& u) override;
+
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
 
