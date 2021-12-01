@@ -1932,7 +1932,7 @@ bool FEPlotRightHencky::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //=============================================================================
-//! Store the average right Hencky
+//! Store the average left Hencky
 class FELeftHencky
 {
 public:
@@ -1951,6 +1951,29 @@ bool FEPlotLeftHencky::Save(FEDomain& dom, FEDataStream& a)
     FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
     if (pme == nullptr) return false;
     writeAverageElementValue<mat3ds>(dom, a, FELeftHencky());
+    return true;
+}
+
+//=============================================================================
+//! Store the average rate of deformation
+class FERateOfDeformation
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+            return pt->RateOfDeformation();
+            }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotRateOfDeformation::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FERateOfDeformation());
     return true;
 }
 
