@@ -297,14 +297,14 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FESurfacePairConstraint* ps = fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel());
-	fem.AddSurfacePairConstraint(ps);
+	FESurfaceConstraint* ps = fecore_new<FESurfaceConstraint>("rigid_wall", GetFEModel());
+	fem.AddNonlinearConstraint(ps);
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	if (GetBuilder()->BuildSurface(*ps->GetPrimarySurface(), *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (GetBuilder()->BuildSurface(*ps->GetSurface(), *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
 	ReadParameterList(tag, ps);
 }
