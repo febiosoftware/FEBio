@@ -188,11 +188,12 @@ FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 
 // Material parameters for the FESolidBoundMolecule material
 BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterialProperty)
+
+	ADD_PARAMETER(m_ID, "sbm", FE_PARAM_ATTRIBUTE, "$(SBMs)");
+
 	ADD_PARAMETER(m_rho0  , "rho0"  );
 	ADD_PARAMETER(m_rhomin, "rhomin");
 	ADD_PARAMETER(m_rhomax, "rhomax");
-
-	ADD_PARAMETER(m_ID, "sbm", FE_PARAM_ATTRIBUTE, 0);
 
 END_FECORE_CLASS();
 
