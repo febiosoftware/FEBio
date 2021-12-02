@@ -30,15 +30,9 @@ SOFTWARE.*/
 #include "FEMaterial.h"
 #include "DumpStream.h"
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FEMaterialBase, FECoreBase)
-	ADD_PARAMETER(m_Q, "mat_axis");
-END_FECORE_CLASS();
-
 //-----------------------------------------------------------------------------
 FEMaterialBase::FEMaterialBase(FEModel* fem) : FECoreBase(fem)
 {
-	m_Q = mat3d::identity();
 }
 
 //-----------------------------------------------------------------------------
@@ -52,23 +46,18 @@ void FEMaterialBase::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const 
 
 }
 
-//-----------------------------------------------------------------------------
-// evaluate local coordinate system at material point
-mat3d FEMaterialBase::GetLocalCS(const FEMaterialPoint& mp)
-{
-	FEMaterialBase* parent = dynamic_cast<FEMaterialBase*>(GetParent());
-	if (parent) {
-		mat3d Qp = parent->GetLocalCS(mp); return Qp * m_Q(mp);
-	}
-	else return m_Q(mp);
-}
-
 //=============================================================================
 REGISTER_SUPER_CLASS(FEMaterial, FEMATERIAL_ID);
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEMaterial, FEMaterialBase)
+	ADD_PARAMETER(m_Q, "mat_axis");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMaterial::FEMaterial(FEModel* fem) : FEMaterialBase(fem)
 {
+	m_Q = mat3d::identity();
 }
 
 //-----------------------------------------------------------------------------
@@ -76,6 +65,19 @@ FEMaterial::~FEMaterial()
 {
 	for (size_t i = 0; i < m_param.size(); ++i) delete m_param[i];
 	m_param.clear();
+}
+
+//-----------------------------------------------------------------------------
+// evaluate local coordinate system at material point
+mat3d FEMaterial::GetLocalCS(const FEMaterialPoint& mp)
+{
+	FEMaterial* parent = dynamic_cast<FEMaterial*>(GetParent());
+	if (parent) 
+	{
+		mat3d Qp = parent->GetLocalCS(mp); 
+		return Qp * m_Q(mp);
+	}
+	else return m_Q(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +115,19 @@ void FEMaterial::AddDomainParameter(FEDomainParameter* p)
 //==============================================================================
 REGISTER_SUPER_CLASS(FEMaterialProperty, FEMATERIALPROP_ID);
 
+BEGIN_FECORE_CLASS(FEMaterialProperty, FEMaterialBase)
+END_FECORE_CLASS();
+
 FEMaterialProperty::FEMaterialProperty(FEModel* fem) : FEMaterialBase(fem)
 {
 
+}
+
+//-----------------------------------------------------------------------------
+// Since properties don't have local coordinate system,
+// we return the parent's 
+mat3d FEMaterialProperty::GetLocalCS(const FEMaterialPoint& mp)
+{
+	FEMaterial* parent = dynamic_cast<FEMaterial*>(GetParent()); assert(parent);
+	return parent->GetLocalCS(mp);
 }

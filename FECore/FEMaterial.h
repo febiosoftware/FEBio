@@ -49,14 +49,6 @@ public:
 
 	//! Update specialized material points at each iteration
 	virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp);
-
-	// evaluate local coordinate system at material point
-	mat3d GetLocalCS(const FEMaterialPoint& mp);
-
-private:
-	FEParamMat3d	m_Q;			//!< local material coordinate system
-
-	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -77,6 +69,12 @@ public:
 	//! get a domain parameter
 	FEDomainParameter* FindDomainParameter(const std::string& paramName);
 
+	// evaluate local coordinate system at material point
+	mat3d GetLocalCS(const FEMaterialPoint& mp);
+
+private:
+	FEParamMat3d	m_Q;			//!< local material coordinate system
+
 public:
 	//! Assign a domain to this material
 	void AddDomain(FEDomain* dom);
@@ -91,6 +89,8 @@ private:
 	FEDomainList	m_domList;		//!< list of domains that use this material
 
 	std::vector<FEDomainParameter*>	m_param;	//!< list of domain variables
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -101,4 +101,9 @@ class FECORE_API FEMaterialProperty : public FEMaterialBase
 
 public:
 	FEMaterialProperty(FEModel* fem);
+
+	// evaluate local coordinate system at material point
+	mat3d GetLocalCS(const FEMaterialPoint& mp);
+
+	DECLARE_FECORE_CLASS();
 };
