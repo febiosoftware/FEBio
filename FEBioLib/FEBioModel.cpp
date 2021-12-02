@@ -519,7 +519,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 					}
 					break;
 				case CB_STEP_SOLVED: if (nplt == FE_PLOT_STEP_FINAL) bout = true;  break;
-				case CB_USER1: if (nplt == FE_PLOT_USER1) bout = true; break;
+				case CB_USER1: if ((nplt == FE_PLOT_USER1) && inRange && isStride) bout = true; break;
 				}
 			}
 
