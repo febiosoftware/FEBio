@@ -278,7 +278,7 @@ void FEBioDiscreteSection25::ParseRigidAxialForce(XMLTag& tag)
 void FEBioDiscreteSection25::ParseRigidCable(XMLTag& tag)
 {
 	// create a new rigid constraint
-	FEModelLoad* pml = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
+	FEModelLoad* pml = fecore_new<FEModelLoad>(FERIGIDLOAD_ID, tag.Name(), GetFEModel());
 	if (pml == nullptr) throw XMLReader::InvalidTag(tag);
 
 	// read all parameters and properties

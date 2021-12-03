@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreBase)
 END_FECORE_CLASS();
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
+BEGIN_FECORE_CLASS(FERigidCable, FERigidLoad)
 	ADD_PARAMETER(m_force   , "force");
 	ADD_PARAMETER(m_forceDir, "force_direction");
 	ADD_PARAMETER(m_brelative, "relative");
@@ -47,7 +47,7 @@ BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
 	ADD_PROPERTY(m_points, "rigid_cable_point");
 END_FECORE_CLASS();
 
-FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(fem)
+FERigidCable::FERigidCable(FEModel* fem) : FERigidLoad(fem)
 {
 	m_force = 0;
 	m_forceDir = vec3d(0,0,-1);

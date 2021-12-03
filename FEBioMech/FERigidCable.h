@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEModelLoad.h>
+#include "FERigidForce.h"
 
 class FERigidBody;
 
@@ -45,7 +45,7 @@ public:
 	DECLARE_FECORE_CLASS();
 };
 
-class FERigidCable : public FEModelLoad
+class FERigidCable : public FERigidLoad
 {
 public:
 	FERigidCable(FEModel* fem);
