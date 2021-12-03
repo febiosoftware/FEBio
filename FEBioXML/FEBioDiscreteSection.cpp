@@ -166,7 +166,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 			const char* szname = tag.AttributeValue("name", true);
 
 			// create the discrete material
-			FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(szt, &fem));
+			FEDiscreteMaterial* pm = fecore_new<FEDiscreteMaterial>(szt, &fem);
 			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 			// set the optional name

@@ -140,6 +140,7 @@ FESolver* FEModelBuilder::BuildSolver(FEModel& fem)
 {
 	string moduleName = fem.GetModuleName();
 	const char* sztype = moduleName.c_str();
+	if (m_defaultSolver.empty() == false) sztype = m_defaultSolver.c_str();
 	FESolver* ps = fecore_new<FESolver>(sztype, &fem);
 	return ps;
 }

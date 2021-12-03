@@ -47,5 +47,13 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
+
+	// some special case
+	if (strcmp(szt, "explicit-solid") == 0)
+	{
+		szt = "solid";
+		GetBuilder()->SetDefaultSolver("explicit-solid");
+	}
+
 	GetBuilder()->SetActiveModule(szt);
 }

@@ -177,12 +177,16 @@ public:
 
 	FEBModel& GetFEBModel();
 
+	void SetDefaultSolver(const std::string& s) { m_defaultSolver = s; }
+
 private:
 	FEModel&		m_fem;				//!< model that is being constructed
 	FEAnalysis*		m_pStep;			//!< pointer to current analysis step
 	int				m_nsteps;			//!< nr of step sections read
 
 	FEBModel	m_feb;
+
+	std::string	m_defaultSolver;		//!< default solver
 
 public:
 	int		m_maxid;		//!< max element ID
