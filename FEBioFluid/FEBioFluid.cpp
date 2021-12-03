@@ -74,6 +74,8 @@ SOFTWARE.*/
 #include "FEPrescribedFluidDilatation.h"
 #include "FEInitialFluidDilatation.h"
 
+#include "FEConstFluidBodyForce.h"
+
 #include "FEFluidModule.h"
 
 //-----------------------------------------------------------------------------
@@ -107,9 +109,6 @@ void FEBioFluid::InitModule()
 		"   \"title\" : \"Fluid Mechanics\","
 		"   \"info\"  : \"Steady-state or transient fluid dynamics analysis.\""
 		"}");
-
-	// TODO: Find a better way, since this pulls in all the boundary conditions, etc. from solid.
-//	febio.SetModuleDependency("solid");	// for body-loads (e.g. see fl08)
 
 //-----------------------------------------------------------------------------
 // solver classes
@@ -149,6 +148,11 @@ REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping")
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
 REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
+
+
+//-----------------------------------------------------------------------------
+// body loads
+REGISTER_FECORE_CLASS(FEConstFluidBodyForce, "const");
 
 //-----------------------------------------------------------------------------
 // boundary conditions
