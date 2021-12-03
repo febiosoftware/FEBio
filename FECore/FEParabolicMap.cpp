@@ -211,7 +211,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	plinsolve->Factor();
 	if (plinsolve->BackSolve(v, rhs) == false)
 	{
-		feLogError("Unable to solve for parabolic fluid normal velocity\n");
+		feLogError("Unable to solve for parabolic field\n");
 		delete ps;
 		return false;
 	}

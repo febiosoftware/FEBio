@@ -114,12 +114,14 @@ class FECORE_API FEMappedValue : public FEScalarValuator
 public:
 	FEMappedValue(FEModel* fem);
 	void setDataMap(FEDataMap* val);
+	void setScaleFactor(double s);
 
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEScalarValuator* copy() override;
 
 private:
+	double		m_scale;	// scale factor
 	FEDataMap*	m_val;
 };
 

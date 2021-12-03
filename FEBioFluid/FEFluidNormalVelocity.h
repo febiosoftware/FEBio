@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -40,9 +41,6 @@ class FEBIOFLUID_API FEFluidNormalVelocity : public FESurfaceLoad
 public:
     //! constructor
     FEFluidNormalVelocity(FEModel* pfem);
-    
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
     
     //! calculate traction stiffness (there is none)
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
@@ -62,24 +60,18 @@ public:
     //! activate
     void Activate() override;
     
-    //! parabolic velocity profile
-    bool SetParabolicVelocity();
-    
     //! rim pressure
     bool SetRimPressure();
 
 private:
-	double NormalVelocity(FESurfaceMaterialPoint& mp);
-    
-private:
-    double			m_velocity;	//!< average velocity
-    FESurfaceMap	m_VC;		//!< velocity boundary cards
-	bool            m_bpv;      //!< flag for prescribing nodal values
-	bool            m_bpar;     //!< flag for parabolic velocity
+    FEParamDouble	m_velocity;	//!< average velocity
     bool            m_brim;     //!< flag for setting rim pressure
 
+    // obsolete parameters
+    bool            m_bpv;      //!< flag for prescribing nodal values
+    bool            m_bpar;
+
 private:
-	vector<double>  m_VN;       //!< nodal scale factors
     vector<vec3d>   m_nu;       //!< nodal normals
     vector<int>     m_rim;      //!< list of nodes on the rim
 

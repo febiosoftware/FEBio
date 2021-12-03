@@ -202,6 +202,7 @@ double FEMathValue::operator()(const FEMaterialPoint& pt)
 
 FEMappedValue::FEMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr)
 {
+	m_scale = 1.0;
 }
 
 void FEMappedValue::setDataMap(FEDataMap* val)
@@ -209,15 +210,21 @@ void FEMappedValue::setDataMap(FEDataMap* val)
 	m_val = val;
 }
 
+void FEMappedValue::setScaleFactor(double s)
+{
+	m_scale = s;
+}
+
 double FEMappedValue::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->value(pt);
+	return m_scale*m_val->value(pt);
 }
 
 FEScalarValuator* FEMappedValue::copy()
 {
 	FEMappedValue* map = new FEMappedValue(GetFEModel());
 	map->setDataMap(m_val);
+	map->m_scale = m_scale;
 	return map;
 }
 
