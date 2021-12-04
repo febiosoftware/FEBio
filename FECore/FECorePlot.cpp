@@ -398,6 +398,18 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 
 		return true;
 	}
+	else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
+	{
+		FEParamVec3& map = m_param.value<FEParamVec3>();
+		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
+		if (nset == 0) return false;
+
+		// write the nodal values
+		writeNodalValues<vec3d>(*nset, a, map);
+
+		return true;
+	}
+
 
 	return false;
 }
