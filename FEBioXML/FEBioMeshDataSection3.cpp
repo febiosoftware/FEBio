@@ -93,7 +93,7 @@ void FEBioMeshDataSection3::ParseNodalData(XMLTag& tag)
 	const char* szset = tag.AttributeValue("node_set");
 
 	// find the element set in the mesh
-	FENodeSet* nset = mesh.FindNodeSet(szset);
+	FENodeSet* nset = GetBuilder()->FindNodeSet(szset);
 	if (nset == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// get the data type
