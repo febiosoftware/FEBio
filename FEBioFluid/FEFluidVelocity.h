@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -40,9 +41,6 @@ class FEBIOFLUID_API FEFluidVelocity : public FESurfaceLoad
 public:
     //! constructor
     FEFluidVelocity(FEModel* pfem);
-    
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
     
     //! calculate traction stiffness (there is none)
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
@@ -63,12 +61,8 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 private:
-	vec3d FluidVelocity(FESurfaceMaterialPoint& mp);
-    
-private:
     double			m_scale;	//!< average velocity
-    FESurfaceMap	m_VC;		//!< velocity boundary cards
-    vector<vec3d>   m_VN;       //!< nodal velocities
+    FEParamVec3 	m_velocity;	//!< velocity boundary cards
     
 private:
     bool            m_bpv;      //!< flag for prescribing nodal values

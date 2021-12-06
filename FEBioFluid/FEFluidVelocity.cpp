@@ -34,40 +34,18 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidVelocity, FESurfaceLoad)
-	ADD_PARAMETER(m_scale, "scale");
-	ADD_PARAMETER(m_VC   , "velocity"   );
+	ADD_PARAMETER(m_scale   , "scale");
+	ADD_PARAMETER(m_velocity, "velocity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D), m_dofW(pfem), m_dofEF(pfem)
+FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem), m_dofEF(pfem)
 {
     m_scale = 1.0;
 
     m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
-}
-
-//-----------------------------------------------------------------------------
-//! allocate storage
-void FEFluidVelocity::SetSurface(FESurface* ps)
-{
-    FESurfaceLoad::SetSurface(ps);
-    m_VC.Create(ps->GetFacetSet());
-}
-
-//-----------------------------------------------------------------------------
-vec3d FEFluidVelocity::FluidVelocity(FESurfaceMaterialPoint& mp)
-{
-	FESurfaceElement& el = *mp.SurfaceElement();
-	double* N = mp.m_shape;
-	vec3d v(0, 0, 0);
-	int neln = el.Nodes();
-	for (int i = 0; i<neln; ++i)
-	{
-		v += m_VN[el.m_lnode[i]] * N[i];
-	}
-	return v;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,7 +55,7 @@ void FEFluidVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	m_psurf->LoadVector(R, m_dofEF, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// calculate the tangent vectors
-		vec3d v = FluidVelocity(mp);
+		vec3d v = m_velocity(mp);
 
 		vec3d nu = mp.dxr ^ mp.dxs;
 		double da = nu.unit();
@@ -95,27 +73,6 @@ bool FEFluidVelocity::Init()
     m_dof.Clear();
     m_dof.AddDofs(m_dofW);
     m_dof.AddDofs(m_dofEF);
-    
-    // evaluate nodal velocities from boundary cards
-	FESurface* ps = &GetSurface();
-	m_VN.resize(ps->Nodes(),vec3d(0,0,0));
-    vector<int> nf(ps->Nodes(),0);
-
-	for (int iel=0; iel<ps->Elements(); ++iel)
-    {
-        FESurfaceElement& el = m_psurf->Element(iel);
-        
-        // nr of element nodes
-        int neln = el.Nodes();
-        
-        for (int i=0; i<neln; ++i) 
-		{
-            m_VN[el.m_lnode[i]] += m_VC.value<vec3d>(iel, i);
-            ++nf[el.m_lnode[i]];
-        }
-    }
-    
-    for (int i=0; i<ps->Nodes(); ++i) m_VN[i] /= nf[i];
     
     return FESurfaceLoad::Init();
 }
@@ -140,13 +97,34 @@ void FEFluidVelocity::Activate()
 //! Evaluate and prescribe the nodal velocities
 void FEFluidVelocity::Update()
 {
-    // prescribe this velocity at the nodes
+    // evaluate nodal velocities from boundary cards
     FESurface* ps = &GetSurface();
-    
+    vector<vec3d> VN(ps->Nodes(), vec3d(0, 0, 0));
+    vector<int> nf(ps->Nodes(), 0);
+
+    for (int iel = 0; iel < ps->Elements(); ++iel)
+    {
+        FESurfaceElement& el = m_psurf->Element(iel);
+
+        // nr of element nodes
+        int neln = el.Nodes();
+
+        for (int i = 0; i < neln; ++i)
+        {
+            FESurfaceMaterialPoint mp;
+            mp.m_elem = &el;
+            mp.m_index = i; // this is a node index, but we really need a gauss-point index
+
+            VN[el.m_lnode[i]] += m_velocity(mp);
+            ++nf[el.m_lnode[i]];
+        }
+    }
+    for (int i = 0; i < ps->Nodes(); ++i) VN[i] /= nf[i];
+
     for (int i=0; i<ps->Nodes(); ++i)
     {
         // evaluate the nodal velocity
-        vec3d v = m_VN[i]*m_scale;
+        vec3d v = VN[i]*m_scale;
         FENode& node = ps->Node(i);
         if (node.m_ID[m_dofW[0]] < -1) node.set(m_dofW[0], v.x);
         if (node.m_ID[m_dofW[1]] < -1) node.set(m_dofW[1], v.y);
@@ -161,5 +139,4 @@ void FEFluidVelocity::Serialize(DumpStream& ar)
 	FESurfaceLoad::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_bpv & m_dofW & m_dofEF;
-	ar & m_VN;
 }
