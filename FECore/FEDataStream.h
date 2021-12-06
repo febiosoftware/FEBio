@@ -86,6 +86,17 @@ public:
 		return *this;
 	}
 
+	FEDataStream& operator << (const std::vector<vec3d>& a)
+	{
+		for (vec3d ai : a)
+		{
+			m_a.push_back((float)ai.x);
+			m_a.push_back((float)ai.y);
+			m_a.push_back((float)ai.z);
+		}
+		return *this;
+	}
+
 	void assign(size_t count, float f) { m_a.assign(count, f); }
 	void resize(size_t count, float f) { m_a.resize(count, f); }
 	void reserve(size_t count) { m_a.reserve(count); }
