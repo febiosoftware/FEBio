@@ -29,9 +29,10 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/tens3d.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FEBCPrescribedDeformation : public FEPrescribedNodeSet
+class FEBIOMECH_API FEBCPrescribedDeformation : public FEPrescribedNodeSet
 {
 public:
 	FEBCPrescribedDeformation(FEModel* pfem);
@@ -53,7 +54,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEBCPrescribedDeformation2O : public FEPrescribedNodeSet
+class FEBIOMECH_API FEBCPrescribedDeformation2O : public FEPrescribedNodeSet
 {
 public:
 	FEBCPrescribedDeformation2O(FEModel* pfem);

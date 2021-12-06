@@ -41,7 +41,7 @@ SOFTWARE.*/
 #include <FEBioFluid/FEBioFluidSolutes.h>
 #include <FEBioFluid/FEBioThermoFluid.h>
 #include <FEBioTest/FEBioTest.h>
-//#include <FEBioRVE/FEBioRVE.h>
+#include <FEBioRVE/FEBioRVE.h>
 #endif
 #include "febio.h"
 #include "plugin.h"
@@ -78,7 +78,7 @@ void InitLibrary()
     FEBioFluidSolutes::InitModule();
     FEBioThermoFluid::InitModule();
 	FEBioTest::InitModule();
-//	FEBioRVE::InitModule();
+	FEBioRVE::InitModule();
 #endif
 }
 
