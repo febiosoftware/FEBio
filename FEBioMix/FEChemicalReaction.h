@@ -77,6 +77,10 @@ public:
     int     m_speciesID;        // the species ID
     int     m_v;                // stoichiometric coefficient
 
+    // these parameters are mostly for parsing older files that used "sol" or "sbm"
+    int     m_solId;
+    int     m_sbmId;
+
 private:
     int     m_speciesType;  // solute or sbm?
 

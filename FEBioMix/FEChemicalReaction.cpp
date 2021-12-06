@@ -39,11 +39,16 @@ SOFTWARE.*/
 //=============================================================================
 BEGIN_FECORE_CLASS(FEReactionSpeciesRef, FEMaterialProperty)
 	ADD_PARAMETER(m_speciesID, "species", FE_PARAM_ATTRIBUTE, "$(species)");
+	ADD_PARAMETER(m_solId    , "sol")->SetFlags(FE_PARAM_ATTRIBUTE | FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_sbmId    , "sbm")->SetFlags(FE_PARAM_ATTRIBUTE | FE_PARAM_HIDDEN);
 END_FECORE_CLASS();
 
 FEReactionSpeciesRef::FEReactionSpeciesRef(FEModel* fem) : FEMaterialProperty(fem) 
 {
     m_speciesID = -1;
+    m_solId = -1;
+    m_sbmId = -1;
+    
     m_v = 0;
 
     m_speciesType = UnknownSpecies;
@@ -68,30 +73,58 @@ bool FEReactionSpeciesRef::IsSBM() const
 bool FEReactionSpeciesRef::Init()
 {
     // make sure the species ID is valid
-    if (m_speciesID == -1) return false;
+    if ((m_speciesID == -1) && (m_solId == -1) && (m_sbmId == -1)) return false;
 
     // figure out if this is a solute or sbm
     if (m_speciesType == UnknownSpecies)
     {
         FEModel& fem = *GetFEModel();
-        int id = m_speciesID - 1;
-        int n = 0;
-        for (int i = 0; i < fem.GlobalDataItems(); ++i)
+        if (m_speciesID != -1)
         {
-            FESoluteData* sol = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-            FESBMData* sbm = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
-            if (sol || sbm)
+            int id = m_speciesID - 1;
+            int n = 0;
+            for (int i = 0; i < fem.GlobalDataItems(); ++i)
             {
-                if (i == n)
+                FESoluteData* sol = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+                FESBMData* sbm = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+                if (sol || sbm)
                 {
-                    if (sol) { m_speciesType = SoluteSpecies; m_speciesID = sol->GetID(); }
-                    if (sbm) { m_speciesType = SBMSpecies; m_speciesID = sbm->GetID(); }
+                    if (id == n)
+                    {
+                        if (sol) { m_speciesType = SoluteSpecies; m_speciesID = sol->GetID(); }
+                        if (sbm) { m_speciesType = SBMSpecies; m_speciesID = sbm->GetID(); }
 
-                    break;
+                        break;
+                    }
+                    else n++;
                 }
-                else n++;
             }
         }
+        else if (m_solId != -1)
+        {
+            for (int i = 0; i < fem.GlobalDataItems(); ++i)
+            {
+                FESoluteData* sol = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+                if (sol && (sol->GetID() == m_solId))
+                {
+                    m_speciesType = SoluteSpecies;
+                    m_speciesID = sol->GetID(); 
+                }
+            }
+        }
+        else if (m_sbmId != -1)
+        {
+            for (int i = 0; i < fem.GlobalDataItems(); ++i)
+            {
+                FESBMData* sbm = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+                if (sbm && (sbm->GetID() == m_sbmId))
+                {
+                    m_speciesType = SBMSpecies;
+                    m_speciesID = sbm->GetID();
+                }
+            }
+        }
+
         assert(m_speciesType != UnknownSpecies);
         if (m_speciesType == UnknownSpecies) return false;
     }
