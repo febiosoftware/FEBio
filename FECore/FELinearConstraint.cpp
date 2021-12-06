@@ -41,15 +41,20 @@ FELinearConstraint::DOF::DOF()
 	AddParameter(val, "value");
 }
 
+//=============================================================================
+BEGIN_FECORE_CLASS(FELinearConstraint, FEBoundaryCondition)
+	ADD_PARAMETER(m_parentDof->node, "node");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint() : FEModelComponent(nullptr)
+FELinearConstraint::FELinearConstraint() : FEBoundaryCondition(nullptr)
 {
 	m_parentDof = nullptr;
 	m_off = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(pfem) 
+FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_parentDof = new DOF;
 	m_off = 0.0;
@@ -77,15 +82,17 @@ void FELinearConstraint::Clear()
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(LC.GetFEModel())
+FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEBoundaryCondition(LC.GetFEModel())
 {
 	m_parentDof = nullptr;
-	CopyFrom(LC);
+	CopyFrom(&(const_cast<FELinearConstraint&>(LC)));
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
+void FELinearConstraint::CopyFrom(FEBoundaryCondition* pbc)
 {
+	FELinearConstraint& LC = dynamic_cast<FELinearConstraint&>(*pbc);
+
 	Clear();
 	if (LC.m_parentDof)
 	{

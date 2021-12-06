@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEPrescribedDOF.h"
 #include "FENodalLoad.h"
 #include "FEFixedBC.h"
+#include "FELinearConstraint.h"
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
 #include "FESurfaceToSurfaceMap.h"
@@ -97,6 +98,7 @@ REGISTER_FECORE_CLASS(FETimeStepController, "time_stepper");
 // boundary conditions
 REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
+REGISTER_FECORE_CLASS(FELinearConstraint, "linear constraint");
 
 // nodal loads
 REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");

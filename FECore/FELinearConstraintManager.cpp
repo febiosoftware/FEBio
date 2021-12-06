@@ -59,7 +59,7 @@ void FELinearConstraintManager::CopyFrom(const FELinearConstraintManager& lcm)
 	for (int i=0; i<lcm.LinearConstraints(); ++i)
 	{
 		FELinearConstraint* lc = new FELinearConstraint(m_fem);
-		lc->CopyFrom(lcm.LinearConstraint(i));
+		lc->CopyFrom(&(const_cast<FELinearConstraint&>(lcm.LinearConstraint(i))));
 		m_LinC.push_back(lc);
 	}
 	InitTable();

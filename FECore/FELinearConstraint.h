@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEBoundaryCondition.h"
 #include <vector>
 using namespace std;
 
 //-----------------------------------------------------------------------------
 //! linear constraint
-class FECORE_API FELinearConstraint : public FEModelComponent
+class FECORE_API FELinearConstraint : public FEBoundaryCondition
 {
 public:
 	class FECORE_API DOF : public FEParamContainer
@@ -64,7 +64,7 @@ public:
 	void Clear();
 
 	// copy data
-	void CopyFrom(const FELinearConstraint& LC);
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 	// serialization
 	void Serialize(DumpStream& ar);
@@ -106,4 +106,6 @@ protected:
 	DOF*			m_parentDof;	// parent degree of freedom
 	vector<DOF*>	m_childDof;		// list of child dofs
 	double			m_off;			// offset value
+
+	DECLARE_FECORE_CLASS();
 };
