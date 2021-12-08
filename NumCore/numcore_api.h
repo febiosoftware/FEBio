@@ -30,7 +30,7 @@ SOFTWARE.*/
 
 #ifdef WIN32
 	#ifdef FECORE_DLL
-		#ifdef NUMCORE_EXPORTS
+		#ifdef numcore_EXPORTS
 			#define NUMCORE_API __declspec(dllexport)
 		#else
 			#define NUMCORE_API __declspec(dllimport)

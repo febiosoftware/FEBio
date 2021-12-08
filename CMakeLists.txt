@@ -29,7 +29,7 @@ endif()
 
 ##### Set appropriate flag for operating system ####
 if(WIN32)
-	add_definitions(-DWIN32)
+	add_definitions(-DWIN32 -DFECORE_DLL)
 elseif(APPLE)
     add_definitions(-D__APPLE__)
 else()
@@ -118,7 +118,7 @@ endif()
 
 ##### Set up compiler flags #####
 if(WIN32)
-    add_compile_options(/MP /openmp)
+    add_compile_options(/MP /openmp /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
 
 else()
@@ -299,9 +299,24 @@ else()
     target_link_libraries(febio4 -ldl)
 endif()
 
-# Link Libraies into FEBioLib
+# Link Libraries into FEBioLib
+target_link_libraries(numcore PRIVATE fecore)
+target_link_libraries(febioxml PRIVATE fecore)
+target_link_libraries(febiotest PRIVATE fecore)
+target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot xml)
+target_link_libraries(febioplot PRIVATE fecore)
+target_link_libraries(febioopt PRIVATE fecore febioxml xml)
+target_link_libraries(febiomix PRIVATE febiomech fecore)
+target_link_libraries(febiomech PRIVATE fecore)
+target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
+target_link_libraries(feamr PRIVATE fecore)
+
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore)
+
+if (WIN32)
+    target_link_libraries(febiolib PRIVATE psapi.lib)
+endif()
 
 # Link FEBio libraries
 if(WIN32 OR APPLE)
