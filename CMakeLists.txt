@@ -4,7 +4,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR FEBioRVE)
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE)
+set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -151,17 +152,31 @@ foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
 endforeach(name)
 
-macro(addLib name)
+foreach(name IN LISTS STATIC_FEBIO_LIBS)
+	findHdrSrc(${name})
+endforeach(name)
+
+
+macro(addLib name TYPE)
     string(TOLOWER ${name} lname)
-	add_library(${lname} SHARED ${HDR_${name}} ${SRC_${name}})
+	add_library(${lname} ${TYPE} ${HDR_${name}} ${SRC_${name}})
 	set_property(TARGET ${lname} PROPERTY AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/CMakeFiles/AutoGen/${name}_autogen)
+    
+    if(NOT WIN32)
+        set_property(TARGET ${lname} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    endif()
+    
     if(APPLE)
         target_link_libraries(${lname} PRIVATE "-undefined dynamic_lookup")
     endif()
 endmacro()
 
 foreach(name IN LISTS FEBIO_LIBS)
-	addLib(${name})
+	addLib(${name} SHARED)
+endforeach(name)
+
+foreach(name IN LISTS STATIC_FEBIO_LIBS)
+	addLib(${name} STATIC)
 endforeach(name)
 
 ##### Set up executable compilation #####
@@ -286,7 +301,7 @@ endif()
 
 # Link Libraies into FEBioLib
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve)
 
 # Link FEBio libraries
 if(WIN32 OR APPLE)
