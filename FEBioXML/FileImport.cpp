@@ -1091,7 +1091,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 
 					// HACK for mapping load curves to FEFunction1D
 					const char* szlc = tag.AttributeValue("lc", true);
-					if (szlc && (tag.m_natt == 1) && (tag == "force"))
+					if (szlc && (tag.m_natt == 1) && (prop->GetClassID() == FEFUNCTION1D_ID))
 					{
 						double v = 1;
 						tag.value(v);
