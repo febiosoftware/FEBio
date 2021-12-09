@@ -270,16 +270,7 @@ void FEBioMeshSection4::ParseElementSetSection(XMLTag& tag, FEBModel::Part* part
 
 	// read elements
 	vector<int> elemList;
-	++tag;
-	do
-	{
-		// get the ID
-		int id;
-		tag.AttributeValue("id", id);
-		elemList.push_back(id);
-
-		++tag;
-	} while (!tag.isend());
+	tag.value(elemList);
 
 	if (elemList.empty()) throw XMLReader::InvalidTag(tag);
 
