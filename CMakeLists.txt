@@ -4,7 +4,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR FEBioRVE)
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE)
+set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -28,7 +29,7 @@ endif()
 
 ##### Set appropriate flag for operating system ####
 if(WIN32)
-	add_definitions(-DWIN32)
+	add_definitions(-DWIN32 -DFECORE_DLL)
 elseif(APPLE)
     add_definitions(-D__APPLE__)
 else()
@@ -117,7 +118,7 @@ endif()
 
 ##### Set up compiler flags #####
 if(WIN32)
-    add_compile_options(/MP /openmp)
+    add_compile_options(/MP /openmp /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
 
 else()
@@ -151,17 +152,31 @@ foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
 endforeach(name)
 
-macro(addLib name)
+foreach(name IN LISTS STATIC_FEBIO_LIBS)
+	findHdrSrc(${name})
+endforeach(name)
+
+
+macro(addLib name TYPE)
     string(TOLOWER ${name} lname)
-	add_library(${lname} SHARED ${HDR_${name}} ${SRC_${name}})
+	add_library(${lname} ${TYPE} ${HDR_${name}} ${SRC_${name}})
 	set_property(TARGET ${lname} PROPERTY AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/CMakeFiles/AutoGen/${name}_autogen)
+    
+    if(NOT WIN32)
+        set_property(TARGET ${lname} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    endif()
+    
     if(APPLE)
         target_link_libraries(${lname} PRIVATE "-undefined dynamic_lookup")
     endif()
 endmacro()
 
 foreach(name IN LISTS FEBIO_LIBS)
-	addLib(${name})
+	addLib(${name} SHARED)
+endforeach(name)
+
+foreach(name IN LISTS STATIC_FEBIO_LIBS)
+	addLib(${name} STATIC)
 endforeach(name)
 
 ##### Set up executable compilation #####
@@ -284,9 +299,24 @@ else()
     target_link_libraries(febio4 -ldl)
 endif()
 
-# Link Libraies into FEBioLib
+# Link Libraries into FEBioLib
+target_link_libraries(numcore PRIVATE fecore)
+target_link_libraries(febioxml PRIVATE fecore)
+target_link_libraries(febiotest PRIVATE fecore)
+target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot xml)
+target_link_libraries(febioplot PRIVATE fecore)
+target_link_libraries(febioopt PRIVATE fecore febioxml xml)
+target_link_libraries(febiomix PRIVATE febiomech fecore)
+target_link_libraries(febiomech PRIVATE fecore)
+target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
+target_link_libraries(feamr PRIVATE fecore)
+
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore)
+
+if (WIN32)
+    target_link_libraries(febiolib PRIVATE psapi.lib)
+endif()
 
 # Link FEBio libraries
 if(WIN32 OR APPLE)

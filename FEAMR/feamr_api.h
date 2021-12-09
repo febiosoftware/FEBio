@@ -30,7 +30,7 @@ SOFTWARE.*/
 
 #ifdef WIN32
 	#ifdef FECORE_DLL
-		#ifdef FEAMR_EXPORTS
+		#ifdef feamr_EXPORTS
 			#define FEAMR_API __declspec(dllexport)
 		#else
 			#define FEAMR_API __declspec(dllimport)

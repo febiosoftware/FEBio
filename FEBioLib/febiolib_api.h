@@ -30,7 +30,7 @@ SOFTWARE.*/
 
 #ifdef WIN32
 	#ifdef FECORE_DLL
-		#ifdef FEBIOLIB_EXPORTS
+		#ifdef febiolib_EXPORTS
 			#define FEBIOLIB_API __declspec(dllexport)
 		#else
 			#define FEBIOLIB_API __declspec(dllimport)
