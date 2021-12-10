@@ -69,7 +69,7 @@ public:
 	void* CreateClass(const char* szclassName, FEModel* fem);
 
 	//! Create a class from a class descriptor
-	void* Create(int superClassID, FEModel* pfem, const ClassDescriptor& cd);
+	void* Create(int superClassID, FEModel* pfem, const FEClassDescriptor& cd);
 
 	//! count the number of registered classes with a given super-class id
 	int Count(SUPER_CLASS_ID sid);
@@ -146,7 +146,7 @@ public:
 	//! set the default linear solver
 	FECoreFactory* SetDefaultSolverType(const char* sztype);
 
-	void SetDefaultSolver(ClassDescriptor* linsolve);
+	void SetDefaultSolver(FEClassDescriptor* linsolve);
 
 	//! get the linear solver type
 	const char* GetLinearSolverType() const;
@@ -159,7 +159,7 @@ private:
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 
 	std::string			m_default_solver_type;	// default linear solver
-	ClassDescriptor*	m_default_solver;
+	FEClassDescriptor*	m_default_solver;
 
 	// module list
 	vector<Module*>	m_modules;

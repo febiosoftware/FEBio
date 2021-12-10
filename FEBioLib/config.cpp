@@ -211,7 +211,7 @@ namespace febio {
 		const char* szt = tag.AttributeValue("type");
 
 		// read the solver parameters
-		ClassDescriptor* cd = fexml::readParameterList(tag);
+		FEClassDescriptor* cd = fexml::readParameterList(tag);
 		if (cd == nullptr)
 		{
 			delete cd;

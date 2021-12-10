@@ -114,7 +114,7 @@ FECoreFactory* FECoreKernel::SetDefaultSolverType(const char* sztype)
 }
 
 //-----------------------------------------------------------------------------
-void FECoreKernel::SetDefaultSolver(ClassDescriptor* linsolve)
+void FECoreKernel::SetDefaultSolver(FEClassDescriptor* linsolve)
 {
 	delete m_default_solver;
 	m_default_solver = linsolve;
@@ -325,9 +325,9 @@ void* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 
 //-----------------------------------------------------------------------------
 //! Create a class from a class descriptor
-void* FECoreKernel::Create(int superClassID, FEModel* pfem, const ClassDescriptor& cd)
+void* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassDescriptor& cd)
 {
-	const ClassDescriptor::ClassVariable* root = cd.Root();
+	const FEClassDescriptor::ClassVariable* root = cd.Root();
 	FECoreBase* pc = (FECoreBase*)Create(superClassID, root->m_type.c_str(), pfem);
 	if (pc == nullptr) return nullptr;
 	pc->SetParameters(cd);

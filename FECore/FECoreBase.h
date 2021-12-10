@@ -143,8 +143,8 @@ public:
 	static FECoreBase* LoadClass(DumpStream& ar, FECoreBase* p);
 
 	// set parameters through a class descriptor
-	bool SetParameters(const ClassDescriptor& cd);
-	bool SetParameters(const ClassDescriptor::ClassVariable& cv);
+	bool SetParameters(const FEClassDescriptor& cd);
+	bool SetParameters(const FEClassDescriptor::ClassVariable& cv);
 
 public:
 	//! Add a property

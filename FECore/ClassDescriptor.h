@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <vector>
 #include "fecore_api.h"
 
-class FECORE_API ClassDescriptor
+class FECORE_API FEClassDescriptor
 {
 public:
 	class Variable
@@ -70,7 +70,7 @@ public:
 	};
 
 public:
-	ClassDescriptor(const std::string& classType) : m_var("root", classType) {}
+	FEClassDescriptor(const std::string& classType) : m_var("root", classType) {}
 
 	void AddVariable(Variable* v) { m_var.AddVariable(v); }
 
