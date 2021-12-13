@@ -27,7 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/Archive.h"
 #include <assert.h>
 #include <string>
 #include <string.h>
@@ -35,6 +34,9 @@ SOFTWARE.*/
 #include <list>
 #include <vector>
 #include <stack>
+
+//-----------------------------------------------------------------------------
+enum IOResult { IO_ERROR, IO_OK, IO_END };
 
 //-----------------------------------------------------------------------------
 //! helper class for writing buffered data to file
