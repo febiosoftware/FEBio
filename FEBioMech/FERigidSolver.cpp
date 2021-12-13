@@ -37,7 +37,6 @@ SOFTWARE.*/
 #include <FECore/SparseMatrix.h>
 #include <FECore/log.h>
 #include <FECore/FEMaterial.h>
-#include <FECore/Archive.h>
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
 

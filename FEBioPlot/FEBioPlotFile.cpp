@@ -60,7 +60,7 @@ class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
 	FEPlotSurfaceDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
-	void Save(FEModel& fem, Archive& ar)
+	void Save(FEModel& fem, PltArchive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NS = mesh.Surfaces();
@@ -93,7 +93,7 @@ class FEPlotDomainDataExport : public FEPlotData
 {
 public:
 	FEPlotDomainDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
-	void Save(FEModel& fem, Archive& ar)
+	void Save(FEModel& fem, PltArchive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NDOMS = mesh.Domains();

@@ -42,7 +42,7 @@ using namespace std;
 class FileStream
 {
 public:
-	FileStream();
+	FileStream(FILE* fp = nullptr, bool owner = true);
 	~FileStream();
 
 	bool Create(const char* szfile);
@@ -64,8 +64,13 @@ public:
 
 	void SetCompression(int n) { m_ncompress = n; }
 
+	FILE* FilePtr() { return m_fp; }
+
+	bool IsValid() { return (m_fp != nullptr); }
+
 private:
 	FILE*	m_fp;
+	bool	m_fileOwner;
 	size_t	m_bufsize;		//!< buffer size
 	size_t	m_current;		//!< current index
 	unsigned char*	m_buf;	//!< buffer
@@ -95,7 +100,7 @@ protected:
 };
 
 class OBranch : public OChunk
-{
+{	
 public:
 	OBranch(unsigned int nid) : OChunk(nid) {}
 	~OBranch()
@@ -208,7 +213,7 @@ template <typename T>
 class OLeaf<vector<T> > : public OChunk
 {
 public:
-	OLeaf(unsigned int nid, vector<T>& a) : OChunk(nid)
+	OLeaf(unsigned int nid, const vector<T>& a) : OChunk(nid)
 	{
 		m_nsize = (int)a.size();
 		assert(m_nsize > 0);
@@ -233,7 +238,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Implementation of an archiving class. Will be used by the FEBioPlotFile class.
-class PltArchive : public Archive
+class PltArchive
 {
 protected:
 	// CHUNK data structure for reading
@@ -294,12 +299,10 @@ public:
 		m_pChunk->AddChild(new OLeaf<vector<T> >(nid, a));
 	}
 
-	// (overridden from Archive)
-	virtual void WriteData(int nid, std::vector<float>& data)
+	void WriteData(int nid, std::vector<float>& data)
 	{
 		WriteChunk(nid, data);
 	}
-
 
 public:
 	// --- Reading ---
