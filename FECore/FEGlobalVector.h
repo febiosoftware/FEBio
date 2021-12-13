@@ -29,7 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include <vector>
 #include "fecore_api.h"
-using namespace std;
 
 class FEModel;
 
@@ -40,16 +39,16 @@ class FECORE_API FEGlobalVector
 {
 public:
 	//! constructor
-	FEGlobalVector(FEModel& fem, vector<double>& R, vector<double>& Fr);
+	FEGlobalVector(FEModel& fem, std::vector<double>& R, std::vector<double>& Fr);
 
 	//! destructor
 	virtual ~FEGlobalVector();
 
 	//! Assemble the element vector into this global vector
-	virtual void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom = false);
+	virtual void Assemble(std::vector<int>& en, std::vector<int>& elm, std::vector<double>& fe, bool bdom = false);
 
 	//! Assemble into this global vector
-	virtual void Assemble(vector<int>& lm, vector<double>& fe);
+	virtual void Assemble(std::vector<int>& lm, std::vector<double>& fe);
 
 	//! assemble a nodel value
 	virtual void Assemble(int node, int dof, double f);
@@ -63,10 +62,10 @@ public:
 	//! get the size of the vector
 	int Size() const { return (int) m_R.size(); }
 
-	operator vector<double>& () { return m_R; }
+	operator std::vector<double>& () { return m_R; }
 
 protected:
 	FEModel&			m_fem;	//!< model
-	vector<double>&		m_R;	//!< residual
-	vector<double>&		m_Fr;	//!< nodal reaction forces \todo I want to remove this
+	std::vector<double>&		m_R;	//!< residual
+	std::vector<double>&		m_Fr;	//!< nodal reaction forces \todo I want to remove this
 };

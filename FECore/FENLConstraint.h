@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FEGlobalMatrix.h"
 #include "FETimeInfo.h"
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 // forward declaration of the model class

@@ -47,5 +47,5 @@ public:
 	~FEFluidResidualVector();
 
 	//! Assemble the element vector into this global vector
-	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
+	void Assemble(std::vector<int>& en, std::vector<int>& elm, std::vector<double>& fe);
 };

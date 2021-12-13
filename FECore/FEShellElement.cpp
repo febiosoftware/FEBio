@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEShellElement.h"
 #include "DumpStream.h"
+using namespace std;
 
 //=================================================================================================
 // FEShellElement

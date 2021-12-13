@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FEDofList.h"
 #include "FEModelParam.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.

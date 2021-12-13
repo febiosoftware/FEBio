@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "vec3d.h"
 #include "FESurface.h"
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 // Structure for representing 2D points
@@ -106,7 +105,7 @@ private:
 	int		m_primary_facet_id;		//!< index of primary facet
 	int		m_secondary_facet_id;	//!< index of secondary facet
 
-	vector<FACET>	m_tri;	//!< triangular patches
+	std::vector<FACET>	m_tri;	//!< triangular patches
 };
 
 //-----------------------------------------------------------------------------
@@ -124,7 +123,7 @@ public:
 	void Clear() { m_patch.clear(); }
 
 private:
-	vector<Patch>	m_patch;	
+	std::vector<Patch>	m_patch;
 };
 
 //-----------------------------------------------------------------------------

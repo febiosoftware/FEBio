@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "CompactSymmMatrix.h"
+using namespace std;
 
 //-----------------------------------------------------------------------------
 //! constructor

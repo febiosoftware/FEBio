@@ -35,7 +35,6 @@ SOFTWARE.*/
 #include <list>
 #include <vector>
 #include <stack>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! helper class for writing buffered data to file
@@ -105,7 +104,7 @@ public:
 	OBranch(unsigned int nid) : OChunk(nid) {}
 	~OBranch()
 	{
-		list<OChunk*>::iterator pc;
+		std::list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) delete (*pc);
 		m_child.clear();
 	}
@@ -113,7 +112,7 @@ public:
 	int Size()
 	{
 		int nsize = 0;
-		list<OChunk*>::iterator pc;
+		std::list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) nsize += (*pc)->Size() + 2*sizeof(unsigned int);
 		return nsize;
 	}
@@ -125,14 +124,14 @@ public:
 		unsigned int nsize = Size();
 		fp->Write(&nsize, sizeof(unsigned int), 1);
 
-		list<OChunk*>::iterator pc;
+		std::list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) (*pc)->Write(fp);
 	}
 
 	void AddChild(OChunk* pc) { m_child.push_back(pc); pc->SetParent(this); }
 
 protected:
-	list<OChunk*>	m_child;
+	std::list<OChunk*>	m_child;
 };
 
 template <typename T>
@@ -210,10 +209,10 @@ protected:
 };
 
 template <typename T>
-class OLeaf<vector<T> > : public OChunk
+class OLeaf<std::vector<T> > : public OChunk
 {
 public:
-	OLeaf(unsigned int nid, const vector<T>& a) : OChunk(nid)
+	OLeaf(unsigned int nid, const std::vector<T>& a) : OChunk(nid)
 	{
 		m_nsize = (int)a.size();
 		assert(m_nsize > 0);
@@ -294,9 +293,9 @@ public:
 		m_pChunk->AddChild(new OLeaf<T*>(nid, po, n));
 	}
 
-	template <typename T> void WriteChunk(unsigned int nid, vector<T>& a)
+	template <typename T> void WriteChunk(unsigned int nid, std::vector<T>& a)
 	{
-		m_pChunk->AddChild(new OLeaf<vector<T> >(nid, a));
+		m_pChunk->AddChild(new OLeaf<std::vector<T> >(nid, a));
 	}
 
 	void WriteData(int nid, std::vector<float>& data)
@@ -359,5 +358,5 @@ protected:
 
 	// read data
 	bool			m_bend;		// chunk end flag
-	stack<CHUNK*>	m_Chunk;
+	std::stack<CHUNK*>	m_Chunk;
 };

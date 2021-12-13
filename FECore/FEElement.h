@@ -63,7 +63,7 @@ public:
 	FEMaterialPoint*& operator [] (int n) { return m_data[n]; }
 
 private:
-	vector<FEMaterialPoint*>	m_data;
+	std::vector<FEMaterialPoint*>	m_data;
 };
 
 //-----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ public:
 	double Evaluate(int order, double* fn, int n);
 
 	//! evaluate scale field at integration point
-	double Evaluate(vector<double>& fn, int n);
+	double Evaluate(std::vector<double>& fn, int n);
 
 	//! evaluate vector field at integration point
 	vec2d Evaluate(vec2d* vn, int n);
@@ -217,11 +217,11 @@ protected:
 	FEMeshPartition * m_part;	//!< parent mesh partition
 
 public:
-	vector<int>		m_node;		//!< connectivity
+	std::vector<int>		m_node;		//!< connectivity
 
 	// This array stores the local node numbers, that is the node numbers
 	// into the node list of a domain.
-	vector<int>		m_lnode;	//!< local connectivity
+	std::vector<int>		m_lnode;	//!< local connectivity
 
 public: 
 	// NOTE: Work in progress

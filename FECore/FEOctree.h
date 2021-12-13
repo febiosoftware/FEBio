@@ -44,7 +44,7 @@ public:
 	~OTnode() {}
 	void Clear() {children.clear(); }
 	void CreateChildren(const int max_level, const int max_elem);
-	void FillNode(vector<int> parent_selist);
+	void FillNode(std::vector<int> parent_selist);
 	bool ElementIntersectsNode(const int j);
 	void PrintNodeContent();
 	bool RayIntersectsNode(vec3d p, vec3d n);
@@ -54,8 +54,8 @@ public:
 public:
 	int				level;		//!< node level
 	vec3d			cmin, cmax;	//!< node bounding box
-	vector<int>		selist;		//!< list of surface elements inside this node
-	vector<OTnode>	children;	//!< children of this node
+	std::vector<int>		selist;		//!< list of surface elements inside this node
+	std::vector<OTnode>	children;	//!< children of this node
 	FESurface*		m_ps;		//!< the surface to search
 };
 

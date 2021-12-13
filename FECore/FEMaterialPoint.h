@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "mat3d.h"
 #include "FETimeInfo.h"
 #include <vector>
-using namespace std;
 
 class FEElement;
 
@@ -192,5 +191,5 @@ public:
 	FEMaterialPoint* GetPointData(int i) override { return m_mp[i]; }
 
 protected:
-	vector<FEMaterialPoint*>	m_mp;	//!< material point data for indidivual properties
+	std::vector<FEMaterialPoint*>	m_mp;	//!< material point data for indidivual properties
 };

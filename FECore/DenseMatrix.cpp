@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "DenseMatrix.h"
 using namespace FECore;
+using namespace std;
 
 //-----------------------------------------------------------------------------
 DenseMatrix::DenseMatrix()

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESolutesMaterialPoint.h"
 #include "FECore/DumpStream.h"
+using namespace std;
 
 //=============================================================================
 //   FESolutesMaterialPoint

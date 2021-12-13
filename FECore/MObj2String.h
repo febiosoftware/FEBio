@@ -29,30 +29,29 @@ SOFTWARE.*/
 #pragma once
 #include "MathObject.h"
 #include <string>
-using namespace std;
 
 // this class converts a MathObject to a string
 class FECORE_API MObj2String
 {
 public:
-	string Convert(const MathObject& o);
+	std::string Convert(const MathObject& o);
 
 protected:
-	string Convert(const MItem* pi);
+	std::string Convert(const MItem* pi);
 
-	string Constant (const MConstant* pc);
-	string Fraction (const MFraction* pc);
-	string NamedCt  (const MNamedCt*  pc);
-	string Variable (const MVarRef*   pv);
-	string OpNeg    (const MNeg*      po);
-	string OpAdd    (const MAdd*      po);
-	string OpSub    (const MSub*      po);
-	string OpMul    (const MMul*      po);
-	string OpDiv    (const MDiv*      po);
-	string OpPow    (const MPow*      po);
-	string OpEqual  (const MEquation* po);
-	string OpFnc1D  (const MFunc1D*   po);
-	string OpFnc2D  (const MFunc2D*   po);
-	string OpFncND  (const MFuncND*   po);
-	string OpSFnc   (const MSFuncND*  po);
+	std::string Constant (const MConstant* pc);
+	std::string Fraction (const MFraction* pc);
+	std::string NamedCt  (const MNamedCt*  pc);
+	std::string Variable (const MVarRef*   pv);
+	std::string OpNeg    (const MNeg*      po);
+	std::string OpAdd    (const MAdd*      po);
+	std::string OpSub    (const MSub*      po);
+	std::string OpMul    (const MMul*      po);
+	std::string OpDiv    (const MDiv*      po);
+	std::string OpPow    (const MPow*      po);
+	std::string OpEqual  (const MEquation* po);
+	std::string OpFnc1D  (const MFunc1D*   po);
+	std::string OpFnc2D  (const MFunc2D*   po);
+	std::string OpFncND  (const MFuncND*   po);
+	std::string OpSFnc   (const MSFuncND*  po);
 };

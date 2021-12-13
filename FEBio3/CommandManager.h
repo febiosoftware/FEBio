@@ -30,7 +30,6 @@ SOFTWARE.*/
 
 #include "Command.h"
 #include <list>
-using namespace std;
 
 class CommandManager
 {
@@ -51,7 +50,7 @@ public:
 		int N = (int)m_Cmd.size();
 		if (N == 0) return 0;
 
-		list<Command*>::iterator ic = m_Cmd.begin();
+		std::list<Command*>::iterator ic = m_Cmd.begin();
 		for (int i=0; i<N; ++i, ++ic)
 		{
 			if (strcmp(szcmd, (*ic)->GetName()) == 0) return (*ic);
@@ -60,12 +59,12 @@ public:
 		return 0;
 	}
 
-	typedef list<Command*>::iterator CmdIterator;
+	typedef std::list<Command*>::iterator CmdIterator;
 
 	CmdIterator First() { return m_Cmd.begin(); }
 
 protected:
-	list<Command*>	m_Cmd;
+	std::list<Command*>	m_Cmd;
 
 protected:
 	static CommandManager* m_pMngr;

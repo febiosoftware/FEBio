@@ -40,7 +40,7 @@ namespace NumCore
 	NUMCORE_API bool write_hb(CompactMatrix& K, const char* szfile, int mode = 0);
 
 	// write a vector to file
-	NUMCORE_API bool write_vector(const vector<double>& a, const char* szfile, int mode = 0);
+	NUMCORE_API bool write_vector(const std::vector<double>& a, const char* szfile, int mode = 0);
 
 	// read compact matrix (binary mode only)
 	NUMCORE_API CompactMatrix* read_hb(const char* szfile);
@@ -58,7 +58,7 @@ namespace NumCore
 	NUMCORE_API double estimateConditionNumber(SparseMatrix* A);
 
 	// create a random vector
-	NUMCORE_API void randomVector(vector<double>& R, double vmin = 0.0, double vmax = 1.0);
+	NUMCORE_API void randomVector(std::vector<double>& R, double vmin = 0.0, double vmax = 1.0);
 
 	// inf-norm of a vector
 	NUMCORE_API double infNorm(const std::vector<double>& x);

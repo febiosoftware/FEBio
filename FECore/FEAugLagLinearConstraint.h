@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include <FECore/FENodeSetConstraint.h>
 #include "fecore_api.h"
 #include <list>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! linear constraint enforced using augmented lagrangian
@@ -54,7 +53,7 @@ public:
 		double	val;	// coefficient value
 	};
 
-	typedef list<FEAugLagLinearConstraint::DOF>::iterator Iterator;
+	typedef std::list<FEAugLagLinearConstraint::DOF>::iterator Iterator;
 
 public:
 	//! constructor
@@ -64,8 +63,8 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	list<DOF>	m_dof;	//!< list of participating dofs
-	double		m_lam;	//!< lagrange multiplier
+	std::list<DOF>	m_dof;	//!< list of participating dofs
+	double			m_lam;	//!< lagrange multiplier
 };
 
 //-----------------------------------------------------------------------------
@@ -101,7 +100,7 @@ protected:
 	double constraint(FEAugLagLinearConstraint& LC);
 
 public:
-	list<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
+	std::list<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
 
 public:
 	bool	m_laugon;	//!< augmentation flag
@@ -149,7 +148,7 @@ protected:
     virtual double constraint(FEAugLagLinearConstraint& LC);
 
 public:
-    list<FEAugLagLinearConstraint*>    m_LC;    //!< list of linear constraints
+	std::list<FEAugLagLinearConstraint*>    m_LC;    //!< list of linear constraints
 
 public:
     bool        m_laugon;   //!< augmentation flag

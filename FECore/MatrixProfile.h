@@ -86,7 +86,7 @@ public:
 		void insertRow(int row);
 
 	private:
-		vector<RowEntry>	m_data;	// the column profile data
+		std::vector<RowEntry>	m_data;	// the column profile data
 	};
 
 public:
@@ -109,7 +109,7 @@ public:
 	void Clear();
 
 	//! updates the profile for an array of elements
-	void UpdateProfile(vector< vector<int> >& LM, int N);
+	void UpdateProfile(std::vector< std::vector<int> >& LM, int N);
 
 	//! inserts an entry into the profile (This is an expensive operation!)
 	void Insert(int i, int j);
@@ -128,5 +128,5 @@ public:
 
 private:
 	int	m_nrow, m_ncol;				//!< dimensions of matrix
-	vector<ColumnProfile>	m_prof;	//!< the actual profile in condensed format
+	std::vector<ColumnProfile>	m_prof;	//!< the actual profile in condensed format
 };

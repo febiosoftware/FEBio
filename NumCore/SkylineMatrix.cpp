@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "SkylineMatrix.h"
+using namespace std;
 
 //=============================================================================
 // SkylineMatrix

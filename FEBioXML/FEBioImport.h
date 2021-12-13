@@ -36,10 +36,8 @@ SOFTWARE.*/
 #include <FECore/FESurfaceMap.h>
 #include <FECore/tens3d.h>
 #include <string>
-using namespace std;
 
 class FENodeSet;
-
 class FEBioImport;
 
 //-----------------------------------------------------------------------------
@@ -178,5 +176,5 @@ public:
 	char	m_szplt[512];
 
 public:
-	vector<DataRecord*>		m_data;
+	std::vector<DataRecord*>		m_data;
 };

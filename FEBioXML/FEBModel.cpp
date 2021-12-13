@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
+using namespace std;
 
 //=============================================================================
 FEBModel::NodeSet::NodeSet() {}

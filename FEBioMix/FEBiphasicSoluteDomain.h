@@ -27,8 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <vector>
-using namespace std;
 #include "FEBioMech/FEElasticDomain.h"
 #include "FEBiphasicSolute.h"
 

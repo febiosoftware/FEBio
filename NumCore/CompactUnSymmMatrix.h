@@ -67,10 +67,10 @@ public:
 	void Create(SparseMatrixProfile& mp) override;
 
 	//! Assemble the element matrix into the global matrix
-	void Assemble(const matrix& ke, const vector<int>& lm) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(const matrix& ke, const vector<int>& lmi, const vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override;
 
 	//! add a value to the matrix item
 	void add(int i, int j, double v) override;
@@ -92,7 +92,7 @@ public:
 
 	// scale matrix 
 	void scale(double s);
-	void scale(const vector<double>& L, const vector<double>& R) override;
+	void scale(const std::vector<double>& L, const std::vector<double>& R) override;
 
 	//! extract a block of this matrix
 	void get(int i0, int j0, int nr, int nc, CSRMatrix& M);
@@ -138,10 +138,10 @@ public:
 	void Create(SparseMatrixProfile& mp) override;
 
 	//! Assemble the element matrix into the global matrix
-	void Assemble(const matrix& ke, const vector<int>& lm) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(const matrix& ke, const vector<int>& lmi, const vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override;
 
 	//! add a value to the matrix item
 	void add(int i, int j, double v) override;
@@ -174,5 +174,5 @@ public:
 	double oneNorm() const override;
 
 	//! do row (L) and column (R) scaling
-	void scale(const vector<double>& L, const vector<double>& R) override;
+	void scale(const std::vector<double>& L, const std::vector<double>& R) override;
 };

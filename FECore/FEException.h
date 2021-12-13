@@ -28,9 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "fecore_api.h"
-#include <vector>
 #include <string>
-using namespace std;
 
 class FEElement;
 

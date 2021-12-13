@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEException.h"
 #include "FESolidElementShape.h"
 #include "FESurfaceElementShape.h"
+using namespace std;
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

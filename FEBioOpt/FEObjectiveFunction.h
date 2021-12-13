@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FEDataSource.h"
 #include <FECore/ElementDataRecord.h>
 #include <FECore/NodeDataRecord.h>
-using namespace std;
 
 class FEModel;
 class FEElement;
@@ -65,7 +64,7 @@ public:
 
 	// evaluate objective function
 	// also returns the function values in f
-	virtual double Evaluate(vector<double>& f);
+	virtual double Evaluate(std::vector<double>& f);
 
 	// evaluate objective function
 	double Evaluate();
@@ -82,10 +81,10 @@ public: // These functions need to be implemented by derived classes
 	virtual int Measurements() = 0;
 
 	// evaluate the function values (i.e. the f_i above)
-	virtual void EvaluateFunctions(vector<double>& f) = 0;
+	virtual void EvaluateFunctions(std::vector<double>& f) = 0;
 
 	// get the measurement vector (i.e. the y_i above)
-	virtual void GetMeasurements(vector<double>& y) = 0;
+	virtual void GetMeasurements(std::vector<double>& y) = 0;
 
 private:
 	FEModel*	m_fem;
@@ -114,17 +113,17 @@ public:
 	void SetDataSource(FEDataSource* src);
 
 	// set the data measurements
-	void SetMeasurements(const vector<pair<double, double> >& data);
+	void SetMeasurements(const std::vector<pair<double, double> >& data);
 
 public:
 	// return number of measurements
 	int Measurements();
 
 	// evaluate the function values
-	void EvaluateFunctions(vector<double>& f);
+	void EvaluateFunctions(std::vector<double>& f);
 
 	// get the measurement vector
-	void GetMeasurements(vector<double>& y);
+	void GetMeasurements(std::vector<double>& y);
 
 private:
 	FEPointFunction		m_lc;		//!< data load curve for evaluating measurements
@@ -162,10 +161,10 @@ public:
 	int Measurements() override;
 
 	// evaluate the function values
-	void EvaluateFunctions(vector<double>& f) override;
+	void EvaluateFunctions(std::vector<double>& f) override;
 
 	// get the measurement vector
-	void GetMeasurements(vector<double>& y) override;
+	void GetMeasurements(std::vector<double>& y) override;
 
 private:
 	std::vector<Function>	m_Func;
@@ -196,10 +195,10 @@ public:
 	int Measurements() override;
 
 	// evaluate the function values (i.e. the f_i above)
-	void EvaluateFunctions(vector<double>& f) override;
+	void EvaluateFunctions(std::vector<double>& f) override;
 
 	// get the measurement vector (i.e. the y_i above)
-	void GetMeasurements(vector<double>& y) override;
+	void GetMeasurements(std::vector<double>& y) override;
 
 private:
 	std::vector<Entry>	m_Data;
@@ -223,7 +222,7 @@ public:
 
 	bool Init() override;
 
-	bool AddValue(int elemID, vector<double>& v);
+	bool AddValue(int elemID, std::vector<double>& v);
 
 	void AddVariable(FENodeLogData* var);
 
@@ -232,10 +231,10 @@ public:
 	int Measurements() override;
 
 	// evaluate the function values (i.e. the f_i above)
-	void EvaluateFunctions(vector<double>& f) override;
+	void EvaluateFunctions(std::vector<double>& f) override;
 
 	// get the measurement vector (i.e. the y_i above)
-	void GetMeasurements(vector<double>& y) override;
+	void GetMeasurements(std::vector<double>& y) override;
 
 private:
 	std::vector<Entry>				m_Data;

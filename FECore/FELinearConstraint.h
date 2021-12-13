@@ -29,7 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include "FEBoundaryCondition.h"
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! linear constraint
@@ -51,7 +50,7 @@ public:
 		void operator = (const DOF&) {}
 	};
 
-	typedef vector<DOF*>::iterator dof_iterator;
+	typedef std::vector<DOF*>::iterator dof_iterator;
 
 public:
 	// constructors
@@ -104,7 +103,7 @@ public:
 
 protected:
 	DOF*			m_parentDof;	// parent degree of freedom
-	vector<DOF*>	m_childDof;		// list of child dofs
+	std::vector<DOF*>	m_childDof;		// list of child dofs
 	double			m_off;			// offset value
 
 	DECLARE_FECORE_CLASS();

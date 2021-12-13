@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "fecore_api.h"
 #include "fecore_enum.h"
 #include "FECoreBase.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 class FENewtonSolver;
@@ -60,10 +59,10 @@ public:
 	virtual void PreSolveUpdate() {}
 
 	//! perform a Newton udpate
-	virtual bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) = 0;
+	virtual bool Update(double s, std::vector<double>& ui, std::vector<double>& R0, std::vector<double>& R1) = 0;
 
 	//! solve the equations
-	virtual void SolveEquations(vector<double>& x, vector<double>& b) = 0;
+	virtual void SolveEquations(std::vector<double>& x, std::vector<double>& b) = 0;
 
 	//! reform the stiffness matrix
 	virtual bool ReformStiffness();

@@ -36,7 +36,6 @@ SOFTWARE.*/
 #include "FEModelBuilder.h"
 #include "febioxml_api.h"
 #include <map>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -119,7 +118,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // class that manages file section parsers
-class FEBIOXML_API FEFileSectionMap : public map<string, FEFileSection*>
+class FEBIOXML_API FEFileSectionMap : public std::map<string, FEFileSection*>
 {
 public:
 	~FEFileSectionMap();

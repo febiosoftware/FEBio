@@ -35,7 +35,6 @@ SOFTWARE.*/
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEDomain2D.h"
 #include <list>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
@@ -182,14 +181,14 @@ public:
 		unsigned int	m_ntype;	// data type
 		unsigned int	m_nfmt;		// storage format
 		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
-		vector<string>	m_arrayNames;	// names of array components (optional)
+		std::vector<string>	m_arrayNames;	// names of array components (optional)
 		char			m_szname[STR_SIZE];
 	};
 
 	class Dictionary
 	{
 	public:
-		bool AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom = "");
+		bool AddVariable(FEModel* pfem, const char* szname, std::vector<int>& item, const char* szdom = "");
 
 		int NodalVariables() { return (int)m_Node.size(); }
 		int DomainVarialbes() { return (int)m_Elem.size(); }
@@ -209,9 +208,9 @@ public:
 	protected:
 		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
 		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
-		bool AddNodalVariable   (FEPlotData* ps, const char* szname, vector<int>& item);
-		bool AddDomainVariable  (FEPlotData* ps, const char* szname, vector<int>& item);
-		bool AddSurfaceVariable (FEPlotData* ps, const char* szname, vector<int>& item);
+		bool AddNodalVariable   (FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddDomainVariable  (FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddSurfaceVariable (FEPlotData* ps, const char* szname, std::vector<int>& item);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
@@ -290,7 +289,7 @@ public:
 	//! Add a variable to the dictionary
 	bool AddVariable(FEPlotData* ps, const char* szname);
 	bool AddVariable(const char* sz);
-	bool AddVariable(const char* sz, vector<int>& item, const char* szdom = "");
+	bool AddVariable(const char* sz, std::vector<int>& item, const char* szdom = "");
 
 	//! Set the compression level
 	void SetCompression(int n);
@@ -360,10 +359,10 @@ protected:
 	int			m_meshesWritten;	// nr of meshes written
 	string		m_softwareString;	// the software string
 
-	vector<Surface>	m_Surf;
+	std::vector<Surface>	m_Surf;
 
-	vector<PointObject*>	m_Points;
-	vector<LineObject*>		m_Lines;
+	std::vector<PointObject*>	m_Points;
+	std::vector<LineObject*>		m_Lines;
 };
 
 //-----------------------------------------------------------------------------

@@ -27,7 +27,6 @@ SOFTWARE.*/
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
 #include <set>
-using namespace std;
 
 class FEContactPotentialSurface : public FEContactSurface
 {
@@ -82,7 +81,7 @@ public:
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 protected:
-	void ElementForce(FESurfaceElement& el1, FESurfaceElement& el2, vector<double>& fe);
+	void ElementForce(FESurfaceElement& el1, FESurfaceElement& el2, std::vector<double>& fe);
 	void ElementStiffness(FESurfaceElement& el1, FESurfaceElement& el2, matrix& ke);
 
 	double PotentialDerive(double r);
@@ -101,8 +100,8 @@ protected:
 
 	double	m_c1, m_c2;
 
-	vector<	set<FESurfaceElement*> >			m_activeElements;
-	vector< set<FESurfaceElement*> >	m_elemNeighbors;
+	std::vector< std::set<FESurfaceElement*> >	m_activeElements;
+	std::vector< std::set<FESurfaceElement*> >	m_elemNeighbors;
 
 	DECLARE_FECORE_CLASS();
 };

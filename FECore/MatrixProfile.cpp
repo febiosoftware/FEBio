@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "MatrixProfile.h"
 #include <assert.h>
+using namespace std;
 
 SparseMatrixProfile::ColumnProfile::ColumnProfile(const SparseMatrixProfile::ColumnProfile& a)
 {

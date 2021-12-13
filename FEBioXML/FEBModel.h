@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include <string>
 #include <FECore/FEElement.h>
 #include <FECore/FETransform.h>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -70,14 +69,14 @@ public:
 		Domain(const Domain& dom);
 		Domain(const FE_Element_Spec& spec);
 
-		void SetName(const string& name);
-		const string& Name() const;
+		void SetName(const std::string& name);
+		const std::string& Name() const;
 
-		void SetMaterialName(const string& name);
-		const string& MaterialName() const;
+		void SetMaterialName(const std::string& name);
+		const std::string& MaterialName() const;
 
-		void SetElementList(const vector<ELEMENT>& el);
-		const vector<ELEMENT>& ElementList() const;
+		void SetElementList(const std::vector<ELEMENT>& el);
+		const std::vector<ELEMENT>& ElementList() const;
 
 		int Elements() const { return (int) m_Elem.size(); }
 
@@ -92,9 +91,9 @@ public:
 
 	private:
 		FE_Element_Spec		m_spec;
-		string				m_name;
-		string				m_matName;
-		vector<ELEMENT>		m_Elem;
+		std::string			m_name;
+		std::string			m_matName;
+		std::vector<ELEMENT>	m_Elem;
 
 	public:
 		double	m_defaultShellThickness;
@@ -105,13 +104,13 @@ public:
 	public:
 		Surface();
 		Surface(const Surface& surf);
-		Surface(const string& name);
+		Surface(const std::string& name);
 
-		void SetName(const string& name);
-		const string& Name() const;
+		void SetName(const std::string& name);
+		const std::string& Name() const;
 
-		void SetFacetList(const vector<FACET>& el);
-		const vector<FACET>& FacetList() const;
+		void SetFacetList(const std::vector<FACET>& el);
+		const std::vector<FACET>& FacetList() const;
 
 		void Create(int n) { m_Face.resize(n); }
 
@@ -119,8 +118,8 @@ public:
 		FACET& GetFacet(int i) { return m_Face[i]; }
 
 	private:
-		string	m_name;
-		vector<FACET>	m_Face;
+		std::string	m_name;
+		std::vector<FACET>	m_Face;
 	};
 
 	class NodeSet
@@ -128,17 +127,17 @@ public:
 	public:
 		NodeSet();
 		NodeSet(const NodeSet& set);
-		NodeSet(const string& name);
+		NodeSet(const std::string& name);
 
-		void SetName(const string& name);
-		const string& Name() const;
+		void SetName(const std::string& name);
+		const std::string& Name() const;
 
-		void SetNodeList(const vector<int>& node);
-		const vector<int>& NodeList() const;
+		void SetNodeList(const std::vector<int>& node);
+		const std::vector<int>& NodeList() const;
 
 	private:
-		string		m_name;
-		vector<int>	m_node;
+		std::string		m_name;
+		std::vector<int>	m_node;
 	};
 
 	class ElementSet
@@ -146,17 +145,17 @@ public:
 	public:
 		ElementSet();
 		ElementSet(const ElementSet& set);
-		ElementSet(const string& name);
+		ElementSet(const std::string& name);
 
-		void SetName(const string& name);
-		const string& Name() const;
+		void SetName(const std::string& name);
+		const std::string& Name() const;
 
-		void SetElementList(const vector<int>& elem);
-		const vector<int>& ElementList() const;
+		void SetElementList(const std::vector<int>& elem);
+		const std::vector<int>& ElementList() const;
 
 	private:
-		string		m_name;
-		vector<int>	m_elem;
+		std::string			m_name;
+		std::vector<int>	m_elem;
 	};
 
 	class SurfacePair
@@ -165,12 +164,12 @@ public:
 		SurfacePair();
 		SurfacePair(const SurfacePair& surfPair);
 
-		const string& Name() const;
+		const std::string& Name() const;
 
 	public:
-		string	m_name;
-		string	m_primary;
-		string	m_secondary;		
+		std::string	m_name;
+		std::string	m_primary;
+		std::string	m_secondary;		
 	};
 
 	class DiscreteSet
@@ -185,15 +184,15 @@ public:
 		DiscreteSet();
 		DiscreteSet(const DiscreteSet& set);
 
-		void SetName(const string& name);
-		const string& Name() const;
+		void SetName(const std::string& name);
+		const std::string& Name() const;
 
 		void AddElement(int n0, int n1);
-		const vector<ELEM>& ElementList() const;
+		const std::vector<ELEM>& ElementList() const;
 
 	private:
-		string			m_name;
-		vector<ELEM>	m_elem;
+		std::string			m_name;
+		std::vector<ELEM>	m_elem;
 	};
 	class Part
 	{
@@ -204,19 +203,19 @@ public:
 		~Part();
 
 		void SetName(const std::string& name);
-		const string& Name() const;
+		const std::string& Name() const;
 
 		void AddNodes(const std::vector<NODE>& nodes);
 
 		int Domains() const { return (int)m_Dom.size(); }
 		void AddDomain(Domain* dom);
 		const Domain& GetDomain(int i) const { return *m_Dom[i]; }
-		Domain* FindDomain(const string& name);
+		Domain* FindDomain(const std::string& name);
 
 		int Surfaces() const { return (int) m_Surf.size(); }
 		void AddSurface(Surface* surf);
 		Surface* GetSurface(int i) { return m_Surf[i]; }
-		Surface* FindSurface(const string& name);
+		Surface* FindSurface(const std::string& name);
 
 		int NodeSets() const { return (int) m_NSet.size(); }
 		void AddNodeSet(NodeSet* nset) { m_NSet.push_back(nset); }
@@ -239,14 +238,14 @@ public:
 		NODE& GetNode(int i) { return m_Node[i]; }
 
 	private:
-		string				m_name;
-		vector<NODE>		m_Node;
-		vector<Domain*>		m_Dom;
-		vector<Surface*>	m_Surf;
-		vector<NodeSet*>	m_NSet;
-		vector<ElementSet*>	m_ESet;
-		vector<SurfacePair*>	m_SurfPair;
-		vector<DiscreteSet*>	m_DiscSet;
+		std::string					m_name;
+		std::vector<NODE>			m_Node;
+		std::vector<Domain*>		m_Dom;
+		std::vector<Surface*>		m_Surf;
+		std::vector<NodeSet*>		m_NSet;
+		std::vector<ElementSet*>	m_ESet;
+		std::vector<SurfacePair*>	m_SurfPair;
+		std::vector<DiscreteSet*>	m_DiscSet;
 	};
 
 public:
@@ -258,7 +257,7 @@ public:
 	Part* AddPart(const std::string& name);
 	void AddPart(Part* part);
 
-	Part* FindPart(const string& name);
+	Part* FindPart(const std::string& name);
 
 	bool BuildPart(FEModel& fem, Part& part, bool buildDomains = true, const Transform& T = Transform());
 

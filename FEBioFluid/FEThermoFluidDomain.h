@@ -27,9 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <vector>
 #include "febiofluid_api.h"
-using namespace std;
 
 class FEModel;
 class FELinearSystem;
