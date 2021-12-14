@@ -238,12 +238,12 @@ enum SUPER_CLASS_ID {
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
-	FESURFACEPAIRINTERACTION_ID, 	// derived from FESurfacePairInteraction
+	FESURFACEINTERFACE_ID, 			// derived from FESurfaceInterface
 	FENODELOGDATA_ID,            	// derived from FENodeLogData
 	FEFACELOGDATA_ID,				// derived from FEFaceLogData
 	FEELEMLOGDATA_ID,            	// derived from FELogElemata
 	FEOBJLOGDATA_ID,            	// derived from FELogObjectData
-	FEBC_ID,						// derived from FEBoundaryCondition (TODO: This does not work yet)
+	FEBC_ID,						// derived from FEBoundaryCondition
 	FEGLOBALDATA_ID,				// derived from FEGlobalData
 	FERIGIDOBJECT_ID,				// derived from FECoreBase (TODO: work in progress)
 	FENLCLOGDATA_ID,             	// derived from FELogNLConstraintData
@@ -255,7 +255,7 @@ enum SUPER_CLASS_ID {
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
 	FESCALARGENERATOR_ID,			// derived from FEScalarValuator (TODO: work in progress)
-	FEVECTORGENERATOR_ID,			// derived from FEVectorValuator (NOTE: work in progress!)
+	FEVEC3DGENERATOR_ID,			// derived from FEVectorValuator (NOTE: work in progress!)
 	FEMAT3DGENERATOR_ID,			// derived from FEMAT3DValuator (NOTE: work in progress!)
 	FEMAT3DSGENERATOR_ID,			// derived from FEMAT3DSValuator (NOTE: work in progress!)
 	FEFUNCTION1D_ID,				// derived from FEFunction1D (TODO: work in progress)
@@ -269,7 +269,6 @@ enum SUPER_CLASS_ID {
 	FEITEMLIST_ID,                  // derived from FEItemList (NOTE: work in progress!)
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
-    FESURFACEPAIRINTERACTIONNL_ID,  // derived from FESurfacePairInteraction
 	FEDATARECORD_ID,				// derived from DataRecord
 	FELOGSURFACEDATA_ID,			// derived from FELogSurfaceData
 	FELOGDOMAINDATA_ID				// derived from FELogDomainData

@@ -644,7 +644,7 @@ const char* super_id_to_string(SUPER_CLASS_ID superID)
 	case FENLCONSTRAINT_ID: szclass = "NLCONSTRAINT"; break;
 	case FEPLOTDATA_ID: szclass = "PLOTDATA"; break;
 	case FEANALYSIS_ID: szclass = "ANALYSIS"; break;
-	case FESURFACEPAIRINTERACTION_ID: szclass = "SURFACEPAIRINTERACTION"; break;
+	case FESURFACEINTERFACE_ID: szclass = "SURFACEINTERFACE"; break;
 	case FENODELOGDATA_ID: szclass = "NODELOGDATA"; break;
 	case FEELEMLOGDATA_ID: szclass = "ELEMLOGDATA"; break;
 	case FEOBJLOGDATA_ID: szclass = "OBJLOGDATA"; break;
@@ -661,7 +661,7 @@ const char* super_id_to_string(SUPER_CLASS_ID superID)
 	case FEMODEL_ID: szclass = "MODEL"; break;
 	case FEMODELDATA_ID: szclass = "MODELDATA"; break;
 	case FESCALARGENERATOR_ID: szclass = "SCALARGENERATOR"; break;
-	case FEVECTORGENERATOR_ID: szclass = "VECTORGENERATOR"; break;
+	case FEVEC3DGENERATOR_ID: szclass = "VEC3DGENERATOR"; break;
 	case FEMAT3DGENERATOR_ID: szclass = "MAT3DGENERATOR"; break;
 	case FEFUNCTION1D_ID: szclass = "FUNCTION1D"; break;
 	case FELINEARSOLVER_ID: szclass = "LINEARSOLVER"; break;
