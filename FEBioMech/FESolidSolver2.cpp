@@ -54,14 +54,16 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
-	ADD_PARAMETER(m_Dtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
-    ADD_PARAMETER(m_rhoi         , "rhoi"        );
-    ADD_PARAMETER(m_alpha        , "alpha"       );
-	ADD_PARAMETER(m_beta         , "beta"        );
-	ADD_PARAMETER(m_gamma        , "gamma"       );
-	ADD_PARAMETER(m_logSolve     , "logSolve"    );
-	ADD_PARAMETER(m_arcLength    , "arc_length"  );
-	ADD_PARAMETER(m_al_scale     , "arc_length_scale");
+	ADD_PARAMETER(m_Dtol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
+	ADD_PARAMETER(m_Etol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
+	ADD_PARAMETER(m_Rtol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
+    ADD_PARAMETER(m_rhoi      , "rhoi"        );
+    ADD_PARAMETER(m_alpha     , "alpha"       );
+	ADD_PARAMETER(m_beta      , "beta"        );
+	ADD_PARAMETER(m_gamma     , "gamma"       );
+	ADD_PARAMETER(m_logSolve  , "logSolve"    );
+	ADD_PARAMETER(m_arcLength , "arc_length"  );
+	ADD_PARAMETER(m_al_scale  , "arc_length_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

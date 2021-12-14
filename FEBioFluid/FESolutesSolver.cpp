@@ -46,7 +46,9 @@ SOFTWARE.*/
 // define the parameter list
 BEGIN_FECORE_CLASS(FESolutesSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Ctol , "ctol"        );
-	ADD_PARAMETER(m_rhoi , "rhoi"        );
+    ADD_PARAMETER(m_Etol, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
+    ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
+    ADD_PARAMETER(m_rhoi , "rhoi"        );
 	ADD_PARAMETER(m_pred , "predictor"   );
 	ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
 END_FECORE_CLASS();

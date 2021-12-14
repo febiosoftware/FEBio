@@ -54,8 +54,6 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_breformAugment      , "reform_augment");
 	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
-	ADD_PARAMETER(m_Etol                , "etol"        );
-	ADD_PARAMETER(m_Rtol                , "rtol"        );
 	ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 
