@@ -271,7 +271,8 @@ enum SUPER_CLASS_ID {
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
 	FEDATARECORD_ID,				// derived from DataRecord
 	FELOGSURFACEDATA_ID,			// derived from FELogSurfaceData
-	FELOGDOMAINDATA_ID				// derived from FELogDomainData
+	FELOGDOMAINDATA_ID,				// derived from FELogDomainData
+	FECLASS_ID						// derivde from FECoreClass
 };
 
 ///////////////////////////////////////////////////////////////////////////////

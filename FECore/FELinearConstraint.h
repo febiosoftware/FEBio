@@ -28,29 +28,32 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBoundaryCondition.h"
+#include "FECoreClass.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
 //! linear constraint
+class FECORE_API FELinearConstraintDOF : public FECoreClass
+{
+public:
+	FELinearConstraintDOF(FEModel* fem);
+
+public:
+	int		node;	// node number
+	int		dof;	// degree of freedom
+	double	val;	// coefficient value (ignored for parent dof)
+
+private:
+	FELinearConstraintDOF(const FELinearConstraintDOF&) : FECoreClass(nullptr) {}
+	void operator = (const FELinearConstraintDOF&) {}
+
+	DECLARE_FECORE_CLASS();
+};
+
 class FECORE_API FELinearConstraint : public FEBoundaryCondition
 {
 public:
-	class FECORE_API DOF : public FEParamContainer
-	{
-	public:
-		DOF();
-
-	public:
-		int		node;	// node number
-		int		dof;	// degree of freedom
-		double	val;	// coefficient value (ignored for parent dof)
-
-	private:
-		DOF(const DOF&) {}
-		void operator = (const DOF&) {}
-	};
-
-	typedef std::vector<DOF*>::iterator dof_iterator;
+	typedef std::vector<FELinearConstraintDOF*>::iterator dof_iterator;
 
 public:
 	// constructors
@@ -86,7 +89,7 @@ public:
 
 	// add a child degree of freedom
 	void AddChildDof(int dof, int node, double v);
-	void AddChildDof(FELinearConstraint::DOF* dof);
+	void AddChildDof(FELinearConstraintDOF* dof);
 
 	// set the linear constraint offset
 	void SetOffset(double d) { m_off = d; }
@@ -95,15 +98,15 @@ public:
 	double GetOffset() const;
 
 	// get the child DOF
-	const DOF& GetChildDof(int n) const;
+	const FELinearConstraintDOF& GetChildDof(int n) const;
 
 	size_t Size() const;
 
 	dof_iterator begin();
 
 protected:
-	DOF*			m_parentDof;	// parent degree of freedom
-	std::vector<DOF*>	m_childDof;		// list of child dofs
+	FELinearConstraintDOF*				m_parentDof;	// parent degree of freedom
+	std::vector<FELinearConstraintDOF*>	m_childDof;		// list of child dofs
 	double			m_off;			// offset value
 
 	DECLARE_FECORE_CLASS();

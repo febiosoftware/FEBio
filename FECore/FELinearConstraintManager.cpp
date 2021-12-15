@@ -217,7 +217,7 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 					int ni = (int)lc.Size();
 					for (int j = 0; j<ni; ++j)
 					{
-						const FELinearConstraint::DOF& sj = lc.GetChildDof(j);
+						const FELinearConstraintDOF& sj = lc.GetChildDof(j);
 						int neq = mesh.Node(sj.node).m_ID[sj.dof];
 						lm[n++] = neq;
 					}
@@ -240,7 +240,7 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 	for (int i = 0; i<nlin; ++i, ++ic)
 	{
 		int ni = (int)ic->m_childDof.size();
-		vector<FELinearConstraint::DOF>::iterator is = ic->m_childDof.begin();
+		vector<FELinearConstraintDOF>::iterator is = ic->m_childDof.begin();
 		for (int j = 0; j<ni; ++j, ++is) 
 		{
 			int neq = mesh.Node(is->node).m_ID[is->dof];
@@ -273,7 +273,7 @@ void FELinearConstraintManager::PrepStep()
 		double v = 0;
 		for (int j=0; j<lc.Size(); ++j)
 		{
-			const FELinearConstraint::DOF& dofj = lc.GetChildDof(j);
+			const FELinearConstraintDOF& dofj = lc.GetChildDof(j);
 			FENode& nj = mesh.Node(dofj.node);
 			v += dofj.val* nj.get(dofj.dof);
 		}
@@ -323,7 +323,7 @@ bool FELinearConstraintManager::Activate()
 			int n = (int)lci.Size();
 			for (int k = 0; k<n; ++k)
 			{
-				const FELinearConstraint::DOF& childDOF = lci.GetChildDof(k);
+				const FELinearConstraintDOF& childDOF = lci.GetChildDof(k);
 				int n = m_LCT(childDOF.node, childDOF.dof);
 				if (n != -1)
 				{

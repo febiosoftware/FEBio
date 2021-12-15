@@ -99,6 +99,7 @@ REGISTER_FECORE_CLASS(FETimeStepController, "time_stepper");
 REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
 REGISTER_FECORE_CLASS(FELinearConstraint, "linear constraint");
+REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 
 // nodal loads
 REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
@@ -106,7 +107,7 @@ REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 // initial conditions
 REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     );
 
-// linear constraints
+// (augmented lagrangian) linear constraints
 REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
 
 // plot field

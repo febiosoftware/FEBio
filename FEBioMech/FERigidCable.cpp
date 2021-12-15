@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
 
-REGISTER_SUPER_CLASS(FERigidCablePoint, FEOBJECT_ID);
-
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreBase)
 	ADD_PARAMETER(m_rb, "rigid_body_id");

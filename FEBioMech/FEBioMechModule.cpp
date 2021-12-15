@@ -594,7 +594,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FERigidFollowerMoment, "rigid_follower_moment");
 	REGISTER_FECORE_CLASS(FERigidCable         , "rigid_cable");
 
-	REGISTER_FECORE_CLASS_EXPLICIT(FERigidCablePoint, FEOBJECT_ID, "rigid_cable_point");
+	REGISTER_FECORE_CLASS(FERigidCablePoint, "rigid_cable_point");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData

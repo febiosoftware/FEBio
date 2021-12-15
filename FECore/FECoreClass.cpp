@@ -23,50 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "FECoreClass.h"
 
+REGISTER_SUPER_CLASS(FECoreClass, FECLASS_ID);
 
+BEGIN_FECORE_CLASS(FECoreClass, FECoreBase)
+END_FECORE_CLASS();
 
-#pragma once
-#include "FERigidForce.h"
-#include <FECore/FECoreClass.h>
-
-class FERigidBody;
-
-class FERigidCablePoint : public FECoreClass
+FECoreClass::FECoreClass(FEModel* fem) : FECoreBase(fem)
 {
-public:
-	FERigidCablePoint(FEModel* fem) : FECoreClass(fem) {}
 
-public:
-	int		m_rb;	//!< rigid body ID
-	vec3d	m_pos;	//!< position of attachment point
-
-	DECLARE_FECORE_CLASS();
-};
-
-class FERigidCable : public FERigidLoad
-{
-public:
-	FERigidCable(FEModel* fem);
-
-	//! initialization
-	bool Init() override;
-
-	//! forces
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-
-	//! Stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-
-private:
-	void applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d& d, FEGlobalVector& R);
-
-private:
-	double	m_force;		//!< magnitude of force (i.e. tension in cable)
-	vec3d	m_forceDir;		//!< direction of force at cable's end
-	bool	m_brelative;	//!< positions are defined relative w.r.t. rigid body's COM or not
-	std::vector<FERigidCablePoint*>	m_points;
-
-private:
-	DECLARE_FECORE_CLASS();
-};
+}
