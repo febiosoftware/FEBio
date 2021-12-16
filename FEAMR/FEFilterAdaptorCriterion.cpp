@@ -39,6 +39,7 @@ FEMinMaxFilterAdaptorCriterion::FEMinMaxFilterAdaptorCriterion(FEModel* fem) : F
 	m_min = -1.0e37;
 	m_max =  1.0e37;
 	m_clamp = true;
+	m_data = nullptr;
 }
 
 bool FEMinMaxFilterAdaptorCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
