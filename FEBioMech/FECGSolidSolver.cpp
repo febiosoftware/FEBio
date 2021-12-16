@@ -487,7 +487,7 @@ bool FECGSolidSolver::SolveStep()
 	PrepStep();
 
 	// update stresses
-	fem.Update();
+	// fem.Update(); not needed as done in PrepStep
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -655,6 +655,7 @@ bool FECGSolidSolver::SolveStep()
 
 			// copy last calculated residual
 			m_R0 = m_R1;
+			Rold = m_R1;		// store residual for use next time
 		}
 		else if (m_baugment)
 		{
@@ -704,6 +705,7 @@ bool FECGSolidSolver::SolveStep()
 void FECGSolidSolver::Update(std::vector<double>& u)
 {
 	UpdateKinematics(u);
+	GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -780,7 +782,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 	double rmin = fabs(FA);
 
 	vector<double> ul(m_ui.size());
-
+	
 	// so we can set AA = 0 and FA= r0
 	// AB=s and we need to evaluate FB (called r1)
 	// n is a count of the number of linesearch attempts
@@ -795,7 +797,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 		{
 			Update(ul);
 			Residual(m_R1);
-		}
+				}
 		catch (...)
 		{
 			//					printf("reducing s at initial evaluation");
@@ -822,7 +824,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 
 		if (r > m_LStol)	// we need to search and find a better value of s
 		{
-			if (FB == FA) s = (AA + AB) * 1000;
+			if (fabs(FB-FA)<FB*1e-8) s = (AA + AB) * 1000; // if FB=FA (or nearly) the next step won't work, so make s much bigger
 			else {
 				s = (AA*FB - AB*FA) / (FB - FA);
 				s = min(s, 100 * max(AA, AB));
