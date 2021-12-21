@@ -95664,6 +95664,105 @@ reference "sec:Guidelines-for-Contact"
 \end_layout
 
 \begin_layout Section
+Guidelines for Dynamic Analyses
+\end_layout
+
+\begin_layout Standard
+A dynamic analysis differs from a quasi-static analysis in that the mass
+ inertia of the model is taken into account.
+ This adds an explicit time-dependency to the model (through the nodal velocitie
+s and accelerations) and therefore the solver needs to integrate the equations
+ of motion in time.
+ There are several integration schemes available in FEBio.
+ 
+\end_layout
+
+\begin_layout Subsection
+Implicit Dynamics Solver
+\end_layout
+
+\begin_layout Standard
+Talk about the implicit solver.
+\end_layout
+
+\begin_layout Subsection
+Explicit Dynamics Solver
+\end_layout
+
+\begin_layout Standard
+Talk about the explicit solver.
+ 
+\end_layout
+
+\begin_layout Subsection
+False Transient Analysis
+\end_layout
+
+\begin_layout Standard
+Quasi-static models may sometimes exhibit instabilities that may prevent
+ the default Newton-based solver from converging.
+ In such situations, a dynamic analysis can be tried instead, with the anticipat
+ion that the inertia of the model provides sufficient stability to solve
+ the model successfully.
+ Since in these situations, only the long-term quasi-static solution is
+ sought, it is important to damp the oscillations introduced by the dynamics
+ of the system.
+ Such damping can be accomplished several ways.
+ 
+\end_layout
+
+\begin_layout Standard
+The generalized-alpha time integration scheme of the implicit solver uses
+ several parameters that control the overall energy-conservation of the
+ model.
+ By choosing these parameters such that the system looses energy over time,
+ artifical damping can be introduced.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+rhoi
+\family default
+ control parameter controls the amount of artificial damping.
+ This parameters takes a value between 0 (more numerical damping) and 1
+ (least numerical damping).
+ Thus, by setting this value to 0, the most numerical damping can be introduced.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+rhoi
+\family default
+ control parameter sets the actual alpha, beta, gamma parameters of the
+ generalized-alpha rule.
+ Instead of using rhoi, users can set these actual parameters directly.
+ To introduce the most numerical damping, set the values as follows.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rhoi>-2</rhoi>             
+\end_layout
+
+\begin_layout LyX-Code
+<gamma>1.5</gamma>
+\end_layout
+
+\begin_layout LyX-Code
+<beta>1</beta>
+\end_layout
+
+\begin_layout Standard
+Note that rhoi needs to be set to -2 so that FEBio uses the actual alpha,
+ beta, gamma parameters.
+ 
+\end_layout
+
+\begin_layout Section
 Guidelines for Contact Problems
 \begin_inset CommandInset label
 LatexCommand label
