@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include "DumpStream.h"
 
 BEGIN_FECORE_CLASS(FELinearConstraintDOF, FECoreClass)
+	ADD_PARAMETER(node, "node");
+	ADD_PARAMETER(dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(val, "value");
 END_FECORE_CLASS();
 
