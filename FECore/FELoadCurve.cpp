@@ -33,9 +33,9 @@ SOFTWARE.*/
 #include "FEFunction1D.h"
 
 BEGIN_FECORE_CLASS(FELoadCurve, FELoadController)
-	ADD_PARAMETER(m_fnc.m_points, "points");
 	ADD_PARAMETER(m_fnc.m_fnc, "interpolate", 0, "STEP\0LINEAR\0SMOOTH\0CUBIC SPLINE\0CONTROL POINTS\0APPROXIMATION\0");
 	ADD_PARAMETER(m_fnc.m_ext, "extend"     , 0, "CONSTANT\0EXTRAPOLATE\0REPEAT\0REPEAT OFFSET\0");
+	ADD_PARAMETER(m_fnc.m_points, "points");
 END_FECORE_CLASS();
 
 FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem), m_fnc(fem)

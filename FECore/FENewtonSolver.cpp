@@ -58,11 +58,11 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 
 	// obsolete parameters (Should be set via the qn_method)
-	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0");
-	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
-	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
-	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
-	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
+	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
 
 	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Optional);
 END_FECORE_CLASS();
