@@ -91,36 +91,43 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     // Evaluate this field only for a specific domain, by checking domain name
     if (pcs->GetName() != GetDomainName()) return false;
     
-    FEMesh* m_pMesh = pcs->GetMesh();
-	int NF = pcs->Elements();
-
+    int NF = pcs->Elements();
+    double fn = 0;    // initialize
+    
     // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
     if (m_binit) {
         m_area.resize(NF);
-        for (int j=0; j<NF; ++j)
+        for (int j = 0; j<NF; ++j)
         {
             FESurfaceElement& el = pcs->Element(j);
-            m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+            m_area[j] = pcs->SurfaceNormal(el, 0, 0)*pcs->FaceArea(el);
         }
         m_binit = false;
     }
     
     // calculate net flow rate normal to this surface
-	FEDataStream tmp; tmp.reserve(NF * 3);
-	writeAverageElementValue<vec3d>(surf, tmp, [](const FEMaterialPoint& mp) {
-		const FEBiphasicMaterialPoint* ptb = mp.ExtractData<FEBiphasicMaterialPoint>();
-		return (ptb ? ptb->m_w : vec3d(0.0));
-	});
-
-	// weigh by area
-	double fn = 0;    // initialize
-	for (int j=0; j<NF; ++j)
+    for (int j = 0; j<NF; ++j)
     {
-		// get the fluid flux
-		vec3d wj = tmp.get<vec3d>(j);
-
-		// Evaluate contribution to net flow rate across surface.
-		fn += wj*m_area[j];
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0];
+        if (pe)
+        {
+            // evaluate the average fluid flux in this element
+            int nint = pe->GaussPoints();
+            vec3d w(0, 0, 0);
+            for (int n = 0; n<nint; ++n)
+            {
+                FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                FEBiphasicMaterialPoint* ptf = mp.ExtractData<FEBiphasicMaterialPoint>();
+                if (ptf) w += ptf->m_w;
+            }
+            w /= nint;
+            
+            // Evaluate contribution to net flow rate across surface.
+            fn += w*m_area[j];
+        }
     }
     
     // save results
