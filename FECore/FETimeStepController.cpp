@@ -118,10 +118,10 @@ bool FETimeStepController::Init()
 			FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
 			if (lc)
 			{
-				FEPointFunction& f = lc->GetFunction();
+				PointCurve& f = lc->GetFunction();
 				for (int i = 0; i < f.Points(); ++i)
 				{
-					double ti = f.LoadPoint(i).time;
+					double ti = f.Point(i).x();
 					m_must_points.push_back(ti);
 				}
 			}
@@ -202,7 +202,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	if (m_nmplc >= 0)
 	{
 		FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem->GetLoadController(m_nmplc)));
-		FEPointFunction& lc = mpc.GetFunction();
+		PointCurve& lc = mpc.GetFunction();
 		dtmax = lc.value(told);
 	}
 

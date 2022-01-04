@@ -33,16 +33,16 @@ SOFTWARE.*/
 #include "FEFunction1D.h"
 
 BEGIN_FECORE_CLASS(FELoadCurve, FELoadController)
-	ADD_PARAMETER(m_fnc.m_fnc, "interpolate", 0, "STEP\0LINEAR\0SMOOTH\0CUBIC SPLINE\0CONTROL POINTS\0APPROXIMATION\0");
-	ADD_PARAMETER(m_fnc.m_ext, "extend"     , 0, "CONSTANT\0EXTRAPOLATE\0REPEAT\0REPEAT OFFSET\0");
-	ADD_PARAMETER(m_fnc.m_points, "points");
+	ADD_PARAMETER(m_int, "interpolate", 0, "STEP\0LINEAR\0SMOOTH\0CUBIC SPLINE\0CONTROL POINTS\0APPROXIMATION\0");
+	ADD_PARAMETER(m_ext, "extend"     , 0, "CONSTANT\0EXTRAPOLATE\0REPEAT\0REPEAT OFFSET\0");
+	ADD_PARAMETER(m_points, "points");
 END_FECORE_CLASS();
 
-FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem), m_fnc(fem)
+FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem)
 {
 }
 
-FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc), m_fnc(lc.GetFEModel())
+FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc)
 {
 	m_fnc = lc.m_fnc;
 }
@@ -57,10 +57,36 @@ FELoadCurve::~FELoadCurve()
 	
 }
 
+bool FELoadCurve::Init()
+{
+	m_fnc.SetInterpolator(m_int);
+	m_fnc.SetExtendMode(m_ext);
+	m_fnc.SetPoints(m_points);
+	if (m_fnc.Update() == false) return false;
+	return FELoadController::Init();
+}
+
 void FELoadCurve::Serialize(DumpStream& ar)
 {
 	FELoadController::Serialize(ar);
-	m_fnc.Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+	{
+		ar << m_int << m_ext;
+		ar << m_points;
+	}
+	else
+	{
+		ar >> m_int >> m_ext;
+		ar >> m_points;
+
+		m_fnc.Clear();
+		m_fnc.SetInterpolator(m_int);
+		m_fnc.SetExtendMode(m_ext);
+		m_fnc.SetPoints(m_points);
+		m_fnc.Update();
+	}
 }
 
 //! evaluates the loadcurve at time
@@ -85,17 +111,12 @@ void FELoadCurve::Clear()
 	m_fnc.Clear();
 }
 
-bool FELoadCurve::Init()
+void FELoadCurve::SetInterpolation(PointCurve::INTFUNC f)
 {
-    return m_fnc.Init();
+	m_fnc.SetInterpolator(f);
 }
 
-void FELoadCurve::SetInterpolation(FEPointFunction::INTFUNC f)
-{
-	m_fnc.SetInterpolation(f);
-}
-
-void FELoadCurve::SetExtendMode(FEPointFunction::EXTMODE f)
+void FELoadCurve::SetExtendMode(PointCurve::EXTMODE f)
 {
 	m_fnc.SetExtendMode(f);
 }

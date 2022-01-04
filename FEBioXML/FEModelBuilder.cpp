@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/log.h>
 #include <FECore/FEModule.h>
+#include <FECore/FEPointFunction.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -803,7 +804,7 @@ void FEModelBuilder::ApplyLoadcurvesToFunctions()
 		FELoadController* plc = fem.GetLoadController(m.lc); assert(plc);
 		FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
 
-		FEPointFunction& f = lc->GetFunction();
+		PointCurve& f = lc->GetFunction();
 
 		m.pf->CopyFrom(f);
 		if (m.scale != 1.0) m.pf->Scale(m.scale);
