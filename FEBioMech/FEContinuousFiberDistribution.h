@@ -42,6 +42,9 @@ public:
     FEContinuousFiberDistribution(FEModel* pfem);
     ~FEContinuousFiberDistribution();
     
+    // returns a pointer to a new material point object
+    FEMaterialPoint* CreateMaterialPointData() override;
+    
     // Initialization
     bool Init() override;
 

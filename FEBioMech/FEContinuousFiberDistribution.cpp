@@ -50,6 +50,12 @@ FEContinuousFiberDistribution::FEContinuousFiberDistribution(FEModel* pfem) : FE
 FEContinuousFiberDistribution::~FEContinuousFiberDistribution() {}
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEContinuousFiberDistribution::CreateMaterialPointData()
+{
+    return m_pFmat->CreateMaterialPointData();
+}
+
+//-----------------------------------------------------------------------------
 bool FEContinuousFiberDistribution::Init()
 {
     // initialize base class
