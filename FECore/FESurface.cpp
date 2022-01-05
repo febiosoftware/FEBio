@@ -97,6 +97,7 @@ void FESurface::Create(const FEFacetSet& set)
 		else if (fi.ntype == 7) el.SetType(FE_TRI7G4);
 		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
 		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+		else if (fi.ntype == 10) el.SetType(FE_TRI10G7);
 		else assert(false);
 
 		int N = el.Nodes(); assert(N == fi.ntype);
