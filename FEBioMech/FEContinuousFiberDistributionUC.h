@@ -58,7 +58,7 @@ public:
 private:
 	double IntegratedFiberDensity(FEMaterialPoint& pt);
 
-public:
+protected:
     FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*	m_pFint;    // pointer to fiber integration scheme

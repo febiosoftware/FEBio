@@ -131,6 +131,10 @@ public:
 	int CheckGeneration(const double t);
 
 public:
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
+    
+public:
 	std::vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list

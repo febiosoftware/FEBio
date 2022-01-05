@@ -131,6 +131,26 @@ double FEUncoupledMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
+//! The strain energy density function calculates the total sed as a sum of
+//! two terms, namely the deviatoric sed and U(J).
+double FEUncoupledMaterial::StrongBondSED(FEMaterialPoint &mp)
+{
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // calculate the stress as a sum of deviatoric stress and pressure
+    return U(pt.m_J) + StrongBondDevSED(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! The strain energy density function calculates the total sed as a sum of
+//! two terms, namely the deviatoric sed and U(J).
+double FEUncoupledMaterial::WeakBondSED(FEMaterialPoint &mp)
+{
+    // calculate the stress as a sum of deviatoric stress and pressure
+    return WeakBondDevSED(mp);
+}
+
+//-----------------------------------------------------------------------------
 FEMaterialPoint* FEUncoupledMaterial::CreateMaterialPointData()
 {
 	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();

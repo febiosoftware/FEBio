@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEUncoupledMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation reactive viscoelastic material
@@ -54,7 +55,9 @@ public:
     void SetBondMaterial(FEUncoupledMaterial* pbond) { m_pBond = pbond; }
     
 public:
-    
+    //! data initialization
+    bool Init() override;
+
     //! stress function
     mat3ds DevStress(FEMaterialPoint& pt) override;
     mat3ds DevStressStrongBonds(FEMaterialPoint& pt);
@@ -67,8 +70,8 @@ public:
 
     //! strain energy density function
     double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
-    double DevStrainEnergyDensityStrongBonds(FEMaterialPoint& pt);
-    double DevStrainEnergyDensityWeakBonds(FEMaterialPoint& pt);
+    double StrongBondDevSED(FEMaterialPoint& pt) override;
+    double WeakBondDevSED(FEMaterialPoint& pt) override;
 
     //! cull generations
     void CullGenerations(FEMaterialPoint& pt);
@@ -100,6 +103,8 @@ public:
     double  m_emin;     //!< strain threshold for triggering new generation
 
     int     m_nmax;     //!< highest number of generations achieved in analysis
+    
+    FEFunction1D*   m_scale;    //!< scale factor (used if m_pBond not specified)
     
     DECLARE_FECORE_CLASS();
 };
