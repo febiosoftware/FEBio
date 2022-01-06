@@ -30,6 +30,34 @@ SOFTWARE.*/
 #include "FEReactiveVEMaterialPoint.h"
 #include "FEElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
+FEReactiveViscoelasticMaterialPoint::FEReactiveViscoelasticMaterialPoint() : FEMaterialPointArray(new FEElasticMaterialPoint)
+{
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEReactiveViscoelasticMaterialPoint::Copy()
+{
+    FEReactiveViscoelasticMaterialPoint* pt = new FEReactiveViscoelasticMaterialPoint;
+    pt->m_mp = m_mp;
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEReactiveViscoelasticMaterialPoint::Init()
+{
+    // don't forget to initialize the base class
+    FEMaterialPointArray::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEReactiveViscoelasticMaterialPoint::Serialize(DumpStream& ar)
+{
+    FEMaterialPointArray::Serialize(ar);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FEReactiveVEMaterialPoint

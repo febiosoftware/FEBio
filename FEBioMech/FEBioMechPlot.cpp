@@ -3504,77 +3504,64 @@ bool FEPlotRVEgenerations::Save(FEDomain& dom, FEDataStream& a)
     int N = dom.Elements();
     FEElasticMaterial* pmat = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
     if (pmat == nullptr) return false;
-    if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat))
-    {
-        int NC = pmat->Properties();
-        for (int i=0; i<N; ++i)
+    FEReactiveViscoelasticMaterial* rvmat = dynamic_cast<FEReactiveViscoelasticMaterial*>(pmat);
+    FEUncoupledReactiveViscoelasticMaterial* rumat = dynamic_cast<FEUncoupledReactiveViscoelasticMaterial*>(pmat);
+    if (rvmat) {
+        for (int iel=0; iel<N; ++iel)
         {
-            FEElement& el = dom.ElementRef(i);
+            FEElement& el = dom.ElementRef(iel);
             
-            float D = 0.f;
             int nint = el.GaussPoints();
+            double bmf = 0;
             for (int j=0; j<nint; ++j)
-            {
-                FEElasticMixtureMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMixtureMaterialPoint>();
-                for (int k=0; k<NC; ++k)
-                {
-                    FEReactiveVEMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEReactiveVEMaterialPoint>();
-                    if (ppd) D += (float) ppd->m_v.size();
-                }
-            }
-            D /= (float) nint;
-            a.push_back(D);
+                bmf += rvmat->RVEGenerations(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
+            a << bmf/nint;
         }
     }
-    else if (dynamic_cast<FEElasticMultigeneration*>(pmat))
-    {
-        FEElasticMultigeneration* pmg = dynamic_cast<FEElasticMultigeneration*>(pmat);
-        int NC = pmg->Properties();
-        for (int i=0; i<N; ++i)
+    else if (rumat) {
+        for (int iel=0; iel<N; ++iel)
         {
-            FEElement& el = dom.ElementRef(i);
+            FEElement& el = dom.ElementRef(iel);
             
-            float D = 0.f;
             int nint = el.GaussPoints();
+            double bmf = 0;
             for (int j=0; j<nint; ++j)
-            {
-                FEMultigenerationMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEMultigenerationMaterialPoint>();
-                for (int k=0; k<NC; ++k)
-                {
-                    FEReactiveVEMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEReactiveVEMaterialPoint>();
-                    FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
-                    if (ppd) D += (float) ppd->m_v.size();
-                    else if (pem)
+                bmf += rumat->RVEGenerations(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
+            a << bmf/nint;
+        }
+    }
+    else {
+        int NC = pmat->Properties();
+        // check all elements
+        for (int iel=0; iel<N; ++iel)
+        {
+            FEElement& el = dom.ElementRef(iel);
+            
+            int n = 0;
+            double bmf = 0;
+            // check all properties
+            for (int ic=0; ic < NC; ++ic) {
+                FEReactiveViscoelasticMaterial* rvmat = pmat->GetProperty(ic)->ExtractProperty<FEReactiveViscoelasticMaterial>();
+                FEUncoupledReactiveViscoelasticMaterial* rumat = dynamic_cast<FEUncoupledReactiveViscoelasticMaterial*>(pmat);
+                if (rvmat) {
+                    int nint = el.GaussPoints();
+                    for (int j=0; j<nint; ++j)
                     {
-                        int NE = (int)pem->m_w.size();
-                        for (int l=0; l<NE; ++l)
-                        {
-                            FEReactiveVEMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveVEMaterialPoint>();
-                            if (ppd) D += (float) ppd->m_v.size();
-                        }
+                        bmf += rvmat->RVEGenerations(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
+                        ++n;
+                    }
+                }
+                else if (rumat) {
+                    int nint = el.GaussPoints();
+                    for (int j=0; j<nint; ++j)
+                    {
+                        bmf += rumat->RVEGenerations(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
+                        ++n;
                     }
                 }
             }
-            D /= (float) nint;
-            a.push_back(D);
-        }
-    }
-    else
-    {
-        for (int i=0; i<N; ++i)
-        {
-            FEElement& el = dom.ElementRef(i);
-            
-            float D = 0.f;
-            int nint = el.GaussPoints();
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-                FEReactiveVEMaterialPoint* ppd = pt.ExtractData<FEReactiveVEMaterialPoint>();
-                if (ppd) D += (float) ppd->m_v.size();
-            }
-            D /= (float) nint;
-            a.push_back(D);
+            if (n > 0) bmf /= n;
+            a << bmf;
         }
     }
 
@@ -3597,7 +3584,7 @@ bool FEPlotRVEbonds::Save(FEDomain& dom, FEDataStream& a)
             int nint = el.GaussPoints();
             double bmf = 0;
             for (int j=0; j<nint; ++j)
-                bmf += rvmat->ReformingBondMassFraction(*el.GetMaterialPoint(j));
+                bmf += rvmat->ReformingBondMassFraction(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
             a << bmf/nint;
         }
     }
@@ -3609,7 +3596,7 @@ bool FEPlotRVEbonds::Save(FEDomain& dom, FEDataStream& a)
             int nint = el.GaussPoints();
             double bmf = 0;
             for (int j=0; j<nint; ++j)
-                bmf += rumat->ReformingBondMassFraction(*el.GetMaterialPoint(j));
+                bmf += rumat->ReformingBondMassFraction(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
             a << bmf/nint;
         }
     }
@@ -3630,7 +3617,7 @@ bool FEPlotRVEbonds::Save(FEDomain& dom, FEDataStream& a)
                     int nint = el.GaussPoints();
                     for (int j=0; j<nint; ++j)
                     {
-                        bmf += rvmat->ReformingBondMassFraction(*el.GetMaterialPoint(j)->GetPointData(ic));
+                        bmf += rvmat->ReformingBondMassFraction(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
                         ++n;
                     }
                 }
@@ -3638,7 +3625,7 @@ bool FEPlotRVEbonds::Save(FEDomain& dom, FEDataStream& a)
                     int nint = el.GaussPoints();
                     for (int j=0; j<nint; ++j)
                     {
-                        bmf += rumat->ReformingBondMassFraction(*el.GetMaterialPoint(j)->GetPointData(ic));
+                        bmf += rumat->ReformingBondMassFraction(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
                         ++n;
                     }
                 }

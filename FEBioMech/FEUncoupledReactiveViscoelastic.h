@@ -85,12 +85,21 @@ public:
     //! detect new generation
     bool NewGeneration(FEMaterialPoint& pt);
     
+    //! return number of generations
+    int RVEGenerations(FEMaterialPoint& pt);
+    
     //! returns a pointer to a new material point object
     FEMaterialPoint* CreateMaterialPointData() override;
 
     //! specialized material points
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
+    //! get base material point
+    FEMaterialPoint* GetBaseMaterialPoint(FEMaterialPoint& mp);
+    
+    //! get bond material point
+    FEMaterialPoint* GetBondMaterialPoint(FEMaterialPoint& mp);
+    
 private:
     FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEUncoupledMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds

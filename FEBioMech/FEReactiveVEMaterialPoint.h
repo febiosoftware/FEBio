@@ -36,6 +36,25 @@ class FEReactiveViscoelasticMaterial;
 class FEUncoupledReactiveViscoelasticMaterial;
 
 //-----------------------------------------------------------------------------
+//! Material point data array for reactive viscoelastic materials
+//!
+class FEReactiveViscoelasticMaterialPoint : public FEMaterialPointArray
+{
+public:
+    //! constructor
+    FEReactiveViscoelasticMaterialPoint();
+    
+    //! Copy material point data
+    FEMaterialPoint* Copy();
+    
+    //! material point initialization
+    void Init();
+    
+    //! data serialization
+    void Serialize(DumpStream& ar);
+};
+
+//-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
 class FEReactiveVEMaterialPoint : public FEMaterialPoint
 {
