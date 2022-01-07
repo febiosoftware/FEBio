@@ -51,8 +51,7 @@ BEGIN_FECORE_CLASS(FEReactiveViscoelasticMaterial, FEElasticMaterial)
 
 	// set material properties
 	ADD_PROPERTY(m_pBase, "elastic");
-	ADD_PROPERTY(m_pBond, "bond", FEProperty::Optional);
-    ADD_PROPERTY(m_scale, "scale", FEProperty::Optional);
+	ADD_PROPERTY(m_pBond, "bond");
 	ADD_PROPERTY(m_pRelx, "relaxation");
 
 END_FECORE_CLASS();
@@ -70,7 +69,6 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
 
 	m_pBase = nullptr;
 	m_pBond = nullptr;
-    m_scale = nullptr;
 	m_pRelx = nullptr;
     
 }
@@ -90,29 +88,6 @@ bool FEReactiveViscoelasticMaterial::Init()
 		feLogError("Bond material should not be of type uncoupled");
 		return false;
 	}
-    
-    // check number of elastic mixtures -- only one allowed, otherwise FEBio
-    // does not know which FEElasticMixtureMaterialPoint to access
-    int nmix = 0;
-    if (dynamic_cast<FEElasticMixture*>(GetParent())) nmix++;
-    if (dynamic_cast<FEElasticMixture*>(m_pBase)) nmix++;
-    if (dynamic_cast<FEElasticMixture*>(m_pBond)) nmix++;
-    
-    if (nmix > 1) {
-        feLogError("Parent, Elastic, and Bond materials of reactive viscoelastic material cannot include more than one elastic mixture");
-        return false;
-    }
-    
-    if (m_pBond == nullptr) {
-        if (m_scale == nullptr) {
-            feLogError("Either a bond material or a scale factor must be provided in a reactive viscoelastic material");
-            return false;
-        }
-        else {
-            m_pBond = new FEScaledElasticMaterial(GetFEModel(),m_pBase,m_scale);
-            assert(m_pBase);
-        }
-    }
     
     if (!m_pBase->Init()) return false;
     if (!m_pBond->Init()) return false;

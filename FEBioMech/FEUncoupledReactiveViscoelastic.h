@@ -113,7 +113,5 @@ public:
 
     int     m_nmax;     //!< highest number of generations achieved in analysis
     
-    FEFunction1D*   m_scale;    //!< scale factor (used if m_pBond not specified)
-    
     DECLARE_FECORE_CLASS();
 };
