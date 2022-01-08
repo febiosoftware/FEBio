@@ -31215,7 +31215,7 @@ The coefficients
  Alternatively, we could have written
 \begin_inset Formula 
 \begin{equation}
-g\left(t\right)=\sum_{i=1}^{6}\hat{\gamma}_{i}e^{-t/\tau_{i}}\,,\quad\sum_{i=1}^{6}\hat{\gamma}_{i}=1\,.\label{eq:rrf-Prony-alt}
+g\left(t\right)=\sum_{i}\hat{\gamma}_{i}e^{-t/\tau_{i}}\,,\quad\sum_{i}\hat{\gamma}_{i}=1\,.\label{eq:rrf-Prony-alt}
 \end{equation}
 
 \end_inset
@@ -31228,7 +31228,7 @@ This type of relaxation function
 \begin_inset Formula $\hat{\gamma}_{i}$
 \end_inset
 
- for each 
+ corresponding to each 
 \begin_inset Formula $\tau_{i}$
 \end_inset
 
@@ -31368,7 +31368,7 @@ literal "false"
 \hat{\gamma}\left(\tau\right)=\begin{cases}
 \frac{\left(\beta-1\right)\left(\tau_{1}\tau_{2}\right)^{\beta}}{\tau_{1}\tau_{2}^{\beta}-\tau_{1}^{\beta}\tau_{2}}\frac{1}{\tau^{\beta}} & \tau_{1}\le\tau\le\tau_{2}\\
 0 & \text{otherwise}
-\end{cases}\,,\quad\beta<1\,.\label{eq:rrf-Malkin-spectrum}
+\end{cases}\,.\label{eq:rrf-Malkin-spectrum}
 \end{equation}
 
 \end_inset
