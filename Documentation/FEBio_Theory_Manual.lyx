@@ -31349,8 +31349,8 @@ g\left(t\right)=\frac{\tau_{2}e^{-t/\tau_{2}}-\tau_{1}e^{-t/\tau_{1}}+t\left[\Ei
 \end_layout
 
 \begin_layout Standard
-A generalization of Fung's earlier continuous relaxation spectrum was given
- by Malkin 
+A generalization of Fung's earlier continuous relaxation spectrum may be
+ derived from the work of Malkin 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Malkin06"
@@ -31362,11 +31362,16 @@ literal "false"
 \begin_inset Formula $\tau^{-\beta}$
 \end_inset
 
-,
+.
+ If we constrain this spectrum to the range 
+\begin_inset Formula $\tau_{1}\le\tau\le\tau_{2}$
+\end_inset
+
+ it takes the form
 \begin_inset Formula 
 \begin{equation}
 \hat{\gamma}\left(\tau\right)=\begin{cases}
-\frac{\left(\beta-1\right)\left(\tau_{1}\tau_{2}\right)^{\beta}}{\tau_{1}\tau_{2}^{\beta}-\tau_{1}^{\beta}\tau_{2}}\frac{1}{\tau^{\beta}} & \tau_{1}\le\tau\le\tau_{2}\\
+\frac{\beta-1}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\frac{1}{\tau^{\beta}} & \tau_{1}\le\tau\le\tau_{2}\\
 0 & \text{otherwise}
 \end{cases}\,.\label{eq:rrf-Malkin-spectrum}
 \end{equation}
@@ -31383,7 +31388,7 @@ noprefix "false"
 
 \end_inset
 
-, this continuous relaxation spectrum produces the reduced relaxation function
+ this continuous relaxation spectrum produces the reduced relaxation function
 \begin_inset Formula 
 \begin{equation}
 g\left(t\right)=\frac{\left(\beta-1\right)t^{1-\beta}}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\left[\Gamma\left(\beta-1,\frac{t}{\tau_{2}}\right)-\Gamma\left(\beta-1,\frac{t}{\tau_{1}}\right)\right]\,.\label{eq:rrf-Malkin}
