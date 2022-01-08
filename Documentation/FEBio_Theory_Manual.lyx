@@ -30812,19 +30812,28 @@ generation weak bonds relative to their reference configuration
 , which may be evaluated from the chain rule, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\mathbf{F}\left(\mathbf{X},u\right)\,.\label{eq492}
+\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\mathbf{U}\left(\mathbf{X},u\right)\,,\label{eq492}
 \end{equation}
 
 \end_inset
 
-The strain energy density 
+where 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is the right-stretch tensor of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ The strain energy density 
 \begin_inset Formula $\Psi_{r}$
 \end_inset
 
  in a reactive viscoelastic material is given by 
 \begin_inset Formula 
 \begin{equation}
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}J^{us}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq493}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq493}
 \end{equation}
 
 \end_inset
@@ -30839,25 +30848,6 @@ where
 
  is the strain energy density of weak bonds, when they all belong to the
  same generation.
- The scale factor 
-\begin_inset Formula $J^{us}$
-\end_inset
-
- emerges as explained in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Mixture-Free-Energy"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
  In this expression, 
 \begin_inset Formula $w^{u}\left(\mathbf{X},t\right)$
 \end_inset
@@ -30893,7 +30883,7 @@ noprefix "false"
  in a reactive viscoelastic material is similarly given by 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\boldsymbol{\sigma}^{e}\left(\mathbf{F}^{s}\right)+\sum\limits _{u}w^{u}\boldsymbol{\sigma}_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq494}
+\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\boldsymbol{\sigma}^{e}\left(\mathbf{F}^{s}\right)+\sum\limits _{u}w^{u}J^{-1}\left(u\right)\boldsymbol{\sigma}_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq494}
 \end{equation}
 
 \end_inset
@@ -30924,7 +30914,7 @@ The mass fractions
  mixtures, 
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial w^{u}}{\partial t}=\hat{w}^{u}\left(\mathbf{F},w^{\gamma}\right)\,,\label{eq496}
+\dot{w}^{u}=\hat{w}^{u}\left(\mathbf{F},w^{\gamma}\right)\,,\label{eq496}
 \end{equation}
 
 \end_inset
@@ -30979,7 +30969,7 @@ generation bonds reforming in an unloaded state during the time interval
 w^{u}\left(\mathbf{X},t\right)=\begin{cases}
 0 & t<u\\
 f^{u}\left(\mathbf{X},t\right) & u\leqslant t<v\\
-f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
+f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
 \end{cases}\,,\label{eq498}
 \end{equation}
 
@@ -30994,7 +30984,7 @@ f^{u}\left(\mathbf{X},t\right)=1-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{
 \end_inset
 
 and 
-\begin_inset Formula $g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right)$
+\begin_inset Formula $g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right)$
 \end_inset
 
  is a reduced relaxation function which may assume any number of valid forms.
@@ -31018,15 +31008,15 @@ and
 \begin_inset Formula $g$
 \end_inset
 
- may depend on the strain at time 
+ may depend on the state of strain at time 
 \begin_inset Formula $v$
 \end_inset
 
- relative to the reference configuration of the 
+ when the 
 \begin_inset Formula $u-$
 \end_inset
 
-generation.
+generation starts breaking and reforming.
  In the recursive expression of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -31047,7 +31037,7 @@ reference "eq498"
 \end_inset
 
  and 
-\begin_inset Formula $w^{u}\left(t\right)=g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right)$
+\begin_inset Formula $w^{u}\left(t\right)=g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right)$
 \end_inset
 
  for 
@@ -31090,6 +31080,8 @@ For this type of bond kinetics, the reduced relaxation function
 \end_inset
 
 .
+ Thus, type II bond kinetics is only valid for quasilinear viscoelasticity,
+ whereas type I bond kinetics also encompasses nonlinear viscoelasticity.
 \end_layout
 
 \begin_layout Standard
@@ -31101,16 +31093,37 @@ For all bond kinetics, it is also possible to constrain the occurrence of
 
 \begin_layout Standard
 The finite element implementation of reactive viscoelasticity stores the
- value of 
-\begin_inset Formula $\mathbf{F}^{-1}\left(\mathbf{X},u\right)$
+ value of time 
+\begin_inset Formula $v$
 \end_inset
 
- every time that a bond-breaking deformation is detected; this value can
- be used to evaluate 
-\begin_inset Formula $\mathbf{F}^{u}\left(\mathbf{X},t\right)$
+, mass fraction of reformed bonds 
+\begin_inset Formula $f^{u}\left(\mathbf{X},v\right)$
 \end_inset
 
- using Eq.
+, and the right stretch tensor 
+\begin_inset Formula $\mathbf{U}\left(\mathbf{X},v\right)$
+\end_inset
+
+ needed to evaluate 
+\begin_inset Formula $w^{u}$
+\end_inset
+
+ in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq498"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}^{v}\left(\mathbf{X},t\right)$
+\end_inset
+
+ in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq492"
@@ -31118,50 +31131,316 @@ reference "eq492"
 \end_inset
 
 .
- It also stores 
-\begin_inset Formula $w^{u}\left(\mathbf{X},v\right)=f^{u}\left(\mathbf{X},v\right)$
-\end_inset
+\end_layout
 
-, where 
-\begin_inset Formula $v$
-\end_inset
-
- is the time step immediately following 
-\begin_inset Formula $u$
-\end_inset
-
-, which is then used for evaluating 
-\begin_inset Formula $w^{u}$
-\end_inset
-
- for subsequent time steps 
-\begin_inset Formula $t>v$
-\end_inset
-
- when using Type I bond kinetics, using the expressions of Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq498"
+\begin_layout Subsection
+Reduced Relaxation Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Reduced-Relaxation-Functions"
 
 \end_inset
 
- and Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq499"
+
+\end_layout
+
+\begin_layout Standard
+Reduced relaxation functions are monotonically decreasing functions of time
+ 
+\begin_inset Formula $g\left(t\right)$
+\end_inset
+
+ that satisfy 
+\begin_inset Formula $g\left(0\right)=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\lim_{t\to\infty}g\left(t\right)=0$
+\end_inset
+
+.
+ Many different forms of reduced relaxation functions are available in FEBio,
+ given in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio User's Manual}}
+\end_layout
 
 \end_inset
 
 .
- These measures are then used to evaluate the stress from Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq494"
+ The simplest and most commonly used relaxation function is the exponential
+ function 
+\begin_inset Formula $g\left(t\right)=e^{-t/\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $\tau$
+\end_inset
+
+ is the relaxation constant.
+ In viscoelasticity theory it is common to use a combination of relaxation
+ functions with distinct relaxation constants 
+\begin_inset Formula $\tau_{i}$
+\end_inset
+
+, described as a Prony series of the form 
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\sum_{i}\gamma_{i}e^{-t/\tau_{i}}}{\sum_{i}\gamma_{i}}\,.\label{eq:rrf-Prony}
+\end{equation}
 
 \end_inset
 
-, with the summation taken over the time steps that correspond to bond-reforming
- generations.
+The coefficients 
+\begin_inset Formula $\gamma_{i}$
+\end_inset
+
+ are normalized by 
+\begin_inset Formula $\sum_{i}\gamma_{i}$
+\end_inset
+
+ to enforce 
+\begin_inset Formula $g\left(0\right)=1$
+\end_inset
+
+.
+ Alternatively, we could have written
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\sum_{i=1}^{6}\hat{\gamma}_{i}e^{-t/\tau_{i}}\,,\quad\sum_{i=1}^{6}\hat{\gamma}_{i}=1\,.\label{eq:rrf-Prony-alt}
+\end{equation}
+
+\end_inset
+
+This type of relaxation function 
+\begin_inset Formula $g\left(t\right)$
+\end_inset
+
+ is said to have a discrete spectrum of coefficients 
+\begin_inset Formula $\hat{\gamma}_{i}$
+\end_inset
+
+ for each 
+\begin_inset Formula $\tau_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is also possible to define a continuous relaxation spectrum 
+\begin_inset Formula $\hat{\gamma}\left(\tau\right)$
+\end_inset
+
+ such that the reduced relaxation function is given by
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\int_{0}^{\infty}\hat{\gamma}\left(\tau\right)e^{-t/\tau}\,d\tau\,.\label{eq:rrf-g-continuous-spectrum}
+\end{equation}
+
+\end_inset
+
+To satisfy 
+\begin_inset Formula $g\left(0\right)=1$
+\end_inset
+
+ the continous relaxation spectrum 
+\begin_inset Formula $\hat{\gamma}\left(\tau\right)$
+\end_inset
+
+ must satisfy
+\begin_inset Formula 
+\begin{equation}
+\int_{0}^{\infty}\hat{\gamma}\left(\tau\right)\,d\tau=1\,.\label{eq:rrf-continuous-spectrum-constraint}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, Fung 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Fung72"
+literal "false"
+
+\end_inset
+
+ proposed a relaxation spectrum of the form
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\begin{cases}
+\frac{1}{\ln\frac{\tau_{2}}{\tau_{1}}}\frac{1}{\tau} & \tau_{1}\le\tau\le\tau_{2}\\
+0 & \text{otherwise}
+\end{cases}\,.\label{eq:rrf-Fung-spectrum-72}
+\end{equation}
+
+\end_inset
+
+When substituted into Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-g-continuous-spectrum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ it produces
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\Gamma\left(0,\frac{t}{\tau_{2}}\right)-\Gamma\left(0,\frac{t}{\tau_{1}}\right)}{\ln\frac{\tau_{2}}{\tau_{1}}}=\frac{-\Ei\left(-\frac{t}{\tau_{2}}\right)+\Ei\left(-\frac{t}{\tau_{1}}\right)}{\ln\frac{\tau_{2}}{\tau_{1}}}\,,\label{eq:rrf-Fung-72}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Gamma\left(a,z\right)$
+\end_inset
+
+ is the incomplete gamma function and 
+\begin_inset Formula $\Ei\left(z\right)$
+\end_inset
+
+ is the exponential integral function, which satisfy 
+\begin_inset Formula $\Gamma\left(0,z\right)=-\Ei\left(-z\right)$
+\end_inset
+
+.
+ An alternative model proposed later by Fung 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Fung81"
+literal "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\begin{cases}
+\frac{1}{\tau_{2}-\tau_{1}} & \tau_{1}\le\tau\le\tau_{2}\\
+0 & \text{otherwise}
+\end{cases}\,,\label{eq:rrf-Fung-spectrum-81}
+\end{equation}
+
+\end_inset
+
+which produces
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\tau_{2}e^{-t/\tau_{2}}-\tau_{1}e^{-t/\tau_{1}}+t\left[\Ei\left(-\frac{t}{\tau_{2}}\right)-\Ei\left(-\frac{t}{\tau_{1}}\right)\right]}{\tau_{2}-\tau_{1}}\,.\label{eq:rrf-Fung-81}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generalization of Fung's earlier continuous relaxation spectrum was given
+ by Malkin 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Malkin06"
+literal "false"
+
+\end_inset
+
+ who proposed to use a function proportional to 
+\begin_inset Formula $\tau^{-\beta}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\begin{cases}
+\frac{\left(\beta-1\right)\left(\tau_{1}\tau_{2}\right)^{\beta}}{\tau_{1}\tau_{2}^{\beta}-\tau_{1}^{\beta}\tau_{2}}\frac{1}{\tau^{\beta}} & \tau_{1}\le\tau\le\tau_{2}\\
+0 & \text{otherwise}
+\end{cases}\,,\quad\beta<1\,.\label{eq:rrf-Malkin-spectrum}
+\end{equation}
+
+\end_inset
+
+When substituted into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-g-continuous-spectrum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, this continuous relaxation spectrum produces the reduced relaxation function
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\left(\beta-1\right)t^{1-\beta}}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\left[\Gamma\left(\beta-1,\frac{t}{\tau_{2}}\right)-\Gamma\left(\beta-1,\frac{t}{\tau_{1}}\right)\right]\,.\label{eq:rrf-Malkin}
+\end{equation}
+
+\end_inset
+
+In the limit as 
+\begin_inset Formula $\beta\to1$
+\end_inset
+
+, the expression of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-Malkin"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-Fung-72"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Another example for a continuous relaxation spectrum is the exponential
+ spectrum
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\frac{1}{\tau_{0}}e^{-\tau/\tau_{0}}\,,\quad0\le\tau<\infty\,,\label{eq:rrf-exponential-spectrum}
+\end{equation}
+
+\end_inset
+
+which produces
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=2\sqrt{\frac{t}{\tau_{0}}}K_{1}\left(2\sqrt{\frac{t}{\tau_{0}}}\right)\,,\label{eq:rrf-exponential}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K_{1}\left(z\right)$
+\end_inset
+
+ is the modified Bessel function of the second kind, of order 1.
 \end_layout
 
 \begin_layout Standard

@@ -64326,10 +64326,14 @@ where
 \end_inset
 
 generation weak bonds, such that 
-\begin_inset Formula $\mathbf{F}^{u}=\mathbf{I}$
+\begin_inset Formula $\mathbf{F}^{u}=\mathbf{R}\left(u\right)$
 \end_inset
 
- at time 
+ (the rotation tensor in the polar decomposition of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+) at time 
 \begin_inset Formula $u$
 \end_inset
 
@@ -64384,7 +64388,7 @@ generation bonds reforming in an unloaded state during the time interval
 w^{u}\left(\mathbf{X},t\right)=\begin{cases}
 0 & t<u\\
 f^{u}\left(\mathbf{X},t\right) & u\leqslant t<v\\
-f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
+f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
 \end{cases}
 \]
 
@@ -64399,7 +64403,7 @@ f^{u}\left(\mathbf{X},t\right)=1-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{
 \end_inset
 
 and 
-\begin_inset Formula $g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right)$
+\begin_inset Formula $g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right)$
 \end_inset
 
  is a reduced relaxation function which may assume any number of valid forms.
@@ -64488,6 +64492,8 @@ For this type of bond kinetics, the reduced relaxation function
 \end_inset
 
 .
+ Thus, type II bond kinetics is only valid for quasilinear viscoelasticity,
+ whereas type I bond kinetics also encompasses nonlinear viscoelasticity.
 \end_layout
 
 \begin_layout Standard
@@ -64960,7 +64966,7 @@ g\left(t\right)=e^{-t/\tau}
 Exponential Distortional
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Exponential-Distortional"
+name "subsec:Exp-Distortional"
 
 \end_inset
 
@@ -65023,7 +65029,7 @@ Characteristic relaxation time
 \series bold
 t
 \series default
-] 
+]
 \end_layout
 
 \end_inset
@@ -65047,7 +65053,7 @@ Characteristic time
 \begin_inset Formula $\tau_{1}$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -65080,7 +65086,7 @@ Power exponent
 \begin_inset Formula $\alpha$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -65152,10 +65158,10 @@ generation start breaking.
 \end_layout
 
 \begin_layout Subsubsection
-Prony
+Exponential Distortional User-Specified
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Prony"
+name "subsec:Exp-Dist-User"
 
 \end_inset
 
@@ -65167,7 +65173,7 @@ The material type for this relaxation function is
 \begin_inset Quotes eld
 \end_inset
 
-relaxation-Prony
+relaxation-exp-dist-user
 \begin_inset Quotes erd
 \end_inset
 
@@ -65182,131 +65188,35 @@ relaxation-Prony
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="1" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-<g1>
+<tau type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Weight factor 
-\begin_inset Formula $\gamma_{1}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\vdots$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\vdots$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\vdots$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<g6>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Weight factor 
-\begin_inset Formula $\gamma_{6}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<t1>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Characteristic relaxation time 
-\begin_inset Formula $\tau_{1}$
+\begin_inset Formula $\tau_{0}$
 \end_inset
 
 
@@ -65314,82 +65224,7 @@ Characteristic relaxation time
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-t
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\vdots$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\vdots$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\vdots$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<t6>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Characteristic relaxation time 
-\begin_inset Formula $\tau_{6}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -65418,12 +65253,487 @@ t
 The reduced relaxation function for this material type is given by 
 \begin_inset Formula 
 \[
-g\left(t\right)=\frac{\sum_{i=1}^{6}\gamma_{i}e^{-t/\tau_{i}}}{\sum_{i=1}^{6}\gamma_{i}}
+g\left(\mathbf{F}\left(v\right);t-v\right)=e^{-\left(t-v\right)/\tau\left[K_{2}\left(v\right)\right]}
 \]
 
 \end_inset
 
+where 
+\begin_inset Formula $\tau\left(K_{2}\left(v\right)\right)$
+\end_inset
 
+ is given as a mathematical expression (type=
+\begin_inset Quotes qrd
+\end_inset
+
+math
+\begin_inset Quotes qrd
+\end_inset
+
+), or as a loadcurve (type=
+\begin_inset Quotes qrd
+\end_inset
+
+point
+\begin_inset Quotes qrd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="RVE" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+  <kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+  <trigger>1</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>0.13</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>0.52</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </bond>
+\end_layout
+
+\begin_layout LyX-Code
+  <relaxation type="relaxation-exp-dist-user">
+\end_layout
+
+\begin_layout LyX-Code
+    <tau type="math">1.0+2.0*(K2^0.5)</tau>
+\end_layout
+
+\begin_layout LyX-Code
+  </relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="RVE UC" type="uncoupled reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+  <kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+  <trigger>1</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>25</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <c1>0.025</c1>
+\end_layout
+
+\begin_layout LyX-Code
+    <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <bond type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <c1>0.025</c1>
+\end_layout
+
+\begin_layout LyX-Code
+    <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  </bond>
+\end_layout
+
+\begin_layout LyX-Code
+  <relaxation type="relaxation-exp-dist-user">
+\end_layout
+
+\begin_layout LyX-Code
+    <tau type="point">
+\end_layout
+
+\begin_layout LyX-Code
+      <interpolate>SMOOTH</interpolate>
+\end_layout
+
+\begin_layout LyX-Code
+      <points>
+\end_layout
+
+\begin_layout LyX-Code
+        <point>0.00, 1.00</point>
+\end_layout
+
+\begin_layout LyX-Code
+        <point>0.25, 2.00</point>
+\end_layout
+
+\begin_layout LyX-Code
+        <point>0.50, 2.41</point>
+\end_layout
+
+\begin_layout LyX-Code
+        <point>0.75, 2.73</point>
+\end_layout
+
+\begin_layout LyX-Code
+        <point>1.00, 3.00</point>
+\end_layout
+
+\begin_layout LyX-Code
+      </points>
+\end_layout
+
+\begin_layout LyX-Code
+    </tau>
+\end_layout
+
+\begin_layout LyX-Code
+  </relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Subsubsection
+Exponential Continuous Spectrum
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CSexp"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This relaxation function is derived from a continuous exponential relaxation
+ spectrum, see 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
+ The material type for this relaxation function is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-CSexp
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameter needs to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This parameter must satisfy 
+\begin_inset Formula $\tau>0$
+\end_inset
+
+.
+ The reduced relaxation function for this material type is given by
+\begin_inset Formula 
+\[
+g\left(t\right)=2\sqrt{\frac{t}{\tau_{0}}}K_{1}\left(2\sqrt{\frac{t}{\tau_{0}}}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $K_{1}\left(z\right)$
+\end_inset
+
+ is the modified Bessel function of the second kind, of order 1.
+\end_layout
+
+\begin_layout Subsubsection
+Exponential Continuous Spectrum Distortional User-Specified
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CSexp-dist-user"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:CSexp"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for the description of this relaxation function.
+ When the material parameters vary with the distortional strain 
+\begin_inset Formula $K_{2}$
+\end_inset
+
+, the material type is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-CSexp-dist-user
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameter needs to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The definition of 
+\begin_inset Formula $K_{2}$
+\end_inset
+
+ is given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+
+\end_inset
+
+.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for examples of how to specify these functions.
 \end_layout
 
 \begin_layout Subsubsection
@@ -65438,7 +65748,17 @@ name "subsec:Fung"
 \end_layout
 
 \begin_layout Standard
-The material type for this relaxation function is 
+This relaxation function, which is derived from a continuous relaxation
+ spectrum, was introduced by Fung 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Fung81"
+literal "false"
+
+\end_inset
+
+.
+ The material type for this relaxation function is 
 \begin_inset Quotes eld
 \end_inset
 
@@ -65513,7 +65833,7 @@ t
 \begin_inset Text
 
 \begin_layout Plain Layout
-Characteristic time 
+Characteristic relaxation time 
 \begin_inset Formula $\tau_{2}$
 \end_inset
 
@@ -65548,10 +65868,15 @@ t
 \end_layout
 
 \begin_layout Standard
-The reduced relaxation function for this material type is given by 
+These parameters must satisfy 
+\begin_inset Formula $\tau_{2}>\tau_{1}$
+\end_inset
+
+.
+ The reduced relaxation function for this material type is given by 
 \begin_inset Formula 
 \[
-g\left(t\right)=\tau_{2}e^{-t/\tau_{2}}-\tau_{1}e^{-t/\tau_{1}}+t\left[\Ei\left(-\frac{t}{\tau_{2}}\right)-\Ei\left(-\frac{t}{\tau_{1}}\right)\right]
+g\left(t\right)=\frac{\tau_{2}e^{-t/\tau_{2}}-\tau_{1}e^{-t/\tau_{1}}+t\left[\Ei\left(-\frac{t}{\tau_{2}}\right)-\Ei\left(-\frac{t}{\tau_{1}}\right)\right]}{\tau_{2}-\tau_{1}}
 \]
 
 \end_inset
@@ -65561,6 +65886,451 @@ where
 \end_inset
 
  is the exponential integral function.
+\end_layout
+
+\begin_layout Subsubsection
+Malkin
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Malkin"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This relaxation function is derived from the continuous relaxation spectrum
+ given in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Malkin06"
+literal "false"
+
+\end_inset
+
+.
+ The material type for this relaxation function is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-Malkin
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau_{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power exponent 
+\begin_inset Formula $\beta$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+These parameters must satisfy 
+\begin_inset Formula $\tau_{2}>\tau_{1}>0$
+\end_inset
+
+.
+ When 
+\begin_inset Formula $\beta\ne1$
+\end_inset
+
+, the reduced relaxation function for this material type is given by
+\begin_inset Formula 
+\[
+g\left(t\right)=\frac{\left(\beta-1\right)t^{1-\beta}}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\left[\Gamma\left(\beta-1,\frac{t}{\tau_{2}}\right)-\Gamma\left(\beta-1,\frac{t}{\tau_{1}}\right)\right]
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Gamma\left(a,z\right)$
+\end_inset
+
+ is the incomplete gamma function.
+ In the limit as 
+\begin_inset Formula $\beta\to1$
+\end_inset
+
+ this function reduces to the form given by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Fung72"
+literal "false"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+g\left(t\right)=\frac{\Gamma\left(0,\frac{t}{\tau_{2}}\right)-\Gamma\left(0,\frac{t}{\tau_{1}}\right)}{\ln\frac{\tau_{2}}{\tau_{1}}}=\frac{\Ei\left(-\frac{t}{\tau_{2}}\right)-\Ei\left(-\frac{t}{\tau_{1}}\right)}{\ln\frac{\tau_{1}}{\tau_{2}}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Ei\left(z\right)$
+\end_inset
+
+ is the exponential integral function.
+\end_layout
+
+\begin_layout Subsubsection
+Malkin Distortional User-Specified
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Malkin-dist-user"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Malkin"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for the description of this relaxation function.
+ When the material parameters vary with the distortional strain 
+\begin_inset Formula $K_{2}$
+\end_inset
+
+, the material type is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-Malkin-dist-user
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau1 type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau2 type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau_{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power exponent 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The definition of 
+\begin_inset Formula $K_{2}$
+\end_inset
+
+ is given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+
+\end_inset
+
+.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for examples of how to specify these functions.
 \end_layout
 
 \begin_layout Subsubsection
@@ -65944,11 +66714,196 @@ The definition of
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Exponential-Distortional"
+reference "subsec:Exp-Dist-User"
 
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsubsection
+Park Distortional User-Specified
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Park-Dist-User"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for this relaxation function is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-Park-dist-user
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power exponent 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The reduced relaxation function for this material type is given by 
+\begin_inset Formula 
+\[
+g\left(\mathbf{F}\left(v\right);t-v\right)=\frac{1}{1+\left(\frac{t-v}{\tau}\right)^{\beta}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tau\left(K_{2}\left(v\right)\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta\left(K_{2}\left(v\right)\right)$
+\end_inset
+
+ are user-specified functions, given either as mathematical expressions
+ or loadcurves.
+ The definition of 
+\begin_inset Formula $K_{2}\left(v\right)$
+\end_inset
+
+ is given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+
+\end_inset
+
+.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for examples of how to specify these functions.
 \end_layout
 
 \begin_layout Subsubsection
@@ -66332,8 +67287,480 @@ The definition of
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Exponential-Distortional"
+reference "subsec:Exp-Dist-User"
 
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Power
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Power-dist-user"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for this relaxation function is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-power-dist-user
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta type=
+\begin_inset Quotes qrd
+\end_inset
+
+math | point
+\begin_inset Quotes qrd
+\end_inset
+
+>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power exponent 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The reduced relaxation function for this material type is given by 
+\begin_inset Formula 
+\[
+g\left(\mathbf{F}\left(v\right);t-v\right)=\frac{1}{\left(1+\frac{t-v}{\tau}\right)^{\beta}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tau\left(K_{2}\left(v\right)\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta\left(K_{2}\left(v\right)\right)$
+\end_inset
+
+ are user-specified functions, given either as mathematical expressions
+ or loadcurves.
+ The definition of 
+\begin_inset Formula $K_{2}\left(v\right)$
+\end_inset
+
+ is given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+
+\end_inset
+
+.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Exp-Dist-User"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for examples of how to specify these functions.
+\end_layout
+
+\begin_layout Subsubsection
+Prony
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prony"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for this relaxation function is 
+\begin_inset Quotes eld
+\end_inset
+
+relaxation-Prony
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<g1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Weight factor 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\vdots$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\vdots$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\vdots$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<g6>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Weight factor 
+\begin_inset Formula $\gamma_{6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<t1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\vdots$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\vdots$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\vdots$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<t6>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Characteristic relaxation time 
+\begin_inset Formula $\tau_{6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The reduced relaxation function for this material type is given by 
+\begin_inset Formula 
+\[
+g\left(t\right)=\frac{\sum_{i=1}^{6}\gamma_{i}e^{-t/\tau_{i}}}{\sum_{i=1}^{6}\gamma_{i}}
+\]
+
+\end_inset
+
+The coefficients 
+\begin_inset Formula $\gamma_{i}$
+\end_inset
+
+ are normalized by 
+\begin_inset Formula $\sum_{i}\gamma_{i}$
+\end_inset
+
+ to enforce 
+\begin_inset Formula $g\left(0\right)=1$
 \end_inset
 
 .
