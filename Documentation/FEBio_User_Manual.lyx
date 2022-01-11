@@ -44302,7 +44302,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-<active_contraction>
+<activation>
 \end_layout
 
 \end_inset
@@ -44434,8 +44434,11 @@ The parameter
 \end_inset
 
  is the activation level and can be specified using the 
+\emph on
+activation
 \shape italic
-active_contraction 
+\emph default
+ 
 \shape default
 element.
  You can specify a loadcurve using the 
