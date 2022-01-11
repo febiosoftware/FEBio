@@ -443,7 +443,10 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistUser, "relaxation-power-dist-user");
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
     REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
-    REGISTER_FECORE_CLASS(FEBondRelaxationExpPow, "relaxation-exp-pow");
+    REGISTER_FECORE_CLASS(FEBondRelaxationMalkin, "relaxation-Malkin");
+    REGISTER_FECORE_CLASS(FEBondRelaxationMalkinDistUser, "relaxation-Malkin-dist-user");
+    REGISTER_FECORE_CLASS(FEBondRelaxationCSexp, "relaxation-CSexp");
+    REGISTER_FECORE_CLASS(FEBondRelaxationCSexpDistUser, "relaxation-CSexp-dist-user");
 
 	// damage cumulative distribution functions (used by damage materials)
 	REGISTER_FECORE_CLASS(FEDamageCDFSimo, "CDF Simo");
@@ -646,6 +649,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotLeftStretch, "left stretch");
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");
     REGISTER_FECORE_CLASS(FEPlotLeftHencky, "left Hencky");
+    REGISTER_FECORE_CLASS(FEPlotRateOfDeformation, "rate of deformation");
 	REGISTER_FECORE_CLASS(FEPlotMortarContactGap, "mortar-gap");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceTraction, "surface traction");
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
@@ -706,10 +710,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_gamma, "continuous damage gamma");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2beta, "continuous damage D2beta");
     REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
-    REGISTER_FECORE_CLASS(FEPlotRVEStrongBondSED, "RVE strong bond SED");
-    REGISTER_FECORE_CLASS(FEPlotRVEWeakBondSED, "RVE weak bond SED");
-    REGISTER_FECORE_CLASS(FEPlotRVEStrongBondDevSED, "RVE strong bond deviatoric SED");
-    REGISTER_FECORE_CLASS(FEPlotRVEWeakBondDevSED, "RVE weak bond deviatoric SED");
+    REGISTER_FECORE_CLASS(FEPlotRVEbonds, "RVE reforming bonds");
+    REGISTER_FECORE_CLASS(FEPlotStrongBondSED, "strong bond SED");
+    REGISTER_FECORE_CLASS(FEPlotWeakBondSED, "weak bond SED");
+    REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
+    REGISTER_FECORE_CLASS(FEPlotWeakBondDevSED, "deviatoric weak bond SED");
 
 
 	// 2O continuum fields

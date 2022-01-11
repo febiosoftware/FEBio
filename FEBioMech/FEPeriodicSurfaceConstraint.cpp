@@ -240,11 +240,10 @@ void FEPeriodicSurfaceConstraint::Activate()
 void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurface& ss, FEPeriodicSurfaceConstraintSurface& ms, bool bmove)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
-	np.SetSearchRadius(R);
+	np.SetSearchRadius(m_srad);
 	np.Init();
 
 	int i;

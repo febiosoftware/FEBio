@@ -30,6 +30,34 @@ SOFTWARE.*/
 #include "FEReactiveVEMaterialPoint.h"
 #include "FEElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
+FEReactiveViscoelasticMaterialPoint::FEReactiveViscoelasticMaterialPoint() : FEMaterialPointArray(new FEElasticMaterialPoint)
+{
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEReactiveViscoelasticMaterialPoint::Copy()
+{
+    FEReactiveViscoelasticMaterialPoint* pt = new FEReactiveViscoelasticMaterialPoint;
+    pt->m_mp = m_mp;
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEReactiveViscoelasticMaterialPoint::Init()
+{
+    // don't forget to initialize the base class
+    FEMaterialPointArray::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEReactiveViscoelasticMaterialPoint::Serialize(DumpStream& ar)
+{
+    FEMaterialPointArray::Serialize(ar);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FEReactiveVEMaterialPoint
@@ -57,49 +85,6 @@ void FEReactiveVEMaterialPoint::Init()
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
-}
-
-//-----------------------------------------------------------------------------
-//! Update material point data.
-void FEReactiveVEMaterialPoint::UpdateGenerations(const FETimeInfo& timeInfo)
-{
-    FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-    
-    // if new generation not already created for current time, check if it should
-    if (m_v.empty() || (m_v.back() < timeInfo.currentTime)) {
-        // check if the current deformation gradient is different from that of
-        // the last generation, in which case store the current state
-        if (m_pRve) {
-            if (m_pRve->NewGeneration(*this)) {
-                m_v.push_back(timeInfo.currentTime);
-                m_Uv.push_back(pt.RightStretch());
-                m_Jv.push_back(pt.m_J);
-                double f = (!m_v.empty()) ? m_pRve->ReformingBondMassFraction(*this) : 1;
-                m_f.push_back(f);
-                m_pRve->CullGenerations(*this);
-            }
-        }
-        else {
-            if (m_pRuc->NewGeneration(*this)) {
-                m_v.push_back(timeInfo.currentTime);
-                m_Uv.push_back(pt.RightStretch());
-                m_Jv.push_back(pt.m_J);
-                double f = (!m_v.empty()) ? m_pRuc->ReformingBondMassFraction(*this) : 1;
-                m_f.push_back(f);
-                m_pRuc->CullGenerations(*this);
-            }
-        }
-    }
-    // otherwise, if we already have a generation for the current time, update the stored values
-    else if (m_v.back() == timeInfo.currentTime) {
-        m_Uv.back() = pt.RightStretch();
-        m_Jv.back() = pt.m_J;
-        if (m_pRve)
-            m_f.back() = m_pRve->ReformingBondMassFraction(*this);
-        else if (m_pRuc)
-            m_f.back() = m_pRuc->ReformingBondMassFraction(*this);
-    }
-
 }
 
 //-----------------------------------------------------------------------------

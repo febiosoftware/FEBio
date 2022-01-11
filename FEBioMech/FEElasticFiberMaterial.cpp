@@ -36,6 +36,13 @@ BEGIN_FECORE_CLASS(FEElasticFiberMaterial, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEElasticFiberMaterial::CreateMaterialPointData()
+{
+    FEFiberMaterialPoint* mp = new FEFiberMaterialPoint(new FEElasticMaterialPoint);
+    return mp;
+}
+
+//-----------------------------------------------------------------------------
 FEElasticFiberMaterial::FEElasticFiberMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	// initialize the fiber vector

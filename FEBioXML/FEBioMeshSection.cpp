@@ -247,6 +247,7 @@ void FEBioMeshSection::ParseSurfaceSection(XMLTag& tag, FEBModel::Part* part)
 		else if (tag == "tri3") face.ntype = 3;
 		else if (tag == "tri6") face.ntype = 6;
 		else if (tag == "tri7") face.ntype = 7;
+		else if (tag == "tri10") face.ntype = 10;
 		else if (tag == "quad8") face.ntype = 8;
 		else if (tag == "quad9") face.ntype = 9;
 		else throw XMLReader::InvalidTag(tag);

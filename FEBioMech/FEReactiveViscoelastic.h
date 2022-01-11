@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation reactive viscoelastic material
@@ -68,8 +69,8 @@ public:
 
     //! strain energy density function
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    double StrainEnergyDensityStrongBonds(FEMaterialPoint& pt);
-    double StrainEnergyDensityWeakBonds(FEMaterialPoint& pt);
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
 
     //! cull generations
     void CullGenerations(FEMaterialPoint& pt);
@@ -83,12 +84,21 @@ public:
     //! detect new generation
     bool NewGeneration(FEMaterialPoint& pt);
     
+    //! return number of generations
+    int RVEGenerations(FEMaterialPoint& pt);
+    
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
 
     //! specialized material points
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
+    //! get base material point
+    FEMaterialPoint* GetBaseMaterialPoint(FEMaterialPoint& mp);
 
+    //! get bond material point
+    FEMaterialPoint* GetBondMaterialPoint(FEMaterialPoint& mp);
+    
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEElasticMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds

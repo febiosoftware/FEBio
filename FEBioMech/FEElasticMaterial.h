@@ -55,6 +55,10 @@ public:
 	//! evaluates approximation to Cauchy stress using forward difference
 	mat3ds SecantStress(FEMaterialPoint& pt) override;
 
+public:
+    virtual double StrongBondSED(FEMaterialPoint& pt) { return StrainEnergyDensity(pt); }
+    virtual double WeakBondSED(FEMaterialPoint& pt) { return 0; }
+
 protected:
 	DECLARE_FECORE_CLASS();
 };

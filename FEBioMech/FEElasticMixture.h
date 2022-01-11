@@ -81,7 +81,9 @@ public:
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
 public:
-   
+    //! data initialization
+    bool Init() override;
+    
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;
 		
@@ -93,6 +95,10 @@ public:
 
 	//! the density is the sum of the constituent densities
 	double Density(FEMaterialPoint& mp) override;
+    
+public:
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
     
 private:
 	std::vector<FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials

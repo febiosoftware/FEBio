@@ -28,7 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEElasticMixture.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint() : FEMaterialPointArray(new FEElasticMaterialPoint)
@@ -93,6 +94,24 @@ FEMaterialPoint* FEElasticMixture::CreateMaterialPointData()
 void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
 { 
 	m_pMat.push_back(pm); 
+}
+
+//-----------------------------------------------------------------------------
+//! data initialization
+bool FEElasticMixture::Init()
+{
+    // check if any of the solid materials are elastic mixtures -- none allowed,
+    // otherwise FEBio does not know which FEElasticMixtureMaterialPoint to access
+    int nmix = 0;
+    for (int i=0; i<Materials(); ++i)
+        if (dynamic_cast<FEElasticMixture*>(m_pMat[i])) nmix++;
+    
+    if (nmix > 0) {
+        feLogError("Solids in solid mixture material cannot be solid mixtures");
+        return false;
+    }
+    
+    return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -201,6 +220,79 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 	return sed;
 }
 
+//-----------------------------------------------------------------------------
+//! This function evaluates the stress at the material point by evaluating the
+//! individual stress components.
+double FEElasticMixture::StrongBondSED(FEMaterialPoint& mp)
+{
+    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    vector<double>& w = pt.m_w;
+    assert(w.size() == m_pMat.size());
+    
+    // get the elastic material point
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // calculate strain energy density
+    double sed = 0.0;
+    for (int i=0; i < (int) m_pMat.size(); ++i)
+    {
+        FEMaterialPoint* mpi = pt.GetPointData(i);
+        mpi->m_elem = mp.m_elem;
+        mpi->m_index = mp.m_index;
+        
+        // copy the elastic material point data to the components
+        FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
+        epi.m_rt = ep.m_rt;
+        epi.m_r0 = mp.m_r0;// ep.m_r0;
+        epi.m_F = ep.m_F;
+        epi.m_J = ep.m_J;
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+        
+        sed += m_pMat[i]->StrongBondSED(*mpi)*w[i];
+    }
+    
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! This function evaluates the stress at the material point by evaluating the
+//! individual stress components.
+double FEElasticMixture::WeakBondSED(FEMaterialPoint& mp)
+{
+    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    vector<double>& w = pt.m_w;
+    assert(w.size() == m_pMat.size());
+    
+    // get the elastic material point
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // calculate strain energy density
+    double sed = 0.0;
+    for (int i=0; i < (int) m_pMat.size(); ++i)
+    {
+        FEMaterialPoint* mpi = pt.GetPointData(i);
+        mpi->m_elem = mp.m_elem;
+        mpi->m_index = mp.m_index;
+        
+        // copy the elastic material point data to the components
+        FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
+        epi.m_rt = ep.m_rt;
+        epi.m_r0 = mp.m_r0;// ep.m_r0;
+        epi.m_F = ep.m_F;
+        epi.m_J = ep.m_J;
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+        
+        sed += m_pMat[i]->WeakBondSED(*mpi)*w[i];
+    }
+    
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
 //! specialized material points
 void FEElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {

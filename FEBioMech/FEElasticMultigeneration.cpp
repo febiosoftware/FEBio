@@ -330,3 +330,85 @@ double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
      
 	return sed;
 }
+
+//-----------------------------------------------------------------------------
+double FEElasticMultigeneration::StrongBondSED(FEMaterialPoint& mp)
+{
+    FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    double sed = 0.0;
+    
+    // extract deformation gradient
+    mat3d Fs = ep.m_F;
+    double Js = ep.m_J;
+    
+    for (int i=0; i < pt.m_ngen; ++i)
+    {
+        // evaluate deformation gradient for this generation
+        FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+        
+        // store safe copies of Fi and Ji for this generation
+        mat3d Fi = epi.m_F;
+        double Ji = epi.m_J;
+        
+        // copy the elastic material point data to the components
+        epi.m_rt = ep.m_rt;
+        epi.m_r0 = ep.m_r0;
+        
+        // evaluate relative deformation gradient
+        epi.m_F = Fs*Fi;
+        epi.m_J = Js*Ji;
+        
+        // evaluate strain energy density for this generation
+        double dsed = m_MG[i]->m_pMat->StrongBondSED(*pt.m_mp[i])/Ji;
+        sed += dsed;
+        
+        // restore the material point deformation gradient
+        epi.m_F = Fi;
+        epi.m_J = Ji;
+    }
+    
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
+double FEElasticMultigeneration::WeakBondSED(FEMaterialPoint& mp)
+{
+    FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    double sed = 0.0;
+    
+    // extract deformation gradient
+    mat3d Fs = ep.m_F;
+    double Js = ep.m_J;
+    
+    for (int i=0; i < pt.m_ngen; ++i)
+    {
+        // evaluate deformation gradient for this generation
+        FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+        
+        // store safe copies of Fi and Ji for this generation
+        mat3d Fi = epi.m_F;
+        double Ji = epi.m_J;
+        
+        // copy the elastic material point data to the components
+        epi.m_rt = ep.m_rt;
+        epi.m_r0 = ep.m_r0;
+        
+        // evaluate relative deformation gradient
+        epi.m_F = Fs*Fi;
+        epi.m_J = Js*Ji;
+        
+        // evaluate strain energy density for this generation
+        double dsed = m_MG[i]->m_pMat->WeakBondSED(*pt.m_mp[i])/Ji;
+        sed += dsed;
+        
+        // restore the material point deformation gradient
+        epi.m_F = Fi;
+        epi.m_J = Ji;
+    }
+    
+    return sed;
+}
