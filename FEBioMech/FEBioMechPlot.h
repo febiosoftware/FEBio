@@ -295,6 +295,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element stresses
+class FEPlotElementPK1Stress : public FEPlotDomainData
+{
+public:
+	FEPlotElementPK1Stress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element stresses for mixture components
 class FEPlotElementMixtureStress : public FEPlotDomainData
 {
