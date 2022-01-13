@@ -227,6 +227,19 @@ int DOFS::GetVariableIndex(const char* szvar)
 }
 
 //-----------------------------------------------------------------------------
+//! Get the variable name
+std::string DOFS::GetVariableName(int n) const
+{
+	std::string varName;
+	if ((n >= 0) && (n < Variables()))
+	{
+		const Var& var = m_var[n];
+		varName = var.m_name;
+	}
+	return varName;
+}
+
+//-----------------------------------------------------------------------------
 //! Add a degree of freedom to a variable.
 // This only works on array variables
 //! Returns -1 if the degree of freedom exists or if the symbol is invalid

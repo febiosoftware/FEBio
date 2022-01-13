@@ -33,8 +33,8 @@ SOFTWARE.*/
 #include "DumpStream.h"
 
 BEGIN_FECORE_CLASS(FELinearConstraintDOF, FECoreClass)
-	ADD_PARAMETER(node, "node");
 	ADD_PARAMETER(dof, "dof", 0, "$(dof_list)");
+	ADD_PARAMETER(node, "node");
 	ADD_PARAMETER(val, "value");
 END_FECORE_CLASS();
 
@@ -46,8 +46,8 @@ FELinearConstraintDOF::FELinearConstraintDOF(FEModel* fem) : FECoreClass(fem)
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FELinearConstraint, FEBoundaryCondition)
+	ADD_PARAMETER(m_parentDof->dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_parentDof->node, "node");
-	ADD_PARAMETER(m_parentDof->dof, "dof");
 
 	ADD_PROPERTY(m_childDof, "child_dof");
 END_FECORE_CLASS();

@@ -119,6 +119,9 @@ public:
 	//! Get the index of a variable (returns -1 if the variable does not exist)
 	int GetVariableIndex(const char* szname);
 
+	//! Get the variable name
+	std::string GetVariableName(int n) const;
+
 	// Add a degree of freedom
 	// Can only be used on array variables.
 	// returns >= 0 on success and -1 on failure (e.g. if the dof is already defined)
