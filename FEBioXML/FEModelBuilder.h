@@ -34,6 +34,8 @@ SOFTWARE.*/
 
 class FESolver;
 class FEPointFunction;
+class FEDataGenerator;
+class FEDomainMap;
 
 // This is a helper class for building the FEModel from file input. 
 class FEBIOXML_API FEModelBuilder
@@ -77,6 +79,13 @@ public:
 		int	lc;
 		double scale;
 		FEPointFunction*	pf;
+	};
+
+	struct FEBIOXML_API DataGen
+	{
+		FEDataGenerator*	gen;	// the data generator
+		FEDomainMap*		map;	// the destination map 
+		FEParamDouble*		pp;		// the param to which to apply the map (or null)
 	};
 
 public:
@@ -167,13 +176,17 @@ public:
 public:
 	void AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap, int index = 0);
 
+	void AddMeshDataGenerator(FEDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp);
+
 	// This will associate all mapped parameters to their assigned maps.
 	void ApplyParameterMaps();
 
 	void ApplyLoadcurvesToFunctions();
 
+	bool GenerateMeshDataMaps();
+
 	// finish the build process
-	void Finish();
+	bool Finish();
 
 	FEBModel& GetFEBModel();
 
@@ -220,6 +233,7 @@ protected:
 	vector<NodeSetSet>		m_nsetSet;
 	vector<MappedParameter>	m_mappedParams;
 	vector<MapLCToFunction>	m_lc2fnc;
+	vector<DataGen>			m_mapgen;
 
 protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)

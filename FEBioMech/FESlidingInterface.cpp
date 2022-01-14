@@ -1018,10 +1018,10 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	vector<int> lm(3*(MAXMN + 1));
 	vector<int> en(MAXMN+1);
 
-	double *Gr, *Gs, w[6];
-	vec3d r0[6];
+	double *Gr, *Gs, w[MAXMN];
+	vec3d r0[MAXMN];
 
-	double detJ[6];
+	double detJ[MAXMN];
 	vec3d dxr, dxs;
 
 	vector<int> sLM;

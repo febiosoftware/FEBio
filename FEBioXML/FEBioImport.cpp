@@ -301,7 +301,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 
 	// finish building
 	try {
-		m_builder->Finish();
+		bool b = m_builder->Finish();
+		if (b == false) return errf("FAILED building FEBio model.");
 	}
 	catch (std::exception e)
 	{
