@@ -97,26 +97,34 @@ double FELoadCurve::GetValue(double time)
 
 bool FELoadCurve::CopyFrom(FELoadCurve* lc)
 {
+	m_int = lc->m_int;
+	m_ext = lc->m_ext;
+	m_points = lc->m_points;
+
 	m_fnc = lc->m_fnc;
 	return true;
 }
 
 void FELoadCurve::Add(double time, double value)
 {
-	m_fnc.Add(time, value);
+//	m_fnc.Add(time, value);
+	m_points.push_back(vec2d(time, value));
 }
 
 void FELoadCurve::Clear()
 {
-	m_fnc.Clear();
+	m_points.clear();
+//	m_fnc.Clear();
 }
 
 void FELoadCurve::SetInterpolation(PointCurve::INTFUNC f)
 {
-	m_fnc.SetInterpolator(f);
+	m_int = f;
+//	m_fnc.SetInterpolator(f);
 }
 
 void FELoadCurve::SetExtendMode(PointCurve::EXTMODE f)
 {
-	m_fnc.SetExtendMode(f);
+	m_ext = f;
+//	m_fnc.SetExtendMode(f);
 }
