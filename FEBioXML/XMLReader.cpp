@@ -386,7 +386,7 @@ XMLReader::Error(tag, "unrecognized tag") {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidValue::InvalidValue(XMLTag& tag) : \
-XMLReader::Error(tag, "invalid value") {}
+XMLReader::Error(tag, format_string("invalid value: %s", tag.isleaf() ? tag.szvalue() : "")) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, const char* sza, const char* szv) : \
