@@ -1219,6 +1219,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
     data.m_mueff = 0.0;
     data.m_fls = 0.0;
     data.m_s1 = vec3d(0,0,0);
+    double flsmax = 1./(1-m_phi);   // theoretical upper bound on fluid load support
     
     // get local FLS from element projection
     double fls = 0;
@@ -1253,6 +1254,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
             {
                 data.m_mueff = ts/pn;
                 data.m_fls = m_bsmfls ? fls : p/pn;
+                if (data.m_fls > flsmax) data.m_fls = flsmax;
             }
             
             // store the previous values as the current
@@ -1287,6 +1289,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                 
                 // calculate effective friction coefficient
                 data.m_fls = m_bsmfls ? fls : p/pn;
+                if (data.m_fls > flsmax) data.m_fls = flsmax;
                 data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                 data.m_mueff = MBRACKET(data.m_mueff);
                 
@@ -1329,6 +1332,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                 if (tn != 0)
                 {
                     data.m_fls = m_bsmfls ? fls : p/(-tn);
+                    if (data.m_fls > flsmax) data.m_fls = flsmax;
                     mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                     mueff = MBRACKET(mueff);
                 }
@@ -1346,6 +1350,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                     if (pn > 0) {
                         data.m_mueff = ts/pn;
                         data.m_fls = m_bsmfls ? fls : p/pn;
+                        if (data.m_fls > flsmax) data.m_fls = flsmax;
                     }
                     
                     // store the previous values as the current
@@ -1382,6 +1387,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                         // calculate effective friction coefficient
                         data.m_fls = p/pn;
                         data.m_fls = m_bsmfls ? fls : p/pn;
+                        if (data.m_fls > flsmax) data.m_fls = flsmax;
                         data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                         data.m_mueff = MBRACKET(data.m_mueff);
 
@@ -1415,6 +1421,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                     
                     // calculate effective friction coefficient
                     data.m_fls = m_bsmfls ? fls : p/pn;
+                    if (data.m_fls > flsmax) data.m_fls = flsmax;
                     data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                     data.m_mueff = MBRACKET(data.m_mueff);
 
