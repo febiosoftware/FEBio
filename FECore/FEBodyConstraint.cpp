@@ -23,24 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEBodyConstraint.h"
 
+REGISTER_SUPER_CLASS(FEBodyConstraint, FEBODYCONSTRAINT_ID);
 
-
-#pragma once
-#include "FENLConstraint.h"
-
-class FESurface;
-
-// Base class for nonlinear constraints that are defined using a surface.
-class FECORE_API FESurfaceConstraint : public FENLConstraint
+FEBodyConstraint::FEBodyConstraint(FEModel* fem) : FENLConstraint(fem)
 {
-	FECORE_SUPER_CLASS
-
-	FECORE_BASE_CLASS(FESurfaceConstraint)
-
-public:
-	FESurfaceConstraint(FEModel* fem);
-
-	// return the surface
-	virtual FESurface* GetSurface() { return 0; }
-};
+}

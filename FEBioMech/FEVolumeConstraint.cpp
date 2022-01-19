@@ -133,8 +133,6 @@ BEGIN_FECORE_CLASS(FEVolumeConstraint, FESurfaceConstraint);
 	ADD_PARAMETER(m_blaugon, "laugon" ); 
 	ADD_PARAMETER(m_atol   , "augtol" );
 	ADD_PARAMETER(m_eps    , "penalty");
-
-	ADD_PROPERTY(m_s, "surface");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

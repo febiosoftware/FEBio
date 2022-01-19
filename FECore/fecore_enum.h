@@ -236,6 +236,8 @@ enum SUPER_CLASS_ID {
 	FEEDGELOAD_ID,					// derived from FEEdgeLoad
 	FENODALLOAD_ID,					// derived from FENodalLoad
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
+	FESURFACECONSTRAINT_ID,         // derived from FESurfaceConstraint
+	FEBODYCONSTRAINT_ID,			// derived from FEBodyConstraint
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
 	FESURFACEINTERFACE_ID, 			// derived from FESurfaceInterface

@@ -29,6 +29,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
 
+REGISTER_SUPER_CLASS(FESurfaceConstraint, FESURFACECONSTRAINT_ID);
+
 FESurfaceConstraint::FESurfaceConstraint(FEModel* fem) : FENLConstraint(fem)
 {
 }
