@@ -59,7 +59,7 @@ FEFluid::FEFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 //! FEFluid initialization
 bool FEFluid::Init()
 {
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
+    m_Tr = GetGlobalConstant("T");
     if (m_pElastic == nullptr) {
         m_pElastic = new FELinearElasticFluid(GetFEModel());
     }

@@ -81,8 +81,7 @@ void NodeDataRecord::SetData(const char* szexpr)
 //-----------------------------------------------------------------------------
 double NodeDataRecord::Evaluate(int item, int ndata)
 {
-	FEModel* fem = GetFEModel();
-	FEMesh& mesh = fem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	int nnode = item - 1;
 	assert((nnode>=0)&&(nnode<mesh.Nodes()));
 	if ((nnode < 0) || (nnode >= mesh.Nodes())) return 0;
@@ -92,8 +91,7 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 //-----------------------------------------------------------------------------
 void NodeDataRecord::SelectAllItems()
 {
-	FEModel* fem = GetFEModel();
-	int n = fem->GetMesh().Nodes();
+	int n = GetFEModel()->GetMesh().Nodes();
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
@@ -115,7 +113,6 @@ FENodeVarData::FENodeVarData(FEModel* pfem, int ndof) : FENodeLogData(pfem), m_n
 //-----------------------------------------------------------------------------
 double FENodeVarData::value(int node)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	return mesh.Node(node).get(m_ndof);
 }

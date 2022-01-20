@@ -28,13 +28,12 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPeriodicLinearConstraint.h"
-#include <FECore/FEModel.h>
-#include <FECore/FELinearConstraintManager.h>
-#include <FECore/FELinearConstraint.h>
-#include <FECore/FEMesh.h>
-#include <FECore/FESurface.h>
+#include "FELinearConstraintManager.h"
+#include "FELinearConstraint.h"
+#include "FEModel.h"
+#include "FESurface.h"
 
-FEPeriodicLinearConstraint::FEPeriodicLinearConstraint(FEModel* fem) : m_exclude(fem)
+FEPeriodicLinearConstraint::FEPeriodicLinearConstraint(FEModel* fem) : FEModelComponent(fem), m_exclude(fem)
 {
 	m_refNode = -1;
 }
@@ -62,7 +61,7 @@ void addLinearConstraint(FEModel& fem, int parent, int child, int nodeA, int nod
 bool FEPeriodicLinearConstraint::GenerateConstraints(FEModel* fem)
 {
 	// get the model's mesh
-	FEMesh& mesh = fem->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// make sure there is a list of sets
 	if (m_set.empty()) return true;

@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEHexRefine2D.h"
 #include <FECore/FEMesh.h>
-#include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEMeshTopo.h>
 #include <FECore/FEPrescribedDOF.h>
@@ -52,8 +51,7 @@ FEHexRefine2D::FEHexRefine2D(FEModel* fem) : FERefineMesh(fem)
 
 bool FEHexRefine2D::Init()
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	if (mesh.IsType(ET_HEX8) == false)
 	{
@@ -66,10 +64,10 @@ bool FEHexRefine2D::Init()
 
 bool FEHexRefine2D::RefineMesh()
 {
-	FEModel& fem = *GetFEModel();
 	FEMeshTopo& topo = *m_topo;
 
-	FEMesh& mesh = fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = GetMesh();
 	FEElementList allElems(mesh);
 
 	const int NEL = mesh.Elements();

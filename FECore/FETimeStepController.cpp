@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FETimeStepController.h"
 #include "FELoadCurve.h"
 #include "FEAnalysis.h"
-#include "FEModel.h"
 #include "FEPointFunction.h"
 #include "DumpStream.h"
 #include "log.h"

@@ -28,9 +28,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEDomain.h"
-#include "FEModel.h"
 #include "FEDofList.h"
 #include "FELinearSystem.h"
+#include "FESolidElement.h"
 
 //-----------------------------------------------------------------------------
 // This typedef defines a surface integrand. 

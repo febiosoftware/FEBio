@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEMaterialPointProperty.h"
 #include "writeplot.h"
 #include "FESurfaceLoad.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)

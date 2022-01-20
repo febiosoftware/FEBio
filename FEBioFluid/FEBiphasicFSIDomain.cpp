@@ -26,8 +26,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBiphasicFSIDomain.h"
-#include "FECore/FESolidDomain.h"
-#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEBiphasicFSIDomain::FEBiphasicFSIDomain(FEModel* pfem)

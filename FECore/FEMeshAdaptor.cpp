@@ -26,7 +26,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMeshAdaptor.h"
 #include "FESolidDomain.h"
-#include <FECore/FEElementList.h>
+#include "FEElementList.h"
+#include "FEModel.h"
 
 REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
 

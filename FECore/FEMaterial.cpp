@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-FEMaterialBase::FEMaterialBase(FEModel* fem) : FECoreBase(fem)
+FEMaterialBase::FEMaterialBase(FEModel* fem) : FEModelComponent(fem)
 {
 }
 

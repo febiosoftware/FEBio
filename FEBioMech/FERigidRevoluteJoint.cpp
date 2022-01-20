@@ -117,8 +117,6 @@ bool FERigidRevoluteJoint::Init()
         return false;
     }
     
-    FEModel& fem = *GetFEModel();
-    
     // initialize joint basis
     m_e0[0].unit();
     m_e0[2] = m_e0[0] ^ m_e0[1]; m_e0[2].unit();

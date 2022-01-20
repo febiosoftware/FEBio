@@ -35,7 +35,7 @@ SOFTWARE.*/
 //! specific internal energy
 double FEElasticFluid::SpecificInternalEnergy(FEMaterialPoint& mp)
 {
-    double Tr =  GetFEModel()->GetGlobalConstant("T");
+    double Tr = GetGlobalConstant("T");
 
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double T = tf.m_T + Tr;

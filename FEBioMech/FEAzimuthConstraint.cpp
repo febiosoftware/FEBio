@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEAzimuthConstraint.h"
 #include "FEBioMech.h"
-#include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/log.h>
 

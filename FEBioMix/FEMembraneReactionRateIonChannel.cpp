@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMembraneReactionRateIonChannel.h"
 
@@ -52,9 +49,9 @@ double FEMembraneReactionRateIonChannel::ReactionRate(FEMaterialPoint& pt)
     FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
     double ci = ps.m_ci[m_sol];
     double ce = ps.m_ce[m_sol];
-    double R = GetFEModel()->GetGlobalConstant("R");
-    double T = GetFEModel()->GetGlobalConstant("T");
-    double Fc = GetFEModel()->GetGlobalConstant("Fc");
+    double R = GetGlobalConstant("R");
+    double T = GetGlobalConstant("T");
+    double Fc = GetGlobalConstant("Fc");
     
     double k = 0;
     if ((ci > 0) && (ce > 0))
@@ -70,9 +67,9 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ci(FEMaterialPoint
     FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
     double ci = ps.m_ci[m_sol];
     double ce = ps.m_ce[m_sol];
-    double R = GetFEModel()->GetGlobalConstant("R");
-    double T = GetFEModel()->GetGlobalConstant("T");
-    double Fc = GetFEModel()->GetGlobalConstant("Fc");
+    double R = GetGlobalConstant("R");
+    double T = GetGlobalConstant("T");
+    double Fc = GetGlobalConstant("Fc");
     
     double dkdc = 0;
     if ((ci > 0) && (ce > 0))
@@ -88,9 +85,9 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ce(FEMaterialPoint
     FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
     double ci = ps.m_ci[m_sol];
     double ce = ps.m_ce[m_sol];
-    double R = GetFEModel()->GetGlobalConstant("R");
-    double T = GetFEModel()->GetGlobalConstant("T");
-    double Fc = GetFEModel()->GetGlobalConstant("Fc");
+    double R = GetGlobalConstant("R");
+    double T = GetGlobalConstant("T");
+    double Fc = GetGlobalConstant("Fc");
     
     double dkdc = 0;
     if ((ci > 0) && (ce > 0))

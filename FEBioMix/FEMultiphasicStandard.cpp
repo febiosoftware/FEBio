@@ -45,7 +45,7 @@ FEMaterialPoint* FEMultiphasicStandard::CreateMaterialPointData()
 // call this function from shell domains only
 void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     
     // check if this mixture includes chemical reactions
     int nreact = (int)Reactions();

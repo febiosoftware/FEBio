@@ -33,8 +33,8 @@ SOFTWARE.*/
 //! forward declaration of the FEModel class.
 //! All classes inherited from FEModelComponent should take the model as a parameter
 //! to the constructor.
-class FEModel;
 class FENodeSet;
+class FEMesh;
 
 //-----------------------------------------------------------------------------
 //! This class serves as a base class for many of the FECore classes. It defines
@@ -77,18 +77,19 @@ public:
 	virtual void SetNodeSet(FENodeSet* ns);
 
 public:
-	//! Get the ID
-	int GetID() const;
-
-public:
 	//! serialization
 	void Serialize(DumpStream& ar);
 
-protected:
-	//! used by derived class to set the ID
-	void SetID(int n);
+public: // some convenience functions (to pull data from FEModel without the need to include)
+	double CurrentTime() const;
+	double CurrentTimeIncrement() const;
+	double GetGlobalConstant(const char* sz) const;
+	int GetDOFIndex(const char* szvar, int n) const;
+	int GetDOFIndex(const char* szdof) const;
+
+	//! Get the model's mesh
+	FEMesh& GetMesh();
 
 private:
-	int			m_nID;
 	bool		m_bactive;	//!< flag indicating whether the component is active
 };

@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMaxDamageCriterion.h"
 #include "FEElasticMaterial.h"
-#include <FECore/FEElement.h>
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEDamageAdaptorCriterion, FEMeshAdaptorCriterion)
 END_FECORE_CLASS();

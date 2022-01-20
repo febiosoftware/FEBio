@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FETemperatureBackFlowStabilization.h"
 #include "FEFluid.h"
 #include "FEBioThermoFluid.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! constructor

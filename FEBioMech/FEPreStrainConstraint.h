@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FENLConstraint.h>
-#include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include "FEPreStrainElastic.h"
 #include "FEPreStrainUncoupledElastic.h"

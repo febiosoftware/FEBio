@@ -10,6 +10,7 @@
 #include "FEMultiphasicFSIPressure.h"
 #include "FEMultiphasicFSI.h"
 #include "FEBioMultiphasicFSI.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEMultiphasicFSIPressure, FESurfaceLoad)

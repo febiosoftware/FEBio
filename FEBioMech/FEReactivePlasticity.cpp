@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/matrix.h>
 

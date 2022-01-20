@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidRotationalVelocity.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEGlobalVector.h"

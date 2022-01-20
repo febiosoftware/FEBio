@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESurfaceToSurfaceMap.h"
-#include "FEModel.h"
 #include "FEMesh.h"
 #include "FESurface.h"
 

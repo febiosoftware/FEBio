@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFluidResistanceBC.h"
 #include "FEBioFluid.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidResistanceBC, FESurfaceLoad)

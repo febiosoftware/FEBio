@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEVariableCriterion.h"
 #include <FECore/FESolidDomain.h>
+#include <FECore/FEMesh.h>
 
 BEGIN_FECORE_CLASS(FEVariableCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(m_dof, "dof");

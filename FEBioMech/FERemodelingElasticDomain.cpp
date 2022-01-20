@@ -29,8 +29,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FERemodelingElasticDomain.h"
 #include "FERemodelingElasticMaterial.h"
-#include <FECore/FEModel.h>
 #include "FECore/FEAnalysis.h"
+#include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
@@ -85,8 +85,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 	int NE = (int)m_Elem.size();
 
 	// I only need this for the element density stiffness
-	FEModel& fem = *GetFEModel();
-	double dt = fem.GetTime().timeIncrement;
+	double dt = GetFEModel()->GetTime().timeIncrement;
 
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)

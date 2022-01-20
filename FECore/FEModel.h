@@ -374,8 +374,8 @@ public:	// --- Miscellaneous routines ---
 	DOFS& GetDOFS();
 
 	//! Get the index of a DOF
-	int GetDOFIndex(const char* sz);
-	int GetDOFIndex(const char* szvar, int n);
+	int GetDOFIndex(const char* sz) const;
+	int GetDOFIndex(const char* szvar, int n) const;
 
 	//! serialize data for restarts
 	void Serialize(DumpStream& ar) override;

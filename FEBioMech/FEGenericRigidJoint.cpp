@@ -28,7 +28,6 @@ SOFTWARE.*/
 #include "FEGenericRigidJoint.h"
 #include "FERigidBody.h"
 #include <FECore/log.h>
-#include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/fecore_debug.h>

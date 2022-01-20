@@ -27,7 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FEBodyForce.h>
 #include "FEFluidMaterialPoint.h"

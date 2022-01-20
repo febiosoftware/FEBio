@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPointBodyForce.h"
 #include "FEElasticMaterial.h"
-#include "FECore/FEModel.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointBodyForce, FEBodyForce);
@@ -98,19 +98,18 @@ void FEPointBodyForce::Serialize(DumpStream &ar)
 //-----------------------------------------------------------------------------
 bool FEPointBodyForce::Init()
 {
+	FEMesh& m = GetMesh();
 	if (m_inode == -1)
 	{
 		if (!m_brigid)
 		{
 			// find the element in which point r0 lies
-			FEMesh& m = GetFEModel()->GetMesh();
 			m_pel = m.FindSolidElement(m_rc, m_rs);
 		}
 		else m_pel = 0;
 	}
 	else 
 	{
-		FEMesh& m = GetFEModel()->GetMesh();
 		m_rc = m.Node(m_inode).m_r0;
 	}
 
@@ -125,7 +124,7 @@ void FEPointBodyForce::Update()
 	{
 		if (m_pel)
 		{
-			FEMesh& m = GetFEModel()->GetMesh();
+			FEMesh& m = GetMesh();
 			vec3d x[FEElement::MAX_NODES];
 			for (int i=0; i<8; ++i) x[i] = m.Node(m_pel->m_node[i]).m_rt;
 
@@ -146,7 +145,7 @@ void FEPointBodyForce::Update()
 	}
 	else
 	{
-		FEMesh& m = GetFEModel()->GetMesh();
+		FEMesh& m = GetMesh();
 		m_rc = m.Node(m_inode).m_rt;
 	}
 }

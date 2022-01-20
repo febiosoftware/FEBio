@@ -25,12 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedFluidDilatation.h"
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEFixedBC)
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
-
 
 FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
 {
@@ -39,9 +37,7 @@ FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
 
 bool FEFixedFluidDilatation::Init()
 {
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
 	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("ef"));
+	m_dofs.push_back(GetDOFIndex("ef"));
 	return FEFixedBC::Init();
 }

@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEHexRefine.h"
 #include <FECore/FEMesh.h>
-#include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEMeshTopo.h>
 #include <FECore/FEPrescribedDOF.h>

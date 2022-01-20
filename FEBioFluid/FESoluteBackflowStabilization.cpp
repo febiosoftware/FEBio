@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include "FEBioFluidSolutes.h"
 #include <FECore/FENodeNodeList.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteBackflowStabilization, FESurfaceLoad)

@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FEDofList.h"
 #include "FESurfaceElement.h"
+#include "FENode.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;

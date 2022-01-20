@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FEFiberMaterialPoint.h"
 #include "FEScaledElasticMaterial.h"
 #include <FECore/FECoreKernel.h>
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <limits>
 

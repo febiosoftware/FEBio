@@ -28,16 +28,13 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEModelComponent.h"
-#include <string.h>
+#include "FEModel.h"
 #include "DumpStream.h"
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 FEModelComponent::FEModelComponent(FEModel* fem) : FECoreBase(fem)
 {
-	// the ID can be used by derived class to define a identifier for derived classes
-	// This value needs to be set in the constructor
-	m_nID = 0;
-
 	// initialize parameters
 	m_bactive = true;
 }
@@ -46,18 +43,6 @@ FEModelComponent::FEModelComponent(FEModel* fem) : FECoreBase(fem)
 FEModelComponent::~FEModelComponent()
 {
 	
-}
-
-//-----------------------------------------------------------------------------
-int FEModelComponent::GetID() const
-{
-	return m_nID;
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::SetID(int n)
-{
-	m_nID = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,9 +74,45 @@ void FEModelComponent::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_nID;
 	ar & m_bactive;
 }
 
 //-----------------------------------------------------------------------------
 void FEModelComponent::SetNodeSet(FENodeSet* ns) {}
+
+//-----------------------------------------------------------------------------
+double FEModelComponent::CurrentTime() const
+{
+	return GetFEModel()->GetTime().currentTime;
+}
+
+//-----------------------------------------------------------------------------
+double FEModelComponent::CurrentTimeIncrement() const
+{
+	return GetFEModel()->GetTime().timeIncrement;
+}
+
+//-----------------------------------------------------------------------------
+double FEModelComponent::GetGlobalConstant(const char* sz) const
+{
+	return GetFEModel()->GetGlobalConstant(sz);
+}
+
+//-----------------------------------------------------------------------------
+int FEModelComponent::GetDOFIndex(const char* szvar, int n) const
+{
+	return GetFEModel()->GetDOFIndex(szvar, n);
+}
+
+//-----------------------------------------------------------------------------
+int FEModelComponent::GetDOFIndex(const char* szdof) const
+{
+	return GetFEModel()->GetDOFIndex(szdof);
+}
+
+//-----------------------------------------------------------------------------
+//! Get the model's mesh
+FEMesh& FEModelComponent::GetMesh()
+{
+	return GetFEModel()->GetMesh();
+}

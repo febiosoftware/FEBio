@@ -72,7 +72,7 @@ double FEMultiphasicMultigeneration::GetGenerationTime(const int igen)
 //-----------------------------------------------------------------------------
 void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     
     // check if this mixture includes chemical reactions
     int nreact = (int)Reactions();

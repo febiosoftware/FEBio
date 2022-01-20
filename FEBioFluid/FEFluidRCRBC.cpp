@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include "FEBioFluid.h"
 #include <FECore/FEAnalysis.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidRCRBC, FESurfaceLoad)

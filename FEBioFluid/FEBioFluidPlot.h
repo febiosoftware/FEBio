@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEPlotData.h"
-#include <FECore/FEModel.h>
 
 //=============================================================================
 //                            N O D E   D A T A

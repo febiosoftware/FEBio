@@ -59,7 +59,7 @@ class FEBIOMECH_API FEBCPrescribedDeformation2O : public FEPrescribedNodeSet
 public:
 	FEBCPrescribedDeformation2O(FEModel* pfem);
 
-	void SetScale(double s, int lc = -1);
+	void SetScale(double s);
 
 	void SetReferenceNode(int n);
 

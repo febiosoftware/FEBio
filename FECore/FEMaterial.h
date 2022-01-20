@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
 #include "FEDomainList.h"
@@ -39,7 +39,7 @@ class FEDomain;
 class DumpStream;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEMaterialBase : public FECoreBase
+class FECORE_API FEMaterialBase : public FEModelComponent
 {
 public:
 	FEMaterialBase(FEModel* fem);

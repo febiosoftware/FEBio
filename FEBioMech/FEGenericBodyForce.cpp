@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEGenericBodyForce.h"
 #include "FEElasticMaterial.h"
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEGenericBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_force, "force");

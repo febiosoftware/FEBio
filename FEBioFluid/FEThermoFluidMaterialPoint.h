@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include "febiofluid_api.h"
 

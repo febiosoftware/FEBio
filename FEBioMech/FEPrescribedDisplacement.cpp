@@ -25,8 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPrescribedDisplacement.h"
-#include <FECore/FEModel.h>
-#include <FECore/DOFS.h>
 
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull

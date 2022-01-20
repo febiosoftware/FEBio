@@ -28,8 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEConstraintFrictionlessWall.h"
-#include "FECore/FECoreKernel.h"
-#include <FECore/FEModel.h>
+#include <FECore/FECoreKernel.h>
+#include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------
 FEConstraintFrictionlessWall::FEConstraintFrictionlessWall(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
@@ -47,9 +47,6 @@ void FEConstraintFrictionlessWall::Activate()
 //-----------------------------------------------------------------------------
 bool FEConstraintFrictionlessWall::Init()
 {
-    FEModel& fem = *GetFEModel();
-    DOFS& dofs = fem.GetDOFS();
-    
     // initialize surface
     m_surf.Init();
     
@@ -80,6 +77,11 @@ bool FEConstraintFrictionlessWall::Init()
     // normalize all vectors
     for (int i=0; i<N; ++i) m_nn[i].unit();
 
+    // get the dofs
+    int dof_wx = GetDOFIndex("wx");
+    int dof_wy = GetDOFIndex("wy");
+    int dof_wz = GetDOFIndex("wz");
+
     // create linear constraints
     // for a frictionless wall the constraint on (vx, vy, vz) is
     // nx*vx + ny*vy + nz*vz = 0
@@ -87,19 +89,19 @@ bool FEConstraintFrictionlessWall::Init()
         FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
         for (int j=0; j<3; ++j) {
             FEAugLagLinearConstraint::DOF dof;
-            FENode node = m_surf.Node(i);
+            FENode& node = m_surf.Node(i);
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("wx");
+                    dof.bc = dof_wx;
                     dof.val = m_nn[i].x;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("wy");
+                    dof.bc = dof_wy;
                     dof.val = m_nn[i].y;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("wz");
+                    dof.bc = dof_wz;
                     dof.val = m_nn[i].z;
                     break;
                 default:

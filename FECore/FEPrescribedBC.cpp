@@ -29,7 +29,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPrescribedBC.h"
 #include "FESurface.h"
-#include "FEModel.h"
+#include "FENode.h"
+#include "DOFS.h"
 
 BEGIN_FECORE_CLASS(FEPrescribedBC, FEBoundaryCondition)
 	ADD_PARAMETER(m_brelative, "relative");

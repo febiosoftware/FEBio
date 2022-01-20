@@ -32,7 +32,6 @@
 #include "FEDamageCDF.h"
 #include "FEUncoupledMaterial.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/matrix.h>
 
@@ -453,7 +452,7 @@ void FEReactivePlasticDamage::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
 {
     double Rhat = 0;
     
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     
     // extract elastic material point
     FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();

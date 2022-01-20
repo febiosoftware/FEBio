@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEShellDomain.h>
-#include <FECore/FEModel.h>
 #include <FECore/FEModelParam.h>
 #include <functional>
 #include "febiomech_api.h"

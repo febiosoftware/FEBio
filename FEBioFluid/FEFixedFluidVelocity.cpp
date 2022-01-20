@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedFluidVelocity.h"
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedFluidVelocity, FEFixedBC)
 	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:relative fluid velocity)");

@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidLock.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
 

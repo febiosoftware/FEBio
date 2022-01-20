@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidMaterial.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}

@@ -371,7 +371,7 @@ bool FERVEModel2O::PrepPeriodicLC()
 	// assign nodes to BCs
 	pdc->SetReferenceNode(set[0]);
 	pdc->SetNodeSet(const_cast<FENodeSet*>(&set));
-	pdc->SetScale(1.0, NLC);
+	pdc->SetScale(1.0);// , NLC);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);

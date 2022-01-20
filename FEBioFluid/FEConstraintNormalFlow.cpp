@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEConstraintNormalFlow.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 FEConstraintNormalFlow::FEConstraintNormalFlow(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
@@ -47,9 +47,6 @@ void FEConstraintNormalFlow::Activate()
 //-----------------------------------------------------------------------------
 bool FEConstraintNormalFlow::Init()
 {
-    FEModel& fem = *GetFEModel();
-    DOFS& dofs = fem.GetDOFS();
-    
     // initialize surface
     m_surf.Init();
     
@@ -79,6 +76,11 @@ bool FEConstraintNormalFlow::Init()
     
     // normalize all vectors
     for (int i=0; i<N; ++i) m_nn[i].unit();
+
+    // get the dof indices
+    int dof_wx = GetDOFIndex("wx");
+    int dof_wy = GetDOFIndex("wy");
+    int dof_wz = GetDOFIndex("wz");
     
     // create linear constraints
     // for a surface with zero tangential velocity the constraints
@@ -96,15 +98,15 @@ bool FEConstraintNormalFlow::Init()
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("wx");
+                    dof.bc = dof_wx;
                     dof.val = 1 - m_nn[i].x*m_nn[i].x;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("wy");
+                    dof.bc = dof_wy;
                     dof.val = -m_nn[i].x*m_nn[i].y;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("wz");
+                    dof.bc = dof_wz;
                     dof.val = -m_nn[i].x*m_nn[i].z;
                     break;
                 default:
@@ -123,15 +125,15 @@ bool FEConstraintNormalFlow::Init()
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("wx");
+                    dof.bc = dof_wx;
                     dof.val = -m_nn[i].x*m_nn[i].y;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("wy");
+                    dof.bc = dof_wy;
                     dof.val = 1 - m_nn[i].y*m_nn[i].y;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("wz");
+                    dof.bc = dof_wz;
                     dof.val = -m_nn[i].y*m_nn[i].z;
                     break;
                 default:
@@ -150,15 +152,15 @@ bool FEConstraintNormalFlow::Init()
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("wx");
+                    dof.bc = dof_wx;
                     dof.val = -m_nn[i].x*m_nn[i].z;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("wy");
+                    dof.bc = dof_wy;
                     dof.val = -m_nn[i].y*m_nn[i].z;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("wz");
+                    dof.bc = dof_wz;
                     dof.val = 1 - m_nn[i].z*m_nn[i].z;
                     break;
                 default:

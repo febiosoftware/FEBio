@@ -28,8 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBCPrescribedDeformation.h"
-#include <FECore/FELinearConstraintManager.h>
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 #include "FEBioMech.h"
 
 BEGIN_FECORE_CLASS(FEBCPrescribedDeformation, FEPrescribedNodeSet)
@@ -123,14 +122,9 @@ bool FEBCPrescribedDeformation2O::Init()
 //-----------------------------------------------------------------------------
 // Sets the displacement scale factor. An optional load curve index can be given
 // of the load curve that will control the scale factor.
-void FEBCPrescribedDeformation2O::SetScale(double s, int lc)
+void FEBCPrescribedDeformation2O::SetScale(double s)
 {
 	m_scale = s;
-	if (lc >= 0)
-	{
-		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		GetFEModel()->AttachLoadController(&p, lc);
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -165,8 +159,7 @@ void FEBCPrescribedDeformation2O::SetDeformationHessian(const tens3drs& G)
 //-----------------------------------------------------------------------------
 void FEBCPrescribedDeformation2O::GetNodalValues(int nodelid, std::vector<double>& val)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 	vec3d X1 = mesh.Node(m_refNode).m_r0;
 
 	vec3d X = GetNodeSet()->Node(nodelid)->m_r0;

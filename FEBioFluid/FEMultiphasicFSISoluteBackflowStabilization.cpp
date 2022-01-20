@@ -31,6 +31,7 @@
 #include "FEFluid.h"
 #include "FEBioMultiphasicFSI.h"
 #include <FECore/FENodeNodeList.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEMultiphasicFSISoluteBackflowStabilization, FESurfaceLoad)

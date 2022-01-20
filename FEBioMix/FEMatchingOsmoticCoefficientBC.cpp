@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
 #include "FEBioMix.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, FESurfaceLoad)

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEBioFluid.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads

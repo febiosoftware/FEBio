@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPrescribedDOF.h"
 #include "FENodeSet.h"
-#include "FEModel.h"
 #include "DumpStream.h"
 #include "log.h"
 

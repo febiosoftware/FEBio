@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEContinuousElasticDamage.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/expint_Ei.h>
 
@@ -199,7 +198,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 	damagePoint.m_Ds = 0.0;
 
 	// get current simulation time.
-	double t = GetFEModel()->GetTime().currentTime;
+	double t = CurrentTime();
 
 	// (i) compute trans-iso strain energy
 	double psi_f0 = Psi0(mp, a0);

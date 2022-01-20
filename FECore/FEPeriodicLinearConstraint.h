@@ -27,13 +27,12 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEMesh.h>
+#include "FEModelComponent.h"
 #include <FECore/FENodeList.h>
+#include <FECore/FENodeSet.h>
 #include "fecore_api.h"
 
-class FEModel;
-
-class FECORE_API FEPeriodicLinearConstraint
+class FECORE_API FEPeriodicLinearConstraint : public FEModelComponent
 {
 	struct NodeSetPair
 	{

@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "FEFluidSolutesPressure.h"
 #include "FEBioFluidSolutes.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidSolutesPressure, FESurfaceLoad)
