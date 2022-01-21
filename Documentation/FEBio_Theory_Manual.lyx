@@ -45481,7 +45481,27 @@ literal "false"
 \end_inset
 
 .
- The value of the slip criterion determines the stick-slip status via
+ The ratio 
+\begin_inset Formula $-p/t_{n}$
+\end_inset
+
+ represents the local fluid load support at each point on the contact surface.
+ Since the friction coefficient 
+\begin_inset Formula $\mu_{\text{eff}}$
+\end_inset
+
+ cannot be negative, the theoretical upper bound on the local fluid load
+ support is 
+\begin_inset Formula $\left.-p/t_{n}\right|_{\max}=\left(1-\varphi\right)^{-1}$
+\end_inset
+
+.
+ This upper bound is enforced whenever numerical errors produce a greater
+ value of the local fluid load support.
+\end_layout
+
+\begin_layout Standard
+The value of the slip criterion determines the stick-slip status via
 \begin_inset Formula 
 \begin{equation}
 \Psi\begin{cases}
@@ -45492,10 +45512,6 @@ literal "false"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 Following our prior study 
 \begin_inset CommandInset citation
 LatexCommand citep

@@ -33,6 +33,11 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEUDGHexDomain, FEElasticSolidDomain)
+	ADD_PARAMETER(m_hg, "hg");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 FEUDGHexDomain::FEUDGHexDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 { 
 	m_hg = 1.0; 
