@@ -27,21 +27,18 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBoundaryCondition.h"
-
-//-----------------------------------------------------------------------------
-class FENodeSet;
+#include "FENodalBC.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a fixed degree of freedom
 //! This boundary conditions sets the BC attribute of the nodes in the nodeset
 //! to DOF_FIXED when activated.
-class FECORE_API FEFixedBC : public FEBoundaryCondition
+class FECORE_API FEFixedBC : public FENodalBC
 {
 public:
 	//! constructors
 	FEFixedBC(FEModel* pfem);
-	FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset);
+	FEFixedBC(FEModel* pfem, int dof, FENodeSet* ps);
 
 	//! initialization
 	bool Init() override;
@@ -53,32 +50,19 @@ public:
 	void Deactivate() override;
 
 	void CopyFrom(FEBoundaryCondition* bc) override;
-
-public:
-	// set the dof list
-	void SetDOF(int ndof);
-	void SetDOFList(const std::vector<int>& dofs);
-
-	// get the dof list
-	const std::vector<int> GetDOFList();
-
-	// Set the node set
-	void SetNodeSet(FENodeSet* nodeSet);
-
-	// Get the node set
-	FENodeSet* GetNodeSet();
-
-protected:
-	std::vector<int>	m_dofs;		//!< dof list
-	FENodeSet*			m_nodeSet;
 };
 
 //-----------------------------------------------------------------------------
 // This class is obsolete, but provides a direct parameterization of the base class.
 // This is maintained for backward compatibility with older feb files.
-class FEFixedDOF : public FEFixedBC
+class FECORE_API FEFixedDOF : public FEFixedBC
 {
 public:
 	FEFixedDOF(FEModel* fem);
 	DECLARE_FECORE_CLASS();
+
+	bool Init() override;
+
+protected:
+	std::vector<int>	m_dofs;
 };

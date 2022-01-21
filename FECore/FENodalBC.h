@@ -23,53 +23,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
 
-
-
-#include "stdafx.h"
 #include "FEBoundaryCondition.h"
-#include "FEFacetSet.h"
-#include "FEModel.h"
+#include "fecore_api.h"
 
-REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
+class FENodeSet;
 
-//-----------------------------------------------------------------------------
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem), m_dof(pfem)
+class FECORE_API FENodalBC : public FEBoundaryCondition
 {
-}
+public:
+	FENodalBC(FEModel* fem);
 
-//-----------------------------------------------------------------------------
-FEBoundaryCondition::~FEBoundaryCondition()
-{
-}
+	// Set the node set
+	void SetNodeSet(FENodeSet* nodeSet);
 
-//-----------------------------------------------------------------------------
-//! fill the prescribed values
-void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
-{
+	// Get the node set
+	FENodeSet* GetNodeSet();
 
-}
+	void Serialize(DumpStream& ar) override;
 
-void FEBoundaryCondition::Serialize(DumpStream& ar)
-{
-	FEModelComponent::Serialize(ar);
-	if (ar.IsShallow() == false) ar & m_dof;
-}
-
-//-----------------------------------------------------------------------------
-void FEBoundaryCondition::SetDOFList(int ndof)
-{
-	m_dof.Clear();
-	m_dof.AddDof(ndof);
-}
-
-//-----------------------------------------------------------------------------
-void FEBoundaryCondition::SetDOFList(const std::vector<int>& dofs)
-{
-	m_dof = dofs;
-}
-
-void FEBoundaryCondition::SetDOFList(const FEDofList& dofs)
-{
-	m_dof = dofs;
-}
+private:
+	FENodeSet* m_nodeSet;
+};

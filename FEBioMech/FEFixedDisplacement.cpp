@@ -30,12 +30,16 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFixedDisplacement, FEFixedBC)
 	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:displacement)");
 	ADD_PARAMETER(m_shellBottom, "shell_bottom");
-
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEFixedDisplacement::FEFixedDisplacement(FEModel* fem) : FEFixedBC(fem)
 {
 	// TODO: Need to figure out how to actually choose the shell dofs!
 	m_shellBottom = false;
+}
+
+bool FEFixedDisplacement::Init()
+{
+	SetDOFList(m_dofs);
+	return FEFixedBC::Init();
 }

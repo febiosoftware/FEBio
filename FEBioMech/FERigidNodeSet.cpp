@@ -28,39 +28,22 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include "FERigidMaterial.h"
 
-BEGIN_FECORE_CLASS(FERigidNodeSet, FEModelComponent)
-	ADD_PARAMETER(m_rigidMat, "rb");
+BEGIN_FECORE_CLASS(FERigidNodeSet, FENodalBC)
+	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)");
 	ADD_PARAMETER(m_bshellBC, "clamp_shells");
-
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(pfem)
+FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FENodalBC(pfem)
 {
 	m_rigidMat = -1;
 	m_bshellBC = true;
-	m_nodeSet = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::CopyFrom(FEBoundaryCondition* pbc)
 {
 	assert(false);
-}
-
-//-----------------------------------------------------------------------------
-FERigidNodeSet::FERigidNodeSet(const FERigidNodeSet& rs) : FEBoundaryCondition(rs.GetFEModel())
-{
-	m_rigidMat = rs.m_rigidMat;
-	m_nodeSet = rs.m_nodeSet;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidNodeSet::operator = (const FERigidNodeSet& rs)
-{
-	m_rigidMat = rs.m_rigidMat;
-	m_nodeSet = rs.m_nodeSet;
 }
 
 //-----------------------------------------------------------------------------
@@ -73,9 +56,7 @@ bool FERigidNodeSet::Init()
 	if (pm == 0) return false;
 	if (pm->GetRigidBodyID() < 0) return false;
 
-	if (m_nodeSet == nullptr) return false;
-
-	return true;
+	return FENodalBC::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +72,7 @@ void FERigidNodeSet::Activate()
 	// assign the rigid body ID
 	FEModelComponent::Activate();
 	FEMesh& mesh = fem.GetMesh();
-	FENodeSet& nset = *m_nodeSet;
+	FENodeSet& nset = *GetNodeSet();
 	for (size_t i=0; i<nset.Size(); ++i)
 	{
 		FENode& node = mesh.Node(nset[i]);
@@ -105,12 +86,6 @@ void FERigidNodeSet::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidNodeSet::SetNodeSet(FENodeSet* ns)
-{
-	m_nodeSet = ns;
-}
-
-//-----------------------------------------------------------------------------
 void FERigidNodeSet::SetRigidMaterialID(int rid)
 {
 	m_rigidMat = rid;
@@ -121,7 +96,7 @@ void FERigidNodeSet::Deactivate()
 {
 	FEModelComponent::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENodeSet& nset = *m_nodeSet;
+	FENodeSet& nset = *GetNodeSet();
 	for (size_t i=0; i<nset.Size(); ++i)
 	{
 		FENode& node = mesh.Node(nset[i]);
@@ -139,5 +114,5 @@ void FERigidNodeSet::Serialize(DumpStream& ar)
 {
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_nodeSet & m_rigidMat & m_bshellBC;
+	ar & m_rigidMat & m_bshellBC;
 }

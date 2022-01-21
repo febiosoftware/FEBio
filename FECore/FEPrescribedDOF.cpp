@@ -87,8 +87,11 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 //-----------------------------------------------------------------------------
 bool FEPrescribedDOF::Init()
 {
+	// set the dof first before calling base class
+	SetDOFList(m_dof);
+
 	// don't forget to call the base class
-	if (FEPrescribedBC::Init() == false) return false;
+	if (FEPrescribedNodeSet::Init() == false) return false;
 
 	// make sure this is not a rigid node
 	FEModel& fem = *GetFEModel();
@@ -107,12 +110,6 @@ bool FEPrescribedDOF::Init()
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPrescribedDOF::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddDof(m_dof);
 }
 
 //-----------------------------------------------------------------------------

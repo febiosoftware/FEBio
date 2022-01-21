@@ -59,6 +59,11 @@ bool FEDofList::AddDof(const char* szdof)
 	return true;
 }
 
+void FEDofList::operator = (const std::vector<int>& dofs)
+{
+	m_dofList = dofs;
+}
+
 bool FEDofList::AddDof(int ndof)
 {
 	m_dofList.push_back(ndof);

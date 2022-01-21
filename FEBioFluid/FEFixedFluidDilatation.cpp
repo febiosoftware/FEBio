@@ -27,7 +27,6 @@ SOFTWARE.*/
 #include "FEFixedFluidDilatation.h"
 
 BEGIN_FECORE_CLASS(FEFixedFluidDilatation, FEFixedBC)
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
@@ -37,7 +36,6 @@ FEFixedFluidDilatation::FEFixedFluidDilatation(FEModel* fem) : FEFixedBC(fem)
 
 bool FEFixedFluidDilatation::Init()
 {
-	m_dofs.clear();
-	m_dofs.push_back(GetDOFIndex("ef"));
+	SetDOFList(GetDOFIndex("ef"));
 	return FEFixedBC::Init();
 }

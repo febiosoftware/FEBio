@@ -33,8 +33,6 @@ BEGIN_FECORE_CLASS(FEPrescribedRotation, FEBoundaryCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:shell rotation)");
 	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_RADIAN)->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
-
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedRotation::FEPrescribedRotation(FEModel* fem) : FEPrescribedDOF(fem)

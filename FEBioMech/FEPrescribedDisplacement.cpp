@@ -29,13 +29,11 @@ SOFTWARE.*/
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FENodalBC)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:displacement)");
 	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
 	ADD_PARAMETER(m_shellBottom, "shell_bottom");
-
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedDisplacement::FEPrescribedDisplacement(FEModel* fem) : FEPrescribedDOF(fem)

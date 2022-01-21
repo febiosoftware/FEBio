@@ -25,8 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPrescribedFluidDilatation.h"
-#include <FECore/FEModel.h>
-#include <FECore/DOFS.h>
 
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
@@ -34,8 +32,6 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedFluidDilatation, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
-
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedFluidDilatation::FEPrescribedFluidDilatation(FEModel* fem) : FEPrescribedDOF(fem)
@@ -45,8 +41,6 @@ FEPrescribedFluidDilatation::FEPrescribedFluidDilatation(FEModel* fem) : FEPresc
 
 bool FEPrescribedFluidDilatation::Init()
 {
-	FEModel* fem = GetFEModel();
-	int Tdof = fem->GetDOFIndex("ef");
-	SetDOF(Tdof);
+	SetDOF(GetDOFIndex("ef"));
 	return FEPrescribedDOF::Init();
 }

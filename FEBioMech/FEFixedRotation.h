@@ -26,7 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEFixedBC.h>
 
-class FEFixedRotation : public FEFixedBC
+class FEFixedRotation : public FEFixedDOF
 {
 public:
 	FEFixedRotation(FEModel* fem);

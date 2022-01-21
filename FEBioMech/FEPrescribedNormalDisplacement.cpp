@@ -41,6 +41,11 @@ FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : F
 {
 	m_scale = 0.0;
 	m_hint = 0;
+
+	// set the dof list
+	FEDofList dofs(fem);
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 }
 
 // activation
@@ -131,12 +136,6 @@ void FEPrescribedNormalDisplacement::Activate()
 	}
 
 	FEPrescribedSurface::Activate();
-}
-
-// set the dof list
-bool FEPrescribedNormalDisplacement::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 // return the values for node nodelid

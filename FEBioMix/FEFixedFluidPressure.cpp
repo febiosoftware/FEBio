@@ -25,21 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedFluidPressure.h"
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedFluidPressure, FEFixedBC)
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
-FEFixedFluidPressure::FEFixedFluidPressure(FEModel* fem) : FEFixedBC(fem)
+FEFixedFluidPressure::FEFixedFluidPressure(FEModel* fem) : FEFixedDOF(fem)
 {
 }
 
 bool FEFixedFluidPressure::Init()
 {
-	FEModel* fem = GetFEModel();
-	DOFS& dofs = fem->GetDOFS();
 	m_dofs.clear();
-	m_dofs.push_back(dofs.GetDOF("p"));
+	m_dofs.push_back(GetDOFIndex("p"));
 	return FEFixedBC::Init();
 }

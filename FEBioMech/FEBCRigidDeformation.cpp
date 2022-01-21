@@ -38,6 +38,10 @@ FEBCRigidDeformation::FEBCRigidDeformation(FEModel* fem) : FEPrescribedNodeSet(f
 {
 	m_rt = vec3d(0, 0, 0);
 	m_qt = vec3d(0, 0, 0);
+
+	FEDofList dofs(fem);
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 }
 
 void FEBCRigidDeformation::Activate()
@@ -66,9 +70,4 @@ void FEBCRigidDeformation::GetNodalValues(int nodelid, std::vector<double>& val)
 	val[0] = u.x;
 	val[1] = u.y;
 	val[2] = u.z;
-}
-
-bool FEBCRigidDeformation::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }

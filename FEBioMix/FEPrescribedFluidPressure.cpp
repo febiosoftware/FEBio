@@ -33,8 +33,6 @@ BEGIN_FECORE_CLASS(FEPrescribedFluidPressure, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC);
 	ADD_PARAMETER(m_brelative, "relative");
 	ADD_PARAMETER(m_shellBottom, "shell_bottom");
-	
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 FEPrescribedFluidPressure::FEPrescribedFluidPressure(FEModel* fem) : FEPrescribedDOF(fem)

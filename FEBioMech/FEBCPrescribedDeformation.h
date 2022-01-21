@@ -44,8 +44,6 @@ public:
 protected:
 	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-	bool SetDofList(FEDofList& dofs) override;
-
 protected:
 	double	m_scale;
 	mat3d	m_F;
@@ -71,8 +69,6 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 protected:
-	bool SetDofList(FEDofList& dofs) override;
-
 	void GetNodalValues(int nodelist, std::vector<double>& val) override;
 
 protected:

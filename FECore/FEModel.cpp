@@ -212,7 +212,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	// model properties
 	ADD_PROPERTY(m_imp->m_MAT , "material"       );
 	ADD_PROPERTY(m_imp->m_BC  , "bc"             );
-	ADD_PROPERTY(m_imp->m_ML  , "load");
+	ADD_PROPERTY(m_imp->m_ML  , "load"           );
 	ADD_PROPERTY(m_imp->m_IC  , "initial"        );
 	ADD_PROPERTY(m_imp->m_CI  , "contact"        );
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );

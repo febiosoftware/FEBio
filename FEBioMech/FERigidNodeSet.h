@@ -24,19 +24,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FENodalBC.h>
 #include "febiomech_api.h"
 
 class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! rigid node set
-class FEBIOMECH_API FERigidNodeSet : public FEBoundaryCondition
+class FEBIOMECH_API FERigidNodeSet : public FENodalBC
 {
 public:
 	FERigidNodeSet(FEModel* pfem);
-	FERigidNodeSet(const FERigidNodeSet& rs);
-	void operator = (const FERigidNodeSet& rs);
 
 	bool Init() override;
 
@@ -50,15 +48,9 @@ public:
 	// copy data from another class
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
-public: // from FEModelComponent
-	void SetNodeSet(FENodeSet* ns) override;
-
 private: // parameters
 	int			m_rigidMat;		//!< rigid body's material
 	bool		m_bshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
-
-private:
-	FENodeSet* m_nodeSet;
 
 	DECLARE_FECORE_CLASS();
 };

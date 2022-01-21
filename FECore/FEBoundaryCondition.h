@@ -60,6 +60,13 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+
+public:
+	// set the dof list
+	void SetDOFList(int ndof);
+	void SetDOFList(const std::vector<int>& dofs);
+	void SetDOFList(const FEDofList& dofs);
+
 	const FEDofList& GetDofList() const { return m_dof; }
 
 protected:

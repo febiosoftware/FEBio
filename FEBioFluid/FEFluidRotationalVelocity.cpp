@@ -49,6 +49,11 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescrib
     m_w = 0.0;
     m_n = vec3d(0,0,1);
     m_p = vec3d(0,0,0);
+
+	// Set the dof list
+	FEDofList dofs(pfem);
+	dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+	SetDOFList(dofs);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,13 +76,6 @@ void FEFluidRotationalVelocity::GetNodalValues(int nodelid, std::vector<double>&
 	val[0] = v.x;
 	val[1] = v.y;
 	val[2] = v.z;
-}
-
-//-----------------------------------------------------------------------------
-//! Set the dof list
-bool FEFluidRotationalVelocity::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 }
 
 //-----------------------------------------------------------------------------

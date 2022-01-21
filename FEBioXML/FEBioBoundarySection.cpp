@@ -201,10 +201,13 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::AddFixedBC(FENodeSet* set, int bc)
+void FEBioBoundarySection::AddFixedBC(FENodeSet* set, int dof)
 {
-	FEModel& fem = *GetFEModel();
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, bc, set));
+	FEModel* fem = GetFEModel();
+	FEFixedBC* bc = new FEFixedBC(fem);
+	bc->SetDOFList(dof);
+	bc->SetNodeSet(set);
+	fem->AddBoundaryCondition(bc);
 }
 
 //-----------------------------------------------------------------------------
@@ -353,7 +356,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 	for (int i=0; i<nbc; ++i)
 	{
 		FEFixedBC* pbci = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
-		pbci->SetDOF(bc[i]);
+		pbci->SetDOFList(bc[i]);
 		pbc[i] = pbci;
 
 		// add it to the model
@@ -426,7 +429,7 @@ void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 	for (int i=0; i<nbc; ++i)
 	{
 		FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
-		pbc->SetDOF(bc[i]);
+		pbc->SetDOFList(bc[i]);
 		pbc->SetNodeSet(nodeSet);
 
 		// add it to the model
