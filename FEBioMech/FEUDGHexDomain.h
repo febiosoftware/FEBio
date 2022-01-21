@@ -74,4 +74,6 @@ protected:
 
 public:
 	double	m_hg;	//!< hourglass parameter
+
+	DECLARE_FECORE_CLASS();
 };
