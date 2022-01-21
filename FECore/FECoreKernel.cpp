@@ -34,42 +34,6 @@ SOFTWARE.*/
 #include <stdarg.h>
 using namespace std;
 
-// A module defines a context in which features are defined and searched. 
-class FECoreKernel::Module
-{
-public:
-	const char*		m_szname;	// name of module
-	const char*		m_szdesc;	// description of module (optional, can be null)
-	unsigned int	m_id;		// unqiue ID (starting at one)
-	int				m_alloc_id;	// ID of allocator
-	vector<int>		m_depMods;	// module dependencies
-	FEModule*		m_module;	// module class needed for initialization model properties
-
-	void AddDependency(Module& mod)
-	{
-		AddDependency(mod.m_id);
-		AddDependencies(mod.m_depMods);
-	}
-
-private:
-	void AddDependency(int mid)
-	{
-		for (size_t i = 0; i < m_depMods.size(); ++i)
-		{
-			if (m_depMods[i] == mid) return;
-		}
-		m_depMods.push_back(mid);
-	}
-
-	void AddDependencies(const vector<int>& mid)
-	{
-		for (size_t i = 0; i < mid.size(); ++i)
-		{
-			AddDependency(mid[i]);
-		}
-	}
-};
-
 //-----------------------------------------------------------------------------
 FECoreKernel* FECoreKernel::m_pKernel = 0;
 
@@ -155,12 +119,10 @@ LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 {
 	unsigned int activeID = 0;
-	vector<int> moduleDepends;
 	if (m_activeModule != -1)
 	{
-		Module& activeModule = *m_modules[m_activeModule];
-		activeID = activeModule.m_id;
-		moduleDepends = activeModule.m_depMods;
+		FEModule& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.GetModuleID();
 	}
 
 	// see if the name already exists
@@ -242,9 +204,9 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 	vector<int> moduleDepends;
 	if (m_activeModule != -1)
 	{
-		Module& activeModule = *m_modules[m_activeModule];
-		activeID = activeModule.m_id;
-		moduleDepends = activeModule.m_depMods;
+		FEModule& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.GetModuleID();
+		moduleDepends = activeModule.GetDependencies();
 	}
 
 	// first check active module
@@ -430,8 +392,8 @@ bool FECoreKernel::SetActiveModule(const char* szmod)
 	// see if the module exists or not
 	for (size_t i=0; i<m_modules.size(); ++i) 
 	{
-		Module& mi = *m_modules[i];
-		if (strcmp(mi.m_szname, szmod) == 0)
+		FEModule& mi = *m_modules[i];
+		if (strcmp(mi.GetName(), szmod) == 0)
 		{
 			m_activeModule = (int) i;
 			return true;
@@ -452,8 +414,8 @@ bool FECoreKernel::SetActiveModule(int moduleId)
 	// see if the module exists or not
 	for (size_t i = 0; i < m_modules.size(); ++i)
 	{
-		Module& mi = *m_modules[i];
-		if (mi.m_id == moduleId)
+		FEModule& mi = *m_modules[i];
+		if (mi.GetModuleID() == moduleId)
 		{
 			m_activeModule = (int)i;
 			return true;
@@ -470,14 +432,14 @@ bool FECoreKernel::SetActiveModule(int moduleId)
 int FECoreKernel::GetActiveModuleID()
 {
 	if (m_activeModule == -1) return -1;
-	return m_modules[m_activeModule]->m_id;
+	return m_modules[m_activeModule]->GetModuleID();
 }
 
 //-----------------------------------------------------------------------------
 FEModule* FECoreKernel::GetActiveModule()
 {
 	if (m_activeModule == -1) return nullptr;
-	return m_modules[m_activeModule]->m_module;
+	return m_modules[m_activeModule];
 }
 
 //-----------------------------------------------------------------------------
@@ -491,6 +453,9 @@ int FECoreKernel::Modules() const
 //! create a module
 bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char* description)
 {
+	assert(pmodule);
+	if (pmodule == nullptr) return false;
+
 	m_activeModule = -1;
 	if (szmod == 0) return false;
 
@@ -498,17 +463,17 @@ bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char
 	if (SetActiveModule(szmod) == false)
 	{
 		// The module does not exist, so let's add it.
-		unsigned int newID = (unsigned int) m_modules.size() + 1;
-		Module* newModule = new Module;
-		newModule->m_szname = szmod;
-		newModule->m_id = newID;
-		newModule->m_szdesc = description;
-		newModule->m_module = pmodule;
-		m_modules.push_back(newModule);
+		unsigned int newID = (unsigned int)m_modules.size() + 1;
+
+		pmodule->SetName(szmod);
+		pmodule->SetID(newID);
+		pmodule->SetDescription(description);
+		m_modules.push_back(pmodule);
 
 		// make this the active module
 		m_activeModule = (int)m_modules.size() - 1;
 	}
+	else return false;
 
 	return true;
 }
@@ -518,13 +483,13 @@ bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char
 const char* FECoreKernel::GetModuleName(int i) const
 {
 	if ((i<0) || (i >= m_modules.size())) return nullptr;
-	return m_modules[i]->m_szname;
+	return m_modules[i]->GetName();
 }
 
 const char* FECoreKernel::GetModuleDescription(int i) const
 {
 	if ((i < 0) || (i >= m_modules.size())) return nullptr;
-	return m_modules[i]->m_szdesc;
+	return m_modules[i]->GetDescription();
 }
 
 //! Get a module
@@ -532,8 +497,8 @@ const char* FECoreKernel::GetModuleNameFromId(int id) const
 {
 	for (size_t n = 0; n < m_modules.size(); ++n)
 	{
-		const Module& mod = *m_modules[n];
-		if (mod.m_id == id) return mod.m_szname;
+		const FEModule& mod = *m_modules[n];
+		if (mod.GetModuleID() == id) return mod.GetName();
 	}
 	return 0;
 }
@@ -544,7 +509,7 @@ vector<int> FECoreKernel::GetModuleDependencies(int i) const
 	vector<int> md;
 	if ((i >= 0) && (i < m_modules.size()))
 	{
-		md = m_modules[i]->m_depMods;
+		md = m_modules[i]->GetDependencies();
 	}
 	return md;
 }
@@ -563,20 +528,20 @@ void FECoreKernel::SetSpecID(int nspec)
 bool FECoreKernel::SetModuleDependency(const char* szmodule)
 {
 	if (m_activeModule == -1) return false;
-	Module& activeModule = *m_modules[m_activeModule];
+	FEModule& activeModule = *m_modules[m_activeModule];
 
 	if (szmodule == 0)
 	{
 		// clear dependencies
-		activeModule.m_depMods.clear();
+		activeModule.ClearDependencies();
 		return true;
 	}
 
 	// find the module
 	for (size_t i = 0; i<m_modules.size(); ++i)
 	{
-		Module& mi = *m_modules[i];
-		if (strcmp(mi.m_szname, szmodule) == 0)
+		FEModule& mi = *m_modules[i];
+		if (strcmp(mi.GetName(), szmodule) == 0)
 		{
 			// add the module to the active module's dependency list
 			activeModule.AddDependency(mi);

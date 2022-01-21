@@ -47,9 +47,6 @@ class FEModule;
 //! with the kernel.
 class FECORE_API FECoreKernel
 {
-	// forward declaration of Module class
-	class Module;
-
 public:
 	// Do not call this function from a plugin as it will not return the correct
 	// instance. Instead, use the FECoreKernel object that is passed in the PluginInitialize method
@@ -162,8 +159,8 @@ private:
 	FEClassDescriptor*	m_default_solver;
 
 	// module list
-	vector<Module*>	m_modules;
-	int				m_activeModule;
+	vector<FEModule*>	m_modules;
+	int					m_activeModule;
 
 	int				m_nspec;
 

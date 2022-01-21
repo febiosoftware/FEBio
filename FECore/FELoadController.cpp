@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 REGISTER_SUPER_CLASS(FELoadController, FELOADCONTROLLER_ID);
 
-FELoadController::FELoadController(FEModel* fem) : FECoreBase(fem)
+FELoadController::FELoadController(FEModel* fem) : FEModelComponent(fem)
 {
 }
 
