@@ -41,12 +41,8 @@ SOFTWARE.*/
 class FELoadController;
 class FEMaterial;
 class FEModelLoad;
-class FENodalLoad;
 class FEBoundaryCondition;
 class FEInitialCondition;
-class FESurfaceLoad;
-class FEEdgeLoad;
-class FEBodyLoad;
 class FENLConstraint;
 class FESurfacePairConstraint;
 class FEAnalysis;
@@ -213,35 +209,6 @@ public:
 	FEInitialCondition* InitialCondition(int i);
 	void AddInitialCondition(FEInitialCondition* pbc);
 
-	// nodal loads
-	int NodalLoads();
-	FENodalLoad* NodalLoad(int i);
-	void AddNodalLoad(FENodalLoad* pfc);
-
-	// surface loads
-	int SurfaceLoads();
-	FESurfaceLoad* SurfaceLoad(int i);
-	void AddSurfaceLoad(FESurfaceLoad* psl);
-
-	// edge loads
-	int EdgeLoads();
-	FEEdgeLoad* EdgeLoad(int i);
-	void AddEdgeLoad(FEEdgeLoad* psl);
-
-public: // --- Body load functions --- 
-
-	//! Add a body load to the model
-	void AddBodyLoad(FEBodyLoad* pf);
-
-	//! get the number of body loads
-	int BodyLoads();
-
-	//! return a pointer to a body load
-	FEBodyLoad* GetBodyLoad(int i);
-
-	//! Init body loads
-	bool InitBodyLoads();
-
 public: // --- Analysis steps functions ---
 
 	//! retrieve the number of steps
@@ -327,9 +294,6 @@ public:	// --- Model Loads ----
 
 	//! initialize model loads
 	bool InitModelLoads();
-
-	//! find a surface load based on the name
-	FESurfaceLoad* FindSurfaceLoad(const std::string& loadName);
 
 public:	// --- Mesh adaptors ---
 	//! return number of mesh adaptors

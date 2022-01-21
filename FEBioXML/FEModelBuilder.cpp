@@ -47,6 +47,10 @@ SOFTWARE.*/
 #include <FEBioMech/FESSIShellDomain.h>
 #include <FECore/FEModule.h>
 #include <FECore/FEPointFunction.h>
+#include <FECore/FENodalLoad.h>
+#include <FECore/FEEdgeLoad.h>
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEBodyLoad.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -223,21 +227,21 @@ void FEModelBuilder::AddBC(FEBoundaryCondition* pbc)
 //-----------------------------------------------------------------------------
 void FEModelBuilder::AddNodalLoad(FENodalLoad* pfc)
 {
-	m_fem.AddNodalLoad(pfc);
+	m_fem.AddModelLoad(pfc);
 	AddComponent(pfc);
 }
 
 //-----------------------------------------------------------------------------
 void FEModelBuilder::AddSurfaceLoad(FESurfaceLoad* psl)
 {
-	m_fem.AddSurfaceLoad(psl);
+	m_fem.AddModelLoad(psl);
 	AddComponent(psl);
 }
 
 //-----------------------------------------------------------------------------
 void FEModelBuilder::AddEdgeLoad(FEEdgeLoad* pel)
 {
-	m_fem.AddEdgeLoad(pel);
+	m_fem.AddModelLoad(pel);
 	AddComponent(pel);
 }
 

@@ -185,7 +185,7 @@ bool FESolidSolver2::Init()
     }
     
 	// allocate vectors
-	m_Fn.assign(m_neq, 0);
+//	m_Fn.assign(m_neq, 0);
 	m_Fr.assign(m_neq, 0);
 	m_Ui.assign(m_neq, 0);
 	m_Ut.assign(m_neq, 0);
@@ -249,7 +249,7 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 
 	if (ar.IsLoading())
 	{
-		m_Fn.assign(m_neq, 0);
+//		m_Fn.assign(m_neq, 0);
 		m_Fr.assign(m_neq, 0);
 //		m_Ui.assign(m_neq, 0);
 	}
@@ -636,10 +636,10 @@ void FESolidSolver2::PrepStep()
     // apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
+//	vector<double> dummy(m_neq, 0.0);
+//	zero(m_Fn);
+//	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
+//	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -1058,10 +1058,10 @@ bool FESolidSolver2::StiffnessMatrix()
 	}
 
 	// calculate the body force stiffness matrix for each non-rigid domain
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.ModelLoads(); ++j)
 	{
-		FEBodyLoad* pbl =fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
+		FEModelLoad* pml = fem.ModelLoad(j);
+		if (pml->IsActive()) pml->StiffnessMatrix(LS);
 	}
     
     // TODO: add body force stiffness for rigid bodies
@@ -1096,7 +1096,7 @@ bool FESolidSolver2::StiffnessMatrix()
 	// for arclength method we need to apply the scale factor to all the 
 	// external forces stiffness matrix. 
 	if (m_arcLength > 0) LS.StiffnessAssemblyScaleFactor(m_al_lam);
-	int nsl = fem.SurfaceLoads();
+/*	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
@@ -1106,14 +1106,14 @@ bool FESolidSolver2::StiffnessMatrix()
 		}
 	}
 	if (m_arcLength > 0) LS.StiffnessAssemblyScaleFactor(1.0);
-
+*/
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(LS, tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS, tp);
+	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
 
 	// add contributions from rigid bodies
 	m_rigidSolver.StiffnessMatrix(*m_pK, tp);
@@ -1270,20 +1270,17 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 	const FETimeInfo& tp = fem.GetTime();
 	FEMesh& mesh = fem.GetMesh();
 
-	// add nodal loads
-	RHS += m_Fn;
-
-	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	// apply loads
+	for (int j = 0; j<fem.ModelLoads(); ++j)
 	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
+		FEModelLoad* pml = fem.ModelLoad(j);
+		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
 	// calculate body forces for rigid bodies
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.ModelLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
 		if (pbf && pbf->IsActive())
 			m_rigidSolver.BodyForces(RHS, tp, *pbf);
 	}
@@ -1311,13 +1308,13 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 	}
 
 	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
+/*	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
-
+*/
 	// calculate contact forces
 	ContactForces(RHS);
 
@@ -1336,7 +1333,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		FEModelLoad& mli = *fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
-			mli.LoadVector(RHS, tp);
+			mli.LoadVector(RHS);
 		}
 	}
 
@@ -1356,9 +1353,9 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 
 		// add nodal loads
 		double s = (m_arcLength>0 ? m_al_lam : 1.0);
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fn[n]*s);
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fn[n]*s);
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fn[n]*s);
+//		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fn[n]*s);
+//		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fn[n]*s);
+//		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fn[n]*s);
 	}
 }
 

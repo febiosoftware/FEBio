@@ -91,7 +91,7 @@ void FERigidCable::applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d&
 }
 
 //! forces
-void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidCable::LoadVector(FEGlobalVector& R)
 {
 	int npoints = (int)m_points.size();
 	if (npoints == 0) return;
@@ -146,7 +146,7 @@ void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! Stiffness matrix
-void FERigidCable::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidCable::StiffnessMatrix(FELinearSystem& LS)
 {
 	int npoints = (int)m_points.size();
 	if (npoints < 2) return;

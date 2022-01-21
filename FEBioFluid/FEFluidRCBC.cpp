@@ -45,7 +45,6 @@ FEFluidRCBC::FEFluidRCBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_pfluid = nullptr;
-    m_gamma = 1.0;
     m_p0 = 0;
     m_C = 0.0;
     m_Bern = false;
@@ -102,8 +101,11 @@ void FEFluidRCBC::Activate()
 //! Evaluate and prescribe the resistance pressure
 void FEFluidRCBC::Update()
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
-    double omoog = 1 - 1./m_gamma;
+    const FETimeInfo& tp = GetTimeInfo();
+
+    double dt = tp.timeIncrement;
+    double gamma = tp.gamma;
+    double omoog = 1 - 1./gamma;
     int niter = GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter;
 
     // if this is the start of a new time step, update the flow/pressure parameters
@@ -120,9 +122,9 @@ void FEFluidRCBC::Update()
     // evaluate the outflow pressure
     double qt = m_Bern ? m_qt*fabs(m_qt) : m_qt;
     double qp = m_Bern ? m_qp*fabs(m_qp) : m_qp;
-    m_dqt = m_dqp*omoog + (qt-qp)/m_gamma/dt;
-    m_dpt = m_dpp*omoog + (m_pt-m_pp)/m_gamma/dt;
-    m_pt = m_pp + (m_R*m_dqt + m_qt/m_C - m_dpp*omoog)*m_gamma*dt;
+    m_dqt = m_dqp*omoog + (qt-qp)/gamma/dt;
+    m_dpt = m_dpp*omoog + (m_pt-m_pp)/gamma/dt;
+    m_pt = m_pp + (m_R*m_dqt + m_qt/m_C - m_dpp*omoog)*gamma*dt;
     
     // calculate the dilatation
     double e = 0;
@@ -204,9 +206,8 @@ double FEFluidRCBC::FlowRate()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FEFluidRCBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidRCBC::LoadVector(FEGlobalVector& R)
 {
-    m_gamma = tp.gamma;
 }
 
 //-----------------------------------------------------------------------------

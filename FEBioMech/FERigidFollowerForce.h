@@ -45,10 +45,10 @@ public:
     void Serialize(DumpStream& ar) override;
 
     //! Residual
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
 
     //! Stiffness matrix
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+    void StiffnessMatrix(FELinearSystem& LS) override;
 
 public:
     int     m_rid;      //!< rigid body ID

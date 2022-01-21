@@ -79,7 +79,7 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 	}
 
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 //-----------------------------------------------------------------------------

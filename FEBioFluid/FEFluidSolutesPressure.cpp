@@ -22,7 +22,6 @@ FEFluidSolutesPressure::FEFluidSolutesPressure(FEModel* pfem) : FESurfaceLoad(pf
 {
     m_pfs = nullptr;
     m_pfs2 = nullptr;
-    m_alpha = 1.0;
     m_p = 0;
     
 
@@ -210,9 +209,8 @@ void FEFluidSolutesPressure::Update()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FEFluidSolutesPressure::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidSolutesPressure::LoadVector(FEGlobalVector& R)
 {
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +218,6 @@ void FEFluidSolutesPressure::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 void FEFluidSolutesPressure::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar & m_alpha & m_alphaf;
     ar & m_pfs;
     ar & m_pfs2;
     ar & m_dofC;

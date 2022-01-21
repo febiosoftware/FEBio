@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEModelParam.h"
 
-REGISTER_SUPER_CLASS(FEBodyLoad, FEBODYLOAD_ID);
-
 //-----------------------------------------------------------------------------
 FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelLoad(pfem)
 {
@@ -107,31 +105,9 @@ FEDomainList& FEBodyLoad::GetDomainList()
 	return m_dom; 
 }
 
-// Evaluate force vector
-void FEBodyLoad::ForceVector(FEGlobalVector& R)
-{
-
-}
-
-// evaluate stiffness matrix
-void FEBodyLoad::StiffnessMatrix(FELinearSystem& S)
-{
-
-}
-
 //! Serialization
 void FEBodyLoad::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
 	m_dom.Serialize(ar);
-}
-
-void FEBodyLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
-{
-
-}
-
-void FEBodyLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
-{
-
 }

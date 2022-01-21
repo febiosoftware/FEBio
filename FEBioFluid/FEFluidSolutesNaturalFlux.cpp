@@ -142,8 +142,10 @@ void FEFluidSolutesNaturalFlux::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesNaturalFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidSolutesNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
     m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
         
         FESurfaceElement& el = *mp.SurfaceElement();
@@ -292,8 +294,10 @@ vec3d FEFluidSolutesNaturalFlux::FluidVelocityElm(FESurfaceMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
     m_psurf->LoadVector(R, m_dofC, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
         
         FESurfaceElement& el = *mp.SurfaceElement();

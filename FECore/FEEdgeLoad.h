@@ -38,8 +38,6 @@ class FEGlobalVector;
 //-----------------------------------------------------------------------------
 class FECORE_API FEEdgeLoad : public FEModelLoad
 {
-	FECORE_SUPER_CLASS
-
 public:
 	FEEdgeLoad(FEModel* pfem);
 	virtual ~FEEdgeLoad(void);

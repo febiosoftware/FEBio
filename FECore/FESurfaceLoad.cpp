@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
-
 BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
 	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
 END_FECORE_CLASS()

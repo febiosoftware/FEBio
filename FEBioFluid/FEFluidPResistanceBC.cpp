@@ -47,7 +47,6 @@ END_FECORE_CLASS();
 FEFluidPResistanceBC::FEFluidPResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
-    m_alpha = 1.0;
     m_p0 = 0;
     
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
@@ -112,6 +111,8 @@ double FEFluidPResistanceBC::FlowRate()
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
+    const FETimeInfo& tp = GetTimeInfo();
+
     for (int iel=0; iel<m_psurf->Elements(); ++iel)
     {
         FESurfaceElement& el = m_psurf->Element(iel);
@@ -125,8 +126,8 @@ double FEFluidPResistanceBC::FlowRate()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alphaf);
+            rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
         }
         
         double* Nr, *Ns;
@@ -161,7 +162,6 @@ double FEFluidPResistanceBC::FlowRate()
 }
 
 //! calculate residual
-void FEFluidPResistanceBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidPResistanceBC::LoadVector(FEGlobalVector& R)
 { 
-	m_alpha = tp.alpha; m_alphaf = tp.alphaf; 
 }

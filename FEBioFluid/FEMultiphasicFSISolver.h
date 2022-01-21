@@ -137,7 +137,6 @@ public:
     vector<int> m_nceq;     //!< number of equations related to concentration dofs
     
 public:
-    vector<double> m_Fn;    //!< concentrated nodal force vector
     vector<double> m_Fr;    //!< nodal reaction forces
     vector<double> m_di;    //!< displacement increment vector
     vector<double> m_Di;    //!< Total displacement vector for iteration

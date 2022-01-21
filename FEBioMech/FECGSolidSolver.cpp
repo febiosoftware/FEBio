@@ -136,7 +136,6 @@ bool FECGSolidSolver::Init()
 	int neq = m_neq;
 
 	// allocate vectors
-	m_Fn.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
@@ -273,14 +272,6 @@ void FECGSolidSolver::PrepStep()
 		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
 	}
-
-	// apply concentrated nodal forces
-	// since these forces do not depend on the geometry
-	// we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -937,7 +928,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -963,30 +954,8 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 		dom.InternalForces(RHS);
 	}
 
-	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				dom.BodyForce(RHS, *pbf);
-			}
-		}
-	}
-
 	// calculate inertial forces for dynamic problems
 	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
-
-	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i = 0; i<nsl; ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
-	}
 
 	// calculate contact forces
 	if (fem.SurfacePairConstraints() > 0)
@@ -1007,10 +976,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	for (int i = 0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *fem.ModelLoad(i);
-		if (mli.IsActive())
-		{
-			mli.LoadVector(RHS, tp);
-		}
+		if (mli.IsActive()) mli.LoadVector(RHS);
 	}
 
 	// set the nodal reaction forces

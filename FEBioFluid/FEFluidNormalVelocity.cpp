@@ -56,8 +56,10 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal velocity
-void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 {
+    FETimeInfo& tp = GetFEModel()->GetTime();
+
 	FEDofList dofE(GetFEModel());
 	dofE.AddDof(m_dofEF);
 	m_psurf->LoadVector(R, dofE, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {

@@ -40,8 +40,6 @@ class FEGlobalVector;
 //! This is the base class for all loads that are applied to surfaces
 class FECORE_API FESurfaceLoad : public FEModelLoad
 {
-	FECORE_SUPER_CLASS
-
 public:
 	FESurfaceLoad(FEModel* pfem);
 	virtual ~FESurfaceLoad(void);

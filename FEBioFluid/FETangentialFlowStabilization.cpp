@@ -90,8 +90,10 @@ vec3d FETangentialFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, d
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
         FESurfaceElement& el = *mp.SurfaceElement();
@@ -131,8 +133,10 @@ void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
 	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
 		FESurfaceElement& el = *mp.SurfaceElement();

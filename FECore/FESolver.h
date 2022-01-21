@@ -138,7 +138,7 @@ public:
 	virtual bool Augment();
 
 	//! Calculates concentrated nodal loads
-	virtual void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp);
+//	virtual void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp);
 
 public:
 	//! Set the equation allocation scheme

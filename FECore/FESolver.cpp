@@ -779,19 +779,6 @@ bool FESolver::Augment()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates concentrated nodal loads
-void FESolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	// loop over nodal loads
-	FEModel& fem = *GetFEModel();
-	for (int i = 0; i<fem.NodalLoads(); ++i)
-	{
-		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.LoadVector(R, tp);
-	}
-}
-
-//-----------------------------------------------------------------------------
 // return the node (mesh index) from an equation number
 FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
 {

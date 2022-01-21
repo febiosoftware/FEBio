@@ -145,8 +145,10 @@ mat3ds FEFluidFSITraction::GetFluidStress(FESurfaceMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFSITraction::LoadVector(FEGlobalVector& R)
 {
+	const FETimeInfo& tp = GetTimeInfo();
+
 	// If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
     FEDofList dof = m_bshellb ? m_dofSU : m_dofU;
 	m_psurf->LoadVector(R, dof, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
@@ -185,10 +187,12 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel* fem = GetFEModel();
 	FESurface* ps = &GetSurface();
+
+	const FETimeInfo& tp = GetTimeInfo();
 
 	// build dof list
 	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).

@@ -41,10 +41,10 @@ public:
     FEFluidPResistanceBC(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
     
     //! set the dilatation
     void Update() override;
@@ -60,8 +60,6 @@ public:
     
 private:
     double          m_R;        //!< flow resistance
-    double          m_alpha;
-    double          m_alphaf;
     double          m_p0;       //!< fluid pressure offset
     
     FEDofList	m_dofW;

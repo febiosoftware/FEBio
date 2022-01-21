@@ -75,10 +75,11 @@ void FERigidFollowerForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidFollowerForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidFollowerForce::LoadVector(FEGlobalVector& R)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
+    const FETimeInfo& tp = fem.GetTime();
 
     double alpha = tp.alphaf;
     
@@ -113,11 +114,12 @@ void FERigidFollowerForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented.
-void FERigidFollowerForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidFollowerForce::StiffnessMatrix(FELinearSystem& LS)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
 
+    const FETimeInfo& tp = fem.GetTime();
     double alpha = tp.alphaf;
     
     // get the attachment position in global coordinates for body A

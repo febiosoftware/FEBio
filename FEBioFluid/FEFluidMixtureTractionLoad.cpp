@@ -63,7 +63,7 @@ bool FEFluidMixtureTractionLoad::Init()
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
-void FEFluidMixtureTractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidMixtureTractionLoad::LoadVector(FEGlobalVector& R)
 {
     m_psurf->LoadVector(R, m_dof, true, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
         
@@ -80,7 +80,7 @@ void FEFluidMixtureTractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo&
 
 //-----------------------------------------------------------------------------
 //! calculate traction stiffness (there is none)
-void FEFluidMixtureTractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidMixtureTractionLoad::StiffnessMatrix(FELinearSystem& LS)
 {
     
 }

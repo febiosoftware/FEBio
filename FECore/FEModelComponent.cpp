@@ -116,3 +116,9 @@ FEMesh& FEModelComponent::GetMesh()
 {
 	return GetFEModel()->GetMesh();
 }
+
+//-----------------------------------------------------------------------------
+const FETimeInfo& FEModelComponent::GetTimeInfo() const
+{
+	return GetFEModel()->GetTime();
+}

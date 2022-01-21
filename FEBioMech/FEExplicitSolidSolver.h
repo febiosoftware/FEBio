@@ -97,7 +97,6 @@ public:
 	int		m_nreq;			//!< start of rigid body equations
 
 	vector<double> m_Mi;	//!< inverse mass vector for explicit analysis
-	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 

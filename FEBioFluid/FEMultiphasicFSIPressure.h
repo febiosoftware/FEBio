@@ -21,10 +21,10 @@ public:
     FEMultiphasicFSIPressure(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
     
     //! set the dilatation
     void Update() override;
@@ -43,9 +43,6 @@ private:
     double          m_p;       //!< prescribed fluid pressure
     
 private:
-    double          m_alpha;
-    double          m_alphaf;
-    
     FEMultiphasicFSI*    m_pfs;   //!< pointer to fluid-solutes material
     
     int        m_dofEF;

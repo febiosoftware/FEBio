@@ -75,7 +75,7 @@ void FEBioLoadsSection1x::ParseBodyForce(XMLTag &tag)
 	if (pf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// add it to the model
-	fem.AddBodyLoad(pf);
+	fem.AddModelLoad(pf);
 
 	// read the parameter list
 	ReadParameterList(tag, pf);
@@ -88,7 +88,7 @@ void FEBioLoadsSection1x::ParseBodyLoad(XMLTag& tag)
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(tag.Name(), &fem);
 	if (pbl == 0) throw XMLReader::InvalidTag(tag);
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ void FEBioLoadsSection2::ParseBodyLoad(XMLTag& tag)
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 
@@ -537,7 +537,7 @@ void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 	}
 
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 //-----------------------------------------------------------------------------

@@ -116,7 +116,6 @@ public:
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
 
 public:
-	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
 
 public:

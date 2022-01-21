@@ -104,7 +104,6 @@ private:
 	vector<double>	m_Ui;
 	vector<double>	m_ui;
 	vector<double>	m_Ut;
-	vector<double>	m_Fn;
 	vector<double>	m_Fd;
 	vector<double>	m_Fr;
 

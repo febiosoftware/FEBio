@@ -33,8 +33,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 class FERigidLoad : public FEModelLoad
 {
-	FECORE_SUPER_CLASS
-
 public:
 	FERigidLoad(FEModel* fem) : FEModelLoad(fem) {}
 };
@@ -54,10 +52,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! Residual
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 public:
 	int		m_ida, m_idb;		//!< rigid body ID's
@@ -96,10 +94,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! forces
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 public:
 	void SetRigidMaterialID(int nid);

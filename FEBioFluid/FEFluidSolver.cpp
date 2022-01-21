@@ -134,7 +134,6 @@ bool FEFluidSolver::Init()
     
     // allocate vectors
     int neq = m_neq;
-    m_Fn.assign(neq, 0);
     m_Fr.assign(neq, 0);
     m_Ui.assign(neq, 0);
     m_Ut.assign(neq, 0);
@@ -346,14 +345,6 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
         if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.Update();
     }
 
-    // prescribe DOFs for specialized surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive() && HasActiveDofs(psl.GetDofList())) psl.Update();
-    }
-    
 	// enforce the linear constraints
 	// TODO: do we really have to do this? Shouldn't the algorithm
 	// already guarantee that the linear constraints are satisfied?
@@ -527,14 +518,6 @@ void FEFluidSolver::PrepStep()
         }
     }
     
-    // apply concentrated nodal forces
-    // since these forces do not depend on the geometry
-    // we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEGlobalVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
-
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
@@ -545,15 +528,7 @@ void FEFluidSolver::PrepStep()
         FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
         if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.PrepStep(ui);
     }
-    
-    // apply prescribed DOFs for specialized surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive() && HasActiveDofs(psl.GetDofList())) psl.Update();
-    }
-    
+  
     // intialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
@@ -766,10 +741,10 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     }
     
     // calculate the body force stiffness matrix for each domain
-	int NBL = fem.BodyLoads();
+	int NBL = fem.ModelLoads();
 	for (int j = 0; j<NBL; ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
 		if (pbf && pbf->IsActive())
 		{
 			for (int i = 0; i<pbf->Domains(); ++i)
@@ -783,12 +758,13 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     // calculate contact stiffness
     ContactStiffness(LS);
     
-    // calculate stiffness matrix due to surface loads
-    int nsl = fem.SurfaceLoads();
+    // calculate stiffness matrix due to model loads
+    int nsl = fem.ModelLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive() && HasActiveDofs(psl->GetDofList())) psl->StiffnessMatrix(LS, tp);
+        FEModelLoad* pml = fem.ModelLoad(i);
+        if (pml->IsActive()) pml->StiffnessMatrix(LS);
+//        if (pml->IsActive() && HasActiveDofs(pml->GetDofList())) pml->StiffnessMatrix(LS);
     }
     
     // Add mass matrix
@@ -864,7 +840,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
     // initialize residual with concentrated nodal loads
-    R = m_Fn;
+    zero(R);
     
     // zero nodal reaction forces
     zero(m_Fr);
@@ -883,9 +859,9 @@ bool FEFluidSolver::Residual(vector<double>& R)
     }
     
     // calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.ModelLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
 		if (pbf && pbf->IsActive())
 		{
 			for (int i = 0; i<pbf->Domains(); ++i)
@@ -903,14 +879,6 @@ bool FEFluidSolver::Residual(vector<double>& R)
         dom.InertialForces(RHS, tp);
     }
 
-    // calculate forces due to surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive() && HasActiveDofs(psl->GetDofList())) psl->LoadVector(RHS, tp);
-    }
-    
     // calculate contact forces
     ContactForces(RHS);
     
@@ -926,7 +894,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
         FEModelLoad& mli = *fem.ModelLoad(i);
         if (mli.IsActive())
         {
-            mli.LoadVector(RHS, tp);
+            mli.LoadVector(RHS);
         }
     }
     
@@ -976,7 +944,7 @@ void FEFluidSolver::Serialize(DumpStream& ar)
 	ar & m_gammaf;
 	ar & m_pred;
 
-	ar & m_Fn & m_Fr & m_Ui &m_Ut;
+	ar & m_Fr & m_Ui &m_Ut;
 	ar & m_Vi & m_vi;
 	ar & m_Di & m_di;
 }

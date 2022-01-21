@@ -71,11 +71,12 @@ void FERigidFollowerMoment::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidFollowerMoment::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidFollowerMoment::LoadVector(FEGlobalVector& R)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
 
+    const FETimeInfo& tp = fem.GetTime();
     double alpha = tp.alphaf;
     
     // calculate the moment value
@@ -96,11 +97,12 @@ void FERigidFollowerMoment::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented.
-void FERigidFollowerMoment::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidFollowerMoment::StiffnessMatrix(FELinearSystem& LS)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
 
+    const FETimeInfo& tp = fem.GetTime();
     double alpha = tp.alphaf;
     
     // calculate the moment value

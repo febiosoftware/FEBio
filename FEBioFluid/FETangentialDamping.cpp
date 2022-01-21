@@ -82,8 +82,10 @@ vec3d FETangentialDamping::FluidVelocity(FESurfaceMaterialPoint& mp, double alph
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialDamping::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETangentialDamping::LoadVector(FEGlobalVector& R)
 {
+	const FETimeInfo& tp = GetTimeInfo();
+
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// fluid velocity
@@ -104,7 +106,7 @@ void FETangentialDamping::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialDamping::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETangentialDamping::StiffnessMatrix(FELinearSystem& LS)
 {
 	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
    

@@ -100,9 +100,9 @@ bool FESoluteFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESoluteFlux::LoadVector(FEGlobalVector& R)
 {
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	m_psurf->SetShellBottom(m_bshellb);
 
@@ -123,10 +123,10 @@ void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS)
 {
 	// time increment
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	m_psurf->SetShellBottom(m_bshellb);
 	

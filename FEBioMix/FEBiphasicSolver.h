@@ -69,10 +69,6 @@ public:
 
 public:
 
-	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
-	//! (This function is called from FESolidSolver2::PrepStep)
-	void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp) override;
-
 	//! Calculates residual (overridden from FESolidSolver2)
 	bool Residual(vector<double>& R) override;
 

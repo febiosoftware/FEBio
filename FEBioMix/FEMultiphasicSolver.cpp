@@ -408,44 +408,6 @@ bool FEMultiphasicSolver::Quasin()
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the concentrated nodal forces
-void FEMultiphasicSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	// loop over nodal loads
-	FEModel& fem = *GetFEModel();
-	int NNL = fem.NodalLoads();
-	for (int i=0; i<NNL; ++i)
-	{
-		FENodalDOFLoad& fc = dynamic_cast<FENodalDOFLoad&>(*fem.NodalLoad(i));
-		if (fc.IsActive())
-		{
-			int dof = fc.GetDOF();
-
-			FENodeSet& nset = *fc.GetNodeSet();
-			int N = nset.Size();
-			for (int j=0; j<N; ++j)
-			{
-				int nid	= nset[j];	// node ID
-
-				// get the nodal load value
-				double f = fc.NodeValue(j);
-			
-				// For pressure and concentration loads, multiply by dt
-				// for consistency with evaluation of residual and stiffness matrix
-                bool adjust = false;
-                if ((dof == m_dofP) || (dof == m_dofQ)) adjust = true;
-                else if ((m_dofC > -1) && (dof >= m_dofC)) adjust = true;
-                else if ((m_dofD > -1) && (dof >= m_dofD)) adjust = true;
-                if (adjust) f *= tp.timeIncrement;
-
-				// assemble into residual
-				R.Assemble(nid, dof, f);
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! calculates the residual vector
 //! Note that the concentrated nodal forces are not calculated here.
 //! This is because they do not depend on the geometry 
@@ -460,7 +422,7 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -511,23 +473,12 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
             ped->InternalForces(RHS);
     }
     
-	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	// add model loads
+	int NML = fem.ModelLoads();
+	for (i = 0; i < NML; ++i)
 	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
-	}
-
-	// calculate body forces
-	// NOTE: I'm putting this here because there is no 
-	// mechanism yet for calling body forces and I need it 
-	// for calling solute point sources
-	int nbl = fem.BodyLoads();
-	for (int i = 0; i < nbl; ++i)
-	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(i);
-		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
+		FEModelLoad& mli = *fem.ModelLoad(i);
+		if (mli.IsActive()) mli.LoadVector(RHS);
 	}
 
 	// calculate contact forces
@@ -537,17 +488,6 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
 	NonLinearConstraintForces(RHS, tp);
-
-	// add model loads
-	int NML = fem.ModelLoads();
-	for (i=0; i<NML; ++i)
-	{
-		FEModelLoad& mli = *fem.ModelLoad(i);
-		if (mli.IsActive())
-		{
-			mli.LoadVector(RHS, tp);
-		}
-	}
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -626,27 +566,12 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 	// calculate contact stiffness
 	ContactStiffness(LS);
 
-	// calculate stiffness matrices for surface loads
-	int nsl = fem.SurfaceLoads();
+	// calculate stiffness matrices for model loads
+	int nsl = fem.ModelLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-
-		if (psl->IsActive())
-		{
-			psl->StiffnessMatrix(LS, tp);
-		}
-	}
-
-	// calculate body forces
-	// NOTE: I'm putting this here because there is no 
-	// mechanism yet for calling body forces and I need it 
-	// for calling solute point sources
-	int nbl = fem.BodyLoads();
-	for (int i = 0; i < nbl; ++i)
-	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(i);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
+		FEModelLoad* pml = fem.ModelLoad(i);
+		if (pml->IsActive()) pml->StiffnessMatrix(LS);
 	}
 
 	// calculate nonlinear constraint stiffness

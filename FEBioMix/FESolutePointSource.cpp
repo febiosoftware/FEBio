@@ -187,14 +187,14 @@ void FESolutePointSource::Update()
 }
 
 //! Evaluate force vector
-void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESolutePointSource::LoadVector(FEGlobalVector& R)
 {
 	// get the domain in which this element resides
 	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(m_el->GetMeshPartition());
 	FEMesh* mesh = dom->GetMesh();
 
 	// get time increment
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	// evaluate the shape functions at the position
 	double H[FEElement::MAX_NODES];
@@ -240,11 +240,10 @@ void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! evaluate stiffness matrix
-void FESolutePointSource::StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp)
+void FESolutePointSource::StiffnessMatrix(FELinearSystem& S)
 {
-
 	// get time increment
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	// get the domain in which this element resides
 	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(m_el->GetMeshPartition());

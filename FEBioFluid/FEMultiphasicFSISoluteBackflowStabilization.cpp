@@ -65,7 +65,6 @@ bool FEMultiphasicFSISoluteBackflowStabilization::Init()
     
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
-    m_alpha = 1.0;
     
     m_nnlist.Create(fem.GetMesh());
     
@@ -176,6 +175,8 @@ void FEMultiphasicFSISoluteBackflowStabilization::MarkBackFlow()
         }
     }
     
+    const FETimeInfo& tp = GetTimeInfo();
+
     // Calculate normal flow velocity on each face to determine
     // backflow condition
     vec3d rt[FEElement::MAX_NODES];
@@ -194,8 +195,8 @@ void FEMultiphasicFSISoluteBackflowStabilization::MarkBackFlow()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alphaf);
+            rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
         }
         
         double* Nr, *Ns;
@@ -240,9 +241,9 @@ void FEMultiphasicFSISoluteBackflowStabilization::MarkBackFlow()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FEMultiphasicFSISoluteBackflowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMultiphasicFSISoluteBackflowStabilization::LoadVector(FEGlobalVector& R)
 {
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
+
 }
 
 //-----------------------------------------------------------------------------
@@ -253,7 +254,5 @@ void FEMultiphasicFSISoluteBackflowStabilization::Serialize(DumpStream& ar)
     ar & m_dofW;
     ar & m_dofC;
     ar & m_backflow;
-    ar & m_alpha;
-    ar & m_alphaf;
     //ar & m_nnlist;
 }

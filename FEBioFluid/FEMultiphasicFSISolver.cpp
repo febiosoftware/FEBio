@@ -210,7 +210,6 @@ bool FEMultiphasicFSISolver::Init()
     
     // allocate vectors
     int neq = m_neq;
-    m_Fn.assign(neq, 0);
     m_Fr.assign(neq, 0);
     m_Ui.assign(neq, 0);
     m_Ut.assign(neq, 0);
@@ -535,7 +534,7 @@ void FEMultiphasicFSISolver::Serialize(DumpStream& ar)
     ar & m_beta & m_gamma;
     ar & m_pred;
     
-    ar & m_Fn & m_Ui & m_Ut & m_Fr;
+    ar & m_Ui & m_Ut & m_Fr;
     ar & m_di & m_Di;
     ar & m_vi & m_Vi;
     ar & m_fi & m_Fi;
@@ -614,11 +613,11 @@ void FEMultiphasicFSISolver::UpdateKinematics(vector<double>& ui)
     }
     
     // apply prescribed DOFs for specialized surface loads
-    int nsl = fem.SurfaceLoads();
+    int nsl = fem.ModelLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive()) psl.Update();
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.Update();
     }
     
     // enforce the linear constraints
@@ -790,14 +789,6 @@ void FEMultiphasicFSISolver::Update(vector<double>& ui)
     
     // update element stresses
     UpdateModel();
-    
-    // update other stuff that may depend on the deformation
-    int NBL = fem.BodyLoads();
-    for (int i = 0; i<NBL; ++i)
-    {
-        FEBodyLoad* pbl = fem.GetBodyLoad(i);
-        if (pbl->IsActive()) pbl->Update();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -998,14 +989,6 @@ void FEMultiphasicFSISolver::PrepStep()
         }
     }
     
-    // apply concentrated nodal forces
-    // since these forces do not depend on the geometry
-    // we can do this once outside the NR loop.
-    vector<double> dummy(m_neq, 0.0);
-    zero(m_Fn);
-    FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-    NodalLoads(Fn, tp);
-    
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
@@ -1015,14 +998,6 @@ void FEMultiphasicFSISolver::PrepStep()
     {
         FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
         if (bc.IsActive()) bc.PrepStep(ui);
-    }
-    
-    // apply prescribed DOFs for specialized surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive()) psl.Update();
     }
     
     // do the linear constraints
@@ -1333,10 +1308,10 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
     
     // calculate the body force stiffness matrix for each domain
     // but not for solid domains (since they have no mass in FSI)
-    int NBL = fem.BodyLoads();
+    int NBL = fem.ModelLoads();
     for (int j = 0; j<NBL; ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
         if (pbf && pbf->IsActive())
         {
             for (int i = 0; i<pbf->Domains(); ++i)
@@ -1401,21 +1376,13 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
     // calculate contact stiffness
     ContactStiffness(LS);
     
-    // calculate stiffness matrix due to surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->StiffnessMatrix(LS, tp);
-    }
-    
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
     // constrainst enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     // calculate the stiffness contributions for the rigid forces
-    for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS, tp);
+    for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
     
     // add contributions from rigid bodies
     m_rigidSolver.StiffnessMatrix(*m_pK, tp);
@@ -1480,7 +1447,7 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
     const FETimeInfo& tp = fem.GetTime();
     
     // initialize residual with concentrated nodal loads
-    R = m_Fn;
+    zero(R);
     
     // zero nodal reaction forces
     zero(m_Fr);
@@ -1518,9 +1485,9 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
     }
     
     // calculate the body forces
-    for (int j = 0; j<fem.BodyLoads(); ++j)
+    for (int j = 0; j<fem.ModelLoads(); ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
         if (pbf && pbf->IsActive())
         {
             for (int i = 0; i<pbf->Domains(); ++i)
@@ -1548,9 +1515,9 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
     }
     
     // calculate body forces for rigid bodies
-    for (int j=0; j<fem.BodyLoads(); ++j)
+    for (int j=0; j<fem.ModelLoads(); ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
         if (pbf && pbf->IsActive())
             m_rigidSolver.BodyForces(RHS, tp, *pbf);
     }
@@ -1586,14 +1553,6 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
     // update rigid bodies
     if (pstep->m_nanalysis == FE_DYNAMIC) m_rigidSolver.InertialForces(RHS, tp);
     
-    // calculate forces due to surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->LoadVector(RHS, tp);
-    }
-    
     // calculate contact forces
     ContactForces(RHS);
     
@@ -1607,10 +1566,7 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
     for (int i=0; i<NML; ++i)
     {
         FEModelLoad& mli = *fem.ModelLoad(i);
-        if (mli.IsActive())
-        {
-            mli.LoadVector(RHS, tp);
-        }
+        if (mli.IsActive()) mli.LoadVector(RHS);
     }
     
     // set the nodal reaction forces

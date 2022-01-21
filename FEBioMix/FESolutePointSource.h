@@ -55,10 +55,10 @@ public:
 	void SetAccumulateFlag(bool b);
 
 	//! Evaluate force vector
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! evaluate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& S) override;
 
 private:
 	int		m_soluteId;	//!< solute ID

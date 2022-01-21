@@ -46,8 +46,6 @@ END_FECORE_CLASS();
 FESoluteConvectiveFlow::FESoluteConvectiveFlow(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_sol = 0;
-    m_gamma = 0.5;
-    m_dt = 0;
     
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     m_dofEF = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
@@ -109,6 +107,10 @@ void FESoluteConvectiveFlow::Update()
 {
     FEModel& fem = *GetFEModel();
     FEMesh& mesh = fem.GetMesh();
+
+    FETimeInfo& tp = fem.GetTime();
+    double gamma = tp.gamma;
+    double dt = tp.timeIncrement;
     
     for (int i=0; i<mesh.Nodes(); ++i)
     {
@@ -118,7 +120,7 @@ void FESoluteConvectiveFlow::Update()
             vec3d vt = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
             vec3d vp = node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
             
-            vec3d X = x - (vt*m_gamma + vp*(1-m_gamma))*m_dt;
+            vec3d X = x - (vt*gamma + vp*(1-gamma))*dt;
             
             int dofc = m_dofC + m_sol - 1;
             double r[3] = { 0 };

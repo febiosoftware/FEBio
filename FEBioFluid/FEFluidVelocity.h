@@ -36,6 +36,7 @@ SOFTWARE.*/
 //! FEFluidVelocity is a fluid surface that has a velocity
 //! prescribed on it.  This routine simultaneously prescribes a
 //! surface load and nodal prescribed velocities
+//! TODO: This is not a surface load!
 class FEBIOFLUID_API FEFluidVelocity : public FESurfaceLoad
 {
 public:
@@ -43,10 +44,10 @@ public:
     FEFluidVelocity(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
     
     //! set the velocity
     void Update() override;

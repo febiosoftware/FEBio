@@ -30,19 +30,21 @@ SOFTWARE.*/
 #include "FEModelLoad.h"
 #include "FESolver.h"
 
+REGISTER_SUPER_CLASS(FEModelLoad, FELOAD_ID)
+
 //-----------------------------------------------------------------------------
 FEModelLoad::FEModelLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 }
 
 //-----------------------------------------------------------------------------
-void FEModelLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEModelLoad::LoadVector(FEGlobalVector& R)
 {
 	// base class does nothing
 }
 
 //-----------------------------------------------------------------------------
-void FEModelLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEModelLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// base class does nothing.
 }

@@ -34,6 +34,7 @@ SOFTWARE.*/
 //! FEMatchingOsmoticCoefficientBC is a surface boundary condition that imposes the same osmotic
 //! coefficient in the bath as in the multiphasic material bounded by tha surface
 //!
+//! TODO: Derive from FESurfaceBC (once I have it)? 
 class FEBIOMIX_API FEMatchingOsmoticCoefficientBC : public FESurfaceLoad
 {
 public:
@@ -41,10 +42,10 @@ public:
     FEMatchingOsmoticCoefficientBC(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override {}
+    void LoadVector(FEGlobalVector& R) override {}
     
     //! set the dilatation
     void Update() override;

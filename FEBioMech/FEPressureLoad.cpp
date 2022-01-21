@@ -69,7 +69,7 @@ bool FEPressureLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPressureLoad::LoadVector(FEGlobalVector& R)
 {
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);
@@ -96,7 +96,7 @@ void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Don't calculate stiffness for a linear load
 	if (m_blinear) return;

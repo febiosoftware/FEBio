@@ -877,10 +877,10 @@ void FEElasticEASShellDomain::ElementMassMatrix(FEShellElementNew& el, matrix& k
 
 void FEElasticEASShellDomain::ElementBodyForce(FEModel& fem, FEShellElementNew& el, vector<double>& fe)
 {
-    int NF = fem.BodyLoads();
+    int NF = fem.ModelLoads();
     for (int nf = 0; nf < NF; ++nf)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(nf));
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(nf));
         if (pbf)
         {
             // integration weights

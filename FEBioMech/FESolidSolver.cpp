@@ -104,7 +104,7 @@ bool FESolidSolver::Init()
 
 	// allocate vectors
 	int neq = m_neq;
-	m_Fn.assign(neq, 0);
+//	m_Fn.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
@@ -300,10 +300,10 @@ void FESolidSolver::PrepStep()
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
+//	vector<double> dummy(m_neq, 0.0);
+//	zero(m_Fn);
+//	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
+//	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -526,12 +526,12 @@ bool FESolidSolver::StiffnessMatrix()
 		dom.StiffnessMatrix(LS);
 	}
 
-	// calculate the body force stiffness matrix for each domain
-	int NBL = fem.BodyLoads();
-	for (int j = 0; j<NBL; ++j)
+	// calculate the model load stiffness matrix
+	int NML = fem.ModelLoads();
+	for (int j = 0; j<NML; ++j)
 	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
+		FEModelLoad* pml = fem.ModelLoad(j);
+		if (pml->IsActive()) pml->StiffnessMatrix(LS);
 	}
 
 	// Add mass matrix for dynamic problems
@@ -557,7 +557,7 @@ bool FESolidSolver::StiffnessMatrix()
 	}
 
 	// calculate stiffness matrices for surface loads
-	int nsl = fem.SurfaceLoads();
+/*	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
@@ -566,14 +566,14 @@ bool FESolidSolver::StiffnessMatrix()
 			psl->StiffnessMatrix(LS, tp); 
 		}
 	}
-
+*/
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(LS, tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS, tp);
+	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -635,7 +635,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);// = m_Fn;
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -657,23 +657,23 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.ModelLoads(); ++j)
 	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
+		FEModelLoad* pml = fem.ModelLoad(j);
+		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
 	// calculate inertial forces for dynamic problems
 	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
 
 	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
+/*	int nsl = fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
-
+*/
 	// calculate contact forces
 	ContactForces(RHS);
 
@@ -686,7 +686,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
 	// add model loads
-	int NML = fem.ModelLoads();
+/*	int NML = fem.ModelLoads();
 	for (int i=0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *fem.ModelLoad(i);
@@ -695,7 +695,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 			mli.LoadVector(RHS, tp);
 		}
 	}
-
+*/
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
 	for (int i=0; i<mesh.Nodes(); ++i)

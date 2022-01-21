@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FECore/log.h>
 
-REGISTER_SUPER_CLASS(FERigidConnector, FERIGIDCONNECTOR_ID);
-
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidConnector, FENLConstraint);
 	// NOTE: We hide these parameters since FEBio Studio already implements

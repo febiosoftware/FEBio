@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FENode.h"
 #include "FEMaterialPoint.h"
 
-REGISTER_SUPER_CLASS(FENodalLoad, FENODALLOAD_ID);
-
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalLoad, FEModelLoad)
 	ADD_PARAMETER(m_brelative, "relative");
@@ -121,7 +119,7 @@ FENodeSet* FENodalLoad::GetNodeSet()
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FENodalLoad::LoadVector(FEGlobalVector& R)
 {
 	FENodeSet& nset = *m_nodeSet;
 	int dofs = m_dofs.Size();
@@ -147,7 +145,7 @@ void FENodalLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FENodalLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to do here.
 }

@@ -22,7 +22,6 @@ END_FECORE_CLASS();
 FEMultiphasicFSIPressure::FEMultiphasicFSIPressure(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_pfs = nullptr;
-    m_alpha = 1.0;
     m_p = 0;
     
     
@@ -197,9 +196,8 @@ void FEMultiphasicFSIPressure::Update()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FEMultiphasicFSIPressure::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMultiphasicFSIPressure::LoadVector(FEGlobalVector& R)
 {
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
 }
 
 //-----------------------------------------------------------------------------
@@ -207,7 +205,6 @@ void FEMultiphasicFSIPressure::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 void FEMultiphasicFSIPressure::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar & m_alpha & m_alphaf;
     ar & m_pfs;
     ar & m_dofC;
     ar & m_dofEF;

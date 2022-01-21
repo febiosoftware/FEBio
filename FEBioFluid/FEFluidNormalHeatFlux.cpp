@@ -61,7 +61,7 @@ bool FEFluidNormalHeatFlux::Init()
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal velocity
-void FEFluidNormalHeatFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidNormalHeatFlux::LoadVector(FEGlobalVector& R)
 {
     FESurface& surf = GetSurface();
 

@@ -36,6 +36,10 @@ class FESolver;
 class FEPointFunction;
 class FEDataGenerator;
 class FEDomainMap;
+class FENodalLoad;
+class FEEdgeLoad;
+class FESurfaceLoad;
+class FEBodyLoad;
 
 // This is a helper class for building the FEModel from file input. 
 class FEBIOXML_API FEModelBuilder

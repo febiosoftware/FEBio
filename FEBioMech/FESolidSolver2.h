@@ -143,7 +143,6 @@ public:
 	int		m_nreq;			//!< start of rigid body equations
 
 public:
-	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
 	vector<double> m_Fint;	//!< internal load vector
 	vector<double> m_Fext;	//!< external load vector

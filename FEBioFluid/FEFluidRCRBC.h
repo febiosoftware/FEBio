@@ -39,10 +39,10 @@ public:
     FEFluidRCRBC(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
     
     //! set the dilatation
     void Update() override;
@@ -72,8 +72,6 @@ private:
     vector<double> m_flowHist;  //!< history of flow rate at each step
     
 private:
-    double              m_alpha;
-    double              m_alphaf;
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
     
     FEDofList   m_dofW;

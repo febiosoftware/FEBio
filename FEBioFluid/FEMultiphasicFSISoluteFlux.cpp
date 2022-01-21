@@ -57,7 +57,7 @@ void FEMultiphasicFSISoluteFlux::SetSurface(FESurface* ps)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal component of velocity
-void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R)
 {
     FEMultiphasicFSISoluteFlux* flux = this;
     m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
@@ -75,8 +75,10 @@ void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo&
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicFSISoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEMultiphasicFSISoluteFlux::StiffnessMatrix(FELinearSystem& LS)
 {
+    FETimeInfo& tp = GetFEModel()->GetTime();
+
     // evaluate the stiffness contribution
     FEMultiphasicFSISoluteFlux* flux = this;
     m_psurf->LoadStiffness(LS, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {

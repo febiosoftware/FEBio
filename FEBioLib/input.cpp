@@ -447,73 +447,25 @@ void FEBioModel::echo_input()
 		feLog("\n\n");
 	}
 
-	if (fem.NodalLoads())
+	if (fem.ModelLoads())
 	{
-		feLog(" NODAL LOAD DATA\n");
+		feLog(" MODEL LOAD DATA\n");
 		feLog("===========================================================================\n");
-		for (int i = 0; i < fem.NodalLoads(); ++i)
+		for (int i = 0; i < fem.ModelLoads(); ++i)
 		{
 			if (i > 0) feLog("---------------------------------------------------------------------------\n");
 			feLog("%3d - ", i + 1);
 
-			// get the nodal load
-			FENodalLoad* pnl = fem.NodalLoad(i);
+			// get the model load
+			FEModelLoad* pml = fem.ModelLoad(i);
 
 			// get the type string
-			const char* sztype = pnl->GetTypeStr();
+			const char* sztype = pml->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
 			feLog(" Type: %s\n", sztype);
 
 			// print the parameter list
-			FEParameterList& pl = pnl->GetParameterList();
-			print_parameter_list(pl);
-		}
-		feLog("\n\n");
-	}
-
-	if (fem.SurfaceLoads())
-	{
-		feLog(" SURFACE LOAD DATA\n");
-		feLog("===========================================================================\n");
-		for (int i = 0; i < fem.SurfaceLoads(); ++i)
-		{
-			if (i > 0) feLog("---------------------------------------------------------------------------\n");
-			feLog("%3d - ", i + 1);
-
-			// get the surface load
-			FESurfaceLoad* psl = fem.SurfaceLoad(i);
-
-			// get the type string
-			const char* sztype = psl->GetTypeStr();
-			if (sztype == 0) sztype = "unknown";
-			feLog(" Type: %s\n", sztype);
-
-			// print the parameter list
-			FEParameterList& pl = psl->GetParameterList();
-			print_parameter_list(pl);
-		}
-		feLog("\n\n");
-	}
-
-	if (fem.BodyLoads() > 0)
-	{
-		feLog(" BODY LOAD DATA\n");
-		feLog("===========================================================================\n");
-		for (int i=0; i<fem.BodyLoads(); ++i)
-		{
-			if (i>0) feLog("---------------------------------------------------------------------------\n");
-			feLog("%3d - ", i+1);
-
-			// get the body load
-			FEBodyLoad* pbl = fem.GetBodyLoad(i);
-
-			// get the type string
-			const char* sztype = pbl->GetTypeStr();
-			if (sztype == 0) sztype = "unknown";
-			feLog(" Type: %s\n", sztype);
-
-			// print the parameter list
-			FEParameterList& pl = pbl->GetParameterList();
+			FEParameterList& pl = pml->GetParameterList();
 			print_parameter_list(pl);
 		}
 		feLog("\n\n");

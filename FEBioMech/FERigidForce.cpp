@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include <FECore/FELinearSystem.h>
 
-REGISTER_SUPER_CLASS(FERigidLoad, FERIGIDLOAD_ID);
-
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidAxialForce, FERigidLoad);
 	ADD_PARAMETER(m_ida      , "rbA"     )->setEnums("$(rigid_materials)");
@@ -103,7 +101,7 @@ void FERigidAxialForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidAxialForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidAxialForce::LoadVector(FEGlobalVector& R)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidBody& bodyA = *fem.GetRigidBody(m_ida);
@@ -157,7 +155,7 @@ void FERigidAxialForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented. 
-void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Get the rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
@@ -316,10 +314,11 @@ double FERigidBodyForce::Value()
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidBodyForce::LoadVector(FEGlobalVector& R)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidBody& rb = *fem.GetRigidBody(m_rid);
+	double t = CurrentTime();
 
 	if (m_ntype == FORCE_FOLLOW)
 	{
@@ -353,7 +352,7 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		double t0 = pstep->m_tstart;
 		double t1 = pstep->m_tend;
-		double w = (tp.currentTime - t0) / (t1 - t0);
+		double w = (t - t0) / (t1 - t0);
 		assert((w >= -0.0000001) && (w <= 1.0000001));
 		double f0 = m_trg, f1 = m_force;
 
@@ -366,7 +365,7 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix
-void FERigidBodyForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidBodyForce::StiffnessMatrix(FELinearSystem& LS)
 {
 	// I think for follower forces I need to contribute to the stiffness matrix, but I'm not sure yet what.
 }

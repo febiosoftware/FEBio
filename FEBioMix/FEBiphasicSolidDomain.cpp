@@ -126,9 +126,9 @@ bool FEBiphasicSolidDomain::Init()
     // initialize body forces
 	FEModel& fem = *GetFEModel();
 	m_pMat->m_bf.clear();
-    for (int j=0; j<fem.BodyLoads(); ++j)
+    for (int j=0; j<fem.ModelLoads(); ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
         if (pbf) m_pMat->m_bf.push_back(pbf);
     }
 
@@ -1156,12 +1156,12 @@ vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
     
     // body force contribution
 	FEModel& fem = *m_pMat->GetFEModel();
-    int nbf = fem.BodyLoads();
+    int nbf = fem.ModelLoads();
     if (nbf) {
         vec3d b(0,0,0);
         for (int i=0; i<nbf; ++i)
 		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(i));
 			if (pbf->IsActive())
 			{
 				// negate b because body forces are defined with a negative sign in FEBio

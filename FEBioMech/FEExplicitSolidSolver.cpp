@@ -364,7 +364,6 @@ bool FEExplicitSolidSolver::Init()
 	int neq = m_neq;
 
 	// allocate vectors
-	m_Fn.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
@@ -676,14 +675,6 @@ void FEExplicitSolidSolver::PrepStep()
 
 	const FETimeInfo& tp = fem.GetTime();
 
-	// apply concentrated nodal forces
-	// since these forces do not depend on the geometry
-	// we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
-
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
 	vector<double>& ui = m_ui;
@@ -908,7 +899,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -934,26 +925,12 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		dom.InternalForces(RHS);
 	}
 
-	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	// calculate forces due to model loads
+	int nml = fem.ModelLoads();
+	for (int i=0; i<nml; ++i)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				if (pbf) dom.BodyForce(RHS, *pbf);
-			}
-		}
-	}
-
-	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i=0; i<nsl; ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
+		FEModelLoad* pml = fem.ModelLoad(i);
+		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
 	// calculate contact forces
@@ -966,9 +943,6 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
 	NonLinearConstraintForces(RHS, tp);
-
-	// forces due to point constraints
-//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->LoadVector(this, R);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?

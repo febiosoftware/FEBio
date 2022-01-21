@@ -29,7 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
-#include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
 class FELinearSystem;
@@ -40,6 +39,8 @@ class FELinearSystem;
 //! includes most boundary loads, body loads, contact, etc.
 class FECORE_API FEModelLoad : public FEModelComponent
 {
+	FECORE_SUPER_CLASS
+
 public:
 	//! constructor
 	FEModelLoad(FEModel* pfem);
@@ -49,8 +50,8 @@ public:
 	// the following functions.
 
 	//! evaluate the contribution to the external load vector
-	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp);
+	virtual void LoadVector(FEGlobalVector& R);
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
+	virtual void StiffnessMatrix(FELinearSystem& LS);
 };

@@ -41,8 +41,6 @@ class FELinearSystem;
 //! Base class for body-loads
 class FECORE_API FEBodyLoad : public FEModelLoad
 {
-	FECORE_SUPER_CLASS
-
 public:
 	FEBodyLoad(FEModel* pfem);
 	virtual ~FEBodyLoad();
@@ -66,19 +64,6 @@ public:
 	//! get the domain list
 	FEDomainList& GetDomainList();
     
-public: // This should be overridden by derived classes
-
-	//! Evaluate force vector
-	virtual void ForceVector(FEGlobalVector& R);
-
-	//! evaluate stiffness matrix
-	virtual void StiffnessMatrix(FELinearSystem& S);
-
-public:
-	// NOTE: Work in progress! Working on integrating body loads as a model loads
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-
 private:
 	FEDomainList	m_dom;	//!< list of domains to which to apply the body load
 };

@@ -155,13 +155,8 @@ double FENodeForceX::value(int nnode)
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<double>& Fn = psolid_solver->m_Fn;
 		vector<int>& id = mesh.Node(nnode).m_ID;
-
-		double Fx = 0.0;
-		if (id[0] >= 0) Fx = Fn[id[0]];
-		else if (-id[0] - 2 >= 0) Fx = Fr[-id[0] - 2];
-		return Fx;
+		return (-id[0] - 2 >= 0 ? Fr[-id[0] - 2] : 0);
 	}
 	return 0;
 }

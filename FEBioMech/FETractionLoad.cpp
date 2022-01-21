@@ -77,7 +77,7 @@ bool FETractionLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETractionLoad::LoadVector(FEGlobalVector& R)
 {
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);
@@ -101,7 +101,7 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETractionLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to do here.
 	// TODO: I think if the linear flag is false, I do need to evaluate a stiffness.

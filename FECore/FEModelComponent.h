@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECoreBase.h"
+#include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
 //! forward declaration of the FEModel class.
@@ -86,6 +87,7 @@ public: // some convenience functions (to pull data from FEModel without the nee
 	double GetGlobalConstant(const char* sz) const;
 	int GetDOFIndex(const char* szvar, int n) const;
 	int GetDOFIndex(const char* szdof) const;
+	const FETimeInfo& GetTimeInfo() const;
 
 	//! Get the model's mesh
 	FEMesh& GetMesh();

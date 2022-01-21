@@ -154,14 +154,10 @@ public: // TODO: Find a better place for these parameters
 public:
 	std::vector<FEMaterial*>				m_MAT;		//!< array of materials
 	std::vector<FEBoundaryCondition*>		m_BC;		//!< boundary conditions
-	std::vector<FENodalLoad*>				m_FC;		//!< concentrated nodal loads
-	std::vector<FESurfaceLoad*>				m_SL;		//!< surface loads
-	std::vector<FEEdgeLoad*>				m_EL;		//!< edge loads
-	std::vector<FEBodyLoad*>				m_BL;		//!< body load data
+	std::vector<FEModelLoad*>				m_ML;		//!< model loads
 	std::vector<FEInitialCondition*>		m_IC;		//!< initial conditions
     std::vector<FESurfacePairConstraint*>   m_CI;       //!< contact interface array
 	std::vector<FENLConstraint*>			m_NLC;		//!< nonlinear constraints
-	std::vector<FEModelLoad*>				m_ML;		//!< model loads
 	std::vector<FELoadController*>			m_LC;		//!< load controller data
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
 	std::vector<FEModelData*>				m_Data;		//!< the model output data
@@ -216,14 +212,10 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	// model properties
 	ADD_PROPERTY(m_imp->m_MAT , "material"       );
 	ADD_PROPERTY(m_imp->m_BC  , "bc"             );
-	ADD_PROPERTY(m_imp->m_FC  , "nodal_load"     );
-	ADD_PROPERTY(m_imp->m_SL  , "surface_load"   );
-	ADD_PROPERTY(m_imp->m_EL  , "edge_load"      );
-	ADD_PROPERTY(m_imp->m_BL  , "body_load"      );
+	ADD_PROPERTY(m_imp->m_ML  , "load");
 	ADD_PROPERTY(m_imp->m_IC  , "initial"        );
 	ADD_PROPERTY(m_imp->m_CI  , "contact"        );
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );
-//	ADD_PROPERTY(m_imp->m_ML  , "model_load"     );
 	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
 	ADD_PROPERTY(m_imp->m_Step, "step"           );
 	ADD_PROPERTY(m_imp->m_Data, "data"           );
@@ -283,14 +275,10 @@ void FEModel::Clear()
 	// clear all properties
 	for (FEMaterial* mat             : m_imp->m_MAT ) delete  mat; m_imp->m_MAT.clear();
 	for (FEBoundaryCondition* bc     : m_imp->m_BC  ) delete   bc; m_imp->m_BC.clear();
-	for (FENodalLoad* nl             : m_imp->m_FC  ) delete   nl; m_imp->m_FC.clear();
-	for (FESurfaceLoad* sl           : m_imp->m_SL  ) delete   sl; m_imp->m_SL.clear();
-	for (FEEdgeLoad* el              : m_imp->m_EL  ) delete   el; m_imp->m_EL.clear();
-	for (FEBodyLoad* bl              : m_imp->m_BL  ) delete   bl; m_imp->m_BL.clear();
+	for (FEModelLoad* ml             : m_imp->m_ML  ) delete   ml; m_imp->m_ML.clear();
 	for (FEInitialCondition* ic      : m_imp->m_IC  ) delete   ic; m_imp->m_IC.clear();
 	for (FESurfacePairConstraint* ci : m_imp->m_CI  ) delete   ci; m_imp->m_CI.clear();
 	for (FENLConstraint* nlc         : m_imp->m_NLC ) delete   nlc; m_imp->m_NLC.clear();
-	for (FEModelLoad* ml             : m_imp->m_ML  ) delete   ml; m_imp->m_ML.clear();
 	for (FELoadController* lc        : m_imp->m_LC  ) delete   lc; m_imp->m_LC.clear();
 	for (FEAnalysis* step            : m_imp->m_Step) delete step; m_imp->m_Step.clear();
 
@@ -342,45 +330,6 @@ FEInitialCondition* FEModel::InitialCondition(int i) { return m_imp->m_IC[i]; }
 
 //-----------------------------------------------------------------------------
 void FEModel::AddInitialCondition(FEInitialCondition* pbc) { m_imp->m_IC.push_back(pbc); }
-
-//-----------------------------------------------------------------------------
-int FEModel::NodalLoads() { return (int)m_imp->m_FC.size(); }
-
-//-----------------------------------------------------------------------------
-FENodalLoad* FEModel::NodalLoad(int i) { return m_imp->m_FC[i]; }
-
-//-----------------------------------------------------------------------------
-void FEModel::AddNodalLoad(FENodalLoad* pfc) { m_imp->m_FC.push_back(pfc); }
-
-//-----------------------------------------------------------------------------
-int FEModel::SurfaceLoads() { return (int)m_imp->m_SL.size(); }
-
-//-----------------------------------------------------------------------------
-FESurfaceLoad* FEModel::SurfaceLoad(int i) { return m_imp->m_SL[i]; }
-
-//-----------------------------------------------------------------------------
-void FEModel::AddSurfaceLoad(FESurfaceLoad* psl) { m_imp->m_SL.push_back(psl); }
-
-//-----------------------------------------------------------------------------
-int FEModel::EdgeLoads() { return (int)m_imp->m_EL.size(); }
-
-//-----------------------------------------------------------------------------
-FEEdgeLoad* FEModel::EdgeLoad(int i) { return m_imp->m_EL[i]; }
-
-//-----------------------------------------------------------------------------
-void FEModel::AddEdgeLoad(FEEdgeLoad* psl) { m_imp->m_EL.push_back(psl); }
-
-//-----------------------------------------------------------------------------
-//! Add a body load to the model
-void FEModel::AddBodyLoad(FEBodyLoad* pf) { m_imp->m_BL.push_back(pf); }
-
-//-----------------------------------------------------------------------------
-//! get the number of body loads
-int FEModel::BodyLoads() { return (int)m_imp->m_BL.size(); }
-
-//-----------------------------------------------------------------------------
-//! return a pointer to a body load
-FEBodyLoad* FEModel::GetBodyLoad(int i) { return m_imp->m_BL[i]; }
 
 //-----------------------------------------------------------------------------
 //! retrieve the number of steps
@@ -513,22 +462,19 @@ bool FEModel::Init()
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
 
-	// initialize model loads
-	// NOTE: This must be called after the InitMaterials since the COM of the rigid bodies
-	//       are set in that function. 
-	if (InitModelLoads() == false) return false;
-
 	// initialize mesh data
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
 	// this is because the mesh data is reset
 	// TODO: perhaps I should not reset the mesh data during the initialization
 	if (InitMesh() == false) return false;
 
+	// initialize model loads
+	// NOTE: This must be called after the InitMaterials since the COM of the rigid bodies
+	//       are set in that function. 
+	if (InitModelLoads() == false) return false;
+
 	// initialize contact data
 	if (InitContact() == false) return false;
-
-	// init body loads
-	if (InitBodyLoads() == false) return false;
 
 	// initialize nonlinear constraints
 	if (InitConstraints() == false) return false;
@@ -617,27 +563,6 @@ void FEModel::Update()
 	// mesh will also be update after the loads are updated
 	m_imp->m_meshUpdate = false;
 
-	// update all edge loads
-	for (int i = 0; i < EdgeLoads(); ++i)
-	{
-		FEEdgeLoad* pel = EdgeLoad(i);
-		if (pel && pel->IsActive()) pel->Update();
-	}
-
-	// update all surface loads
-	for (int i = 0; i < SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad* psl = SurfaceLoad(i);
-		if (psl && psl->IsActive()) psl->Update();
-	}
-
-	// update all body loads
-	for (int i = 0; i<BodyLoads(); ++i)
-	{
-		FEBodyLoad* pbl = GetBodyLoad(i);
-		if (pbl && pbl->IsActive()) pbl->Update();
-	}
-
 	// update all model loads
 	for (int i = 0; i < ModelLoads(); ++i)
 	{
@@ -691,31 +616,13 @@ bool FEModel::InitBCs()
 	}
 
 	// check the nodal loads
-	int NNL = NodalLoads();
-	for (int i=0; i<NNL; ++i)
+	int NML = ModelLoads();
+	for (int i = 0; i < NML; ++i)
 	{
-		FENodalLoad* pbc = NodalLoad(i);
+		FEModelLoad* pbc = ModelLoad(i);
 		if (pbc->Init() == false) return false;
 	}
 
-    // check the surface loads
-    int NSL = SurfaceLoads();
-    for (int i=0; i<NSL; ++i)
-    {
-        FESurfaceLoad* pbc = SurfaceLoad(i);
-        if (pbc->Init() == false) return false;
-    }
-    
-    // check the edge loads
-    int NEL = EdgeLoads();
-    for (int i=0; i<NEL; ++i)
-    {
-        FEEdgeLoad* pbc = EdgeLoad(i);
-        if (pbc->Init() == false) return false;
-    }
-
-	// TODO: Where are the body loads?
-    
     return true;
 }
 
@@ -751,17 +658,6 @@ FEMaterial* FEModel::FindMaterial(const std::string& matName)
 	{
 		FEMaterial* mat = GetMaterial(i);
 		if (mat->GetName() == matName) return mat;
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FESurfaceLoad* FEModel::FindSurfaceLoad(const std::string& loadName)
-{
-	for (int i = 0; i<SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad* load = SurfaceLoad(i);
-		if (load->GetName() == loadName) return load;
 	}
 	return 0;
 }
@@ -1045,16 +941,6 @@ bool FEModel::InitConstraints()
 }
 
 //-----------------------------------------------------------------------------
-bool FEModel::InitBodyLoads()
-{
-	for (int i=0; i<BodyLoads(); ++i)
-	{
-		if (GetBodyLoad(i)->Init() == false) return false;
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 //! This function solves the FE problem by calling the solve method for each step.
 bool FEModel::Solve()
 {
@@ -1285,14 +1171,7 @@ void FEModel::Activate()
 		if (plc->IsActive()) plc->Activate();
 	}
 
-    // surface loads
-    for (int i=0; i<SurfaceLoads(); ++i)
-    {
-        FESurfaceLoad& FC = *SurfaceLoad(i);
-        if (FC.IsActive()) FC.Activate();
-    }
-    
-    // initialize material points before evaluating contact autopenalty
+	// initialize material points before evaluating contact autopenalty
     m_imp->m_mesh.InitMaterialPoints();
     
 	// contact interfaces
@@ -1318,20 +1197,11 @@ void FEModel::Reactivate()
 		if (bc.IsActive()) bc.Activate();
 	}
 
-	// reactivate nodal loads
-	for (int i = 0; i < NodalLoads(); ++i)
+	// reactivate model loads
+	for (int i = 0; i < ModelLoads(); ++i)
 	{
-		FENodalLoad& nl = *NodalLoad(i);
-		if (nl.IsActive()) nl.Activate();
-	}
-
-	// update surface loads 
-	for (int i = 0; i < SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad& sl = *SurfaceLoad(i);
-		FESurface& surf = sl.GetSurface();
-		sl.SetSurface(&surf);
-		if (sl.IsActive()) sl.Activate();
+		FEModelLoad& ml = *ModelLoad(i);
+		if (ml.IsActive()) ml.Activate();
 	}
 
 	// update surface interactions
@@ -2119,14 +1989,10 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 
 		// stream all boundary conditions
 		ar & m_BC;
-		ar & m_FC;
-		ar & m_SL;
-		ar & m_EL;
-		ar & m_BL;
+		ar & m_ML;
 		ar & m_IC;
 		ar & m_CI;
 		ar & m_NLC;
-		ar & m_ML;
 
 		// stream step data next
 		ar & m_nStep;
