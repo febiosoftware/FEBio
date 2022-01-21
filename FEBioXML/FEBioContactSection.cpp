@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include <FECore/FEAugLagLinearConstraint.h>
-#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FENodalBC.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
 
@@ -344,7 +344,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 
 	++tag;
 	int id, rb, rbp = -1;
-	FEBoundaryCondition* prn = 0;
+	FENodalBC* prn = 0;
 	FENodeSet* ns = nullptr;
 	for (int i=0; i<nrn; ++i)
 	{
@@ -356,7 +356,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 
 		if ((prn == 0) || (rb != rbp))
 		{
-			prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
+			prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 			ns = new FENodeSet(&fem);
 			prn->SetNodeSet(ns);
 

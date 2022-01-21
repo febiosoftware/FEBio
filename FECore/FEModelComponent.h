@@ -57,10 +57,6 @@ public:
 	//! This is called whenever the model is updated, i.e. the primary variables were updated.
 	virtual void Update();
 
-	// TODO: This is a bit of a hack so that derived class can set their item lists
-	//       through the model component. None of these functions do anything by default
-	virtual void SetNodeSet(FENodeSet* ns);
-
 public: // some convenience functions (to pull data from FEModel without the need to include)
 	double CurrentTime() const;
 	double CurrentTimeIncrement() const;

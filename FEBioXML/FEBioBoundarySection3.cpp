@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioBoundarySection3.h"
-#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FENodalBC.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearConstraintManager.h>
 
@@ -131,7 +131,7 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FEBoundaryCondition* prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
+	FENodalBC* prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 
 	prn->SetNodeSet(nodeSet);
 

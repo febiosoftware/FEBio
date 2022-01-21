@@ -50,9 +50,6 @@ void FEModelComponent::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FEModelComponent::SetNodeSet(FENodeSet* ns) {}
-
-//-----------------------------------------------------------------------------
 double FEModelComponent::CurrentTime() const
 {
 	return GetFEModel()->GetTime().currentTime;

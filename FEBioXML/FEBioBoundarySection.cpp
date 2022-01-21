@@ -1131,7 +1131,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 		++tag;
 		int id, rb, rbp = -1;
-		FEBoundaryCondition* prn = 0;
+		FENodalBC* prn = 0;
 		FENodeSet* ns = 0;
 		for (int i=0; i<nrn; ++i)
 		{
@@ -1140,7 +1140,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			if ((prn == 0) || (rb != rbp))
 			{
-				prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
+				prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 
 				prn->SetParameter("rb", rb);
 
@@ -1263,7 +1263,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FEBoundaryCondition* prn = fecore_new_class<FEBoundaryCondition>("FERigidNodeSet", &fem);
+	FENodalBC* prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 
 	// the default shell bc depends on the shell formulation
 	prn->SetParameter("clamped_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
