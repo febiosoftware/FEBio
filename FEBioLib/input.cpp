@@ -43,6 +43,8 @@ SOFTWARE.*/
 #include <FECore/FEModelParam.h>
 #include <FECore/FELoadCurve.h>
 #include <FECore/FEMeshAdaptor.h>
+#include <FECore/FESurfacePairConstraint.h>
+#include <FECore/FETimeStepController.h>
 #include <FECore/log.h>
 #include <string.h>
 

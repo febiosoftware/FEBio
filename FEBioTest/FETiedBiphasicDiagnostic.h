@@ -26,6 +26,8 @@ SOFTWARE.*/
 #pragma once
 #include "FEDiagnostic.h"
 
+class SparseMatrix;
+
 //-----------------------------------------------------------------------------
 class FETiedBiphasicScenario : public FEDiagnosticScenario
 {

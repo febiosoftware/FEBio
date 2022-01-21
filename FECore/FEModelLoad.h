@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include "FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class FELinearSystem;
 //! This class is the base class for all classes that affect the state of the model
 //! and contribute directly to the residual and the global stiffness matrix. This
 //! includes most boundary loads, body loads, contact, etc.
-class FECORE_API FEModelLoad : public FEModelComponent
+class FECORE_API FEModelLoad : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
 

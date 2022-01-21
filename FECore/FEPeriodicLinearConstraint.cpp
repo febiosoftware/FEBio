@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FESurface.h"
 
-FEPeriodicLinearConstraint::FEPeriodicLinearConstraint(FEModel* fem) : FEModelComponent(fem), m_exclude(fem)
+FEPeriodicLinearConstraint::FEPeriodicLinearConstraint(FEModel* fem) : FEStepComponent(fem), m_exclude(fem)
 {
 	m_refNode = -1;
 }

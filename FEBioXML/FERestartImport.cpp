@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
+#include <FECore/FETimeStepController.h>
 #include "FEBioLoadDataSection.h"
 #include "FEBioStepSection.h"
 #include "FEBioStepSection3.h"

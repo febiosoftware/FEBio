@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FETimeStepController.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------

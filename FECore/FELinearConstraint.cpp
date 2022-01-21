@@ -210,7 +210,7 @@ bool FELinearConstraint::Init()
 // The parent dof is fixed in order to make sure that they are not assigned an equation number.
 void FELinearConstraint::Activate()
 {
-	FEModelComponent::Activate();
+	FEStepComponent::Activate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	// we need the parent node to be fixed so that no equation is allocated
@@ -221,7 +221,7 @@ void FELinearConstraint::Activate()
 //-----------------------------------------------------------------------------
 void FELinearConstraint::Deactivate()
 {
-	FEModelComponent::Deactivate();
+	FEStepComponent::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	FENode& node = mesh.Node(m_parentDof->node);

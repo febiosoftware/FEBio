@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FESolver.h>
 #include <FECore/CompactMatrix.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/FEGlobalMatrix.h>
 #include "FEBioCommand.h"
 #include "console.h"
 #include "cmdoptions.h"

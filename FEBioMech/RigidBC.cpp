@@ -38,13 +38,13 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FERigidBC, FERIGIDBC_ID);
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidBC, FEModelComponent)
+BEGIN_FECORE_CLASS(FERigidBC, FEStepComponent)
 	// NOTE: This parameter is hidden, since FEBio Studio implements its own mechanism
 	//       for assigning the rigid material ID.
 	ADD_PARAMETER(m_rigidMat, "rb")->SetFlags(FE_PARAM_HIDDEN);
 END_FECORE_CLASS();
 
-FERigidBC::FERigidBC(FEModel* fem) : FEModelComponent(fem)
+FERigidBC::FERigidBC(FEModel* fem) : FEStepComponent(fem)
 {
 	m_rigidMat = -1;
 	m_rb = -1;
@@ -57,7 +57,7 @@ bool FERigidBC::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	if (pm == nullptr) return false;
 
-	return FEModelComponent::Init();
+	return FEStepComponent::Init();
 }
 
 void FERigidBC::Activate()
@@ -67,13 +67,13 @@ void FERigidBC::Activate()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1)); assert(pm);
 	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
 
-	FEModelComponent::Activate();
+	FEStepComponent::Activate();
 }
 
 void FERigidBC::Serialize(DumpStream& ar)
 {
 	ar & m_rb;
-	FEModelComponent::Serialize(ar);
+	FEStepComponent::Serialize(ar);
 }
 
 FERigidBody& FERigidBC::GetRigidBody()

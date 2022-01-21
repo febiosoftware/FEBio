@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include <FECore/FEModelLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FENLConstraint.h>
 #include "FEBodyForce.h"
 #include "FECore/sys.h"
 #include "FEMechModel.h"

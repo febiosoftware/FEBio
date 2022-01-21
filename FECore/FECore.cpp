@@ -63,6 +63,7 @@ SOFTWARE.*/
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
 #include "LUSolver.h"
+#include "FETimeStepController.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1

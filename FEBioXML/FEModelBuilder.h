@@ -112,8 +112,8 @@ public:
 	// get the current step (will create a new one if no step was defined yet)
 	FEAnalysis*	GetStep(bool allocSolver = true);
 
-	// add module component to current step
-	void AddComponent(FEModelComponent* mc);
+	// add component to current step
+	void AddComponent(FEStepComponent* mc);
 
 	// reset some data for reading next step
 	void NextStep();
@@ -150,7 +150,7 @@ public:
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 
 	// TODO: Try to remove these
-	virtual void AddRigidBC(FEModelComponent* prc);
+	virtual void AddRigidBC(FEStepComponent* prc);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }

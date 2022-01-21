@@ -35,8 +35,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEModelComponent::FEModelComponent(FEModel* fem) : FECoreBase(fem)
 {
-	// initialize parameters
-	m_bactive = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,35 +44,9 @@ FEModelComponent::~FEModelComponent()
 }
 
 //-----------------------------------------------------------------------------
-bool FEModelComponent::IsActive() const
-{ 
-	return m_bactive; 
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::Activate()
-{ 
-	m_bactive = true; 
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::Deactivate()
-{ 
-	m_bactive = false; 
-}
-
-//-----------------------------------------------------------------------------
 void FEModelComponent::Update()
 {
 
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::Serialize(DumpStream& ar)
-{
-	FECoreBase::Serialize(ar);
-	if (ar.IsShallow()) return;
-	ar & m_bactive;
 }
 
 //-----------------------------------------------------------------------------

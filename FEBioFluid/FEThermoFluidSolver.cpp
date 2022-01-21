@@ -53,6 +53,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/FENLConstraint.h>
 #include <NumCore/NumCore.h>
 
 //-----------------------------------------------------------------------------

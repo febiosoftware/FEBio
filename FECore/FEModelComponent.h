@@ -53,22 +53,6 @@ public:
 	virtual ~FEModelComponent();
 
 	//-----------------------------------------------------------------------------------
-	//! This function checks if the component is active in the current step. 
-	bool IsActive() const;
-
-	//-----------------------------------------------------------------------------------
-	//! Activate the component.
-	//! This function is called during the step initialization, right before the step is solved.
-	//! This function can be used to initialize any data that could depend on the model state. 
-	//! Data allocation and initialization of data that does not depend on the model state should
-	//! be done in Init().
-	virtual void Activate();
-
-	//-----------------------------------------------------------------------------------
-	//! Deactivate the component
-	virtual void Deactivate();
-
-	//-----------------------------------------------------------------------------------
 	//! Update the component
 	//! This is called whenever the model is updated, i.e. the primary variables were updated.
 	virtual void Update();
@@ -76,10 +60,6 @@ public:
 	// TODO: This is a bit of a hack so that derived class can set their item lists
 	//       through the model component. None of these functions do anything by default
 	virtual void SetNodeSet(FENodeSet* ns);
-
-public:
-	//! serialization
-	void Serialize(DumpStream& ar);
 
 public: // some convenience functions (to pull data from FEModel without the need to include)
 	double CurrentTime() const;
@@ -93,7 +73,4 @@ public: // some convenience functions (to pull data from FEModel without the nee
 
 	//! Get the model's mesh
 	FEMesh& GetMesh();
-
-private:
-	bool		m_bactive;	//!< flag indicating whether the component is active
 };

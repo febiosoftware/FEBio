@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
 #include "FEMeshAdaptor.h"
+#include "FETimeStepController.h"
 
 REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
 
@@ -129,20 +130,20 @@ FEDomain* FEAnalysis::Domain(int i)
 }
 
 //-----------------------------------------------------------------------------
-void FEAnalysis::AddModelComponent(FEModelComponent* pmc)
+void FEAnalysis::AddStepComponent(FEStepComponent* pmc)
 {
 	if (pmc) m_MC.push_back(pmc);
 }
 
 //-----------------------------------------------------------------------------
-int FEAnalysis::ModelComponents() const
+int FEAnalysis::StepComponents() const
 {
 	return (int) m_MC.size();
 }
 
 //-----------------------------------------------------------------------------
 //! get a model component
-FEModelComponent* FEAnalysis::GetModelComponent(int i)
+FEStepComponent* FEAnalysis::GetStepComponent(int i)
 {
 	return m_MC[i];
 }

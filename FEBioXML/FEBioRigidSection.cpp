@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModelComponent.h>
 #include <FECore/FEModelLoad.h>
+#include <FECore/FENLConstraint.h>
 
 void FEBioRigidSection::Parse(XMLTag& tag)
 {
@@ -59,14 +60,14 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	if (strcmp(sztype, "fix") == 0)
 	{
 		// create the fixed dof
-		FEModelComponent* pBC = fecore_new_class<FEModelComponent>("FERigidBodyFixedBC", fem);
+		FEStepComponent* pBC = fecore_new_class<FEStepComponent>("FERigidBodyFixedBC", fem);
 		feb.AddRigidBC(pBC);
 		ReadParameterList(tag, pBC);
 	}
 	else if (strcmp(sztype, "prescribe") == 0)
 	{
 		// create the rigid displacement constraint
-		FEModelComponent* pDC = fecore_new_class<FEModelComponent>("FERigidBodyDisplacement", fem);
+		FEStepComponent* pDC = fecore_new_class<FEStepComponent>("FERigidBodyDisplacement", fem);
 		feb.AddRigidBC(pDC);
 		ReadParameterList(tag, pDC);
 	}
@@ -79,13 +80,13 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	}
 	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{
-		FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyVelocity", fem);
+		FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyVelocity", fem);
 		feb.AddRigidBC(pic);
 		ReadParameterList(tag, pic);
 	}
 	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
 	{
-		FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyAngularVelocity", fem);
+		FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyAngularVelocity", fem);
 		feb.AddRigidBC(pic);
 		ReadParameterList(tag, pic);
 	}
@@ -104,7 +105,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	else
 	{
 		// create the rigid constraint
-		FEModelComponent* pBC = fecore_new<FEModelComponent>(FERIGIDBC_ID, sztype, fem);
+		FEStepComponent* pBC = fecore_new<FEStepComponent>(FERIGIDBC_ID, sztype, fem);
 		if (pBC == nullptr)  throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		feb.AddRigidBC(pBC);
 		ReadParameterList(tag, pBC);

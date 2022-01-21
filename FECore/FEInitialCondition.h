@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include <vector>
 #include "FENodeDataMap.h"
 #include "FENodeSet.h"
@@ -37,7 +37,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.
 //! Initial conditions can be used to set the initial state of the model in an analysis. 
-class FECORE_API FEInitialCondition : public FEModelComponent
+class FECORE_API FEInitialCondition : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
 

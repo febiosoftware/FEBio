@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include "FEBioMix/FESlidingInterfaceBiphasic.h"
 #include "FEBioMech/FEResidualVector.h"
+#include <FECore/SparseMatrix.h>
 #include <FECore/log.h>
 
 //////////////////////////////////////////////////////////////////////

@@ -51,6 +51,8 @@ SOFTWARE.*/
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
+#include <FECore/FESurfacePairConstraint.h>
+#include <FECore/FENLConstraint.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -208,11 +210,11 @@ void FEModelBuilder::AddMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddComponent(FEModelComponent* pmc)
+void FEModelBuilder::AddComponent(FEStepComponent* pmc)
 {
 	if (m_nsteps > 0)
 	{
-		GetStep()->AddModelComponent(pmc);
+		GetStep()->AddStepComponent(pmc);
 		pmc->Deactivate();
 	}
 }
@@ -274,7 +276,7 @@ void FEModelBuilder::AddNonlinearConstraint(FENLConstraint* pnc)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidBC(FEModelComponent* pmc) { assert(false); }
+void FEModelBuilder::AddRigidBC(FEStepComponent* pmc) { assert(false); }
 
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions

@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
 
-FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(pfem)
+FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEStepComponent(pfem)
 {
 }
 
@@ -81,7 +81,7 @@ bool FENodalIC::Init()
 //-----------------------------------------------------------------------------
 void FENodalIC::Activate()
 {
-	FEModelComponent::Activate();
+	FEStepComponent::Activate();
 	if (m_dofs.IsEmpty()) return;
 
 	int dofs = (int)m_dofs.Size();
@@ -106,7 +106,7 @@ void FENodalIC::Activate()
 // serialization
 void FENodalIC::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEStepComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 
 	ar & m_dofs;

@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FESolver.h"
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include "FEGlobalVector.h"
 #include "FEGlobalMatrix.h"
 #include "FETimeInfo.h"
@@ -45,7 +45,7 @@ class FELinearSystem;
 //! The constraint must provide a residual (force) contribution, its stiffness matrix,
 //! and an augmentation function.
 //!
-class FECORE_API FENLConstraint : public FEModelComponent
+class FECORE_API FENLConstraint : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
 

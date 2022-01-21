@@ -252,7 +252,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, v);
 
 					// create the initial condition
-					FEModelComponent* pic = fecore_new_class< FEModelComponent>("FERigidBodyVelocity", &fem);
+					FEStepComponent* pic = fecore_new_class< FEStepComponent>("FERigidBodyVelocity", &fem);
 					pic->SetParameter("rb", nmat);
 					pic->SetParameter("value", v);
 
@@ -266,7 +266,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, w);
 
 					// create the initial condition
-					FEModelComponent* pic = fecore_new_class<FEModelComponent>("FERigidBodyAngularVelocity", &fem);
+					FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyAngularVelocity", &fem);
 					pic->SetParameter("rb", nmat);
 					pic->SetParameter("value", w);
 

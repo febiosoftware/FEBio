@@ -33,7 +33,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEModelLoad, FELOAD_ID)
 
 //-----------------------------------------------------------------------------
-FEModelLoad::FEModelLoad(FEModel* pfem) : FEModelComponent(pfem)
+FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem)
 {
 }
 

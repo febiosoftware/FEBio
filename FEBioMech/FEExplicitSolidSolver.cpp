@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FENLConstraint.h>
 #include "FEResidualVector.h"
 #include "FEBioMech.h"
 

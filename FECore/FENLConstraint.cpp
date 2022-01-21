@@ -32,7 +32,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FENLConstraint, FENLCONSTRAINT_ID);
 
 //-----------------------------------------------------------------------------
-FENLConstraint::FENLConstraint(FEModel* pfem) : FEModelComponent(pfem)
+FENLConstraint::FENLConstraint(FEModel* pfem) : FEStepComponent(pfem)
 {
 	static int ncount = 1;
 	SetID(ncount++);

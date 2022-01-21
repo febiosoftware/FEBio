@@ -116,9 +116,9 @@ bool FEBioRestart::Init(const char *szfile)
 			if (step->Init() == false) return false;
 
 			// also initialize all the model components
-			for (int j = 0; j < step->ModelComponents(); ++j)
+			for (int j = 0; j < step->StepComponents(); ++j)
 			{
-				FEModelComponent* pc = step->GetModelComponent(j);
+				FEStepComponent* pc = step->GetStepComponent(j);
 				if (pc->Init() == false) return false;
 			}
 		}

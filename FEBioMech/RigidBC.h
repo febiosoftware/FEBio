@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FEStepComponent.h>
 #include "febiomech_api.h"
 
 class FERigidBody;
 
 //-----------------------------------------------------------------------------
-class FEBIOMECH_API FERigidBC : public FEModelComponent
+class FEBIOMECH_API FERigidBC : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
 

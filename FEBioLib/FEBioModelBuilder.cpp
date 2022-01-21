@@ -99,7 +99,7 @@ FEDomain* FEBioModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat
 }
 
 //-----------------------------------------------------------------------------
-void FEBioModelBuilder::AddRigidBC(FEModelComponent* pmc)
+void FEBioModelBuilder::AddRigidBC(FEStepComponent* pmc)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(GetFEModel());
 

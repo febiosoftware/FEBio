@@ -23,65 +23,37 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEStepComponent.h"
 
-
-
-#pragma once
-#include "FEDiagnostic.h"
-
-class SparseMatrix;
+FEStepComponent::FEStepComponent(FEModel* fem) : FEModelComponent(fem)
+{
+	// initialize parameters
+	m_bactive = true;
+}
 
 //-----------------------------------------------------------------------------
-class FEContactBiphasicScenario : public FEDiagnosticScenario
+bool FEStepComponent::IsActive() const
 {
-public:
-    FEContactBiphasicScenario(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_dt = 1.0; }
-    
-public:
-    double	m_dt;
-};
+	return m_bactive;
+}
 
 //-----------------------------------------------------------------------------
-class FEContactBiphasicTangentHex8 : public FEContactBiphasicScenario
+void FEStepComponent::Activate()
 {
-public:
-    FEContactBiphasicTangentHex8(FEDiagnostic* pdia);
-    
-    bool Init() override;
-    
-    DECLARE_FECORE_CLASS();
-};
+	m_bactive = true;
+}
 
 //-----------------------------------------------------------------------------
-class FEContactBiphasicTangentHex20 : public FEContactBiphasicScenario
+void FEStepComponent::Deactivate()
 {
-public:
-    FEContactBiphasicTangentHex20(FEDiagnostic* pdia);
-    
-    bool Init() override;
-    
-    DECLARE_FECORE_CLASS();
-};
+	m_bactive = false;
+}
 
 //-----------------------------------------------------------------------------
-class FEContactDiagnosticBiphasic : public FEDiagnostic
+void FEStepComponent::Serialize(DumpStream& ar)
 {
-public:
-    FEContactDiagnosticBiphasic(FEModel& fem);
-    ~FEContactDiagnosticBiphasic();
-    
-    bool Run();
-    
-    bool Init();
-    
-    FEDiagnosticScenario* CreateScenario(const std::string& sname);
-    
-protected:
-    void print_matrix(matrix& m);
-    void print_matrix(SparseMatrix& m);
-    
-    void deriv_residual(matrix& K);
-    
-public:
-    FEContactBiphasicScenario*  m_pscn;
-};
+	FEModelComponent::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar& m_bactive;
+}

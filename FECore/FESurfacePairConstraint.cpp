@@ -32,7 +32,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FESurfacePairConstraint, FESURFACEINTERFACE_ID);
 
 //-----------------------------------------------------------------------------
-FESurfacePairConstraint::FESurfacePairConstraint(FEModel* pfem) : FEModelComponent(pfem)
+FESurfacePairConstraint::FESurfacePairConstraint(FEModel* pfem) : FEStepComponent(pfem)
 {
 }
 

@@ -70,7 +70,7 @@ void FERigidNodeSet::Activate()
 	int rid = pm->GetRigidBodyID(); assert(rid >= 0);
 
 	// assign the rigid body ID
-	FEModelComponent::Activate();
+	FEStepComponent::Activate();
 	FEMesh& mesh = fem.GetMesh();
 	FENodeSet& nset = *GetNodeSet();
 	for (size_t i=0; i<nset.Size(); ++i)
@@ -94,7 +94,7 @@ void FERigidNodeSet::SetRigidMaterialID(int rid)
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Deactivate()
 {
-	FEModelComponent::Deactivate();
+	FEStepComponent::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENodeSet& nset = *GetNodeSet();
 	for (size_t i=0; i<nset.Size(); ++i)
@@ -112,7 +112,7 @@ void FERigidNodeSet::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEStepComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_rigidMat & m_bshellBC;
 }

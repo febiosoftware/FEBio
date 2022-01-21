@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "DOFS.h"
 #include "FEMesh.h"
 #include "FETimeInfo.h"
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include "Callback.h"
 #include "FECoreKernel.h"
 #include "DataStore.h"

@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEAnalysis.h"
 #include "DumpStream.h"
 #include "FEDomain.h"
+#include "FEGlobalMatrix.h"
 
 //-----------------------------------------------------------------------------
 FELinearConstraintManager::FELinearConstraintManager(FEModel* fem) : m_fem(fem)

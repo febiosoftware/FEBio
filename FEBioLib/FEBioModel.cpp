@@ -58,6 +58,7 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FEPlotDataStore.h>
+#include <FECore/FETimeStepController.h>
 #include "febio.h"
 #include "version.h"
 #include <iostream>

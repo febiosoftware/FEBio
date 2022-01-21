@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FENLConstraint.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
 #include <assert.h>

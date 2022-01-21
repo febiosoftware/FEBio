@@ -23,65 +23,37 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEDiagnostic.h"
-
-class SparseMatrix;
+#include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
-class FEContactBiphasicScenario : public FEDiagnosticScenario
+// A Step component is a model component that can be assigned to a step. 
+// It adds a mechanism for activating and deactivating the component.
+class FECORE_API FEStepComponent : public FEModelComponent
 {
 public:
-    FEContactBiphasicScenario(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_dt = 1.0; }
-    
-public:
-    double	m_dt;
-};
+	FEStepComponent(FEModel* fem);
 
-//-----------------------------------------------------------------------------
-class FEContactBiphasicTangentHex8 : public FEContactBiphasicScenario
-{
-public:
-    FEContactBiphasicTangentHex8(FEDiagnostic* pdia);
-    
-    bool Init() override;
-    
-    DECLARE_FECORE_CLASS();
-};
+	//-----------------------------------------------------------------------------------
+	//! This function checks if the component is active in the current step. 
+	bool IsActive() const;
 
-//-----------------------------------------------------------------------------
-class FEContactBiphasicTangentHex20 : public FEContactBiphasicScenario
-{
-public:
-    FEContactBiphasicTangentHex20(FEDiagnostic* pdia);
-    
-    bool Init() override;
-    
-    DECLARE_FECORE_CLASS();
-};
+	//-----------------------------------------------------------------------------------
+	//! Activate the component.
+	//! This function is called during the step initialization, right before the step is solved.
+	//! This function can be used to initialize any data that could depend on the model state. 
+	//! Data allocation and initialization of data that does not depend on the model state should
+	//! be done in Init().
+	virtual void Activate();
 
-//-----------------------------------------------------------------------------
-class FEContactDiagnosticBiphasic : public FEDiagnostic
-{
+	//-----------------------------------------------------------------------------------
+	//! Deactivate the component
+	virtual void Deactivate();
+
 public:
-    FEContactDiagnosticBiphasic(FEModel& fem);
-    ~FEContactDiagnosticBiphasic();
-    
-    bool Run();
-    
-    bool Init();
-    
-    FEDiagnosticScenario* CreateScenario(const std::string& sname);
-    
-protected:
-    void print_matrix(matrix& m);
-    void print_matrix(SparseMatrix& m);
-    
-    void deriv_residual(matrix& K);
-    
-public:
-    FEContactBiphasicScenario*  m_pscn;
+	//! serialization
+	void Serialize(DumpStream& ar);
+
+private:
+	bool		m_bactive;	//!< flag indicating whether the component is active
 };

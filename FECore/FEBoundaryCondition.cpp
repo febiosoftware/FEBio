@@ -33,7 +33,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
 
 //-----------------------------------------------------------------------------
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem), m_dof(pfem)
+FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
 {
 }
 
@@ -51,7 +51,7 @@ void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
 
 void FEBoundaryCondition::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEStepComponent::Serialize(ar);
 	if (ar.IsShallow() == false) ar & m_dof;
 }
 
