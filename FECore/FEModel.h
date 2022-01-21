@@ -356,10 +356,14 @@ public:	// --- Miscellaneous routines ---
 
 public:
 	//! Log a message
-	virtual void Log(int ntag, const char* msg);
 	void Logf(int ntag, const char* msg, ...);
 	void BlockLog();
 	void UnBlockLog();
+	bool LogBlocked() const;
+
+public:
+	// Derived classes can use this to implement the actual logging mechanism
+	virtual void Log(int ntag, const char* msg);
 
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);

@@ -88,6 +88,8 @@ public: // some convenience functions (to pull data from FEModel without the nee
 	int GetDOFIndex(const char* szvar, int n) const;
 	int GetDOFIndex(const char* szdof) const;
 	const FETimeInfo& GetTimeInfo() const;
+	void AttachLoadController(const char* szparam, int lc);
+	void AttachLoadController(void* pd, int lc);
 
 	//! Get the model's mesh
 	FEMesh& GetMesh();

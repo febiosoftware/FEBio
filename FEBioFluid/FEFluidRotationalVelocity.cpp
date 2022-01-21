@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalVector.h"
 #include "FECore/log.h"
 #include "FECore/LinearSolver.h"
+#include <FECore/FENode.h>
 #include "FEBioFluid.h"
 
 //=============================================================================

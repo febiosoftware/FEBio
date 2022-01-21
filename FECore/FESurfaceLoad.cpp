@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FESurfaceLoad.h"
 #include "FEMesh.h"
 #include "DumpStream.h"
+#include "FEModel.h"
 
 BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
 	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
@@ -70,4 +71,9 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 
 	ar & m_dof;
 	ar & m_psurf;
+}
+
+void FESurfaceLoad::ForceMeshUpdate()
+{
+	GetFEModel()->SetMeshUpdateFlag(true);
 }

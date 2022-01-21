@@ -122,3 +122,25 @@ const FETimeInfo& FEModelComponent::GetTimeInfo() const
 {
 	return GetFEModel()->GetTime();
 }
+
+//-----------------------------------------------------------------------------
+void FEModelComponent::AttachLoadController(const char* szparam, int lc)
+{
+	FEParam* p = GetParameter(szparam); assert(p);
+	if (p)
+	{
+		FEModel* fem = GetFEModel();
+		fem->AttachLoadController(p, lc);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEModelComponent::AttachLoadController(void* pd, int lc)
+{
+	FEParam* p = FindParameterFromData(pd); assert(p);
+	if (p)
+	{
+		FEModel* fem = GetFEModel();
+		fem->AttachLoadController(p, lc);
+	}
+}

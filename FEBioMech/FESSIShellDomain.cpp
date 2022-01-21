@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/FEModelParam.h>
 #include <FECore/FEDataStream.h>
 #include <FECore/log.h>
+#include <FECore/FEMesh.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------

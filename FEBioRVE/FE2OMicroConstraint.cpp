@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -179,7 +180,7 @@ void FE2OMicroConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	int N = el.Nodes();
 	lm.resize(N*3);
 	for (int i=0; i<N; ++i)

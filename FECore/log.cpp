@@ -23,17 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "fecore_api.h"
-class FEModel;
+#include "log.h"
+#include "FEModel.h"
+#include <stdarg.h>
 
-FECORE_API void write_log(FEModel* fem, int ntag, const char* szmsg, ...);
+void write_log(FEModel* fem, int ntag, const char* szmsg, ...)
+{
+	assert(fem);
+	if (fem->LogBlocked()) return;
 
-#define feLog(...) write_log(GetFEModel(), 0, __VA_ARGS__)
-#define feLogWarning(...) write_log(GetFEModel(), 1, __VA_ARGS__)
-#define feLogError(...) write_log(GetFEModel(), 2, __VA_ARGS__)
-#define feLogInfo(...) write_log(GetFEModel(), 3, __VA_ARGS__)
+	// get a pointer to the argument list
+	va_list	args;
 
-#define feLogEx(fem, ...) write_log(fem, 0, __VA_ARGS__)
-#define feLogWarningEx(fem, ...) write_log(fem, 1, __VA_ARGS__)
-#define feLogErrorEx(fem, ...) write_log(fem, 2, __VA_ARGS__)
+	// make the message
+	char sztxt[2048] = { 0 };
+	va_start(args, szmsg);
+	vsprintf(sztxt, szmsg, args);
+	va_end(args);
+
+	fem->Log(ntag, sztxt);
+}

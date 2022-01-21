@@ -135,7 +135,7 @@ bool FEFluidTangentUniaxial::Init()
 	FENodeSet* dc = new FENodeSet(&fem);
 	dc->Add({ 0, 3, 4, 7 });
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_WX, dc);
-	pdc->SetScale(m_velocity, 0);
+    pdc->SetScale(m_velocity, 0);
 	fem.AddBoundaryCondition(pdc);
 
     return true;

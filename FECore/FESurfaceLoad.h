@@ -56,6 +56,11 @@ public:
 
 	const FEDofList& GetDofList() const;
 
+	// TODO: Can I get rid of this?
+	// This is needed to update the mesh after some surface loads, which aren't really
+	// surface loads modify boundary conditions
+	void ForceMeshUpdate();
+
 protected:
 	FESurface*	m_psurf;
 	FEDofList	m_dof;

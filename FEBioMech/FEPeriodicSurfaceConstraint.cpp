@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalMatrix.h"
 #include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
+#include <FECore/FEMesh.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------

@@ -1645,6 +1645,12 @@ void FEModel::UnBlockLog()
 }
 
 //-----------------------------------------------------------------------------
+bool FEModel::LogBlocked() const
+{
+	return m_imp->m_block_log;
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::SetGlobalConstant(const string& s, double v)
 {
 	m_imp->m_Const[s] = v;

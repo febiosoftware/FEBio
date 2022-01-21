@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEMeshTopo.h>
 #include <FECore/FEFixedBC.h>
 #include <FECore/FESurface.h>
+#include <FECore/FEModel.h>
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FETestRefine, FERefineMesh)

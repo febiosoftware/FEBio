@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEUncoupledElasticMixture.h"
 #include "FEPreStrainElastic.h"
 #include <FECore/FECoreKernel.h>
+#include <FECore/FEMesh.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -61,7 +62,7 @@ bool FEPreStrainConstraint::Augment(int naug, const FETimeInfo& tp)
 	if (IsActive() == false) return true;
 	if (m_laugon == false) return true;
 
-	FEMesh& m = GetFEModel()->GetMesh();
+	FEMesh& m = GetMesh();
 	int ND = m.Domains();
 
 	// do pre-strain augmentations

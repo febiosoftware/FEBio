@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMMGRemesh.h"
 #include <FECore/FEMeshTopo.h>
-#include <FECore/FEMesh.h>
+#include <FECore/FEModel.h>
 #include <FECore/FEDomain.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FESurface.h>

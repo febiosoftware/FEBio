@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEAnalysis.h"
 #include "FEPointFunction.h"
 #include "DumpStream.h"
+#include "FEModel.h"
 #include "log.h"
 
 REGISTER_SUPER_CLASS(FETimeStepController, FETIMECONTROLLER_ID);

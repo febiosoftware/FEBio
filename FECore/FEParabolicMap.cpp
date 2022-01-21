@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "SparseMatrix.h"
 #include "LinearSolver.h"
 #include "FEGlobalMatrix.h"
+#include "FEModel.h"
 
 BEGIN_FECORE_CLASS(FEParabolicMap, FEDataGenerator)
 	ADD_PARAMETER(m_scale, "value");

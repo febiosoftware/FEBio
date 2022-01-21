@@ -127,9 +127,9 @@ bool FESolutesMaterial::Init()
     
     int zmin = 0, zmax = 0;
     
-    m_Rgas = GetFEModel()->GetGlobalConstant("R");
-    m_Tabs = GetFEModel()->GetGlobalConstant("T");
-    m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
+    m_Rgas = GetGlobalConstant("R");
+    m_Tabs = GetGlobalConstant("T");
+    m_Fc   = GetGlobalConstant("Fc");
     
     if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
     if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");     return false; }

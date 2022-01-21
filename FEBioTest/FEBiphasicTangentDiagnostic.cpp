@@ -129,7 +129,7 @@ bool FEBiphasicTangentUniaxial::Init()
 	FENodeSet* dc = new FENodeSet(&fem);
     dc->Add({1, 2, 5, 6});
     FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_x, dc);
-	pdc->SetScale(d, 0);
+    pdc->SetScale(d, 0);
 	fem.AddBoundaryCondition(pdc);
 
 	return true;

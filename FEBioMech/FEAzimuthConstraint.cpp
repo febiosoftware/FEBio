@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEAzimuthConstraint.h"
 #include "FEBioMech.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/FENode.h>
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEAzimuthConstraint, FENodeSetConstraint)
@@ -174,8 +175,6 @@ void FEAzimuthConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! calculate the constraint stiffness
 void FEAzimuthConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-
 	int N = m_nodeSet.Size();
 	for (int i = 0; i < N; ++i)
 	{

@@ -54,7 +54,7 @@ FETempDependentConductivity::FETempDependentConductivity(FEModel* pfem) : FEFlui
 //! initialization
 bool FETempDependentConductivity::Init()
 {
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
+    m_Tr = GetGlobalConstant("T");
     
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
     

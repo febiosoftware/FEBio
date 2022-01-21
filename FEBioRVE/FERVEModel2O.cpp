@@ -316,9 +316,13 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	// create the DC's
 	ClearBoundaryConditions();
 	FEPrescribedDOF* pdc[3] = { 0 };
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[2]);
+	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC);
+	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC);
+	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC);
+
+	AddBoundaryCondition(pdc[0]);
+	AddBoundaryCondition(pdc[1]);
+	AddBoundaryCondition(pdc[2]);
 
 	// assign nodes to BCs
 	pdc[0]->SetNodeSet(pset);
@@ -371,7 +375,7 @@ bool FERVEModel2O::PrepPeriodicLC()
 	// assign nodes to BCs
 	pdc->SetReferenceNode(set[0]);
 	pdc->SetNodeSet(const_cast<FENodeSet*>(&set));
-	pdc->SetScale(1.0);// , NLC);
+	pdc->SetScale(1.0, NLC);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);

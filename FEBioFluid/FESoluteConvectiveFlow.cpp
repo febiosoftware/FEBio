@@ -28,12 +28,11 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESoluteConvectiveFlow.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEGlobalVector.h"
-#include "FECore/log.h"
 #include "FECore/LinearSolver.h"
+#include <FECore/FEModel.h>
 #include "FEBioFluidSolutes.h"
 
 //=============================================================================
@@ -48,10 +47,9 @@ FESoluteConvectiveFlow::FESoluteConvectiveFlow(FEModel* pfem) : FESurfaceLoad(pf
     m_sol = 0;
     
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
-    m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+    m_dofEF = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
+    m_dofC = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
 }
-
 
 //-----------------------------------------------------------------------------
 //! initialize
@@ -63,7 +61,7 @@ bool FESoluteConvectiveFlow::Init()
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
     if ((m_sol < 1) || (m_sol > MAX_CDOFS)) return false;
     
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     m_octree = new FEOctreeSearch(&mesh);
     m_octree->Init();
     
@@ -86,7 +84,7 @@ void FESoluteConvectiveFlow::Activate()
     int dofc = m_dofC + m_sol - 1;
     
     FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     
     for (int i=0; i<mesh.Nodes(); ++i)
     {
@@ -105,10 +103,9 @@ void FESoluteConvectiveFlow::Activate()
 // return nodal value
 void FESoluteConvectiveFlow::Update()
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
 
-    FETimeInfo& tp = fem.GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
     double gamma = tp.gamma;
     double dt = tp.timeIncrement;
     

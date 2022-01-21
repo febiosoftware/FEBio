@@ -118,9 +118,10 @@ bool FEBCPrescribedDeformation2O::Init()
 //-----------------------------------------------------------------------------
 // Sets the displacement scale factor. An optional load curve index can be given
 // of the load curve that will control the scale factor.
-void FEBCPrescribedDeformation2O::SetScale(double s)
+void FEBCPrescribedDeformation2O::SetScale(double s, int lc)
 {
 	m_scale = s;
+	if (lc >= 0) AttachLoadController(&m_scale, lc);
 }
 
 //-----------------------------------------------------------------------------

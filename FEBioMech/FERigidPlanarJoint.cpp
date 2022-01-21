@@ -612,8 +612,8 @@ void FERigidPlanarJoint::Update()
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alphaf;
+    const FETimeInfo& tp = GetTimeInfo();
+    double alpha = tp.alphaf;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);

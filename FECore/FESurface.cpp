@@ -714,7 +714,7 @@ void FESurface::NodalCoordinates(FESurfaceElement& el, vec3d* re)
 //! return +1 if face points away from element, -1 if face points into element, 0 if invalid solution found
 double FESurface::FacePointing(FESurfaceElement& se, FEElement& el)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = *GetMesh();
     // get point on surface element
     vec3d sp = Position(se, 0,0);
     

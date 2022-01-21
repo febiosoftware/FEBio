@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEPrescribedDOF.h"
 #include "FENodeSet.h"
 #include "DumpStream.h"
+#include "FEMesh.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -62,8 +63,7 @@ void FEPrescribedDOF::SetDOF(int ndof)
 //-----------------------------------------------------------------------------
 bool FEPrescribedDOF::SetDOF(const char* szdof)
 {
-	FEModel* fem = GetFEModel();
-	int ndof = fem->GetDOFIndex(szdof);
+	int ndof = GetDOFIndex(szdof);
 	assert(ndof >= 0);
 	if (ndof < 0) return false;
 	SetDOF(ndof);
@@ -78,8 +78,7 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 	m_scale = s;
 	if (lc >= 0)
 	{
-		FEParam* p = FindParameterFromData(&m_scale); assert(p);
-		GetFEModel()->AttachLoadController(p, lc);
+		AttachLoadController(&m_scale, lc);
 	}
 	return *this;
 }
@@ -94,8 +93,7 @@ bool FEPrescribedDOF::Init()
 	if (FEPrescribedNodeSet::Init() == false) return false;
 
 	// make sure this is not a rigid node
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 	int NN = mesh.Nodes();
 	const FENodeSet& nset = *GetNodeSet();
 	for (size_t i = 0; i<nset.Size(); ++i)

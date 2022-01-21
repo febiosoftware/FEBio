@@ -51,14 +51,14 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
     m_brim = false;
     
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
 
 	FEDofList dofE(GetFEModel());
 	dofE.AddDof(m_dofEF);
@@ -100,17 +100,16 @@ bool FEFluidNormalVelocity::Init()
 //! Activate the degrees of freedom for this BC
 void FEFluidNormalVelocity::Activate()
 {
-	FESurface* ps = &GetSurface();
-	FEMesh* mesh = ps->GetMesh();
+	FESurface& surface = GetSurface();
 
 	// evaluate surface normals
-	vector<vec3d> sn(ps->Elements(), vec3d(0, 0, 0));
-	m_nu.resize(ps->Nodes(), vec3d(0, 0, 0));
-	vector<int> nf(ps->Nodes(), 0);
+	vector<vec3d> sn(surface.Elements(), vec3d(0, 0, 0));
+	m_nu.resize(surface.Nodes(), vec3d(0, 0, 0));
+	vector<int> nf(surface.Nodes(), 0);
 	vec3d r0[FEElement::MAX_NODES];
-	for (int iel = 0; iel<ps->Elements(); ++iel)
+	for (int iel = 0; iel< surface.Elements(); ++iel)
 	{
-		FESurfaceElement& el = m_psurf->Element(iel);
+		FESurfaceElement& el = surface.Element(iel);
 
 		// nr integration points
 		int nint = el.GaussPoints();
@@ -120,7 +119,7 @@ void FEFluidNormalVelocity::Activate()
 
 		// nodal coordinates
 		for (int i = 0; i<neln; ++i) {
-			r0[i] = mesh->Node(el.m_node[i]).m_r0;
+			r0[i] = surface.Node(el.m_lnode[i]).m_r0;
 			++nf[el.m_lnode[i]];
 		}
 
@@ -151,7 +150,7 @@ void FEFluidNormalVelocity::Activate()
 			m_nu[el.m_lnode[i]] += sn[iel];
 	}
 
-	for (int i = 0; i<ps->Nodes(); ++i) {
+	for (int i = 0; i< surface.Nodes(); ++i) {
 		m_nu[i].unit();
 	}
 
@@ -159,12 +158,11 @@ void FEFluidNormalVelocity::Activate()
     if (m_brim) {
         // find rim nodes (rim)
         FEElemElemList EEL;
-        FESurface* ps = &GetSurface();
-        EEL.Create(ps);
+        EEL.Create(&surface);
         
-        vector<bool> boundary(ps->Nodes(), false);
-        for (int i=0; i<ps->Elements(); ++i) {
-            FESurfaceElement& el = ps->Element(i);
+        vector<bool> boundary(surface.Nodes(), false);
+        for (int i=0; i< surface.Elements(); ++i) {
+            FESurfaceElement& el = surface.Element(i);
             for (int j=0; j<el.facet_edges(); ++j) {
                 FEElement* nel = EEL.Neighbor(i, j);
                 if (nel == nullptr) {
@@ -179,25 +177,25 @@ void FEFluidNormalVelocity::Activate()
         
         // store boundary nodes for which the velocity DOFs are fixed
         // which defines the rim on which the dilatation needs to be prescribed
-        m_rim.reserve(ps->Nodes());
-        for (int i=0; i<ps->Nodes(); ++i)
+        m_rim.reserve(surface.Nodes());
+        for (int i=0; i<surface.Nodes(); ++i)
             if (boundary[i]) {
-                FENode& node = ps->Node(i);
+                FENode& node = surface.Node(i);
                 if ((node.get_bc(m_dofW[0]) == DOF_FIXED) &&
                     (node.get_bc(m_dofW[1]) == DOF_FIXED) &&
                     (node.get_bc(m_dofW[2]) == DOF_FIXED))
                     m_rim.push_back(i);
             }
         
-        if (m_rim.size() == ps->Nodes())
+        if (m_rim.size() == surface.Nodes())
         {
             feLogError("Unable to set rim pressure\n");
         }
     }
     
-    for (int i=0; i<ps->Nodes(); ++i)
+    for (int i=0; i< surface.Nodes(); ++i)
     {
-        FENode& node = ps->Node(i);
+        FENode& node = surface.Node(i);
         // mark node as having prescribed DOF
         if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
         if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
@@ -206,7 +204,7 @@ void FEFluidNormalVelocity::Activate()
     
     if (m_brim) {
         for (int i=0; i<m_rim.size(); ++i) {
-            FENode& node = ps->Node(m_rim[i]);
+            FENode& node = surface.Node(m_rim[i]);
             // mark node as having prescribed DOF
             if (node.get_bc(m_dofEF) != DOF_FIXED) node.set_bc(m_dofEF, DOF_PRESCRIBED);
         }
@@ -258,8 +256,9 @@ void FEFluidNormalVelocity::Update()
     }
     
     if (m_brim) SetRimPressure();
-    
-    GetFEModel()->SetMeshUpdateFlag(true);
+
+    // make sure the mesh gets updated after all loads are updated
+    ForceMeshUpdate();
 }
 
 //-----------------------------------------------------------------------------

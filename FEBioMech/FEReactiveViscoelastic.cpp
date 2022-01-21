@@ -243,7 +243,7 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
     double w = 0;
     
     // current time
-    double time = GetFEModel()->GetTime().currentTime;
+    double time = CurrentTime();
     double tv = time - pt.m_v[ig];
 
     switch (m_btype) {
@@ -328,7 +328,7 @@ mat3ds FEReactiveViscoelasticMaterial::StressStrongBonds(FEMaterialPoint& mp)
 //! Stress function for weak bonds
 mat3ds FEReactiveViscoelasticMaterial::StressWeakBonds(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTime();
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);
@@ -505,7 +505,7 @@ double FEReactiveViscoelasticMaterial::StrongBondSED(FEMaterialPoint& mp)
 //! strain energy density function in weak bonds
 double FEReactiveViscoelasticMaterial::WeakBondSED(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTime();
     if (dt == 0) return 0;
     
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);

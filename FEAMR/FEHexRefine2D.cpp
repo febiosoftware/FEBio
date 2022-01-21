@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEHexRefine2D.h"
-#include <FECore/FEMesh.h>
+#include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEMeshTopo.h>
 #include <FECore/FEPrescribedDOF.h>

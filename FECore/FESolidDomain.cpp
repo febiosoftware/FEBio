@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEMaterial.h"
 #include "tools.h"
 #include "log.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m_dofU(pfem), m_dofSU(pfem)

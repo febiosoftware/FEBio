@@ -35,6 +35,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! This class represents a global system array. It provides functions to assemble
 //! local (element) vectors into this array
+//! TODO: remove FEModel dependency!
 class FECORE_API FEGlobalVector
 {
 public:

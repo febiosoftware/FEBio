@@ -28,8 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "CompactUnSymmMatrix.h"
-#include <FECore/log.h>
-
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
 #ifdef MKL_ISS
 #ifdef PARDISO
@@ -39,6 +37,7 @@ SOFTWARE.*/
 #include "mkl_blas.h"
 #include "mkl_spblas.h"
 #endif // MKL_ISS
+using namespace std;
 
 //-----------------------------------------------------------------------------
 // this sort function is defined in qsort.cpp
