@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESymmetryPlane.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FEModel.h>
+//#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FESymmetryPlane::FESymmetryPlane(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
@@ -44,8 +44,13 @@ void FESymmetryPlane::Activate()
     // don't forget to call base class
     FELinearConstraintSet::Activate();
 
-    FEModel& fem = *FELinearConstraintSet::GetFEModel();
-    DOFS& dofs = fem.GetDOFS();
+    // get the dof indices
+    int dofX = GetDOFIndex("x");
+    int dofY = GetDOFIndex("y");
+    int dofZ = GetDOFIndex("z");
+    int dofSX = GetDOFIndex("sx");
+    int dofSY = GetDOFIndex("sy");
+    int dofSZ = GetDOFIndex("sz");
     
     // evaluate the nodal normals
     int N = m_surf.Nodes();
@@ -72,15 +77,15 @@ void FESymmetryPlane::Activate()
                 dof.node = node.GetID() - 1;    // zero-based
                 switch (j) {
                     case 0:
-                        dof.bc = dofs.GetDOF("x");
+                        dof.bc = dofX;
                         dof.val = nu.x;
                         break;
                     case 1:
-                        dof.bc = dofs.GetDOF("y");
+                        dof.bc = dofY;
                         dof.val = nu.y;
                         break;
                     case 2:
-                        dof.bc = dofs.GetDOF("z");
+                        dof.bc = dofZ;
                         dof.val = nu.z;
                         break;
                     default:
@@ -103,15 +108,15 @@ void FESymmetryPlane::Activate()
                 dof.node = node.GetID() - 1;    // zero-based
                 switch (j) {
                     case 0:
-                        dof.bc = dofs.GetDOF("sx");
+                        dof.bc = dofSX;
                         dof.val = nu.x;
                         break;
                     case 1:
-                        dof.bc = dofs.GetDOF("sy");
+                        dof.bc = dofSY;
                         dof.val = nu.y;
                         break;
                     case 2:
-                        dof.bc = dofs.GetDOF("sz");
+                        dof.bc = dofSZ;
                         dof.val = nu.z;
                         break;
                     default:

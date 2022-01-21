@@ -26,8 +26,6 @@
 
 
 #include "FENonlinearElasticFluid.h"
-#include <FECore/FEModel.h>
-#include <FECore/log.h>
 #include "FEFluidMaterialPoint.h"
 
 //-----------------------------------------------------------------------------

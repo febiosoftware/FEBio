@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidVelocity.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include "FEBioFluid.h"
 

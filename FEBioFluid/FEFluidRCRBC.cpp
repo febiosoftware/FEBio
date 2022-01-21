@@ -28,7 +28,6 @@ SOFTWARE.*/
 #include "FEFluidRCRBC.h"
 #include "FEFluid.h"
 #include "FEBioFluid.h"
-#include <FECore/FEAnalysis.h>
 #include <FECore/FEModel.h>
 
 //=============================================================================
@@ -58,7 +57,7 @@ FEFluidRCRBC::FEFluidRCRBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
     m_flowHist.clear();
     
     m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -111,9 +110,9 @@ void FEFluidRCRBC::Update()
     // evaluate the flow rate
     double Q = FlowRate();
     
-    int numsteps = GetFEModel()->GetCurrentStep()->m_ntimesteps;
-    FETimeInfo& tp = GetFEModel()->GetTime();
-    
+    const FETimeInfo& tp = GetTimeInfo();
+    int numsteps = tp.timeStep;
+
     m_flowHist.resize(numsteps + 1, 0);
     m_timeHist.resize(numsteps + 1);
     m_stepHist.resize(numsteps + 1);
@@ -180,8 +179,9 @@ void FEFluidRCRBC::Update()
             node.set(m_dofEF, e);
         }
     }
-    
-    GetFEModel()->SetMeshUpdateFlag(true);
+
+    // Force a mesh update after loads have been updated
+    ForceMeshUpdate();
 }
 
 //-----------------------------------------------------------------------------
@@ -207,7 +207,7 @@ double FEFluidRCRBC::FlowRate()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
+            FENode& node = GetMesh().Node(el.m_node[i]);
             rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
             vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
         }

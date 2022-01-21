@@ -73,7 +73,7 @@ void FEBackFlowFSIStabilization::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FEBackFlowFSIStabilization::StiffnessMatrix(FELinearSystem& LS)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
 
     m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
@@ -139,7 +139,7 @@ vec3d FEBackFlowFSIStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, doub
 //-----------------------------------------------------------------------------
 void FEBackFlowFSIStabilization::LoadVector(FEGlobalVector& R)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
 
     m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 

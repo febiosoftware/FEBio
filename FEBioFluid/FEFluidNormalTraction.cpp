@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "FEBioFluid.h"
 #include <FECore/FESurface.h>
 #include <FECore/FEFacetSet.h>
-#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalTraction, FESurfaceLoad)
@@ -66,7 +65,7 @@ bool FEFluidNormalTraction::Init()
 //! Calculate the residual for the traction load
 void FEFluidNormalTraction::LoadVector(FEGlobalVector& R)
 {
-	FETimeInfo& tp = GetFEModel()->GetTime();
+	const FETimeInfo& tp = GetTimeInfo();
 
 	// evaluate integral over surface
 	m_psurf->LoadVector(R, m_dofW, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape &dof_a, vector<double>& fa) {

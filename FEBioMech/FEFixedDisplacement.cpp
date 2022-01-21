@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedDisplacement.h"
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedDisplacement, FEFixedBC)
 	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:displacement)");

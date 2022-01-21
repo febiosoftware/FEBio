@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEDomain.h"
 #include "DumpStream.h"
-#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEElementSet::FEElementSet(FEModel* fem) : FEItemList(fem)

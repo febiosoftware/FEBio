@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEAugLagLinearConstraint.h"
-#include "FECore/FEModel.h"
+#include "FECore/FEMesh.h"
 #include "FECore/log.h"
 #include <FECore/FELinearSystem.h>
 
@@ -86,7 +86,7 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FESurfaceConstrain
 //-----------------------------------------------------------------------------
 void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	list<FEAugLagLinearConstraint*>& LC = m_LC;
 	vector<int> lm;
 	int N = (int)LC.size();
@@ -110,7 +110,7 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 	double c = 0;
 	list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
 	double u;
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	for (int i=0; i<n; ++i, ++it) 
 	{
 		FENode& node = mesh.Node(it->node);
@@ -185,7 +185,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 
 void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	int M = (int)m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
@@ -211,7 +211,7 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	vector<int> en;
 	vector<int> elm;
@@ -319,7 +319,7 @@ FENodeConstraintSet::FENodeConstraintSet(FEModel* pfem) : FENodeSetConstraint(pf
 //-----------------------------------------------------------------------------
 void FENodeConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = GetMesh();
     list<FEAugLagLinearConstraint*>& LC = m_LC;
     vector<int> lm;
     int N = (int)LC.size();
@@ -343,7 +343,7 @@ double FENodeConstraintSet::constraint(FEAugLagLinearConstraint& LC)
     double c = 0;
     list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
     double u;
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = GetMesh();
     for (int i=0; i<n; ++i, ++it)
     {
         FENode& node = mesh.Node(it->node);
@@ -418,7 +418,7 @@ bool FENodeConstraintSet::Augment(int naug, const FETimeInfo& tp)
 
 void FENodeConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = GetMesh();
 
     int M = (int)m_LC.size();
     list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
@@ -444,7 +444,7 @@ void FENodeConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 void FENodeConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = GetMesh();
 
     vector<int> en;
     vector<int> elm;

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <stdio.h>
 #include <time.h>
 #include <string>
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 // Define the data types used for measuring times.
@@ -152,4 +153,18 @@ void Timer::time_str(double fsec, char* sz)
 	int nhour, nmin, nsec;
 	GetTime(fsec, nhour, nmin, nsec);
 	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
+}
+
+//============================================================================
+TimerTracker::TimerTracker(FEModel* fem, int timerId) : TimerTracker(fem->GetTimer(timerId)) {}
+
+TimerTracker::TimerTracker(Timer* timer) 
+{
+	if (timer && (timer->isRunning() == false)) { m_timer = timer; timer->start(); }
+	else m_timer = nullptr;
+};
+
+TimerTracker::~TimerTracker() 
+{ 
+	if (m_timer) m_timer->stop(); 
 }

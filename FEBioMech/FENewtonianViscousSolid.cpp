@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FENewtonianViscousSolid.h"
-#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -63,7 +62,7 @@ mat3ds FENewtonianViscousSolid::Stress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FENewtonianViscousSolid::Tangent(FEMaterialPoint& mp)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
     tens4ds Cv;
     
     if (tp.timeIncrement > 0) {

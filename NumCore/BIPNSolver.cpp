@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "BIPNSolver.h"
 #include <FECore/vector.h>
-#include <FECore/FEModel.h>
 #include "RCICGSolver.h"
 #include <FECore/SchurComplement.h>
 #include <FECore/log.h>

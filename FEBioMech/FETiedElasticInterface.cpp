@@ -279,16 +279,15 @@ bool FETiedElasticInterface::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     
     // get the DOFS
-    const int dof_X = fem.GetDOFIndex("x");
-    const int dof_Y = fem.GetDOFIndex("y");
-    const int dof_Z = fem.GetDOFIndex("z");
-    const int dof_RU = fem.GetDOFIndex("Ru");
-    const int dof_RV = fem.GetDOFIndex("Rv");
-    const int dof_RW = fem.GetDOFIndex("Rw");
+    const int dof_X = GetDOFIndex("x");
+    const int dof_Y = GetDOFIndex("y");
+    const int dof_Z = GetDOFIndex("z");
+    const int dof_RU = GetDOFIndex("Ru");
+    const int dof_RV = GetDOFIndex("Rv");
+    const int dof_RW = GetDOFIndex("Rw");
     
     const int ndpn = 6;
     vector<int> lm(ndpn*FEElement::MAX_NODES*2);

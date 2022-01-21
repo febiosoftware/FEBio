@@ -29,8 +29,8 @@
 #include "stdafx.h"
 #include "FEMultiphasicFSISoluteFlux.h"
 #include "FEBioMultiphasicFSI.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FECore/FEFacetSet.h>
 #include "FECore/FEAnalysis.h"
 
 //=============================================================================
@@ -77,7 +77,7 @@ void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FEMultiphasicFSISoluteFlux::StiffnessMatrix(FELinearSystem& LS)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
 
     // evaluate the stiffness contribution
     FEMultiphasicFSISoluteFlux* flux = this;
@@ -117,7 +117,7 @@ bool FEMultiphasicFSISoluteFlux::Init()
     FEModel* fem = GetFEModel();
     m_dofC.Clear();
     m_dofU.Clear();
-    m_dofC.AddDof(fem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), m_isol-1));
+    m_dofC.AddDof(GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), m_isol-1));
     m_dofU.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::DISPLACEMENT));
     m_dof.Clear();
     m_dof.AddDofs(m_dofU);

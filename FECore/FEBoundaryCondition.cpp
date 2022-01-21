@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBoundaryCondition.h"
 #include "FEFacetSet.h"
-#include "FEModel.h"
 
 REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
 

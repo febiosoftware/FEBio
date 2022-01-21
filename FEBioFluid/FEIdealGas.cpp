@@ -26,7 +26,6 @@ SOFTWARE.*/
 
 
 #include "FEIdealGas.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include "FEFluidMaterialPoint.h"
 #include "FEThermoFluid.h"
@@ -54,9 +53,9 @@ FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
 //! initialization
 bool FEIdealGas::Init()
 {
-    m_R  = GetFEModel()->GetGlobalConstant("R");
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
-    m_Pr = GetFEModel()->GetGlobalConstant("P");
+    m_R  = GetGlobalConstant("R");
+    m_Tr = GetGlobalConstant("T");
+    m_Pr = GetGlobalConstant("P");
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }

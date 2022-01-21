@@ -404,6 +404,7 @@ bool FEAnalysis::Solve()
 		double newTime = tp.currentTime + m_dt;
 		tp.currentTime = newTime;
 		tp.timeIncrement = m_dt;
+		tp.timeStep = m_ntimesteps;
 		feLog("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
 
 		// initialize the solver step

@@ -84,6 +84,21 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+class FEModel;
+
+//-----------------------------------------------------------------------------
+// Timer IDs
+enum TimerID {
+	Timer_Update,
+	Timer_LinSolve,
+	Timer_Reform,
+	Timer_Residual,
+	Timer_Stiffness,
+	Timer_QNUpdate,
+	Timer_ModelSolve
+};
+
+//-----------------------------------------------------------------------------
 // This is helper class that can be used to ensure that a timer is stopped when
 // the function that is being timed exits. That way, the Timer::stop member does not 
 // have to be called at every exit point of a function.
@@ -92,14 +107,12 @@ private:
 class FECORE_API TimerTracker
 {
 public:
-	TimerTracker(Timer* timer) { 
-		if (timer && (timer->isRunning() == false)) { m_timer = timer; timer->start(); }
-		else m_timer = nullptr; 
-	};
-	~TimerTracker() { if (m_timer) m_timer->stop(); }
+	TimerTracker(FEModel* fem, int timerId);
+	TimerTracker(Timer* timer);
+	~TimerTracker();
 
 private:
 	Timer*	m_timer;
 };
 
-#define TRACK_TIME(timerId) TimerTracker _trackTimer(GetFEModel()->GetTimer(timerId));
+#define TRACK_TIME(timerId) TimerTracker _trackTimer(GetFEModel(), timerId);

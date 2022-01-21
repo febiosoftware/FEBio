@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedBC.h"
 #include "FENodeSet.h"
-#include "FEModel.h"
+#include "FENode.h"
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------

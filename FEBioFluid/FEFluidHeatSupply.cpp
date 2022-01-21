@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEFluidHeatSupply.h"
 #include "FEThermoFluid.h"
 #include "FEThermoFluidDomain.h"
-#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FEFluidHeatSupply::FEFluidHeatSupply(FEModel* pfem) : FEBodyLoad(pfem)
@@ -41,7 +40,7 @@ FEFluidHeatSupply::FEFluidHeatSupply(FEModel* pfem) : FEBodyLoad(pfem)
 // NOTE: Work in progress! Working on integrating body loads as model loads
 void FEFluidHeatSupply::LoadVector(FEGlobalVector& R)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
     for (int i = 0; i<Domains(); ++i)
     {
         FEDomain* dom = Domain(i);
@@ -58,7 +57,7 @@ void FEFluidHeatSupply::LoadVector(FEGlobalVector& R)
 // NOTE: Work in progress! Working on integrating body loads as model loads
 void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
     for (int i = 0; i<Domains(); ++i)
     {
         FEDomain* dom = Domain(i);

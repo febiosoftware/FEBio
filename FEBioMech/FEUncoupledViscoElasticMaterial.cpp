@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FEModel.h>
+#include <stdexcept>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -92,7 +92,7 @@ FEMaterialPoint* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
 //! Stress function
 mat3ds FEUncoupledViscoElasticMaterial::DevStress(FEMaterialPoint& mp)
 {
-	double dt = GetFEModel()->GetTime().timeIncrement;
+	double dt = CurrentTimeIncrement();
 	if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
 	// get the elastic part
@@ -132,7 +132,7 @@ mat3ds FEUncoupledViscoElasticMaterial::DevStress(FEMaterialPoint& mp)
 //! Material tangent
 tens4ds FEUncoupledViscoElasticMaterial::DevTangent(FEMaterialPoint& pt)
 {
-	double dt = GetFEModel()->GetTime().timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	// calculate the spatial elastic tangent
 	tens4ds C = m_pBase->DevTangent(pt);

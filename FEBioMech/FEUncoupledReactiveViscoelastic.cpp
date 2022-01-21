@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FEFiberMaterialPoint.h"
 #include "FEScaledUncoupledMaterial.h"
 #include <FECore/FECoreKernel.h>
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <limits>
 
@@ -231,7 +230,7 @@ double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMater
     double w = 0;
     
     // current time
-    double time = GetFEModel()->GetTime().currentTime;
+    double time = CurrentTime();
     double tv = time - pt.m_v[ig];
 
     switch (m_btype) {
@@ -316,7 +315,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStressStrongBonds(FEMaterialP
 //! Stress function in weak bonds
 mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStressWeakBonds(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);
@@ -493,7 +492,7 @@ double FEUncoupledReactiveViscoelasticMaterial::StrongBondDevSED(FEMaterialPoint
 //! strain energy density function
 double FEUncoupledReactiveViscoelasticMaterial::WeakBondDevSED(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     if (dt == 0) return 0;
     
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);

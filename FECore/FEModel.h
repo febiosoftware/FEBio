@@ -65,18 +65,6 @@ struct FEMODEL_MEMORY_STATS {
 };
 
 //-----------------------------------------------------------------------------
-// Timer IDs
-enum TimerID {
-	Timer_Update,
-	Timer_LinSolve,
-	Timer_Reform,
-	Timer_Residual,
-	Timer_Stiffness,
-	Timer_QNUpdate,
-	Timer_ModelSolve
-};
-
-//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.

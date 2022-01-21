@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FENewtonStrategy.h"
 #include "FENewtonSolver.h"
 #include "LinearSolver.h"
-#include "FEModel.h"
 
 REGISTER_SUPER_CLASS(FENewtonStrategy, FENEWTONSTRATEGY_ID);
 

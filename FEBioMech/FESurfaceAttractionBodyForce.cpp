@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESurfaceAttractionBodyForce.h"
 #include "FEElasticMaterial.h"
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 #include <FECore/FEClosestPointProjection.h>
 #include <FECore/log.h>
 
@@ -70,7 +70,7 @@ bool FESurfaceAttractionBodyForce::Init()
 	cpp.Init();
 
     // allocate projection point vector array
-    int nel = GetFEModel()->GetMesh().Elements();
+    int nel = GetMesh().Elements();
     m_q.resize(nel);
     
     const char s[] = "%%";

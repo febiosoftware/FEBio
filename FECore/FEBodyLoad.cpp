@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBodyLoad.h"
-#include "FEModel.h"
+#include "FEMesh.h"
 #include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ bool FEBodyLoad::Init()
 	// If the domain list is empty, add all the domains
 	if (m_dom.IsEmpty())
 	{
-		FEMesh& mesh = GetFEModel()->GetMesh();
+		FEMesh& mesh = GetMesh();
 		for (int i=0; i<mesh.Domains(); ++i)
 		{
 			FEDomain* dom = &mesh.Domain(i);
