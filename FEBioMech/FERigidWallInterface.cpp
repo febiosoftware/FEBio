@@ -37,40 +37,13 @@ SOFTWARE.*/
 #define HEAVYSIDE(x) ((x)>=0?1:0)
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FERigidPlane, FECoreBase)
-	ADD_PARAMETER(a, 4, "plane");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-FERigidPlane::FERigidPlane(FEModel* pfem) : FECoreBase(pfem)
-{
-}
-
-//-----------------------------------------------------------------------------
-//! Initializes data for FEPlane
-vec3d FERigidPlane::Normal(const vec3d& r)
-{
-	vec3d n(a[0], a[1], a[2]);
-	n.unit();
-	return n;
-}
-
-vec3d FERigidPlane::Project(const vec3d& r)
-{
-	double d = a[3];
-
-	double l = a[0] * r.x + a[1] * r.y + a[2] * r.z - d;
-	return vec3d(r.x - l * a[0], r.y - l * a[1], r.z - l * a[2]);
-}
-
-//-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FERigidWallInterface, FESurfaceConstraint)
 	ADD_PARAMETER(m_laugon , "laugon"    );
 	ADD_PARAMETER(m_atol   , "tolerance" );
 	ADD_PARAMETER(m_eps    , "penalty"   );
 	ADD_PARAMETER(m_d	   , "offset"    );
-	ADD_PARAMETER(m_plane.a, 4, "plane"  );
+	ADD_PARAMETER(m_a      , 4, "plane"  );
 
 	ADD_PROPERTY(m_ss, "surface");
 END_FECORE_CLASS();
@@ -237,10 +210,12 @@ void FERigidWallSurface::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FESurfaceConstraint(pfem), m_plane(pfem)
+FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FESurfaceConstraint(pfem)
 {
 	static int count = 1;
 	SetID(count++);
+
+	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0.0;
 
 	m_ss = new FERigidWallSurface(pfem);
 	m_eps = 0;
@@ -261,10 +236,6 @@ bool FERigidWallInterface::Init()
 {
 	// create the surface
 	if (m_ss->Init() == false) return false;
-
-	// initialize rigid surface
-	m_plane.Init();
-
 	return true;
 }
 
@@ -325,10 +296,10 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 		vec3d r = surf.Node(i).m_rt;
 
 		// project this node onto the plane
-		vec3d q = m_plane.Project(r);
+		vec3d q = ProjectToPlane(r);
 
 		// get the local surface normal
-		vec3d np = m_plane.Normal(q);
+		vec3d np = PlaneNormal(q);
 
 		// calculate offset
 		q += np*m_d;
@@ -655,10 +626,25 @@ bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
+vec3d FERigidWallInterface::PlaneNormal(const vec3d& r)
+{
+	vec3d n(m_a[0], m_a[1], m_a[2]);
+	n.unit();
+	return n;
+}
 
+//-----------------------------------------------------------------------------
+vec3d FERigidWallInterface::ProjectToPlane(const vec3d& r)
+{
+	double d = m_a[3];
+
+	double l = m_a[0] * r.x + m_a[1] * r.y + m_a[2] * r.z - d;
+	return vec3d(r.x - l * m_a[0], r.y - l * m_a[1], r.z - l * m_a[2]);
+}
+
+//-----------------------------------------------------------------------------
 void FERigidWallInterface::Serialize(DumpStream &ar)
 {
 	FESurfaceConstraint::Serialize(ar);
 	m_ss->Serialize(ar);
-	m_plane.Serialize(ar);
 }

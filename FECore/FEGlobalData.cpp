@@ -32,12 +32,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEGlobalData, FEGLOBALDATA_ID);
 
 //-----------------------------------------------------------------------------
-FEGlobalData::FEGlobalData(FEModel* fem) : FECoreBase(fem)
+FEGlobalData::FEGlobalData(FEModel* fem) : FEModelComponent(fem)
 {
-}
 
-//-----------------------------------------------------------------------------
-bool FEGlobalData::Init()
-{
-	return true;
 }

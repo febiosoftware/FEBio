@@ -77,31 +77,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! This class implements a rigid plane
-
-//! The FEPlane is used to describe the (moving) rigid wall in a FERigidWallInterface
-class FERigidPlane : public FECoreBase
-{
-public:
-	//! constructor
-	FERigidPlane(FEModel* fem);
-
-	//! return plane normal
-	vec3d Normal(const vec3d& r);
-
-	//! project node onto plane
-	vec3d Project(const vec3d& r);
-
-	//! get the initial plane equation
-	double* GetEquation() { return a; }
-
-public:
-	double	a[4];	//!< plane equation
-
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
 //! This class implements a sliding contact interface with a rigid wall
 
 //! This class is a specialization of the general sliding interface where
@@ -151,10 +126,17 @@ private:
 	//! project surface nodes onto plane
 	void ProjectSurface(FERigidWallSurface& s);
 
+private:
+	//! return plane normal
+	vec3d PlaneNormal(const vec3d& r);
+
+	//! project node onto plane
+	vec3d ProjectToPlane(const vec3d& r);
+
 public:
 	FERigidWallSurface*	m_ss;		//!< primary surface
 
-	FERigidPlane		m_plane;	//!< secondary surface
+	double	m_a[4];	//!< plane equation
 
 	int			m_laugon;	//!< augmentation flag
 	double		m_atol;		//!< augmentation tolerance
