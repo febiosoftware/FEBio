@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioBoundarySection3.h"
 #include <FECore/FENodalBC.h>
+#include <FECore/FESurfaceBC.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearConstraintManager.h>
 
@@ -79,20 +80,23 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 	if (szname) pbc->SetName(szname);
 
 	// get the node set
-	FEProperty* pn = pbc->FindProperty("node_set");
-	if (pn)
+	if (dynamic_cast<FENodalBC*>(pbc))
 	{
+		FENodalBC* nbc = dynamic_cast<FENodalBC*>(pbc); assert(nbc);
+
 		// read required node_set attribute
 		const char* szset = tag.AttributeValue("node_set");
 		FENodeSet* nodeSet = GetBuilder()->FindNodeSet(szset);
 		if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-		pn->SetProperty(nodeSet);
+
+		nbc->SetNodeSet(nodeSet);
 	}
 
 	// get the surface
-	FEProperty* ps = pbc->FindProperty("surface");
-	if (ps)
+	if (dynamic_cast<FESurfaceBC*>(pbc))
 	{
+		FESurfaceBC* sbc = dynamic_cast<FESurfaceBC*>(pbc);
+
 		// read required surface attribute
 		const char* surfaceName = tag.AttributeValue("surface");
 		FEFacetSet* pface = mesh.FindFacetSet(surfaceName);
@@ -104,15 +108,14 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 
 		// assign it
 		mesh.AddSurface(psurf);
-		ps->SetProperty(psurf);
+		sbc->SetSurface(psurf);
 	}
 
 	// add this boundary condition to the current step
 	GetBuilder()->AddBC(pbc);
 
 	// Read the parameter list
-	if (tag.isleaf() == false)
-		ReadParameterList(tag, pbc);
+	ReadParameterList(tag, pbc);
 }
 
 //-----------------------------------------------------------------------------

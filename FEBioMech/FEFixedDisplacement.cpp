@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedDisplacement.h"
 
-BEGIN_FECORE_CLASS(FEFixedDisplacement, FEFixedBC)
+BEGIN_FECORE_CLASS(FEFixedDisplacement, FENodalBC)
 	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:displacement)");
 	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
