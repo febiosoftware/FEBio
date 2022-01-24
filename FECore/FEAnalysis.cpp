@@ -40,6 +40,16 @@ SOFTWARE.*/
 #include "FEMeshAdaptor.h"
 #include "FETimeStepController.h"
 
+//---------------------------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEStepOutput, FECoreClass)
+	ADD_PARAMETER(m_bplotZero, "plot_zero_state");
+	ADD_PARAMETER(m_nplotRange, 2, "plot_range");
+	ADD_PARAMETER(m_nplot, "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
+	ADD_PARAMETER(m_noutput, "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
+	ADD_PARAMETER(m_nplot_stride, "plot_stride");
+END_FECORE_CLASS();
+
+//---------------------------------------------------------------------------------------------
 REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
 
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
@@ -47,17 +57,13 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
 	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME);
 	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
-	ADD_PARAMETER(m_bplotZero   , "plot_zero_state");
-	ADD_PARAMETER(m_nplotRange  , 2, "plot_range");
-	ADD_PARAMETER(m_nplot       , "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
-	ADD_PARAMETER(m_noutput     , "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
-	ADD_PARAMETER(m_nplot_stride, "plot_stride");
 	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
 
 	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional);
 	ADD_PROPERTY(m_psolver, "solver");
+	ADD_PROPERTY(m_output, "output");
 
-END_FECORE_CLASS()
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
@@ -84,13 +90,13 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
 	// --- I/O Data ---
-	m_nplot   = FE_PLOT_MAJOR_ITRS;
-	m_noutput = FE_OUTPUT_MAJOR_ITRS;
-	m_nplot_stride = 1;
-	m_nplotRange[0] = 0; // by default, will store step zero.
-	m_nplotRange[1] = -1; // by default, store last time step
-	m_bplotZero = false; // don't force plotting step zero.
-	m_plotHint = 0;
+	m_output.m_nplot   = FE_PLOT_MAJOR_ITRS;
+	m_output.m_noutput = FE_OUTPUT_MAJOR_ITRS;
+	m_output.m_nplot_stride = 1;
+	m_output.m_nplotRange[0] = 0; // by default, will store step zero.
+	m_output.m_nplotRange[1] = -1; // by default, store last time step
+	m_output.m_bplotZero = false; // don't force plotting step zero.
+	m_output.m_plotHint = 0;
 
 	m_bactive = false;
 }
@@ -150,50 +156,50 @@ FEStepComponent* FEAnalysis::GetStepComponent(int i)
 
 //-----------------------------------------------------------------------------
 //! sets the plot level
-void FEAnalysis::SetPlotLevel(int n) { m_nplot = n; }
+void FEAnalysis::SetPlotLevel(int n) { m_output.m_nplot = n; }
 
 //-----------------------------------------------------------------------------
 //! sets the plot stride
-void FEAnalysis::SetPlotStride(int n) { m_nplot_stride = n; }
+void FEAnalysis::SetPlotStride(int n) { m_output.m_nplot_stride = n; }
 
 //-----------------------------------------------------------------------------
 //! sets the plot range
 void FEAnalysis::SetPlotRange(int n0, int n1)
 {
-	m_nplotRange[0] = n0;
-	m_nplotRange[1] = n1; 
+	m_output.m_nplotRange[0] = n0;
+	m_output.m_nplotRange[1] = n1;
 }
 
 //-----------------------------------------------------------------------------
 //! sets the zero-state plot flag
 void FEAnalysis::SetPlotZeroState(bool b)
 {
-	m_bplotZero = b;	
+	m_output.m_bplotZero = b;
 }
 
 //-----------------------------------------------------------------------------
 //! sets the plot hint
 void FEAnalysis::SetPlotHint(int plotHint)
 {
-	m_plotHint = plotHint;
+	m_output.m_plotHint = plotHint;
 }
 
 //-----------------------------------------------------------------------------
 //! get the plot hint
 int FEAnalysis::GetPlotHint() const
 {
-	return m_plotHint;
+	return m_output.m_plotHint;
 }
 
 //-----------------------------------------------------------------------------
 //! get the plot level
-int FEAnalysis::GetPlotLevel() { return m_nplot; }
+int FEAnalysis::GetPlotLevel() { return m_output.m_nplot; }
 
 //! Set the output level
-void FEAnalysis::SetOutputLevel(int n) { m_noutput = n; }
+void FEAnalysis::SetOutputLevel(int n) { m_output.m_noutput = n; }
 
 //! Get the output level
-int FEAnalysis::GetOutputLevel() { return m_noutput; }
+int FEAnalysis::GetOutputLevel() { return m_output.m_noutput; }
 
 //-----------------------------------------------------------------------------
 void FEAnalysis::Reset()
@@ -237,7 +243,7 @@ bool FEAnalysis::Init()
 		m_timeController->SetAnalysis(this);
 		if (m_timeController->Init() == false) return false;
 	}
-	if (m_nplot_stride <= 0) return false;
+	if (m_output.m_nplot_stride <= 0) return false;
 	return Validate();
 }
 
@@ -632,11 +638,11 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	ar & m_ntimesteps;
 
 	// --- I/O Data ---
-	ar & m_nplot;
-	ar & m_noutput;
-	ar & m_nplot_stride;
-	ar & m_nplotRange;
-	ar & m_bplotZero;
+	ar & m_output.m_nplot;
+	ar & m_output.m_noutput;
+	ar & m_output.m_nplot_stride;
+	ar & m_output.m_nplotRange;
+	ar & m_output.m_bplotZero;
 
 	// Serialize solver data
 	ar & m_psolver;

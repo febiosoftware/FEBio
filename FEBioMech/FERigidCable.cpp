@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreBase)
+BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreClass)
 	ADD_PARAMETER(m_rb, "rigid_body_id");
 	ADD_PARAMETER(m_pos, "position");
 END_FECORE_CLASS();

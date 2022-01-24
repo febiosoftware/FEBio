@@ -33,7 +33,7 @@ class FECORE_API FECoreClass : public FECoreBase
 	FECORE_SUPER_CLASS
 
 public:
-	FECoreClass(FEModel* fem);
+	FECoreClass(FEModel* fem = nullptr);
 
 	DECLARE_FECORE_CLASS();
 };

@@ -180,6 +180,12 @@ private:
 // include template property definitions
 #include "FEPropertyT.h"
 
+template <class T>	void AddClassProperty(FECoreBase* pc, T* pp, const char* sz)
+{
+	FEFixedPropertyT<T>* prop = new FEFixedPropertyT<T>(pp);
+	pc->AddProperty(prop, sz, FEProperty::Fixed);
+}
+
 template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);

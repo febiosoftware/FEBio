@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECoreBase.h"
+#include "FECoreClass.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -37,6 +38,19 @@ class FEDomain;
 class DumpStream;
 class FEStepComponent;
 class FETimeStepController;
+
+class FECORE_API FEStepOutput : public FECoreClass
+{
+public:
+	int		m_nplot;		//!< plot level
+	int		m_noutput;		//!< data output level
+	int		m_nplot_stride;	//!< stride for plotting
+	int		m_nplotRange[2];	//!< plot range
+	bool	m_bplotZero;		//!< Force plotting of time step "zero"
+	int		m_plotHint;			//!< the plot mode
+
+	DECLARE_FECORE_CLASS();
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
@@ -170,12 +184,7 @@ public:
 
 	// --- I/O Data ---
 	//{
-		int		m_nplot;		//!< plot level
-		int		m_noutput;		//!< data output level
-		int		m_nplot_stride;	//!< stride for plotting
-		int		m_nplotRange[2];	//!< plot range
-		bool	m_bplotZero;		//!< Force plotting of time step "zero"
-		int		m_plotHint;			//!< the plot mode
+		FEStepOutput	m_output;
 	//}
 
 private:

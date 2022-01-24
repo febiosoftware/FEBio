@@ -429,7 +429,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 					bool bout = true;
 
 					// if we're using the fixed time stepper, we check the plot range and zero state flag
-					if (pstep->m_timeController == nullptr) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
+					if (pstep->m_timeController == nullptr) bout = (pstep->m_output.m_nplotRange[0] == 0) || (pstep->m_output.m_bplotZero);
 
 					// store initial time step (i.e. time step zero)
 					double time = GetTime().currentTime;
@@ -469,8 +469,8 @@ void FEBioModel::WritePlot(unsigned int nevent)
 			{
 				int currentStep = pstep->m_ntimesteps;
 				int lastStep = pstep->m_ntime;
-				int nmin = pstep->m_nplotRange[0]; if (nmin < 0) nmin = lastStep + nmin + 1;
-				int nmax = pstep->m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
+				int nmin = pstep->m_output.m_nplotRange[0]; if (nmin < 0) nmin = lastStep + nmin + 1;
+				int nmax = pstep->m_output.m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
 
 				bool inRange = true;
 				bool isStride = true;
@@ -480,7 +480,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 					if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
 
 				}
-				isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
+				isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_output.m_nplot_stride) == 0;
 
 				switch (nevent)
 				{

@@ -50,7 +50,8 @@ public:
 	{
 		Optional		= 0x00,
 		Required		= 0x01,		// the property is required (default)
-		Reference       = 0x02		// references another class in the model
+		Reference       = 0x02,		// references another class in the model
+		Fixed			= 0x04		// fixed properties are fixed type class members
 	};
 
 private:
