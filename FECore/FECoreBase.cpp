@@ -60,13 +60,13 @@ const char* FECoreBase::GetTypeStr() { return (m_fac ? m_fac->GetTypeStr() : nul
 
 //-----------------------------------------------------------------------------
 //! Set the factory class
-void FECoreBase::SetFactoryClass(FECoreFactory* fac)
+void FECoreBase::SetFactoryClass(const FECoreFactory* fac)
 {
 	m_fac = fac;
 }
 
 //-----------------------------------------------------------------------------
-FECoreFactory* FECoreBase::GetFactoryClass()
+const FECoreFactory* FECoreBase::GetFactoryClass() const
 {
 	return m_fac;
 }

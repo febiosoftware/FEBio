@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEShellDomain.h"
 #include "FEMeshAdaptor.h"
 #include "FETimeStepController.h"
+#include "FEModule.h"
 
 //---------------------------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEStepOutput, FECoreClass)
@@ -59,9 +60,14 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
 	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
 
-	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional);
-	ADD_PROPERTY(m_psolver, "solver");
+	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional)->SetDefaultType("default");
+	FEProperty* solver = ADD_PROPERTY(m_psolver, "solver");
 	ADD_PROPERTY(m_output, "output");
+
+	// the default type of the solver should match the active module's name
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	const char* szmod = fecore.GetActiveModule()->GetName();
+	solver->SetDefaultType(szmod);
 
 END_FECORE_CLASS();
 

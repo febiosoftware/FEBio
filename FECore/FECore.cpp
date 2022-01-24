@@ -94,7 +94,7 @@ void FECore::InitModule()
 REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
 
 // time controller
-REGISTER_FECORE_CLASS(FETimeStepController, "time_stepper");
+REGISTER_FECORE_CLASS(FETimeStepController, "default");
 
 // boundary conditions
 REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      );

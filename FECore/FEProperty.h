@@ -60,6 +60,8 @@ private:
 	const char*		m_szname;
 	unsigned int	m_flags;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
 
+	const char* m_szdefaultType;	// default type string (used by FEBio Studio to initialize required properties).
+
 protected:
 	const char* m_className;	// name of class that can be assigned to this
 
@@ -79,6 +81,12 @@ public:
 
 	// set the flags
 	void SetFlags(unsigned int flags) { m_flags = flags; }
+
+	// get default type (can be null)
+	const char* GetDefaultType() const;
+
+	// set the default type
+	void SetDefaultType(const char* szdefType);
 
 public: // these functions have to be implemented by derived classes
 

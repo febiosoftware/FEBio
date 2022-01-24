@@ -48,7 +48,7 @@ public:
 	virtual ~FECoreFactory();
 
 	//! This is the function that the kernel will use to intantiate an object
-	FECoreBase* CreateInstance(FEModel* pfem);
+	FECoreBase* CreateInstance(FEModel* pfem) const;
 
 public:
 	// return the class name

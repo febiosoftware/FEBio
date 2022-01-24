@@ -157,10 +157,10 @@ public:
 
 protected:
 	// Set the factory class
-	void SetFactoryClass(FECoreFactory* fac);
+	void SetFactoryClass(const FECoreFactory* fac);
 
 public:
-	FECoreFactory* GetFactoryClass();
+	const FECoreFactory* GetFactoryClass() const;
 
 private:
 	std::string		m_name;			//!< user defined name of component
@@ -172,7 +172,7 @@ private:
 private:
 	int		m_nID;			//!< component ID
 
-	FECoreFactory*	m_fac;	//!< factory class that instantiated this class
+	const FECoreFactory*	m_fac;	//!< factory class that instantiated this class
 
 	friend class FECoreFactory;
 };
@@ -180,25 +180,28 @@ private:
 // include template property definitions
 #include "FEPropertyT.h"
 
-template <class T>	void AddClassProperty(FECoreBase* pc, T* pp, const char* sz)
+template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, T* pp, const char* sz)
 {
 	FEFixedPropertyT<T>* prop = new FEFixedPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, FEProperty::Fixed);
+	return prop;
 }
 
-template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
+template <class T> FEProperty* AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);
+	return prop;
 }
 
-template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = FEProperty::Required)
+template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEVecPropertyT<T>* prop = new FEVecPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);
+	return prop;
 }
 
-#define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);
+#define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__)
 
 #define FECORE_SUPER_CLASS public: static SUPER_CLASS_ID superClassID();
 #define REGISTER_SUPER_CLASS(theClass, a) SUPER_CLASS_ID theClass::superClassID() { return a;}

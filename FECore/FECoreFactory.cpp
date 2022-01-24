@@ -55,7 +55,7 @@ void FECoreFactory::SetModuleID(unsigned int mid)
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem)
+FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem) const
 {
 	// create a new instance of this class
 	FECoreBase* pclass = Create(pfem); assert(pclass);

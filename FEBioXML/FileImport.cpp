@@ -1118,8 +1118,13 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				{
 					const char* sztype = tag.AttributeValue("type", true);
 
-					// If the type attribute is omitted we assume the tag's name is the type
-					if (sztype == 0) sztype = tag.Name();
+					// If the type attribute is omitted we try the property's default type,
+					// otherwise assume the tag's name is the default type
+					if (sztype == nullptr)
+					{
+						if (prop->GetDefaultType()) sztype = prop->GetDefaultType();
+						else sztype = tag.Name();
+					}
 
 					// HACK for mapping load curves to FEFunction1D
 					const char* szlc = tag.AttributeValue("lc", true);
