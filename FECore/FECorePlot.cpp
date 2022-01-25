@@ -55,6 +55,9 @@ FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
 // the material parameter in the format [materialname.parametername].
 bool FEPlotParameter::SetFilter(const char* sz)
 {
+	// store the filter for serialization
+	m_filter = sz;
+
 	// find the parameter
 	ParamString ps(sz);
 	m_param = GetFEModel()->GetParameterValue(ps);
@@ -236,6 +239,22 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotParameter::Serialize(DumpStream& ar)
+{
+	FEPlotData::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+		ar << m_filter;
+	else
+	{
+		string filter;
+		ar >> filter;
+		SetFilter(filter.c_str());
+	}
 }
 
 //-----------------------------------------------------------------------------

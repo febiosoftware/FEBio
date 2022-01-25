@@ -1738,12 +1738,16 @@ bool FEBioPlotFile::Append(const char *szfile)
 		}
 	}
 
+	// NOTE: Reading the dictionary rebuilds the plot variables too, but
+	//       there is not enough data in the dictionary to do that correctly. 
+	//       So, we should probably rely on the data store, which gets serialized to the dump file.
 	// open the root element
-	m_ar.OpenChunk();
+	bool bok = true;
+/*	m_ar.OpenChunk();
 	unsigned int nid = m_ar.GetChunkID();
 	if (nid != PLT_ROOT) return false;
 
-	bool bok = false;
+	bok = false;
 	while (m_ar.OpenChunk() == IO_OK)
 	{
 		nid = m_ar.GetChunkID();
@@ -1755,7 +1759,7 @@ bool FEBioPlotFile::Append(const char *szfile)
 		}
 		m_ar.CloseChunk();
 	}
-
+*/
 	// close it again ...
 	m_ar.Close();
 

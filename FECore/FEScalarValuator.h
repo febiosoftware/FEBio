@@ -120,6 +120,8 @@ public:
 
 	FEScalarValuator* copy() override;
 
+	void Serialize(DumpStream& dmp) override;
+
 private:
 	double		m_scale;	// scale factor
 	FEDataMap*	m_val;
