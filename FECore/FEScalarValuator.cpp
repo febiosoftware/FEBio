@@ -221,6 +221,12 @@ FEScalarValuator* FEMappedValue::copy()
 	return map;
 }
 
+void FEMappedValue::Serialize(DumpStream& dmp)
+{
+	if (dmp.IsShallow()) return;
+	dmp & m_val;
+}
+
 //---------------------------------------------------------------------------------------
 
 FENodeMappedValue::FENodeMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr)

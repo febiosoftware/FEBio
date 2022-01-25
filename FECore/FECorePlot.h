@@ -44,7 +44,9 @@ public:
 	bool Save(FESurface& dom, FEDataStream& a);
 	bool Save(FEMesh& mesh, FEDataStream& a);
 
-	virtual bool SetFilter(const char* sz);
+	bool SetFilter(const char* sz) override;
+
+	void Serialize(DumpStream& ar) override;
 
 protected:
 	FEParamValue	m_param;	//!< parameter
@@ -54,4 +56,6 @@ private:
 	FEMaterial*			m_mat;
 	FEDomainList*		m_dom;
 	FEFacetSet*			m_surf;
+
+	std::string		m_filter;
 };
