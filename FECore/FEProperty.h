@@ -50,8 +50,9 @@ public:
 	{
 		Optional		= 0x00,
 		Required		= 0x01,		// the property is required (default)
-		Reference       = 0x02,		// references another class in the model
-		Fixed			= 0x04		// fixed properties are fixed type class members
+		Preferred		= 0x02,		// the property is not required, but a default should be allocated when possible.
+		Reference       = 0x04,		// references another class in the model
+		Fixed			= 0x08		// fixed properties are fixed type class members
 	};
 
 private:
@@ -75,6 +76,9 @@ public:
 
 	// is the property required
 	bool IsRequired() const { return (m_flags & Required) != 0; }
+
+	// is the property preferred
+	bool IsPreferred() const { return (m_flags & Preferred) != 0; }
 
 	// is this a referemce property
 	bool IsReference() const { return (m_flags & Reference) != 0; }

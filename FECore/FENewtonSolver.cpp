@@ -64,7 +64,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
 	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
 
-	ADD_PROPERTY(m_qnstrategy, "qn_method")->SetDefaultType("BFGS");
+	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Preferred)->SetDefaultType("BFGS");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
