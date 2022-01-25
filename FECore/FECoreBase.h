@@ -183,6 +183,7 @@ private:
 template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, T* pp, const char* sz)
 {
 	FEFixedPropertyT<T>* prop = new FEFixedPropertyT<T>(pp);
+	prop->SetDefaultType(sz);
 	pc->AddProperty(prop, sz, FEProperty::Fixed);
 	return prop;
 }
@@ -190,6 +191,7 @@ template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, T* pp, const cha
 template <class T> FEProperty* AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
+	if (prop->GetSuperClassID() == FECLASS_ID) prop->SetDefaultType(sz);
 	pc->AddProperty(prop, sz, flags);
 	return prop;
 }
@@ -197,6 +199,7 @@ template <class T> FEProperty* AddClassProperty(FECoreBase* pc, T** pp, const ch
 template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEVecPropertyT<T>* prop = new FEVecPropertyT<T>(pp);
+	if (prop->GetSuperClassID() == FECLASS_ID) prop->SetDefaultType(sz);
 	pc->AddProperty(prop, sz, flags);
 	return prop;
 }
