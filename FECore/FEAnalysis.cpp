@@ -60,7 +60,7 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
 	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
 
-	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional)->SetDefaultType("default");
+	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Preferred)->SetDefaultType("default");
 	FEProperty* solver = ADD_PROPERTY(m_psolver, "solver");
 	ADD_PROPERTY(m_output, "output");
 
