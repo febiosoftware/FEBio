@@ -110,9 +110,10 @@ private:
 
 	int				m_neq;
 	int				m_nreq;
+	int m_CGmethod; // 0 =  Hager-Zhang (default), 1 = steepest descent
 
 protected:
-	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
+	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ,m_dofSU, m_dofSV, m_dofSA, m_rigidSolver;
 
 	DECLARE_FECORE_CLASS();
 };

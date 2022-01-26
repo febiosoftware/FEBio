@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"
 #include "FEContactInterface.h"
+#include "FESSIShellDomain.h"
 #include "FEUncoupledMaterial.h"
 #include "FEResidualVector.h"
 #include "FEElasticDomain.h"
@@ -47,6 +48,7 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include "FEBodyForce.h"
 #include "FECore/sys.h"
+#include "FECore/vector.h"
 #include "FEMechModel.h"
 #include "FEBioMech.h"
 
@@ -62,23 +64,27 @@ BEGIN_FECORE_CLASS(FECGSolidSolver, FESolver)
 	ADD_PARAMETER(m_LStol , "lstol");
 	ADD_PARAMETER(m_LSmin , "lsmin");
 	ADD_PARAMETER(m_LSiter, "lsiter");
-END_FECORE_CLASS();
+	ADD_PARAMETER(m_CGmethod, "cgmethod");
+	END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem), m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
+FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem), m_rigidSolver(pfem), \
+m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
-	m_Dtol = 0.001;
+	m_Dtol = 1e-6;
 	m_Etol = 0.01;
 	m_Rmin = 1.0e-20;
 
-	m_LStol = 0;
-	m_LSmin = 0;
+	m_LStol = 0.9;
+	m_LSmin = 1e-15;
 	m_LSiter = 10;
 
 	m_niter = 0;
 	m_nreq = 0;
+
+	m_CGmethod = 0; // 0 = Hager-Zhang, 1 = steepest descent
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
@@ -86,28 +92,44 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem), m_dofU(pfem), 
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable("displacement", VAR_VEC3);
+	int varD = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT), VAR_VEC3);
 	dofs.SetDOFName(varD, 0, "x");
 	dofs.SetDOFName(varD, 1, "y");
 	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+	int varQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION), VAR_VEC3);
 	dofs.SetDOFName(varQ, 0, "u");
 	dofs.SetDOFName(varQ, 1, "v");
 	dofs.SetDOFName(varQ, 2, "w");
-	int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+	int varQR = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION), VAR_VEC3);
 	dofs.SetDOFName(varQR, 0, "Ru");
 	dofs.SetDOFName(varQR, 1, "Rv");
 	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable("velocity", VAR_VEC3);
+	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
+	int varSU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
+	dofs.SetDOFName(varSU, 0, "sx");
+	dofs.SetDOFName(varSU, 1, "sy");
+	dofs.SetDOFName(varSU, 2, "sz");
+	int varSV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
+	dofs.SetDOFName(varSV, 0, "svx");
+	dofs.SetDOFName(varSV, 1, "svy");
+	dofs.SetDOFName(varSV, 2, "svz");
+	int varSA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
+	dofs.SetDOFName(varSA, 0, "sax");
+	dofs.SetDOFName(varSA, 1, "say");
+	dofs.SetDOFName(varSA, 2, "saz");
 
 	// get the DOF indices
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
 	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
 	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
+	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -150,6 +172,9 @@ bool FECGSolidSolver::Init()
 	gather(m_Ut, mesh, m_dofSQ[0]);
 	gather(m_Ut, mesh, m_dofSQ[1]);
 	gather(m_Ut, mesh, m_dofSQ[2]);
+	gather(m_Ut, mesh, m_dofSU[0]);
+	gather(m_Ut, mesh, m_dofSU[1]);
+	gather(m_Ut, mesh, m_dofSU[2]);
 
 	return true;
 }
@@ -259,6 +284,12 @@ void FECGSolidSolver::PrepStep()
 	m_nref = 0;	// nr of stiffness reformations
 	m_ntotref = 0;
 	m_naug = 0;	// nr of augmentations
+
+	// allocate data vectors
+	m_R0.assign(m_neq, 0);
+	m_R1.assign(m_neq, 0);
+	m_ui.assign(m_neq, 0);
+	m_Ui.assign(m_neq, 0);
 
 	// zero total displacements
 	zero(m_Ui);
@@ -432,7 +463,7 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && (ci.m_laugon != 1)) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations
@@ -476,7 +507,7 @@ bool FECGSolidSolver::SolveStep()
 
 	// initialize flags
 	bool breform = false;	// reformation flag
-	bool sdflag = true;		// flag for steepest descent iterations in NLCG
+	bool sdstep = true; // set to true on a steepest descent iteration - if this fails we will give up
 
 	// Get the current step
 	FEModel& fem = *GetFEModel();
@@ -486,23 +517,27 @@ bool FECGSolidSolver::SolveStep()
 	const FETimeInfo& tp = fem.GetTime();
 	PrepStep();
 
-	// update stresses
-	// fem.Update(); not needed as done in PrepStep
+	// We need to try the prescribed displacements and make sure they don't cause a -ve Jacobian
+	// before we have moved any of the flexible nodes
+	// We also calculate the initial residual
+	// TODO: I think some of this update is duplicated in PrepStep and could just be done here
+	//if (Residual(m_R0) == false) return false;
+	try
+	{
+		Update(m_ui); // m_ui contains the prescribed displacements calculated in PrepStep
+		Residual(m_R0);
+	}
+	catch (...) // negative Jacobian if prescribed disps are too big
+	{
+			feLogError("Time step too big, prescribed displacements caused negative Jacobian");
+			return false;
+	}
 
-	// calculate initial residual
-	if (Residual(m_R0) == false) return false;
-
-//	m_R0 += m_Fd;
-
-	// TODO: I can check here if the residual is zero.
-	// If it is than there is probably no force acting on the system
-	// if (m_R0*m_R0 < eps) bconv = true;
-
-//	double r0 = m_R0*m_R0;
-
-	// set the initial step length estimates to 1.0
-	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
-	s=1; olds=1; oldolds=1;
+	// set the initial step length estimates to 1.0e-6
+	double s = 1e-6;
+	double olds = 1e-6;
+	double oldolds = 1e-6;  // line search step lengths from the current iteration and the two previous ones
+	//s=1e-6; olds=s; oldolds=s;
 
 	// loop until converged or when max nr of reformations reached
 	bool bconv = false;		// convergence flag
@@ -512,22 +547,22 @@ bool FECGSolidSolver::SolveStep()
 
 		// assume we'll converge. 
 		bconv = true;
-		if ((m_niter>0)&&(breform==0))  // no need to restart CG
+		if ((m_niter>0)&&(breform==false)&&(m_CGmethod == 0))  // no need to restart CG
 		{ 
 			// calculate Hager- Zhang direction
         	double moddU=sqrt(u0*u0);  // needed later for the step length calculation
 
 			// calculate yk
 			vector<double> RR(m_neq);
-			RR=m_R1-Rold;
+			RR=m_R0-Rold;
 
 			// calculate dk.yk
 			double bdiv=u0*RR;
 			double betapcg;
-			if (bdiv==0.0) 
+			if (bdiv==0.0) // use steepest descent method if necessary
 			{
 				betapcg=0.0;
-				sdflag=true;
+				sdstep = true;
 			}
     		else {
 				double RR2=RR*RR;	// yk^2
@@ -535,7 +570,7 @@ bool FECGSolidSolver::SolveStep()
 				for (i=0; i<m_neq; ++i) {
 					m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
 					}
-				betapcg=m_ui*m_R1;	// m_ui*gk+1
+				betapcg=m_ui*m_R0;	// m_ui*gk+1
 				betapcg=-betapcg/bdiv;   
           		double modR=sqrt(m_R0*m_R0);
           		double etak=-1.0/(moddU*min(0.01,modR));
@@ -543,12 +578,12 @@ bool FECGSolidSolver::SolveStep()
 				// try Fletcher - Reeves instead
 				// betapcg=(m_R0*m_R0)/(m_Rold*m_Rold);
 				// betapcg=0.0;
-				sdflag=false;
+				sdstep = false;
 			}
 
 			for (i=0; i<m_neq; ++i) 
 			{
-            	m_ui[i]=m_R1[i]+betapcg*u0[i];
+            	m_ui[i]=m_R0[i]+betapcg*u0[i];
 			}
 		}
 		else 
@@ -556,39 +591,45 @@ bool FECGSolidSolver::SolveStep()
 			// use steepest descent for first iteration or when a restart is needed
             m_ui=m_R0;
 			breform=false;
-			sdflag=true;
-        	}
-		Rold=m_R1;		// store residual for use next time
+			if (m_niter > 0) m_nref += 1;
+			sdstep = true;
+       	}
+		Rold=m_R0;		// store residual for use next time
 		u0=m_ui;		// store direction for use on the next iteration
 
 		// check for nans
 		double du = m_ui*m_ui;
 		if (ISNAN(du)) throw NANDetected();
 
-		// set initial convergence norms
-		if (m_niter == 0)
-		{
-			normRi = fabs(m_R0*m_R0);
-			normEi = fabs(m_ui*m_R0);
-			normUi = fabs(m_ui*m_ui);
-			normEm = normEi;
-		}
-
 		// perform a linesearch
 		// the geometry is also updated in the line search
 		// use the step length from two steps previously as the initial guess
 		// note that it has its own linesearch, different from the BFGS one
 		s = LineSearchCG(oldolds);
-		// update the old step lengths for use as an initial guess in two iterations' time
-		if (m_niter<1) oldolds=s;	// if this is the first iteration, use current step length
-		else oldolds=olds;	// otherwise use the previous one
-		olds=s;  // and store the current step to be used for the iteration after next
+		if (s != -1) {// update the old step lengths for use as an initial guess in two iterations' time
+			if (m_niter < 1) oldolds = s;	// if this is the first iteration, use current step length
+			else oldolds = olds;	// otherwise use the previous one
+			if (s > 0) olds = s;  // and store the current step to be used for the iteration after next
+			// update total incremental displacements
+			int neq = (int)m_Ui.size();
+			for (i = 0; i < neq; ++i) m_Ui[i] += s * m_ui[i];
+		}
+		else { // the line search has failed and we need to restart
+			breform = true;
+			feLogWarning("Line search failed. Restarting conjugate gradient algorithm");
+			oldolds = 1e-6;
+			olds = 1e-6;
+		}
+		// set initial convergence norms if on the first iteration
+		if (m_niter == 0)
+		{
+			normRi = fabs(m_R0 * m_R0);
+			normEi = fabs(m_ui * m_R0)*s;
+			normUi = fabs(m_ui * m_ui)*s*s;
+			normEm = normEi;
+		}
 
-		// update total displacements
-		int neq = (int)m_Ui.size();
-		for (i=0; i<neq; ++i) m_Ui[i] += s*m_ui[i];
-
-		// calculate norms
+		// calculate norms (using actual step from line search=s*m_ui)
 		normR1 = m_R1*m_R1;
 		normu  = (m_ui*m_ui)*(s*s);
 		normU  = m_Ui*m_Ui;
@@ -612,8 +653,8 @@ bool FECGSolidSolver::SolveStep()
 		// print convergence summary
 		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
-		feLog("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);
+		feLog("\tconjugate gradient restarts = %d\n", m_nref);
+		if (m_LStol > 0) feLog("\tstep from line search         = %15le\n", s);
 		feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		feLog("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		feLog("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
@@ -629,33 +670,39 @@ bool FECGSolidSolver::SolveStep()
 		}
 
 		// check if we have converged. 
-		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			if (s < m_LSmin)
+			if (fabs(s) < m_LSmin)
 			{
 				// check for zero linestep size
-				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed");
+				feLogWarning("Zero linestep size. Restarting conjugate gradient algorithm");
+				feLogWarning("\tstep from line search         = %15le\n", s);
 				breform = true;
+				oldolds = 1e-6; // reset step lengths for restart
+				olds = 1e-6;
 			}
-			else if (normE1 > normEm)
+			else if (normE1 > 1000*normEm) // less strict divergence check than for BFGS
+				// as norms tend to increase at first as deformation propagates
 			{
 				// check for diverging
+				feLogWarning("Solution is diverging. Restarting conjugate gradient algorithm");
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
 				breform = true;
+				oldolds = 1e-6; // reset step lengths for restart
+				olds = 1e-6;
 			}
 
 			// zero displacement increments
-			// we must set this to zero before the reformation
+			// we must set this to zero before the next iteration
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
 			zero(m_ui);
 
 			// copy last calculated residual
 			m_R0 = m_R1;
-			Rold = m_R1;		// store residual for use next time
+			//Rold = m_R1;		// store residual for use next time
 		}
 		else if (m_baugment)
 		{
@@ -690,7 +737,7 @@ bool FECGSolidSolver::SolveStep()
 		// do minor iterations callbacks
 		fem.DoCallback(CB_MINOR_ITERS);
 	}
-	while (bconv == false);
+	while ((bconv == false)&&((s!=-1)||(sdstep==false))); // give up if a steepest descent iteration fails
 
 	// if converged we update the total displacements
 	if (bconv)
@@ -733,6 +780,10 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 	scatter(U, mesh, m_dofSQ[0]);
 	scatter(U, mesh, m_dofSQ[1]);
 	scatter(U, mesh, m_dofSQ[2]);
+	// shell dofs
+	scatter(U, mesh, m_dofSU[0]);
+	scatter(U, mesh, m_dofSU[1]);
+	scatter(U, mesh, m_dofSU[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -769,19 +820,29 @@ double FECGSolidSolver::LineSearchCG(double s)
 
 	double FA, FB, FC, AA, AB, r, r0;
 	bool failed = false;
+	double A[12] = {}; // vectors to store line search results
+	double F[12] = {};
+	double lspow[5]; // used for quadratic fitting calculation
+	double B[3][4];
+	double Y[3]; // RHS vector for curve fitting
+	double coeffs[3];
+	double temp, term;
+
 
 	// max nr of line search iterations
 	int nmax = m_LSiter;
 	int n = 0;
+	int i, j,k;
 
 	// initial energy
 	FA = m_ui*m_R0;
 	AA = 0.0;
 	r0 = FA;
-
+	F[0] = FA;
+	
 	double rmin = fabs(FA);
 
-	vector<double> ul(m_ui.size());
+	vector<double> ul(m_ui.size());  // temporary vector for trial displacements
 	
 	// so we can set AA = 0 and FA= r0
 	// AB=s and we need to evaluate FB (called r1)
@@ -798,68 +859,116 @@ double FECGSolidSolver::LineSearchCG(double s)
 			Update(ul);
 			Residual(m_R1);
 				}
-		catch (...)
+		catch (...) // negative Jacobian if s is much too big
 		{
-			//					printf("reducing s at initial evaluation");
-			failed = true;
-			s = 0.1*s;
+						//feLog("reducing s at initial evaluation");
+						//feLog("\tstep from line search         = %15le\n", s); 
+						failed = true;
+						if (s > 10 * m_LSmin) s = 0.1 * s; // make s smaller and try again until we don't get a -ve J
+						else {
+							feLogError("Direction invalid, line search failed");
+							s= -1;
+							failed = false;
+						}
+						
 		}
 	} while (failed == true);
+	if (s != -1) {
+		// calculate energies
+		FB = m_ui * m_R1;
+		AB = s;
+		F[1] = FB;
+		A[1] = AB;
 
-	// calculate energies
-	FB = m_ui*m_R1;
-	AB = s;
+		if (FB < rmin) { // remember best values in case we need them later
+			rmin = FB;
+			smin = s;
+		}
 
-	if (FB<rmin){
-		rmin = FB;
-		smin = s;
-	}
-
-	do
-	{
-		// make sure that r1 does not happen to be really close to zero,
-		// since in that case we won't find any better solution.
-		if (fabs(FB) < 1.e-20) r = 0;  // we've hit the converged solution and don't need to do any more
-		else r = fabs(FB / r0);
-
-		if (r > m_LStol)	// we need to search and find a better value of s
+		do
 		{
-			if (fabs(FB-FA)<FB*1e-8) s = (AA + AB) * 1000; // if FB=FA (or nearly) the next step won't work, so make s much bigger
-			else {
-				s = (AA*FB - AB*FA) / (FB - FA);
-				s = min(s, 100 * max(AA, AB));
-			}
-			// calculate residual at this point, reducing s if necessary
-			do
-			{
-				// Update geometry using the initial guess s
-				vcopys(ul, m_ui, s);
-				failed = false;
-				try
-				{
-					Update(ul);
-					Residual(m_R1);
-				}
-				catch (...)
-				{
-					//					printf("reducing s at FC");
-					failed = true;
-					s = 0.1*s;
-				}
-			} while ((failed == true) && (s>m_LSmin));
+			// make sure that r1 does not happen to be really close to zero,
+			// since in that case we won't find any better solution.
+			if (fabs(FB) < 1.e-20) r = 0;  // we've hit the converged solution and don't need to do any more
+			else r = fabs(FB / r0);
 
-			// calculate energies
-			FC = m_ui*m_R1;
-			r = fabs(FC / r0);
-
-			if (fabs(FC)>100 * min(fabs(FA), fabs(FB)))  //  it was a bad guess and we need to go back a bit
+			if (r > m_LStol)	// we need to search and find a better value of s
 			{
-				s = 0.1*s;
+				if (n < 4) { // use linear fitting algorithm
+					if (fabs(FB - FA) < fabs(FB * 0.01)) { // if FB=FA (or nearly) the next step won't work, so make s bigger
+						if (AB != 0) s = AB * 200; // try a much bigger value
+						else if (AA != 0) s = AA * 200;
+						else s = 1e-6; // should never happen!
+					}
+					else {
+						s = (AA * FB - AB * FA) / (FB - FA);  // use linear interpolation for first few attempts
+						s = min(s, 1e-3); // limit how much s can grow to avoid over-extrapolating
+					}
+				}
+				else { // use quadratic curve fit to try to find a minimum if multiple linear attempts have failed
+					// calculate powers to fill matrix
+					for (i = 0; i <= 4; i++) {
+						lspow[i] = 0;
+						for (j = 0; j < n; j++) {
+							lspow[i] = lspow[i] + pow(A[j], i);
+						}
+					}
+					// calculate rhs
+					for (i = 0; i <= 2; i++) {
+						Y[i] = 0;
+						for (j = 0; j < n; j++) {
+							Y[i] = Y[i] + pow(A[j], i) * F[j];
+						}
+					}
+					// fill matrix
+					for (i = 0; i <= 2; i++) {
+						for (j = 0; j <= 2; j++) {
+							B[i][j] = lspow[i + j];
+						}
+					}
+					for (i = 0; i <= 2; i++) {
+						B[i][3] = Y[i];
+					}
+					// solve by Gaussian elimination
+					for (i = 0; i < 3; i++) {
+						for (k = i + 1; k < 3; k++) {
+							if (fabs(B[i][i]) < fabs(B[k][i])) {
+								//Swap
+								for (j = 0; j < 4; j++) {
+									temp = B[i][j];
+									B[i][j] = B[k][j];
+									B[k][j] = temp;
+								}
+							}
+						}
+						// eliminate
+						for (k = i + 1; k < 3; k++) {
+							term = B[k][i] / B[i][i];
+							for (j = 0; j < 4; j++) {
+								B[k][j] = B[k][j] - term * B[i][j];
+							}
+						}
+					}
+					//back substitute
+					for (i = 2; i >= 0; i--) {
+						coeffs[i] = B[i][3];
+						for (j = i + 1; j < 3; j++) {
+							coeffs[i] = coeffs[i] - B[i][j] * coeffs[j];
+						}
+						coeffs[i] = coeffs[i] / B[i][i];
+					}
+					s = -coeffs[1]*0.5/coeffs[2]; // quadratic estimate
+					//feLog("\tQuadratic curve fit coeffs s %15le %15le %15le %15le\n", coeffs[0], coeffs[1], coeffs[2], s);
+				}
+				if (s == 0) { // check just in case
+					feLog("\tZero step length FA FB AA AB %15le %15le %15le %15le\n", FA, FB, AA, AB);
+				}
 
 				// calculate residual at this point, reducing s if necessary
 				do
 				{
 					// Update geometry using the initial guess s
+					//feLog("\tFA FB AA AB s %15le %15le %15le %15le %15le\n", FA, FB, AA, AB, s);
 					vcopys(ul, m_ui, s);
 					failed = false;
 					try
@@ -869,58 +978,98 @@ double FECGSolidSolver::LineSearchCG(double s)
 					}
 					catch (...)
 					{
-						//					printf("reducing s after bad guess");
+						feLog("reducing s at FC");
+						feLog("\tstep from line search         = %15le\n", s);
 						failed = true;
-						s = 0.1*s;
+						s = 0.1 * s;
 					}
-				} while (failed == true);
+				} while ((failed == true) && (s > m_LSmin));
 
 				// calculate energies
-				FC = m_ui*m_R1;
+				FC = m_ui * m_R1;
 				r = fabs(FC / r0);
+
+				if (fabs(FC) > 100 * min(fabs(FA), fabs(FB)))  //  it was a bad guess and we need to go back a bit
+				{
+					s = 0.1 * s;
+
+					// calculate residual at this point, reducing s more if necessary
+					do
+					{
+						// Update geometry using the initial guess s
+						vcopys(ul, m_ui, s);
+						failed = false;
+						try
+						{
+							Update(ul);
+							Residual(m_R1);
+						}
+						catch (...)
+						{
+							feLog("reducing s after bad guess");
+							feLog("\tstep from line search         = %15le\n", s);
+							failed = true;
+							s = 0.1 * s;
+						}
+					} while (failed == true);
+
+					// calculate energies
+					FC = m_ui * m_R1;
+					r = fabs(FC / r0);
+				}
+
+				if (fabs(FA) < fabs(FB)) // use the new value and the closest of the previous ones
+				{
+					FB = FC;
+					AB = s;
+				}
+				else
+				{
+					FA = FC;
+					AA = s;
+				}
+				F[n + 2] = FC;
+				A[n + 2] = s;
+				++n;
+				feLog("\tF %15le %15le %15le %15le %15le\n", F[0], F[1], F[2], F[3], F[4]);
+				feLog("\tA %15le %15le %15le %15le %15le\n", A[0], A[1], A[2], A[3], A[4]);
+				if (n > 3) {
+					feLog("\tF %15le %15le %15le %15le %15le\n", F[5], F[6], F[7], F[8], F[9]);
+					feLog("\tA %15le %15le %15le %15le %15le\n", A[5], A[6], A[7], A[8], A[9]);
+				}
 			}
+		} while ((((r > m_LStol) && (n <= 5)) || ((r >= 1) && (n > 3))) && (n < nmax));
+		// try to find a better solution within m_LStol, but if we haven't after five tries, accept any improvement
 
-			if (fabs(FA)<fabs(FB)) // use the new value and the closest of the previous ones
-			{
-				FB = FC;
-				AB = s;
-			}
-			else
-			{
-				FA = FC;
-				AA = s;
-			}
-
-			++n;
-		}
-	} while ((r > m_LStol) && (n < nmax));
-
-
-	if (n >= nmax)
-	{
-		// max nr of iterations reached.
-		// we choose the line step that reached the smallest energy
-		s = smin;
-		// calculate residual at this point, reducing s if necessary
-		do
+		if (n >= nmax)
 		{
-			// Update geometry using the initial guess s
-			vcopys(ul, m_ui, s);
-			failed = false;
-			try
-			{
-				Update(ul);
-				Residual(m_R1);
-			}
-			catch (...)
-			{
-				//					printf("reducing s after failed line search");
-				failed = true;
-				s = 0.1*s;
-			}
-		} while (failed == true);
+			// max nr of iterations reached.
+			// we choose the line step that reached the smallest energy
+			//s = smin;
+			// recalculate residual at this point, reducing s if necessary
+			//do
+			//{
+				// Update geometry using the initial guess s
+				//vcopys(ul, m_ui, s);
+				//failed = false;
+				//try
+				//{
+					//Update(ul);
+					//Residual(m_R1);
+				//}
+				//catch (...)
+				//{
+					//					feLog("reducing s after failed line search");
+				//						feLog("\tstep from line search         = %15le\n", s);
+					//failed = true;
+					//s = 0.1*s;
+				//}
+			//} while (failed == true);
+			s = -1;// this signals to the main algorithm that the line search has failed and a restart is needed
+		}
+		//if (err < 0) s = 1.5 * s;
+		//else s = 0.5 * s;
 	}
-
 	return s;
 }
 
