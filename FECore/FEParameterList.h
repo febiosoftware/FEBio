@@ -54,16 +54,16 @@ class FEMaterialPointProperty;
 class Image;
 
 //-----------------------------------------------------------------------------
-typedef list<FEParam>::iterator FEParamIterator;
-typedef list<FEParam>::const_iterator FEParamIteratorConst;
+typedef std::list<FEParam>::iterator FEParamIterator;
+typedef std::list<FEParam>::const_iterator FEParamIteratorConst;
 
 //-----------------------------------------------------------------------------
 //! A list of material parameters
 class FECORE_API FEParameterList
 {
 public:
-	FEParameterList(FEParamContainer* pc) : m_pc(pc) {}
-	virtual ~FEParameterList(){}
+	FEParameterList(FEParamContainer* pc);
+	virtual ~FEParameterList();
 
 	//! assignment operator
 	void operator = (FEParameterList& l);
@@ -95,9 +95,17 @@ public:
 	//! return the parameter container
 	FEParamContainer* GetContainer() { return m_pc; }
 
+public:
+	int SetActiveGroup(const char* szgroup);
+	int GetActiveGroup();
+	int ParameterGroups() const;
+	const char* GetParameterGroupName(int i);
+
 protected:
 	FEParamContainer*	m_pc;	//!< parent container
-	list<FEParam>		m_pl;	//!< the actual parameter list
+	std::list<FEParam>		m_pl;	//!< the actual parameter list
+	std::vector<const char*>	m_pg;	//!< parameter groups
+	int	m_currentGroup;	//!< active parameter group (new parameters are assigned to the current group; can be -1)
 };
 
 //-----------------------------------------------------------------------------
@@ -140,6 +148,10 @@ public:
 	//! This function assumes that there is a one-to-one correspondence between
 	//! source and target parameter lists.
 	void CopyParameterListState(const FEParameterList& pl);
+
+public:
+	void BeginParameterGroup(const char* szname);
+	void EndParameterGroup();
 
 public:
 	//! This function will be overridden by each class that defines a parameter list
@@ -215,11 +227,11 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 	protected: void BuildParamList() override;
 
 #define FECORE_BASE_CLASS(theClass) \
-	public: static const char* BaseClassName() { return typeid(theClass).name(); } \
+	public: static const char* BaseClassName() { return #theClass; } \
 
 // the BEGIN_FECORE_CLASS defines the beginning of a parameter list
 #define BEGIN_FECORE_CLASS(theClass, baseClass) \
-	const char* theClass::BaseClassName() { return typeid(baseClass).name(); } \
+	const char* theClass::BaseClassName() { return #baseClass; } \
 	void theClass::BuildParamList() { \
 			baseClass::BuildParamList(); \
 
@@ -230,3 +242,9 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 // the END_FECORE_CLASS defines the end of a parameter list
 #define END_FECORE_CLASS() \
 	}
+
+// macro for starting a parameter group
+#define BEGIN_PARAM_GROUP(a) BeginParameterGroup(a)
+
+// macro for ending a parameter group
+#define END_PARAM_GROUP()    EndParameterGroup()

@@ -43,19 +43,24 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
-	ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
-	ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
-	ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
-	ADD_PARAMETER(m_maxref              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
-	ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
-	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_force_partition     , "force_partition");
-	ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
-	ADD_PARAMETER(m_breformAugment      , "reform_augment");
-	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
-	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
-	ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
-	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
+	BEGIN_PARAM_GROUP("line search");
+		ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
+		ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
+		ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+	END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Nonlinear solver");
+		ADD_PARAMETER(m_maxref              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
+		ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
+		ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
+		ADD_PARAMETER(m_force_partition     , "force_partition");
+		ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
+		ADD_PARAMETER(m_breformAugment      , "reform_augment");
+		ADD_PARAMETER(m_bdivreform          , "diverge_reform");
+		ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
+		ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+		ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
+	END_PARAM_GROUP();
 
 	// obsolete parameters (Should be set via the qn_method)
 	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);

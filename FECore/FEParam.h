@@ -133,6 +133,7 @@ private:
 	FEParamType		m_type;		// type of variable
 	unsigned int	m_flag;		// parameter flags
 	bool*			m_watch;	// parameter watch (set to true if read in)
+	int				m_group;	// index of parameter group (-1 by default)
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
@@ -199,6 +200,10 @@ public:
 	unsigned int GetFlags() const;
 
 	void SetWatch(bool b);
+
+public:
+	int GetParamGroup() const;
+	void SetParamGroup(int i);
 
 public:
 	void Serialize(DumpStream& ar);

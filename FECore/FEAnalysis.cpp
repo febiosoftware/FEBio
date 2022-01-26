@@ -54,11 +54,20 @@ END_FECORE_CLASS();
 REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
 
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
-	ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
-	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
-	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME);
-	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
-	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
+
+	BEGIN_PARAM_GROUP("Analysis");
+		ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
+	END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Time stepping");
+		ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
+		ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME);
+		ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
+	END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Advanced settings");
+		ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
+	END_PARAM_GROUP();
 
 	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Preferred)->SetDefaultType("default");
 	FEProperty* solver = ADD_PROPERTY(m_psolver, "solver");

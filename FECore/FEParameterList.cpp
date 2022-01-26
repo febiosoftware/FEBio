@@ -34,6 +34,18 @@ SOFTWARE.*/
 #include "FEModelParam.h"
 #include <string>
 #include <assert.h>
+using namespace std;
+
+//-----------------------------------------------------------------------------
+FEParameterList::FEParameterList(FEParamContainer* pc) : m_pc(pc) 
+{
+	m_currentGroup = -1;
+}
+
+//-----------------------------------------------------------------------------
+FEParameterList::~FEParameterList() 
+{
+}
 
 //-----------------------------------------------------------------------------
 //! This function copies the parameter data from the passed parameter list.
@@ -112,6 +124,7 @@ FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, co
 
 	// create a new parameter object
 	FEParam p(pv, itype, ndim, sz, watch);
+	p.SetParamGroup(m_currentGroup);
 
 	// add the parameter to the list
 	m_pl.push_back(p);
@@ -127,6 +140,7 @@ FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FE
 
 	// create a new parameter object
 	FEParam p(pv, itype, ndim, sz);
+	p.SetParamGroup(m_currentGroup);
 
 	// set the range
 	// (range checking is only supported for int and double params)
@@ -207,6 +221,47 @@ FEParam* FEParameterList::FindFromName(const char* sz)
 	}
 
 	return pp;
+}
+
+//-----------------------------------------------------------------------------
+int FEParameterList::SetActiveGroup(const char* szgroup)
+{
+	if (szgroup == nullptr) m_currentGroup = -1;
+	else
+	{
+		m_currentGroup = -1;
+		for (size_t i = 0; i < m_pg.size(); ++i)
+		{
+			if (strcmp(m_pg[i], szgroup) == 0)
+			{
+				m_currentGroup = i;
+			}
+		}
+		if (m_currentGroup == -1)
+		{
+			m_currentGroup = (int)m_pg.size();
+			m_pg.push_back(szgroup);
+		}
+	}
+	return m_currentGroup;
+}
+
+//-----------------------------------------------------------------------------
+int FEParameterList::GetActiveGroup()
+{
+	return m_currentGroup;
+}
+
+//-----------------------------------------------------------------------------
+int FEParameterList::ParameterGroups() const
+{
+	return (int)m_pg.size();
+}
+
+//-----------------------------------------------------------------------------
+const char* FEParameterList::GetParameterGroupName(int i)
+{
+	return m_pg[i];
 }
 
 //=============================================================================
@@ -424,4 +479,18 @@ void FEParamContainer::CopyParameterListState(const FEParameterList& pl)
 		FEParam& pd = *it_d;
 		if (pd.CopyState(ps) == false) { assert(false); }
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEParamContainer::BeginParameterGroup(const char* szname)
+{
+	FEParameterList& pl_this = GetParameterList();
+	pl_this.SetActiveGroup(szname);
+}
+
+//-----------------------------------------------------------------------------
+void FEParamContainer::EndParameterGroup()
+{
+	FEParameterList& pl_this = GetParameterList();
+	pl_this.SetActiveGroup(nullptr);
 }

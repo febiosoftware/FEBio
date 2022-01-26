@@ -41,10 +41,12 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
-	ADD_PARAMETER(m_msymm    , "symmetric_stiffness", 0, "non-symmetric\0symmetric\0symmetric structure\0");
-	ADD_PARAMETER(m_eq_scheme, "equation_scheme", 0, "staggered\0block\0");
-	ADD_PARAMETER(m_eq_order , "equation_order", 0, "default\0reverse\0febio2\0");
-	ADD_PARAMETER(m_bwopt    , "optimize_bw");
+	BEGIN_PARAM_GROUP("linear solver");
+		ADD_PARAMETER(m_msymm    , "symmetric_stiffness", 0, "non-symmetric\0symmetric\0symmetric structure\0");
+		ADD_PARAMETER(m_eq_scheme, "equation_scheme", 0, "staggered\0block\0");
+		ADD_PARAMETER(m_eq_order , "equation_order", 0, "default\0reverse\0febio2\0");
+		ADD_PARAMETER(m_bwopt    , "optimize_bw");
+	END_PARAM_GROUP();
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

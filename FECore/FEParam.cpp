@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEDataArray.h"
 #include "tens3d.h"
 #include "FEModelParam.h"
+using namespace std;
 
 FEParamValue FEParamValue::component(int n)
 {
@@ -81,6 +82,7 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, b
 	if (m_watch) *m_watch = false;
 
 	m_flag = 0;
+	m_group = -1;
 
 	// set the name
 	// note that we just copy the pointer, not the actual string
@@ -107,6 +109,7 @@ FEParam::FEParam(const FEParam& p)
 	m_watch = p.m_watch;
 
 	m_flag = p.m_flag;
+	m_group = p.m_group;
 
 	m_szname = p.m_szname;
 	m_szlongname = p.m_szlongname;
@@ -117,6 +120,18 @@ FEParam::FEParam(const FEParam& p)
 	m_szunit = p.m_szunit;
 
 	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
+}
+
+//-----------------------------------------------------------------------------
+int FEParam::GetParamGroup() const
+{
+	return m_group;
+}
+
+//-----------------------------------------------------------------------------
+void FEParam::SetParamGroup(int i)
+{
+	m_group = i;
 }
 
 //-----------------------------------------------------------------------------
