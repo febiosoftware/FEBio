@@ -292,7 +292,7 @@ void FEBioModel::echo_input()
 	// print output data
 	feLog(" OUTPUT DATA\n");
 	feLog("===========================================================================\n");
-	switch (step.m_output.m_nplot)
+	switch (step.m_nplot)
 	{
 	case FE_PLOT_NEVER      : feLog("\tplot level ................................ : never\n"); break;
 	case FE_PLOT_MAJOR_ITRS : feLog("\tplot level ................................ : major iterations\n"); break;
