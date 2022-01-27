@@ -44,8 +44,6 @@ BEGIN_FECORE_CLASS(FERigidWallInterface, FESurfaceConstraint)
 	ADD_PARAMETER(m_eps    , "penalty"   );
 	ADD_PARAMETER(m_d	   , "offset"    );
 	ADD_PARAMETER(m_a      , 4, "plane"  );
-
-	ADD_PROPERTY(m_ss, "surface");
 END_FECORE_CLASS();
 
 ///////////////////////////////////////////////////////////////////////////////

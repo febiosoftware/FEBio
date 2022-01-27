@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
-	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
 END_FECORE_CLASS()
 
 FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
