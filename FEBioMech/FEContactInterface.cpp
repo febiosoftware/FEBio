@@ -36,9 +36,11 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 
 BEGIN_FECORE_CLASS(FEContactInterface, FESurfacePairConstraint)
-	ADD_PARAMETER(m_laugon, "laugon"        );
-    ADD_PARAMETER(m_psf   , "penalty_sf"    );
-    ADD_PARAMETER(m_psfmax, "max_penalty_sf");
+	BEGIN_PARAM_GROUP("Augmentation");
+		ADD_PARAMETER(m_laugon, "laugon"        )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
+	    ADD_PARAMETER(m_psf   , "penalty_sf"    )->setLongName("penalty scale factor")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+		ADD_PARAMETER(m_psfmax, "max_penalty_sf")->setLongName("Max penalty scale factor")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+	END_PARAM_GROUP();
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////

@@ -330,6 +330,7 @@ bool FECoreBase::Init()
 void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 {
 	pp->SetName(sz);
+	pp->SetLongName(sz);
 	pp->SetFlags(flags);
 	pp->SetParent(this);
 	m_Prop.push_back(pp);

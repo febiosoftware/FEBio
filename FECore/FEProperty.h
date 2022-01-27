@@ -59,6 +59,7 @@ private:
 	//! Name of the property.
 	//! Note that the name is not copied so it must point to a static string.
 	const char*		m_szname;
+	const char*		m_szlongname;	// long name (optional; used in FEBio Studio)
 	unsigned int	m_flags;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
 
 	const char* m_szdefaultType;	// default type string (used by FEBio Studio to initialize required properties).
@@ -70,6 +71,10 @@ public:
 	// Set\Get the name of the property
 	FEProperty& SetName(const char* sz);
 	const char* GetName() const;
+
+	// get\set the long name
+	FEProperty& SetLongName(const char* sz);
+	const char* GetLongName() const;
 
 	// get the class name
 	const char* GetClassName() const { return m_className; }
@@ -90,7 +95,7 @@ public:
 	const char* GetDefaultType() const;
 
 	// set the default type
-	void SetDefaultType(const char* szdefType);
+	FEProperty* SetDefaultType(const char* szdefType);
 
 public: // these functions have to be implemented by derived classes
 
