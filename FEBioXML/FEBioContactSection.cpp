@@ -362,7 +362,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 		if ((prn == 0) || (rb != rbp))
 		{
 			prn = fecore_alloc(FERigidNodeSet, &fem);
-			ns = new FENodeSet(&fem);
+			ns = fecore_alloc(FENodeSet, &fem);
 			prn->SetNodeSet(ns);
 
 			// the default shell bc depends on the shell formulation
