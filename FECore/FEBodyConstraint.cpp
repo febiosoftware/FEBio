@@ -26,8 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBodyConstraint.h"
 
-REGISTER_SUPER_CLASS(FEBodyConstraint, FEBODYCONSTRAINT_ID);
-
 FEBodyConstraint::FEBodyConstraint(FEModel* fem) : FENLConstraint(fem)
 {
 }

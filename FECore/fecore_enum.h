@@ -233,8 +233,8 @@ enum SUPER_CLASS_ID {
 	FEDISCRETEMATERIAL_ID,			// derived from FEDiscreteMaterial
 	FELOAD_ID,               	    // derived from FEModelLoad
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
-	FESURFACECONSTRAINT_ID,         // derived from FESurfaceConstraint
-	FEBODYCONSTRAINT_ID,			// derived from FEBodyConstraint
+//	FESURFACECONSTRAINT_ID,         // derived from FESurfaceConstraint
+//	FEBODYCONSTRAINT_ID,			// derived from FEBodyConstraint
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
 	FESURFACEINTERFACE_ID, 			// derived from FESurfaceInterface

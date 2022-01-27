@@ -1162,7 +1162,7 @@ vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
         for (int i=0; i<nbf; ++i)
 		{
 			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(i));
-			if (pbf->IsActive())
+			if (pbf && pbf->IsActive())
 			{
 				// negate b because body forces are defined with a negative sign in FEBio
 				b -= pbf->force(mp);

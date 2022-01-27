@@ -365,6 +365,8 @@ bool FEExplicitSolidSolver::Init()
 	int neq = m_neq;
 
 	// allocate vectors
+	m_R0.assign(neq, 0);
+	m_R1.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);

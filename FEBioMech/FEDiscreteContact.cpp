@@ -702,6 +702,9 @@ void FEDiscreteContact::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FEDiscreteContact2, FESurfaceConstraint);
+END_FECORE_CLASS();
+
 FEDiscreteContact2::FEDiscreteContact2(FEModel* fem) : FESurfaceConstraint(fem), m_surf(fem)
 {
 	m_dom = 0;	
