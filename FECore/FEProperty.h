@@ -32,17 +32,12 @@ SOFTWARE.*/
 #include "fecore_enum.h"
 
 //-----------------------------------------------------------------------------
-class FEParam;
 class FECoreBase;
-class ParamString;
 class DumpStream;
 
 //-----------------------------------------------------------------------------
-//! First attempt at conceptualizing material properties.
-//! A material property is essentially any material that is nested inside
-//! another material definition. To faciliate automation of properties, we
-//! created an explicit interface for such properties.
-//! \todo I'd like to make this available for all FECoreBase classes, not just materials.
+//! A property of a class reflects a member variable of the class that is a 
+//! pointer to a FECoreBase derived class. 
 class FECORE_API FEProperty
 {
 public:
@@ -60,7 +55,7 @@ private:
 	//! Note that the name is not copied so it must point to a static string.
 	const char*		m_szname;
 	const char*		m_szlongname;	// long name (optional; used in FEBio Studio)
-	unsigned int	m_flags;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
+	unsigned int	m_flags;		// bitwise or of flags defined above 
 
 	const char* m_szdefaultType;	// default type string (used by FEBio Studio to initialize required properties).
 
@@ -95,7 +90,7 @@ public:
 	const char* GetDefaultType() const;
 
 	// set the default type
-	FEProperty* SetDefaultType(const char* szdefType);
+	FEProperty& SetDefaultType(const char* szdefType);
 
 public: // these functions have to be implemented by derived classes
 
@@ -149,6 +144,6 @@ protected:
 	virtual ~FEProperty();
 
 protected:
-	FECoreBase*		m_pParent;	//!< pointer to the "parent" material
+	FECoreBase*		m_pParent;		//!< pointer to the parent class (i.e. the class that defines this property)
 	SUPER_CLASS_ID	m_superClassID;	//!< The super class ID
 };

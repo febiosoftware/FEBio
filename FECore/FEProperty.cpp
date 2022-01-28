@@ -69,10 +69,10 @@ const char* FEProperty::GetDefaultType() const
 }
 
 //-----------------------------------------------------------------------------
-FEProperty* FEProperty::SetDefaultType(const char* szdefType)
+FEProperty& FEProperty::SetDefaultType(const char* szdefType)
 {
 	m_szdefaultType = szdefType;
-	return this;
+	return *this;
 }
 
 //-----------------------------------------------------------------------------
