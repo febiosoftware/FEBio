@@ -3322,6 +3322,209 @@ literal "true"
 er composites.
 \end_layout
 
+\begin_layout Subsection
+Tension-Bearing Fiber Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tension-Bearing-Fiber-Materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In biomechanics we often find it convenient to model fibrous or fibrillar
+ materials using one-dimensional fibers that can only sustain tension.
+ Typically, such fibers are represented with a strain energy density function
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}\left(\mathbf{C}\right)=H\left(I_{n}-1\right)\Psi_{n}\left(I_{n}\right)\,,\quad I_{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}\label{eq:fiber-model}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the unit vector along the fiber in its reference configuration, and
+ 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the square of the stretch ratio along the fiber.
+ The Heaviside unit step function 
+\begin_inset Formula $H\left(I_{n}-1\right)$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fiber-model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ ensures that the fiber contributes strain energy only when it is under
+ tension (
+\begin_inset Formula $I_{n}>1$
+\end_inset
+
+); thus, the constitutive model 
+\begin_inset Formula $\Psi_{n}\left(I_{n}\right)$
+\end_inset
+
+ for the tensile response of the fiber must reduce to zero when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using the hyperelasticity relations presented above, the Cauchy stress in
+ this fiber material can be evaluated as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=H\left(I_{n}-1\right)2J^{-1}\frac{d\Psi_{n}}{dI_{n}}\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\,,\label{eq:fiber-stress}
+\end{equation}
+
+\end_inset
+
+and the spatial elasticity tensor is
+\begin_inset Formula 
+\begin{equation}
+\mathcal{C}=4J^{-1}\frac{d^{2}\Psi_{n}}{dI_{n}^{2}}\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\,.\label{eq:fiber-elasticity}
+\end{equation}
+
+\end_inset
+
+If we denote the unit vector along the fiber in the current configuration
+ as 
+\begin_inset Formula $\mathbf{n}\equiv I_{n}^{-1/2}\mathbf{F}\cdot\mathbf{n}_{r}$
+\end_inset
+
+, the above expressions may be rewritten as 
+\begin_inset Formula $\boldsymbol{\sigma}=H\left(I_{n}-1\right)2J^{-1}I_{n}\Psi_{n}^{\prime}\left(I_{n}\right)\mathbf{n}\otimes\mathbf{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{C}=4J^{-1}I_{n}^{2}\Psi_{n}^{\prime\prime}\left(I_{n}\right)\mathbf{n}\otimes\mathbf{n}\otimes\mathbf{n}\otimes\mathbf{n}$
+\end_inset
+
+.
+ As explained in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian07a"
+literal "false"
+
+\end_inset
+
+, these fiber models must be combined with a ground matrix in order to produce
+ a stable material response.
+ In FEBio this can be done by using a constrained mixture of solid constituents
+ (for example, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Simple-Solid-Mixtures"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+In the classical fiber mechanics literature it was suggested that uncoupled
+ fiber formulations could also be implemented, whereby 
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}\left(\mathbf{C}\right)=H\left(\tilde{I}_{n}-1\right)\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)+U\left(J\right)\,,\quad\tilde{I}_{n}=\mathbf{n}_{r}\cdot\tilde{\mathbf{C}}\cdot\mathbf{n}_{r}\,,\label{eq:fiber-model-UC}
+\end{equation}
+
+\end_inset
+
+and the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is given by Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq87"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}=H\left(\tilde{I}_{n}-1\right)2J^{-1}\frac{d\tilde{\Psi}_{n}}{d\tilde{I}_{n}}\left(\tilde{\mathbf{F}}\cdot\mathbf{n}_{r}\right)\otimes\left(\tilde{\mathbf{F}}\cdot\mathbf{n}_{r}\right)\,.\label{eq:fiber-stress-UC}
+\end{equation}
+
+\end_inset
+
+Uncoupled fiber formulations of this kind are available in FEBio.
+ More recently however, several studies have demonstrated that using 
+\begin_inset Formula $H\left(\tilde{I}_{n}-1\right)$
+\end_inset
+
+ to detect whether a fiber is in tension or compression is non-physical,
+ since 
+\begin_inset Formula $\tilde{I}_{n}\ne I_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the sole true measure of the tensile stretch in the fiber 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Sansour08,Helfenstein10,Gultekin19"
+literal "false"
+
+\end_inset
+
+.
+ Therefore, uncoupled fiber formulations have fallen out of favor, even
+ though FEBio still allows users to employ these for historical reasons.
+ It is now recommended to use the standard (unconstrained) fiber models,
+ also available in FEBio, with the formulation given in Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fiber-model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fiber-elasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, even when the ground matrix uses an uncoupled formulation.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -31562,7 +31765,7 @@ such that the mixture mass balance is satisfied by
 \end_layout
 
 \begin_layout Subsection
-Free Energy Density and Stress
+Strain Energy Density and Stress
 \end_layout
 
 \begin_layout Standard
@@ -31729,6 +31932,137 @@ noprefix "false"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+For nearly-incompressible hyperelastic materials (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Nearly-Incompressible-Hyperelast"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), the strain energy density of the intact material has the form of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq79"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, thus 
+\begin_inset Formula $\Psi_{0}\left(\mathbf{C}\right)=\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)$
+\end_inset
+
+.
+ In this case, we assume that the damage only affects the distortional part
+ of the strain energy density 
+\begin_inset Formula $\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)$
+\end_inset
+
+, consistent with the general framework advocated in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Holzapfel00"
+literal "false"
+
+\end_inset
+
+.
+ Thus, for 
+\emph on
+uncoupled damage
+\emph default
+, we assume that 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{C}\right)=\left(1-D\right)\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)$
+\end_inset
+
+.
+ The resulting damage stress similarly takes the form 
+\begin_inset Formula $\boldsymbol{\sigma}=\left(1-D\right)\dev\tilde{\boldsymbol{\sigma}}_{0}+p\mathbf{I}$
+\end_inset
+
+, consistent with Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq87"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}_{0}$
+\end_inset
+
+ is evaluated from 
+\begin_inset Formula $\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)$
+\end_inset
+
+ as given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq88"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+ is evaluated from 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ as given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq81"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When investigating the damage mechanics of tension-bearing fibrous materials,
+ described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Tension-Bearing-Fiber-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it is important to use the unconstrained version of the fiber and damage
+ mechanics models, even when the fibers are embedded in a ground matrix
+ with a nearly-incompressible response (uncoupled formulation).
+ This is a necessary requirement since uncoupled fiber formulations are
+ now understood to be non-physical.
+ Nevertheless, for historical reasons, FEBio allows users to use uncoupled
+ fiber formulations in an uncoupled damage material.
 \end_layout
 
 \begin_layout Subsection
