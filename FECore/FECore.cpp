@@ -163,4 +163,6 @@ REGISTER_FECORE_CLASS(FESurface, "surface");
 REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
 REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
+REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
+REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 }

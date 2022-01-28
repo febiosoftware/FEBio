@@ -118,6 +118,8 @@ public:
 
 	FEScalarValuator* copy() override;
 
+	void Serialize(DumpStream& dmp) override;
+
 private:
 	FEDataMap*	m_val;
 };

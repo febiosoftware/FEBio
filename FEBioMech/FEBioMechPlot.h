@@ -295,6 +295,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element stresses
+class FEPlotElementPK1Stress : public FEPlotDomainData
+{
+public:
+	FEPlotElementPK1Stress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element stresses for mixture components
 class FEPlotElementMixtureStress : public FEPlotDomainData
 {
@@ -839,6 +848,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Rate of deformation
+class FEPlotRateOfDeformation : public FEPlotDomainData
+{
+public:
+    FEPlotRateOfDeformation(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Rigid body reaction force
 class FEPlotRigidReactionForce : public FEPlotDomainData
 {
@@ -1006,6 +1024,10 @@ class FEPlotContinuousDamage_gamma : public FEPlotContinuousDamage_ {
 public: FEPlotContinuousDamage_gamma(FEModel* fem) : FEPlotContinuousDamage_(fem, 8) {}
 };
 
+class FEPlotContinuousDamage_D2beta : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D2beta(FEModel* fem) : FEPlotContinuousDamage_(fem, 9) {}
+};
+
 //-----------------------------------------------------------------------------
 //! Number of generations in reactive viscoelastic material point
 class FEPlotRVEgenerations : public FEPlotDomainData
@@ -1016,38 +1038,46 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Strain energy density of strong bonds in reactive viscoelastic material point
-class FEPlotRVEStrongBondSED : public FEPlotDomainData
+//! Reforming bond mass fraction in reactive viscoelastic material point
+class FEPlotRVEbonds : public FEPlotDomainData
 {
 public:
-    FEPlotRVEStrongBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Strain energy density of weak bonds in reactive viscoelastic material point
-class FEPlotRVEWeakBondSED : public FEPlotDomainData
-{
-public:
-    FEPlotRVEWeakBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    FEPlotRVEbonds(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Strain energy density of strong bonds in reactive viscoelastic material point
-class FEPlotRVEStrongBondDevSED : public FEPlotDomainData
+class FEPlotStrongBondSED : public FEPlotDomainData
 {
 public:
-    FEPlotRVEStrongBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    FEPlotStrongBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Strain energy density of weak bonds in reactive viscoelastic material point
-class FEPlotRVEWeakBondDevSED : public FEPlotDomainData
+class FEPlotWeakBondSED : public FEPlotDomainData
 {
 public:
-    FEPlotRVEWeakBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    FEPlotWeakBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Strain energy density of strong bonds in reactive viscoelastic material point
+class FEPlotStrongBondDevSED : public FEPlotDomainData
+{
+public:
+    FEPlotStrongBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of weak bonds in reactive viscoelastic material point
+class FEPlotWeakBondDevSED : public FEPlotDomainData
+{
+public:
+    FEPlotWeakBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};

@@ -260,7 +260,6 @@ void FEBioMech::InitModule()
 	// Solver classes
 	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
-	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 	//-----------------------------------------------------------------------------
 	// material classes
@@ -433,7 +432,10 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistUser, "relaxation-power-dist-user");
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
     REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
-    REGISTER_FECORE_CLASS(FEBondRelaxationExpPow, "relaxation-exp-pow");
+    REGISTER_FECORE_CLASS(FEBondRelaxationMalkin, "relaxation-Malkin");
+    REGISTER_FECORE_CLASS(FEBondRelaxationMalkinDistUser, "relaxation-Malkin-dist-user");
+    REGISTER_FECORE_CLASS(FEBondRelaxationCSexp, "relaxation-CSexp");
+    REGISTER_FECORE_CLASS(FEBondRelaxationCSexpDistUser, "relaxation-CSexp-dist-user");
 
 	// damage cumulative distribution functions (used by damage materials)
 	REGISTER_FECORE_CLASS(FEDamageCDFSimo, "CDF Simo");
@@ -596,6 +598,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDensity, "density");
 	REGISTER_FECORE_CLASS(FEPlotElementStress, "stress");
 	REGISTER_FECORE_CLASS(FEPlotElementPK2Stress, "PK2 stress");
+	REGISTER_FECORE_CLASS(FEPlotElementPK1Stress, "PK1 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
@@ -639,6 +642,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotLeftStretch, "left stretch");
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");
     REGISTER_FECORE_CLASS(FEPlotLeftHencky, "left Hencky");
+    REGISTER_FECORE_CLASS(FEPlotRateOfDeformation, "rate of deformation");
 	REGISTER_FECORE_CLASS(FEPlotMortarContactGap, "mortar-gap");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceTraction, "surface traction");
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
@@ -696,11 +700,13 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_Psi0 , "continuous damage Psi0");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_beta , "continuous damage beta");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_gamma, "continuous damage gamma");
+	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2beta, "continuous damage D2beta");
     REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
-    REGISTER_FECORE_CLASS(FEPlotRVEStrongBondSED, "RVE strong bond SED");
-    REGISTER_FECORE_CLASS(FEPlotRVEWeakBondSED, "RVE weak bond SED");
-    REGISTER_FECORE_CLASS(FEPlotRVEStrongBondDevSED, "RVE strong bond deviatoric SED");
-    REGISTER_FECORE_CLASS(FEPlotRVEWeakBondDevSED, "RVE weak bond deviatoric SED");
+    REGISTER_FECORE_CLASS(FEPlotRVEbonds, "RVE reforming bonds");
+    REGISTER_FECORE_CLASS(FEPlotStrongBondSED, "strong bond SED");
+    REGISTER_FECORE_CLASS(FEPlotWeakBondSED, "weak bond SED");
+    REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
+    REGISTER_FECORE_CLASS(FEPlotWeakBondDevSED, "deviatoric weak bond SED");
 
 
 	// 2O continuum fields
@@ -912,6 +918,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidConnectorRotationZ, "RCthz");
 
 	//-----------------------------------------------------------------------------
+	// Derived from FELogNLConstraintData
+	REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
+	REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
+
+	//-----------------------------------------------------------------------------
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
@@ -926,12 +937,10 @@ void FEBioMech::InitModule()
 	febio.SetModuleDependency("solid");
 	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 
+	febio.CreateModule("CG-solid");
+	febio.SetModuleDependency("solid");
+	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
+
 
 	febio.SetActiveModule(0);
 }
-
-//-----------------------------------------------------------------------------
-// Derived from FELogNLConstraintData
-REGISTER_FECORE_CLASS(FELogVolumeConstraint, "constrained volume");
-REGISTER_FECORE_CLASS(FELogVolumePressure, "volume pressure");
-

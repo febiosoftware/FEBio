@@ -42,6 +42,9 @@ public:
     FEContinuousFiberDistributionUC(FEModel* pfem);
     ~FEContinuousFiberDistributionUC();
     
+    // returns a pointer to a new material point object
+    FEMaterialPoint* CreateMaterialPointData() override;
+    
 public:
 	//! calculate stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt) override;
@@ -52,13 +55,10 @@ public:
 	//! calculate deviatoric strain energy density
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
-	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
-
 private:
 	double IntegratedFiberDensity(FEMaterialPoint& pt);
 
-public:
+protected:
     FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*	m_pFint;    // pointer to fiber integration scheme

@@ -31,6 +31,8 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include <FECore/log.h>
 #include <FECore/expint_Ei.h>
+#include <FECore/gamma.h>
+#include <FECore/besselIK.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -54,8 +56,9 @@ FEBondRelaxationExponential::FEBondRelaxationExponential(FEModel* pfem) : FEBond
 //! Relaxation function
 double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
+    double tau = m_tau(mp);
 	// --- constant relaxation times ---
-    double g = exp(-t/m_tau);
+    double g = exp(-t/tau);
 	
 	return g;
 }
@@ -86,6 +89,9 @@ FEBondRelaxationExpDistortion::FEBondRelaxationExpDistortion(FEModel* pfem) : FE
 //! Relaxation function
 double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
+    double alpha = m_alpha(mp);
+    double tau0 = m_tau0(mp);
+    double tau1 = m_tau1(mp);
     // get the elastic material point data
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -95,8 +101,8 @@ double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const doub
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
 
-    double K2a = pow(K2,m_alpha);
-    double tau = m_tau0 + m_tau1*K2a;
+    double K2a = pow(K2,alpha);
+    double tau = tau0 + tau1*K2a;
 
     double g = exp(-t/tau);
     
@@ -119,6 +125,14 @@ END_FECORE_CLASS();
 FEBondRelaxationExpDistUser::FEBondRelaxationExpDistUser(FEModel* pfem) : FEBondRelaxation(pfem)
 {
     m_tau = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! performs initialization
+bool FEBondRelaxationExpDistUser::Init()
+{
+    if (!m_tau->Init()) return false;
+    return FEBondRelaxation::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +178,7 @@ FEBondRelaxationFung::FEBondRelaxationFung(FEModel* pfem) : FEBondRelaxation(pfe
 bool FEBondRelaxationFung::Validate()
 {
     if (FEBondRelaxation::Validate() == false) return false;
-	if (m_tau2 <= m_tau1) { feLogError("tau2 must be > tau1"); return false; }
+//	if (m_tau2 <= m_tau1) { feLogError("tau2 must be > tau1"); return false; }
 	return true;
 }
 
@@ -172,12 +186,14 @@ bool FEBondRelaxationFung::Validate()
 //! Relaxation function
 double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
+    double tau1 = m_tau1(mp);
+    double tau2 = m_tau2(mp);
     double g = 0;
     
     if (t > 0) {
-        g = (m_tau2*exp(-t/m_tau2) - m_tau1*exp(-t/m_tau1)
-        + t*(expint_Ei(-t/m_tau2) - expint_Ei(-t/m_tau1)))
-        /(m_tau2 - m_tau1);
+        g = (tau2*exp(-t/tau2) - tau1*exp(-t/tau1)
+        + t*(expint_Ei(-t/tau2) - expint_Ei(-t/tau1)))
+        /(tau2 - tau1);
     }
     else
         g = 1;
@@ -209,7 +225,9 @@ FEBondRelaxationPark::FEBondRelaxationPark(FEModel* pfem) : FEBondRelaxation(pfe
 //! Relaxation function
 double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
-    double g = 1./(1+pow(t/m_tau,m_beta));
+    double tau = m_tau(mp);
+    double beta = m_beta(mp);
+    double g = 1./(1+pow(t/tau,beta));
     
     return g;
 }
@@ -245,7 +263,12 @@ FEBondRelaxationParkDistortion::FEBondRelaxationParkDistortion(FEModel* pfem) : 
 double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g;
-    
+    double alpha = m_alpha(mp);
+    double tau0 = m_tau0(mp);
+    double tau1 = m_tau1(mp);
+    double beta0 = m_beta0(mp);
+    double beta1 = m_beta1(mp);
+
     // get the elastic material point data
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -255,9 +278,9 @@ double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const dou
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
 
-    double K2a = pow(K2,m_alpha);
-    double tau = m_tau0 + m_tau1*K2a;
-    double beta = m_beta0 + m_beta1*K2a;
+    double K2a = pow(K2,alpha);
+    double tau = tau0 + tau1*K2a;
+    double beta = beta0 + beta1*K2a;
     g = 1./(1+pow(t/tau,beta));
     
     return g;
@@ -281,6 +304,15 @@ FEBondRelaxationParkDistUser::FEBondRelaxationParkDistUser(FEModel* pfem) : FEBo
 {
     m_tau = nullptr;
     m_beta = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! performs initialization
+bool FEBondRelaxationParkDistUser::Init()
+{
+    if (!m_tau->Init()) return false;
+    if (!m_beta->Init()) return false;
+    return FEBondRelaxation::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -327,7 +359,9 @@ FEBondRelaxationPower::FEBondRelaxationPower(FEModel* pfem) : FEBondRelaxation(p
 //! Relaxation function
 double FEBondRelaxationPower::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
-    double g = pow(1+t/m_tau,-m_beta);
+    double tau = m_tau(mp);
+    double beta = m_beta(mp);
+    double g = pow(1+t/tau,-beta);
     
     return g;
 }
@@ -360,7 +394,12 @@ FEBondRelaxationPowerDistortion::FEBondRelaxationPowerDistortion(FEModel* pfem) 
 double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g;
-    
+    double tau0 = m_tau0(mp);
+    double tau1 = m_tau1(mp);
+    double beta0 = m_beta0(mp);
+    double beta1 = m_beta1(mp);
+    double alpha = m_alpha(mp);
+
     // get the elastic material point data
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -370,9 +409,9 @@ double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const do
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
     
-    double K2a = pow(K2,m_alpha);
-    double tau = m_tau0 + m_tau1*K2a;
-    double beta = m_beta0 + m_beta1*K2a;
+    double K2a = pow(K2,alpha);
+    double tau = tau0 + tau1*K2a;
+    double beta = beta0 + beta1*K2a;
 
     g = pow(1+t/tau,-beta);
     
@@ -397,6 +436,15 @@ FEBondRelaxationPowerDistUser::FEBondRelaxationPowerDistUser(FEModel* pfem) : FE
 {
     m_tau = nullptr;
     m_beta = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! performs initialization
+bool FEBondRelaxationPowerDistUser::Init()
+{
+    if (!m_tau->Init()) return false;
+    if (!m_beta->Init()) return false;
+    return FEBondRelaxation::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -449,12 +497,15 @@ FEBondRelaxationCarreau::FEBondRelaxationCarreau(FEModel* pfem) : FEBondRelaxati
 double FEBondRelaxationCarreau::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g;
+    double tau0 = m_tau0(mp);
+    double lam = m_lam(mp);
+    double n = m_n(mp);
     
     // evaluate the engineering shear rate
     double gdot = sqrt(2.)*D.norm();
     
     // evaluate the relaxation time
-    double tau = m_tau0*pow(1+pow(m_lam*gdot,2),(m_n-1)/2.);
+    double tau = tau0*pow(1+pow(lam*gdot,2),(n-1)/2.);
     
     g = exp(-t/tau);
     
@@ -521,29 +572,200 @@ double FEBondRelaxationProny::Relaxation(FEMaterialPoint& mp, const double t, co
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// FEBondRelaxationExpPow
+// FEBondRelaxationMalkin
 //
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FEBondRelaxationExpPow, FEBondRelaxation)
-    ADD_PARAMETER(m_tau  , FE_RANGE_GREATER(0.0)    , "tau" );
-    ADD_PARAMETER(m_beta , FE_RANGE_GREATER(0.0)    , "beta" );
-    ADD_PARAMETER(m_gamma, FE_RANGE_CLOSED(0.0, 1.0), "gamma");
+BEGIN_FECORE_CLASS(FEBondRelaxationMalkin, FEBondRelaxation)
+ADD_PARAMETER(m_tau1 , FE_RANGE_GREATER(0.0), "tau1");
+ADD_PARAMETER(m_tau2 , FE_RANGE_GREATER(0.0), "tau2");
+ADD_PARAMETER(m_beta , FE_RANGE_GREATER(0.0), "beta");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FEBondRelaxationExpPow::FEBondRelaxationExpPow(FEModel* pfem) : FEBondRelaxation(pfem)
+FEBondRelaxationMalkin::FEBondRelaxationMalkin(FEModel* pfem) : FEBondRelaxation(pfem)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationExpPow::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+double FEBondRelaxationMalkin::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
-    double g = m_gamma*exp(-t/m_tau) + (1-m_gamma)*exp(-pow(t/m_tau,m_beta));
-
+    double g = 1.0;
+    if (t == 0) return g;
+    
+    double tau1 = m_tau1(mp);
+    double tau2 = m_tau2(mp);
+    double beta = m_beta(mp);
+    
+    if (beta != 1) {
+        double bm1 = beta - 1;
+#ifdef __APPLE__
+        double Ga = tgamma(bm1);
+#else
+        double Ga = gamma(bm1);
+#endif
+        double Q1 = gamma_inc_Q(bm1, t/tau1);
+        double G1 = Ga*Q1;
+        double Q2 = gamma_inc_Q(bm1, t/tau2);
+        double G2 = Ga*Q2;
+        g = bm1*pow(t,-bm1)/(pow(tau1, -bm1) - pow(tau2, -bm1))*(G2-G1);
+    }
+    else {
+        g = (expint_Ei(-t/tau2) - expint_Ei(-t/tau1))/(log(tau1/tau2));
+    }
     return g;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationMalkinDistUser
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRelaxationMalkinDistUser, FEBondRelaxation)
+ADD_PROPERTY(m_tau1  , "tau1");
+ADD_PROPERTY(m_tau2  , "tau2");
+ADD_PROPERTY(m_beta  , "beta");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationMalkinDistUser::FEBondRelaxationMalkinDistUser(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+    m_tau1 = nullptr;
+    m_tau2 = nullptr;
+    m_beta = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! performs initialization
+bool FEBondRelaxationMalkinDistUser::Init()
+{
+    if (!m_tau1->Init()) return false;
+    if (!m_tau2->Init()) return false;
+    if (!m_beta->Init()) return false;
+    return FEBondRelaxation::Init();
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationMalkinDistUser::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    double g = 1.0;
+    if (t == 0) return g;
+    
+    // get the elastic material point data
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // evaluate spatial Hencky (logarithmic) strain
+    mat3ds h = pt.LeftHencky();
+    
+    // evaluate distortion magnitude (always positive)
+    double K2 = (h.dev()).norm();
+    
+    double tau1 = m_tau1->value(K2);
+    double tau2 = m_tau2->value(K2);
+    double beta = m_beta->value(K2);
+    
+    if (beta != 1) {
+        double bm1 = beta - 1;
+#ifdef __APPLE__
+        double Ga = tgamma(bm1);
+#else
+        double Ga = gamma(bm1);
+#endif
+        double Q1 = gamma_inc_Q(bm1, t/tau1);
+        double G1 = Ga*Q1;
+        double Q2 = gamma_inc_Q(bm1, t/tau2);
+        double G2 = Ga*Q2;
+        g = bm1*pow(t,-bm1)/(pow(tau1, -bm1) - pow(tau2, -bm1))*(G2-G1);
+    }
+    else {
+        g = (expint_Ei(-t/tau2) - expint_Ei(-t/tau1))/(log(tau1/tau2));
+    }
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationCSexp
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRelaxationCSexp, FEBondRelaxation)
+ADD_PARAMETER(m_tau , FE_RANGE_GREATER(0.0), "tau");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationCSexp::FEBondRelaxationCSexp(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationCSexp::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    double g = 1;
+    if (t == 0) return g;
+    double tau = m_tau(mp);
+    double ts = 2*sqrt(t/tau);
+    g = ts*k1(ts);
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationCSexpDistUser
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRelaxationCSexpDistUser, FEBondRelaxation)
+ADD_PROPERTY(m_tau  , "tau");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationCSexpDistUser::FEBondRelaxationCSexpDistUser(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+    m_tau = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! performs initialization
+bool FEBondRelaxationCSexpDistUser::Init()
+{
+    if (!m_tau->Init()) return false;
+    return FEBondRelaxation::Init();
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationCSexpDistUser::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    double g = 1;
+    if (t == 0) return g;
+
+    // get the elastic material point data
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // evaluate spatial Hencky (logarithmic) strain
+    mat3ds h = pt.LeftHencky();
+    
+    // evaluate distortion magnitude (always positive)
+    double K2 = (h.dev()).norm();
+    
+    double tau = m_tau->value(K2);
+
+    // evaluate relaxation function
+    double ts = 2*sqrt(t/tau);
+    // k1 is the modified bessel function of the second kind
+    g = ts*k1(ts);
+    return g;
+}

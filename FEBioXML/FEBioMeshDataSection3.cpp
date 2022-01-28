@@ -93,7 +93,7 @@ void FEBioMeshDataSection3::ParseNodalData(XMLTag& tag)
 	const char* szset = tag.AttributeValue("node_set");
 
 	// find the element set in the mesh
-	FENodeSet* nset = mesh.FindNodeSet(szset);
+	FENodeSet* nset = GetBuilder()->FindNodeSet(szset);
 	if (nset == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// get the data type
@@ -265,6 +265,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 	// create the data map
 	FEDomainMap* map = new FEDomainMap(dataType, fmt);
 	map->Create(elset);
+	map->SetName(mapName);
 
 	// see if there is a generator
 	if (szgen)
@@ -310,36 +311,8 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 		// read the parameters
 		ReadParameterList(tag, gen);
 
-		// initialize the generator
-		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
-
-		// generate the data
-		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
-
-		// see if this map is already defined
-		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
-		if (oldMap)
-		{
-			// it is, so merge it
-			oldMap->Merge(*map);
-
-			// we can now delete this map
-			delete map;
-		}
-		else
-		{
-			// nope, so add it
-			map->SetName(mapName);
-			mesh.AddDataMap(map);
-
-			// apply the map
-			if (pp)
-			{
-				FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
-				val->setDataMap(map);
-				pp->setValuator(val);
-			}
-		}
+		// Add it to the list (will be applied after the rest of the model was read in)
+		GetBuilder()->AddMeshDataGenerator(gen, map, pp);
 	}
 	else
 	{

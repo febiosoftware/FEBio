@@ -37,6 +37,8 @@ class FEElasticFiberMaterial : public FEElasticMaterial
 public:
     FEElasticFiberMaterial(FEModel* pfem);
 
+    FEMaterialPoint* CreateMaterialPointData() override;
+    
 	// get the fiber vector (in global coordinates)
 	vec3d FiberVector(FEMaterialPoint& mp);
 

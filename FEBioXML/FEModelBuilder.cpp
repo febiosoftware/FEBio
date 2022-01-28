@@ -46,6 +46,8 @@ SOFTWARE.*/
 #include <FECore/FEEdge.h>
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/log.h>
+#include <FECore/FEDataGenerator.h>
+#include <FECore/FECoreKernel.h>
 #include <FEBioMech/FESSIShellDomain.h>
 #include <sstream>
 
@@ -596,6 +598,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 		else if (strcmp(sztype, "TRI3G9"      ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G9; }
 		else if (strcmp(sztype, "TRI6G14"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }
 		else if (strcmp(sztype, "TRI6G21"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G21; }
+		else if (strcmp(sztype, "HEX8G1"      ) == 0) { eshape = ET_HEX8; m_nhex8 = FE_HEX8G1; }
 		else
 		{
 			assert(false);
@@ -682,6 +685,11 @@ void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const ch
 	mp.index = index;
 
 	m_mappedParams.push_back(mp);
+}
+
+void FEModelBuilder::AddMeshDataGenerator(FEDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp)
+{
+	m_mapgen.push_back(DataGen{ gen, map, pp });
 }
 
 void FEModelBuilder::ApplyParameterMaps()
@@ -842,11 +850,59 @@ void FEModelBuilder::ApplyLoadcurvesToFunctions()
 	}
 }
 
-// finish the build process
-void FEModelBuilder::Finish()
+bool FEModelBuilder::GenerateMeshDataMaps()
 {
-	ApplyParameterMaps();
+	FEModel& fem = GetFEModel();
+	FEMesh& mesh = GetMesh();
+	for (int i = 0; i < m_mapgen.size(); ++i)
+	{
+		FEDataGenerator* gen = m_mapgen[i].gen;
+		FEDomainMap* map = m_mapgen[i].map;
+		FEParamDouble* pp = m_mapgen[i].pp;
+
+		// initialize the generator
+		if (gen->Init() == false) return false;
+
+		// generate the data
+		if (gen->Generate(*map) == false) return false;
+
+		// see if this map is already defined
+		string mapName = map->GetName();
+		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
+		if (oldMap)
+		{
+			// it is, so merge it
+			oldMap->Merge(*map);
+
+			// we can now delete this map
+			delete map;
+		}
+		else
+		{
+			// nope, so add it
+			map->SetName(mapName);
+			mesh.AddDataMap(map);
+
+			// apply the map
+			if (pp)
+			{
+				FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+				val->setDataMap(map);
+				pp->setValuator(val);
+			}
+		}
+	}
+
+	return true;
+}
+
+// finish the build process
+bool FEModelBuilder::Finish()
+{
 	ApplyLoadcurvesToFunctions();
+	if (GenerateMeshDataMaps() == false) return false;
+	ApplyParameterMaps();
+	return true;
 }
 
 FEBModel& FEModelBuilder::GetFEBModel()

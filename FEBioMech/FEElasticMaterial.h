@@ -57,6 +57,10 @@ public:
 
 	mat3ds SolidStress(FEMaterialPoint& pt) override;
 
+public:
+    virtual double StrongBondSED(FEMaterialPoint& pt) { return StrainEnergyDensity(pt); }
+    virtual double WeakBondSED(FEMaterialPoint& pt) { return 0; }
+
 protected:
 	bool	m_secant_stress;	//!< use secant approximation to stress
 

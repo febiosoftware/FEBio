@@ -103,8 +103,8 @@ public:
 	double*		m_shape;
 
 protected:
-	FEMaterialPoint*	m_pNext;	//<! next data in the list
-	FEMaterialPoint*	m_pPrev;	//<! previous data in the list
+	FEMaterialPoint*	m_pNext;    //!< next data in the list
+	FEMaterialPoint*	m_pPrev;    //!< previous data in the list
 };
 
 //-----------------------------------------------------------------------------

@@ -48,14 +48,23 @@ public:
 
 	//! Strain energy density
 	virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
+    
+    // Set or clear pre-stretch, as needed in multigenerational materials (e.g., reactive viscoelasticity)
+    void SetPreStretch(const mat3ds Us) { m_Us = Us; m_bUs = true; }
+    void ResetPreStretch() { m_bUs = false; }
+    vec3d FiberPreStretch(const vec3d a0);
 
-public:
+private:
 	// These are made private since fiber materials should implement the functions above instead. 
 	// The functions can still be reached when a fiber material is used in an elastic mixture. 
 	// In those cases the fiber vector is taken from the first column of Q. 
 	mat3ds DevStress(FEMaterialPoint& mp) final { return DevFiberStress(mp, FiberVector(mp)); }
 	tens4ds DevTangent(FEMaterialPoint& mp) final { return DevFiberTangent(mp, FiberVector(mp)); }
 	double DevStrainEnergyDensity(FEMaterialPoint& mp) final { return DevFiberStrainEnergyDensity(mp, FiberVector(mp)); }
+    
+private:
+    mat3ds  m_Us;   //!< pre-stretch tensor for fiber
+    bool    m_bUs;  //!< flag for pre-stretch
 
 public:
 	FEParamVec3		m_fiber;	//!< fiber orientation

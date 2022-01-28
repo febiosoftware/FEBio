@@ -36,13 +36,31 @@ class FEReactiveViscoelasticMaterial;
 class FEUncoupledReactiveViscoelasticMaterial;
 
 //-----------------------------------------------------------------------------
+//! Material point data array for reactive viscoelastic materials
+//!
+class FEReactiveViscoelasticMaterialPoint : public FEMaterialPointArray
+{
+public:
+    //! constructor
+    FEReactiveViscoelasticMaterialPoint();
+    
+    //! Copy material point data
+    FEMaterialPoint* Copy();
+    
+    //! material point initialization
+    void Init();
+    
+    //! data serialization
+    void Serialize(DumpStream& ar);
+};
+
+//-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
 class FEReactiveVEMaterialPoint : public FEMaterialPoint
 {
 public:
     //! olverloaded constructors
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = pe; m_pRuc = 0; }
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEUncoupledReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = 0; m_pRuc = pe; }
+    FEReactiveVEMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
     
     //! copy material point data
     FEMaterialPoint* Copy() override;
@@ -50,9 +68,6 @@ public:
     //! Initialize material point data
     void Init() override;
 
-    //! Update material point data
-    void UpdateGenerations(const FETimeInfo& timeInfo);
-    
     //! Serialize data to archive
     void Serialize(DumpStream& ar) override;
     
@@ -62,6 +77,4 @@ public:
     deque <double> m_Jv;	//!< determinant of Uv (store for efficiency)
     deque <double> m_v;     //!< time tv when generation starts breaking
     deque <double> m_f;     //!< mass fraction when generation starts breaking
-    FEReactiveViscoelasticMaterial*  m_pRve; //!< pointer to parent material
-    FEUncoupledReactiveViscoelasticMaterial*  m_pRuc; //!< pointer to parent material
 };

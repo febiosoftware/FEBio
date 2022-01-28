@@ -28,12 +28,14 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFiberExpPowUncoupled.h"
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberExpPowUncoupled, FEElasticFiberMaterialUC)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
+    ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -45,6 +47,7 @@ FEFiberExpPowUncoupled::FEFiberExpPowUncoupled(FEModel* pfem) : FEElasticFiberMa
 	m_ksi = 0.0;
 	m_alpha = 0.0;
 	m_beta = 2.0;
+    m_mu = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -80,6 +83,10 @@ mat3ds FEFiberExpPowUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d& 
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
+
+        // add the contribution from shear
+        mat3ds BmI = pt.DevLeftCauchyGreen() - mat3dd(1);
+        s += (N*BmI).sym()*(m_mu / J);
 	}
 	else
 	{
@@ -118,7 +125,10 @@ tens4ds FEFiberExpPowUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d
 		// calculate the outer product of nt
 		mat3ds N = dyad(nt);
 		tens4ds NxN = dyad1s(N);
-		
+        mat3dd I(1);
+        tens4ds IxI = dyad1s(I);
+        tens4ds I4  = dyad4s(I);
+
 		// calculate strain energy derivatives
 		double tmp = m_alpha*pow(In_1, m_beta);
 		double Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
@@ -126,14 +136,19 @@ tens4ds FEFiberExpPowUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
-		
+
+        // add the contribution from shear
+        mat3ds B = pt.DevLeftCauchyGreen();
+        mat3ds BmI = B - I;
+        s += (N*BmI).sym()*(m_mu / J);
+
 		// calculate the fiber tangent
 		c = NxN*(4.0*Wll/J);
-		
+
+        // add the contribution from shear
+        c += dyad4s(N, B)*(m_mu / J);
+
 		// This is the final value of the elasticity tensor
-		mat3dd I(1);
-		tens4ds IxI = dyad1s(I);
-		tens4ds I4  = dyad4s(I);
 		c += ((I4+IxI/3.0)*s.tr() - dyad1s(I,s))*(2./3.)
 		- (ddots(IxI, c)-IxI*(c.tr()/3.))/3.;
 	}
@@ -154,7 +169,8 @@ double FEFiberExpPowUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, 
 	
 	// loop over all integration points
 	mat3ds C = pt.DevRightCauchyGreen();
-	
+    mat3ds C2 = C.sqr();
+
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
 	
@@ -170,6 +186,9 @@ double FEFiberExpPowUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, 
         }
         else
             sed = ksi/m_beta*pow(In_1, m_beta);
+
+        // add the contribution from shear
+        sed += m_mu*(n0*(C2*n0) - 2 * In_1 - 1) / 4.0;
 	}
     
     return sed;
