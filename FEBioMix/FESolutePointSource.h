@@ -50,9 +50,13 @@ public:
 
 	void SetRate(double rate);
 
+	void SetRadius(double radius);
+
 	double GetRate() const;
 
 	void SetAccumulateFlag(bool b);
+
+	void SetAccumulateCAFlag(bool b);
 
 	//! Evaluate force vector
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
@@ -60,11 +64,16 @@ public:
 	//! evaluate stiffness matrix
 	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
 
+	//! return all the elements in the given radius
+	std::vector<FEMaterialPoint*> FindIntInRadius();
+
 private:
 	int		m_soluteId;	//!< solute ID
 	double	m_rate;		//!< production rate
 	vec3d	m_pos;		//!< position of source
 	bool	m_accumulate; //!< accumulate flag
+	bool	m_accumulate_ca; //! < accumulate actual concentration flag
+	double	m_radius;
 
 private:
 	FEOctreeSearch		m_search;

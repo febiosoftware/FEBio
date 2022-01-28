@@ -61,11 +61,11 @@ bool FESBMPointSource::Init()
 // allow species to accumulate at the point source
 void FESBMPointSource::Accumulate(double dc) {
 	double rt[3] = { 0, 0, 0 };
-	FEElement* el = m_search.FindElement(m_pos, rt);
-	if (el == nullptr) return;
+	m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, rt));
+	if (m_el == nullptr) return;
 
 	// make sure this element is part of a multiphasic domain
-	FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
+	FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
 	FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
 	if (mat == nullptr) return;
 
@@ -90,66 +90,75 @@ void FESBMPointSource::Update()
 {
 	if (m_reset && m_doReset) ResetSBM();
 
-	// find the element in which the point lies
-	double rt[3] = { 0, 0, 0 };
-	FEElement* el = m_search.FindElement(m_pos, rt);
-	if (el == nullptr) return;
+	if (m_accumulate) {
+		// find the element in which the point lies
+		double rt[3] = { 0, 0, 0 };
+		m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, rt));
+		if (m_el == nullptr) return;
 
-	// make sure this element is part of a multiphasic domain
-	FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
-	FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
-	if (mat == nullptr) return;
+		// make sure this element is part of a multiphasic domain
+		FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
+		FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+		if (mat == nullptr) return;
 
-	// calculate the element volume
-	FEMesh* mesh = dom->GetMesh();
-	double Ve = mesh->ElementVolume(*el);
+		// calculate the element volume
+		FEMesh* mesh = dom->GetMesh();
+		double Ve = mesh->ElementVolume(*m_el);
 
-	// we prescribe the element average to the integration points
-	const int nint = el->GaussPoints();
-	double val = (m_weighVolume ? m_val / Ve : m_val);
+		// we prescribe the element average to the integration points
+		const int nint = m_el->GaussPoints();
+		double val = (m_weighVolume ? m_val / Ve : m_val);
 
-	// Make sure the material has the correct sbm
-	int sbmid = -1;
-	int sbms = mat->SBMs();
-	for (int j = 0; j<sbms; ++j)
-	{
-		int sbmj = mat->GetSBM(j)->GetSBMID();
-		if (sbmj == m_sbm)
+		// Make sure the material has the correct sbm
+		int sbmid = -1;
+		int sbms = mat->SBMs();
+		for (int j = 0; j < sbms; ++j)
 		{
-			sbmid = j;
-			break;
+			int sbmj = mat->GetSBM(j)->GetSBMID();
+			if (sbmj == m_sbm)
+			{
+				sbmid = j;
+				break;
+			}
 		}
-	}
-	if (sbmid == -1) return;
+		if (sbmid == -1) return;
+		std::vector<FEMaterialPoint*> possible_ints = FindIntInRadius();
+		if (possible_ints.size() == 0) {
+			// set the concentration of all the integration points
+			double H[FEElement::MAX_NODES];
+			double m_q[3];
+			m_q[0] = m_q[1] = m_q[2] = 0.0;
+			m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
+			if (m_el == nullptr) return;
+			m_el->shape_fnc(H, m_q[0], m_q[1], m_q[2]);
 
-	// set the concentration of all the integration points
-	double H[FEElement::MAX_NODES];
-	double m_q[3];
-	m_q[0] = m_q[1] = m_q[2] = 0.0;
-	FESolidElement* m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
-	if (m_el == nullptr) return;
-	m_el->shape_fnc(H, m_q[0], m_q[1], m_q[2]);
-	double tot_conc = 0.0;
-	for (int i=0; i<nint; ++i)
-	{
-		FEMaterialPoint* mp = el->GetMaterialPoint(i);
-		FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
-		// if this point source has not yet been added to the integration points do it then turn off the flag so we don't double count
-		if (m_accumulate) {
-
-			//pd.m_sbmr[sbmid] = std::max(0.0, (1.0/8.0) * val + pd.m_sbmrp[sbmid]);
-			//pd.m_sbmr[sbmid] = std::max(0.0, val + pd.m_sbmrp[sbmid]);
-			pd.m_sbmr[sbmid] = std::max(0.0, nint*H[i] * val + pd.m_sbmrp[sbmid]);
-			tot_conc += pd.m_sbmr[sbmid];
-			pd.m_sbmrp[sbmid] = pd.m_sbmr[sbmid];
+			for (int i = 0; i < nint; ++i)
+			{
+				FEMaterialPoint& mp = *m_el->GetMaterialPoint(i);
+				FESolutesMaterialPoint& pd = *(mp.ExtractData<FESolutesMaterialPoint>());
+				pd.m_sbmr[sbmid] = std::max(0.0, nint * H[i] * val + pd.m_sbmrp[sbmid]);
+				pd.m_sbmrp[sbmid] = pd.m_sbmr[sbmid];
+			}
 		}
 		else {
-			pd.m_sbmr[sbmid] = pd.m_sbmr[sbmid];
-			pd.m_sbmrp[sbmid] = pd.m_sbmrp[sbmid];
+			int nint_in = possible_ints.size();
+			double m_q[3];
+			m_q[0] = m_q[1] = m_q[2] = 0.0;
+			m_el = dynamic_cast<FESolidElement*>(m_search.FindElement(m_pos, m_q));
+			if (m_el == nullptr) return;
+			for (auto iter = possible_ints.begin(); iter != possible_ints.end(); ++iter)
+			{
+				FEMaterialPoint& mp = **iter;
+				FESolutesMaterialPoint& pd = *(mp.ExtractData<FESolutesMaterialPoint>());
+				pd.m_sbmr[sbmid] = std::max(0.0, nint * val / nint_in + pd.m_sbmrp[sbmid]);
+				pd.m_sbmrp[sbmid] = pd.m_sbmr[sbmid];
+			}
 		}
+		
+		// multiply by # integration points to prevent smoothing/distilling concentration
+		m_accumulate = false; // don't double count a point source
+		m_val = 0;
 	}
-	m_accumulate = false; // don't double count a point source
-	m_val = 0;
 }
 
 void FESBMPointSource::SetPosition(const vec3d& pos)
@@ -175,6 +184,11 @@ int FESBMPointSource::GetSBMID() const
 void FESBMPointSource::SetValue(double val)
 {
 	m_val = val;
+}
+
+void FESBMPointSource::SetRadius(double radius)
+{
+	m_radius = radius;
 }
 
 double FESBMPointSource::GetValue() const
@@ -242,4 +256,18 @@ void FESBMPointSource::ResetSBM()
 			}
 		}
 	}
+}
+
+std::vector<FEMaterialPoint*> FESBMPointSource::FindIntInRadius() {
+	// determine if the radius exceeds the boundaries of the element
+	int nint = m_el->GaussPoints();
+	std::vector<FEMaterialPoint*> possible_ints;
+	for (int i = 0; i < nint; i++) {
+		FEMaterialPoint* mp = m_el->GetMaterialPoint(i);
+		vec3d disp = mp->m_r0 - m_pos;
+		if (disp.norm() <= m_radius) {
+			possible_ints.push_back(mp);
+		}
+	}
+	return possible_ints;
 }
