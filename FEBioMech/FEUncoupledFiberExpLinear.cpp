@@ -38,7 +38,6 @@ BEGIN_FECORE_CLASS(FEUncoupledFiberExpLinear, FEElasticFiberMaterialUC);
 	ADD_PARAMETER(m_c4  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
 	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
-	ADD_PARAMETER(m_fiber, "fiber");
 	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
