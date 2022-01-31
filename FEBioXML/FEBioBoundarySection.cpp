@@ -1144,7 +1144,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 				prn->SetParameter("rb", rb);
 
-				ns = new FENodeSet(&fem);
+				ns = fecore_alloc(FENodeSet, &fem);
 				prn->SetNodeSet(ns);
 
 				// the default shell bc depends on the shell formulation

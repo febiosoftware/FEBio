@@ -27,6 +27,8 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
 
+class FESolidElement;
+
 class FESBMPointSource : public FEBodyLoad
 {
 public:
@@ -48,6 +50,8 @@ public:
 
 	void SetValue(double val);
 
+	void SetRadius(double radius);
+
 	double GetValue() const;
 
 	void SetWeighVolume(bool b);
@@ -56,6 +60,8 @@ public:
 
 	void SetAccumulateFlag(bool b);
 
+	std::vector<FEMaterialPoint*> FindIntInRadius();
+
 private:
 	void ResetSBM();
 
@@ -63,6 +69,7 @@ private:
 	int		m_sbm;	// The SBM ID that defins the cell's "concentration"
 	vec3d	m_pos;	// the position (in reference coordinates)
 	double	m_val;	// density value at point source
+	double	m_radius;
 	bool	m_reset;
 	bool	m_doReset;
 	bool	m_weighVolume;
@@ -70,6 +77,7 @@ private:
 
 private:
 	FEOctreeSearch		m_search;
+	FESolidElement*		m_el;
 
 	DECLARE_FECORE_CLASS();
 };

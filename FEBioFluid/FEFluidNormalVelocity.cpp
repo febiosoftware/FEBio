@@ -48,8 +48,10 @@ END_FECORE_CLASS();
 FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_velocity = 0.0;
+    m_bpv = true;
+    m_bpar = false;
     m_brim = false;
-    
+
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
@@ -193,13 +195,15 @@ void FEFluidNormalVelocity::Activate()
         }
     }
     
-    for (int i=0; i< surface.Nodes(); ++i)
-    {
-        FENode& node = surface.Node(i);
-        // mark node as having prescribed DOF
-        if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
-        if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
-        if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
+    if (m_bpv) {
+        for (int i = 0; i < surface.Nodes(); ++i)
+        {
+            FENode& node = surface.Node(i);
+            // mark node as having prescribed DOF
+            if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
+            if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
+            if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
+        }
     }
     
     if (m_brim) {
@@ -217,47 +221,26 @@ void FEFluidNormalVelocity::Update()
 {
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
-
-    // we need to map the surface data to nodes
-    int NN = ps->Nodes();
-    vector<double> VN(NN, 0.0);
-    vector<int> nf(NN, 0);
-
-    for (int iel = 0; iel < ps->Elements(); ++iel)
-    {
-        FESurfaceElement& el = m_psurf->Element(iel);
-
-        // nr of element nodes
-        int neln = el.Nodes();
-
-        // nodal coordinates
-        for (int i = 0; i < neln; ++i) 
+    
+    if (m_bpv) {
+        for (int i=0; i<ps->Nodes(); ++i)
         {
-            FESurfaceMaterialPoint mp;
-            mp.m_elem = &el;
-            mp.m_index = i; // this is a node index, but we really need a gauss-point index
+            FEMaterialPoint mp;
+            mp.m_index = i;
+            mp.m_r0 = ps->Node(i).m_r0;
+            mp.m_rt = ps->Node(i).m_rt;
 
-            VN[el.m_lnode[i]] += m_velocity(mp);
-            ++nf[el.m_lnode[i]];
+            // evaluate the velocity
+            vec3d v = m_nu[i]*(m_velocity(mp));
+            FENode& node = ps->Node(i);
+            if (node.get_bc(m_dofW[0]) == DOF_PRESCRIBED) node.set(m_dofW[0], v.x);
+            if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
+            if (node.get_bc(m_dofW[2]) == DOF_PRESCRIBED) node.set(m_dofW[2], v.z);
         }
-    }
-    for (int i = 0; i < NN; ++i) {
-        VN[i] /= nf[i];
-    }
-
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        // evaluate the velocity
-        vec3d v = m_nu[i]*VN[i];
-        FENode& node = ps->Node(i);
-        if (node.get_bc(m_dofW[0]) == DOF_PRESCRIBED) node.set(m_dofW[0], v.x);
-        if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
-        if (node.get_bc(m_dofW[2]) == DOF_PRESCRIBED) node.set(m_dofW[2], v.z);
     }
     
     if (m_brim) SetRimPressure();
-
-    // make sure the mesh gets updated after all loads are updated
+    
     ForceMeshUpdate();
 }
 

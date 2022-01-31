@@ -357,7 +357,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 		if ((prn == 0) || (rb != rbp))
 		{
 			prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
-			ns = new FENodeSet(&fem);
+			ns = fecore_all(FENodeSet, &fem);
 			prn->SetNodeSet(ns);
 
 			// the default shell bc depends on the shell formulation
