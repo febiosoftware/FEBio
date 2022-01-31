@@ -229,13 +229,15 @@ void FEFluidNormalVelocity::Activate()
 	// and nodal cards in m_VN
 	if (m_bpar) SetParabolicVelocity();
     
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
-        if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
-        if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
+    if (m_bpv) {
+        for (int i=0; i<ps->Nodes(); ++i)
+        {
+            FENode& node = ps->Node(i);
+            // mark node as having prescribed DOF
+            if (node.get_bc(m_dofW[0]) != DOF_FIXED) node.set_bc(m_dofW[0], DOF_PRESCRIBED);
+            if (node.get_bc(m_dofW[1]) != DOF_FIXED) node.set_bc(m_dofW[1], DOF_PRESCRIBED);
+            if (node.get_bc(m_dofW[2]) != DOF_FIXED) node.set_bc(m_dofW[2], DOF_PRESCRIBED);
+        }
     }
     
     if (m_brim) {
@@ -254,14 +256,16 @@ void FEFluidNormalVelocity::Update()
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
     
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        // evaluate the velocity
-        vec3d v = m_nu[i]*(m_velocity*m_VN[i]);
-        FENode& node = ps->Node(i);
-        if (node.get_bc(m_dofW[0]) == DOF_PRESCRIBED) node.set(m_dofW[0], v.x);
-        if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
-        if (node.get_bc(m_dofW[2]) == DOF_PRESCRIBED) node.set(m_dofW[2], v.z);
+    if (m_bpv) {
+        for (int i=0; i<ps->Nodes(); ++i)
+        {
+            // evaluate the velocity
+            vec3d v = m_nu[i]*(m_velocity*m_VN[i]);
+            FENode& node = ps->Node(i);
+            if (node.get_bc(m_dofW[0]) == DOF_PRESCRIBED) node.set(m_dofW[0], v.x);
+            if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
+            if (node.get_bc(m_dofW[2]) == DOF_PRESCRIBED) node.set(m_dofW[2], v.z);
+        }
     }
     
     if (m_brim) SetRimPressure();
