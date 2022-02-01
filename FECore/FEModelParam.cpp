@@ -56,6 +56,11 @@ FEParamDouble::FEParamDouble()
 	m_val = fecore_new<FEScalarValuator>("const", nullptr);
 }
 
+FEParamDouble::~FEParamDouble()
+{
+	delete m_val;
+}
+
 FEParamDouble::FEParamDouble(const FEParamDouble& p)
 {
 	m_val = p.m_val->copy();
@@ -109,6 +114,11 @@ FEParamVec3::FEParamVec3()
 	m_val = fecore_new<FEVec3dValuator>("vector", nullptr);
 }
 
+FEParamVec3::~FEParamVec3()
+{
+	delete m_val;
+}
+
 FEParamVec3::FEParamVec3(const FEParamVec3& p)
 {
 	m_val = p.m_val->copy();
@@ -150,6 +160,11 @@ FEParamMat3d::FEParamMat3d()
 	m_val = fecore_new<FEMat3dValuator>("const", nullptr);
 }
 
+FEParamMat3d::~FEParamMat3d()
+{
+	delete m_val;
+}
+
 FEParamMat3d::FEParamMat3d(const FEParamMat3d& p)
 {
 	m_val = p.m_val->copy();
@@ -189,6 +204,11 @@ void FEParamMat3d::Serialize(DumpStream& ar)
 FEParamMat3ds::FEParamMat3ds()
 {
 	m_val = fecore_new<FEMat3dsValuator>("const", nullptr);
+}
+
+FEParamMat3ds::~FEParamMat3ds()
+{
+	delete m_val;
 }
 
 FEParamMat3ds::FEParamMat3ds(const FEParamMat3ds& p)
