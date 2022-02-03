@@ -275,16 +275,13 @@ public:
 	XMLReader();
 	virtual ~XMLReader();
 
-	FILE* GetFilePtr();
+    std::ifstream* GetFileStream();
 
 	//! Open the xml file
 	bool Open(const char* szfile, bool checkForXMLTag = true);
 
 	//! Close the xml file
 	void Close();
-
-	// Attach a file to this reader. Reader does not take ownership of file pointer
-	bool Attach(FILE* fp);
 
 	//! Find a tag
 	bool FindTag(const char* xpath, XMLTag& tag);
@@ -327,7 +324,7 @@ protected: // helper functions
 	char GetNextChar();
 	
 protected:
-	FILE*	m_fp;			//!< the file pointer
+    std::istream* m_stream;
 	bool	m_ownFile;		//!< flag that inidicates whether the reader owns the file pointer or not
 
 	int		m_nline;		//!< current line (used only as temp storage)

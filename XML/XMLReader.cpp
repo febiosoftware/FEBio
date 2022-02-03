@@ -26,6 +26,8 @@ SOFTWARE.*/
 #include "XMLReader.h"
 #include <assert.h>
 #include <stdarg.h>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 //=============================================================================
@@ -484,7 +486,7 @@ XMLReader::Error(tag, format_string("missing tag \"%s\"", sza)) {}
 //-----------------------------------------------------------------------------
 XMLReader::XMLReader()
 {
-	m_fp = 0;
+    m_stream = nullptr;
 	m_nline = 0;
 	m_bufIndex = 0;
 	m_bufSize = 0;
@@ -501,12 +503,18 @@ XMLReader::~XMLReader()
 //-----------------------------------------------------------------------------
 void XMLReader::Close()
 {
-	if (m_ownFile && (m_fp != 0))
-	{
-		fclose(m_fp);
-	}
+    if(m_stream)
+    {
+        ifstream* fileStream = dynamic_cast<ifstream*>(m_stream);
+        if(fileStream)
+        {
+            fileStream->close();
+        }
 
-	m_fp = 0;
+        delete m_stream;
+        m_stream = nullptr;
+    }
+
 	m_nline = 0;
 	m_bufIndex = 0;
 	m_bufSize = 0;
@@ -515,43 +523,23 @@ void XMLReader::Close()
 }
 
 //-----------------------------------------------------------------------------
-// Attach a file to this reader. Reader does not take ownership of file pointer
-bool XMLReader::Attach(FILE* fp)
-{
-	// keep a copy of the file pointer
-	m_fp = fp;
-	m_ownFile = false;
-
-	// read the first line
-	char szline[256] = { 0 };
-	fgets(szline, 255, m_fp);
-
-	// make sure it is correct
-	if (strncmp(szline, "<?xml", 5) != 0)
-	{
-		// This file is not an XML file
-		return false;
-	}
-
-	// This file is ready to be processed
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 bool XMLReader::Open(const char* szfile, bool checkForXMLTag)
 {
 	// make sure this reader has not been attached to a file yet
-	if (m_fp != 0) return false;
+    if(m_stream) return false;
 
 	// open the file
-	m_fp = fopen(szfile, "rb");
-	if (m_fp == 0) return false;
+    m_stream = new ifstream;
+    static_cast<ifstream*>(m_stream)->open(szfile, ifstream::in|ifstream::binary);
+    if(m_stream->fail()) return false;
+
 
 	// read the first line
 	if (checkForXMLTag)
 	{
 		char szline[256] = { 0 };
-		fgets(szline, 255, m_fp);
+		// fgets(szline, 255, m_fp);
+        m_stream->get(szline, 255);
 
 		// make sure it is correct
 		if (strncmp(szline, "<?xml", 5) != 0)
@@ -681,7 +669,7 @@ private:
 bool XMLReader::FindTag(const char* xpath, XMLTag& tag)
 {
 	// go to the beginning of the file
-	fseek(m_fp, 0, SEEK_SET);
+    m_stream->seekg(0, ios_base::beg);
 	m_bufIndex = m_bufSize = 0;
 	m_currentPos = 0;
 	m_eof = false;
@@ -737,7 +725,7 @@ void XMLReader::NextTag(XMLTag& tag)
 	// set the current file position
 	if (m_currentPos != tag.m_fpos)
 	{
-		fseek(m_fp, tag.m_fpos, SEEK_SET);
+        m_stream->seekg(tag.m_fpos, ios_base::beg);
 		m_currentPos = tag.m_fpos;
 		m_bufSize = m_bufIndex = 0;
 		m_eof = false;
@@ -973,11 +961,15 @@ char XMLReader::readNextChar()
 {
 	if (m_bufIndex >= m_bufSize)
 	{
-		if (m_eof) throw EndOfFile();
+		if (m_eof) 
+        {
+            throw EndOfFile();
+        }
 
-		m_bufSize = fread(m_buf, 1, BUF_SIZE, m_fp);
-		m_bufIndex = 0;
-		m_eof = (m_bufSize != BUF_SIZE);
+        m_stream->readsome(m_buf, BUF_SIZE);
+        m_bufSize = m_stream->gcount();
+        m_bufIndex = 0;
+        m_eof = (m_bufSize != BUF_SIZE);
 	}
 	m_currentPos++;
 	return m_buf[m_bufIndex++];
@@ -998,7 +990,7 @@ void XMLReader::rewind(int64_t nstep)
 
 	if (m_bufIndex < 0)
 	{
-		fseek(m_fp, m_bufIndex - m_bufSize, SEEK_CUR);
+        m_stream->seekg(m_bufIndex - m_bufSize, ios_base::cur);
 		m_bufIndex = m_bufSize = 0;
 		m_eof = false;
 	}
@@ -1065,7 +1057,10 @@ char XMLReader::GetNextChar()
 	return ch;
 }
 
-FILE* XMLReader::GetFilePtr() { return m_fp; }
+ifstream* XMLReader::GetFileStream()
+{
+    return dynamic_cast<ifstream*>(m_stream);
+}
 
 //! return the current line
 int XMLReader::GetCurrentLine() { return m_nline; }
