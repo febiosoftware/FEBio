@@ -280,6 +280,9 @@ public:
 	//! Open the xml file
 	bool Open(const char* szfile, bool checkForXMLTag = true);
 
+    //! Pass xml formatted string to reader
+    bool OpenString(std::string& xml, bool checkForXMLTag = true);
+
 	//! Close the xml file
 	void Close();
 

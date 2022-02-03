@@ -555,6 +555,36 @@ bool XMLReader::Open(const char* szfile, bool checkForXMLTag)
 	return true;
 }
 
+bool XMLReader::OpenString(std::string& xml, bool checkForXMLTag)
+{
+    // make sure this we don't already have a stream
+    if(m_stream) return false;
+
+    // create string stream
+    m_stream = new std::istringstream(xml);
+    if(m_stream->fail()) return false;
+
+    // read the first line
+	if (checkForXMLTag)
+	{
+		char szline[256] = { 0 };
+		// fgets(szline, 255, m_fp);
+        m_stream->get(szline, 255);
+
+		// make sure it is correct
+		if (strncmp(szline, "<?xml", 5) != 0)
+		{
+			// This file is not an XML file
+			return false;
+		}
+	}
+
+	m_currentPos = 0;
+
+	// This file is ready to be processed
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 
 class XMLPath
