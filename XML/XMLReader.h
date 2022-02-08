@@ -161,6 +161,7 @@ public:
 	const char* szvalue() { return m_szval.c_str(); }
 
 	const std::string& comment();
+    const void clearComment();
 };
 
 
@@ -299,6 +300,7 @@ public:
 	void SkipTag(XMLTag& tag);
 
 	const std::string& GetLastComment();
+    void ClearComment();
 
 protected: // helper functions
 
@@ -333,7 +335,7 @@ protected:
 	int		m_nline;		//!< current line (used only as temp storage)
     int64_t	m_currentPos;	//!< current file position
 
-	std::string	m_comment;	// last comment that was read
+	std::string	m_comment;	//!< last comment that was read
 
 	char		m_buf[BUF_SIZE];
     int64_t    m_bufIndex, m_bufSize;
@@ -347,6 +349,8 @@ inline void XMLTag::operator ++ () { m_preader->NextTag(*this); }
 inline void XMLTag::skip() { m_preader->SkipTag(*this); }
 
 inline const std::string& XMLTag::comment() { return m_preader->GetLastComment(); }
+
+inline const void XMLTag::clearComment() { m_preader->ClearComment(); }
 
 //-----------------------------------------------------------------------------
 // mechanism for using custom types with XMLReader. 

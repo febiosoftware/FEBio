@@ -813,6 +813,8 @@ void XMLReader::ReadTag(XMLTag& tag)
 		ch = GetChar();
 		if (ch == '!')
 		{
+            m_comment.clear();
+
 			// parse the comment
 			ch = GetChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
 			ch = GetChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
@@ -824,7 +826,11 @@ void XMLReader::ReadTag(XMLTag& tag)
 				ch = GetChar();
 				if (ch == '-') n++;
 				else if ((ch == '>') && (n >= 2)) break;
-				else n = 0;
+				else
+                {
+                    m_comment += ch;
+                    n = 0;
+                } 
 			}
 			while (1);
 		}
@@ -1098,5 +1104,10 @@ int XMLReader::GetCurrentLine() { return m_nline; }
 
 const std::string& XMLReader::GetLastComment()
 {
-	return m_comment;
+    return m_comment;
+}
+
+void XMLReader::ClearComment()
+{
+    m_comment.clear();
 }
