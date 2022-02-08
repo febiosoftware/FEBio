@@ -229,11 +229,28 @@ bool XMLWriter::open(const char* szfile)
 	// write the first line
     if(m_stream)
     {
-        m_stream->precision(12);
-        *m_stream << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        init();
     }
 	
     return (m_stream != nullptr);
+}
+
+bool XMLWriter::setStringstream(std::ostringstream* stream)
+{
+    if (m_stream) return false;
+    if (!stream) return false;
+
+    m_stream = stream;
+
+    init();
+
+    return true;
+}
+
+void XMLWriter::init()
+{
+    m_stream->precision(12);
+    *m_stream << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
 }
 
 void XMLWriter::close()

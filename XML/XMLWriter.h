@@ -121,6 +121,8 @@ public:
 	virtual ~XMLWriter();
 	
 	bool open(const char* szfile);
+    bool setStringstream(std::ostringstream* stream);
+    void init();
 
 	void close();
 
@@ -161,7 +163,6 @@ protected:
 
 protected:
     std::ostream* m_stream;
-	// FILE*	m_fp;
 	int		m_level;
 
 	char	m_tag[MAX_TAGS][256];
