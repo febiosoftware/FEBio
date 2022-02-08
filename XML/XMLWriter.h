@@ -160,7 +160,8 @@ protected:
 	void write_leaf(const char* sztag, const char* szval);
 
 protected:
-	FILE*	m_fp;
+    std::ostream* m_stream;
+	// FILE*	m_fp;
 	int		m_level;
 
 	char	m_tag[MAX_TAGS][256];

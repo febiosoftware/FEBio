@@ -30,6 +30,7 @@ SOFTWARE.*/
 
 #include "XMLWriter.h"
 #include <sstream>
+#include <fstream>
 using namespace std;
 
 const char* XMLElement::intFormat = "%6d";
@@ -205,7 +206,7 @@ XMLWriter::XMLFloatFormat XMLWriter::GetFloatFormat()
 
 XMLWriter::XMLWriter()
 {
-	m_fp = 0;
+    m_stream = nullptr;
 	m_level = 0;
 
 	m_sztab[0] = 0;
@@ -220,20 +221,31 @@ XMLWriter::~XMLWriter()
 
 bool XMLWriter::open(const char* szfile)
 {
-	if (m_fp) return false;
+    if (m_stream) return false;
 	if (szfile == nullptr) return false;
 
-	m_fp = fopen(szfile, "wt");
+    m_stream = new ofstream(szfile, std::ios_base::out);
 
 	// write the first line
-	if (m_fp) fprintf(m_fp, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
+    if(m_stream)
+    {
+        m_stream->precision(12);
+        *m_stream << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+    }
 	
-	return (m_fp != nullptr);
+    return (m_stream != nullptr);
 }
 
 void XMLWriter::close()
 {
-	if (m_fp) fclose(m_fp); m_fp = 0;
+    ofstream* fstrm = dynamic_cast<ofstream*>(m_stream);
+    if (fstrm) 
+    {
+        fstrm->close();
+
+        delete m_stream;
+        m_stream = nullptr;
+    }
 }
 
 void XMLWriter::inc_level()
@@ -269,18 +281,16 @@ void XMLWriter::dec_level()
 
 void XMLWriter::add_branch(XMLElement& el, bool bclear)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s", m_sztab);
-
-	fprintf(m_fp, szformat, el.m_tag.c_str());
+    *m_stream << m_sztab << "<" << el.m_tag;
 
 	for (int i=0; i<el.attributes(); ++i)
 	{
 		const XMLElement::XMLAtt& att = el.attribute(i);
-		fprintf(m_fp, " %s=\"%s\"", att.name(), att.value());
+
+        *m_stream << " " << att.name() << "=\"" << att.value() << "\"";
 	}
 
-	fprintf(m_fp, ">%s\n", el.m_val.c_str());
+    *m_stream << ">" << el.m_val << "\n";
 
 	strcpy(m_tag[m_level], el.m_tag.c_str());
 
@@ -291,9 +301,7 @@ void XMLWriter::add_branch(XMLElement& el, bool bclear)
 
 void XMLWriter::add_branch(const char* sz)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s>\n", m_sztab);
-	fprintf(m_fp, szformat, sz);
+    *m_stream << m_sztab << "<" << sz << ">\n";
 
 	strcpy(m_tag[m_level], sz);
 	inc_level();
@@ -301,48 +309,41 @@ void XMLWriter::add_branch(const char* sz)
 
 void XMLWriter::add_empty(XMLElement& el, bool bclear)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s", m_sztab);
-
-	fprintf(m_fp, szformat, el.m_tag.c_str());
+    *m_stream << m_sztab << "<" << el.m_tag;
 
 	for (int i=0; i<el.attributes(); ++i)
 	{
 		const XMLElement::XMLAtt& att = el.attribute(i);
-		fprintf(m_fp, " %s=\"%s\"", att.name(), att.value());
+
+        *m_stream << " " << att.name() << "=\"" << att.value() << "\"";
 	}
 
-	fprintf(m_fp, "/>\n");
+    *m_stream << "/>\n";
+
 
 	if (bclear) el.clear();
 }
 
 void XMLWriter::add_leaf(XMLElement& el, bool bclear)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s", m_sztab);
-
-	fprintf(m_fp, szformat, el.m_tag.c_str());
+    *m_stream << m_sztab << "<" << el.m_tag;
 
 	for (int i=0; i<el.attributes(); ++i)
 	{
 		const XMLElement::XMLAtt& att = el.attribute(i);
-		fprintf(m_fp, " %s=\"%s\"", att.name(), att.value());
+        *m_stream << " " << att.name() << "=\"" << att.value() << "\"";
 	}
 
-	fprintf(m_fp, ">%s</%s>\n", el.m_val.c_str(), el.m_tag.c_str());
+    *m_stream << ">" << el.m_val << "</" << el.m_tag << ">\n";
 
 	if (bclear) el.clear();
 }
 
 void XMLWriter::write_leaf(const char* sztag, const char* szval)
 {
-	char szformat[256] = { 0 };
-	sprintf(szformat, "%s<%%s", m_sztab);
+    *m_stream << m_sztab << "<" << sztag;
 
-	fprintf(m_fp, szformat, sztag);
-
-	fprintf(m_fp, ">%s</%s>\n", szval, sztag);
+    *m_stream << ">" << szval << "</" << sztag << ">\n";
 }
 
 void XMLWriter::add_leaf(const char* szn, const char* szv)
@@ -357,84 +358,75 @@ void XMLWriter::add_leaf(const char* szn, const std::string& s)
 
 void XMLWriter::add_leaf(const char* szn, double* pg, int n)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s>", m_sztab);
-
-	fprintf(m_fp, szformat, szn);
+    *m_stream << m_sztab << "<" << szn << ">";
 
 	if (n>0)
 	{
-		fprintf(m_fp, "%.12lg", pg[0]);
-		for (int i=1; i<n; ++i) fprintf(m_fp, ",%.12lg", pg[i]);
+        *m_stream << pg[0];
+        for (int i=1; i<n; ++i) *m_stream << "," << pg[i];
 	}
 
-	fprintf(m_fp, "</%s>\n", szn);
-
+    *m_stream << "</" << szn << ">\n";
 }
 
 void XMLWriter::add_leaf(const char* szn, float* pg, int n)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s>", m_sztab);
-
-	fprintf(m_fp, szformat, szn);
+    *m_stream << m_sztab << "<" << szn << ">";
 
 	if (n>0)
 	{
-		fprintf(m_fp, "%.12g", pg[0]);
-		for (int i=1; i<n; ++i) fprintf(m_fp, ",%.12g", pg[i]);
+        *m_stream << pg[0];
+        for (int i=1; i<n; ++i) *m_stream << "," << pg[i];
 	}
 
-	fprintf(m_fp, "</%s>\n", szn);
-
+    *m_stream << "</" << szn << ">\n";
 }
 
 
 void XMLWriter::add_leaf(const char* szn, int* pi, int n)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s>", m_sztab);
-
-	fprintf(m_fp, szformat, szn);
+    *m_stream << m_sztab << "<" << szn << ">";
 
 	if (n>0)
 	{
-		fprintf(m_fp, "%d", pi[0]);
-		for (int i=1; i<n; ++i) fprintf(m_fp, ",%d", pi[i]);
+        *m_stream << pi[0];
+        for (int i=1; i<n; ++i) *m_stream << "," << pi[i];
 	}
 
-	fprintf(m_fp, "</%s>\n", szn);
+    *m_stream << "</" << szn << ">\n";
 }
 
 void XMLWriter::add_leaf(XMLElement& el, const std::vector<int>& A)
 {
-	char szformat[256] = {0};
-	sprintf(szformat, "%s<%%s", m_sztab);
-
-	fprintf(m_fp, szformat, el.m_tag.c_str());
+    *m_stream << m_sztab << "<" << el.m_tag;
 
 	for (int i=0; i<el.attributes(); ++i)
 	{
 		const XMLElement::XMLAtt& att = el.attribute(i);
-		fprintf(m_fp, " %s=\"%s\"", att.name(), att.value());
+        *m_stream << " " << att.name() << "=\"" << att.value() << "\"";
 	}
 
 	inc_level();
-	fprintf(m_fp, ">\n%s", m_sztab);
+
+    *m_stream << ">\n" << m_sztab;
 
 	int n = (int) A.size(), l = 0;
+    streampos start;
 	for (int i=0; i<n; ++i)
 	{
-		l += fprintf(m_fp, "%d", A[i]);
+
+        start = m_stream->tellp();
+        *m_stream << A[i];
+        l += m_stream->tellp() - start;
+
 		if (i < n-1)
 		{
-//			if (l > 80) { fprintf(m_fp, ",\n%s", m_sztab); l=0; }
-			if ((i+1) % 8 == 0) { fprintf(m_fp, ",\n%s", m_sztab); l=0; }
-			else fprintf(m_fp, ", ");
+            if ((i+1) % 8 == 0) { *m_stream << ",\n" << m_sztab; l=0; }
+			else *m_stream << ", ";
 		}
 	}
 	dec_level();
-	fprintf(m_fp,"\n%s</%s>\n", m_sztab, el.m_tag.c_str());
+    *m_stream << "\n" << m_sztab << "</" << el.m_tag << ">\n";
 }
 
 
@@ -447,7 +439,7 @@ void XMLWriter::close_branch()
 		char szformat[256] = {0};
 		sprintf(szformat, "%s</%%s>\n", m_sztab);
 
-		fprintf(m_fp, szformat, m_tag[m_level]);
+        *m_stream << m_sztab << "</" << m_tag[m_level] << ">\n";
 	}
 }
 
@@ -457,10 +449,10 @@ void XMLWriter::add_comment(const std::string& s, bool singleLine)
 
 	if (singleLine)
 	{
-		fprintf(m_fp, "<!-- %s -->\n", s.c_str());
+        *m_stream << "<!-- " << s << " -->\n";
 	}
 	else
 	{
-		fprintf(m_fp, "<!--\n%s\n-->\n", s.c_str());
+        *m_stream << "<!--\n" << s << "\n-->\n";
 	}
 }
