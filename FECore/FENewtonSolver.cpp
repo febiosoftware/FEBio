@@ -100,6 +100,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_bforceReform = true;
 	m_bdivreform = true;
 	m_bdoreforms = true;
+	m_persistMatrix = true;
 
 	m_bzero_diagonal = false;
 	m_zero_tol = 0.0;
@@ -582,6 +583,19 @@ bool FENewtonSolver::SolveStep()
 		feLog("\nconvergence summary\n");
 		feLog("    number of iterations   : %d\n", m_niter);
 		feLog("    number of reformations : %d\n", m_nref);
+	}
+
+	// if we don't want to hold on to the stiffness matrix, let's clean it up
+	if (m_persistMatrix == false)
+	{
+		// clean up the solver
+		m_plinsolve->Destroy();
+
+		// clean up the stiffness matrix
+		m_pK->Clear();
+
+		// make sure we recreate it in the next time step
+		m_breshape = true;
 	}
 
 	return bret;
