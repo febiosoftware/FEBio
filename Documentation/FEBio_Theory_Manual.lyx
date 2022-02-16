@@ -11873,8 +11873,8 @@ ns in fluid pressure caused by relatively coarse meshes near free-draining
  the early time response to loading.
  These spurious oscillations typically occur when the mesh is not able to
  resolve this boundary layer.
- Stabilization methos serve as an alternative to mesh refinement, when the
- latter is not feasible or practical.
+ Stabilization methods serve as an alternative to mesh refinement, when
+ the latter is not feasible or practical.
  In FEBio we have implemented a stabilization method based on the work of
  Aguilar et al.
  
