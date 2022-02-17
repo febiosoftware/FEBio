@@ -41,6 +41,96 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.6   2/18/2022
+
+===========================================================================
+
+* Added description of plot variables RVE generations, RVE reforming bonds, and effective friction coefficient
+* Updated description of plot variables in user manual.
+*	Documented the coupled and uncoupled Gent material.
+* Added new uncoupled Holmes-Mow isotropic elastic solid.
+* Updated Theory and User Manual to include description of uncoupled Holmes-Mow material
+* Added persistMatrix flag that cleans up linear solver and stiffness matrix after every time step. (This is useful for reducing memory requirements for homogenization problems.)
+* Added deviatoric strain energy density calculation for FEIncompNeoHookean
+* Fixed problem with appending plotfile with compression flag on.
+* Fixed memory leak.
+* Implemented missing functionality of "prescribe_nodal_velocities".
+* Updated Theory Manual to explain that uncoupled fiber formulations are non-physical and that uncoupled damage should not be used with fiber materials
+* Fixed issue with allocating FENodeSet that caused crash in restarts.
+* Fixed problem with serialization of mapped model parameters.
+* Added parameter list for FEUDGHexDomain.
+* Updated calculation of local fluid load support in sliding-biphasic contact interface to place theoretical upper bound on its value. Improves prediction of fluid load support over contact interface.
+* Updated User Manual and Theory Manual to define and include local fluid load support as a plot variable
+* Minor formatting change to Invalid Value error.
+* Mesh data isn't generated until after the feb file is read in. This allows that load data section no longer needs to be defined before mesh data sections. 
+* Fixed bug in FESlidingInterface when using higher-order elements. 
+* Added PK1 stress plot variable.
+* Fixed error in description of muscle material.
+* Updated User Manual to include description of parameters <emin> and <wmin> in reactive viscoelastic materials
+* Updated Theory and User Manuals to include a description of new relaxation functions implemented in FEBio and general theoretical background about continuous relaxation spectra
+* Cleaned up relaxation functions needed for reactive viscoelasticity (replaced double with ParamDouble for most of them).  Fixed Malkin relaxation function to employ two time constants tau1 and tau2. Fixed CSexp relaxation function to return 1 at t=0 without further calculations.
+* Removed ability to specify (weak) bond material as a scaled version of base (strong bond) material in reactive viscoelastic and uncoupled reactive viscoelastic, because of initialization conflicts. Removed constraint on specifying solid mixtures in both base and bond materials, now that a material point data array is used to distinguish material points of base and bond materials.
+* Cleaned up reactive viscoelastic material implementation, using material point array to differentiate base and bond materials.  Fixed small bug introduced in last commit.
+* Added missing CreateMaterialPointData function for FEContinuousFiberDistribution.
+* Added modified Bessel functions of the first and second kind, of orders 0 and 1.
+* Fixed issues with tri10 surface facets.
+* Added new reduced relaxation functions for reactive viscoelasticity (Malkin, Malkin-dist-user, CSexp, CSexp-dist-user). Added plot variable for rate of deformation tensor in solids. Added plot variables for mass fraction of reforming bonds in reactive viscoelasticity, strain energy density of strong and weak bonds, and deviatoric strain energy density for strong and weak bonds. Added initialization functions for bond relaxation materials that employ FEFunction1D objects for user-specified functions. Updated reactive viscoelasticity framework to reset fiber orientation of each weak bond generation based on fiber configuration at start of generation; created FEFiberMaterialPoint to store fiber pre-stretch tensor; updated continuous fiber distribution materials to set/reset fiber prestretch. Updated initialization of solid mixtures and uncoupled solid mixtures to prevent specification of mixture of mixtures. Modified FiberExpPowUncoupled to be consistent with FiberExpPow. Cleaned up reactive viscoelasticity materials to (a) update specialized material points in situ instead of within FEReactiveVEMaterialPoint; (b) prevent the specification of more than one mixture in these materials; (c) allow the weak bond material to be a scaled function of the elastic bond material (optional); (d) evaluate relaxation function using state of total strain at genesis time of weak bond generation (instead of relative strain); (e) properly set/reset fiber prestretch when applicable. Introduced FEScaledElasticMaterial and FEScaledUncoupledMaterial to allow item (c) in preceding sentence. Updated FETransIsoMooneyRivlin and FETransIsoVerondaWestmann fiber stress calculations to use public functions only.
+* Implemented symbolic derivative of pow.
+* Remove positivity constraint on Poisson's ratio v12 in "orthotropic elastic" material.
+* Fixed implementation of "fluid flow rate" plot variable for biphasic mixtures.
+* Added guidance section for dynamic problems to user manual.
+* Added error check for FERigidBodyFixedBC.
+* Fixed uninitialized member variable in FEMinMaxFilterAdaptorCriterion.
+* Fixed bug in coupled-trans-iso tangent and strain-energy-density calculation.
+* Added ramp parameter to FEConstPrestrainGradient.
+* Fixed issue with reading FEFunction1D object through loadcurves.
+* Added description of fiber exp-linear fiber models to user manual.
+* Fixed issue with reading nodedata when node set is defined implicitly via surface.
+* Added support for exporting vec3d mapped nodal data to plot file.
+* Plot stride now also respected when using FE_PLOT_USER1 plot level.
+* Updated User Manual to include description of pyra13 elements
+* Made some repairs to the CG-solid solver.
+* Minor edits to continuous damage section.
+* Added plot variable for "rate of deformation"
+* Added force and displacement norm to output for explicit solver.
+* Updated documentation on continuous damage formulation.
+* Added some documentation for homogenization.
+* Added new "D2beta" plot variable.
+* Param run now uses FEDataParameter for output variable. Added support for special domain log data that evaluates average and percentile of element data.
+* Implemented contact area for tied-elastic.
+* Implemented contact force for tied-elastic interface.
+* Refactored linear constraints. Added support for setting a loadcurve to the child dof's value parameter.
+* Cleaned up continuous elastic damage formulation.
+* Added PK2 stress log variables.
+* Added ':' as valid character for xml tag name.
+* Added '-' as valid character for xml tag name.
+* Fixed issue with beta plot variable and added psi0 plot variable for damage elastic fiber materials.
+* Fixed issue where incorrect termination status was reported.
+* Fixed HYPRE_Int typing issue in BoomerAMG function calls caused by recent change.
+* ́Added new bond relaxation function called relaxation-exp-pow, for reactive viscoelasticity.
+* Added SetResetFlag to FESBMPointSource.
+* Allow parameter optimization on the y value of vec2d parameters. This can be used to optimize individual points in the load curve description of a material response.
+* Fixed issue with output on CB_USER1 event.
+* Added CB_USER1 callback event, and FE_PLOT_USER1 plot option.
+* Added new parameter run feature, which allows users to run a model and set model parameters and output variables in separate input file.
+* Modified BoomerAMG function calls to re-type arguments
+* The RVE model now follows time stepping of macro model.
+* The micro material now uses RCI for solving RVEs.
+* Implemented RCI (Reverse Control Interface) for solving FE model.
+* Added additional check in FEVecPropertyT::SetProperty to make sure the correct class is allocated.
+* Made cp parameter of FEOgdenUnconstrained a mapped variable.
+* Added position of rigid bodies to default output for plot object.
+* Made coefficient parameters of Ogden materials variable. (issue #33)
+* Added mechanism for copying materials that have additional properties.
+* Added parameter to FECoreKernel::RegisterDomain to push a domain factory to the front of the list.
+* Added new bond relaxation models for reactive viscoelasticity (relaxation-exp-dist-user, relaxation-Park-dist-user, relaxation-power-dist-user). Fixed reactive viscoelastic materials by making them frame-invariant. Improved method of updating generations during iterative solution process. Fixed strain-dependent relaxation functions to depend on strain only at time of bond breaking. Added plot variables to save strain energy density in strong and weak bonds of reactive and uncoupled reactive viscoelastic materials.
+* Updated Theory and User manuals to version 3.5.1
+* Fixed initialization of newly introduced Prony bond relaxation function. Modified culling method in reactive viscoelasticity to prevent reduction in maximum number of generations. Added strain threshold for triggering new generation in reactive viscoelasticity.
+* Added reduced relaxation function for Prony series (can be used with reactive viscoelastic materials). Added safeguard in calculation of Fung relaxation function to prevent small negative values. Added plot variable for counting number of generations in reactive viscoelastic materials.
+* Improved method for culling generations in reactive viscoelastic materials.
+
+===========================================================================
+
  R E L E A S E   3.5.1   9/28/2021
 
 ===========================================================================
