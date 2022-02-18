@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +30,34 @@ SOFTWARE.*/
 #include "FEReactiveVEMaterialPoint.h"
 #include "FEElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
+FEReactiveViscoelasticMaterialPoint::FEReactiveViscoelasticMaterialPoint() : FEMaterialPointArray(new FEElasticMaterialPoint)
+{
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEReactiveViscoelasticMaterialPoint::Copy()
+{
+    FEReactiveViscoelasticMaterialPoint* pt = new FEReactiveViscoelasticMaterialPoint;
+    pt->m_mp = m_mp;
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEReactiveViscoelasticMaterialPoint::Init()
+{
+    // don't forget to initialize the base class
+    FEMaterialPointArray::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEReactiveViscoelasticMaterialPoint::Serialize(DumpStream& ar)
+{
+    FEMaterialPointArray::Serialize(ar);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FEReactiveVEMaterialPoint
@@ -49,45 +77,14 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 //! Initializes material point data.
 void FEReactiveVEMaterialPoint::Init()
 {
-	// initialize data to include first generation (initially intact bonds)
-    m_Fi.resize(1,mat3dd(1));
-    m_Ji.resize(1,1);
-    m_v.resize(1,0);
-    m_w.resize(1,1);
+	// initialize data to zero
+	m_Uv.clear();
+	m_Jv.clear();
+	m_v.clear();
+	m_f.clear();
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
-}
-
-//-----------------------------------------------------------------------------
-//! Update material point data.
-void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
-{
-    FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-
-	// check if the current deformation gradient is different from that of
-	// the last generation, in which case store the current state
-	if (m_pRve) {
-	    if (m_pRve->NewGeneration(*this)) {
-		    m_Fi.push_back(pt.m_F.inverse());
-	        m_Ji.push_back(1./pt.m_J);
-			m_v.push_back(timeInfo.currentTime);
-			double w = m_pRve->ReformingBondMassFraction(*this);
-			m_w.push_back(w);
-		}
-	}
-	else {
-		if (m_pRuc->NewGeneration(*this)) {
-			m_Fi.push_back(pt.m_F.inverse());
-			m_Ji.push_back(1./pt.m_J);
-			m_v.push_back(timeInfo.currentTime);
-			double w = m_pRuc->ReformingBondMassFraction(*this);
-			m_w.push_back(w);
-		}
-	}
-    
-    // don't forget to initialize the base class
-    FEMaterialPoint::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -98,18 +95,18 @@ void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
     
     if (ar.IsSaving())
     {
-        int n = (int)m_Fi.size();
+        int n = (int)m_Uv.size();
         ar << n;
-        for (int i=0; i<n; ++i) ar << m_Fi[i] << m_Ji[i] << m_v[i] << m_w[i];
+        for (int i=0; i<n; ++i) ar << m_Uv[i] << m_Jv[i] << m_v[i] << m_f[i];
     }
     else
     {
         int n;
         ar >> n;
-		m_Fi.resize(n);
-		m_Ji.resize(n);
+		m_Uv.resize(n);
+		m_Jv.resize(n);
 		m_v.resize(n);
-		m_w.resize(n);
-        for (int i=0; i<n; ++i) ar >> m_Fi[i] >> m_Ji[i] >> m_v[i] >> m_w[i];
+		m_f.resize(n);
+        for (int i=0; i<n; ++i) ar >> m_Uv[i] >> m_Jv[i] >> m_v[i] >> m_f[i];
     }
 }

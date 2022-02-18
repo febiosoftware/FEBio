@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,8 +57,15 @@ bool FEModelParameter::Init()
 		return false;
 	}
 
-	// see if it's the correct type
-	if (val.type() != FE_PARAM_DOUBLE)
+    // see if it's the correct type
+    if (val.type() == FE_PARAM_VEC2D) {
+        // make sure we have a valid data pointer
+        vec2d* vd = (vec2d*) val.data_ptr();
+        // store the pointer to the parameter
+        m_pd = &vd->y();
+        return true;
+    }
+	else if (val.type() != FE_PARAM_DOUBLE)
 	{
 		feLogError("Invalid parameter type for parameter %s", name.c_str());
 		return false;

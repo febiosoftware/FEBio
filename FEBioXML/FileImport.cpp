@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1091,7 +1091,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 
 					// HACK for mapping load curves to FEFunction1D
 					const char* szlc = tag.AttributeValue("lc", true);
-					if (szlc && (tag.m_natt == 1) && (tag == "force"))
+					if (szlc && (tag.m_natt == 1) && (prop->GetClassID() == FEFUNCTION1D_ID))
 					{
 						double v = 1;
 						tag.value(v);

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,26 +36,32 @@ using namespace std;
 class FECORE_API FELinearConstraint : public FEModelComponent
 {
 public:
-	class DOF
+	class DOF : public FEParamContainer
 	{
 	public:
-		DOF()
-		{
-			node = dof = -1;
-			val = 0.0;
-		}
+		DOF();
 
 	public:
 		int		node;	// node number
 		int		dof;	// degree of freedom
 		double	val;	// coefficient value (ignored for parent dof)
+
+	private:
+		DOF(const DOF&) {}
+		void operator = (const DOF&) {}
 	};
+
+	typedef vector<DOF*>::iterator dof_iterator;
 
 public:
 	// constructors
 	FELinearConstraint();
 	FELinearConstraint(FEModel* pfem);
 	FELinearConstraint(const FELinearConstraint& LC);
+
+	~FELinearConstraint();
+
+	void Clear();
 
 	// copy data
 	void CopyFrom(const FELinearConstraint& LC);
@@ -72,15 +78,32 @@ public:
 
 	// set the parent degree of freedom
 	void SetParentDof(int dof, int node);
+	void SetParentNode(int node);
+	void SetParentDof(int dof);
+
+	// get the parent dof
+	int GetParentDof() const;
+	int GetParentNode() const;
 
 	// add a child degree of freedom
 	void AddChildDof(int dof, int node, double v);
+	void AddChildDof(FELinearConstraint::DOF* dof);
 
 	// set the linear constraint offset
 	void SetOffset(double d) { m_off = d; }
 
-public:
-	DOF			m_parentDof;	// parent degree of freedom
-	vector<DOF>	m_childDof;		// list of child dofs
-	double		m_off;			// offset value
+	// return offset
+	double GetOffset() const;
+
+	// get the child DOF
+	const DOF& GetChildDof(int n) const;
+
+	size_t Size() const;
+
+	dof_iterator begin();
+
+protected:
+	DOF*			m_parentDof;	// parent degree of freedom
+	vector<DOF*>	m_childDof;		// list of child dofs
+	double			m_off;			// offset value
 };

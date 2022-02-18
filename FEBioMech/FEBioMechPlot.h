@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -277,15 +277,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element norm for G
-class FEPlotElementGnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementGnorm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Element stresses
 class FEPlotElementStress : public FEPlotDomainData
 {
@@ -300,6 +291,15 @@ class FEPlotElementPK2Stress : public FEPlotDomainData
 {
 public:
 	FEPlotElementPK2Stress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element stresses
+class FEPlotElementPK1Stress : public FEPlotDomainData
+{
+public:
+	FEPlotElementPK1Stress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -330,33 +330,6 @@ class FEPlotElementsnorm : public FEPlotDomainData
 {
 public:
 	FEPlotElementsnorm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK1 stress
-class FEPlotElementPK1norm : public FEPlotDomainData
-{
-public:
-	FEPlotElementPK1norm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK1 stress moment
-class FEPlotElementQK1norm : public FEPlotDomainData
-{
-public:
-	FEPlotElementQK1norm(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element micro energy
-class FEPlotElementMicroEnergy : public FEPlotDomainData
-{
-public:
-	FEPlotElementMicroEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -875,6 +848,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Rate of deformation
+class FEPlotRateOfDeformation : public FEPlotDomainData
+{
+public:
+    FEPlotRateOfDeformation(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Rigid body reaction force
 class FEPlotRigidReactionForce : public FEPlotDomainData
 {
@@ -994,18 +976,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEPlotContinuousDamage : public FEPlotDomainData
-{
-public:
-	FEPlotContinuousDamage(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a) override;
-	bool SetFilter(const char* sz) override;
-private:
-	std::string	m_prop;
-	int			m_propIndex;
-};
-
-//-----------------------------------------------------------------------------
 class FEPlotContinuousDamage_ : public FEPlotDomainData
 {
 public:
@@ -1018,54 +988,96 @@ private:
 	int			m_comp;
 };
 
-class FEPlotContinuousDamage_1 : public FEPlotContinuousDamage_ {
-	public: FEPlotContinuousDamage_1(FEModel* fem) : FEPlotContinuousDamage_(fem, 0) {}
+class FEPlotContinuousDamage_D : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D(FEModel* fem) : FEPlotContinuousDamage_(fem, 0) {}
 };
 
-class FEPlotContinuousDamage_2 : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_2(FEModel* fem) : FEPlotContinuousDamage_(fem, 1) {}
-};
-
-class FEPlotContinuousDamage_3 : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_3(FEModel* fem) : FEPlotContinuousDamage_(fem, 2) {}
-};
-
-class FEPlotContinuousDamage_P : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_P(FEModel* fem) : FEPlotContinuousDamage_(fem, 3) {}
-};
-
-class FEPlotContinuousDamage_D3s : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_D3s(FEModel* fem) : FEPlotContinuousDamage_(fem, 4) {}
+class FEPlotContinuousDamage_D1 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D1(FEModel* fem) : FEPlotContinuousDamage_(fem, 1) {}
 };
 
 class FEPlotContinuousDamage_Ds : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_Ds(FEModel* fem) : FEPlotContinuousDamage_(fem, 5) {}
+public: FEPlotContinuousDamage_Ds(FEModel* fem) : FEPlotContinuousDamage_(fem, 2) {}
 };
 
-class FEPlotContinuousDamage_D2s : public FEPlotContinuousDamage_ {
-public: FEPlotContinuousDamage_D2s(FEModel* fem) : FEPlotContinuousDamage_(fem, 6) {}
+class FEPlotContinuousDamage_D2 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D2(FEModel* fem) : FEPlotContinuousDamage_(fem, 3) {}
+};
+
+class FEPlotContinuousDamage_D3 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D3(FEModel* fem) : FEPlotContinuousDamage_(fem, 4) {}
+};
+
+class FEPlotContinuousDamage_P : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_P(FEModel* fem) : FEPlotContinuousDamage_(fem, 5) {}
+};
+
+class FEPlotContinuousDamage_Psi0 : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_Psi0(FEModel* fem) : FEPlotContinuousDamage_(fem, 6) {}
+};
+
+class FEPlotContinuousDamage_beta : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_beta(FEModel* fem) : FEPlotContinuousDamage_(fem, 7) {}
+};
+
+class FEPlotContinuousDamage_gamma : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_gamma(FEModel* fem) : FEPlotContinuousDamage_(fem, 8) {}
+};
+
+class FEPlotContinuousDamage_D2beta : public FEPlotContinuousDamage_ {
+public: FEPlotContinuousDamage_D2beta(FEModel* fem) : FEPlotContinuousDamage_(fem, 9) {}
 };
 
 //-----------------------------------------------------------------------------
-class FEPlotContinuousDamageBeta : public FEPlotDomainData
+//! Number of generations in reactive viscoelastic material point
+class FEPlotRVEgenerations : public FEPlotDomainData
 {
 public:
-	FEPlotContinuousDamageBeta(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a) override;
-	bool SetFilter(const char* sz) override;
-private:
-	std::string	m_prop;
-	int			m_propIndex;
+    FEPlotRVEgenerations(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
-class FEPlotContinuousDamageGamma : public FEPlotDomainData
+//! Reforming bond mass fraction in reactive viscoelastic material point
+class FEPlotRVEbonds : public FEPlotDomainData
 {
 public:
-	FEPlotContinuousDamageGamma(FEModel* fem);
-	bool Save(FEDomain& dom, FEDataStream& a) override;
-	bool SetFilter(const char* sz) override;
-private:
-	std::string	m_prop;
-	int			m_propIndex;
+    FEPlotRVEbonds(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of strong bonds in reactive viscoelastic material point
+class FEPlotStrongBondSED : public FEPlotDomainData
+{
+public:
+    FEPlotStrongBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of weak bonds in reactive viscoelastic material point
+class FEPlotWeakBondSED : public FEPlotDomainData
+{
+public:
+    FEPlotWeakBondSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of strong bonds in reactive viscoelastic material point
+class FEPlotStrongBondDevSED : public FEPlotDomainData
+{
+public:
+    FEPlotStrongBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy density of weak bonds in reactive viscoelastic material point
+class FEPlotWeakBondDevSED : public FEPlotDomainData
+{
+public:
+    FEPlotWeakBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
 };

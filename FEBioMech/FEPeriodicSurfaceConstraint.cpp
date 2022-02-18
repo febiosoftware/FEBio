@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -240,11 +240,10 @@ void FEPeriodicSurfaceConstraint::Activate()
 void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurface& ss, FEPeriodicSurfaceConstraintSurface& ms, bool bmove)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
-	np.SetSearchRadius(R);
+	np.SetSearchRadius(m_srad);
 	np.Init();
 
 	int i;

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -390,6 +390,22 @@ bool FECoreBase::SetProperty(int i, FECoreBase* pb)
 	if (pm->IsType(pb))
 	{
 		pm->SetProperty(pb);
+		if (pb) pb->SetParent(this);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a property via name
+bool FECoreBase::SetProperty(const char* sz, FECoreBase* pb)
+{
+	FEProperty* prop = FindProperty(sz);
+	if (prop == nullptr) return false;
+
+	if (prop->IsType(pb))
+	{
+		prop->SetProperty(pb);
 		if (pb) pb->SetParent(this);
 		return true;
 	}

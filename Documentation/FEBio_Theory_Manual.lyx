@@ -179,11 +179,11 @@ status open
 
 
 \series default
-Theory Manual Version 3.5 
+Theory Manual Version 3.6 
 \end_layout
 
 \begin_layout Date
-Last Updated: August 30, 2021
+Last Updated: February 17, 2022
 \end_layout
 
 \begin_layout Paragraph*
@@ -2835,7 +2835,7 @@ literal "true"
  becomes 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}=2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+pJ\mathbf{C}^{-1}\,,\label{eq78}
+\mathbf{S}=2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+pJ\mathbf{C}^{-1}\,,\label{eq:UC-PK2}
 \end{equation}
 
 \end_inset
@@ -2860,7 +2860,7 @@ is the deviatoric strain energy function and
  has the advantage that equation 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq78"
+reference "eq:UC-PK2"
 
 \end_inset
 
@@ -2888,7 +2888,7 @@ ble hyperelasticity is simplified by adding a volumetric energy component
 : 
 \begin_inset Formula 
 \begin{equation}
-\Psi\left(\mathbf{C}\right)=\tilde{\Psi}\left(\mathbf{C}\right)+U\left(J\right)\,.\label{eq79}
+\Psi\left(\mathbf{C}\right)=\tilde{\Psi}\left(\mathbf{C}\right)+U\left(J\right)\,.\label{eq:UC-SED}
 \end{equation}
 
 \end_inset
@@ -2896,7 +2896,7 @@ ble hyperelasticity is simplified by adding a volumetric energy component
 The second Piola-Kirchhoff tensor for a material defined by 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq79"
+reference "eq:UC-SED"
 
 \end_inset
 
@@ -2915,7 +2915,7 @@ reference "eq64"
  & =2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+2\frac{dU}{dJ}\frac{\partial J}{\partial C}\\
  & =2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+pJ\mathbf{C}^{-1}
 \end{aligned}
-\,,\label{eq80}
+\,,\label{eq:UC-PK2-redux}
 \end{equation}
 
 \end_inset
@@ -2927,7 +2927,7 @@ where the pressure
  is defined as 
 \begin_inset Formula 
 \begin{equation}
-p=\frac{dU}{dJ}\,.\label{eq81}
+p=\frac{dU}{dJ}\,.\label{eq:UC-p}
 \end{equation}
 
 \end_inset
@@ -2940,7 +2940,7 @@ An example for
  
 \begin_inset Formula 
 \begin{equation}
-U\left(J\right)=\frac{1}{2}\kappa\left(\ln J\right)^{2}\,.\label{eq82}
+U\left(J\right)=\frac{1}{2}\kappa\left(\ln J\right)^{2}\,.\label{eq:UC-U-exa}
 \end{equation}
 
 \end_inset
@@ -2960,7 +2960,7 @@ The parameter
  function in the form of 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq79"
+reference "eq:UC-SED"
 
 \end_inset
 
@@ -2968,14 +2968,14 @@ reference "eq79"
  In the case where the dilatational energy is given by 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq82"
+reference "eq:UC-U-exa"
 
 \end_inset
 
 , the pressure is 
 \begin_inset Formula 
 \begin{equation}
-p=\kappa\frac{\ln J}{J}\,.\label{eq83}
+p=\kappa\frac{\ln J}{J}\,.\label{eq:UC-p-exa}
 \end{equation}
 
 \end_inset
@@ -2983,7 +2983,7 @@ p=\kappa\frac{\ln J}{J}\,.\label{eq83}
 Equation 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq80"
+reference "eq:UC-PK2-redux"
 
 \end_inset
 
@@ -2991,7 +2991,7 @@ reference "eq80"
  
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}=pJ\mathbf{C}^{-1}+J^{-2/3}\dev\tilde{\mathbf{S}}\,,\label{eq84}
+\mathbf{S}=pJ\mathbf{C}^{-1}+J^{-2/3}\dev\tilde{\mathbf{S}}\,,\label{eq:UC-PK2-redux2}
 \end{equation}
 
 \end_inset
@@ -3011,7 +3011,7 @@ literal "true"
  is defined by, 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\mathbf{S}}=2\frac{\partial\tilde{\Psi}}{\partial\tilde{\mathbf{C}}}\,,\label{eq85}
+\tilde{\mathbf{S}}=2\frac{\partial\tilde{\Psi}}{\partial\tilde{\mathbf{C}}}\,,\label{eq:UC-PK2-tilde}
 \end{equation}
 
 \end_inset
@@ -3023,7 +3023,7 @@ and
  is the deviator operator in the reference frame: 
 \begin_inset Formula 
 \begin{equation}
-\Dev\left(\cdot\right)=\left(\cdot\right)-\frac{1}{3}\left(\left(\cdot\right):\mathbf{C}\right)\mathbf{C}^{-1}.\label{eq86}
+\Dev\left(\cdot\right)=\left(\cdot\right)-\frac{1}{3}\left(\left(\cdot\right):\mathbf{C}\right)\mathbf{C}^{-1}.\label{eq:UC-Dev}
 \end{equation}
 
 \end_inset
@@ -3042,7 +3042,7 @@ reference "eq52"
 : 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}=p\mathbf{I}+\dev\tilde{\boldsymbol{\sigma}}\,,\label{eq87}
+\boldsymbol{\sigma}=p\mathbf{I}+\dev\tilde{\boldsymbol{\sigma}}\,,\label{eq:UC-Cauchy-stress}
 \end{equation}
 
 \end_inset
@@ -3050,7 +3050,7 @@ reference "eq52"
 where 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\boldsymbol{\sigma}}=\frac{2}{J}\mathbf{\tilde{F}}\cdot\frac{\partial\tilde{\Psi}}{\partial\mathbf{\tilde{C}}}\cdot\mathbf{\tilde{F}}^{T}\,.\label{eq88}
+\tilde{\boldsymbol{\sigma}}=\frac{2}{J}\mathbf{\tilde{F}}\cdot\frac{\partial\tilde{\Psi}}{\partial\mathbf{\tilde{C}}}\cdot\mathbf{\tilde{F}}^{T}\,.\label{eq:UC-Cauchy-stress-tilde}
 \end{equation}
 
 \end_inset
@@ -3127,7 +3127,7 @@ The spatial elasticity tensor follows from
  & -\frac{2}{3}\left(\dev\tilde{\boldsymbol{\sigma}}\otimes\mathbf{I}+\mathbf{I}\otimes\dev\tilde{\boldsymbol{\sigma}}\right)\\
  & +\frac{2}{3}\left(\tilde{\boldsymbol{\sigma}}:\mathbf{I}\right)\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)+\hat{\mathcal{\boldsymbol{C}}}
 \end{aligned}
-\,,\label{eq93}
+\,,\label{eq:UC-spatial-elasticity}
 \end{equation}
 
 \end_inset
@@ -3136,9 +3136,10 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\hat{\mathcal{C}}_{ijkl} & =\frac{1}{J}\tilde{F}_{iI}\tilde{F}_{jJ}\tilde{F}_{kK}\tilde{F}_{lL}\hat{\mathcal{\mathbb{C}}}_{IJKL}\\
-\hat{\boldsymbol{\mathcal{C}}} & =\frac{1}{J}\left(\tilde{\mathbf{F}}\oslash\tilde{\mathbf{F}}\right):\hat{\boldsymbol{\mathbb{C}}}:\left(\tilde{\mathbf{F}}^{T}\oslash\tilde{\mathbf{F}}^{T}\right)
+\hat{\boldsymbol{\mathcal{C}}} & =\frac{1}{J}\left(\tilde{\mathbf{F}}\oslash\tilde{\mathbf{F}}\right):\hat{\boldsymbol{\mathbb{C}}}:\left(\tilde{\mathbf{F}}^{T}\oslash\tilde{\mathbf{F}}^{T}\right)\\
+ & =\tilde{\boldsymbol{\mathcal{C}}}-\frac{1}{3}\left(\mathbf{I}\otimes\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}+\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\otimes\mathbf{I}\right)+\frac{1}{9}\left(\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\right)\mathbf{I}\otimes\mathbf{I}
 \end{aligned}
-\,.\label{eq94}
+\,.\label{eq:UC-spatial-elasticity-hat}
 \end{equation}
 
 \end_inset
@@ -3320,6 +3321,209 @@ literal "true"
  the general case, it also embodies almost all of the material behavior
  that one would expect from transversely isotropic, large deformation matrix-fib
 er composites.
+\end_layout
+
+\begin_layout Subsection
+Tension-Bearing Fiber Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tension-Bearing-Fiber-Materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In biomechanics we often find it convenient to model fibrous or fibrillar
+ materials using one-dimensional fibers that can only sustain tension.
+ Typically, such fibers are represented with a strain energy density function
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}\left(\mathbf{C}\right)=H\left(I_{n}-1\right)\Psi_{n}\left(I_{n}\right)\,,\quad I_{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}\label{eq:fiber-model}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the unit vector along the fiber in its reference configuration, and
+ 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the square of the stretch ratio along the fiber.
+ The Heaviside unit step function 
+\begin_inset Formula $H\left(I_{n}-1\right)$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fiber-model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ ensures that the fiber contributes strain energy only when it is under
+ tension (
+\begin_inset Formula $I_{n}>1$
+\end_inset
+
+); thus, the constitutive model 
+\begin_inset Formula $\Psi_{n}\left(I_{n}\right)$
+\end_inset
+
+ for the tensile response of the fiber must reduce to zero when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using the hyperelasticity relations presented above, the Cauchy stress in
+ this fiber material can be evaluated as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=H\left(I_{n}-1\right)2J^{-1}\frac{d\Psi_{n}}{dI_{n}}\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\,,\label{eq:fiber-stress}
+\end{equation}
+
+\end_inset
+
+and the spatial elasticity tensor is
+\begin_inset Formula 
+\begin{equation}
+\mathcal{C}=4J^{-1}\frac{d^{2}\Psi_{n}}{dI_{n}^{2}}\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\otimes\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)\,.\label{eq:fiber-elasticity}
+\end{equation}
+
+\end_inset
+
+If we denote the unit vector along the fiber in the current configuration
+ as 
+\begin_inset Formula $\mathbf{n}\equiv I_{n}^{-1/2}\mathbf{F}\cdot\mathbf{n}_{r}$
+\end_inset
+
+, the above expressions may be rewritten as 
+\begin_inset Formula $\boldsymbol{\sigma}=H\left(I_{n}-1\right)2J^{-1}I_{n}\Psi_{n}^{\prime}\left(I_{n}\right)\mathbf{n}\otimes\mathbf{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{C}=4J^{-1}I_{n}^{2}\Psi_{n}^{\prime\prime}\left(I_{n}\right)\mathbf{n}\otimes\mathbf{n}\otimes\mathbf{n}\otimes\mathbf{n}$
+\end_inset
+
+.
+ As explained in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian07a"
+literal "false"
+
+\end_inset
+
+, these fiber models must be combined with a ground matrix in order to produce
+ a stable material response.
+ In FEBio this can be done by using a constrained mixture of solid constituents
+ (for example, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Simple-Solid-Mixtures"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+In the classical fiber mechanics literature it was suggested that uncoupled
+ fiber formulations could also be implemented, whereby 
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}\left(\mathbf{C}\right)=H\left(\tilde{I}_{n}-1\right)\tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)+U\left(J\right)\,,\quad\tilde{I}_{n}=\mathbf{n}_{r}\cdot\tilde{\mathbf{C}}\cdot\mathbf{n}_{r}\,,\label{eq:fiber-model-UC}
+\end{equation}
+
+\end_inset
+
+and the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is given by Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-Cauchy-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}=H\left(\tilde{I}_{n}-1\right)2J^{-1}\frac{d\tilde{\Psi}_{n}}{d\tilde{I}_{n}}\left(\tilde{\mathbf{F}}\cdot\mathbf{n}_{r}\right)\otimes\left(\tilde{\mathbf{F}}\cdot\mathbf{n}_{r}\right)\,.\label{eq:fiber-stress-UC}
+\end{equation}
+
+\end_inset
+
+Uncoupled fiber formulations of this kind are available in FEBio.
+ More recently however, several studies have demonstrated that using 
+\begin_inset Formula $H\left(\tilde{I}_{n}-1\right)$
+\end_inset
+
+ to detect whether a fiber is in tension or compression is non-physical,
+ since 
+\begin_inset Formula $\tilde{I}_{n}\ne I_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the sole true measure of the tensile stretch in the fiber 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Sansour08,Helfenstein10,Gultekin19"
+literal "false"
+
+\end_inset
+
+.
+ Therefore, uncoupled fiber formulations have fallen out of favor, even
+ though FEBio still allows users to employ these for historical reasons.
+ It is now recommended to use the standard (unconstrained) fiber models,
+ also available in FEBio, with the formulation given in Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fiber-model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fiber-elasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, even when the ground matrix uses an uncoupled formulation.
 \end_layout
 
 \begin_layout Standard
@@ -11652,6 +11856,136 @@ D\left(\delta W_{\text{ext}}^{b}\right)\left[\Delta p\right] & =0\,.
 \end_layout
 
 \begin_layout Subsection
+Stabilization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Biphasic-Stabilization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finite element models of deformable porous media are known to exhibit oscillatio
+ns in fluid pressure caused by relatively coarse meshes near free-draining
+ boundaries, where a boundary layer in fluid pressure normally forms during
+ the early time response to loading.
+ These spurious oscillations typically occur when the mesh is not able to
+ resolve this boundary layer.
+ Stabilization methods serve as an alternative to mesh refinement, when
+ the latter is not feasible or practical.
+ In FEBio we have implemented a stabilization method based on the work of
+ Aguilar et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Aguilar08"
+literal "false"
+
+\end_inset
+
+.
+ Basically, this method proposes that the fluid flux 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\mathbf{w}=-\mathbf{k}\cdot\grad\left(p+\tau\dot{p}\right)\label{eq:stab-fluid-flux}
+\end{equation}
+
+\end_inset
+
+instead of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq107"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where 
+\begin_inset Formula $\tau$
+\end_inset
+
+ represents the stabilization parameter.
+ A representative value for 
+\begin_inset Formula $\tau$
+\end_inset
+
+ may be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\tau\approx\frac{h^{2}}{E\cdot k}\,,\label{eq:stab-tau}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $h$
+\end_inset
+
+ is the element thickness on the free-draining boundary, 
+\begin_inset Formula $E$
+\end_inset
+
+ is a representative measure of the solid matrix elastic modulus and 
+\begin_inset Formula $k$
+\end_inset
+
+ is a representative measure of the hydraulic permeability tensor 
+\begin_inset Formula $\mathbf{k}$
+\end_inset
+
+.
+ The contribution of this form of 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ to the virtual work expression in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq194"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G & =\int_{b}\mathbf{w}\cdot\grad\delta p\,dv\\
+ & =-\int_{b}\grad\delta p\cdot\mathbf{k}\cdot\grad\left(p+\tau\dot{p}\right)\,dv
+\end{aligned}
+\,.\label{eq:stab-virtual-work}
+\end{equation}
+
+\end_inset
+
+The linearizations of 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ are then given by
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =-\int_{b}\grad\delta p\cdot\left(\boldsymbol{\mathcal{K}}:\Delta\boldsymbol{\varepsilon}\right)\cdot\grad\left(p+\tau\dot{p}\right)\,dv\\
+D\delta G\left[\Delta p\right] & =-\int_{b}\left(1+\frac{\tau}{\Delta t}\right)\grad\delta p\cdot\mathbf{k}\cdot\grad\Delta p\,dv
+\end{aligned}
+\,.\label{eq:stab-linearization}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Discretization
 \begin_inset CommandInset label
 LatexCommand label
@@ -11862,6 +12196,21 @@ literal "true"
 \end_inset
 
 .
+ Contributions from the stabilization method presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "subsec:Biphasic-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be similarly evaluated.
 \end_layout
 
 \begin_layout Standard
@@ -30515,6 +30864,114 @@ where
 .
 \end_layout
 
+\begin_layout Subsection
+Holmes-Mow Uncoupled
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Holmes-Mow-Uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The uncoupled hyperelastic strain-energy function for this material is given
+ by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Holmes90"
+literal "true"
+
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\Psi\left(\mathbf{C}\right)=\tilde{\Psi}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)\,,\label{eq:HMU-SED}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\tilde{\Psi}\left(\tilde{\mathbf{C}}\right)=\frac{1}{2}\frac{\mu}{\beta}\left(e^{\tilde{Q}}-1\right)\,,\label{eq:HMU-DSED}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\tilde{Q}=\beta\left(\tilde{I}_{1}-3\right)\,.\label{eq:HMU-Q}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the shear modulus and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is the exponential nonlinearity coefficient.
+ The corresponding spatial stress and elasticity tensors are
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}=\frac{\mu}{J}e^{\tilde{Q}}\tilde{\mathbf{b}}\,,\label{eq:HMU-stress}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\mathcal{C}}}=2\beta\frac{\mu}{J}e^{\tilde{Q}}\tilde{\mathbf{b}}\otimes\tilde{\mathbf{b}}\label{eq:HMU-elasticity}
+\end{equation}
+
+\end_inset
+
+respectively.
+ Note that 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}$
+\end_inset
+
+ does not reduce to zero when 
+\begin_inset Formula $\tilde{\mathbf{b}}=\mathbf{I}$
+\end_inset
+
+, but 
+\begin_inset Formula $\dev\tilde{\boldsymbol{\sigma}}$
+\end_inset
+
+ does.
+ These expressions can be substituted into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-Cauchy-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-spatial-elasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to evaluate the final expressions for the Cauchy stress and spatial elasticity
+ tensors, respectively.
+\end_layout
+
 \begin_layout Section
 Viscoelasticity
 \begin_inset CommandInset label
@@ -30812,19 +31269,28 @@ generation weak bonds relative to their reference configuration
 , which may be evaluated from the chain rule, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\mathbf{F}\left(\mathbf{X},u\right)\,.\label{eq492}
+\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\mathbf{U}\left(\mathbf{X},u\right)\,,\label{eq492}
 \end{equation}
 
 \end_inset
 
-The strain energy density 
+where 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is the right-stretch tensor of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ The strain energy density 
 \begin_inset Formula $\Psi_{r}$
 \end_inset
 
  in a reactive viscoelastic material is given by 
 \begin_inset Formula 
 \begin{equation}
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}J^{us}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq493}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq493}
 \end{equation}
 
 \end_inset
@@ -30839,25 +31305,6 @@ where
 
  is the strain energy density of weak bonds, when they all belong to the
  same generation.
- The scale factor 
-\begin_inset Formula $J^{us}$
-\end_inset
-
- emerges as explained in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Mixture-Free-Energy"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
  In this expression, 
 \begin_inset Formula $w^{u}\left(\mathbf{X},t\right)$
 \end_inset
@@ -30893,7 +31340,7 @@ noprefix "false"
  in a reactive viscoelastic material is similarly given by 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\boldsymbol{\sigma}^{e}\left(\mathbf{F}^{s}\right)+\sum\limits _{u}w^{u}\boldsymbol{\sigma}_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq494}
+\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\boldsymbol{\sigma}^{e}\left(\mathbf{F}^{s}\right)+\sum\limits _{u}w^{u}J^{-1}\left(u\right)\boldsymbol{\sigma}_{0}^{b}\left(\mathbf{F}^{u}\right)\,,\label{eq494}
 \end{equation}
 
 \end_inset
@@ -30924,7 +31371,7 @@ The mass fractions
  mixtures, 
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial w^{u}}{\partial t}=\hat{w}^{u}\left(\mathbf{F},w^{\gamma}\right)\,,\label{eq496}
+\dot{w}^{u}=\hat{w}^{u}\left(\mathbf{F},w^{\gamma}\right)\,,\label{eq496}
 \end{equation}
 
 \end_inset
@@ -30979,7 +31426,7 @@ generation bonds reforming in an unloaded state during the time interval
 w^{u}\left(\mathbf{X},t\right)=\begin{cases}
 0 & t<u\\
 f^{u}\left(\mathbf{X},t\right) & u\leqslant t<v\\
-f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
+f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
 \end{cases}\,,\label{eq498}
 \end{equation}
 
@@ -30994,7 +31441,7 @@ f^{u}\left(\mathbf{X},t\right)=1-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{
 \end_inset
 
 and 
-\begin_inset Formula $g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right)$
+\begin_inset Formula $g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right)$
 \end_inset
 
  is a reduced relaxation function which may assume any number of valid forms.
@@ -31018,15 +31465,15 @@ and
 \begin_inset Formula $g$
 \end_inset
 
- may depend on the strain at time 
+ may depend on the state of strain at time 
 \begin_inset Formula $v$
 \end_inset
 
- relative to the reference configuration of the 
+ when the 
 \begin_inset Formula $u-$
 \end_inset
 
-generation.
+generation starts breaking and reforming.
  In the recursive expression of Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -31047,7 +31494,7 @@ reference "eq498"
 \end_inset
 
  and 
-\begin_inset Formula $w^{u}\left(t\right)=g\left(\mathbf{F}^{u}\left(v\right);\mathbf{X},t-v\right)$
+\begin_inset Formula $w^{u}\left(t\right)=g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right)$
 \end_inset
 
  for 
@@ -31090,6 +31537,8 @@ For this type of bond kinetics, the reduced relaxation function
 \end_inset
 
 .
+ Thus, type II bond kinetics is only valid for quasilinear viscoelasticity,
+ whereas type I bond kinetics also encompasses nonlinear viscoelasticity.
 \end_layout
 
 \begin_layout Standard
@@ -31101,16 +31550,37 @@ For all bond kinetics, it is also possible to constrain the occurrence of
 
 \begin_layout Standard
 The finite element implementation of reactive viscoelasticity stores the
- value of 
-\begin_inset Formula $\mathbf{F}^{-1}\left(\mathbf{X},u\right)$
+ value of time 
+\begin_inset Formula $v$
 \end_inset
 
- every time that a bond-breaking deformation is detected; this value can
- be used to evaluate 
-\begin_inset Formula $\mathbf{F}^{u}\left(\mathbf{X},t\right)$
+, mass fraction of reformed bonds 
+\begin_inset Formula $f^{u}\left(\mathbf{X},v\right)$
 \end_inset
 
- using Eq.
+, and the right stretch tensor 
+\begin_inset Formula $\mathbf{U}\left(\mathbf{X},v\right)$
+\end_inset
+
+ needed to evaluate 
+\begin_inset Formula $w^{u}$
+\end_inset
+
+ in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq498"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}^{v}\left(\mathbf{X},t\right)$
+\end_inset
+
+ in Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq492"
@@ -31118,50 +31588,321 @@ reference "eq492"
 \end_inset
 
 .
- It also stores 
-\begin_inset Formula $w^{u}\left(\mathbf{X},v\right)=f^{u}\left(\mathbf{X},v\right)$
-\end_inset
+\end_layout
 
-, where 
-\begin_inset Formula $v$
-\end_inset
-
- is the time step immediately following 
-\begin_inset Formula $u$
-\end_inset
-
-, which is then used for evaluating 
-\begin_inset Formula $w^{u}$
-\end_inset
-
- for subsequent time steps 
-\begin_inset Formula $t>v$
-\end_inset
-
- when using Type I bond kinetics, using the expressions of Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq498"
+\begin_layout Subsection
+Reduced Relaxation Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Reduced-Relaxation-Functions"
 
 \end_inset
 
- and Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq499"
+
+\end_layout
+
+\begin_layout Standard
+Reduced relaxation functions are monotonically decreasing functions of time
+ 
+\begin_inset Formula $g\left(t\right)$
+\end_inset
+
+ that satisfy 
+\begin_inset Formula $g\left(0\right)=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\lim_{t\to\infty}g\left(t\right)=0$
+\end_inset
+
+.
+ Many different forms of reduced relaxation functions are available in FEBio,
+ given in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio User's Manual}}
+\end_layout
 
 \end_inset
 
 .
- These measures are then used to evaluate the stress from Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq494"
+ The simplest and most commonly used relaxation function is the exponential
+ function 
+\begin_inset Formula $g\left(t\right)=e^{-t/\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $\tau$
+\end_inset
+
+ is the relaxation constant.
+ In viscoelasticity theory it is common to use a combination of relaxation
+ functions with distinct relaxation constants 
+\begin_inset Formula $\tau_{i}$
+\end_inset
+
+, described as a Prony series of the form 
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\sum_{i}\gamma_{i}e^{-t/\tau_{i}}}{\sum_{i}\gamma_{i}}\,.\label{eq:rrf-Prony}
+\end{equation}
 
 \end_inset
 
-, with the summation taken over the time steps that correspond to bond-reforming
- generations.
+The coefficients 
+\begin_inset Formula $\gamma_{i}$
+\end_inset
+
+ are normalized by 
+\begin_inset Formula $\sum_{i}\gamma_{i}$
+\end_inset
+
+ to enforce 
+\begin_inset Formula $g\left(0\right)=1$
+\end_inset
+
+.
+ Alternatively, we could have written
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\sum_{i}\hat{\gamma}_{i}e^{-t/\tau_{i}}\,,\quad\sum_{i}\hat{\gamma}_{i}=1\,.\label{eq:rrf-Prony-alt}
+\end{equation}
+
+\end_inset
+
+This type of relaxation function 
+\begin_inset Formula $g\left(t\right)$
+\end_inset
+
+ is said to have a discrete spectrum of coefficients 
+\begin_inset Formula $\hat{\gamma}_{i}$
+\end_inset
+
+ corresponding to each 
+\begin_inset Formula $\tau_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is also possible to define a continuous relaxation spectrum 
+\begin_inset Formula $\hat{\gamma}\left(\tau\right)$
+\end_inset
+
+ such that the reduced relaxation function is given by
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\int_{0}^{\infty}\hat{\gamma}\left(\tau\right)e^{-t/\tau}\,d\tau\,.\label{eq:rrf-g-continuous-spectrum}
+\end{equation}
+
+\end_inset
+
+To satisfy 
+\begin_inset Formula $g\left(0\right)=1$
+\end_inset
+
+ the continous relaxation spectrum 
+\begin_inset Formula $\hat{\gamma}\left(\tau\right)$
+\end_inset
+
+ must satisfy
+\begin_inset Formula 
+\begin{equation}
+\int_{0}^{\infty}\hat{\gamma}\left(\tau\right)\,d\tau=1\,.\label{eq:rrf-continuous-spectrum-constraint}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, Fung 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Fung72"
+literal "false"
+
+\end_inset
+
+ proposed a relaxation spectrum of the form
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\begin{cases}
+\frac{1}{\ln\frac{\tau_{2}}{\tau_{1}}}\frac{1}{\tau} & \tau_{1}\le\tau\le\tau_{2}\\
+0 & \text{otherwise}
+\end{cases}\,.\label{eq:rrf-Fung-spectrum-72}
+\end{equation}
+
+\end_inset
+
+When substituted into Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-g-continuous-spectrum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ it produces
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\Gamma\left(0,\frac{t}{\tau_{2}}\right)-\Gamma\left(0,\frac{t}{\tau_{1}}\right)}{\ln\frac{\tau_{2}}{\tau_{1}}}=\frac{-\Ei\left(-\frac{t}{\tau_{2}}\right)+\Ei\left(-\frac{t}{\tau_{1}}\right)}{\ln\frac{\tau_{2}}{\tau_{1}}}\,,\label{eq:rrf-Fung-72}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Gamma\left(a,z\right)$
+\end_inset
+
+ is the incomplete gamma function and 
+\begin_inset Formula $\Ei\left(z\right)$
+\end_inset
+
+ is the exponential integral function, which satisfy 
+\begin_inset Formula $\Gamma\left(0,z\right)=-\Ei\left(-z\right)$
+\end_inset
+
+.
+ An alternative model proposed later by Fung 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Fung81"
+literal "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\begin{cases}
+\frac{1}{\tau_{2}-\tau_{1}} & \tau_{1}\le\tau\le\tau_{2}\\
+0 & \text{otherwise}
+\end{cases}\,,\label{eq:rrf-Fung-spectrum-81}
+\end{equation}
+
+\end_inset
+
+which produces
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\tau_{2}e^{-t/\tau_{2}}-\tau_{1}e^{-t/\tau_{1}}+t\left[\Ei\left(-\frac{t}{\tau_{2}}\right)-\Ei\left(-\frac{t}{\tau_{1}}\right)\right]}{\tau_{2}-\tau_{1}}\,.\label{eq:rrf-Fung-81}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generalization of Fung's earlier continuous relaxation spectrum may be
+ derived from the work of Malkin 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Malkin06"
+literal "false"
+
+\end_inset
+
+ who proposed to use a function proportional to 
+\begin_inset Formula $\tau^{-\beta}$
+\end_inset
+
+.
+ If we constrain this spectrum to the range 
+\begin_inset Formula $\tau_{1}\le\tau\le\tau_{2}$
+\end_inset
+
+ it takes the form
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\begin{cases}
+\frac{\beta-1}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\frac{1}{\tau^{\beta}} & \tau_{1}\le\tau\le\tau_{2}\\
+0 & \text{otherwise}
+\end{cases}\,.\label{eq:rrf-Malkin-spectrum}
+\end{equation}
+
+\end_inset
+
+When substituted into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-g-continuous-spectrum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ this continuous relaxation spectrum produces the reduced relaxation function
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=\frac{\left(\beta-1\right)t^{1-\beta}}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\left[\Gamma\left(\beta-1,\frac{t}{\tau_{2}}\right)-\Gamma\left(\beta-1,\frac{t}{\tau_{1}}\right)\right]\,.\label{eq:rrf-Malkin}
+\end{equation}
+
+\end_inset
+
+In the limit as 
+\begin_inset Formula $\beta\to1$
+\end_inset
+
+, the expression of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-Malkin"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rrf-Fung-72"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Another example for a continuous relaxation spectrum is the exponential
+ spectrum
+\begin_inset Formula 
+\begin{equation}
+\hat{\gamma}\left(\tau\right)=\frac{1}{\tau_{0}}e^{-\tau/\tau_{0}}\,,\quad0\le\tau<\infty\,,\label{eq:rrf-exponential-spectrum}
+\end{equation}
+
+\end_inset
+
+which produces
+\begin_inset Formula 
+\begin{equation}
+g\left(t\right)=2\sqrt{\frac{t}{\tau_{0}}}K_{1}\left(2\sqrt{\frac{t}{\tau_{0}}}\right)\,,\label{eq:rrf-exponential}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K_{1}\left(z\right)$
+\end_inset
+
+ is the modified Bessel function of the second kind, of order 1.
 \end_layout
 
 \begin_layout Standard
@@ -31278,7 +32019,7 @@ such that the mixture mass balance is satisfied by
 \end_layout
 
 \begin_layout Subsection
-Free Energy Density and Stress
+Strain Energy Density and Stress
 \end_layout
 
 \begin_layout Standard
@@ -31445,6 +32186,137 @@ noprefix "false"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+For nearly-incompressible hyperelastic materials (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Nearly-Incompressible-Hyperelast"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), the strain energy density of the intact material has the form of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-SED"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, thus 
+\begin_inset Formula $\Psi_{0}\left(\mathbf{C}\right)=\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)$
+\end_inset
+
+.
+ In this case, we assume that the damage only affects the distortional part
+ of the strain energy density 
+\begin_inset Formula $\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)$
+\end_inset
+
+, consistent with the general framework advocated in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Holzapfel00"
+literal "false"
+
+\end_inset
+
+.
+ Thus, for 
+\emph on
+uncoupled damage
+\emph default
+, we assume that 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{C}\right)=\left(1-D\right)\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)$
+\end_inset
+
+.
+ The resulting damage stress similarly takes the form 
+\begin_inset Formula $\boldsymbol{\sigma}=\left(1-D\right)\dev\tilde{\boldsymbol{\sigma}}_{0}+p\mathbf{I}$
+\end_inset
+
+, consistent with Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-Cauchy-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}_{0}$
+\end_inset
+
+ is evaluated from 
+\begin_inset Formula $\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)$
+\end_inset
+
+ as given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-Cauchy-stress-tilde"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+ is evaluated from 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ as given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-p"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When investigating the damage mechanics of tension-bearing fibrous materials,
+ described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Tension-Bearing-Fiber-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it is important to use the unconstrained version of the fiber and damage
+ mechanics models, even when the fibers are embedded in a ground matrix
+ with a nearly-incompressible response (uncoupled formulation).
+ This is a necessary requirement since uncoupled fiber formulations are
+ now understood to be non-physical.
+ Nevertheless, for historical reasons, FEBio allows users to use uncoupled
+ fiber formulations in an uncoupled damage material.
 \end_layout
 
 \begin_layout Subsection
@@ -45197,7 +46069,27 @@ literal "false"
 \end_inset
 
 .
- The value of the slip criterion determines the stick-slip status via
+ The ratio 
+\begin_inset Formula $-p/t_{n}$
+\end_inset
+
+ represents the local fluid load support at each point on the contact surface.
+ Since the friction coefficient 
+\begin_inset Formula $\mu_{\text{eff}}$
+\end_inset
+
+ cannot be negative, the theoretical upper bound on the local fluid load
+ support is 
+\begin_inset Formula $\left.-p/t_{n}\right|_{\max}=\left(1-\varphi\right)^{-1}$
+\end_inset
+
+.
+ This upper bound is enforced whenever numerical errors produce a greater
+ value of the local fluid load support.
+\end_layout
+
+\begin_layout Standard
+The value of the slip criterion determines the stick-slip status via
 \begin_inset Formula 
 \begin{equation}
 \Psi\begin{cases}
@@ -45208,10 +46100,6 @@ literal "false"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 Following our prior study 
 \begin_inset CommandInset citation
 LatexCommand citep

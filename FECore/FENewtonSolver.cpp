@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -100,6 +100,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_bforceReform = true;
 	m_bdivreform = true;
 	m_bdoreforms = true;
+	m_persistMatrix = true;
 
 	m_bzero_diagonal = false;
 	m_zero_tol = 0.0;
@@ -226,7 +227,7 @@ bool FENewtonSolver::ReformStiffness()
     if (bret)
     {
         {
-			TRACK_TIME(TimerID::Timer_Solve);
+			TRACK_TIME(TimerID::Timer_LinSolve);
 			// factorize the stiffness matrix
 			if (m_plinsolve->Factor() == false)
 			{
@@ -301,7 +302,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME(TimerID::Timer_Solve);
+		TRACK_TIME(TimerID::Timer_LinSolve);
 		if (!m_plinsolve->PreProcess())
 		{
 			feLogError("An error occurred during preprocessing of linear solver");
@@ -582,6 +583,19 @@ bool FENewtonSolver::SolveStep()
 		feLog("\nconvergence summary\n");
 		feLog("    number of iterations   : %d\n", m_niter);
 		feLog("    number of reformations : %d\n", m_nref);
+	}
+
+	// if we don't want to hold on to the stiffness matrix, let's clean it up
+	if (m_persistMatrix == false)
+	{
+		// clean up the solver
+		m_plinsolve->Destroy();
+
+		// clean up the stiffness matrix
+		m_pK->Clear();
+
+		// make sure we recreate it in the next time step
+		m_breshape = true;
 	}
 
 	return bret;
@@ -866,7 +880,7 @@ bool FENewtonSolver::QNInit()
 void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>& R)
 {
 	// call the strategy to solve the linear equations
-	TRACK_TIME(TimerID::Timer_Solve);
+	TRACK_TIME(TimerID::Timer_LinSolve);
 
 	// for iterative solvers, we pass the last solution as the initial guess
 	if (m_plinsolve->IsIterative())

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -362,7 +362,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 		if ((prn == 0) || (rb != rbp))
 		{
 			prn = fecore_alloc(FERigidNodeSet, &fem);
-			ns = new FENodeSet(&fem);
+			ns = fecore_alloc(FENodeSet, &fem);
 			prn->SetNodeSet(ns);
 
 			// the default shell bc depends on the shell formulation

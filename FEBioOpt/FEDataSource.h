@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -77,6 +77,9 @@ public:
 
 	// Evaluate the model parameter at x
 	double Evaluate(double x) override;
+
+	// evaluate the current value
+	double value() { return m_fy(); }
 
 private:
 	static bool update(FEModel* pmdl, unsigned int nwhen, void* pd);

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,8 +52,8 @@ public:
 	bool Init() override;
 
 public:
-	double	m_E;	//<! Young's modulus
-	double	m_v;	//<! Poisson's ratio
+	double	m_E;	//!< Young's modulus
+	double	m_v;	//!< Poisson's ratio
 
 	//--- active contraction stuff ---
 	double	m_a[3];

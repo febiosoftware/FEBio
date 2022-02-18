@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -162,7 +162,7 @@ bool FEErosionAdaptor::Apply(int iteration)
 	for (int j = 0; j < LCM.LinearConstraints();)
 	{
 		FELinearConstraint& lc = LCM.LinearConstraint(j);
-		if (mesh.Node(lc.m_parentDof.node).HasFlags(FENode::EXCLUDE))
+		if (mesh.Node(lc.GetParentNode()).HasFlags(FENode::EXCLUDE))
 		{
 			LCM.RemoveLinearConstraint(j);
 		}
@@ -175,10 +175,10 @@ bool FEErosionAdaptor::Apply(int iteration)
 		FELinearConstraint& lc = LCM.LinearConstraint(j);
 
 		bool del = false;
-		int n = lc.m_childDof.size();
+		int n = lc.Size();
 		for (int k = 0; k < n; ++k)
 		{
-			if (mesh.Node(lc.m_childDof[k].node).HasFlags(FENode::EXCLUDE))
+			if (mesh.Node(lc.GetChildDof(k).node).HasFlags(FENode::EXCLUDE))
 			{
 				del = true;
 				break;

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,10 +43,6 @@ SOFTWARE.*/
 #include "FERemodelingElasticMaterial.h"
 #include "FECore/FEDiscreteMaterial.h"
 #include "FEDiscreteElementMaterial.h"
-#include "FEMicroMaterial.h"
-#include "FEMicroMaterial2O.h"
-#include "FEElasticMultiscaleDomain1O.h"
-#include "FEElasticMultiscaleDomain2O.h"
 #include "FESRIElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
@@ -69,9 +65,6 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		else return 0;
 	}
 	else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
-	else if (dynamic_cast<FEMicroMaterial*            >(pmat)) sztype = "elastic-mm-solid";
-	else if (dynamic_cast<FEMicroMaterial2O*          >(pmat)) sztype = "elastic-mm-solid2O";
-	else if (dynamic_cast<FEElasticMaterial2O*        >(pmat)) sztype = "elastic-solid2O";
 	else if (dynamic_cast<FESolidMaterial*>(pmat))
 	{
 		// structural elements

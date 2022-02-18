@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1018,10 +1018,10 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	vector<int> lm(3*(MAXMN + 1));
 	vector<int> en(MAXMN+1);
 
-	double *Gr, *Gs, w[6];
-	vec3d r0[6];
+	double *Gr, *Gs, w[MAXMN];
+	vec3d r0[MAXMN];
 
-	double detJ[6];
+	double detJ[MAXMN];
 	vec3d dxr, dxs;
 
 	vector<int> sLM;

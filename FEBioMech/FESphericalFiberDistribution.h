@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,10 +39,10 @@ public:
 	FESphericalFiberDistribution(FEModel* pfem);
 	
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp) override;
+	mat3ds Stress(FEMaterialPoint& mp) override;
 	
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	// Strain energy density
 	virtual double StrainEnergyDensity(FEMaterialPoint& mp) override;

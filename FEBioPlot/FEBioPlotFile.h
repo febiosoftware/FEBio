@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -268,21 +268,25 @@ public:
 	};
 
 public:
-	FEBioPlotFile(FEModel& fem);
+	FEBioPlotFile(FEModel* fem);
 	~FEBioPlotFile(void);
 
 	//! Open the plot database
-	bool Open(FEModel& fem, const char* szfile);
+	bool Open(const char* szfile) override;
 
 	//! Close the plot database
-	void Close();
+	void Close() override;
 
 	//! Open for appending
-	bool Append(FEModel& fem, const char* szfile);
+	bool Append(const char* szfile) override;
 
 	//! Write current FE state to plot database
-	bool Write(FEModel& fem, float ftime, int flag = 0);
+	bool Write(float ftime, int flag = 0)  override;
 
+	//! see if the plot file is valid
+	bool IsValid() const override;
+
+public:
 	//! Add a variable to the dictionary
 	bool AddVariable(FEPlotData* ps, const char* szname);
 	bool AddVariable(const char* sz);
@@ -290,9 +294,6 @@ public:
 
 	//! Set the compression level
 	void SetCompression(int n);
-
-	//! see if the plot file is valid
-	virtual bool IsValid() const;
 
 	// Write a mesh section
 	bool WriteMeshSection(FEModel& fem);
@@ -355,7 +356,6 @@ protected:
 protected:
 	Dictionary	m_dic;	// dictionary
 	PltArchive	m_ar;	// the data archive
-	FEModel&	m_fem;
 	int			m_ncompress;	// compression level
 	int			m_meshesWritten;	// nr of meshes written
 	string		m_softwareString;	// the software string

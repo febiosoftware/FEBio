@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -219,6 +219,12 @@ FEScalarValuator* FEMappedValue::copy()
 	FEMappedValue* map = new FEMappedValue(GetFEModel());
 	map->setDataMap(m_val);
 	return map;
+}
+
+void FEMappedValue::Serialize(DumpStream& dmp)
+{
+	if (dmp.IsShallow()) return;
+	dmp & m_val;
 }
 
 //---------------------------------------------------------------------------------------

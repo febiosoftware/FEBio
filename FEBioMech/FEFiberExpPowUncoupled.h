@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -51,6 +51,7 @@ protected:
 	double			m_alpha;	// coefficient of (In-1) in exponential
 	double			m_beta;		// power of (In-1) in exponential
 	FEParamDouble	m_ksi;		// fiber modulus
+    double          m_mu;       // shear modulus
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

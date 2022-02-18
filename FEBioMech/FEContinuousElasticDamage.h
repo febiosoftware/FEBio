@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include "FEElasticFiberMaterial.h"
 
 // These classes implement the elastic damage framework from 
-// Balzani, Brinkhues, Holzapfel, Comput. Methods Appl. Mech. Engrg. 213–216 (2012) 139–151
+// Balzani, Brinkhues, Holzapfel, Comput. Methods Appl. Mech. Engrg. 213Â–216 (2012) 139Â–151
 
 class FEFiberDamagePoint;
 
@@ -42,8 +42,6 @@ public:
 
 	double Damage(FEMaterialPoint& mp);
 	double Damage(FEMaterialPoint& mp, int n);
-	double beta(FEMaterialPoint& mp);
-	double gamma(FEMaterialPoint& mp);
 
 	//! Strain energy density
 	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
@@ -73,24 +71,14 @@ protected:
 	double	m_r_s, m_r_inf;
 
 	// D2 parameters
-//	double m_D2_D0;
-//	double m_D2_beta0;
-//	double m_D2_x1;
-//	double m_D2_x2;
 	double m_D2_a;
 	double m_D2_b;
 	double m_D2_c;
 	double m_D2_d;
-	double m_D2_ginf;
-	double m_D2_g0;
-	double m_D2_xg;
 
-	// D3 parameters
-	double	m_D3_xb;
-	double	m_D3_binf;
-	double	m_D3_g0;
-	double	m_D3_ginf;
-	double	m_D3_xg;
+	double m_D3_g0;
+	double m_D3_rg;
+	double m_D3_inf;
 
 	DECLARE_FECORE_CLASS();
 };

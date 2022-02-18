@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -241,6 +241,7 @@ public:
 	LinearSolver*		m_plinsolve;	//!< the linear solver
 	FEGlobalMatrix*		m_pK;			//!< global stiffness matrix
     bool				m_breshape;		//!< Matrix reshape flag
+	bool				m_persistMatrix;//!< Don't delete stiffness matrix until necessary (if true, K is deleted at end of time step)
 
 	// data used by Quasin
 	vector<double> m_R0;	//!< residual at iteration i-1

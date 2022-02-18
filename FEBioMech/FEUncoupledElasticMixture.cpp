@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEUncoupledElasticMixture.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/log.h>
 
 // define the material parameters
  BEGIN_FECORE_CLASS(FEUncoupledElasticMixture, FEUncoupledMaterial)
@@ -57,6 +58,26 @@ FEMaterialPoint* FEUncoupledElasticMixture::CreateMaterialPointData()
 void FEUncoupledElasticMixture::AddMaterial(FEElasticMaterial* pm)
 { 
 	m_pMat.push_back(pm); 
+}
+
+//-----------------------------------------------------------------------------
+//! data initialization
+bool FEUncoupledElasticMixture::Init()
+{
+    // check if any of the solid materials are elastic mixtures -- none allowed,
+    // otherwise FEBio does not know which FEElasticMixtureMaterialPoint to access
+    int nmix = 0;
+    for (int i=0; i<Materials(); ++i) {
+        if (dynamic_cast<FEElasticMixture*>(m_pMat[i])) nmix++;
+        if (dynamic_cast<FEUncoupledElasticMixture*>(m_pMat[i])) nmix++;
+    }
+    
+    if (nmix > 0) {
+        feLogError("Solids in uncoupled solid mixture material cannot be solid mixtures");
+        return false;
+    }
+    
+    return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -167,6 +188,94 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	return sed;
 }
 
+//-----------------------------------------------------------------------------
+double FEUncoupledElasticMixture::StrongBondDevSED(FEMaterialPoint& mp)
+{
+    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    vector<double>& w = pt.m_w;
+    assert(w.size() == m_pMat.size());
+    
+    // get the elastic material point
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // calculate strain energy density
+    double sed = 0.0;
+    for (int i=0; i < (int)m_pMat.size(); ++i)
+    {
+        // copy the elastic material point data to the components
+        FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+        epi.m_elem = mp.m_elem;
+        epi.m_index = mp.m_index;
+        epi.m_rt = ep.m_rt;
+        epi.m_r0 = ep.m_r0;
+        epi.m_F = ep.m_F;
+        epi.m_J = ep.m_J;
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+        
+        FEUncoupledMaterial* uMat = dynamic_cast<FEUncoupledMaterial*>(m_pMat[i]);
+        if (uMat)
+            sed += uMat->StrongBondDevSED(*pt.GetPointData(i))*w[i];
+        else
+            sed += m_pMat[i]->StrongBondSED(*pt.GetPointData(i))*w[i];
+    }
+    
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
+double FEUncoupledElasticMixture::WeakBondDevSED(FEMaterialPoint& mp)
+{
+    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    vector<double>& w = pt.m_w;
+    assert(w.size() == m_pMat.size());
+    
+    // get the elastic material point
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // calculate strain energy density
+    double sed = 0.0;
+    for (int i=0; i < (int)m_pMat.size(); ++i)
+    {
+        // copy the elastic material point data to the components
+        FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+        epi.m_elem = mp.m_elem;
+        epi.m_index = mp.m_index;
+        epi.m_rt = ep.m_rt;
+        epi.m_r0 = ep.m_r0;
+        epi.m_F = ep.m_F;
+        epi.m_J = ep.m_J;
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+        
+        FEUncoupledMaterial* uMat = dynamic_cast<FEUncoupledMaterial*>(m_pMat[i]);
+        if (uMat)
+            sed += uMat->WeakBondDevSED(*pt.GetPointData(i))*w[i];
+        else
+            sed += m_pMat[i]->WeakBondSED(*pt.GetPointData(i))*w[i];
+    }
+    
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! specialized material points
+void FEUncoupledElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    
+    for (int i=0; i < (int) m_pMat.size(); ++i)
+    {
+        FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+        epi.m_elem = mp.m_elem;
+        FEMaterial* pmj = GetMaterial(i);
+        pmj->UpdateSpecializedMaterialPoints(epi, tp);
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! the density is the sum of the component densities
 double FEUncoupledElasticMixture::Density(FEMaterialPoint& mp)
 {

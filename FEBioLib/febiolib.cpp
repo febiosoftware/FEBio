@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include <FEBioFluid/FEBioFluidSolutes.h>
 #include <FEBioFluid/FEBioThermoFluid.h>
 #include <FEBioTest/FEBioTest.h>
+#include <FEBioRVE/FEBioRVE.h>
 #endif
 #include "febio.h"
 #include "plugin.h"
@@ -59,7 +60,8 @@ FECoreKernel* GetFECoreKernel()
 void InitLibrary()
 {
 	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
-	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
+	REGISTER_FECORE_CLASS(FEBioRestart  , "restart");
+	REGISTER_FECORE_CLASS(FEBioRCISolver, "rci_solve");
 
 	FECore::InitModule();
 	FEAMR::InitModule();
@@ -76,6 +78,7 @@ void InitLibrary()
     FEBioFluidSolutes::InitModule();
     FEBioThermoFluid::InitModule();
 	FEBioTest::InitModule();
+	FEBioRVE::InitModule();
 #endif
 }
 

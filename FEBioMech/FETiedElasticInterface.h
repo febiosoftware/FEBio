@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -69,9 +69,16 @@ public:
 public:
     void GetVectorGap      (int nface, vec3d& pg) override;
     void GetContactTraction(int nface, vec3d& pt) override;
-    
+
+    //! evaluate net contact force
+    vec3d GetContactForce() override;
+
+    //! evaluate net contact area
+    double GetContactArea() override;
+
 public:
     vector<vec3d>           m_nn;   //!< node normals
+    vector<vec3d>           m_Fn;   //!< nodal forces
 };
 
 //-----------------------------------------------------------------------------

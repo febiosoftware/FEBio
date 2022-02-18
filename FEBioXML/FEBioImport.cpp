@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -147,21 +147,6 @@ FEBioImport::MeshDataError::MeshDataError()
 }
 
 //-----------------------------------------------------------------------------
-FEBioImport::PlotVariable::PlotVariable(const FEBioImport::PlotVariable& pv)
-{
-	strcpy(m_szvar, pv.m_szvar);
-    strcpy(m_szdom, pv.m_szdom);
-	m_item = pv.m_item;
-}
-
-FEBioImport::PlotVariable::PlotVariable(const std::string& var, vector<int>& item, const char* szdom)
-{
-    strcpy(m_szvar, var.c_str());
-    m_item = item;
-    strcpy(m_szdom, szdom);
-}
-
-//-----------------------------------------------------------------------------
 FEBioImport::FEBioImport()
 {
 }
@@ -269,11 +254,6 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	m_szlog[0] = 0;
 	m_szplt[0] = 0;
 
-	// plot output
-	m_szplot_type[0] = 0;
-	m_plot.clear();
-	m_nplot_compression = 0;
-
 	m_data.clear();
 
 	// extract the path
@@ -290,7 +270,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 
 	// finish building
 	try {
-		m_builder->Finish();
+		bool b = m_builder->Finish();
+		if (b == false) return errf("FAILED building FEBio model.");
 	}
 	catch (std::exception e)
 	{
@@ -491,19 +472,6 @@ void FEBioImport::SetPlotfileName(const char* sz) { sprintf(m_szplt, "%s", sz); 
 void FEBioImport::AddDataRecord(DataRecord* pd)
 {
 	m_data.push_back(pd);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item, const char* szdom)
-{
-    PlotVariable var(szvar, item, szdom);
-    m_plot.push_back(var);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::SetPlotCompression(int n)
-{
-	m_nplot_compression = n;
 }
 
 //-----------------------------------------------------------------------------

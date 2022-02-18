@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 #include <FECore/DumpStream.h>
+#include <FECore/log.h>
 
 REGISTER_SUPER_CLASS(FERigidBC, FERIGIDBC_ID);
 
@@ -172,10 +173,15 @@ bool FERigidBodyFixedBC::Init()
 	if (pm == 0) return false;
 
 	// make sure we have a valid dof
+	// TODO: Can I test this automatically during validation?
 	for (int i = 0; i < m_dofs.size(); ++i)
 	{
 		int dof_i = m_dofs[i];
-		if ((dof_i < 0) || (dof_i >= 6)) return false;
+		if ((dof_i < 0) || (dof_i >= 6))
+		{
+			feLogError("Invalid value for dofs of fixed rigid constraint %s", GetName().c_str());
+			return false;
+		}
 	}
 
 	m_binit = true;

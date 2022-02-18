@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,6 +56,7 @@ SOFTWARE.*/
 #include <FECore/LinearSolver.h>
 #include <FECore/FEDomain.h>
 #include <FECore/FEMaterial.h>
+#include <FECore/FEPlotDataStore.h>
 #include "febio.h"
 #include "version.h"
 #include <iostream>
@@ -65,39 +66,6 @@ SOFTWARE.*/
 #ifdef WIN32
 size_t FEBIOLIB_API GetPeakMemory();	// in memory.cpp
 #endif
-
-FEBioModel::FEPlotVariable::FEPlotVariable()
-{
-
-}
-
-FEBioModel::FEPlotVariable::FEPlotVariable(const std::string& varName, const std::vector<int>& itemList, const std::string& domainName)
-{
-	m_var = varName;
-	m_item = itemList;
-	m_domName = domainName;
-}
-
-FEBioModel::FEPlotVariable::FEPlotVariable(const FEBioModel::FEPlotVariable& v)
-{
-	m_var = v.m_var;
-	m_item = v.m_item;
-	m_domName = v.m_domName;
-}
-
-void FEBioModel::FEPlotVariable::operator = (const FEBioModel::FEPlotVariable& v)
-{
-	m_var = v.m_var;
-	m_item = v.m_item;
-	m_domName = v.m_domName;
-}
-
-void FEBioModel::FEPlotVariable::Serialize(DumpStream& ar)
-{
-	ar & m_var;
-	ar & m_item;
-	ar & m_domName;
-}
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEBioModel, FEMechModel)
@@ -109,17 +77,24 @@ END_FECORE_CLASS();
 // echo the input data to the log file
 extern void echo_input(FEBioModel& fem);
 
-//-----------------------------------------------------------------------------
-// Callback that guides FEBio output
-bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
+bool FEBioModel::handleCB(FEModel* fem, int unsigned nwhen, void* pd)
 {
-	FEBioModel* pfebio = (FEBioModel*) pd;
+	FEBioModel* febioModel = (FEBioModel*)pd;
+	return febioModel->processEvent(nwhen);
+}
 
-	// write output to screen
-	pfebio->WriteLog(nwhen);
+//-----------------------------------------------------------------------------
+bool FEBioModel::processEvent(int nevent)
+{
+	// write output files
+	Write(nevent);
 
-	// write plot file
-	pfebio->Write(nwhen);
+	// process event handlers
+	switch (nevent)
+	{
+	case CB_STEP_SOLVED: on_cb_stepSolved(); break;
+	case CB_SOLVED     : on_cb_solved(); break;
+	}
 
 	return true;
 }
@@ -143,14 +118,13 @@ FEBioModel::FEBioModel()
 	m_ntotalRHS = 0;
 	m_ntotalReforms = 0;
 
-	m_pltCompression = 0;
 	m_pltAppendOnRestart = true;
 
 	m_lastUpdate = -1;
 
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
-	AddCallback(output_cb, CB_ALWAYS, this);
+	AddCallback(handleCB, CB_ALWAYS, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -164,14 +138,14 @@ FEBioModel::~FEBioModel()
 //-----------------------------------------------------------------------------
 Timer& FEBioModel::GetSolveTimer()
 {
-	return m_SolveTime;
+	return *GetTimer(Timer_ModelSolve);
 }
 
 //-----------------------------------------------------------------------------
 //! return number of seconds of time spent in linear solver
 int FEBioModel::GetLinearSolverTime()
 {
-	Timer* t = GetTimer(TimerID::Timer_Solve);
+	Timer* t = GetTimer(TimerID::Timer_LinSolve);
 	return (int)t->peek();
 }
 
@@ -354,37 +328,6 @@ bool FEBioModel::Input(const char* szfile)
 	if (fim.m_szlog[0]) SetLogFilename (fim.m_szlog);
 	if (fim.m_szplt[0]) SetPlotFilename(fim.m_szplt);
 
-	// set the plot file
-	if (strcmp(fim.m_szplot_type, "febio") == 0)
-	{
-		m_pltData.clear();
-
-		// set compression
-		m_pltCompression = fim.m_nplot_compression;
-
-		// define the plot file variables
-		FEModel& fem = *GetFEModel();
-		int NP = (int) fim.m_plot.size();
-		for (int i=0; i<NP; ++i)
-		{
-			FEBioImport::PlotVariable& var = fim.m_plot[i];
-
-			vector<int> item = var.m_item;
-			if (item.empty() == false)
-			{
-				// TODO: currently, this is only supported for domain variables, where
-				//       the list is a list of materials
-				vector<int> lmat = var.m_item;
-
-				// convert the material list to a domain list
-				DomainListFromMaterial(lmat, item);
-			}
-
-			FEPlotVariable pltvar(var.m_szvar, item, var.m_szdom);
-			m_pltData.push_back(pltvar);
-		}
-	}
-
 	// add the data records
 	int ND = (int)fim.m_data.size();
 	for (int i=0; i<ND; ++i) AddDataRecord(fim.m_data[i]);
@@ -424,288 +367,244 @@ void FEBioModel::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
 //    O U T P U T
 //=============================================================================
 
-//! Write log data
-void FEBioModel::WriteLog(unsigned int nwhen)
-{
-	FEAnalysis* step = GetCurrentStep();
-	if (step == nullptr) return;
-
-	if (nwhen == CB_STEP_SOLVED)
-	{
-		// output report
-		feLog("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
-		feLog("\tAverage number of equilibrium iterations .......... : %lg\n\n", (step->m_ntimesteps != 0 ? (double)step->m_ntotiter / (double)step->m_ntimesteps : 0));
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
-
-		// print linear solver stats
-		LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
-		if (ls)
-		{
-			LinearSolverStats stats = ls->GetStats();
-			int nsolves = stats.backsolves;
-			int niters = stats.iterations;
-			double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
-			feLog("\n L I N E A R   S O L V E R   S T A T S\n\n");
-			feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
-			feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
-		}
-
-		// add to stats
-		m_ntimeSteps += step->m_ntimesteps;
-		m_ntotalIters += step->m_ntotiter;
-		m_ntotalRHS += step->m_ntotrhs;
-		m_ntotalReforms += step->m_ntotref;
-	}
-
-	if (nwhen == CB_SOLVED)
-	{
-		// for multistep analysis we'll print a grand total
-		if (Steps() > 1)
-		{
-			feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-			feLog("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
-			feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
-			feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
-			feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
-		}
-
-		// get and print elapsed time
-		char sztime[64];
-
-		Timer* solveTimer = GetTimer(TimerID::Timer_Solve);
-		solveTimer->time_str(sztime);
-		feLog("\tTime in linear solver: %s\n\n", sztime);
-	}
-
-	// always flush the log
-	m_log.flush();
-}
-
 //-----------------------------------------------------------------------------
 //! Export state to plot file.
-void FEBioModel::Write(unsigned int nwhen)
+void FEBioModel::Write(unsigned int nevent)
 {
 	TimerTracker t(&m_IOTimer);
 
 	// get the current step
 	FEAnalysis* pstep = GetCurrentStep();
 
-	if (m_plot)
+	// update plot file
+	if (m_plot) WritePlot(nevent);
+
+	// Dump converged state to the archive
+	DumpData(nevent);
+
+	// write the output data
+	WriteData(nevent);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::WritePlot(unsigned int nevent)
+{
+	// get the current step
+	FEAnalysis* pstep = GetCurrentStep();
+
+	// get the plot level
+	int nplt = pstep->GetPlotLevel();
+
+	// if we don't want to plot anything we return
+	if (nplt != FE_PLOT_NEVER)
 	{
-		// get the plot level
-		int nplt = pstep->GetPlotLevel();
-
-		// if we don't want to plot anything we return
-		if (nplt != FE_PLOT_NEVER)
+		// try to open the plot file
+		if ((nevent == CB_INIT) || (nevent == CB_STEP_ACTIVE))
 		{
-			// try to open the plot file
-			if ((nwhen == CB_INIT) || (nwhen == CB_STEP_ACTIVE))
+			if (m_plot->IsValid() == false)
 			{
-				if (m_plot->IsValid() == false)
+				// Add the plot objects
+				UpdatePlotObjects();
+
+				if (m_plot->Open(m_splot.c_str()) == false)
 				{
-					// Add the plot objects
-					UpdatePlotObjects();
+					feLog("ERROR : Failed creating PLOT database\n");
+					delete m_plot;
+					m_plot = 0;
+				}
 
-					if (m_plot->Open(*this, m_splot.c_str()) == false)
-					{
-						feLog("ERROR : Failed creating PLOT database\n");
-						delete m_plot;
-						m_plot = 0;
-					}
+				// Since it is assumed that for the first timestep
+				// there are no loads or initial displacements, the case n=0 is skipped.
+				// Therefor we can output those results here.
+				// TODO: Offcourse we should actually check if this is indeed
+				//       the case, otherwise we should also solve for t=0
+				// Only output the initial state if requested
+				if (m_plot)
+				{
+					bool bout = true;
 
-					// Since it is assumed that for the first timestep
-					// there are no loads or initial displacements, the case n=0 is skipped.
-					// Therefor we can output those results here.
-					// TODO: Offcourse we should actually check if this is indeed
-					//       the case, otherwise we should also solve for t=0
-					// Only output the initial state if requested
-					if (m_plot)
-					{
-						bool bout = true;
+					// if we're using the fixed time stepper, we check the plot range and zero state flag
+					if (pstep->m_timeController == nullptr) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
 
-						// if we're using the fixed time stepper, we check the plot range and zero state flag
-						if (pstep->m_timeController == nullptr) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
+					// store initial time step (i.e. time step zero)
+					double time = GetTime().currentTime;
+					if (bout) m_plot->Write((float)time);
+				}
+			}
+		}
+		else
+		{
+			// assume we won't be writing anything
+			bool bout = false;
 
-						// store initial time step (i.e. time step zero)
-						double time = GetTime().currentTime;
-						if (bout) m_plot->Write(*this, (float) time);
-					}
+			// see if we need to output something
+			int ndebug = GetDebugLevel();
+
+			// write a new mesh section if needed
+			if (nevent == CB_REMESH)
+			{
+				m_writeMesh = true;
+				m_lastUpdate = -1;
+			}
+
+			if (ndebug == 1)
+			{
+				if ((nevent == CB_INIT) || (nevent == CB_MODEL_UPDATE) || (nevent == CB_MINOR_ITERS) || (nevent == CB_SOLVED) || (nevent == CB_REMESH))
+				{
+					bout = true;
+				}
+
+				if (nevent == CB_MAJOR_ITERS)
+				{
+					bout = true;
+					m_lastUpdate = -1;
 				}
 			}
 			else
 			{
-				// assume we won't be writing anything
-				bool bout = false;
+				int currentStep = pstep->m_ntimesteps;
+				int lastStep = pstep->m_ntime;
+				int nmin = pstep->m_nplotRange[0]; if (nmin < 0) nmin = lastStep + nmin + 1;
+				int nmax = pstep->m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
 
-				// see if we need to output something
-				int ndebug = GetDebugLevel();
-
-				// write a new mesh section if needed
-				if (nwhen == CB_REMESH)
+				bool inRange = true;
+				bool isStride = true;
+				if (pstep->m_timeController == nullptr)
 				{
-					m_writeMesh = true;
-					m_lastUpdate = -1;
+					inRange = false;
+					if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
+
 				}
+				isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
 
-				if (ndebug == 1)
+				switch (nevent)
 				{
-					if ((nwhen == CB_INIT) || (nwhen == CB_MODEL_UPDATE) || (nwhen == CB_MINOR_ITERS) || (nwhen == CB_SOLVED) || (nwhen == CB_REMESH))
+				case CB_MINOR_ITERS:
+				{
+					if (nplt == FE_PLOT_MINOR_ITRS) bout = true;
+					if ((ndebug == 2) && (NegativeJacobian::IsThrown()))
 					{
 						bout = true;
-					}
-
-					if (nwhen == CB_MAJOR_ITERS)
-					{
-						bout = true;
-						m_lastUpdate = -1;
+						NegativeJacobian::clearFlag();
 					}
 				}
-				else
-				{
-					int currentStep = pstep->m_ntimesteps;
-					int lastStep = pstep->m_ntime;
-					int nmin = pstep->m_nplotRange[0]; if (nmin < 0) nmin = lastStep + nmin + 1;
-					int nmax = pstep->m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
-
-					bool inRange = true;
-					bool isStride = true;
-					if (pstep->m_timeController == nullptr)
+				break;
+				case CB_MAJOR_ITERS:
+					if ((nplt == FE_PLOT_MAJOR_ITRS) && inRange && isStride) bout = true;
+					if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
+					if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
+					break;
+				case CB_AUGMENT:
+					if (nplt == FE_PLOT_AUGMENTATIONS)
 					{
-						inRange = false;
-						if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
-
-					}
-                    isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
-
-					switch (nwhen)
-					{
-					case CB_MINOR_ITERS: 
-					{
-						if (nplt == FE_PLOT_MINOR_ITRS) bout = true;
-						if ((ndebug == 2) && (NegativeJacobian::IsThrown()))
-						{
-							bout = true;
-							NegativeJacobian::clearFlag();
-						}
+						// Note that this is called before the augmentations.
+						// The reason we store the state prior to the augmentations
+						// is because the augmentations are going to change things such that
+						// the system no longer in equilibrium. Since the model has to be converged
+						// before we do augmentations, storing the model now will store an actual converged state.
+						bout = true;
 					}
 					break;
-					case CB_MAJOR_ITERS  : 
-						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true;
-						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
-						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
-						break;
-					case CB_AUGMENT: 
-						if (nplt == FE_PLOT_AUGMENTATIONS) 
-						{
-							// Note that this is called before the augmentations.
-							// The reason we store the state prior to the augmentations
-							// is because the augmentations are going to change things such that
-							// the system no longer in equilibrium. Since the model has to be converged
-							// before we do augmentations, storing the model now will store an actual converged state.
-							bout = true;
-						}
-						break;
-					case CB_SOLVED : 
-						if (nplt == FE_PLOT_FINAL) bout = true; 
-						if (nplt == FE_PLOT_MAJOR_ITRS)
-						{
-							// we want to force storing the final time step, but we have to make sure 
-							// it hasn't been stored already during the CB_MAJOR_ITERS callback.
-							if ((inRange == false) || (isStride == false)) bout = true;
-						}
-						break;
-					case CB_STEP_SOLVED: if (nplt == FE_PLOT_STEP_FINAL) bout = true;  break;
-					}
-				}
-
-				// output the state if requested
-				if (bout && (m_lastUpdate != UpdateCounter()) )
-				{
-					m_lastUpdate = UpdateCounter();
-
-					// update the plot objects
-					UpdatePlotObjects();
-
-					// see if we need to write a new mesh section
-					if (m_writeMesh) {
-						FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
-						plt->WriteMeshSection(*this);
-					}
-
-					// set the status flag
-					int statusFlag = 0;
-					if (m_writeMesh) statusFlag = 1;
-					else if (nwhen != CB_MAJOR_ITERS)
+				case CB_SOLVED:
+					if (nplt == FE_PLOT_FINAL) bout = true;
+					if (nplt == FE_PLOT_MAJOR_ITRS)
 					{
-						statusFlag = 2;
+						// we want to force storing the final time step, but we have to make sure 
+						// it hasn't been stored already during the CB_MAJOR_ITERS callback.
+						if ((inRange == false) || (isStride == false)) bout = true;
 					}
-
-					// write the state section
-					double time = GetTime().currentTime;
-					if (m_plot) m_plot->Write(*this, (float)time, statusFlag);
-
-					// make sure to reset write mesh flag
-					m_writeMesh = false;
+					break;
+				case CB_STEP_SOLVED: if (nplt == FE_PLOT_STEP_FINAL) bout = true;  break;
+				case CB_USER1: if ((nplt == FE_PLOT_USER1) && inRange && isStride) bout = true; break;
 				}
 			}
+
+			// output the state if requested
+			if (bout && (m_lastUpdate != UpdateCounter()))
+			{
+				m_lastUpdate = UpdateCounter();
+
+				// update the plot objects
+				UpdatePlotObjects();
+
+				// see if we need to write a new mesh section
+				if (m_writeMesh) {
+					FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
+					plt->WriteMeshSection(*this);
+				}
+
+				// set the status flag
+				int statusFlag = 0;
+				if (m_writeMesh) statusFlag = 1;
+				else if (nevent != CB_MAJOR_ITERS)
+				{
+					statusFlag = 2;
+				}
+
+				// write the state section
+				double time = GetTime().currentTime;
+				if (m_plot) m_plot->Write((float)time, statusFlag);
+
+				// make sure to reset write mesh flag
+				m_writeMesh = false;
+			}
 		}
-	}
-
-	// Dump converged state to the archive
-	int ndump = GetDumpLevel();
-	if (ndump != FE_DUMP_NEVER)
-	{
-		bool bdump = false;
-		if ((nwhen == CB_STEP_SOLVED) && (ndump == FE_DUMP_STEP      )) bdump = true;
-		if ((nwhen == CB_MAJOR_ITERS) && (ndump == FE_DUMP_MAJOR_ITRS)) bdump = true;
-		if (bdump) DumpData();
-	}
-
-	// write the output data
-	int nout = pstep->GetOutputLevel();
-	if (nout != FE_OUTPUT_NEVER)
-	{
-		bool bout = false;
-		switch (nwhen)
-		{
-		case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
-		case CB_MAJOR_ITERS:
-			if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
-			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
-			break;
-		case CB_SOLVED:
-			if (nout == FE_OUTPUT_FINAL) bout = true;
-			break;
-		}
-
-		if (bout) WriteData();
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! Write user data to the logfile
-void FEBioModel::WriteData()
+void FEBioModel::WriteData(unsigned int nevent)
 {
-	DataStore& dataStore = GetDataStore();
-	dataStore.Write();
+	// get the current step
+	FEAnalysis* pstep = GetCurrentStep();
+	int nout = pstep->GetOutputLevel();
+	if (nout == FE_OUTPUT_NEVER) return;
+
+	// see if we need to output
+	bool bout = false;
+	switch (nevent)
+	{
+	case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
+	case CB_MAJOR_ITERS:
+		if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
+		if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
+		break;
+	case CB_SOLVED:
+		if (nout == FE_OUTPUT_FINAL) bout = true;
+		break;
+	}
+
+	// output data
+	if (bout)
+	{
+		DataStore& dataStore = GetDataStore();
+		dataStore.Write();
+	}
 }
 
 //-----------------------------------------------------------------------------
 //! Dump state to archive for restarts
-void FEBioModel::DumpData()
+void FEBioModel::DumpData(int nevent)
 {
-	DumpFile ar(*this);
-	if (ar.Create(m_sdump.c_str()) == false)
+	int ndump = GetDumpLevel();
+	if (ndump == FE_DUMP_NEVER) return;
+
+	bool bdump = false;
+	if ((nevent == CB_STEP_SOLVED) && (ndump == FE_DUMP_STEP)) bdump = true;
+	if ((nevent == CB_MAJOR_ITERS) && (ndump == FE_DUMP_MAJOR_ITRS)) bdump = true;
+	if (bdump)
 	{
-		feLogWarning("Failed creating restart file (%s).\n", m_sdump.c_str());
-	}
-	else 
-	{
-		Serialize(ar);
-		feLogInfo("\nRestart point created. Archive name is %s.", m_sdump.c_str());
+		DumpFile ar(*this);
+		if (ar.Create(m_sdump.c_str()) == false)
+		{
+			feLogWarning("Failed creating restart file (%s).\n", m_sdump.c_str());
+		}
+		else
+		{
+			Serialize(ar);
+			feLogInfo("\nRestart point created. Archive name is %s.", m_sdump.c_str());
+		}
 	}
 }
 
@@ -723,6 +622,23 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 }
 
 //-----------------------------------------------------------------------------
+
+class FEPlotRigidBodyPosition : public FEPlotObjectData
+{
+public:
+	FEPlotRigidBodyPosition(FEModel* fem, FERigidBody* prb) : FEPlotObjectData(fem), m_rb(prb) {}
+
+	bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+	{
+		assert(m_rb);
+		ar << m_rb->m_rt;
+		return true;
+	}
+
+private:
+	FERigidBody* m_rb;
+};
+
 class FEPlotRigidBodyForce : public FEPlotObjectData
 {
 public:
@@ -883,6 +799,7 @@ void FEBioModel::UpdatePlotObjects()
 			po->m_pos = rb->m_r0;
 			po->m_rot = quatd(0, vec3d(1,0,0));
 
+			po->AddData("Position", PLT_VEC3F, new FEPlotRigidBodyPosition(this, rb));
 			po->AddData("Force" , PLT_VEC3F, new FEPlotRigidBodyForce(this, rb));
 			po->AddData("Moment", PLT_VEC3F, new FEPlotRigidBodyMoment(this, rb));
 
@@ -1254,8 +1171,7 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		int npltfmt = 2;
 		ar << npltfmt;
 
-		ar << m_pltCompression;
-		ar << m_pltData;
+		SerializePlotData(ar);
 
 		// data records
 		SerializeDataStore(ar);
@@ -1284,20 +1200,19 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		ar >> npltfmt;
 		assert(npltfmt == 2);
 
-		ar >> m_pltCompression;
-		ar >> m_pltData;
+		SerializePlotData(ar);
 
 		// remove the plot file (if any)
 		if (m_plot) { delete m_plot; m_plot = 0; }
 
 		// create the plot file
-		FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+		FEBioPlotFile* pplt = new FEBioPlotFile(this);
 		m_plot = pplt;
 
 		if (m_pltAppendOnRestart)
 		{
 			// Open for appending
-			if (m_plot->Append(*this, m_splot.c_str()) == false)
+			if (m_plot->Append(m_splot.c_str()) == false)
 			{
 				printf("FATAL ERROR: Failed reopening plot database %s\n", m_splot.c_str());
 				throw "FATAL ERROR";
@@ -1305,30 +1220,22 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		}
 		else
 		{
-			// create a new plot file
-			pplt->SetCompression(m_pltCompression);
-
 			// set the software string
 			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
 			sprintf(szbuf, "FEBio %s", szver);
 			pplt->SetSoftwareString(szbuf);
-
-			// add plot variables
-			for (FEPlotVariable& vi : m_pltData)
-			{
-				// add the plot output variable
-				if (pplt->AddVariable(vi.m_var.c_str(), vi.m_item, vi.m_domName.c_str()) == false)
-				{
-					feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", vi.m_var.c_str());
-					throw "FATAL ERROR";
-				}
-			}
 		}
 
 		// data records
 		SerializeDataStore(ar);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::SerializePlotData(DumpStream& ar)
+{
+	GetPlotDataStore().Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1402,28 +1309,14 @@ bool FEBioModel::Init()
 	{
 		if (m_plot == 0) 
 		{
-			pplt = new FEBioPlotFile(*this);
+			pplt = new FEBioPlotFile(this);
 			m_plot = pplt;
-
-			// set compression
-			pplt->SetCompression(m_pltCompression);
 
 			// set the software string
 			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
 			sprintf(szbuf, "FEBio %s", szver);
 			pplt->SetSoftwareString(szbuf);
-
-			// add plot variables
-			for (FEPlotVariable& vi : m_pltData)
-			{
-				// add the plot output variable
-				if (pplt->AddVariable(vi.m_var.c_str(), vi.m_item, vi.m_domName.c_str()) == false)
-				{
-					feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", vi.m_var.c_str());
-					return false;
-				}
-			}
 		}
 
 		// see if a valid plot file name is defined.
@@ -1561,13 +1454,13 @@ bool FEBioModel::Reset()
 		int hint = step->GetPlotHint();
 		if (m_plot == 0) 
 		{
-			m_plot = new FEBioPlotFile(*this);
+			m_plot = new FEBioPlotFile(this);
 			hint = 0;
 		}
 
 		if (hint != FE_PLOT_APPEND)
 		{
-			if (m_plot->Open(*this, m_splot.c_str()) == false)
+			if (m_plot->Open(m_splot.c_str()) == false)
 			{
 				feLogError("Failed creating PLOT database.");
 				return false;
@@ -1592,20 +1485,29 @@ bool FEBioModel::Reset()
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! This is the main solve method. This function loops over all analysis steps
-//! and solves each one in turn. 
-//! \sa FEAnalysis
-
-bool FEBioModel::Solve()
+void FEBioModel::on_cb_solved()
 {
-	// start the total time tracker
-	m_SolveTime.start();
+	FEAnalysis* step = GetCurrentStep();
+	if (step == nullptr) return;
 
-	// solve the FE model
-	bool bconv = FEMechModel::Solve();
+	// for multistep analysis we'll print a grand total
+	if (Steps() > 1)
+	{
+		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
+	}
 
-	// stop total time tracker
-	m_SolveTime.stop();
+	// get and print elapsed time
+	char sztime[64];
+	Timer* solveTimer = GetTimer(TimerID::Timer_LinSolve);
+	solveTimer->time_str(sztime);
+	feLog("\tTime in linear solver: %s\n\n", sztime);
+
+	// always flush the log
+	m_log.flush();
 
 	// get peak memory usage
 #ifdef WIN32
@@ -1618,8 +1520,7 @@ bool FEBioModel::Solve()
 #endif
 
 	// print the elapsed time
-	char sztime[64];
-	m_SolveTime.time_str(sztime);
+	GetSolveTimer().time_str(sztime);
 	feLog("\n Elapsed time : %s\n\n", sztime);
 
 	// print additional stats to the log file only
@@ -1629,12 +1530,12 @@ bool FEBioModel::Solve()
 		Logfile::MODE old_mode = m_log.SetMode(Logfile::LOG_FILE);
 
 		// sum up all the times spend in the linear solvers
-		double total_time = 0.0;
+		double total_time   = 0.0;
 		double input_time   = m_InputTime.GetTime(); total_time += input_time;
-		double init_time    = m_InitTime.GetTime (); total_time += init_time;
-		double solve_time   = m_SolveTime.GetTime(); total_time += solve_time;
-		double io_time      = m_IOTimer.GetTime  ();
-		double total_linsol = GetTimer(TimerID::Timer_Solve    )->GetTime();
+		double init_time    = m_InitTime .GetTime(); total_time += init_time;
+		double solve_time   = GetTimer(TimerID::Timer_ModelSolve)->GetTime(); total_time += solve_time;
+		double io_time      = m_IOTimer.GetTime();
+		double total_linsol = GetTimer(TimerID::Timer_LinSolve )->GetTime();
 		double total_reform = GetTimer(TimerID::Timer_Reform   )->GetTime();
 		double total_stiff  = GetTimer(TimerID::Timer_Stiffness)->GetTime();
 		double total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime();
@@ -1642,21 +1543,21 @@ bool FEBioModel::Solve()
 		double total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime();
 
 		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
-		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );
-		Timer::time_str(init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time   );
-		Timer::time_str(solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time  );
-		Timer::time_str(io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time     );
+		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time);
+		Timer::time_str(init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time);
+		Timer::time_str(solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time);
+		Timer::time_str(io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time);
 		Timer::time_str(total_reform, sztime); feLog("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, total_reform);
-		Timer::time_str(total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff );
-		Timer::time_str(total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs   );
+		Timer::time_str(total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff);
+		Timer::time_str(total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs);
 		Timer::time_str(total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
 		Timer::time_str(total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, total_qn);
 		Timer::time_str(total_linsol, sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
-		Timer::time_str(total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time  );
-
+		Timer::time_str(total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time);
 
 		m_log.SetMode(old_mode);
 
+		bool bconv = IsSolved();
 		if (bconv)
 		{
 			feLog("\n N O R M A L   T E R M I N A T I O N\n\n");
@@ -1674,7 +1575,38 @@ bool FEBioModel::Solve()
 	int hint = GetStep(Steps() - 1)->GetPlotHint();
 	if (hint != FE_PLOT_APPEND)
 		if (m_plot) m_plot->Close();
+}
 
-	// We're done !
-	return bconv;
+//-----------------------------------------------------------------------------
+void FEBioModel::on_cb_stepSolved()
+{
+	FEAnalysis* step = GetCurrentStep();
+	if (step == nullptr) return;
+
+	// output report
+	feLog("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+	feLog("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
+	feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
+	feLog("\tAverage number of equilibrium iterations .......... : %lg\n\n", (step->m_ntimesteps != 0 ? (double)step->m_ntotiter / (double)step->m_ntimesteps : 0));
+	feLog("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
+	feLog("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
+
+	// print linear solver stats
+	LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
+	if (ls)
+	{
+		LinearSolverStats stats = ls->GetStats();
+		int nsolves = stats.backsolves;
+		int niters = stats.iterations;
+		double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
+		feLog("\n L I N E A R   S O L V E R   S T A T S\n\n");
+		feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
+		feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
+	}
+
+	// add to stats
+	m_ntimeSteps    += step->m_ntimesteps;
+	m_ntotalIters   += step->m_ntotiter;
+	m_ntotalRHS     += step->m_ntotrhs;
+	m_ntotalReforms += step->m_ntotref;
 }

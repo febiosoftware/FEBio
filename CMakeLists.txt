@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR FEBioRVE)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -182,8 +183,6 @@ endmacro()
 
 findHdrSrc(FEBioStudio)
 
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FEBioPlot FEBioTest FEBioXML FECore NumCore FEAMR)
-
 foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
 endforeach(name)
@@ -258,10 +257,10 @@ endif()
 # Link FEBio libraries
 if(WIN32 OR APPLE)
 	target_link_libraries(febio3 fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr febiorve)
 else()
 	target_link_libraries(febio3 -Wl,--start-group fecore febiolib febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr -Wl,--end-group)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr febiorve -Wl,--end-group)
 endif()
 
 # Link LEVMAR

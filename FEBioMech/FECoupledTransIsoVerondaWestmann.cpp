@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -123,11 +123,8 @@ tens4ds FECoupledTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	// calculate left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.LeftCauchyGreen();
 
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
-
 	// get the material fiber axis
-	vec3d a0 = Q.col(0);
+	vec3d a0 = m_fiber(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -198,12 +195,9 @@ double FECoupledTransIsoVerondaWestmann::StrainEnergyDensity(FEMaterialPoint& mp
 	// calculate square of B
 	mat3ds B2 = B.sqr();
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
-
 	// get the material fiber axis
-	vec3d a0 = Q.col(0);
-    
+	vec3d a0 = m_fiber(mp);
+
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
 	double l = a.unit();

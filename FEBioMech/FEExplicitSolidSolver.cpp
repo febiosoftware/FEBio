@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -810,7 +810,7 @@ bool FEExplicitSolidSolver::DoSolve()
 	// prepare for solve
 	PrepStep();
 
-	feLog(" %d\n", m_niter+1);
+//	feLog(" %d\n", m_niter+1);
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
@@ -845,10 +845,15 @@ bool FEExplicitSolidSolver::DoSolve()
 	{
 		m_ui[i] = dt * v_pred[i];
 	}
+	double Dnorm = sqrt(m_ui * m_ui);
+	feLog("\t displacement norm : %lg\n", Dnorm);
 	Update(m_ui);
 
 	// evaluate acceleration
 	Residual(m_R1);
+	double Rnorm = sqrt(m_R1 * m_R1);
+	feLog("\t force vector norm : %lg\n", Rnorm);
+
 	vector<double> anp1(m_neq);
 	for (int i = 0; i < m_neq; ++i)
 	{

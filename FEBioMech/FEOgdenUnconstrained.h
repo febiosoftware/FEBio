@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -50,9 +50,9 @@ protected:
 	double	m_eps;
 	
 public:
-	double	m_c[MAX_TERMS];		//!< coefficients mu
-	double	m_m[MAX_TERMS];		//!< powers
-	double	m_p;				//!< coefficient mu prime
+	FEParamDouble	m_cp;				//!< coefficient mu prime
+	FEParamDouble	m_c[MAX_TERMS];		//!< coefficients mu
+	double	m_m[MAX_TERMS];				//!< powers
 	
 	DECLARE_FECORE_CLASS();
 };

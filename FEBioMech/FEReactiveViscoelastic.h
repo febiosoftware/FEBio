@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation reactive viscoelastic material
@@ -58,13 +59,19 @@ public:
     
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt) override;
-    
+    mat3ds StressStrongBonds(FEMaterialPoint& pt);
+    mat3ds StressWeakBonds(FEMaterialPoint& pt);
+
 	//! tangent function
 	tens4ds Tangent(FEMaterialPoint& pt) override;
-    
+    tens4ds TangentStrongBonds(FEMaterialPoint& pt);
+    tens4ds TangentWeakBonds(FEMaterialPoint& pt);
+
     //! strain energy density function
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
+
     //! cull generations
     void CullGenerations(FEMaterialPoint& pt);
     
@@ -77,8 +84,20 @@ public:
     //! detect new generation
     bool NewGeneration(FEMaterialPoint& pt);
     
+    //! return number of generations
+    int RVEGenerations(FEMaterialPoint& pt);
+    
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
+
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
+    //! get base material point
+    FEMaterialPoint* GetBaseMaterialPoint(FEMaterialPoint& mp);
+
+    //! get bond material point
+    FEMaterialPoint* GetBondMaterialPoint(FEMaterialPoint& mp);
     
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
@@ -89,6 +108,9 @@ public:
     double	m_wmin;		//!< minimum value of relaxation
     int     m_btype;    //!< bond kinetics type
     int     m_ttype;    //!< bond breaking trigger type
+    double  m_emin;     //!< strain threshold for triggering new generation
+    
+    int     m_nmax;     //!< highest number of generations achieved in analysis
     
     DECLARE_FECORE_CLASS();
 };

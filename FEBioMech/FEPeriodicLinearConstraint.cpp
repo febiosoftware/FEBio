@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -272,12 +272,12 @@ void addLinearConstraint(FEModel& fem, int parent, int child, int nodeA, int nod
 	// do one constraint for x, y, z
 	for (int j = 0; j<3; ++j)
 	{
-		FELinearConstraint lc(&fem);
-		lc.SetParentDof(j, parent);
+		FELinearConstraint* lc = new FELinearConstraint(&fem);
+		lc->SetParentDof(j, parent);
 
-		lc.AddChildDof(j, child, 1.0);
-		lc.AddChildDof(j, nodeA, 1.0);
-		lc.AddChildDof(j, nodeB, -1.0);
+		lc->AddChildDof(j, child, 1.0);
+		lc->AddChildDof(j, nodeA, 1.0);
+		lc->AddChildDof(j, nodeB, -1.0);
 
 		LCM.AddLinearConstraint(lc);
 	}

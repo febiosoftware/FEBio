@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -51,6 +51,10 @@ bool FEBioStdSolver::Run()
 	// Solve the problem and return error code
 	return (GetFEModel() ? GetFEModel()->Solve() : false);
 }
+
+//=============================================================================
+
+FEBioRestart::FEBioRestart(FEModel* pfem) : FECoreTask(pfem) {}
 
 //-----------------------------------------------------------------------------
 bool FEBioRestart::Init(const char *szfile)
@@ -144,4 +148,45 @@ bool FEBioRestart::Run()
 {
 	// continue the analysis
 	return (GetFEModel() ? GetFEModel()->Solve() : false);
+}
+
+//=============================================================================
+
+FEBioRCISolver::FEBioRCISolver(FEModel* fem) : FECoreTask(fem) {}
+
+//! initialization
+bool FEBioRCISolver::Init(const char* szfile)
+{
+	return (GetFEModel() ? GetFEModel()->Init() : false);
+}
+
+//! Run the FE model
+bool FEBioRCISolver::Run()
+{
+	// get the model
+	FEModel* fem = GetFEModel();
+	if (fem == nullptr) return false;
+
+	// initialize RCI solver
+	if (fem->RCI_Init() == false) return false;
+
+	// loop until solved
+	while (fem->IsSolved() == false)
+	{
+		// try to advance the solution
+		if (fem->RCI_Advance() == false)
+		{
+			// if we were unable to advance the solution, we do a rewind and try again
+			if (fem->RCI_Rewind() == false)
+			{
+				// couldn't rewind, so we're done
+				break;
+			}
+		}
+	}
+
+	// finalize the solver
+	if (fem->RCI_Finish() == false) return false;
+
+	return true;
 }

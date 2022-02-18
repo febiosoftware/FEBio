@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,8 +35,8 @@ SOFTWARE.*/
 // SUBSUBVERSION is incremented when bugs are fixed.
 
 #define VERSION			3
-#define SUBVERSION		5
-#define SUBSUBVERSION	1
+#define SUBVERSION		6
+#define SUBSUBVERSION	0
 
 ///////////////////////////////////////////////////////////////////////////////
 // Restart file version

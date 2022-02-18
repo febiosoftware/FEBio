@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,7 +56,13 @@ public:
 	// Add a material component
 	void AddMaterial(FEElasticMaterial* pm);
 
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+
 public:
+    //! data initialization
+    bool Init() override;
+    
 	//! calculate stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt) override;
 	
@@ -69,6 +75,9 @@ public:
 	//! the density is the sum of the constituent densities
 	double Density(FEMaterialPoint& mp) override;
 
+public:
+    double StrongBondDevSED(FEMaterialPoint& pt) override;
+    double WeakBondDevSED(FEMaterialPoint& pt) override;
 
 private:
 	std::vector<FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials

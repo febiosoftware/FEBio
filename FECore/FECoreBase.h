@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -92,6 +92,9 @@ public: // interface for getting/setting properties
 
 	//! Set a property
 	bool SetProperty(int nid, FECoreBase* pm);
+
+	//! Set a property via name
+	bool SetProperty(const char* sz, FECoreBase* pm);
 
 	//! return a property
 	virtual FECoreBase* GetProperty(int i);

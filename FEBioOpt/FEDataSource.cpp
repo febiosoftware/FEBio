@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <cwctype>
 #include "FEDataSource.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
@@ -180,29 +181,85 @@ bool FEDataParameter::Init()
 		}
 		else if (strstr(m_param.c_str(), "fem.domain_data"))
 		{
+			const char* c = m_param.c_str() + 15;
 			char buf[256] = { 0 };
-			strcpy(buf, m_param.c_str());
-			char* sz = buf + 17;
-			char* c1 = strchr(sz, ',');
+			int n = 0;
+			bool skipws = true;
+			while (c && *c)
+			{
+				if (*c == '\'')
+				{
+					if (skipws) skipws = false; else skipws = true;
+				}
+
+				if ((skipws == false) || (iswspace(*c) == 0)) buf[n++] = *c;
+				c++;
+			}
+			buf[n] = 0;
+
+			char* sz = buf;
+			int l = strlen(sz);
+			if (sz[0  ] != '(') { feLogErrorEx(fem, "Syntax error in parameter name %s", m_param.c_str()); return false; }
+			if (sz[l-1] != ')') { feLogErrorEx(fem, "Syntax error in parameter name %s", m_param.c_str()); return false; }
+			sz[l - 1] = 0;
+			*sz++ = 0;
+
+			// separate string in data variable and domain name
+			char* c1 = strrchr(sz, ',');
 			*c1++ = 0;
 
+			// process part name
 			char* szdom = strchr(c1, '\'');
 			if (szdom == 0) { feLogErrorEx(fem, "Syntax error in parameter name %s", m_param.c_str()); return false; }
 			szdom++;
 
-			c1 = strrchr(sz, '\'');
-			if (sz[0] == '\'') sz++;
-			*c1 = 0;
-
 			c1 = strrchr(szdom, '\'');
-			if (c1) *c1 = 0;
-
-			FELogDomainData* pd = fecore_new<FELogDomainData>(sz, fem);
-			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+			if (c1) *c1 = 0; else { feLogErrorEx(fem, "Syntax error in parameter name %s", m_param.c_str()); return false; }
 
 			FEMesh& mesh = fem->GetMesh();
 			FEDomain* dom = mesh.FindDomain(szdom);
 			if (dom == nullptr) { feLogErrorEx(fem, "Invalid domain name %s", szdom); return false; }
+
+			// process data name
+			FELogDomainData* pd = nullptr;
+			if (sz[0] == '\'')
+			{
+				sz++;
+				c1 = strrchr(sz, '\'');
+				if (c1 == nullptr) { feLogErrorEx(fem, "Invalid domain name %s", szdom); return false; }
+				*c1 = 0;
+				pd = fecore_new<FELogDomainData>(sz, fem);
+			}
+			else
+			{
+				c1 = strchr(sz, '(');
+				if (c1 == nullptr) { feLogErrorEx(fem, "Syntax error"); return false; }
+				char* cvar = c1 + 1;
+				*c1 = 0;
+				if ((c1 = strrchr(cvar, ')')) == nullptr) { feLogErrorEx(fem, "Syntax error"); return false; }
+				*c1 = 0;
+
+				std::vector<std::string> varList;
+				do
+				{
+					if (cvar[0] == '\'')
+					{
+						*cvar++ = 0;
+						if ((c1 = strchr(cvar, '\'')) == nullptr) { feLogErrorEx(fem, "Syntax error"); return false; }
+						*c1 = 0;
+						varList.push_back(cvar);
+						cvar = c1 + 1;
+					}
+					else varList.push_back(cvar);
+					cvar = strchr(cvar, ',');
+					if (cvar) cvar++;
+				} while (cvar && *cvar);
+
+				pd = fecore_new<FELogDomainData>(sz, fem);
+				if (pd == nullptr) { feLogErrorEx(fem, "Syntax error"); return false; }
+				if (pd->SetParameters(varList) == false) { feLogErrorEx(fem, "Syntax error"); return false; }
+			}
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
 
 			m_fy = [=]() { return pd->value(*dom); };
 		}

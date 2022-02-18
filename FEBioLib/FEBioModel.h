@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -51,22 +51,6 @@ enum FE_Dump_Level {
 //!
 class FEBIOLIB_API FEBioModel : public FEMechModel
 {
-	class FEPlotVariable
-	{
-	public:
-		FEPlotVariable();
-		FEPlotVariable(const std::string& varName, const std::vector<int>& itemList, const std::string& domainName);
-		FEPlotVariable(const FEPlotVariable& v);
-		void operator = (const FEPlotVariable& v);
-
-		void Serialize(DumpStream& ar);
-
-	public:
-		std::string			m_var;
-		std::vector<int>	m_item;
-		std::string			m_domName;
-	};
-
 public:
 	//! constructor
 	FEBioModel();
@@ -80,25 +64,22 @@ public:
 	//! Resets data structures
 	bool Reset() override;
 
-	//! Solves the problem
-	bool Solve() override;
-
 public: // --- I/O functions ---
 
 	//! input data from file
 	bool Input(const char* szfile);
 
-	//! write to plot file
+	//! handle output
 	void Write(unsigned int nwhen);
 
-	//! Write log data
-	void WriteLog(unsigned int nwhen);
+	// write to plot file
+	void WritePlot(unsigned int nevent);
 
 	//! write data to log file
-	void WriteData();
+	void WriteData(unsigned int nevent);
 
 	//! dump data to archive for restart
-	void DumpData();
+	void DumpData(int nevent);
 
 	//! add to log 
 	void Log(int ntag, const char* szmsg) override;
@@ -118,10 +99,18 @@ public: //! --- serialization for restarts ---
 	//! Write or read data from archive
 	void Serialize(DumpStream& ar) override;
 
+private:
+	static bool handleCB(FEModel* fem, unsigned int nwhen, void* pd);
+	bool processEvent(int nevent);
+
+	void on_cb_solved();
+	void on_cb_stepSolved();
+
 protected:
 	// helper functions for serialization
 	void SerializeIOData   (DumpStream& ar);
 	void SerializeDataStore(DumpStream& ar);
+	void SerializePlotData (DumpStream& ar);
 
 	bool InitLogFile();
 	bool InitPlotFile();
@@ -192,7 +181,6 @@ private:
 	void UpdatePlotObjects();
 
 private:
-	Timer		m_SolveTime;	//!< timer to track total time to solve problem
 	Timer		m_InputTime;	//!< timer to track time to read model
 	Timer		m_InitTime;		//!< timer to track model initialization
 	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)
@@ -223,8 +211,6 @@ protected: // file names
 	std::string	m_title;	//!< model title
 
 protected:
-	vector<FEPlotVariable>	m_pltData;
-	int						m_pltCompression;
 	bool					m_pltAppendOnRestart;
 	int						m_lastUpdate;
 

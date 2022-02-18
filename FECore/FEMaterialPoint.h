@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -103,8 +103,8 @@ public:
 	double*		m_shape;
 
 protected:
-	FEMaterialPoint*	m_pNext;	//<! next data in the list
-	FEMaterialPoint*	m_pPrev;	//<! previous data in the list
+	FEMaterialPoint*	m_pNext;    //!< next data in the list
+	FEMaterialPoint*	m_pPrev;    //!< previous data in the list
 };
 
 //-----------------------------------------------------------------------------

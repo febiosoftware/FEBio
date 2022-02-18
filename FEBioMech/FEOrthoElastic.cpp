@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,7 +39,7 @@ BEGIN_FECORE_CLASS(FEOrthoElastic, FEElasticMaterial)
 	ADD_PARAMETER(G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12");
 	ADD_PARAMETER(G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23");
 	ADD_PARAMETER(G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31");
-	ADD_PARAMETER(v12, FE_RANGE_GREATER_OR_EQUAL(0.0), "v12");
+	ADD_PARAMETER(v12, "v12");
 	ADD_PARAMETER(v23, "v23");
 	ADD_PARAMETER(v31, "v31");
 END_FECORE_CLASS();

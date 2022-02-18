@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioOpt.h"
 #include "FEOptimize.h"
 #include "FEParameterSweep.h"
+#include "FEBioParamRun.h"
 #include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
@@ -37,6 +38,7 @@ SOFTWARE.*/
 //! in this module with the FEBio framework.
 void FEBioOpt::InitModule()
 {
-REGISTER_FECORE_CLASS(FEOptimize, "optimize");
+REGISTER_FECORE_CLASS(FEOptimize      , "optimize");
 REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
+REGISTER_FECORE_CLASS(FEBioParamRun   , "param_run");
 }

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -140,20 +140,6 @@ public:
 	};
 
 public:
-	//-------------------------------------------------------------------------
-	class FEBIOXML_API PlotVariable
-	{
-	public:
-		PlotVariable(const PlotVariable& pv);
-        PlotVariable(const std::string& var, vector<int>& item, const char* szdom = "");
-        
-	public:
-		char		m_szvar[128];	//!< name of output variable
-        char        m_szdom[128];    //!< (optional) name of domain
-		vector<int>	m_item;			//!< (optional) list of items
-	};
-
-public:
 	//! constructor
 	FEBioImport();
 
@@ -171,10 +157,6 @@ public:
 	void SetLogfileName (const char* sz);
 	void SetPlotfileName(const char* sz);
 
-    void AddPlotVariable(const char* szvar, vector<int>& item, const char* szdom = "");
-
-	void SetPlotCompression(int n);
-    
 	void AddDataRecord(DataRecord* pd);
 
 public:
@@ -193,9 +175,5 @@ public:
 	char	m_szplt[512];
 
 public:
-	char					m_szplot_type[256];
-	vector<PlotVariable>	m_plot;
-	int						m_nplot_compression;
-
 	vector<DataRecord*>		m_data;
 };

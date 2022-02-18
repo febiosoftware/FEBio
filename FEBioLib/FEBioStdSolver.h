@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,21 +39,35 @@ public:
 	FEBioStdSolver(FEModel* pfem);
 
 	//! initialization
-	bool Init(const char* szfile);
+	bool Init(const char* szfile) override;
 
 	//! Run the FE model
-	bool Run();
+	bool Run() override;
 };
 
 //-----------------------------------------------------------------------------
 class FEBioRestart : public FECoreTask
 {
 public:
-	FEBioRestart(FEModel* pfem) : FECoreTask(pfem){}
+	FEBioRestart(FEModel* pfem);
 
 	//! initialization
-	bool Init(const char* szfile);
+	bool Init(const char* szfile) override;
 
 	//! Run the FE model
-	virtual bool Run();
+	bool Run() override;
+};
+
+//-----------------------------------------------------------------------------
+// class for testing reverse communication interface of FEModel
+class FEBioRCISolver : public FECoreTask
+{
+public:
+	FEBioRCISolver(FEModel* fem);
+
+	//! initialization
+	bool Init(const char* szfile) override;
+
+	//! Run the FE model
+	bool Run() override;
 };

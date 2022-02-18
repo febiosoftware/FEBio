@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -47,6 +47,9 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
+    //! calculate deviatoric strain energy density at material point
+    double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+    
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };

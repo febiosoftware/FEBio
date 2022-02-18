@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -130,6 +130,10 @@ public:
     
 	int CheckGeneration(const double t);
 
+public:
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
+    
 public:
 	std::vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
 

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEOgdenUnconstrained.h"
 
 BEGIN_FECORE_CLASS(FEOgdenUnconstrained, FEElasticMaterial);
-	ADD_PARAMETER(m_p   , "cp");
+	ADD_PARAMETER(m_cp  , "cp");
 	ADD_PARAMETER(m_c[0], "c1");
 	ADD_PARAMETER(m_c[1], "c2");
 	ADD_PARAMETER(m_c[2], "c3");
@@ -98,14 +98,19 @@ mat3ds FEOgdenUnconstrained::Stress(FEMaterialPoint &mp)
 	lam[1] = sqrt(lam2[1]);
 	lam[2] = sqrt(lam2[2]);
 	
+	// evaluate coefficients at material points
+	double cp = m_cp(mp);
+	double ci[MAX_TERMS] = { 0 };
+	for (int i = 0; i < MAX_TERMS; ++i) ci[i] = m_c[i](mp);
+
 	// stress
 	mat3ds s;
 	s.zero();
 	double T;
 	for (int i=0; i<3; ++i) {
-		T = m_p*(J-1);
+		T = cp*(J-1);
 		for (int j=0; j<MAX_TERMS; ++j)
-			T += m_c[j]/m_m[j]*(pow(lam[i], m_m[j]) - 1)/J;
+			T += ci[j]/m_m[j]*(pow(lam[i], m_m[j]) - 1)/J;
 		s += dyad(ev[i])*T;
 	}
 
@@ -149,31 +154,36 @@ tens4ds FEOgdenUnconstrained::Tangent(FEMaterialPoint& mp)
 		lamp[2][j] = pow(lam[2], m_m[j]);
 	}
 	
+	// evaluate coefficients at material points
+	double cp = m_cp(mp);
+	double ci[MAX_TERMS] = { 0 };
+	for (int i = 0; i < MAX_TERMS; ++i) ci[i] = m_c[i](mp);
+
 	// principal stresses
 	mat3ds s;
 	s.zero();
 	double T[3];
 	for (i=0; i<3; ++i) {
-		T[i] = m_p*(J-1);
+		T[i] = cp*(J-1);
 		for (j=0; j<MAX_TERMS; ++j)
-			T[i] += m_c[j]/m_m[j]*(lamp[i][j] - 1)/J;
+			T[i] += ci[j]/m_m[j]*(lamp[i][j] - 1)/J;
 		s += N[i]*T[i];
 	}
 	
 	// coefficients appearing in elasticity tensor
 	double D[3][3],E[3][3];
 	for (j=0; j<3; ++j) {
-		D[j][j] = m_p;
+		D[j][j] = cp;
 		for (k=0; k<MAX_TERMS; ++k)
-			D[j][j] += m_c[k]/m_m[k]*((m_m[k]-2)*lamp[j][k]+2)/J;
+			D[j][j] += ci[k]/m_m[k]*((m_m[k]-2)*lamp[j][k]+2)/J;
 		for (i=j+1; i<3; ++i) {
-			D[i][j] = m_p*(2*J-1);
+			D[i][j] = cp*(2*J-1);
 			if (lam2[j] != lam2[i])
 				E[i][j] = 2*(lam2[j]*T[i] - lam2[i]*T[j])/(lam2[i]-lam2[j]);
 			else {
-				E[i][j] = 2*m_p*(1-J);
+				E[i][j] = 2*cp*(1-J);
 				for (k=0; k<MAX_TERMS; ++k)
-					E[i][j] += m_c[k]/m_m[k]*((m_m[k]-2)*lamp[j][k]+2)/J;
+					E[i][j] += ci[k]/m_m[k]*((m_m[k]-2)*lamp[j][k]+2)/J;
 			}
 		}
 	}
@@ -216,10 +226,15 @@ double FEOgdenUnconstrained::StrainEnergyDensity(FEMaterialPoint& mp)
 	lam[1] = sqrt(lam2[1]);
 	lam[2] = sqrt(lam2[2]);
 	
+	// evaluate coefficients at material points
+	double cp = m_cp(mp);
+	double ci[MAX_TERMS] = { 0 };
+	for (int i = 0; i < MAX_TERMS; ++i) ci[i] = m_c[i](mp);
+
 	// strain energy density
-    double sed = m_p*(J-1)*(J-1)/2;
+    double sed = cp*(J-1)*(J-1)/2;
     for (int j=0; j<MAX_TERMS; ++j)
-        sed += m_c[j]/(m_m[j]*m_m[j])*
+        sed += ci[j]/(m_m[j]*m_m[j])*
         (pow(lam[0], m_m[j]) + pow(lam[1], m_m[j]) + pow(lam[2], m_m[j])
          - 3 - m_m[j]*lnJ);
 	

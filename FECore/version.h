@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,7 +34,7 @@ SOFTWARE.*/
 // of FEBio. In that case, plugins need to be recompiled to be usable with the 
 // newer version of FEBio.
 #define FE_SDK_MAJOR_VERSION	3
-#define FE_SDK_SUB_VERSION		4
+#define FE_SDK_SUB_VERSION		6
 #define FE_SDK_SUBSUB_VERSION	0
 
 //-----------------------------------------------------------------------------

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -66,6 +66,7 @@ class FECORE_API FEParamDouble : public FEModelParam
 {
 public:
 	FEParamDouble();
+	~FEParamDouble();
 
 	FEParamDouble(const FEParamDouble& p);
 
@@ -103,6 +104,7 @@ class FECORE_API FEParamVec3 : public FEModelParam
 {
 public:
 	FEParamVec3();
+	~FEParamVec3();
 
 	FEParamVec3(const FEParamVec3& p);
 
@@ -137,6 +139,7 @@ class FECORE_API FEParamMat3d : public FEModelParam
 {
 public:
 	FEParamMat3d();
+	~FEParamMat3d();
 
 	FEParamMat3d(const FEParamMat3d& p);
 
@@ -170,6 +173,7 @@ class FECORE_API FEParamMat3ds : public FEModelParam
 {
 public:
 	FEParamMat3ds();
+	~FEParamMat3ds();
 
 	FEParamMat3ds(const FEParamMat3ds& p);
 

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,7 +45,7 @@ public:
 	struct FACET
 	{
 		// max nr of nodes for each facet
-		enum { MAX_NODES = 9};
+		enum { MAX_NODES = 10};
 
 		// different facet types
 		enum FacetType {
@@ -55,7 +55,8 @@ public:
 			TRI6  = 6,
 			TRI7  = 7,
 			QUAD8 = 8,
-			QUAD9 = 9
+			QUAD9 = 9,
+			TRI10 = 10
 		};
 
 		int	node[FACET::MAX_NODES];

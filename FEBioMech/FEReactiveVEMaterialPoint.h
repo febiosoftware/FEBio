@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,32 +36,45 @@ class FEReactiveViscoelasticMaterial;
 class FEUncoupledReactiveViscoelasticMaterial;
 
 //-----------------------------------------------------------------------------
+//! Material point data array for reactive viscoelastic materials
+//!
+class FEReactiveViscoelasticMaterialPoint : public FEMaterialPointArray
+{
+public:
+    //! constructor
+    FEReactiveViscoelasticMaterialPoint();
+    
+    //! Copy material point data
+    FEMaterialPoint* Copy();
+    
+    //! material point initialization
+    void Init();
+    
+    //! data serialization
+    void Serialize(DumpStream& ar);
+};
+
+//-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
 class FEReactiveVEMaterialPoint : public FEMaterialPoint
 {
 public:
     //! olverloaded constructors
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = pe; m_pRuc = 0; }
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEUncoupledReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = 0; m_pRuc = pe; }
+    FEReactiveVEMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
     
     //! copy material point data
-    FEMaterialPoint* Copy();
+    FEMaterialPoint* Copy() override;
     
     //! Initialize material point data
-    void Init();
+    void Init() override;
 
-    //! Update material point data
-    void Update(const FETimeInfo& timeInfo);
-    
     //! Serialize data to archive
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
 public:
     // multigenerational material data
-    deque <mat3d>  m_Fi;	//!< inverse of relative deformation gradient
-    deque <double> m_Ji;	//!< determinant of Fi (store for efficiency)
-    deque <double> m_v;     //!< time when generation starts breaking
-    deque <double> m_w;     //!< mass fraction when generation starts breaking
-    FEReactiveViscoelasticMaterial*  m_pRve; //!< pointer to parent material
-    FEUncoupledReactiveViscoelasticMaterial*  m_pRuc; //!< pointer to parent material
+    deque <mat3ds> m_Uv;	//!< right stretch tensor at tv (when generation u starts breaking)
+    deque <double> m_Jv;	//!< determinant of Uv (store for efficiency)
+    deque <double> m_v;     //!< time tv when generation starts breaking
+    deque <double> m_f;     //!< mass fraction when generation starts breaking
 };

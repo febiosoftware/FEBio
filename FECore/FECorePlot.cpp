@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,6 +54,9 @@ FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
 // the material parameter in the format [materialname.parametername].
 bool FEPlotParameter::SetFilter(const char* sz)
 {
+	// store the filter for serialization
+	m_filter = sz;
+
 	// find the parameter
 	ParamString ps(sz);
 	m_param = GetFEModel()->GetParameterValue(ps);
@@ -238,6 +241,22 @@ bool FEPlotParameter::SetFilter(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+void FEPlotParameter::Serialize(DumpStream& ar)
+{
+	FEPlotData::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+		ar << m_filter;
+	else
+	{
+		string filter;
+		ar >> filter;
+		SetFilter(filter.c_str());
+	}
+}
+
+//-----------------------------------------------------------------------------
 // The Save function stores the material parameter data to the plot file.
 bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 {
@@ -398,6 +417,18 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 
 		return true;
 	}
+	else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
+	{
+		FEParamVec3& map = m_param.value<FEParamVec3>();
+		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
+		if (nset == 0) return false;
+
+		// write the nodal values
+		writeNodalValues<vec3d>(*nset, a, map);
+
+		return true;
+	}
+
 
 	return false;
 }

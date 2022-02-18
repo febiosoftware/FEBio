@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -104,18 +104,18 @@ tens4ds FEFiberNHUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 
 		// calculate the fiber tangent
 		c = NxN*(2 * m_mu / J);
+
+        // This is the final value of the elasticity tensor
+        mat3dd I(1);
+        tens4ds IxI = dyad1s(I);
+        tens4ds I4 = dyad4s(I);
+        c += ((I4 + IxI / 3.0)*s.tr() - dyad1s(I, s))*(2. / 3.)
+        - (ddots(IxI, c) - IxI*(c.tr() / 3.)) / 3.;
 	}
 	else
 	{
 		c.zero();
 	}
-
-	// This is the final value of the elasticity tensor
-	mat3dd I(1);
-	tens4ds IxI = dyad1s(I);
-	tens4ds I4 = dyad4s(I);
-	c += ((I4 + IxI / 3.0)*s.tr() - dyad1s(I, s))*(2. / 3.)
-		- (ddots(IxI, c) - IxI*(c.tr() / 3.)) / 3.;
 
 	return c;
 }

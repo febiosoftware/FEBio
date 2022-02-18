@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -386,7 +386,7 @@ XMLReader::Error(tag, "unrecognized tag") {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidValue::InvalidValue(XMLTag& tag) : \
-XMLReader::Error(tag, "invalid value") {}
+XMLReader::Error(tag, format_string("invalid value: %s", tag.isleaf() ? tag.szvalue() : "")) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, const char* sza, const char* szv) : \
@@ -672,7 +672,7 @@ void XMLReader::NextTag(XMLTag& tag)
 //-----------------------------------------------------------------------------
 inline bool isvalid(char c)
 {
-	return (isalnum(c) || (c=='_') || (c=='.'));
+	return (isalnum(c) || (c=='_') || (c=='.') || (c=='-') || (c==':'));
 }
 
 //-----------------------------------------------------------------------------

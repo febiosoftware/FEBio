@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -73,6 +73,10 @@ public:
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
     
 public:
+    virtual double StrongBondDevSED(FEMaterialPoint& pt) { return DevStrainEnergyDensity(pt); }
+    virtual double WeakBondDevSED(FEMaterialPoint& pt) { return 0; }
+
+public:
 	//! strain energy density U(J)
     virtual double U(double J) {
         switch (m_npmodel) {
@@ -120,6 +124,8 @@ public:
 
 	//! calculate strain energy (do not overload!)
 	double StrainEnergyDensity(FEMaterialPoint& pt) final;
+    double StrongBondSED(FEMaterialPoint& pt) final;
+    double WeakBondSED(FEMaterialPoint& pt) final;
 
 	// Create material point data
 	FEMaterialPoint* CreateMaterialPointData() override;

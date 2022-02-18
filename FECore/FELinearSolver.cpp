@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -205,7 +205,7 @@ bool FELinearSolver::SolveStep()
 	// solve the equations
 	vector<double> u(m_neq);
 	{
-		TRACK_TIME(TimerID::Timer_Solve);
+		TRACK_TIME(TimerID::Timer_LinSolve);
 		if (m_pls->BackSolve(u, m_R) == false)
 			throw LinearSolverFailed();
 	}
@@ -261,7 +261,7 @@ bool FELinearSolver::ReformStiffness()
 
 	// factorize the stiffness matrix
 	{
-		TRACK_TIME(TimerID::Timer_Solve);
+		TRACK_TIME(TimerID::Timer_LinSolve);
 		m_pls->Factor();
 	}
 
@@ -299,7 +299,7 @@ bool FELinearSolver::CreateStiffness()
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME(TimerID::Timer_Solve);
+		TRACK_TIME(TimerID::Timer_LinSolve);
 		if (!m_pls->PreProcess()) throw FatalError();
 	}
 

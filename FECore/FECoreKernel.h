@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -127,7 +127,7 @@ public: // Modules
 
 public:
 	//! Register a new domain class
-	void RegisterDomain(FEDomainFactory* pf);
+	void RegisterDomain(FEDomainFactory* pf, bool pushFront = false);
 
 	//! Create a domain of a certain type
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);

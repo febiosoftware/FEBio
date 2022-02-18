@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -58,7 +58,7 @@ public:
 	vector<double>		rhs;	// right-hand side 
 
 	HYPRE_Solver	m_solver;
-	int				m_num_iterations;
+	HYPRE_Int		m_num_iterations;
 	double			m_final_res_norm;
 
 	int			m_print_level;
@@ -77,7 +77,7 @@ public:
 	bool		m_jacobi_pc;
 	bool		m_failMaxIters;
 
-	int*	m_dofMap;
+	HYPRE_Int*	m_dofMap;
 
 public:
 	Implementation()
@@ -260,7 +260,7 @@ public:
 			// allocate dof map
 			// (We need to copy it here since Hypre will deallocate it)
 			int neq = (int)dofMap.size();
-			m_dofMap = (int*)malloc(neq * sizeof(int));
+			m_dofMap = (HYPRE_Int*)malloc(neq * sizeof(HYPRE_Int));
 			for (size_t i = 0; i < neq; ++i) m_dofMap[i] = dofMap[i];
 
 			printf("\tNumber of functions : %d\n", nfunc);

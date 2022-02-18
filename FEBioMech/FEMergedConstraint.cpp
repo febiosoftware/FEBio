@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -96,9 +96,9 @@ bool FEMergedConstraint::Merge(FEFacetSet* surf1, FEFacetSet* surf2, const vecto
 		for (int j=0; j<ndofs; ++j)
 		{
 			int dof = dofList[j];
-			FELinearConstraint lc(&m_fem);
-			lc.SetParentDof(dof, set1[i]);
-			lc.AddChildDof(dof, set2[tag[i]], 1.0);
+			FELinearConstraint* lc = new FELinearConstraint(&m_fem);
+			lc->SetParentDof(dof, set1[i]);
+			lc->AddChildDof(dof, set2[tag[i]], 1.0);
 
 			LCM.AddLinearConstraint(lc);
 		}

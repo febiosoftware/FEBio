@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -40,6 +40,8 @@ FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledM
 {
 	// initialize the fiber vector
 	m_fiber = vec3d(1, 0, 0);
+    m_Us = mat3dd(1);
+    m_bUs = false;
 }
 
 // Get the fiber direction (in global coordinates) at a material point
@@ -53,6 +55,22 @@ vec3d FEElasticFiberMaterialUC::FiberVector(FEMaterialPoint& mp)
 
 	// convert to global coordinates
 	vec3d a0 = Q*fiber;
+    
+    // account for prior deformation in multigenerational formulation
+    vec3d a = FiberPreStretch(a0);
+    
+    return a;
+}
 
-	return a0;
+//-----------------------------------------------------------------------------
+vec3d FEElasticFiberMaterialUC::FiberPreStretch(const vec3d a0)
+{
+    // account for prior deformation in multigenerational formulation
+    if (m_bUs) {
+        vec3d a = (m_Us*a0);
+        a.unit();
+        return a;
+    }
+    else
+        return a0;
 }

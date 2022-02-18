@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "DomainDataRecord.h"
 #include "FECoreKernel.h"
 #include "FEModel.h"
+#include "FEDomain.h"
 
 REGISTER_SUPER_CLASS(FELogDomainData, FELOGDOMAINDATA_ID);
 
@@ -80,4 +81,93 @@ void FEDomainDataRecord::SelectAllItems()
     int n = mesh.Domains();
     m_item.resize(n);
     for (int i = 0; i < n; ++i) m_item[i] = i + 1;
+}
+
+//============================================================================
+FELogAvgDomainData::FELogAvgDomainData(FEModel* pfem) : FELogDomainData(pfem) 
+{
+    m_elemData = nullptr;
+}
+
+FELogAvgDomainData::~FELogAvgDomainData()
+{
+    if (m_elemData) delete m_elemData;
+    m_elemData = nullptr;
+}
+
+bool FELogAvgDomainData::SetParameters(std::vector<std::string>& params)
+{
+    if (params.size() != 1) return false;
+    std::string& v1 = params[0];
+    if (v1.empty()) return false;
+
+    m_elemData = fecore_new<FELogElemData>(v1.c_str(), GetFEModel());
+    if (m_elemData == nullptr) return false;
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+double FELogAvgDomainData::value(FEDomain& dom)
+{
+    if (m_elemData == nullptr) return 0.0;
+
+    double avg = 0.0;
+    const int NE = dom.Elements();
+    for (int i = 0; i < dom.Elements(); ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        double eval = m_elemData->value(el);
+        avg += eval;
+    }
+    avg /= (double)NE;
+    return avg;
+}
+
+//============================================================================
+FELogPctDomainData::FELogPctDomainData(FEModel* pfem) : FELogDomainData(pfem)
+{
+    m_pct = 0.0;
+    m_elemData = nullptr;
+}
+
+FELogPctDomainData::~FELogPctDomainData()
+{
+    if (m_elemData) delete m_elemData;
+    m_elemData = nullptr;
+}
+
+bool FELogPctDomainData::SetParameters(std::vector<std::string>& params)
+{
+    if (params.size() != 2) return false;
+    std::string& v1 = params[0];
+    std::string& v2 = params[1];
+    if (v1.empty() || v2.empty()) return false;
+
+    m_elemData = fecore_new<FELogElemData>(v1.c_str(), GetFEModel());
+    if (m_elemData == nullptr) return false;
+
+    m_pct = atof(v2.c_str());
+    if ((m_pct < 0.0) || (m_pct > 1.0)) return false;
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+double FELogPctDomainData::value(FEDomain& dom)
+{
+    if (m_elemData == nullptr) return 0.0;
+
+    const int NE = dom.Elements();
+    vector<double> val(NE, 0.0);
+    for (int i = 0; i < NE; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        val[i] = m_elemData->value(el);
+    }
+
+    std::sort(val.begin(), val.end());
+
+    int n = (int) (m_pct * ((double)val.size() - 1.0));
+    return val[n];
 }

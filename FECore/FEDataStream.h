@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -83,6 +83,17 @@ public:
 	FEDataStream& operator << (const std::vector<double>& a)
 	{
 		for (double ai : a) m_a.push_back((float)ai);
+		return *this;
+	}
+
+	FEDataStream& operator << (const std::vector<vec3d>& a)
+	{
+		for (vec3d ai : a)
+		{
+			m_a.push_back((float)ai.x);
+			m_a.push_back((float)ai.y);
+			m_a.push_back((float)ai.z);
+		}
 		return *this;
 	}
 

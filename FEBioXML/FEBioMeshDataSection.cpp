@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -165,8 +165,12 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 				// get the variable or name
+				string mapName;
 				const char* szvar = tag.AttributeValue("var", true);
-				const char* szname = (szvar == nullptr ? tag.AttributeValue("name") : nullptr);
+				const char* szname = tag.AttributeValue("name", true);
+				if (szvar) mapName = szvar;
+				else if (szname) mapName = szname;
+				else { assert(false); }
 
 				// make sure the parameter is valid
 				FEParamDouble* pp = nullptr;
@@ -191,71 +195,16 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					else pp = &(pv->value<FEParamDouble>());
 				}
 
-				// read the parameters of the generator
-				ReadParameterList(tag, gen);
-
-				// give the generator a chance to validate itself
-				if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
-
 				// create a new domain map (only scalars for now!)
 				FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
 				map->Create(part);
+				map->SetName(mapName);
 
-				// generate the data
-				if (gen->Generate(*map) == false)
-				{
-					delete map;
-					throw FEBioImport::DataGeneratorError();
-				}
+				// read the parameters of the generator
+				ReadParameterList(tag, gen);
 
-				// either map it directly to a variable or just store it
-				if (szvar)
-				{
-					FEParamDouble& p = *pp;
-
-					// see if this map is already defined
-					FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szvar));
-					if (oldMap)
-					{
-						// it is, so merge it
-						oldMap->Merge(*map);
-
-						// we can now delete this map
-						delete map;
-					}
-					else
-					{
-						// nope, so add it
-						map->SetName(szvar);
-						mesh.AddDataMap(map);
-
-						// apply the map
-						FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
-						val->setDataMap(map);
-						p.setValuator(val);
-					}
-				}
-				else
-				{
-					// see if this map is already defined
-					FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szname));
-					if (oldMap)
-					{
-						// it is, so merge it
-						oldMap->Merge(*map);
-
-						// we can now delete this map
-						delete map;
-					}
-					else
-					{
-						// set the name
-						map->SetName(szname);
-
-						// add it to the mesh
-						mesh.AddDataMap(map);
-					}
-				}
+				// Add it to the list (will be evaluated later)
+				GetBuilder()->AddMeshDataGenerator(gen, map, pp);
 			}
 		}
 		else if (tag == "SurfaceData")

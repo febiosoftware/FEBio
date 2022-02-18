@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,12 +54,14 @@ void FEConstPrestrainGradient::MaterialPointData::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEConstPrestrainGradient, FEPrestrainGradient)
+	ADD_PARAMETER(m_ramp, "ramp");
 	ADD_PARAMETER(m_Fp, "F0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEConstPrestrainGradient::FEConstPrestrainGradient(FEModel* pfem) : FEPrestrainGradient(pfem)
 {
+	m_ramp = 1.0;
 	m_Fp = mat3dd(1.0);
 }
 
@@ -73,7 +75,10 @@ FEMaterialPoint* FEConstPrestrainGradient::CreateMaterialPointData()
 mat3d FEConstPrestrainGradient::Prestrain(FEMaterialPoint& mp)
 {
 	MaterialPointData& ep = *mp.ExtractData<MaterialPointData>();
-	return m_Fp(mp)*ep.Fp;
+
+	mat3d Fp = mat3dd(1.0) * (1.0 - m_ramp) + m_Fp(mp) * m_ramp;
+
+	return Fp*ep.Fp;
 }
 
 //-----------------------------------------------------------------------------

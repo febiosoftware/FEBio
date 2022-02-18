@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -526,9 +526,12 @@ bool FECoreKernel::SetModuleDependency(const char* szmodule)
 
 //-----------------------------------------------------------------------------
 //! Register a new domain class
-void FECoreKernel::RegisterDomain(FEDomainFactory* pf)
+void FECoreKernel::RegisterDomain(FEDomainFactory* pf, bool pushFront)
 {
-	m_Dom.push_back(pf); 
+	if (pushFront)
+		m_Dom.insert(m_Dom.begin(), pf);
+	else
+		m_Dom.push_back(pf); 
 }
 
 //-----------------------------------------------------------------------------

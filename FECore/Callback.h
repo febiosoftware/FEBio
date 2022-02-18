@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -51,6 +51,7 @@ class FEModel;
 #define CB_RESET            0x00000800		//!< Called after FEModel::Reset
 #define CB_MODEL_UPDATE		0x00001000		//!< Called at the end of FEModel::Update
 #define CB_TIMESTEP_SOLVED	0x00002000		//!< Called at FEAnalysis::SolveTimeStep after the solver returns.
+#define CB_USER1			0x00010000		//!< can be used by users
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef bool(*FECORE_CB_FNC)(FEModel*, unsigned int, void*);

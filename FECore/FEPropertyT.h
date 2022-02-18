@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -96,8 +96,9 @@ public:
 	virtual bool IsArray() const { return true; }
 	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
 	virtual void SetProperty(FECoreBase* pc) {
-		m_pmp->push_back(dynamic_cast<T*>(pc)); 
-		pc->SetParent(GetParent());
+		T* pt = dynamic_cast<T*>(pc); assert(pt != nullptr);
+		m_pmp->push_back(pt); 
+		pt->SetParent(GetParent());
 	}
 	virtual int size() const { return (int)m_pmp->size(); }
 	virtual FECoreBase* get(int i) { return (*m_pmp)[i]; }

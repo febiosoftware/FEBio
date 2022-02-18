@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,6 +57,8 @@ SOFTWARE.*/
 #include "LinearSolver.h"
 #include "FETimeStepController.h"
 #include "Timer.h"
+#include "DumpMemStream.h"
+#include "FEPlotDataStore.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -90,7 +92,7 @@ public:
 	};
 
 public:
-	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem)
+	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem), m_dmp(*fem)
 	{
 		// --- Analysis Data ---
 		m_pStep = 0;
@@ -112,10 +114,34 @@ public:
 
 		// allocate timers
 		// Make sure enough timers are allocated for all the TimerIds!
-		m_timers.resize(6);
+		m_timers.resize(7);
 	}
 
 	void Serialize(DumpStream& ar);
+
+	void PushState()
+	{
+		DumpMemStream& ar = m_dmp;
+		ar.clear(); // this also prepares the stream for writing
+		m_fem->Serialize(ar);
+	}
+
+	bool PopState()
+	{
+		// get the dump stream
+		DumpMemStream& ar = m_dmp;
+
+		// make sure we have data to rewind
+		if (ar.size() == 0) return false;
+
+		// prepare the archive for reading
+		ar.Open(false, true);
+
+		// restore the previous state
+		m_fem->Serialize(m_dmp);
+
+		return true;
+	}
 
 public: // TODO: Find a better place for these parameters
 	FETimeInfo	m_timeInfo;			//!< current time value
@@ -170,6 +196,10 @@ public:
 
 	DataStore	m_dataStore;			//!< the data store used for data logging
 
+	FEPlotDataStore	m_plotData;		//!< Output request for plot file
+
+	DumpMemStream	m_dmp;	// only used by incremental solver
+
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
@@ -223,6 +253,12 @@ DataStore& FEModel::GetDataStore()
 {
 	return m_imp->m_dataStore;
 }
+
+//-----------------------------------------------------------------------------
+FEPlotDataStore& FEModel::GetPlotDataStore() { return m_imp->m_plotData; }
+
+//-----------------------------------------------------------------------------
+const FEPlotDataStore& FEModel::GetPlotDataStore() const { return m_imp->m_plotData; }
 
 //-----------------------------------------------------------------------------
 //! will return true if the model solved succussfully
@@ -1022,6 +1058,8 @@ bool FEModel::InitBodyLoads()
 //! This function solves the FE problem by calling the solve method for each step.
 bool FEModel::Solve()
 {
+	TRACK_TIME(Timer_ModelSolve);
+
 	// error flag
 	bool bok = true;
 
@@ -1051,7 +1089,7 @@ bool FEModel::Solve()
 		if (nstep + 1 == Steps())
 		{
 			// set the solved flag
-			m_imp->m_bsolved = true;
+			m_imp->m_bsolved = bok;
 		}
 
 		// do callbacks
@@ -1068,6 +1106,147 @@ bool FEModel::Solve()
 	DoCallback(CB_SOLVED);
 
 	return bok;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::RCI_Rewind()
+{
+	return m_imp->PopState();
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::RCI_ClearRewindStack()
+{
+	if (m_imp->m_dmp.size() == 0) return false;
+	m_imp->m_dmp.clear();
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::RCI_Init()
+{
+	// start the timer
+	GetTimer(Timer_ModelSolve)->start();
+
+	// reset solver status flag
+	m_imp->m_bsolved = false;
+
+	// loop over all analysis steps
+	int nstep = m_imp->m_nStep;
+	m_imp->m_pStep = m_imp->m_Step[(int)nstep];
+
+	FEAnalysis* step = m_imp->m_pStep;
+
+	// intitialize step data
+	if (step->Activate() == false)
+	{
+		return false;
+	}
+
+	// do callback
+	DoCallback(CB_STEP_ACTIVE);
+
+	// initialize the step's solver
+	if (step->InitSolver() == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool FEModel::RCI_Advance()
+{
+	// get the current step
+	FEAnalysis* step = m_imp->m_pStep;
+	if (step == nullptr) return false;
+
+	// first see if the step has finished
+	const double eps = step->m_tend * 1e-7;
+	double currentTime = GetCurrentTime();
+	if (step->m_tend - currentTime <= eps)
+	{
+		// TODO: not sure why this is needed.
+		SetStartTime(GetCurrentTime());
+
+		// wrap it up
+		DoCallback(CB_STEP_SOLVED);
+		step->Deactivate();
+
+		// go to the next step
+		int nstep = ++m_imp->m_nStep;
+		if (nstep >= m_imp->m_Step.size())
+		{
+			// we're done
+			m_imp->m_bsolved = true;
+			return true;
+		}
+		else
+		{
+			// go to the next step
+			step = m_imp->m_pStep = m_imp->m_Step[nstep];
+			if (step->Activate() == false) return false;
+			DoCallback(CB_STEP_ACTIVE);
+			if (step->InitSolver() == false) return false;
+		}
+	}
+
+	// store current state in case we need to rewind
+	m_imp->PushState();
+
+	// Inform that the time is about to change. (Plugins can use 
+	// this callback to modify time step)
+	DoCallback(CB_UPDATE_TIME);
+
+	// update time
+	FETimeInfo& tp = GetTime();
+	double newTime = tp.currentTime + step->m_dt;
+	tp.currentTime = newTime;
+	tp.timeIncrement = step->m_dt;
+	feLog("\n===== beginning time step %d : %lg =====\n", step->m_ntimesteps + 1, newTime);
+
+	// initialize the solver step
+	// (This basically evaluates all the parameter lists, but let's the solver
+	//  customize this process to the specific needs of the solver)
+	if (step->GetFESolver()->InitStep(newTime) == false) return false;
+
+	// Solve the time step
+	int ierr = step->SolveTimeStep();
+	if (ierr != 0) return false;
+
+	// update counters
+	FESolver* psolver = step->GetFESolver();
+	step->m_ntotref += psolver->m_ntotref;
+	step->m_ntotiter += psolver->m_niter;
+	step->m_ntotrhs += psolver->m_nrhs;
+
+	// update model's data
+	UpdateModelData();
+
+	// Yes! We have converged!
+	feLog("\n------- converged at time : %lg\n\n", GetCurrentTime());
+
+	// update nr of completed timesteps
+	step->m_ntimesteps++;
+
+	// call callback function
+	if (DoCallback(CB_MAJOR_ITERS) == false)
+	{
+		feLogWarning("Early termination on user's request");
+		return false;
+	}
+
+	return true;
+}
+
+bool FEModel::RCI_Finish()
+{
+	// stop the timer
+	GetTimer(Timer_ModelSolve)->stop();
+
+	// do the callbacks
+	DoCallback(CB_SOLVED);
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1242,6 +1421,13 @@ double FEModel::GetCurrentTime() const { return m_imp->m_timeInfo.currentTime; }
 
 //-----------------------------------------------------------------------------
 void FEModel::SetCurrentTime(double t) { m_imp->m_timeInfo.currentTime = t; }
+
+//-----------------------------------------------------------------------------
+void FEModel::SetCurrentTimeStep(double dt)
+{ 
+	FEAnalysis* step = GetCurrentStep(); assert(step);
+	if (step) step->m_dt = dt;
+}
 
 //=============================================================================
 //    P A R A M E T E R   F U N C T I O N S
@@ -1648,6 +1834,35 @@ void FEModel::UpdateModelData()
 }
 
 //-----------------------------------------------------------------------------
+FEMaterial* CopyMaterial(FEMaterial* pmat, FEModel* fem)
+{
+	const char* sztype = pmat->GetTypeStr();
+
+	// create a new material
+	FEMaterial* pnew = fecore_new<FEMaterial>(sztype, fem);
+	assert(pnew);
+
+	pnew->SetID(pmat->GetID());
+
+	// copy parameters
+	pnew->GetParameterList() = pmat->GetParameterList();
+
+	// copy properties
+	for (int i = 0; i < pmat->Properties(); ++i)
+	{
+		FEProperty* prop = pmat->PropertyClass(i);
+		FEMaterial* mati = dynamic_cast<FEMaterial*>(prop->get(0));
+		if (mati)
+		{
+			FEMaterial* newMati = CopyMaterial(mati, fem);
+			bool b = pnew->SetProperty(i, newMati); assert(b);
+		}
+	}
+
+	return pnew;
+}
+
+//-----------------------------------------------------------------------------
 //! This function copies the model data from the fem object. Note that it only copies
 //! the model definition, i.e. mesh, bc's, contact interfaces, etc..
 void FEModel::CopyFrom(FEModel& fem)
@@ -1703,21 +1918,15 @@ void FEModel::CopyFrom(FEModel& fem)
 	{
 		// get the type info from the old material
 		FEMaterial* pmat = fem.GetMaterial(i);
-		const char* sztype = pmat->GetTypeStr();
 
-		// create a new material
-		FEMaterial* pnew = fecore_new<FEMaterial>(sztype, this);
-		assert(pnew);
+		// copy the material
+		FEMaterial* pnew = CopyMaterial(pmat, this);
 
-		pnew->SetID(pmat->GetID());
-
-		// copy material data
-		// we only copy material parameters
-		pnew->GetParameterList() = pmat->GetParameterList();
+		// copy the name
+		pnew->SetName(pmat->GetName());
 
 		// add the material
 		AddMaterial(pnew);
-
 	}
 	assert(m_imp->m_MAT.size() == fem.m_imp->m_MAT.size());
 
@@ -1854,6 +2063,9 @@ void FEModel::CopyFrom(FEModel& fem)
 		m_imp->m_LCM = new FELinearConstraintManager(this);
 		m_imp->m_LCM->CopyFrom(*fem.m_imp->m_LCM);
 	}
+
+	// copy output data
+	m_imp->m_plotData = fem.m_imp->m_plotData;
 
 	// TODO: copy all the properties
 //	assert(false);

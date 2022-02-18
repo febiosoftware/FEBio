@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -494,7 +494,7 @@ void FEHexRefine2D::FindHangingNodes(FEModel& fem)
 	for (int i = 0; i < LCM.LinearConstraints();)
 	{
 		FELinearConstraint& lc = LCM.LinearConstraint(i);
-		int nodeID = lc.m_parentDof.node;
+		int nodeID = lc.GetParentNode();
 		if (mesh.Node(nodeID).HasFlags(FENode::HANGING) == false)
 		{
 			LCM.RemoveLinearConstraint(i);
@@ -532,10 +532,10 @@ void FEHexRefine2D::FindHangingNodes(FEModel& fem)
 					// setup a linear constraint for this node
 					for (int k = 0; k < MAX_DOFS; ++k)
 					{
-						FELinearConstraint lc(&fem);
-						lc.SetParentDof(k, nodeId);
-						lc.AddChildDof(k, edge.node[0], 0.5);
-						lc.AddChildDof(k, edge.node[1], 0.5);
+						FELinearConstraint* lc = new FELinearConstraint(&fem);
+						lc->SetParentDof(k, nodeId);
+						lc->AddChildDof(k, edge.node[0], 0.5);
+						lc->AddChildDof(k, edge.node[1], 0.5);
 
 						LCM.AddLinearConstraint(lc);
 						nadded++;

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,3 +28,27 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEMaterial.h"
+
+//-----------------------------------------------------------------------------
+// Define a material point that stores the fiber pre-stretch
+class FEFiberMaterialPoint : public FEMaterialPoint
+{
+public:
+    FEFiberMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+    
+    FEMaterialPoint* Copy();
+    
+    void Init();
+    
+    void Serialize(DumpStream& ar);
+    
+public:
+    // Set or clear pre-stretch, as needed in multigenerational materials (e.g., reactive viscoelasticity)
+    void SetPreStretch(const mat3ds Us) { m_Us = Us; m_bUs = true; }
+    void ResetPreStretch() { m_bUs = false; }
+    vec3d FiberPreStretch(const vec3d a0);
+
+public:
+    mat3ds  m_Us;   //!< pre-stretch tensor for fiber
+    bool    m_bUs;  //!< flag for pre-stretch
+};

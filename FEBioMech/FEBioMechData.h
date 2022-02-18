@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -739,6 +739,54 @@ class FELogElemStress3 : public FELogElemData
 {
 public:
 	FELogElemStress3(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressX : public FELogElemData
+{
+public:
+	FELogElemPK2StressX(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressY : public FELogElemData
+{
+public:
+	FELogElemPK2StressY(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressZ : public FELogElemData
+{
+public:
+	FELogElemPK2StressZ(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressXY : public FELogElemData
+{
+public:
+	FELogElemPK2StressXY(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressYZ : public FELogElemData
+{
+public:
+	FELogElemPK2StressYZ(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK2StressXZ : public FELogElemData
+{
+public:
+	FELogElemPK2StressXZ(FEModel* pfem) : FELogElemData(pfem) {}
 	double value(FEElement& el);
 };
 
