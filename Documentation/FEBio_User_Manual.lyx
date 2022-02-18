@@ -75258,7 +75258,7 @@ biphasic
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="6" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -75392,7 +75392,7 @@ Specification of the hydraulic permeability
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -75401,7 +75401,7 @@ Specification of the hydraulic permeability
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -75414,11 +75414,48 @@ Specification of the fluid supply
 
 \end_inset
 </cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Stabilization parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
 \end_layout
 
 \end_inset
@@ -75529,6 +75566,62 @@ Example:
 
 \begin_layout LyX-Code
 </material>
+\end_layout
+
+\begin_layout Standard
+The stabilization parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+ can be used to reduced oscillations in the fluid pressure field produced
+ under certain loading conditions, when the finite element mesh is relatively
+ coarse in the vicinity of a free-draining boundary (a boundary on which
+ the fluid pressure is set to zero).
+ When this occurs it is best to refine the mesh (create thinner elements
+ in the direction normal to the boundary) to overcome these oscillations.
+ When mesh refinement is not feasible or practical, one may use a non-zero
+ stabilization parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+.
+ FEBio uses an implementation based on the formulation of Aguilar et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Aguilar08"
+literal "false"
+
+\end_inset
+
+.
+ In our adaptation of this formulation the parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+ has units of time.
+ Its value is best estimated by identifying the thickness 
+\begin_inset Formula $h$
+\end_inset
+
+ of elements on the free-draining boundary, the characteristic modulus 
+\begin_inset Formula $E$
+\end_inset
+
+ of the solid matrix and hydraulic permeability 
+\begin_inset Formula $k$
+\end_inset
+
+ in these elements.
+ Then 
+\begin_inset Formula $\tau$
+\end_inset
+
+ may be set approximately to 
+\begin_inset Formula $h^{2}/\left(E\cdot k\right)$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard

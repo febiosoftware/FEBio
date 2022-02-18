@@ -11856,6 +11856,136 @@ D\left(\delta W_{\text{ext}}^{b}\right)\left[\Delta p\right] & =0\,.
 \end_layout
 
 \begin_layout Subsection
+Stabilization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Biphasic-Stabilization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finite element models of deformable porous media are known to exhibit oscillatio
+ns in fluid pressure caused by relatively coarse meshes near free-draining
+ boundaries, where a boundary layer in fluid pressure normally forms during
+ the early time response to loading.
+ These spurious oscillations typically occur when the mesh is not able to
+ resolve this boundary layer.
+ Stabilization methods serve as an alternative to mesh refinement, when
+ the latter is not feasible or practical.
+ In FEBio we have implemented a stabilization method based on the work of
+ Aguilar et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Aguilar08"
+literal "false"
+
+\end_inset
+
+.
+ Basically, this method proposes that the fluid flux 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\mathbf{w}=-\mathbf{k}\cdot\grad\left(p+\tau\dot{p}\right)\label{eq:stab-fluid-flux}
+\end{equation}
+
+\end_inset
+
+instead of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq107"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where 
+\begin_inset Formula $\tau$
+\end_inset
+
+ represents the stabilization parameter.
+ A representative value for 
+\begin_inset Formula $\tau$
+\end_inset
+
+ may be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\tau\approx\frac{h^{2}}{E\cdot k}\,,\label{eq:stab-tau}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $h$
+\end_inset
+
+ is the element thickness on the free-draining boundary, 
+\begin_inset Formula $E$
+\end_inset
+
+ is a representative measure of the solid matrix elastic modulus and 
+\begin_inset Formula $k$
+\end_inset
+
+ is a representative measure of the hydraulic permeability tensor 
+\begin_inset Formula $\mathbf{k}$
+\end_inset
+
+.
+ The contribution of this form of 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ to the virtual work expression in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq194"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G & =\int_{b}\mathbf{w}\cdot\grad\delta p\,dv\\
+ & =-\int_{b}\grad\delta p\cdot\mathbf{k}\cdot\grad\left(p+\tau\dot{p}\right)\,dv
+\end{aligned}
+\,.\label{eq:stab-virtual-work}
+\end{equation}
+
+\end_inset
+
+The linearizations of 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ are then given by
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =-\int_{b}\grad\delta p\cdot\left(\boldsymbol{\mathcal{K}}:\Delta\boldsymbol{\varepsilon}\right)\cdot\grad\left(p+\tau\dot{p}\right)\,dv\\
+D\delta G\left[\Delta p\right] & =-\int_{b}\left(1+\frac{\tau}{\Delta t}\right)\grad\delta p\cdot\mathbf{k}\cdot\grad\Delta p\,dv
+\end{aligned}
+\,.\label{eq:stab-linearization}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Discretization
 \begin_inset CommandInset label
 LatexCommand label
@@ -12066,6 +12196,21 @@ literal "true"
 \end_inset
 
 .
+ Contributions from the stabilization method presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "subsec:Biphasic-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be similarly evaluated.
 \end_layout
 
 \begin_layout Standard
