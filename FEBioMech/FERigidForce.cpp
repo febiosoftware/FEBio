@@ -244,6 +244,7 @@ BEGIN_FECORE_CLASS(FERigidBodyForce, FEModelLoad)
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_force, "value");
 	ADD_PARAMETER(m_ntype, "load_type");
+	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
 FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(pfem)
@@ -251,6 +252,8 @@ FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(pfem)
 	m_ntype = FORCE_LOAD;
 	m_trg = 0.0;
 	m_rid = -1;
+	m_brelative = false;
+	m_force0 = 0.0;
 }
 
 void FERigidBodyForce::SetRigidMaterialID(int nid) { m_rigidMat = nid; }
@@ -296,6 +299,18 @@ void FERigidBodyForce::Activate()
 		case 5: m_trg= rb.m_Mr.z; break;
 		}
 	}
+	if ((m_ntype == FORCE_LOAD) && m_brelative)
+	{
+		switch (m_dof)
+		{
+		case 0: m_force0 = rb.m_Fr.x; break;
+		case 1: m_force0 = rb.m_Fr.y; break;
+		case 2: m_force0 = rb.m_Fr.z; break;
+		case 3: m_force0 = rb.m_Mr.x; break;
+		case 4: m_force0 = rb.m_Mr.y; break;
+		case 5: m_force0 = rb.m_Mr.z; break;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -303,12 +318,6 @@ void FERigidBodyForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
 	ar & m_ntype & m_dof & m_rigidMat & m_force & m_trg & m_rid;
-}
-
-//-----------------------------------------------------------------------------
-double FERigidBodyForce::Value()
-{
-	return m_force;
 }
 
 //-----------------------------------------------------------------------------
@@ -322,9 +331,9 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	{
 		// setup the force vector
 		vec3d f(0,0,0);
-		if      (m_dof == 0) f.x = Value();
-		else if (m_dof == 1) f.y = Value();
-		else if (m_dof == 2) f.z = Value();
+		if      (m_dof == 0) f.x = m_force;
+		else if (m_dof == 1) f.y = m_force;
+		else if (m_dof == 2) f.z = m_force;
 	
 		// apply the rigid body rotation
 		f = rb.GetRotation()*f;
@@ -340,7 +349,7 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		int I = rb.m_LM[m_dof];
 		if (I >= 0)
 		{
-			R[I] += m_force;
+			R[I] += m_force + m_force0;
 		}
 	}
 	else if (m_ntype == FORCE_TARGET)
