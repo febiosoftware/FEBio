@@ -66,6 +66,7 @@ SOFTWARE.*/
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEHolmesMow.h"
+#include "FEHolmesMowUC.h"
 #include "FEHolzapfelGasserOgden.h"
 #include "FEHolzapfelUnconstrained.h"
 #include "FEHuiskesSupply.h"
@@ -290,6 +291,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFungOrthoCompressible, "Fung-ortho-compressible");
 	REGISTER_FECORE_CLASS(FECompressibleGentMaterial, "compressible Gent");
 	REGISTER_FECORE_CLASS(FEHolmesMow, "Holmes-Mow");
+    REGISTER_FECORE_CLASS(FEHolmesMowUC, "uncoupled Holmes-Mow");
     REGISTER_FECORE_CLASS(FEHolzapfelUnconstrained, "HGO unconstrained");
 	REGISTER_FECORE_CLASS(FEIsotropicElastic, "isotropic elastic");
 	REGISTER_FECORE_CLASS(FECoupledMooneyRivlin, "coupled Mooney-Rivlin");

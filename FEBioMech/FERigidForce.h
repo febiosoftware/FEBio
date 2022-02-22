@@ -87,9 +87,6 @@ public:
 	//! initialization
 	bool Init() override;
 
-	//! get the current force value
-	double Value();
-
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
 
@@ -111,9 +108,11 @@ public:
 private:
 	int		m_rigidMat;		//!< rigid body material id
 	int		m_dof;			//!< force direction
+	bool	m_brelative;	//!< relative flag
 
 	int		m_ntype;		//!< type of force (0=loadcurve, 1=target)
 	double	m_force;		//!< applied force
+	double	m_force0;		//!< initial force at activation (used with brelative flag)
 	double	m_trg;			//!< target force for target case
 	int		m_rid;
 

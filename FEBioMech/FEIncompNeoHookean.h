@@ -47,6 +47,9 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
+    //! calculate deviatoric strain energy density at material point
+    double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+    
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };

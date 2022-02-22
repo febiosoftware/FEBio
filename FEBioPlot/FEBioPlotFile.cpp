@@ -1721,9 +1721,11 @@ bool FEBioPlotFile::Append(const char *szfile)
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;
 
-	// add plot variables
 	FEModel* fem = GetFEModel();
 	FEPlotDataStore& pltData = fem->GetPlotDataStore();
+	SetCompression(pltData.GetPlotCompression());
+
+	// add plot variables
 	for (int n = 0; n < pltData.PlotVariables(); ++n)
 	{
 		FEPlotVariable& vi = pltData.GetPlotVariable(n);

@@ -88,3 +88,20 @@ tens4ds FEIncompNeoHookean::DevTangent(FEMaterialPoint& mp)
 
 	return (I4*Ib -BxI + IxI*(Ib/3))*(2.0*muJ/3.0);
 }
+
+//-----------------------------------------------------------------------------
+//! Calculate deviatoric strain energy density
+double FEIncompNeoHookean::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // shear modulus
+    double G = m_G(mp);
+    
+    mat3ds C = pt.DevRightCauchyGreen();
+    double I1 = C.tr();
+    
+    // calculate deviatoric stress
+    return (I1-3)*G/2;
+}
+

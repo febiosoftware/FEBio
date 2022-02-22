@@ -241,6 +241,7 @@ public:
 	LinearSolver*		m_plinsolve;	//!< the linear solver
 	FEGlobalMatrix*		m_pK;			//!< global stiffness matrix
     bool				m_breshape;		//!< Matrix reshape flag
+	bool				m_persistMatrix;//!< Don't delete stiffness matrix until necessary (if true, K is deleted at end of time step)
 
 	// data used by Quasin
 	vector<double> m_R0;	//!< residual at iteration i-1

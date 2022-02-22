@@ -169,13 +169,13 @@ status open
 
 \end_inset
 
-User's Manual Version 3.5.1
+User's Manual Version 3.6
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: September 28, 2021
+Last Updated: February 17, 2022
 \end_layout
 
 \begin_layout Standard
@@ -35515,7 +35515,7 @@ By default, all the results are stored in a binary database, referred to
 plotfile
 \shape default
 .
- The preferred storage format is the FEBio bindary database format (referred
+ The preferred storage format is the FEBio binary database format (referred
  to as the 
 \shape italic
 xplt 
@@ -35542,15 +35542,37 @@ format.
 \end_layout
 
 \begin_layout Standard
-To define the contents of the plotfile you need to define the 
+To define the contents of the plotfile the 
 \shape italic
 plotfile 
 \shape default
-element in the Output section of the FEBio input file.
+element needs to be added in the 
+\emph on
+Output 
+\emph default
+section of the FEBio input file.
 \end_layout
 
 \begin_layout LyX-Code
-<plotfile type="febio" [file="name.xplt"]/>
+<plotfile [type="febio"] [file="name.xplt"]/>
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+type 
+\emph default
+attribute defines the output format.
+ Currently, only 
+\begin_inset Quotes eld
+\end_inset
+
+febio
+\begin_inset Quotes erd
+\end_inset
+
+ is supported, and thus defining the type attribute is optional.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -35558,8 +35580,8 @@ The
 \shape italic
 file
 \shape default
- attribute is optional and allows the user to define the file name of the
- plotfile.
+ attribute is also optional and allows the user to define the file name
+ of the plotfile.
  If this attribute is omitted, FEBio will use a default file name for the
  plotfile.
 \end_layout
@@ -35576,7 +35598,17 @@ elements in the
 \shape italic
 plotfile 
 \shape default
-section.
+section as described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Plotfile-Variables"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -35596,15 +35628,25 @@ Plotfile variables are defined using the
 var 
 \shape default
 keyword.
- This tag takes one parameter, namely the 
+ This tag takes one attribute, namely the 
 \shape italic
 type
 \shape default
  of the variable.
+ The 
+\emph on
+type
+\emph default
+ defines the specific output variable that will be stored to the plot file.
+ 
 \end_layout
 
 \begin_layout LyX-Code
-<var type="<name>"/>
+<var type="
+\emph on
+name
+\emph default
+"/>
 \end_layout
 
 \begin_layout Standard
@@ -35612,12 +35654,281 @@ where
 \shape italic
 name 
 \shape default
-is the name of the variable.
- The following table lists the possible values for 
-\shape italic
+is the name of the output variable.
+ (For a complete list of supported output variables, please see section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:List-of-Plotfile"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+As of FEBio 2.4, additional information can be added in the type attribute
+ of the variable definition.
+ The general format is as follows.
+\end_layout
+
+\begin_layout LyX-Code
+<var type="
+\emph on
 name
-\shape default
-.
+\emph default
+[
+\emph on
+filter
+\emph default
+]=
+\emph on
+alias
+\emph default
+"/>
+\end_layout
+
+\begin_layout Standard
+The filter is defined by appending the name of the plot variable with the
+ filter inside square brackets.
+ The filter can be either an integer, or a string.
+ If the filter is a string, it must be surrounded by single quotes.
+\end_layout
+
+\begin_layout LyX-Code
+<var type="
+\emph on
+name
+\emph default
+['
+\emph on
+filter
+\emph default
+ string']=
+\emph on
+alias
+\emph default
+"/>
+\end_layout
+
+\begin_layout Standard
+The optional alias can be used to rename the variable.
+ The alias will be used as the name of the plot variable in the plot file,
+ and this is the name that will show up in post-processing software such
+ as FEBio Studio.
+ 
+\end_layout
+
+\begin_layout Standard
+Some plot variables use filters to resolve possible ambiguities.
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+<var type="solute concentration['solute1']"/>
+\end_layout
+
+\begin_layout Standard
+This example will store the solute concentration of a solute named 'solute1'
+ to the plot file.
+\end_layout
+
+\begin_layout Standard
+In addition, an alias can be used to define a more descriptive name of the
+ plot variable.
+\end_layout
+
+\begin_layout LyX-Code
+<var type="solute concentration['Na']=Na concentration"/>
+\end_layout
+
+\begin_layout Standard
+This variable will store the solute concentration of a solute named 'Na'
+ to the plot file using the name 'Na concentration'.
+\end_layout
+
+\begin_layout Standard
+The following example shows how to export a particular fiber vector from
+ a solid mixture.
+ Since solid mixtures can have several fiber distributions associated, it
+ is necessary to specify which component of the mixture the plot variable
+ refers to.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<var type="fiber vector['solid[0]']=v1"/>
+\end_layout
+
+\begin_layout LyX-Code
+<var type="fiber vector['solid[1]']=v2"/>
+\end_layout
+
+\begin_layout Standard
+Some plot variables require the specification of a named surface (* in table
+ below).
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+<var type="fluid surface force" surface="airfoil"/>
+\end_layout
+
+\begin_layout Standard
+The named surface should be described in a 
+\emph on
+Surface
+\emph default
+ element (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Surface-Section"
+
+\end_inset
+
+) within 
+\emph on
+Mesh
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geometry-Section"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The following example shows a complete definition of the plotfile section
+ and stores nodal displacements and element stresses.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<plotfile type="febio">
+\end_layout
+
+\begin_layout LyX-Code
+  <var type="displacement"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <var type="stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+</plotfile>
+\end_layout
+
+\begin_layout Subsubsection
+List of Plotfile Variables
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:List-of-Plotfile"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are four categories of plot file variables:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Nodal:
+\series default
+ These typically correspond to data that is directly available at nodes.
+ For instance, the primary solution variables are usually stored as nodal
+ variables.
+ (E.g.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+displacement
+\begin_inset Quotes erd
+\end_inset
+
+) 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Element:
+\series default
+ These quantities correspond to data that is typically stored on the elements
+ (e.g.
+ stress).
+ In FEBio, element data is usually stored at the integration points during
+ the solution phase.
+ Since this is often not a convenient format for post-processing, element
+ data is processed before export and will be written to the plot file as
+ either a constant, element-averaged value, or projected to the nodes of
+ the element.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Surface:
+\series default
+ These quantities correspond to data that is only available at the surface
+ of the mesh (e.g.
+ contact traction).
+ If the surface data is defined at the nodes of the surface, it will be
+ written directly to the plot file.
+ However, if the data is associated with the surface facets - or more accurately
+, with the integration points of the surface facet - then it will be processed
+ before export, and a constant, facet-averaged value, will be written to
+ the plot file.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Rigid body:
+\series default
+ These are quantities that correspond to data stored on rigid bodies.
+ 
+\end_layout
+
+\begin_layout Standard
+The following table lists the possible values for the 
+\emph on
+type
+\emph default
+ attribute of the plot file variable tag.
+ 
+\end_layout
+
+\begin_layout Standard
+An asterisk (*) in the Category column denotes that the attribute is required
+ and must be included in the definition of the plot variable.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -35627,7 +35938,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="133" columns="3">
+<lyxtabular version="3" rows="136" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -35639,7 +35950,7 @@ name
 \begin_layout Plain Layout
 
 \series bold
-Name
+Type
 \end_layout
 
 \end_inset
@@ -35650,7 +35961,7 @@ Name
 \begin_layout Plain Layout
 
 \series bold
-Variable
+Category
 \end_layout
 
 \end_inset
@@ -36443,6 +36754,35 @@ reference "eq:mp-effective-p-c"
 \end_inset
 
  
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+effective friction coefficient
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Effective friction coefficient at a biphasic contact interface
 \end_layout
 
 \end_inset
@@ -38170,7 +38510,7 @@ Surface
 \begin_inset Text
 
 \begin_layout Plain Layout
-Local fluid load support, evaluated at contact faces
+Local fluid load support on biphasic contact surfaces
 \end_layout
 
 \end_inset
@@ -39221,6 +39561,65 @@ Rigid body center of mass velocity
 \begin_inset Text
 
 \begin_layout Plain Layout
+RVE generations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of generations in reactive viscoelastic material
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RVE reforming bonds
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fraction of weak bonds available to break and reform in reactive viscoelastic
+ material
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 sbm concentration 
 \end_layout
 
@@ -39956,117 +40355,6 @@ The 3x3 prestrain correction tensor (recovered with SPR)
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-The following example stores nodal displacements and element stresses.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example:
-\end_layout
-
-\begin_layout LyX-Code
-<plotfile type="febio">
-\end_layout
-
-\begin_layout LyX-Code
-  <var type="displacement"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <var type="stress"/>
-\end_layout
-
-\begin_layout LyX-Code
-</plotfile>
-\end_layout
-
-\begin_layout Standard
-As of FEBio 2.4, additional information can be added in the type description
- of the variable definition.
- The general format is as follows.
-\end_layout
-
-\begin_layout LyX-Code
-<var type="name[filter]=alias"/>
-\end_layout
-
-\begin_layout Standard
-The plot filter is defined by appending the name of the plot variable with
- the filter inside square brackets.
- Some plot variables require this to resolve possible ambiguities.
- For example,
-\end_layout
-
-\begin_layout LyX-Code
-<var type="solute concentration['solute1']"/>
-\end_layout
-
-\begin_layout Standard
-This example will store the solute concentration of a solute named `solute1'
- to the plot file.
-\end_layout
-
-\begin_layout Standard
-The optional alias can be used to rename the variable.
- For example,
-\end_layout
-
-\begin_layout LyX-Code
-<var type="solute concentration['Na']=Na concentration"/>
-\end_layout
-
-\begin_layout Standard
-This variable will store the solute concentration of a solute named `Na'
- to the plot file using the name `Na concentration'.
- This is the name that will be shown in PostView for instance.
-\end_layout
-
-\begin_layout Standard
-Some variables require the specification of a named surface (* in above
- table).
- For example,
-\end_layout
-
-\begin_layout LyX-Code
-<var type="fluid surface force" surface="airfoil"/>
-\end_layout
-
-\begin_layout Standard
-The named surface should be described in a 
-\emph on
-Surface
-\emph default
- element (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Surface-Section"
-
-\end_inset
-
-) within 
-\emph on
-Mesh
-\emph default
- (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geometry-Section"
-
-\end_inset
-
-).
 \end_layout
 
 \begin_layout Standard
@@ -43329,6 +43617,400 @@ Example
 
 \begin_layout LyX-Code
   <k>120000</k>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Gent Material
+\end_layout
+
+\begin_layout Standard
+The uncoupled Gent material is defined using the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Gent
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ type string.
+ It defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<G>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shear modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Jm>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $J_{m}=I_{m}-1$
+\end_inset
+
+, with 
+\begin_inset Formula $I_{m}$
+\end_inset
+
+ max value for first invariant 
+\begin_inset Formula $I_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bulk modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The strain energy of this material is defined via an uncoupled formulation,
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{r}=\tilde{\Psi}_{r}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)
+\]
+
+\end_inset
+
+Here, the deviatoric strain energy is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\Psi}=-\frac{\mu J_{m}}{2}\ln\left(1-\frac{\tilde{I}_{1}-3}{J_{m}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" type="Gent">
+\end_layout
+
+\begin_layout LyX-Code
+  <G>3.14</G>
+\end_layout
+
+\begin_layout LyX-Code
+  <Jm>1.5</Jm>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>1e5</k>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Subsubsection
+Uncoupled Holmes-Mow
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Holmes-Mow-Uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for the uncoupled Holmes-Mow material is 
+\emph on
+uncoupled Holmes-Mow
+\emph default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shear modulus 
+\begin_inset Formula $\mu$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Exponential stiffening coefficient 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material model uncouples deviatoric and volumetric behaviors, 
+\begin_inset Formula 
+\[
+\Psi_{r}=\tilde{\Psi}_{r}\left(\tilde{\mathbf{C}}\right)+U\left(J\right)
+\]
+
+\end_inset
+
+The deviatoric strain-energy function is given by
+\begin_inset Formula 
+\[
+\tilde{\Psi}_{r}=\frac{1}{2}\frac{\mu}{\beta}\left(e^{\tilde{Q}}-1\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the shear modulus and
+\begin_inset Formula 
+\[
+\tilde{Q}=\beta\left(\tilde{I}_{1}-3\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is the exponential stiffening coefficient.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="uncoupled Holmes-Mow">
+\end_layout
+
+\begin_layout LyX-Code
+  <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.5</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <beta>2</beta>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>5000</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -51766,6 +52448,211 @@ Example
 
 \begin_layout LyX-Code
   <k>120</k>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Subsubsection
+Gent Compressible
+\end_layout
+
+\begin_layout Standard
+The compressible Gent material is defined using the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+compressible Gent
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ type string.
+ It defines the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<G>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shear modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Jm>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $J_{m}=I_{m}-1$
+\end_inset
+
+, with 
+\begin_inset Formula $I_{m}$
+\end_inset
+
+ max value for first invariant 
+\begin_inset Formula $I_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bulk modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The strain energy of this material is defined as follows, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{r}=-\frac{\mu J_{m}}{2}\ln\left(1-\frac{I_{1}-3}{J_{m}}\right)+\frac{\kappa}{2}\left(\frac{J^{2}-1}{2}-\ln J\right)^{4}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the shear modulus.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" type="compressible Gent">
+\end_layout
+
+\begin_layout LyX-Code
+  <G>3.14</G>
+\end_layout
+
+\begin_layout LyX-Code
+  <Jm>1.5</Jm>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>1e5</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -74371,7 +75258,7 @@ biphasic
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="6" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -74505,7 +75392,7 @@ Specification of the hydraulic permeability
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -74514,7 +75401,7 @@ Specification of the hydraulic permeability
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -74527,11 +75414,48 @@ Specification of the fluid supply
 
 \end_inset
 </cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<tau>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Stabilization parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+]
 \end_layout
 
 \end_inset
@@ -74642,6 +75566,62 @@ Example:
 
 \begin_layout LyX-Code
 </material>
+\end_layout
+
+\begin_layout Standard
+The stabilization parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+ can be used to reduced oscillations in the fluid pressure field produced
+ under certain loading conditions, when the finite element mesh is relatively
+ coarse in the vicinity of a free-draining boundary (a boundary on which
+ the fluid pressure is set to zero).
+ When this occurs it is best to refine the mesh (create thinner elements
+ in the direction normal to the boundary) to overcome these oscillations.
+ When mesh refinement is not feasible or practical, one may use a non-zero
+ stabilization parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+.
+ FEBio uses an implementation based on the formulation of Aguilar et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Aguilar08"
+literal "false"
+
+\end_inset
+
+.
+ In our adaptation of this formulation the parameter 
+\begin_inset Formula $\tau$
+\end_inset
+
+ has units of time.
+ Its value is best estimated by identifying the thickness 
+\begin_inset Formula $h$
+\end_inset
+
+ of elements on the free-draining boundary, the characteristic modulus 
+\begin_inset Formula $E$
+\end_inset
+
+ of the solid matrix and hydraulic permeability 
+\begin_inset Formula $k$
+\end_inset
+
+ in these elements.
+ Then 
+\begin_inset Formula $\tau$
+\end_inset
+
+ may be set approximately to 
+\begin_inset Formula $h^{2}/\left(E\cdot k\right)$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
