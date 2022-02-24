@@ -21,39 +21,39 @@ endif()
 
 if(MKLROOT)
     if(${MKLROOT} MATCHES "oneapi")
-        find_path(MKL_INC mkl.h 
+        find_path(MKL_INC mkl.h
             PATHS ${MKLROOT}/latest/include
             DOC "MKL include directory")
-            
+
         find_library(MKL_CORE mkl_core
             PATHS ${MKLROOT}/latest/lib
             NO_DEFAULT_PATH)
-            
-        find_library(MKL_OMP_LIB 
-            NAMES iomp5 iomp5md libiomp5md.lib
+
+        find_library(MKL_OMP_LIB
+            NAMES libiomp5.so libiomp5 iomp5 iomp5md libiomp5md.lib
             PATHS ${MKLROOT}/../compiler/latest/*/compiler/lib
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
-            
+
     else()
-        find_path(MKL_INC mkl.h 
+        find_path(MKL_INC mkl.h
             PATHS ${MKLROOT}/include
             DOC "MKL include directory")
-            
+
         find_library(MKL_CORE mkl_core
             PATHS ${MKLROOT}/lib
             PATH_SUFFIXES "intel64" "intel32"
             NO_DEFAULT_PATH)
-            
-        find_library(MKL_OMP_LIB 
-            NAMES iomp5 iomp5md libiomp5md.lib
-            PATHS ${MKLROOT}/../lib ${MKLROOT}/../compiler/lib
+
+        find_library(MKL_OMP_LIB
+            NAMES libiomp5.so libiomp5 iomp5 iomp5md libiomp5md.lib
+            PATHS ${MKLROOT}/lib ${MKLROOT}/../lib ${MKLROOT}/../compiler/lib
             PATH_SUFFIXES "intel64" "intel32"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
-    
+
     endif()
-        
+
     if(MKL_CORE)
         get_filename_component(MKL_TEMP ${MKL_CORE} DIRECTORY)
         set(MKL_LIB_DIR ${MKL_TEMP} CACHE PATH "MKL Library directory")

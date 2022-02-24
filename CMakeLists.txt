@@ -47,10 +47,10 @@ function(findLib libName libDir libOut)
         find_library(TEMP NAMES ${libName}.lib ${ARGV3}.lib ${ARGV4}.lib ${ARGV5}.lib ${ARGV6}.lib
             PATHS ${${libDir}} NO_DEFAULT_PATH)
     else()
-        find_library(TEMP NAMES lib${libName}.a lib${ARGV3}.a lib${ARGV4}.a lib${ARGV5}.a lib${ARGV6}.a
+        find_library(TEMP NAMES lib${libName}.a lib${ARGV3}.a lib${ARGV4}.a lib${ARGV5}.a lib${ARGV6}.a lib${libName}.so lib${ARGV3}.so lib${ARGV4}.so lib${ARGV5}.so lib${ARGV6}.so
             PATHS ${${libDir}} NO_DEFAULT_PATH)
     endif()
-    
+
     if(TEMP)
         set(${libOut} ${TEMP} PARENT_SCOPE)
         unset(TEMP CACHE)
