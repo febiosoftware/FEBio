@@ -214,12 +214,14 @@ template <typename T>
 class OLeaf<std::vector<T> > : public OChunk
 {
 public:
-	OLeaf(unsigned int nid, const std::vector<T>& a) : OChunk(nid)
+	OLeaf(unsigned int nid, const std::vector<T>& a) : OChunk(nid), m_pd(nullptr)
 	{
 		m_nsize = (int)a.size();
-		assert(m_nsize > 0);
-		m_pd = new T[m_nsize];
-		memcpy(m_pd, &a[0], sizeof(T)*m_nsize);
+		if (m_nsize > 0)
+		{
+			m_pd = new T[m_nsize];
+			memcpy(m_pd, &a[0], sizeof(T) * m_nsize);
+		}
 	}
 	~OLeaf() { delete m_pd; }
 
@@ -229,7 +231,7 @@ public:
 		fp->Write(&m_nID , sizeof(unsigned int), 1);
 		unsigned int nsize = Size();
 		fp->Write(&nsize , sizeof(unsigned int), 1);
-		fp->Write(m_pd   , sizeof(T), m_nsize);
+		if (m_pd && (nsize > 0)) fp->Write(m_pd   , sizeof(T), m_nsize);
 	}
 
 protected:
