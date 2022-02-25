@@ -3459,7 +3459,7 @@ and the Cauchy stress
 \begin_inset Formula $\boldsymbol{\sigma}$
 \end_inset
 
- is given by Eq.
+ is given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:UC-Cauchy-stress"
@@ -3755,7 +3755,7 @@ where
 \end_inset
 
  is the hydraulic permeability of the mixture.
- When combined with Eq.
+ When combined with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq106"
@@ -5421,7 +5421,7 @@ relative deformation gradient
 \begin_inset Formula $\sigma$
 \end_inset
 
- by applying the chain rule to Eq.
+ by applying the chain rule to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-mixture-kinematics"
@@ -5471,7 +5471,7 @@ postulated by constitutive assumption
  is a time-invariant spatial mapping.
  It follows that only one deformation gradient represents an independent
  state variable in a constrained mixture framework, whereas all others are
- related to it via Eq.
+ related to it via eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -5486,7 +5486,7 @@ noprefix "false"
 \end_inset
 
 's may be selected, based on convenience.
- In Eq.
+ In eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -5499,7 +5499,7 @@ noprefix "false"
  the spatio-temporal arguments have been written explicitly for clarity.
  These dependencies are implied in the forthcoming sections and henceforth
  those arguments may be selectively suppressed.
- Taking the determinant of Eq.
+ Taking the determinant of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -5672,7 +5672,7 @@ This summation is carried out over all constituents.
 \end_inset
 
  remains constant over time.
- Taking the material time derivative of Eq.
+ Taking the material time derivative of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-mass-balance"
@@ -5682,7 +5682,7 @@ noprefix "false"
 
 \end_inset
 
- and using Eq.
+ and using eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-balance-alpha-1"
@@ -5790,7 +5790,7 @@ In reactive frameworks where
 \begin_inset Formula $\rho_{r}^{\sigma}$
 \end_inset
 
- evolves according to Eq.
+ evolves according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-balance-alpha-1"
@@ -5808,7 +5808,7 @@ w^{\sigma}=\frac{\rho_{r}^{\sigma}}{\rho_{r}}\,,\label{eq:mass-fraction}
 
 \end_inset
 
-in which case we may rewrite Eq.
+in which case we may rewrite eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-free-energy"
@@ -5836,7 +5836,7 @@ noprefix "false"
 \end_inset
 
 .
- Based on Eq.
+ Based on eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-mass-balance"
@@ -5863,7 +5863,7 @@ noprefix "false"
 \begin_inset Formula $\mathbf{F}^{\sigma}$
 \end_inset
 
-, we may use Eq.
+, we may use eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -5965,7 +5965,7 @@ tuent solids.
 \end_inset
 
  returns the actual contribution of that measure to the entire mixture.
- Based on Eq.
+ Based on eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-jacobian-relation"
@@ -6016,7 +6016,7 @@ These relations show that the Cauchy stress and spatial elasticity tensor
 \begin_inset Formula $\sigma$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:febio-mixture-stress"
@@ -6035,7 +6035,7 @@ noprefix "false"
 \begin_inset Formula $\mathbf{X}^{\sigma}$
 \end_inset
 
-, as evidenced by Eq.
+, as evidenced by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:febio-stress-function"
@@ -6051,7 +6051,7 @@ noprefix "false"
 \begin_inset Formula $J^{\sigma s}$
 \end_inset
 
- as shown in Eq.
+ as shown in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:febio-mixture-sed"
@@ -6161,7 +6161,7 @@ In the simplest type of non-reactive constrained mixtures of solids all
 \end_inset
 
  to the mixture.
- Thus, the relation of Eq.
+ Thus, the relation of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:febio-mixture-stress"
@@ -6315,7 +6315,7 @@ literal "false"
 \begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)=\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
- according to Eq.
+ according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -6776,7 +6776,7 @@ where
 
  results exclusively from osmotic effects and ambient conditions (i.e., it
  does not depend on the loading history).
- Thus, in analogy to Eq.
+ Thus, in analogy to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq118"
@@ -6824,7 +6824,7 @@ The osmotic pressure
 \begin_inset Formula $\mathbf{t}=\mathbf{0}$
 \end_inset
 
-, the relation of Eq.
+, the relation of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq141"
@@ -6875,7 +6875,7 @@ where
 \begin_inset Formula $\varphi_{r}^{s}$
 \end_inset
 
- depend on the solid matrix deformation, thus Eq.
+ depend on the solid matrix deformation, thus eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -6897,7 +6897,7 @@ reference "eq142"
 \begin_inset Formula $-p\mathbf{I}$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq141"
@@ -6987,7 +6987,7 @@ Consider a porous medium with an interstitial fluid that consists of a solvent
 \end_inset
 
 is the osmolarity of the external environment.
- Using Eq.
+ Using eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -7024,7 +7024,7 @@ The reference configuration (the stress-free configuration of the solid)
 \end_inset
 
  in the reference state.
- Therefore Eq.
+ Therefore eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq144"
@@ -7039,7 +7039,7 @@ p=R\theta c^{\ast}\left(\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}\frac{c_{0}^{
 
 \end_inset
 
-and this expression may be substituted into Eq.
+and this expression may be substituted into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq143"
@@ -7061,7 +7061,7 @@ A perfect osmometer is a porous material whose interstitial fluid behaves
 \begin_inset Formula $p=0$
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq145"
@@ -7092,7 +7092,7 @@ This equation is known as the Boyle-van't Hoff relation for a perfect osmometer.
 \end_layout
 
 \begin_layout Standard
-FEBio implements the relation of Eq.
+FEBio implements the relation of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq145"
@@ -7148,7 +7148,7 @@ perfect osmometer
 
  framework by simply increasing the mass of the intracellular solid matrix
  and membrane-impermeant solute.
- This is achieved by using Eq.
+ This is achieved by using eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq144"
@@ -7239,7 +7239,7 @@ where
 \end_inset
 
 .
- Though this expression may be equated with Eq.
+ Though this expression may be equated with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -7256,7 +7256,7 @@ reference "eq142"
 
 \begin_layout Standard
 However, since the number of charges fixed to the solid matrix is invariant,
- we may manipulate Eq.
+ we may manipulate eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq142"
@@ -7289,7 +7289,7 @@ p=R\theta\left(\sqrt{\left(\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}c_{r}^{F}\
 
 \end_inset
 
-This expression may be substituted into Eq.
+This expression may be substituted into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq143"
@@ -7365,14 +7365,14 @@ In a mixture containing a solid constituent (denoted by
 
 \end_inset
 
-Substituting Eq.
+Substituting eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq152"
 
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq150"
@@ -7465,7 +7465,7 @@ For constituents constrained to move with the solid (denoted generically
 \begin_inset Formula $\forall\sigma)$
 \end_inset
 
-, the statement of mass balance in Eq.
+, the statement of mass balance in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq153"
@@ -7486,7 +7486,7 @@ This representation makes it easy to see that alterations in
 
  can occur only as a result of chemical reactions (such as synthesis, degradatio
 n, or binding).
- In contrast, as seen in Eq.
+ In contrast, as seen in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq153"
@@ -7560,7 +7560,7 @@ where
 
  is the referential solid volume fraction of solid constituents not explicitly
  modeled by solid-bound molecules (a user-defined parameter).
- According to Eq.
+ According to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq154"
@@ -7752,7 +7752,7 @@ The volume fraction of each constituent is given by
 \begin_inset Formula $\rho^{\alpha}=\varphi^{\alpha}\rho_{T}^{\alpha}$
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq150"
@@ -7783,14 +7783,14 @@ This mass balance relation for the mixture expresses the fact that the mixture
 \begin_inset Formula $\alpha$
 \end_inset
 
- would nullify the right-hand-side of Eq.
+ would nullify the right-hand-side of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq162"
 
 \end_inset
 
- based on Eq.
+ based on eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq151"
@@ -7832,7 +7832,7 @@ In the special case of the solvent (
 \begin_inset Formula $\hat{\varphi}^{w}=\hat{\rho}^{w}/\hat{\rho}_{T}^{w}$
 \end_inset
 
-, which may be incorporated in Eq.
+, which may be incorporated in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq163"
@@ -8019,7 +8019,7 @@ reference "eq166"
 \begin_inset Formula $\hat{\rho}^{\alpha}=\left(1-\varphi^{s}\right)M^{\alpha}\nu^{\alpha}\hat{\zeta}$
 \end_inset
 
-, so that the constraint of Eq.
+, so that the constraint of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq151"
@@ -8038,7 +8038,7 @@ Thus, properly balancing a chemical reaction satisfies this constraint.
 \end_layout
 
 \begin_layout Standard
-The mixture mass balance in Eq.
+The mixture mass balance in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq163b"
@@ -8078,21 +8078,21 @@ where
 \begin_inset Formula $\overline{\mathcal{V}}$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq170"
 
 \end_inset
 
-; therefore, if one desires to model chemical reactions, Eq.
+; therefore, if one desires to model chemical reactions, eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq165"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq168"
@@ -8104,7 +8104,7 @@ reference "eq168"
 \begin_inset Formula $\hat{\varphi}^{w}=\left(1-\varphi^{s}\right)\hat{\zeta}\nu^{w}\mathcal{V}^{w}$
 \end_inset
 
-.) Similarly, the solute mass balance in Eq.
+.) Similarly, the solute mass balance in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq161"
@@ -8254,7 +8254,7 @@ Let
 \begin_inset Formula $\dot{J}=J\mathbf{F}^{-T}:\dot{\mathbf{F}}$
 \end_inset
 
- which, when combined with Eq.
+ which, when combined with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:F-dot"
@@ -8509,7 +8509,7 @@ where
 \begin_inset Formula $\mathbf{v}_{-}=\mathbf{v}_{\Gamma}$
 \end_inset
 
- for the solid, such that Eq.
+ for the solid, such that eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-jump"
@@ -8602,7 +8602,7 @@ reference "eq:elastic-pressure"
 \end_inset
 
 .
- Thus, the mass jump in Eq.
+ Thus, the mass jump in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mass-jump"
@@ -8751,7 +8751,7 @@ For the specialized conditions of a viscous fluid at constant temperature
 \begin_inset Formula $\boldsymbol{\sigma}$
 \end_inset
 
- must have the form of Eq.
+ must have the form of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stress"
@@ -8762,7 +8762,7 @@ reference "eq:stress"
 \begin_inset Formula $p$
 \end_inset
 
- is given by Eq.
+ is given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:elastic-pressure"
@@ -8845,7 +8845,7 @@ reference "eq:elastic-pressure"
 \end_inset
 
  (heat leaving the system).
- Now, the integral form of the energy balance in Eq.
+ Now, the integral form of the energy balance in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:energy-integral-redux"
@@ -8861,7 +8861,7 @@ reference "eq:energy-integral-redux"
 \end_inset
 
 A comparison of this statement with the statement of virtual work, presented
- below in Eq.
+ below in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:virtual work"
@@ -9212,7 +9212,7 @@ where
 \begin_inset Formula $\mathbf{a}^{f}$
 \end_inset
 
- is given in Eq.
+ is given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:fsi-fluid-acceleration-redux"
@@ -9914,7 +9914,7 @@ Since the finite element implementation requires all material time derivatives
 \begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
- is not a nodal degree of freedom, we use Eq.
+ is not a nodal degree of freedom, we use eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-flux"
@@ -10116,7 +10116,7 @@ also implying that
 \end_inset
 
 .
- Given Eq.
+ Given eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-Jf"
@@ -10203,7 +10203,7 @@ Finally, another relation which is sufficient to satisfy the jump condition
 
 \end_inset
 
-This jump condition Eq.
+This jump condition eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-mtm-jump"
@@ -10252,7 +10252,7 @@ noprefix "false"
 \begin_inset Formula $\varphi^{f}\to0$
 \end_inset
 
-), in which case the mixture momentum jump in Eq.
+), in which case the mixture momentum jump in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-mix-mtm-jump"
@@ -10282,7 +10282,7 @@ Letting
 \begin_inset Formula $J^{f}$
 \end_inset
 
- be nodal DOFs automatically enforces the jump conditions Eq.
+ be nodal DOFs automatically enforces the jump conditions eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-Jf-jump"
@@ -10292,7 +10292,7 @@ noprefix "false"
 
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-flux-jump"
@@ -10308,7 +10308,7 @@ noprefix "false"
 \end_inset
 
 .
- Finally, subtracting Eq.
+ Finally, subtracting eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-mtm-jump"
@@ -10318,7 +10318,7 @@ noprefix "false"
 
 \end_inset
 
- from Eq.
+ from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-mix-mtm-jump"
@@ -10365,7 +10365,7 @@ However, when the biphasic domain interfaces with a non-porous solid domain
 \begin_inset Formula $\Gamma^{bs}$
 \end_inset
 
-, the jump conditions Eq.
+, the jump conditions eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-Jf-jump"
@@ -10379,7 +10379,7 @@ noprefix "false"
 \begin_inset Formula $J^{f}$
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-solid-mtm-jump"
@@ -10394,7 +10394,7 @@ noprefix "false"
 \end_inset
 
  don't apply.
- In that case, the jump condition Eq.
+ In that case, the jump condition eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:bfsi-fluid-flux-jump"
@@ -10532,7 +10532,7 @@ reference "eq171"
 
 \begin_layout Standard
 To linearize the finite element equations, the directional derivative of
- the virtual work in Eq.
+ the virtual work in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq171"
@@ -11352,7 +11352,7 @@ where
 \end_inset
 
 .
- In the expression of Eq.
+ In the expression of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq194"
@@ -11378,7 +11378,7 @@ name "subsec:Biphasic-linearization"
 \end_layout
 
 \begin_layout Standard
-Since the system of equations in Eq.
+Since the system of equations in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq194"
@@ -11511,7 +11511,7 @@ where
 \end_inset
 
 .
- Based on the relation of Eq.
+ Based on the relation of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq104"
@@ -11667,7 +11667,7 @@ Note that letting
 
  in the above equations recovers the virtual work relations for nonlinear
  elasticity of compressible solids.
- The resulting simplified equation emerging from Eq.
+ The resulting simplified equation emerging from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq199"
@@ -11898,7 +11898,7 @@ literal "false"
 
 \end_inset
 
-instead of Eq.
+instead of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq107"
@@ -11946,7 +11946,7 @@ where
 \begin_inset Formula $\mathbf{w}$
 \end_inset
 
- to the virtual work expression in Eq.
+ to the virtual work expression in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq194"
@@ -12041,7 +12041,7 @@ where
 \begin_inset Formula $\delta W_{int}$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq197"
@@ -20147,7 +20147,7 @@ Now, the discretized form of
 \begin_inset Formula $\delta W_{int}$
 \end_inset
 
-, using Eq.
+, using eq.
 \begin_inset space ~
 \end_inset
 
@@ -20356,7 +20356,7 @@ k_{ab}^{JJ}= & \int_{\Omega^{b}}\alpha_{f}N_{a}\frac{1}{J^{f}}\left(\left(\varph
 
 \end_inset
 
- for external virtual work in Eq.
+ for external virtual work in eq.
 \begin_inset space ~
 \end_inset
 
@@ -20470,7 +20470,7 @@ The virtual work
 \begin_inset Formula $\delta F$
 \end_inset
 
- on a biphasic-FSI interface was given in Eq.
+ on a biphasic-FSI interface was given in eq.
 \begin_inset space ~
 \end_inset
 
@@ -31323,7 +31323,7 @@ generation weak bonds, which evolves over time as described below.
 \end_inset
 
 .
- Based on Eq.
+ Based on eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:febio-mixture-stress"
@@ -31474,7 +31474,7 @@ and
 \end_inset
 
 generation starts breaking and reforming.
- In the recursive expression of Eq.
+ In the recursive expression of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq498"
@@ -31566,7 +31566,7 @@ The finite element implementation of reactive viscoelasticity stores the
 \begin_inset Formula $w^{u}$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq498"
@@ -31580,7 +31580,7 @@ noprefix "false"
 \begin_inset Formula $\mathbf{F}^{v}\left(\mathbf{X},t\right)$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq492"
@@ -31744,7 +31744,7 @@ literal "false"
 
 \end_inset
 
-When substituted into Eq.
+When substituted into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:rrf-g-continuous-spectrum"
@@ -31857,7 +31857,7 @@ In the limit as
 \begin_inset Formula $\beta\to1$
 \end_inset
 
-, the expression of Eq.
+, the expression of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:rrf-Malkin"
@@ -31867,7 +31867,7 @@ noprefix "false"
 
 \end_inset
 
- reduces to Eq.
+ reduces to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:rrf-Fung-72"
@@ -32052,7 +32052,7 @@ w^{\alpha}=\frac{\rho_{r}^{\alpha}}{\rho_{r}}\,.\label{eq:dmg-mass-fraction}
 
 \end_inset
 
-Now, the mixture mass balance in Eq.
+Now, the mixture mass balance in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-mass-balance"
@@ -32074,7 +32074,7 @@ w^{i}+w^{b}=1\,.\label{eq:dmg-massfraction-balance}
 
 \end_inset
 
-We may also rewrite the mixture free energy density in Eq.
+We may also rewrite the mixture free energy density in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-FED"
@@ -32092,7 +32092,7 @@ noprefix "false"
 
 \end_inset
 
-where we have made use of Eq.
+where we have made use of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-massfraction-balance"
@@ -32147,7 +32147,7 @@ To further clarify this equivalence, we may let
 \end_inset
 
  represent the free energy density of an intact elastic solid, such that
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-FED-redux"
@@ -32162,7 +32162,7 @@ noprefix "false"
 \end_inset
 
 .
- Similarly, Eq.
+ Similarly, eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-stress"
@@ -32203,7 +32203,7 @@ noprefix "false"
 
 \end_inset
 
-), the strain energy density of the intact material has the form of Eq.
+), the strain energy density of the intact material has the form of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:UC-SED"
@@ -32245,7 +32245,7 @@ uncoupled damage
 \begin_inset Formula $\boldsymbol{\sigma}=\left(1-D\right)\dev\tilde{\boldsymbol{\sigma}}_{0}+p\mathbf{I}$
 \end_inset
 
-, consistent with Eq.
+, consistent with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:UC-Cauchy-stress"
@@ -32263,7 +32263,7 @@ noprefix "false"
 \begin_inset Formula $\tilde{\Psi}_{0}\left(\tilde{\mathbf{C}}\right)$
 \end_inset
 
- as given in Eq.
+ as given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:UC-Cauchy-stress-tilde"
@@ -32281,7 +32281,7 @@ noprefix "false"
 \begin_inset Formula $U\left(J\right)$
 \end_inset
 
- as given in Eq.
+ as given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:UC-p"
@@ -32526,7 +32526,7 @@ where
 
 \end_inset
 
-Substituting these expressions into Eq.
+Substituting these expressions into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-mass-balance-alpha"
@@ -32619,7 +32619,7 @@ Since
 \end_inset
 
  is always positive when the damage is increasing, and zero otherwise as
- per Eq.
+ per eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-Xsi-dot"
@@ -32638,7 +32638,7 @@ noprefix "false"
 \begin_inset Formula $r=-\dot{F}\left(\Xi_{m}\right)\psi\left(\mathbf{F}\right)$
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-heat-supply"
@@ -32694,7 +32694,7 @@ This damage measure is valid for isotropic or anisotropic materials, since
 \begin_inset Formula $\Psi_{r}$
 \end_inset
 
- must satisfy the frame-invariance of Eq.
+ must satisfy the frame-invariance of eq.
 \begin_inset CommandInset ref
 LatexCommand pageref
 reference "eq:dmg-criterion-invariance"
@@ -32746,7 +32746,7 @@ This damage measure is valid for isotropic or anisotropic materials, since
 \begin_inset Formula $\Psi_{r}$
 \end_inset
 
- must satisfy the frame-invariance of Eq.
+ must satisfy the frame-invariance of eq.
 \begin_inset CommandInset ref
 LatexCommand pageref
 reference "eq:dmg-criterion-invariance"
@@ -32765,7 +32765,7 @@ noprefix "false"
 
 \end_inset
 
-where we have used the result of Eq.
+where we have used the result of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-model-SED-N"
@@ -32814,7 +32814,7 @@ This damage measure is valid for isotropic or anisotropic materials, since
 \begin_inset Formula $\Psi_{r}$
 \end_inset
 
- must satisfy the frame-invariance of Eq.
+ must satisfy the frame-invariance of eq.
 \begin_inset CommandInset ref
 LatexCommand pageref
 reference "eq:dmg-criterion-invariance"
@@ -32833,7 +32833,7 @@ noprefix "false"
 
 \end_inset
 
-where we have used the result of Eq.
+where we have used the result of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-model-SED-N"
@@ -32883,7 +32883,7 @@ where
 
 \end_inset
 
-From the hyperelasticity relation in Eq.
+From the hyperelasticity relation in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-stress"
@@ -32927,7 +32927,7 @@ where
 
 \end_inset
 
-From the von Mises criterion in Eq.
+From the von Mises criterion in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-model-VMS"
@@ -32965,7 +32965,7 @@ noprefix "false"
 
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dmg-N-redux"
@@ -33240,7 +33240,7 @@ The Lagrange strain tensor
 \begin_inset Formula $\mathbf{F}$
 \end_inset
 
- via Eq.
+ via eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Lagrange-strain-tensor"
@@ -33308,7 +33308,7 @@ and
 \begin_inset Formula $\mathbf{E}$
 \end_inset
 
- is given in Eq.
+ is given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Lagrange-strain-tensor"
@@ -33492,7 +33492,7 @@ yield measure
 \end_inset
 
 .
- Thus, according to Eq.
+ Thus, according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -33638,7 +33638,7 @@ is the unit tensor along
 \end_inset
 
  is a non-dimensional scalar which may be determined analytically by enforcing
- the plastic consistency condition in Eq.
+ the plastic consistency condition in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:plastic-consistency-condition"
@@ -33671,7 +33671,7 @@ generation is in the elastic regime; therefore,
 \begin_inset Formula $\mathbf{F}^{us}=\mathbf{I}$
 \end_inset
 
- at the start of the recursive relation in Eq.
+ at the start of the recursive relation in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:plasticity-Fvsi-normality"
@@ -33685,7 +33685,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Standard
-The stress response of this solid mixture is given generically by Eq.
+The stress response of this solid mixture is given generically by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-mixture-stress-redux"
@@ -33752,7 +33752,7 @@ where
 \begin_inset Formula $\sigma=u,v$
 \end_inset
 
-) and Eq.
+) and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:plasticity-Fvsi-normality"
@@ -33766,7 +33766,7 @@ noprefix "false"
 \begin_inset Formula $\boldsymbol{\sigma}_{0}$
 \end_inset
 
- is given in Eq.
+ is given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:febio-stress-function"
@@ -34031,7 +34031,7 @@ bond families
 \begin_inset Formula $\mathbf{F}_{\beta}^{\sigma s}$
 \end_inset
 
- in the updated form of Eq.
+ in the updated form of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-total-def-grad"
@@ -34041,7 +34041,7 @@ noprefix "false"
 
 \end_inset
 
-, such as that given in Eq.
+, such as that given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:plasticity-Fvsi-normality"
@@ -34088,7 +34088,7 @@ The referential mass density of bond family
 \begin_inset Formula $\sum_{\sigma}\rho_{r\beta}^{\sigma}=\rho_{r\beta}$
 \end_inset
 
-, as per Eq.
+, as per eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:general-mass-balance"
@@ -34193,7 +34193,7 @@ where the summation runs over all possible yielded generations
 \begin_inset Formula $t=u$
 \end_inset
 
-, Eq.
+, eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:hardening-yielded-mass-fraction"
@@ -34234,7 +34234,7 @@ noprefix "false"
 
 \end_inset
 
-Then the mixture stress in Eq.
+Then the mixture stress in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:multiplebonds-mixture-stress"
@@ -34777,7 +34777,7 @@ The relationships between
 \begin_inset Formula $\Phi_{m\beta}$
 \end_inset
 
- embodied in Eq.
+ embodied in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:hardening-phi-model-no-r"
@@ -35551,7 +35551,7 @@ noprefix "false"
 \begin_inset Formula $w_{\beta}^{s}=1-w_{\beta}^{b}$
 \end_inset
 
- all yield, following the reaction in Eq.
+ all yield, following the reaction in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:hardening-yielded-rxn"
@@ -35720,7 +35720,7 @@ w_{\beta}^{b} & =F^{e}\left(\Xi_{m\beta}^{e}\right)
 
 \end_inset
 
-and hence the mass balance of Eq.
+and hence the mass balance of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:multiplebonds-bond-species-mass-fractions"
@@ -35898,7 +35898,7 @@ Strain Energy Density, Stress, and Damage
 
 \begin_layout Standard
 Recognizing that damaged (broken) bonds do not store free energy, the referentia
-l mixture free energy density in Eq.
+l mixture free energy density in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:multiplebonds-mixture-energy"
@@ -35949,7 +35949,7 @@ noprefix "false"
 \end_inset
 
 .
- Similarly, the mixture stress may be evaluated from Eq.
+ Similarly, the mixture stress may be evaluated from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:multiplebonds-mixture-stress"
@@ -35971,7 +35971,7 @@ where the stresses
 \begin_inset Formula $\boldsymbol{\sigma}_{0}$
 \end_inset
 
- are given by the standard hyperelasticity relation in Eq.
+ are given by the standard hyperelasticity relation in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:multiplebonds-mixture-stress"
@@ -42299,7 +42299,7 @@ where
 
 \end_inset
 
-Eq.
+eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact_int"
@@ -42414,7 +42414,7 @@ Furthermore, the elemental area on
 
 \end_inset
 
-Therefore the contact integral of Eq.
+Therefore the contact integral of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact_int"
@@ -42584,7 +42584,7 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-The projection approach of Eq.
+The projection approach of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_x2"
@@ -42633,7 +42633,7 @@ literal "true"
 \end_inset
 
 ).
- The benefits associated with a projection method such as Eq.
+ The benefits associated with a projection method such as eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_x2"
@@ -42906,7 +42906,7 @@ on, by definition
 \begin_layout Standard
 We now use these relations to produce a more practical formulation of the
  slip velocity for our frictional contact implementation.
- Taking the material time derivative of Eq.
+ Taking the material time derivative of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_x2"
@@ -42981,7 +42981,7 @@ where
 \begin_inset Formula $\gamma^{\left(1\right)}$
 \end_inset
 
-, evaluated from Eq.
+, evaluated from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:n"
@@ -43032,7 +43032,7 @@ Previous authors have utilized
 \begin_inset Formula $\mathbf{v}^{r}=\dot{\eta}_{(2)}^{\alpha}\mathbf{g}_{\alpha}^{(2)}$
 \end_inset
 
- directly instead of the right-hand-side of Eq.
+ directly instead of the right-hand-side of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:vr"
@@ -43058,7 +43058,7 @@ literal "true"
 \end_inset
 
 .
- The relative velocity measure on the right-hand-side of Eq.
+ The relative velocity measure on the right-hand-side of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:vr"
@@ -43259,7 +43259,7 @@ where
 \begin_inset Formula $\varepsilon$
 \end_inset
 
- is the penalty parameter and we have employed Eq.
+ is the penalty parameter and we have employed eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick_gap"
@@ -43272,7 +43272,7 @@ reference "eq:stick_gap"
 
 \begin_layout Standard
 During slip, we first calculate the normal component of the contact traction
- by penalizing the normal gap of Eq.
+ by penalizing the normal gap of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_gap"
@@ -43432,7 +43432,7 @@ where
 \begin_inset Formula $t_{n}$
 \end_inset
 
- is given by Eq.
+ is given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL_tn"
@@ -43499,7 +43499,7 @@ The Lagrange multipliers
 \end_inset
 
 ), and the other is considered passive and is derived from the active multiplier.
- The contact status is determined via Eq.
+ The contact status is determined via eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-criterion"
@@ -43697,14 +43697,14 @@ Determination of whether stick or slip is active is accomplished by a trial
 \begin_inset Formula $\tilde{\mathbf{t}}^{(1)}$
 \end_inset
 
- assuming stick, utilizing either Eq.
+ assuming stick, utilizing either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick_traction"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL_stick_traction"
@@ -43752,14 +43752,14 @@ where
 \begin_inset Formula $t_{n}$
 \end_inset
 
- is given by either Eq.
+ is given by either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_tn"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL_tn"
@@ -43806,7 +43806,7 @@ Computationally, care must be taken to ensure that augmentation does not
 \begin_inset Formula $\boldsymbol{\lambda}_{s}=\varepsilon\mathbf{g}_{s}$
 \end_inset
 
- according to Eq.
+ according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-stick"
@@ -43822,7 +43822,7 @@ reference "eq:AL-stick"
 \begin_inset Formula $\mathbf{t}^{(1)}=\boldsymbol{\lambda}_{s}+\varepsilon\mathbf{g}_{s}=2\varepsilon\mathbf{g}_{s}$
 \end_inset
 
- according to Eq.
+ according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL_stick_traction"
@@ -43855,7 +43855,7 @@ name "subsec:SE-Linearization"
 \end_layout
 
 \begin_layout Standard
-To evaluate the linearization in Eq.
+To evaluate the linearization in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dgc"
@@ -44033,7 +44033,7 @@ noprefix "false"
 
 \end_inset
 
-, along with the relations of Eq.
+, along with the relations of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick_xv_linearizations"
@@ -44052,7 +44052,7 @@ D\mathbf{t}^{(1)}=\varepsilon\left(\Delta\mathbf{u}^{(2)}-\Delta\mathbf{u}^{(1)}
 \end_inset
 
 The linearization operator may be brought inside the contact integral of
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant"
@@ -44082,7 +44082,7 @@ where we recall that
 \begin_inset Formula $D\delta\mathbf{v}^{(1)}=D\delta\mathbf{v}^{(2)}=\mathbf{0}$
 \end_inset
 
- from Eq.
+ from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick_xv_linearizations"
@@ -44128,7 +44128,7 @@ As in stick, the contact integral over
 \begin_inset Formula $\mathbf{n}^{(1)}$
 \end_inset
 
-, in accordance with Eq.
+, in accordance with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_x2"
@@ -44256,7 +44256,7 @@ In this expression,
 \begin_inset Formula $a^{\alpha\beta}\to\mathbf{g}_{(2)}^{\alpha}\cdot\mathbf{g}_{(1)}^{\beta}$
 \end_inset
 
- (see the discussion following Eq.(40) in 
+ (see the discussion following eq.(40) in 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
@@ -44271,7 +44271,7 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-From Eq.
+From eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_traction"
@@ -44289,7 +44289,7 @@ D\mathbf{t}^{(1)}=Dt_{n}\left(\mathbf{n}+\mu\mathbf{s}^{(1)}\right)+t_{n}\left(D
 
 \end_inset
 
-By Eq.
+By eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_tn"
@@ -44312,7 +44312,7 @@ noprefix "false"
 
 \end_inset
 
-Applying the linearization operator to Eq.
+Applying the linearization operator to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:s1"
@@ -44334,7 +44334,7 @@ where
 \begin_inset Formula $D\mathbf{v}^{r}=Dg\,\dot{\mathbf{n}}^{(1)}+g\,D\dot{\mathbf{n}}^{(1)}+D\left(\partial\mathbf{x}^{\left(1\right)}/\partial t\right)-D\left(\partial\mathbf{x}^{\left(2\right)}/\partial t\right)$
 \end_inset
 
- according to Eq.
+ according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:vr"
@@ -44506,7 +44506,7 @@ Stick
 \end_layout
 
 \begin_layout Standard
-Applying the discretization to Eq.
+Applying the discretization to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant"
@@ -44538,7 +44538,7 @@ and
 \begin_inset Formula $\mathbf{t}^{(1)}$
 \end_inset
 
- is defined by Eq.
+ is defined by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick_traction"
@@ -44548,7 +44548,7 @@ noprefix "false"
 
 \end_inset
 
- in the penalty case and Eq.
+ in the penalty case and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL_stick_traction"
@@ -44560,7 +44560,7 @@ noprefix "false"
 
  when augmented Lagrangian regularization is used.
  Individual terms may now be discretized and placed into matrix notation,
- facilitating their substitution into Eq.
+ facilitating their substitution into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-linearized-2"
@@ -44568,14 +44568,14 @@ reference "eq:stick-linearized-2"
 \end_inset
 
 .
- A straightforward application of Eq.
+ A straightforward application of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:u-v-discretization"
 
 \end_inset
 
- to Eq.
+ to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dgcov_Djeta"
@@ -44629,7 +44629,7 @@ and
 \end_inset
 
 .
- Furthermore, discretizing Eq.
+ Furthermore, discretizing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dt_stick"
@@ -44646,28 +44646,28 @@ D\mathbf{t}^{(1)}=\begin{bmatrix}\sum_{c}-\varepsilon N_{c}^{(1)}\mathbf{I} & \s
 
 \end_inset
 
-Substituting Eq.
+Substituting eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Djeta-discretized"
 
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dt-stick-discretized"
 
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-linearized-2"
 
 \end_inset
 
- and applying the discretization of Eq.
+ and applying the discretization of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:u-v-discretization"
@@ -44693,7 +44693,7 @@ reference "eq:u-v-discretization"
 
 \end_inset
 
- An examination of Eq.
+ An examination of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-stiffness"
@@ -44706,7 +44706,7 @@ reference "eq:stick-stiffness"
 \end_layout
 
 \begin_layout Standard
-Although the stiffness matrix of Eq.
+Although the stiffness matrix of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-stiffness"
@@ -44757,7 +44757,7 @@ Slip
 \end_layout
 
 \begin_layout Standard
-In the case of slip, the contact integral of Eq.
+In the case of slip, the contact integral of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant"
@@ -44808,7 +44808,7 @@ and
 \begin_inset Formula $t_{n}$
 \end_inset
 
- is given by Eq.
+ is given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_tn"
@@ -44818,7 +44818,7 @@ noprefix "false"
 
 \end_inset
 
- in the penalty formulation and Eq.
+ in the penalty formulation and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL_tn"
@@ -44835,7 +44835,7 @@ noprefix "false"
 For the following linearization and discretization the normal and tangential
  components, representing frictionless and frictional contributions to the
  contact integral, will be treated separately and may then be added together
- as in Eq.
+ as in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-contact-int-split"
@@ -44861,7 +44861,7 @@ The linearization of the frictionless contribution
 \begin_inset Formula $\delta G_{c}^{n}$
 \end_inset
 
- makes use of Eq.
+ makes use of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip_xv_linearizations"
@@ -44888,7 +44888,7 @@ reference "eq:slip_xv_linearizations"
 
 \end_inset
 
-Evaluating Eq.
+Evaluating eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictionless-int-linearization"
@@ -44974,14 +44974,14 @@ with the definitions
 
 \end_inset
 
-Applying the discretization in Eq.
+Applying the discretization in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:u-v-discretization"
 
 \end_inset
 
- to Eq.
+ to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictionless-int-linearization"
@@ -45045,7 +45045,7 @@ G_{bc} & =ga^{\alpha\beta}\frac{\partial N_{b}}{\partial\eta_{(2)}^{\alpha}}\fra
 
 and it is apparent that the resulting frictionless stiffness matrix is also
  nonsymmetric.
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictionless-stiffness"
@@ -45084,7 +45084,7 @@ name "subsec:SE-Frictional-Terms"
 
 \begin_layout Standard
 The linearization of the frictional contribution follows from the second
- term of Eq.
+ term of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-contact-int-split"
@@ -45115,7 +45115,7 @@ The remaining quantity to be determined in this expression is the linearization
 \begin_inset Formula $D\mathbf{s}^{(1)}$
 \end_inset
 
-; according to Eq.
+; according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Ds"
@@ -45135,7 +45135,7 @@ reference "eq:Ds"
 \begin_inset Formula $\dot{\mathbf{g}}_{\alpha}^{(1)}$
 \end_inset
 
- via Eq.
+ via eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:n_dot"
@@ -45151,7 +45151,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Standard
-In a similar fashion to Eq.
+In a similar fashion to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Euler-integration"
@@ -45180,7 +45180,7 @@ where
 \end_inset
 
  from the previous time step.
- A temporally discretized form of Eq.
+ A temporally discretized form of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:n_dot"
@@ -45238,7 +45238,7 @@ and
 \begin_inset Formula $\bar{\mathbf{A}}_{c}^{(1)}$
 \end_inset
 
- is defined by analogy with Eq.
+ is defined by analogy with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Ac"
@@ -45279,7 +45279,7 @@ reference "eq:ndot-euler"
 
 \end_inset
 
- in Eq.
+ in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:vr"
@@ -45297,7 +45297,7 @@ noprefix "false"
 
 \end_inset
 
-and thus Eq.
+and thus eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Ds"
@@ -45327,7 +45327,7 @@ where
 
 \end_inset
 
-In Eq.
+In eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:delta-h"
@@ -45420,7 +45420,7 @@ where
 \end_inset
 
 The stiffness matrix of the frictional contribution to the virtual work,
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictional-stiffness"
@@ -45428,14 +45428,14 @@ reference "eq:frictional-stiffness"
 \end_inset
 
 , is nonsymmetric.
- Summing Eq.
+ Summing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictionless-stiffness"
 
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictional-stiffness"
@@ -45460,14 +45460,14 @@ name "subsec:SE-Integration-Scheme"
 \begin_layout Standard
 In this formulation, a Gaussian quadrature integration scheme is adopted.
  The general form of the contact integral (e.g.
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-discretized"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-discretized-2"
@@ -45598,7 +45598,7 @@ noprefix "false"
 \begin_inset Formula $\gamma^{(2)}$
 \end_inset
 
- as defined by either Eq.
+ as defined by either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick_x2"
@@ -45643,7 +45643,7 @@ where the matrix of tensors
 \end_inset
 
  is a general representation of the stiffness terms given explicitly in
- either Eq.
+ either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-stiffness"
@@ -45901,7 +45901,7 @@ where
 \end_inset
 
 .
- Casting Eq.
+ Casting eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int"
@@ -45969,7 +45969,7 @@ name "subsec:Biphasic-Frictional-Formulation"
 \end_layout
 
 \begin_layout Standard
-An examination of Eq.
+An examination of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant-1"
@@ -46038,7 +46038,7 @@ Here,
 \begin_inset Formula $\mu_{\text{eff}}$
 \end_inset
 
- is given by Eq.
+ is given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mueff-biphasic"
@@ -46423,7 +46423,7 @@ literal "false"
 \end_inset
 
 .
- Taking the material time derivative of Eq.
+ Taking the material time derivative of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-x2"
@@ -46489,7 +46489,7 @@ where
 \begin_inset Formula $\dot{\mathbf{n}}^{(1)}$
 \end_inset
 
- is evaluated from Eq.
+ is evaluated from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:n-1"
@@ -46512,7 +46512,7 @@ Here,
 \begin_inset Formula $\mathbf{g}_{\alpha}^{(1)}$
 \end_inset
 
- in the material frame, evaluated from Eq.
+ in the material frame, evaluated from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:basis-vectors"
@@ -46586,7 +46586,7 @@ where
 \begin_inset Formula $\varepsilon$
 \end_inset
 
- is the contact penalty parameter and we have utilized Eq.
+ is the contact penalty parameter and we have utilized eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-gap"
@@ -46609,7 +46609,7 @@ During slip, the normal component of the contact traction is first calculated
 \begin_inset Formula $g$
 \end_inset
 
- of the gap, given by Eq.
+ of the gap, given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-gap"
@@ -46639,7 +46639,7 @@ where
 \begin_inset Formula $\mathbf{s}^{(1)}$
 \end_inset
 
- is the unit vector in the slip direction, given by Eq.
+ is the unit vector in the slip direction, given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:s-def"
@@ -46650,7 +46650,7 @@ noprefix "false"
 \end_inset
 
 .
- We note that Eq.
+ We note that eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-traction"
@@ -46850,14 +46850,14 @@ noprefix "false"
 \begin_inset Formula $w_{n}$
 \end_inset
 
- from Eq.
+ from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:wn"
 
 \end_inset
 
- using the contact kinematics determined by Eq.
+ using the contact kinematics determined by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-criterion-1"
@@ -46980,7 +46980,7 @@ where
 
 \end_inset
 
-where Eq.
+where eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-tn"
@@ -47012,7 +47012,7 @@ literal "false"
 
 .
  Here it suffices to note that by augmenting only the normal gap and employing
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:augmented-t"
@@ -47099,7 +47099,7 @@ literal "false"
 \end_inset
 
  is not dependent on the stick-slip status.
- However, as noted before, Eq.
+ However, as noted before, eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-wn"
@@ -47137,14 +47137,14 @@ literal "false"
 \begin_inset Formula $\tilde{\mathbf{t}}^{(1)}$
 \end_inset
 
-, utilizing either Eq.
+, utilizing either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-traction"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-stick-traction"
@@ -47192,14 +47192,14 @@ where
 \begin_inset Formula $t_{n}$
 \end_inset
 
- is given by either Eq.
+ is given by either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-tn"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-tn"
@@ -47438,7 +47438,7 @@ name "sec:SB-Definitions-Notation"
 \end_layout
 
 \begin_layout Standard
-Evaluating the linearizations of Eq.
+Evaluating the linearizations of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant-1"
@@ -47806,7 +47806,7 @@ D\delta p^{(1)} & =0 & D\delta p^{(2)} & =0
 
 \end_inset
 
-From the definitions of Eq.
+From the definitions of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-gap"
@@ -47816,7 +47816,7 @@ noprefix "false"
 
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-traction"
@@ -47826,7 +47826,7 @@ noprefix "false"
 
 \end_inset
 
-, and utilizing Eq.
+, and utilizing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-stick-linearization"
@@ -47841,7 +47841,7 @@ D\mathbf{t}^{(1)}=\varepsilon\left(\Delta\mathbf{u}^{(2)}-\Delta\mathbf{u}^{(1)}
 
 \end_inset
 
-Similarly, application of Eq.
+Similarly, application of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-stick-linearization"
@@ -47876,7 +47876,7 @@ Dw_{n}=\varepsilon_{p}\left(\Delta p^{(1)}-\Delta p^{(2)}\right)\label{eq:biph-s
 
 \end_inset
 
-The biphasic contact integral of Eq.
+The biphasic contact integral of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int"
@@ -47905,7 +47905,7 @@ noprefix "false"
 
 \end_inset
 
-Note that for convenience, terms in Eq.
+Note that for convenience, terms in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biph-cont-int-linearized"
@@ -47915,7 +47915,7 @@ noprefix "false"
 
 \end_inset
 
- have been grouped differently than in Eq.
+ have been grouped differently than in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:D-contact-int"
@@ -48025,14 +48025,14 @@ where
 \end_layout
 
 \begin_layout Standard
-Inserting the discretization of Eq.
+Inserting the discretization of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-stick-var-discretization"
 
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant-1"
@@ -48071,7 +48071,7 @@ and
 \begin_inset Formula $\mathbf{t}^{(1)}$
 \end_inset
 
- is obtained from Eq.
+ is obtained from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-traction"
@@ -48081,7 +48081,7 @@ noprefix "false"
 
 \end_inset
 
- in the penalty case and from Eq.
+ in the penalty case and from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-stick-traction"
@@ -48096,7 +48096,7 @@ noprefix "false"
 \begin_inset Formula $w_{n}$
 \end_inset
 
- is calculated from either Eq.
+ is calculated from either eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:wn"
@@ -48106,7 +48106,7 @@ noprefix "false"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-wn"
@@ -48122,7 +48122,7 @@ noprefix "false"
 
 \begin_layout Standard
 We may now discretize individual terms and place them into matrix notation,
- anticipating their substitution into Eq.
+ anticipating their substitution into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biph-cont-int-linearized"
@@ -48130,7 +48130,7 @@ reference "eq:biph-cont-int-linearized"
 \end_inset
 
 .
- By placing Eq.
+ By placing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biph-stick-int-disc"
@@ -48151,7 +48151,7 @@ reference "eq:biph-stick-Dwn"
 
 \end_inset
 
- and inserting the resulting linearizations into Eq.
+ and inserting the resulting linearizations into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biph-cont-int-linearized"
@@ -48211,7 +48211,7 @@ and
 
 \end_inset
 
-In Eq.
+In eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-stick-stiffness"
@@ -48336,7 +48336,7 @@ th element face of
 \begin_inset Formula $X^{(2)}$
 \end_inset
 
- obtained from Eq.
+ obtained from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:stick-x2"
@@ -48367,7 +48367,7 @@ noprefix "false"
  on sliding-elastic frictional contact, we split the contact stiffness matrices
  in a different way, which allowed us to clearly separate like terms.
  Here, due to the complexity of the biphasic contact formulation, it was
- determined that the form of Eq.
+ determined that the form of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-stick-stiffness"
@@ -48429,7 +48429,7 @@ During slip, the contact integral over
 \begin_inset Formula $\mathbf{n}^{(1)}$
 \end_inset
 
-, in accordance with Eq.
+, in accordance with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-gap"
@@ -48517,7 +48517,7 @@ literal "false"
 \end_inset
 
 .
- From Eq.
+ From eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mueff-biphasic"
@@ -48539,7 +48539,7 @@ where
 \begin_inset Formula $Dt_{n}=\varepsilon Dg$
 \end_inset
 
- according to Eq.
+ according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-tn"
@@ -48549,7 +48549,7 @@ noprefix "false"
 
 \end_inset
 
-; this term has been provided previously in Eq.
+; this term has been provided previously in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dg_slip"
@@ -48599,7 +48599,7 @@ D\mathbf{t}^{(1)}=Dt_{n}\left(\no+\mueff\so\right)+t_{n}\left(D\no+\left(D\mueff
 
 \end_inset
 
-Finally, from Eq.
+Finally, from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:wn"
@@ -48613,7 +48613,7 @@ noprefix "false"
 \begin_inset Formula $\mathbf{x}^{\left(2\right)}$
 \end_inset
 
- determined by Eq.
+ determined by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-x2"
@@ -48623,7 +48623,7 @@ noprefix "false"
 
 \end_inset
 
-) and Eq.
+) and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-linearization"
@@ -48642,7 +48642,7 @@ Note that the form of
 \begin_inset Formula $Dw_{n}$
 \end_inset
 
- given in Eq.
+ given in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dwn"
@@ -48652,7 +48652,7 @@ noprefix "false"
 
 \end_inset
 
- contains additional terms not present in Eq.
+ contains additional terms not present in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biph-stick-Dwn"
@@ -48674,7 +48674,7 @@ noprefix "false"
 \end_inset
 
  is determined by the stick-slip status.
- Per the discussion following Eq.
+ Per the discussion following eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:pi-biphasic-penalty"
@@ -48707,7 +48707,7 @@ ed over each element face according to
 
 \end_inset
 
-In the case of slip, the contact integral of Eq.
+In the case of slip, the contact integral of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:contact-int-invariant-1"
@@ -48811,7 +48811,7 @@ noprefix "false"
 \begin_inset Formula $w_{n}$
 \end_inset
 
- is given by Eq.
+ is given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:wn"
@@ -48821,7 +48821,7 @@ noprefix "false"
 
 \end_inset
 
- or Eq.
+ or eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:AL-wn"
@@ -48835,7 +48835,7 @@ noprefix "false"
  For the following linearization and discretization the normal and tangential
  components, representing frictionless and frictional contributions to the
  contact integral, will be treated separately and may then be added together
- as in Eq.
+ as in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-discretized"
@@ -48851,14 +48851,14 @@ Frictionless Terms
 \end_layout
 
 \begin_layout Standard
-The linearization of the frictional part of Eq.
+The linearization of the frictional part of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-discretized"
 
 \end_inset
 
- makes use of Eq.
+ makes use of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-linearization"
@@ -48899,7 +48899,7 @@ w_{n}
 
 where we note that the virtual variables on the secondary surface now enter
  the linearization, as parametric coordinates on the secondary surface vary
- during slip according to Eq.
+ during slip according to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:slip-gap"
@@ -48914,14 +48914,14 @@ noprefix "false"
 \begin_inset Formula $Dw_{n}$
 \end_inset
 
-, and it follows from placing Eq.
+, and it follows from placing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-var-discretization"
 
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dwn"
@@ -48978,7 +48978,7 @@ Directional derivatives of virtual variables on the secondary surface will
 
 \end_inset
 
-In Eq.
+In eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dNb-deta"
@@ -48992,7 +48992,7 @@ noprefix "false"
  In an effort to keep the expression more compact, we have not included
  these variables.
  However, this expression could easily be cast into the form of e.g.
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:dp-deta"
@@ -49003,7 +49003,7 @@ noprefix "false"
 \end_inset
 
  by adding zeros where necessary.
- Discretizing Eq.
+ Discretizing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dgc-biph-fricless-slip"
@@ -49133,7 +49133,7 @@ Frictional Terms
 
 \begin_layout Standard
 Linearizing the frictional contribution follows from the second term of
- Eq.
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-discretized"
@@ -49177,14 +49177,14 @@ The remaining quantity in this expression to be determined is the discretization
 \begin_inset Formula $D\mueff$
 \end_inset
 
-; from Eq.
+; from eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dmueff"
 
 \end_inset
 
- and Eq.
+ and eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-slip-var-discretization"
@@ -49214,7 +49214,7 @@ where we made the definition
 
 \end_inset
 
-just to be used in Eq.
+just to be used in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dmueff-discrete"
@@ -49239,7 +49239,7 @@ reference "eq:Dmueff-discrete"
 
 \end_inset
 
- into Eq.
+ into eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:Dgc-biph-fric-slip"
@@ -49304,7 +49304,7 @@ and
 
 \end_inset
 
-In Eq.
+In eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-fric-slip-solid-stiffness"
@@ -49347,7 +49347,7 @@ noprefix "false"
 
 .
  The stiffness matrix of the frictional contribution to the virtual work,
- given by Eq.
+ given by eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-fric-slip-stiffness"
@@ -49399,7 +49399,7 @@ noprefix "false"
 \end_inset
 
  contains the solid-solid stiffness terms.
- Comparing Eq.
+ Comparing eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:biphasic-fric-slip-solid-stiffness"
@@ -49409,7 +49409,7 @@ noprefix "false"
 
 \end_inset
 
- with Eq.
+ with eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:frictional-stiffness"
@@ -55492,6 +55492,2663 @@ can be set with the
 tau 
 \emph default
 parameter.
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Tensor Calculus
+\end_layout
+
+\begin_layout Section
+Second-Order Tensors
+\end_layout
+
+\begin_layout Subsection
+Definition
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ be a transformation, which transforms any vector into another vector, e.g.,
+ 
+\begin_inset Formula 
+\[
+\mathbf{T}\cdot\mathbf{a}=\mathbf{b}\quad\mathbf{T}\cdot\mathbf{c}=\mathbf{d}
+\]
+
+\end_inset
+
+ If 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ has the following properties, 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{T}\cdot\left(\mathbf{a}+\mathbf{c}\right)=\mathbf{T}\cdot\mathbf{a}+\mathbf{T}\cdot\mathbf{c}\label{eq6-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{T}\cdot\left(\alpha\mathbf{a}\right)=\alpha\mathbf{T}\cdot\mathbf{a}\label{eq7-1}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{c}$
+\end_inset
+
+ are arbitrary vectors, and 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is an arbitrary scalar, then 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ is called a 
+\shape italic
+linear transformation
+\shape default
+, a 
+\shape italic
+second-order tensor
+\shape default
+, or simply a 
+\shape italic
+tensor
+\shape default
+.
+ Vectors are first-order tensors and scalars are zeroth-order tensors.
+ 
+\end_layout
+
+\begin_layout Subsection
+Cartesian Components of a Tensor
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ form an orthonormal basis in a Cartesian coordinate system 
+\begin_inset Formula $x_{1},x_{2},x_{3}$
+\end_inset
+
+.
+ Then the Cartesian components of 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ are 
+\begin_inset Formula 
+\[
+a_{1}=\mathbf{e}_{1}\cdot\mathbf{a},\quad a_{2}=\mathbf{e}_{2}\cdot\mathbf{a},\quad a_{3}=\mathbf{e}_{3}\cdot\mathbf{a}
+\]
+
+\end_inset
+
+ or equivalently, 
+\begin_inset Formula 
+\begin{equation}
+\boxed{a_{j}=\mathbf{e}_{j}\cdot\mathbf{a}}\label{eq7b}
+\end{equation}
+
+\end_inset
+
+ (Recall that 
+\begin_inset Formula $\mathbf{a}=a_{i}\mathbf{e}_{i}$
+\end_inset
+
+, thus 
+\begin_inset Formula $\mathbf{a}\cdot\mathbf{e}_{j}=a_{i}\mathbf{e}_{i}\cdot\mathbf{e}_{j}=a_{i}\delta_{ij}=a_{j}$
+\end_inset
+
+.) 
+\end_layout
+
+\begin_layout Standard
+The Cartesian components of a tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ are obtained as follows.
+ Let 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{a}=\mathbf{b}$
+\end_inset
+
+.
+ The components of 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ are given by 
+\begin_inset Formula $b_{i}=\mathbf{e}_{i}\cdot\mathbf{b}=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{a}$
+\end_inset
+
+.
+ But 
+\begin_inset Formula $\mathbf{a}=a_{j}\mathbf{e}_{j}$
+\end_inset
+
+, so 
+\begin_inset Formula $b_{i}=a_{j}\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}$
+\end_inset
+
+ is the component along 
+\begin_inset Formula $\mathbf{e}_{i}$
+\end_inset
+
+ of the vector 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{e}_{j}$
+\end_inset
+
+.
+ By convention, we denote this component as 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boxed{T_{ij}=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}}\quad\text{components of tensor }\mathbf{T}\label{eq7c}
+\end{equation}
+
+\end_inset
+
+ components of tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Thus, 
+\begin_inset Formula $\mathbf{b}=\mathbf{T}\cdot\mathbf{a}=a_{j}\mathbf{T}\cdot\mathbf{e}_{j}=b_{k}\mathbf{e}_{k}$
+\end_inset
+
+.
+ Taking the dot product on both sides with 
+\begin_inset Formula $\mathbf{e}_{i}$
+\end_inset
+
+ yields 
+\begin_inset Formula $a_{j}\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}=a_{j}T_{ij}=b_{k}\mathbf{e}_{i}\cdot\mathbf{e}_{k}=b_{k}\delta_{ik}=b_{i}$
+\end_inset
+
+, or
+\begin_inset Formula 
+\[
+\boxed{b_{i}=T_{ij}a_{j}}
+\]
+
+\end_inset
+
+ in indicial form.
+ In matrix form, 
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+b_{1}\\
+b_{2}\\
+b_{3}
+\end{array}\right]=\left[\begin{array}{ccc}
+T_{11} & T_{12} & T_{13}\\
+T_{21} & T_{22} & T_{23}\\
+T_{31} & T_{32} & T_{33}
+\end{array}\right]\left[\begin{array}{c}
+a_{1}\\
+a_{2}\\
+a_{3}
+\end{array}\right]
+\]
+
+\end_inset
+
+ The matrix of tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ can also be denoted by 
+\begin_inset Formula $\left[\mathbf{T}\right]$
+\end_inset
+
+ or 
+\begin_inset Formula $\left[T_{ij}\right]$
+\end_inset
+
+.
+ The columns of 
+\begin_inset Formula $\left[\mathbf{T}\right]$
+\end_inset
+
+ are given by 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{e}_{i}$
+\end_inset
+
+, e.g., 
+\begin_inset Formula 
+\[
+\left[\mathbf{T}\cdot\mathbf{e}_{2}\right]=\left[T_{j2}\mathbf{e}_{2}\right]=\left[\begin{array}{ccc}
+T_{11} & T_{12} & T_{13}\\
+T_{21} & T_{22} & T_{23}\\
+T_{31} & T_{32} & T_{33}
+\end{array}\right]\left[\begin{array}{c}
+0\\
+1\\
+0
+\end{array}\right]=\left[\begin{array}{c}
+T_{12}\\
+T_{22}\\
+T_{32}
+\end{array}\right]
+\]
+
+\end_inset
+
+ This result, when generalized, leads to the useful identity 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{T}\cdot\mathbf{e}_{i}=T_{ji}\mathbf{e}_{j}}=T_{1i}\mathbf{e}_{1}+T_{2i}\mathbf{e}_{2}+T_{3i}\mathbf{e}_{3}\label{eq8-1}
+\end{equation}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Example
+Scaling transformation
+\end_layout
+
+\begin_layout Example
+A scaling transformation 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ with different scale factors along 
+\begin_inset Formula $x_{1},x_{2},x_{3}$
+\end_inset
+
+ should satisfy the following relations by definition:
+\begin_inset Formula 
+\[
+\mathbf{T}\cdot\mathbf{a}=s_{1}\left(\mathbf{a}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+s_{2}\left(\mathbf{a}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+s_{3}\left(\mathbf{a}\cdot\mathbf{e}_{3}\right)\mathbf{e}_{3}
+\]
+
+\end_inset
+
+Verify that 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ is a tensor.
+ Also find the matrix of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ in 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Example
+
+\shape italic
+Solution
+\shape default
+.
+ Is 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ a tensor? Let any 
+\begin_inset Formula $\mathbf{a}=a_{i}\mathbf{e}_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{b}=b_{i}\mathbf{e}_{i}$
+\end_inset
+
+, then
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{T}\cdot\left(\alpha\mathbf{a}\right) & =s_{1}\left(\alpha\mathbf{a}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+s_{2}\left(\alpha\mathbf{a}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+s_{3}\left(\alpha\mathbf{a}\cdot\mathbf{e}_{3}\right)\mathbf{e}_{3}\\
+ & =\alpha\left(s_{1}\left(\mathbf{a}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+s_{2}\left(\mathbf{a}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+s_{3}\left(\mathbf{a}\cdot\mathbf{e}_{3}\right)\mathbf{e}_{3}\right)\\
+ & =\alpha\mathbf{T}\cdot\mathbf{a}
+\end{aligned}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{T}\cdot\left(\mathbf{a}+\mathbf{b}\right) & =s_{1}\left(\left(\mathbf{a}+\mathbf{b}\right)\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+s_{2}\left(\left(\mathbf{a}+\mathbf{b}\right)\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+s_{3}\left(\left(\mathbf{a}+\mathbf{b}\right)\cdot\mathbf{e}_{3}\right)\mathbf{e}_{3}\\
+ & =s_{1}\left(\mathbf{a}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+s_{2}\left(\mathbf{a}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+s_{3}\left(\mathbf{a}\cdot\mathbf{e}_{3}\right)\mathbf{e}_{3}\\
+ & +s_{1}\left(\mathbf{b}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+s_{2}\left(\mathbf{b}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+s_{3}\left(\mathbf{b}\cdot\mathbf{e}_{3}\right)\mathbf{e}_{3}\\
+ & =\mathbf{T}\cdot\mathbf{a}+\mathbf{T}\cdot\mathbf{b}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+Now that we have demonstrated that 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ is a tensor, its components are given by 
+\begin_inset Formula $T_{ij}=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}$
+\end_inset
+
+, thus 
+\begin_inset Formula 
+\[
+\begin{gathered}\left[T_{i1}\right]=\left[\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{1}\right]=\left[\mathbf{e}_{i}\cdot s_{1}\mathbf{e}_{1}\right]=\left[s_{1}\delta_{i1}\right]=\left[\begin{array}{c}
+s_{1}\\
+0\\
+0
+\end{array}\right]\\
+\left[T_{i2}\right]=\left[\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{2}\right]=\left[\mathbf{e}_{i}\cdot s_{2}\mathbf{e}_{2}\right]=\left[s_{2}\delta_{i2}\right]=\left[\begin{array}{c}
+0\\
+s_{2}\\
+0
+\end{array}\right]\\
+\left[T_{i3}\right]=\left[\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{3}\right]=\left[\mathbf{e}_{i}\cdot s_{3}\mathbf{e}_{3}\right]=\left[s_{3}\delta_{i3}\right]=\left[\begin{array}{c}
+0\\
+0\\
+s_{3}
+\end{array}\right]
+\end{gathered}
+\]
+
+\end_inset
+
+ Then, the matrix of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ is given by 
+\begin_inset Formula 
+\[
+\left[\mathbf{T}\right]=\left[\begin{array}{ccc}
+s_{1} & 0 & 0\\
+0 & s_{2} & 0\\
+0 & 0 & s_{3}
+\end{array}\right]
+\]
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+Sum of Tensors
+\end_layout
+
+\begin_layout Standard
+The sum of two tensors 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ is denoted by 
+\begin_inset Formula $\mathbf{T}+\mathbf{S}$
+\end_inset
+
+ and defined by 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\left(\mathbf{T}+\mathbf{S}\right)\cdot\mathbf{a}=\mathbf{T}\cdot\mathbf{a}+\mathbf{S}\cdot\mathbf{a}}\label{eq9-1}
+\end{equation}
+
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+.
+ Thus 
+\begin_inset Formula $\mathbf{T}+\mathbf{S}$
+\end_inset
+
+ is also a tensor, whose components are 
+\begin_inset Formula 
+\[
+\left(\mathbf{T}+\mathbf{S}\right)_{ij}=\mathbf{e}_{i}\cdot\left(\mathbf{T}+\mathbf{S}\right)\cdot\mathbf{e}_{j}=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}+\mathbf{e}_{i}\cdot\mathbf{S}\cdot\mathbf{e}_{j}=T_{ij}+S_{ij}
+\]
+
+\end_inset
+
+ In matrix notation, 
+\begin_inset Formula $\left[\mathbf{T}+\mathbf{S}\right]=\left[\mathbf{T}\right]+\left[\mathbf{S}\right]$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Dyadic Product of Vectors
+\end_layout
+
+\begin_layout Standard
+The dyadic product of two vectors 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ is denoted by 
+\begin_inset Formula $\mathbf{a}\otimes\mathbf{b}$
+\end_inset
+
+ (or 
+\begin_inset Formula $\mathbf{ab}$
+\end_inset
+
+) and defined as the transformation which satisfies 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\left(\mathbf{a}\otimes\mathbf{b}\right)\cdot\mathbf{c}=\left(\mathbf{b}\cdot\mathbf{c}\right)\mathbf{a}}\label{eq10-1}
+\end{equation}
+
+\end_inset
+
+ For any 
+\begin_inset Formula $\mathbf{c}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{d}$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+, we have 
+\begin_inset Formula 
+\[
+\begin{gathered}\left(\mathbf{a}\otimes\mathbf{b}\right)\cdot\left(\alpha\mathbf{c}+\beta\mathbf{d}\right)=\left(\mathbf{b}\cdot\left(\alpha\mathbf{c}+\beta\mathbf{d}\right)\right)\mathbf{a}=\left(\mathbf{b}\cdot\alpha\mathbf{c}\right)\mathbf{a}+\left(\mathbf{b}\cdot\beta\mathbf{d}\right)\mathbf{a}\\
+=\alpha\left(\mathbf{b}\cdot\mathbf{c}\right)\mathbf{a}+\beta\left(\mathbf{b}\cdot\mathbf{d}\right)\mathbf{a}=\alpha\left(\mathbf{a}\otimes\mathbf{b}\right)\cdot\mathbf{c}+\beta\left(\mathbf{a}\otimes\mathbf{b}\right)\cdot\mathbf{d}
+\end{gathered}
+\]
+
+\end_inset
+
+ thus 
+\begin_inset Formula $\mathbf{a}\otimes\mathbf{b}$
+\end_inset
+
+ is a tensor.
+ Its Cartesian components with respect to 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ are 
+\begin_inset Formula 
+\[
+\left(\mathbf{a}\otimes\mathbf{b}\right)_{ij}=\mathbf{e}_{i}\cdot\left(\mathbf{a}\otimes\mathbf{b}\right)\cdot\mathbf{e}_{j}=\mathbf{e}_{i}\cdot\left(\mathbf{b}\cdot\mathbf{e}_{j}\right)\mathbf{a}=b_{j}\mathbf{e}_{i}\cdot\mathbf{a}=a_{i}b_{j}
+\]
+
+\end_inset
+
+ In matrix form, 
+\begin_inset Formula 
+\[
+\left[\mathbf{a}\otimes\mathbf{b}\right]=\left[\begin{array}{ccc}
+a_{1}b_{1} & a_{1}b_{2} & a_{1}b_{3}\\
+a_{2}b_{1} & a_{2}b_{2} & a_{2}b_{3}\\
+a_{3}b_{1} & a_{3}b_{2} & a_{3}b_{3}
+\end{array}\right]=\left[\begin{array}{c}
+a_{1}\\
+a_{2}\\
+a_{3}
+\end{array}\right]\left[\begin{array}{ccc}
+b_{1} & b_{2} & b_{3}\end{array}\right]=\left[\mathbf{a}\right]\left[\mathbf{b}\right]^{T}
+\]
+
+\end_inset
+
+ Note that in general, 
+\begin_inset Formula $\mathbf{a}\otimes\mathbf{b}\ne\mathbf{b}\otimes\mathbf{a}$
+\end_inset
+
+, i.e., the dyadic product is 
+\shape italic
+not commutative
+\shape default
+.
+ Also note that 
+\begin_inset Formula 
+\[
+\left[\mathbf{e}_{1}\otimes\mathbf{e}_{1}\right]=\left[\begin{array}{ccc}
+1 & 0 & 0\\
+0 & 0 & 0\\
+0 & 0 & 0
+\end{array}\right],\quad\left[\mathbf{e}_{1}\otimes\mathbf{e}_{2}\right]=\left[\begin{array}{ccc}
+0 & 1 & 0\\
+0 & 0 & 0\\
+0 & 0 & 0
+\end{array}\right],\quad\left[\mathbf{e}_{1}\otimes\mathbf{e}_{3}\right]=\left[\begin{array}{ccc}
+0 & 0 & 1\\
+0 & 0 & 0\\
+0 & 0 & 0
+\end{array}\right]\quad\text{etc.}
+\]
+
+\end_inset
+
+thus it is possible to represent a second-order tensor in terms of its Cartesian
+ components in 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ as 
+\begin_inset Formula $\mathbf{T}=T_{11}\mathbf{e}_{1}\otimes\mathbf{e}_{1}+T_{12}\mathbf{e}_{1}\otimes\mathbf{e}_{2}+T_{13}\mathbf{e}_{1}\otimes\mathbf{e}_{3}+\ldots+T_{33}\mathbf{e}_{3}\otimes\mathbf{e}_{3}$
+\end_inset
+
+, or 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{T}=T_{ij}\mathbf{e}_{i}\otimes\mathbf{e}_{j}}\label{eq11-1}
+\end{equation}
+
+\end_inset
+
+This turns out to be an important result that can be generalized to higher
+ order tensors, e.g., third-order tensors can be represented in terms of their
+ Cartesian components as 
+\begin_inset Formula $\mathbb{T}=T_{ijk}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}$
+\end_inset
+
+, and similarly for higher orders.
+ 
+\end_layout
+
+\begin_layout Example
+The scaling transformation derived in a previous example can be represented
+ as 
+\begin_inset Formula 
+\[
+\mathbf{T}=s_{1}\mathbf{e}_{1}\otimes\mathbf{e}_{1}+s_{2}\mathbf{e}_{2}\otimes\mathbf{e}_{2}+s_{3}\mathbf{e}_{3}\otimes\mathbf{e}_{3}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Trace of a Second-Order Tensor
+\end_layout
+
+\begin_layout Standard
+The trace of any dyad 
+\begin_inset Formula $\mathbf{a}\otimes\mathbf{b}$
+\end_inset
+
+ is defined by 
+\begin_inset Formula 
+\[
+\boxed{\tr\left(\mathbf{a}\otimes\mathbf{b}\right)=\mathbf{a}\cdot\mathbf{b}}
+\]
+
+\end_inset
+
+ and 
+\begin_inset Formula 
+\[
+\boxed{\tr\left(\alpha\mathbf{a}\otimes\mathbf{b}+\beta\mathbf{c}\otimes\mathbf{d}\right)=\alpha\tr\left(\mathbf{a}\otimes\mathbf{b}\right)+\beta\tr\left(\mathbf{c}\otimes\mathbf{d}\right)}
+\]
+
+\end_inset
+
+The trace operator yields a scalar function.
+ In component form, 
+\begin_inset Formula 
+\[
+\tr\left(a_{i}b_{j}\right)=a_{i}b_{i}
+\]
+
+\end_inset
+
+ For any tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, we can write 
+\begin_inset Formula $\mathbf{T}=T_{ij}\mathbf{e}_{i}\otimes\mathbf{e}_{j}$
+\end_inset
+
+, thus 
+\begin_inset Formula 
+\[
+\tr\mathbf{T}=T_{ij}\tr\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right)=T_{ij}\mathbf{e}_{i}\cdot\mathbf{e}_{j}=T_{ij}\delta_{ij}=T_{ii}=T_{11}+T_{22}+T_{33}
+\]
+
+\end_inset
+
+ The trace of a tensor is the sum of its diagonal components.
+ 
+\end_layout
+
+\begin_layout Subsection
+Product of Two Tensors
+\end_layout
+
+\begin_layout Standard
+The products of two tensors 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ are denoted by 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{S}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{S}\cdot\mathbf{T}$
+\end_inset
+
+ and defined respectively by 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\left(\mathbf{T}\cdot\mathbf{S}\right)\cdot\mathbf{a}=\mathbf{T}\cdot\left(\mathbf{S}\cdot\mathbf{a}\right)}\label{eq12-1}
+\end{equation}
+
+\end_inset
+
+ and 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\left(\mathbf{S}\cdot\mathbf{T}\right)\cdot\mathbf{a}=\mathbf{S}\cdot\left(\mathbf{T}\cdot\mathbf{a}\right)}\label{eq12b}
+\end{equation}
+
+\end_inset
+
+Clearly, 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{S}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{S}\cdot\mathbf{T}$
+\end_inset
+
+ are tensors as well.
+ Their components in 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ are given by 
+\begin_inset Formula 
+\[
+\left(\mathbf{T}\cdot\mathbf{S}\right)_{ij}=\mathbf{e}_{i}\cdot\left(\mathbf{T}\cdot\mathbf{S}\right)\cdot\mathbf{e}_{j}=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\left(\mathbf{S}\cdot\mathbf{e}_{j}\right)=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\left(S_{kj}\mathbf{e}_{k}\right)=S_{kj}\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{k}=T_{ik}S_{kj}
+\]
+
+\end_inset
+
+ In matrix form, 
+\begin_inset Formula $\left[\mathbf{T}\cdot\mathbf{S}\right]=\left[\mathbf{T}\right]\left[\mathbf{S}\right]$
+\end_inset
+
+.
+ Similarly, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left(\mathbf{S}\cdot\mathbf{T}\right)_{ij}=S_{ik}T_{kj}\quad\text{and}\quad\left[\mathbf{S}\cdot\mathbf{T}\right]=\left[\mathbf{S}\right]\left[\mathbf{T}\right]
+\]
+
+\end_inset
+
+ In general, 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{S}\ne\mathbf{S}\cdot\mathbf{T}$
+\end_inset
+
+, however 
+\begin_inset Formula $\left(\mathbf{T}\cdot\mathbf{S}\right)\cdot\mathbf{V}=\mathbf{T}\cdot\left(\mathbf{S}\cdot\mathbf{V}\right)$
+\end_inset
+
+, i.e., the tensor product is 
+\shape italic
+associative
+\shape default
+ but 
+\shape italic
+not commutative
+\shape default
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Identity Tensor and Tensor Inverse
+\end_layout
+
+\begin_layout Standard
+The identity tensor, denoted by 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+, is defined by 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{I}\cdot\mathbf{a}=\mathbf{a}}\label{eq13-1}
+\end{equation}
+
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+.
+ The Cartesian components o f 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+ in 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ are given by 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+I_{ij}=\mathbf{e}_{i}\cdot\mathbf{I}\cdot\mathbf{e}_{j}=\mathbf{e}_{i}\cdot\mathbf{e}_{j}=\delta_{ij}
+\]
+
+\end_inset
+
+ or 
+\begin_inset Formula 
+\[
+\left[\mathbf{I}\right]=\left[\begin{array}{ccc}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{array}\right]
+\]
+
+\end_inset
+
+Given 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, if 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ exists such that 
+\begin_inset Formula $\mathbf{S}\cdot\mathbf{T}=\mathbf{I}$
+\end_inset
+
+, we call 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ the 
+\emph on
+inverse
+\emph default
+ of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{S}=\mathbf{T}^{-1}$
+\end_inset
+
+.
+ The inverse exists as long as 
+\begin_inset Formula $\det\mathbf{T}\neq0$
+\end_inset
+
+.
+ Also note that 
+\begin_inset Formula $\left(\mathbf{T}^{-1}\right)^{-1}=\mathbf{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{T}^{-1}\cdot\mathbf{T}=\mathbf{T}\cdot\mathbf{T}^{-1}=\mathbf{I}$
+\end_inset
+
+.
+ Also note that
+\begin_inset Formula 
+\[
+\boxed{\left(\mathbf{U}\cdot\mathbf{V}\right)^{-1}=\mathbf{V}^{-1}\cdot\mathbf{U}^{-1}}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Transpose of a Tensor
+\end_layout
+
+\begin_layout Standard
+Given a tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, its transpose is denoted by 
+\begin_inset Formula $\mathbf{T}^{T}$
+\end_inset
+
+ which is defined by 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{a}\cdot\left(\mathbf{T}\cdot\mathbf{b}\right)=\mathbf{b}\cdot\left(\mathbf{T}^{T}\cdot\mathbf{\mathbf{a}}\right)}\label{eq14-1}
+\end{equation}
+
+\end_inset
+
+ In component form, 
+\begin_inset Formula 
+\[
+T_{ij}^{T}=\mathbf{e}_{i}\cdot\mathbf{T}^{T}\cdot\mathbf{e}_{j}=\mathbf{e}_{j}\cdot\mathbf{T}\cdot\mathbf{e}_{i}=T_{ji}
+\]
+
+\end_inset
+
+ Also note that 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\left(\mathbf{S}\cdot\mathbf{T}\right)^{T}=\mathbf{T}^{T}\cdot\mathbf{S}^{T}}\label{eq15-1}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\left(\mathbf{S}^{T}\right)^{T}=\mathbf{S}$
+\end_inset
+
+ and
+\begin_inset Formula $\left(\mathbf{S}+\mathbf{T}\right)^{T}=\mathbf{S}^{T}+\mathbf{T}^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Double Product of Tensors
+\end_layout
+
+\begin_layout Standard
+The double product of tensors is analogous to the dot product of vectors.
+ Given two tensors 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, the double product (or 
+\shape italic
+double contraction
+\shape default
+) is defined as 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{S}:\mathbf{T}=\tr\left(\mathbf{S}^{T}\cdot\mathbf{T}\right)}\label{eq16-1}
+\end{equation}
+
+\end_inset
+
+ Thus, for any tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, 
+\begin_inset Formula $\tr\mathbf{T}=\mathbf{I}:\mathbf{T}$
+\end_inset
+
+.
+ In component form, 
+\begin_inset Formula 
+\[
+\mathbf{S}:\mathbf{T}=S_{ij}T_{ij}
+\]
+
+\end_inset
+
+The double product of second order tensors is commutative.
+ 
+\end_layout
+
+\begin_layout Example
+Show that 
+\begin_inset Formula $\mathbf{a}\cdot\mathbf{T}\cdot\mathbf{b}=\mathbf{T}:\left(\mathbf{a}\otimes\mathbf{b}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(\mathbf{a}\otimes\mathbf{b}\right):\left(\mathbf{c}\otimes\mathbf{d}\right)=\left(\mathbf{a}\cdot\mathbf{c}\right)\left(\mathbf{b}\cdot\mathbf{d}\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Example
+Using indicial notation, 
+\begin_inset Formula 
+\[
+\mathbf{a}\cdot\mathbf{T}\cdot\mathbf{b}=a_{i}T_{ij}b_{j}=T_{ij}a_{i}b_{j}=\mathbf{T}:\left(\mathbf{a}\otimes\mathbf{b}\right)\,,
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\left(\mathbf{a}\otimes\mathbf{b}\right):\left(\mathbf{c}\otimes\mathbf{d}\right)=a_{i}b_{j}c_{i}d_{j}=\left(a_{i}c_{i}\right)\left(b_{j}d_{j}\right)=\left(\mathbf{a}\cdot\mathbf{c}\right)\left(\mathbf{b}\cdot\mathbf{d}\right)\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Determinant of a Tensor
+\begin_inset CommandInset label
+LatexCommand label
+name "subsubsec:determinant"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The determinant of a tensor is equal to the determinant of its components
+ in 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\det\mathbf{T}=\det\left[\mathbf{T}\right]_{\mathbf{e}_{i}}=\left|\begin{array}{ccc}
+T_{11} & T_{12} & T_{13}\\
+T_{21} & T_{22} & T_{23}\\
+T_{31} & T_{32} & T_{33}
+\end{array}\right|=\left(\mathbf{T}\cdot\mathbf{e}_{1}\times\mathbf{T}\cdot\mathbf{e}_{2}\right)\cdot\mathbf{T}\cdot\mathbf{e}_{3}=\varepsilon_{ijk}T_{i1}T_{j2}T_{k3}\label{eq17-1}
+\end{equation}
+
+\end_inset
+
+ In particular, the determinant of a diagonal matrix is the product of the
+ diagonal components, 
+\begin_inset Formula 
+\begin{equation}
+\det\left[\mathbf{T}\right]_{\mathbf{e}_{i}}=\left|\begin{array}{ccc}
+T_{11} & 0 & 0\\
+0 & T_{22} & 0\\
+0 & 0 & T_{33}
+\end{array}\right|=\varepsilon_{123}T_{11}T_{22}T_{33}=T_{11}T_{22}T_{33}\label{eq18-1}
+\end{equation}
+
+\end_inset
+
+ The determinant satisfies the following relations, 
+\begin_inset Formula 
+\begin{equation}
+\det\mathbf{T}^{-1}=\frac{1}{\det\mathbf{T}}\label{eq19-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\det\left(\mathbf{S}\cdot\mathbf{T}\right)=\left(\det\mathbf{S}\right)\left(\det\mathbf{T}\right)\label{eq20-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Orthogonal Tensor
+\end_layout
+
+\begin_layout Standard
+An orthogonal tensor 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is a linear transformation which preserves the length of a vector and the
+ angle between vectors.
+ Thus, by definition, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left|\mathbf{Q}\cdot\mathbf{a}\right|=\left|\mathbf{a}\right|\quad\text{and}\quad\cos\left(\mathbf{Q}\cdot\mathbf{a},\mathbf{Q}\cdot\mathbf{b}\right)=\cos\left(\mathbf{a},\mathbf{b}\right)
+\]
+
+\end_inset
+
+ for any vectors 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+.
+ It follows from this definition and the definition of the dot product of
+ vectors (
+\begin_inset Formula $\mathbf{a}\cdot\mathbf{b}=\left|\mathbf{a}\right|\left|\mathbf{b}\right|\cos\left(\mathbf{a},\mathbf{b}\right))$
+\end_inset
+
+, that 
+\begin_inset Formula 
+\[
+\left(\mathbf{Q}\cdot\mathbf{a}\right)\cdot\left(\mathbf{Q}\cdot\mathbf{b}\right)=\mathbf{a}\cdot\mathbf{b}
+\]
+
+\end_inset
+
+ But 
+\begin_inset Formula $\left(\mathbf{Q}\cdot\mathbf{a}\right)\cdot\left(\mathbf{Q}\cdot\mathbf{b}\right)=\mathbf{b}\cdot\left(\mathbf{Q}^{T}\cdot\mathbf{Q}\right)\mathbf{a}=\mathbf{a}\cdot\mathbf{b}=\mathbf{b}\cdot\mathbf{I}\cdot\mathbf{a}$
+\end_inset
+
+, which implies that 
+\begin_inset Formula $\mathbf{b}\cdot\left(\mathbf{Q}^{T}\cdot\mathbf{Q}-\mathbf{I}\right)\cdot\mathbf{a}=0$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ are arbitrary, an orthogonal tensor must satisfy 
+\begin_inset Formula $\mathbf{Q}^{T}\cdot\mathbf{Q}=\mathbf{I}$
+\end_inset
+
+.
+ In indicial form, 
+\begin_inset Formula $Q_{im}^{T}Q_{mj}=Q_{mi}Q_{mj}=\delta_{ij}$
+\end_inset
+
+, and in matrix form, 
+\begin_inset Formula $\left[\mathbf{Q}\right]^{T}\left[\mathbf{Q}\right]=\left[\mathbf{I}\right]$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $\mathbf{Q}^{T}\cdot\mathbf{Q}=\mathbf{I}$
+\end_inset
+
+ implies that 
+\begin_inset Formula $\mathbf{Q}^{T}=\mathbf{Q}^{-1}$
+\end_inset
+
+, i.e., the transpose of an orthogonal tensor is equal to its inverse, since
+ 
+\begin_inset Formula $\mathbf{Q}^{-1}\cdot\mathbf{Q}=\mathbf{Q}\cdot\mathbf{Q}^{-1}=\mathbf{I}$
+\end_inset
+
+.
+ It follows that 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{Q}^{T}\cdot\mathbf{Q}=\mathbf{Q}\cdot\mathbf{Q}^{T}=\mathbf{I}}\label{eq21-1}
+\end{equation}
+
+\end_inset
+
+ The determinant of an orthogonal tensor is given by 
+\begin_inset Formula 
+\[
+\det\mathbf{Q}=\left(\mathbf{Q}\cdot\mathbf{e}_{1}\times\mathbf{Q}\cdot\mathbf{e}_{2}\right)\cdot\mathbf{Q}\cdot\mathbf{e}_{3}=\left(\mathbf{e}'_{1}\times\mathbf{e}'_{2}\right)\cdot\mathbf{e}'_{3}=\pm\mathbf{e}'_{3}\cdot\mathbf{e}'_{3}=\pm1
+\]
+
+\end_inset
+
+ Here, 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+ is the orthonormal basis resulting from the transformation of 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ maintains the handedness of 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ (e.g., if both 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+ form a right-handed basis), then 
+\begin_inset Formula $\det\mathbf{Q}=+1$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is called a 
+\shape italic
+proper
+\shape default
+ orthogonal transformation (also equivalent to a rigid body rotation).
+ Otherwise, in the case of a reflection which reverses the handedness of
+ the basis vectors, 
+\begin_inset Formula $\det\mathbf{Q}=-1$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is called 
+\shape italic
+improper
+\shape default
+ (e.g., 
+\begin_inset Formula $\mathbf{e}'_{1}=\mathbf{e}_{1},\,\mathbf{e}'_{2}=-\mathbf{e}_{2},\,\mathbf{e}'_{3}=\mathbf{e}_{3}$
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Subsection
+Transformation Laws for Cartesian Components of Vectors and Tensors
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/FigOrthoBases.png
+	lyxscale 50
+	width 1.39in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Orthonormal bases 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig3"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Let 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+ be two orthogonal bases in a Cartesian coordinate system.
+ 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ could be made to coincide with 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+ through a rigid body rotation (i.e., a transformation that preserves vector
+ length and angles), 
+\begin_inset Formula 
+\[
+\mathbf{e}'_{i}=\mathbf{Q}\cdot\mathbf{e}_{i}=Q_{mi}\mathbf{e}_{m}
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $Q_{mi}Q_{mj}=Q_{im}Q_{jm}=\delta_{ij}$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $Q_{mi}=\mathbf{e}_{m}\cdot\mathbf{Q}\cdot\mathbf{e}_{i}=\mathbf{e}_{m}\cdot\mathbf{e}'_{i}=\cos\left(\mathbf{e}_{m},\mathbf{e}'_{i}\right)$
+\end_inset
+
+, the components of 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ are direction cosines between 
+\begin_inset Formula $\mathbf{e}_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}'_{i}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Example
+Rotation about 
+\begin_inset Formula $x_{3}$
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/FigRotationAboutX3.png
+	lyxscale 50
+	width 2.58in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Rotation about 
+\begin_inset Formula $x_{3}$
+\end_inset
+
+.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig36"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left[\mathbf{Q}\right]=\left[\begin{array}{ccc}
+\cos\theta & -\sin\theta & 0\\
+\sin\theta & \cos\theta & 0\\
+0 & 0 & 1
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+Reflection about 
+\begin_inset Formula $x_{2}-x_{3}$
+\end_inset
+
+ plane, 
+\begin_inset Formula $\mathbf{e}'_{1}=\mathbf{Q}\cdot\mathbf{e}_{1}=-\mathbf{e}_{1},\,\mathbf{e}'_{2}=\mathbf{Q}\cdot\mathbf{e}_{2}=\mathbf{e}_{2},\,\mathbf{e}'_{3}=\mathbf{Q}\cdot\mathbf{e}_{3}=\mathbf{e}_{3}$
+\end_inset
+
+.
+\begin_inset Formula 
+\[
+\left[\mathbf{Q}\right]=\left[\begin{array}{ccc}
+-1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+, its components with respect to 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+ are 
+\begin_inset Formula $a_{i}=\mathbf{e}_{i}\cdot\mathbf{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $a'_{i}=\mathbf{e}'_{i}\cdot\mathbf{a}$
+\end_inset
+
+, respectively.
+ Using the above relation, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+a'_{i}=\mathbf{e}'_{i}\cdot\mathbf{a}=\mathbf{a}\cdot\mathbf{Q}\cdot\mathbf{e}_{i}=Q_{mi}\mathbf{a}\cdot\mathbf{e}_{m}=Q_{mi}a_{m},
+\]
+
+\end_inset
+
+ or 
+\begin_inset Formula 
+\begin{equation}
+\boxed{a'_{i}=Q_{mi}a_{m}}\label{eq22-1}
+\end{equation}
+
+\end_inset
+
+ In matrix form, 
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+a'_{1}\\
+a'_{2}\\
+a'_{3}
+\end{array}\right]_{\mathbf{e'}_{i}}=\left[\begin{array}{ccc}
+Q_{11} & Q_{21} & Q_{31}\\
+Q_{12} & Q_{22} & Q_{32}\\
+Q_{13} & Q_{23} & Q_{33}
+\end{array}\right]\left[\begin{array}{c}
+a_{1}\\
+a_{2}\\
+a_{3}
+\end{array}\right]_{\mathbf{e}_{i}}
+\]
+
+\end_inset
+
+or 
+\begin_inset Formula 
+\[
+\left[\mathbf{a}\right]^{\prime}=\left[\mathbf{Q}\right]^{T}\left[\mathbf{a}\right]\quad\text{or}\quad\left[\mathbf{a}\right]_{\mathbf{e'}_{i}}=\left[\mathbf{Q}\right]^{T}\left[\mathbf{a}\right]_{\mathbf{e}_{i}}
+\]
+
+\end_inset
+
+Here 
+\begin_inset Formula $\left[\mathbf{a}\right]^{\prime}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left[\mathbf{a}\right]$
+\end_inset
+
+ are matrices of the 
+\shape italic
+same
+\shape default
+ vector, expressed in two different coordinate systems.
+ This is 
+\shape italic
+not the same
+\shape default
+ as 
+\begin_inset Formula $\mathbf{a}'=\mathbf{Q}^{T}\cdot\mathbf{a}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{a}'$
+\end_inset
+
+ is the linear transformation of 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{Q}^{T}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Now consider a tensors 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+ Its components with respect to 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \mathbf{e}'_{1},\mathbf{e}'_{2},\mathbf{e}'_{3}\right\} $
+\end_inset
+
+ are given by 
+\begin_inset Formula $T_{ij}=\mathbf{e}_{i}\cdot\mathbf{T}\cdot\mathbf{e}_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $T'_{ij}=\mathbf{e}'_{i}\cdot\mathbf{T}\cdot\mathbf{e}'_{j}$
+\end_inset
+
+, respectively.
+ Thus, 
+\begin_inset Formula $T'_{ij}=\left(\mathbf{Q}\cdot\mathbf{e}_{i}\right)\cdot\mathbf{T}\cdot\left(\mathbf{Q}\cdot\mathbf{e}_{j}\right)=Q_{mi}\mathbf{e}_{m}\cdot\mathbf{T}\cdot Q_{nj}\mathbf{e}_{n}=Q_{mi}Q_{nj}\mathbf{e}_{m}\cdot\mathbf{T}\cdot\mathbf{e}_{n}=Q_{mi}Q_{nj}T_{mn}$
+\end_inset
+
+, or 
+\begin_inset Formula 
+\begin{equation}
+\boxed{T'_{ij}=Q_{mi}Q_{nj}T_{mn}}\label{eq23-1}
+\end{equation}
+
+\end_inset
+
+ In matrix form, 
+\begin_inset Formula $\left[\mathbf{T}\right]^{\prime}=\left[\mathbf{Q}\right]^{T}\left[\mathbf{T}\right]\left[\mathbf{Q}\right]$
+\end_inset
+
+, or 
+\begin_inset Formula 
+\[
+\left[\begin{array}{ccc}
+T'_{11} & T'_{12} & T'_{13}\\
+T'_{21} & T'_{22} & T'_{23}\\
+T'_{31} & T'_{32} & T'_{33}
+\end{array}\right]=\left[\begin{array}{ccc}
+Q_{11} & Q_{21} & Q_{31}\\
+Q_{12} & Q_{22} & Q_{32}\\
+Q_{13} & Q_{23} & Q_{33}
+\end{array}\right]\left[\begin{array}{ccc}
+T_{11} & T_{12} & T_{13}\\
+T_{21} & T_{22} & T_{23}\\
+T_{31} & T_{32} & T_{33}
+\end{array}\right]\left[\begin{array}{ccc}
+Q_{11} & Q_{12} & Q_{13}\\
+Q_{21} & Q_{22} & Q_{23}\\
+Q_{31} & Q_{32} & Q_{33}
+\end{array}\right]
+\]
+
+\end_inset
+
+ Equivalently, we can show that 
+\begin_inset Formula 
+\begin{equation}
+\boxed{T_{ij}=Q_{im}Q_{jn}T'_{mn}}\label{eq24-1}
+\end{equation}
+
+\end_inset
+
+ or 
+\begin_inset Formula $\left[\mathbf{T}\right]=\left[\mathbf{Q}\right]\left[\mathbf{T}\right]^{\prime}\left[\mathbf{Q}\right]^{T}$
+\end_inset
+
+.
+ As for vectors, we note that 
+\begin_inset Formula $\left[\mathbf{T}\right]$
+\end_inset
+
+ and 
+\begin_inset Formula $\left[\mathbf{T}\right]^{\prime}$
+\end_inset
+
+ are the matrices of the 
+\shape italic
+same
+\shape default
+ tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, with respect to two different coordinate systems.
+ This is 
+\shape italic
+not the same
+\shape default
+ as 
+\begin_inset Formula $\mathbf{T}'=\mathbf{Q}^{T}\cdot\mathbf{T}\cdot\mathbf{Q}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Symmetric and Antisymmetric Tensors
+\begin_inset CommandInset label
+LatexCommand label
+name "subsubsec:symmetric"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A 
+\shape italic
+symmetric
+\shape default
+ tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\mathbf{T}^{T}=\mathbf{T}$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $T_{ji}=T_{ij}$
+\end_inset
+
+, or in matrix form, 
+\begin_inset Formula 
+\[
+\left[\mathbf{T}\right]=\left[\begin{array}{ccc}
+T_{11} & T_{12} & T_{13}\\
+T_{12} & T_{22} & T_{23}\\
+T_{13} & T_{23} & T_{33}
+\end{array}\right]
+\]
+
+\end_inset
+
+ An 
+\shape italic
+antisymmetric
+\shape default
+ (or 
+\shape italic
+skew-symmetric
+\shape default
+) tensor 
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\boldsymbol{\Omega}^{T}=-\boldsymbol{\Omega}$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $\Omega_{ji}=-\Omega_{ij}$
+\end_inset
+
+ and thus 
+\begin_inset Formula $\Omega_{11}=\Omega_{22}=\Omega_{33}=0$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\left[\boldsymbol{\Omega}\right]=\left[\begin{array}{ccc}
+0 & \Omega_{12} & -\Omega_{31}\\
+-\Omega_{12} & 0 & \Omega_{23}\\
+\Omega_{31} & -\Omega_{23} & 0
+\end{array}\right]
+\]
+
+\end_inset
+
+Any tensor can be written as the sum of a symmetric and antisymmetric tensor,
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbf{T}=\mathbf{T}^{S}+\mathbf{T}^{A}\quad\text{where}\quad\mathbf{T}^{S}=\frac{1}{2}\left(\mathbf{T}+\mathbf{T}^{T}\right)\quad\text{and}\quad\mathbf{T}^{A}=\frac{1}{2}\left(\mathbf{T}-\mathbf{T}^{T}\right)
+\]
+
+\end_inset
+
+This is a unique decomposition.
+ It can be checked that 
+\begin_inset Formula $\mathbf{T}^{S}$
+\end_inset
+
+ is symmetric and 
+\begin_inset Formula $\mathbf{T}^{A}$
+\end_inset
+
+ is antisymmetric.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+dual vector
+\shape default
+ 
+\begin_inset Formula $\boldsymbol{\omega}$
+\end_inset
+
+ of an antisymmetric tensor 
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ satisfies 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\boldsymbol{\Omega}\cdot\mathbf{a}=\boldsymbol{\omega}\times\mathbf{a}}\label{eq25-1}
+\end{equation}
+
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+.
+ Thus 
+\begin_inset Formula $\Omega_{ij}=\mathbf{e}_{i}\cdot\boldsymbol{\Omega}\cdot\mathbf{e}_{j}=\mathbf{e}_{i}\cdot\left(\boldsymbol{\omega}\times\mathbf{e}_{j}\right)=\omega_{k}\mathbf{e}_{i}\cdot\left(\mathbf{e}_{k}\times\mathbf{e}_{j}\right)=\omega_{k}\mathbf{e}_{i}\cdot\varepsilon_{kjl}\mathbf{e}_{l}=\omega_{k}\varepsilon_{kjl}\delta_{il}$
+\end_inset
+
+ or 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\Omega_{ij}=-\varepsilon_{ijk}\omega_{k}}\label{eq26-1}
+\end{equation}
+
+\end_inset
+
+In matrix form, 
+\begin_inset Formula 
+\[
+\left[\boldsymbol{\Omega}\right]=\left[\begin{array}{ccc}
+0 & -\omega_{3} & \omega_{2}\\
+\omega_{3} & 0 & -\omega_{1}\\
+-\omega_{2} & \omega_{1} & 0
+\end{array}\right]
+\]
+
+\end_inset
+
+Conversely, it can also be shown that 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\omega_{i}=-\frac{1}{2}\varepsilon_{ijk}\Omega_{jk}}\label{eq27-1}
+\end{equation}
+
+\end_inset
+
+As a homework problem, it may be shown that 
+\begin_inset Formula $\varepsilon_{ijk}T_{jk}=\varepsilon_{ijk}T_{jk}^{A}$
+\end_inset
+
+, since 
+\begin_inset Formula $\varepsilon_{ijk}T_{jk}^{S}=0$
+\end_inset
+
+ for any symmetric tensor 
+\begin_inset Formula $\mathbf{T}^{S}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Eigenvalues and Eigenvectors of Real Symmetric Tensors
+\end_layout
+
+\begin_layout Standard
+A second-order tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ has three pairs of eigenvalues 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ and eigenvectors 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ that each satisfy
+\begin_inset Formula 
+\begin{equation}
+\mathbf{T}\cdot\mathbf{v}=\lambda\mathbf{v}\label{eq:eigen-def}
+\end{equation}
+
+\end_inset
+
+The eigenvalues 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ are the roots of the characteristic equation of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, which is the cubic polynomial produced by setting 
+\begin_inset Formula $\det\left(\mathbf{T}-\lambda\mathbf{I}\right)=0$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+-\lambda^{3}+I_{1}\lambda^{2}-I_{2}\lambda+I_{3}=0\label{eq:eigen-char-eqn}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}I_{1} & =\tr\mathbf{T}\\
+I_{2} & =\frac{1}{2}\left(I_{1}^{2}-\tr\mathbf{T}^{2}\right)\\
+I_{3} & =\det\mathbf{T}
+\end{aligned}
+\label{eq:eigen-invariants}
+\end{equation}
+
+\end_inset
+
+are called 
+\emph on
+invariants
+\emph default
+ of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+According to the Cayley-Hamilton theorem, a tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ satisfies its own characteristic equation,
+\begin_inset Formula 
+\begin{equation}
+-\mathbf{T}^{3}+I_{1}\mathbf{T}^{2}-I_{2}\mathbf{T}+I_{3}\mathbf{I}=\mathbf{0}\label{eq:Cayley-Hamilton-theorem}
+\end{equation}
+
+\end_inset
+
+Therefore, the cubic power of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ can be expressed in terms of its lower powers according to 
+\begin_inset Formula $\mathbf{T}^{3}=I_{1}\mathbf{T}^{2}-I_{2}\mathbf{T}+I_{3}\mathbf{I}$
+\end_inset
+
+.
+ Taking the trace of this equation allows us to solve for 
+\begin_inset Formula $I_{3}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}I_{3} & =\frac{1}{3}\left(\tr\mathbf{T}^{3}-I_{1}\tr\mathbf{T}^{2}+I_{2}\tr\mathbf{T}\right)\\
+ & =\frac{1}{3}\left(\tr\mathbf{T}^{3}-I_{1}^{3}+3I_{1}I_{2}\right)
+\end{aligned}
+\label{eq:eigen-I3-soln}
+\end{equation}
+
+\end_inset
+
+Multiplying eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Cayley-Hamilton-theorem"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{T}^{-1}$
+\end_inset
+
+ also produces 
+\begin_inset Formula 
+\[
+I_{3}\mathbf{T}^{-1}=\mathbf{T}^{2}-I_{1}\mathbf{T}+I_{2}\mathbf{I}
+\]
+
+\end_inset
+
+Using all these relations, we may differentiate the three invariants of
+ 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ to get
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial I_{1}}{\partial\mathbf{T}} & =\mathbf{I}\\
+\frac{\partial I_{2}}{\partial\mathbf{T}} & =I_{1}\mathbf{I}-\mathbf{T}^{T}\\
+\frac{\partial I_{3}}{\partial\mathbf{T}} & =I_{3}\mathbf{T}^{-T}
+\end{aligned}
+\label{eq:eigen-dinv-dT}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Theorem*
+The eigenvalues of real symmetric tensors are real (proof not provided here).
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Theorem*
+If the eigenvalues of a real symmetric tensor are all distinct, the eigenvectors
+ are orthogonal to each other.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\shape italic
+Proof:
+\shape default
+ Given 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{v}_{1}=\lambda_{1}\mathbf{v}_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{v}_{2}=\lambda_{2}\mathbf{v}_{2}$
+\end_inset
+
+, 
+\begin_inset Formula $\lambda_{1}\ne\lambda_{2}$
+\end_inset
+
+ , then 
+\begin_inset Formula $\mathbf{v}_{2}\cdot\mathbf{T}\cdot\mathbf{v}_{1}=\lambda_{1}\mathbf{v}_{1}\cdot\mathbf{v}_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}_{1}\cdot\mathbf{T}\cdot\mathbf{v}_{2}=\lambda_{2}\mathbf{v}_{1}\cdot\mathbf{v}_{2}=\mathbf{v}_{2}\cdot\mathbf{T}^{T}\cdot\mathbf{v}_{1}=\mathbf{v}_{2}\cdot\mathbf{T}\cdot\mathbf{v}_{1}$
+\end_inset
+
+ , 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Rightarrow\lambda_{1}\mathbf{v}_{1}\cdot\mathbf{v}_{2}=\lambda_{2}\mathbf{v}_{1}\cdot\mathbf{v}_{2}\quad\text{or}\quad\left(\lambda_{1}-\lambda_{2}\right)\mathbf{v}_{1}\cdot\mathbf{v}_{2}=0\quad\Rightarrow\mathbf{v}_{1}\cdot\mathbf{v}_{2}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When two of the eigenvalues are repeated (a double root of the characteristic
+ equation), the resulting eigenvectors are not necessarily orthogonal to
+ each other; however, they remain orthogonal to the third eigenvector.
+ This means that any vector lying in the plane normal to the third eigenvector
+ is an eigenvector corresponding to the double root.
+ Similarly, when all three eigenvalues are repeated (a triple root), any
+ vector becomes an eigenvector of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Example
+In hydrostatics the stress tensor is 
+\begin_inset Formula $\mathbf{T}=-p\mathbf{I}$
+\end_inset
+
+, where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the hydrostatic pressure.
+ In this case, 
+\begin_inset Formula $-p$
+\end_inset
+
+ is a triple root of the characteristic equation of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+ Any vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\mathbf{T}\cdot\mathbf{v}=-p\mathbf{v}$
+\end_inset
+
+, and is thus an eigenvector of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In continuum mechanics the eigenvectors 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ of a tensor are generally normalized,
+\begin_inset Formula 
+\[
+\mathbf{n}\equiv\frac{\mathbf{v}}{\left|\mathbf{v}\right|}
+\]
+
+\end_inset
+
+Thus, we can always find a set of three orthonormal eigenvectors 
+\begin_inset Formula $\left\{ \mathbf{n}_{1},\mathbf{n}_{2},\mathbf{n}_{3}\right\} $
+\end_inset
+
+ for any real symmetric tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+, even when the eigenvalues are repeated.
+ Given a tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ with eigenvalues 
+\begin_inset Formula $\lambda_{1},\lambda_{2},\lambda_{3}$
+\end_inset
+
+ and eigenvectors 
+\begin_inset Formula $\mathbf{n}_{1},\mathbf{n}_{2},\mathbf{n}_{3}$
+\end_inset
+
+, the components of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ in the orthonormal basis 
+\begin_inset Formula $\left\{ \mathbf{n}_{1},\mathbf{n}_{2},\mathbf{n}_{3}\right\} $
+\end_inset
+
+ can be obtained from 
+\begin_inset Formula 
+\[
+T_{i1}=\mathbf{v}_{i}\cdot\mathbf{T}\cdot\mathbf{n}_{1}=\lambda_{1}\mathbf{n}_{i}\cdot\mathbf{n}_{1}=\lambda_{1}\delta_{i1}\quad T_{i2}=\lambda_{2}\delta_{i2}T_{i3}=\lambda_{3}\delta_{i3}
+\]
+
+\end_inset
+
+ Thus, 
+\begin_inset Formula 
+\[
+\left[\mathbf{T}\right]_{\mathbf{n}_{i}}=\left[\begin{array}{ccc}
+\lambda_{1} & 0 & 0\\
+0 & \lambda_{2} & 0\\
+0 & 0 & \lambda_{3}
+\end{array}\right]=\left[\begin{array}{ccc}
+T_{1} & 0 & 0\\
+0 & T_{2} & 0\\
+0 & 0 & T_{3}
+\end{array}\right]
+\]
+
+\end_inset
+
+ Since 
+\begin_inset Formula $\mathbf{T}=T_{ij}\mathbf{n}_{i}\otimes\mathbf{n}_{j}=T_{i1}\mathbf{n}_{i}\otimes\mathbf{n}_{1}+T_{i2}\mathbf{n}_{i}\otimes\mathbf{n}_{2}+T_{i3}\mathbf{n}_{i}\otimes\mathbf{n}_{3}$
+\end_inset
+
+, we find that 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{T}=\lambda_{1}\mathbf{n}_{1}\otimes\mathbf{n}_{1}+\lambda_{2}\mathbf{n}_{2}\otimes\mathbf{n}_{2}+\lambda_{3}\mathbf{n}_{3}\otimes\mathbf{n}_{3}\label{eq:eigen-spectral-rep}
+\end{equation}
+
+\end_inset
+
+ This is known as the 
+\shape italic
+spectral representation
+\shape default
+ of the tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+.
+ In particular, since the eigenvalues of the identity tensor are 
+\begin_inset Formula $\lambda_{1}=\lambda_{2}=\lambda_{3}=1$
+\end_inset
+
+, and since any vector is an eigenvector of 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+, we can select the basis vectors 
+\begin_inset Formula $\mathbf{e}_{1},\,\mathbf{e}_{2},\,\mathbf{e}_{3}$
+\end_inset
+
+ so that the spectral representation of 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+ may be given by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{I}=\mathbf{e}_{i}\otimes\mathbf{e}_{i}=\mathbf{e}_{1}\otimes\mathbf{e}_{1}+\mathbf{e}_{2}\otimes\mathbf{e}_{2}+\mathbf{e}_{3}\otimes\mathbf{e}_{3}\label{eq:eigen-identity-spectral}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Orthogonal Transformation of Tensors
+\end_layout
+
+\begin_layout Standard
+An orthogonal transformation 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ transforms any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ into the vector 
+\begin_inset Formula $\mathbf{Q}\cdot\mathbf{a}$
+\end_inset
+
+, which we may denote as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}^{*}=\mathbf{Q}\cdot\mathbf{a}\label{eq:OT-vector}
+\end{equation}
+
+\end_inset
+
+Recall that a tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ may be expressed in its spectral representation as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:eigen-spectral-rep"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Each of its eigenvectors 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is transformed by 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ into 
+\begin_inset Formula $\mathbf{n}^{*}=\mathbf{Q}\cdot\mathbf{n}$
+\end_inset
+
+.
+ Since eigenvalues of 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ are invariant to orthogonal transformations, it follows that
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{T}^{*} & =\lambda_{1}\mathbf{n}_{1}^{*}\otimes\mathbf{n}_{1}^{*}+\lambda_{2}\mathbf{n}_{2}^{*}\otimes\mathbf{n}_{2}^{*}+\lambda_{3}\mathbf{n}_{3}^{*}\otimes\mathbf{n}_{3}^{*}\\
+ & =\lambda_{1}\left(\mathbf{Q}\cdot\mathbf{n}_{1}\right)\otimes\left(\mathbf{Q}\cdot\mathbf{n}_{1}\right)+\lambda_{2}\left(\mathbf{Q}\cdot\mathbf{n}_{2}\right)\otimes\left(\mathbf{Q}\cdot\mathbf{n}_{2}\right)+\lambda_{3}\left(\mathbf{Q}\cdot\mathbf{n}_{3}\right)\otimes\left(\mathbf{Q}\cdot\mathbf{n}_{3}\right)\\
+ & =\mathbf{Q}\cdot\left(\lambda_{1}\mathbf{n}_{1}\otimes\mathbf{n}_{1}+\lambda_{2}\mathbf{n}_{2}\otimes\mathbf{n}_{2}+\lambda_{3}\mathbf{n}_{3}\otimes\mathbf{n}_{3}\right)\cdot\mathbf{Q}^{T}\\
+ & =\mathbf{Q}\cdot\mathbf{T}\cdot\mathbf{Q}^{T}
+\end{aligned}
+\]
+
+\end_inset
+
+Thus, the transformation of the second-order tensor 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is 
+\begin_inset Formula $\mathbf{T}^{*}=\mathbf{Q}\cdot\mathbf{T}\cdot\mathbf{Q}^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Higher Order Tensors
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $\mathbf{a}\cdot\mathbf{T}\cdot\mathbf{b}=\mathbf{a}\otimes\mathbf{b}:\mathbf{T}=\mathbf{T}:\mathbf{a}\otimes\mathbf{b}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{a}\otimes\mathbf{b}:\mathbf{c}\otimes\mathbf{d}=\left(\mathbf{a}\cdot\mathbf{c}\right)\left(\mathbf{b}\cdot\mathbf{d}\right)$
+\end_inset
+
+.
+ Similarly, 
+\begin_inset Formula $\left(\mathbf{a}\otimes\mathbf{b}\right)\cdot\left(\mathbf{c}\otimes\mathbf{d}\right)=\left(\mathbf{b}\cdot\mathbf{c}\right)\mathbf{a}\otimes\mathbf{d}$
+\end_inset
+
+.
+ We will be using generalizations of these relations when examining higher
+ order tensors.
+\end_layout
+
+\begin_layout Subsection
+Third-Order Tensors
+\end_layout
+
+\begin_layout Standard
+A third-order tensor 
+\begin_inset Formula $\mathbb{T}$
+\end_inset
+
+ is a linear transformation that transforms any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ into a second-order tensor 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbb{T}\cdot\mathbf{a}=\mathbf{S}}\label{eq62-1}
+\end{equation}
+
+\end_inset
+
+In general, the dyadic product of three vectors is a third-order tensor
+ which satisfies
+\begin_inset Formula 
+\begin{equation}
+\boxed{\left(\mathbf{a}\otimes\mathbf{b}\otimes\mathbf{c}\right)\cdot\left(\alpha\mathbf{u}+\beta\mathbf{v}\right)=\left(\alpha\mathbf{c}\cdot\mathbf{u}+\beta\mathbf{c}\cdot\mathbf{v}\right)\left(\mathbf{a}\otimes\mathbf{b}\right)}\quad\forall\,\mathbf{u},\mathbf{v}\,.\label{eq62b}
+\end{equation}
+
+\end_inset
+
+Any third-order tensor 
+\begin_inset Formula $\mathbb{T}$
+\end_inset
+
+ can be expressed in terms of its Cartesian components 
+\begin_inset Formula $T_{ijk}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbb{T}=T_{ijk}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}}\label{eq62d}
+\end{equation}
+
+\end_inset
+
+and the Cartesian components of a third-order tensor may be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\boxed{T_{ijk}=\mathbf{e}_{i}\cdot\left(\mathbb{T}\cdot\mathbf{e}_{k}\right)\cdot\mathbf{e}_{j}}\label{eq62c}
+\end{equation}
+
+\end_inset
+
+It follows from Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq62b"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq62d"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that
+\begin_inset Formula 
+\[
+\mathbb{T}\cdot\mathbf{a}=T_{ijk}\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\right)\cdot\mathbf{a}=T_{ijk}\left(\mathbf{e}_{k}\cdot\mathbf{a}\right)\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right)=T_{ijk}a_{k}\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right)=\mathbf{S}=S_{ij}\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right)
+\]
+
+\end_inset
+
+so that the indicial form of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq62-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+T_{ijk}a_{k}=S_{ij}\label{eq62e}
+\end{equation}
+
+\end_inset
+
+In particular,
+\begin_inset Formula 
+\begin{equation}
+\mathbb{T}\cdot\mathbf{e}_{k}=T_{ijk}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\label{eq62f}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The double dot product of a third-order tensor with a second-order tensor
+ is defined by
+\begin_inset Formula 
+\[
+\boxed{\left(\mathbf{a}\otimes\mathbf{b}\otimes\mathbf{c}\right):\left(\mathbf{d}\otimes\mathbf{e}\right)=\left(\mathbf{b}\cdot\mathbf{d}\right)\left(\mathbf{c}\cdot\mathbf{e}\right)\mathbf{a}}\,,
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\boxed{\left(\mathbf{a}\otimes\mathbf{b}\right):\left(\mathbf{c}\otimes\mathbf{d}\otimes\mathbf{e}\right)=\left(\mathbf{a}\cdot\mathbf{c}\right)\left(\mathbf{b}\cdot\mathbf{d}\right)\mathbf{e}}\,.
+\]
+
+\end_inset
+
+Therefore, the double dot product of a third-order tensor with a second-order
+ tensor is a vector given by
+\begin_inset Formula 
+\begin{equation}
+\mathbb{T}:\left(\mathbf{a}\otimes\mathbf{b}\right)=\left(\mathbb{T}\cdot\mathbf{b}\right)\cdot\mathbf{a}\,.\label{eq63f}
+\end{equation}
+
+\end_inset
+
+Proof: Using 
+\begin_inset Formula $\mathbb{T}\cdot\mathbf{b}=T_{ijk}b_{k}\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right)$
+\end_inset
+
+, we find that 
+\begin_inset Formula $\left(\mathbb{T}\cdot\mathbf{b}\right)\cdot\mathbf{a}=T_{ijk}b_{k}\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right)\cdot\mathbf{a}=T_{ijk}b_{k}\left(\mathbf{a}\cdot\mathbf{e}_{j}\right)\mathbf{e}_{i}=T_{ijk}a_{j}b_{k}\mathbf{e}_{i}$
+\end_inset
+
+.
+ Similarly, 
+\begin_inset Formula $\mathbb{T}:\left(\mathbf{a}\otimes\mathbf{b}\right)=T_{ijk}\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\right):\left(\mathbf{a}\otimes\mathbf{b}\right)=T_{ijk}\left(\mathbf{e}_{j}\cdot\mathbf{a}\right)\left(\mathbf{e}_{k}\cdot\mathbf{b}\right)\mathbf{e}_{i}=T_{ijk}a_{j}b_{k}\mathbf{e}_{i}$
+\end_inset
+
+, thus completing the proof.
+ 
+\end_layout
+
+\begin_layout Standard
+For any second-order tensor 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+, it also follows that
+\begin_inset Formula 
+\[
+\mathbb{T}:\mathbf{S}=T_{ijk}S_{jk}\mathbf{e}_{i}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+If we introduce the notation 
+\begin_inset Formula $\mathbb{E}$
+\end_inset
+
+ as the third-order (pseudo-)tensor of Cartesian components 
+\begin_inset Formula $\varepsilon_{ijk}$
+\end_inset
+
+, the relation between an antisymmetric tensor and its dual vector can also
+ be written as
+\begin_inset Formula 
+\begin{equation}
+\boxed{\boldsymbol{\Omega}=-\mathbb{E}\cdot\boldsymbol{\omega}}\label{eq26b}
+\end{equation}
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\begin{equation}
+\boxed{\boldsymbol{\omega}=-\frac{1}{2}\mathbb{E}:\boldsymbol{\Omega}}\label{eq27b}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Fourth-Order Tensors
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fourth-Order-Tensors"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The dyadic product of four vectors is a fourth-order tensor 
+\begin_inset Formula $\mathbf{a}\otimes\mathbf{b}\otimes\mathbf{c}\otimes\mathbf{d}$
+\end_inset
+
+, defined as
+\begin_inset Formula 
+\begin{equation}
+\left(\mathbf{a}\otimes\mathbf{b}\otimes\mathbf{c}\otimes\mathbf{d}\right)\cdot\mathbf{v}=\left(\mathbf{d}\cdot\mathbf{v}\right)\left(\mathbf{a}\otimes\mathbf{b}\otimes\mathbf{c}\right)\label{eq:63g}
+\end{equation}
+
+\end_inset
+
+The Cartesian components of a fourth-order tensor 
+\begin_inset Formula $\mathcal{T}$
+\end_inset
+
+ are given by
+\begin_inset Formula 
+\begin{equation}
+T_{ijkl}=\left(\mathbf{e}_{i}\otimes\mathbf{e}_{j}\right):\mathcal{T}:\left(\mathbf{e}_{k}\otimes\mathbf{e}_{l}\right)\label{eq:63h}
+\end{equation}
+
+\end_inset
+
+such that
+\begin_inset Formula 
+\begin{equation}
+\mathcal{T}=T_{ijkl}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\otimes\mathbf{e}_{l}\label{eq:63i}
+\end{equation}
+
+\end_inset
+
+Therefore, a fourth-order tensor transforms a vector into a third-order
+ tensor,
+\begin_inset Formula 
+\begin{equation}
+\mathcal{T}\cdot\mathbf{a}=\left(T_{ijkl}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\otimes\mathbf{e}_{l}\right)\cdot\mathbf{a}=T_{ijkl}a_{l}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\equiv S_{ijk}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}=\mathbb{S}\label{eq:63j}
+\end{equation}
+
+\end_inset
+
+The double dot product of a fourth-order tensor with a second-order tensor
+ is a second-order tensor defined as
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathcal{T}:\left(\mathbf{a}\otimes\mathbf{b}\right)=\left(\mathcal{T}\cdot\mathbf{b}\right)\cdot\mathbf{a}}\label{eq:63k}
+\end{equation}
+
+\end_inset
+
+from which it can be shown that
+\begin_inset Formula 
+\begin{equation}
+\mathcal{T}:\mathbf{S}=T_{ijmn}S_{mn}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\label{eq:63l}
+\end{equation}
+
+\end_inset
+
+or equivalently, 
+\begin_inset Formula $\left(\mathcal{T}:\mathbf{S}\right)_{ij}=T_{ijkl}S_{kl}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A fourth-order tensor can exhibit three levels of symmetry, which can be
+ represented using Cartesian components as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}T_{ijkl} & =T_{jikl} & \text{left minor symmetry}\\
+T_{ijkl} & =T_{ijlk} & \text{right minor symmetry}\\
+T_{ijkl} & =T_{klij} & \text{major symmetry}
+\end{aligned}
+\label{eq:tens4-symmetries}
+\end{equation}
+
+\end_inset
+
+Whereas a general fourth-order tensor may have 81 distinct components, a
+ tensor with one minor symmetry has 54 distinct components; a tensor with
+ both minor symmetries has 36 distinct components; and a tensor with minor
+ and major symmetries has 21distinct components.
+ We may represent the major symmetry of 
+\begin_inset Formula $\mathcal{T}$
+\end_inset
+
+ as 
+\begin_inset Formula $\mathcal{T}=\mathcal{T}^{T}$
+\end_inset
+
+, whose Cartesian representation is provided above.
+ It follows from this definition that
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{S}:\mathcal{T} & =\mathcal{T}^{T}:\mathbf{S}\\
+\left(\mathbf{S}:\mathcal{T}\right)_{ij} & =S_{kl}T_{klij}=T_{ijkl}^{T}S_{kl}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Additional Tensor Products
+\end_layout
+
+\begin_layout Standard
+Earlier we saw that the dyadic product of vectors can produce tensors.
+ Similarly, we can define dyadic products of tensors which produce higher-order
+ tensors.
+ In particular, the following products of second-order tensors 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{B}$
+\end_inset
+
+ produce fouth-order tensors, satisfying
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\left(\mathbf{A}\otimes\mathbf{B}\right):\mathbf{S} & =\left(\mathbf{B}:\mathbf{S}\right)\mathbf{A}\\
+\left(\mathbf{A}\oslash\mathbf{B}\right):\mathbf{S} & =\mathbf{A}\cdot\mathbf{S}\cdot\mathbf{B}^{T}\\
+\left(\mathbf{A}\obslash\mathbf{B}\right):\mathbf{S} & =\mathbf{A}\cdot\mathbf{S}^{T}\cdot\mathbf{B}^{T}\\
+\left(\mathbf{A}\odot\mathbf{B}\right):\mathbf{S} & =\frac{1}{2}\left(\mathbf{A}\oslash\mathbf{B}+\mathbf{A}\obslash\mathbf{B}\right):\mathbf{S}=\frac{1}{2}\left(\mathbf{A}\cdot\mathbf{S}\cdot\mathbf{B}^{T}+\mathbf{A}\cdot\mathbf{S}^{T}\cdot\mathbf{B}^{T}\right)
+\end{aligned}
+\label{eq:tensor-products}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ is any second-order tensor.
+ Using Cartesian components of tensors, the indicial form of these tensor
+ products are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\left(\mathbf{A}\otimes\mathbf{B}\right)_{ijkl} & =A_{ij}B_{kl}\\
+\left(\mathbf{A}\oslash\mathbf{B}\right)_{ijkl} & =A_{ik}B_{jl}\\
+\left(\mathbf{A}\obslash\mathbf{B}\right)_{ijkl} & =A_{il}B_{jk}\\
+\left(\mathbf{A}\odot\mathbf{B}\right)_{ijkl} & =\frac{1}{2}\left(A_{ik}B_{jl}+A_{il}B_{jk}\right)
+\end{aligned}
+\label{eq:tensor-products-Cartesian}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
