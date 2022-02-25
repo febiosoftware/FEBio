@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include "FERigidConnector.h"
 #include "FEVolumeConstraint.h"
 #include "FEContactSurface.h"
+#include "FEDiscreteElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(int nnode) 
@@ -1736,6 +1737,72 @@ double FELogOctahedralPlasticStrain::value(FEElement& el)
     }
     D /= (double) nint;
     return D;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementStretch::value(FEElement& el)
+{
+	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
+
+	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
+
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vec3d ra0 = mesh.Node(del.m_node[0]).m_r0;
+	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
+	vec3d rb0 = mesh.Node(del.m_node[1]).m_r0;
+	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
+
+	double L0 = (rb0 - ra0).norm();
+	double Lt = (rb1 - ra1).norm();
+
+	double l = Lt / L0;
+
+	return l;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementElongation::value(FEElement& el)
+{
+	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
+
+	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
+
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vec3d ra0 = mesh.Node(del.m_node[0]).m_r0;
+	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
+	vec3d rb0 = mesh.Node(del.m_node[1]).m_r0;
+	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
+
+	double L0 = (rb0 - ra0).norm();
+	double Lt = (rb1 - ra1).norm();
+
+	double Dl = Lt - L0;
+
+	return Dl;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForce::value(FEElement& el)
+{
+	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
+
+	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	// get the (one) material point data
+	FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+
+	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
+	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
+	vec3d e = rb1 - ra1; e.unit();
+
+	vec3d F = mp.m_Ft;
+
+	double Fm = F * e;
+
+	return Fm;
 }
 
 //-----------------------------------------------------------------------------
