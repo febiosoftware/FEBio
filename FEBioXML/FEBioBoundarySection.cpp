@@ -287,7 +287,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 	int NN = mesh.Nodes();
 
 	// get the required bc attribute
-	char szbc[8];
+	char szbc[32] = { 0 };
 	strcpy(szbc, tag.AttributeValue("bc"));
 
 	// process the bc string
