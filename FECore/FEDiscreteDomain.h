@@ -47,6 +47,8 @@ public:
 
 	bool Init() override;
 
+	void Reset() override;
+
 public:
 	void AddElement(int eid, int n[2]);
 

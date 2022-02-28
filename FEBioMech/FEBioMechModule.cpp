@@ -869,6 +869,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
     REGISTER_FECORE_CLASS(FELogOctahedralPlasticStrain, "ops");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData

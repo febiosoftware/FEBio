@@ -94,6 +94,7 @@ public:
 
 public:
 	FEFunction1D*	m_F;	//!< force-displacement function
+	double			m_scale;	// scale factor for force
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

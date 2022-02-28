@@ -216,6 +216,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PROPERTY(m_imp->m_IC  , "initial"        );
 	ADD_PROPERTY(m_imp->m_CI  , "contact"        );
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );
+	ADD_PROPERTY(m_imp->m_MA  , "mesh_adaptor"   );
 	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
 	ADD_PROPERTY(m_imp->m_Step, "step"           );
 	ADD_PROPERTY(m_imp->m_Data, "data"           );
