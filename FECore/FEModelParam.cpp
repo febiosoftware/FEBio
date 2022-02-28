@@ -76,6 +76,14 @@ void FEParamDouble::operator = (double v)
 	setValuator(val);
 }
 
+void FEParamDouble::operator = (const FEParamDouble& p)
+{
+	if (m_val) delete m_val;
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
+}
+
 // set the valuator
 void FEParamDouble::setValuator(FEScalarValuator* val)
 {
@@ -134,6 +142,13 @@ void FEParamVec3::operator = (const vec3d& v)
 	setValuator(val);
 }
 
+void FEParamVec3::operator = (const FEParamVec3& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
+}
+
 // set the valuator
 void FEParamVec3::setValuator(FEVec3dValuator* val)
 {
@@ -173,6 +188,13 @@ void FEParamMat3d::operator = (const mat3d& v)
 	FEConstValueMat3d* val = fecore_new<FEConstValueMat3d>("const", nullptr);
 	val->value() = v;
 	setValuator(val);
+}
+
+void FEParamMat3d::operator = (const FEParamMat3d& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
 }
 
 // set the valuator
@@ -219,6 +241,13 @@ void FEParamMat3ds::operator = (const mat3ds& v)
 	FEConstValueMat3ds* val = fecore_new<FEConstValueMat3ds>("const", nullptr);
 	val->value() = v;
 	setValuator(val);
+}
+
+void FEParamMat3ds::operator = (const FEParamMat3ds& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
 }
 
 // set the valuator

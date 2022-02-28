@@ -72,6 +72,7 @@ public:
 
 	// set the value
 	void operator = (double v);
+	void operator = (const FEParamDouble& p);
 
 	// set the valuator
 	void setValuator(FEScalarValuator* val);
@@ -110,6 +111,7 @@ public:
 
 	// set the value
 	void operator = (const vec3d& v);
+	void operator = (const FEParamVec3& p);
 
 	// set the valuator
 	void setValuator(FEVec3dValuator* val);
@@ -145,6 +147,7 @@ public:
 
 	// set the value
 	void operator = (const mat3d& v);
+	void operator = (const FEParamMat3d& v);
 
 	// set the valuator
 	void setValuator(FEMat3dValuator* val);
@@ -179,6 +182,7 @@ public:
 
 	// set the value
 	void operator = (const mat3ds& v);
+	void operator = (const FEParamMat3ds& v);
 
 	// set the valuator
 	void setValuator(FEMat3dsValuator* val);
