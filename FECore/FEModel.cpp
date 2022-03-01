@@ -616,14 +616,6 @@ bool FEModel::InitBCs()
 		if (pbc->Init() == false) return false;
 	}
 
-	// check the nodal loads
-	int NML = ModelLoads();
-	for (int i = 0; i < NML; ++i)
-	{
-		FEModelLoad* pbc = ModelLoad(i);
-		if (pbc->Init() == false) return false;
-	}
-
     return true;
 }
 
