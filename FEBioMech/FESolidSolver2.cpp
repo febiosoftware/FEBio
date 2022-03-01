@@ -1114,9 +1114,6 @@ bool FESolidSolver2::StiffnessMatrix()
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(LS, tp);
 
-	// calculate the stiffness contributions for the rigid forces
-	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
-
 	// add contributions from rigid bodies
 	m_rigidSolver.StiffnessMatrix(*m_pK, tp);
 
@@ -1327,17 +1324,6 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 
 	// forces due to point constraints
 	//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
-
-	// add model loads
-	int NML = fem.ModelLoads();
-	for (int i = 0; i<NML; ++i)
-	{
-		FEModelLoad& mli = *fem.ModelLoad(i);
-		if (mli.IsActive())
-		{
-			mli.LoadVector(RHS);
-		}
-	}
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
