@@ -1002,7 +1002,12 @@ char XMLReader::readNextChar()
             throw EndOfFile();
         }
 
-        m_stream->readsome(m_buf, BUF_SIZE);
+        m_stream->read(m_buf, BUF_SIZE);
+        
+        // clear eofbit and failbit if eof is hit. Unless we do this, seekg doesn't work
+        // we handle eof manually, so we can clear it without issue. 
+        m_stream->clear();
+        
         m_bufSize = m_stream->gcount();
         m_bufIndex = 0;
         m_eof = (m_bufSize != BUF_SIZE);
