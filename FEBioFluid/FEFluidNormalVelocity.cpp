@@ -221,17 +221,40 @@ void FEFluidNormalVelocity::Update()
 {
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
-    
+
+   
     if (m_bpv) {
+
+        // The velocity map is read in as surface data with MULT format. 
+        // However, we need to have (unique) values at the nodes
+        // so we need to convert this to nodal data. 
+        int N = ps->Nodes();
+        vector<double> VN(N, 0.0);
+        vector<int> tag(N, 0);
+        for (int i = 0; i < ps->Elements(); ++i)
+        {
+            FESurfaceElement& el = ps->Element(i);
+            for (int j = 0; j < el.Nodes(); ++j)
+            {
+                FEMaterialPoint mp;
+                mp.m_elem = &el;
+                mp.m_index = j;
+
+                double vnj = m_velocity(mp);
+
+                VN[el.m_lnode[j]] += vnj;
+                tag[el.m_lnode[j]]++;
+            }
+        }
+        for (int i = 0; i < N; ++i)
+        {
+            if (tag[i] != 0) VN[i] /= (double)tag[i];
+        }
+
         for (int i=0; i<ps->Nodes(); ++i)
         {
-            FEMaterialPoint mp;
-            mp.m_index = i;
-            mp.m_r0 = ps->Node(i).m_r0;
-            mp.m_rt = ps->Node(i).m_rt;
-
             // evaluate the velocity
-            vec3d v = m_nu[i]*(m_velocity(mp));
+            vec3d v = m_nu[i]*VN[i];
             FENode& node = ps->Node(i);
             if (node.get_bc(m_dofW[0]) == DOF_PRESCRIBED) node.set(m_dofW[0], v.x);
             if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
