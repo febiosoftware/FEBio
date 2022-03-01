@@ -161,13 +161,15 @@ double FEDamageCDFLogNormal::pdf(const double X)
 BEGIN_FECORE_CLASS(FEDamageCDFWeibull, FEDamageCDF)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER(m_ploc, "ploc");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageCDFWeibull::FEDamageCDFWeibull(FEModel* pfem) : FEDamageCDF(pfem)
 {
-    m_alpha = m_mu;
+    m_alpha = m_mu = 1;
+    m_ploc = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -177,8 +179,8 @@ double FEDamageCDFWeibull::cdf(const double X)
     double cdf = 0;
     
     // this CDF only admits positive values
-    if (X > 0)
-        cdf = 1 - exp(-pow(X/m_mu,m_alpha));
+    if (X > m_ploc)
+        cdf = 1 - exp(-pow((X-m_ploc)/m_mu,m_alpha));
     
     return cdf;
 }
@@ -189,10 +191,10 @@ double FEDamageCDFWeibull::pdf(const double X)
     double pdf = 0;
     
     // this CDF only admits positive values
-    if ((m_alpha > 1) && (X > 0))
-        pdf = exp(-pow(X/m_mu,m_alpha))*m_alpha*pow(X, m_alpha-1)/pow(m_mu, m_alpha);
-    else if (m_alpha == 1)
-        pdf = exp(-X/m_mu)/m_mu;
+    if ((m_alpha > 1) && (X > m_ploc))
+        pdf = exp(-pow((X-m_ploc)/m_mu,m_alpha))*m_alpha*pow(X-m_ploc, m_alpha-1)/pow(m_mu, m_alpha);
+    else if ((m_alpha == 1) && (X > m_ploc))
+        pdf = exp(-(X-m_ploc)/m_mu)/m_mu;
     
     return pdf;
 }

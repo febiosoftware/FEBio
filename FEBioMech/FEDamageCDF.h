@@ -119,6 +119,7 @@ public:
 public:
 	double	m_alpha;            //!< exponent alpha
 	double	m_mu;               //!< mean mu
+    double  m_ploc;             //!< location parameter
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
