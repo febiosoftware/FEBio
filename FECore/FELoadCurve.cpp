@@ -40,6 +40,8 @@ END_FECORE_CLASS();
 
 FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem)
 {
+	m_int = PointCurve::LINEAR;
+	m_ext = PointCurve::CONSTANT;
 }
 
 FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc)
