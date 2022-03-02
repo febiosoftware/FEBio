@@ -300,7 +300,6 @@ public:
 	void SkipTag(XMLTag& tag);
 
 	const std::string& GetLastComment();
-    void ClearComment();
 
 protected: // helper functions
 
@@ -349,8 +348,6 @@ inline void XMLTag::operator ++ () { m_preader->NextTag(*this); }
 inline void XMLTag::skip() { m_preader->SkipTag(*this); }
 
 inline const std::string& XMLTag::comment() { return m_preader->GetLastComment(); }
-
-inline const void XMLTag::clearComment() { m_preader->ClearComment(); }
 
 //-----------------------------------------------------------------------------
 // mechanism for using custom types with XMLReader. 

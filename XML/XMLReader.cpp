@@ -850,6 +850,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 	if (ch == '/')
 	{
 		tag.m_bend = true;
+        m_comment.clear();
 		ch = GetChar();
 	}
 
@@ -1110,9 +1111,4 @@ int XMLReader::GetCurrentLine() { return m_nline; }
 const std::string& XMLReader::GetLastComment()
 {
     return m_comment;
-}
-
-void XMLReader::ClearComment()
-{
-    m_comment.clear();
 }
