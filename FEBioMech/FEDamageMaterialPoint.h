@@ -40,12 +40,12 @@ class FEDamageMaterialPoint : public FEMaterialPoint
 public:
     FEDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
     
-    FEMaterialPoint* Copy();
+    FEMaterialPoint* Copy() override;
     
-    void Init();
-    void Update(const FETimeInfo& timeInfo);
+    void Init() override;
+    void Update(const FETimeInfo& timeInfo) override;
     
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
 public:
 	double	m_Etrial;		//!< trial damage criterion at time t

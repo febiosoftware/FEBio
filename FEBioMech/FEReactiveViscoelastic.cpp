@@ -52,6 +52,7 @@ BEGIN_FECORE_CLASS(FEReactiveViscoelasticMaterial, FEElasticMaterial)
 	ADD_PROPERTY(m_pBase, "elastic");
 	ADD_PROPERTY(m_pBond, "bond");
 	ADD_PROPERTY(m_pRelx, "relaxation");
+    ADD_PROPERTY(m_pWCDF, "recruitment", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -69,7 +70,7 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
 	m_pBase = nullptr;
 	m_pBond = nullptr;
 	m_pRelx = nullptr;
-    
+    m_pWCDF = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -91,6 +92,7 @@ bool FEReactiveViscoelasticMaterial::Init()
     if (!m_pBase->Init()) return false;
     if (!m_pBond->Init()) return false;
     if (!m_pRelx->Init()) return false;
+    if (m_pWCDF && !m_pWCDF->Init()) return false;
 
     return FEElasticMaterial::Init();
 }
@@ -270,7 +272,7 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
             break;
     }
     
-    assert((w >= 0) && (w <= 1));
+    assert(w >= 0);
     
     return w;
 }
@@ -294,7 +296,7 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
     // get current number of generations
     int ng = (int)pt.m_Uv.size();
     
-    double w = 1;
+    double w = (!pt.m_wv.empty()) ? pt.m_wv.back() : 1;
     
     for (int ig=0; ig<ng-1; ++ig)
     {
@@ -309,7 +311,7 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
     ep.m_F = F;
     ep.m_J = J;
     
-    assert((w >= 0) && (w <= 1));
+    assert(w >= 0);
     
     // return the bond mass fraction of the reforming generation
     return w;
@@ -655,6 +657,14 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
             pt.m_v.push_back(tp.currentTime);
             pt.m_Uv.push_back(Uv);
             pt.m_Jv.push_back(Jv);
+            if (m_pWCDF) {
+                pt.m_Et = ScalarStrain(pt);
+                if (pt.m_Et > pt.m_Em)
+                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Et));
+                else
+                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Em));
+            }
+            else pt.m_wv.push_back(1);
             double f = (!pt.m_v.empty()) ? ReformingBondMassFraction(wb) : 1;
             pt.m_f.push_back(f);
             CullGenerations(wb);
@@ -665,6 +675,13 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
         pt.m_Uv.back() = Uv;
         pt.m_Jv.back() = Jv;
         pt.m_f.back() = ReformingBondMassFraction(wb);
+        if (m_pWCDF) {
+            pt.m_Et = ScalarStrain(pt);
+            if (pt.m_Et > pt.m_Em)
+                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Et);
+            else
+                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Em);
+        }
     }
 }
 
@@ -680,3 +697,46 @@ int FEReactiveViscoelasticMaterial::RVEGenerations(FEMaterialPoint& mp)
     // return the bond mass fraction of the reforming generation
     return (int)pt.m_v.size();
 }
+
+//-----------------------------------------------------------------------------
+//! evaluate trigger strain
+double FEReactiveViscoelasticMaterial::ScalarStrain(FEMaterialPoint& mp)
+{
+    double d;
+    // get the elastic point data
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    switch (m_ttype) {
+        case 0:
+        {
+            // evaluate the Lagrangian strain
+            mat3ds E = ep.Strain();
+            
+            d = E.norm();
+        }
+            break;
+        case 1:
+        {
+            // distortional strain
+            // evaluate spatial Hencky (logarithmic) strain
+            mat3ds h = ep.LeftHencky();
+            
+            // evaluate distortion magnitude (always positive)
+            d = (h.dev()).norm();
+        }
+            break;
+        case 2:
+        {
+            // dilatational strain
+            d = fabs(log(ep.m_J));
+        }
+            break;
+            
+        default:
+            d = 0;
+            break;
+    }
+    
+    return d;
+}
+

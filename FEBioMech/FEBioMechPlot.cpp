@@ -1362,10 +1362,6 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 {
-    const int dof_SX = GetFEModel()->GetDOFIndex("sx");
-    const int dof_SY = GetFEModel()->GetDOFIndex("sy");
-    const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
-    
     FEMesh& mesh = *dom.GetMesh();
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
@@ -1530,9 +1526,6 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 {
-    const int dof_SX = GetFEModel()->GetDOFIndex("sx");
-    const int dof_SY = GetFEModel()->GetDOFIndex("sy");
-    const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
     const int dof_VX = GetFEModel()->GetDOFIndex("vx");
     const int dof_VY = GetFEModel()->GetDOFIndex("vy");
     const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
@@ -1772,11 +1765,6 @@ public:
 	double operator()(const FEMaterialPoint& mp)
 	{
 		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-		// get the deformation gradient
-		const mat3d& F = pt.m_F;
-		double J = pt.m_J;
-		double Jm13 = pow(J, -1.0 / 3.0);
 
 		mat3d Q = m_mat->GetLocalCS(mp);
 
@@ -2647,8 +2635,7 @@ bool FEPlotShellStrain::Save(FEDomain &dom, FEDataStream &a)
 	FEShellDomainNew* newsd = dynamic_cast<FEShellDomainNew*>(sd);
 	FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(newsd);
 	FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
-    int NE = sd->Elements();
-    if (easd || ansd) 
+    if (easd || ansd)
 	{
 		writeAverageElementValue<mat3ds>(dom, a, [](FEElement& el, int ip) {
 			FEShellElementNew& se = static_cast<FEShellElementNew&>(el);
@@ -2680,7 +2667,6 @@ bool FEPlotShellRelativeVolume::Save(FEDomain &dom, FEDataStream &a)
     FEShellDomainNew* newsd = dynamic_cast<FEShellDomainNew*>(sd);
 	FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(newsd);
 	FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
-    int NE = sd->Elements();
     if (easd || ansd) {
 		writeAverageElementValue<mat3ds, double>(dom, a, [](FEElement& el, int ip) {
 			FEShellElementNew& se = static_cast<FEShellElementNew&>(el);
@@ -3001,7 +2987,6 @@ bool FEPlotFiberTargetStretch::Save(FEDomain& dom, FEDataStream& a)
 		for (int j = 0; j<nint; ++j)
 		{
 			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
-			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 			FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
 
 			mat3d Fp = pp.initialPrestrain();
@@ -3240,7 +3225,6 @@ bool FEPlotPreStrainCompatibility::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	int NN = sd.Nodes();
 	int NE = sd.Elements();
 
 	// STEP 1 - first we do an SPR recovery of the pre-strain gradient
@@ -3436,7 +3420,6 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 	if (pdiscreteDomain == nullptr) return false;
 	FEDiscreteElasticDomain& discreteDomain = *pdiscreteDomain;
 
-	FEMesh& mesh = *dom.GetMesh();
 	int NE = discreteDomain.Elements();
 	for (int i = 0; i < NE; ++i)
 	{
@@ -3460,7 +3443,6 @@ bool FEPlotDiscreteElementStrainEnergy::Save(FEDomain& dom, FEDataStream& a)
 
 	FEDiscreteElasticMaterial* discreteMaterial = dynamic_cast<FEDiscreteElasticMaterial*>(discreteDomain.GetMaterial());
 
-	FEMesh& mesh = *dom.GetMesh();
 	int NE = discreteDomain.Elements();
 	for (int i = 0; i < NE; ++i)
 	{
@@ -3507,7 +3489,6 @@ bool FEPlotContinuousDamage_::Save(FEDomain& dom, FEDataStream& a)
 	}
 	if (mat == nullptr) return false;
 
-	FEMesh& mesh = *dom.GetMesh();
 	int NE = dom.Elements();
 	for (int i = 0; i < NE; ++i)
 	{
@@ -3668,6 +3649,76 @@ bool FEPlotRVEbonds::Save(FEDomain& dom, FEDataStream& a)
         }
     }
 
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRVEstrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    int N = dom.Elements();
+    FEElasticMaterial* pmat = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pmat == nullptr) return false;
+    FEReactiveViscoelasticMaterial* rvmat = dynamic_cast<FEReactiveViscoelasticMaterial*>(pmat);
+    FEUncoupledReactiveViscoelasticMaterial* rumat = dynamic_cast<FEUncoupledReactiveViscoelasticMaterial*>(pmat);
+    if (rvmat) {
+        for (int iel=0; iel<N; ++iel)
+        {
+            FEElement& el = dom.ElementRef(iel);
+            
+            int nint = el.GaussPoints();
+            double bmf = 0;
+            for (int j=0; j<nint; ++j)
+                bmf += rvmat->ScalarStrain(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
+            a << bmf/nint;
+        }
+    }
+    else if (rumat) {
+        for (int iel=0; iel<N; ++iel)
+        {
+            FEElement& el = dom.ElementRef(iel);
+            
+            int nint = el.GaussPoints();
+            double bmf = 0;
+            for (int j=0; j<nint; ++j)
+                bmf += rumat->ScalarStrain(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
+            a << bmf/nint;
+        }
+    }
+    else {
+        int NC = pmat->Properties();
+        // check all elements
+        for (int iel=0; iel<N; ++iel)
+        {
+            FEElement& el = dom.ElementRef(iel);
+            
+            int n = 0;
+            double bmf = 0;
+            // check all properties
+            for (int ic=0; ic < NC; ++ic) {
+                FEReactiveViscoelasticMaterial* rvmat = pmat->GetProperty(ic)->ExtractProperty<FEReactiveViscoelasticMaterial>();
+                FEUncoupledReactiveViscoelasticMaterial* rumat = dynamic_cast<FEUncoupledReactiveViscoelasticMaterial*>(pmat);
+                if (rvmat) {
+                    int nint = el.GaussPoints();
+                    for (int j=0; j<nint; ++j)
+                    {
+                        bmf += rvmat->ScalarStrain(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
+                        ++n;
+                    }
+                }
+                else if (rumat) {
+                    int nint = el.GaussPoints();
+                    for (int j=0; j<nint; ++j)
+                    {
+                        bmf += rumat->ScalarStrain(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
+                        ++n;
+                    }
+                }
+            }
+            if (n > 0) bmf /= n;
+            a << bmf;
+        }
+    }
+    
     return true;
 }
 

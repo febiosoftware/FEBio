@@ -83,8 +83,19 @@ void FEReactiveVEMaterialPoint::Init()
 	m_v.clear();
 	m_f.clear();
     
+    m_Et = 0;
+    m_Em = 0;
+    m_wv.clear();
+    
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
+}
+
+void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+    FEMaterialPoint::Update(timeInfo);
+    
+    m_Em = max(m_Em, m_Et);
 }
 
 //-----------------------------------------------------------------------------

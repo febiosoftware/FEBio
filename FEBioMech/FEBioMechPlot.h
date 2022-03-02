@@ -1057,6 +1057,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Reactive viscoelastic strain measure for bond-breaking trigger and bond recruitment
+class FEPlotRVEstrain : public FEPlotDomainData
+{
+public:
+    FEPlotRVEstrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Strain energy density of strong bonds in reactive viscoelastic material point
 class FEPlotStrongBondSED : public FEPlotDomainData
 {
