@@ -836,7 +836,15 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 		if (gen->Init() == false) return false;
 
 		// generate the data
-		if (gen->Generate(*map) == false) return false;
+		if (map)
+		{
+			if (gen->Generate(*map) == false) return false;
+		}
+		else
+		{
+			map = gen->Generate();
+			map->SetName(gen->GetName());
+		}
 
 		// see if this map is already defined
 		string mapName = map->GetName();

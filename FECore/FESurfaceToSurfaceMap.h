@@ -45,9 +45,9 @@ public:
 
 	void value(const vec3d& x, double& data) override;
 
+	FEDomainMap* Generate() override;
+
 private:
-	std::string		m_surfName1;
-	std::string		m_surfName2;
 	FEFunction1D*	m_func;
 	
 private:

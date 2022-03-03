@@ -186,6 +186,9 @@ public:
 	FESurface* FindSurface(const std::string& name);
 	int FindSurfaceIndex(const std::string& name);
 
+	// create a surface from a facet set
+	FESurface* CreateSurface(FEFacetSet& facetSet);
+
 	// --- EDGES ---
 	int Edges() { return (int) m_Edge.size(); }
 	FEEdge& Edge(int n) { return *m_Edge[n]; }

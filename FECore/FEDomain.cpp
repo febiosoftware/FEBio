@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEGlobalMatrix.h"
 
+REGISTER_SUPER_CLASS(FEDomain, FEDOMAIN_ID);
+
 //-----------------------------------------------------------------------------
 FEDomain::FEDomain(int nclass, FEModel* fem) : FEMeshPartition(nclass, fem)
 {

@@ -484,6 +484,14 @@ int FEMesh::FindSurfaceIndex(const std::string& name)
 	return -1;
 }
 
+FESurface* FEMesh::CreateSurface(FEFacetSet& facetSet)
+{
+	FESurface* surf = fecore_alloc(FESurface, m_fem);
+	surf->Create(facetSet);
+	AddSurface(surf);
+	return surf;
+}
+
 //-----------------------------------------------------------------------------
 //! Find a discrete element set set by name
 

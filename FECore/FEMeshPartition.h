@@ -48,9 +48,6 @@ class FEElementSet;
 //! a part of the mesh.
 class FECORE_API FEMeshPartition : public FECoreBase
 {
-	FECORE_SUPER_CLASS
-	FECORE_BASE_CLASS(FEMeshPartition)
-
 public:
 	//! constructor
 	FEMeshPartition(int nclass, FEModel* fem);

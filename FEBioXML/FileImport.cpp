@@ -1091,7 +1091,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					if (nodeSet == nullptr) throw XMLReader::InvalidValue(tag);
 					prop->SetProperty(nodeSet);
 				}
-				else */if (classID == FEDOMAIN_ID)
+				else */if (classID == FESURFACE_ID)
 				{
 					FEModelBuilder* builder = GetBuilder();
 					FEFacetSet* facetSet = mesh.FindFacetSet(szref);

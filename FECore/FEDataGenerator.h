@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "vec3d.h"
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
@@ -40,7 +40,7 @@ class FEDomainMap;
 
 //-----------------------------------------------------------------------------
 // Data generators are used to generate values of model parameters. 
-class FECORE_API FEDataGenerator : public FECoreBase
+class FECORE_API FEDataGenerator : public FEModelComponent
 {
 public:
 	FEDataGenerator(FEModel* fem);
@@ -93,4 +93,13 @@ public:
 
 	// generate the data array for the given element set
 	virtual bool Generate(FEDomainMap& data);
+
+	virtual FEDomainMap* Generate();
+
+public:
+	void SetElementSet(FEElementSet* elset);
+	FEElementSet* GetElementSet();
+
+private:
+	FEElementSet* m_elemSet;
 };

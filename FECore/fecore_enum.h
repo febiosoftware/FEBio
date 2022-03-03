@@ -248,6 +248,7 @@ enum SUPER_CLASS_ID {
 	FENLCLOGDATA_ID,             	// derived from FELogNLConstraintData
 	FECALLBACK_ID,					// derived from FECallBack
 	FEDOMAIN_ID,					// derived from FEDomain (TODO: work in progress)
+	FESURFACE_ID,					// derived from FESurface (TODO: work in progress)
 	FEIC_ID,						// derived from initial condition
 	FENODEDATAGENERATOR_ID,			// derived from FENodeDataGenerator
 	FEFACEDATAGENERATOR_ID,			// derived from FESurfaceDataGenerator

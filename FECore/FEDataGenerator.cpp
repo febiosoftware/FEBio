@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "log.h"
 
-FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(fem)
+FEDataGenerator::FEDataGenerator(FEModel* fem) : FEModelComponent(fem)
 {
 }
 
@@ -129,8 +129,11 @@ REGISTER_SUPER_CLASS(FEDomainDataGenerator, FEELEMDATAGENERATOR_ID);
 
 FEDomainDataGenerator::FEDomainDataGenerator(FEModel* fem) : FEDataGenerator(fem)
 {
-
+	m_elemSet = nullptr;
 }
+
+void FEDomainDataGenerator::SetElementSet(FEElementSet* elset) { m_elemSet = elset; }
+FEElementSet* FEDomainDataGenerator::GetElementSet() { return m_elemSet; }
 
 // generate the data array for the given element set
 bool FEDomainDataGenerator::Generate(FEDomainMap& map)
@@ -204,4 +207,10 @@ bool FEDomainDataGenerator::Generate(FEDomainMap& map)
 		};
 	}
 	return true;
+}
+
+FEDomainMap* FEDomainDataGenerator::Generate()
+{
+	assert(false);
+	return nullptr;
 }

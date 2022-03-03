@@ -79,6 +79,9 @@ typedef std::function<void(FESurfaceMaterialPoint& mp, const FESurfaceDofShape& 
 
 class FECORE_API FESurface : public FEMeshPartition
 {
+	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FESurface)
+
 public:
 	//! default constructor
 	FESurface(FEModel* fem);

@@ -35,6 +35,8 @@ SOFTWARE.*/
 #include "matrix.h"
 #include <FECore/log.h>
 
+REGISTER_SUPER_CLASS(FESurface, FESURFACE_ID);
+
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
 {
