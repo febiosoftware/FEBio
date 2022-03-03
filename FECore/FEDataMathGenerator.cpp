@@ -33,11 +33,11 @@ SOFTWARE.*/
 #include "FEMesh.h"
 using namespace std;
 
-BEGIN_FECORE_CLASS(FEDataMathGenerator, FEDataGenerator)
+BEGIN_FECORE_CLASS(FEDataMathGenerator, FENodeDataGenerator)
 	ADD_PARAMETER(m_math, "math");
 END_FECORE_CLASS();
 
-FEDataMathGenerator::FEDataMathGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEDataMathGenerator::FEDataMathGenerator(FEModel* fem) : FENodeDataGenerator(fem)
 {
 }
 

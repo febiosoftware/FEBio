@@ -827,7 +827,8 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 	FEMesh& mesh = GetMesh();
 	for (int i = 0; i < m_mapgen.size(); ++i)
 	{
-		FEDataGenerator* gen = m_mapgen[i].gen;
+		// TODO: This is going to break quickly!
+		FEDomainDataGenerator* gen = dynamic_cast<FEDomainDataGenerator*>(m_mapgen[i].gen);
 		FEDomainMap* map = m_mapgen[i].map;
 		FEParamDouble* pp = m_mapgen[i].pp;
 

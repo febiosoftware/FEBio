@@ -152,9 +152,6 @@ public:
 	//! return a node set
 	FENodeSet* NodeSet(int i) { return m_NodeSet[i]; }
 
-	//! Find a nodeset by ID
-	FENodeSet* FindNodeSet(int nid);
-
 	//! Find a nodeset by name
 	FENodeSet* FindNodeSet(const std::string& name);
 

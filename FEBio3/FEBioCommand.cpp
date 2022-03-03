@@ -655,7 +655,9 @@ const char* super_id_to_string(SUPER_CLASS_ID superID)
 	case FECALLBACK_ID        : szclass = "CALLBACK"; break;
 	case FEDOMAIN_ID          : szclass = "DOMAIN"; break;
 	case FEIC_ID              : szclass = "IC"; break;
-	case FEDATAGENERATOR_ID   : szclass = "DATAGENERATOR"; break;
+	case FENODEDATAGENERATOR_ID: szclass = "NODEDATAGENERATOR"; break;
+	case FEFACEDATAGENERATOR_ID: szclass = "FACEDATAGENERATOR"; break;
+	case FEELEMDATAGENERATOR_ID: szclass = "ELEMDATAGENERATOR"; break;
 	case FELOADCONTROLLER_ID  : szclass = "LOADCONTROLLER"; break;
 	case FEMODEL_ID           : szclass = "MODEL"; break;
 	case FEMODELDATA_ID       : szclass = "MODELDATA"; break;

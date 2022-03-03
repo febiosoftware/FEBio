@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>
 #include <FECore/FEBoundaryCondition.h>
+#include <FECore/FEPrescribedBC.h>
 #include <FECore/log.h>
 
 //=============================================================================
@@ -680,12 +681,8 @@ void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
 	// this "load" was moved to the boundary section
 	if (strcmp(sztype, "fluid rotational velocity") == 0)
 	{
-		FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
+		FEPrescribedNodeSet* pbc = fecore_new<FEPrescribedNodeSet>(sztype, fem);
 		if (pbc == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-		// get the node_set property
-		FEProperty* prop = pbc->FindProperty("node_set");
-		if (prop == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		// get the surface
 		const char* szset = tag.AttributeValue("surface");
@@ -699,8 +696,8 @@ void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
 		nodeSet->Add(nodeList);
 		mesh.AddNodeSet(nodeSet);
 
-		// assign the surface
-		prop->SetProperty(nodeSet);
+		// assign the node set
+		pbc->SetNodeSet(nodeSet);
 
 		// Read the parameter list
 		ReadParameterList(tag, pbc);

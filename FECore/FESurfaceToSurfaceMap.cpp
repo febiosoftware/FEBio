@@ -33,11 +33,11 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FESurfaceToSurfaceMap, FEDataGenerator)
 	ADD_PROPERTY(m_func, "function");
-	ADD_PROPERTY(m_surf1, "bottom_surface", FEProperty::Reference);
-	ADD_PROPERTY(m_surf2, "top_surface"   , FEProperty::Reference);
+//	ADD_PROPERTY(m_surf1, "bottom_surface", FEProperty::Reference);
+//	ADD_PROPERTY(m_surf2, "top_surface"   , FEProperty::Reference);
 END_FECORE_CLASS();
 
-FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem)
+FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDomainDataGenerator(fem)
 {
 	m_ccp1 = 0;
 	m_ccp2 = 0;

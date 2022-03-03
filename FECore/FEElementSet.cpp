@@ -40,6 +40,12 @@ FEElementSet::FEElementSet(FEModel* fem) : FEItemList(fem)
 	m_maxID = -1;
 }
 
+FEElementSet::FEElementSet(FEMesh* mesh) : FEItemList(mesh)
+{
+	m_minID = -1;
+	m_maxID = -1;
+}
+
 //-----------------------------------------------------------------------------
 void FEElementSet::Create(const std::vector<int>& elemList)
 {
@@ -185,6 +191,13 @@ void FEElementSet::Serialize(DumpStream& ar)
 	ar & m_Elem;
 	ar & m_LUT;
 	ar & m_minID & m_maxID;
+}
+
+void FEElementSet::SaveClass(DumpStream& ar, FEElementSet* p) {}
+FEElementSet* FEElementSet::LoadClass(DumpStream& ar, FEElementSet* p)
+{
+	p = new FEElementSet(&ar.GetFEModel());
+	return p;
 }
 
 //-----------------------------------------------------------------------------

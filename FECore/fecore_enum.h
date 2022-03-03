@@ -249,7 +249,9 @@ enum SUPER_CLASS_ID {
 	FECALLBACK_ID,					// derived from FECallBack
 	FEDOMAIN_ID,					// derived from FEDomain (TODO: work in progress)
 	FEIC_ID,						// derived from initial condition
-	FEDATAGENERATOR_ID,				// derived from FEDataGenerator
+	FENODEDATAGENERATOR_ID,			// derived from FENodeDataGenerator
+	FEFACEDATAGENERATOR_ID,			// derived from FESurfaceDataGenerator
+	FEELEMDATAGENERATOR_ID,			// derived from FEDomainDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller (TODO: work in progress)
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
@@ -263,7 +265,6 @@ enum SUPER_CLASS_ID {
 	FEMESHADAPTORCRITERION_ID,		// derived from FEMeshAdaptorCriterion
 	FERIGIDBC_ID,					// derived from FERigidBC
 	FENEWTONSTRATEGY_ID,			// derived from FENewtonStrategy
-	FEITEMLIST_ID,                  // derived from FEItemList (NOTE: work in progress!)
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
 	FEDATARECORD_ID,				// derived from DataRecord

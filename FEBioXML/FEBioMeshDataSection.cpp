@@ -161,7 +161,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			else
 			{
 				// data will be generated
-				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
+				FEDomainDataGenerator* gen = fecore_new<FEDomainDataGenerator>(szgen, &fem);
 				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 				// get the variable or name
@@ -232,7 +232,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szgen = tag.AttributeValue("generator", true);
 			if (szgen)
 			{
-				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
+				FESurfaceDataGenerator* gen = fecore_new<FESurfaceDataGenerator>(szgen, &fem);
 				if (gen == nullptr) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 				ReadParameterList(tag, gen);

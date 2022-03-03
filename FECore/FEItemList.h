@@ -33,19 +33,26 @@ SOFTWARE.*/
 
 class FEMesh;
 
-class FECORE_API FEItemList : public FECoreBase
+class FECORE_API FEItemList// : public FECoreBase
 {
-	FECORE_SUPER_CLASS
-	FECORE_BASE_CLASS(FEItemList)
-
 public:
-	FEItemList(FEModel* fem);
+	FEItemList(FEModel* fem);	// TODO: remove
+	FEItemList(FEMesh* mesh);
+	virtual ~FEItemList();
 
 	// get the mesh
 	FEMesh* GetMesh() const;
 
 	void SetMesh(FEMesh* mesh);
 
+	const std::string& GetName() const;
+	void SetName(const std::string& name);
+
+public:
+	void Serialize(DumpStream& ar);
+
 protected:
 	FEMesh*		m_mesh;
+
+	std::string	m_name;
 };

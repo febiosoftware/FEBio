@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 class FESurface;
 
-class FECORE_API FEParabolicMap : public FEDataGenerator
+class FECORE_API FEParabolicMap : public FESurfaceDataGenerator
 {
 public:
 	FEParabolicMap(FEModel* fem);

@@ -739,24 +739,25 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 	FEBoundaryCondition* pdc = fecore_new<FEBoundaryCondition>(sztype, &fem);
 	if (pdc == 0) throw XMLReader::InvalidTag(tag);
 
-	// get the node set
+	// get the selection
 	const char* szset = tag.AttributeValue("node_set", true);
-	if (szset)
+	if (dynamic_cast<FENodalBC*>(pdc))
 	{
+		FENodalBC* pnbc = dynamic_cast<FENodalBC*>(pdc);
 		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
 		if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 		// Set the node set
-		FEProperty* p = pdc->FindProperty("node_set");
-		if (p == nullptr) XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-		p->SetProperty(nodeSet);
+		pnbc->SetNodeSet(nodeSet);
 
 		// Read the parameter list
 		FEParameterList& pl = pdc->GetParameterList();
 		ReadParameterList(tag, pl);
 	}
-	else
+	else if (dynamic_cast<FESurfaceBC*>(pdc))
 	{
+		FESurfaceBC* sbc = dynamic_cast<FESurfaceBC*>(pdc);
+
 		// if a node set is not defined, see if a surface is defined
 		szset = tag.AttributeValue("surface");
 		FEFacetSet* set = mesh.FindFacetSet(szset);
@@ -766,12 +767,11 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		ReadParameterList(tag, pl);
 
 		// add the surface
-		FEProperty* p = pdc->FindProperty("surface");
-		if (p == nullptr) XMLReader::InvalidAttributeValue(tag, "surface", szset);
 		FESurface* surf = fecore_alloc(FESurface, GetFEModel());
 		surf->Create(*set);
 		mesh.AddSurface(surf);
-		p->SetProperty(surf);
+
+		sbc->SetSurface(surf);
 	}
 
 	// add this boundary condition to the current step

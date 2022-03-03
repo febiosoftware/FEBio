@@ -67,3 +67,14 @@ void FESegmentSet::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_Seg;
 }
+
+void FESegmentSet::SaveClass(DumpStream& ar, FESegmentSet* p)
+{
+
+}
+
+FESegmentSet* FESegmentSet::LoadClass(DumpStream& ar, FESegmentSet* p)
+{
+	p = new FESegmentSet(&ar.GetFEModel());
+	return p;
+}

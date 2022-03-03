@@ -63,7 +63,10 @@ public:
 	FENode* Node(int i);
 	const FENode* Node(int i) const;
 
+public:
 	void Serialize(DumpStream& ar);
+	static void SaveClass(DumpStream& ar, FENodeSet* p);
+	static FENodeSet* LoadClass(DumpStream& ar, FENodeSet* p);
 
 protected:
 	FENodeList	m_Node;		//!< list of nodes

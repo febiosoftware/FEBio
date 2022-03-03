@@ -35,7 +35,7 @@ class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEDataMathGenerator : public FEDataGenerator
+class FECORE_API FEDataMathGenerator : public FENodeDataGenerator
 {
 public:
 	FEDataMathGenerator(FEModel* fem);

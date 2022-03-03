@@ -63,15 +63,14 @@ void FEBioInitialSection3::ParseIC(XMLTag& tag)
 	// add it to the model
 	GetBuilder()->AddInitialCondition(pic);
 
-	// get the node set
-	FEProperty* pn = pic->FindProperty("node_set");
-	if (pn)
+	FENodalIC* nic = dynamic_cast<FENodalIC*>(pic);
+	if (nic)
 	{
 		// read required node_set attribute
 		const char* szset = tag.AttributeValue("node_set");
 		FENodeSet* nodeSet = GetBuilder()->FindNodeSet(szset);
 		if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-		pn->SetProperty(nodeSet);
+		nic->SetNodeSet(nodeSet);
 	}
 
 	// Read the parameter list

@@ -68,8 +68,12 @@ public:
 	SEGMENT& Segment(int i);
 	const SEGMENT& Segment(int i) const;
 
+public:
 	// serialization
 	void Serialize(DumpStream& ar);
+
+	static void SaveClass(DumpStream& ar, FESegmentSet* p);
+	static FESegmentSet* LoadClass(DumpStream& ar, FESegmentSet* p);
 
 private:
 	vector<SEGMENT>	m_Seg;	// the actual segment list

@@ -30,16 +30,16 @@ SOFTWARE.*/
 #include "FEDataGenerator.h"
 #include "fecore_type.h"
 
-template<class T> class FEConstDataGenerator : public FEDataGenerator
+template<class T, class TBase> class FEConstDataGenerator : public TBase
 {
 public:
-	FEConstDataGenerator(FEModel* fem) : FEDataGenerator(fem), m_val(0.0) {}
+	FEConstDataGenerator(FEModel* fem) : TBase(fem), m_val(0.0) {}
 
 	void value(const vec3d& r, T& d) override { d = m_val; }
 
 	void BuildParamList() override
 	{
-		AddParameter(m_val, "value");
+		TBase::AddParameter(m_val, "value");
 	}
 
 private:

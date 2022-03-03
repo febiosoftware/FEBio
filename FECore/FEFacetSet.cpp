@@ -133,3 +133,10 @@ void FEFacetSet::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_Face;
 }
+
+void FEFacetSet::SaveClass(DumpStream& ar, FEFacetSet* p) {}
+FEFacetSet* FEFacetSet::LoadClass(DumpStream& ar, FEFacetSet* p)
+{
+	p = new FEFacetSet(&ar.GetFEModel());
+	return p;
+}

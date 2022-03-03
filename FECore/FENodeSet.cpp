@@ -85,3 +85,13 @@ void FENodeSet::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_Node;
 }
+
+void FENodeSet::SaveClass(DumpStream& ar, FENodeSet* p)
+{
+}
+
+FENodeSet* FENodeSet::LoadClass(DumpStream& ar, FENodeSet* p)
+{
+	p = new FENodeSet(&ar.GetFEModel());
+	return p;
+}

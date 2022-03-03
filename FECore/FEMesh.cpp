@@ -449,15 +449,6 @@ double FEMesh::CurrentElementVolume(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-//! Find a nodeset by ID
-
-FENodeSet* FEMesh::FindNodeSet(int nid)
-{
-	for (size_t i=0; i<m_NodeSet.size(); ++i) if (m_NodeSet[i]->GetID() == nid) return m_NodeSet[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! Find a nodeset by name
 
 FENodeSet* FEMesh::FindNodeSet(const std::string& name)

@@ -34,11 +34,11 @@ SOFTWARE.*/
 #include "FEGlobalMatrix.h"
 #include "FEModel.h"
 
-BEGIN_FECORE_CLASS(FEParabolicMap, FEDataGenerator)
+BEGIN_FECORE_CLASS(FEParabolicMap, FESurfaceDataGenerator)
 	ADD_PARAMETER(m_scale, "value");
 END_FECORE_CLASS();
 
-FEParabolicMap::FEParabolicMap(FEModel* fem) : FEDataGenerator(fem)
+FEParabolicMap::FEParabolicMap(FEModel* fem) : FESurfaceDataGenerator(fem)
 {
 	m_scale = 1.0;
 }

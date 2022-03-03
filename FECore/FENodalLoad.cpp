@@ -36,7 +36,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalLoad, FEModelLoad)
 	ADD_PARAMETER(m_brelative, "relative");
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
+//	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

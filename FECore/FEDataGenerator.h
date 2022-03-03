@@ -42,8 +42,6 @@ class FEDomainMap;
 // Data generators are used to generate values of model parameters. 
 class FECORE_API FEDataGenerator : public FECoreBase
 {
-	FECORE_SUPER_CLASS
-
 public:
 	FEDataGenerator(FEModel* fem);
 	virtual ~FEDataGenerator();
@@ -52,15 +50,6 @@ public:
 	// and check for any input problems.
 	virtual bool Init();
 
-	// generate the data array for the given node set
-	virtual bool Generate(FENodeDataMap& ar);
-
-	// generate the data array for the given facet set
-	virtual bool Generate(FESurfaceMap& data);
-
-	// generate the data array for the given element set
-	virtual bool Generate(FEDomainMap& data);
-
 public:
 	// overload  one of these functions for custom generators
 	virtual void value(const vec3d& r, double& data) {}
@@ -68,4 +57,40 @@ public:
 	virtual void value(const vec3d& r, vec3d& data) {}
 	virtual void value(const vec3d& r, mat3d& data) {}
     virtual void value(const vec3d& r, mat3ds& data) {}
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FENodeDataGenerator : public FEDataGenerator
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FENodeDataGenerator(FEModel* fem);
+
+	// generate the data array for the given node set
+	virtual bool Generate(FENodeDataMap& ar);
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FESurfaceDataGenerator : public FEDataGenerator
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FESurfaceDataGenerator(FEModel* fem);
+
+	// generate the data array for the given facet set
+	virtual bool Generate(FESurfaceMap& data);
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEDomainDataGenerator : public FEDataGenerator
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FEDomainDataGenerator(FEModel* fem);
+
+	// generate the data array for the given element set
+	virtual bool Generate(FEDomainMap& data);
 };

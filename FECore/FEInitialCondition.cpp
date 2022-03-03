@@ -41,7 +41,6 @@ FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEStepComponent(pfem)
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalIC, FEInitialCondition)
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

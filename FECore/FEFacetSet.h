@@ -90,8 +90,12 @@ public:
 	// extract the node set from the facet set
 	FENodeList GetNodeList() const;
 
+public:
 	// serialize
 	void Serialize(DumpStream& ar);
+
+	static void SaveClass(DumpStream& ar, FEFacetSet* p);
+	static FEFacetSet* LoadClass(DumpStream& ar, FEFacetSet* p);
 
 	// TODO: This is a hack used to convert between a surface and a facet set when reading face data records
 	void SetSurface(FESurface* surf);

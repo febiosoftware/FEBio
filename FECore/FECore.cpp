@@ -121,7 +121,7 @@ REGISTER_FECORE_CLASS(FEStepFunction  , "step");
 REGISTER_FECORE_CLASS(FEMathFunction  , "math");
 
 // data generators
-REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
+//REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
@@ -165,11 +165,6 @@ REGISTER_FECORE_CLASS(JFNKStrategy     , "JFNK");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
-
-// Mesh item lists
-REGISTER_FECORE_CLASS(FENodeSet   , "node_set");
-REGISTER_FECORE_CLASS(FEFacetSet  , "surface" );
-REGISTER_FECORE_CLASS(FEElementSet, "elem_set");
 
 REGISTER_FECORE_CLASS(FESurface, "surface");
 

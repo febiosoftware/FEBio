@@ -35,8 +35,6 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "log.h"
 
-REGISTER_SUPER_CLASS(FEDataGenerator, FEDATAGENERATOR_ID);
-
 FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(fem)
 {
 }
@@ -50,8 +48,17 @@ bool FEDataGenerator::Init()
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+
+REGISTER_SUPER_CLASS(FENodeDataGenerator, FENODEDATAGENERATOR_ID);
+
+FENodeDataGenerator::FENodeDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+{
+
+}
+
 // generate the data array for the given node set
-bool FEDataGenerator::Generate(FENodeDataMap& map)
+bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 {
 	const FENodeSet& set = *map.GetNodeSet();
 	int N = set.Size();
@@ -76,8 +83,16 @@ bool FEDataGenerator::Generate(FENodeDataMap& map)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+REGISTER_SUPER_CLASS(FESurfaceDataGenerator, FEFACEDATAGENERATOR_ID);
+
+FESurfaceDataGenerator::FESurfaceDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+{
+
+}
+
 // generate the data array for the given facet set
-bool FEDataGenerator::Generate(FESurfaceMap& map)
+bool FESurfaceDataGenerator::Generate(FESurfaceMap& map)
 {
 	const FEFacetSet& surf = *map.GetFacetSet();
 
@@ -109,8 +124,16 @@ bool FEDataGenerator::Generate(FESurfaceMap& map)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+REGISTER_SUPER_CLASS(FEDomainDataGenerator, FEELEMDATAGENERATOR_ID);
+
+FEDomainDataGenerator::FEDomainDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+{
+
+}
+
 // generate the data array for the given element set
-bool FEDataGenerator::Generate(FEDomainMap& map)
+bool FEDomainDataGenerator::Generate(FEDomainMap& map)
 {
 	const FEElementSet& set = *map.GetElementSet();
 

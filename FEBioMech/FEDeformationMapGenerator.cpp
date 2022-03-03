@@ -31,12 +31,12 @@ SOFTWARE.*/
 
 double defgrad(FESolidElement &el, std::vector<vec3d>& X, std::vector<vec3d>& u, mat3d &F, int n);
 
-BEGIN_FECORE_CLASS(FEDeformationMapGenerator, FEDataGenerator)
+BEGIN_FECORE_CLASS(FEDeformationMapGenerator, FEDomainDataGenerator)
 	ADD_PARAMETER(m_nodeDisplacementMap, "node_displacement_map");
 END_FECORE_CLASS();
 
 
-FEDeformationMapGenerator::FEDeformationMapGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEDeformationMapGenerator::FEDeformationMapGenerator(FEModel* fem) : FEDomainDataGenerator(fem)
 {
 	m_nodeMap = nullptr;
 }
