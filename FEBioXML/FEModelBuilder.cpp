@@ -767,7 +767,7 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// okay, first time here, so let's create a node set from this surface
 		FENodeList nodeList = surf->GetNodeList();
-		ps = fecore_alloc(FENodeSet, &m_fem);
+		ps = new FENodeSet(&m_fem);
 		ps->Add(nodeList);
 		ps->SetName(surfName);
 		mesh.AddNodeSet(ps);
@@ -788,7 +788,7 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// okay, first time here, so let's create a node set from this element set
 		FENodeList nodeList = part->GetNodeList();
-		ps = fecore_alloc(FENodeSet, &m_fem);
+		ps = new FENodeSet(&m_fem);
 		ps->Add(nodeList);
 		ps->SetName(esetName);
 		mesh.AddNodeSet(ps);
