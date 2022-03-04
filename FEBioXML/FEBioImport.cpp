@@ -255,7 +255,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Control"    ] = new FEBioControlSection4     (this);
 		m_map["Material"   ] = new FEBioMaterialSection3    (this);
 		m_map["Mesh"       ] = new FEBioMeshSection4        (this);
-		m_map["MeshDomains"] = new FEBioMeshDomainsSection  (this);
+		m_map["MeshDomains"] = new FEBioMeshDomainsSection4 (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);

@@ -221,8 +221,13 @@ void FEShellDomainOld::InitShells()
 
 //=================================================================================================
 
+BEGIN_FECORE_CLASS(FEShellDomainNew, FEShellDomain)
+	ADD_PARAMETER(m_h0, "shell_thickness");
+END_FECORE_CLASS();
+
 FEShellDomainNew::FEShellDomainNew(FEModel* fem) : FEShellDomain(fem)
 {
+	m_h0 = 0.0;
 }
 
 //-----------------------------------------------------------------------------

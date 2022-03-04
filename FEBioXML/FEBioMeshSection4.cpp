@@ -560,7 +560,7 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	FE_Element_Spec spec = partDomain->ElementSpec();
 
 	// create the domain
-	FEDomain* dom = febio.CreateDomain(spec, &mesh, mat);
+	FEShellDomainNew* dom = dynamic_cast<FEShellDomainNew*>(febio.CreateDomain(spec, &mesh, mat));
 	if (dom == 0) throw XMLReader::InvalidTag(tag);
 
 	mesh.AddDomain(dom);
@@ -580,22 +580,27 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	string domName = partName + partDomain->Name();
 	dom->SetName(domName);
 
-	// process element data
-	for (int j = 0; j < elems; ++j)
-	{
-		const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
-
-		FEElement& el = dom->ElementRef(j);
-		el.SetID(domElement.id);
-
-		// TODO: This assumes one-based indexing of all nodes!
-		int ne = el.Nodes();
-		for (int n = 0; n < ne; ++n) el.m_node[n] = domElement.node[n] - 1;
-	}
-
 	// read additional parameters
 	if (tag.isleaf() == false)
 	{
 		ReadParameterList(tag, dom);
+	}
+
+	// process element data
+	double h0 = dom->DefaultShellThickness();
+	for (int j = 0; j < elems; ++j)
+	{
+		const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
+
+		FEShellElement& el = dom->Element(j);
+		el.SetID(domElement.id);
+
+		// TODO: This assumes one-based indexing of all nodes!
+		int ne = el.Nodes();
+		for (int n = 0; n < ne; ++n)
+		{
+			el.m_node[n] = domElement.node[n] - 1;
+			el.m_h0[n] = h0;
+		}
 	}
 }
