@@ -55,13 +55,13 @@ void FEObjectiveFunction::Reset()
 {
 }
 
-double FEObjectiveFunction::Evaluate()
+void FEObjectiveFunction::Evaluate(double &chisq, double &rsq)
 {
 	vector<double> dummy(Measurements());
-	return Evaluate(dummy);
+	Evaluate(dummy, chisq, rsq);
 }
 
-double FEObjectiveFunction::Evaluate(vector<double>& y)
+void FEObjectiveFunction::Evaluate(vector<double>& y, double &chisq, double &rsq)
 {
 	// get the number of measurements
 	int ndata = Measurements();
@@ -73,8 +73,21 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 	// get the measurement vector
 	vector<double> y0(ndata);
 	GetMeasurements(y0);
+    
+    // evaluate regression coefficient R^2
+    double xb=0,yb=0,xyb=0,x2b=0,y2b=0;
+    for (int i = 0; i<ndata; ++i)
+    {
+        xb += y0[i]; yb += y[i];
+        xyb += y0[i]*y[i];
+        x2b += pow(y0[i],2); y2b += pow(y[i],2);
+    }
+    xb /= ndata; yb /= ndata;
+    xyb /= ndata;
+    x2b /= ndata; y2b /= ndata;
+    rsq = pow(xyb - xb*yb,2)/(x2b - xb*xb)/(y2b - yb*yb);
 
-	double chisq = 0.0;
+	chisq = 0.0;
 	if (m_verbose) feLog("               CURRENT        REQUIRED      DIFFERENCE\n");
 	for (int i = 0; i<ndata; ++i)
 	{
@@ -83,8 +96,7 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 		if (m_verbose) feLog("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
 	}
 	feLog("objective value: %lg\n", chisq);
-
-	return chisq;
+    feLog("regression coef: %lg\n", rsq);
 }
 
 //=============================================================================

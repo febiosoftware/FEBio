@@ -79,7 +79,7 @@ FELMOptimizeMethod::FELMOptimizeMethod()
 }
 
 //-----------------------------------------------------------------------------
-bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
+bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2)
 {
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
@@ -172,7 +172,14 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 	// store optimal values
 	amin = a;
 	ymin = m_yopt;
-	if (minObj) *minObj = fret;
+    if (minObj) {
+        *minObj = fret;
+        // evaluate objective function
+        FEObjectiveFunction& obj = opt.GetObjective();
+        double fobj, R2;
+        obj.Evaluate(fobj, R2);
+        *minR2 = R2;
+    }
 
 	return true;
 }
@@ -199,7 +206,8 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	// evaluate at a
 	if (opt.FESolve(a) == false) throw FEErrorTermination();
 	
-	opt.GetObjective().Evaluate(y);
+    double fobj, R2;
+	opt.GetObjective().Evaluate(y, fobj, R2);
 	m_yopt = y;
 
 	// now calculate the derivatives using forward differences
@@ -217,7 +225,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 		assert(a1[i] != a[i]);
 
 		if (opt.FESolve(a1) == false) throw FEErrorTermination();
-		opt.GetObjective().Evaluate(y1);
+		opt.GetObjective().Evaluate(y1, fobj, R2);
 		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
 		a1[i] = a[i];
 	}

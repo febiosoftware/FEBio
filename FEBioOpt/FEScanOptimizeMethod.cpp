@@ -39,7 +39,7 @@ END_FECORE_CLASS();
 // FEScanOptimizeMethod
 //-----------------------------------------------------------------------------
 
-bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
+bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2)
 {
 	if (pOpt == 0) return false;
 	FEOptimizeData& opt = *pOpt;
@@ -57,19 +57,20 @@ bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt, vector<double>& amin, vec
 	// loop until done
 	vector<double> y(ma, 0.0);
 	bool bdone = false;
-	double fmin = 0.0;
+	double fmin = 0.0, R2min = 0.0;
 	do
 	{
 		// solve the problem with the new input parameters
 		if (opt.FESolve(a) == false) return false;
 
 		// calculate objective function
-		double fobj = obj.Evaluate(y);
+        double fobj, R2;
+        obj.Evaluate(y, fobj, R2);
 
 		// update minimum
 		if ((fmin == 0.0) || (fobj < fmin))
 		{
-			fmin = fobj;
+            fmin = fobj; R2min = R2;
 			amin = a;
 			ymin = y;
 		}
@@ -87,7 +88,10 @@ bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt, vector<double>& amin, vec
 	while (!bdone);
 
 	// store the optimum data
-	if (minObj) *minObj = fmin;
+    if (minObj) {
+        *minObj = fmin;
+        *minR2 = R2min;
+    }
 
 	return true;
 }

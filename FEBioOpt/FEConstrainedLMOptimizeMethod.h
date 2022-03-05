@@ -37,7 +37,7 @@ class FEConstrainedLMOptimizeMethod : public FEOptimizeMethod
 {
 public:
 	FEConstrainedLMOptimizeMethod();
-	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
+	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2) override;
 
 	FEOptimizeData* GetOptimizeData() { return m_pOpt; }
 

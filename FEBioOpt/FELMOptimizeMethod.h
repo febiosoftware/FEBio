@@ -38,7 +38,7 @@ class FELMOptimizeMethod : public FEOptimizeMethod
 {
 public:
 	FELMOptimizeMethod();
-	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
+	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2) override;
 
 protected:
 	FEOptimizeData* m_pOpt;

@@ -39,7 +39,7 @@ FEPowellOptimizeMethod* FEPowellOptimizeMethod::m_pThis = 0;
 // FEPowellOptimizeMethod
 //-----------------------------------------------------------------------------
 
-bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
+bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2)
 {
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
@@ -68,7 +68,14 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, v
 
 	// store optimal values
 	amin = p;
-	if (minObj) *minObj = fret;
+    if (minObj) {
+        *minObj = fret;
+        // evaluate objective function
+        FEObjectiveFunction& obj = opt.GetObjective();
+        double fobj, R2;
+        obj.Evaluate(fobj, R2);
+        *minR2 = R2;
+    }
 
 	return true;
 }
@@ -96,7 +103,8 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	{
 		// evaluate objective function
 		FEObjectiveFunction& obj = opt.GetObjective();
-		double fobj = obj.Evaluate();
+        double fobj, R2;
+        obj.Evaluate(fobj, R2);
 		return fobj;
 	}
 }

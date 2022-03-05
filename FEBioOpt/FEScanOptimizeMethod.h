@@ -38,7 +38,7 @@ public:
 	// returns the optimal parameter values in amin
 	// returns the optimal measurement vector in ymin
 	// returns the optimal objective function value in minObj
-	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
+	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2) override;
 
 	DECLARE_FECORE_CLASS();
 };

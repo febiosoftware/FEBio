@@ -65,10 +65,10 @@ public:
 
 	// evaluate objective function
 	// also returns the function values in f
-	virtual double Evaluate(vector<double>& f);
+	virtual void Evaluate(vector<double>& f, double &chisq, double &rsq);
 
 	// evaluate objective function
-	double Evaluate();
+	void Evaluate(double &chisq, double &rsq);
 
 	// print output to screen or not
 	void SetVerbose(bool b) { m_verbose = b; }

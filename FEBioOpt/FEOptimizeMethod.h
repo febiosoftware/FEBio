@@ -59,7 +59,7 @@ public:
 	// values of the measurement vector in ymin and
 	// the corresponding objective value in obj.
 	// If this function returns false, something went wrong
-	virtual bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) = 0;
+	virtual bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2) = 0;
 
 public:
 	int		m_loglevel;		//!< log file output level

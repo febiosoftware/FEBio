@@ -57,30 +57,43 @@ bool FEModelParameter::Init()
 		return false;
 	}
 
-    // see if it's the correct type
-    if (val.type() == FE_PARAM_VEC2D) {
-        // make sure we have a valid data pointer
-        vec2d* vd = (vec2d*) val.data_ptr();
-        // store the pointer to the parameter
-        m_pd = &vd->y();
-        return true;
+    switch (val.type()) {
+        case FE_PARAM_DOUBLE:
+        {
+            // make sure we have a valid data pointer
+            double* pd = (double*) val.data_ptr();
+            if (pd == 0)
+            {
+                feLogError("Invalid data pointer for parameter %s", name.c_str());
+                return false;
+            }
+            
+            // store the pointer to the parameter
+            m_pd = pd;
+        }
+            break;
+            
+        case FE_PARAM_VEC2D:
+        {
+            // make sure we have a valid data pointer
+            vec2d* vd = (vec2d*) val.data_ptr();
+            if (vd == 0)
+            {
+                feLogError("Invalid data pointer for parameter %s", name.c_str());
+                return false;
+            }
+            // store the pointer to the parameter
+            m_pd = &vd->y();
+        }
+            break;
+            
+       default:
+        {
+            feLogError("Invalid parameter type for parameter %s", name.c_str());
+            return false;
+        }
+            break;
     }
-	else if (val.type() != FE_PARAM_DOUBLE)
-	{
-		feLogError("Invalid parameter type for parameter %s", name.c_str());
-		return false;
-	}
-
-	// make sure we have a valid data pointer
-	double* pd = (double*) val.data_ptr();
-	if (pd == 0)
-	{
-		feLogError("Invalid data pointer for parameter %s", name.c_str());
-		return false;
-	}
-
-	// store the pointer to the parameter
-	m_pd = pd;
 
 	return true;
 }
@@ -164,8 +177,8 @@ bool FEOptimizeData::Solve()
 	int NVAR = (int) m_Var.size();
 	vector<double> amin(NVAR, 0.0);
 	vector<double> ymin;
-	double minObj = 0.0;
-	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj);
+	double minObj = 0.0, minR2 = 0.0;
+	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj, &minR2);
 	if (bret)
 	{
 		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
@@ -176,6 +189,7 @@ bool FEOptimizeData::Solve()
 
 		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
+        feLog("\tFinal regression coef ... : %15lg\n\n", minR2);
 		feLog("\tOptimal parameters:\n\n");
 		// report the parameters for the minimal value
 		for (int i = 0; i<NVAR; ++i)
