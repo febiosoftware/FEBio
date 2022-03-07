@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include "FESurfaceMap.h"
 #include "FENodeDataMap.h"
 #include "DumpStream.h"
+#include "FECoreKernel.h"
 #include <algorithm>
 
 //-----------------------------------------------------------------------------
@@ -1044,7 +1045,16 @@ void FEMesh::CopyFrom(FEMesh& mesh)
 		const char* sz = dom.GetTypeStr();
 
 		// create a new domain
-		FEDomain* pd = fecore_new<FEDomain>(sz, nullptr);
+		// create a new domain
+		FEDomain* pd = nullptr;
+		switch (dom.Class())
+		{
+		case FE_DOMAIN_SOLID   : pd = fecore_new<FESolidDomain   >(sz, nullptr); break;
+		case FE_DOMAIN_SHELL   : pd = fecore_new<FEShellDomain   >(sz, nullptr); break;
+		case FE_DOMAIN_TRUSS   : pd = fecore_new<FETrussDomain   >(sz, nullptr); break;
+		case FE_DOMAIN_2D      : pd = fecore_new<FEDomain2D      >(sz, nullptr); break;
+		case FE_DOMAIN_DISCRETE: pd = fecore_new<FEDiscreteDomain>(sz, nullptr); break;
+		}
 		assert(pd);
 		pd->SetMesh(this);
 

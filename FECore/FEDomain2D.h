@@ -33,6 +33,7 @@ SOFTWARE.*/
 //! Abstract base class for shell elements
 class FECORE_API FEDomain2D : public FEDomain
 {
+    FECORE_SUPER_CLASS
     FECORE_BASE_CLASS(FEDomain2D)
 
 public:

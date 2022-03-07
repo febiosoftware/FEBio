@@ -31,7 +31,7 @@
 #include "FEMultiphasicFSI.h"
 #include "FEBiphasicFSI.h"
 #include "FEFluidFSI.h"
-#include <FECore/FEDomain.h>
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 FEDomain* FEMultiphasicFSIDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
@@ -61,7 +61,7 @@ FEDomain* FEMultiphasicFSIDomainFactory::CreateDomain(const FE_Element_Spec& spe
     
     if (sztype)
     {
-        FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
+        FEDomain* pd = fecore_new<FESolidDomain>(sztype, pfem);
         if (pd) pd->SetMaterial(pmat);
         return pd;
     }

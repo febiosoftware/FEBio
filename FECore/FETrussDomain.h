@@ -33,6 +33,7 @@ SOFTWARE.*/
 //! Abstract base class for truss elements
 class FECORE_API FETrussDomain : public FEDomain
 {
+	FECORE_SUPER_CLASS
 	FECORE_BASE_CLASS(FETrussDomain)
 
 public:

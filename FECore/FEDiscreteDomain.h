@@ -33,6 +33,7 @@ SOFTWARE.*/
 //! domain for discrete elements
 class FECORE_API FEDiscreteDomain : public FEDomain
 {
+	FECORE_SUPER_CLASS
 	FECORE_BASE_CLASS(FEDiscreteDomain)
 
 public:

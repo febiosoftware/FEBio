@@ -49,26 +49,20 @@ SOFTWARE.*/
 FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
 	FEModel* pfem = pmat->GetFEModel();
-	const char* sztype = 0;
 	FE_Element_Class eclass = spec.eclass;
 	FE_Element_Shape eshape = spec.eshape;
 	FE_Element_Type etype = spec.etype;
-	if (dynamic_cast<FERigidMaterial*>(pmat))
+
+	// this will store the domain we are going to allocate
+	FEDomain* pd = nullptr;
+
+	// try to allocate the domain
+	if (eclass == FE_ELEM_SOLID)
 	{
-		// rigid elements
-		if      (eclass == FE_ELEM_SOLID) sztype = "rigid-solid";
-		else if (eclass == FE_ELEM_SHELL) 
-		{
-			if (spec.m_shell_formulation == OLD_SHELL) sztype = "rigid-shell-old";
-			else sztype = "rigid-shell";
-		}
-		else return 0;
-	}
-	else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
-	else if (dynamic_cast<FESolidMaterial*>(pmat))
-	{
-		// structural elements
-		if (eshape == ET_HEX8)
+		const char* sztype = nullptr;
+		if      (dynamic_cast<FERigidMaterial*            >(pmat)) sztype = "rigid-solid";
+		else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
+		else if (eshape == ET_HEX8)
 		{
 			// three-field implementation for uncoupled materials
 			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
@@ -80,7 +74,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		}
 		else if ((eshape == ET_TET10) || (eshape == ET_TET15) || (eshape == ET_TET20))
 		{
-			if ((etype == FE_TET10G8RI4)||(etype == FE_TET10G4RI1))
+			if ((etype == FE_TET10G8RI4) || (etype == FE_TET10G4RI1))
 			{
 				sztype = "sri-solid";
 			}
@@ -110,59 +104,81 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
 			else sztype = "elastic-solid";
 		}
-        else if (eshape == ET_PENTA15)
-        {
-            // three-field implementation for uncoupled materials
+		else if (eshape == ET_PENTA15)
+		{
+			// three-field implementation for uncoupled materials
 //          if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";
-            sztype = "elastic-solid";
-        }
+			sztype = "elastic-solid";
+		}
 		else if (eshape == ET_PYRA5)
 		{
 			// three-field implementation for uncoupled materials
 			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) sztype = "three-field-solid";
 			else sztype = "elastic-solid";
 		}
-		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3) || (eshape == ET_QUAD8) || (eshape == ET_TRI6))
+
+		if (sztype) pd = fecore_new<FESolidDomain>(sztype, pfem);
+	}
+	else if (eclass == FE_ELEM_SHELL)
+	{
+		const char* sztype = nullptr;
+		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
-			switch (spec.m_shell_formulation)
+			if (spec.m_shell_formulation == OLD_SHELL) sztype = "rigid-shell-old";
+			else sztype = "rigid-shell";
+		}
+		else if (dynamic_cast<FESolidMaterial*>(pmat))
+		{
+			if ((eshape == ET_QUAD4) || (eshape == ET_TRI3) || (eshape == ET_QUAD8) || (eshape == ET_TRI6))
 			{
-			case NEW_SHELL:
-                    // three-field implementation for uncoupled materials
-                    if (dynamic_cast<FEUncoupledMaterial*>(pmat)) {
-                        if (spec.m_bthree_field) sztype = "three-field-shell";
-                        else if ((eshape == ET_QUAD4) && spec.m_bthree_field) sztype = "three-field-shell";
-                        else if ((eshape == ET_TRI3) && spec.m_bthree_field) sztype = "three-field-shell";
-                        else sztype = "elastic-shell";
-                    }
-                    else
-                        sztype = "elastic-shell";
-                    break;
-			case OLD_SHELL: sztype = "elastic-shell-old"; break;
-            case EAS_SHELL: sztype = "elastic-shell-eas"; break;
-            case ANS_SHELL: sztype = "elastic-shell-ans"; break;
-			default:
-				return 0;
+				switch (spec.m_shell_formulation)
+				{
+				case NEW_SHELL:
+					// three-field implementation for uncoupled materials
+					if (dynamic_cast<FEUncoupledMaterial*>(pmat)) {
+						if (spec.m_bthree_field) sztype = "three-field-shell";
+						else if ((eshape == ET_QUAD4) && spec.m_bthree_field) sztype = "three-field-shell";
+						else if ((eshape == ET_TRI3) && spec.m_bthree_field) sztype = "three-field-shell";
+						else sztype = "elastic-shell";
+					}
+					else sztype = "elastic-shell";
+					break;
+				case OLD_SHELL: sztype = "elastic-shell-old"; break;
+				case EAS_SHELL: sztype = "elastic-shell-eas"; break;
+				case ANS_SHELL: sztype = "elastic-shell-ans"; break;
+				default:
+					return 0;
+				}
 			}
 		}
-		else if (eshape == ET_TRUSS2) sztype = "elastic-truss";
-		else return 0;
+
+		if (sztype) pd = fecore_new<FEShellDomain>(sztype, pfem);
 	}
-	else if (dynamic_cast<FEDiscreteMaterial*>(pmat))
+	else if (eclass == FE_ELEM_TRUSS)
 	{
-//		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring";
-		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring2";
-		else if (eclass == FE_ELEM_DISCRETE)
+		const char* sztype = nullptr;
+		if (dynamic_cast<FESolidMaterial*>(pmat))
+			if (eshape == ET_TRUSS2) sztype = "elastic-truss";
+
+		if (sztype) pd = fecore_new<FETrussDomain>(sztype, pfem);
+	}
+	else if (eclass == FE_ELEM_DISCRETE)
+	{
+		const char* sztype = nullptr;
+		if (dynamic_cast<FEDiscreteMaterial*>(pmat))
 		{
-			if (dynamic_cast<FEDiscreteElasticMaterial*>(pmat)) sztype = "discrete";
+	//		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring";
+			if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring2";
+			else if (eclass == FE_ELEM_DISCRETE)
+			{
+				if (dynamic_cast<FEDiscreteElasticMaterial*>(pmat)) sztype = "discrete";
+			}
+			else return 0;
 		}
-		else return 0;
+
+		if (sztype) pd = fecore_new<FEDiscreteDomain>(sztype, pfem);
 	}
 
-	if (sztype)
-	{
-		FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
-		if (pd) pd->SetMaterial(pmat);
-		return pd;
-	}
-	else return 0;
+	if (pd) pd->SetMaterial(pmat);
+	return pd;
 }

@@ -584,7 +584,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 		if (newElems > 0)
 		{
 			// create a copy of old domain (since we want to retain the old domain)
-			FEDomain* newDom = fecore_new<FEDomain>(oldDom.GetTypeStr(), &fem);
+			FEDomain* newDom = fecore_new<FESolidDomain>(oldDom.GetTypeStr(), &fem);
 			newDom->Create(NE0, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 			for (int j = 0; j < NE0; ++j)
 			{

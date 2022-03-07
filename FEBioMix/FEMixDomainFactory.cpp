@@ -42,40 +42,29 @@ FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* 
 {
 	FEModel* pfem = pmat->GetFEModel();
 	FE_Element_Class eclass = spec.eclass;
-	const char* sztype = 0;
-	if (dynamic_cast<FEBiphasic*>(pmat))
+
+	FEDomain* pd = nullptr;
+
+	if (eclass == FE_ELEM_SOLID)
 	{
-		// biphasic elements
-		if (eclass == FE_ELEM_SOLID) sztype = "biphasic-solid";
-        else if (eclass == FE_ELEM_SHELL) sztype = "biphasic-shell";
-		else return 0;
+		const char* sztype = 0;
+		if      (dynamic_cast<FEBiphasic*      >(pmat)) sztype = "biphasic-solid";
+		else if (dynamic_cast<FEBiphasicSolute*>(pmat)) sztype = "biphasic-solute-solid";
+		else if (dynamic_cast<FETriphasic*     >(pmat)) sztype = "triphasic-solid";
+		else if (dynamic_cast<FEMultiphasic*   >(pmat)) sztype = "multiphasic-solid";
+
+		if (sztype) pd = fecore_new<FESolidDomain>(sztype, pfem);
 	}
-	if (dynamic_cast<FEBiphasicSolute*>(pmat))
+	else if (eclass == FE_ELEM_SHELL)
 	{
-		// biphasic solute elements
-		if (eclass == FE_ELEM_SOLID) sztype = "biphasic-solute-solid";
-        else if (eclass == FE_ELEM_SHELL) sztype = "biphasic-solute-shell";
-		else return 0;
-	}
-	else if (dynamic_cast<FETriphasic*>(pmat))
-	{
-		// triphasic elements
-		if (eclass == FE_ELEM_SOLID) sztype = "triphasic-solid";
-		else return 0;
-	}
-	if (dynamic_cast<FEMultiphasic*>(pmat))
-	{
-		// multiphasic elements
-		if (eclass == FE_ELEM_SOLID)  sztype = "multiphasic-solid";
-        else if (eclass == FE_ELEM_SHELL) sztype = "multiphasic-shell";
-		else return 0;
+		const char* sztype = 0;
+		if      (dynamic_cast<FEBiphasic*      >(pmat)) sztype = "biphasic-shell";
+		else if (dynamic_cast<FEBiphasicSolute*>(pmat)) sztype = "biphasic-solute-shell";
+		else if (dynamic_cast<FEMultiphasic*   >(pmat)) sztype = "multiphasic-shell";
+
+		if (sztype) pd = fecore_new<FEShellDomain>(sztype, pfem);
 	}
 
-	if (sztype)
-	{
-		FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
-		if (pd) pd->SetMaterial(pmat);
-		return pd;
-	}
-	else return 0;
+	if (pd) pd->SetMaterial(pmat);
+	return pd;
 }

@@ -247,7 +247,11 @@ enum SUPER_CLASS_ID {
 	FERIGIDOBJECT_ID,				// derived from FECoreBase (TODO: work in progress)
 	FENLCLOGDATA_ID,             	// derived from FELogNLConstraintData
 	FECALLBACK_ID,					// derived from FECallBack
-	FEDOMAIN_ID,					// derived from FEDomain (TODO: work in progress)
+	FESOLIDDOMAIN_ID,				// derived from FESolidDomain (TODO: work in progress)
+	FESHELLDOMAIN_ID,				// derived from FEShellDomain (TODO: work in progress)
+	FETRUSSDOMAIN_ID,				// derived from FETrussDomain (TODO: work in progress)
+	FEDISCRETEDOMAIN_ID,			// derived from FEDiscreteDomain (TODO: work in progress)
+	FEDOMAIN2D_ID,					// derived from FEDomain2D (TODO: work in progress)
 	FESURFACE_ID,					// derived from FESurface (TODO: work in progress)
 	FEIC_ID,						// derived from initial condition
 	FENODEDATAGENERATOR_ID,			// derived from FENodeDataGenerator
@@ -271,7 +275,7 @@ enum SUPER_CLASS_ID {
 	FEDATARECORD_ID,				// derived from DataRecord
 	FELOGSURFACEDATA_ID,			// derived from FELogSurfaceData
 	FELOGDOMAINDATA_ID,				// derived from FELogDomainData
-	FECLASS_ID						// derivde from FECoreClass
+	FECLASS_ID						// derived from FECoreClass
 };
 
 ///////////////////////////////////////////////////////////////////////////////

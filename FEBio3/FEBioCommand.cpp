@@ -653,7 +653,8 @@ const char* super_id_to_string(SUPER_CLASS_ID superID)
 	case FERIGIDOBJECT_ID     : szclass = "RIGIDOBJECT"; break;
 	case FENLCLOGDATA_ID      : szclass = "NLCLOGDATA"; break;
 	case FECALLBACK_ID        : szclass = "CALLBACK"; break;
-	case FEDOMAIN_ID          : szclass = "DOMAIN"; break;
+	case FESOLIDDOMAIN_ID     : szclass = "SOLIDDOMAIN"; break;
+	case FESHELLDOMAIN_ID     : szclass = "SHELLDOMAIN"; break;
 	case FESURFACE_ID         : szclass = "SURFACE"; break;
 	case FEIC_ID              : szclass = "IC"; break;
 	case FENODEDATAGENERATOR_ID: szclass = "NODEDATAGENERATOR"; break;
