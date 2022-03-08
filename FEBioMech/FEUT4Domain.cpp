@@ -244,10 +244,13 @@ void FEUT4Domain::SetUT4Parameters(double alpha, bool bdev)
 //! override Create so we can grab the ut4 parameters
 bool FEUT4Domain::Create(int nelems, FE_Element_Spec espec)
 {
-	if (espec.m_but4 == false) return false;
+	// some sanity checks first
+	if (espec.eclass != FE_Element_Class::FE_ELEM_SOLID) return false;
+	if (espec.eshape != FE_Element_Shape::ET_TET4) return false;
 
 	m_alpha = espec.m_ut4_alpha;
 	m_bdev = espec.m_ut4_bdev;
+	espec.m_but4 = true;
 
 	return FEElasticSolidDomain::Create(nelems, espec);
 }

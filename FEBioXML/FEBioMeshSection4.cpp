@@ -418,24 +418,8 @@ void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
 		partDomain->SetElementSpec(newSpec);
 	}
 
-	// see if the three_field flag is defined
-	const char* sz3field = tag.AttributeValue("three_field", true);
-	if (sz3field)
-	{
-		if (strcmp(sz3field, "on") == 0)
-		{
-			FE_Element_Spec espec = partDomain->ElementSpec();
-			espec.m_bthree_field = true;
-			partDomain->SetElementSpec(espec);
-		}
-		else if (strcmp(sz3field, "off") == 0)
-		{
-			FE_Element_Spec espec = partDomain->ElementSpec();
-			espec.m_bthree_field = false;
-			partDomain->SetElementSpec(espec);
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "three_field", sz3field);
-	}
+	// get the (optional) type attribute
+	const char* sztype = tag.AttributeValue("type", true);
 
 	// --- build the domain --- 
 	// we'll need the kernel for creating domains
@@ -448,15 +432,26 @@ void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
 	FE_Element_Spec spec = partDomain->ElementSpec();
 
 	// create the domain
-	FEDomain* dom = febio.CreateDomain(spec, &mesh, mat);
-	if (dom == 0) throw XMLReader::InvalidTag(tag);
+	FEDomain* dom = nullptr;
+	if (sztype)
+	{
+		// if the type attribute is defined, try to allocate the domain class directly. 
+		dom = febio.CreateDomainExplicit(FESOLIDDOMAIN_ID, sztype, &fem);
+		if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, sztype);
+		dom->SetMaterial(mat);
+	}
+	else
+	{
+		// if not, then use "old" logic, which tries to match the domain using the 
+		// domain factories. 
+		dom = febio.CreateDomain(spec, &mesh, mat);
+		if (dom == 0) throw XMLReader::InvalidTag(tag);
+	}
 
+	// add it to the mesh
 	mesh.AddDomain(dom);
 
-	// TODO: Should the domain parameters be read in before
-	//       the domain is created? For UT4 domains, this is necessary
-	//       since the initial ut4 parameters are copied from the element spec.
-	//       but they can be overridden by the parameters.
+	// Allocate elements
 	if (dom->Create(elems, spec) == false)
 	{
 		throw XMLReader::InvalidTag(tag);
@@ -472,6 +467,12 @@ void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
 	string domName = partName + partDomain->Name();
 	dom->SetName(domName);
 
+	// read additional parameters
+	if (tag.isleaf() == false)
+	{
+		ReadParameterList(tag, dom);
+	}
+
 	// process element data
 	for (int j = 0; j < elems; ++j)
 	{
@@ -483,12 +484,6 @@ void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
 		// TODO: This assumes one-based indexing of all nodes!
 		int ne = el.Nodes();
 		for (int n = 0; n < ne; ++n) el.m_node[n] = domElement.node[n] - 1;
-	}
-
-	// read additional parameters
-	if (tag.isleaf() == false)
-	{
-		ReadParameterList(tag, dom);
 	}
 }
 
@@ -530,24 +525,8 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
         partDomain->SetElementSpec(newSpec);
     }
     
-	// see if the three_field flag is defined
-	const char* sz3field = tag.AttributeValue("three_field", true);
-	if (sz3field)
-	{
-		if (strcmp(sz3field, "on") == 0)
-		{
-			FE_Element_Spec espec = partDomain->ElementSpec();
-			espec.m_bthree_field = true;
-			partDomain->SetElementSpec(espec);
-		}
-		else if (strcmp(sz3field, "off") == 0)
-		{
-			FE_Element_Spec espec = partDomain->ElementSpec();
-			espec.m_bthree_field = false;
-			partDomain->SetElementSpec(espec);
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "three_field", sz3field);
-	}
+	// get the (optional) type attribute
+	const char* sztype = tag.AttributeValue("type", true);
 
 	// --- build the domain --- 
 	// we'll need the kernel for creating domains
@@ -560,8 +539,21 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	FE_Element_Spec spec = partDomain->ElementSpec();
 
 	// create the domain
-	FEShellDomainNew* dom = dynamic_cast<FEShellDomainNew*>(febio.CreateDomain(spec, &mesh, mat));
-	if (dom == 0) throw XMLReader::InvalidTag(tag);
+	FEDomain* dom = nullptr;
+	if (sztype)
+	{
+		// if the type attribute is defined, try to allocate the domain class directly. 
+		dom = febio.CreateDomainExplicit(FESHELLDOMAIN_ID, sztype, &fem);
+		if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, sztype);
+		dom->SetMaterial(mat);
+	}
+	else
+	{
+		// if not, then use "old" logic, which tries to match the domain using the 
+		// domain factories. 
+		dom = febio.CreateDomain(spec, &mesh, mat);
+		if (dom == 0) throw XMLReader::InvalidTag(tag);
+	}
 
 	mesh.AddDomain(dom);
 
@@ -587,20 +579,24 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	}
 
 	// process element data
-	double h0 = dom->DefaultShellThickness();
-	for (int j = 0; j < elems; ++j)
+	FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(dom);
+	if (shellDomain)
 	{
-		const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
-
-		FEShellElement& el = dom->Element(j);
-		el.SetID(domElement.id);
-
-		// TODO: This assumes one-based indexing of all nodes!
-		int ne = el.Nodes();
-		for (int n = 0; n < ne; ++n)
+		double h0 = shellDomain->DefaultShellThickness();
+		for (int j = 0; j < elems; ++j)
 		{
-			el.m_node[n] = domElement.node[n] - 1;
-			el.m_h0[n] = h0;
+			const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
+
+			FEShellElement& el = shellDomain->Element(j);
+			el.SetID(domElement.id);
+
+			// TODO: This assumes one-based indexing of all nodes!
+			int ne = el.Nodes();
+			for (int n = 0; n < ne; ++n)
+			{
+				el.m_node[n] = domElement.node[n] - 1;
+				el.m_h0[n] = h0;
+			}
 		}
 	}
 }

@@ -136,8 +136,11 @@ public:
 	//! Register a new domain class
 	void RegisterDomain(FEDomainFactory* pf, bool pushFront = false);
 
-	//! Create a domain of a certain type
+	//! Create a domain of a certain type (this uses the domain factories)
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
+
+	//! Create a domain of a certain type (this does not use the domain factories)
+	FEDomain* CreateDomainExplicit(int superClass, const char* sztype, FEModel* fem);
 
 public:
 	//! set the default linear solver

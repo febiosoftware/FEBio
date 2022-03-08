@@ -51,6 +51,20 @@ void FEUDGHexDomain::SetHourGlassParameter(double hg)
 }
 
 //-----------------------------------------------------------------------------
+bool FEUDGHexDomain::Create(int nelems, FE_Element_Spec spec)
+{
+	// make sure these solid, hex8 elements are requested
+	if (spec.eclass != FE_Element_Class::FE_ELEM_SOLID) return false;
+	if (spec.eshape != FE_Element_Shape::ET_HEX8) return false;
+
+	// we need to enforce HEX8G1 integration rule
+	spec.etype = FE_HEX8G1;
+
+	// now allocate the domain
+	return FESolidDomain::Create(nelems, spec);
+}
+
+//-----------------------------------------------------------------------------
 void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector

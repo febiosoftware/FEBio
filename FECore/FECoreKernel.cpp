@@ -574,3 +574,10 @@ FEDomain* FECoreKernel::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FE
 	}
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype, FEModel* fem)
+{
+	FEDomain* domain = (FEDomain*)Create(superClass, sztype, fem);
+	return domain;
+}
