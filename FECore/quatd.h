@@ -315,8 +315,7 @@ public:
 	void GetEuler(double& x, double& y, double& z) const;
 
 public:
-	double w;
-	double x, y, z;
+	double x, y, z, w;
 };
 
 inline quatd operator * (const double a, const quatd& q)
