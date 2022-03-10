@@ -201,12 +201,18 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxY            , "wy");
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxZ            , "wz");
 	REGISTER_FECORE_CLASS(FELogElemPorosity              , "porosity");
-	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 0     , "Kp11");
-	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 1     , "Kp22");
-	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 2     , "Kp33");
-	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 3     , "Kp12");
-	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 4     , "Kp23");
-	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 5     , "Kp13");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 0     , "Kpxx");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 1     , "Kpyy");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 2     , "Kpzz");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 3     , "Kpxy");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 4     , "Kpyz");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 5     , "Kpxz");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 0, "esxx");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 1, "esyy");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 2, "eszz");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 3, "esxy");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 4, "esyz");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 5, "esxz");
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)

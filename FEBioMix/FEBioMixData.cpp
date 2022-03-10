@@ -336,3 +336,28 @@ double FELogElemPermeability::value(FEElement& el)
 	}
 	return val / (double)nint;
 }
+
+//-----------------------------------------------------------------------------
+double FELogElemSolidStress::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		const FEMaterialPoint* mp = el.GetMaterialPoint(i);
+		const FEBiphasicMaterialPoint* pt = (mp->ExtractData<FEBiphasicMaterialPoint>());
+
+		mat3ds ss = pt->m_ss;
+
+		switch (m_comp)
+		{
+		case 0: val += ss(0, 0); break;
+		case 1: val += ss(1, 1); break;
+		case 2: val += ss(2, 2); break;
+		case 3: val += ss(0, 1); break;
+		case 4: val += ss(1, 2); break;
+		case 5: val += ss(0, 2); break;
+		}
+	}
+	return val / (double)nint;
+}

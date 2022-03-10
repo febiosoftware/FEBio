@@ -267,3 +267,19 @@ class FELogElemPermeability_T : public FELogElemPermeability
 {
 public: FELogElemPermeability_T(FEModel* fem) : FELogElemPermeability(fem, n) {}
 };
+
+//-----------------------------------------------------------------------------
+class FELogElemSolidStress : public FELogElemData
+{
+public:
+	FELogElemSolidStress(FEModel* fem, int n) : FELogElemData(fem) { m_comp = n; }
+	double value(FEElement& el);
+protected:
+	int	m_comp;
+};
+
+template <int n>
+class FELogElemSolidStress_T : public FELogElemSolidStress
+{
+public: FELogElemSolidStress_T(FEModel* fem) : FELogElemSolidStress(fem, n) {}
+};
