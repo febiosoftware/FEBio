@@ -64,7 +64,7 @@ void clevmar_cb(double *p, double *hx, int m, int n, void *adata)
 	// store the measurement vector
 	vector<double> y(n, 0.0);
 	opt.GetObjective().Evaluate(y);
-	for (int i=0; i<n; ++i) hx[i] = y[i];
+	for (int i = 0; i < n; ++i) hx[i] = y[i];
 
 	// store the last calculated values
 	pLM->m_yopt = y;
@@ -180,7 +180,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	amin = a;
 	ymin = m_yopt;
 	if (minObj) *minObj = fret;
-    
+
 	return true;
 }
 

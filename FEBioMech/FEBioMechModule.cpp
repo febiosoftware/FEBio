@@ -114,6 +114,7 @@ SOFTWARE.*/
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include "FESpringMaterial.h"
+#include "FENonlinearSpring.h"
 #include "FEDiscreteElementMaterial.h"
 #include "FEElasticMultigeneration.h"
 #include "FEPRLig.h"
@@ -427,7 +428,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FECompositeDiscreteMaterial, "discrete composite");
 	REGISTER_FECORE_CLASS(FELinearSpring, "linear spring");
 	REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, "tension-only linear spring");
-	REGISTER_FECORE_CLASS(FENonLinearSpring, "nonlinear spring");
+	REGISTER_FECORE_CLASS(FENonlinearSpringMaterial, "nonlinear spring");
 	REGISTER_FECORE_CLASS(FEExperimentalSpring, "experimental spring");
 	REGISTER_FECORE_CLASS(FEDiscreteContractileMaterial, "Hill");
 	REGISTER_FECORE_CLASS(FETorsionalSpring, "torsion spring");

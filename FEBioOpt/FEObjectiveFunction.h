@@ -75,6 +75,9 @@ public:
 	// return the FE model
 	FEModel* GetFEModel() { return m_fem; }
 
+public:
+	double RegressionCoefficient(const std::vector<double>& y0, const std::vector<double>& y);
+
 public: // These functions need to be implemented by derived classes
 
 	// return number of measurements (i.e. nr of terms in objective function)
