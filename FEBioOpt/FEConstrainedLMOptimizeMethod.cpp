@@ -63,9 +63,8 @@ void clevmar_cb(double *p, double *hx, int m, int n, void *adata)
 
 	// store the measurement vector
 	vector<double> y(n, 0.0);
-    double fobj, R2;
-	opt.GetObjective().Evaluate(y, fobj, R2);
-	for (int i=0; i<n; ++i) hx[i] = y[i];
+	opt.GetObjective().Evaluate(y);
+	for (int i = 0; i < n; ++i) hx[i] = y[i];
 
 	// store the last calculated values
 	pLM->m_yopt = y;
@@ -82,7 +81,7 @@ FEConstrainedLMOptimizeMethod::FEConstrainedLMOptimizeMethod()
 }
 
 //-----------------------------------------------------------------------------
-bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj, double* minR2)
+bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
 {
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
@@ -116,7 +115,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	opt.m_niter = 0;
 
 	// return value
-	double fret = 0.0, R2 = 0.0;
+	double fret = 0.0;
 
 	int niter = 1;
 
@@ -163,7 +162,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 		for (int i=0; i<ma; ++i) a[i] = p[i];
 
 		// store the optimal values
-		obj.Evaluate(m_yopt, fret, R2);
+		fret = obj.Evaluate(m_yopt);
 
 		delete [] q;
 		delete [] ub;
@@ -180,11 +179,8 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	// return optimal values
 	amin = a;
 	ymin = m_yopt;
-    if (minObj) {
-        *minObj = fret;
-        *minR2 = R2;
-    }
-    
+	if (minObj) *minObj = fret;
+
 	return true;
 }
 
@@ -210,8 +206,7 @@ void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a,
 	
 	// evaluate at a
 	if (opt.FESolve(a) == false) throw FEErrorTermination();
-    double fobj, R2;
-	opt.GetObjective().Evaluate(y, fobj, R2);
+	opt.GetObjective().Evaluate(y);
 	m_yopt = y;
 
 	// now calculate the derivatives using forward differences
@@ -225,7 +220,7 @@ void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a,
 		a1[i] = a1[i] + dir[i]*m_fdiff*(b + fabs(a[i]));
 
 		if (opt.FESolve(a1) == false) throw FEErrorTermination();
-		opt.GetObjective().Evaluate(y1, fobj, R2);
+		opt.GetObjective().Evaluate(y1);
 		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
 		a1[i] = a[i];
 	}

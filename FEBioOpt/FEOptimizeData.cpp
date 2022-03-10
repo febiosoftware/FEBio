@@ -177,8 +177,8 @@ bool FEOptimizeData::Solve()
 	int NVAR = (int) m_Var.size();
 	vector<double> amin(NVAR, 0.0);
 	vector<double> ymin;
-	double minObj = 0.0, minR2 = 0.0;
-	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj, &minR2);
+	double minObj = 0.0;
+	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj);
 	if (bret)
 	{
 		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
@@ -186,6 +186,11 @@ bool FEOptimizeData::Solve()
 		feLog("\tFunction values:\n\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
 			feLog("\t\t%15lg\n", ymin[i]);
+
+		// evaluate final regression coefficient
+		vector<double> y0;
+		m_obj->GetMeasurements(y0);
+		double minR2 = m_obj->RegressionCoefficient(y0, ymin);
 
 		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);

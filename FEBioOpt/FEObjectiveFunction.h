@@ -65,16 +65,19 @@ public:
 
 	// evaluate objective function
 	// also returns the function values in f
-	virtual void Evaluate(vector<double>& f, double &chisq, double &rsq);
+	virtual double Evaluate(std::vector<double>& f);
 
 	// evaluate objective function
-	void Evaluate(double &chisq, double &rsq);
+	double Evaluate();
 
 	// print output to screen or not
 	void SetVerbose(bool b) { m_verbose = b; }
 
 	// return the FE model
 	FEModel* GetFEModel() { return m_fem; }
+
+public:
+	double RegressionCoefficient(const std::vector<double>& y0, const std::vector<double>& y);
 
 public: // These functions need to be implemented by derived classes
 
