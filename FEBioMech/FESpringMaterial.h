@@ -82,25 +82,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! general purpose nonlinear spring
-class FEBIOMECH_API FENonLinearSpring : public FESpringMaterial
-{
-public:
-	FENonLinearSpring(FEModel* pfem);
-    
-	double force    (double dl) override;
-	double stiffness(double dl) override;
-	double strainEnergy(double dl) override;
-
-public:
-	FEFunction1D*	m_F;	//!< force-displacement function
-	double			m_scale;	// scale factor for force
-
-	// declare the parameter list
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
 class FEBIOMECH_API FEExperimentalSpring : public FESpringMaterial
 {
 public:

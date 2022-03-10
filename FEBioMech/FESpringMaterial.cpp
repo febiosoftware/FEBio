@@ -127,37 +127,6 @@ double FETensionOnlyLinearSpring::strainEnergy(double dl)
 }
 
 //-----------------------------------------------------------------------------
-// FENonLinearSpring
-//-----------------------------------------------------------------------------
-
-// define the material parameters
-BEGIN_FECORE_CLASS(FENonLinearSpring, FESpringMaterial)
-	ADD_PARAMETER(m_scale, "scale");
-	ADD_PROPERTY(m_F, "force");
-END_FECORE_CLASS();
-
-FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
-{
-	m_F = nullptr;
-	m_scale = 1.0;
-}
-
-double FENonLinearSpring::force(double dl)
-{
-	return m_scale*m_F->value(dl);
-}
-
-double FENonLinearSpring::stiffness(double dl)
-{
-	return m_scale*m_F->derive(dl);
-}
-
-double FENonLinearSpring::strainEnergy(double dl)
-{
-	return m_scale*m_F->integrate(0, dl);
-}
-
-//-----------------------------------------------------------------------------
 // FEExperimentalSpring
 //-----------------------------------------------------------------------------
 
