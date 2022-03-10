@@ -23,23 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEGeneralSpring.h"
+#include "FENonlinearSpring.h"
 
-BEGIN_FECORE_CLASS(FEGeneralSpringMaterial, FEDiscreteElasticMaterial)
+BEGIN_FECORE_CLASS(FENonlinearSpringMaterial, FEDiscreteElasticMaterial)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_measure, "measure", 0, "elongation\0strain\0stretch\0");
 	ADD_PROPERTY(m_F, "force");
 END_FECORE_CLASS();
 
 
-FEGeneralSpringMaterial::FEGeneralSpringMaterial(FEModel* pfem) : FEDiscreteElasticMaterial(pfem) 
+FENonlinearSpringMaterial::FENonlinearSpringMaterial(FEModel* pfem) : FEDiscreteElasticMaterial(pfem)
 {
 	m_scale = 1.0;
 	m_measure = 0;
 	m_F = nullptr;
 }
 
-vec3d FEGeneralSpringMaterial::Force(FEDiscreteMaterialPoint& mp)
+vec3d FENonlinearSpringMaterial::Force(FEDiscreteMaterialPoint& mp)
 {
 	vec3d t = mp.m_drt; t.unit();
 
@@ -66,7 +66,7 @@ vec3d FEGeneralSpringMaterial::Force(FEDiscreteMaterialPoint& mp)
 	return t*F;
 }
 
-mat3d FEGeneralSpringMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
+mat3d FENonlinearSpringMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 {
 	vec3d e = mp.m_drt; e.unit();
 
@@ -106,7 +106,7 @@ mat3d FEGeneralSpringMaterial::Stiffness(FEDiscreteMaterialPoint& mp)
 	return A;
 }
 
-double FEGeneralSpringMaterial::StrainEnergy(FEDiscreteMaterialPoint& mp)
+double FENonlinearSpringMaterial::StrainEnergy(FEDiscreteMaterialPoint& mp)
 {
 	// TODO: implement this
 	assert(false);

@@ -31,10 +31,10 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! This class implements a non-linear spring where users can choose what 
 //! deformation measure to use in the force curve. 
-class FEBIOMECH_API FEGeneralSpringMaterial : public FEDiscreteElasticMaterial
+class FEBIOMECH_API FENonlinearSpringMaterial : public FEDiscreteElasticMaterial
 {
 public:
-	FEGeneralSpringMaterial(FEModel* pfem);
+	FENonlinearSpringMaterial(FEModel* pfem);
 
 	vec3d Force(FEDiscreteMaterialPoint& mp) override;
 	mat3d Stiffness(FEDiscreteMaterialPoint& mp) override;
