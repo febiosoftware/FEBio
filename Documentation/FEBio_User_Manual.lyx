@@ -4059,8 +4059,12 @@ With the optional arguments, the complete syntax would be:
 
 \begin_layout Standard
 The dump level can set to 1 (= write dump file after each converged time
- step), or 2 (= write dump file after each completed step).
- 
+ step), 2 (= write dump file after each completed step), 
+ or 3 (= write dump file after each converged 
+ \shape italic
+ must-point
+ \shape default
+ ).
 \end_layout
 
 \begin_layout Standard

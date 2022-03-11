@@ -40,7 +40,8 @@ SOFTWARE.*/
 enum FE_Dump_Level {
 	FE_DUMP_NEVER,			// never write a dump file
 	FE_DUMP_MAJOR_ITRS,		// create a dump file at the end of each converged time step
-	FE_DUMP_STEP			// create a dump file at the end of an analysis step
+	FE_DUMP_STEP,			// create a dump file at the end of an analysis step
+	FE_DUMP_MUST_POINTS     // create a dump file only on must-points
 };
 
 //-----------------------------------------------------------------------------

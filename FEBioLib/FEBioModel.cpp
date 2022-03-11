@@ -592,12 +592,21 @@ void FEBioModel::WriteData(unsigned int nevent)
 //! Dump state to archive for restarts
 void FEBioModel::DumpData(int nevent)
 {
+	// get the current step
+	FEAnalysis* pstep = GetCurrentStep();
 	int ndump = GetDumpLevel();
 	if (ndump == FE_DUMP_NEVER) return;
 
 	bool bdump = false;
-	if ((nevent == CB_STEP_SOLVED) && (ndump == FE_DUMP_STEP)) bdump = true;
-	if ((nevent == CB_MAJOR_ITERS) && (ndump == FE_DUMP_MAJOR_ITRS)) bdump = true;
+	switch (nevent)
+	{
+	case CB_MAJOR_ITERS:
+		if (ndump == FE_DUMP_MAJOR_ITRS) bdump = true;
+		if ((ndump == FE_DUMP_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bdump = true;
+		break;
+	case CB_STEP_SOLVED: if (ndump == FE_DUMP_STEP) bdump = true; break;
+	}
+	
 	if (bdump)
 	{
 		DumpFile ar(*this);
