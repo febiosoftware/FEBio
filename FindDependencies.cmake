@@ -47,7 +47,7 @@ if(MKLROOT)
             
         find_library(MKL_OMP_LIB 
             NAMES iomp5 iomp5md libiomp5md.lib
-            PATHS ${MKLROOT}/../lib ${MKLROOT}/../compiler/lib
+            PATHS ${MKLROOT}/lib ${MKLROOT}/../lib ${MKLROOT}/../compiler/lib
             PATH_SUFFIXES "intel64" "intel32"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
