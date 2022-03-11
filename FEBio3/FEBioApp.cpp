@@ -288,8 +288,8 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		else if (strncmp(sz, "-dump", 5) == 0)
 		{
 			ops.dumpLevel = FE_DUMP_MAJOR_ITRS;
-			if (sz[8] == '=') ops.dumpLevel = atoi(sz + 9);
-			if ((ops.dumpLevel < 0) || (ops.dumpLevel > 2))
+			if (sz[5] == '=') ops.dumpLevel = atoi(sz + 6);
+			if ((ops.dumpLevel < 0) || (ops.dumpLevel > 3))
 			{
 				fprintf(stderr, "FATAL ERROR: invalid restart level.\n");
 				return false;
