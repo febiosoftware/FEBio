@@ -135,4 +135,5 @@ public:
 	int     m_npmodel;      //!< pressure model for U(J)
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEUncoupledMaterial)
 };

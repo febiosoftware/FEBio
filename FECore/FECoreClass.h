@@ -31,6 +31,7 @@ SOFTWARE.*/
 class FECORE_API FECoreClass : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FECoreClass);
 
 public:
 	FECoreClass(FEModel* fem = nullptr);

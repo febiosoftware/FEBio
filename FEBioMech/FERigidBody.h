@@ -45,6 +45,7 @@ class FERigidBodyDisplacement;
 class FEBIOMECH_API FERigidBody : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FERigidBody)
 
 public:
 	// Constructor

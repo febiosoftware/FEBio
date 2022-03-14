@@ -35,6 +35,7 @@ SOFTWARE.*/
 class FECORE_API FEGlobalData : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEGlobalData)
 
 public:
 	//! constructor

@@ -108,7 +108,7 @@ void FEFatigueMaterialPoint::Serialize(DumpStream& ar)
 //////////////////////////// FATIGUE MATERIAL /////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFatigueMaterial, FEMaterial)
+BEGIN_FECORE_CLASS(FEFatigueMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_k0   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k0"  );
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
 

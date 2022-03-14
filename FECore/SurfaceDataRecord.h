@@ -34,6 +34,7 @@ class FESurface;
 class FECORE_API FELogSurfaceData : public FECoreBase
 {
     FECORE_SUPER_CLASS
+    FECORE_BASE_CLASS(FELogSurfaceData);
 
 public:
     FELogSurfaceData(FEModel* fem) : FECoreBase(fem) {}

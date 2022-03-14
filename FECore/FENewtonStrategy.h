@@ -42,6 +42,7 @@ class LinearSolver;
 class FECORE_API FENewtonStrategy : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FENewtonStrategy)
 
 public:
 	FENewtonStrategy(FEModel* fem);

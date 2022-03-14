@@ -87,7 +87,7 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds fs = m_fib.DevFiberStress(mp,m_fib.FiberVector(mp));
 
 	// calculate the active fiber stress (if provided)
-	if (m_ac) fs += m_ac->FiberStress(m_fib.FiberVector(mp), pt);
+	if (m_ac) fs += m_ac->FiberStress(pt, m_fib.FiberVector(mp));
 
 	return s + fs;
 }
@@ -144,7 +144,7 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	c += m_fib.DevFiberTangent(mp,m_fib.FiberVector(mp));
 
 	// add the active fiber stiffness
-	if (m_ac) c += m_ac->FiberStiffness(m_fib.FiberVector(mp), mp);
+	if (m_ac) c += m_ac->FiberTangent(mp, m_fib.FiberVector(mp));
 
 	return c;
 }

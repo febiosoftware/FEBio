@@ -58,6 +58,7 @@ public:
 class FECORE_API FEMaterial : public FEMaterialBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMaterial)
 
 public:
 	FEMaterial(FEModel* fem);
@@ -98,6 +99,7 @@ private:
 class FECORE_API FEMaterialProperty : public FEMaterialBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMaterialProperty)
 
 public:
 	FEMaterialProperty(FEModel* fem);

@@ -223,7 +223,6 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 
 // the following macro declares the parameter list for a material
 #define DECLARE_FECORE_CLASS() \
-	public: static const char* BaseClassName(); \
 	protected: void BuildParamList() override;
 
 #define FECORE_BASE_CLASS(theClass) \
@@ -231,7 +230,6 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 
 // the BEGIN_FECORE_CLASS defines the beginning of a parameter list
 #define BEGIN_FECORE_CLASS(theClass, baseClass) \
-	const char* theClass::BaseClassName() { return #baseClass; } \
 	void theClass::BuildParamList() { \
 			baseClass::BuildParamList(); \
 

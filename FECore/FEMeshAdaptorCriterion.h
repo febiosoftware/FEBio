@@ -73,6 +73,7 @@ private:
 class FECORE_API FEMeshAdaptorCriterion : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMeshAdaptorCriterion)
 
 public:
 	// Constructor

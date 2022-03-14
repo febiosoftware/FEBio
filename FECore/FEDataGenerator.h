@@ -75,6 +75,7 @@ public:
 class FECORE_API FESurfaceDataGenerator : public FEDataGenerator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FESurfaceDataGenerator);
 
 public:
 	FESurfaceDataGenerator(FEModel* fem);
@@ -87,6 +88,7 @@ public:
 class FECORE_API FEDomainDataGenerator : public FEDataGenerator
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEDomainDataGenerator);
 
 public:
 	FEDomainDataGenerator(FEModel* fem);

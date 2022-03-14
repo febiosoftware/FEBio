@@ -88,7 +88,7 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	s += m_fib.DevFiberStress(mp, m_fib.FiberVector(mp));
 
 	// add the active fiber stress
-	if ((FEActiveFiberContraction*)m_ac) s += m_ac->FiberStress(m_fib.FiberVector(mp), mp);
+	if ((FEActiveFiberContraction*)m_ac) s += m_ac->FiberStress(mp, m_fib.FiberVector(mp));
 
 	return s;
 }

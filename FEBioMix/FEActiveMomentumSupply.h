@@ -36,6 +36,8 @@ SOFTWARE.*/
 //!
 class FEBIOMIX_API FEActiveMomentumSupply : public FEMaterialProperty
 {
+    FECORE_BASE_CLASS(FEActiveMomentumSupply)
+
 public:
     FEActiveMomentumSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEActiveMomentumSupply(){}

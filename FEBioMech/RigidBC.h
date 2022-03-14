@@ -36,6 +36,7 @@ class FERigidBody;
 class FEBIOMECH_API FERigidBC : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FERigidBC)
 
 public:
 	FERigidBC(FEModel* fem);

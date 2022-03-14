@@ -74,4 +74,5 @@ protected:
 	FEParamDouble	m_density;	//!< material density
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FESolidMaterial)
 };

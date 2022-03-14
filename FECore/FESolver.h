@@ -94,6 +94,7 @@ class FEGlobalVector;
 class FECORE_API FESolver : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FESolver)
 
 public:
 	//! constructor

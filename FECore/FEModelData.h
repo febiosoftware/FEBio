@@ -36,6 +36,7 @@ SOFTWARE.*/
 class FECORE_API FEModelData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEModelData)
 
 	struct ELEMREF
 	{

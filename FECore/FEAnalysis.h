@@ -44,6 +44,7 @@ class FETimeStepController;
 class FECORE_API FEAnalysis : public FECoreBase
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEAnalysis);
 
 public:
 	//! constructor
