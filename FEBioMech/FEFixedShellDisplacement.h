@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,18 +23,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEPrescribedDisplacement.h"
+#pragma once
+#include <FECore/FEFixedBC.h>
 
-//=======================================================================================
-// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
-//       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FENodalBC)
-	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:displacement)");
-	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
-	ADD_PARAMETER(m_brelative, "relative");
-END_FECORE_CLASS();
-
-FEPrescribedDisplacement::FEPrescribedDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
+class FEFixedShellDisplacement : public FEFixedBC
 {
-}
+public:
+	FEFixedShellDisplacement(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	std::vector<int>	m_dofs;
+
+	DECLARE_FECORE_CLASS();
+};
+

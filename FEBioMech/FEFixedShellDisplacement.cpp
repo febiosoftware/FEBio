@@ -24,17 +24,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEPrescribedDisplacement.h"
+#include "FEFixedShellDisplacement.h"
 
-//=======================================================================================
-// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
-//       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FENodalBC)
-	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:displacement)");
-	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
-	ADD_PARAMETER(m_brelative, "relative");
+BEGIN_FECORE_CLASS(FEFixedShellDisplacement, FENodalBC)
+	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:shell displacement)");
 END_FECORE_CLASS();
 
-FEPrescribedDisplacement::FEPrescribedDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
+FEFixedShellDisplacement::FEFixedShellDisplacement(FEModel* fem) : FEFixedBC(fem)
 {
+}
+
+bool FEFixedShellDisplacement::Init()
+{
+	SetDOFList(m_dofs);
+	return FEFixedBC::Init();
 }

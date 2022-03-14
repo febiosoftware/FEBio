@@ -23,18 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEPrescribedDisplacement.h"
+#pragma once
+#include <FECore/FEPrescribedDOF.h>
 
-//=======================================================================================
-// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
-//       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedDisplacement, FENodalBC)
-	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:displacement)");
-	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_LENGTH)->SetFlags(FE_PARAM_ADDLC);
-	ADD_PARAMETER(m_brelative, "relative");
-END_FECORE_CLASS();
-
-FEPrescribedDisplacement::FEPrescribedDisplacement(FEModel* fem) : FEPrescribedDOF(fem)
+class FEPrescribedShellDisplacement : public FEPrescribedDOF
 {
-}
+public:
+	FEPrescribedShellDisplacement(FEModel* fem);
+
+private:
+	DECLARE_FECORE_CLASS();
+};

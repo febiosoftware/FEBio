@@ -35,7 +35,6 @@ public:
 
 private:
 	std::vector<int>	m_dofs;
-	bool	m_shellBottom;
 
 	DECLARE_FECORE_CLASS();
 };

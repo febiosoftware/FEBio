@@ -224,8 +224,10 @@ SOFTWARE.*/
 #include "RigidBC.h"
 #include "FERigidNodeSet.h"
 #include "FEFixedDisplacement.h"
+#include "FEFixedShellDisplacement.h"
 #include "FEFixedRotation.h"
 #include "FEPrescribedDisplacement.h"
+#include "FEPrescribedShellDisplacement.h"
 #include "FEPrescribedRotation.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEBCRigidDeformation.h"
@@ -508,8 +510,10 @@ void FEBioMech::InitModule()
 	// classes derived from FEBoundaryCondition
 	REGISTER_FECORE_CLASS(FEFixedDisplacement           , "zero displacement");
 	REGISTER_FECORE_CLASS(FEFixedRotation               , "zero rotation");
+	REGISTER_FECORE_CLASS(FEFixedShellDisplacement      , "zero shell displacement");
 	REGISTER_FECORE_CLASS(FEPrescribedDisplacement      , "prescribed displacement");
 	REGISTER_FECORE_CLASS(FEPrescribedRotation          , "prescribed rotation");
+	REGISTER_FECORE_CLASS(FEPrescribedShellDisplacement , "prescribed shell displacement");
 	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation     , "prescribed deformation");
 	REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement");
 	REGISTER_FECORE_CLASS(FEBCRigidDeformation          , "rigid deformation");
