@@ -33,10 +33,10 @@
 //-----------------------------------------------------------------------------
 // Virtual base class for plastic flow curve
 
-class FEPlasticFlowCurve : public FEMaterial
+class FEPlasticFlowCurve : public FEMaterialProperty
 {
 public:
-    FEPlasticFlowCurve(FEModel* pfem) : FEMaterial(pfem) { m_binit = false; }
+    FEPlasticFlowCurve(FEModel* pfem) : FEMaterialProperty(pfem) { m_binit = false; }
 
     //! return
     vector<double> BondYieldMeasures() { return Ky; }
@@ -47,6 +47,8 @@ protected:
     vector<double> Ky;
     vector<double> w;
     bool    m_binit; //!< flag indicating whether the material has been initialized
+
+    FECORE_BASE_CLASS(FEPlasticFlowCurve);
 };
 
 //-----------------------------------------------------------------------------

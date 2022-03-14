@@ -30,8 +30,8 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include "FECore/FEModel.h"
 
-BEGIN_FECORE_CLASS(FEElasticMaterial, FESolidMaterial)
-END_FECORE_CLASS();
+//BEGIN_FECORE_CLASS(FEElasticMaterial, FESolidMaterial)
+//END_FECORE_CLASS();
 
 FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 { 

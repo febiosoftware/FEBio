@@ -40,6 +40,7 @@ class FELinearSystem;
 class FECORE_API FEModelLoad : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEModelLoad);
 
 public:
 	//! constructor

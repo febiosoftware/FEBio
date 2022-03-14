@@ -40,6 +40,7 @@ class FEMeshAdaptorCriterion;
 class FECORE_API FEMeshAdaptor : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEMeshAdaptor);
 
 public:
 	FEMeshAdaptor(FEModel* fem);

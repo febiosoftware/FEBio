@@ -60,7 +60,8 @@ public:
     virtual double WeakBondSED(FEMaterialPoint& pt) { return 0; }
 
 protected:
-	DECLARE_FECORE_CLASS();
+//	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEElasticMaterial);
 };
 
 //-----------------------------------------------------------------------------

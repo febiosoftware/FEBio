@@ -40,6 +40,7 @@ SOFTWARE.*/
 class FECORE_API FEInitialCondition : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEInitialCondition);
 
 public:
 	FEInitialCondition(FEModel* pfem);

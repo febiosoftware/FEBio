@@ -41,6 +41,7 @@ class FEFacetSet;
 class FECORE_API FEBoundaryCondition : public FEStepComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEBoundaryCondition);
 
 public:
 	//! constructor

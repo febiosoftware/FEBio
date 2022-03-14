@@ -35,6 +35,7 @@ SOFTWARE.*/
 class FECORE_API FELoadController : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FELoadController);
 
 public:
 	FELoadController(FEModel* fem);

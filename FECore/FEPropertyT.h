@@ -40,7 +40,7 @@ public:
 	FEPropertyT(T** ppc) : FEProperty(T::superClassID())
 	{ 
 		m_pc = ppc; 
-		m_className = typeid(T).name();
+		m_className = T::BaseClassName();
 	}
 
 	bool IsArray() const override { return false; }
@@ -95,7 +95,7 @@ public:
 	FEFixedPropertyT(T* ppc) : FEProperty(T::superClassID())
 	{
 		m_pc = ppc;
-		m_className = typeid(T).name();
+		m_className = T::BaseClassName();
 	}
 
 	bool IsArray() const override { return false; }
@@ -153,7 +153,7 @@ public:
 	FEVecPropertyT(Y* p) : FEProperty(T::superClassID()) 
 	{ 
 		m_pmp = p; 
-		m_className = typeid(T).name();
+		m_className = T::BaseClassName();
 	}
 	T* operator [] (int i) { return (*m_pmp)[i]; }
 	const T* operator [] (int i) const { return (*m_pmp)[i]; }

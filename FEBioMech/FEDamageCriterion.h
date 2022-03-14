@@ -42,6 +42,8 @@ public:
     
     //! criterion tangent with respect to stress
     virtual mat3ds CriterionStressTangent(FEMaterialPoint& pt) { return mat3ds(0); }
+
+    FECORE_BASE_CLASS(FEDamageCriterion);
 };
 
 //-----------------------------------------------------------------------------
