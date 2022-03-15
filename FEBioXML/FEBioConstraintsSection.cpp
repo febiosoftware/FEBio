@@ -83,12 +83,10 @@ void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 				const char* szname = tag.AttributeValue("name", true);
 				if (szname) plc->SetName(szname);
 
-				FEParameterList& pl = plc->GetParameterList();
-
 				++tag;
 				do
 				{
-					if (ReadParameter(tag, pl) == false)
+					if (ReadParameter(tag, plc) == false)
 					{
 						if (tag == "surface")
 						{
@@ -183,12 +181,10 @@ void FEBioConstraintsSection2::Parse(XMLTag &tag)
 				const char* szname = tag.AttributeValue("name", true);
 				if (szname) plc->SetName(szname);
 
-				FEParameterList& pl = plc->GetParameterList();
-
 				++tag;
 				do
 				{
-					if (ReadParameter(tag, pl) == false)
+					if (ReadParameter(tag, plc) == false)
 					{
 						if (tag == "surface")
 						{

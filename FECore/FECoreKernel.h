@@ -245,7 +245,8 @@ template <typename TClass> inline TClass* fecore_new_class(const char* szclass, 
 }
 
 //-----------------------------------------------------------------------------
-#define fecore_alloc(theClass, fem) fecore_new_class<theClass>(#theClass, fem)
+//#define fecore_alloc(theClass, fem) fecore_new_class<theClass>(#theClass, fem)
+#define fecore_alloc(theClass, fem) new theClass(fem);
 
 //-----------------------------------------------------------------------------
 // Three-parameter form of the fecore_new function for situations where the base class does not 

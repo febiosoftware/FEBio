@@ -202,6 +202,7 @@ public:
 
 	FEParam* AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
 	FEParam* AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum);
+	FEParam* AddParameter(std::string& s, const char* sz, unsigned int flags);
 
 	template <typename T> void SetParameter(const char* sz, T v);
 

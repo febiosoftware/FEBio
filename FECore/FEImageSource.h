@@ -23,49 +23,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FENodalBC.h"
+#include "FEModelComponent.h"
+#include "Image.h"
+#include "fecore_api.h"
 
-//-----------------------------------------------------------------------------
-//! This class represents a fixed degree of freedom
-//! This boundary conditions sets the BC attribute of the nodes in the nodeset
-//! to DOF_FIXED when activated.
-class FECORE_API FEFixedBC : public FENodalBC
+//---------------------------------------------------------------------------
+// Base class for image sources. 
+class FECORE_API FEImageSource : public FEModelComponent
 {
+	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FEImageSource)
+
 public:
-	//! constructors
-	FEFixedBC(FEModel* pfem);
-	FEFixedBC(FEModel* pfem, int dof, FENodeSet* ps);
+	FEImageSource(FEModel* fem);
 
-	//! initialization
-	bool Init() override;
-
-	//! activation
-	void Activate() override;
-
-	//! deactivation
-	void Deactivate() override;
-
-	void CopyFrom(FEBoundaryCondition* bc) override;
+	virtual bool GetImage3D(Image& im) = 0;
 };
 
-//-----------------------------------------------------------------------------
-// This class is obsolete, but provides a direct parameterization of the base class.
-// This is maintained for backward compatibility with older feb files.
-class FECORE_API FEFixedDOF : public FEFixedBC
+//---------------------------------------------------------------------------
+// Class for reading raw images
+class FECORE_API FERawImage : public FEImageSource
 {
-	DECLARE_FECORE_CLASS();
-
 public:
-	FEFixedDOF(FEModel* fem);
+	FERawImage(FEModel* fem);
 
-	void SetDOFS(const std::vector<int>& dofs);
-
-	bool Init() override;
+	bool GetImage3D(Image& im) override;
 
 protected:
-	std::vector<int>	m_dofs;
+	std::string		m_file;
+	int				m_dim[3];
+	int				m_format;
+	bool			m_bend;
+
+	DECLARE_FECORE_CLASS();
 };

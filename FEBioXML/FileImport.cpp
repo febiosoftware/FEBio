@@ -531,49 +531,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
 		case FE_PARAM_STRING: value(tag, pp->cvalue()); break;
 		case FE_PARAM_STD_STRING: value(tag, pp->value<string>()); break;
-		case FE_PARAM_IMAGE_3D:
-		{
-			// get the file name
-			const char* szfile = tag.AttributeValue("file");
-
-			++tag;
-			int n[3] = { 0 };
-			bool bend = false;
-			Image::ImageFormat fmt = Image::RAW8;
-			do
-			{
-				if (tag == "size") tag.value(n, 3);
-				else if (tag == "format")
-				{
-					const char* szfmt = tag.szvalue();
-					// figure out the image format
-					if      (strcmp(szfmt, "RAW8"  ) == 0) fmt = Image::RAW8;
-					else if (strcmp(szfmt, "RAW16U") == 0) fmt = Image::RAW16U;
-					else throw XMLReader::InvalidValue(tag);
-				}
-				else if (tag == "endianness") tag.value(bend);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-			Image& im = pp->value<Image>();
-			im.Create(n[0], n[1], n[2]);
-
-			// see if we need to pre-pend a path
-			char szin[512];
-			strcpy(szin, szfile);
-			char* ch = strrchr(szin, '\\');
-			if (ch == 0) ch = strrchr(szin, '/');
-			if (ch == 0)
-			{
-				// pre-pend the name with the input path
-				sprintf(szin, "%s%s", m_pim->GetFilePath(), szfile);
-			}
-
-			// Try to load the image file
-			if (im.Load(szin, fmt, bend) == false) throw XMLReader::InvalidValue(tag);
-		}
-		break;
 		case FE_PARAM_DATA_ARRAY:
 		{
 			// get the surface map
@@ -1033,6 +990,7 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 						break;
 					}
 					case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+					case FE_PARAM_STD_STRING: param->value<std::string>() = szval; break;
 					default:
 						throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
 					}

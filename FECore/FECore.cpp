@@ -64,6 +64,7 @@ SOFTWARE.*/
 #include "FELogDomainVolume.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
+#include "FEImageSource.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -183,5 +184,8 @@ REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");
+
+// image sources
+REGISTER_FECORE_CLASS(FERawImage, "raw");
 
 }

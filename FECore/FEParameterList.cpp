@@ -364,7 +364,7 @@ FEParam* FEParamContainer::AddParameter(std::vector<double>&      v, const char*
 FEParam* FEParamContainer::AddParameter(std::vector<vec2d>&       v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D, 1, sz); }
 FEParam* FEParamContainer::AddParameter(std::vector<std::string>& v, const char* sz) { return AddParameter(&v, FE_PARAM_STD_VECTOR_STRING, 1, sz); }
 FEParam* FEParamContainer::AddParameter(FEMaterialPointProperty&  v, const char* sz) { return AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
-FEParam* FEParamContainer::AddParameter(Image& v                   , const char* sz) { return AddParameter(&v, FE_PARAM_IMAGE_3D, 1, sz); }
+//FEParam* FEParamContainer::AddParameter(Image& v                   , const char* sz) { return AddParameter(&v, FE_PARAM_IMAGE_3D, 1, sz); }
 
 FEParam* FEParamContainer::AddParameter(int&           v, RANGE rng, const char* sz) { return AddParameter(&v, FE_PARAM_INT, 1, rng, sz); }
 FEParam* FEParamContainer::AddParameter(double&        v, RANGE rng, const char* sz) { return AddParameter(&v, FE_PARAM_DOUBLE, 1, rng, sz); }
@@ -397,6 +397,15 @@ FEParam* FEParamContainer::AddParameter(std::vector<int>& v, const char* sz, uns
 	p->setParent(this);
 	p->SetFlags(flags);
 	p->setEnums(szenum);
+	return p;
+}
+
+//-----------------------------------------------------------------------------
+FEParam* FEParamContainer::AddParameter(std::string& s, const char* sz, unsigned int flags)
+{
+	FEParam* p = AddParameter(&s, FE_PARAM_STD_STRING, 1, sz);
+	p->setParent(this);
+	p->SetFlags(flags);
 	return p;
 }
 

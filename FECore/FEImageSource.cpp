@@ -23,49 +23,48 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "FEImageSource.h"
 
+REGISTER_SUPER_CLASS(FEImageSource, FEIMAGESOURCE_ID);
 
-
-#pragma once
-#include "FENodalBC.h"
-
-//-----------------------------------------------------------------------------
-//! This class represents a fixed degree of freedom
-//! This boundary conditions sets the BC attribute of the nodes in the nodeset
-//! to DOF_FIXED when activated.
-class FECORE_API FEFixedBC : public FENodalBC
+FEImageSource::FEImageSource(FEModel* fem) : FEModelComponent(fem)
 {
-public:
-	//! constructors
-	FEFixedBC(FEModel* pfem);
-	FEFixedBC(FEModel* pfem, int dof, FENodeSet* ps);
 
-	//! initialization
-	bool Init() override;
+}
 
-	//! activation
-	void Activate() override;
+//========================================================================
 
-	//! deactivation
-	void Deactivate() override;
+BEGIN_FECORE_CLASS(FERawImage, FEImageSource)
+	ADD_PARAMETER(m_file, "file", FE_PARAM_ATTRIBUTE);
+	ADD_PARAMETER(m_format, "format", 0, "RAW8\0RAW16U\0");
+	ADD_PARAMETER(m_dim, 3, "size");
+	ADD_PARAMETER(m_bend, "endianess");
+END_FECORE_CLASS();
 
-	void CopyFrom(FEBoundaryCondition* bc) override;
-};
-
-//-----------------------------------------------------------------------------
-// This class is obsolete, but provides a direct parameterization of the base class.
-// This is maintained for backward compatibility with older feb files.
-class FECORE_API FEFixedDOF : public FEFixedBC
+FERawImage::FERawImage(FEModel* fem) : FEImageSource(fem)
 {
-	DECLARE_FECORE_CLASS();
+	m_dim[0] = m_dim[1] = m_dim[2] = 0;
+	m_bend = false;
+	m_format = 0;
+}
 
-public:
-	FEFixedDOF(FEModel* fem);
+bool FERawImage::GetImage3D(Image& im)
+{
+	// get the file name
+	const char* szfile = m_file.c_str();
 
-	void SetDOFS(const std::vector<int>& dofs);
+	int* n = m_dim;
+	im.Create(n[0], n[1], n[2]);
 
-	bool Init() override;
-
-protected:
-	std::vector<int>	m_dofs;
-};
+	// Try to load the image file
+	Image::ImageFormat fmt;
+	switch (m_format)
+	{
+	case 0: fmt = Image::RAW8; break;
+	case 1: fmt = Image::RAW16U; break;
+	default:
+		assert(false);
+		return false;
+	}
+	return im.Load(szfile, fmt, m_bend);
+}

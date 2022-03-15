@@ -314,7 +314,10 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 
 		// The supported fixed BC strings don't quite follow the dof naming convention.
 		// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
-		if      (strcmp(szbc, "xy"  ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Y); }
+		if      (strcmp(szbc, "x"   ) == 0) { bc.push_back(dof_X ); }
+		else if (strcmp(szbc, "y"   ) == 0) { bc.push_back(dof_Y ); }
+		else if (strcmp(szbc, "z"   ) == 0) { bc.push_back(dof_Z ); }
+		else if (strcmp(szbc, "xy"  ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Y); }
 		else if (strcmp(szbc, "yz"  ) == 0) { bc.push_back(dof_Y ); bc.push_back(dof_Z); }
 		else if (strcmp(szbc, "xz"  ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Z); }
 		else if (strcmp(szbc, "xyz" ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Y); bc.push_back(dof_Z); }
@@ -349,19 +352,13 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 	}
 
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-	int nbc = (int)bc.size();
 
 	// create the fixed BC's
-	vector<FEFixedBC*> pbc(nbc);
-	for (int i=0; i<nbc; ++i)
-	{
-		FEFixedBC* pbci = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
-		pbci->SetDOFList(bc[i]);
-		pbc[i] = pbci;
+	FEFixedDOF* pbc = dynamic_cast<FEFixedDOF*>(fecore_new<FEBoundaryCondition>("fix", &fem));
+	pbc->SetDOFS(bc);
 
-		// add it to the model
-		GetBuilder()->AddBC(pbci);
-	}
+	// add it to the model
+	GetBuilder()->AddBC(pbc);
 
 	// see if the set attribute is defined
 	const char* szset = tag.AttributeValue("set", true);
@@ -374,7 +371,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 		FENodeSet* pns = mesh.FindNodeSet(szset);
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
-		for (int j=0; j<nbc; ++j) pbc[j]->SetNodeSet(pns);
+		pbc->SetNodeSet(pns);
 	}
 	else
 	{
@@ -392,7 +389,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 		}
 		while (!tag.isend());
 
-		for (int j = 0; j<nbc; ++j) pbc[j]->SetNodeSet(nset);
+		pbc->SetNodeSet(nset);
 	}
 }
 

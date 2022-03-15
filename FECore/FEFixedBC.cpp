@@ -114,6 +114,11 @@ FEFixedDOF::FEFixedDOF(FEModel* fem) : FEFixedBC(fem)
 
 }
 
+void FEFixedDOF::SetDOFS(const std::vector<int>& dofs)
+{
+	m_dofs = dofs;
+}
+
 bool FEFixedDOF::Init()
 {
 	SetDOFList(m_dofs);
