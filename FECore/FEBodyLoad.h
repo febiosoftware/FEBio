@@ -41,6 +41,8 @@ class FELinearSystem;
 //! Base class for body-loads
 class FECORE_API FEBodyLoad : public FEModelLoad
 {
+	FECORE_BASE_CLASS(FEBodyLoad)
+
 public:
 	FEBodyLoad(FEModel* pfem);
 	virtual ~FEBodyLoad();

@@ -29,6 +29,8 @@ SOFTWARE.*/
 // Base class for nonlinear constraints that are defined using a surface.
 class FECORE_API FEBodyConstraint : public FENLConstraint
 {
+	FECORE_BASE_CLASS(FEBodyConstraint)
+
 public:
 	FEBodyConstraint(FEModel* fem);
 };

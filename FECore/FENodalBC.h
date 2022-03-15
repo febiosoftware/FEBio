@@ -32,6 +32,8 @@ class FENodeSet;
 
 class FECORE_API FENodalBC : public FEBoundaryCondition
 {
+	FECORE_BASE_CLASS(FENodalBC)
+
 public:
 	FENodalBC(FEModel* fem);
 

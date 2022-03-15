@@ -35,6 +35,8 @@ class FERigidLoad : public FEModelLoad
 {
 public:
 	FERigidLoad(FEModel* fem) : FEModelLoad(fem) {}
+
+	FECORE_BASE_CLASS(FERigidLoad)
 };
 
 //-----------------------------------------------------------------------------

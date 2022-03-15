@@ -39,6 +39,8 @@ class FENodeSet;
 //! Nodal load boundary condition
 class FECORE_API FENodalLoad : public FEModelLoad
 {
+	FECORE_BASE_CLASS(FENodalLoad)
+
 public:
 	//! constructor
 	FENodalLoad(FEModel* pfem);

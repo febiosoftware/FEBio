@@ -32,6 +32,8 @@ class FESurface;
 
 class FECORE_API FESurfaceBC : public FEBoundaryCondition
 {
+	FECORE_BASE_CLASS(FESurfaceBC)
+
 public:
 	FESurfaceBC(FEModel* fem);
 

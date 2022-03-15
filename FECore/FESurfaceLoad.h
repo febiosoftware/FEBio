@@ -66,4 +66,5 @@ protected:
 	FEDofList	m_dof;
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FESurfaceLoad)
 };
