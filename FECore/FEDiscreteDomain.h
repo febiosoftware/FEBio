@@ -47,6 +47,9 @@ public:
 
 	void Reset() override;
 
+	//! copy data from another domain (overridden from FEDomain)
+	void CopyFrom(FEMeshPartition* pd) override;
+
 public:
 	void AddElement(int eid, int n[2]);
 

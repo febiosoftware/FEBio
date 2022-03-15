@@ -1835,32 +1835,32 @@ void FEModel::UpdateModelData()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* CopyMaterial(FEMaterial* pmat, FEModel* fem)
+FECoreBase* CopyClass(FECoreBase* pc, FEModel* fem)
 {
-	const char* sztype = pmat->GetTypeStr();
+	const char* sztype = pc->GetTypeStr();
 
 	// create a new material
-	FEMaterial* pnew = fecore_new<FEMaterial>(sztype, fem);
-	assert(pnew);
+	FECoreBase* pcnew = fecore_new<FECoreBase>(pc->GetSuperClassID(), sztype, fem);
+	assert(pcnew);
 
-	pnew->SetID(pmat->GetID());
+	pcnew->SetID(pc->GetID());
 
 	// copy parameters
-	pnew->GetParameterList() = pmat->GetParameterList();
+	pcnew->GetParameterList() = pc->GetParameterList();
 
 	// copy properties
-	for (int i = 0; i < pmat->Properties(); ++i)
+	for (int i = 0; i < pc->Properties(); ++i)
 	{
-		FEProperty* prop = pmat->PropertyClass(i);
-		FEMaterial* mati = dynamic_cast<FEMaterial*>(prop->get(0));
-		if (mati)
+		FEProperty* prop = pc->PropertyClass(i);
+		FECoreBase* pci = prop->get(0);
+		if (pc)
 		{
-			FEMaterial* newMati = CopyMaterial(mati, fem);
-			bool b = pnew->SetProperty(i, newMati); assert(b);
+			FECoreBase* pci_new = CopyClass(pci, fem); assert(pci_new);
+			bool b = pcnew->SetProperty(i, pci_new); assert(b);
 		}
 	}
 
-	return pnew;
+	return pcnew;
 }
 
 //-----------------------------------------------------------------------------
@@ -1921,7 +1921,8 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEMaterial* pmat = fem.GetMaterial(i);
 
 		// copy the material
-		FEMaterial* pnew = CopyMaterial(pmat, this);
+		FEMaterial* pnew = dynamic_cast<FEMaterial*>(CopyClass(pmat, this));
+		assert(pnew);
 
 		// copy the name
 		pnew->SetName(pmat->GetName());
