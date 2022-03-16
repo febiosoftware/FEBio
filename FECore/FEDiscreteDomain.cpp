@@ -68,6 +68,15 @@ bool FEDiscreteDomain::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEDiscreteDomain::CopyFrom(FEMeshPartition* pd)
+{
+	FEDomain::CopyFrom(pd);
+	FEDiscreteDomain* psd = dynamic_cast<FEDiscreteDomain*>(pd);
+	m_Elem = psd->m_Elem;
+	ForEachElement([=](FEElement& el) { el.SetMeshPartition(this); });
+}
+
+//-----------------------------------------------------------------------------
 void FEDiscreteDomain::AddElement(int eid, int n[2])
 {
 	FEDiscreteElement el;

@@ -89,6 +89,11 @@ void FEParameterList::operator = (FEParameterList& l)
 				mat3d.setValuator(src.valuator()->copy());
 			}
 			break;
+			case FE_PARAM_STD_VECTOR_VEC2D:
+			{
+				d.value< std::vector<vec2d> >() = s.value< std::vector<vec2d> >();
+			}
+			break;
 			default:
 				assert(false);
 			}
