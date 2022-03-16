@@ -74,7 +74,9 @@ void FEBioStepSection4::Parse(XMLTag& tag)
 				if (ReadParameter(tag, pstep) == false)
 				{
 					// parse the file sections
-					Map.Parse(tag);
+					std::map<string, FEFileSection*>::iterator is = Map.find(tag.Name());
+					if (is != Map.end()) is->second->Parse(tag);
+					else throw XMLReader::InvalidTag(tag);
 				}
 				++tag;
 			} while (!tag.isend());
