@@ -363,3 +363,99 @@ double FEDamageCDFUser::pdf(const double X)
     return m_cdf->derive(X);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEDamageCDFPower, FEDamageCDF)
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(1.0), "alpha" );
+    ADD_PARAMETER(m_mu0  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0"   );
+    ADD_PARAMETER(m_mu1  , "mu1"   );
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEDamageCDFPower::FEDamageCDFPower(FEModel* pfem) : FEDamageCDF(pfem)
+{
+    m_alpha = 2;
+    m_mu0 = 1;
+    m_mu1 = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Parameter validation
+bool FEDamageCDFPower::Validate() {
+    if (m_mu0 + m_mu1 < 0) {
+        feLogError("mu0 + mu1 = %f must be non-negative", m_mu0 + m_mu1);
+        return false;
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Power cumulative distribution function
+double FEDamageCDFPower::cdf(const double X)
+{
+    double cdf = 0;
+    
+    // this CDF only admits positive values
+    if (X > 0)
+        cdf = m_mu0 + m_mu1*pow(X,m_alpha);
+    
+    return cdf;
+}
+
+// Power probability density function
+double FEDamageCDFPower::pdf(const double X)
+{
+    double pdf = 0;
+    
+    // this CDF only admits positive values
+    if (X > 0)
+        pdf = m_mu1*m_alpha*pow(X,m_alpha-1);
+    
+    return pdf;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEDamageCDFPoly2, FEDamageCDF)
+    ADD_PARAMETER(m_mu0  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0"   );
+    ADD_PARAMETER(m_mu1  , "mu1"   );
+    ADD_PARAMETER(m_mu2  , "mu2"   );
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEDamageCDFPoly2::FEDamageCDFPoly2(FEModel* pfem) : FEDamageCDF(pfem)
+{
+    m_mu0 = 1;
+    m_mu1 = 0;
+    m_mu2 = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Poly2 cumulative distribution function
+double FEDamageCDFPoly2::cdf(const double X)
+{
+    double cdf = 0;
+    
+    // this CDF only admits positive arguments
+    if (X > 0)
+        cdf = m_mu0 + m_mu1*X + m_mu2*X*X;
+    
+    return cdf;
+}
+
+// Poly2 probability density function
+double FEDamageCDFPoly2::pdf(const double X)
+{
+    double pdf = 0;
+    
+    // this PDF only admits positive arguments
+    if (X > 0)
+        pdf = m_mu1 + 2*m_mu2*X;
+    
+    return pdf;
+}
+
