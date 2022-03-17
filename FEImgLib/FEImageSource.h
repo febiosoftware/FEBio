@@ -24,15 +24,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEModelComponent.h"
 #include "Image.h"
-#include "fecore_api.h"
+#include <FECore/FECoreClass.h>
+#include "feimglib_api.h"
 
 //---------------------------------------------------------------------------
 // Base class for image sources. 
-class FECORE_API FEImageSource : public FEModelComponent
+class FEIMGLIB_API FEImageSource : public FECoreClass
 {
-	FECORE_SUPER_CLASS
 	FECORE_BASE_CLASS(FEImageSource)
 
 public:
@@ -43,7 +42,7 @@ public:
 
 //---------------------------------------------------------------------------
 // Class for reading raw images
-class FECORE_API FERawImage : public FEImageSource
+class FEIMGLIB_API FERawImage : public FEImageSource
 {
 public:
 	FERawImage(FEModel* fem);

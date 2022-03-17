@@ -26,7 +26,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FileImport.h"
-#include <FECore/Image.h>
 #include <FECore/FENodeDataMap.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEFunction1D.h>

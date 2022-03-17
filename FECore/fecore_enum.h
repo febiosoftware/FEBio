@@ -276,7 +276,6 @@ enum SUPER_CLASS_ID {
 	FELOGSURFACEDATA_ID,			// derived from FELogSurfaceData
 	FELOGDOMAINDATA_ID,				// derived from FELogDomainData
 	FECLASS_ID,						// derived from FECoreClass
-	FEIMAGESOURCE_ID				// derived from FEImageSource
 };
 
 ///////////////////////////////////////////////////////////////////////////////

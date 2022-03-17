@@ -23,59 +23,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "FEImageSource.h"
 
-
-
-#pragma once
-#include "fecore_api.h"
-
-//-----------------------------------------------------------------------------
-// This class implements a simple single precision grayscale 3D-image
-class FECORE_API Image
+FEImageSource::FEImageSource(FEModel* fem) : FECoreClass(fem)
 {
-public:
-	enum ImageFormat {
-		RAW8,
-		RAW16U
-	};
 
-public:
-	// constructor
-	Image(void);
+}
 
-	// destructor
-	~Image(void);
+//========================================================================
 
-	//! copy constructor
-	Image(Image& im);
+BEGIN_FECORE_CLASS(FERawImage, FEImageSource)
+	ADD_PARAMETER(m_file, "file", FE_PARAM_ATTRIBUTE);
+	ADD_PARAMETER(m_format, "format", 0, "RAW8\0RAW16U\0");
+	ADD_PARAMETER(m_dim, 3, "size");
+	ADD_PARAMETER(m_bend, "endianess");
+END_FECORE_CLASS();
 
-	//! assignment operator
-	Image& operator = (Image& im);
+FERawImage::FERawImage(FEModel* fem) : FEImageSource(fem)
+{
+	m_dim[0] = m_dim[1] = m_dim[2] = 0;
+	m_bend = false;
+	m_format = 0;
+}
 
-	// allocate storage for image data
-	void Create(int nx, int ny, int nz);
+bool FERawImage::GetImage3D(Image& im)
+{
+	// get the file name
+	const char* szfile = m_file.c_str();
 
-	// load raw data from file
-	bool Load(const char* szfile, ImageFormat fmt, bool endianess = false);
+	int* n = m_dim;
+	im.Create(n[0], n[1], n[2]);
 
-	// return size attributes
-	int width () { return m_nx; }
-	int height() { return m_ny; }
-	int depth () { return m_nz; }
-
-	// get a particular data value
-	float& value(int x, int y, int z) { return m_pf[(z*m_ny + (m_ny-y-1))*m_nx+x]; }
-
-	// zero image data
-	void zero();
-
-protected:
-	float*	m_pf;				// image data
-	int		m_nx, m_ny, m_nz;	// image dimensions
-};
-
-//-----------------------------------------------------------------------------
-// helper functions for calculating image derivatives
-void image_derive_x(Image& s, Image& d);
-void image_derive_y(Image& s, Image& d);
-void image_derive_z(Image& s, Image& d);
+	// Try to load the image file
+	Image::ImageFormat fmt;
+	switch (m_format)
+	{
+	case 0: fmt = Image::RAW8; break;
+	case 1: fmt = Image::RAW16U; break;
+	default:
+		assert(false);
+		return false;
+	}
+	return im.Load(szfile, fmt, m_bend);
+}
