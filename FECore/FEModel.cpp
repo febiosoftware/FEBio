@@ -932,7 +932,13 @@ bool FEModel::InitConstraints()
 		FENLConstraint* plc = NonlinearConstraint(i);
 
 		// initialize
-		if (plc->Init() == false) return false;
+		if (plc->Init() == false)
+		{
+			std::string s = plc->GetName();
+			const char* sz = (s.empty() ? "<unknown>" : s.c_str());
+			feLogError("Nonlinear constraint %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 
 	return true;
