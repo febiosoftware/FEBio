@@ -5,7 +5,7 @@ mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
 set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE)
-set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML)
+set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML FEImgLib)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -312,7 +312,7 @@ target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
 target_link_libraries(feamr PRIVATE fecore)
 
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore feimglib)
 
 if (WIN32)
     target_link_libraries(febiolib PRIVATE psapi.lib)
