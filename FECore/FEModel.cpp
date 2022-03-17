@@ -445,7 +445,13 @@ bool FEModel::Init()
 	for (int i = 0; i < LoadControllers(); ++i)
 	{
 		FELoadController* plc = m_imp->m_LC[i];
-		if (plc->Init() == false) return false;
+		if (plc->Init() == false)
+		{
+			std::string s = plc->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Load controller %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 		plc->Evaluate(0);
 	}
 
@@ -453,7 +459,13 @@ bool FEModel::Init()
 	for (int i = 0; i<(int)m_imp->m_Step.size(); ++i)
 	{
 		FEAnalysis& step = *m_imp->m_Step[i];
-		if (step.Init() == false) return false;
+		if (step.Init() == false)
+		{
+			std::string s = step.GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Step %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 
 	// create and initialize the rigid body data
@@ -489,7 +501,13 @@ bool FEModel::Init()
 	for (int i = 0; i < MeshAdaptors(); ++i)
 	{
 		FEMeshAdaptor* ma = MeshAdaptor(i);
-		if (ma->Init() == false) return false;
+		if (ma->Init() == false)
+		{
+			std::string s = ma->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Mesh adaptor %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 
 	// evaluate all load parameters
@@ -610,7 +628,13 @@ bool FEModel::InitBCs()
 	for (int i = 0; i<NIC; ++i)
 	{
 		FEInitialCondition* pic = InitialCondition(i);
-		if (pic->Init() == false) return false;
+		if (pic->Init() == false)
+		{
+			std::string s = pic->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Initial condition %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 
 	// check the BC's
@@ -618,7 +642,13 @@ bool FEModel::InitBCs()
 	for (int i=0; i<NBC; ++i)
 	{
 		FEBoundaryCondition* pbc = BoundaryCondition(i);
-		if (pbc->Init() == false) return false;
+		if (pbc->Init() == false)
+		{
+			std::string s = pbc->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Boundary condition %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 
     return true;
@@ -785,7 +815,13 @@ bool FEModel::InitModelLoads()
 	for (int i=0; i<ModelLoads(); ++i)
 	{
 		FEModelLoad& FC = *ModelLoad(i);
-		if (FC.Init() == false) return false;
+		if (FC.Init() == false)
+		{
+			std::string s = FC.GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Load %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 	return true;
 }
@@ -916,7 +952,13 @@ bool FEModel::InitContact()
         FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 
 		// initializes contact interface data
-		if (ci.Init() == false) return false;
+		if (ci.Init() == false)
+		{
+			std::string s = ci.GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Contact %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
 	}
 
 	return true;
@@ -935,7 +977,7 @@ bool FEModel::InitConstraints()
 		if (plc->Init() == false)
 		{
 			std::string s = plc->GetName();
-			const char* sz = (s.empty() ? "<unknown>" : s.c_str());
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
 			feLogError("Nonlinear constraint %d (%s) failed to initialize", i + 1, sz);
 			return false;
 		}
