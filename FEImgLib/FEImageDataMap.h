@@ -40,15 +40,19 @@ public:
 
 	FEDomainMap* Generate() override;
 
+	void Evaluate(double time) override;
+
 private:
 	vec3d	m_r0;
 	vec3d	m_r1;
+	double	m_blur;
 
 	FEImageSource* m_imgSrc;
 
 private:
-	Image		m_im;
+	Image		m_im0, m_im;
 	ImageMap	m_map;
+	FEDomainMap* m_data;
 
 	DECLARE_FECORE_CLASS();
 };

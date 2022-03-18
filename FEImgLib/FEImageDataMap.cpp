@@ -25,28 +25,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FEImageDataMap.h"
 #include <FECore/FEDomainMap.h>
+#include "image_tools.h"
 
 BEGIN_FECORE_CLASS(FEImageDataMap, FEDomainDataGenerator)
 	ADD_PARAMETER(m_r0, "range_min");
 	ADD_PARAMETER(m_r1, "range_max");
-
+	ADD_PARAMETER(m_blur, "blur");
 	ADD_PROPERTY(m_imgSrc, "image");
 END_FECORE_CLASS();
 
 FEImageDataMap::FEImageDataMap(FEModel* fem) : FEDomainDataGenerator(fem), m_map(m_im)
 {
 	m_imgSrc = nullptr;
+	m_blur = 0.0;
+	m_data = nullptr;
 }
 
 bool FEImageDataMap::Init()
 {
 	if (m_imgSrc == nullptr) return false;
 
-	if (m_imgSrc->GetImage3D(m_im) == false)
+	if (m_imgSrc->GetImage3D(m_im0) == false)
 	{
 		return false;
 	}
-
+	m_im = m_im0;
 	m_map.SetRange(m_r0, m_r1);
 
 	return FEDomainDataGenerator::Init();
@@ -69,5 +72,18 @@ FEDomainMap* FEImageDataMap::Generate()
 	{
 		delete map; map = nullptr;
 	}
+	m_data = map;
 	return map;
+}
+
+void FEImageDataMap::Evaluate(double time)
+{
+	if (m_blur > 0)
+	{
+		if (m_im0.depth() == 1) blur_image_2d(m_im, m_im0, (float)m_blur);
+		else blur_image(m_im, m_im0, (float)m_blur);
+	}
+	else m_im = m_im0;
+
+	FEDomainDataGenerator::Generate(*m_data);
 }
