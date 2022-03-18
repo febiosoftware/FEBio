@@ -625,7 +625,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, "volume fraction");
 	REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses, "ut4 nodal stress");
 	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain");
-	REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume, "shell relative volume");
+	REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume, "shell relative volume"); // TODO: This is redundant and is already evaluated in "relative volume"
 	REGISTER_FECORE_CLASS(FEPlotContactGap, "contact gap");
 	REGISTER_FECORE_CLASS(FEPlotNodalContactGap, "nodal contact gap");
 	REGISTER_FECORE_CLASS(FEPlotVectorGap, "vector gap");

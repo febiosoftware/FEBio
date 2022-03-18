@@ -1605,12 +1605,41 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 {
-	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+			const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+			return (pt ? pt->m_J : 0.0);
+			});
+	}
+	else if (dom.Class() == FE_DOMAIN_SHELL)
+	{
+		FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom); assert(sd);
 
-	writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
-		return (pt ? pt->m_J : 0.0);
-	});
+		// a filter to get J from a strain tensor
+		auto getJfromE = [](const mat3ds& E) {
+			mat3ds C = mat3dd(1) + E * 2;
+			return sqrt(C.det());
+		};
+
+		FEShellDomainNew* newsd = dynamic_cast<FEShellDomainNew*>(sd);
+		FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(newsd);
+		FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
+		if (easd || ansd) {
+			writeAverageElementValue<mat3ds, double>(dom, a, [](FEElement& el, int ip) {
+				FEShellElementNew& se = static_cast<FEShellElementNew&>(el);
+				return se.m_E[ip];
+				}, getJfromE);
+		}
+		else {
+			writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+				const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+				return (pt ? pt->m_J : 0.0);
+				});
+		}
+		return true;
+	}
+	else return false;
 
 	return true;
 }

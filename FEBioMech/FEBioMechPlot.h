@@ -647,6 +647,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Shell relative volume
+//! TODO: This class is redundant since it is already evaluate in FEPlotRelativeVolume
 class FEPlotShellRelativeVolume : public FEPlotDomainData
 {
 public:
