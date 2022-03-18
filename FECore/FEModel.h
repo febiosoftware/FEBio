@@ -54,6 +54,7 @@ class FEDataArray;
 class FEMeshAdaptor;
 class Timer;
 class FEPlotDataStore;
+class FEDataGenerator;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel
@@ -161,6 +162,17 @@ public:	// --- Load controller functions ----
 
 	//! Get a load controller for a parameter (returns null if the param is not under load control)
 	FELoadController* GetLoadController(FEParam* p);
+
+public:	// --- mesh data generators ---
+
+	//! Add a mesh data generator to the model
+	void AddDataGenerator(FEDataGenerator* pmd);
+
+	//! get a load controller
+	FEDataGenerator* GetDataGenerator(int i);
+
+	//! get the number of mesh data generators
+	int DataGenerators() const;
 
 public: // --- Material functions ---
 
@@ -297,6 +309,9 @@ public: // --- parameter functions ---
 
 	//! evaluate all load controllers at some time
 	void EvaluateLoadControllers(double time);
+
+	// evaluate all mesh data
+	void EvaluateDataGenerators(double time);
 
 	//! evaluate all load parameters
 	virtual bool EvaluateLoadParameters();

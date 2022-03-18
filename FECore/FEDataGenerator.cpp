@@ -48,6 +48,11 @@ bool FEDataGenerator::Init()
 	return true;
 }
 
+void FEDataGenerator::Evaluate(double time)
+{
+
+}
+
 //-----------------------------------------------------------------------------
 
 REGISTER_SUPER_CLASS(FENodeDataGenerator, FENODEDATAGENERATOR_ID);

@@ -64,6 +64,7 @@ SOFTWARE.*/
 #include "FETrussDomain.h"
 #include "FEDomain2D.h"
 #include "FEDiscreteDomain.h"
+#include "FEDataGenerator.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -167,6 +168,7 @@ public:
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
 	std::vector<FEModelData*>				m_Data;		//!< the model output data
 	std::vector<FEMeshAdaptor*>				m_MA;		//!< mesh adaptors
+	std::vector<FEDataGenerator*>			m_MD;		//!< mesh data generators
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
 	std::vector<Timer>			m_timers;	// list of timers
@@ -223,6 +225,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );
 	ADD_PROPERTY(m_imp->m_MA  , "mesh_adaptor"   );
 	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
+//	ADD_PROPERTY(m_imp->m_MD  , "mesh_data"      );
 	ADD_PROPERTY(m_imp->m_Step, "step"           );
 	ADD_PROPERTY(m_imp->m_Data, "data"           );
 
@@ -286,6 +289,7 @@ void FEModel::Clear()
 	for (FESurfacePairConstraint* ci : m_imp->m_CI  ) delete   ci; m_imp->m_CI.clear();
 	for (FENLConstraint* nlc         : m_imp->m_NLC ) delete   nlc; m_imp->m_NLC.clear();
 	for (FELoadController* lc        : m_imp->m_LC  ) delete   lc; m_imp->m_LC.clear();
+	for (FEDataGenerator* md         : m_imp->m_MD  ) delete   md; m_imp->m_MD.clear();
 	for (FEAnalysis* step            : m_imp->m_Step) delete step; m_imp->m_Step.clear();
 
 	// global data
@@ -453,6 +457,20 @@ bool FEModel::Init()
 			return false;
 		}
 		plc->Evaluate(0);
+	}
+
+	// evaluate all mesh data generators
+	for (int i = 0; i < DataGenerators(); ++i)
+	{
+		FEDataGenerator* pmd = m_imp->m_MD[i];
+		if (pmd->Init() == false)
+		{
+			std::string s = pmd->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Load controller %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
+		pmd->Evaluate(0);
 	}
 
 	// check step data
@@ -805,6 +823,27 @@ FELoadController* FEModel::GetLoadController(FEParam* p)
 		}
 	}
 	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! Add a mesh data generator to the model
+void FEModel::AddDataGenerator(FEDataGenerator* pmd)
+{
+	m_imp->m_MD.push_back(pmd);
+}
+
+//-----------------------------------------------------------------------------
+//! get a load controller
+FEDataGenerator* FEModel::GetDataGenerator(int i)
+{
+	return m_imp->m_MD[i];
+}
+
+//-----------------------------------------------------------------------------
+//! get the number of mesh data generators
+int FEModel::DataGenerators() const
+{
+	return (int)m_imp->m_MD.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -1537,6 +1576,14 @@ void FEModel::EvaluateLoadControllers(double time)
 }
 
 //-----------------------------------------------------------------------------
+//! Evaluates all load curves at the specified time
+void FEModel::EvaluateDataGenerators(double time)
+{
+	const int NDG = DataGenerators();
+	for (int i = 0; i < NDG; ++i) GetDataGenerator(i)->Evaluate(time);
+}
+
+//-----------------------------------------------------------------------------
 //! Set the print parameters flag
 void FEModel::SetPrintParametersFlag(bool b)
 {
@@ -2062,6 +2109,9 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 
 		// serialize linear constraints
 		if (m_LCM) m_LCM->Serialize(ar);
+
+		// serialize data generators
+		ar & m_MD;
 
 		// load controllers and load parameters are streamed last
 		// since they can depend on other model parameters.

@@ -93,6 +93,10 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 	FENodeDataGenerator* gen = fecore_new<FENodeDataGenerator>(sztype, &fem);
 	if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+	gen->SetName(szname);
+
+	GetBuilder()->GetFEModel().AddDataGenerator(gen);
+
 	// read the parameters
 	ReadParameterList(tag, gen);
 }
@@ -119,6 +123,10 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 	FESurfaceDataGenerator* gen = fecore_new<FESurfaceDataGenerator>(sztype, &fem);
 	if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", sztype);
 
+	gen->SetName(szname);
+
+	GetBuilder()->GetFEModel().AddDataGenerator(gen);
+
 	// read the parameters
 	ReadParameterList(tag, gen);
 }
@@ -144,6 +152,8 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	FEDomainDataGenerator* gen = fecore_new<FEDomainDataGenerator>(sztype, &fem);
 	gen->SetElementSet(elset);
 	gen->SetName(szname);
+
+	GetBuilder()->GetFEModel().AddDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);

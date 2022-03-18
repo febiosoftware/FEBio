@@ -50,6 +50,9 @@ public:
 	// and check for any input problems.
 	virtual bool Init();
 
+	// evaluate the data at specific time
+	virtual void Evaluate(double time);
+
 public:
 	// overload  one of these functions for custom generators
 	virtual void value(const vec3d& r, double& data) {}
