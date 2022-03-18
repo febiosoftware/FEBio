@@ -637,25 +637,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Store shell strains
-class FEPlotShellStrain : public FEPlotDomainData
-{
-public:
-	FEPlotShellStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Shell relative volume
-//! TODO: This class is redundant since it is already evaluate in FEPlotRelativeVolume
-class FEPlotShellRelativeVolume : public FEPlotDomainData
-{
-public:
-    FEPlotShellRelativeVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! class the projects stresses from integration points to nodes using
 //! SPR (superconvergergent patch recovery)
 class FEPlotSPRStresses : public FEPlotDomainData
