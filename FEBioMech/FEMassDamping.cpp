@@ -39,7 +39,7 @@ FEMassDamping::FEMassDamping(FEModel* fem) : FEBodyForce(fem)
 //! calculate the body force at a material point
 vec3d FEMassDamping::force(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& ep = dynamic_cast<FEElasticMaterialPoint&>(mp);
+	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 	return ep.m_v*m_C;
 }
 
