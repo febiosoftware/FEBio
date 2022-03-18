@@ -340,6 +340,31 @@ public:
 //-----------------------------------------------------------------------------
 // This class implements a Malkin relaxation with adjustable relaxation time
 
+class FEBondRelaxationMalkinDist : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationMalkinDist(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
+    
+public:
+    FEParamDouble  m_t1c0;     //!< constant coefficient of lower relaxation time
+    FEParamDouble  m_t1c1;     //!< coefficient of exponential for lower relaxation time
+    FEParamDouble  m_t1s0;     //!< time constant of exponential for lower relaxation time
+    FEParamDouble  m_t2c0;     //!< constant coefficient of upper relaxation time
+    FEParamDouble  m_t2c1;     //!< coefficient of exponential for upper relaxation time
+    FEParamDouble  m_t2s0;     //!< time constant of exponential for upper relaxation time
+    FEParamDouble  m_beta;     //!< exponent
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements a Malkin relaxation with user-adjustable relaxation time
+
 class FEBondRelaxationMalkinDistUser : public FEBondRelaxation
 {
 public:

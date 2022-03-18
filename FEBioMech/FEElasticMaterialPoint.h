@@ -92,6 +92,9 @@ public:
 	// solid material data
 	mat3ds		m_s;		//!< Cauchy stress
     
+    // uncoupled pressure
+    double      m_p;        //!< only for uncoupled materials
+    
     // current time data
     double      m_Wt;       //!< strain energy density at current time
     

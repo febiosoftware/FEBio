@@ -754,7 +754,7 @@ bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
 	writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 		if (pt == 0) return 0.0;
-		return -pmu->UJ(pt->m_J);   // use negative sign to get positive pressure in compression
+		return -pt->m_p;   // use negative sign to get positive pressure in compression
 	});
     
     return true;
@@ -2168,7 +2168,6 @@ bool FEPlotNestedDamage::SetFilter(int nmat)
 //-----------------------------------------------------------------------------
 bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
 {
-    int N = dom.Elements();
     FESolidMaterial* pmat = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
     if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat))
     {

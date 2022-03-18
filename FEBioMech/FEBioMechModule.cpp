@@ -92,6 +92,7 @@ SOFTWARE.*/
 #include "FEStVenantKirchhoff.h"
 #include "FETCNonlinearOrthotropic.h"
 #include "FETendonMaterial.h"
+#include "FETraceFreeNeoHookean.h"
 #include "FETransIsoMooneyRivlin.h"
 #include "FETransIsoVerondaWestmann.h"
 #include "FETrussMaterial.h"
@@ -302,6 +303,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FENaturalNeoHookean, "natural neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookeanTransIso, "neo-Hookean transiso");
+    REGISTER_FECORE_CLASS(FETraceFreeNeoHookean, "trace-free neo-Hookean");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolid, "Newtonian viscous solid");
 	REGISTER_FECORE_CLASS(FEOgdenUnconstrained, "Ogden unconstrained");
 	REGISTER_FECORE_CLASS(FEOrthoElastic, "orthotropic elastic");
@@ -449,6 +451,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
     REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
     REGISTER_FECORE_CLASS(FEBondRelaxationMalkin, "relaxation-Malkin");
+    REGISTER_FECORE_CLASS(FEBondRelaxationMalkinDist, "relaxation-Malkin-distortion");
     REGISTER_FECORE_CLASS(FEBondRelaxationMalkinDistUser, "relaxation-Malkin-dist-user");
     REGISTER_FECORE_CLASS(FEBondRelaxationCSexp, "relaxation-CSexp");
     REGISTER_FECORE_CLASS(FEBondRelaxationCSexpDistUser, "relaxation-CSexp-dist-user");
@@ -461,6 +464,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFPQP, "CDF quintic");
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
+    REGISTER_FECORE_CLASS(FEDamageCDFPower, "CDF power");
 
 	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");
