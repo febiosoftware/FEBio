@@ -486,6 +486,14 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+// NOTE: Deprecated, but maintained for backward compatibility
+class FEPlotShellRelativeVolume : public FEPlotDomainData
+{
+public:
+	FEPlotShellRelativeVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //-----------------------------------------------------------------------------
 //! Material fibers
 class FEPlotFiberVector : public FEPlotDomainData
@@ -781,6 +789,14 @@ class FEPlotLagrangeStrain : public FEPlotDomainData
 {
 public:
 	FEPlotLagrangeStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//! NOTE: Deprecated, but maintained for backward compatibility
+class FEPlotShellStrain : public FEPlotDomainData
+{
+public:
+	FEPlotShellStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
