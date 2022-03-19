@@ -1009,6 +1009,14 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 			return true;
 		}
 	}
+	else if (dom.Class() == FE_DOMAIN_SHELL)
+	{
+		FEElasticMaterial* em = dynamic_cast<FEElasticMaterial*>(dom.GetMaterial());
+		if (em == 0) return false;
+		FEDensity dens(em);
+		writeAverageElementValue<double>(dom, a, dens);
+		return true;
+	}
 	return false;
 }
 
