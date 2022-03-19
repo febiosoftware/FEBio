@@ -140,7 +140,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 		strncpy(right, sztitle+l/2, l - l/2);
 		sprintf(ch," * %33s", left); ch += strlen(ch);
 		sprintf(ch,"%-36s *\n", right); ch += strlen(ch);
-		sprintf(ch," *%71s*\n", ""); ch += strlen(ch);
+//		sprintf(ch," *%71s*\n", ""); ch += strlen(ch);
 	}
 
 	// print the message
@@ -167,7 +167,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 		if (cn) ct = cn+1;
 	}
 	while (cn);
-	sprintf(ch," *                                                                       *\n"); ch += strlen(ch);
+//	sprintf(ch," *                                                                       *\n"); ch += strlen(ch);
 	sprintf(ch," *************************************************************************\n");
 
 	// print the message

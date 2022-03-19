@@ -110,3 +110,7 @@ public:
 
 	virtual FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat) = 0;
 };
+
+#define FECORE_SPEC(major, minor) ((major << 8) + minor)
+#define FECORE_SPEC_MAJOR(n) ((n) >> 8)
+#define FECORE_SPEC_MINOR(n) ((n) & 0x0F)
