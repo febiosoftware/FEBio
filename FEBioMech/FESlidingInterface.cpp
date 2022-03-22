@@ -82,6 +82,9 @@ BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FESlidingSurface::FESlidingSurface(FEModel* pfem) : FEContactSurface(pfem) {}
+
+//-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
 void FESlidingInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
@@ -406,6 +409,10 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_bautopen = false;	// don't use auto-penalty
 	m_btwo_pass = false; // don't use two-pass
 	m_sradius = 0;				// no search radius limitation
+
+	// set parents
+	m_ms.SetContactInterface(this);
+	m_ss.SetContactInterface(this);
 
 	// set the siblings
 	m_ms.SetSibling(&m_ss);

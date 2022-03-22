@@ -154,6 +154,10 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	static int count = 1;
 	SetID(count++);
 
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
+
 	// define sibling relationships
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);

@@ -314,6 +314,10 @@ FESlidingElasticInterface::FESlidingElasticInterface(FEModel* pfem) : FEContactI
     m_bflipm = m_bflips = false;
     m_bshellbm = m_bshellbs = false;
 
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }
