@@ -178,49 +178,56 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
 
-	// NOTE: the sliding surface does not use material points, so we need this little hack. 
-	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
-	if (ss)
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
 	{
-		for (int i = 0; i < ss->Elements(); ++i)
+		// NOTE: the sliding surface does not use material points, so we need this little hack. 
+		FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
+		if (ss)
 		{
-			FEElement& el = ss->Element(i);
-			double g = 0.0;
-			for (int j = 0; j < el.Nodes(); ++j)
+			for (int i = 0; i < ss->Elements(); ++i)
 			{
-				double gj = ss->m_data[el.m_lnode[j]].m_gap;
-				g += gj;
+				FEElement& el = ss->Element(i);
+				double g = 0.0;
+				for (int j = 0; j < el.Nodes(); ++j)
+				{
+					double gj = ss->m_data[el.m_lnode[j]].m_gap;
+					g += gj;
+				}
+				g /= el.Nodes();
+				a << g;
 			}
-			g /= el.Nodes();
-			a << g;
+			return true;
 		}
+
+		FETiedContactSurface* ts = dynamic_cast<FETiedContactSurface*>(pcs);
+		if (ts)
+		{
+			for (int i = 0; i < ts->Elements(); ++i)
+			{
+				FEElement& el = ts->Element(i);
+				double g = 0.0;
+				for (int j = 0; j < el.Nodes(); ++j)
+				{
+					double gj = ts->m_data[el.m_lnode[j]].m_gap;
+					g += gj;
+				}
+				g /= el.Nodes();
+				a << g;
+			}
+			return true;
+		}
+
+		writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			return (pt ? pt->m_gap : 0.0);
+			});
+
 		return true;
 	}
-
-	FETiedContactSurface* ts = dynamic_cast<FETiedContactSurface*>(pcs);
-	if (ts)
-	{
-		for (int i = 0; i < ts->Elements(); ++i)
-		{
-			FEElement& el = ts->Element(i);
-			double g = 0.0;
-			for (int j = 0; j < el.Nodes(); ++j)
-			{
-				double gj = ts->m_data[el.m_lnode[j]].m_gap;
-				g += gj;
-			}
-			g /= el.Nodes();
-			a << g;
-		}
-		return true;
-	}
-
-	writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
-		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-		return (pt ? pt->m_gap : 0.0);
-	});
-	
-    return true;
+	else return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -230,12 +237,19 @@ bool FEPlotVectorGap::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue<vec3d>(surf, a, [=](int nface) {
-		vec3d gn;
-		pcs->GetVectorGap(nface, gn);
-		return gn;
-	});
-    return true;
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		writeElementValue<vec3d>(surf, a, [=](int nface) {
+			vec3d gn;
+			pcs->GetVectorGap(nface, gn);
+			return gn;
+			});
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -245,31 +259,37 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	// NOTE: the sliding surface does not use material points, so we need this little hack. 
-	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
-	if (ss)
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
 	{
-		for (int i = 0; i < ss->Elements(); ++i)
+		// NOTE: the sliding surface does not use material points, so we need this little hack. 
+		FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
+		if (ss)
 		{
-			FEElement& el = ss->Element(i);
-			double Lm = 0.0;
-			for (int j = 0; j < el.Nodes(); ++j)
+			for (int i = 0; i < ss->Elements(); ++i)
 			{
-				double Lmj = ss->m_data[el.m_lnode[j]].m_Ln;
-				Lm += Lmj;
+				FEElement& el = ss->Element(i);
+				double Lm = 0.0;
+				for (int j = 0; j < el.Nodes(); ++j)
+				{
+					double Lmj = ss->m_data[el.m_lnode[j]].m_Ln;
+					Lm += Lmj;
+				}
+				Lm /= el.Nodes();
+				a << Lm;
 			}
-			Lm /= el.Nodes();
-			a << Lm;
+			return true;
 		}
+
+		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			return (pt ? pt->m_Ln : 0.0);
+		});
 		return true;
 	}
-
-	writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-		return (pt ? pt->m_Ln : 0.0);
-	});
-
-    return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -278,13 +298,20 @@ bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
 {
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
-    
-	writeElementValue<vec3d>(surf, a, [=](int nface) {
-		vec3d tn;
-		pcs->GetContactTraction(nface, tn);
-		return tn;
-	});    
-    return true;
+
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		writeElementValue<vec3d>(surf, a, [=](int nface) {
+			vec3d tn;
+			pcs->GetContactTraction(nface, tn);
+			return tn;
+		});
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -294,27 +321,34 @@ bool FEPlotNodalContactGap::Save(FESurface& surf, FEDataStream& a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
-	// NOTE: the sliding surface does not use material points, so we need this little hack. 
-	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
-	if (ss)
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
 	{
-		for (int i = 0; i < ss->Elements(); ++i)
+		// NOTE: the sliding surface does not use material points, so we need this little hack. 
+		FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
+		if (ss)
 		{
-			FEElement& el = ss->Element(i);
-			for (int j = 0; j < el.Nodes(); ++j)
+			for (int i = 0; i < ss->Elements(); ++i)
 			{
-				double gap = ss->m_data[el.m_lnode[j]].m_gap;
-				a << gap;
+				FEElement& el = ss->Element(i);
+				for (int j = 0; j < el.Nodes(); ++j)
+				{
+					double gap = ss->m_data[el.m_lnode[j]].m_gap;
+					a << gap;
+				}
 			}
+			return true;
 		}
+
+		writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
+			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			return (pt ? pt->m_gap : 0.0);
+			});
 		return true;
 	}
-
-	writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
-		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-		return (pt ? pt->m_gap : 0.0);
-	});
-	return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -324,19 +358,26 @@ bool FEPlotNodalVectorGap::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    vec3d gn[FEElement::MAX_NODES];
-    for (int j=0; j<NF; ++j)
-    {
-        FESurfaceElement& el = pcs->Element(j);
-        pcs->GetNodalVectorGap(j, gn);
-        
-        // store in archive
-        int ne = el.Nodes();
-        for (int k=0; k<ne; ++k) a << gn[k];
-    }
-    
-    return true;
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		int NF = pcs->Elements();
+		vec3d gn[FEElement::MAX_NODES];
+		for (int j = 0; j < NF; ++j)
+		{
+			FESurfaceElement& el = pcs->Element(j);
+			pcs->GetNodalVectorGap(j, gn);
+
+			// store in archive
+			int ne = el.Nodes();
+			for (int k = 0; k < ne; ++k) a << gn[k];
+		}
+
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -346,12 +387,19 @@ bool FEPlotNodalContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
-		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
-		return (pt ? pt->m_Ln : 0.0);
-	});
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
+			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			return (pt ? pt->m_Ln : 0.0);
+			});
 
-	return true;
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -361,19 +409,26 @@ bool FEPlotNodalContactTraction::Save(FESurface &surf, FEDataStream& a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
-	int NF = pcs->Elements();
-	vec3d tn[FEElement::MAX_NODES];
-	for (int j=0; j<NF; ++j)
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
 	{
-		FESurfaceElement& el = pcs->Element(j);
-		pcs->GetNodalContactTraction(j, tn);
+		int NF = pcs->Elements();
+		vec3d tn[FEElement::MAX_NODES];
+		for (int j = 0; j < NF; ++j)
+		{
+			FESurfaceElement& el = pcs->Element(j);
+			pcs->GetNodalContactTraction(j, tn);
 
-		// store in archive
-		int ne = el.Nodes();
-		for (int k=0; k<ne; ++k) a << tn[k];
+			// store in archive
+			int ne = el.Nodes();
+			for (int k = 0; k < ne; ++k) a << tn[k];
+		}
+
+		return true;
 	}
-
-	return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -383,13 +438,21 @@ bool FEPlotSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue<vec3d>(surf, a, [=](int nface) {
-		vec3d tn;
-		pcs->GetSurfaceTraction(nface, tn);
-		return tn;
-	});
-    
-    return true;
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+
+		writeElementValue<vec3d>(surf, a, [=](int nface) {
+			vec3d tn;
+			pcs->GetSurfaceTraction(nface, tn);
+			return tn;
+			});
+
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -399,19 +462,26 @@ bool FEPlotNodalSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    vec3d tn[FEElement::MAX_NODES];
-    for (int j=0; j<NF; ++j)
-    {
-        FESurfaceElement& el = pcs->Element(j);
-        pcs->GetNodalSurfaceTraction(j, tn);
-        
-        // store in archive
-        int ne = el.Nodes();
-        for (int k=0; k<ne; ++k) a << tn[k];
-    }
-    
-    return true;
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		int NF = pcs->Elements();
+		vec3d tn[FEElement::MAX_NODES];
+		for (int j = 0; j < NF; ++j)
+		{
+			FESurfaceElement& el = pcs->Element(j);
+			pcs->GetNodalSurfaceTraction(j, tn);
+
+			// store in archive
+			int ne = el.Nodes();
+			for (int k = 0; k < ne; ++k) a << tn[k];
+		}
+
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -421,13 +491,20 @@ bool FEPlotStickStatus::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue<double>(surf, a, [=](int nface) {
-		double gn;
-		pcs->GetStickStatus(nface, gn);
-        return gn;
-	});
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		writeElementValue<double>(surf, a, [=](int nface) {
+			double gn;
+			pcs->GetStickStatus(nface, gn);
+			return gn;
+			});
 
-    return true;
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -436,10 +513,16 @@ bool FEPlotContactForce::Save(FESurface &surf, FEDataStream &a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
     
-	vec3d fn = pcs->GetContactForce();
-	a << fn;
-    
-	return true;
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d fn = pcs->GetContactForce();
+		a << fn;
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -449,38 +532,49 @@ bool FEPlotContactArea::Save(FESurface &surf, FEDataStream& a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
-	double area = pcs->GetContactArea();
-	a << area;
-
-	return true;
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		double area = pcs->GetContactArea();
+		a << area;
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
 // Plot contact penalty parameter
 bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 {
-
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
-	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
-	if (ps)
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
 	{
-		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-			const FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
-			return pt.m_eps;
-		});
-		return true;
-	}
+		FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+		if (ps)
+		{
+			writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+				const FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
+				return pt.m_eps;
+				});
+			return true;
+		}
 
-	FESlidingElasticSurface* pse = dynamic_cast<FESlidingElasticSurface*>(&surf);
-	if (pse)
-	{
-		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-			const FESlidingElasticSurface::Data& pt = *mp.ExtractData<FESlidingElasticSurface::Data>();
-			return pt.m_epsn;
-			});
-		return true;
+		FESlidingElasticSurface* pse = dynamic_cast<FESlidingElasticSurface*>(&surf);
+		if (pse)
+		{
+			writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+				const FESlidingElasticSurface::Data& pt = *mp.ExtractData<FESlidingElasticSurface::Data>();
+				return pt.m_epsn;
+				});
+			return true;
+		}
 	}
 
 	return false;
@@ -492,24 +586,31 @@ bool FEPlotContactStatus::Save(FESurface& surf, FEDataStream& a)
 	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
 	if (ps == nullptr) return false;
 
-	int NF = ps->Elements();
-	for (int i = 0; i < NF; ++i)
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
 	{
-		FESurfaceElement& el = ps->Element(i);
-		double nc = 0.0;
-		int nint = el.GaussPoints();
-		for (int j = 0; j < nint; ++j)
+		int NF = ps->Elements();
+		for (int i = 0; i < NF; ++i)
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
+			FESurfaceElement& el = ps->Element(i);
+			double nc = 0.0;
+			int nint = el.GaussPoints();
+			for (int j = 0; j < nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
 
-			if (pt.m_pme) nc++;
+				if (pt.m_pme) nc++;
+			}
+
+			a << nc;
 		}
 
-		a << nc;
+		return true;
 	}
-
-	return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------

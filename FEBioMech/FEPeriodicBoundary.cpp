@@ -160,6 +160,10 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 	m_off = vec3d(0,0,0);
 	m_naugmin = 0;
 
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }

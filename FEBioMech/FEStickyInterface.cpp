@@ -125,6 +125,10 @@ FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), 
 	static int count = 1;
 	SetID(count++);
 
+	// set parents
+	ss.SetContactInterface(this);
+	ms.SetContactInterface(this);
+	
 	// define sibling relationships
 	ss.SetSibling(&ms);
 	ms.SetSibling(&ss);

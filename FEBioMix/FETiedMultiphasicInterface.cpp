@@ -317,6 +317,10 @@ FETiedMultiphasicInterface::FETiedMultiphasicInterface(FEModel* pfem) : FEContac
     m_dofP = pfem->GetDOFIndex("p");
     m_dofC = pfem->GetDOFIndex("concentration", 0);
     
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }

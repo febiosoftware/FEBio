@@ -55,7 +55,7 @@ class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 
 public:
 	//! constructor
-	FESlidingSurface(FEModel* pfem) : FEContactSurface(pfem) {}
+	FESlidingSurface(FEModel* pfem);
 
 	//! Initializes data structures
 	bool Init();

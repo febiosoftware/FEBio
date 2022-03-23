@@ -68,6 +68,10 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(p
 	m_Dmax = 0.0;
 	m_bspecial = true;
 	m_breloc = false;
+
+	// set parents
+	ss.SetContactInterface(this);
+	ms.SetContactInterface(this);
 }
 
 //-----------------------------------------------------------------------------

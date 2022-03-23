@@ -275,6 +275,10 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_mu = 0;
 	m_epsf = 0;
 
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }

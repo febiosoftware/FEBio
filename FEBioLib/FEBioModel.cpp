@@ -431,9 +431,26 @@ void FEBioModel::WritePlot(unsigned int nevent)
 					// if we're using the fixed time stepper, we check the plot range and zero state flag
 					if (pstep->m_timeController == nullptr) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
 
+					// for multi-step analyses, some plot variables can't be plot until the first step
+					// is activated. So, in that case, we'll wait. 
+					if ((nevent == CB_INIT) && (Steps() > 1)) bout = false;
+
 					// store initial time step (i.e. time step zero)
+					if (bout)
+					{
+						double time = GetTime().currentTime;
+						m_plot->Write((float)time);
+					}
+				}
+			}
+			else
+			{
+				// for multi-step analyses, we did not write the initial time step during CB_INIT
+				// so we'll do it during the activation of the first step. 
+				if ((nevent == CB_STEP_ACTIVE) && (Steps() > 1) && (GetCurrentStepIndex() == 0))
+				{
 					double time = GetTime().currentTime;
-					if (bout) m_plot->Write((float)time);
+					m_plot->Write((float)time);
 				}
 			}
 		}
