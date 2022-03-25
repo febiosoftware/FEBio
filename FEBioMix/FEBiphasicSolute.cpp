@@ -82,6 +82,11 @@ bool FEBiphasicSolute::Init()
 	// because it is used in FESolute::Init()
 	m_pSolute->SetSoluteLocalID(0);
 
+    if (!m_pSolid->Init()) return false;
+    if (!m_pPerm->Init()) return false;
+    if (!m_pOsmC->Init()) return false;
+    if (!m_pSolute->Init()) return false;
+    
 	// Call base class which calls the Init member of all properties
 	if (FEMaterial::Init() == false) return false;
 	
@@ -92,6 +97,16 @@ bool FEBiphasicSolute::Init()
 	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");	 return false; }
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FEBiphasicSolute::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pOsmC->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pSolute->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------

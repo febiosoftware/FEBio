@@ -84,6 +84,9 @@ public: // overridden from FEBiphasicInterface
 
 public:
 	bool Init() override;
+    
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;

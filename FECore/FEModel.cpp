@@ -1620,7 +1620,7 @@ bool FEModel::EvaluateLoadParameters()
 			case FE_PARAM_BOOL: {
 				p->value<bool>() = (s > 0 ? true : false); 
 				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "false" : "true"));
+					feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "true" : "false"));
 			}
 			break;
 			case FE_PARAM_VEC3D: {

@@ -47,6 +47,9 @@ public:
 
 	//! initialization
 	bool Init() override;
+    
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
@@ -88,46 +91,70 @@ public:
                                        vector< vector<double> >& dkdJr,
                                        vector< vector< vector<double> > >& dkdrc);
 	
+	//! solid referential apparent density
+	double SolidReferentialApparentDensity(FEMaterialPoint& pt);
+
+	//! solid referential volume fraction
+	double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
+
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
-	
+
 	//! porosity
 	double Porosity(FEMaterialPoint& pt);
-	
+
 	//! fixed charge density
-    virtual double FixedChargeDensity(FEMaterialPoint& pt);
-	
+	virtual double FixedChargeDensity(FEMaterialPoint& pt);
+
 	//! electric potential
-	double ElectricPotential(FEMaterialPoint& pt, const bool eform=false);
-	
+	double ElectricPotential(FEMaterialPoint& pt, const bool eform = false);
+
 	//! current density
 	vec3d CurrentDensity(FEMaterialPoint& pt);
 
 	//! fluid true density
 	double FluidDensity() { return m_rhoTw; }
-	
+
 	//! solute density
 	double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
-	
+
 	//! solute molar mass
 	double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
-	
+
 	//! solute charge number
 	int SoluteChargeNumber(const int sol) { return m_pSolute[sol]->ChargeNumber(); }
-	
+
 	//! SBM density
 	double SBMDensity(const int sbm) { return m_pSBM[sbm]->Density(); }
-	
+
 	//! SBM molar mass
 	double SBMMolarMass(const int sbm) { return m_pSBM[sbm]->MolarMass(); }
-	
+
 	//! SBM charge number
 	int SBMChargeNumber(const int sbm) { return m_pSBM[sbm]->ChargeNumber(); }
-	
+
+	//! SBM actual concentration (molar concentration per fluid volume in current configuration)
+	double SBMConcentration(FEMaterialPoint& pt, const int sbm) {
+		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+		return spt.m_sbmr[sbm] / (ept.m_J - bpt.m_phi0) / SBMMolarMass(sbm);
+	}
+
+	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
+	double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) {
+		FEShellElement* sel = dynamic_cast<FEShellElement*>(pt.m_elem);
+		assert(sel);
+		double h = sel->Evaluate(sel->m_ht, pt.m_index);   // shell thickness
+		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+		return spt.m_sbmr[sbm] / SBMMolarMass(sbm) * h / ept.m_J;
+	}
+
 	//! SBM referential volume fraction
 	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm]/SBMDensity(sbm);
+		return spt.m_sbmr[sbm] / SBMDensity(sbm);
 	}
 
 	//! find local SBM ID from global one
@@ -138,52 +165,37 @@ public:
 
 	//! Add a chemical reaction
 	void AddChemicalReaction(FEChemicalReaction* pcr);
-    
-    //! Add a membrane reaction
-    void AddMembraneReaction(FEMembraneReaction* pcr);
 
-// solute interface
+	//! Add a membrane reaction
+	void AddMembraneReaction(FEMembraneReaction* pcr);
+
+public:
+	//! Evaluate effective permeability
+	mat3ds EffectivePermeability(FEMaterialPoint& pt);
+	tens4dmm TangentPermeabilityStrain(FEMaterialPoint& pt, const mat3ds& Ke);
+	mat3ds TangentPermeabilityConcentration(FEMaterialPoint& pt, const int sol, const mat3ds& Ke);
+
+	// solute interface
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
-	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
-	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
-		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return spt->m_cF;
-	}
-
-	int SBMs() const override { return (int)m_pSBM.size(); }
-	FESolidBoundMolecule* GetSBM(int i) override { return m_pSBM[i]; }
-	//! SBM actual concentration (molar concentration in current configuration)
-	double SBMConcentration(FEMaterialPoint& pt, const int sbm) override {
-		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
-		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm] / (ept.m_J - bpt.m_phi0) / SBMMolarMass(sbm);
-	}
-
-// biphasic interface
-public:
-	//! solid referential apparent density
-	double SolidReferentialApparentDensity(FEMaterialPoint& pt) override;
-
-	//! solid referential volume fraction
-	double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
 public:
-	FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
-	FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
-	FESolventSupply*			GetSolventSupply()		{ return m_pSupp;  }
-	FEChemicalReaction*			GetReaction			(int i) { return m_pReact[i];  }
-    FEMembraneReaction*         GetMembraneReaction (int i) { return m_pMReact[i]; }
+	FEElasticMaterial* GetSolid() { return m_pSolid; }
+	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
+	FEOsmoticCoefficient* GetOsmoticCoefficient() { return m_pOsmC; }
+	FESolventSupply* GetSolventSupply() { return m_pSupp; }
+	FESolidBoundMolecule* GetSBM(int i) { return m_pSBM[i]; }
+	FEChemicalReaction* GetReaction(int i) { return m_pReact[i]; }
+	FEMembraneReaction* GetMembraneReaction(int i) { return m_pMReact[i]; }
 
-	int Reactions	     () { return (int) m_pReact.size();	}
-    int MembraneReactions() { return (int) m_pMReact.size();}
+	int SBMs() { return (int)m_pSBM.size(); }
+	int Reactions() { return (int)m_pReact.size(); }
+	int MembraneReactions() { return (int)m_pMReact.size(); }
 
 public: // parameters
 	FEParamDouble       m_phi0;     //!< solid volume fraction in reference configuration
-    FEParamDouble       m_cFr;      //!< fixed charge density in reference configurations
+	FEParamDouble       m_cFr;      //!< fixed charge density in reference configurations
 	double              m_rhoTw;    //!< true fluid density
 	double              m_penalty;  //!< penalty for enforcing electroneutrality
 
@@ -196,10 +208,10 @@ public:
 
 protected:
 	// material properties
-	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
-	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
-	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolventSupply*			m_pSupp;		//!< pointer to solvent supply material
+	FEElasticMaterial* m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability* m_pPerm;		//!< pointer to permeability material
+	FEOsmoticCoefficient* m_pOsmC;		//!< pointer to osmotic coefficient material
+	FESolventSupply* m_pSupp;		//!< pointer to solvent supply material
 	std::vector<FESolute*>				m_pSolute;		//!< pointer to solute materials
 	std::vector<FESolidBoundMolecule*>	m_pSBM;			//!< pointer to solid-bound molecule materials
 	std::vector<FEChemicalReaction*>	m_pReact;		//!< pointer to chemical reactions
