@@ -336,6 +336,19 @@ bool FEMultiphasic::Init()
 		m_pSolute[i]->SetSoluteLocalID(i);
 	}
 
+    if (m_pSolid->Init() == false) return false;
+    if (m_pPerm->Init() == false) return false;
+    if (m_pOsmC->Init() == false) return false;
+    if (m_pSupp && (m_pSupp->Init() == false)) return false;
+    for (int i=0; i<Solutes(); ++i)
+        if (m_pSolute[i]->Init() == false) return false;
+    for (int i=0; i<SBMs(); ++i)
+        if (m_pSBM[i]->Init() == false) return false;
+    for (int i=0; i<Reactions(); ++i)
+        if (m_pReact[i]->Init() == false) return false;
+    for (int i=0; i<MembraneReactions(); ++i)
+        if (m_pMReact[i]->Init() == false) return false;
+
 	// call the base class.
 	// This also initializes all properties
 	if (FEMaterial::Init() == false) return false;
@@ -363,6 +376,24 @@ bool FEMultiphasic::Init()
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FEMultiphasic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pOsmC->UpdateSpecializedMaterialPoints(mp, tp);
+    if (m_pSupp) m_pSupp->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<Solutes(); ++i)
+        m_pSolute[i]->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<SBMs(); ++i)
+        m_pSBM[i]->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<Reactions(); ++i)
+        m_pReact[i]->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<MembraneReactions(); ++i)
+        m_pMReact[i]->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -985,4 +1016,125 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 	Ie *= m_Fc;
 	
 	return Ie;
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate effective permeability
+mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
+{
+    // evaluate the hydraulic permeability
+    mat3ds K = GetPermeability()->Permeability(pt);
+
+    const int nsol = Solutes();
+    
+    // if there are no solutes in this mixture, we're done
+    if (nsol == 0) return K;
+
+    // initialize effective permeability
+    mat3ds Ke = K.inverse();
+    
+    // fluid volume fraction (porosity) in current configuration
+    double phiw = Porosity(pt);
+    double tmp = m_Rgas*m_Tabs/phiw;
+    mat3dd I(1.0);
+
+    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+
+    // add solute contributions
+    for (int isol=0; isol<nsol; ++isol) {
+        // concentration
+        double ca = spt.m_ca[isol];
+        // solute diffusivity in mixture
+        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt);
+        // solute free diffusivity
+        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+
+        Ke += (I - D/D0)*(tmp*ca/D0);
+    }
+        
+    return Ke.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate tangent of effective permeability w.r.t. strain
+tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat3ds& Ke)
+{
+    // get the hydraulic permeability strain tangent
+    tens4dmm dKdE = GetPermeability()->Tangent_Permeability_Strain(pt);
+    
+    const int nsol = Solutes();
+    
+    // if there are no solutes in this mixture, we're done
+    if (nsol == 0) return dKdE;
+    
+    // evaluate the inverse of the hydraulic permeability
+    mat3ds Ki = GetPermeability()->Permeability(pt).inverse();
+    
+    // fluid volume fraction (porosity) in current configuration
+    double phiw = Porosity(pt);
+    mat3dd I(1.0);
+    
+    FEElasticMaterialPoint&  ept = *(pt.ExtractData<FEElasticMaterialPoint >());
+    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+    
+    tens4dmm dKedE;
+    dKedE.zero();
+    
+    // add solute contributions
+    for (int isol=0; isol<nsol; ++isol) {
+        // concentration
+        double ca = spt.m_ca[isol];
+        // solute free diffusivity
+        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+        // solute diffusivity in mixture, normalized by D0
+        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt)/D0;
+        // solute diffusiviety strain tangent, normalized by D0
+        tens4dmm dDdE = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(pt)/D0;
+        
+        dKedE += (dDdE + (dyad4mm(I, D) + dyad4mm(D,I) - dyad4mm(I,I))*2
+        - dyad1mm(D,I) + dyad1mm(I-D,I)*(1./phiw - ept.m_J*spt.m_dkdJ[isol]/spt.m_k[isol]))*ca/D0;
+    }
+    
+    dKedE = dKedE*(m_Rgas*m_Tabs/phiw) + ddot(dyad2mm(Ki,Ki), dKdE);
+    
+    return ddot(dyad2mm(Ke, Ke), dKedE);
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate tangent of effective permeability w.r.t. concentration
+mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, const int sol, const mat3ds& Ke)
+{
+    mat3ds dKedc(0,0,0,0,0,0);
+    
+    const int nsol = Solutes();
+    
+    if (nsol == 0) return dKedc;
+    
+    // fluid volume fraction (porosity) in current configuration
+    double phiw = Porosity(pt);
+    mat3dd I(1.0);
+    
+    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+    
+    // add solute contributions
+    for (int isol=0; isol<nsol; ++isol) {
+        // concentration
+        double ca = spt.m_ca[isol];
+        // solute free diffusivity
+        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+        // solute diffusivity in mixture, normalized by D0
+        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt)/D0;
+        // solute free diffusivity concentration tangent
+        double dD0dc = m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(pt, sol);
+        // solute diffusivity concentration tangent
+        mat3ds dDdc = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(pt,sol);
+        
+        double kd = (isol == sol) ? 1 : 0;
+        dKedc += (I-D)*((spt.m_dkdc[isol][sol]*spt.m_c[isol] + spt.m_k[isol]*kd - dD0dc*ca/D0)/D0)
+        - (dDdc - D*dD0dc)*(ca/D0/D0);
+    }
+    
+    dKedc *= m_Rgas*m_Tabs/phiw;
+    
+    return -(Ke*dKedc*Ke).sym();
 }
