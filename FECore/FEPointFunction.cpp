@@ -45,7 +45,7 @@ END_FECORE_CLASS();
 //! default constructor
 FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem)
 {
-	m_int = PointCurve::SMOOTH;
+	m_int = PointCurve::LINEAR;
 	m_ext = PointCurve::CONSTANT;
     m_bln = false;
 }
