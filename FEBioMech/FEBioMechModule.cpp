@@ -502,7 +502,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEUDGHexDomain, "udg-hex");
 	REGISTER_FECORE_CLASS(FESRIElasticSolidDomain, "sri-solid");
 	REGISTER_FECORE_CLASS(FEUT4Domain, "ut4-solid");
-	REGISTER_FECORE_CLASS(FEElasticSolidDomain, "elastic-solid");
+	REGISTER_FECORE_CLASS(FEStandardElasticSolidDomain, "elastic-solid");
 	REGISTER_FECORE_CLASS(FEElasticShellDomain, "elastic-shell");
 	REGISTER_FECORE_CLASS(FEElasticShellDomainOld, "elastic-shell-old");
 	REGISTER_FECORE_CLASS(FEElasticEASShellDomain, "elastic-shell-eas");

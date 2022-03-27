@@ -767,3 +767,15 @@ void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<doubl
         }
     }
 }
+
+
+//=================================================================================================
+
+BEGIN_FECORE_CLASS(FEStandardElasticSolidDomain, FEElasticSolidDomain)
+	ADD_PARAMETER(m_elemType, "elem_type", FE_PARAM_ATTRIBUTE, "default\0");
+END_FECORE_CLASS();
+
+FEStandardElasticSolidDomain::FEStandardElasticSolidDomain(FEModel* fem) : FEElasticSolidDomain(fem)
+{
+
+}

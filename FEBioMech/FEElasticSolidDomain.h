@@ -136,3 +136,14 @@ protected:
 
 	FESolidMaterial*	m_pMat;
 };
+
+class FEStandardElasticSolidDomain : public FEElasticSolidDomain
+{
+public:
+	FEStandardElasticSolidDomain(FEModel* fem);
+
+private:
+	std::string		m_elemType;
+
+	DECLARE_FECORE_CLASS();
+};

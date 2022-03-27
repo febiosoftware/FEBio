@@ -406,11 +406,12 @@ FEParam* FEParamContainer::AddParameter(std::vector<int>& v, const char* sz, uns
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FEParamContainer::AddParameter(std::string& s, const char* sz, unsigned int flags)
+FEParam* FEParamContainer::AddParameter(std::string& s, const char* sz, unsigned int flags, const char* szenum)
 {
 	FEParam* p = AddParameter(&s, FE_PARAM_STD_STRING, 1, sz);
 	p->setParent(this);
 	p->SetFlags(flags);
+	p->setEnums(szenum);
 	return p;
 }
 
