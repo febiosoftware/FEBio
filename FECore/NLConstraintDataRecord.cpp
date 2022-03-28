@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FELogNLConstraintData, FENLCLOGDATA_ID);
-
 //-----------------------------------------------------------------------------
 void NLConstraintDataRecord::SetData(const char* szexpr)
 {

@@ -233,19 +233,13 @@ enum SUPER_CLASS_ID {
 	FEDISCRETEMATERIAL_ID,			// derived from FEDiscreteMaterial
 	FELOAD_ID,               	    // derived from FEModelLoad
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
-//	FESURFACECONSTRAINT_ID,         // derived from FESurfaceConstraint
-//	FEBODYCONSTRAINT_ID,			// derived from FEBodyConstraint
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
 	FESURFACEINTERFACE_ID, 			// derived from FESurfaceInterface
-	FENODELOGDATA_ID,            	// derived from FENodeLogData
-	FEFACELOGDATA_ID,				// derived from FEFaceLogData
-	FEELEMLOGDATA_ID,            	// derived from FELogElemata
-	FEOBJLOGDATA_ID,            	// derived from FELogObjectData
+	FELOGDATA_ID,            		// derived from FELogData
 	FEBC_ID,						// derived from FEBoundaryCondition
 	FEGLOBALDATA_ID,				// derived from FEGlobalData
 	FERIGIDOBJECT_ID,				// derived from FECoreBase (TODO: work in progress)
-	FENLCLOGDATA_ID,             	// derived from FELogNLConstraintData
 	FECALLBACK_ID,					// derived from FECallBack
 	FESOLIDDOMAIN_ID,				// derived from FESolidDomain (TODO: work in progress)
 	FESHELLDOMAIN_ID,				// derived from FEShellDomain (TODO: work in progress)
@@ -254,9 +248,7 @@ enum SUPER_CLASS_ID {
 	FEDOMAIN2D_ID,					// derived from FEDomain2D (TODO: work in progress)
 	FESURFACE_ID,					// derived from FESurface (TODO: work in progress)
 	FEIC_ID,						// derived from initial condition
-	FENODEDATAGENERATOR_ID,			// derived from FENodeDataGenerator
-	FEFACEDATAGENERATOR_ID,			// derived from FESurfaceDataGenerator
-	FEELEMDATAGENERATOR_ID,			// derived from FEDomainDataGenerator
+	FEMESHDATAGENERATOR_ID,			// derived from FEMeshDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller (TODO: work in progress)
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
@@ -273,8 +265,6 @@ enum SUPER_CLASS_ID {
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
 	FEDATARECORD_ID,				// derived from DataRecord
-	FELOGSURFACEDATA_ID,			// derived from FELogSurfaceData
-	FELOGDOMAINDATA_ID,				// derived from FELogDomainData
 	FECLASS_ID,						// derived from FECoreClass
 };
 

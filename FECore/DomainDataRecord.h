@@ -32,13 +32,12 @@ class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! Base class for domain log data
-class FECORE_API FELogDomainData : public FECoreBase
+class FECORE_API FELogDomainData : public FELogData
 {
-    FECORE_SUPER_CLASS
     FECORE_BASE_CLASS(FELogDomainData)
 
 public:
-    FELogDomainData(FEModel* fem) : FECoreBase(fem) {}
+    FELogDomainData(FEModel* fem) : FELogData(fem) {}
     virtual ~FELogDomainData() {}
     virtual double value(FEDomain& rc) = 0;
 

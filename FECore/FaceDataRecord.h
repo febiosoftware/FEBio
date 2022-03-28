@@ -32,9 +32,8 @@ class FESurfaceElement;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for a face data value.
-class FECORE_API FEFaceLogData : public FECoreBase
+class FECORE_API FEFaceLogData : public FELogData
 {
-	FECORE_SUPER_CLASS
 	FECORE_BASE_CLASS(FEFaceLogData)
 
 public:

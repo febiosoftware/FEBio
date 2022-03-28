@@ -35,6 +35,8 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "log.h"
 
+REGISTER_SUPER_CLASS(FEDataGenerator, FEMESHDATAGENERATOR_ID);
+
 FEDataGenerator::FEDataGenerator(FEModel* fem) : FEModelComponent(fem)
 {
 }
@@ -54,9 +56,6 @@ void FEDataGenerator::Evaluate(double time)
 }
 
 //-----------------------------------------------------------------------------
-
-REGISTER_SUPER_CLASS(FENodeDataGenerator, FENODEDATAGENERATOR_ID);
-
 FENodeDataGenerator::FENodeDataGenerator(FEModel* fem) : FEDataGenerator(fem)
 {
 
@@ -89,8 +88,6 @@ bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 }
 
 //-----------------------------------------------------------------------------
-REGISTER_SUPER_CLASS(FESurfaceDataGenerator, FEFACEDATAGENERATOR_ID);
-
 FESurfaceDataGenerator::FESurfaceDataGenerator(FEModel* fem) : FEDataGenerator(fem)
 {
 
@@ -130,8 +127,6 @@ bool FESurfaceDataGenerator::Generate(FESurfaceMap& map)
 }
 
 //-----------------------------------------------------------------------------
-REGISTER_SUPER_CLASS(FEDomainDataGenerator, FEELEMDATAGENERATOR_ID);
-
 FEDomainDataGenerator::FEDomainDataGenerator(FEModel* fem) : FEDataGenerator(fem)
 {
 	m_elemSet = nullptr;

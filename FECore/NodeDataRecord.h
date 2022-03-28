@@ -35,9 +35,8 @@ class FENodeSet;
 //-----------------------------------------------------------------------------
 //! This is the base class for a node data value.
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number
-class FECORE_API FENodeLogData : public FECoreBase
+class FECORE_API FENodeLogData : public FELogData
 { 
-	FECORE_SUPER_CLASS
 	FECORE_BASE_CLASS(FENodeLogData)
 
 public:

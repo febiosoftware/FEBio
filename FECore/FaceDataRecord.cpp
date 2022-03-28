@@ -29,10 +29,8 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FESurface.h"
 
-REGISTER_SUPER_CLASS(FEFaceLogData, FEFACELOGDATA_ID);
-
 //-----------------------------------------------------------------------------
-FEFaceLogData::FEFaceLogData(FEModel* fem) : FECoreBase(fem) {}
+FEFaceLogData::FEFaceLogData(FEModel* fem) : FELogData(fem) {}
 
 //-----------------------------------------------------------------------------
 FEFaceLogData::~FEFaceLogData() {}

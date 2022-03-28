@@ -32,10 +32,8 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEDomain.h"
 
-REGISTER_SUPER_CLASS(FELogElemData, FEELEMLOGDATA_ID)
-
 //-----------------------------------------------------------------------------
-FELogElemData::FELogElemData(FEModel* fem) : FECoreBase(fem) {}
+FELogElemData::FELogElemData(FEModel* fem) : FELogData(fem) {}
 
 //-----------------------------------------------------------------------------
 FELogElemData::~FELogElemData() {}

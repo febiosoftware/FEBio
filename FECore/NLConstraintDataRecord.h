@@ -33,13 +33,12 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Base class for nonlinear constraints log data (e.g. rigid connectors)
-class FECORE_API FELogNLConstraintData : public FECoreBase
+class FECORE_API FELogNLConstraintData : public FELogData
 {
-	FECORE_SUPER_CLASS
     FECORE_BASE_CLASS(FELogNLConstraintData)
 
 public:
-    FELogNLConstraintData(FEModel* fem) : FECoreBase(fem) {}
+    FELogNLConstraintData(FEModel* fem) : FELogData(fem) {}
     virtual ~FELogNLConstraintData(){}
     virtual double value(FENLConstraint& rc) = 0;
 };

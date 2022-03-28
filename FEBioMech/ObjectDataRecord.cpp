@@ -32,8 +32,6 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 
-REGISTER_SUPER_CLASS(FELogObjectData, FEOBJLOGDATA_ID);
-
 //-----------------------------------------------------------------------------
 ObjectDataRecord::ObjectDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_RB) 
 {

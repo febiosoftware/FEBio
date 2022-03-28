@@ -32,10 +32,8 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FENodeLogData, FENODELOGDATA_ID);
-
 //-----------------------------------------------------------------------------
-FENodeLogData::FENodeLogData(FEModel* fem) : FECoreBase(fem) {}
+FENodeLogData::FENodeLogData(FEModel* fem) : FELogData(fem) {}
 
 //-----------------------------------------------------------------------------
 FENodeLogData::~FENodeLogData() {}

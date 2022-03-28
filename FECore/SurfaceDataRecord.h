@@ -31,13 +31,12 @@ class FESurface;
 
 //-----------------------------------------------------------------------------
 //! Base class for surface log data
-class FECORE_API FELogSurfaceData : public FECoreBase
+class FECORE_API FELogSurfaceData : public FELogData
 {
-    FECORE_SUPER_CLASS
     FECORE_BASE_CLASS(FELogSurfaceData);
 
 public:
-    FELogSurfaceData(FEModel* fem) : FECoreBase(fem) {}
+    FELogSurfaceData(FEModel* fem) : FELogData(fem) {}
     virtual ~FELogSurfaceData() {}
     virtual double value(FESurface& surface) = 0;
 };

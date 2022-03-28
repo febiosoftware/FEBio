@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FESurface.h"
 
-REGISTER_SUPER_CLASS(FELogSurfaceData, FELOGSURFACEDATA_ID);
-
 //-----------------------------------------------------------------------------
 void FESurfaceDataRecord::SetData(const char* szexpr)
 {

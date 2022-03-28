@@ -296,3 +296,11 @@ void DataRecord::Serialize(DumpStream &ar)
 		}
 	}
 }
+
+//=============================================================================
+REGISTER_SUPER_CLASS(FELogData, FELOGDATA_ID);
+
+FELogData::FELogData(FEModel* fem) : FECoreBase(fem)
+{
+
+}

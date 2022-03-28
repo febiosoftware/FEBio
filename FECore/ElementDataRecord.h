@@ -35,9 +35,8 @@ class FEElementSet;
 
 //-----------------------------------------------------------------------------
 //! Base class for element log data
-class FECORE_API FELogElemData : public FECoreBase
+class FECORE_API FELogElemData : public FELogData
 {
-	FECORE_SUPER_CLASS
 	FECORE_BASE_CLASS(FELogElemData)
 
 public:

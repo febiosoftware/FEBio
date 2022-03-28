@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEDomain.h"
 
-REGISTER_SUPER_CLASS(FELogDomainData, FELOGDOMAINDATA_ID);
-
 //-----------------------------------------------------------------------------
 void FEDomainDataRecord::SetData(const char* szexpr)
 {

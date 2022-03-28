@@ -112,3 +112,13 @@ protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
 	FILE*		m_fp;
 };
+
+//=========================================================================
+// Super class for log data classes. 
+class FECORE_API FELogData : public FECoreBase
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FELogData(FEModel* fem);
+};
