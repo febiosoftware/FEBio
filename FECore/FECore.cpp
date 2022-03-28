@@ -175,7 +175,7 @@ REGISTER_FECORE_CLASS(ElementDataRecord, "element_data");
 REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
 
 // log classes
-REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
+REGISTER_FECORE_CLASS(FELogEnclosedVolume, "enclosed volume");
 REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");

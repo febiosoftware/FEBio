@@ -60,13 +60,16 @@ public:
 	void RegisterFactory(FECoreFactory* ptf);
 
 	//! Create a specific using a superclass ID and an alias
-	void* Create(int superClassID, const char* szalias, FEModel* pfem);
+	FECoreBase* Create(int superClassID, const char* szalias, FEModel* pfem);
+
+	//! Create a class from its base class name and type string
+	FECoreBase* Create(const char* baseClassName, const char* typeStr, FEModel* pfem);
 
 	//! Create a specific class
-	void* CreateClass(const char* szclassName, FEModel* fem);
+	FECoreBase* CreateClass(const char* szclassName, FEModel* fem);
 
 	//! Create a class from a class descriptor
-	void* Create(int superClassID, FEModel* pfem, const FEClassDescriptor& cd);
+	FECoreBase* Create(int superClassID, FEModel* pfem, const FEClassDescriptor& cd);
 
 	//! count the number of registered classes with a given super-class id
 	int Count(SUPER_CLASS_ID sid);
@@ -223,7 +226,8 @@ public:
 template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
+//	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
+	return static_cast<TBase*>(fecore.Create(TBase::BaseClassName(), sztype, pfem));
 }
 
 //-----------------------------------------------------------------------------

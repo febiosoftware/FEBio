@@ -196,7 +196,7 @@ void FECoreKernel::SetAllocatorID(int alloc_id)
 //-----------------------------------------------------------------------------
 //! Create an object. An object is created by specifying the super-class id
 //! and the type-string. 
-void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
+FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 {
 	if (sztype == 0) return 0;
 
@@ -269,8 +269,84 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 }
 
 //-----------------------------------------------------------------------------
+//! Create an object. An object is created by specifying the super-class id
+//! and the type-string. 
+FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel* pfem)
+{
+	if (szbase == nullptr) return nullptr;
+	if (sztype == nullptr) return nullptr;
+
+	unsigned int activeID = 0;
+	vector<int> moduleDepends;
+	if (m_activeModule != -1)
+	{
+		FEModule& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.GetModuleID();
+		moduleDepends = activeModule.GetDependencies();
+	}
+
+	// first check active module
+	if ((activeID > 0) || (activeID == 0))
+	{
+		std::vector<FECoreFactory*>::iterator pf;
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (strcmp(pfac->GetBaseClassName(), szbase) == 0) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == activeID) || (mid == 0))
+				{
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac->CreateInstance(pfem);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// check dependencies in order in which they are defined
+	std::vector<FECoreFactory*>::iterator pf;
+	for (int i = 0; i < moduleDepends.size(); ++i)
+	{
+		unsigned modId = moduleDepends[i];
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (strcmp(pfac->GetBaseClassName(), szbase) == 0) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == 0) || (mid == modId))
+				{
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac->CreateInstance(pfem);
+						}
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Create a specific class
-void* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
+FECoreBase* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 {
 	std::vector<FECoreFactory*>::iterator pf;
 	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
@@ -287,7 +363,7 @@ void* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 
 //-----------------------------------------------------------------------------
 //! Create a class from a class descriptor
-void* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassDescriptor& cd)
+FECoreBase* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassDescriptor& cd)
 {
 	const FEClassDescriptor::ClassVariable* root = cd.Root();
 	FECoreBase* pc = (FECoreBase*)Create(superClassID, root->m_type.c_str(), pfem);

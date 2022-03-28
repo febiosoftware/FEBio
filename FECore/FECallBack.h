@@ -38,6 +38,7 @@ class FEModel;
 class FECORE_API FECallBack : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FECallBack)
 
 public:
 	// constructor requires the WHEN parameter (defined in FEModel.h)
