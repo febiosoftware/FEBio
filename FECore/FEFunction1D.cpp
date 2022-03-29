@@ -181,7 +181,7 @@ bool FEMathFunction::Init()
 
 	// evaluate first derivative
     if (m_ix != -1) {
-        MITEM mi = MSimplify(MDerive(m_exp.GetExpression(), *m_exp.Variable(m_ix)));
+        MITEM mi = MDerive(m_exp.GetExpression(), *m_exp.Variable(m_ix));
 		m_dexp.SetExpression(mi);
     }
 	else
@@ -189,7 +189,7 @@ bool FEMathFunction::Init()
 
 	// evaluate second derivative
     if (m_ix != -1) {
-        MITEM mi = MSimplify(MDerive(m_dexp.GetExpression(), *m_dexp.Variable(m_ix)));
+        MITEM mi = MDerive(m_dexp.GetExpression(), *m_dexp.Variable(m_ix));
         m_d2exp.SetExpression(mi);
     }
     else

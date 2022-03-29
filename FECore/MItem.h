@@ -593,6 +593,8 @@ bool is_dependent(const MItem* pi, const MVariable& x); // is i dependent on x
 bool is_dependent(const MItem* pi, const MItem* px); // is i dependent on x
 bool is_scalar(const MItem* pi);	// is the expression scalar
 
+inline bool is_rconst(const MITEM& i) { return is_rconst(i.ItemPtr()); }
+
 bool is_pi(const MItem* pi); // is pi the constant pi?
 inline bool is_pi(const MITEM& i) { return is_pi(i.ItemPtr()); }
 
