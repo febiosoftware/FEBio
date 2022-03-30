@@ -209,6 +209,11 @@ void FEMappedValue::setDataMap(FEDataMap* val)
 	m_val = val;
 }
 
+FEDataMap* FEMappedValue::dataMap()
+{
+	return m_val;
+}
+
 double FEMappedValue::operator()(const FEMaterialPoint& pt)
 {
 	return m_val->value(pt);
