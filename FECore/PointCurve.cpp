@@ -45,7 +45,7 @@ public:
 //-----------------------------------------------------------------------------
 PointCurve::PointCurve() : im(new PointCurve::Imp)
 {
-	im->fnc = SMOOTH;
+	im->fnc = LINEAR;
 	im->ext = CONSTANT;
 	im->spline = nullptr;
 }
