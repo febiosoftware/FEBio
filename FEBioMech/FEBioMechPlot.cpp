@@ -2088,6 +2088,31 @@ bool FEPlotShellStrain::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotInfStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+			// displacement tensor
+			mat3d U = pt.m_F - mat3dd(1.0);
+
+			// evaluate small strain tensor eij = 0.5*(Uij + Uji)
+			mat3ds e = U.sym();
+
+			return e;
+			});
+	}
+	else return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSPRLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 {
 	// For now, this is only available for solid domains

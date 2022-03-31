@@ -811,6 +811,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// Infinitesimal strain
+class FEPlotInfStrain : public FEPlotDomainData
+{
+public:
+	FEPlotInfStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Lagrange strains
 class FEPlotSPRLagrangeStrain : public FEPlotDomainData
 {
