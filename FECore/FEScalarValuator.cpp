@@ -210,6 +210,11 @@ void FEMappedValue::setDataMap(FEDataMap* val)
 	m_val = val;
 }
 
+FEDataMap* FEMappedValue::dataMap()
+{
+	return m_val;
+}
+
 void FEMappedValue::setScaleFactor(double s)
 {
 	m_scale = s;

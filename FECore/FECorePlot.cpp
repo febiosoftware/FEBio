@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEMaterialPointProperty.h"
 #include "writeplot.h"
 #include "FESurfaceLoad.h"
+#include "FEDomainMap.h"
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
@@ -284,6 +285,34 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		if (m_param.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& mapDouble = dynamic_cast<FEParamDouble&>(map);
+
+			FEMappedValue* val = dynamic_cast<FEMappedValue*>(mapDouble.valuator());
+			if (val)
+			{
+				FEDomainMap* map = dynamic_cast<FEDomainMap*>(val->dataMap()); assert(map);
+				if (map->StorageFormat() == FMT_MULT)
+				{
+					// loop over all elements
+					int NE = dom.Elements();
+					for (int i = 0; i < NE; ++i)
+					{
+						FEElement& e = dom.ElementRef(i);
+						int ne = e.Nodes();
+
+						vector<double> sn(ne);
+						for (int j = 0; j < ne; ++j)
+						{
+							sn[j] = map->value<double>(i, j);
+						}
+
+						// push data to archive
+						for (int j = 0; j < ne; ++j) a << sn[j];
+					}
+
+					return true;
+				}
+			}
+
 			writeNodalProjectedElementValues<double>(sd, a, mapDouble);
 		}
 		else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
