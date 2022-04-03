@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "FECoreKernel.h"
 #include "FEFunction1D.h"
+#include "log.h"
 
 BEGIN_FECORE_CLASS(FELoadCurve, FELoadController)
 	ADD_PARAMETER(m_fnc.m_points, "points");
@@ -87,6 +88,17 @@ void FELoadCurve::Clear()
 
 bool FELoadCurve::Init()
 {
+	// check points
+	if (m_fnc.Points() > 1)
+	{
+		for (int i = 1; i < m_fnc.Points(); ++i)
+		{
+			double t0 = m_fnc.LoadPoint(i-1).time;
+			double t1 = m_fnc.LoadPoint(i  ).time;
+			if (t0 == t1) feLogWarning("Repeated time coordinate in load controller %d", GetID() + 1);
+		}
+	}
+
     return m_fnc.Init();
 }
 
