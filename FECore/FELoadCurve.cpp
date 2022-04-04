@@ -65,6 +65,18 @@ bool FELoadCurve::Init()
 	m_fnc.SetInterpolator(m_int);
 	m_fnc.SetExtendMode(m_ext);
 	m_fnc.SetPoints(m_points);
+
+	// check points
+	if (m_fnc.Points() > 1)
+	{
+		for (int i = 1; i < m_points.size(); ++i)
+		{
+			double t0 = m_points[i - 1].x();
+			double t1 = m_points[i    ].x();
+			if (t0 == t1) feLogWarning("Repeated time coordinate in load controller %d", GetID() + 1);
+		}
+	}
+
 	if (m_fnc.Update() == false) return false;
 	return FELoadController::Init();
 }
@@ -117,22 +129,6 @@ void FELoadCurve::Add(double time, double value)
 void FELoadCurve::Clear()
 {
 	m_fnc.Clear();
-}
-
-bool FELoadCurve::Init()
-{
-	// check points
-	if (m_fnc.Points() > 1)
-	{
-		for (int i = 1; i < m_fnc.Points(); ++i)
-		{
-			double t0 = m_fnc.LoadPoint(i-1).time;
-			double t1 = m_fnc.LoadPoint(i  ).time;
-			if (t0 == t1) feLogWarning("Repeated time coordinate in load controller %d", GetID() + 1);
-		}
-	}
-
-    return m_fnc.Init();
 }
 
 void FELoadCurve::SetInterpolation(PointCurve::INTFUNC f)
