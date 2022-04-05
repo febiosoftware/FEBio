@@ -45,11 +45,12 @@ public:
 public:
 	double	m_E;		//!< Young's modulus
 	double	m_v;		//!< Poisson's ratio
-	int		m_pmid;		//!< parent material ID
+	bool	m_auto_com;	//!< Calculate the com automatically (and ignore the rc parameter)
+	vec3d	m_rc;		//!< center of mass
 
 public:
+	int		m_pmid;	//!< parent material ID
 	bool	m_com;	//!< center of mass input flag
-	vec3d	m_rc;	//!< center of mass
 	int		m_nRB;	//!< rigid body ID (TODO: rigid materials can be assigned to mulitple rigid bodies, so does it make sense to store this?)
 
 public:
