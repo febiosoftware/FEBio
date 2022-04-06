@@ -458,10 +458,6 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	static int count = 1;
 	SetID(count++);
 	
-    // get number of DOFS
-    DOFS& fedofs = pfem->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
 	// initial values
 	m_knmult = 1;
 	m_atol = 0.1;
@@ -476,7 +472,6 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	m_ptol = 0;
 	m_ctol = 0;
 	m_ambp = 0;
-    m_ambc.assign(MAX_CDOFS,0);
 	m_nsegup = 0;
 	m_bautopen = false;
     m_breloc = false;
@@ -486,9 +481,9 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	m_naugmin = 0;
 	m_naugmax = 10;
 
-	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("concentration", 0);
-	
+	m_dofP = -1;
+	m_dofC = -1;
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
     m_ss.SetContactInterface(this);
@@ -526,6 +521,14 @@ bool FESlidingInterfaceMP::Init()
 {
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
+
+	// get number of DOFS
+	FEModel* fem = GetFEModel();
+	DOFS& fedofs = fem->GetDOFS();
+	int nsol = fedofs.GetVariableSize("concentration");
+	m_ambc.assign(nsol, 0.0);
+	m_dofP = fem->GetDOFIndex("p");
+	m_dofC = fem->GetDOFIndex("concentration", 0);
 	
 	// initialize surface data
 	if (m_ss.Init() == false) return false;
@@ -546,9 +549,6 @@ bool FESlidingInterfaceMP::Init()
 	}
 
     // cycle through all the solutes and determine ambient concentrations
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int nsol = fedofs.GetVariableSize("concentration");
-    
 	itridmap it;
 	idmap ambc = m_ambcinp;
 	for (int isol=0; isol<nsol; ++isol) {
