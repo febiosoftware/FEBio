@@ -600,6 +600,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fatigue bond fraction (fatigue)
+class FEPlotFatigueBondFraction : public FEPlotDomainData
+{
+public:
+    FEPlotFatigueBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Yielded bond fraction (fatigue)
 class FEPlotYieldedBondFraction : public FEPlotDomainData
 {

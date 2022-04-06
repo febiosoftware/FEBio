@@ -52,7 +52,6 @@ SOFTWARE.*/
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEEllipsoidalFiberDistribution.h"
-#include "FEFatigueMaterial.h"
 #include "FEFiberExpPow.h"
 #include "FEFiberExpPowUncoupled.h"
 #include "FEFiberNaturalNeoHookean.h"
@@ -86,6 +85,8 @@ SOFTWARE.*/
 #include "FEOrthotropicCLE.h"
 #include "FEOsmoticVirialExpansion.h"
 #include "FEPerfectOsmometer.h"
+#include "FEReactiveFatigue.h"
+#include "FEUncoupledReactiveFatigue.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FERigidMaterial.h"
 #include "FESphericalFiberDistribution.h"
@@ -319,7 +320,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial, "reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterial, "elastic damage");
 	REGISTER_FECORE_CLASS(FERVEDamageMaterial, "reactive viscoelastic damage");
-	REGISTER_FECORE_CLASS(FEFatigueMaterial, "reactive fatigue");
+	REGISTER_FECORE_CLASS(FEReactiveFatigue, "reactive fatigue");
 	REGISTER_FECORE_CLASS(FEReactivePlasticity, "reactive plasticity");
 	REGISTER_FECORE_CLASS(FEReactivePlasticDamage, "reactive plastic damage");
 
@@ -353,6 +354,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPRLig, "PRLig");
 	REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, "uncoupled reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterialUC, "uncoupled elastic damage");
+    REGISTER_FECORE_CLASS(FEUncoupledReactiveFatigue, "uncoupled reactive fatigue");
 	REGISTER_FECORE_CLASS(FEGenericHyperelasticUC, "uncoupled hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, "uncoupled trans-iso hyperelastic");
 	REGISTER_FECORE_CLASS(FEKamensky, "Kamensky");
@@ -622,6 +624,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDamage, "damage");
 	REGISTER_FECORE_CLASS(FEPlotNestedDamage, "nested damage");
 	REGISTER_FECORE_CLASS(FEPlotIntactBondFraction, "intact bond fraction");
+    REGISTER_FECORE_CLASS(FEPlotFatigueBondFraction, "fatigue bond fraction");
 	REGISTER_FECORE_CLASS(FEPlotYieldedBondFraction, "yielded bond fraction");
 	REGISTER_FECORE_CLASS(FEPlotOctahedralPlasticStrain, "octahedral plastic strain");
 	REGISTER_FECORE_CLASS(FEPlotReactivePlasticityHeatSupply, "plasticity heat supply density");
