@@ -62,6 +62,7 @@ SOFTWARE.*/
 #include "FEFiberExponentialPowerUC.h"
 #include "FEFiberNHUC.h"
 #include "FEFiberKiousisUncoupled.h"
+#include "FEForceVelocityContraction.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEHolmesMow.h"
@@ -95,6 +96,7 @@ SOFTWARE.*/
 #include "FETendonMaterial.h"
 #include "FETraceFreeNeoHookean.h"
 #include "FETransIsoMooneyRivlin.h"
+#include "FETransIsoMREstrada.h"
 #include "FETransIsoVerondaWestmann.h"
 #include "FETrussMaterial.h"
 #include "FEUncoupledActiveContraction.h"
@@ -344,6 +346,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FETCNonlinearOrthotropic, "TC nonlinear orthotropic");
 	REGISTER_FECORE_CLASS(FETendonMaterial, "tendon material");
 	REGISTER_FECORE_CLASS(FETransIsoMooneyRivlin, "trans iso Mooney-Rivlin");
+    REGISTER_FECORE_CLASS(FETransIsoMREstrada, "trans iso MR-Estrada");
 	REGISTER_FECORE_CLASS(FETransIsoVerondaWestmann, "trans iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FEUncoupledElasticMixture, "uncoupled solid mixture");
 	REGISTER_FECORE_CLASS(FEVerondaWestmann, "Veronda-Westmann");
@@ -405,6 +408,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FETrussMaterial, "linear truss");
 	REGISTER_FECORE_CLASS(FEHuiskesSupply, "Huiskes-supply");
 	REGISTER_FECORE_CLASS(FEActiveFiberContraction, "active_contraction");
+    REGISTER_FECORE_CLASS(FEForceVelocityContraction, "force-velocity-Estrada");
 	REGISTER_FECORE_CLASS(FEWrinkleOgdenMaterial, "wrinkle Ogden");
 	REGISTER_FECORE_CLASS(FEElasticMembrane, "elastic membrane");
 
