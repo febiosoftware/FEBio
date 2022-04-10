@@ -49,8 +49,22 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
-	m_ac = 0;
+	m_ac = nullptr;
 	m_fib.SetParent(this);
+}
+
+//-----------------------------------------------------------------------------
+//! create material point data
+FEMaterialPoint* FETransIsoMooneyRivlin::CreateMaterialPointData() {
+    // create the elastic solid material point
+    FEMaterialPoint* ep = new FEElasticMaterialPoint;
+    
+    // create the material point from the active contraction material
+    if (m_ac) {
+        FEMaterialPoint* pt = m_ac->CreateMaterialPointData(*ep);
+        if (pt != nullptr) return pt;
+    }
+    return ep;
 }
 
 //-----------------------------------------------------------------------------
@@ -173,3 +187,14 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
     
 	return sed;
 }
+
+//-----------------------------------------------------------------------------
+// update force-velocity material point
+void FETransIsoMooneyRivlin::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& timeInfo)
+{
+    // get the material fiber axis
+    vec3d a0 = m_fib.m_fiber.unitVector(mp);
+    
+    m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
+}
+

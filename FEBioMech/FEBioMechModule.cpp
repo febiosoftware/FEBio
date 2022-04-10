@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FE2DFiberNeoHookean.h"
 #include "FE2DTransIsoMooneyRivlin.h"
 #include "FE2DTransIsoVerondaWestmann.h"
+#include "FEActiveFiberContraction.h"
 #include "FEArrudaBoyce.h"
 #include "FECarreauYasudaViscousSolid.h"
 #include "FECarterHayesOld.h"

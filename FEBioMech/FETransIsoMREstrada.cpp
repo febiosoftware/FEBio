@@ -60,9 +60,11 @@ FEMaterialPoint* FETransIsoMREstrada::CreateMaterialPointData() {
     FEMaterialPoint* ep = new FEElasticMaterialPoint;
     
     // create the material point from the active contraction material
-    FEMaterialPoint* pt = m_ac->CreateMaterialPointData(*ep);
-    if (pt != nullptr) return pt;
-    else return ep;
+    if (m_ac) {
+        FEMaterialPoint* pt = m_ac->CreateMaterialPointData(*ep);
+        if (pt != nullptr) return pt;
+    }
+    return ep;
 }
 
 //-----------------------------------------------------------------------------
