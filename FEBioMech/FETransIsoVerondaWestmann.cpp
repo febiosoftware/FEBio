@@ -88,7 +88,7 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	s += m_fib.DevFiberStress(mp, m_fib.FiberVector(mp));
 
 	// add the active fiber stress
-	if ((FEActiveFiberContraction*)m_ac) s += m_ac->FiberStress(m_fib.FiberVector(mp), mp);
+	if ((FEActiveFiberContraction*)m_ac) s += m_ac->ActiveStress(mp, m_fib.FiberVector(mp));
 
 	return s;
 }
@@ -143,6 +143,10 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	tens4ds cw = BxB*((W11 + W2)*4.0*Ji) - B4*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
+
+    // add the active fiber stress
+    if ((FEActiveFiberContraction*)m_ac) c += m_ac->ActiveStiffness(mp, m_fib.FiberVector(mp));
+    
 	return c + m_fib.DevFiberTangent(mp,m_fib.FiberVector(mp));
 }
 

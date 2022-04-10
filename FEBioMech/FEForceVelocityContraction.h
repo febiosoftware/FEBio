@@ -28,7 +28,6 @@
 
 #pragma once
 #include "FEActiveContractionMaterial.h"
-#include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 class FEForceVelocityMaterialPoint : public FEMaterialPoint
