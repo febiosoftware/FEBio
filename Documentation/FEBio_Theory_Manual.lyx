@@ -1383,7 +1383,7 @@ The Cartesian component forms of the operators
 The fourth order identity tensors are defined as: 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{A} & =\underline{\text{\mathcal{I}}}:\mathbf{A}\,,\\
+\begin{aligned}\mathbf{A} & =\underline{\mathcal{I}}:\mathbf{A}\,,\\
 \mathbf{A}^{T} & =\overline{\mathcal{I}}:\mathbf{A}\,,
 \end{aligned}
 \label{eq25}
@@ -1392,7 +1392,7 @@ The fourth order identity tensors are defined as:
 \end_inset
 
 where 
-\begin_inset Formula $\underline{\text{\mathcal{I}}}=\mathbf{I}\oslash\mathbf{I}$
+\begin_inset Formula $\underline{\mathcal{I}}=\mathbf{I}\oslash\mathbf{I}$
 \end_inset
 
  and 
@@ -1429,7 +1429,7 @@ We may also define
 \end_inset
 
  is symmetric it follows that 
-\begin_inset Formula $\underline{\text{\mathcal{I}}}:\mathbf{A}=\boldsymbol{\mathcal{I}}:\mathbf{A}=\mathbf{A}$
+\begin_inset Formula $\underline{\mathcal{I}}:\mathbf{A}=\boldsymbol{\mathcal{I}}:\mathbf{A}=\mathbf{A}$
 \end_inset
 
 .
