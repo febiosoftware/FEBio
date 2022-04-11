@@ -196,5 +196,5 @@ void FETransIsoVerondaWestmann::UpdateSpecializedMaterialPoints(FEMaterialPoint&
     // get the material fiber axis
     vec3d a0 = m_fib.m_fiber.unitVector(mp);
     
-    m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
+    if (m_ac) m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
 }
