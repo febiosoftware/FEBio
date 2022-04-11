@@ -48692,7 +48692,7 @@ This example defines a thin soft tissue material where fibers are distributed
 \end_layout
 
 \begin_layout Subsubsection
-Kamensky uncoupled
+isotropic Lee-Sacks uncoupled
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Kamensky-uncoupled"
@@ -48707,7 +48707,11 @@ This material implements a Fung-type material, as presented in Kamensy,
  CMAME 2018.
  The material formulation is selected by setting the type attribute to "
 \family typewriter
-Kamensky uncoupled
+uncoupled
+\family default
+ 
+\family typewriter
+isotropic Lee-Sacks
 \family default
 ".
  It defines the following parameters: 
@@ -48937,7 +48941,15 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<material id="1" name="material1" type="Kamensky uncoupled">
+<material id="1" name="material1" type="
+\family typewriter
+uncoupled
+\family default
+ 
+\family typewriter
+isotropic Lee-Sacks
+\family default
+">
 \end_layout
 
 \begin_layout LyX-Code
