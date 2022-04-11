@@ -24,28 +24,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEElasticMaterial.h"
 
-class FEKamenskyUncoupled : public FEUncoupledMaterial
+class FEIsotropicLeeSacks : public FEElasticMaterial
 {
 public:
-	FEKamenskyUncoupled(FEModel* pfem);
+	FEIsotropicLeeSacks(FEModel* pfem);
 
 	//! calculate deviatoric stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt) override;
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt) override;
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! calculate strain energy density at material point
-	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
 public:
 	double	m_c0;
 	double	m_c1;
 	double	m_c2;
+	double	m_k;
 	double	m_tangent_scale;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
 };
+

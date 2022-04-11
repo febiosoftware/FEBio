@@ -153,8 +153,8 @@ SOFTWARE.*/
 #include "FEActiveFiberStress.h"
 #include "FEActiveFiberStressUC.h"
 #include "FEContinuousElasticDamage.h"
-#include "FEKamensky.h"
-#include "FEKamenskyUncoupled.h"
+#include "FEIsotropicLeeSacks.h"
+#include "FEIsotropicLeeSacksUncoupled.h"
 #include "FEPolynomialHyperElastic.h"
 
 #include "FEPressureLoad.h"
@@ -361,8 +361,8 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEUncoupledReactiveFatigue, "uncoupled reactive fatigue");
 	REGISTER_FECORE_CLASS(FEGenericHyperelasticUC, "uncoupled hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, "uncoupled trans-iso hyperelastic");
-	REGISTER_FECORE_CLASS(FEKamensky, "Kamensky");
-	REGISTER_FECORE_CLASS(FEKamenskyUncoupled, "Kamensky uncoupled");
+	REGISTER_FECORE_CLASS(FEIsotropicLeeSacks, "isotropic Lee-Sacks");
+	REGISTER_FECORE_CLASS(FEIsotropicLeeSacksUncoupled, "uncoupled isotropic Lee-Sacks");
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
 
 	// Fiber materials
