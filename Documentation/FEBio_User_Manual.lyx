@@ -4059,11 +4059,11 @@ With the optional arguments, the complete syntax would be:
 
 \begin_layout Standard
 The dump level can set to 1 (= write dump file after each converged time
- step), 2 (= write dump file after each completed step), 
- or 3 (= write dump file after each converged 
- \shape italic
- must-point
- \shape default
+ step), 2 (= write dump file after each completed step),  or 3 (= write
+ dump file after each converged  
+\shape italic
+ must-point 
+\shape default
  ).
 \end_layout
 
@@ -96841,6 +96841,36 @@ This defines the data function as a function of time.
 
 \begin_layout LyX-Code
   <param name="fem.rigidbody('rigid').Fz"/>
+\end_layout
+
+\begin_layout LyX-Code
+</fnc>
+\end_layout
+
+\begin_layout Standard
+As another example, the following creates a stress-strain curve for a single
+ solid element, using the left Hencky (logarithmic) strain component along
+ the z-axis (denoted by 
+\emph on
+hz
+\emph default
+), and the Cauchy normal stress component along z-axis (denoted by 
+\emph on
+sz
+\emph default
+) in element number 1,
+\end_layout
+
+\begin_layout LyX-Code
+<fnc type="parameter">
+\end_layout
+
+\begin_layout LyX-Code
+  <ordinate name="fem.element_data('hz',1)"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="fem.element_data('sz',1)"/>
 \end_layout
 
 \begin_layout LyX-Code
