@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEActiveFiberContraction, FEElasticFiberMaterial);
+BEGIN_FECORE_CLASS(FEActiveFiberContraction, FEActiveContractionMaterial);
 	ADD_PARAMETER(m_ascl , "ascl");
 	ADD_PARAMETER(m_Tmax , "Tmax");
 	ADD_PARAMETER(m_ca0  , "ca0");
@@ -43,7 +43,7 @@ BEGIN_FECORE_CLASS(FEActiveFiberContraction, FEElasticFiberMaterial);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEActiveFiberContraction::FEActiveFiberContraction(FEModel* pfem) : FEElasticFiberMaterial(pfem)
+FEActiveFiberContraction::FEActiveFiberContraction(FEModel* pfem) : FEActiveContractionMaterial(pfem)
 {
 	m_ascl = 0;
 	m_Tmax = 1.0;
@@ -64,7 +64,7 @@ bool FEActiveFiberContraction::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEActiveFiberContraction::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
+mat3ds FEActiveFiberContraction::ActiveStress(FEMaterialPoint& mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -110,7 +110,7 @@ mat3ds FEActiveFiberContraction::FiberStress(FEMaterialPoint& mp, const vec3d& a
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEActiveFiberContraction::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
+tens4ds FEActiveFiberContraction::ActiveStiffness(FEMaterialPoint& mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -162,11 +162,4 @@ tens4ds FEActiveFiberContraction::FiberTangent(FEMaterialPoint& mp, const vec3d&
 	}
 
 	return AxAxAxA*c;
-}
-
-double FEActiveFiberContraction::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0)
-{
-	// TODO: Not sure what to do here
-	assert(false);
-	return 0.0;
 }

@@ -27,12 +27,11 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEMaterial.h>
-#include "FEElasticFiberMaterial.h"
+#include "FEActiveContractionMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! A material class describing the active fiber contraction
-class FEActiveFiberContraction : public FEElasticFiberMaterial
+class FEActiveFiberContraction : public FEActiveContractionMaterial
 {
 public:
 	FEActiveFiberContraction(FEModel* pfem);
@@ -41,12 +40,10 @@ public:
 	bool Init() override;
 
 	//! calculate the fiber stress
-	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds ActiveStress(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	//! active contraction stiffness contribution
-	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
-
-	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds ActiveStiffness(FEMaterialPoint& mp, const vec3d& a0) override;
 
 protected:
 	double	m_ascl;		//!< activation scale factor
