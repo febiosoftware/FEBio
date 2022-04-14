@@ -160,6 +160,8 @@ public:
 
 	const char* szvalue() { return m_szval.c_str(); }
 
+	std::string relpath(const char* szroot) const;
+
 	const std::string& comment();
     const void clearComment();
 };

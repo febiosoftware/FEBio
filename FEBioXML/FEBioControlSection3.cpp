@@ -31,6 +31,56 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/FENewtonSolver.h"
+
+class FEObsoleteStepParamHandler : public FEObsoleteParamHandler
+{
+public:
+	FEObsoleteStepParamHandler(XMLTag& tag, FEAnalysis* step) : m_step(step), FEObsoleteParamHandler(tag, step)
+	{
+		AddParam("solver.max_ups"           , "solver.qn_method.max_ups"        , FE_PARAM_INT);
+		AddParam("solver.qn_max_buffer_size", "solver.qn_method.max_buffer_size", FE_PARAM_INT);
+		AddParam("solver.qn_cycle_buffer"   , "solver.qn_method.cycle_buffer"   , FE_PARAM_BOOL);
+		AddParam("solver.cmax"              , "solver.qn_method.cmax"           , FE_PARAM_DOUBLE);
+	}
+
+	bool ProcessTag(XMLTag& tag) override
+	{
+		if (tag == "qnmethod")
+		{
+			tag.value(m_qnmethod);
+			return true;
+		}
+		else return FEObsoleteParamHandler::ProcessTag(tag);
+	}
+
+	void MapParameters() override
+	{
+		FEModel* fem = m_step->GetFEModel();
+
+		// first, make sure that the QN method is allocated
+		if (m_qnmethod != -1)
+		{
+			FENewtonSolver& solver = dynamic_cast<FENewtonSolver&>(*m_step->GetFESolver());
+			FEProperty& qn = *solver.FindProperty("qn_method");
+			switch (m_qnmethod)
+			{
+			case QN_BFGS   : solver.SetSolutionStrategy(fecore_new<FENewtonStrategy>("BFGS"   , fem)); break;
+			case QN_BROYDEN: solver.SetSolutionStrategy(fecore_new<FENewtonStrategy>("Broyden", fem)); break;
+			case QN_JFNK   : solver.SetSolutionStrategy(fecore_new<FENewtonStrategy>("JFNK"   , fem)); break;
+			default:
+				assert(false);
+			}
+		}
+
+		// now, process the rest
+		FEObsoleteParamHandler::MapParameters();
+	}
+
+private:
+	int	m_qnmethod = -1;
+	FEAnalysis* m_step;
+};
 
 //-----------------------------------------------------------------------------
 FEBioControlSection3::FEBioControlSection3(FEFileImport* pim) : FEFileSection(pim)
@@ -55,6 +105,12 @@ void FEBioControlSection3::Parse(XMLTag& tag)
 		throw FEBioImport::FailedAllocatingSolver(m.c_str());
 	}
 
+	// prepare obsolete parameter mapping.
+	FEObsoleteStepParamHandler stepParamHandler(tag, pstep);
+
 	// read the step parameters
+	SetInvalidTagHandler(&stepParamHandler);
 	ReadParameterList(tag, pstep);
+
+	stepParamHandler.MapParameters();
 }

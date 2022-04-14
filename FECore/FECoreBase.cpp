@@ -47,7 +47,10 @@ FECoreBase::FECoreBase(FEModel* fem) : m_fem(fem)
 
 //-----------------------------------------------------------------------------
 //! destructor does nothing for now.
-FECoreBase::~FECoreBase(){}
+FECoreBase::~FECoreBase()
+{
+	ClearProperties();
+}
 
 //-----------------------------------------------------------------------------
 //! return the super class id
@@ -334,6 +337,22 @@ void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 	pp->SetFlags(flags);
 	pp->SetParent(this);
 	m_Prop.push_back(pp);
+}
+
+//-----------------------------------------------------------------------------
+void FECoreBase::RemoveProperty(int i)
+{
+	m_Prop[i] = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void FECoreBase::ClearProperties()
+{
+	for (int i = 0; i < m_Prop.size(); ++i)
+	{
+		delete m_Prop[i];
+	}
+	m_Prop.clear();
 }
 
 //-----------------------------------------------------------------------------

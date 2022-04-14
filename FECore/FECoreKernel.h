@@ -213,12 +213,12 @@ public:
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T(theClass, theArg, theName) \
-	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::superClassID(), 0, 0, theName);
+	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::superClassID(), #theClass, theClass<theArg>::BaseClassName(), theName);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T2(theClass, theArg1, theArg2, theName) \
-	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::superClassID(), 0, 0, theName);
+	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::superClassID(), #theClass, theClass<theArg1, theArg2>::BaseClassName(), theName);
 
 //-----------------------------------------------------------------------------
 // Create an instance of a class.
@@ -226,8 +226,8 @@ public:
 template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-//	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
-	return static_cast<TBase*>(fecore.Create(TBase::BaseClassName(), sztype, pfem));
+	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
+//	return static_cast<TBase*>(fecore.Create(TBase::BaseClassName(), sztype, pfem));
 }
 
 //-----------------------------------------------------------------------------

@@ -62,13 +62,6 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 		ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 	END_PARAM_GROUP();
 
-	// obsolete parameters (Should be set via the qn_method)
-	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
-
 	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Preferred)->SetDefaultType("BFGS").SetLongName("Quasi-Newton method");
 END_FECORE_CLASS();
 
@@ -92,12 +85,6 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_Rmin = 1.0e-20;
 	m_Rmax = 0;     // not used if zero
 
-	m_cmax   = 1e5;
-	m_maxups = 10;
-	m_max_buf_size = 0;
-	m_cycle_buffer = true;
-
-	m_qndefault = QN_BFGS;
 	m_qnstrategy = nullptr;
 
 	m_bforceReform = true;
@@ -117,7 +104,15 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 //! Set the default solution strategy
 void FENewtonSolver::SetDefaultStrategy(QN_STRATEGY qn)
 {
-	m_qndefault = qn;
+	FEProperty& p = *FindProperty("qn_method");
+	switch (qn)
+	{
+	case QN_BFGS   : p.SetDefaultType("BFGS"); break;
+	case QN_BROYDEN: p.SetDefaultType("Broyden"); break;
+	case QN_JFNK   : p.SetDefaultType("JFNK"); break;
+	default:
+		assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -405,24 +400,7 @@ bool FENewtonSolver::AllocateLinearSystem()
 bool FENewtonSolver::Init()
 {
 	// choose a solution strategy
-	if (m_qnstrategy == nullptr)
-	{
-		switch (m_qndefault)
-		{
-		case QN_BFGS   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("BFGS"   , GetFEModel())); break;
-		case QN_BROYDEN: SetSolutionStrategy(fecore_new<FENewtonStrategy>("Broyden", GetFEModel())); break;
-		case QN_JFNK   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("JFNK"   , GetFEModel())); break;
-		default:
-			feLogError("Invalid quasi-Newton option (%d)", m_qndefault);
-			return false;
-		}
-
-		// copy some solution parameters
-		m_qnstrategy->m_maxups = m_maxups;
-		m_qnstrategy->m_max_buf_size = m_max_buf_size;
-		m_qnstrategy->m_cycle_buffer = m_cycle_buffer;
-		m_qnstrategy->m_cmax = m_cmax;
-	}
+	if (m_qnstrategy == nullptr) return false;
 	else
 	{
 		// make sure the QN strategy knows what solver it belongs to
@@ -473,14 +451,14 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 	{
 		ar << m_neq;
 		ar << m_maxref;
-		ar << m_qndefault;
+//		ar << m_qndefault;
 		ar << m_qnstrategy;
 	}
 	else
 	{
 		ar >> m_neq;
 		ar >> m_maxref;
-		ar >> m_qndefault;
+//		ar >> m_qndefault;
 		ar >> m_qnstrategy;
 
 		// realloc data
@@ -1002,7 +980,7 @@ bool FENewtonSolver::QNUpdate()
 	bool breform = m_bforceReform; m_bforceReform = false;
 
 	// for full-Newton, we skip QN update
-	if (m_maxups == 0) breform = true;
+	if (m_qnstrategy->m_maxups == 0) breform = true;
 
 	// if not, do a QN update
 	if (breform == false)

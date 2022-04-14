@@ -82,7 +82,7 @@ bool FEFluidSolutesSolver2::Init()
 
 	// assign fluid solver parameters
 	m_fldSolver.m_maxref = m_maxRef;
-	m_fldSolver.m_maxups = m_maxUps;
+//	m_fldSolver.m_maxups = m_maxUps;
 	m_fldSolver.m_bdivreform = m_divergeReform;
 	m_fldSolver.m_breformtimestep = m_reformTimeStep;
 	m_fldSolver.m_Vtol = m_vtol;
@@ -93,11 +93,11 @@ bool FEFluidSolutesSolver2::Init()
 	m_fldSolver.m_Rmin = m_minRes;
     m_fldSolver.m_Rmax = m_maxRes;
 	m_fldSolver.m_rhoi = m_rhoi;
-	m_fldSolver.m_qndefault = m_qnmethod;
+//	m_fldSolver.m_qndefault = m_qnmethod;
 
 	// assign solute solver parameters
 	m_sltSolver.m_maxref = m_maxRef;
-	m_sltSolver.m_maxups = m_maxUps;
+//	m_sltSolver.m_maxups = m_maxUps;
 	m_sltSolver.m_bdivreform = m_divergeReform;
 	m_sltSolver.m_breformtimestep = m_reformTimeStep;
 	m_sltSolver.m_Ctol = m_ctol;
@@ -107,7 +107,7 @@ bool FEFluidSolutesSolver2::Init()
 	m_sltSolver.m_Rmin = m_minRes;
     m_sltSolver.m_Rmax = m_maxRes;
 	m_sltSolver.m_rhoi = m_rhoi;
-	m_sltSolver.m_qndefault = m_qnmethod;
+//	m_sltSolver.m_qndefault = m_qnmethod;
 
 	// We need to enforce the block allocation strategy
 	m_fldSolver.SetEquationScheme(EQUATION_SCHEME::BLOCK);

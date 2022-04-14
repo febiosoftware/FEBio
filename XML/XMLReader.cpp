@@ -85,7 +85,7 @@ XMLTag::XMLTag()
 
 	m_sztag[0] = 0;
 	m_nlevel = 0;
-
+	
 	m_natt = 0;
 	for (int i=0; i<MAX_LEVEL; ++i) m_szroot[i][0] = 0;
 }
@@ -100,6 +100,34 @@ void XMLTag::clear()
 	m_bend = false;
 	m_bleaf = true;
 	m_bempty = false;
+}
+
+//-----------------------------------------------------------------------------
+std::string XMLTag::relpath(const char* szroot) const
+{
+	std::string s;
+	int m = -1;
+	if (szroot)
+	{
+		for (int i = 0; i <= m_nlevel; ++i)
+		{
+			if (strcmp(szroot, m_szroot[i]) == 0)
+			{
+				m = i;
+				break;
+			}
+		}
+	}
+
+	if (m != -1)
+	{
+		for (int i = m+1; i <= m_nlevel; i++)
+		{
+			if (i != m+1) s += ".";
+			s += m_szroot[i];
+		}
+	}
+	return s;
 }
 
 //-----------------------------------------------------------------------------

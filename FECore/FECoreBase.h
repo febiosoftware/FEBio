@@ -152,6 +152,10 @@ public:
 	//! build the property list
 	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = FEProperty::Required);
 
+	void RemoveProperty(int i);
+
+	void ClearProperties();
+
 public:
 	template <class T> T* ExtractProperty(bool extractSelf = true);
 

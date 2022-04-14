@@ -222,7 +222,6 @@ public:
 	double				m_Rmax;			//!< max residual value
 
 	// solution strategy
-	int					m_qndefault;
 	FENewtonStrategy*	m_qnstrategy;		//!< class handling the specific stiffness update logic
 	bool				m_breformtimestep;	//!< reform at start of time step
 	bool				m_breformAugment;	//!< reform after each (failed) augmentations
@@ -251,13 +250,6 @@ public:
 	vector<double> m_Ui;	//!< total solution increments of current time step
 	vector<double> m_up;	//!< solution increment of previous iteration
 	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
-
-public:
-	// obsolete parameters
-	int					m_maxups;		//!< max number of quasi-newton updates
-	int					m_max_buf_size;	//!< max buffer size for update vector storage
-	bool				m_cycle_buffer;	//!< cycle the qn buffer when updates larger than buffer size
-	double				m_cmax;			//!< max condition numbers
 
 private:
 	double	m_ls;	//!< line search factor calculated in last call to QNSolve

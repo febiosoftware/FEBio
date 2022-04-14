@@ -86,6 +86,9 @@ public:
 	// set the flags
 	void SetFlags(unsigned int flags) { m_flags = flags; }
 
+	// get the flags
+	unsigned int Flags() const { return m_flags; }
+
 	// get default type (can be null)
 	const char* GetDefaultType() const;
 
@@ -133,6 +136,9 @@ public: // these functions have to be implemented by derived classes
 	//! Get the class ID
 	SUPER_CLASS_ID GetSuperClassID() const { return m_superClassID; }
 
+public:
+	virtual ~FEProperty();
+
 protected:
 	//! some helper functions for reading, writing properties
 	void Write(DumpStream& ar, FECoreBase* pc);
@@ -141,7 +147,6 @@ protected:
 protected:
 	// This class should not be created directly
 	FEProperty(SUPER_CLASS_ID classID);
-	virtual ~FEProperty();
 
 protected:
 	FECoreBase*		m_pParent;		//!< pointer to the parent class (i.e. the class that defines this property)

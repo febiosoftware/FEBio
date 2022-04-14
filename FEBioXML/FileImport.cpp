@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEPointFunction.h>
+#include <FECore/log.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -46,6 +47,91 @@ SOFTWARE.*/
 #ifndef WIN32
 #define strnicmp strncasecmp
 #endif
+
+//-----------------------------------------------------------------------------
+FEObsoleteParamHandler::FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc) : m_pc(pc) 
+{
+	m_root = tag.m_szroot[tag.m_nlevel - 1];
+}
+
+void FEObsoleteParamHandler::AddParam(const char* oldName, const char* newName, FEParamType paramType)
+{
+	FEObsoleteParam p = { oldName, newName, paramType };
+	m_param.push_back(p);
+}
+
+bool FEObsoleteParamHandler::ProcessTag(XMLTag& tag)
+{
+	std::string path = tag.relpath(m_root.c_str());
+	for (int i = 0; i < m_param.size(); ++i)
+	{
+		if (path == m_param[i].oldName)
+		{
+			m_param[i].readIn = true;
+
+			switch (m_param[i].paramType)
+			{
+			case FE_PARAM_INVALID: break; // parameter will be ignored
+			case FE_PARAM_BOOL   : tag.value(m_param[i].bVal); break;
+			case FE_PARAM_INT    : tag.value(m_param[i].iVal); break;
+			case FE_PARAM_DOUBLE : tag.value(m_param[i].gVal); break;
+			default:
+				assert(false);
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void FEObsoleteParamHandler::MapParameters()
+{
+	FEModel* fem = m_pc->GetFEModel();
+	feLogEx(fem, "\n");
+	for (FEObsoleteParam& p : m_param)
+	{
+		if (p.readIn)
+		{
+			if (p.newName == nullptr)
+			{
+				feLogWarningEx(fem, "Obsolete parameter %s is ignored!", p.oldName);
+			}
+			else
+			{
+				ParamString ps(p.newName);
+				FEParam* pp = m_pc->FindParameter(ps);
+				if (pp == nullptr)
+				{
+					feLogErrorEx(fem, "Failed to map obsolete parameter %s. Could not find new parameter %s", p.oldName, p.newName);
+				}
+				else
+				{
+					if (pp->type() == p.paramType)
+					{
+						switch (pp->type())
+						{
+						case FE_PARAM_BOOL  : pp->value<bool>  () = p.bVal; break;
+						case FE_PARAM_INT   : pp->value<int>   () = p.iVal; break;
+						case FE_PARAM_DOUBLE: pp->value<double>() = p.gVal; break;
+						}
+						feLogEx(fem, "Successfully mapped obsolete parameter %s to %s\n", p.oldName, p.newName);
+					}
+					else if ((pp->type() == FE_PARAM_DOUBLE_MAPPED) && (p.paramType == FE_PARAM_DOUBLE))
+					{
+						FEParamDouble& v = pp->value<FEParamDouble>();
+						v = p.gVal;
+						feLogEx(fem, "Successfully mapped obsolete parameter %s to %s\n", p.oldName, p.newName);
+					}
+					else
+					{
+						feLogErrorEx(fem, "Failed to map obsolete parameter %s. New parameter %s has different type.", p.oldName, p.newName);
+					}
+				}
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 FEFileException::FEFileException()
@@ -82,6 +168,12 @@ FEModel* FEFileSection::GetFEModel() { return &GetBuilder()->GetFEModel(); }
 
 //-----------------------------------------------------------------------------
 FEModelBuilder* FEFileSection::GetBuilder() { return m_pim->GetBuilder(); }
+
+//-----------------------------------------------------------------------------
+void FEFileSection::SetInvalidTagHandler(FEInvalidTagHandler* ith)
+{
+	m_ith = ith;
+}
 
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, int& n)
@@ -1167,7 +1259,11 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 		++tag;
 		do
 		{
-			if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
+			if (ReadParameter(tag, pc) == false)
+			{
+				if ((m_ith == nullptr) || (m_ith->ProcessTag(tag) == false))
+					throw XMLReader::InvalidTag(tag);
+			}
 			++tag;
 		}
 		while (!tag.isend());
