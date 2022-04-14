@@ -27,12 +27,12 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEElasticMaterial.h"
 #include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Polynomial Hyperelastic
-class FEPolynomialHyperElastic : public FEUncoupledMaterial
+class FEPolynomialHyperElastic : public FEElasticMaterial
 {
 public:
 	FEPolynomialHyperElastic(FEModel* pfem);
@@ -43,17 +43,18 @@ public:
 
 public:
 	//! calculate deviatoric stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt) override;
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt) override;
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
+	double StrainEnergyDensity(FEMaterialPoint& mp) override;
 
-	virtual double U(double J) override;
-	virtual double UJ(double J) override;
-	virtual double UJJ(double J) override;
+private:
+	double U(double J);
+	double UJ(double J);
+	double UJJ(double J);
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
