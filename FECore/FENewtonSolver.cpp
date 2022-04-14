@@ -104,6 +104,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 //! Set the default solution strategy
 void FENewtonSolver::SetDefaultStrategy(QN_STRATEGY qn)
 {
+	GetParameterList(); // This needs to be called to ensure that the parameter and property lists have been setup.
+
 	FEProperty& p = *FindProperty("qn_method");
 	switch (qn)
 	{

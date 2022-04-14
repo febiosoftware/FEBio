@@ -59,6 +59,8 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	// try to allocate the domain
 	if (eclass == FE_ELEM_SOLID)
 	{
+		if (dynamic_cast<FESolidMaterial*>(pmat) == nullptr) return nullptr;
+
 		const char* sztype = nullptr;
 		if      (dynamic_cast<FERigidMaterial*            >(pmat)) sztype = "rigid-solid";
 		else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
@@ -121,6 +123,8 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	}
 	else if (eclass == FE_ELEM_SHELL)
 	{
+		if (dynamic_cast<FESolidMaterial*>(pmat) == nullptr) return nullptr;
+
 		const char* sztype = nullptr;
 		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
@@ -157,7 +161,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	else if (eclass == FE_ELEM_TRUSS)
 	{
 		const char* sztype = nullptr;
-		if (dynamic_cast<FESolidMaterial*>(pmat))
+		if (dynamic_cast<FETrussMaterial*>(pmat))
 			if (eshape == ET_TRUSS2) sztype = "elastic-truss";
 
 		if (sztype) pd = fecore_new<FETrussDomain>(sztype, pfem);

@@ -189,7 +189,10 @@ public:
 	FEChemicalReaction* GetReaction(int i) { return m_pReact[i]; }
 	FEMembraneReaction* GetMembraneReaction(int i) { return m_pMReact[i]; }
 
-	int SBMs() { return (int)m_pSBM.size(); }
+public: // From FESoluteInterface
+	int SBMs() const override  { return (int)m_pSBM.size(); }
+
+public:
 	int Reactions() { return (int)m_pReact.size(); }
 	int MembraneReactions() { return (int)m_pMReact.size(); }
 

@@ -157,6 +157,7 @@ void FEDataFitObjective::SetMeasurements(const vector<pair<double, double> >& da
 		const pair<double,double>& pt = data[i];
 		m_lc.Add(pt.first, pt.second);
 	}
+	m_lc.Init();
 }
 
 //----------------------------------------------------------------------------

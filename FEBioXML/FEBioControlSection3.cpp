@@ -48,7 +48,13 @@ public:
 	{
 		if (tag == "qnmethod")
 		{
-			tag.value(m_qnmethod);
+			const char* szv = tag.szvalue();
+			int l = strlen(szv);
+			if      ((strnicmp(szv, "BFGS"   , l) == 0) || (strnicmp(szv, "0", l) == 0)) m_qnmethod = QN_BFGS;
+			else if ((strnicmp(szv, "BROYDEN", l) == 0) || (strnicmp(szv, "1", l) == 0)) m_qnmethod = QN_BROYDEN;
+			else if ((strnicmp(szv, "JFNK"   , l) == 0) || (strnicmp(szv, "2", l) == 0)) m_qnmethod = QN_JFNK;
+			else return false;
+
 			return true;
 		}
 		else return FEObsoleteParamHandler::ProcessTag(tag);

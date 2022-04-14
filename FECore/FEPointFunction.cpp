@@ -119,7 +119,7 @@ void FEPointFunction::Add(double x, double y)
 {
 	// find the place to insert the data point
 	int n = 0;
-	int nsize = Points();
+	int nsize = m_points.size();
 	while ((n<nsize) && (m_points[n].x() < x)) ++n;
 
 	// insert loadpoint
