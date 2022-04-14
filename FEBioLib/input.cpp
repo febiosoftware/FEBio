@@ -181,7 +181,13 @@ void FEBioModel::print_parameter_list(FEParameterList& pl, int level)
 	if (n > 0)
 	{
 		FEParamIterator it = pl.first();
-		for (int j=0; j<n; ++j, ++it) print_parameter(*it, level);
+		for (int j = 0; j < n; ++j, ++it)
+		{
+			if (it->IsHidden() == false)
+			{
+				print_parameter(*it, level);
+			}
+		}
 	}
 }
 

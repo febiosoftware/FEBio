@@ -594,6 +594,12 @@ void FEParam::SetWatch(bool b)
 }
 
 //-----------------------------------------------------------------------------
+bool FEParam::IsHidden() const
+{
+	return (m_flag & FEParamFlag::FE_PARAM_HIDDEN);
+}
+
+//-----------------------------------------------------------------------------
 FEParam* FEParam::SetFlags(unsigned int flags) { m_flag = flags; return this; }
 unsigned int FEParam::GetFlags() const { return m_flag; }
 

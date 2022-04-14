@@ -200,6 +200,8 @@ public:
 
 	void SetWatch(bool b);
 
+	bool IsHidden() const;
+
 public:
 	int GetParamGroup() const;
 	void SetParamGroup(int i);
