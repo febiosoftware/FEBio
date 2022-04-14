@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FEPolynomialHyperElastic, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEPolynomialHyperElastic, FEElasticMaterial)
 //	ADD_PARAMETER(m_c[0][0], "c00");  // should always be zero
 	ADD_PARAMETER(m_c[0][1], "c01");
 	ADD_PARAMETER(m_c[0][2], "c02");
@@ -43,18 +43,16 @@ BEGIN_FECORE_CLASS(FEPolynomialHyperElastic, FEUncoupledMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEPolynomialHyperElastic::FEPolynomialHyperElastic(FEModel* pfem) : FEUncoupledMaterial(pfem) 
+FEPolynomialHyperElastic::FEPolynomialHyperElastic(FEModel* pfem) : FEElasticMaterial(pfem) 
 {
-	// This isn't used, but can't be zero. 
-	m_K = 1e-12;
-
+	m_D1 = m_D2 = 0.0;
 	for (int i = 0; i < 3; ++i)
 		for (int j = 0; j < 3; ++j) m_c[i][j] = 0.0;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the deviatoric stress
-mat3ds FEPolynomialHyperElastic::DevStress(FEMaterialPoint& mp)
+mat3ds FEPolynomialHyperElastic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -94,12 +92,16 @@ mat3ds FEPolynomialHyperElastic::DevStress(FEMaterialPoint& mp)
 	// T = F*dW/dC*Ft
 	mat3ds T = B * (W1 + W2 * I1) - B2 * W2;
 
-	return T.dev() * (2.0 / J);
+	mat3ds devs = T.dev() * (2.0 / J);
+
+	pt.m_p = UJ(pt.m_J);
+
+	return mat3dd(pt.m_p) + devs;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the deviatoric tangent
-tens4ds FEPolynomialHyperElastic::DevTangent(FEMaterialPoint& mp)
+tens4ds FEPolynomialHyperElastic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -176,12 +178,12 @@ tens4ds FEPolynomialHyperElastic::DevTangent(FEMaterialPoint& mp)
 	tens4ds cs = dyad1s(devs, I)* (-2.0 / 3.0) + (I4 - IxI / 3.0) * (4.0 / 3.0 * Ji * WC);
 	tens4ds ce = cs + cw*(4.0 * Ji);
 
-	return ce;
+	return ce + (IxI - I4 * 2) * pt.m_p + IxI * (UJJ(pt.m_J) * pt.m_J);
 }
 
 //-----------------------------------------------------------------------------
 //! calculate deviatoric strain energy density
-double FEPolynomialHyperElastic::DevStrainEnergyDensity(FEMaterialPoint& mp)
+double FEPolynomialHyperElastic::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -205,7 +207,7 @@ double FEPolynomialHyperElastic::DevStrainEnergyDensity(FEMaterialPoint& mp)
 		for (int j = 0; j < 3; ++j)
 			W += c[i][j] * pow(I1 - 3, i) * pow(I2 - 3, j);
 
-	return W;
+	return U(pt.m_J) + W;
 }
 
 double FEPolynomialHyperElastic::U(double J)

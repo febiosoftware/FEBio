@@ -78,7 +78,7 @@ public:
 
 public:
 	//! strain energy density U(J)
-    virtual double U(double J) {
+    double U(double J) {
         switch (m_npmodel) {
             case 0: return 0.5*m_K*pow(log(J),2); break;    // FEBio default
             case 1: return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); break;    // NIKE3D's Ogden material
@@ -88,7 +88,7 @@ public:
         }
     }
 	//! pressure, i.e. first derivative of U(J)
-	virtual double UJ(double J) {
+	double UJ(double J) {
         switch (m_npmodel) {
             case 0: return m_K*log(J)/J; break;
             case 1: return 0.5*m_K*(J - 1.0/J); break;
@@ -99,7 +99,7 @@ public:
     }
 
 	//! second derivative of U(J) 
-	virtual double UJJ(double J) {
+	double UJJ(double J) {
         switch (m_npmodel) {
             case 0: return m_K*(1-log(J))/(J*J); break;
             case 1: return 0.5*m_K*(1 + 1.0/(J*J)); break;
