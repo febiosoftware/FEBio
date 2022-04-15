@@ -53,6 +53,25 @@ void FECoreKernel::SetInstance(FECoreKernel* pkernel)
 }
 
 //-----------------------------------------------------------------------------
+const char* FECoreKernel::SuperClassString(unsigned int sid)
+{
+	FECoreKernel& fecore = GetInstance();
+	if (fecore.m_sidMap.find(sid) != fecore.m_sidMap.end())
+		return fecore.m_sidMap[sid];
+	else
+		return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+std::map<unsigned int, const char*>	FECoreKernel::GetSuperClassMap()
+{
+	FECoreKernel& fecore = GetInstance();
+	return fecore.m_sidMap;
+}
+
+//-----------------------------------------------------------------------------
+
+#define ADD_SUPER_CLASS(a) m_sidMap[a] = #a
 FECoreKernel::FECoreKernel()
 {
 	m_activeModule = -1;
@@ -60,6 +79,49 @@ FECoreKernel::FECoreKernel()
 	m_next_alloc_id = 1;
 
 	m_default_solver = nullptr;
+
+	// build the super class ID table
+	ADD_SUPER_CLASS(FEINVALID_ID);
+	ADD_SUPER_CLASS(FEOBJECT_ID);
+	ADD_SUPER_CLASS(FETASK_ID);
+	ADD_SUPER_CLASS(FESOLVER_ID);
+	ADD_SUPER_CLASS(FEMATERIAL_ID);
+	ADD_SUPER_CLASS(FEMATERIALPROP_ID);
+	ADD_SUPER_CLASS(FEDISCRETEMATERIAL_ID);
+	ADD_SUPER_CLASS(FELOAD_ID);
+	ADD_SUPER_CLASS(FENLCONSTRAINT_ID);
+	ADD_SUPER_CLASS(FEPLOTDATA_ID);
+	ADD_SUPER_CLASS(FEANALYSIS_ID);
+	ADD_SUPER_CLASS(FESURFACEINTERFACE_ID);
+	ADD_SUPER_CLASS(FELOGDATA_ID);
+	ADD_SUPER_CLASS(FEBC_ID);
+	ADD_SUPER_CLASS(FEGLOBALDATA_ID);
+	ADD_SUPER_CLASS(FECALLBACK_ID);
+	ADD_SUPER_CLASS(FESOLIDDOMAIN_ID);
+	ADD_SUPER_CLASS(FESHELLDOMAIN_ID);
+	ADD_SUPER_CLASS(FETRUSSDOMAIN_ID);
+	ADD_SUPER_CLASS(FEDISCRETEDOMAIN_ID);
+	ADD_SUPER_CLASS(FEDOMAIN2D_ID);
+	ADD_SUPER_CLASS(FESURFACE_ID);
+	ADD_SUPER_CLASS(FEIC_ID);
+	ADD_SUPER_CLASS(FEMESHDATAGENERATOR_ID);
+	ADD_SUPER_CLASS(FELOADCONTROLLER_ID);
+	ADD_SUPER_CLASS(FEMODEL_ID);
+	ADD_SUPER_CLASS(FEMODELDATA_ID);
+	ADD_SUPER_CLASS(FESCALARGENERATOR_ID);
+	ADD_SUPER_CLASS(FEVEC3DGENERATOR_ID);
+	ADD_SUPER_CLASS(FEMAT3DGENERATOR_ID);
+	ADD_SUPER_CLASS(FEMAT3DSGENERATOR_ID);
+	ADD_SUPER_CLASS(FEFUNCTION1D_ID);
+	ADD_SUPER_CLASS(FELINEARSOLVER_ID);
+	ADD_SUPER_CLASS(FEMESHADAPTOR_ID);
+	ADD_SUPER_CLASS(FEMESHADAPTORCRITERION_ID);
+	ADD_SUPER_CLASS(FERIGIDBC_ID);
+	ADD_SUPER_CLASS(FENEWTONSTRATEGY_ID);
+	ADD_SUPER_CLASS(FETIMECONTROLLER_ID);
+	ADD_SUPER_CLASS(FEEIGENSOLVER_ID);
+	ADD_SUPER_CLASS(FEDATARECORD_ID);
+	ADD_SUPER_CLASS(FECLASS_ID);
 }
 
 //-----------------------------------------------------------------------------

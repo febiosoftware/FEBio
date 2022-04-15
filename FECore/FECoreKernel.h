@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECoreFactory.h"
 #include "ClassDescriptor.h"
 #include <vector>
+#include <map>
 #include <string.h>
 #include <stdio.h>
 #include "version.h"
@@ -54,6 +55,11 @@ public:
 
 	// set the instance of the kernel
 	static void SetInstance(FECoreKernel* pkernel);
+
+public:
+	static const char* SuperClassString(unsigned int sid);
+
+	static std::map<unsigned int, const char*>	GetSuperClassMap();
 
 public:
 	//! Register a class with the framework
@@ -160,6 +166,8 @@ public:
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
+
+	std::map<unsigned int, const char*>	m_sidMap;	// super class ID map
 
 	std::string			m_default_solver_type;	// default linear solver
 	FEClassDescriptor*	m_default_solver;

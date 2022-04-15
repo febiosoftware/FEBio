@@ -239,24 +239,23 @@ enum SUPER_CLASS_ID {
 	FELOGDATA_ID,            		// derived from FELogData
 	FEBC_ID,						// derived from FEBoundaryCondition
 	FEGLOBALDATA_ID,				// derived from FEGlobalData
-	FERIGIDOBJECT_ID,				// derived from FECoreBase (TODO: work in progress)
 	FECALLBACK_ID,					// derived from FECallBack
-	FESOLIDDOMAIN_ID,				// derived from FESolidDomain (TODO: work in progress)
-	FESHELLDOMAIN_ID,				// derived from FEShellDomain (TODO: work in progress)
-	FETRUSSDOMAIN_ID,				// derived from FETrussDomain (TODO: work in progress)
-	FEDISCRETEDOMAIN_ID,			// derived from FEDiscreteDomain (TODO: work in progress)
-	FEDOMAIN2D_ID,					// derived from FEDomain2D (TODO: work in progress)
-	FESURFACE_ID,					// derived from FESurface (TODO: work in progress)
-	FEIC_ID,						// derived from initial condition
+	FESOLIDDOMAIN_ID,				// derived from FESolidDomain
+	FESHELLDOMAIN_ID,				// derived from FEShellDomain
+	FETRUSSDOMAIN_ID,				// derived from FETrussDomain
+	FEDISCRETEDOMAIN_ID,			// derived from FEDiscreteDomain
+	FEDOMAIN2D_ID,					// derived from FEDomain2D
+	FESURFACE_ID,					// derived from FESurface
+	FEIC_ID,						// derived from FEInitialCondition
 	FEMESHDATAGENERATOR_ID,			// derived from FEMeshDataGenerator
-	FELOADCONTROLLER_ID,			// derived from FELoadContoller (TODO: work in progress)
+	FELOADCONTROLLER_ID,			// derived from FELoadContoller
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
-	FESCALARGENERATOR_ID,			// derived from FEScalarValuator (TODO: work in progress)
-	FEVEC3DGENERATOR_ID,			// derived from FEVectorValuator (NOTE: work in progress!)
-	FEMAT3DGENERATOR_ID,			// derived from FEMAT3DValuator (NOTE: work in progress!)
-	FEMAT3DSGENERATOR_ID,			// derived from FEMAT3DSValuator (NOTE: work in progress!)
-	FEFUNCTION1D_ID,				// derived from FEFunction1D (TODO: work in progress)
+	FESCALARGENERATOR_ID,			// derived from FEScalarValuator
+	FEVEC3DGENERATOR_ID,			// derived from FEVectorValuator
+	FEMAT3DGENERATOR_ID,			// derived from FEMAT3DValuator
+	FEMAT3DSGENERATOR_ID,			// derived from FEMAT3DSValuator
+	FEFUNCTION1D_ID,				// derived from FEFunction1D
 	FELINEARSOLVER_ID,				// derived from LinearSolver
 	FEMESHADAPTOR_ID,				// derived from FEMeshAdaptor
 	FEMESHADAPTORCRITERION_ID,		// derived from FEMeshAdaptorCriterion

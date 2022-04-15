@@ -633,40 +633,8 @@ int FEBioCmd_hist::run(int nargs, char **argv)
 
 const char* super_id_to_string(SUPER_CLASS_ID superID)
 {
-	const char* szclass = 0;
-	switch (superID)
-	{
-	case FEINVALID_ID          : szclass = "INVALID"; break;
-	case FEOBJECT_ID           : szclass = "OBJECT"; break;
-	case FETASK_ID             : szclass = "TASK"; break;
-	case FESOLVER_ID           : szclass = "SOLVER"; break;
-	case FEMATERIAL_ID         : szclass = "MATERIAL"; break;
-	case FELOAD_ID             : szclass = "LOAD"; break;
-	case FENLCONSTRAINT_ID     : szclass = "NLCONSTRAINT"; break;
-	case FEPLOTDATA_ID         : szclass = "PLOTDATA"; break;
-	case FEANALYSIS_ID         : szclass = "ANALYSIS"; break;
-	case FESURFACEINTERFACE_ID : szclass = "SURFACEINTERFACE"; break;
-	case FELOGDATA_ID          : szclass = "LOGDATA"; break;
-	case FEBC_ID               : szclass = "BC"; break;
-	case FEGLOBALDATA_ID       : szclass = "GLOBALDATA"; break;
-	case FERIGIDOBJECT_ID      : szclass = "RIGIDOBJECT"; break;
-	case FECALLBACK_ID         : szclass = "CALLBACK"; break;
-	case FESOLIDDOMAIN_ID      : szclass = "SOLIDDOMAIN"; break;
-	case FESHELLDOMAIN_ID      : szclass = "SHELLDOMAIN"; break;
-	case FESURFACE_ID          : szclass = "SURFACE"; break;
-	case FEIC_ID               : szclass = "IC"; break;
-	case FEMESHDATAGENERATOR_ID: szclass = "MESHDATAGENERATOR"; break;
-	case FELOADCONTROLLER_ID   : szclass = "LOADCONTROLLER"; break;
-	case FEMODEL_ID            : szclass = "MODEL"; break;
-	case FEMODELDATA_ID        : szclass = "MODELDATA"; break;
-	case FESCALARGENERATOR_ID  : szclass = "SCALARGENERATOR"; break;
-	case FEVEC3DGENERATOR_ID   : szclass = "VEC3DGENERATOR"; break;
-	case FEMAT3DGENERATOR_ID   : szclass = "MAT3DGENERATOR"; break;
-	case FEFUNCTION1D_ID       : szclass = "FUNCTION1D"; break;
-	case FELINEARSOLVER_ID     : szclass = "LINEARSOLVER"; break;
-	default:
-		szclass = "(unknown)";
-	};
+	const char* szclass = FECoreKernel::SuperClassString(superID);
+	if (szclass == nullptr) szclass = "(unknown)";
 	return szclass;
 }
 
