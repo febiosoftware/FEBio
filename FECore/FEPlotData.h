@@ -62,7 +62,6 @@ class FEElement;
 class FECORE_API FEPlotData : public FECoreBase
 {
 	FECORE_SUPER_CLASS(FEPLOTDATA_ID)
-	FECORE_BASE_CLASS(FEPlotData)
 
 public:
 	FEPlotData(FEModel* fem);
@@ -129,6 +128,8 @@ private:
 //! associated with each node of the mesh, will use this base class.
 class FECORE_API FEPlotNodeData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotNodeData)
+
 public:
 	FEPlotNodeData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_NODE, t, s) {}
 };
@@ -138,6 +139,8 @@ public:
 //! associated with each element or node of a domain, will use this base class.
 class FECORE_API FEPlotDomainData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotDomainData)
+
 public:
 	FEPlotDomainData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_DOMAIN, t, s) {}
 };
@@ -147,6 +150,8 @@ public:
 //! associated with each node or facet of a surface, will use this base class.
 class FECORE_API FEPlotSurfaceData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotSurfaceData)
+
 public:
 	FEPlotSurfaceData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_SURFACE, t, s) {}
 };

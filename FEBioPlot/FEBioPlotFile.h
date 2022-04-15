@@ -368,6 +368,8 @@ protected:
 //-----------------------------------------------------------------------------
 class FEPlotObjectData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotObjectData)
+
 public:
 	FEPlotObjectData(FEModel* fem) : FEPlotData(fem) {}
 

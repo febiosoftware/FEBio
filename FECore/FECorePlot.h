@@ -38,6 +38,8 @@ class FEFacetSet;
 // class for exporting element specific material parameters to plot file
 class FEPlotParameter : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotParameter)
+
 public:
 	FEPlotParameter(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
