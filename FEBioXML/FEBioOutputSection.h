@@ -42,5 +42,4 @@ public:
 protected:
 	void ParseLogfile    (XMLTag& tag);
 	void ParsePlotfile   (XMLTag& tag);
-	void ParseDataSection(XMLTag& tag);
 };

@@ -49,7 +49,6 @@ class FEAnalysis;
 class FEGlobalData;
 class FEGlobalMatrix;
 class FELinearConstraintManager;
-class FEModelData;
 class FEDataArray;
 class FEMeshAdaptor;
 class Timer;
@@ -376,14 +375,6 @@ public: // Global data
 	// get/set global data
 	void SetGlobalConstant(const string& s, double v);
 	double GetGlobalConstant(const string& s);
-
-public: // model data
-	void AddModelData(FEModelData* data);
-	FEModelData* GetModelData(int i);
-	int ModelDataItems() const;
-
-	// update all model data
-	void UpdateModelData();
 
 public: // Data retrieval
 

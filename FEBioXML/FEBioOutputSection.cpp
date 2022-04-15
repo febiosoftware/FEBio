@@ -36,7 +36,6 @@ SOFTWARE.*/
 #include <FECore/SurfaceDataRecord.h>
 #include <FECore/DomainDataRecord.h>
 #include <FECore/FEModel.h>
-#include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
 #include <FECore/FEPlotDataStore.h>
 #include <FECore/FESurface.h>
@@ -87,35 +86,6 @@ void FEBioOutputSection::Parse(XMLTag& tag)
 	{
 		if      (tag == "logfile" ) ParseLogfile(tag);
 		else if (tag == "plotfile") ParsePlotfile(tag);
-		else if (tag == "data"    ) ParseDataSection(tag);
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-void FEBioOutputSection::ParseDataSection(XMLTag &tag)
-{
-	FEModel& fem = *GetFEModel();
-
-	++tag;
-	do
-	{
-		if (tag == "element_data")
-		{
-			const char* szdata = tag.AttributeValue("data");
-
-			FELogElemData* pd = fecore_new<FELogElemData>(szdata, &fem);
-			if (pd == 0) throw XMLReader::InvalidAttributeValue(tag, "data", szdata);
-
-			vector<int> items;
-			tag.value(items);
-
-			FEModelData* data = new FEModelData(&fem, pd, items);
-			data->SetName(szdata);
-			fem.AddModelData(data);
-		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

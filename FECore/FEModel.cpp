@@ -44,7 +44,6 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FELinearConstraintManager.h"
 #include "log.h"
-#include "FEModelData.h"
 #include "FEDataArray.h"
 #include "FESurfaceConstraint.h"
 #include "FEModelParam.h"
@@ -164,7 +163,6 @@ public:
 	std::vector<FENLConstraint*>			m_NLC;		//!< nonlinear constraints
 	std::vector<FELoadController*>			m_LC;		//!< load controller data
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
-	std::vector<FEModelData*>				m_Data;		//!< the model output data
 	std::vector<FEMeshAdaptor*>				m_MA;		//!< mesh adaptors
 	std::vector<FEDataGenerator*>			m_MD;		//!< mesh data generators
 
@@ -225,7 +223,6 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
 //	ADD_PROPERTY(m_imp->m_MD  , "mesh_data"      );
 	ADD_PROPERTY(m_imp->m_Step, "step"           );
-	ADD_PROPERTY(m_imp->m_Data, "data"           );
 
 END_FECORE_CLASS();
 
@@ -1189,9 +1186,6 @@ bool FEModel::RCI_Advance()
 	step->m_ntotiter += psolver->m_niter;
 	step->m_ntotrhs += psolver->m_nrhs;
 
-	// update model's data
-	UpdateModelData();
-
 	// Yes! We have converged!
 	feLog("\n------- converged at time : %lg\n\n", GetCurrentTime());
 
@@ -1349,7 +1343,6 @@ bool FEModel::Reset()
 
 	// Reevaluate load parameters
 	EvaluateLoadParameters();
-	UpdateModelData();
 
 	DoCallback(CB_RESET);
 
@@ -1770,34 +1763,6 @@ FEGlobalData* FEModel::GetGlobalData(int i)
 int FEModel::GlobalDataItems()
 {
 	return (int)m_imp->m_GD.size();
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::AddModelData(FEModelData* data)
-{
-	m_imp->m_Data.push_back(data);
-}
-
-//-----------------------------------------------------------------------------
-FEModelData* FEModel::GetModelData(int i)
-{
-	return m_imp->m_Data[i];
-}
-
-//-----------------------------------------------------------------------------
-int FEModel::ModelDataItems() const
-{
-	return (int) m_imp->m_Data.size();
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::UpdateModelData()
-{
-	for (int i=0; i<ModelDataItems(); ++i)
-	{
-		FEModelData* data = GetModelData(i);
-		data->Update();
-	}
 }
 
 //-----------------------------------------------------------------------------
