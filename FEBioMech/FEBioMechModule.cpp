@@ -375,7 +375,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH, "fiber-natural-NH");
 	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
+	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
     REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-Kiousis-uncoupled");
