@@ -125,6 +125,10 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 				MITEM Pi = new MNamedCt(PI, "pi");
 				return -(2/Sqrt(Pi))*Exp(-(p^2))*dp;
 			}
+			if (s.compare("H") == 0)
+			{
+				return 0.0;
+			}
 			assert(false);
 		}
 		break;
