@@ -112,7 +112,7 @@ FEForceVelocityContraction::FEForceVelocityContraction(FEModel* pfem) : FEActive
 //-----------------------------------------------------------------------------
 bool FEForceVelocityContraction::Init()
 {
-    if (FEMaterial::Init() == false) return false;
+    if (FEActiveContractionMaterial::Init() == false) return false;
     
     // for backward compatibility we set m_camax to m_ca0 if it is not defined
     if (m_camax == 0.0) m_camax = m_ca0;

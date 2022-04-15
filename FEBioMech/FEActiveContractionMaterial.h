@@ -33,10 +33,10 @@
 
 //-----------------------------------------------------------------------------
 //! A material class describing the active fiber contraction model of Estrada et al. in doi: 10.1115/1.4044030
-class FEBIOMECH_API FEActiveContractionMaterial : public FEMaterial
+class FEBIOMECH_API FEActiveContractionMaterial : public FEMaterialProperty
 {
 public:
-    FEActiveContractionMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+    FEActiveContractionMaterial(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEActiveContractionMaterial(){}
     
     //! calculate the active contractile stress
@@ -49,4 +49,6 @@ public:
 
     //! update force-velocity material point
     virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp, const vec3d& a0) {}
+
+    FECORE_BASE_CLASS(FEActiveContractionMaterial)
 };

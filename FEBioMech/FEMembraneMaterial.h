@@ -75,6 +75,8 @@ public:
 
 	//! calculate in-plane membrane tangent
 	virtual void Tangent(FEMaterialPoint& mp, double D[3][3]) = 0;
+
+	FECORE_BASE_CLASS(FEMembraneMaterial)
 };
 
 //-----------------------------------------------------------------------------
