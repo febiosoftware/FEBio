@@ -74,7 +74,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	else if (strcmp(sztype, "force") == 0)
 	{
 		// create the rigid body force
-		FEModelLoad* pFC = fecore_new<FEModelLoad>(FELOAD_ID, "rigid_force", fem);
+		FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", fem);
 		feb.AddModelLoad(pFC);
 		ReadParameterList(tag, pFC);
 	}
@@ -116,7 +116,7 @@ void FEBioRigidSection::ParseRigidConnector(XMLTag& tag)
 {
 	const char* sztype = tag.AttributeValue("type");
 
-	FENLConstraint* plc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, GetFEModel());
+	FENLConstraint* plc = fecore_new<FENLConstraint>(sztype, GetFEModel());
 	if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	const char* szname = tag.AttributeValue("name", true);

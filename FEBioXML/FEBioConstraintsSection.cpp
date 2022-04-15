@@ -401,7 +401,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				double val = 0.0;
 				value(tag, val);
 
-				FEModelLoad* pFC = fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", &fem);
+				FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
 				feb.AddModelLoad(pFC);
 
 				pFC->SetParameter("rb", nmat);
@@ -461,7 +461,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				double val = 0.0;
 				value(tag, val);
 
-				FEModelLoad* pFC = fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", &fem);
+				FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
 				feb.AddModelLoad(pFC);
 
 				pFC->SetParameter("rb", nmat);
@@ -590,7 +590,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			value(tag, val);
 
 			// create the rigid body force
-			FEModelLoad* pFC = fecore_new<FEModelLoad>(FEBC_ID, "rigid_force", &fem);
+			FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
 			feb.AddModelLoad(pFC);
 
 			pFC->SetParameter("load_type", ntype);

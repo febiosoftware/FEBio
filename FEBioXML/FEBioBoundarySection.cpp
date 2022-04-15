@@ -1375,7 +1375,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			value(tag, val);
 
 			// create the rigid body force
-			FEModelLoad* pFC = fecore_new<FEModelLoad>(FELOAD_ID, "rigid_force",  &fem);
+			FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force",  &fem);
 			feb.AddModelLoad(pFC);
 
 			pFC->SetParameter("load_type", ntype);

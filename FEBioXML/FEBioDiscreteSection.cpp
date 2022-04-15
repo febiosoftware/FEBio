@@ -124,7 +124,7 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 {
 	// create a new rigid constraint
-	FEModelLoad* paf = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
+	FEModelLoad* paf = fecore_new<FEModelLoad>(tag.Name(), GetFEModel());
 
 	// read the parameters
 	FEParameterList& pl = paf->GetParameterList();
@@ -258,7 +258,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 void FEBioDiscreteSection25::ParseRigidAxialForce(XMLTag& tag)
 {
 	// create a new rigid constraint
-	FEModelLoad* paf = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
+	FEModelLoad* paf = fecore_new<FEModelLoad>(tag.Name(), GetFEModel());
 
 	// read the parameters
 	FEParameterList& pl = paf->GetParameterList();
@@ -278,7 +278,7 @@ void FEBioDiscreteSection25::ParseRigidAxialForce(XMLTag& tag)
 void FEBioDiscreteSection25::ParseRigidCable(XMLTag& tag)
 {
 	// create a new rigid constraint
-	FEModelLoad* pml = fecore_new<FEModelLoad>(FELOAD_ID, tag.Name(), GetFEModel());
+	FEModelLoad* pml = fecore_new<FEModelLoad>(tag.Name(), GetFEModel());
 	if (pml == nullptr) throw XMLReader::InvalidTag(tag);
 
 	// read all parameters and properties
