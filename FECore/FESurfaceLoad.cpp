@@ -32,9 +32,6 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "FEModel.h"
 
-BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
-END_FECORE_CLASS()
-
 FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
 {
 	m_psurf = 0;
