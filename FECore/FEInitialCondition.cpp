@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FENode.h"
 #include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
-
 FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEStepComponent(pfem)
 {
 }

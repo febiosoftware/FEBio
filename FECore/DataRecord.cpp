@@ -39,8 +39,6 @@ UnknownDataField::UnknownDataField(const char* sz) : std::runtime_error(sz)
 {
 }
 
-REGISTER_SUPER_CLASS(DataRecord, FEDATARECORD_ID);
-
 //-----------------------------------------------------------------------------
 DataRecord::DataRecord(FEModel* pfem, int ntype) : FECoreBase(pfem), m_type(ntype)
 {
@@ -298,8 +296,6 @@ void DataRecord::Serialize(DumpStream &ar)
 }
 
 //=============================================================================
-REGISTER_SUPER_CLASS(FELogData, FELOGDATA_ID);
-
 FELogData::FELogData(FEModel* fem) : FECoreBase(fem)
 {
 

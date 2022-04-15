@@ -72,7 +72,7 @@ struct FEMODEL_MEMORY_STATS {
 //!
 class FECORE_API FEModel : public FECoreBase, public CallbackHandler
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMODEL_ID)
 
 public:
 	enum {MAX_STRING = 256};

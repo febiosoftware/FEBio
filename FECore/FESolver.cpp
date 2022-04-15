@@ -38,8 +38,6 @@ SOFTWARE.*/
 #include "FENodalLoad.h"
 #include "LinearSolver.h"
 
-REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
-
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 	BEGIN_PARAM_GROUP("linear solver");
 		ADD_PARAMETER(m_msymm    , "symmetric_stiffness", 0, "non-symmetric\0symmetric\0symmetric structure\0");

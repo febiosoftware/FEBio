@@ -40,7 +40,7 @@ class FEFacetSet;
 //! prescribed (FEPrescribedBC) boundary condition. 
 class FECORE_API FEBoundaryCondition : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEBC_ID)
 	FECORE_BASE_CLASS(FEBoundaryCondition);
 
 public:

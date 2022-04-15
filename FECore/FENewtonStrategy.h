@@ -41,7 +41,7 @@ class LinearSolver;
 //! A Base class for newton-type solution strategies
 class FECORE_API FENewtonStrategy : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FENEWTONSTRATEGY_ID)
 	FECORE_BASE_CLASS(FENewtonStrategy)
 
 public:

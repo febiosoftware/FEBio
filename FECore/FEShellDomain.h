@@ -31,7 +31,7 @@ SOFTWARE.*/
 //! Abstract base class for shell element domains
 class FECORE_API FEShellDomain : public FEDomain
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FESHELLDOMAIN_ID)
 	FECORE_BASE_CLASS(FEShellDomain)
 
 public:

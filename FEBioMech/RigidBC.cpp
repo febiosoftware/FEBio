@@ -35,8 +35,6 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 #include <FECore/log.h>
 
-REGISTER_SUPER_CLASS(FERigidBC, FERIGIDBC_ID);
-
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidBC, FEStepComponent)
 	// NOTE: This parameter is hidden, since FEBio Studio implements its own mechanism

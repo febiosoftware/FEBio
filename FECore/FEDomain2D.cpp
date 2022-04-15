@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEMaterial.h"
 
-REGISTER_SUPER_CLASS(FEDomain2D, FEDOMAIN2D_ID);
-
 //-----------------------------------------------------------------------------
 bool FEDomain2D::Create(int nelems, FE_Element_Spec espec)
 {

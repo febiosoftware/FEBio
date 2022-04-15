@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPlotData.h"
 
-REGISTER_SUPER_CLASS(FEPlotData, FEPLOTDATA_ID);
-
 //-----------------------------------------------------------------------------
 FEPlotData::FEPlotData(FEModel* fem) : FECoreBase(fem)
 {

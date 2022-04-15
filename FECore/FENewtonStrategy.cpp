@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FENewtonSolver.h"
 #include "LinearSolver.h"
 
-REGISTER_SUPER_CLASS(FENewtonStrategy, FENEWTONSTRATEGY_ID);
-
 BEGIN_FECORE_CLASS(FENewtonStrategy, FECoreBase)
 	ADD_PARAMETER(m_maxups, "max_ups");
 	ADD_PARAMETER(m_max_buf_size, FE_RANGE_GREATER_OR_EQUAL(0), "max_buffer_size"); 

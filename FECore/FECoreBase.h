@@ -210,8 +210,8 @@ template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, std::vector<T*>*
 
 #define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__)
 
-#define FECORE_SUPER_CLASS public: static SUPER_CLASS_ID superClassID();
-#define REGISTER_SUPER_CLASS(theClass, a) SUPER_CLASS_ID theClass::superClassID() { return a;}
+#define FECORE_SUPER_CLASS(a) public: static SUPER_CLASS_ID superClassID() { return a; }
+//#define REGISTER_SUPER_CLASS(theClass, a) SUPER_CLASS_ID theClass::superClassID() { return a;}
 
 template <class T> T* FECoreBase::ExtractProperty(bool extractSelf)
 {

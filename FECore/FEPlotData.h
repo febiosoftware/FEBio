@@ -61,7 +61,7 @@ class FEElement;
 //!
 class FECORE_API FEPlotData : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEPLOTDATA_ID)
 	FECORE_BASE_CLASS(FEPlotData)
 
 public:

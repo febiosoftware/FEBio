@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEMaterial.h"
 
-REGISTER_SUPER_CLASS(FEShellDomain, FESHELLDOMAIN_ID);
-
 //-----------------------------------------------------------------------------
 //! constructor
 FEShellDomain::FEShellDomain(FEModel* fem) : FEDomain(FE_DOMAIN_SHELL, fem)

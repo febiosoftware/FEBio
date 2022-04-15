@@ -57,7 +57,7 @@ public:
 
 class FECORE_API FEMaterial : public FEMaterialBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMATERIAL_ID)
 	FECORE_BASE_CLASS(FEMaterial)
 
 public:
@@ -98,7 +98,7 @@ private:
 // Material properties are classes that can only be defined as properties of other materials
 class FECORE_API FEMaterialProperty : public FEMaterialBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMATERIALPROP_ID)
 	FECORE_BASE_CLASS(FEMaterialProperty)
 
 public:

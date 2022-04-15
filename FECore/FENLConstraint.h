@@ -47,7 +47,7 @@ class FELinearSystem;
 //!
 class FECORE_API FENLConstraint : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FENLCONSTRAINT_ID)
 	FECORE_BASE_CLASS(FENLConstraint);
 
 public:

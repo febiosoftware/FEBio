@@ -63,7 +63,7 @@ public:
 
 class FECORE_API DataRecord : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEDATARECORD_ID)
 	FECORE_BASE_CLASS(DataRecord)
 
 public:
@@ -117,7 +117,7 @@ protected:
 // Super class for log data classes. 
 class FECORE_API FELogData : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FELOGDATA_ID)
 
 public:
 	FELogData(FEModel* fem);

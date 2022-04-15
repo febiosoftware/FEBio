@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "FEElementList.h"
 #include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
-
 FEMeshAdaptor::FEMeshAdaptor(FEModel* fem) : FEStepComponent(fem)
 {
 	m_elemSet = nullptr;

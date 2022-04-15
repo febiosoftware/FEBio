@@ -34,8 +34,6 @@ SOFTWARE.*/
 #include "MObj2String.h"
 #include "log.h"
 
-REGISTER_SUPER_CLASS(FEFunction1D, FEFUNCTION1D_ID);
-
 FEFunction1D::FEFunction1D(FEModel* fem) : FECoreBase(fem)
 {
 }

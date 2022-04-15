@@ -35,8 +35,6 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "log.h"
 
-REGISTER_SUPER_CLASS(FEDataGenerator, FEMESHDATAGENERATOR_ID);
-
 FEDataGenerator::FEDataGenerator(FEModel* fem) : FEModelComponent(fem)
 {
 }

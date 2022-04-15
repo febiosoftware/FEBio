@@ -68,8 +68,6 @@ SOFTWARE.*/
 #include <stdarg.h>
 using namespace std;
 
-REGISTER_SUPER_CLASS(FEModel, FEMODEL_ID)
-
 //-----------------------------------------------------------------------------
 // Implementation class for the FEModel class
 class FEModel::Implementation

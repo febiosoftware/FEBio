@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "log.h"
 #include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FESolidDomain, FESOLIDDOMAIN_ID);
-
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m_dofU(pfem), m_dofSU(pfem)
 {

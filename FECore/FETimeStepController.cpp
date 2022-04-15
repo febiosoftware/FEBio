@@ -35,8 +35,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "log.h"
 
-REGISTER_SUPER_CLASS(FETimeStepController, FETIMECONTROLLER_ID);
-
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_maxretries, "max_retries");

@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include "FETrussDomain.h"
 #include "FEMesh.h"
 
-REGISTER_SUPER_CLASS(FETrussDomain, FETRUSSDOMAIN_ID);
-
 //-----------------------------------------------------------------------------
 FETrussDomain::FETrussDomain(FEModel* fem) : FEDomain(FE_DOMAIN_TRUSS, fem)
 {

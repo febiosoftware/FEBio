@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include "FEBoundaryCondition.h"
 #include "FEFacetSet.h"
 
-REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
-
 //-----------------------------------------------------------------------------
 FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
 {

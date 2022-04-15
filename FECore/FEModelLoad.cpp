@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include "FEModelLoad.h"
 #include "FESolver.h"
 
-REGISTER_SUPER_CLASS(FEModelLoad, FELOAD_ID)
-
 //-----------------------------------------------------------------------------
 FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem)
 {

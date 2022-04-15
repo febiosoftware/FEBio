@@ -31,8 +31,6 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEMaterial.h"
 
-REGISTER_SUPER_CLASS(FEDiscreteDomain, FEDISCRETEDOMAIN_ID);
-
 //-----------------------------------------------------------------------------
 bool FEDiscreteDomain::Create(int nelems, FE_Element_Spec espec)
 { 

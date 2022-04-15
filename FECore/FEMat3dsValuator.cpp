@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FEDataMap.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEMat3dsValuator, FEMAT3DSGENERATOR_ID);
-
 //=============================================================================
 // FEConstValueMat3ds
 //-----------------------------------------------------------------------------

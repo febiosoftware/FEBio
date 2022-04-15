@@ -42,8 +42,6 @@ SOFTWARE.*/
 #include "FEModule.h"
 
 //---------------------------------------------------------------------------------------------
-REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
-
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 
 	BEGIN_PARAM_GROUP("Analysis");

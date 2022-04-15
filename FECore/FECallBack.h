@@ -37,7 +37,7 @@ class FEModel;
 // This class implements a mechanism for defining callbacks from within plugins.
 class FECORE_API FECallBack : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FECALLBACK_ID)
 	FECORE_BASE_CLASS(FECallBack)
 
 public:

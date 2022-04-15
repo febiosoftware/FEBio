@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEVec3dValuator.h"
 
-REGISTER_SUPER_CLASS(FEVec3dValuator, FEVEC3DGENERATOR_ID);
-
 FEVec3dValuator::FEVec3dValuator(FEModel* fem) : FEValuator(fem) 
 {
 

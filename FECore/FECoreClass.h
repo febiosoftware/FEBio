@@ -30,7 +30,7 @@ SOFTWARE.*/
 // Generic base class for classes that don't fit in the super-class structure
 class FECORE_API FECoreClass : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FECLASS_ID)
 	FECORE_BASE_CLASS(FECoreClass);
 
 public:

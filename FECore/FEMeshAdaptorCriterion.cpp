@@ -48,8 +48,6 @@ void FEMeshAdaptorSelection::Sort(FEMeshAdaptorSelection::SortFlag sortFlag)
 }
 
 //=============================================================================
-REGISTER_SUPER_CLASS(FEMeshAdaptorCriterion, FEMESHADAPTORCRITERION_ID);
-
 BEGIN_FECORE_CLASS(FEMeshAdaptorCriterion, FEModelComponent)
 END_FECORE_CLASS();
 

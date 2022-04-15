@@ -42,7 +42,7 @@ class FEDomainMap;
 // Data generators are used to generate values of model parameters. 
 class FECORE_API FEDataGenerator : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMESHDATAGENERATOR_ID)
 
 public:
 	FEDataGenerator(FEModel* fem);

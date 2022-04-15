@@ -34,7 +34,7 @@ SOFTWARE.*/
 //! global date section of the FEModel class
 class FECORE_API FEGlobalData : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEGLOBALDATA_ID)
 	FECORE_BASE_CLASS(FEGlobalData)
 
 public:

@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESurfacePairConstraint.h"
 
-REGISTER_SUPER_CLASS(FESurfacePairConstraint, FESURFACEINTERFACE_ID);
-
 //-----------------------------------------------------------------------------
 FESurfacePairConstraint::FESurfacePairConstraint(FEModel* pfem) : FEStepComponent(pfem)
 {

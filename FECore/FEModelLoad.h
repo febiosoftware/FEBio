@@ -39,7 +39,7 @@ class FELinearSystem;
 //! includes most boundary loads, body loads, contact, etc.
 class FECORE_API FEModelLoad : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FELOAD_ID)
 	FECORE_BASE_CLASS(FEModelLoad);
 
 public:

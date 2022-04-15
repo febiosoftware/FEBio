@@ -72,7 +72,7 @@ private:
 // mesh adaptor for further processing.
 class FECORE_API FEMeshAdaptorCriterion : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMESHADAPTORCRITERION_ID)
 	FECORE_BASE_CLASS(FEMeshAdaptorCriterion)
 
 public:

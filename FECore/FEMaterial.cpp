@@ -47,9 +47,6 @@ void FEMaterialBase::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const 
 }
 
 //=============================================================================
-REGISTER_SUPER_CLASS(FEMaterial, FEMATERIAL_ID);
-
-//=============================================================================
 BEGIN_FECORE_CLASS(FEMaterial, FEMaterialBase)
 	ADD_PARAMETER(m_Q, "mat_axis");
 END_FECORE_CLASS();
@@ -113,8 +110,6 @@ void FEMaterial::AddDomainParameter(FEDomainParameter* p)
 }
 
 //==============================================================================
-REGISTER_SUPER_CLASS(FEMaterialProperty, FEMATERIALPROP_ID);
-
 BEGIN_FECORE_CLASS(FEMaterialProperty, FEMaterialBase)
 END_FECORE_CLASS();
 

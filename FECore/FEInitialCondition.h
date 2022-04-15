@@ -39,7 +39,7 @@ SOFTWARE.*/
 //! Initial conditions can be used to set the initial state of the model in an analysis. 
 class FECORE_API FEInitialCondition : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEIC_ID)
 	FECORE_BASE_CLASS(FEInitialCondition);
 
 public:

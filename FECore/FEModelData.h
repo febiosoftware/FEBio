@@ -35,7 +35,7 @@ SOFTWARE.*/
 // Class that can used to query model data
 class FECORE_API FEModelData : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMODELDATA_ID)
 	FECORE_BASE_CLASS(FEModelData)
 
 	struct ELEMREF

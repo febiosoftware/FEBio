@@ -35,7 +35,7 @@ class FEDataMap;
 // Base class for evaluating vec3d parameters
 class FECORE_API FEMat3dValuator : public FEValuator
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMAT3DGENERATOR_ID)
 	FECORE_BASE_CLASS(FEMat3dValuator)
 
 public:

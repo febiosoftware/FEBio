@@ -39,7 +39,7 @@ class FEMeshAdaptorCriterion;
 // Base class for all mesh adaptors
 class FECORE_API FEMeshAdaptor : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMESHADAPTOR_ID)
 	FECORE_BASE_CLASS(FEMeshAdaptor);
 
 public:

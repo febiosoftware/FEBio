@@ -49,7 +49,7 @@ public:
 //! material class for discrete elements
 class FECORE_API FEDiscreteMaterial : public FEMaterial
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEDISCRETEMATERIAL_ID)
 
 public:
 	FEDiscreteMaterial(FEModel* pfem);

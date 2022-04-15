@@ -93,7 +93,7 @@ class FEGlobalVector;
 //! the SolveStep function to solve the FE problem.
 class FECORE_API FESolver : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FESOLVER_ID)
 	FECORE_BASE_CLASS(FESolver)
 
 public:

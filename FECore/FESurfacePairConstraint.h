@@ -43,7 +43,7 @@ class FEGlobalMatrix;
 //       but am hesitant to push this through at this point. 
 class FECORE_API FESurfacePairConstraint : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FESURFACEINTERFACE_ID)
 	FECORE_BASE_CLASS(FESurfacePairConstraint);
 
 public:

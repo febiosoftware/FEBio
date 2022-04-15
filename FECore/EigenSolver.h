@@ -32,7 +32,7 @@ class SparseMatrix;
 
 class FECORE_API EigenSolver : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEEIGENSOLVER_ID)
 	FECORE_BASE_CLASS(EigenSolver)
 
 public:
