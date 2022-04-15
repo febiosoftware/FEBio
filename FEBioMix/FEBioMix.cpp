@@ -308,7 +308,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElectricPotential                , "electric potential"  );
 
 	//-----------------------------------------------------------------------------
-	// classes derived from FENodeLogData
+	// classes derived from FELogNodeData
 	REGISTER_FECORE_CLASS(FENodeConcentration, "c");
 
 	//-----------------------------------------------------------------------------

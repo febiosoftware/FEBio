@@ -33,6 +33,7 @@ class FESurface;
 //! Base class for surface log data
 class FECORE_API FELogSurfaceData : public FELogData
 {
+    FECORE_SUPER_CLASS(FELOGSURFACEDATA_ID)
     FECORE_BASE_CLASS(FELogSurfaceData);
 
 public:
@@ -47,7 +48,7 @@ class FECORE_API FESurfaceDataRecord : public DataRecord
 public:
     FESurfaceDataRecord(FEModel* pfem);
     double Evaluate(int item, int ndata);
-    void SetData(const char* sz);
+    void SetData(const char* sz) override;
     void SetSurface(int surfIndex);
     void SelectAllItems();
     int Size() const;

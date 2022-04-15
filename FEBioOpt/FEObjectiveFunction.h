@@ -227,7 +227,7 @@ public:
 
 	bool AddValue(int elemID, std::vector<double>& v);
 
-	void AddVariable(FENodeLogData* var);
+	void AddVariable(FELogNodeData* var);
 
 public:
 	// return number of measurements (i.e. nr of terms in objective function)
@@ -241,5 +241,5 @@ public:
 
 private:
 	std::vector<Entry>				m_Data;
-	std::vector<FENodeLogData*>		m_var;
+	std::vector<FELogNodeData*>		m_var;
 };

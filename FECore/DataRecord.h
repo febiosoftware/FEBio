@@ -117,8 +117,6 @@ protected:
 // Super class for log data classes. 
 class FECORE_API FELogData : public FECoreBase
 {
-	FECORE_SUPER_CLASS(FELOGDATA_ID)
-
 public:
 	FELogData(FEModel* fem);
 };

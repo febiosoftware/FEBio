@@ -236,7 +236,13 @@ enum SUPER_CLASS_ID {
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
 	FESURFACEINTERFACE_ID, 			// derived from FESurfaceInterface
-	FELOGDATA_ID,            		// derived from FELogData
+	FELOGNODEDATA_ID,            	// derived from FELogNodeData
+	FELOGFACEDATA_ID,            	// derived from FELogFaceData
+	FELOGELEMDATA_ID,            	// derived from FELogElemData
+	FELOGOBJECTDATA_ID,            	// derived from FELogObjectData
+	FELOGDOMAINDATA_ID,            	// derived from FELogDomainData
+	FELOGNLCONSTRAINTDATA_ID,      	// derived from FELogNLConstraintData
+	FELOGSURFACEDATA_ID,      		// derived from FELogSurfaceData
 	FEBC_ID,						// derived from FEBoundaryCondition
 	FEGLOBALDATA_ID,				// derived from FEGlobalData
 	FECALLBACK_ID,					// derived from FECallBack

@@ -32,13 +32,14 @@ class FESurfaceElement;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for a face data value.
-class FECORE_API FEFaceLogData : public FELogData
+class FECORE_API FELogFaceData : public FELogData
 {
-	FECORE_BASE_CLASS(FEFaceLogData)
+	FECORE_SUPER_CLASS(FELOGFACEDATA_ID)
+	FECORE_BASE_CLASS(FELogFaceData)
 
 public:
-	FEFaceLogData(FEModel* fem);
-	virtual ~FEFaceLogData();
+	FELogFaceData(FEModel* fem);
+	virtual ~FELogFaceData();
 	virtual double value(FESurfaceElement& el) = 0;
 };
 
@@ -50,7 +51,7 @@ public:
 	FaceDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata) override;
 	bool Initialize() override;
-	void SetData(const char* sz)  override;
+	void SetData(const char* sz) override;
 	void SelectAllItems() override;
 	int Size() const override;
 
@@ -58,5 +59,5 @@ public:
 
 private:
 	FESurface*	m_surface;
-	vector<FEFaceLogData*>	m_Data;
+	vector<FELogFaceData*>	m_Data;
 };

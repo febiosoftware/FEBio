@@ -119,7 +119,7 @@ bool FEDataParameter::Init()
 			if (sz[0] == '\'') sz++;
 			*c1 = 0;
 
-			FENodeLogData* pd = fecore_new<FENodeLogData>(sz, fem);
+			FELogNodeData* pd = fecore_new<FELogNodeData>(sz, fem);
 			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
 
 			FEMesh& mesh = fem->GetMesh();
@@ -297,7 +297,7 @@ bool FEDataParameter::Init()
             if (sz[0] == '\'') sz++;
             *c1 = 0;
             
-            FENodeLogData* pd = fecore_new<FENodeLogData>(sz, fem);
+            FELogNodeData* pd = fecore_new<FELogNodeData>(sz, fem);
             if (pd == nullptr) { feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str()); return false; }
             
             FEMesh& mesh = fem->GetMesh();
@@ -410,7 +410,7 @@ FEDataFilterSum::~FEDataFilterSum()
 	delete m_data;
 }
 
-void FEDataFilterSum::SetData(FENodeLogData* data, FENodeSet* nodeSet)
+void FEDataFilterSum::SetData(FELogNodeData* data, FENodeSet* nodeSet)
 {
 	m_data = data;
 	m_nodeSet = nodeSet;

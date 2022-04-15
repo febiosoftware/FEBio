@@ -126,7 +126,7 @@ public:
 	FEDataFilterSum(FEModel* fem);
 	~FEDataFilterSum();
 
-	void SetData(FENodeLogData* data, FENodeSet* nodeSet);
+	void SetData(FELogNodeData* data, FENodeSet* nodeSet);
 
 	// Initialize data
 	bool Init() override;
@@ -143,7 +143,7 @@ private:
 	void update();
 
 private:
-	FENodeLogData*	m_data;
+	FELogNodeData*	m_data;
 	FENodeSet*		m_nodeSet;
 	FEPointFunction		m_rf;
 };

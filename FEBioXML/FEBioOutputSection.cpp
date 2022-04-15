@@ -192,6 +192,8 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		if (tag == "node_data")
 		{
 			pdr = fecore_new<DataRecord>("node_data", &fem);
+			pdr->SetData(szdata);
+
 			const char* sztmp = "set";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
 			const char* sz = tag.AttributeValue(sztmp, true);

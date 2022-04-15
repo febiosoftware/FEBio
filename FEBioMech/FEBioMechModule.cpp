@@ -744,7 +744,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
 
 	//-----------------------------------------------------------------------------
-	// Derived from FENodeLogData
+	// Derived from FELogNodeData
 	REGISTER_FECORE_CLASS(FENodeXPos, "x");
 	REGISTER_FECORE_CLASS(FENodeYPos, "y");
 	REGISTER_FECORE_CLASS(FENodeZPos, "z");

@@ -35,6 +35,7 @@ SOFTWARE.*/
 //! Base class for object log data (e.g. rigid bodies)
 class FEBIOMECH_API FELogObjectData : public FELogData
 {
+	FECORE_SUPER_CLASS(FELOGOBJECTDATA_ID)
 	FECORE_BASE_CLASS(FELogObjectData)
 
 public:
@@ -49,7 +50,7 @@ class FEBIOMECH_API ObjectDataRecord : public DataRecord
 public:
 	ObjectDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
-	void SetData(const char* sz);
+	void SetData(const char* sz) override;
 	void SelectAllItems();
 	int Size() const;
 

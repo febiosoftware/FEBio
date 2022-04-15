@@ -34,6 +34,7 @@ class FEDomain;
 //! Base class for domain log data
 class FECORE_API FELogDomainData : public FELogData
 {
+    FECORE_SUPER_CLASS(FELOGDOMAINDATA_ID)
     FECORE_BASE_CLASS(FELogDomainData)
 
 public:
@@ -50,7 +51,7 @@ class FECORE_API FEDomainDataRecord : public DataRecord
 public:
     FEDomainDataRecord(FEModel* pfem);
     double Evaluate(int item, int ndata);
-    void SetData(const char* sz);
+    void SetData(const char* sz) override;
     void SelectAllItems();
     void SetDomain(int domainIndex);
     int Size() const;

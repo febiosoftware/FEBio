@@ -37,6 +37,7 @@ class FEElementSet;
 //! Base class for element log data
 class FECORE_API FELogElemData : public FELogData
 {
+	FECORE_SUPER_CLASS(FELOGELEMDATA_ID)
 	FECORE_BASE_CLASS(FELogElemData)
 
 public:
@@ -58,7 +59,7 @@ class FECORE_API ElementDataRecord : public DataRecord
 public:
 	ElementDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
-	void SetData(const char* sz);
+	void SetData(const char* sz) override;
 	void SelectAllItems();
 	int Size() const;
 	void SetElementSet(FEElementSet* pg);

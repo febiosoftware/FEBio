@@ -325,7 +325,7 @@ void FEOptimizeInput::ParseObjective(XMLTag& tag)
 						*ch = 0;
 						
 						// try to allocate the element data record
-						FENodeLogData* var = fecore_new<FENodeLogData>(sz, &fem);
+						FELogNodeData* var = fecore_new<FELogNodeData>(sz, &fem);
 						if (var == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 						obj->AddVariable(var);
@@ -441,7 +441,7 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag)
 				FENodeSet* nodeSet = mesh.FindNodeSet(szset);
 				if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
-				FENodeLogData* nodeData = fecore_new<FENodeLogData>(szdata, &fem);
+				FELogNodeData* nodeData = fecore_new<FELogNodeData>(szdata, &fem);
 				if (nodeData == nullptr) throw XMLReader::InvalidAttributeValue(tag, "data", szdata);
 
 				flt->SetData(nodeData, nodeSet);

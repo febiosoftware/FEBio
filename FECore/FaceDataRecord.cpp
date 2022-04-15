@@ -30,10 +30,10 @@ SOFTWARE.*/
 #include "FESurface.h"
 
 //-----------------------------------------------------------------------------
-FEFaceLogData::FEFaceLogData(FEModel* fem) : FELogData(fem) {}
+FELogFaceData::FELogFaceData(FEModel* fem) : FELogData(fem) {}
 
 //-----------------------------------------------------------------------------
-FEFaceLogData::~FEFaceLogData() {}
+FELogFaceData::~FELogFaceData() {}
 
 //-----------------------------------------------------------------------------
 FaceDataRecord::FaceDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_FACE) 
@@ -56,7 +56,7 @@ void FaceDataRecord::SetData(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FEFaceLogData* pdata = fecore_new<FEFaceLogData>(sz, GetFEModel());
+		FELogFaceData* pdata = fecore_new<FELogFaceData>(sz, GetFEModel());
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;

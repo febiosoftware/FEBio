@@ -33,10 +33,10 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FENodeLogData::FENodeLogData(FEModel* fem) : FELogData(fem) {}
+FELogNodeData::FELogNodeData(FEModel* fem) : FELogData(fem) {}
 
 //-----------------------------------------------------------------------------
-FENodeLogData::~FENodeLogData() {}
+FELogNodeData::~FELogNodeData() {}
 
 //-----------------------------------------------------------------------------
 NodeDataRecord::NodeDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NODE) {}
@@ -57,7 +57,7 @@ void NodeDataRecord::SetData(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FENodeLogData* pdata = fecore_new<FENodeLogData>(sz, fem);
+		FELogNodeData* pdata = fecore_new<FELogNodeData>(sz, fem);
 		if (pdata) m_Data.push_back(pdata);
 		else 
 		{
@@ -106,7 +106,7 @@ void NodeDataRecord::SetItemList(FEItemList* items, const std::vector<int>& sele
 }
 
 //-----------------------------------------------------------------------------
-FENodeVarData::FENodeVarData(FEModel* pfem, int ndof) : FENodeLogData(pfem), m_ndof(ndof) {}
+FENodeVarData::FENodeVarData(FEModel* pfem, int ndof) : FELogNodeData(pfem), m_ndof(ndof) {}
 
 //-----------------------------------------------------------------------------
 double FENodeVarData::value(int node)
