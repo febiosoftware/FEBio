@@ -42,6 +42,8 @@ public:
     
 	//! relaxation
 	virtual double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) = 0;
+
+    FECORE_BASE_CLASS(FEBondRelaxation)
 };
 
 //-----------------------------------------------------------------------------

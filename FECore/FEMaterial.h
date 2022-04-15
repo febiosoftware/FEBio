@@ -99,7 +99,6 @@ private:
 class FECORE_API FEMaterialProperty : public FEMaterialBase
 {
 	FECORE_SUPER_CLASS(FEMATERIALPROP_ID)
-	FECORE_BASE_CLASS(FEMaterialProperty)
 
 public:
 	FEMaterialProperty(FEModel* fem);

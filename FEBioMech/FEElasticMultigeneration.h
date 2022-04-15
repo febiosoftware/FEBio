@@ -55,6 +55,8 @@ public:
 	double	btime;	//!< generation birth time
 
 	FEElasticMaterial* m_pMat;	//!< pointer to elastic material
+
+	FECORE_BASE_CLASS(FEGenerationBase)
 };
 
 //-----------------------------------------------------------------------------

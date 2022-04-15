@@ -58,5 +58,6 @@ public:
     
     //! bulk viscosity
     virtual double BulkViscosity(FEMaterialPoint& mp) = 0;
-    
+
+    FECORE_BASE_CLASS(FEViscousFluid)
 };

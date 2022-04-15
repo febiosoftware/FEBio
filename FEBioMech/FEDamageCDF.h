@@ -52,6 +52,7 @@ public:
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
+    FECORE_BASE_CLASS(FEDamageCDF)
 };
 
 //-----------------------------------------------------------------------------

@@ -49,6 +49,8 @@ public:
 	
 	//! tangent of solute supply with respect to referential density
 	virtual double Tangent_Supply_Density(FEMaterialPoint& mp) = 0;	
+
+	FECORE_BASE_CLASS(FESolidSupply)
 };
 
 //-----------------------------------------------------------------------------

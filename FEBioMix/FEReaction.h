@@ -55,4 +55,6 @@ public:
 
 protected:
     FESoluteInterface* m_psm;   //!< solute interface to parent class
+
+    FECORE_BASE_CLASS(FEReaction)
 };

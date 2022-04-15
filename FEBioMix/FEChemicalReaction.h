@@ -55,6 +55,8 @@ public:
     
 public:
     FEReaction*    m_pReact;    //!< pointer to parent reaction
+
+    FECORE_BASE_CLASS(FEReactionRate)
 };
 
 //-----------------------------------------------------------------------------
@@ -85,6 +87,7 @@ private:
     int     m_speciesType;  // solute or sbm?
 
     DECLARE_FECORE_CLASS();
+    FECORE_BASE_CLASS(FEReactionSpeciesRef)
 };
 
 class FEBIOMIX_API FEReactantSpeciesRefBase : public FEReactionSpeciesRef {

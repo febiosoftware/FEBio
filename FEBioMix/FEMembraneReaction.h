@@ -65,6 +65,8 @@ public:
     
 public:
     FEReaction*    m_pReact;    //!< pointer to parent reaction
+
+    FECORE_BASE_CLASS(FEMembraneReactionRate)
 };
 
 //-----------------------------------------------------------------------------

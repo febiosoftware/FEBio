@@ -82,6 +82,8 @@ public:
 	// initialize the pre-strain gradient based on a deformation gradient
 	// This is used by the pre-strain initial condition
 	virtual void Initialize(const mat3d& F, FEMaterialPoint& mp) = 0;
+
+	FECORE_BASE_CLASS(FEPrestrainGradient)
 };
 
 //-----------------------------------------------------------------------------

@@ -48,5 +48,7 @@ public:
 	
 	//! tangent of osmotic coefficient with respect to concentration
 	virtual double Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint& mp, const int isol) = 0;
+
+	FECORE_BASE_CLASS(FEOsmoticCoefficient)
 };
 

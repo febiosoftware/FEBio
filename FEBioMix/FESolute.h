@@ -66,6 +66,7 @@ public:
 private:
 	int	m_ID;		//!< solute ID
 	
+	FECORE_BASE_CLASS(FESoluteDiffusivity)
 };
 
 //-----------------------------------------------------------------------------
@@ -106,6 +107,7 @@ public:
 private:
 	int	m_ID;		//!< solute ID
 	
+	FECORE_BASE_CLASS(FESoluteSolubility)
 };
 
 //-----------------------------------------------------------------------------
@@ -142,7 +144,8 @@ public:
 	
 	//! referential solid concentration under steady-state conditions
 	virtual double SolidConcentrationSS(FEMaterialPoint& pt) = 0;
-	
+
+	FECORE_BASE_CLASS(FESoluteSupply)
 };
 
 //-----------------------------------------------------------------------------
@@ -218,6 +221,8 @@ public: // material properties
 	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
 	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
+
+	FECORE_BASE_CLASS(FESolute)
 };
 
 //-----------------------------------------------------------------------------
@@ -289,4 +294,5 @@ public:
 	double					m_rhomax;	//!< maximum referential (apparent) density of SBM
 	
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FESolidBoundMolecule)
 };

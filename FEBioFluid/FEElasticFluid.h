@@ -100,5 +100,6 @@ public:
     
     //! specific free enthalpy
     double SpecificFreeEnthalpy(FEMaterialPoint& mp);
-    
+
+    FECORE_BASE_CLASS(FEElasticFluid)
 };

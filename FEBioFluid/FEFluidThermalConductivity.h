@@ -49,4 +49,5 @@ public:
     //! tangent of thermal conductivity with respect to temperature T
     virtual double Tangent_Temperature(FEMaterialPoint& mp) = 0;
 
+    FECORE_BASE_CLASS(FEFluidThermalConductivity)
 };

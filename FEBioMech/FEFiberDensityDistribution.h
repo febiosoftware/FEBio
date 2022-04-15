@@ -40,6 +40,8 @@ public:
     
     // Evaluation of fiber density along n0
     virtual double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) = 0;
+
+    FECORE_BASE_CLASS(FEFiberDensityDistribution)
 };
 
 //---------------------------------------------------------------------------
