@@ -60562,6 +60562,319 @@ reference "subsec:Solid-Mixture"
 </solid>
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Exp-Pow-Linear Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Exp-Pow-Linear"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-exp-pow-linear
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $E,$
+\end_inset
+
+ the fiber modulus in the linear range (
+\begin_inset Formula $E\geqslant0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\alpha,$
+\end_inset
+
+ coefficient of exponential argument
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta,$
+\end_inset
+
+ the power-law exponent in the toe region (
+\begin_inset Formula $\beta\geqslant2)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<lam0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{0},$
+\end_inset
+
+ the stretch ratio when the toe region transitions to the linear region
+ (
+\begin_inset Formula $\lambda_{0}>1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\Psi_{n}=\begin{cases}
+0 & I_{n}<1\\
+\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right) & 1\le I_{n}\le I_{0}\\
+B\left(I_{n}-I_{0}\right)-E\left(I_{n}^{1/2}-I_{0}^{1/2}\right)+\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]-1\right) & I_{n}>I_{0}
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+B=\frac{E}{2I_{0}^{1/2}}+\xi\left(I_{0}-1\right)^{\beta-1}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]
+\]
+
+\end_inset
+
+This model reduces to 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+fiber-pow-linear
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ when 
+\begin_inset Formula $\alpha=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a solid mixture (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<solid type="fiber-exp-pow-linear">
+\end_layout
+
+\begin_layout LyX-Code
+ <E>1080</E>
+\end_layout
+
+\begin_layout LyX-Code
+ <alpha>1400</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+ <beta>2.73</beta>
+\end_layout
+
+\begin_layout LyX-Code
+ <lam0>1.012</lam0>
+\end_layout
+
+\begin_layout LyX-Code
+ <fiber type="vector">0,0,1</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+</solid>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsubsection
 Fiber Exp-Linear
 \end_layout
