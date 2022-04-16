@@ -37,9 +37,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidBC, FEStepComponent)
-	// NOTE: This parameter is hidden, since FEBio Studio implements its own mechanism
-	//       for assigning the rigid material ID.
-	ADD_PARAMETER(m_rigidMat, "rb")->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 END_FECORE_CLASS();
 
 FERigidBC::FERigidBC(FEModel* fem) : FEStepComponent(fem)
