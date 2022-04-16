@@ -67,7 +67,7 @@ bool FEDamageMaterialUC::Init()
 mat3ds FEDamageMaterialUC::DevStress(FEMaterialPoint& pt)
 {
     // evaluate the damage
-    double d = m_pDamg->Damage(pt);
+    double d = Damage(pt);
     
     // evaluate the stress
     mat3ds s = m_pBase->DevStress(pt);
@@ -81,7 +81,7 @@ mat3ds FEDamageMaterialUC::DevStress(FEMaterialPoint& pt)
 tens4ds FEDamageMaterialUC::DevTangent(FEMaterialPoint& pt)
 {
     // evaluate the damage
-    double d = m_pDamg->Damage(pt);
+    double d = Damage(pt);
     
     // evaluate the tangent
     tens4ds c = m_pBase->DevTangent(pt);
@@ -95,7 +95,7 @@ tens4ds FEDamageMaterialUC::DevTangent(FEMaterialPoint& pt)
 double FEDamageMaterialUC::DevStrainEnergyDensity(FEMaterialPoint& pt)
 {
     // evaluate the damage
-    double d = m_pDamg->Damage(pt);
+    double d = Damage(pt);
     
     // evaluate the strain energy density
     double sed = m_pBase->DevStrainEnergyDensity(pt);
