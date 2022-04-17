@@ -90,7 +90,6 @@ protected:
     double  m_refl;             //!< sarcomere length
     double  m_alpha[MAX_TERMS];
     double  m_A[MAX_TERMS];
-    double  m_A0;
     double  m_at;
     bool    m_bfvel;            //!< flag for calculating force-velocity contraction response
 
