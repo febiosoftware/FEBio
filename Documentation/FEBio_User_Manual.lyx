@@ -27967,6 +27967,140 @@ maxaug
 \end_layout
 
 \begin_layout Subsection
+Fixed Normal Displacement
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fixed-Normal-Displacement"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A fixed normal displacement constraint enforces zero solid displacement
+ normal to a user-selected surface.
+ This constraint is prescribed on a deformable surface of the model and
+ is enforced for every node on that surface.
+ It uses the local surface normal in the selected surface's reference configurat
+ion.
+ If the selected surface is planar, the functionality of this constraint
+ is equivalent to the Symmetry Plane constraint described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Symmetry-Plane"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="fixed normal displacement" surface="FixedNormalDisplacement01"
+>
+\end_layout
+
+\begin_layout LyX-Code
+	<laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+	<penalty>1000</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+	<tol>0.2</tol>
+\end_layout
+
+\begin_layout LyX-Code
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<maxaug>10</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<shell_bottom>0</shell_bottom>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+surface
+\emph default
+ (FixedNormalDisplacement01 in this example), is defined in the 
+\emph on
+Mesh
+\emph default
+ section.
+ Let 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ denote the nodal displacement vector and let 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ denote the unit normal at each node of the surface; the fixed normal displaceme
+nt constraint enforces 
+\begin_inset Formula $u_{n}\equiv\mathbf{u}\cdot\mathbf{n}=0$
+\end_inset
+
+ using a penalty method, optionally with augmented Lagrangian.
+ The reaction force needed to enforce this constraint is evaluated as 
+\begin_inset Formula $\varepsilon u_{n}$
+\end_inset
+
+, where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the user-specified 
+\emph on
+penalty
+\emph default
+ parameter (with units of force per length).
+ To use the augmented Lagrangian method, set 
+\emph on
+laugon
+\emph default
+ to 1, and the Lagrange multiplier 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ will be augmented as 
+\begin_inset Formula $\lambda\leftarrow\lambda+\varepsilon u_{n}$
+\end_inset
+
+.
+ Augmentations terminate when the relative change in 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is less than the user-specified tolerance 
+\emph on
+tol
+\emph default
+, or when the number of augmentations exceeds 
+\emph on
+maxaug
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
 Normal Fluid Velocity Constraint
 \begin_inset CommandInset label
 LatexCommand label
