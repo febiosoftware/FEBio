@@ -203,6 +203,7 @@ SOFTWARE.*/
 #include "FEDiscreteContact.h"
 #include "FERigidFollowerForce.h"
 #include "FERigidFollowerMoment.h"
+#include "FEFixedNormalDisplacement.h"
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -562,6 +563,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGPAConstraint, "prestrain");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint, "in-situ stretch");
 	REGISTER_FECORE_CLASS(FEAzimuthConstraint, "azimuth constraint");
+    REGISTER_FECORE_CLASS(FEFixedNormalDisplacement, "fixed normal displacement");
 
 	// Lagrange multiplier constraints
 	REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node");
