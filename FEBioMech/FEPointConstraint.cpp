@@ -48,7 +48,11 @@ FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem), m_do
 	m_node = -1;
 	m_pel = 0;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------

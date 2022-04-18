@@ -46,18 +46,22 @@ FEFluidPDomain3D::FEFluidPDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluid
     m_pMat = 0;
     m_btrans = true;
 
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF  = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
-    
-	m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
-    m_dofAEF = pfem->GetDOFIndex("aef");
-    
-    // list the degrees of freedom
-    // (This allows the FEBomain base class to handle several tasks such as UnpackLM)
-    m_dof.AddDof(m_dofW[0]);
-    m_dof.AddDof(m_dofW[1]);
-    m_dof.AddDof(m_dofW[2]);
-    m_dof.AddDof(m_dofEF);
+    // TODO: Can this be done in Init, since  there is no error checking
+    if (pfem)
+    {
+        m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+        m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+
+        m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
+        m_dofAEF = pfem->GetDOFIndex("aef");
+
+        // list the degrees of freedom
+        // (This allows the FEBomain base class to handle several tasks such as UnpackLM)
+        m_dof.AddDof(m_dofW[0]);
+        m_dof.AddDof(m_dofW[1]);
+        m_dof.AddDof(m_dofW[2]);
+        m_dof.AddDof(m_dofEF);
+    }
 }
 
 //-----------------------------------------------------------------------------

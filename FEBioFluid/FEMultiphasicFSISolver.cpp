@@ -122,19 +122,23 @@ m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(p
     CheckZeroDiagonal(false);
     
     // get the dof indices
-    m_dofU.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::DISPLACEMENT));
-    m_dofV.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::VELOCITY));
-    m_dofSU.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_DISPLACEMENT));
-    m_dofSV.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_VELOCITY));
-    m_dofSA.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_ACCELERATION));
-    m_dofR.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::RIGID_ROTATION));
-    m_dofW.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::RELATIVE_FLUID_VELOCITY));
-    m_dofAW.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::RELATIVE_FLUID_ACCELERATION));
-    m_dofVF.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_VELOCITY));
-    m_dofAF.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_ACCELERATION));
-    m_dofEF.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION));
-    m_dofAEF = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION_TDERIV), 0);
-    m_dofC = m_dofAC = -1;
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::DISPLACEMENT));
+        m_dofV.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::VELOCITY));
+        m_dofSU.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_DISPLACEMENT));
+        m_dofSV.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_VELOCITY));
+        m_dofSA.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_ACCELERATION));
+        m_dofR.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::RIGID_ROTATION));
+        m_dofW.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::RELATIVE_FLUID_VELOCITY));
+        m_dofAW.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::RELATIVE_FLUID_ACCELERATION));
+        m_dofVF.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_VELOCITY));
+        m_dofAF.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_ACCELERATION));
+        m_dofEF.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION));
+        m_dofAEF = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION_TDERIV), 0);
+        m_dofC = m_dofAC = -1;
+    }
 }
 
 //-----------------------------------------------------------------------------

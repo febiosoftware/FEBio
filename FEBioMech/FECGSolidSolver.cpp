@@ -86,29 +86,33 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem), m_dofU(pfem), 
 	m_gamma = 0.5;
 
 	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable("displacement", VAR_VEC3);
-	dofs.SetDOFName(varD, 0, "x");
-	dofs.SetDOFName(varD, 1, "y");
-	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
-	dofs.SetDOFName(varQ, 0, "u");
-	dofs.SetDOFName(varQ, 1, "v");
-	dofs.SetDOFName(varQ, 2, "w");
-	int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
-	dofs.SetDOFName(varQR, 0, "Ru");
-	dofs.SetDOFName(varQR, 1, "Rv");
-	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable("velocity", VAR_VEC3);
-	dofs.SetDOFName(varV, 0, "vx");
-	dofs.SetDOFName(varV, 1, "vy");
-	dofs.SetDOFName(varV, 2, "vz");
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int varD = dofs.AddVariable("displacement", VAR_VEC3);
+		dofs.SetDOFName(varD, 0, "x");
+		dofs.SetDOFName(varD, 1, "y");
+		dofs.SetDOFName(varD, 2, "z");
+		int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+		dofs.SetDOFName(varQ, 0, "u");
+		dofs.SetDOFName(varQ, 1, "v");
+		dofs.SetDOFName(varQ, 2, "w");
+		int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+		dofs.SetDOFName(varQR, 0, "Ru");
+		dofs.SetDOFName(varQR, 1, "Rv");
+		dofs.SetDOFName(varQR, 2, "Rw");
+		int varV = dofs.AddVariable("velocity", VAR_VEC3);
+		dofs.SetDOFName(varV, 0, "vx");
+		dofs.SetDOFName(varV, 1, "vy");
+		dofs.SetDOFName(varV, 2, "vz");
 
-	// get the DOF indices
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
-	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
-	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+		// get the DOF indices
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------

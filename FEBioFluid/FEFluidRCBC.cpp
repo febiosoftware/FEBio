@@ -54,8 +54,12 @@ FEFluidRCBC::FEFluidRCBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
     m_pp = m_dpp = 0;
     m_qp = m_dqp = 0;
     
-    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    // TODO: Can this be done in Init, since  there is no error checking
+    if (pfem)
+    {
+        m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+        m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    }
 }
 
 //-----------------------------------------------------------------------------

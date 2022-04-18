@@ -49,10 +49,14 @@ FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FESSIShellDomain(pfe
     m_secant_stress = false;
     m_secant_tangent = false;
 
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
-	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
-	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+        m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
+        m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    }
 }
 
 //-----------------------------------------------------------------------------

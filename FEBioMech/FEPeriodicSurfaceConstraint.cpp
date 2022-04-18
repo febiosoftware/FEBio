@@ -131,7 +131,11 @@ FEPeriodicSurfaceConstraint::FEPeriodicSurfaceConstraint(FEModel* pfem) : FECont
 	m_eps = 0;
 	m_btwo_pass = false;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 
 	// set parents
 	m_ss.SetContactInterface(this);

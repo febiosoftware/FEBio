@@ -33,8 +33,12 @@ FEDiscreteElasticDomain::FEDiscreteElasticDomain(FEModel* fem) : FEDiscreteDomai
 {
 	m_pMat = nullptr;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------

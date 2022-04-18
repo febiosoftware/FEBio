@@ -41,11 +41,16 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
-	m_pMat = 0;
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
-	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("concentration", 0);
+	m_pMat = nullptr;
+
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+        m_dofP = pfem->GetDOFIndex("p");
+        m_dofC = pfem->GetDOFIndex("concentration", 0);
+    }
 }
 
 //-----------------------------------------------------------------------------

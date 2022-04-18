@@ -43,9 +43,13 @@ FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : F
 	m_hint = 0;
 
 	// set the dof list
-	FEDofList dofs(fem);
-	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	SetDOFList(dofs);
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		FEDofList dofs(fem);
+		dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		SetDOFList(dofs);
+	}
 }
 
 // activation

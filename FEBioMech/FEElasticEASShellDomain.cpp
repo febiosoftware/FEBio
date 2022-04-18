@@ -41,10 +41,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEElasticEASShellDomain::FEElasticEASShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
 {
-    m_pMat = 0;
+    m_pMat = nullptr;
 
-	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    }
 }
 
 //-----------------------------------------------------------------------------

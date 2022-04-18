@@ -52,9 +52,13 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescrib
     m_p = vec3d(0,0,0);
 
 	// Set the dof list
-	FEDofList dofs(pfem);
-	dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-	SetDOFList(dofs);
+	// TODO: Can this be done in Init, since  there is no error checking
+	if (pfem)
+	{
+		FEDofList dofs(pfem);
+		dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+		SetDOFList(dofs);
+	}
 }
 
 //-----------------------------------------------------------------------------

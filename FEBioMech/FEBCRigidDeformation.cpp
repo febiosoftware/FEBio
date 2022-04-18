@@ -39,9 +39,13 @@ FEBCRigidDeformation::FEBCRigidDeformation(FEModel* fem) : FEPrescribedNodeSet(f
 	m_rt = vec3d(0, 0, 0);
 	m_qt = vec3d(0, 0, 0);
 
-	FEDofList dofs(fem);
-	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	SetDOFList(dofs);
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		FEDofList dofs(fem);
+		dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		SetDOFList(dofs);
+	}
 }
 
 void FEBCRigidDeformation::Activate()

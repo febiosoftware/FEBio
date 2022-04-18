@@ -133,7 +133,11 @@ FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FESurfaceConstraint(pf
 	m_blaugon = false;
 	m_binit = false;	// will be set to true during activation
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------

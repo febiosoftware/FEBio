@@ -46,11 +46,15 @@ FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(
     m_beta = 1.0;
     
     // get the degrees of freedom
-    m_dofW.Clear();
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+	// TODO: Can this be done in Init, since  there is no error checking
+	if (pfem)
+	{
+		m_dofW.Clear();
+		m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
+		m_dof.Clear();
+		m_dof.AddDofs(m_dofW);
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -41,9 +41,13 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 	m_scale = 1.0;
 	m_F.unit();
 
-	FEDofList dof(pfem);
-	dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	SetDOFList(dof);
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		FEDofList dof(pfem);
+		dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		SetDOFList(dof);
+	}
 }
 
 //-----------------------------------------------------------------------------

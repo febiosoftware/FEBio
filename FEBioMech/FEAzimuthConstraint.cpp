@@ -47,7 +47,11 @@ FEAzimuthConstraint::FEAzimuthConstraint(FEModel* fem) : FENodeSetConstraint(fem
 	m_minaug = 0;
 	m_maxaug = 0;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------

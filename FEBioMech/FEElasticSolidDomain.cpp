@@ -51,7 +51,7 @@ FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem),
 	m_secant_stress = false;
 	m_secant_tangent = false;
 
-	// TODO: Move this elsewhere since there is no error checking
+	// TODO: Can this be done in Init, since  there is no error checking
 	if (pfem)
 	{
 		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));

@@ -83,9 +83,13 @@ FESolutesSolver::FESolutesSolver(FEModel* pfem) : FENewtonSolver(pfem), m_dofC(p
     CheckZeroDiagonal(false);
     
     // Allocate degrees of freedom
-    DOFS& dofs = pfem->GetDOFS();
-    int varC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), VAR_ARRAY);
-    int varAC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), VAR_ARRAY);
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        DOFS& dofs = pfem->GetDOFS();
+        int varC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), VAR_ARRAY);
+        int varAC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), VAR_ARRAY);
+    }
 }
 
 //-----------------------------------------------------------------------------
