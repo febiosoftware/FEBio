@@ -159,6 +159,7 @@ SOFTWARE.*/
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
+#include "FESurfaceForceUniform.h"
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -201,6 +202,7 @@ SOFTWARE.*/
 #include "FEDiscreteContact.h"
 #include "FERigidFollowerForce.h"
 #include "FERigidFollowerMoment.h"
+#include "FEFixedNormalDisplacement.h"
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -388,7 +390,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH, "fiber-natural-NH");
 	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
+	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
     REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-Kiousis-uncoupled");
@@ -546,6 +548,7 @@ void FEBioMech::InitModule()
 	// classes derived from FESurfaceLoad
 	REGISTER_FECORE_CLASS(FEPressureLoad, "pressure");
 	REGISTER_FECORE_CLASS(FETractionLoad, "traction");
+    REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
@@ -581,6 +584,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGPAConstraint, "prestrain");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint, "in-situ stretch");
 	REGISTER_FECORE_CLASS(FEAzimuthConstraint, "azimuth constraint");
+    REGISTER_FECORE_CLASS(FEFixedNormalDisplacement, "fixed normal displacement");
 
 	// Lagrange multiplier constraints
 	REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node");

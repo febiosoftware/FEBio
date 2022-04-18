@@ -176,41 +176,43 @@ double FEFiberPowLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
 }
 
 //-----------------------------------------------------------------------------
-// FEFiberPowerLinear
+// FEFiberExpPowLinear
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberPowerLinear, FEElasticFiberMaterial)
+BEGIN_FECORE_CLASS(FEFiberExpPowLinear, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_E   , FE_RANGE_GREATER_OR_EQUAL(0.0), "E");
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_lam0, FE_RANGE_GREATER(1.0), "lam0");
 	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFiberPowerLinear::FEFiberPowerLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
+FEFiberExpPowLinear::FEFiberExpPowLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 {
 	m_E = 0;
 	m_lam0 = 1;
+    m_alpha = 0;
 	m_beta = 3;
 	m_epsf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-bool FEFiberPowerLinear::Validate()
+bool FEFiberExpPowLinear::Validate()
 {
 	if (FEElasticFiberMaterial::Validate() == false) return false;
 
 	// initialize material constants
 	m_I0 = m_lam0*m_lam0;
-	m_ksi = 0.25*m_E*pow(m_I0 - 1, 2 - m_beta) / (m_beta - 1)*pow(m_I0, -3. / 2.);
-	m_b = m_ksi*pow(m_I0 - 1, m_beta - 1) + m_E / 2 / sqrt(m_I0);
+    m_ksi = m_E*pow(m_I0-1,2-m_beta)*exp(m_alpha*pow(m_I0-1,m_beta))/(4*pow(m_I0,1.5)*(m_beta-1+m_alpha*m_beta*pow(m_I0-1,m_beta)));
+    m_b = m_ksi*pow(m_I0-1,m_beta-1)*exp(m_alpha*pow(m_I0-1,m_beta))+m_E/2/sqrt(m_I0);
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowerLinear::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberExpPowLinear::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -237,7 +239,7 @@ mat3ds FEFiberPowerLinear::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 
 		// calculate the fiber stress magnitude
 		double sn = (In < m_I0) ?
-			2 * In*m_ksi*pow(In - 1, m_beta - 1) :
+			2 * In*exp(m_alpha*pow(In-1,m_beta))*m_ksi*pow(In - 1, m_beta - 1) :
 			2 * m_b*In - m_E*sqrt(In);
 
 		// calculate the fiber stress
@@ -252,7 +254,7 @@ mat3ds FEFiberPowerLinear::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowerLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberExpPowLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -279,7 +281,7 @@ tens4ds FEFiberPowerLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 
 		// calculate modulus
 		double cn = (In < m_I0) ?
-			4 * In*In*m_ksi*(m_beta - 1)*pow(In - 1, m_beta - 2) :
+			4*m_ksi*In*In*exp(m_alpha*pow(In-1,m_beta))*pow(In-1,m_beta-2)*(m_beta-1+m_alpha*m_beta*pow(In-1,m_beta)) :
 			m_E*sqrt(In);
 
 		// calculate the fiber tangent
@@ -295,7 +297,7 @@ tens4ds FEFiberPowerLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-double FEFiberPowerLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberExpPowLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
 	double sed = 0.0;
 
@@ -312,9 +314,16 @@ double FEFiberPowerLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const v
 	if (In - 1 >= eps)
 	{
 		// calculate strain energy density
+        if (m_alpha == 0) {
 		sed = (In < m_I0) ?
 			m_ksi / m_beta*pow(In - 1, m_beta) :
 			m_b*(In - m_I0) - m_E*(sqrt(In) - sqrt(m_I0)) + m_ksi / m_beta*pow(m_I0 - 1, m_beta);
+        }
+        else {
+            sed = (In < m_I0) ?
+            m_ksi / (m_alpha*m_beta)*(exp(m_alpha*pow(In - 1, m_beta))-1) :
+            m_b*(In - m_I0) - m_E*(sqrt(In) - sqrt(m_I0)) + m_ksi / (m_alpha*m_beta)*(exp(m_alpha*pow(m_I0 - 1, m_beta))-1);
+        }
 	}
 
 	return sed;

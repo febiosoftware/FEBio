@@ -58,12 +58,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Power law toe region - linear
-//! TODO: I want to delete one of these materials
-class FEFiberPowerLinear : public FEElasticFiberMaterial
+//! Exponential-Power law toe region - linear
+class FEFiberExpPowLinear : public FEElasticFiberMaterial
 {
 public:
-	FEFiberPowerLinear(FEModel* pfem);
+	FEFiberExpPowLinear(FEModel* pfem);
 
 	//! Initialization
 	bool Validate() override;
@@ -80,6 +79,7 @@ public:
 public:
 	double	m_E;		// fiber modulus
 	double  m_lam0;     // stretch ratio at end of toe region
+    double  m_alpha;    // exponential coefficient
 	double  m_beta;     // power law exponent in toe region
 	double	m_epsf;
 

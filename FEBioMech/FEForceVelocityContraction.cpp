@@ -94,7 +94,6 @@ BEGIN_FECORE_CLASS(FEForceVelocityContraction, FEActiveContractionMaterial);
     ADD_PARAMETER(m_A[0] , "A1");
     ADD_PARAMETER(m_A[1] , "A2");
     ADD_PARAMETER(m_A[2] , "A3");
-    ADD_PARAMETER(m_A0   , "A0");
     ADD_PARAMETER(m_at   , "a_t");
     ADD_PARAMETER(m_bfvel, "force_velocity" );
 END_FECORE_CLASS();
@@ -106,7 +105,12 @@ FEForceVelocityContraction::FEForceVelocityContraction(FEModel* pfem) : FEActive
     m_Tmax = 1.0;
     m_ca0 = 1.0;
     m_camax = 0.0;
-    m_bfvel = false;
+    m_l0 = m_refl = 0;
+    m_beta = 0;
+    m_A[0] = m_A[1] = m_A[2] = 0;
+    m_alpha[0] = m_alpha[1] = m_alpha[2] = 0;
+    m_at = 0;
+    m_bfvel = true;
 }
 
 //-----------------------------------------------------------------------------

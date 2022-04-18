@@ -19796,6 +19796,67 @@ attribute is omitted a constant traction load is applied.
 \end_layout
 
 \begin_layout Subsubsection
+Surface Force
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Surface-Force"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A surface force applies an equivalent uniform traction load to a surface.
+ The direction of the force remains unchanged as the mesh deforms.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="force" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <scale lc="1">1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+  <force>0,0,1</force>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+The force vector is determined by two quantities.
+ The direction and magnitude is defined by the 
+\shape italic
+force 
+\shape default
+element.
+ In addition, the magnitude can be scaled using the 
+\shape italic
+scale 
+\shape default
+element.
+ An optional load curve can be defined for the 
+\shape italic
+scale 
+\shape default
+element using the 
+\shape italic
+lc 
+\shape default
+attribute.
+ This allows the surface force to become time dependent.
+ If the 
+\shape italic
+lc 
+\shape default
+attribute is omitted a constant force is applied.
+\end_layout
+
+\begin_layout Subsubsection
 Mixture Normal Traction
 \begin_inset CommandInset label
 LatexCommand label
@@ -27921,6 +27982,140 @@ Mesh
 
  denote the unit normal to the plane; the symmetry plane constraint enforces
  
+\begin_inset Formula $u_{n}\equiv\mathbf{u}\cdot\mathbf{n}=0$
+\end_inset
+
+ using a penalty method, optionally with augmented Lagrangian.
+ The reaction force needed to enforce this constraint is evaluated as 
+\begin_inset Formula $\varepsilon u_{n}$
+\end_inset
+
+, where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the user-specified 
+\emph on
+penalty
+\emph default
+ parameter (with units of force per length).
+ To use the augmented Lagrangian method, set 
+\emph on
+laugon
+\emph default
+ to 1, and the Lagrange multiplier 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ will be augmented as 
+\begin_inset Formula $\lambda\leftarrow\lambda+\varepsilon u_{n}$
+\end_inset
+
+.
+ Augmentations terminate when the relative change in 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is less than the user-specified tolerance 
+\emph on
+tol
+\emph default
+, or when the number of augmentations exceeds 
+\emph on
+maxaug
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Fixed Normal Displacement
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fixed-Normal-Displacement"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A fixed normal displacement constraint enforces zero solid displacement
+ normal to a user-selected surface.
+ This constraint is prescribed on a deformable surface of the model and
+ is enforced for every node on that surface.
+ It uses the local surface normal in the selected surface's reference configurat
+ion.
+ If the selected surface is planar, the functionality of this constraint
+ is equivalent to the Symmetry Plane constraint described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Symmetry-Plane"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="fixed normal displacement" surface="FixedNormalDisplacement01"
+>
+\end_layout
+
+\begin_layout LyX-Code
+	<laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+	<penalty>1000</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+	<tol>0.2</tol>
+\end_layout
+
+\begin_layout LyX-Code
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<maxaug>10</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<shell_bottom>0</shell_bottom>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+surface
+\emph default
+ (FixedNormalDisplacement01 in this example), is defined in the 
+\emph on
+Mesh
+\emph default
+ section.
+ Let 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ denote the nodal displacement vector and let 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ denote the unit normal at each node of the surface; the fixed normal displaceme
+nt constraint enforces 
 \begin_inset Formula $u_{n}\equiv\mathbf{u}\cdot\mathbf{n}=0$
 \end_inset
 
@@ -46190,7 +46385,7 @@ trans iso Mooney-Rivlin
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -46419,7 +46614,7 @@ Fiber stretch for straightened fibers
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -46428,7 +46623,7 @@ Fiber stretch for straightened fibers
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -46437,7 +46632,36 @@ Fiber distribution option
 
 \end_inset
 </cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<active_contraction>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Optional active contraction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -46618,177 +46842,22 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 .
- Active stress along the fiber direction can be simulated using an active
- contraction model.
- To use this feature you need to define the 
-\shape italic
-active_contraction 
-\shape default
-material.
- This material has a 
-\emph on
-ascl
-\emph default
- property that takes an optional attribute, 
-\shape italic
-lc
-\shape default
-, which defines the loadcurve.
- There are also several options:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<ascl>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Activation scale factor (default=0) 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<ca0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Intracellular calcium concentration (default=1)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<camax>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Maximum peak intracellular calcium concentration (default=ca0)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<beta>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-tension-sarcomere length relation constant 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<l0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-No tension sarcomere length 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<refl>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Unloaded sarcomere length 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<Tmax>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Isometric tension under maximal activation at camax (default=1)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
+ An optional active contraction model can also be defined for this material.
+ See Section
+\begin_inset space ~
 \end_inset
 
 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fiber-Active-Contraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details.
 \end_layout
 
 \begin_layout Standard
@@ -46838,34 +46907,6 @@ This example defines a transversely isotropic material with a Mooney-Rivlin
 
 \begin_layout LyX-Code
   <fiber type="vector">1,0,0</fiber>
-\end_layout
-
-\begin_layout LyX-Code
-  <active_contraction>
-\end_layout
-
-\begin_layout LyX-Code
-    <ascl lc="1">1</ascl>
-\end_layout
-
-\begin_layout LyX-Code
-    <ca0>4.35</ca0>
-\end_layout
-
-\begin_layout LyX-Code
-    <beta>4.75</beta>
-\end_layout
-
-\begin_layout LyX-Code
-    <l0>1.58</l0>
-\end_layout
-
-\begin_layout LyX-Code
-    <refl>2.04</refl>
-\end_layout
-
-\begin_layout LyX-Code
-  </active_contraction>
 \end_layout
 
 \begin_layout LyX-Code
@@ -46923,7 +46964,7 @@ literal "true"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -47148,7 +47189,7 @@ Fiber stretch for straightened fibers
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -47157,7 +47198,7 @@ Fiber stretch for straightened fibers
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -47166,7 +47207,36 @@ Fiber distribution option.
 
 \end_inset
 </cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<active_contraction>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Optional active contraction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -47215,19 +47285,22 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 .
- An active contraction model can also be defined for this material.
- See the transversely isotropic Mooney-Rivlin model for more details (Section
+ An optional active contraction model can also be defined for this material.
+ See Section
 \begin_inset space ~
 \end_inset
 
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Transversely-Isotropic-Mooney-Rivlin"
+reference "subsec:Fiber-Active-Contraction"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-).
+ for more details.
 \end_layout
 
 \begin_layout Standard
@@ -48966,6 +49039,951 @@ isotropic Lee-Sacks
 
 \begin_layout LyX-Code
   <c2>9.046</c2>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Fiber Active Contraction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Active-Contraction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some of the material models described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ which include a fiber model may provide the option to specify an active
+ contraction along that fiber.
+ This section lists the types of fiber active contraction models.
+\end_layout
+
+\begin_layout Subsubsection
+Active Contraction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Active-Contraction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default active contraction model is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+active_contraction
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It is based on the formulation of Guccione et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Guccione93"
+literal "false"
+
+\end_inset
+
+ and reviewed in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
+ The active stress is evaluated as 
+\begin_inset Formula $T^{a}\mathbf{a}\otimes\mathbf{a}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ is the unit vector along the fiber in the current configuration, and
+\begin_inset Formula 
+\[
+T^{a}=T_{\max}\frac{Ca_{0}^{2}}{Ca_{0}^{2}+ECa_{50}^{2}}C\left(t\right)
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+ECa_{50}=\frac{\left(\text{Ca}_{0}\right)_{\max}}{\sqrt{\exp\left[\beta\left(\lambda\left(t\right)l_{r}-l_{0}\right)\right]-1}}
+\]
+
+\end_inset
+
+In this expression, 
+\begin_inset Formula $\lambda\left(t\right)$
+\end_inset
+
+ is the fiber stretch ratio at the current time.
+ The activation curve 
+\begin_inset Formula $C\left(t\right)$
+\end_inset
+
+ is represented by the 
+\emph on
+ascl
+\emph default
+ property that takes an optional attribute, 
+\shape italic
+lc
+\shape default
+, which defines the loadcurve.
+ The list of parameters required for this model is as follows.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ascl>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Activation scale factor 
+\begin_inset Formula $C\left(t\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ca0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Intracellular calcium concentration 
+\begin_inset Formula $Ca_{0}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<camax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum peak intracellular calcium concentration 
+\begin_inset Formula $\left(\text{Ca}_{0}\right)_{\max}$
+\end_inset
+
+ (default=ca0)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tension-sarcomere length relation constant 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<l0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+No tension sarcomere length 
+\begin_inset Formula $l_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<refl>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Unloaded sarcomere length 
+\begin_inset Formula $l_{r}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Tmax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Isometric tension under maximal activation at camax 
+\begin_inset Formula $T_{\max}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout Standard
+This example defines a transversely isotropic material with a Mooney-Rivlin
+ basis.
+ It defines a homogeneous fiber direction and uses the active fiber contraction
+ feature.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="3" type="trans iso Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+  <c1>13.85</c1>
+\end_layout
+
+\begin_layout LyX-Code
+  <c2>0.0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  <c3>2.07</c3>
+\end_layout
+
+\begin_layout LyX-Code
+  <c4>61.44</c4>
+\end_layout
+
+\begin_layout LyX-Code
+  <c5>640.7</c5>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>100.0</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <lam_max>1.03</lam_max>
+\end_layout
+
+\begin_layout LyX-Code
+  <fiber type="vector">1,0,0</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  <active_contraction type="active_contraction">
+\end_layout
+
+\begin_layout LyX-Code
+    <ascl lc="1">1</ascl>
+\end_layout
+
+\begin_layout LyX-Code
+    <ca0>4.35</ca0>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>4.75</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <l0>1.58</l0>
+\end_layout
+
+\begin_layout LyX-Code
+    <refl>2.04</refl>
+\end_layout
+
+\begin_layout LyX-Code
+  </active_contraction>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Subsubsection
+Force-Velocity Active Contraction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Force-Velocity-Active-Contractio"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material model was formulated by Estrada et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Estrada20"
+literal "false"
+
+\end_inset
+
+ and is called 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+force-velocity-Estrada
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It is a modification of the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+active_contraction
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material based on the formulation of Guccione et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Guccione93"
+literal "false"
+
+\end_inset
+
+ described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Active-Contraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, based on the fading-memory formulation poroposed by Hunter et al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hunter98"
+literal "false"
+
+\end_inset
+
+.
+ The active stress is evaluated as 
+\begin_inset Formula $T^{a}\mathbf{a}\otimes\mathbf{a}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+ is the unit vector along the fiber in the current configuration, and
+\begin_inset Formula 
+\[
+T^{a}=e\left(t\right)\underbrace{T_{\max}\frac{Ca_{0}^{2}}{Ca_{0}^{2}+ECa_{50}^{2}}}_{\begin{array}{c}
+\text{instantaneous length}\\
+\text{dependence}
+\end{array}}\underbrace{\frac{1+aQ\left(t,\lambda\left(t\right)\right)}{1-Q\left(t,\lambda\left(t\right)\right)}}_{\text{force-velocity}}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+ECa_{50}=\frac{\left(\text{Ca}_{0}\right)_{\max}}{\sqrt{\exp\left[\beta\left(\lambda\left(t\right)l_{r}-l_{0}\right)\right]-1}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+Q\left(t,\lambda\left(t\right)\right)=\sum_{k=1}^{3}A_{k}\int_{-\infty}^{t}e^{-\alpha_{k}\left(t-\tau\right)}\dot{\lambda}\left(\tau\right)\,d\tau
+\]
+
+\end_inset
+
+In these expressions, 
+\begin_inset Formula $\lambda\left(t\right)$
+\end_inset
+
+ is the fiber stretch ratio at the current time.
+ Here, 
+\begin_inset Formula $T^{a}$
+\end_inset
+
+ 
+\begin_inset Quotes eld
+\end_inset
+
+is the product of three distinct components: a time-varying normalized activatio
+n, 
+\begin_inset Formula $e\left(t\right)$
+\end_inset
+
+, that defines the time course of force generation throughout the cardiac
+ cycle; an instantaneous length-dependent term that scales the peak possible
+ isometric tension based on the current fiber stretch; and a force-velocity
+ term that dampens the instantaneous force generation based on the rate
+ of shortening of the fibers
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Estrada20"
+literal "false"
+
+\end_inset
+
+.
+ The activation curve 
+\begin_inset Formula $e\left(t\right)$
+\end_inset
+
+ is represented by the 
+\emph on
+ascl
+\emph default
+ property that takes an optional attribute, 
+\shape italic
+lc
+\shape default
+, which defines the time-dependent loadcurve.
+ The list of parameters required for this model is as follows.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ascl>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Activation scale factor 
+\begin_inset Formula $e\left(t\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ca0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Intracellular calcium concentration 
+\begin_inset Formula $Ca_{0}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<camax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum peak intracellular calcium concentration 
+\begin_inset Formula $\left(\text{Ca}_{0}\right)_{\max}$
+\end_inset
+
+ (default=ca0)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tension-sarcomere length relation constant 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<l0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+No tension sarcomere length 
+\begin_inset Formula $l_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<refl>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Unloaded sarcomere length 
+\begin_inset Formula $l_{r}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<Tmax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Isometric tension under maximal activation at camax 
+\begin_inset Formula $T_{\max}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<A1>, <A2>, <A3>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameters 
+\begin_inset Formula $A_{k}$
+\end_inset
+
+ for 
+\begin_inset Formula $k=1,2,3$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha1>, <alpha2>, <alpha3>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameters 
+\begin_inset Formula $\alpha_{k}$
+\end_inset
+
+ for 
+\begin_inset Formula $k=1,2,3$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<a_t>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $a$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<force_velocity>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set to true (1) by default.
+ Set to false (0) to turn off the force-velocity term
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout Standard
+This example defines a transversely isotropic material with a Mooney-Rivlin
+ basis.
+ It defines a homogeneous fiber direction and uses the active fiber contraction
+ feature.
+\end_layout
+
+\begin_layout LyX-Code
+<material id="3" type="trans iso Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+  <c1>13.85</c1>
+\end_layout
+
+\begin_layout LyX-Code
+  <c2>0.0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+  <c3>2.07</c3>
+\end_layout
+
+\begin_layout LyX-Code
+  <c4>61.44</c4>
+\end_layout
+
+\begin_layout LyX-Code
+  <c5>640.7</c5>
+\end_layout
+
+\begin_layout LyX-Code
+  <k>100.0</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <lam_max>1.03</lam_max>
+\end_layout
+
+\begin_layout LyX-Code
+  <fiber type="vector">1,0,0</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+  <active_contraction type="force-velocity-Estrada">
+\end_layout
+
+\begin_layout LyX-Code
+    <ascl lc="1">1</ascl>
+\end_layout
+
+\begin_layout LyX-Code
+    <ca0>4.35</ca0>
+\end_layout
+
+\begin_layout LyX-Code
+    <beta>4.75</beta>
+\end_layout
+
+\begin_layout LyX-Code
+    <l0>1.58</l0>
+\end_layout
+
+\begin_layout LyX-Code
+    <refl>1.58</refl>
+\end_layout
+
+\begin_layout LyX-Code
+	<Tmax>135.7</Tmax>
+\end_layout
+
+\begin_layout LyX-Code
+	<alpha1>30.30303</alpha1>
+\end_layout
+
+\begin_layout LyX-Code
+	<A1>50</A1>
+\end_layout
+
+\begin_layout LyX-Code
+	<a_t>0.5</a_t>
+\end_layout
+
+\begin_layout LyX-Code
+	<force_velocity>1</force_velocity>
+\end_layout
+
+\begin_layout LyX-Code
+  </active_contraction>
 \end_layout
 
 \begin_layout LyX-Code
@@ -60560,6 +61578,319 @@ reference "subsec:Solid-Mixture"
 
 \begin_layout LyX-Code
 </solid>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber with Exp-Pow-Linear Response
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Exp-Pow-Linear"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-exp-pow-linear
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The following material parameters need to be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $E,$
+\end_inset
+
+ the fiber modulus in the linear range (
+\begin_inset Formula $E\geqslant0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\alpha,$
+\end_inset
+
+ coefficient of exponential argument
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta,$
+\end_inset
+
+ the power-law exponent in the toe region (
+\begin_inset Formula $\beta\geqslant2)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<lam0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{0},$
+\end_inset
+
+ the stretch ratio when the toe region transitions to the linear region
+ (
+\begin_inset Formula $\lambda_{0}>1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain energy density is given by 
+\begin_inset Formula 
+\[
+\Psi_{n}=\begin{cases}
+0 & I_{n}<1\\
+\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right) & 1\le I_{n}\le I_{0}\\
+B\left(I_{n}-I_{0}\right)-E\left(I_{n}^{1/2}-I_{0}^{1/2}\right)+\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]-1\right) & I_{n}>I_{0}
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+B=\frac{E}{2I_{0}^{1/2}}+\xi\left(I_{0}-1\right)^{\beta-1}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]
+\]
+
+\end_inset
+
+This model reduces to 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+fiber-pow-linear
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ when 
+\begin_inset Formula $\alpha=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout Standard
+Fiber model as specified in a solid mixture (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solid-Mixture"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout LyX-Code
+<solid type="fiber-exp-pow-linear">
+\end_layout
+
+\begin_layout LyX-Code
+ <E>1080</E>
+\end_layout
+
+\begin_layout LyX-Code
+ <alpha>1400</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+ <beta>2.73</beta>
+\end_layout
+
+\begin_layout LyX-Code
+ <lam0>1.012</lam0>
+\end_layout
+
+\begin_layout LyX-Code
+ <fiber type="vector">0,0,1</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+</solid>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection

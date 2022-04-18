@@ -37196,10 +37196,10 @@ literal "true"
 
  was added to the transversely isotropic materials.
  When active contraction is activated, the total Cauchy stress 
-\begin_inset Formula $\mathbf{\sigma}$
+\begin_inset Formula $\boldsymbol{\sigma}$
 \end_inset
 
-is defined as the sum of the active stress tensor 
+ is defined as the sum of the active stress tensor 
 \begin_inset Formula $\boldsymbol{\sigma}^{a}=T^{a}\mathbf{a}\otimes\mathbf{a}$
 \end_inset
 
