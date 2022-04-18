@@ -19796,6 +19796,67 @@ attribute is omitted a constant traction load is applied.
 \end_layout
 
 \begin_layout Subsubsection
+Surface Force
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Surface-Force"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A surface force applies an equivalent uniform traction load to a surface.
+ The direction of the force remains unchanged as the mesh deforms.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="force" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <scale lc="1">1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+  <force>0,0,1</force>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+The force vector is determined by two quantities.
+ The direction and magnitude is defined by the 
+\shape italic
+force 
+\shape default
+element.
+ In addition, the magnitude can be scaled using the 
+\shape italic
+scale 
+\shape default
+element.
+ An optional load curve can be defined for the 
+\shape italic
+scale 
+\shape default
+element using the 
+\shape italic
+lc 
+\shape default
+attribute.
+ This allows the surface force to become time dependent.
+ If the 
+\shape italic
+lc 
+\shape default
+attribute is omitted a constant force is applied.
+\end_layout
+
+\begin_layout Subsubsection
 Mixture Normal Traction
 \begin_inset CommandInset label
 LatexCommand label
