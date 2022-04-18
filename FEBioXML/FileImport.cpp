@@ -1027,6 +1027,13 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				{
 					int lc = atoi(tag.m_att[i].m_szatv) - 1;
 					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+
+					// make sure the parameter is volatile
+					if (pp->IsVolatile() == false)
+					{
+						throw XMLReader::InvalidAttribute(tag, szat);
+					}
+
 					GetFEModel()->AttachLoadController(pp, lc);
 				}
 				/*			else

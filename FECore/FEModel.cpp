@@ -1594,6 +1594,7 @@ bool FEModel::EvaluateLoadParameters()
 		{
 			double s = GetLoadController(nlc)->Value();
 			FEParam* p = pi.param;
+			assert(p->IsVolatile());
 			switch (p->type())
 			{
 			case FE_PARAM_INT: {
