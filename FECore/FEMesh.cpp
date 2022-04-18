@@ -124,6 +124,17 @@ void FEMesh::Serialize(DumpStream& ar)
 		// write facet sets
 		ar << m_FaceSet;
 
+		// write surface pairs
+		int surfPairs = m_SurfPair.size();
+		ar << surfPairs;
+		for (int i = 0; i < m_SurfPair.size(); ++i)
+		{
+			FESurfacePair& sp = *m_SurfPair[i];
+			ar << sp.GetName();
+			ar << sp.GetPrimarySurface()->GetName();
+			ar << sp.GetSecondarySurface()->GetName();
+		}
+
 		// write discrete sets
 		int dsets = DiscreteSets();
 		ar << dsets;
@@ -160,8 +171,29 @@ void FEMesh::Serialize(DumpStream& ar)
 		// read element sets
 		ar >> m_ElemSet;
 
-		// write facet sets
+		// read facet sets
 		ar >> m_FaceSet;
+
+		// read surface pairs
+		int surfPairs = 0;
+		ar >> surfPairs;
+		for (int i = 0; i < surfPairs; ++i)
+		{
+			FESurfacePair* sp = new FESurfacePair(this);
+			std::string name;
+			ar >> name; 
+			sp->SetName(name);
+
+			ar >> name;
+			FEFacetSet* ps = FindFacetSet(name);
+			sp->SetPrimarySurface(ps);
+
+			ar >> name;
+			ps = FindFacetSet(name);
+			sp->SetSecondarySurface(ps);
+
+			AddSurfacePair(sp);
+		}
 
 		// read discrete sets
 		int dsets = 0;

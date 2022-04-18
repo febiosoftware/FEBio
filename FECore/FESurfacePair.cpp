@@ -68,3 +68,12 @@ void FESurfacePair::SetSecondarySurface(FEFacetSet* pf)
 {
 	m_surface2 = pf;
 }
+
+void FESurfacePair::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+
+	ar& m_surface1;
+	ar& m_surface2;
+	ar& m_mesh;
+}
