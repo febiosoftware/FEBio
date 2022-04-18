@@ -38,6 +38,9 @@ BEGIN_FECORE_CLASS(FEUncoupledActiveContraction, FEUncoupledMaterial)
 	ADD_PARAMETER(m_beta , "beta" );
 	ADD_PARAMETER(m_l0   , "l0"   );
 	ADD_PARAMETER(m_refl , "refl" );
+
+	ADD_PARAMETER(m_Q, "mat_axis");
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

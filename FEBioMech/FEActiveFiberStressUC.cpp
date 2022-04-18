@@ -39,6 +39,9 @@ BEGIN_FECORE_CLASS(FEActiveFiberStressUC, FEUncoupledMaterial);
 
 	ADD_PROPERTY(m_stl, "stl", FEProperty::Optional);
 	ADD_PROPERTY(m_stv, "stv", FEProperty::Optional);
+
+	ADD_PARAMETER(m_Q, "mat_axis");
+
 END_FECORE_CLASS();
 
 FEActiveFiberStressUC::FEActiveFiberStressUC(FEModel* fem) : FEUncoupledMaterial(fem)

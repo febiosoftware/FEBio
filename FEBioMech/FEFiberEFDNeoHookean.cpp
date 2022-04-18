@@ -36,6 +36,9 @@ BEGIN_FECORE_CLASS(FEFiberEFDNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETER(m_a, 3, "a");
 	ADD_PARAMETER(m_ac, "active_contraction")->setUnits(UNIT_PRESSURE);
+
+	ADD_PARAMETER(m_Q, "mat_axis");
+
 END_FECORE_CLASS();
 
 #ifndef SQR

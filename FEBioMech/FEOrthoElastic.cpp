@@ -42,6 +42,9 @@ BEGIN_FECORE_CLASS(FEOrthoElastic, FEElasticMaterial)
 	ADD_PARAMETER(v12, "v12");
 	ADD_PARAMETER(v23, "v23");
 	ADD_PARAMETER(v31, "v31");
+
+	ADD_PARAMETER(m_Q, "mat_axis");
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

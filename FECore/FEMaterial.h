@@ -73,7 +73,7 @@ public:
 	// evaluate local coordinate system at material point
 	mat3d GetLocalCS(const FEMaterialPoint& mp);
 
-private:
+protected:
 	FEParamMat3d	m_Q;			//!< local material coordinate system
 
 public:

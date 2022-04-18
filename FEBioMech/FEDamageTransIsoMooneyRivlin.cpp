@@ -80,6 +80,9 @@ BEGIN_FECORE_CLASS(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_Fbeta, "Fbeta");
 	ADD_PARAMETER(m_Fsmin, "Fsmin");
 	ADD_PARAMETER(m_Fsmax, "Fsmax");
+
+	ADD_PARAMETER(m_Q, "mat_axis");
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

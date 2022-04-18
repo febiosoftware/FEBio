@@ -40,6 +40,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c5, "c5")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_lam1, "lam_max");
 	ADD_PARAMETER(m_epsf, "epsilon_scale");
+	ADD_PARAMETER(m_Q, "mat_axis");
 END_FECORE_CLASS();
 
 double FE2DTransIsoVerondaWestmann::m_cth[FE2DTransIsoVerondaWestmann::NSTEPS];

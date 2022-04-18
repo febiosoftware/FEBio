@@ -33,6 +33,9 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_T0 , "T0"   );
+
+    ADD_PARAMETER(m_Q, "mat_axis");
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

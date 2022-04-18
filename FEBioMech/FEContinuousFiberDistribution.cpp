@@ -31,6 +31,8 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEContinuousFiberDistribution, FEElasticMaterial)
 
+	ADD_PARAMETER(m_Q, "mat_axis");
+
 	// material properties
 	ADD_PROPERTY(m_pFmat, "fibers");
 	ADD_PROPERTY(m_pFDD, "distribution");

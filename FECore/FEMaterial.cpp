@@ -48,7 +48,7 @@ void FEMaterialBase::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const 
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEMaterial, FEMaterialBase)
-	ADD_PARAMETER(m_Q, "mat_axis");
+//	ADD_PARAMETER(m_Q, "mat_axis");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

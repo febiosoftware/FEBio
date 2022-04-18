@@ -35,6 +35,7 @@ BEGIN_FECORE_CLASS(FE2DFiberNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_v, "v");
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_Q, "mat_axis");
 END_FECORE_CLASS();
 
 double FE2DFiberNeoHookean::m_cth[FE2DFiberNeoHookean::NSTEPS];
