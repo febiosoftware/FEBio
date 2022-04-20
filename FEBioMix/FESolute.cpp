@@ -89,7 +89,7 @@ BEGIN_FECORE_CLASS(FESoluteMaterial, FESolute)
 //	ADD_PARAMETER(m_M, "molar_mass");
 //	ADD_PARAMETER(m_z, "charge_number");
 
-	ADD_PARAMETER(m_ID, "sol", FE_PARAM_ATTRIBUTE, "$(Solutes)");
+	ADD_PARAMETER(m_ID, "sol", FE_PARAM_ATTRIBUTE, "$(solutes)");
 
 	// set material properties
 	ADD_PROPERTY(m_pDiff , "diffusivity");
@@ -189,7 +189,7 @@ FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 // Material parameters for the FESolidBoundMolecule material
 BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterialProperty)
 
-	ADD_PARAMETER(m_ID, "sbm", FE_PARAM_ATTRIBUTE, "$(SBMs)");
+	ADD_PARAMETER(m_ID, "sbm", FE_PARAM_ATTRIBUTE, "$(sbms)");
 
 	ADD_PARAMETER(m_rho0  , "rho0"  );
 	ADD_PARAMETER(m_rhomin, "rhomin");

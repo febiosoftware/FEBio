@@ -185,4 +185,5 @@ public:
     bool            m_Vovr;     //!< override flag for m_Vbar
 
 	DECLARE_FECORE_CLASS();
+    FECORE_BASE_CLASS(FEChemicalReaction)
 };

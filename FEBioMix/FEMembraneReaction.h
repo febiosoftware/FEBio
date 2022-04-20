@@ -167,4 +167,5 @@ public:
     int             m_vPetmp;       //!< helper variable for reading in stoichiometric coefficients for products
 
     DECLARE_FECORE_CLASS();
+    FECORE_BASE_CLASS(FEMembraneReaction)
 };
