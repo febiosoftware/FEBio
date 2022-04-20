@@ -53,6 +53,9 @@ public:
     //! update
     void Update() override;
     
+    //! evaluate bearing pressure
+    double ScalarLoad(FESurfaceMaterialPoint& mp) override;
+
 public:
     //! calculate residual
     void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;

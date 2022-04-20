@@ -64,6 +64,8 @@ SOFTWARE.*/
 #include "FESlidingElasticInterface.h"
 #include "FETiedContactSurface.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include <FECore/FESurface.h>
+#include <FECore/FESurfaceLoad.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -653,6 +655,32 @@ bool FEPlotSurfaceArea::Save(FESurface &surf, FEDataStream &a)
         return (g[0] ^ g[1]).norm();
     });
     return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot scalar surface load
+bool FEPlotScalarSurfaceLoad::Save(FESurface &surf, FEDataStream& a)
+{
+    FEModel* fem = GetFEModel();
+    int nsl = fem->SurfaceLoads();
+    FESurfaceLoad* psl = nullptr;
+    for (int i = 0; i<nsl; ++i)
+    {
+        psl = fem->SurfaceLoad(i);
+        if (&psl->GetSurface() == &surf) break;
+    }
+
+    if (psl == nullptr) return false;
+    
+    if (psl->IsActive()) {
+        writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+            const FESurfaceMaterialPoint* pt = mp.ExtractData<FESurfaceMaterialPoint>();
+            FESurfaceMaterialPoint pnc(*pt);
+            return (pt ? psl->ScalarLoad(pnc) : 0.0);
+        });
+        return true;
+    }
+    return false;
 }
 
 //=============================================================================

@@ -245,6 +245,14 @@ void FEBearingLoad::Update()
     }
 }
 
+//-----------------------------------------------------------------------------
+//! evaluate bearing pressure
+double FEBearingLoad::ScalarLoad(FESurfaceMaterialPoint& mp)
+{
+    // evaluate pressure at this material point
+    double P = m_pc->value(mp)*m_scale*m_force.norm();
+    return P;
+}
 
 //-----------------------------------------------------------------------------
 void FEBearingLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
@@ -256,9 +264,9 @@ void FEBearingLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     surf.LoadVector(R, m_dof, m_blinear, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
         
         // evaluate pressure at this material point
-        double P = -m_pc->value(pt)*m_scale*m_force.norm();
+        double P = -ScalarLoad(pt);
         if (m_bshellb) P = -P;
-        
+
         double J = (pt.dxr ^ pt.dxs).norm();
         
         // force vector
@@ -286,9 +294,9 @@ void FEBearingLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
     surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& kab) {
         
         // evaluate pressure at this material point
-        double P = -m_pc->value(mp)*m_scale*m_force.norm();
+        double P = -ScalarLoad(mp);
         if (m_bshellb) P = -P;
-        
+
         double H_i  = dof_a.shape;
         double Gr_i = dof_a.shape_deriv_r;
         double Gs_i = dof_a.shape_deriv_s;
