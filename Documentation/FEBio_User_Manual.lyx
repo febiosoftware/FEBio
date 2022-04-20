@@ -19857,6 +19857,160 @@ attribute is omitted a constant force is applied.
 \end_layout
 
 \begin_layout Subsubsection
+Bearing Load
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Bearing-Load"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A bearing load can be applied on a cylindrical surface that represents a
+ journal bearing.
+ This load gets prescribed as a non-uniform compressive pressure distribution
+ on that surface, representing the radial component of the bearing load.
+ (The axial component of a bearing load may be prescribed using the surface
+ force presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Surface-Force"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.) The non-uniform pressure distribution may be sinusoidal or parabolic.
+ It gets distributed over a ±90 degree arc relative to the loading direction,
+ which is specified as a force vector.
+ The user is expected to specify the bearing force in a plane perpendicular
+ to the axis of the cylindrical bearing surface.
+ Otherwise, only the projection of the bearing force onto that plane will
+ be prescribed as the radial bearing load.
+ For example, a bearing load may be specified as
+\end_layout
+
+\begin_layout Standard
+<surface_load type="bearing load" surface="BearingSurface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <scale lc="1">1000.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+  <force>0.707107,0.707107,0</force>
+\end_layout
+
+\begin_layout LyX-Code
+  <profile>1</profile>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+In this example the bearing load is in the xy-plane, oriented at 45 degrees
+ from the x-axis.
+ The surface 
+\emph on
+BearingSurface1
+\emph default
+ should be a cylinder with its axis along the z-direction.
+ The pressure distribution is parabolic (profile=1), and the alternative
+ option is sinusoidal (profile=0).
+ In general, a parabolic distribution produces a higher (often more realistic)
+ central peak pressure on the bearing surface.
+ An optional loadcurve can be associated with the 
+\emph on
+scale
+\emph default
+ as shown in this example, to scale the prescribed bearing force as a function
+ of time.
+ Alternatively, the user may assign a loadcurve to the 
+\emph on
+force
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Additional options are available for a bearing load, including 
+\emph on
+symmetric_stiffness
+\emph default
+, 
+\emph on
+linear
+\emph default
+ and 
+\emph on
+shell_bottom
+\emph default
+ as outlined in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Pressure-Load"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ When the 
+\emph on
+linear
+\emph default
+ flag is set to false, the pressure prescribed on the bearing surface is
+ adjusted to account for the change in area and orientation of each face,
+ caused by the finite deformation of the bearing surface.
+ However, the bearing radial force direction remains unchanged with deformation.
+ It is recommended to set the 
+\emph on
+symmetric_stiffness
+\emph default
+ flag to false when performing a finite deformation analysis.
+\end_layout
+
+\begin_layout Standard
+The bearing load is always prescribed as a compressive load on the selected
+ bearing surface.
+ Therefore, it is recommended to select a complete cylindrical surface on
+ which the bearing load is prescribed; the solver automatically determines
+ which faces of the selected surface must be loaded in compression and which
+ of those have zero pressure prescribed on them, based on the vectorial
+ orientation of the bearing 
+\emph on
+force
+\emph default
+.
+ If the user selects a semi-cylindrical surface as the bearing surface,
+ it becomes the user's responsibility to ensure that the prescribed bearing
+ force bisects the 180 degree arc of that surface.
+ Otherwise, the analysis may produce unexpected results, due to unevenness
+ of the pressure distribution about the force's line of action.
+ If the user selects a surface with a smaller arc than ±90 degrees, the
+ pressure will not reduce to zero at the straight edges of the surface,
+ though the pressure will be scaled to produce the prescribed force magnitude
+ along the bearing force direction.
+ 
+\end_layout
+
+\begin_layout Subsubsection
 Mixture Normal Traction
 \begin_inset CommandInset label
 LatexCommand label
