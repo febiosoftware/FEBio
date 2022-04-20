@@ -160,6 +160,7 @@ SOFTWARE.*/
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
 #include "FESurfaceForceUniform.h"
+#include "FEBearingLoad.h"
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -529,6 +530,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPressureLoad, "pressure");
 	REGISTER_FECORE_CLASS(FETractionLoad, "traction");
     REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
+    REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce

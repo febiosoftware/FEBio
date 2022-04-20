@@ -811,6 +811,10 @@ public:
 	// local derivatives of shape functions at gauss points, for different interpolation order
 	std::vector<matrix>	Gr_p;
 	std::vector<matrix>	Gs_p;
+    
+    // parametric coordinates of element center
+    double cr;
+    double cs;
 };
 
 //=============================================================================

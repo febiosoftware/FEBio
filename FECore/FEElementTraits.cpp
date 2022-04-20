@@ -1691,7 +1691,10 @@ void FEQuad4_::init()
 	m_shapeP[0] = 0;
 	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD4));
 
-	// initialize base class
+    // centroid coordinates
+    cr = cs = 0;
+
+    // initialize base class
 	FESurfaceElementTraits::init();
 }
 
@@ -1756,6 +1759,9 @@ void FETri3_::init()
 	m_shapeP[0] = 0;
 	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
 
+    // centroid coordinates
+    cr = cs = 1.0/3.0;
+    
 	// initialize base class
 	FESurfaceElementTraits::init();
 }
@@ -1882,6 +1888,9 @@ void FETri6_::init()
 	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
 	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI6));
 
+    // centroid coordinates
+    cr = cs = 1.0/3.0;
+    
 	// initialize base class
 	FESurfaceElementTraits::init();
 }
@@ -2255,6 +2264,9 @@ void FETri7_::init()
 	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
 	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI7));
 
+    // centroid coordinates
+    cr = cs = 1.0/3.0;
+    
 	// initialize base class
 	FESurfaceElementTraits::init();
 }
@@ -2339,6 +2351,9 @@ void FETri10_::init()
 	m_shapeP[2] = 0; // this element cannot be used for quadratic interpolation!
 	m_shapeP[3] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI10));
 
+    // centroid coordinates
+    cr = cs = 1.0/3.0;
+    
 	// initialize base class
 	FESurfaceElementTraits::init();
 }
@@ -2418,6 +2433,9 @@ void FEQuad8_::init()
 	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD4));
 	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD8));
 
+    // centroid coordinates
+    cr = cs = 0;
+    
 	// initialize base class
 	FESurfaceElementTraits::init();
 }
@@ -2512,6 +2530,9 @@ void FEQuad9_::init()
 	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD4));
 	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD9));
 
+    // centroid coordinates
+    cr = cs = 0;
+    
 	// initialize base class
 	FESurfaceElementTraits::init();
 }
