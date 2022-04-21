@@ -265,6 +265,16 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Scalar surface load
+//!
+class FEPlotScalarSurfaceLoad : public FEPlotSurfaceData
+{
+public:
+    FEPlotScalarSurfaceLoad(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

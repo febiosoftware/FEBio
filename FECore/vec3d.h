@@ -54,6 +54,28 @@ public:
 
 	vec3d operator - () const { return vec3d(-x, -y, -z); }
 
+    double& operator() (int i)
+    {
+        switch(i)
+        {
+            case 0: {return x; break;}
+            case 1: {return y; break;}
+            case 2: {return z; break;}
+            default: {return x; break;}
+        }
+    }
+    
+    double operator() (int i) const
+    {
+        switch(i)
+        {
+            case 0: {return x; break;}
+            case 1: {return y; break;}
+            case 2: {return z; break;}
+            default: {return x; break;}
+        }
+    }
+    
 	// dot product
 	double operator * (const vec3d& r) const { return (x*r.x + y*r.y + z*r.z); }
 
@@ -89,29 +111,7 @@ public:
 	double SqrLength() const { return norm2(); }
 	bool operator == (const vec3d& a) const { return ((a.x == x) && (a.y == y) && (a.z == z)); }
 
-    double& operator() (int i)
-    {
-        switch(i)
-        {
-            case 0: {return x; break;}
-            case 1: {return y; break;}
-            case 2: {return z; break;}
-            default: {return x; break;}
-        }
-    }
-
-    double operator() (int i) const
-    {
-        switch(i)
-        {
-            case 0: {return x; break;}
-            case 1: {return y; break;}
-            case 2: {return z; break;}
-            default: {return x; break;}
-        }
-    }
-
-public:
+ public:
 	double x, y, z;
 };
 

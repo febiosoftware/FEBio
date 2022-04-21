@@ -44,6 +44,8 @@ public:
 	const double* GaussWeights() const { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 	double gr(int n) const { return ((FESurfaceElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
 	double gs(int n) const { return ((FESurfaceElementTraits*)(m_pT))->gs[n]; }	// integration point coordinate  s
+    double cr() const { return ((FESurfaceElementTraits*)(m_pT))->cr; }    // centroid point coordinate r
+    double cs() const { return ((FESurfaceElementTraits*)(m_pT))->cs; }    // centroid point coordinate s
 
 	double* Gr(int n) const { return ((FESurfaceElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Gs(int n) const { return ((FESurfaceElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s

@@ -62,6 +62,8 @@ public:
     
     //! rim pressure
     bool SetRimPressure();
+    
+    double ScalarLoad(FESurfaceMaterialPoint& mp) override;
 
 private:
     FEParamDouble	m_velocity;	//!< average velocity

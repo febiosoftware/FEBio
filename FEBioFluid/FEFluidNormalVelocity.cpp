@@ -90,6 +90,12 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
+double FEFluidNormalVelocity::ScalarLoad(FESurfaceMaterialPoint& mp)
+{
+    return m_velocity(mp);
+}
+
+//-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidNormalVelocity::Init()
 {

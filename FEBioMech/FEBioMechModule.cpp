@@ -160,6 +160,7 @@ SOFTWARE.*/
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
 #include "FESurfaceForceUniform.h"
+#include "FEBearingLoad.h"
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -549,6 +550,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPressureLoad, "pressure");
 	REGISTER_FECORE_CLASS(FETractionLoad, "traction");
     REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
+    REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
@@ -713,6 +715,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy, "rigid kinetic energy");
 	REGISTER_FECORE_CLASS(FEPlotRigidEuler, "Euler angle");
 	REGISTER_FECORE_CLASS(FEPlotRigidRotationVector, "rigid rotation vector");
+    REGISTER_FECORE_CLASS(FEPlotScalarSurfaceLoad, "scalar surface load");
 	REGISTER_FECORE_CLASS(FEPlotStressError, "stress error");
 	REGISTER_FECORE_CLASS(FEPlotFiberTargetStretch, "in-situ target stretch");
 	REGISTER_FECORE_CLASS(FEPlotPreStrainStretch, "prestrain stretch");

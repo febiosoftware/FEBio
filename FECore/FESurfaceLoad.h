@@ -55,6 +55,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	const FEDofList& GetDofList() const;
+    
+public:
+    virtual double ScalarLoad(FESurfaceMaterialPoint& mp) { return 0; }
+    virtual vec3d VectorLoad(FESurfaceMaterialPoint& mp) { return vec3d(0,0,0); }
 
 	// TODO: Can I get rid of this?
 	// This is needed to update the mesh after some surface loads, which aren't really
