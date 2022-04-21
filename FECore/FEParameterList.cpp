@@ -63,6 +63,7 @@ void FEParameterList::operator = (FEParameterList& l)
 			case FE_PARAM_MAT3D : d.value<mat3d >() = s.value<mat3d >(); break;
 			case FE_PARAM_MAT3DS: d.value<mat3ds>() = s.value<mat3ds>(); break;
 			case FE_PARAM_TENS3DRS: d.value<tens3drs>() = s.value<tens3drs>(); break;
+			case FE_PARAM_STD_STRING: d.value<std::string>() = s.value<std::string>(); break;
 			case FE_PARAM_DOUBLE_MAPPED:
 			{
 				FEParamDouble& mat3d = d.value<FEParamDouble>();
