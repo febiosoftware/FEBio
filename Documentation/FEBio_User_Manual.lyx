@@ -6,13 +6,6 @@
 \origin unavailable
 \textclass extbook
 \begin_preamble
-% Converted from Microsoft Word to LaTeX
-% by Chikrii Softlab Word2TeX converter (version 5.0)
-% Copyright (C) 1999-2011 Chikrii Softlab. All rights reserved.
-% http://www.chikrii.com
-% mailto: support@chikrii.com
-% License: CSL#005010
-
 \usepackage{latexsym}
 \hypersetup{colorlinks=true,citecolor=blue,filecolor=blue,urlcolor=blue,linkcolor=blue}
 \end_preamble
