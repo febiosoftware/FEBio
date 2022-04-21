@@ -61,6 +61,7 @@
 #include <FEBioMech/FESolidLinearSystem.h>
 #include "FEBioFSI.h"
 #include "FEBioMultiphasicFSI.h"
+#include "FEMultiphasicFSIAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -270,25 +271,25 @@ bool FEMultiphasicFSISolver::Init()
             FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
             FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(&dom);
             if (fdom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::STEADY_STATE)
                     fdom->SetSteadyStateAnalysis();
                 else
                     fdom->SetTransientAnalysis();
             }
             else if (fsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::STEADY_STATE)
                     fsidom->SetSteadyStateAnalysis();
                 else
                     fsidom->SetTransientAnalysis();
             }
             else if (bfsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::STEADY_STATE)
                     bfsidom->SetSteadyStateAnalysis();
                 else
                     bfsidom->SetTransientAnalysis();
             }
             else if (mfsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::STEADY_STATE)
                     mfsidom->SetSteadyStateAnalysis();
                 else
                     mfsidom->SetTransientAnalysis();
@@ -648,7 +649,7 @@ void FEMultiphasicFSISolver::UpdateKinematics(vector<double>& ui)
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
     FEAnalysis* pstep = fem.GetCurrentStep();
-    if (pstep->m_nanalysis == FE_DYNAMIC)
+    if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::DYNAMIC)
     {
         int N = mesh.Nodes();
         double dt = fem.GetTime().timeIncrement;
@@ -1346,7 +1347,7 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
     
     // Add mass matrix
     //    FEAnalysis* pstep = fem.GetCurrentStep();
-    //    if (pstep->m_nanalysis == FE_DYNAMIC)
+    //    if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::DYNAMIC)
     {
         // scale factor
         double dt = tp.timeIncrement;
@@ -1546,7 +1547,7 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
             else if (fsidom) fsidom->InertialForces(RHS, tp);
             else if (bfsidom) bfsidom->InertialForces(RHS, tp);
             else if (mfsidom) mfsidom->InertialForces(RHS, tp);
-            else if (edom && (pstep->m_nanalysis == FE_DYNAMIC))
+            else if (edom && (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::DYNAMIC))
             {
                 FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
                 if (mat && (mat->IsRigid()==false)) edom->InertialForces(RHS, F);
@@ -1555,7 +1556,7 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
     }
     
     // update rigid bodies
-    if (pstep->m_nanalysis == FE_DYNAMIC) m_rigidSolver.InertialForces(RHS, tp);
+    if (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::DYNAMIC) m_rigidSolver.InertialForces(RHS, tp);
     
     // calculate contact forces
     ContactForces(RHS);

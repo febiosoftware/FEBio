@@ -45,7 +45,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 
 	BEGIN_PARAM_GROUP("Analysis");
-		ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
+		ADD_PARAMETER(m_nanalysis, "analysis");// , 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
 	END_PARAM_GROUP();
 
 	BEGIN_PARAM_GROUP("Time stepping");
@@ -85,7 +85,7 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 	m_timeController = nullptr;
 
 	// --- Analysis data ---
-	m_nanalysis = FE_STATIC;	// do quasi-static analysis
+	m_nanalysis = 0;
 	m_badaptorReSolve = true;
 
 	// --- Time Step Data ---

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FETangentDiagnostic.h"
 #include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioFluid/FEFluidDomain3D.h"
+#include "FEBioFluid/FEFluidAnalysis.h"
 #include "FECore/log.h"
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEFixedBC.h>
@@ -73,7 +74,7 @@ bool FEFluidTangentUniaxial::Init()
     
     FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    pstep->m_nanalysis = FE_DYNAMIC;
+    pstep->m_nanalysis = FEFluidAnalysis::DYNAMIC;
 
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_WX = fem.GetDOFIndex("wx");
@@ -171,7 +172,7 @@ bool FEFluidTangentUniaxialSS::Init()
     
     FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    pstep->m_nanalysis = FE_STEADY_STATE;
+    pstep->m_nanalysis = FEFluidAnalysis::STEADY_STATE;
     
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
     const int dof_WX = fem.GetDOFIndex("wx");

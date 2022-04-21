@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
@@ -1060,7 +1061,7 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
 {
     FEModel& fem = *GetFEModel();
     double dt = fem.GetTime().timeIncrement;
-    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE);
     
     int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
     int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();

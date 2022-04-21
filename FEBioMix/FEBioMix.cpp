@@ -117,6 +117,9 @@ SOFTWARE.*/
 #include "FEInitialConcentration.h"
 
 #include "FEBiphasicModule.h"
+#include "FEBiphasicAnalysis.h"
+#include "FEBiphasicSoluteAnalysis.h"
+#include "FEMultiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -155,6 +158,10 @@ void FEBioMix::InitModule()
 		"}");
 
 	febio.SetModuleDependency("solid");
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEBiphasicAnalysis, "biphasic");
 
 	//-----------------------------------------------------------------------------
 	// solver classes
@@ -254,7 +261,11 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FESoluteData, "solute");
 
 	//-----------------------------------------------------------------------------
-	// solver classes
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEBiphasicSoluteAnalysis, "solute");
+
+	//-----------------------------------------------------------------------------
+	// solver classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEBiphasicSoluteSolver, "solute");
 
 	//-----------------------------------------------------------------------------
@@ -366,6 +377,10 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Global data classes
 	REGISTER_FECORE_CLASS(FESBMData, "solid_bound");
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEMultiphasicAnalysis, "multiphasic");
 
 	//-----------------------------------------------------------------------------
 	// solver classes

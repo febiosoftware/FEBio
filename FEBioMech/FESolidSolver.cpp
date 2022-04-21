@@ -48,6 +48,7 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <assert.h>
 #include "FEBioMech.h"
+#include "FESolidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -125,7 +126,7 @@ bool FESolidSolver::Init()
 	gather(m_Ut, mesh, m_dofSQ[2]);
 
 	// set the dynamic update flag only if we are running a dynamic analysis
-	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
+	bool b = (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC ? true : false);
 	for (int i = 0; i < mesh.Domains(); ++i)
 	{
 		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
@@ -248,7 +249,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	// update velocity and accelerations
 	// for dynamic simulations
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		int N = mesh.Nodes();
 		double dt = fem.GetTime().timeIncrement;
@@ -541,7 +542,7 @@ bool FESolidSolver::StiffnessMatrix()
 
 	// Add mass matrix for dynamic problems
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		// scale factor
 		double dt = tp.timeIncrement;
@@ -669,7 +670,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate inertial forces for dynamic problems
-	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
+	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
 
 	// calculate forces due to surface loads
 /*	int nsl = fem.SurfaceLoads();

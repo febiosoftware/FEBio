@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
 #include "FEFluidModule.h"
+#include "FEThermoFluidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
@@ -72,6 +73,11 @@ void FEBioThermoFluid::InitModule()
     febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
     febio.SetModuleDependency("fluid");
 
+    //-----------------------------------------------------------------------------
+    // analyis classes (default type must match module name!)
+    REGISTER_FECORE_CLASS(FEThermoFluidAnalysis, "thermo-fluid");
+
+    //-----------------------------------------------------------------------------
     REGISTER_FECORE_CLASS(FEThermoFluidSolver, "thermo-fluid");
 
     REGISTER_FECORE_CLASS(FEThermoFluid, "thermo-fluid");

@@ -119,7 +119,9 @@ std::string FEModelBuilder::GetModuleName() const
 //-----------------------------------------------------------------------------
 FEAnalysis* FEModelBuilder::CreateNewStep(bool allocSolver)
 {
-	FEAnalysis* pstep = fecore_new<FEAnalysis>("analysis", &m_fem);
+	// default analysis type should match module name
+	std::string modName = GetModuleName();
+	FEAnalysis* pstep = fecore_new<FEAnalysis>(modName.c_str(), &m_fem);
 
 	// make sure we have a solver defined
 	FESolver* psolver = pstep->GetFESolver();

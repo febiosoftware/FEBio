@@ -91,7 +91,7 @@ void FECore::InitModule()
 	FEElementLibrary::Initialize();
 
 // analysis class
-REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
+//REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
 
 // time controller
 REGISTER_FECORE_CLASS(FETimeStepController, "default");

@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioMix.h"
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFlux, FESurfaceLoad)
@@ -135,7 +136,7 @@ void FEFluidFlux::LoadVector(FEGlobalVector& R)
 
 	// only add the mixture term for transient analysis and when the m_bmixture flag is true
 	bool bmixture = m_bmixture;
-	if (fem->GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) bmixture = false;
+	if (fem->GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE) bmixture = false;
 
 	// get time increment
 	double dt = CurrentTimeIncrement();
@@ -175,7 +176,7 @@ void FEFluidFlux::StiffnessMatrix(FELinearSystem& LS)
 	double dt = CurrentTimeIncrement();
 
 	FEFluidFlux* flux = this;
-	bool btransient = (fem.GetCurrentStep()->m_nanalysis != FE_STEADY_STATE);
+	bool btransient = (fem.GetCurrentStep()->m_nanalysis != FEBiphasicAnalysis::STEADY_STATE);
 
 	if (!m_blinear || m_bmixture)
 	{

@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
+#include "FESolidAnalysis.h"
 
 FERigidSolver::FERigidSolver(FEModel* fem)
 {
@@ -269,7 +270,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	}
 
 	FEAnalysis* pstep = m_fem->GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		FEMesh& mesh = m_fem->GetMesh();
 

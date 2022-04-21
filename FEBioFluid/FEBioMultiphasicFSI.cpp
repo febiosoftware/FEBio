@@ -41,6 +41,7 @@
 #include "FESoluteConvectiveFlow.h"
 #include "FEMultiphasicFSISoluteBackflowStabilization.h"
 #include "FEFluidModule.h"
+#include "FEMultiphasicFSIAnalysis.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASIC_FSI_VARIABLE var)
@@ -79,6 +80,11 @@ void FEBioMultiphasicFSI::InitModule()
     febio.SetModuleDependency("fluid");
     febio.SetModuleDependency("multiphasic");    // also pulls in solid, biphasic, solutes
     
+    //-----------------------------------------------------------------------------
+    // analyis classes (default type must match module name!)
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIAnalysis, "multiphasic-FSI");
+
+    //-----------------------------------------------------------------------------
     REGISTER_FECORE_CLASS(FEMultiphasicFSISolver, "multiphasic-FSI");
     
     REGISTER_FECORE_CLASS(FEMultiphasicFSI, "multiphasic-FSI");

@@ -49,6 +49,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEBoundaryCondition.h>
+#include "FEMultiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -446,25 +447,25 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
         FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
         FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
         if (pbd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEMultiphasicAnalysis::STEADY_STATE)
                 pbd->InternalForcesSS(RHS);
             else
                 pbd->InternalForces(RHS);
         }
         else if (pbs) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEMultiphasicAnalysis::STEADY_STATE)
                 pbs->InternalForcesSS(RHS);
             else
                 pbs->InternalForces(RHS);
         }
         else if (ptd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEMultiphasicAnalysis::STEADY_STATE)
                 ptd->InternalForcesSS(RHS);
             else
                 ptd->InternalForces(RHS);
         }
         else if (pmd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEMultiphasicAnalysis::STEADY_STATE)
                 pmd->InternalForcesSS(RHS);
             else
                 pmd->InternalForces(RHS);
@@ -526,7 +527,7 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
-	if (pstep->m_nanalysis == FE_STEADY_STATE)
+	if (pstep->m_nanalysis == FEMultiphasicAnalysis::STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 
 		{

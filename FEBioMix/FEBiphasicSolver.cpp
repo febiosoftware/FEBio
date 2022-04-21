@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEBoundaryCondition.h>
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -359,7 +360,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	FEMesh& mesh = fem.GetMesh();
 
 	// calculate internal stress force
-	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+	if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i)
 		{
@@ -440,7 +441,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
-	if (pstep->m_nanalysis == FE_STEADY_STATE)
+	if (pstep->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 
 		{

@@ -50,6 +50,7 @@ SOFTWARE.*/
 #include "FECore/sys.h"
 #include "FEMechModel.h"
 #include "FEBioMech.h"
+#include "FESolidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -384,7 +385,7 @@ void FECGSolidSolver::PrepStep()
 	}
 
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		FEMesh& mesh = fem.GetMesh();
 
@@ -960,7 +961,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate inertial forces for dynamic problems
-	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
+	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
 
 	// calculate contact forces
 	if (fem.SurfacePairConstraints() > 0)

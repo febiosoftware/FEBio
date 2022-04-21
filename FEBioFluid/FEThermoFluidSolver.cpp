@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include <FECore/FENLConstraint.h>
 #include <NumCore/NumCore.h>
+#include "FEThermoFluidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -176,13 +177,13 @@ bool FEThermoFluidSolver::Init()
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
             if (fdom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEThermoFluidAnalysis::STEADY_STATE)
                     fdom->SetSteadyStateAnalysis();
                 else
                     fdom->SetTransientAnalysis();
             }
             else if (tdom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEThermoFluidAnalysis::STEADY_STATE)
                     tdom->SetSteadyStateAnalysis();
                 else
                     tdom->SetTransientAnalysis();
@@ -419,7 +420,7 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
     FEAnalysis* pstep = fem.GetCurrentStep();
-    if (pstep->m_nanalysis == FE_DYNAMIC)
+    if (pstep->m_nanalysis == FEThermoFluidAnalysis::DYNAMIC)
     {
         int N = mesh.Nodes();
         double dt = fem.GetTime().timeIncrement;

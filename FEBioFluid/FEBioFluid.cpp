@@ -78,6 +78,8 @@ SOFTWARE.*/
 
 #include "FEFluidModule.h"
 
+#include "FEFluidAnalysis.h"
+
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
 {
@@ -109,6 +111,10 @@ void FEBioFluid::InitModule()
 		"   \"title\" : \"Fluid Mechanics\","
 		"   \"info\"  : \"Steady-state or transient fluid dynamics analysis.\""
 		"}");
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEFluidAnalysis, "fluid");
 
 //-----------------------------------------------------------------------------
 // solver classes

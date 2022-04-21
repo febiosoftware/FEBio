@@ -254,24 +254,8 @@ void FEBioModel::echo_input()
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
 	feLog("\tModule type .................................... : %s\n", szmod);
 
-	const char* szan = 0;
-	switch (step.m_nanalysis)
-	{
-	case FE_STATIC      : szan = "quasi-static"; break;
-	case FE_DYNAMIC     : szan = "dynamic"     ; break;
-	case FE_STEADY_STATE: szan = "steady-state"; break;
-	default:
-		szan = "unknown";
-		assert(false);
-	}
-	feLog("\tAnalysis type .................................. : %s\n", szan);
+	print_parameter_list(step.GetParameterList());
 
-	if (step.m_ntime > 0)
-		feLog("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
-	else
-		feLog("\tFinal time ..................................... : %lg\n", step.m_final_time);
-
-	feLog("\tTime step size ................................. : %lg\n", step.m_dt0);
 	feLog("\tAuto time stepper activated .................... : %s\n", (step.m_timeController ? "yes" : "no"));
 	if (step.m_timeController)
 	{

@@ -62,6 +62,7 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/DumpStream.h>
 #include <NumCore/NumCore.h>
+#include "FEFluidFSIAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -246,19 +247,19 @@ bool FEFluidFSISolver::Init()
             FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
             FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
             if (fdom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEFluidFSIAnalysis::STEADY_STATE)
                     fdom->SetSteadyStateAnalysis();
                 else
                     fdom->SetTransientAnalysis();
             }
             else if (fsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEFluidFSIAnalysis::STEADY_STATE)
                     fsidom->SetSteadyStateAnalysis();
                 else
                     fsidom->SetTransientAnalysis();
             }
             else if (bfsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
+                if (pstep->m_nanalysis == FEFluidFSIAnalysis::STEADY_STATE)
                     bfsidom->SetSteadyStateAnalysis();
                 else
                     bfsidom->SetTransientAnalysis();
@@ -555,7 +556,7 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
     FEAnalysis* pstep = fem.GetCurrentStep();
-    if (pstep->m_nanalysis == FE_DYNAMIC)
+    if (pstep->m_nanalysis == FEFluidFSIAnalysis::DYNAMIC)
     {
         int N = mesh.Nodes();
 		double dt = fem.GetTime().timeIncrement;
@@ -1175,7 +1176,7 @@ bool FEFluidFSISolver::StiffnessMatrix()
     
     // Add mass matrix
 //    FEAnalysis* pstep = fem.GetCurrentStep();
-//    if (pstep->m_nanalysis == FE_DYNAMIC)
+//    if (pstep->m_nanalysis == FEFluidFSIAnalysis::DYNAMIC)
     {
         // scale factor
         double dt = tp.timeIncrement;
@@ -1367,7 +1368,7 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
 			if (fdom) fdom->InertialForces(RHS, tp);
 			else if (fsidom) fsidom->InertialForces(RHS, tp);
             else if (bfsidom) bfsidom->InertialForces(RHS, tp);
-			else if (edom && (pstep->m_nanalysis == FE_DYNAMIC))
+			else if (edom && (pstep->m_nanalysis == FEFluidFSIAnalysis::DYNAMIC))
 			{
 				FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
 				if (mat && (mat->IsRigid()==false)) edom->InertialForces(RHS, F);
@@ -1376,7 +1377,7 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     }
     
     // update rigid bodies
-    if (pstep->m_nanalysis == FE_DYNAMIC) m_rigidSolver.InertialForces(RHS, tp);
+    if (pstep->m_nanalysis == FEFluidFSIAnalysis::DYNAMIC) m_rigidSolver.InertialForces(RHS, tp);
 
     // calculate contact forces
     ContactForces(RHS);

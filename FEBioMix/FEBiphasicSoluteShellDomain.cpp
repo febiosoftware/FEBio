@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include <FECore/FELinearSystem.h>
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dof(pfem)
@@ -1239,7 +1240,7 @@ void FEBiphasicSoluteShellDomain::UpdateElementStress(int iel)
 {
     FEModel& fem = *GetFEModel();
     double dt = fem.GetTime().timeIncrement;
-    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE);
     
     // get the solid element
     FEShellElement& el = m_Elem[iel];

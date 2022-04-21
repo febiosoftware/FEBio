@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FEBiphasicFSI.h"
 #include "FEBiphasicFSIDomain3D.h"
 #include "FEFluidModule.h"
+#include "FEFluidFSIAnalysis.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
@@ -81,6 +82,11 @@ void FEBioFSI::InitModule()
 	febio.SetModuleDependency("fluid");
 	febio.SetModuleDependency("biphasic");	// also pulls in "solid"
 
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEFluidFSIAnalysis, "fluid-FSI");
+
+	//-----------------------------------------------------------------------------
 	REGISTER_FECORE_CLASS(FEFluidFSISolver, "fluid-FSI");
 
 	REGISTER_FECORE_CLASS(FEFluidFSI, "fluid-FSI");

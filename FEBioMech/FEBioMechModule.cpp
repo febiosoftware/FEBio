@@ -261,6 +261,8 @@ SOFTWARE.*/
 
 #include "FESolidModule.h"
 
+#include "FESolidAnalysis.h"
+
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
 void FEBioMech::InitModule()
@@ -279,7 +281,11 @@ void FEBioMech::InitModule()
 		"}");
 
 	//-----------------------------------------------------------------------------
-	// Solver classes
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FESolidAnalysis, "solid");
+
+	//-----------------------------------------------------------------------------
+	// Solver classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
 	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
 	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");

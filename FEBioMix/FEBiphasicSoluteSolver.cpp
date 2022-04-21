@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include "FECore/sys.h"
+#include "FEBiphasicSoluteAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -395,19 +396,19 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
         FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
         FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
         if (psd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
                 psd->InternalForcesSS(RHS);
             else
                 psd->InternalForces(RHS);
         }
         else if (ptd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
                 ptd->InternalForcesSS(RHS);
             else
                 ptd->InternalForces(RHS);
         }
         else if (pbd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
                 pbd->InternalForcesSS(RHS);
             else
                 pbd->InternalForces(RHS);
@@ -476,7 +477,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
-	if (pstep->m_nanalysis == FE_STEADY_STATE)
+	if (pstep->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 
 		{

@@ -272,16 +272,6 @@ enum SUPER_CLASS_ID {
 	FECLASS_ID,						// derived from FECoreClass
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// ENUM: Analysis types
-//  Types of analysis that can be performed
-// TODO: Make this a FESolver attribute
-enum FE_Analysis_Type {
-	FE_STATIC		= 0,
-	FE_DYNAMIC		= 1,
-	FE_STEADY_STATE	= 2
-};
-
 //-----------------------------------------------------------------------------
 // Plot level sets the frequency of writes to the plot file.
 enum FE_Plot_Level {
