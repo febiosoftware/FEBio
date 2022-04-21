@@ -202,6 +202,7 @@ public:
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
+	std::vector<FEGlobalVariable*>	m_Var;
 
 	FEMODEL_MEMORY_STATS	m_memstats;
 };
@@ -290,6 +291,10 @@ void FEModel::Clear()
 	// global data
 	for (size_t i = 0; i<m_imp->m_GD.size(); ++i) delete m_imp->m_GD[i]; m_imp->m_GD.clear();
 	m_imp->m_Const.clear();
+
+	// global variables (TODO: Should I delete the corresponding parameters?)
+	for (size_t i = 0; i < m_imp->m_Var.size(); ++i) delete m_imp->m_Var[i];
+	m_imp->m_Var.clear();
 
 	// clear the linear constraints
 	if (m_imp->m_LCM) m_imp->m_LCM->Clear();
@@ -1749,6 +1754,27 @@ double FEModel::GetGlobalConstant(const string& s)
 }
 
 //-----------------------------------------------------------------------------
+int FEModel::GlobalVariables() const
+{
+	return (int)m_imp->m_Var.size();
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::AddGlobalVariable(const string& s, double v)
+{
+	FEGlobalVariable* var = new FEGlobalVariable;
+	var->v = v;
+	var->name = s;
+	AddParameter(var->v, var->name.c_str());
+	m_imp->m_Var.push_back(var);
+}
+
+const FEGlobalVariable& FEModel::GetGlobalVariable(int n)
+{
+	return *m_imp->m_Var[n];
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::AddGlobalData(FEGlobalData* psd)
 {
 	m_imp->m_GD.push_back(psd);
@@ -1810,6 +1836,21 @@ void FEModel::CopyFrom(FEModel& fem)
 	m_imp->m_timeInfo = fem.m_imp->m_timeInfo;
 	m_imp->m_ftime0 = fem.m_imp->m_ftime0;
 	m_imp->m_pStep = 0;
+
+	// copy model variables
+	// we only copy the user created parameters, which presumably don't exist yet
+	// in this model.
+	int NS = fem.GlobalVariables();
+	if (NS > 0)
+	{
+		assert(GlobalVariables() == 0);
+		FEParameterList& PL = GetParameterList();
+		for (int i = 0; i < NS; ++i)
+		{
+			const FEGlobalVariable& var = fem.GetGlobalVariable(i);
+			AddGlobalVariable(var.name, var.v);
+		}
+	}
 
 	// --- Steps ---
 
