@@ -115,6 +115,7 @@ SOFTWARE.*/
 
 #include "FEInitialFluidPressure.h"
 #include "FEInitialConcentration.h"
+#include "FENodalFluidFlux.h"
 
 #include "FEBiphasicModule.h"
 #include "FEBiphasicAnalysis.h"
@@ -193,6 +194,10 @@ void FEBioMix::InitModule()
 	// Initial conditions
 	REGISTER_FECORE_CLASS(FEInitialFluidPressure     , "initial fluid pressure");
 	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
+
+	//-----------------------------------------------------------------------------
+	// Nodal loads
+	REGISTER_FECORE_CLASS(FENodalFluidFlux, "nodal fluidflux");
 
 	//-----------------------------------------------------------------------------
 	// Surface loads
