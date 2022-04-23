@@ -74,7 +74,7 @@ public:
 	mat3d GetLocalCS(const FEMaterialPoint& mp);
 
 protected:
-	FEParamMat3d	m_Q;			//!< local material coordinate system
+	FEMat3dValuator*	m_Q;			//!< local material coordinate system
 
 public:
 	//! Assign a domain to this material

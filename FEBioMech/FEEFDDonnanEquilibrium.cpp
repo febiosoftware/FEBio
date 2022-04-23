@@ -37,7 +37,8 @@ BEGIN_FECORE_CLASS(FEEFDDonnanEquilibrium, FEElasticMaterial)
     ADD_PARAMETER(m_DEQ.m_Phi, "Phi");
 	ADD_PARAMETER(m_Fib.m_beta, 3, "beta");
 	ADD_PARAMETER(m_Fib.m_ksi , 3, "ksi" )->setUnits(UNIT_PRESSURE);
-	ADD_PARAMETER(m_Q, "mat_axis");
+
+	ADD_PROPERTY(m_Q, "mat_axis");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -411,7 +411,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		if (mat == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 		FEDomainList& DL = mat->GetDomainList();
-		FEElementSet* set = fecore_alloc(FEElementSet, &fem);
+		FEElementSet* set = new FEElementSet(&fem);
 		set->Create(DL);
 		mesh.AddElementSet(set);
 
@@ -467,7 +467,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		FEBodyLoad* pbl = dynamic_cast<FEBodyLoad*>(pc);
 
 		FEDomainList& DL = pbl->GetDomainList();
-		FEElementSet* set = fecore_alloc(FEElementSet, &fem);
+		FEElementSet* set = new FEElementSet(&fem);
 		set->Create(DL);
 		mesh.AddElementSet(set);
 
@@ -547,7 +547,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		// create node set
 		const FENodeSet& bc_set = *bc->GetNodeSet();
 		int nsize = bc_set.Size();
-		FENodeSet* set = fecore_alloc(FENodeSet, &fem);
+		FENodeSet* set = new FENodeSet(&fem);
 		for (int i = 0; i < nsize; ++i) set->Add(bc_set[i]);
 
 		FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);
@@ -611,7 +611,7 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 	if (mat)
 	{
 		FEDomainList& DL = mat->GetDomainList();
-		FEElementSet* set = fecore_alloc(FEElementSet, &fem);
+		FEElementSet* set = new FEElementSet(&fem);
 		set->Create(DL);
 
 		if (szgen)
@@ -747,21 +747,17 @@ void FEBioMeshDataSection3::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 	FEMaterial* mat = dom->GetMaterial();
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
 
-	// get the fiber parameter
-	ParamString s("fiber");
-	FEParam* param = mat->FindParameter(s);
-	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
-	if (param->type() != FE_PARAM_VEC3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
-
-	// get the parameter
-	FEParamVec3& p = param->value<FEParamVec3>();
+	// get the fiber property
+	FEProperty* fiber = mat->FindProperty("fiber");
+	if (fiber == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (fiber->GetSuperClassID() != FEVEC3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
 
 	// create a domain map
 	FEDomainMap* map = new FEDomainMap(FE_VEC3D, FMT_ITEM);
 	map->Create(&set);
 	FEMappedValueVec3* val = fecore_new<FEMappedValueVec3>("map", GetFEModel());
 	val->setDataMap(map);
-	p.setValuator(val);
+	fiber->SetProperty(val);
 
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
@@ -802,13 +798,9 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	FEMaterial* mat = dom->GetMaterial();
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
-	// get the mat_axis parameter
-	FEParam* param = mat->FindParameter("mat_axis");
-	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
-	if (param->type() != FE_PARAM_MAT3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
-
-	// get the parameter
-	FEParamMat3d& p = param->value<FEParamMat3d>();
+	// get the mat_axis property
+	FEProperty* pQ = mat->FindProperty("mat_axis");
+	if (pQ->GetSuperClassID() != FEMAT3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
 	// create the map's name: material_name.mat_axis
 	stringstream ss;
@@ -926,7 +918,7 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 		// It does not, so add it
 		FEMappedValueMat3d* val = fecore_alloc(FEMappedValueMat3d, GetFEModel());
 		val->setDataMap(map);
-		p.setValuator(val);
+		pQ->SetProperty(val);
 		mesh->AddDataMap(map);
 	}
 }

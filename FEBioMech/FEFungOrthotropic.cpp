@@ -43,7 +43,7 @@ BEGIN_FECORE_CLASS(FEFungOrthotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(v31, "v31");
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER(0.0), "c")->setUnits(UNIT_PRESSURE);
 
-	ADD_PARAMETER(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 

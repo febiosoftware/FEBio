@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FEPRLig, FEElasticMaterial)
 	ADD_PARAMETER(m_m,  "m");
 	ADD_PARAMETER(m_k, "k");
 
-	ADD_PARAMETER(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 

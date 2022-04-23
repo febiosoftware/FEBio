@@ -56,7 +56,7 @@ BEGIN_FECORE_CLASS(FESFDSBM, FEElasticMaterial)
 	ADD_PARAMETER(m_g    , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
 	ADD_PARAMETER(m_sbm, "sbm");
 
-	ADD_PARAMETER(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 

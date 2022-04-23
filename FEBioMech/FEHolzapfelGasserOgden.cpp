@@ -37,7 +37,7 @@ BEGIN_FECORE_CLASS(FEHolzapfelGasserOgden, FEUncoupledMaterial)
 	ADD_PARAMETER(m_kappa, FE_RANGE_CLOSED(0.0, 1.0/3.0), "kappa");
 	ADD_PARAMETER(m_gdeg , "gamma");
 
-    ADD_PARAMETER(m_Q, "mat_axis");
+    ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 

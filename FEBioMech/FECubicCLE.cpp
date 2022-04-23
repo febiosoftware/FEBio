@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FECubicCLE, FEElasticMaterial)
 	ADD_PARAMETER(m_l2 , "l2")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_mu , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
 
-    ADD_PARAMETER(m_Q, "mat_axis");
+    ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 

@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FENeoHookeanTransIso, FEElasticMaterial)
 	ADD_PARAMETER(m_vp, "vp");
 	ADD_PARAMETER(m_gz, "gz");
 
-	ADD_PARAMETER(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 

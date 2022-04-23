@@ -48,13 +48,13 @@ void FEMaterialBase::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const 
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEMaterial, FEMaterialBase)
-//	ADD_PARAMETER(m_Q, "mat_axis");
+//	ADD_PROPERTY(m_Q, "mat_axis");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMaterial::FEMaterial(FEModel* fem) : FEMaterialBase(fem)
 {
-	m_Q = mat3d::identity();
+	m_Q = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -68,13 +68,14 @@ FEMaterial::~FEMaterial()
 // evaluate local coordinate system at material point
 mat3d FEMaterial::GetLocalCS(const FEMaterialPoint& mp)
 {
+	mat3d Q = (m_Q ? m_Q->operator()(mp) : mat3d::identity());
 	FEMaterial* parent = dynamic_cast<FEMaterial*>(GetParent());
 	if (parent) 
 	{
-		mat3d Qp = parent->GetLocalCS(mp); 
-		return Qp * m_Q(mp);
+		mat3d Qp = parent->GetLocalCS(mp);
+		return Qp*Q;
 	}
-	else return m_Q(mp);
+	else return Q;
 }
 
 //-----------------------------------------------------------------------------

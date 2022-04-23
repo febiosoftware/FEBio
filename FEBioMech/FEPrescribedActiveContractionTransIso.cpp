@@ -34,7 +34,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedActiveContractionTransIso, FEElasticMaterial)
 	ADD_PARAMETER(m_T0 , "T0"   );
 
-    ADD_PARAMETER(m_Q, "mat_axis");
+    ADD_PROPERTY(m_Q, "mat_axis");
 
 END_FECORE_CLASS();
 
