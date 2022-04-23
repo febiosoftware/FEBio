@@ -431,13 +431,13 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 			}
 			else return false;
 		}
-		else if (strcmp(var, "Solutes") == 0)
+		else if (strcmp(var, "solutes") == 0)
 		{
 			int n = atoi(val);
 			pp->value<int>() = n;
 			return true;
 		}
-		else if (strcmp(var, "SBMs") == 0)
+		else if (strcmp(var, "sbms") == 0)
 		{
 			int n = atoi(val);
 			pp->value<int>() = n;
@@ -580,7 +580,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				else
 				{
 					bool bfound = parseEnumParam(pp, tag.szvalue());
-					if (bfound == false) throw XMLReader::InvalidValue(tag);
+					if (bfound == false)
+					{
+						if ((m_ith == nullptr) || (m_ith->ProcessTag(tag) == false)) {
+							throw XMLReader::InvalidValue(tag);
+						}
+					}
 				}
 			}
 			break;
@@ -1181,6 +1186,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						if (prop->GetDefaultType()) sztype = prop->GetDefaultType();
 						else sztype = tag.Name();
 					}
+
+					// HACK for getting passed the old "user" fiber type.
+					if (strcmp(sztype, "user") == 0) sztype = "map";
 
 					// HACK for mapping load curves to FEFunction1D
 					const char* szlc = tag.AttributeValue("lc", true);

@@ -61,6 +61,22 @@ public:
 
 			return true;
 		}
+		else if (tag == "analysis")
+		{
+			const char* szval = tag.szvalue();
+			FEParam* p = m_step->GetParameter("analysis");
+			if      (strcmp(szval, "STEADY_STATE") == 0) p->value<int>() = 0;
+			else if (strcmp(szval, "STEADY-STATE") == 0) p->value<int>() = 0;
+			else if (strcmp(szval, "STATIC"      ) == 0) p->value<int>() = 0;
+			else if (strcmp(szval, "TRANSIENT"   ) == 0) p->value<int>() = 1;
+			else if (strcmp(szval, "DYNAMIC"     ) == 0) p->value<int>() = 1;
+			else
+			{
+				assert(false);
+				return false;
+			}
+			return true;
+		}
 		else return FEObsoleteParamHandler::ProcessTag(tag);
 	}
 
