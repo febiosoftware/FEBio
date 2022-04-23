@@ -28,15 +28,16 @@ SOFTWARE.*/
 #include <FECore/MMath.h>
 #include <FECore/MObj2String.h>
 #include <FECore/log.h>
+#include <FECore/FEConstValueVec3.h>
 
 BEGIN_FECORE_CLASS(FEGenericTransIsoHyperelastic, FEElasticMaterial)
 	ADD_PARAMETER(m_exp, "W");
-	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 FEGenericTransIsoHyperelastic::FEGenericTransIsoHyperelastic(FEModel* fem) : FEElasticMaterial(fem)
 {
-	m_fiber = vec3d(1, 0, 0);
+	m_fiber = nullptr;
 }
 
 bool FEGenericTransIsoHyperelastic::Init()
@@ -131,7 +132,7 @@ mat3ds FEGenericTransIsoHyperelastic::Stress(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -175,7 +176,7 @@ tens4ds FEGenericTransIsoHyperelastic::Tangent(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -271,7 +272,7 @@ double FEGenericTransIsoHyperelastic::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;

@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include <FECore/log.h>
 #include <FECore/expint_Ei.h>
+#include <FECore/FEConstValueVec3.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -41,13 +42,14 @@ BEGIN_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, FEElasticMaterial)
 	ADD_PARAMETER(m_c5  , "c5");
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
-	ADD_PARAMETER(m_fiber, "fiber");
+	
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECoupledTransIsoVerondaWestmann::FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_fiber = vec3d(1, 0, 0);
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +66,7 @@ mat3ds FECoupledTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -124,7 +126,7 @@ tens4ds FECoupledTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	mat3ds B = pt.LeftCauchyGreen();
 
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -196,7 +198,7 @@ double FECoupledTransIsoVerondaWestmann::StrainEnergyDensity(FEMaterialPoint& mp
 	mat3ds B2 = B.sqr();
     
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;

@@ -48,7 +48,7 @@ public:
 
 private:
 	std::string			m_exp;		// the string with the strain energy expression
-	FEParamVec3			m_fiber;	// fiber direction
+	FEVec3dValuator*	m_fiber;	// fiber direction
 	bool				m_printDerivs;	// option to print out derivatives
 
 private:

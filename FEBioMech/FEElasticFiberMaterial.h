@@ -69,7 +69,7 @@ private:
     bool    m_bUs;  //!< flag for pre-stretch
     
 public:
-	FEParamVec3		m_fiber;	//!< fiber orientation
+	FEVec3dValuator*	m_fiber;	//!< fiber orientation
 
 	DECLARE_FECORE_CLASS();
 };

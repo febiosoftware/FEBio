@@ -182,14 +182,13 @@ mat3d FEInSituStretchConstraint::UpdateFc(const mat3d& F, const mat3d& Fc_prev, 
 
 	FEElasticMaterial* elasticMat = pmat->GetElasticMaterial();
 	if (elasticMat == nullptr) return mat3dd(1.0);
-	FEParam* fp = elasticMat->FindParameter("fiber");
-	if (fp == nullptr) return mat3dd(1.0);
-	if (fp->type() != FE_PARAM_VEC3D_MAPPED) return mat3dd(1.0);
-	FEParamVec3& fiber = fp->value<FEParamVec3>();
+
+	FEVec3dValuator* fiber = dynamic_cast<FEVec3dValuator*>(elasticMat->GetProperty("fiber"));
+	if (fiber == nullptr) return mat3dd(1.0);
 
 	// calculate the fiber stretch
 	mat3d Q = elasticMat->GetLocalCS(mp);
-	vec3d a0 = fiber(mp);
+	vec3d a0 = fiber->unitVector(mp);
 	vec3d ar = Q * a0;
 	vec3d a = F*ar;
 	double l = a.norm();

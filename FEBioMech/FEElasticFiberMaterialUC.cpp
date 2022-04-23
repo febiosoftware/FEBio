@@ -28,18 +28,20 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEElasticFiberMaterialUC.h"
+#include <FECore/FEConstValueVec3.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEElasticFiberMaterialUC, FEUncoupledMaterial)
-	ADD_PARAMETER(m_fiber, "fiber");
+    // NOTE: We need to make this optional since it should not
+    // be defined when used in a CFD material.
+	ADD_PROPERTY(m_fiber, "fiber")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
-
 
 //-----------------------------------------------------------------------------
 FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
-	// initialize the fiber vector
-	m_fiber = vec3d(1, 0, 0);
+    m_fiber = nullptr;
+
     m_Us = mat3dd(1);
     m_bUs = false;
 }
@@ -51,7 +53,7 @@ vec3d FEElasticFiberMaterialUC::FiberVector(FEMaterialPoint& mp)
 	mat3d Q = GetLocalCS(mp);
 
 	// get the fiber vector in local coordinates
-	vec3d fiber = m_fiber.unitVector(mp);
+	vec3d fiber = m_fiber->unitVector(mp);
 
 	// convert to global coordinates
 	vec3d a0 = Q*fiber;

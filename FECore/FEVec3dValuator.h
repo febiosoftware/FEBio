@@ -53,4 +53,11 @@ public:
 
 	// return the const value
 	virtual vec3d* constValue() { return nullptr; }
+
+	// return a unit vector
+	vec3d unitVector(const FEMaterialPoint& pt)
+	{
+		vec3d v = operator () (pt);
+		return v.Normalized();
+	}
 };

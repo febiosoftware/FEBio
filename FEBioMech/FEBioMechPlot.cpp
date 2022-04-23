@@ -1842,16 +1842,15 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 		if (pme == nullptr) return false;
 	}
 
-	ParamString ps("fiber");
-	FEParam* pp = pme->FindParameter(ps);
-	if (pp == 0) return false;
-	FEParamVec3& vec = pp->value<FEParamVec3>();
+	// get the fiber property
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == 0) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	writeAverageElementValue<double>(dom, a, [&](const FEMaterialPoint& mp) -> double { 
 		const FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 		mat3d Q = pme->GetLocalCS(mp);
-		vec3d a0 = vec(mp); a0.unit();
+		vec3d a0 = vec->unitVector(mp);
 		vec3d ar = Q * a0;
 		mat3d F = ep.m_F;
 		vec3d a = F*ar;
@@ -1865,7 +1864,7 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 class FEFiberVector
 {
 public:
-	FEFiberVector(FEMaterial* pm, FEParamVec3& vec) : m_pm(pm), m_vec(vec) {}
+	FEFiberVector(FEMaterial* pm, FEVec3dValuator& vec) : m_pm(pm), m_vec(vec) {}
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
 		const FEElasticMaterialPoint* pt = mp.ExtractData<const FEElasticMaterialPoint>();
@@ -1873,7 +1872,7 @@ public:
 		{
 			mat3d Q = m_pm->GetLocalCS(mp);
 			mat3d F = pt->m_F;
-			vec3d a0 = m_vec(mp); a0.unit();
+			vec3d a0 = m_vec.unitVector(mp);
 			vec3d ar = Q * a0;
 			vec3d a = F * ar; a.unit();
 			return a;
@@ -1883,7 +1882,7 @@ public:
 	}
 private:
 	FEMaterial*		m_pm;
-	FEParamVec3&	m_vec;
+	FEVec3dValuator&	m_vec;
 };
 
 
@@ -1908,12 +1907,11 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 		if (pme == nullptr) return false;
 	}
 
-	ParamString ps("fiber");
-	FEParam* pp = pme->FindParameter(ps);
-	if (pp == 0) return false;
-	FEParamVec3& vec = pp->value<FEParamVec3>();
+	// get the fiber property
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == 0) return false;
 
-	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(pme, vec), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
+	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(pme, *vec), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
 
 	return true;
 }
@@ -3295,10 +3293,8 @@ bool FEPlotFiberTargetStretch::Save(FEDomain& dom, FEDataStream& a)
 	if (pme == 0) return false;
 
 	// get the fiber property
-	ParamString ps("fiber");
-	FEParam* pp = pme->FindParameter(ps);
-	if (pp == 0) return false;
-	FEParamVec3& vec = pp->value<FEParamVec3>();
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == 0) return false;
 
 	// we're good so store the in-situ stretch
 	int NE = dom.Elements();
@@ -3314,7 +3310,7 @@ bool FEPlotFiberTargetStretch::Save(FEDomain& dom, FEDataStream& a)
 
 			mat3d Fp = pp.initialPrestrain();
 			mat3d Q = mat->GetLocalCS(mp);
-			vec3d a0 = vec.unitVector(mp);
+			vec3d a0 = vec->unitVector(mp);
 			vec3d ar = Q * a0;
 			vec3d a = Fp*ar;
 			double lamp = a.norm();
@@ -3343,10 +3339,8 @@ bool FEPlotPreStrainStretch::Save(FEDomain& dom, FEDataStream& a)
 	if (pme== 0) return false;
 
 	// get the fiber property
-	ParamString ps("fiber");
-	FEParam* pp = pme->FindParameter(ps);
-	if (pp == 0) return false;
-	FEParamVec3& vec = pp->value<FEParamVec3>();
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == 0) return false;
 
 	int NE = dom.Elements();
 	for (int i = 0; i<NE; ++i)
@@ -3365,7 +3359,7 @@ bool FEPlotPreStrainStretch::Save(FEDomain& dom, FEDataStream& a)
 			mat3d Ft = F*Fp;
 
 			mat3d Q = mat->GetLocalCS(mp);
-			vec3d a0 = vec.unitVector(mp);
+			vec3d a0 = vec->unitVector(mp);
 			vec3d ar = Q * a0;
 			vec3d a = Ft*ar;
 
@@ -3394,10 +3388,8 @@ bool FEPlotPreStrainStretchError::Save(FEDomain& dom, FEDataStream& a)
 	if (pme == 0) return false;
 
 	// get the fiber property
-	ParamString ps("fiber");
-	FEParam* pp = pme->FindParameter(ps);
-	if (pp == 0) return false;
-	FEParamVec3& vec = pp->value<FEParamVec3>();
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == 0) return false;
 
 	int NE = dom.Elements();
 	for (int i = 0; i<NE; ++i)
@@ -3413,7 +3405,7 @@ bool FEPlotPreStrainStretchError::Save(FEDomain& dom, FEDataStream& a)
 
 			// initial fiber vector
 			mat3d Q = mat->GetLocalCS(mp);
-			vec3d a0 = vec.unitVector(mp);
+			vec3d a0 = vec->unitVector(mp);
 			vec3d ar = Q * a0;
 
 			// target stretch

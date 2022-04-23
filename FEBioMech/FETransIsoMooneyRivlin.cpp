@@ -37,7 +37,8 @@ BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_fib.m_c4  , "c4");
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
 	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
-	ADD_PARAMETER(m_fib.m_fiber, "fiber");
+	
+	ADD_PROPERTY(m_fib.m_fiber, "fiber")->SetDefaultType("vector");
 
 	ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 END_FECORE_CLASS();
@@ -193,8 +194,6 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 void FETransIsoMooneyRivlin::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& timeInfo)
 {
     // get the material fiber axis
-    vec3d a0 = m_fib.m_fiber.unitVector(mp);
-    
+    vec3d a0 = m_fib.m_fiber->unitVector(mp);
     if (m_ac) m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
 }
-

@@ -51,12 +51,11 @@ bool FEInSituStretchGradient::Init()
 	FEElasticMaterial* elasticMat = prestrainMat->GetElasticMaterial();
 
 	// make sure it has a fiber property
-	FEParam* fiberProp = elasticMat->FindParameter("fiber");
+	FEVec3dValuator* fiberProp = dynamic_cast<FEVec3dValuator*>(elasticMat->GetProperty("fiber"));
 	if (fiberProp == nullptr) return false;
 
 	// make sure it's a vector map
-	if (fiberProp->type() != FE_PARAM_VEC3D_MAPPED) return false;
-	m_fiber = &(fiberProp->value<FEParamVec3>());
+	m_fiber = fiberProp;
 
 	return FEPrestrainGradient::Init();
 }

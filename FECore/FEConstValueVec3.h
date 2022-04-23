@@ -47,6 +47,8 @@ public:
 
 	vec3d& value() { return m_val; }
 
+	void setConstValue(const vec3d& v) { m_val = v; }
+
 private:
 	vec3d	m_val;
 
