@@ -28,7 +28,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEMultiphasicFSIAnalysis, FEAnalysis)
 	// The analysis parameter is already defined in the FEAnalysis base class. 
 	// Here, we just need to set the enum values for the analysis parameter.
-	FindParameterFromData(&m_nanalysis)->setEnums("STEADY_STATE\0DYNAMIC\0");
+	FindParameterFromData(&m_nanalysis)->setEnums("STEADY-STATE\0DYNAMIC\0");
 END_FECORE_CLASS()
 
 FEMultiphasicFSIAnalysis::FEMultiphasicFSIAnalysis(FEModel* fem) : FEAnalysis(fem)
