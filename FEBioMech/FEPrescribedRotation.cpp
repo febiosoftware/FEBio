@@ -31,7 +31,7 @@ SOFTWARE.*/
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedRotation, FEBoundaryCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:shell rotation)");
-	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_RADIAN)->SetFlags(FE_PARAM_ADDLC);
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_RADIAN)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 

@@ -34,7 +34,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FEPressureLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_pressure, "pressure")->setUnits(UNIT_PRESSURE)->SetFlags(FE_PARAM_ADDLC);
+	ADD_PARAMETER(m_pressure, "pressure")->setUnits(UNIT_PRESSURE)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_bsymm   , "symmetric_stiffness");
 	ADD_PARAMETER(m_blinear , "linear");
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
