@@ -437,7 +437,7 @@ void FENewtonSolver::Clean()
 	if (m_plinsolve) delete m_plinsolve; 
 	m_plinsolve = nullptr;
 	if (m_pK) delete m_pK; m_pK = nullptr;
-	if (m_qnstrategy) delete m_qnstrategy; m_qnstrategy = nullptr;
+	if (m_qnstrategy) m_qnstrategy->Reset();
 	m_Var.clear();
 }
 

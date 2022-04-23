@@ -52,6 +52,9 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	//! reset data for new run
+	virtual void Reset();
+
 public:
 	//! initialize the linear system
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type mtype);

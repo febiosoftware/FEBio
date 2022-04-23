@@ -88,3 +88,9 @@ void FENewtonStrategy::Serialize(DumpStream& ar)
 	ar & m_nups;
 	ar & m_pns;
 }
+
+//! reset data for new run
+void FENewtonStrategy::Reset()
+{
+
+}
