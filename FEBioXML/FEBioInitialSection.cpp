@@ -58,7 +58,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			GetBuilder()->AddInitialCondition(pic);
 
 			// create a node set
-			FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
+			FENodeSet* nset = new FENodeSet(&fem);
 			fem.GetMesh().AddNodeSet(nset);
 			pic->SetNodeSet(nset);
 
@@ -143,7 +143,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			GetBuilder()->AddInitialCondition(pic);
 
 			// create a node set
-			FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
+			FENodeSet* nset = new FENodeSet(&fem);
 			fem.GetMesh().AddNodeSet(nset);
 			pic->SetNodeSet(nset);
 
@@ -252,7 +252,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, v);
 
 					// create the initial condition
-					FEStepComponent* pic = fecore_new_class< FEStepComponent>("FERigidBodyVelocity", &fem);
+					FEStepComponent* pic = fecore_new_class<FEInitialCondition>("FERigidBodyVelocity", &fem);
 					pic->SetParameter("rb", nmat);
 					pic->SetParameter("value", v);
 
@@ -266,7 +266,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, w);
 
 					// create the initial condition
-					FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyAngularVelocity", &fem);
+					FEStepComponent* pic = fecore_new_class<FEInitialCondition>("FERigidBodyAngularVelocity", &fem);
 					pic->SetParameter("rb", nmat);
 					pic->SetParameter("value", w);
 

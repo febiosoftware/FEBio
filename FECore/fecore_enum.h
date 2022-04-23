@@ -264,7 +264,6 @@ enum SUPER_CLASS_ID {
 	FELINEARSOLVER_ID,				// derived from LinearSolver
 	FEMESHADAPTOR_ID,				// derived from FEMeshAdaptor
 	FEMESHADAPTORCRITERION_ID,		// derived from FEMeshAdaptorCriterion
-	FERIGIDBC_ID,					// derived from FERigidBC
 	FENEWTONSTRATEGY_ID,			// derived from FENewtonStrategy
 	FETIMECONTROLLER_ID,			// derived from FETimeStepController
 	FEEIGENSOLVER_ID,				// derived from EigenSolver

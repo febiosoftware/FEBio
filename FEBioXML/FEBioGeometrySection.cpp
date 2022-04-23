@@ -101,7 +101,7 @@ void FEBioGeometrySection1x::ParseNodeSection(XMLTag& tag)
 	FENodeSet* ps = 0;
 	if (szl)
 	{
-		ps = fecore_alloc(FENodeSet, &fem);
+		ps = new FENodeSet(&fem);
 
 		ps->SetName(szl);
 		mesh.AddNodeSet(ps);
@@ -537,7 +537,7 @@ void FEBioGeometrySection2::ParseNodeSection(XMLTag& tag)
 	FENodeSet* ps = 0;
 	if (szl)
 	{
-		ps = fecore_alloc(FENodeSet, &fem);
+		ps = new FENodeSet(&fem);
 
 		ps->SetName(szl);
 		mesh.AddNodeSet(ps);
@@ -633,7 +633,7 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 	FEElementSet* pg = 0;
 	if (szname)
 	{
-		pg = fecore_alloc(FEElementSet, &fem);
+		pg = new FEElementSet(&fem);
 		pg->SetName(szname);
 		mesh.AddElementSet(pg);
 	}
@@ -900,7 +900,7 @@ void FEBioGeometrySection2::ParseSurfaceSection(XMLTag& tag)
 	int faces = tag.children();
 
 	// allocate storage for faces
-	FEFacetSet* ps = fecore_alloc(FEFacetSet, &fem);
+	FEFacetSet* ps = new FEFacetSet(&fem);
 	ps->Create(faces);
 	ps->SetName(szname);
 
@@ -948,7 +948,7 @@ void FEBioGeometrySection2::ParseElementSetSection(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// create a new element set
-	FEElementSet* pg = fecore_alloc(FEElementSet, &fem);
+	FEElementSet* pg = new FEElementSet(&fem);
 	pg->SetName(szname);
 
 	vector<int> l;
@@ -1192,7 +1192,7 @@ void FEBioGeometrySection25::ParseNodeSection(XMLTag& tag)
 	FENodeSet* ps = 0;
 	if (szl)
 	{
-		ps = fecore_alloc(FENodeSet, &fem);
+		ps = new FENodeSet(&fem);
 
 		ps->SetName(szl);
 		mesh.AddNodeSet(ps);
@@ -1362,7 +1362,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	FEElementSet* pg = 0;
 	if (szname)
 	{
-		pg = fecore_alloc(FEElementSet, &fem);
+		pg = new FEElementSet(&fem);
 		pg->SetName(szname);
 		mesh.AddElementSet(pg);
 	}
@@ -1731,7 +1731,7 @@ void FEBioGeometrySection25::ParseSurfaceSection(XMLTag& tag)
 	// if parts are defined we use the new format
 	if (m_feb.Parts() > 0)
 	{
-		FEFacetSet* ps = fecore_alloc(FEFacetSet, &fem);
+		FEFacetSet* ps = new FEFacetSet(&fem);
 		ps->SetName(szname);
 
 		// add it to the mesh
@@ -1760,7 +1760,7 @@ void FEBioGeometrySection25::ParseSurfaceSection(XMLTag& tag)
 		int faces = tag.children();
 
 		// allocate storage for faces
-		FEFacetSet* ps = fecore_alloc(FEFacetSet, &fem);
+		FEFacetSet* ps = new FEFacetSet(&fem);
 		ps->Create(faces);
 		ps->SetName(szname);
 
@@ -1855,7 +1855,7 @@ void FEBioGeometrySection25::ParseElementSetSection(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// create a new element set
-	FEElementSet* pg = fecore_alloc(FEElementSet, &fem);
+	FEElementSet* pg = new FEElementSet(&fem);
 	pg->SetName(szname);
 
 	vector<int> l;

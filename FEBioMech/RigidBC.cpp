@@ -36,11 +36,11 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidBC, FEStepComponent)
+BEGIN_FECORE_CLASS(FERigidBC, FEBoundaryCondition)
 	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 END_FECORE_CLASS();
 
-FERigidBC::FERigidBC(FEModel* fem) : FEStepComponent(fem)
+FERigidBC::FERigidBC(FEModel* fem) : FEBoundaryCondition(fem)
 {
 	m_rigidMat = -1;
 	m_rb = -1;
@@ -53,7 +53,14 @@ bool FERigidBC::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	if (pm == nullptr) return false;
 
-	return FEStepComponent::Init();
+	return FEBoundaryCondition::Init();
+}
+
+void FERigidBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+	FERigidBC* rbc = dynamic_cast<FERigidBC*>(pbc);
+	GetParameterList() = rbc->GetParameterList();
+	m_rb = rbc->m_rb;
 }
 
 void FERigidBC::Activate()
@@ -63,13 +70,13 @@ void FERigidBC::Activate()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1)); assert(pm);
 	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
 
-	FEStepComponent::Activate();
+	FEBoundaryCondition::Activate();
 }
 
 void FERigidBC::Serialize(DumpStream& ar)
 {
 	ar & m_rb;
-	FEStepComponent::Serialize(ar);
+	FEBoundaryCondition::Serialize(ar);
 }
 
 FERigidBody& FERigidBC::GetRigidBody()
@@ -257,14 +264,53 @@ void FERigidBodyDisplacement::InitTimeStep()
 	RB.m_dul[I] = Value() - RB.m_Ut[I];
 }
 
-//=============================================================================
-FERigidIC::FERigidIC(FEModel* fem) : FERigidBC(fem)
-{
 
+//=============================================================================
+BEGIN_FECORE_CLASS(FERigidIC, FEInitialCondition)
+	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
+END_FECORE_CLASS();
+
+FERigidIC::FERigidIC(FEModel* fem) : FEInitialCondition(fem)
+{
+	m_rigidMat = -1;
+	m_rb = -1;
+}
+
+bool FERigidIC::Init()
+{
+	// Make sure the rigid material ID is valid
+	FEModel& fem = *GetFEModel();
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
+	if (pm == nullptr) return false;
+
+	return FEInitialCondition::Init();
+}
+
+void FERigidIC::Activate()
+{
+	// Get the Rigidbody ID
+	FEModel& fem = *GetFEModel();
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1)); assert(pm);
+	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
+
+	FEInitialCondition::Activate();
+}
+
+void FERigidIC::Serialize(DumpStream& ar)
+{
+	ar& m_rb;
+	FEInitialCondition::Serialize(ar);
+}
+
+FERigidBody& FERigidIC::GetRigidBody()
+{
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidBody& RB = *fem.GetRigidBody(m_rb);
+	return RB;
 }
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidBodyVelocity, FERigidBC)
+BEGIN_FECORE_CLASS(FERigidBodyVelocity, FERigidIC)
 	ADD_PARAMETER(m_vel, "value");
 END_FECORE_CLASS();
 
@@ -283,7 +329,7 @@ void FERigidBodyVelocity::Activate()
 }
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidBodyAngularVelocity, FERigidBC)
+BEGIN_FECORE_CLASS(FERigidBodyAngularVelocity, FERigidIC)
 	ADD_PARAMETER(m_w, "value");
 END_FECORE_CLASS();
 

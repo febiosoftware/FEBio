@@ -412,7 +412,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		NodeSet* set = part.GetNodeSet(i);
 
 		// create a new node set
-		FENodeSet* feset = new FENodeSet(&fem);// fecore_alloc(FENodeSet, &fem);
+		FENodeSet* feset = new FENodeSet(&fem);
 
 		// add the name
 		string name = partName + set->Name();
@@ -436,7 +436,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		int faces = surf->Facets();
 
 		// create a new facet set
-		FEFacetSet* fset = new FEFacetSet(&fem);// fecore_alloc(FEFacetSet, &fem);
+		FEFacetSet* fset = new FEFacetSet(&fem);
 		string name = partName + surf->Name();
 		fset->SetName(name.c_str());
 
@@ -464,7 +464,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		vector<int> elist = eset.ElementList();
 
 		int ne = (int) elist.size();
-		FEElementSet* feset = new FEElementSet(&fem);// fecore_alloc(FEElementSet, &fem);
+		FEElementSet* feset = new FEElementSet(&fem);
 		string name = partName + eset.Name();
 		feset->SetName(name);
 

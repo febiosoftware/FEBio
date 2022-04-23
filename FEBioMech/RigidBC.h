@@ -27,19 +27,44 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEStepComponent.h>
+#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FEInitialCondition.h>
 #include "febiomech_api.h"
 
 class FERigidBody;
 
 //-----------------------------------------------------------------------------
-class FEBIOMECH_API FERigidBC : public FEStepComponent
+class FEBIOMECH_API FERigidBC : public FEBoundaryCondition
 {
-	FECORE_SUPER_CLASS(FERIGIDBC_ID)
 	FECORE_BASE_CLASS(FERigidBC)
 
 public:
 	FERigidBC(FEModel* fem);
+
+	bool Init() override;
+
+	void Activate() override;
+
+	void Serialize(DumpStream& ar);
+
+	FERigidBody& GetRigidBody();
+
+	void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+	int		m_rigidMat;		// rigid material ID
+	int		m_rb;			// rigid body ID
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+class FEBIOMECH_API FERigidIC : public FEInitialCondition
+{
+	FECORE_BASE_CLASS(FERigidIC)
+
+public:
+	FERigidIC(FEModel* fem);
 
 	bool Init() override;
 
@@ -118,14 +143,6 @@ private:
 	bool	m_binit;	//!init flag
 
 	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-// rigid body initial conditions
-class FEBIOMECH_API FERigidIC : public FERigidBC
-{
-public:
-	FERigidIC(FEModel* fem);
 };
 
 //-----------------------------------------------------------------------------

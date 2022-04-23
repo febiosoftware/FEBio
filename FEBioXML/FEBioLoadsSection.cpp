@@ -691,7 +691,7 @@ void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
 
 		// extract the nodeset from the surface
 		FENodeList nodeList = pface->GetNodeList();
-		FENodeSet* nodeSet = fecore_alloc(FENodeSet, fem);
+		FENodeSet* nodeSet = new FENodeSet(fem);
 		nodeSet->SetName(pface->GetName());
 		nodeSet->Add(nodeList);
 		mesh.AddNodeSet(nodeSet);

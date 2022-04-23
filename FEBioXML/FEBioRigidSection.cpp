@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/FEModelComponent.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FENLConstraint.h>
+#include <FECore/FEBoundaryCondition.h>
 
 void FEBioRigidSection::Parse(XMLTag& tag)
 {
@@ -60,14 +61,14 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	if (strcmp(sztype, "fix") == 0)
 	{
 		// create the fixed dof
-		FEStepComponent* pBC = fecore_new_class<FEStepComponent>("FERigidBodyFixedBC", fem);
+		FEBoundaryCondition* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC", fem);
 		feb.AddRigidBC(pBC);
 		ReadParameterList(tag, pBC);
 	}
 	else if (strcmp(sztype, "prescribe") == 0)
 	{
 		// create the rigid displacement constraint
-		FEStepComponent* pDC = fecore_new_class<FEStepComponent>("FERigidBodyDisplacement", fem);
+		FEBoundaryCondition* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", fem);
 		feb.AddRigidBC(pDC);
 		ReadParameterList(tag, pDC);
 	}
@@ -80,13 +81,13 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	}
 	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{
-		FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyVelocity", fem);
+		FEBoundaryCondition* pic = fecore_new_class<FEBoundaryCondition>("FERigidBodyVelocity", fem);
 		feb.AddRigidBC(pic);
 		ReadParameterList(tag, pic);
 	}
 	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
 	{
-		FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyAngularVelocity", fem);
+		FEBoundaryCondition* pic = fecore_new_class<FEBoundaryCondition>("FERigidBodyAngularVelocity", fem);
 		feb.AddRigidBC(pic);
 		ReadParameterList(tag, pic);
 	}
@@ -105,7 +106,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	else
 	{
 		// create the rigid constraint
-		FEStepComponent* pBC = fecore_new<FEStepComponent>(FERIGIDBC_ID, sztype, fem);
+		FEBoundaryCondition* pBC = fecore_new<FEBoundaryCondition>(sztype, fem);
 		if (pBC == nullptr)  throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		feb.AddRigidBC(pBC);
 		ReadParameterList(tag, pBC);

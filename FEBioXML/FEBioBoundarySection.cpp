@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include <FECore/FEFacetSet.h>
 #include <FECore/log.h>
 #include <FECore/FEModelLoad.h>
+#include <FECore/FEInitialCondition.h>
 
 //---------------------------------------------------------------------------------
 void FEBioBoundarySection::BuildNodeSetMap()
@@ -375,7 +376,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 	}
 	else
 	{
-		FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
+		FENodeSet* nset = new FENodeSet(&fem);
 		fem.GetMesh().AddNodeSet(nset);
 
 		// Read the fixed nodes
@@ -522,7 +523,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			pdc->SetScale(scale);
 			pdc->SetRelativeFlag(br);
 
-			FENodeSet* ps = fecore_alloc(FENodeSet, &fem);
+			FENodeSet* ps = new FENodeSet(&fem);
 			ps->Add(n);
 			pdc->SetNodeSet(ps);
 
@@ -616,7 +617,7 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 	}
 	else
 	{
-		FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
+		FENodeSet* nset = new FENodeSet(&fem);
 		fem.GetMesh().AddNodeSet(nset);
 
 		// read the prescribed data
@@ -683,7 +684,7 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	if (nodeSet) pdc->SetNodeSet(nodeSet);
 	else if (facetSet)
 	{
-		FENodeSet* set = fecore_alloc(FENodeSet, &fem);
+		FENodeSet* set = new FENodeSet(&fem);
 		set->Add(facetSet->GetNodeList());
 		pdc->SetNodeSet(set);
 	}
@@ -1141,7 +1142,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 				prn->SetParameter("rb", rb);
 
-				ns = fecore_alloc(FENodeSet, &fem);
+				ns = new FENodeSet(&fem);
 				prn->SetNodeSet(ns);
 
 				// the default shell bc depends on the shell formulation
@@ -1324,7 +1325,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			value(tag, val);
 
 			// create the rigid displacement constraint
-			FEStepComponent* pDC = fecore_new_class<FEStepComponent>("FERigidBodyDisplacement", &fem);
+			FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", &fem);
 			feb.AddRigidBC(pDC);
 
 			pDC->SetParameter("rb", nmat);
@@ -1404,7 +1405,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// create the fixed dof
-			FEStepComponent* pBC = fecore_new_class<FEStepComponent>("FERigidBodyFixedBC",  &fem);
+			FEBoundaryCondition* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC",  &fem);
 			feb.AddRigidBC(pBC);
 
 			pBC->SetParameter("rb", nmat);
@@ -1420,7 +1421,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			value(tag, v);
 
 			// create the initial condition
-			FEStepComponent* pic = fecore_new_class< FEStepComponent>("FERigidBodyVelocity", &fem);
+			FEStepComponent* pic = fecore_new_class<FEInitialCondition>("FERigidBodyVelocity", &fem);
 			pic->SetParameter("rb", nmat);
 			pic->SetParameter("value", v);
 
@@ -1434,7 +1435,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			value(tag, w);
 
 			// create the initial condition
-			FEStepComponent* pic = fecore_new_class<FEStepComponent>("FERigidBodyAngularVelocity", &fem);
+			FEStepComponent* pic = fecore_new_class<FEInitialCondition>("FERigidBodyAngularVelocity", &fem);
 			pic->SetParameter("rb", nmat);
 			pic->SetParameter("value", w);
 

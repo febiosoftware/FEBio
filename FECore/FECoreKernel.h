@@ -252,13 +252,13 @@ template <typename TBase> inline TBase* fecore_new(int classIndex, FEModel* pfem
 //-----------------------------------------------------------------------------
 template <typename TClass> inline TClass* fecore_new_class(const char* szclass, FEModel* fem)
 {
+	int superId = TClass::superClassID();
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	return static_cast<TClass*>(fecore.CreateClass(szclass, fem));
 }
 
 //-----------------------------------------------------------------------------
-//#define fecore_alloc(theClass, fem) fecore_new_class<theClass>(#theClass, fem)
-#define fecore_alloc(theClass, fem) new theClass(fem);
+#define fecore_alloc(theClass, fem) fecore_new_class<theClass>(#theClass, fem)
 
 //-----------------------------------------------------------------------------
 // Three-parameter form of the fecore_new function for situations where the base class does not 
