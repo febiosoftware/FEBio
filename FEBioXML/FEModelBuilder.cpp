@@ -830,7 +830,7 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 	for (int i = 0; i < m_mapgen.size(); ++i)
 	{
 		// TODO: This is going to break quickly!
-		FEDomainDataGenerator* gen = dynamic_cast<FEDomainDataGenerator*>(m_mapgen[i].gen);
+		FEElemDataGenerator* gen = dynamic_cast<FEElemDataGenerator*>(m_mapgen[i].gen);
 		FEDomainMap* map = m_mapgen[i].map;
 		FEParamDouble* pp = m_mapgen[i].pp;
 

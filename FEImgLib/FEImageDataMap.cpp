@@ -27,14 +27,14 @@ SOFTWARE.*/
 #include <FECore/FEDomainMap.h>
 #include "image_tools.h"
 
-BEGIN_FECORE_CLASS(FEImageDataMap, FEDomainDataGenerator)
+BEGIN_FECORE_CLASS(FEImageDataMap, FEElemDataGenerator)
 	ADD_PARAMETER(m_r0, "range_min");
 	ADD_PARAMETER(m_r1, "range_max");
 	ADD_PARAMETER(m_blur, "blur");
 	ADD_PROPERTY(m_imgSrc, "image");
 END_FECORE_CLASS();
 
-FEImageDataMap::FEImageDataMap(FEModel* fem) : FEDomainDataGenerator(fem), m_map(m_im)
+FEImageDataMap::FEImageDataMap(FEModel* fem) : FEElemDataGenerator(fem), m_map(m_im)
 {
 	m_imgSrc = nullptr;
 	m_blur = 0.0;
@@ -52,7 +52,7 @@ bool FEImageDataMap::Init()
 	m_im = m_im0;
 	m_map.SetRange(m_r0, m_r1);
 
-	return FEDomainDataGenerator::Init();
+	return FEElemDataGenerator::Init();
 }
 
 void FEImageDataMap::value(const vec3d& x, double& data)
@@ -68,7 +68,7 @@ FEDomainMap* FEImageDataMap::Generate()
 	// TODO: Can I use FMT_NODE?
 	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MULT);
 	map->Create(elset);
-	if (FEDomainDataGenerator::Generate(*map) == false)
+	if (FEElemDataGenerator::Generate(*map) == false)
 	{
 		delete map; map = nullptr;
 	}
@@ -85,5 +85,5 @@ void FEImageDataMap::Evaluate(double time)
 	}
 	else m_im = m_im0;
 
-	FEDomainDataGenerator::Generate(*m_data);
+	FEElemDataGenerator::Generate(*m_data);
 }

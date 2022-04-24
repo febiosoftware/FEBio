@@ -181,18 +181,18 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag)
 	const char* szgen = tag.AttributeValue("generator", true);
 	if (szgen)
 	{
-		FESurfaceDataGenerator* gen = 0;
+		FEFaceDataGenerator* gen = 0;
 		// data will be generated
 		if (strcmp(szgen, "const") == 0)
 		{
-			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double, FESurfaceDataGenerator>(&fem);
-			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d , FESurfaceDataGenerator>(&fem);
-			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d , FESurfaceDataGenerator>(&fem);
-            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds, FESurfaceDataGenerator>(&fem);
+			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double, FEFaceDataGenerator>(&fem);
+			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d , FEFaceDataGenerator>(&fem);
+			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d , FEFaceDataGenerator>(&fem);
+            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds, FEFaceDataGenerator>(&fem);
 		}
 		else
 		{
-			gen = fecore_new<FESurfaceDataGenerator>(szgen, &fem);
+			gen = fecore_new<FEFaceDataGenerator>(szgen, &fem);
 		}
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
@@ -293,18 +293,17 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 			else pp = &(pv->value<FEParamDouble>());
 		}
 
-		FEDomainDataGenerator* gen = 0;
-		// data will be generated
+		FEElemDataGenerator* gen = nullptr;		// data will be generated
 		if (strcmp(szgen, "const") == 0)
 		{
-			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double, FEDomainDataGenerator>(&fem);
-			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d , FEDomainDataGenerator>(&fem);
-			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d , FEDomainDataGenerator>(&fem);
-            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds, FEDomainDataGenerator>(&fem);
+			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double, FEElemDataGenerator>(&fem);
+			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d , FEElemDataGenerator>(&fem);
+			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d , FEElemDataGenerator>(&fem);
+            else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds, FEElemDataGenerator>(&fem);
 		}
 		else
 		{
-			gen = fecore_new<FEDomainDataGenerator>(szgen, &fem);
+			gen = fecore_new<FEElemDataGenerator>(szgen, &fem);
 		}
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
@@ -828,11 +827,11 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 		// data will be generated
 		FEModel* fem = GetFEModel();
-		FEDomainDataGenerator* gen = 0;
-		if (strcmp(szgen, "const") == 0) gen = new FEConstDataGenerator<mat3d, FEDomainDataGenerator>(fem);
+		FEElemDataGenerator* gen = 0;
+		if (strcmp(szgen, "const") == 0) gen = new FEConstDataGenerator<mat3d, FEElemDataGenerator>(fem);
 		else
 		{
-			gen = fecore_new<FEDomainDataGenerator>(szgen, fem);
+			gen = fecore_new<FEElemDataGenerator>(szgen, fem);
 		}
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 

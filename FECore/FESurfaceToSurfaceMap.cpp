@@ -32,13 +32,13 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include <FECore/FEDomainMap.h>
 
-BEGIN_FECORE_CLASS(FESurfaceToSurfaceMap, FEDomainDataGenerator)
+BEGIN_FECORE_CLASS(FESurfaceToSurfaceMap, FEElemDataGenerator)
 	ADD_PROPERTY(m_func, "function");
 	ADD_PROPERTY(m_surf1, "bottom_surface", FEProperty::Reference);
 	ADD_PROPERTY(m_surf2, "top_surface", FEProperty::Reference);
 END_FECORE_CLASS();
 
-FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDomainDataGenerator(fem)
+FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEElemDataGenerator(fem)
 {
 	m_ccp1 = 0;
 	m_ccp2 = 0;
@@ -135,7 +135,7 @@ FEDomainMap* FESurfaceToSurfaceMap::Generate()
 
 	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MATPOINTS);
 	map->Create(elset);
-	if (FEDomainDataGenerator::Generate(*map) == false)
+	if (FEElemDataGenerator::Generate(*map) == false)
 	{
 		delete map; map = nullptr;
 	}

@@ -53,7 +53,10 @@ class FEDataArray;
 class FEMeshAdaptor;
 class Timer;
 class FEPlotDataStore;
-class FEDataGenerator;
+class FENodeDataGenerator;
+class FEEdgeDataGenerator;
+class FEFaceDataGenerator;
+class FEElemDataGenerator;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel
@@ -173,13 +176,40 @@ public:	// --- Load controller functions ----
 public:	// --- mesh data generators ---
 
 	//! Add a mesh data generator to the model
-	void AddDataGenerator(FEDataGenerator* pmd);
+	void AddNodeDataGenerator(FENodeDataGenerator* pmd);
 
-	//! get a load controller
-	FEDataGenerator* GetDataGenerator(int i);
+	//! get a node data generator
+	FENodeDataGenerator* GetNodeDataGenerator(int i);
 
-	//! get the number of mesh data generators
-	int DataGenerators() const;
+	//! get the number of node mesh data generators
+	int NodeDataGenerators() const;
+
+	//! Add a mesh data generator to the model
+	void AddEdgeDataGenerator(FEEdgeDataGenerator* pmd);
+
+	//! get a node data generator
+	FEEdgeDataGenerator* GetEdgeDataGenerator(int i);
+
+	//! get the number of node mesh data generators
+	int EdgeDataGenerators() const;
+
+	//! Add a mesh data generator to the model
+	void AddFaceDataGenerator(FEFaceDataGenerator* pmd);
+
+	//! get a face data generator
+	FEFaceDataGenerator* GetFaceDataGenerator(int i);
+
+	//! get the number of face data generators
+	int FaceDataGenerators() const;
+
+	//! Add a element data generator to the model
+	void AddElemDataGenerator(FEElemDataGenerator* pmd);
+
+	//! get a face data generator
+	FEElemDataGenerator* GetElemDataGenerator(int i);
+
+	//! get the number of face data generators
+	int ElemDataGenerators() const;
 
 public: // --- Material functions ---
 

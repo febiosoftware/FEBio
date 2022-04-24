@@ -26,7 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEDataGenerator.h>
 
-class FEDeformationMapGenerator : public FEDomainDataGenerator
+class FEDeformationMapGenerator : public FEElemDataGenerator
 {
 public:
 	FEDeformationMapGenerator(FEModel* fem);

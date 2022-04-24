@@ -35,7 +35,7 @@ SOFTWARE.*/
 class FEModel;
 class FESurface;
 
-class FESurfaceToSurfaceMap : public FEDomainDataGenerator
+class FESurfaceToSurfaceMap : public FEElemDataGenerator
 {
 public:
 	FESurfaceToSurfaceMap(FEModel* fem);

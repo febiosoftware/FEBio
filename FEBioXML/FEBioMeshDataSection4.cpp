@@ -95,7 +95,7 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 
 	gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddDataGenerator(gen);
+	GetBuilder()->GetFEModel().AddNodeDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);
@@ -120,12 +120,12 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// see if there is a generator
-	FESurfaceDataGenerator* gen = fecore_new<FESurfaceDataGenerator>(sztype, &fem);
+	FEFaceDataGenerator* gen = fecore_new<FEFaceDataGenerator>(sztype, &fem);
 	if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", sztype);
 
 	gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddDataGenerator(gen);
+	GetBuilder()->GetFEModel().AddFaceDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);
@@ -149,11 +149,11 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	// get the name or var (required!)
 	const char* szname = tag.AttributeValue("name");
 
-	FEDomainDataGenerator* gen = fecore_new<FEDomainDataGenerator>(sztype, &fem);
+	FEElemDataGenerator* gen = fecore_new<FEElemDataGenerator>(sztype, &fem);
 	gen->SetElementSet(elset);
 	gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddDataGenerator(gen);
+	GetBuilder()->GetFEModel().AddElemDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);

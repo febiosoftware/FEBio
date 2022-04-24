@@ -42,8 +42,6 @@ class FEDomainMap;
 // Data generators are used to generate values of model parameters. 
 class FECORE_API FEDataGenerator : public FEModelComponent
 {
-	FECORE_SUPER_CLASS(FEMESHDATAGENERATOR_ID)
-
 public:
 	FEDataGenerator(FEModel* fem);
 	virtual ~FEDataGenerator();
@@ -67,7 +65,8 @@ public:
 //-----------------------------------------------------------------------------
 class FECORE_API FENodeDataGenerator : public FEDataGenerator
 {
-	FECORE_BASE_CLASS(FENodeDataGenerator);
+	FECORE_SUPER_CLASS(FENODEDATAGENERATOR_ID)
+	FECORE_BASE_CLASS(FENodeDataGenerator)
 
 public:
 	FENodeDataGenerator(FEModel* fem);
@@ -77,24 +76,39 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FESurfaceDataGenerator : public FEDataGenerator
+class FECORE_API FEEdgeDataGenerator : public FEDataGenerator
 {
-	FECORE_BASE_CLASS(FESurfaceDataGenerator);
+	FECORE_SUPER_CLASS(FEEDGEDATAGENERATOR_ID)
+	FECORE_BASE_CLASS(FEEdgeDataGenerator)
 
 public:
-	FESurfaceDataGenerator(FEModel* fem);
+	FEEdgeDataGenerator(FEModel* fem);
+
+	// generate the data array for the given node set
+//	virtual bool Generate(FEEdgeDataMap& ar);
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEFaceDataGenerator : public FEDataGenerator
+{
+	FECORE_SUPER_CLASS(FEFACEDATAGENERATOR_ID)
+	FECORE_BASE_CLASS(FEFaceDataGenerator)
+
+public:
+	FEFaceDataGenerator(FEModel* fem);
 
 	// generate the data array for the given facet set
 	virtual bool Generate(FESurfaceMap& data);
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEDomainDataGenerator : public FEDataGenerator
+class FECORE_API FEElemDataGenerator : public FEDataGenerator
 {
-	FECORE_BASE_CLASS(FEDomainDataGenerator);
+	FECORE_SUPER_CLASS(FEELEMDATAGENERATOR_ID)
+	FECORE_BASE_CLASS(FEElemDataGenerator)
 
 public:
-	FEDomainDataGenerator(FEModel* fem);
+	FEElemDataGenerator(FEModel* fem);
 
 	// generate the data array for the given element set
 	virtual bool Generate(FEDomainMap& data);

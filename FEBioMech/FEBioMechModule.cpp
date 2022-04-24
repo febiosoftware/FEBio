@@ -983,7 +983,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FESpringStretchCriterion, "spring stretch");
 
 	//-----------------------------------------------------------------------------
-	// Derived from FEDataGenerator
+	// Derived from FEElemDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
 
 	febio.SetActiveModule(0);

@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "ImageMap.h"
 #include "feimglib_api.h"
 
-class FEIMGLIB_API FEImageDataMap : public FEDomainDataGenerator
+class FEIMGLIB_API FEImageDataMap : public FEElemDataGenerator
 {
 public:
 	FEImageDataMap(FEModel* fem);

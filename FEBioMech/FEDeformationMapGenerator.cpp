@@ -31,12 +31,12 @@ SOFTWARE.*/
 
 double defgrad(FESolidElement &el, std::vector<vec3d>& X, std::vector<vec3d>& u, mat3d &F, int n);
 
-BEGIN_FECORE_CLASS(FEDeformationMapGenerator, FEDomainDataGenerator)
+BEGIN_FECORE_CLASS(FEDeformationMapGenerator, FEElemDataGenerator)
 	ADD_PARAMETER(m_nodeDisplacementMap, "node_displacement_map");
 END_FECORE_CLASS();
 
 
-FEDeformationMapGenerator::FEDeformationMapGenerator(FEModel* fem) : FEDomainDataGenerator(fem)
+FEDeformationMapGenerator::FEDeformationMapGenerator(FEModel* fem) : FEElemDataGenerator(fem)
 {
 	m_nodeMap = nullptr;
 }
@@ -59,7 +59,7 @@ bool FEDeformationMapGenerator::Init()
 
 	if (m_nodeMap->DataType() != FE_VEC3D) return false;
 
-	return FEDataGenerator::Init();
+	return FEElemDataGenerator::Init();
 }
 
 // generate the data array for the given element set

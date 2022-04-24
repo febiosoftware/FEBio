@@ -86,13 +86,19 @@ bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 }
 
 //-----------------------------------------------------------------------------
-FESurfaceDataGenerator::FESurfaceDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEEdgeDataGenerator::FEEdgeDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+FEFaceDataGenerator::FEFaceDataGenerator(FEModel* fem) : FEDataGenerator(fem)
 {
 
 }
 
 // generate the data array for the given facet set
-bool FESurfaceDataGenerator::Generate(FESurfaceMap& map)
+bool FEFaceDataGenerator::Generate(FESurfaceMap& map)
 {
 	const FEFacetSet& surf = *map.GetFacetSet();
 
@@ -125,16 +131,16 @@ bool FESurfaceDataGenerator::Generate(FESurfaceMap& map)
 }
 
 //-----------------------------------------------------------------------------
-FEDomainDataGenerator::FEDomainDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEElemDataGenerator::FEElemDataGenerator(FEModel* fem) : FEDataGenerator(fem)
 {
 	m_elemSet = nullptr;
 }
 
-void FEDomainDataGenerator::SetElementSet(FEElementSet* elset) { m_elemSet = elset; }
-FEElementSet* FEDomainDataGenerator::GetElementSet() { return m_elemSet; }
+void FEElemDataGenerator::SetElementSet(FEElementSet* elset) { m_elemSet = elset; }
+FEElementSet* FEElemDataGenerator::GetElementSet() { return m_elemSet; }
 
 // generate the data array for the given element set
-bool FEDomainDataGenerator::Generate(FEDomainMap& map)
+bool FEElemDataGenerator::Generate(FEDomainMap& map)
 {
 	const FEElementSet& set = *map.GetElementSet();
 
@@ -207,7 +213,7 @@ bool FEDomainDataGenerator::Generate(FEDomainMap& map)
 	return true;
 }
 
-FEDomainMap* FEDomainDataGenerator::Generate()
+FEDomainMap* FEElemDataGenerator::Generate()
 {
 	assert(false);
 	return nullptr;
