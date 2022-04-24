@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FETCNonlinearOrthotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(m_ksi , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
 	ADD_PARAMETER(m_epsf, "epsilon_scale");
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////

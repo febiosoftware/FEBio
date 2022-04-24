@@ -35,7 +35,7 @@ BEGIN_FECORE_CLASS(FEContinuousFiberDistributionUC, FEUncoupledMaterial)
 	ADD_PROPERTY(m_pFDD , "distribution");
 	ADD_PROPERTY(m_pFint, "scheme");
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 

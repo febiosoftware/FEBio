@@ -34,7 +34,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_T0 , "T0"   );
 
-    ADD_PROPERTY(m_Q, "mat_axis");
+    ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 

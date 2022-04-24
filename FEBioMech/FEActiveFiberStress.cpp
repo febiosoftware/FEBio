@@ -40,7 +40,7 @@ BEGIN_FECORE_CLASS(FEActiveFiberStress, FEElasticMaterial);
 	ADD_PROPERTY(m_stl, "stl", FEProperty::Optional);
 	ADD_PROPERTY(m_stv, "stv", FEProperty::Optional);
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 

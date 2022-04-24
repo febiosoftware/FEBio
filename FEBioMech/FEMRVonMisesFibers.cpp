@@ -49,7 +49,7 @@ BEGIN_FECORE_CLASS(FEMRVonMisesFibers, FEUncoupledMaterial)
 	// Exponent for the constrained von Mises distribution
 	ADD_PARAMETER(var_n, "var_n"); 
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 

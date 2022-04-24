@@ -41,7 +41,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_lam1, "lam_max");
 	ADD_PARAMETER(m_epsf, "epsilon_scale");
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 double FE2DTransIsoVerondaWestmann::m_cth[FE2DTransIsoVerondaWestmann::NSTEPS];

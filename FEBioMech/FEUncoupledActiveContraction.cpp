@@ -39,7 +39,7 @@ BEGIN_FECORE_CLASS(FEUncoupledActiveContraction, FEUncoupledMaterial)
 	ADD_PARAMETER(m_l0   , "l0"   );
 	ADD_PARAMETER(m_refl , "refl" );
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 

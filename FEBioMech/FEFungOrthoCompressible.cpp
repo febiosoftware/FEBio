@@ -44,7 +44,7 @@ BEGIN_FECORE_CLASS(FEFungOrthoCompressible, FEElasticMaterial)
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER(0.0),"c")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_k, FE_RANGE_GREATER(0.0), "k")->setUnits(UNIT_PRESSURE);
 
-	ADD_PROPERTY(m_Q, "mat_axis");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 

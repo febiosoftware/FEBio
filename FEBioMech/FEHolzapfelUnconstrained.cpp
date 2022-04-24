@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FEHolzapfelUnconstrained, FEElasticMaterial)
     ADD_PARAMETER(m_gdeg , "gamma");
     ADD_PARAMETER(m_k    , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 
-    ADD_PROPERTY(m_Q, "mat_axis");
+    ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
 END_FECORE_CLASS();
 
