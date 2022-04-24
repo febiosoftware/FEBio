@@ -377,14 +377,39 @@ int FECoreBase::FindPropertyIndex(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-FEProperty* FECoreBase::FindProperty(const char* sz)
+FEProperty* FECoreBase::FindProperty(const char* sz, bool searchChildren)
 {
+	// first, search the class' properties
 	int NP = (int)m_Prop.size();
 	for (int i = 0; i<NP; ++i)
 	{
 		FEProperty* pm = m_Prop[i];
 		if (pm && (strcmp(pm->GetName(), sz) == 0)) return pm;
 	}
+
+	// the property, wasn't found so look into the properties' properties
+	if (searchChildren)
+	{
+		for (int i = 0; i < NP; ++i)
+		{
+			FEProperty* pm = m_Prop[i];
+			if (pm)
+			{
+				int m = pm->size();
+				for (int j = 0; j < m; ++j)
+				{
+					FECoreBase* pcj = pm->get(j);
+					if (pcj)
+					{
+						// Note: we don't search children's children!
+						FEProperty* pj = pcj->FindProperty(sz);
+						if (pj) return pj;
+					}
+				}
+			}
+		}
+	}
+
 	return nullptr;
 }
 
