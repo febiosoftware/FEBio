@@ -61963,6 +61963,10 @@ B=E\frac{2I_{0}\left(\beta-\frac{1}{2}+\alpha\beta\left(I_{0}-1\right)^{\beta}\r
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 This model reduces to 
 \begin_inset Quotes eld
 \end_inset
@@ -61980,6 +61984,34 @@ fiber-pow-linear
 \end_inset
 
 .
+ Alternatively, in the limit when 
+\begin_inset Formula $I_{0}=1$
+\end_inset
+
+, the above parameters reduce to 
+\begin_inset Formula $\xi=0$
+\end_inset
+
+ and 
+\begin_inset Formula $B=E/2$
+\end_inset
+
+ and the strain energy density takes the quadratic form 
+\begin_inset Formula 
+\[
+\Psi_{n}=\begin{cases}
+0 & I_{n}<1\\
+\frac{E}{2}\left(I_{n}^{1/2}-1\right)^{2} & I_{n}>1
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{n}^{1/2}=\lambda_{n}$
+\end_inset
+
+ is the stretch ratio along the fiber.
 \end_layout
 
 \begin_layout Standard
