@@ -126,6 +126,10 @@ void FEBioMeshDataSection3::ParseNodalData(XMLTag& tag)
 			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d, FENodeDataGenerator>(&fem);
             else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds, FENodeDataGenerator>(&fem);
 		}
+		else if (strcmp(szgen, "math") == 0)
+		{
+			gen = new FEDataMathGenerator(&fem);
+		}
 		else
 		{
 			gen = fecore_new<FENodeDataGenerator>(szgen, &fem);
