@@ -6,13 +6,6 @@
 \origin unavailable
 \textclass extbook
 \begin_preamble
-% Converted from Microsoft Word to LaTeX
-% by Chikrii Softlab Word2TeX converter (version 5.0)
-% Copyright (C) 1999-2011 Chikrii Softlab. All rights reserved.
-% http://www.chikrii.com
-% mailto: support@chikrii.com
-% License: CSL#005010
-
 \usepackage{latexsym}
 \hypersetup{colorlinks=true,citecolor=blue,filecolor=blue,urlcolor=blue,linkcolor=blue}
 \end_preamble
@@ -61957,7 +61950,7 @@ where
 , 
 \begin_inset Formula 
 \[
-\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
+\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[-\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
 \]
 
 \end_inset
@@ -61965,11 +61958,15 @@ where
 and
 \begin_inset Formula 
 \[
-B=\frac{E}{2I_{0}^{1/2}}+\xi\left(I_{0}-1\right)^{\beta-1}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]
+B=E\frac{2I_{0}\left(\beta-\frac{1}{2}+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)-1}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
 \]
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 This model reduces to 
 \begin_inset Quotes eld
 \end_inset
@@ -61987,6 +61984,34 @@ fiber-pow-linear
 \end_inset
 
 .
+ Alternatively, in the limit when 
+\begin_inset Formula $I_{0}=1$
+\end_inset
+
+, the above parameters reduce to 
+\begin_inset Formula $\xi=0$
+\end_inset
+
+ and 
+\begin_inset Formula $B=E/2$
+\end_inset
+
+ and the strain energy density takes the quadratic form 
+\begin_inset Formula 
+\[
+\Psi_{n}=\begin{cases}
+0 & I_{n}<1\\
+\frac{E}{2}\left(I_{n}^{1/2}-1\right)^{2} & I_{n}>1
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{n}^{1/2}=\lambda_{n}$
+\end_inset
+
+ is the stretch ratio along the fiber.
 \end_layout
 
 \begin_layout Standard
