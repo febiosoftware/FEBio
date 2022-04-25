@@ -71,7 +71,7 @@ REGISTER_COMMAND(FEBioCmd_Events       , "events" , "print list of events");
 REGISTER_COMMAND(FEBioCmd_Fail         , "fail"   , "force iteratoin failer");
 REGISTER_COMMAND(FEBioCmd_Help         , "help"   , "print available commands");
 REGISTER_COMMAND(FEBioCmd_hist         , "hist"   , "lists history of commands");
-REGISTER_COMMAND(FEBioCmd_LoadPlugin   , "load"   , "load a plugin");
+REGISTER_COMMAND(FEBioCmd_LoadPlugin   , "import" , "load a plugin");
 REGISTER_COMMAND(FEBioCmd_Plot         , "plot"   , "store current state to plot file");
 REGISTER_COMMAND(FEBioCmd_out          , "out"    , "write matrix and rhs file");
 REGISTER_COMMAND(FEBioCmd_Plugins      , "plugins", "list the plugins that are loaded");
