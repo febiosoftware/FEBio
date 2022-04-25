@@ -35,26 +35,26 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "log.h"
 
-FEDataGenerator::FEDataGenerator(FEModel* fem) : FEModelComponent(fem)
+FEMeshDataGenerator::FEMeshDataGenerator(FEModel* fem) : FEModelComponent(fem)
 {
 }
 
-FEDataGenerator::~FEDataGenerator()
+FEMeshDataGenerator::~FEMeshDataGenerator()
 {
 }
 
-bool FEDataGenerator::Init()
+bool FEMeshDataGenerator::Init()
 {
 	return true;
 }
 
-void FEDataGenerator::Evaluate(double time)
+void FEMeshDataGenerator::Evaluate(double time)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-FENodeDataGenerator::FENodeDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+FENodeDataGenerator::FENodeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
 
 }
@@ -86,13 +86,13 @@ bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 }
 
 //-----------------------------------------------------------------------------
-FEEdgeDataGenerator::FEEdgeDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEEdgeDataGenerator::FEEdgeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-FEFaceDataGenerator::FEFaceDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEFaceDataGenerator::FEFaceDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
 
 }
@@ -131,7 +131,7 @@ bool FEFaceDataGenerator::Generate(FESurfaceMap& map)
 }
 
 //-----------------------------------------------------------------------------
-FEElemDataGenerator::FEElemDataGenerator(FEModel* fem) : FEDataGenerator(fem)
+FEElemDataGenerator::FEElemDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
 	m_elemSet = nullptr;
 }

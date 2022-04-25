@@ -88,7 +88,7 @@ bool FESurfaceToSurfaceMap::Init()
     
     m_func->Init();
 
-	return FEDataGenerator::Init();
+	return FEMeshDataGenerator::Init();
 }
 
 void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)

@@ -660,7 +660,7 @@ void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const ch
 	m_mappedParams.push_back(mp);
 }
 
-void FEModelBuilder::AddMeshDataGenerator(FEDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp)
+void FEModelBuilder::AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp)
 {
 	m_mapgen.push_back(DataGen{ gen, map, pp });
 }

@@ -40,11 +40,14 @@ class FEDomainMap;
 
 //-----------------------------------------------------------------------------
 // Data generators are used to generate values of model parameters. 
-class FECORE_API FEDataGenerator : public FEModelComponent
+class FECORE_API FEMeshDataGenerator : public FEModelComponent
 {
+	FECORE_SUPER_CLASS(FEMESHDATAGENERATOR_ID)
+	FECORE_BASE_CLASS(FEMeshDataGenerator)
+
 public:
-	FEDataGenerator(FEModel* fem);
-	virtual ~FEDataGenerator();
+	FEMeshDataGenerator(FEModel* fem);
+	virtual ~FEMeshDataGenerator();
 
 	// this function gives the data generator a chance to initialize itself
 	// and check for any input problems.
@@ -63,9 +66,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FENodeDataGenerator : public FEDataGenerator
+class FECORE_API FENodeDataGenerator : public FEMeshDataGenerator
 {
-	FECORE_SUPER_CLASS(FENODEDATAGENERATOR_ID)
 	FECORE_BASE_CLASS(FENodeDataGenerator)
 
 public:
@@ -76,9 +78,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEEdgeDataGenerator : public FEDataGenerator
+class FECORE_API FEEdgeDataGenerator : public FEMeshDataGenerator
 {
-	FECORE_SUPER_CLASS(FEEDGEDATAGENERATOR_ID)
 	FECORE_BASE_CLASS(FEEdgeDataGenerator)
 
 public:
@@ -89,9 +90,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEFaceDataGenerator : public FEDataGenerator
+class FECORE_API FEFaceDataGenerator : public FEMeshDataGenerator
 {
-	FECORE_SUPER_CLASS(FEFACEDATAGENERATOR_ID)
 	FECORE_BASE_CLASS(FEFaceDataGenerator)
 
 public:
@@ -102,9 +102,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEElemDataGenerator : public FEDataGenerator
+class FECORE_API FEElemDataGenerator : public FEMeshDataGenerator
 {
-	FECORE_SUPER_CLASS(FEELEMDATAGENERATOR_ID)
 	FECORE_BASE_CLASS(FEElemDataGenerator)
 
 public:

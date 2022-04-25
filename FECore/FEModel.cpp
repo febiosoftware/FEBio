@@ -164,10 +164,7 @@ public:
 	std::vector<FELoadController*>			m_LC;		//!< load controller data
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
 	std::vector<FEMeshAdaptor*>				m_MA;		//!< mesh adaptors
-	std::vector<FENodeDataGenerator*>		m_ND;		//!< node data generators
-	std::vector<FEEdgeDataGenerator*>		m_CD;		//!< edge data generators
-	std::vector<FEFaceDataGenerator*>		m_FD;		//!< face data generators
-	std::vector<FEElemDataGenerator*>		m_ED;		//!< elem data generators
+	std::vector<FEMeshDataGenerator*>		m_MD;		//!< mesh data generators
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
 	std::vector<Timer>			m_timers;	// list of timers
@@ -225,10 +222,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );
 	ADD_PROPERTY(m_imp->m_MA  , "mesh_adaptor"   );
 	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
-	ADD_PROPERTY(m_imp->m_ND  , "node_data"      );
-	ADD_PROPERTY(m_imp->m_CD  , "edge_data"      );
-	ADD_PROPERTY(m_imp->m_FD  , "surface_data"	 );
-	ADD_PROPERTY(m_imp->m_ED  , "element_data"   );
+	ADD_PROPERTY(m_imp->m_MD  , "mesh_data"      );
 	ADD_PROPERTY(m_imp->m_Step, "step"           );
 
 END_FECORE_CLASS();
@@ -291,10 +285,7 @@ void FEModel::Clear()
 	for (FESurfacePairConstraint* ci : m_imp->m_CI  ) delete   ci; m_imp->m_CI.clear();
 	for (FENLConstraint* nlc         : m_imp->m_NLC ) delete   nlc; m_imp->m_NLC.clear();
 	for (FELoadController* lc        : m_imp->m_LC  ) delete   lc; m_imp->m_LC.clear();
-	for (FENodeDataGenerator* nd     : m_imp->m_ND  ) delete   nd; m_imp->m_ND.clear();
-	for (FEEdgeDataGenerator* cd     : m_imp->m_CD  ) delete   cd; m_imp->m_CD.clear();
-	for (FEFaceDataGenerator* fd     : m_imp->m_FD  ) delete   fd; m_imp->m_FD.clear();
-	for (FEElemDataGenerator* ed     : m_imp->m_ED  ) delete   ed; m_imp->m_ED.clear();
+	for (FEMeshDataGenerator* md     : m_imp->m_MD  ) delete   md; m_imp->m_MD.clear();
 	for (FEAnalysis* step            : m_imp->m_Step) delete step; m_imp->m_Step.clear();
 
 	// global data
@@ -469,9 +460,9 @@ bool FEModel::Init()
 	}
 
 	// evaluate all mesh data generators
-	for (int i = 0; i < NodeDataGenerators(); ++i)
+	for (int i = 0; i < MeshDataGenerators(); ++i)
 	{
-		FENodeDataGenerator* pmd = m_imp->m_ND[i];
+		FEMeshDataGenerator* pmd = m_imp->m_MD[i];
 		if (pmd->Init() == false)
 		{
 			std::string s = pmd->GetName();
@@ -481,43 +472,6 @@ bool FEModel::Init()
 		}
 		pmd->Evaluate(0);
 	}
-	for (int i = 0; i < EdgeDataGenerators(); ++i)
-	{
-		FEEdgeDataGenerator* pmd = m_imp->m_CD[i];
-		if (pmd->Init() == false)
-		{
-			std::string s = pmd->GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Edge data generator %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-		pmd->Evaluate(0);
-	}
-	for (int i = 0; i < FaceDataGenerators(); ++i)
-	{
-		FEFaceDataGenerator* pmd = m_imp->m_FD[i];
-		if (pmd->Init() == false)
-		{
-			std::string s = pmd->GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Surface data generator %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-		pmd->Evaluate(0);
-	}
-	for (int i = 0; i < ElemDataGenerators(); ++i)
-	{
-		FEElemDataGenerator* pmd = m_imp->m_ED[i];
-		if (pmd->Init() == false)
-		{
-			std::string s = pmd->GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Element data generator %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-		pmd->Evaluate(0);
-	}
-
 
 	// check step data
 	for (int i = 0; i<(int)m_imp->m_Step.size(); ++i)
@@ -873,82 +827,22 @@ FELoadController* FEModel::GetLoadController(FEParam* p)
 
 //-----------------------------------------------------------------------------
 //! Add a mesh data generator to the model
-void FEModel::AddNodeDataGenerator(FENodeDataGenerator* pmd)
+void FEModel::AddMeshDataGenerator(FEMeshDataGenerator* pmd)
 {
-	m_imp->m_ND.push_back(pmd);
+	m_imp->m_MD.push_back(pmd);
 }
 
 //-----------------------------------------------------------------------------
-FENodeDataGenerator* FEModel::GetNodeDataGenerator(int i)
+FEMeshDataGenerator* FEModel::GetMeshDataGenerator(int i)
 {
-	return m_imp->m_ND[i];
-}
-
-//-----------------------------------------------------------------------------
-//! get the number of mesh data generators
-int FEModel::NodeDataGenerators() const
-{
-	return (int)m_imp->m_ND.size();
-}
-
-//-----------------------------------------------------------------------------
-//! Add a mesh data generator to the model
-void FEModel::AddEdgeDataGenerator(FEEdgeDataGenerator* pmd)
-{
-	m_imp->m_CD.push_back(pmd);
-}
-
-//-----------------------------------------------------------------------------
-FEEdgeDataGenerator* FEModel::GetEdgeDataGenerator(int i)
-{
-	return m_imp->m_CD[i];
+	return m_imp->m_MD[i];
 }
 
 //-----------------------------------------------------------------------------
 //! get the number of mesh data generators
-int FEModel::EdgeDataGenerators() const
+int FEModel::MeshDataGenerators() const
 {
-	return (int)m_imp->m_CD.size();
-}
-
-//-----------------------------------------------------------------------------
-//! Add a mesh data generator to the model
-void FEModel::AddFaceDataGenerator(FEFaceDataGenerator* pmd)
-{
-	m_imp->m_FD.push_back(pmd);
-}
-
-//-----------------------------------------------------------------------------
-FEFaceDataGenerator* FEModel::GetFaceDataGenerator(int i)
-{
-	return m_imp->m_FD[i];
-}
-
-//-----------------------------------------------------------------------------
-//! get the number of mesh data generators
-int FEModel::FaceDataGenerators() const
-{
-	return (int)m_imp->m_FD.size();
-}
-
-//-----------------------------------------------------------------------------
-//! Add a mesh data generator to the model
-void FEModel::AddElemDataGenerator(FEElemDataGenerator* pmd)
-{
-	m_imp->m_ED.push_back(pmd);
-}
-
-//-----------------------------------------------------------------------------
-FEElemDataGenerator* FEModel::GetElemDataGenerator(int i)
-{
-	return m_imp->m_ED[i];
-}
-
-//-----------------------------------------------------------------------------
-//! get the number of mesh data generators
-int FEModel::ElemDataGenerators() const
-{
-	return (int)m_imp->m_ED.size();
+	return (int)m_imp->m_MD.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -1680,9 +1574,7 @@ void FEModel::EvaluateLoadControllers(double time)
 //! Evaluates all load curves at the specified time
 void FEModel::EvaluateDataGenerators(double time)
 {
-	for (int i = 0; i < NodeDataGenerators(); ++i) GetNodeDataGenerator(i)->Evaluate(time);
-	for (int i = 0; i < FaceDataGenerators(); ++i) GetFaceDataGenerator(i)->Evaluate(time);
-	for (int i = 0; i < ElemDataGenerators(); ++i) GetElemDataGenerator(i)->Evaluate(time);
+	for (int i = 0; i < MeshDataGenerators(); ++i) GetMeshDataGenerator(i)->Evaluate(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -2222,10 +2114,7 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		if (m_LCM) m_LCM->Serialize(ar);
 
 		// serialize data generators
-		ar & m_ND;
-		ar & m_CD;
-		ar & m_FD;
-		ar & m_ED;
+		ar & m_MD;
 
 		// load controllers and load parameters are streamed last
 		// since they can depend on other model parameters.

@@ -34,7 +34,7 @@ SOFTWARE.*/
 
 class FESolver;
 class FEPointFunction;
-class FEDataGenerator;
+class FEMeshDataGenerator;
 class FEDomainMap;
 class FENodalLoad;
 class FEEdgeLoad;
@@ -87,9 +87,9 @@ public:
 
 	struct FEBIOXML_API DataGen
 	{
-		FEDataGenerator*	gen;	// the data generator
-		FEDomainMap*		map;	// the destination map 
-		FEParamDouble*		pp;		// the param to which to apply the map (or null)
+		FEMeshDataGenerator*	gen;	// the data generator
+		FEDomainMap*			map;	// the destination map 
+		FEParamDouble*			pp;		// the param to which to apply the map (or null)
 	};
 
 public:
@@ -180,7 +180,7 @@ public:
 public:
 	void AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap, int index = 0);
 
-	void AddMeshDataGenerator(FEDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp);
+	void AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp);
 
 	// This will associate all mapped parameters to their assigned maps.
 	void ApplyParameterMaps();

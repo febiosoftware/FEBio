@@ -95,7 +95,7 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 
 	gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddNodeDataGenerator(gen);
+	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);
@@ -125,7 +125,7 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 
 	gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddFaceDataGenerator(gen);
+	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);
@@ -153,7 +153,7 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	gen->SetElementSet(elset);
 	gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddElemDataGenerator(gen);
+	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);

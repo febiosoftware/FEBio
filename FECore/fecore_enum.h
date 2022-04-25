@@ -253,10 +253,7 @@ enum SUPER_CLASS_ID {
 	FEDOMAIN2D_ID,					// derived from FEDomain2D
 	FESURFACE_ID,					// derived from FESurface
 	FEIC_ID,						// derived from FEInitialCondition
-	FENODEDATAGENERATOR_ID,			// derived from FENodeDataGenerator
-	FEEDGEDATAGENERATOR_ID,			// derived from FEEdgeDataGenerator
-	FEFACEDATAGENERATOR_ID,			// derived from FEFaceDataGenerator
-	FEELEMDATAGENERATOR_ID,			// derived from FEElemDataGenerator
+	FEMESHDATAGENERATOR_ID,			// derived from FEMeshDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FESCALARGENERATOR_ID,			// derived from FEScalarValuator
