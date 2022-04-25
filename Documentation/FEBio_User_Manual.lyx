@@ -61950,7 +61950,7 @@ where
 , 
 \begin_inset Formula 
 \[
-\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
+\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[-\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
 \]
 
 \end_inset
@@ -61958,7 +61958,7 @@ where
 and
 \begin_inset Formula 
 \[
-B=\frac{E}{2I_{0}^{1/2}}+\xi\left(I_{0}-1\right)^{\beta-1}\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]
+B=E\frac{2I_{0}\left(\beta-\frac{1}{2}+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)-1}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
 \]
 
 \end_inset
