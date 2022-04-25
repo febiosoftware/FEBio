@@ -329,7 +329,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			strcpy(ops.sztask, "optimize");
 			strcpy(ops.szctrl, argv[++i]);
 		}
-		else if (strcmp(sz, "-g") == 0)
+		else if ((strcmp(sz, "-g") == 0) || (strcmp(sz, "-g1") == 0))
 		{
 			ops.ndebug = 1;
 		}
