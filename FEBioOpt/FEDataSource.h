@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEPointFunction.h>
+#include <FECore/PointCurve.h>
 #include <functional>
 #include <FECore/NodeDataRecord.h>
 
@@ -90,7 +90,7 @@ private:
 	string	m_ord;				//!< name of ordinate parameter
 	std::function<double()>	m_fx;				//!< pointer to ordinate value
 	std::function<double()>	m_fy;				//!< pointer to variable data
-	FEPointFunction		m_rf;	//!< reaction force data
+	PointCurve		m_rf;	//!< reaction force data
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -145,5 +145,5 @@ private:
 private:
 	FELogNodeData*	m_data;
 	FENodeSet*		m_nodeSet;
-	FEPointFunction		m_rf;
+	PointCurve		m_rf;
 };

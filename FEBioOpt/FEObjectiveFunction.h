@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEPointFunction.h>
+#include <FECore/PointCurve.h>
 #include <vector>
 #include <string>
 #include "FEDataSource.h"
@@ -129,7 +129,7 @@ public:
 	void GetMeasurements(std::vector<double>& y);
 
 private:
-	FEPointFunction		m_lc;		//!< data load curve for evaluating measurements
+	PointCurve			m_lc;		//!< data load curve for evaluating measurements
 	FEDataSource*		m_src;		//!< source for evaluating functions
 };
 

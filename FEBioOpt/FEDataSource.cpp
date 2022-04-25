@@ -80,7 +80,7 @@ void FEDataParameter::update()
 	m_rf.Add(x, y);
 }
 
-FEDataParameter::FEDataParameter(FEModel* fem) : FEDataSource(fem), m_rf(fem)
+FEDataParameter::FEDataParameter(FEModel* fem) : FEDataSource(fem)
 {
 	m_ord = "fem.time";
 }
@@ -399,7 +399,7 @@ double FEDataFilterPositive::Evaluate(double t)
 
 
 //=================================================================================================
-FEDataFilterSum::FEDataFilterSum(FEModel* fem) : FEDataSource(fem), m_rf(fem)
+FEDataFilterSum::FEDataFilterSum(FEModel* fem) : FEDataSource(fem)
 {
 	m_data = nullptr;
 	m_nodeSet = nullptr;
