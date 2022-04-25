@@ -202,8 +202,10 @@ bool FEFiberExpPowLinear::Validate()
 
 	// initialize material constants
 	m_I0 = m_lam0*m_lam0;
-    m_ksi = m_E*pow(m_I0-1,2-m_beta)*exp(m_alpha*pow(m_I0-1,m_beta))/(4*pow(m_I0,1.5)*(m_beta-1+m_alpha*m_beta*pow(m_I0-1,m_beta)));
-    m_b = m_ksi*pow(m_I0-1,m_beta-1)*exp(m_alpha*pow(m_I0-1,m_beta))+m_E/2/sqrt(m_I0);
+    m_ksi = m_E*pow(m_I0-1,2-m_beta)*exp(-m_alpha*pow(m_I0-1,m_beta))
+    /(4*pow(m_I0,1.5)*(m_beta-1+m_alpha*m_beta*pow(m_I0-1,m_beta)));
+    m_b = m_E*(2*m_I0*(m_beta-0.5+m_alpha*m_beta*pow(m_I0-1,m_beta))-1)
+    /(4*pow(m_I0,1.5)*(m_beta-1+m_alpha*m_beta*pow(m_I0-1,m_beta)));
 
 	return true;
 }
