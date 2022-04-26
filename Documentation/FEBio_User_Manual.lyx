@@ -58161,6 +58161,372 @@ Example:
 
 \begin_layout LyX-Code
 </material>
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Birzle-Wall 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Birzle-Wall"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material describes a Birzle-Wall material
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Birzle2019"
+literal "false"
+
+\end_inset
+
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Young's modulus, 
+\begin_inset Formula $E$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<v>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Poisson's ratio, 
+\begin_inset Formula $\nu$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Birzle-Wall c1 parameter, 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c3>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Birzle-Wall c3 parameter, 
+\begin_inset Formula $c_{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<d1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Birzle-Wall exponential d1 parameter, 
+\begin_inset Formula $d_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<d3>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Birzle-Wall exponential d3 parameter, 
+\begin_inset Formula $d_{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This model is derived from the following hyperelastic strain-energy function:
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W=c\left(\bar{I}_{1}-3\right)+\frac{c}{\beta}\left(\bar{I}_{3}^{-\beta}-1\right)+c_{1}\left(\bar{I}_{3}^{-\frac{1}{3}}\bar{I}_{1}-3\right)^{d_{1}}+c_{3}\left(\bar{I}_{3}^{\frac{1}{3}}-1\right)^{d_{3}},
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $I_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $I_{2}$
+\end_inset
+
+ are the first and second invariants of the right Cauchy-Green deformation
+ tensor 
+\series bold
+
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+
+\series default
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+c=\frac{E}{4\left(1+\nu\right)},
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta=\frac{\nu}{1-2\nu}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="birzle">
+\end_layout
+
+\begin_layout LyX-Code
+  <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+  <E>1913.7</E>
+\end_layout
+
+\begin_layout LyX-Code
+  <v>0.3413</v>
+\end_layout
+
+\begin_layout LyX-Code
+  <c1>278.2</c1>
+\end_layout
+
+\begin_layout LyX-Code
+  <c3>5.766</c3>
+\end_layout
+
+\begin_layout LyX-Code
+  <d1>3</d1>
+\end_layout
+
+\begin_layout LyX-Code
+  <d3>6</d3>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
 \end_layout
 
 \begin_layout Standard
