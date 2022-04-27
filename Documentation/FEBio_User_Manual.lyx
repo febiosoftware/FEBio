@@ -7911,7 +7911,7 @@ element sets the parameters that control the FEBio auto-time stepper.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -8069,7 +8069,7 @@ Maximum number of times a time step is restarted.
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8078,11 +8078,40 @@ aggressiveness
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Algorithm for cutting the time step size after a failed time step
+Algorithm for cutting the time step size after a failed time step (4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cutback
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Time step scale factor, used when aggressiveness = 1
 \end_layout
 
 \end_inset
@@ -8091,7 +8120,7 @@ Algorithm for cutting the time step size after a failed time step
 \begin_inset Text
 
 \begin_layout Plain Layout
-0
+0.5
 \end_layout
 
 \end_inset
@@ -8266,6 +8295,62 @@ plot_level
 \shape default
 parameter is set to PLOT_MUST_POINTS, then only the three defined time points
  will be stored to the plotfile.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+When FEBio fails to converge a time step, the time step size is reduced
+ and then FEBio tries to solve the time step again.
+ The algorithm for determining the reduced time step size, depends on the
+ 
+\emph on
+aggressiveness 
+\emph default
+parameter.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+
+\emph on
+aggressiveness = 0
+\emph default
+ (default): 
+\begin_inset Formula $\Delta t_{k+1}=\Delta t_{k}-(\Delta t_{k}/m_{r})$
+\end_inset
+
+, where 
+\begin_inset Formula $m_{r}$
+\end_inset
+
+is the max numer of retries (set by the 
+\emph on
+max_retries 
+\emph default
+parameter).
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+aggressiveness = 1: 
+\emph default
+
+\begin_inset Formula $\Delta t_{k+1}=\gamma\Delta t_{k}$
+\end_inset
+
+, where 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ is the cutback factor (i.e.
+ the 
+\emph on
+cutback 
+\emph default
+parameter).
+ 
 \end_layout
 
 \end_deeper
