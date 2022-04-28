@@ -125,4 +125,6 @@ private:
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
 	void ParseElementData(XMLTag& tag, FEDomainMap& map);
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
+	void ParseMaterialAxes(XMLTag& tag, FEElementSet& set);
+	void ParseMaterialFibers(XMLTag& tag, FEElementSet& set);
 };
