@@ -37,8 +37,6 @@ BEGIN_FECORE_CLASS(FEGenericRigidJoint, FERigidConnector);
 	ADD_PARAMETER(m_laugon , "laugon" );
 	ADD_PARAMETER(m_eps    , "penalty");
 	ADD_PARAMETER(m_tol    , "tolerance");
-	ADD_PARAMETER(m_nRBa   , "body_a" );
-	ADD_PARAMETER(m_nRBb   , "body_b" );
 	ADD_PARAMETER(m_q0     , "joint"  );
 	ADD_PARAMETER(m_dc[0]  , "prescribe_x" , m_bc[0]);
 	ADD_PARAMETER(m_dc[1]  , "prescribe_y" , m_bc[1]);
