@@ -51,6 +51,7 @@ protected: // required functions of FENodalLoad
 
 private:
 	FEParamVec3		m_f;		//!< the applied force
+	bool			m_shellBottom;
 
 	DECLARE_FECORE_CLASS();
 };
