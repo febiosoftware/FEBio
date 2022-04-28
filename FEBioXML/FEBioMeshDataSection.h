@@ -123,5 +123,6 @@ protected:
 private:
 	void ParseSurfaceData(XMLTag& tag, FESurfaceMap& map);
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
+	void ParseElementData(XMLTag& tag, FEDomainMap& map);
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
 };
