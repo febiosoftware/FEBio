@@ -171,20 +171,24 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	// get the type
 	const char* sztype = tag.AttributeValue("type", true);
 
-	// get the name or var (required!)
-	const char* szname = tag.AttributeValue("name");
+	if (strcmp(sztype, "shell thickness") == 0) ParseShellThickness(tag, *elset);
+	else
+	{
+		// get the name or var (required!)
+		const char* szname = tag.AttributeValue("name");
 
-	FEElemDataGenerator* gen = fecore_new<FEElemDataGenerator>(sztype, &fem);
-	gen->SetElementSet(elset);
-	gen->SetName(szname);
+		FEElemDataGenerator* gen = fecore_new<FEElemDataGenerator>(sztype, &fem);
+		gen->SetElementSet(elset);
+		gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
+		GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
-	// read the parameters
-	ReadParameterList(tag, gen);
+		// read the parameters
+		ReadParameterList(tag, gen);
 
-	// Add it to the list (will be applied after the rest of the model was read in)
-	GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
+		// Add it to the list (will be applied after the rest of the model was read in)
+		GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -241,6 +245,74 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
 			}
 		}
 		else throw XMLReader::InvalidValue(tag);
+		++tag;
+	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection4::ParseShellThickness(XMLTag& tag, FEElementSet& set)
+{
+	if (tag.isleaf())
+	{
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		double h[FEElement::MAX_NODES];
+		int nval = tag.value(h, FEElement::MAX_NODES);
+
+		for (int i = 0; i < set.Elements(); ++i)
+		{
+			FEShellElement* pel = dynamic_cast<FEShellElement*>(&set.Element(i));
+			if (pel == 0) throw XMLReader::InvalidValue(tag);
+
+			if (pel->Nodes() != nval) throw XMLReader::InvalidValue(tag);
+			for (int j = 0; j < nval; ++j) pel->m_h0[j] = h[j];
+		}
+	}
+	else
+	{
+		vector<ELEMENT_DATA> data;
+		ParseElementData(tag, set, data, FEElement::MAX_NODES);
+		for (int i = 0; i < (int)data.size(); ++i)
+		{
+			ELEMENT_DATA& di = data[i];
+			if (di.nval > 0)
+			{
+				FEElement& el = set.Element(i);
+
+				if (el.Class() != FE_ELEM_SHELL) throw XMLReader::InvalidTag(tag);
+				FEShellElement& shell = static_cast<FEShellElement&> (el);
+
+				int ne = shell.Nodes();
+				if (ne != di.nval) throw XMLReader::InvalidTag(tag);
+				for (int j = 0; j < ne; ++j) shell.m_h0[j] = di.val[j];
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection4::ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues)
+{
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nelems = set.Elements();
+
+	// resize the array
+	values.resize(nelems);
+	for (int i = 0; i < nelems; ++i) values[i].nval = 0;
+
+	++tag;
+	do
+	{
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		ELEMENT_DATA& data = values[n];
+		data.nval = tag.value(data.val, nvalues);
 		++tag;
 	} while (!tag.isend());
 }
