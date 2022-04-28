@@ -40,8 +40,7 @@ BEGIN_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
 	ADD_PARAMETER(m_c3  , "c3")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c4  , "c4");
 	ADD_PARAMETER(m_c5  , "c5");
-	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda"); // consider obsolete (use lam_max)
-	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
+	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
 	
 	ADD_PROPERTY(m_fiber, "fiber");
