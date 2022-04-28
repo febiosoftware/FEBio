@@ -23,97 +23,83 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
-#include "FEBioRigidSection.h"
+#include "FEBioRigidSection4.h"
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModelComponent.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/FEBoundaryCondition.h>
+#include <FECore/FEInitialCondition.h>
 
-void FEBioRigidSection::Parse(XMLTag& tag)
+void FEBioRigidSection4::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
 	++tag;
 	do
 	{
-		if      (tag == "rigid_constraint") ParseRigidBC(tag);
-		else if (tag == "rigid_connector" ) ParseRigidConnector(tag);
+		if      (tag == "rigid_bc"       ) ParseRigidBC(tag);
+		else if (tag == "rigid_ic"       ) ParseRigidIC(tag);
+		else if (tag == "rigid_load"     ) ParseRigidLoad(tag);
+		else if (tag == "rigid_connector") ParseRigidConnector(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
-	} 
-	while (!tag.isend());
+	} while (!tag.isend());
 }
 
-void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
+void FEBioRigidSection4::ParseRigidBC(XMLTag& tag)
 {
 	FEModel* fem = GetFEModel();
 	FEModelBuilder& feb = *GetBuilder();
 
+	// get the name
+	const char* szname = tag.AttributeValue("name", true);
+
 	// get the type
 	const char* sztype = tag.AttributeValue("type");
 
-	if (strcmp(sztype, "fix") == 0)
-	{
-		// create the fixed dof
-		FEBoundaryCondition* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC", fem);
-		feb.AddRigidComponent(pBC);
-		ReadParameterList(tag, pBC);
-	}
-	else if (strcmp(sztype, "prescribe") == 0)
-	{
-		// create the rigid displacement constraint
-		FEBoundaryCondition* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", fem);
-		feb.AddRigidComponent(pDC);
-		ReadParameterList(tag, pDC);
-	}
-	else if (strcmp(sztype, "force") == 0)
-	{
-		// create the rigid body force
-		FEModelLoad* pFC = fecore_new_class<FEModelLoad>("FERigidBodyForce", fem);
-		feb.AddModelLoad(pFC);
-		ReadParameterList(tag, pFC);
-	}
-	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
-	{
-		FEBoundaryCondition* pic = fecore_new_class<FEBoundaryCondition>("FERigidBodyVelocity", fem);
-		feb.AddRigidComponent(pic);
-		ReadParameterList(tag, pic);
-	}
-	else if (strcmp(sztype, "initial_rigid_angular_velocity") == 0)
-	{
-		FEBoundaryCondition* pic = fecore_new_class<FEBoundaryCondition>("FERigidBodyAngularVelocity", fem);
-		feb.AddRigidComponent(pic);
-		ReadParameterList(tag, pic);
-	}
-    else if (strcmp(sztype, "follower force") == 0)
-    {
-        FEModelLoad* rc = fecore_new_class<FEModelLoad>("FERigidFollowerForce", fem);
-        feb.AddModelLoad(rc);
-        ReadParameterList(tag, rc);
-    }
-    else if (strcmp(sztype, "follower moment") == 0)
-    {
-		FEModelLoad* rc = fecore_new_class<FEModelLoad>("FERigidFollowerMoment", fem);
-        feb.AddModelLoad(rc);
-        ReadParameterList(tag, rc);
-    }
-	else
-	{
-		// create the rigid constraint
-		FEBoundaryCondition* pBC = fecore_new<FEBoundaryCondition>(sztype, fem);
-		if (pBC == nullptr)  throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		feb.AddRigidComponent(pBC);
-		ReadParameterList(tag, pBC);
-	}
+	FEBoundaryCondition* bc = fecore_new<FEBoundaryCondition>(sztype, fem);
+	if (szname) bc->SetName(szname);
+
+	GetBuilder()->AddRigidComponent(bc);
+	ReadParameterList(tag, bc);
 }
 
-void FEBioRigidSection::ParseRigidConnector(XMLTag& tag)
+void FEBioRigidSection4::ParseRigidIC(XMLTag& tag)
+{
+	FEModel* fem = GetFEModel();
+
+	// get the name
+	const char* szname = tag.AttributeValue("name", true);
+
+	// get the type
+	const char* sztype = tag.AttributeValue("type");
+
+	FEInitialCondition* ic = fecore_new<FEInitialCondition>(sztype, fem);
+	if (szname) ic->SetName(szname);
+
+	GetBuilder()->AddRigidComponent(ic);
+	ReadParameterList(tag, ic);
+}
+
+void FEBioRigidSection4::ParseRigidLoad(XMLTag& tag)
+{
+	// get the name
+	const char* szname = tag.AttributeValue("name", true);
+
+	// get the type
+	const char* sztype = tag.AttributeValue("type");
+
+	FEModelLoad* ml = fecore_new<FEModelLoad>(sztype, GetFEModel());
+	if (szname) ml->SetName(szname);
+
+	GetBuilder()->AddRigidComponent(ml);
+	ReadParameterList(tag, ml);
+}
+
+void FEBioRigidSection4::ParseRigidConnector(XMLTag& tag)
 {
 	const char* sztype = tag.AttributeValue("type");
 

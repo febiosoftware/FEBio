@@ -99,7 +99,7 @@ FEDomain* FEBioModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat
 }
 
 //-----------------------------------------------------------------------------
-void FEBioModelBuilder::AddRigidBC(FEStepComponent* pmc)
+void FEBioModelBuilder::AddRigidComponent(FEStepComponent* pmc)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(GetFEModel());
 
@@ -115,7 +115,7 @@ void FEBioModelBuilder::AddRigidBC(FEStepComponent* pmc)
 	if (ric) { fem.AddRigidInitialCondition(ric); return; }
 
 	FEModelLoad* pml = dynamic_cast<FEModelLoad*>(pmc);
-	if (pml) AddModelLoad(pml);
+	if (pml) { AddModelLoad(pml); return; }
 
 	assert(false);
 }

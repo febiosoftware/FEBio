@@ -150,7 +150,7 @@ public:
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 
 	// TODO: Try to remove these
-	virtual void AddRigidBC(FEStepComponent* prc);
+	virtual void AddRigidComponent(FEStepComponent* prc);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }

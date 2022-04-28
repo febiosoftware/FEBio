@@ -119,4 +119,7 @@ protected:
 	void ParseNodalData(XMLTag& tag);
 	void ParseSurfaceData(XMLTag& tag);
 	void ParseElementData(XMLTag& tag);
+
+private:
+	void ParseSurfaceData(XMLTag& tag, FESurfaceMap& map);
 };

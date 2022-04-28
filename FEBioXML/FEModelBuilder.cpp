@@ -273,7 +273,7 @@ void FEModelBuilder::AddNonlinearConstraint(FENLConstraint* pnc)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddRigidBC(FEStepComponent* pmc) { assert(false); }
+void FEModelBuilder::AddRigidComponent(FEStepComponent* pmc) { assert(false); }
 
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions

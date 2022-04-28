@@ -44,6 +44,9 @@ SOFTWARE.*/
 #include <FECore/FEConstValueVec3.h>
 #include <sstream>
 
+// defined in FEBioMeshDataSection3.cpp
+extern FEDataType str2datatype(const char* szdataType);
+
 //-----------------------------------------------------------------------------
 #ifdef WIN32
 #define szcmp    _stricmp
@@ -120,15 +123,37 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// see if there is a generator
-	FEFaceDataGenerator* gen = fecore_new<FEFaceDataGenerator>(sztype, &fem);
-	if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", sztype);
+	if (sztype)
+	{
+		FEFaceDataGenerator* gen = fecore_new<FEFaceDataGenerator>(sztype, &fem);
+		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-	gen->SetName(szname);
+		gen->SetName(szname);
 
-	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
+		GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
-	// read the parameters
-	ReadParameterList(tag, gen);
+		// read the parameters
+		ReadParameterList(tag, gen);
+	}
+	else
+	{
+		// get the data type
+		const char* szdataType = tag.AttributeValue("datatype", true);
+		if (szdataType == nullptr) szdataType = "scalar";
+		FEDataType dataType = str2datatype(szdataType);
+		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
+
+		// create the data map
+		FESurfaceMap* map = new FESurfaceMap(dataType);
+		map->Create(surf);
+		map->SetName(szname);
+
+		// add it to the mesh
+		mesh.AddDataMap(map);
+
+		// read the data
+		ParseSurfaceData(tag, *map);
+	}
 }
 
 void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
@@ -160,4 +185,62 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 
 	// Add it to the list (will be applied after the rest of the model was read in)
 	GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
+{
+	const FEFacetSet* set = map.GetFacetSet();
+	if (set == nullptr) throw XMLReader::InvalidTag(tag);
+
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nelems = set->Faces();
+
+	FEDataType dataType = map.DataType();
+	int dataSize = map.DataSize();
+	int m = map.MaxNodes();
+	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
+
+	++tag;
+	do
+	{
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		int nread = tag.value(data, m * dataSize);
+		if (nread == dataSize)
+		{
+			switch (dataType)
+			{
+			case FE_DOUBLE:	map.setValue(n, data[0]); break;
+			case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
+			case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+			default:
+				assert(false);
+			}
+		}
+		else if (nread == m * dataSize)
+		{
+			double* pd = data;
+			for (int i = 0; i < m; ++i, pd += dataSize)
+			{
+				switch (dataType)
+				{
+				case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
+				case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;
+				case FE_VEC3D:	map.setValue(n, i, vec3d(pd[0], pd[1], pd[2])); break;
+				default:
+					assert(false);
+				}
+			}
+		}
+		else throw XMLReader::InvalidValue(tag);
+		++tag;
+	} while (!tag.isend());
 }

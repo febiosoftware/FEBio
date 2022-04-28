@@ -1326,7 +1326,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 
 			// create the rigid displacement constraint
 			FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", &fem);
-			feb.AddRigidBC(pDC);
+			feb.AddRigidComponent(pDC);
 
 			pDC->SetParameter("rb", nmat);
 			pDC->SetParameter("dof", bc);
@@ -1406,7 +1406,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 
 			// create the fixed dof
 			FEBoundaryCondition* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC",  &fem);
-			feb.AddRigidBC(pBC);
+			feb.AddRigidComponent(pBC);
 
 			pBC->SetParameter("rb", nmat);
 
@@ -1426,7 +1426,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			pic->SetParameter("value", v);
 
 			// add to model
-			feb.AddRigidBC(pic);
+			feb.AddRigidComponent(pic);
 		}
 		else if (tag == "initial_angular_velocity")
 		{
@@ -1440,7 +1440,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			pic->SetParameter("value", w);
 
 			// add to model
-			feb.AddRigidBC(pic);
+			feb.AddRigidComponent(pic);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

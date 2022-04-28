@@ -451,8 +451,19 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		}
 		else if (strcmp(var, "rigid_materials") == 0)
 		{
-			int n = atoi(val);
-			pp->value<int>() = n;
+			if (is_number(val))
+			{
+				int n = atoi(val);
+				pp->value<int>() = n;
+			}
+			else
+			{
+				FEModel* fem = GetFEModel();
+				FEMaterial* mat = fem->FindMaterial(val);
+				if (mat == nullptr) return false;
+				int n = mat->GetID();
+				pp->value<int>() = n;
+			}
 			return true;
 		}
 		else return false;
