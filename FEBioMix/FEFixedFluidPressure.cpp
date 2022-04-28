@@ -37,5 +37,5 @@ bool FEFixedFluidPressure::Init()
 {
 	m_dofs.clear();
 	m_dofs.push_back(GetDOFIndex("p"));
-	return FEFixedBC::Init();
+	return FEFixedDOF::Init();
 }
