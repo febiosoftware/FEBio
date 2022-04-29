@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEDataMathGenerator.h"
+#include "FENodeDataMap.h"
 #include "MathObject.h"
 #include "MObjBuilder.h"
 #include "FEMesh.h"
@@ -75,6 +76,21 @@ bool FEDataMathGenerator::Init()
 	}
 
 	return true;
+}
+
+FENodeDataMap* FEDataMathGenerator::Generate()
+{
+	assert(m_nodeSet);
+	if (m_nodeSet == nullptr) return nullptr;
+	FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);
+	map->Create(m_nodeSet);
+	if (FENodeDataGenerator::Generate(*map) == false)
+	{
+		delete map;
+		map = nullptr;
+		assert(false);
+	}
+	return map;
 }
 
 void FEDataMathGenerator::value(const vec3d& r, double& data)

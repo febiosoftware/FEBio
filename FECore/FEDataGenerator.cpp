@@ -56,7 +56,12 @@ void FEMeshDataGenerator::Evaluate(double time)
 //-----------------------------------------------------------------------------
 FENodeDataGenerator::FENodeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
+	m_nodeSet = nullptr;
+}
 
+void FENodeDataGenerator::SetNodeSet(FENodeSet* nodeSet)
+{
+	m_nodeSet = nodeSet;
 }
 
 // generate the data array for the given node set
@@ -83,6 +88,12 @@ bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 	}
 
 	return true;
+}
+
+FENodeDataMap* FENodeDataGenerator::Generate()
+{
+	assert(false);
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------

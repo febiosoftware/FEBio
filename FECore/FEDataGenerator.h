@@ -75,6 +75,14 @@ public:
 
 	// generate the data array for the given node set
 	virtual bool Generate(FENodeDataMap& ar);
+
+	virtual FENodeDataMap* Generate();
+
+public:
+	void SetNodeSet(FENodeSet* nodeSet);
+
+protected:
+	FENodeSet* m_nodeSet;
 };
 
 //-----------------------------------------------------------------------------

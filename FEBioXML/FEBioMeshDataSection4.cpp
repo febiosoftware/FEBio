@@ -97,11 +97,15 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 	if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	gen->SetName(szname);
+	gen->SetNodeSet(nset);
 
 	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 	// read the parameters
 	ReadParameterList(tag, gen);
+
+	// Add it to the list (will be applied after the rest of the model was read in)
+	GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
 }
 
 void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)

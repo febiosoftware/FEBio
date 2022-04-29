@@ -829,48 +829,82 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 	FEMesh& mesh = GetMesh();
 	for (int i = 0; i < m_mapgen.size(); ++i)
 	{
-		// TODO: This is going to break quickly!
-		FEElemDataGenerator* gen = dynamic_cast<FEElemDataGenerator*>(m_mapgen[i].gen);
-		FEDomainMap* map = m_mapgen[i].map;
-		FEParamDouble* pp = m_mapgen[i].pp;
+		FEMeshDataGenerator* gen = m_mapgen[i].gen;
 
-		// initialize the generator
+		// try to initialize the generator
 		if (gen->Init() == false) return false;
 
-		// generate the data
-		if (map)
+		FENodeDataGenerator* ngen = dynamic_cast<FENodeDataGenerator*>(gen);
+		if (ngen)
 		{
-			if (gen->Generate(*map) == false) return false;
-		}
-		else
-		{
-			map = gen->Generate();
-			map->SetName(gen->GetName());
-		}
+			// generate the node data map
+			FENodeDataMap* map = ngen->Generate();
+			if (map == nullptr) return false;
 
-		// see if this map is already defined
-		string mapName = map->GetName();
-		FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
-		if (oldMap)
-		{
-			// it is, so merge it
-			oldMap->Merge(*map);
+			map->SetName(ngen->GetName());
 
-			// we can now delete this map
-			delete map;
-		}
-		else
-		{
-			// nope, so add it
-			map->SetName(mapName);
-			mesh.AddDataMap(map);
-
-			// apply the map
-			if (pp)
+			// see if this map is already defined
+			string mapName = map->GetName();
+			FENodeDataMap* oldMap = dynamic_cast<FENodeDataMap*>(mesh.FindDataMap(mapName));
+			if (oldMap)
 			{
-				FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
-				val->setDataMap(map);
-				pp->setValuator(val);
+				// TODO: implement merge
+				assert(false);
+				// it is, so merge it
+//				oldMap->Merge(*map);
+
+				// we can now delete this map
+				delete map;
+			}
+			else
+			{
+				// nope, so add it
+				map->SetName(mapName);
+				mesh.AddDataMap(map);
+			}
+		}
+
+		FEElemDataGenerator* egen = dynamic_cast<FEElemDataGenerator*>(gen);
+		if (egen)
+		{
+			FEDomainMap* map = m_mapgen[i].map;
+			FEParamDouble* pp = m_mapgen[i].pp;
+
+			// generate the data
+			if (map)
+			{
+				if (egen->Generate(*map) == false) return false;
+			}
+			else
+			{
+				map = egen->Generate();
+				map->SetName(egen->GetName());
+			}
+
+			// see if this map is already defined
+			string mapName = map->GetName();
+			FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
+			if (oldMap)
+			{
+				// it is, so merge it
+				oldMap->Merge(*map);
+
+				// we can now delete this map
+				delete map;
+			}
+			else
+			{
+				// nope, so add it
+				map->SetName(mapName);
+				mesh.AddDataMap(map);
+
+				// apply the map
+				if (pp)
+				{
+					FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+					val->setDataMap(map);
+					pp->setValuator(val);
+				}
 			}
 		}
 	}

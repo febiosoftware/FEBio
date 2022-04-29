@@ -121,7 +121,7 @@ REGISTER_FECORE_CLASS(FEStepFunction  , "step");
 REGISTER_FECORE_CLASS(FEMathFunction  , "math");
 
 // data generators
-//REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
+REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
