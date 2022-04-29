@@ -45,7 +45,25 @@ public:
 
 private:
 	FEParamVec3		m_v0;
-	bool			m_shellBottom;
+
+	DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMECH_API FEInitialShellVelocity : public FENodalIC
+{
+public:
+	FEInitialShellVelocity(FEModel* fem);
+
+	bool Init() override;
+
+	// set the initial value
+	void SetValue(const vec3d& v0);
+
+	// return the values for node i
+	void GetNodalValues(int inode, std::vector<double>& values) override;
+
+private:
+	FEParamVec3		m_v0;
 
 	DECLARE_FECORE_CLASS();
 };

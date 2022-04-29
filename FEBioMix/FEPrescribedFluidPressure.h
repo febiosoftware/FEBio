@@ -34,7 +34,15 @@ public:
 	bool Init() override;
 
 private:
-	bool	m_shellBottom;
+	DECLARE_FECORE_CLASS();
+};
 
+class FEBIOMIX_API FEPrescribedShellFluidPressure : public FEPrescribedDOF
+{
+public:
+	FEPrescribedShellFluidPressure(FEModel* fem);
+	bool Init() override;
+
+private:
 	DECLARE_FECORE_CLASS();
 };

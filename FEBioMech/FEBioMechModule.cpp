@@ -545,6 +545,7 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// classes derived from FEInitialCondition
 	REGISTER_FECORE_CLASS(FEInitialVelocity, "velocity");
+	REGISTER_FECORE_CLASS(FEInitialShellVelocity, "shell velocity");
 	REGISTER_FECORE_CLASS(FEInitialPreStrain, "prestrain");
 
 	//-----------------------------------------------------------------------------

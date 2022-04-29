@@ -187,13 +187,16 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Boundary conditions
-	REGISTER_FECORE_CLASS(FEFixedFluidPressure     , "zero fluid pressure");
-	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure, "prescribed fluid pressure");
+	REGISTER_FECORE_CLASS(FEFixedFluidPressure          , "zero fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure     , "prescribed fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedShellFluidPressure, "prescribed shell fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// Initial conditions
 	REGISTER_FECORE_CLASS(FEInitialFluidPressure     , "initial fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialShellFluidPressure, "initial shell fluid pressure");
 	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
+	REGISTER_FECORE_CLASS(FEInitialShellConcentration, "initial shell concentration");
 
 	//-----------------------------------------------------------------------------
 	// Nodal loads

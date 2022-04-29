@@ -31,7 +31,12 @@ class FEInitialConcentration : public FEInitialDOF
 public:
 	FEInitialConcentration(FEModel* fem);
 	DECLARE_FECORE_CLASS();
+};
 
-private:
-	bool	m_shellBottom;
+
+class FEInitialShellConcentration : public FEInitialDOF
+{
+public:
+	FEInitialShellConcentration(FEModel* fem);
+	DECLARE_FECORE_CLASS();
 };

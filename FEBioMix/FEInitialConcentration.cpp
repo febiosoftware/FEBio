@@ -29,11 +29,18 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
 	ADD_PARAMETER(m_data, "value");
-	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
 
 FEInitialConcentration::FEInitialConcentration(FEModel* fem) : FEInitialDOF(fem)
 {
-	// TODO: I need to figure out a way to actually select the bottom concentration dofs!
-	m_shellBottom = false;
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialShellConcentration, FEInitialCondition)
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:shell_concentration)");
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
+
+FEInitialShellConcentration::FEInitialShellConcentration(FEModel* fem) : FEInitialDOF(fem)
+{
 }

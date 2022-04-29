@@ -33,7 +33,13 @@ public:
 	bool Init() override;
 
 	DECLARE_FECORE_CLASS();
+};
 
-private:
-	bool	m_shellBottom;
+class FEInitialShellFluidPressure : public FEInitialDOF
+{
+public:
+	FEInitialShellFluidPressure(FEModel* fem);
+	bool Init() override;
+
+	DECLARE_FECORE_CLASS();
 };

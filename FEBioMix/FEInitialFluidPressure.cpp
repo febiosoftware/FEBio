@@ -28,20 +28,30 @@ SOFTWARE.*/
 //=============================================================================
 BEGIN_FECORE_CLASS(FEInitialFluidPressure, FEInitialCondition)
 	ADD_PARAMETER(m_data, "value");
-	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
 
 FEInitialFluidPressure::FEInitialFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
-	m_shellBottom = false;
 }
 
 bool FEInitialFluidPressure::Init()
 {
-	if (m_shellBottom == false)
-		if (SetDOF("p") == false) return false;
-	else
-		if (SetDOF("q") == false) return false;
+	if (SetDOF("p") == false) return false;
+	return FEInitialDOF::Init();
+}
 
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialShellFluidPressure, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
+
+FEInitialShellFluidPressure::FEInitialShellFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+{
+}
+
+bool FEInitialShellFluidPressure::Init()
+{
+	if (SetDOF("q") == false) return false;
 	return FEInitialDOF::Init();
 }

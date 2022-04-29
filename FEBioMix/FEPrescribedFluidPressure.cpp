@@ -32,23 +32,32 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedFluidPressure, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_brelative, "relative");
-	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
 
 FEPrescribedFluidPressure::FEPrescribedFluidPressure(FEModel* fem) : FEPrescribedDOF(fem)
 {
-	m_shellBottom = false;
 }
 
 bool FEPrescribedFluidPressure::Init()
 {
-	if (m_shellBottom == false)
-	{
-		if (SetDOF("p") == false) return false;
-	}
-	else
-	{
-		if (SetDOF("q") == false) return false;
-	}
+	if (SetDOF("p") == false) return false;
+	return FEPrescribedDOF::Init();
+}
+
+//=======================================================================================
+// NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
+//       in the parameters of FEPrescribedDOF. 
+BEGIN_FECORE_CLASS(FEPrescribedShellFluidPressure, FEBoundaryCondition)
+	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
+	ADD_PARAMETER(m_brelative, "relative");
+END_FECORE_CLASS();
+
+FEPrescribedShellFluidPressure::FEPrescribedShellFluidPressure(FEModel* fem) : FEPrescribedDOF(fem)
+{
+}
+
+bool FEPrescribedShellFluidPressure::Init()
+{
+	if (SetDOF("q") == false) return false;
 	return FEPrescribedDOF::Init();
 }
