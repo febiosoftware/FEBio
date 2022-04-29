@@ -243,8 +243,7 @@ void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairCons
 	if (GetBuilder()->BuildSurface(*pci->GetPrimarySurface(), *surfacePair->GetPrimarySurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// get the parameter list
-	FEParameterList& pl = pci->GetParameterList();
-	ReadParameterList(tag, pl);
+	ReadParameterList(tag, pci);
 
 	// Make sure we have both surfaces
 	FESurface* pss = pci->GetPrimarySurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingPrimarySurface ();

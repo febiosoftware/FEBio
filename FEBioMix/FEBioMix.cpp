@@ -438,6 +438,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
 	REGISTER_FECORE_CLASS(FESlidingInterfaceMP      , "sliding-multiphasic"    );
+	REGISTER_FECORE_CLASS(FEAmbientConcentration    , "ambient_concentration"  );
 	REGISTER_FECORE_CLASS(FETiedMultiphasicInterface, "tied-multiphasic"       );
 
 	//-----------------------------------------------------------------------------

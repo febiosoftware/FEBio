@@ -40,6 +40,18 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEAmbientConcentration, FECoreClass)
+	ADD_PARAMETER(m_sol, "sol", FE_PARAM_ATTRIBUTE, "$(solutes)");
+	ADD_PARAMETER(m_ambc, "ambient_concentration")->MakeVolatile(false);
+END_FECORE_CLASS();
+
+FEAmbientConcentration::FEAmbientConcentration(FEModel* fem) : FECoreClass(fem) 
+{
+	m_sol = -1;
+	m_ambc = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
 	ADD_PARAMETER(m_atol     , "tolerance"            );
@@ -62,7 +74,8 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
 	ADD_PARAMETER(m_naugmin  , "minaug"               );
 	ADD_PARAMETER(m_naugmax  , "maxaug"               );
 	ADD_PARAMETER(m_ambp     , "ambient_pressure"     );
-	ADD_PARAMETER(m_ambctmp  , "ambient_concentration");
+
+	ADD_PROPERTY(m_ambctmp, "ambient_concentration");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -497,26 +510,6 @@ FESlidingInterfaceMP::~FESlidingInterfaceMP()
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingInterfaceMP::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    // get number of DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-	if (strcmp(p.name(), "ambient_concentration") == 0)
-	{
-		if (strcmp(szatt, "sol") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if ((id < 0) || (id >= MAX_CDOFS)) return false;
-			SetAmbientConcentration(id, m_ambctmp);
-			return true;
-		}
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
 bool FESlidingInterfaceMP::Init()
 {
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
@@ -549,11 +542,12 @@ bool FESlidingInterfaceMP::Init()
 	}
 
     // cycle through all the solutes and determine ambient concentrations
-	itridmap it;
-	idmap ambc = m_ambcinp;
-	for (int isol=0; isol<nsol; ++isol) {
-		it = ambc.find(isol);
-		if (it != ambc.end()) m_ambc[isol] = it->second;
+	for (int i = 0; i < m_ambctmp.size(); ++i)
+	{
+		FEAmbientConcentration* aci = m_ambctmp[i];
+		int isol = aci->m_sol - 1;
+		assert((isol >= 0) && (isol < nsol));
+		m_ambc[isol] = aci->m_ambc;
 	}
 
 	return true;

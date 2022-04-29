@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBiphasicContactSurface.h"
 #include "FESolute.h"
+#include <FECore/FECoreClass.h>
 #include <map>
 
 //-----------------------------------------------------------------------------
@@ -110,12 +111,25 @@ protected:
 	int	m_dofC;
 };
 
-typedef std::map<int,double> idmap;     //!< map integer id with double value
-typedef std::map<int,double>::iterator itridmap;
+//-----------------------------------------------------------------------------
+// helper class for reading ambient concentrations
+class FEAmbientConcentration : public FECoreClass
+{
+public:
+	FEAmbientConcentration(FEModel* fem);
+
+public:
+	int			m_sol;
+	double		m_ambc;
+
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEAmbientConcentration);
+};
 
 //-----------------------------------------------------------------------------
 class FEBIOMIX_API FESlidingInterfaceMP : public FEContactInterface
 {
+
 public:
 	//! constructor
 	FESlidingInterfaceMP(FEModel* pfem);
@@ -150,14 +164,8 @@ public:
     
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
-    
-    //! set parameter attribute for ambient concentrations
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
-    
-	//! set the ambient concentration
-	void SetAmbientConcentration(int id, double ambc) { m_ambcinp.insert(std::pair<int, double>(id, ambc)); }
-    
-    //! get solute data
+ 
+	//! get solute data
     FESoluteData* FindSoluteData(int nid);
 
 public:
@@ -219,8 +227,8 @@ public:
 	double	m_Tabs;					//!< absolute temperature
 	double	m_ambp;					//!< ambient pressure
 	vector<double>	m_ambc;         //!< ambient concentration
-    double  m_ambctmp;              //!< helper variable for reading in ambient concentrations of solutes
-    idmap	m_ambcinp;                 //!< ambient concentration of solute (input)
+
+	vector<FEAmbientConcentration*>	m_ambctmp;
 	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
 	vector<int> m_ssl;				//!< list of primary surface solutes common to both contact surfaces
 	vector<int> m_msl;				//!< list of secondary surface solutes common to both contact surfaces
