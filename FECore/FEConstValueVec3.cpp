@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEMeshPartition.h"
 #include "FENode.h"
 #include "quatd.h"
+#include <assert.h>
 
 //==================================================================================
 BEGIN_FECORE_CLASS(FEConstValueVec3, FEVec3dValuator)
@@ -320,4 +321,25 @@ FEVec3dValuator* FESphericalAnglesVectorGenerator::copy()
 	v->m_theta = m_theta;
 	v->m_phi = m_phi;
 	return v;
+}
+
+
+//=================================================================================================
+BEGIN_FECORE_CLASS(FEUserVectorGenerator, FEVec3dValuator)
+END_FECORE_CLASS();
+
+FEUserVectorGenerator::FEUserVectorGenerator(FEModel* fem) : FEVec3dValuator(fem)
+{
+}
+
+vec3d FEUserVectorGenerator::operator () (const FEMaterialPoint& mp)
+{
+	assert(false);
+	return vec3d(0, 0, 0);
+}
+
+FEVec3dValuator* FEUserVectorGenerator::copy()
+{
+	assert(false);
+	return fecore_alloc(FEUserVectorGenerator, GetFEModel());
 }

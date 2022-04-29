@@ -138,6 +138,7 @@ REGISTER_FECORE_CLASS(FESphericalVectorGenerator      , "spherical");
 REGISTER_FECORE_CLASS(FECylindricalVectorGenerator    , "cylindrical");
 REGISTER_FECORE_CLASS(FESphericalAnglesVectorGenerator, "angles");
 REGISTER_FECORE_CLASS(FEMappedValueVec3               , "map");
+REGISTER_FECORE_CLASS(FEUserVectorGenerator           , "user");
 
 // mat3d generators
 REGISTER_FECORE_CLASS(FEConstValueMat3d       , "const"      );

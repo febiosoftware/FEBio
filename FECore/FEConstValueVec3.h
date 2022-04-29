@@ -177,3 +177,18 @@ protected:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+// This class is mostly to support some older formats that used the "user" fiber
+// generator option. It actually doesn't generate any vectors and should not be used. 
+class FECORE_API FEUserVectorGenerator : public FEVec3dValuator
+{
+public:
+	FEUserVectorGenerator(FEModel* fem);
+
+	vec3d operator () (const FEMaterialPoint& mp) override;
+
+	FEVec3dValuator* copy() override;
+
+	DECLARE_FECORE_CLASS();
+};
