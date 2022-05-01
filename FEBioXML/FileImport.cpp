@@ -1035,29 +1035,26 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		for (int i = 0; i < nattr; ++i)
 		{
 			const char* szat = tag.m_att[i].m_szatt;
-			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
+			// If we get here, the container did not understand the attribute.
+			// If the attribute is a "lc", we interpret it as a load curve
+			if (strcmp(szat, "lc") == 0)
 			{
-				// If we get here, the container did not understand the attribute.
-				// If the attribute is a "lc", we interpret it as a load curve
-				if (strcmp(szat, "lc") == 0)
-				{
-					int lc = atoi(tag.m_att[i].m_szatv) - 1;
-					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+				int lc = atoi(tag.m_att[i].m_szatv) - 1;
+				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 
-					// make sure the parameter is volatile
-					if (pp->IsVolatile() == false)
-					{
-						throw XMLReader::InvalidAttribute(tag, szat);
-					}
-
-					GetFEModel()->AttachLoadController(pp, lc);
-				}
-				/*			else
+				// make sure the parameter is volatile
+				if (pp->IsVolatile() == false)
 				{
-				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+					throw XMLReader::InvalidAttribute(tag, szat);
 				}
-				*/
+
+				GetFEModel()->AttachLoadController(pp, lc);
 			}
+/*			else
+			{
+				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+			}
+*/
 			// This is not true. Parameters can have attributes that are used for other purposes. E.g. The local fiber option.
 			//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}

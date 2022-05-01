@@ -478,10 +478,6 @@ bool FEParamContainer::Validate()
 }
 
 //-----------------------------------------------------------------------------
-//! If a parameter has attributes, this function will be called
-bool FEParamContainer::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
-
-//-----------------------------------------------------------------------------
 void FEParamContainer::CopyParameterListState(const FEParameterList& pl)
 {
 	FEParameterList& pl_this = GetParameterList();

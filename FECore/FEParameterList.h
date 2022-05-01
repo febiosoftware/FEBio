@@ -141,9 +141,6 @@ public:
 	virtual bool Validate();
 
 public:
-	//! If a parameter has attributes, this function will be called
-	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
-
 	//! This copies the state of a parameter list (i.e. assigned load curve IDs)
 	//! This function assumes that there is a one-to-one correspondence between
 	//! source and target parameter lists.
