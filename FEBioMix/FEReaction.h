@@ -56,3 +56,47 @@ public:
 protected:
     FESoluteInterface* m_psm;   //!< solute interface to parent class
 };
+
+
+//-----------------------------------------------------------------------------
+class FEBIOMIX_API FEReactionSpeciesRef : public FEMaterialProperty
+{
+public:
+    enum SpeciesType { UnknownSpecies, SoluteSpecies, SBMSpecies };
+
+public:
+    FEReactionSpeciesRef(FEModel* fem);
+
+    bool Init() override;
+
+    int GetSpeciesType() const;
+
+    bool IsSolute() const;
+    bool IsSBM() const;
+
+public:
+    int     m_speciesID;        // the species ID
+    int     m_v;                // stoichiometric coefficient
+
+    // these parameters are mostly for parsing older files that used "sol" or "sbm"
+    int     m_solId;
+    int     m_sbmId;
+
+private:
+    int     m_speciesType;  // solute or sbm?
+
+    DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMIX_API FEReactantSpeciesRef : public FEReactionSpeciesRef
+{
+public: FEReactantSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEReactantSpeciesRef)
+};
+
+class FEBIOMIX_API FEProductSpeciesRef : public FEReactionSpeciesRef {
+public: FEProductSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEProductSpeciesRef)
+};

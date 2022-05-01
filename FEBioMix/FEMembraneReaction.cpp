@@ -36,16 +36,36 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <stdlib.h>
 
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEInternalReactantSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vRi");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEInternalProductSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vPi");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEExternalReactantSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vRe");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEExternalProductSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vPe");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMembraneReaction, FEReaction)
 	ADD_PARAMETER(&m_Vbar  , FE_PARAM_DOUBLE, 1, "Vbar", &m_Vovr);
-	ADD_PARAMETER(m_vRtmp , "vR"  );
-	ADD_PARAMETER(m_vPtmp , "vP"  );
-	ADD_PARAMETER(m_vRitmp, "vRi");
-	ADD_PARAMETER(m_vPitmp, "vPi");
-	ADD_PARAMETER(m_vRetmp, "vRe");
-	ADD_PARAMETER(m_vPetmp, "vPe");
+
+    ADD_PROPERTY(m_vRtmp, "vR");
+    ADD_PROPERTY(m_vPtmp, "vP");
+    ADD_PROPERTY(m_vRitmp, "vRi");
+    ADD_PROPERTY(m_vPitmp, "vPi");
+    ADD_PROPERTY(m_vRetmp, "vRe");
+    ADD_PROPERTY(m_vPetmp, "vPe");
 
 	// set material properties
 	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
@@ -86,7 +106,45 @@ bool FEMembraneReaction::Init()
     if (m_pRev) m_pRev->m_pReact = this;
     
     //************* reactants and products in multiphasic domain **************
-    
+
+    // create the intmaps
+    for (int i = 0; i < m_vRtmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRtmp[i];
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solR, pvr->m_speciesID - 1, pvr->m_v);
+        if (pvr->IsSBM()) SetStoichiometricCoefficient(m_sbmR, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPtmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPtmp[i];
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solP, pvp->m_speciesID - 1, pvp->m_v);
+        if (pvp->IsSBM()) SetStoichiometricCoefficient(m_sbmP, pvp->m_speciesID - 1, pvp->m_v);
+    }
+    for (int i = 0; i < m_vRitmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRitmp[i];
+        assert(pvr->IsSolute());
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solRi, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPitmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPitmp[i];
+        assert(pvp->IsSolute());
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solPi, pvp->m_speciesID - 1, pvp->m_v);
+    }
+    for (int i = 0; i < m_vRetmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRetmp[i];
+        assert(pvr->IsSolute());
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solRe, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPetmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPetmp[i];
+        assert(pvp->IsSolute());
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solPe, pvp->m_speciesID - 1, pvp->m_v);
+    }
+
     // initialize the reaction coefficients
     const int nsol = m_psm->Solutes();
     const int nsbm = m_psm->SBMs();
@@ -191,90 +249,6 @@ bool FEMembraneReaction::Init()
 	}
     
     return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEMembraneReaction::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    // get number of DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-    if (strcmp(p.name(), "vR") == 0)
-    {
-        if (strcmp(szatt, "sbm") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if (id < 0) return false;
-            SetStoichiometricCoefficient(m_sbmR, id, m_vRtmp);
-            return true;
-        }
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solR, id, m_vRtmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vP") == 0)
-    {
-        if (strcmp(szatt, "sbm") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if (id < 0) return false;
-            SetStoichiometricCoefficient(m_sbmP, id, m_vPtmp);
-            return true;
-        }
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solP, id, m_vPtmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vRi") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solRi, id, m_vRitmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vPi") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solPi, id, m_vPitmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vRe") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solRe, id, m_vRetmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vPe") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solPe, id, m_vPetmp);
-            return true;
-        }
-    }
-    return false;
 }
 
 //-----------------------------------------------------------------------------

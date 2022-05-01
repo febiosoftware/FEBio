@@ -70,6 +70,33 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEBIOMIX_API FEInternalReactantSpeciesRef : public FEReactionSpeciesRef
+{
+public: FEInternalReactantSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEInternalReactantSpeciesRef)
+};
+
+class FEBIOMIX_API FEInternalProductSpeciesRef : public FEReactionSpeciesRef {
+public: FEInternalProductSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEInternalProductSpeciesRef)
+};
+
+class FEBIOMIX_API FEExternalReactantSpeciesRef : public FEReactionSpeciesRef
+{
+public: FEExternalReactantSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEExternalReactantSpeciesRef)
+};
+
+class FEBIOMIX_API FEExternalProductSpeciesRef : public FEReactionSpeciesRef {
+public: FEExternalProductSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEExternalProductSpeciesRef)
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for membrane reactions.
 class FEBIOMIX_API FEMembraneReaction : public FEReaction
 {
@@ -81,8 +108,6 @@ public:
     bool Init() override;
     
 public:
-    bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
-    
     //! set the forward reaction rate
     void SetForwardReactionRate(FEMembraneReactionRate* pfwd) { m_pFwd = pfwd; }
     
@@ -135,7 +160,14 @@ public:
     FEMembraneReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
     FEMembraneReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
     
-public:
+private:
+    vector<FEReactantSpeciesRef*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
+    vector<FEProductSpeciesRef*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
+    vector<FEInternalReactantSpeciesRef*> m_vRitmp;	//!< helper variable for reading in stoichiometric coefficients for internal reactants
+    vector<FEInternalProductSpeciesRef*> m_vPitmp;	//!< helper variable for reading in stoichiometric coefficients for internal products
+    vector<FEExternalReactantSpeciesRef*> m_vRetmp;	//!< helper variable for reading in stoichiometric coefficients for external reactants
+    vector<FEExternalProductSpeciesRef*> m_vPetmp;	//!< helper variable for reading in stoichiometric coefficients for external products
+
     intmap          m_solR;         //!< stoichiometric coefficients of solute reactants
     intmap          m_solP;         //!< stoichiometric coefficients of solute products
     intmap          m_sbmR;         //!< stoichiometric coefficients of solid-bound reactants
@@ -152,19 +184,13 @@ public:
     vector<int>     m_vR;           //!< stoichiometric coefficients of reactants
     vector<int>     m_vP;           //!< stoichiometric coefficients of products
     vector<int>     m_v;            //!< net stoichiometric coefficients of reactants and products
-    int             m_vRtmp;        //!< helper variable for reading in stoichiometric coefficients for reactants
-    int             m_vPtmp;        //!< helper variable for reading in stoichiometric coefficients for products
     int             m_NSOL;         //!< number of solutes in the model
     vector<int>     m_vRi;          //!< stoichiometric coefficients of reactants
     vector<int>     m_vPi;          //!< stoichiometric coefficients of products
     vector<int>     m_vi;           //!< net stoichiometric coefficients of reactants and products
-    int             m_vRitmp;       //!< helper variable for reading in stoichiometric coefficients for reactants
-    int             m_vPitmp;       //!< helper variable for reading in stoichiometric coefficients for products
     vector<int>     m_vRe;          //!< stoichiometric coefficients of reactants
     vector<int>     m_vPe;          //!< stoichiometric coefficients of products
     vector<int>     m_ve;           //!< net stoichiometric coefficients of reactants and products
-    int             m_vRetmp;       //!< helper variable for reading in stoichiometric coefficients for reactants
-    int             m_vPetmp;       //!< helper variable for reading in stoichiometric coefficients for products
 
     DECLARE_FECORE_CLASS();
     FECORE_BASE_CLASS(FEMembraneReaction)

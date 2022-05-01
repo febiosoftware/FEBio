@@ -60,56 +60,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEBIOMIX_API FEReactionSpeciesRef : public FEMaterialProperty
-{
-public:
-    enum SpeciesType { UnknownSpecies, SoluteSpecies, SBMSpecies };
-
-public:
-    FEReactionSpeciesRef(FEModel* fem);
-
-    bool Init() override;
-
-    int GetSpeciesType() const;
-
-    bool IsSolute() const;
-    bool IsSBM() const;
-
-public:
-    int     m_speciesID;        // the species ID
-    int     m_v;                // stoichiometric coefficient
-
-    // these parameters are mostly for parsing older files that used "sol" or "sbm"
-    int     m_solId;
-    int     m_sbmId;
-
-private:
-    int     m_speciesType;  // solute or sbm?
-
-    DECLARE_FECORE_CLASS();
-    FECORE_BASE_CLASS(FEReactionSpeciesRef)
-};
-
-class FEBIOMIX_API FEReactantSpeciesRefBase : public FEReactionSpeciesRef {
-public: FEReactantSpeciesRefBase(FEModel* fem) : FEReactionSpeciesRef(fem){}
-};
-
-class FEBIOMIX_API FEReactantSpeciesRef : public FEReactantSpeciesRefBase
-{
-public: FEReactantSpeciesRef(FEModel* fem) : FEReactantSpeciesRefBase(fem) {}
-      DECLARE_FECORE_CLASS();
-};
-
-class FEBIOMIX_API FEProductSpeciesRefBase : public FEReactionSpeciesRef {
-public: FEProductSpeciesRefBase(FEModel* fem) : FEReactionSpeciesRef(fem) {}
-};
-
-class FEBIOMIX_API FEProductSpeciesRef : public FEProductSpeciesRefBase {
-public: FEProductSpeciesRef(FEModel* fem) : FEProductSpeciesRefBase(fem) {}
-      DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
 //! Base class for chemical reactions.
 
 class FEBIOMIX_API FEChemicalReaction : public FEReaction
@@ -164,8 +114,8 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 public:
-    vector<FEReactantSpeciesRefBase*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
-    vector<FEProductSpeciesRefBase*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
+    vector<FEReactantSpeciesRef*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
+    vector<FEProductSpeciesRef*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
 
     FEReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
     FEReactionRate*    m_pRev;        //!< pointer to reverse reaction rate

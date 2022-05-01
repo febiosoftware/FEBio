@@ -425,6 +425,10 @@ void FEBioMix::InitModule()
 
 	REGISTER_FECORE_CLASS(FEReactantSpeciesRef, "vR");
 	REGISTER_FECORE_CLASS(FEProductSpeciesRef , "vP");
+	REGISTER_FECORE_CLASS(FEInternalReactantSpeciesRef, "vRi");
+	REGISTER_FECORE_CLASS(FEInternalProductSpeciesRef , "vPi");
+	REGISTER_FECORE_CLASS(FEExternalReactantSpeciesRef, "vRe");
+	REGISTER_FECORE_CLASS(FEExternalProductSpeciesRef , "vPe");
     
 	//-----------------------------------------------------------------------------
 	// Surface loads
