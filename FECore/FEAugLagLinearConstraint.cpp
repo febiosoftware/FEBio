@@ -33,44 +33,61 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
-void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
+BEGIN_FECORE_CLASS(FEAugLagLinearConstraintDOF, FECoreClass)
+	ADD_PARAMETER(m_node, "id", FE_PARAM_ATTRIBUTE, 0);
+	ADD_PARAMETER(m_bc, "bc", FE_PARAM_ATTRIBUTE, "$(dof_list)");
+	ADD_PARAMETER(m_val, "node")->setLongName("Value");
+END_FECORE_CLASS();
+
+FEAugLagLinearConstraintDOF::FEAugLagLinearConstraintDOF(FEModel* fem) : FECoreClass(fem)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_lam;
-
-		ar << (int) m_dof.size();
-		list<DOF>::iterator it = m_dof.begin();
-		for (int i=0; i<(int) m_dof.size(); ++i, ++it) ar << it->bc << it->node << it->val;
-	}
-	else
-	{
-		ar >> m_lam;
-
-		int n;
-		ar >> n;
-		DOF dof;
-		m_dof.clear();
-		for (int i=0; i<n; ++i)
-		{
-			ar >> dof.bc >> dof.node >> dof.val;
-			m_dof.push_back(dof);
-		}
-	}
+	m_node = m_bc = 0;
+	m_val = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FELinearConstraintSet, FESurfaceConstraint)
+BEGIN_FECORE_CLASS(FEAugLagLinearConstraint, FECoreClass)
+	ADD_PROPERTY(m_dof, "node");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+void FEAugLagLinearConstraint::ClearDOFs()
+{
+	for (int i = 0; i < m_dof.size(); ++i) delete m_dof[i];
+	m_dof.clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEAugLagLinearConstraint::AddDOF(int node, int bc, double val)
+{
+	FEAugLagLinearConstraintDOF* dof = fecore_alloc(FEAugLagLinearConstraintDOF, GetFEModel());
+	dof->m_node = node;
+	dof->m_bc = bc;
+	dof->m_val = val;
+	m_dof.push_back(dof);
+}
+
+//-----------------------------------------------------------------------------
+void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
+{
+    FECoreClass::Serialize(ar);
+    ar& m_lam;
+}
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FELinearConstraintSet, FENLConstraint)
 	ADD_PARAMETER(m_laugon , "laugon");
 	ADD_PARAMETER(m_tol    , "tol");
 	ADD_PARAMETER(m_eps    , "penalty");
     ADD_PARAMETER(m_rhs    , "rhs");
 	ADD_PARAMETER(m_naugmin, "minaug");
 	ADD_PARAMETER(m_naugmax, "maxaug");
+
+	ADD_PROPERTY(m_LC, "linear_constraint");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FESurfaceConstraint(pfem)
+FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfem)
 {
 	static int nc = 1;
 	m_nID = nc++;
@@ -87,16 +104,16 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FESurfaceConstrain
 void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
 {
 	FEMesh& mesh = GetMesh();
-	list<FEAugLagLinearConstraint*>& LC = m_LC;
+	vector<FEAugLagLinearConstraint*>& LC = m_LC;
 	vector<int> lm;
 	int N = (int)LC.size();
-	list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
+	vector<FEAugLagLinearConstraint*>::iterator it = LC.begin();
 	for (int i=0; i<N; ++i, ++it)
 	{
 		int n = (int)(*it)->m_dof.size();
 		lm.resize(n);
 		FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-		for (int j = 0; j<n; ++j, ++is) lm[j] = mesh.Node(is->node).m_ID[is->bc];;
+		for (int j = 0; j<n; ++j, ++is) lm[j] = mesh.Node((*is)->m_node - 1).m_ID[(*is)->m_bc];
 		M.build_add(lm);
 	}
 }
@@ -108,21 +125,21 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 {
 	int n = (int)LC.m_dof.size();
 	double c = 0;
-	list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
+	vector<FEAugLagLinearConstraintDOF*>::iterator it = LC.m_dof.begin();
 	double u;
 	FEMesh& mesh = GetMesh();
 	for (int i=0; i<n; ++i, ++it) 
 	{
-		FENode& node = mesh.Node(it->node);
-		switch (it->bc)
+		FENode& node = mesh.Node((*it)->m_node - 1);
+		switch ((*it)->m_bc)
 		{
 		case 0: u = node.m_rt.x - node.m_r0.x; break;
 		case 1: u = node.m_rt.y - node.m_r0.y; break;
 		case 2: u = node.m_rt.z - node.m_r0.z; break;
 		default:
-                u = node.get(it->bc);
+                u = node.get((*it)->m_bc);
 		}
-		c += it->val*u;
+		c += (*it)->m_val*u;
 	}
 
 	return c;
@@ -137,7 +154,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 	if (m_laugon == false) return true;
 
 	int M = (int)m_LC.size(), i;
-	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
+	vector<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
 
 	// calculate lag multipliers
 	double L0 = 0, L1 = 0;
@@ -188,7 +205,7 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FEMesh& mesh = GetMesh();
 
 	int M = (int)m_LC.size();
-	list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
+	vector<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
 	for (int m=0; m<M; ++m, ++im)
 	{
 		FEAugLagLinearConstraint& LC = *(*im);
@@ -197,10 +214,10 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
 		for (int i=0; i<n; ++i, ++it)
 		{
-			int neq = mesh.Node(it->node).m_ID[it->bc];
+			int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
 			if (neq >= 0)
 			{
-				R[neq] -= (LC.m_lam+m_eps*c)*it->val;
+				R[neq] -= (LC.m_lam+m_eps*c)* (*it)->m_val;
 			}		
 		}
 	}
@@ -218,7 +235,7 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 	FEElementMatrix ke;
 
 	int M = (int)m_LC.size();
-	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
+	vector<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
 	for (int m=0; m<M; ++m, ++im)
 	{
 		FEAugLagLinearConstraint& LC = *(*im);
@@ -230,7 +247,7 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 			jt = LC.m_dof.begin();
 			for (j=0; j<n; ++j, ++jt)
 			{
-				ke[i][j] = m_eps*it->val*jt->val;
+				ke[i][j] = m_eps* (*it)->m_val*(*jt)->m_val;
 			}
 		}
 
@@ -239,286 +256,12 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 		it = LC.m_dof.begin();
 		for (i=0; i<n; ++i, ++it)
 		{
-			en[i] = it->node;
-			int neq = mesh.Node(it->node).m_ID[it->bc];
+			en[i] = (*it)->m_node - 1;
+			int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
 			elm[i] = neq;
 		}
 		ke.SetNodes(en);
 		ke.SetIndices(elm);
 		LS.Assemble(ke);
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FELinearConstraintSet::Serialize(DumpStream& ar)
-{
-	FESurfaceConstraint::Serialize(ar);
-
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-			for (int i=0; i<(int) m_LC.size(); ++i, ++it) ar << (*it)->m_lam;
-		}
-		else
-		{
-			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-			for (int i=0; i<(int) m_LC.size(); ++i, ++it) ar >> (*it)->m_lam;
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_nID;
-			ar << (int) m_LC.size();
-			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-			for (int i=0; i<(int) m_LC.size(); ++i, ++it) (*it)->Serialize(ar);
-		}
-		else
-		{
-			ar >> m_nID;
-			int n;
-			ar >> n;
-			m_LC.clear();
-			for (int i=0; i<n; ++i)
-			{
-				FEAugLagLinearConstraint* plc = new FEAugLagLinearConstraint;
-				plc->Serialize(ar);
-				m_LC.push_back(plc);
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FENodeConstraintSet, FENodeSetConstraint)
-    ADD_PARAMETER(m_laugon , "laugon");
-    ADD_PARAMETER(m_tol    , "tol");
-    ADD_PARAMETER(m_eps    , "penalty");
-    ADD_PARAMETER(m_rhs    , "rhs");
-    ADD_PARAMETER(m_naugmin, "minaug");
-    ADD_PARAMETER(m_naugmax, "maxaug");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-FENodeConstraintSet::FENodeConstraintSet(FEModel* pfem) : FENodeSetConstraint(pfem)
-{
-    static int nc = 1;
-    m_nID = nc++;
-
-    m_laugon = true;
-    m_eps = 1;
-    m_tol = 0.1;
-    m_rhs = 0;
-    m_naugmax = 50;
-    m_naugmin = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FENodeConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
-{
-    FEMesh& mesh = GetMesh();
-    list<FEAugLagLinearConstraint*>& LC = m_LC;
-    vector<int> lm;
-    int N = (int)LC.size();
-    list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
-    for (int i=0; i<N; ++i, ++it)
-    {
-        int n = (int)(*it)->m_dof.size();
-        lm.resize(n);
-        FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-        for (int j = 0; j<n; ++j, ++is) lm[j] = mesh.Node(is->node).m_ID[is->bc];;
-        M.build_add(lm);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! This function calculates the current value of the constraint.
-
-double FENodeConstraintSet::constraint(FEAugLagLinearConstraint& LC)
-{
-    int n = (int)LC.m_dof.size();
-    double c = 0;
-    list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
-    double u;
-    FEMesh& mesh = GetMesh();
-    for (int i=0; i<n; ++i, ++it)
-    {
-        FENode& node = mesh.Node(it->node);
-        switch (it->bc)
-        {
-        case 0: u = node.m_rt.x - node.m_r0.x; break;
-        case 1: u = node.m_rt.y - node.m_r0.y; break;
-        case 2: u = node.m_rt.z - node.m_r0.z; break;
-        default:
-                u = node.get(it->bc);
-        }
-        c += it->val*u;
-    }
-
-    return c;
-}
-
-//-----------------------------------------------------------------------------
-//! This function performs an augmentation, if the Lagrange multiplier
-//! has not converged
-
-bool FENodeConstraintSet::Augment(int naug, const FETimeInfo& tp)
-{
-    if (m_laugon == false) return true;
-
-    int M = (int)m_LC.size(), i;
-    list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
-
-    // calculate lag multipliers
-    double L0 = 0, L1 = 0;
-    for (i=0; i<M; ++i, ++im)
-    {
-        FEAugLagLinearConstraint& LC = *(*im);
-        double c = constraint(LC) - m_rhs;
-        double lam = LC.m_lam + m_eps*c;
-
-        L0 += LC.m_lam*LC.m_lam;
-        L1 += lam*lam;
-    }
-
-    L0 = sqrt(L0);
-    L1 = sqrt(L1);
-
-    double p;
-    if (L1 != 0)
-        p = fabs((L1 - L0)/L1);
-    else p = fabs(L1 - L0);
-
-    feLog("linear constraint set %d: %15.7lg %15.7lg %15.7lg\n", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
-
-    bool bconv = false;
-    if (p <= m_tol) bconv = true;
-    if ((m_naugmax >= 0) && (naug >= m_naugmax)) bconv = true;
-    if (naug < m_naugmin) bconv = false;
-
-    if (bconv == false)
-    {
-        im = m_LC.begin();
-        for (i=0; i<M; ++i, ++im)
-        {
-            FEAugLagLinearConstraint& LC = *(*im);
-            double c = constraint(LC) - m_rhs;
-            LC.m_lam += m_eps*c;
-        }
-    }
-
-    return bconv;
-}
-
-//-----------------------------------------------------------------------------
-//! This function calculates the contribution to the residual.
-
-void FENodeConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
-{
-    FEMesh& mesh = GetMesh();
-
-    int M = (int)m_LC.size();
-    list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
-    for (int m=0; m<M; ++m, ++im)
-    {
-        FEAugLagLinearConstraint& LC = *(*im);
-        int n = (int)LC.m_dof.size();
-        double c = constraint(LC);
-        FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
-        for (int i=0; i<n; ++i, ++it)
-        {
-            int neq = mesh.Node(it->node).m_ID[it->bc];
-            if (neq >= 0)
-            {
-                R[neq] -= (LC.m_lam+m_eps*c)*it->val;
-            }
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! This function calculates the contribution to the stiffness matrix.
-
-void FENodeConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
-{
-    FEMesh& mesh = GetMesh();
-
-    vector<int> en;
-    vector<int> elm;
-    FEElementMatrix ke;
-
-    int M = (int)m_LC.size();
-    list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
-    for (int m=0; m<M; ++m, ++im)
-    {
-        FEAugLagLinearConstraint& LC = *(*im);
-        int n = (int)LC.m_dof.size(), i, j;
-        ke.resize(n, n);
-        FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin(), jt;
-        for (i=0; i<n; ++i, ++it)
-        {
-            jt = LC.m_dof.begin();
-            for (j=0; j<n; ++j, ++jt)
-            {
-                ke[i][j] = m_eps*it->val*jt->val;
-            }
-        }
-
-        en.resize(n);
-        elm.resize(n);
-        it = LC.m_dof.begin();
-        for (i=0; i<n; ++i, ++it)
-        {
-            en[i] = it->node;
-            int neq = mesh.Node(it->node).m_ID[it->bc];
-            elm[i] = neq;
-        }
-        ke.SetNodes(en);
-        ke.SetIndices(elm);
-        LS.Assemble(ke);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FENodeConstraintSet::Serialize(DumpStream& ar)
-{
-    if (ar.IsShallow())
-    {
-        if (ar.IsSaving())
-        {
-            list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-            for (int i=0; i<(int) m_LC.size(); ++i, ++it) ar << (*it)->m_lam;
-        }
-        else
-        {
-            list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-            for (int i=0; i<(int) m_LC.size(); ++i, ++it) ar >> (*it)->m_lam;
-        }
-    }
-    else
-    {
-        if (ar.IsSaving())
-        {
-            ar << m_tol << m_eps << m_naugmax << m_nID;
-            ar << (int) m_LC.size();
-            list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-            for (int i=0; i<(int) m_LC.size(); ++i, ++it) (*it)->Serialize(ar);
-        }
-        else
-        {
-            ar >> m_tol >> m_eps >> m_naugmax >> m_nID;
-            int n;
-            ar >> n;
-            m_LC.clear();
-            for (int i=0; i<n; ++i)
-            {
-                FEAugLagLinearConstraint* plc = new FEAugLagLinearConstraint;
-                plc->Serialize(ar);
-                m_LC.push_back(plc);
-            }
-        }
-    }
 }

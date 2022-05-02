@@ -1080,42 +1080,39 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 		const char* szval = att.cvalue();
 		if ((att.m_bvisited == false) && szatt && szval)
 		{
-			if      (strcmp("name", szatt) == 0) pc->SetName(szval);
+			FEParam* param = pl.FindFromName(szatt);
+			if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+			{
+				switch (param->type())
+				{
+				case FE_PARAM_INT:
+				{
+					if (param->enums() == nullptr)
+						param->value<int>() = atoi(szval);
+					else
+					{
+						if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+					}
+					break;
+				}
+				case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+				case FE_PARAM_STD_STRING: param->value<std::string>() = szval; break;
+				default:
+					throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+				}
+			}
+			else if (strcmp("name", szatt) == 0) pc->SetName(szval);
 			else if (strcmp("id"  , szatt) == 0) pc->SetID(atoi(szval));
 			else if (strcmp("lc"  , szatt) == 0) { /* don't do anything. Loadcurves are processed elsewhere. */ }
 			else
 			{
-				FEParam* param = pl.FindFromName(szatt);
-				if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+				if (m_pim->StopOnUnknownAttribute())
 				{
-					switch (param->type())
-					{
-					case FE_PARAM_INT:
-					{
-						if (param->enums() == nullptr)
-							param->value<int>() = atoi(szval);
-						else
-						{
-							if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
-						}
-						break;
-					}
-					case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
-					case FE_PARAM_STD_STRING: param->value<std::string>() = szval; break;
-					default:
-						throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
-					}
+					throw XMLReader::InvalidAttribute(tag, szatt);
 				}
 				else
 				{
-					if (m_pim->StopOnUnknownAttribute())
-					{
-						throw XMLReader::InvalidAttribute(tag, szatt);
-					}
-					else
-					{
-						fprintf(stderr, "WARNING: Unknown parameter %s in tag %s\n", szatt, tag.Name());
-					}
+					fprintf(stderr, "WARNING: Unknown attribute %s in tag %s\n", szatt, tag.Name());
 				}
 			}
 		}

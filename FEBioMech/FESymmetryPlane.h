@@ -34,7 +34,7 @@ SOFTWARE.*/
 //! The FESymmetryPlane class implements a symmetry plane
 //! as a linear constraint on the components of the solid displacement.
 
-class FESymmetryPlane : public FELinearConstraintSet
+class FESymmetryPlane : public FESurfaceConstraint
 {
 public:
     //! constructor
@@ -51,8 +51,29 @@ public:
     
     //! Get the surface
     FESurface* GetSurface() override { return &m_surf; }
+
+public:
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
+    //! add the linear constraint contributions to the residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+    //! add the linear constraint contributions to the stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+
+    //! do the augmentation
+    bool Augment(int naug, const FETimeInfo& tp) override;
+
+    //! build connectivity for matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
     
 protected:
     FESurface    m_surf;
 	bool		m_binit;
+
+private:
+    FELinearConstraintSet m_lc;
+
+    DECLARE_FECORE_CLASS();
 };

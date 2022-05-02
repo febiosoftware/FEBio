@@ -222,7 +222,8 @@ public:
 		{
 			int n = 0;
 			ar >> n;
-			m_pmp->assign(n, nullptr);
+			if (ar.IsShallow() == false) m_pmp->assign(n, nullptr);
+			assert(m_pmp->size() == n);
 			for (int i = 0; i<n; ++i)
 			{
 				ar >> (*m_pmp)[i];

@@ -110,6 +110,8 @@ REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     );
 
 // (augmented lagrangian) linear constraints
 REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
+REGISTER_FECORE_CLASS(FEAugLagLinearConstraint, "linear_constraint");
+REGISTER_FECORE_CLASS(FEAugLagLinearConstraintDOF, "node");
 
 // plot field
 REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");

@@ -32,45 +32,55 @@ SOFTWARE.*/
 #include <FECore/matrix.h>
 #include <FECore/FESurfaceConstraint.h>
 #include <FECore/FENodeSetConstraint.h>
+#include <FECore/FECoreClass.h>
 #include "fecore_api.h"
 #include <list>
 
 //-----------------------------------------------------------------------------
 //! linear constraint enforced using augmented lagrangian
 
-class FECORE_API FEAugLagLinearConstraint
+class FECORE_API FEAugLagLinearConstraintDOF : public FECoreClass
 {
 public:
-	// this class describes a degree of freedom (dof) that
-	// participates in the linear constraint
-	class DOF
-	{
-	public:
-		DOF() { node = bc = 0; val = 0.0; }
-	public:
-		int	node;		// the node to which this dof belongs to
-		int	bc;			// the degree of freedom
-		double	val;	// coefficient value
-	};
+	FEAugLagLinearConstraintDOF(FEModel* fem);
 
-	typedef std::list<FEAugLagLinearConstraint::DOF>::iterator Iterator;
+public:
+	int	m_node;		// the node to which this dof belongs to
+	int	m_bc;			// the degree of freedom
+	double	m_val;	// coefficient value
+
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEAugLagLinearConstraintDOF);
+};
+
+class FECORE_API FEAugLagLinearConstraint : public FECoreClass
+{
+public:
+	typedef std::vector<FEAugLagLinearConstraintDOF*>::iterator Iterator;
 
 public:
 	//! constructor
-	FEAugLagLinearConstraint() { m_lam = 0; }
+	FEAugLagLinearConstraint(FEModel* fem) : FECoreClass(fem) { m_lam = 0; }
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
 
+	void ClearDOFs();
+
+	void AddDOF(int node, int bc, double val);
+
 public:
-	std::list<DOF>	m_dof;	//!< list of participating dofs
-	double			m_lam;	//!< lagrange multiplier
+	std::vector<FEAugLagLinearConstraintDOF*>	m_dof;	//!< list of participating dofs
+	double									m_lam;	//!< lagrange multiplier
+
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEAugLagLinearConstraint);
 };
 
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FECORE_API FELinearConstraintSet : public FESurfaceConstraint
+class FECORE_API FELinearConstraintSet : public FENLConstraint
 {
 public:
 	//! constructor
@@ -80,9 +90,6 @@ public:
 	void add(FEAugLagLinearConstraint* plc) { m_LC.push_back(plc); }
 
 public:
-	//! serialize data to archive
-	void Serialize(DumpStream& ar) override;
-
 	//! add the linear constraint contributions to the residual
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
@@ -100,7 +107,7 @@ protected:
 	double constraint(FEAugLagLinearConstraint& LC);
 
 public:
-	std::list<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
+	std::vector<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
 
 public:
 	bool	m_laugon;	//!< augmentation flag
@@ -113,52 +120,4 @@ public:
 	int	m_nID;		//!< ID of manager
 
 	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-//! This class manages a group of linear constraints
-
-class FECORE_API FENodeConstraintSet : public FENodeSetConstraint
-{
-public:
-    //! constructor
-    FENodeConstraintSet(FEModel* pfem);
-
-    //! add a linear constraint to the list
-    void add(FEAugLagLinearConstraint* plc) { m_LC.push_back(plc); }
-
-public:
-    //! serialize data to archive
-    void Serialize(DumpStream& ar) override;
-
-    //! add the linear constraint contributions to the residual
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-
-    //! add the linear constraint contributions to the stiffness matrix
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-
-    //! do the augmentation
-    bool Augment(int naug, const FETimeInfo& tp) override;
-
-    //! build connectivity for matrix profile
-    void BuildMatrixProfile(FEGlobalMatrix& M) override;
-
-protected:
-    //! calculate the constraint value
-    virtual double constraint(FEAugLagLinearConstraint& LC);
-
-public:
-	std::list<FEAugLagLinearConstraint*>    m_LC;    //!< list of linear constraints
-
-public:
-    bool        m_laugon;   //!< augmentation flag
-    double      m_tol;      //!< augmentation tolerance
-    double      m_eps;      //!< penalty factor
-    double      m_rhs;      //!< right-hand-side of linear constraint equation
-    int         m_naugmax;  //!< max nr of augmentations
-    int         m_naugmin;  //!< min nf of augmentations
-
-    int         m_nID;      //!< ID of manager
-
-    DECLARE_FECORE_CLASS();
 };

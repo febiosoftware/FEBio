@@ -31,8 +31,17 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEMesh.h>
 
+BEGIN_FECORE_CLASS(FEConstraintNormalFlow, FESurfaceConstraint)
+    ADD_PARAMETER(m_lc.m_laugon, "laugon");
+    ADD_PARAMETER(m_lc.m_tol, "tol");
+    ADD_PARAMETER(m_lc.m_eps, "penalty");
+    ADD_PARAMETER(m_lc.m_rhs, "rhs");
+    ADD_PARAMETER(m_lc.m_naugmin, "minaug");
+    ADD_PARAMETER(m_lc.m_naugmax, "maxaug");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
-FEConstraintNormalFlow::FEConstraintNormalFlow(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
+FEConstraintNormalFlow::FEConstraintNormalFlow(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem), m_lc(pfem)
 {
 }
 
@@ -42,6 +51,7 @@ void FEConstraintNormalFlow::Activate()
 {
     // don't forget to call base class
     FENLConstraint::Activate();
+    m_lc.Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -91,87 +101,55 @@ bool FEConstraintNormalFlow::Init()
     for (int i=0; i<N; ++i) {
 
         //  (1-nx^2)*vx - nx*ny*vy - nx*nz*vz = 0
-        FEAugLagLinearConstraint* pLC0 = new FEAugLagLinearConstraint;
+        FEAugLagLinearConstraint* pLC0 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
         for (int j=0; j<3; ++j) {
-            FEAugLagLinearConstraint::DOF dof;
-            FENode node = m_surf.Node(i);
-            dof.node = node.GetID() - 1;    // zero-based
+            FENode& node = m_surf.Node(i);
             switch (j) {
-                case 0:
-                    dof.bc = dof_wx;
-                    dof.val = 1 - m_nn[i].x*m_nn[i].x;
-                    break;
-                case 1:
-                    dof.bc = dof_wy;
-                    dof.val = -m_nn[i].x*m_nn[i].y;
-                    break;
-                case 2:
-                    dof.bc = dof_wz;
-                    dof.val = -m_nn[i].x*m_nn[i].z;
-                    break;
-                default:
-                    break;
+            case 0: pLC0->AddDOF(node.GetID(), dof_wx, 1.0 - m_nn[i].x * m_nn[i].x); break;
+            case 1: pLC0->AddDOF(node.GetID(), dof_wy,       m_nn[i].x * m_nn[i].y); break;
+            case 2: pLC0->AddDOF(node.GetID(), dof_wz,       m_nn[i].x * m_nn[i].z); break;
             }
-            pLC0->m_dof.push_back(dof);
         }
         // add the linear constraint to the system
-        add(pLC0);
+        m_lc.add(pLC0);
         
         // -nx*ny*vx + (1-ny^2)*vy - ny*nz*vz = 0
-        FEAugLagLinearConstraint* pLC1 = new FEAugLagLinearConstraint;
+        FEAugLagLinearConstraint* pLC1 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
         for (int j=0; j<3; ++j) {
-            FEAugLagLinearConstraint::DOF dof;
-            FENode node = m_surf.Node(i);
-            dof.node = node.GetID() - 1;    // zero-based
+            FENode& node = m_surf.Node(i);
             switch (j) {
-                case 0:
-                    dof.bc = dof_wx;
-                    dof.val = -m_nn[i].x*m_nn[i].y;
-                    break;
-                case 1:
-                    dof.bc = dof_wy;
-                    dof.val = 1 - m_nn[i].y*m_nn[i].y;
-                    break;
-                case 2:
-                    dof.bc = dof_wz;
-                    dof.val = -m_nn[i].y*m_nn[i].z;
-                    break;
+                case 0: pLC1->AddDOF(node.GetID(), dof_wx,     -m_nn[i].y * m_nn[i].x); break;
+                case 1: pLC1->AddDOF(node.GetID(), dof_wy, 1.0 -m_nn[i].y * m_nn[i].y); break;
+                case 2: pLC1->AddDOF(node.GetID(), dof_wz,     -m_nn[i].y * m_nn[i].z); break;
                 default:
                     break;
             }
-            pLC1->m_dof.push_back(dof);
         }
         // add the linear constraint to the system
-        add(pLC1);
+        m_lc.add(pLC1);
         
         // -nx*nz*vx - ny*nz*vy + (1-nz^2)*vz = 0
-        FEAugLagLinearConstraint* pLC2 = new FEAugLagLinearConstraint;
+        FEAugLagLinearConstraint* pLC2 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
         for (int j=0; j<3; ++j) {
-            FEAugLagLinearConstraint::DOF dof;
             FENode node = m_surf.Node(i);
-            dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
-                case 0:
-                    dof.bc = dof_wx;
-                    dof.val = -m_nn[i].x*m_nn[i].z;
-                    break;
-                case 1:
-                    dof.bc = dof_wy;
-                    dof.val = -m_nn[i].y*m_nn[i].z;
-                    break;
-                case 2:
-                    dof.bc = dof_wz;
-                    dof.val = 1 - m_nn[i].z*m_nn[i].z;
-                    break;
+                case 0: pLC2->AddDOF(node.GetID(), dof_wx,    -m_nn[i].z * m_nn[i].x); break;
+                case 1: pLC2->AddDOF(node.GetID(), dof_wy,    -m_nn[i].z * m_nn[i].y); break;
+                case 2: pLC2->AddDOF(node.GetID(), dof_wz, 1.0-m_nn[i].z * m_nn[i].z); break;
                 default:
                     break;
             }
-            pLC2->m_dof.push_back(dof);
         }
         // add the linear constraint to the system
-        add(pLC2);
+        m_lc.add(pLC2);
     }
     
     return true;
 }
 
+//-----------------------------------------------------------------------------
+void FEConstraintNormalFlow::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
+void FEConstraintNormalFlow::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
+void FEConstraintNormalFlow::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
+bool FEConstraintNormalFlow::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }
+void FEConstraintNormalFlow::BuildMatrixProfile(FEGlobalMatrix& M) { m_lc.BuildMatrixProfile(M); }

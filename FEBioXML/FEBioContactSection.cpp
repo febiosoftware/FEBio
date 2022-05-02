@@ -396,23 +396,26 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 	{
 		if (tag == "linear_constraint")
 		{
-			FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
+			FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
 
-			FEAugLagLinearConstraint::DOF dof;
 			++tag;
 			do
 			{
+				int node, bc;
+				double val;
 				if (tag == "node")
 				{
-					tag.value(dof.val);
-					dof.node = ReadNodeID(tag);
+					tag.value(val);
+					
+					const char* szid = tag.AttributeValue("id");
+					node = atoi(szid);
 
 					const char* szbc = tag.AttributeValue("bc");
                     int ndof = dofs.GetDOF(szbc);
-                    if (ndof >= 0) dof.bc = ndof;
+                    if (ndof >= 0) bc = ndof;
 					else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
-					pLC->m_dof.push_back(dof);
+					pLC->AddDOF(node, bc, val);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
