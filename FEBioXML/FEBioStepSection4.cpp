@@ -43,7 +43,7 @@ void FEBioStepSection4::Parse(XMLTag& tag)
 	// Build the file section map
 	FEFileImport* imp = GetFileReader();
 	FEFileSectionMap Map;
-//	Map["Control"    ] = new FEBioControlSection4(imp);
+	Map["Control"    ] = new FEBioControlSection4(imp);
 	Map["Initial"    ] = new FEBioInitialSection3(imp);
 	Map["Boundary"   ] = new FEBioBoundarySection3(imp);
 	Map["Loads"      ] = new FEBioLoadsSection3(imp);
@@ -60,28 +60,9 @@ void FEBioStepSection4::Parse(XMLTag& tag)
 			// create next step
 			GetBuilder()->NextStep();
 
-			// get the step (don't allocate solver)
-			FEAnalysis* pstep = GetBuilder()->GetStep(false);
-			if (pstep == 0)
-			{
-				throw XMLReader::InvalidTag(tag);
-			}
-
-			// read the step parameters
-			++tag;
-			do
-			{
-				if (ReadParameter(tag, pstep) == false)
-				{
-					// parse the file sections
-					std::map<string, FEFileSection*>::iterator is = Map.find(tag.Name());
-					if (is != Map.end()) is->second->Parse(tag);
-					else throw XMLReader::InvalidTag(tag);
-				}
-				++tag;
-			} while (!tag.isend());
+			// parse the file sections
+			Map.Parse(tag);
 		}
-		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
