@@ -1785,6 +1785,26 @@ FEGlobalData* FEModel::GetGlobalData(int i)
 }
 
 //-----------------------------------------------------------------------------
+FEGlobalData* FEModel::FindGlobalData(const char* szname)
+{
+	for (int i = 0; i < m_imp->m_GD.size(); ++i)
+	{
+		if (m_imp->m_GD[i]->GetName() == szname) return m_imp->m_GD[i];
+	}
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+int FEModel::FindGlobalDataIndex(const char* szname)
+{
+	for (int i = 0; i < m_imp->m_GD.size(); ++i)
+	{
+		if (m_imp->m_GD[i]->GetName() == szname) return i;
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
 int FEModel::GlobalDataItems()
 {
 	return (int)m_imp->m_GD.size();

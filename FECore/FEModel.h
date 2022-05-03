@@ -378,6 +378,8 @@ public:
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);
 	FEGlobalData* GetGlobalData(int i);
+	FEGlobalData* FindGlobalData(const char* szname);
+	int FindGlobalDataIndex(const char* szname);
 	int GlobalDataItems();
 
 	// get/set global data

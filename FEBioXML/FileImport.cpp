@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEPointFunction.h>
+#include <FECore/FEGlobalData.h>
 #include <FECore/log.h>
 #include <stdio.h>
 #include <string.h>
@@ -406,6 +407,8 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 	// special cases
 	if (szenums[0] == '$')
 	{
+		FEModel* fem = GetFEModel();
+
 		char var[256] = { 0 };
 		const char* chl = strchr(szenums, '('); assert(chl);
 		const char* chr = strchr(szenums, ')'); assert(chr);
@@ -433,19 +436,43 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		}
 		else if (strcmp(var, "solutes") == 0)
 		{
-			int n = atoi(val);
+			int n = -1;
+			if (is_number(val)) n = atoi(val);
+			else
+			{
+				FEGlobalData* pd = fem->FindGlobalData(val);
+				if (pd == nullptr) return false;
+				n = pd->GetID(); assert(n > 0);
+			}
+				
 			pp->value<int>() = n;
 			return true;
 		}
 		else if (strcmp(var, "sbms") == 0)
 		{
-			int n = atoi(val);
+			int n = -1;
+			if (is_number(val)) n = atoi(val);
+			else
+			{
+				FEGlobalData* pd = fem->FindGlobalData(val);
+				if (pd == nullptr) return false;
+				n = pd->GetID(); assert(n > 0);
+			}
+
 			pp->value<int>() = n;
 			return true;
 		}
 		else if (strcmp(var, "species") == 0)
 		{
-			int n = atoi(val);
+			int n = -1;
+			if (is_number(val)) n = atoi(val);
+			else
+			{
+				// NOTE: This assumes that the solutes are defined before the SBMS!
+				int m = fem->FindGlobalDataIndex(val);
+				if (m == -1) return false;
+				n = m + 1;
+			}
 			pp->value<int>() = n;
 			return true;
 		}
@@ -458,7 +485,6 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 			}
 			else
 			{
-				FEModel* fem = GetFEModel();
 				FEMaterial* mat = fem->FindMaterial(val);
 				if (mat == nullptr) return false;
 				int n = mat->GetID();
