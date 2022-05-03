@@ -42,6 +42,7 @@ public:
 	vec3d	m_pos;	//!< position of attachment point
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FERigidCablePoint);
 };
 
 class FERigidCable : public FERigidLoad

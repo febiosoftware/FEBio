@@ -48,6 +48,7 @@ private:
 	void operator = (const FELinearConstraintDOF&) {}
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FELinearConstraintDOF);
 };
 
 class FECORE_API FELinearConstraint : public FEBoundaryCondition
