@@ -32,7 +32,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEContinuousFiberDistribution, FEElasticMaterial)
 
 	// material properties
-	ADD_PROPERTY(m_pFmat, "fibers");
+	ADD_PROPERTY(m_pFmat, "fibers")->SetFlags(FEProperty::Restricted | FEProperty::Required);
 	ADD_PROPERTY(m_pFDD, "distribution");
 	ADD_PROPERTY(m_pFint, "scheme");
 

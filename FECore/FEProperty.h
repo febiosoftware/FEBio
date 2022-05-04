@@ -48,7 +48,8 @@ public:
 		Preferred		= 0x02,		// the property is not required, but a default should be allocated when possible.
 		Reference       = 0x04,		// references another class in the model
 		Fixed			= 0x08,		// fixed properties are fixed type class members
-		TopLevel		= 0x10		// This is a "top-level" property. 
+		TopLevel		= 0x10,		// This is a "top-level" property. 
+		Restricted		= 0x20		// This is a "restricted" property
 	};
 
 private:
@@ -83,6 +84,9 @@ public:
 
 	// is this a reference property
 	bool IsReference() const { return (m_flags & Reference) != 0; }
+
+	// is this a restricted property
+	bool IsRestricted() const { return (m_flags & Restricted) != 0; }
 
 	// is this a top-level property
 	bool IsTopLevel() const { return (m_flags & TopLevel) != 0; }
