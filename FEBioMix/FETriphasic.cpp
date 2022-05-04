@@ -44,7 +44,7 @@ BEGIN_FECORE_CLASS(FETriphasic, FEMaterial)
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid , "solid"              );
+	ADD_PROPERTY(m_pSolid , "solid"              , FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm  , "permeability"       );
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSolute, "solute"             );

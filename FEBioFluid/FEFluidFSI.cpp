@@ -34,7 +34,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFSI, FEMaterial)
 	// material properties
-	ADD_PROPERTY(m_pSolid, "solid");
+	ADD_PROPERTY(m_pSolid, "solid", FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pFluid, "fluid");
 END_FECORE_CLASS();
 

@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FEBiphasic, FEMaterial)
     ADD_PARAMETER(m_tau  , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid, "solid");
+	ADD_PROPERTY(m_pSolid, "solid", FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm, "permeability");
 	ADD_PROPERTY(m_pSupp, "solvent_supply", FEProperty::Optional);
 	ADD_PROPERTY(m_pAmom, "active_supply", FEProperty::Optional);

@@ -43,7 +43,7 @@ BEGIN_FECORE_CLASS(FEBiphasicSolute, FEMaterial)
 	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid , "solid");
+	ADD_PROPERTY(m_pSolid , "solid", FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm  , "permeability");
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSolute, "solute");

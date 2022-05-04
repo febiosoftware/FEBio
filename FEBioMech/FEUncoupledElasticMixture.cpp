@@ -57,7 +57,7 @@ FEMaterialPoint* FEUncoupledElasticMixture::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 void FEUncoupledElasticMixture::AddMaterial(FEElasticMaterial* pm)
 { 
-	m_pMat.push_back(pm); 
+	m_pMat.push_back(dynamic_cast<FEUncoupledMaterial*>(pm)); 
 }
 
 //-----------------------------------------------------------------------------

@@ -73,7 +73,8 @@ enum FEParamFlag {
 	FE_PARAM_USER      = 0x02,		// user parameter (owned by parameter list)	
 	FE_PARAM_HIDDEN	   = 0x04,		// Hides parameter (in FEBio Studio)
 	FE_PARAM_ADDLC     = 0x08,		// parameter should get a default load curve in FEBio Studio
-	FE_PARAM_VOLATILE  = 0x10		// parameter can change (e.g. via a load curve)
+	FE_PARAM_VOLATILE  = 0x10,		// parameter can change (e.g. via a load curve)
+	FE_PARAM_TOPLEVEL  = 0x20		// parameter should only defined at top-level (materials only)
 };
 
 class FEParam;
@@ -205,7 +206,10 @@ public:
 
 	bool IsVolatile() const;
 
-	void MakeVolatile(bool b);
+	FEParam* MakeVolatile(bool b);
+
+	bool IsTopLevel() const;
+	FEParam* MakeTopLevel(bool b);
 
 public:
 	int GetParamGroup() const;

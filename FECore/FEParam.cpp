@@ -619,10 +619,25 @@ bool FEParam::IsVolatile() const
 }
 
 //-----------------------------------------------------------------------------
-void FEParam::MakeVolatile(bool b)
+FEParam* FEParam::MakeVolatile(bool b)
 {
 	if (b) m_flag = (m_flag | FEParamFlag::FE_PARAM_VOLATILE);
 	else m_flag = (m_flag & ~FEParamFlag::FE_PARAM_VOLATILE);
+	return this;
+}
+
+//-----------------------------------------------------------------------------
+bool FEParam::IsTopLevel() const
+{
+	return (m_flag & FEParamFlag::FE_PARAM_TOPLEVEL);
+}
+
+//-----------------------------------------------------------------------------
+FEParam* FEParam::MakeTopLevel(bool b)
+{
+	if (b) m_flag = (m_flag | FEParamFlag::FE_PARAM_TOPLEVEL);
+	else m_flag = (m_flag & ~FEParamFlag::FE_PARAM_TOPLEVEL);
+	return this;
 }
 
 //-----------------------------------------------------------------------------
