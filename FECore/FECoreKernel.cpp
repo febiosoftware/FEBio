@@ -173,7 +173,7 @@ LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 	{
 		const char* sztype = m_default_solver_type.c_str();
 		FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-		return (LinearSolver*)fac->Create(fem);
+		return (LinearSolver*)fac->CreateInstance(fem);
 	}
 	else
 	{
@@ -207,9 +207,7 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 			// then this feature will replace the existing one. 
 			if ((modId == activeID) && (pfi->GetSpecID() == ptf->GetSpecID()))
 			{
-#ifdef _DEBUG
 				fprintf(stderr, "WARNING: \"%s\" feature is redefined\n", ptf->GetTypeStr());
-#endif
 				m_Fac[i] = ptf;
 				return;
 			}

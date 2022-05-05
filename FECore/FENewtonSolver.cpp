@@ -63,6 +63,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	END_PARAM_GROUP();
 
 	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Preferred)->SetDefaultType("BFGS").SetLongName("Quasi-Newton method");
+	ADD_PROPERTY(m_plinsolve, "linear_solver", FEProperty::Optional)->SetDefaultType("pardiso");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -358,6 +359,8 @@ bool FENewtonSolver::AllocateLinearSystem()
 			m_plinsolve->SetPartitions(m_part);
 		}
 	}
+
+	feLogInfo("Selecting linear solver %s", m_plinsolve->GetTypeStr());
 
 	Matrix_Type mtype = MatrixType();
 	SparseMatrix* pS = m_qnstrategy->CreateSparseMatrix(mtype);

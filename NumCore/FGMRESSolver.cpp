@@ -53,8 +53,8 @@ BEGIN_FECORE_CLASS(FGMRESSolver, IterativeLinearSolver)
 	ADD_PARAMETER(m_abstol        , "abs_tol");
 	ADD_PARAMETER(m_maxIterFail   , "fail_max_iters");
 
-	ADD_PROPERTY(m_P, "pc_left");
-	ADD_PROPERTY(m_R, "pc_right");
+	ADD_PROPERTY(m_P, "pc_left")->SetFlags(FEProperty::Optional);
+	ADD_PROPERTY(m_R, "pc_right")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

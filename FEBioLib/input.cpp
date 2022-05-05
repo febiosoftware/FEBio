@@ -256,13 +256,11 @@ void FEBioModel::echo_input()
 
 	print_parameter_list(step.GetParameterList());
 
-	feLog("\tAuto time stepper activated .................... : %s\n", (step.m_timeController ? "yes" : "no"));
+	feLog("\tAuto time stepper activated ....................... : %s\n", (step.m_timeController ? "yes" : "no"));
 	if (step.m_timeController)
 	{
 		FETimeStepController& tc = *step.m_timeController;
-		feLog("\t  Optimal nr of iterations ..................... : %d\n", tc.m_iteopt);
-		feLog("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
-		feLog("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
+		print_parameter_list(tc.GetParameterList(), 1);
 	}
 	feLog("\tNumber of load controllers ..................... : %d\n", fem.LoadControllers());
 
@@ -518,7 +516,7 @@ void FEBioModel::echo_input()
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	feLog(" LINEAR SOLVER DATA\n");
 	feLog("===========================================================================\n");
-	feLog("\tSolver type ....................................... : %s\n", fecore.GetLinearSolverType());
+	feLog("\tDefault linear solver ............................. : %s\n", fecore.GetLinearSolverType());
 	feLog("\tMatrix format ..................................... : ");
 	switch (step.GetFESolver()->MatrixSymmetryFlag())
 	{

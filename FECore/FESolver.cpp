@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include "LinearSolver.h"
 
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
-	BEGIN_PARAM_GROUP("linear solver");
+	BEGIN_PARAM_GROUP("linear system");
 		ADD_PARAMETER(m_msymm    , "symmetric_stiffness", 0, "non-symmetric\0symmetric\0symmetric structure\0");
 		ADD_PARAMETER(m_eq_scheme, "equation_scheme", 0, "staggered\0block\0");
 		ADD_PARAMETER(m_eq_order , "equation_order", 0, "default\0reverse\0febio2\0");
