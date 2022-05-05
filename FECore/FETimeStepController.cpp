@@ -44,7 +44,7 @@ BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
 	ADD_PARAMETER(m_cutback   , "cutback");
 	ADD_PARAMETER(m_dtforce   , "dtforce");
-	ADD_PARAMETER(m_must_points, "must_points");
+//	ADD_PARAMETER(m_must_points, "must_points");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
