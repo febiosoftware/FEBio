@@ -78,6 +78,7 @@ SOFTWARE.*/
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
+#include "FESoluteNaturalFlux.hpp"
 #include "FEPressureStabilization.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
 
@@ -254,6 +255,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
+    REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
