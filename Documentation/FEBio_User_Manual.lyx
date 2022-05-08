@@ -61876,6 +61876,16 @@ where
 
 \end_inset
 
+For this material type, the fiber elasticity at the strain origin reduces
+ to zero unless 
+\begin_inset Formula $\beta=2$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
 
 \shape italic
 Example
@@ -62174,7 +62184,13 @@ B=E\frac{2I_{0}\left(\beta-\frac{1}{2}+\alpha\beta\left(I_{0}-1\right)^{\beta}\r
 \end_layout
 
 \begin_layout Standard
-This model reduces to 
+For this material type, the fiber elasticity at the strain origin reduces
+ to zero unless 
+\begin_inset Formula $\beta=2$
+\end_inset
+
+.
+ This model reduces to 
 \begin_inset Quotes eld
 \end_inset
 
