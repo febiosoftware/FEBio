@@ -880,6 +880,60 @@ double FESurface::FaceArea(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
+//! This function calculates the area of a surface element
+double FESurface::CurrentFaceArea(FESurfaceElement& el)
+{
+	// get the mesh to which this surface belongs
+	FEMesh& mesh = *m_pMesh;
+
+	// get the number of nodes
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+
+	// get the initial nodes
+	vec3d rt[FEElement::MAX_NODES];
+	if (!m_bshellb) for (int i = 0; i < neln; ++i) rt[i] = mesh.Node(el.m_node[i]).m_rt;
+	else for (int i = 0; i < neln; ++i) rt[i] = mesh.Node(el.m_node[i]).m_st();
+
+	// get the integration weights
+	double* w = el.GaussWeights();
+
+	double* Gr, * Gs;
+	vec3d dxr, dxs;
+
+	double detJ;
+
+	double area = 0;
+
+	int n, k;
+
+	for (n = 0; n < nint; ++n)
+	{
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+
+		// calculate jacobian
+		dxr = dxs = vec3d(0, 0, 0);
+		for (k = 0; k < neln; ++k)
+		{
+			dxr.x += Gr[k] * rt[k].x;
+			dxr.y += Gr[k] * rt[k].y;
+			dxr.z += Gr[k] * rt[k].z;
+
+			dxs.x += Gs[k] * rt[k].x;
+			dxs.y += Gs[k] * rt[k].y;
+			dxs.z += Gs[k] * rt[k].z;
+		}
+
+		detJ = (dxr ^ dxs).norm();
+
+		area += w[n] * detJ;
+	}
+
+	return area;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the max element size.
 double FESurface::MaxElementSize()
 {
