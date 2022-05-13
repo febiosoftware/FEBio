@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FEPointFunction.h"
 #include "FELoadCurve.h"
 #include "FEMathController.h"
+#include "FEMathIntervalController.h"
 #include "FEPIDController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
@@ -157,9 +158,10 @@ REGISTER_FECORE_CLASS(FEConstValueMat3ds , "const");
 REGISTER_FECORE_CLASS(FEMappedValueMat3ds, "map");
 
 // load controllers
-REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");
-REGISTER_FECORE_CLASS(FEMathController, "math");
-REGISTER_FECORE_CLASS(FEPIDController , "PID");
+REGISTER_FECORE_CLASS(FELoadCurve             , "loadcurve");
+REGISTER_FECORE_CLASS(FEMathController        , "math");
+REGISTER_FECORE_CLASS(FEMathIntervalController, "math-interval");
+REGISTER_FECORE_CLASS(FEPIDController         , "PID");
 
 // Newton strategies
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");

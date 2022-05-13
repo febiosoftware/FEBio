@@ -84,15 +84,18 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, b
 	// default flags depend on type
 	// (see also FEModel::EvaluateLoadParameters())
 	m_flag = 0;
-	switch (itype)
+	if (ndim == 1)
 	{
-	case FE_PARAM_DOUBLE:
-	case FE_PARAM_VEC3D:
-	case FE_PARAM_DOUBLE_MAPPED:
-	case FE_PARAM_VEC3D_MAPPED:
-		// all these types can be modified via a load curve
-		m_flag = FE_PARAM_VOLATILE;
-		break;
+		switch (itype)
+		{
+		case FE_PARAM_DOUBLE:
+		case FE_PARAM_VEC3D:
+		case FE_PARAM_DOUBLE_MAPPED:
+		case FE_PARAM_VEC3D_MAPPED:
+			// all these types can be modified via a load curve
+			m_flag = FE_PARAM_VOLATILE;
+			break;
+		}
 	}
 
 	m_group = -1;
