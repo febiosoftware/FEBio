@@ -56,6 +56,7 @@ SOFTWARE.*/
 #define UNIT_CURRENT "I"
 #define UNIT_SUBSTANCE	"n"
 #define UNIT_FORCE "F"
+#define UNIT_MOMENT "F.L"
 #define UNIT_PRESSURE "P"
 #define UNIT_ENERGY	"E"
 #define UNIT_POWER "W"
