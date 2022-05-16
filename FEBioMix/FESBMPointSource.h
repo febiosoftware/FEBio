@@ -48,11 +48,11 @@ public:
 
 	int GetSBMID() const;
 
-	void SetValue(double val);
+	void SetRate(double rate);
 
 	void SetRadius(double radius);
 
-	double GetValue() const;
+	double GetRate() const;
 
 	void SetWeighVolume(bool b);
 
@@ -60,15 +60,16 @@ public:
 
 	void SetAccumulateFlag(bool b);
 
-	std::vector<FEMaterialPoint*> FindIntInRadius();
+	//std::vector<FEMaterialPoint*> FindIntInRadius();
+	void FindIntInRadius(std::vector<FEMaterialPoint*> &possible_ints, double &total_elem);
 
 private:
-	void ResetSBM();
+	//void ResetSBM();
 
 private:
-	int		m_sbm;	// The SBM ID that defins the cell's "concentration"
+	int		m_sbmId;	// The SBM ID that defins the cell's "concentration"
 	vec3d	m_pos;	// the position (in reference coordinates)
-	double	m_val;	// density value at point source
+	double	m_rate;	// density value at point source
 	double	m_radius;
 	bool	m_reset;
 	bool	m_doReset;
@@ -78,6 +79,7 @@ private:
 private:
 	FEOctreeSearch		m_search;
 	FESolidElement*		m_el;
+	double				m_q[3];
 
 	DECLARE_FECORE_CLASS();
 };

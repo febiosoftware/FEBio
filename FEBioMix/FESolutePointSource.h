@@ -65,7 +65,7 @@ public:
 	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
 
 	//! return all the elements in the given radius
-	std::vector<FEMaterialPoint*> FindIntInRadius();
+	void FindIntInRadius(std::vector<FEMaterialPoint*>& possible_ints, double& total_elem);
 
 private:
 	int		m_soluteId;	//!< solute ID
