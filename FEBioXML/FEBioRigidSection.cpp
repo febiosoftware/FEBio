@@ -74,10 +74,73 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	}
 	else if (strcmp(sztype, "force") == 0)
 	{
-		// create the rigid body force
-		FEModelLoad* pFC = fecore_new_class<FEModelLoad>("FERigidBodyForce", fem);
+		// we need to decide whether we want to apply a force or a moment, since these
+		// are now two separate classes. Unfortunately, this means we first need to 
+		// read all parameters, before we can allocate the correct class. 
+		int rb = -1;
+		int ntype = 0;
+		int bc = -1;
+		double val = 0.;
+		bool brel = false;
+		int lc = -1;
+		++tag;
+		do
+		{
+			if      (tag == "rb"       ) tag.value(rb);
+			else if (tag == "value")
+			{
+				tag.value(val);
+				const char* szlc = tag.AttributeValue("lc", true);
+				if (szlc) lc = atoi(szlc) - 1;
+			}
+			else if (tag == "load_type") tag.value(ntype);
+			else if (tag == "relative" ) tag.value(brel);
+			else if (tag == "dof"      )
+			{
+				const char* sz = tag.szvalue();
+				if ((strcmp(sz, "Rx") == 0) || (strcmp(sz, "0") == 0)) bc = 0;
+				if ((strcmp(sz, "Ry") == 0) || (strcmp(sz, "1") == 0)) bc = 1;
+				if ((strcmp(sz, "Rz") == 0) || (strcmp(sz, "2") == 0)) bc = 2;
+				if ((strcmp(sz, "Ru") == 0) || (strcmp(sz, "3") == 0)) bc = 3;
+				if ((strcmp(sz, "Rv") == 0) || (strcmp(sz, "4") == 0)) bc = 4;
+				if ((strcmp(sz, "Rw") == 0) || (strcmp(sz, "5") == 0)) bc = 5;
+
+				if (bc < 0)
+				{
+					throw XMLReader::InvalidValue(tag);
+				}
+			}
+
+			++tag;
+		} while (!tag.isend());
+
+		FEModelLoad* pFC = nullptr;
+		if (bc < 3)
+		{
+			pFC = fecore_new_class<FEModelLoad>("FERigidBodyForce", fem);
+			pFC->SetParameter("load_type", ntype);
+			pFC->SetParameter("rb", rb);
+			pFC->SetParameter("dof", bc);
+			pFC->SetParameter("value", val);
+			pFC->SetParameter("relative", brel);
+		}
+		else
+		{
+			pFC = fecore_new_class<FEModelLoad>("FERigidBodyMoment", fem);
+			pFC->SetParameter("rb", rb);
+			pFC->SetParameter("dof", bc - 3);
+			pFC->SetParameter("value", val);
+			pFC->SetParameter("relative", brel);
+		}
+
+		if (lc >= 0)
+		{
+			FEParam* p = pFC->GetParameter("value");
+			if (p == nullptr) throw XMLReader::InvalidTag(tag);
+			GetFEModel()->AttachLoadController(p, lc);
+		}
+
 		feb.AddModelLoad(pFC);
-		ReadParameterList(tag, pFC);
 	}
 	else if (strcmp(sztype, "initial_rigid_velocity") == 0)
 	{

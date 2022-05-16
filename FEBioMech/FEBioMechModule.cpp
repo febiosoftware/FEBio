@@ -628,6 +628,7 @@ void FEBioMech::InitModule()
 	// classes derived directly from FERigidLoad
 	REGISTER_FECORE_CLASS(FERigidAxialForce    , "rigid_axial_force"    );
 	REGISTER_FECORE_CLASS(FERigidBodyForce     , "rigid_force"          );
+	REGISTER_FECORE_CLASS(FERigidBodyMoment    , "rigid_moment"         );
     REGISTER_FECORE_CLASS(FERigidFollowerForce , "rigid_follower_force" );
     REGISTER_FECORE_CLASS(FERigidFollowerMoment, "rigid_follower_moment");
 	REGISTER_FECORE_CLASS(FERigidCable         , "rigid_cable");

@@ -403,12 +403,25 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				double val = 0.0;
 				value(tag, val);
 
-				FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
-				feb.AddModelLoad(pFC);
+				FEModelLoad* pFC = nullptr;
+				
+				if (bc < 3)
+				{
+					pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
 
-				pFC->SetParameter("rb", nmat);
-				pFC->SetParameter("dof", bc);
-				pFC->SetParameter("value", val);
+					pFC->SetParameter("rb", nmat);
+					pFC->SetParameter("dof", bc);
+					pFC->SetParameter("value", val);
+				}
+				else
+				{
+					pFC = fecore_new<FEModelLoad>("rigid_moment", &fem);
+
+					pFC->SetParameter("rb", nmat);
+					pFC->SetParameter("dof", bc - 3);
+					pFC->SetParameter("value", val);
+				}
+				feb.AddModelLoad(pFC);
 
 				if (lc >= 0)
 				{
@@ -416,7 +429,6 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
 					GetFEModel()->AttachLoadController(p, lc);
 				}
-				GetBuilder()->AddModelLoad(pFC);
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
@@ -463,12 +475,25 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				double val = 0.0;
 				value(tag, val);
 
-				FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
-				feb.AddModelLoad(pFC);
+				FEModelLoad* pFC = nullptr;
 
-				pFC->SetParameter("rb", nmat);
-				pFC->SetParameter("dof", bc);
-				pFC->SetParameter("value", val);
+				if (bc < 3)
+				{
+					pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
+
+					pFC->SetParameter("rb", nmat);
+					pFC->SetParameter("dof", bc);
+					pFC->SetParameter("value", val);
+				}
+				else
+				{
+					pFC = fecore_new<FEModelLoad>("rigid_moment", &fem);
+
+					pFC->SetParameter("rb", nmat);
+					pFC->SetParameter("dof", bc - 3);
+					pFC->SetParameter("value", val);
+				}
+				feb.AddModelLoad(pFC);
 
 				if (lc >= 0)
 				{
@@ -592,13 +617,27 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			value(tag, val);
 
 			// create the rigid body force
-			FEModelLoad* pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
+			FEModelLoad* pFC = nullptr;
+
+			if (bc < 3)
+			{
+				pFC = fecore_new<FEModelLoad>("rigid_force", &fem);
+
+				pFC->SetParameter("load_type", ntype);
+				pFC->SetParameter("rb", nmat);
+				pFC->SetParameter("dof", bc);
+				pFC->SetParameter("value", val);
+			}
+			else
+			{
+				pFC = fecore_new<FEModelLoad>("rigid_moment", &fem);
+
+				pFC->SetParameter("rb", nmat);
+				pFC->SetParameter("dof", bc - 3);
+				pFC->SetParameter("value", val);
+			}
 			feb.AddModelLoad(pFC);
 
-			pFC->SetParameter("load_type", ntype);
-			pFC->SetParameter("rb", nmat);
-			pFC->SetParameter("dof", bc);
-			pFC->SetParameter("value", val);
 			if (lc >= 0)
 			{
 				FEParam* p = pFC->GetParameter("value");

@@ -120,3 +120,44 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+//! rigid body moment
+class FEBIOMECH_API FERigidBodyMoment : public FERigidLoad
+{
+public:
+	FERigidBodyMoment(FEModel* pfem);
+
+	//! Activation
+	void Activate() override;
+
+	//! initialization
+	bool Init() override;
+
+	//! Serialization
+	void Serialize(DumpStream& ar) override;
+
+	//! forces
+	void LoadVector(FEGlobalVector& R) override;
+
+	//! Stiffness matrix
+	void StiffnessMatrix(FELinearSystem& LS) override;
+
+public:
+	void SetRigidMaterialID(int nid);
+
+	void SetDOF(int bc);
+
+	void SetValue(double f);
+
+private:
+	int		m_rigidMat;		//!< rigid body material id
+	int		m_dof;			//!< force direction
+	bool	m_brelative;	//!< relative flag
+	double	m_value;		//!< applied moment
+
+	double	m_value0;		//!< initial moment at activation (used with brelative flag)
+	int		m_rid;
+
+	DECLARE_FECORE_CLASS();
+};
