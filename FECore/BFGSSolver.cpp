@@ -38,9 +38,6 @@ SOFTWARE.*/
 
 BFGSSolver::BFGSSolver(FEModel* fem) : FENewtonStrategy(fem)
 {
-	m_maxups = 10;
-	m_cmax   = 1e5;
-
 	m_neq = 0;
 
 	// pointer to linear solver
