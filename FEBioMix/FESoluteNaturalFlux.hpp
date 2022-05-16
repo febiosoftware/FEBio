@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2022 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,32 +27,45 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEElasticFiberMaterialUC.h"
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelParam.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
-//! Material class for single fiber, tension only
-//! Power-law linear response (uncoupled)
-
-class FEFiberPowLinearUncoupled : public FEElasticFiberMaterialUC
+//! The flux surface is a surface domain that sustains a solute natural flux boundary
+//! condition
+//!
+class FEBIOMIX_API FESoluteNaturalFlux : public FESurfaceLoad
 {
 public:
-    FEFiberPowLinearUncoupled(FEModel* pfem);
+    //! constructor
+    FESoluteNaturalFlux(FEModel* pfem);
 
-   
-    //! Cauchy stress
-    virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& n0) override;
-    
-    // Spatial tangent
-    virtual tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0) override;
-    
-    //! Strain energy density
-    virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0) override;
-    
-public:
-    FEParamDouble	m_E;		// fiber modulus
-    double  m_lam0;     // stretch ratio at end of toe region
-	double  m_beta;     // power law exponent in toe region
+    //! Initialization
+    bool Init() override;
 
-	// declare the parameter list
-	DECLARE_FECORE_CLASS();
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+
+    void SetSolute(int isol) { m_isol = isol; }
+    
+    //! calculate flux stiffness
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+    
+    //! calculate residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    
+protected:
+    bool        m_bshellb;      //!< flag for prescribing flux on shell bottom
+    int         m_isol;         //!< solute index
+
+protected:
+    FEDofList    m_dofC;
+    FEDofList    m_dofU;
+    FEDofList    m_dofP;
+
+    DECLARE_FECORE_CLASS();
 };

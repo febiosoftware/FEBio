@@ -168,8 +168,11 @@ public:
     
 
 public:
-	//! calculate the surface area of a surface element
+	//! calculate the reference surface area of a surface element
 	double FaceArea(FESurfaceElement& el);
+
+	//! calculate the current surface area of a surface element
+	double CurrentFaceArea(FESurfaceElement& el);
 
 	//! return the max element size
 	double MaxElementSize();

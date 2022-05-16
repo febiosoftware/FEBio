@@ -672,6 +672,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
 	REGISTER_FECORE_CLASS(FEPlotEnclosedVolume, "enclosed volume");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceArea, "surface area");
+	REGISTER_FECORE_CLASS(FEPlotFacetArea, "facet area");
 	REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity, "strain energy density");
 	REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity, "deviatoric strain energy density");
 	REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy, "specific strain energy");

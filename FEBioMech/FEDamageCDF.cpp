@@ -370,6 +370,7 @@ BEGIN_FECORE_CLASS(FEDamageCDFPower, FEDamageCDF)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(1.0), "alpha" );
     ADD_PARAMETER(m_mu0  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0"   );
     ADD_PARAMETER(m_mu1  , "mu1"   );
+    ADD_PARAMETER(m_s    , FE_RANGE_GREATER(0.0)         , "scale" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -379,6 +380,7 @@ FEDamageCDFPower::FEDamageCDFPower(FEModel* pfem) : FEDamageCDF(pfem)
     m_alpha = 2;
     m_mu0 = 1;
     m_mu1 = 0;
+    m_s = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -399,7 +401,7 @@ double FEDamageCDFPower::cdf(const double X)
     
     // this CDF only admits positive values
     if (X > 0)
-        cdf = m_mu0 + m_mu1*pow(X,m_alpha);
+        cdf = m_mu0 + m_mu1*pow(X/m_s,m_alpha);
     
     return cdf;
 }
@@ -411,7 +413,7 @@ double FEDamageCDFPower::pdf(const double X)
     
     // this CDF only admits positive values
     if (X > 0)
-        pdf = m_mu1*m_alpha*pow(X,m_alpha-1);
+        pdf = m_mu1*m_alpha/m_s*pow(X/m_s,m_alpha-1);
     
     return pdf;
 }

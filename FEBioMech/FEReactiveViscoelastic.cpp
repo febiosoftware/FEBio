@@ -247,24 +247,24 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
     
     // current time
     double time = GetFEModel()->GetTime().currentTime;
-    double tv = time - pt.m_v[ig];
+    double dtv = time - pt.m_v[ig];
 
     switch (m_btype) {
         case 1:
         {
-            if (tv >= 0)
-                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, tv, D);
+            if (dtv >= 0)
+                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, dtv, D);
         }
             break;
         case 2:
         {
             if (ig == 0) {
-                w = m_pRelx->Relaxation(mp, tv, D);
+                w = m_pRelx->Relaxation(mp, dtv, D);
             }
             else
             {
-                double tu = time - pt.m_v[ig-1];
-                w = m_pRelx->Relaxation(mp, tv, D) - m_pRelx->Relaxation(mp, tu, D);
+                double dtu = time - pt.m_v[ig-1];
+                w = m_pRelx->Relaxation(mp, dtv, D) - m_pRelx->Relaxation(mp, dtu, D);
             }
         }
             break;
@@ -297,7 +297,7 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
     // get current number of generations
     int ng = (int)pt.m_Uv.size();
     
-    double w = (!pt.m_wv.empty()) ? pt.m_wv.back() : 1;
+    double f = (!pt.m_wv.empty()) ? pt.m_wv.back() : 1;
     
     for (int ig=0; ig<ng-1; ++ig)
     {
@@ -305,17 +305,17 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
         ep.m_F = pt.m_Uv[ig];
         ep.m_J = pt.m_Jv[ig];
         // evaluate the breaking bond mass fraction for this generation
-        w -= BreakingBondMassFraction(mp, ig, D);
+        f -= BreakingBondMassFraction(mp, ig, D);
     }
     
     // restore safe copy of deformation gradient
     ep.m_F = F;
     ep.m_J = J;
     
-    assert(w >= 0);
+    assert(f >= 0);
     
     // return the bond mass fraction of the reforming generation
-    return w;
+    return f;
 }
 
 //-----------------------------------------------------------------------------
@@ -622,10 +622,12 @@ void FEReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
         pt.m_Uv[1] = (pt.m_Uv[0]*w0 + pt.m_Uv[1]*w1)/(w0+w1);
         pt.m_Jv[1] = pt.m_Uv[1].det();
         pt.m_f[1] = (w0*pt.m_f[0] + w1*pt.m_f[1])/(w0+w1);
+        pt.m_wv[1] = (w0*pt.m_wv[0] + w1*pt.m_wv[1])/(w0+w1);
         pt.m_Uv.pop_front();
         pt.m_Jv.pop_front();
         pt.m_v.pop_front();
         pt.m_f.pop_front();
+        pt.m_wv.pop_front();
     }
     
     // restore safe copy of deformation gradient
@@ -675,7 +677,6 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
     else if (pt.m_v.back() == tp.currentTime) {
         pt.m_Uv.back() = Uv;
         pt.m_Jv.back() = Jv;
-        pt.m_f.back() = ReformingBondMassFraction(wb);
         if (m_pWCDF) {
             pt.m_Et = ScalarStrain(pt);
             if (pt.m_Et > pt.m_Em)
@@ -683,6 +684,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
             else
                 pt.m_wv.back() = m_pWCDF->cdf(pt.m_Em);
         }
+        pt.m_f.back() = ReformingBondMassFraction(wb);
     }
 }
 

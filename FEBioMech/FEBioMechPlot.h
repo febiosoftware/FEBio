@@ -256,6 +256,23 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Surface facet area
+//!
+class FEPlotFacetArea : public FEPlotSurfaceData
+{
+private:
+	FEModel* m_pfem;
+	bool                m_binit;
+	vector<FEElement*>  m_elem;
+	vector<vec3d>       m_area;
+
+public:
+	FEPlotFacetArea(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { m_binit = true; }
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+
+//-----------------------------------------------------------------------------
 //! Scalar surface load
 //!
 class FEPlotScalarSurfaceLoad : public FEPlotSurfaceData

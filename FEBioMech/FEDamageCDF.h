@@ -238,6 +238,7 @@ public:
     double    m_alpha;            //!< power exponent alpha
     double    m_mu0;              //!< constant coeff
     double    m_mu1;              //!< coeff of power
+    double    m_s;                //!< scale factor for argument
 
     // declare parameter list
     DECLARE_FECORE_CLASS();
