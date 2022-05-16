@@ -62,6 +62,7 @@ public:
 
 		void AddVariable(Variable* v) { m_var.push_back(v); }
 
+		Variable* GetVariable(int i) { return m_var[i]; }
 		const Variable* GetVariable(int i) const { return m_var[i]; }
 
 	public:
@@ -76,6 +77,8 @@ public:
 
 	ClassVariable* Root() { return &m_var; }
 	const ClassVariable* Root() const { return &m_var; }
+
+	SimpleVariable* FindParameter(const char* szparam);
 
 	const std::string& ClassType() const { return m_var.m_type; }
 
