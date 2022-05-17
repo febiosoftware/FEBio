@@ -386,25 +386,40 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEIsotropicLeeSacks, "isotropic Lee-Sacks");
 	REGISTER_FECORE_CLASS(FEIsotropicLeeSacksUncoupled, "uncoupled isotropic Lee-Sacks");
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
-
-	// Fiber materials
-	REGISTER_FECORE_CLASS(FEFiberExpPow, "fiber-exp-pow");
-	REGISTER_FECORE_CLASS(FEFiberExpPowUncoupled, "fiber-exp-pow-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
-	REGISTER_FECORE_CLASS(FEFiberPowLinear, "fiber-pow-linear");
-	REGISTER_FECORE_CLASS(FEFiberPowLinearUncoupled, "fiber-pow-linear-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC, "fiber-exponential-power-law-uncoupled");
-    REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
-	REGISTER_FECORE_CLASS(FEFiberNaturalNH, "fiber-natural-NH");
-	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
+
+	// fiber materials (derived from FEFiberMaterial)
+	REGISTER_FECORE_CLASS(FEFiberNH          , "fiber-NH"            );
+	REGISTER_FECORE_CLASS(FEFiberExpPow      , "fiber-exp-pow"       );
+	REGISTER_FECORE_CLASS(FEFiberExpLinear   , "fiber-exp-linear"    );
+	REGISTER_FECORE_CLASS(FEFiberPowLinear   , "fiber-pow-linear"    );
 	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
-	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
+	REGISTER_FECORE_CLASS(FEFiberNaturalNH   , "fiber-natural-NH"    );
+
+	// Elastic Fiber materials (derived from FEElasticFiberMaterial)
+	REGISTER_FECORE_CLASS(FEElasticFiberNH          , "fiber-NH"            );
+	REGISTER_FECORE_CLASS(FEElasticFiberExpPow      , "fiber-exp-pow"       );
+	REGISTER_FECORE_CLASS(FEElasticFiberExpLinear   , "fiber-exp-linear"    );
+	REGISTER_FECORE_CLASS(FEElasticFiberPowLinear   , "fiber-pow-linear"    );
+	REGISTER_FECORE_CLASS(FEElasticFiberExpPowLinear, "fiber-exp-pow-linear");
+	REGISTER_FECORE_CLASS(FEElasticFiberNaturalNH   , "fiber-natural-NH"    );
+
+	// fiber materials for uncoupled formulation (derived from FEFiberMaterialUC)
+	REGISTER_FECORE_CLASS(FEFiberExpLinearUC, "uncoupled fiber-exp-linear");
+	REGISTER_FECORE_CLASS(FEFiberNHUC       , "fiber-NH-uncoupled");
+	REGISTER_FECORE_CLASS(FEFiberExpPowUC   , "fiber-exp-pow-uncoupled");
+	REGISTER_FECORE_CLASS(FEFiberPowLinearUC, "fiber-pow-linear-uncoupled");
+
+	// Uncoupled elastic fiber materials (derived from FEUncoupledFiberMaterial)
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
-    REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-Kiousis-uncoupled");
+	REGISTER_FECORE_CLASS(FEUncoupledFiberNH       , "fiber-NH-uncoupled");
+	REGISTER_FECORE_CLASS(FEUncoupledFiberExpPow   , "fiber-exp-pow-uncoupled");
+	REGISTER_FECORE_CLASS(FEUncoupledFiberPowLinear, "fiber-pow-linear-uncoupled");
+    REGISTER_FECORE_CLASS(FEUncoupledFiberKiousis  , "fiber-Kiousis-uncoupled");
 
 	// obsolete fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExponentialPower, "fiber-exponential-power-law");
-
+	REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC, "fiber-exponential-power-law-uncoupled");
 
 	// solid materials (derived from FESolidMaterial)
 	REGISTER_FECORE_CLASS(FERigidMaterial, "rigid body");

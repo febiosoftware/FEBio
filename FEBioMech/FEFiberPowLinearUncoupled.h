@@ -28,16 +28,16 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFiberMaterialUC.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
 //! Power-law linear response (uncoupled)
 
-class FEFiberPowLinearUncoupled : public FEElasticFiberMaterialUC
+class FEFiberPowLinearUC : public FEFiberMaterialUncoupled
 {
 public:
-    FEFiberPowLinearUncoupled(FEModel* pfem);
-
+    FEFiberPowLinearUC(FEModel* pfem);
    
     //! Cauchy stress
     virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& n0) override;
@@ -55,4 +55,11 @@ public:
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
+};
+
+class FEUncoupledFiberPowLinear : public FEElasticFiberMaterialUC_T<FEFiberPowLinearUC>
+{
+public:
+    FEUncoupledFiberPowLinear(FEModel* fem) : FEElasticFiberMaterialUC_T<FEFiberPowLinearUC>(fem) {}
+    DECLARE_FECORE_CLASS();
 };

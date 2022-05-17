@@ -30,14 +30,14 @@ SOFTWARE.*/
 #include "FEFiberPowLinearUncoupled.h"
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberPowLinearUncoupled, FEElasticFiberMaterialUC)
+BEGIN_FECORE_CLASS(FEFiberPowLinearUC, FEFiberMaterialUncoupled)
 	ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    )->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFiberPowLinearUncoupled::FEFiberPowLinearUncoupled(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
+FEFiberPowLinearUC::FEFiberPowLinearUC(FEModel* pfem) : FEFiberMaterialUncoupled(pfem)
 { 
     m_E = 0.0;
     m_lam0 = 1.0;
@@ -45,7 +45,7 @@ FEFiberPowLinearUncoupled::FEFiberPowLinearUncoupled(FEModel* pfem) : FEElasticF
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowLinearUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberPowLinearUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -93,7 +93,7 @@ mat3ds FEFiberPowLinearUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowLinearUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberPowLinearUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -156,7 +156,7 @@ tens4ds FEFiberPowLinearUncoupled::DevFiberTangent(FEMaterialPoint& mp, const ve
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberPowLinearUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberPowLinearUC::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -185,3 +185,10 @@ double FEFiberPowLinearUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& m
     
     return sed;
 }
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEUncoupledFiberPowLinear, FEElasticFiberMaterialUC)
+	ADD_PARAMETER(m_fib.m_E    , FE_RANGE_GREATER(0.0), "E"    )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
+	ADD_PARAMETER(m_fib.m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+END_FECORE_CLASS();

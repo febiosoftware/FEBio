@@ -41,7 +41,6 @@ END_FECORE_CLASS();
 FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
     m_fiber = nullptr;
-
     m_Us = mat3dd(1);
     m_bUs = false;
 }
@@ -65,7 +64,7 @@ vec3d FEElasticFiberMaterialUC::FiberVector(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-vec3d FEElasticFiberMaterialUC::FiberPreStretch(const vec3d a0)
+vec3d FEElasticFiberMaterialUC::FiberPreStretch(const vec3d& a0)
 {
     // account for prior deformation in multigenerational formulation
     if (m_bUs) {

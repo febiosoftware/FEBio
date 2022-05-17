@@ -23,45 +23,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEElasticFiberMaterial.h"
-#include "FEFiberMaterial.h"
+#include <FECore/FEMaterial.h>
+#include "febiomech_api.h"
+#include <FECore/tens4d.h>
 
-//-----------------------------------------------------------------------------
-//! This class represents a fiber material with an exponential toe-region
-//! and a linear region.
-class FEFiberExpLinear : public FEFiberMaterial
+class FEFiberMaterial : public FEMaterialProperty
 {
-public:
-	//! constructor
-	FEFiberExpLinear(FEModel* pfem);
-	
-	//! Calculate the fiber stress
-	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
-
-	//! Calculate the fiber tangent
-	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
-
-	//! Calculate the fiber strain energy density
-	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+	FECORE_BASE_CLASS(FEFiberMaterial);
 
 public:
-	double	m_c3;		//!< Exponential stress coefficient
-	double	m_c4;		//!< Fiber uncrimping coefficient
-	double	m_c5;		//!< Modulus of straightened fibers
-	double	m_lam1;		//!< fiber stretch for straightened fibers
-	double	m_epsf;
+	FEFiberMaterial(FEModel* fem);
 
-	DECLARE_FECORE_CLASS();
+	FEMaterialPoint* CreateMaterialPointData();
+
+	virtual mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& fiber) = 0;
+
+	virtual tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& fiber) = 0;
+
+	virtual double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& fiber) = 0;
 };
 
-//-----------------------------------------------------------------------------
-class FEElasticFiberExpLinear : public FEElasticFiberMaterial_T<FEFiberExpLinear>
+// fiber materials for use in uncoupled materials
+class FEFiberMaterialUncoupled : public FEMaterialProperty
 {
+	FECORE_BASE_CLASS(FEFiberMaterialUncoupled);
+
 public:
-	FEElasticFiberExpLinear(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberExpLinear>(fem) {}
-	DECLARE_FECORE_CLASS();
+	FEFiberMaterialUncoupled(FEModel* fem);
+
+	FEMaterialPoint* CreateMaterialPointData();
+
+	virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& fiber) = 0;
+
+	virtual tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& fiber) = 0;
+
+	virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& fiber) = 0;
 };

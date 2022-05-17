@@ -28,12 +28,15 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFiberMaterial.h"
+#include "FEFiberMaterial.h"
+
+class FEElasticFiberExpPow;
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
 //! Exponential-power law
 
-class FEFiberExpPow : public FEElasticFiberMaterial
+class FEFiberExpPow : public FEFiberMaterial
 {
 public:
 	FEFiberExpPow(FEModel* pfem);
@@ -56,6 +59,16 @@ protected:
 	double	m_epsf;
 
 	// declare the parameter list
+	DECLARE_FECORE_CLASS();
+
+	friend class FEElasticFiberExpPow;
+};
+
+//-----------------------------------------------------------------------------
+class FEElasticFiberExpPow : public FEElasticFiberMaterial_T<FEFiberExpPow>
+{
+public:
+	FEElasticFiberExpPow(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberExpPow>(fem) {}
 	DECLARE_FECORE_CLASS();
 };
 

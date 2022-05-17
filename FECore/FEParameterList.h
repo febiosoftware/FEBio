@@ -221,7 +221,7 @@ template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
 
 // the following macro declares the parameter list for a material
 #define DECLARE_FECORE_CLASS() \
-	protected: void BuildParamList() override;
+	public: void BuildParamList() override;
 
 #define FECORE_BASE_CLASS(theClass) \
 	public: static const char* BaseClassName() { return #theClass; } \

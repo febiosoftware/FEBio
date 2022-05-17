@@ -33,9 +33,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEElasticFiberMaterial, FEElasticMaterial)
-    // NOTE: We need to make this optional since it should not
-    // be defined when used in a CFD material.
-	ADD_PROPERTY(m_fiber, "fiber")->SetFlags(FEProperty::Optional);
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

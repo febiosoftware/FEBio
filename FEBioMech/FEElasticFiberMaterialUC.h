@@ -50,9 +50,9 @@ public:
 	virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
     
     // Set or clear pre-stretch, as needed in multigenerational materials (e.g., reactive viscoelasticity)
-    void SetPreStretch(const mat3ds Us) { m_Us = Us; m_bUs = true; }
+    void SetPreStretch(const mat3ds& Us) { m_Us = Us; m_bUs = true; }
     void ResetPreStretch() { m_bUs = false; }
-    vec3d FiberPreStretch(const vec3d a0);
+    vec3d FiberPreStretch(const vec3d& a0);
 
 private:
 	// These are made private since fiber materials should implement the functions above instead. 
@@ -73,4 +73,33 @@ public:
 	double	m_epsf;
 
 	DECLARE_FECORE_CLASS();
+};
+
+
+template <class FiberMatUC>
+class FEElasticFiberMaterialUC_T : public FEElasticFiberMaterialUC
+{
+public: 
+	FEElasticFiberMaterialUC_T(FEModel* fem) : FEElasticFiberMaterialUC(fem), m_fib(fem) {}
+
+	bool Init() override { return m_fib.Init(); }
+	bool Validate() override { return m_fib.Validate(); }
+	FEMaterialPoint* CreateMaterialPointData() override 
+	{
+		FEMaterialPoint* mp = FEUncoupledMaterial::CreateMaterialPointData();
+		mp->SetNext(m_fib.CreateMaterialPointData());
+		return mp;
+	}	
+	void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override 
+	{ 
+		FEElasticFiberMaterialUC::UpdateSpecializedMaterialPoints(mp, tp);
+		m_fib.UpdateSpecializedMaterialPoints(mp, tp); 
+	}
+
+	mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.DevFiberStress(mp, a0); }
+	tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.DevFiberTangent(mp, a0); }
+	double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.DevFiberStrainEnergyDensity(mp, a0); }
+
+protected:
+	FiberMatUC	m_fib;
 };

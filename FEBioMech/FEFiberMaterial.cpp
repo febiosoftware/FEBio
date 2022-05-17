@@ -23,45 +23,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
-#pragma once
-#include "FEElasticFiberMaterial.h"
+#include "stdafx.h"
 #include "FEFiberMaterial.h"
+#include "FEFiberMaterialPoint.h"
 
-//-----------------------------------------------------------------------------
-//! This class represents a fiber material with an exponential toe-region
-//! and a linear region.
-class FEFiberExpLinear : public FEFiberMaterial
+FEFiberMaterial::FEFiberMaterial(FEModel* fem) : FEMaterialProperty(fem)
 {
-public:
-	//! constructor
-	FEFiberExpLinear(FEModel* pfem);
-	
-	//! Calculate the fiber stress
-	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+}
 
-	//! Calculate the fiber tangent
-	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
-
-	//! Calculate the fiber strain energy density
-	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
-
-public:
-	double	m_c3;		//!< Exponential stress coefficient
-	double	m_c4;		//!< Fiber uncrimping coefficient
-	double	m_c5;		//!< Modulus of straightened fibers
-	double	m_lam1;		//!< fiber stretch for straightened fibers
-	double	m_epsf;
-
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-class FEElasticFiberExpLinear : public FEElasticFiberMaterial_T<FEFiberExpLinear>
+FEMaterialPoint* FEFiberMaterial::CreateMaterialPointData()
 {
-public:
-	FEElasticFiberExpLinear(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberExpLinear>(fem) {}
-	DECLARE_FECORE_CLASS();
-};
+	return new FEFiberMaterialPoint(nullptr);
+}
+
+//===========================================================================================
+FEFiberMaterialUncoupled::FEFiberMaterialUncoupled(FEModel* fem) : FEMaterialProperty(fem)
+{
+}
+
+FEMaterialPoint* FEFiberMaterialUncoupled::CreateMaterialPointData()
+{
+	return new FEFiberMaterialPoint(nullptr);
+}

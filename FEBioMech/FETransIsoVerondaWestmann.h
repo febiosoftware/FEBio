@@ -63,8 +63,9 @@ public:
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 protected:
-    FEUncoupledFiberExpLinear       m_fib;
+    FEFiberExpLinearUC		       m_fib;
     FEActiveContractionMaterial*    m_ac;
+	FEVec3dValuator* m_fiber;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

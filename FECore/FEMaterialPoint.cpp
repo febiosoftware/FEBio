@@ -53,7 +53,7 @@ void FEMaterialPoint::SetPrev(FEMaterialPoint* pt)
 void FEMaterialPoint::SetNext(FEMaterialPoint* pt)
 {
 	m_pNext = pt;
-	pt->m_pPrev = this;
+	if (pt) pt->m_pPrev = this;
 }
 
 void FEMaterialPoint::Append(FEMaterialPoint* pt)

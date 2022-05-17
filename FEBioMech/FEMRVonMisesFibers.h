@@ -79,5 +79,5 @@ public:
 	DECLARE_FECORE_CLASS();
 
 protected:
-	FEUncoupledFiberExpLinear	m_fib;
+	FEFiberExpLinearUC	m_fib;
 };

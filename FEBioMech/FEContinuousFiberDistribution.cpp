@@ -54,7 +54,9 @@ FEContinuousFiberDistribution::~FEContinuousFiberDistribution() {}
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEContinuousFiberDistribution::CreateMaterialPointData()
 {
-    return m_pFmat->CreateMaterialPointData();
+	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
+	mp->SetNext(m_pFmat->CreateMaterialPointData());
+    return mp;
 }
 
 //-----------------------------------------------------------------------------

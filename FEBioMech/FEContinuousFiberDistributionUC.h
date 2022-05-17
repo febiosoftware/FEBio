@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEFiberDensityDistribution.h"
 #include "FEFiberIntegrationScheme.h"
 #include "FEFiberMaterialPoint.h"
+#include "FEFiberMaterial.h"
 
 //  This material is a container for a fiber material, a fiber density
 //  distribution, and an integration scheme.
@@ -59,7 +60,7 @@ private:
 	double IntegratedFiberDensity(FEMaterialPoint& pt);
 
 protected:
-    FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
+	FEFiberMaterialUncoupled*	m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*	m_pFint;    // pointer to fiber integration scheme
 

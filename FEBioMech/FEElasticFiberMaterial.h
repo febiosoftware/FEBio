@@ -73,3 +73,32 @@ public:
 
 	DECLARE_FECORE_CLASS();
 };
+
+// helper class for constructing elastic fiber materials from classes derived from FEFiberMaterial. 
+template <class fiberMat> 
+class FEElasticFiberMaterial_T : public FEElasticFiberMaterial
+{
+public:
+	FEElasticFiberMaterial_T(FEModel* fem) : FEElasticFiberMaterial(fem), m_fib(fem) {}
+
+	bool Init() override { return m_fib.Init(); }
+	bool Validate() override { return m_fib.Validate(); }
+	FEMaterialPoint* CreateMaterialPointData() override 
+	{ 
+		FEMaterialPoint* mp = new FEElasticMaterialPoint;
+		mp->SetNext(m_fib.CreateMaterialPointData());
+		return mp; 
+	}
+	void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override 
+	{
+		FEElasticFiberMaterial::UpdateSpecializedMaterialPoints(mp, tp);
+		m_fib.UpdateSpecializedMaterialPoints(mp, tp);
+	}
+
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.FiberStress(mp, a0); }
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.FiberTangent(mp, a0); }
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.FiberStrainEnergyDensity(mp, a0); }
+
+protected:
+	fiberMat	m_fib;
+};

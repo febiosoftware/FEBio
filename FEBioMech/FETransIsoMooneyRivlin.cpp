@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
 	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
 	
-	ADD_PROPERTY(m_fib.m_fiber, "fiber")->SetDefaultType("vector");
+	ADD_PROPERTY(m_fiber, "fiber")->SetDefaultType("vector");
 
 	ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 END_FECORE_CLASS();
@@ -52,6 +52,7 @@ FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMater
 {
 	m_ac = nullptr;
 	m_fib.SetParent(this);
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,6 +87,15 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
 
+	// material axes
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
+
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
 	double W1 = c1;
@@ -99,10 +109,10 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// calculate the passive fiber stress
-	mat3ds fs = m_fib.DevFiberStress(mp,m_fib.FiberVector(mp));
+	mat3ds fs = m_fib.DevFiberStress(mp, a0);
 
 	// calculate the active fiber stress (if provided)
-	if (m_ac) fs += m_ac->ActiveStress(mp, m_fib.FiberVector(mp));
+	if (m_ac) fs += m_ac->ActiveStress(mp, a0);
 
 	return s + fs;
 }
@@ -126,6 +136,15 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
+
+	// fiber vector
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
 
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
@@ -156,10 +175,10 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	// add the passive fiber stiffness
-	c += m_fib.DevFiberTangent(mp,m_fib.FiberVector(mp));
+	c += m_fib.DevFiberTangent(mp, a0);
 
 	// add the active fiber stiffness
-	if (m_ac) c += m_ac->ActiveStiffness(mp, m_fib.FiberVector(mp));
+	if (m_ac) c += m_ac->ActiveStiffness(mp, a0);
 
 	return c;
 }
@@ -174,6 +193,15 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
     
 	// calculate square of B
 	mat3ds B2 = B.sqr();
+
+	// fiber vector
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
     
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
@@ -184,7 +212,7 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double sed = c1*(I1-3) + c2*(I2-3);
     
 	// add the fiber sed
-	sed += m_fib.DevFiberStrainEnergyDensity(mp,m_fib.FiberVector(mp));
+	sed += m_fib.DevFiberStrainEnergyDensity(mp, a0);
     
 	return sed;
 }
@@ -193,7 +221,15 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 // update force-velocity material point
 void FETransIsoMooneyRivlin::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& timeInfo)
 {
+	// fiber vector
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
+
     // get the material fiber axis
-    vec3d a0 = m_fib.m_fiber->unitVector(mp);
     if (m_ac) m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
 }

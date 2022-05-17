@@ -42,7 +42,7 @@ BEGIN_FECORE_CLASS(FETransIsoMREstrada, FEUncoupledMaterial)
     ADD_PARAMETER(m_fib.m_c5, "c5");
     ADD_PARAMETER(m_fib.m_lam1, "lam_max");
     
-    ADD_PROPERTY(m_fib.m_fiber, "fiber");
+    ADD_PROPERTY(m_fiber, "fiber");
     ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 END_FECORE_CLASS();
 
@@ -51,6 +51,7 @@ FETransIsoMREstrada::FETransIsoMREstrada(FEModel* pfem) : FEUncoupledMaterial(pf
 {
     m_ac = nullptr;
     m_fib.SetParent(this);
+    m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -80,6 +81,15 @@ mat3ds FETransIsoMREstrada::DevStress(FEMaterialPoint& mp)
     
     // calculate square of B
     mat3ds B2 = B.sqr();
+
+    // material axes
+    mat3d Q = GetLocalCS(mp);
+
+    // get the fiber vector in local coordinates
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d a0 = Q * fiber;
     
     // Invariants of B (= invariants of C)
     // Note that these are the invariants of Btilde, not of B!
@@ -98,10 +108,10 @@ mat3ds FETransIsoMREstrada::DevStress(FEMaterialPoint& mp)
     mat3ds s = T.dev()*(2.0/J);
     
     // calculate the passive fiber stress
-    mat3ds fs = m_fib.DevFiberStress(mp,m_fib.FiberVector(mp));
+    mat3ds fs = m_fib.DevFiberStress(mp, a0);
     
     // calculate the active fiber stress (if provided)
-    if (m_ac) fs += m_ac->ActiveStress(mp,m_fib.FiberVector(mp));
+    if (m_ac) fs += m_ac->ActiveStress(mp, a0);
     
     return s + fs;
 }
@@ -144,6 +154,15 @@ tens4ds FETransIsoMREstrada::DevTangent(FEMaterialPoint& mp)
     tens4ds I4  = dyad4s(I);
     tens4ds BxB = dyad1s(B);
     tens4ds B4  = dyad4s(B);
+
+    // material axes
+    mat3d Q = GetLocalCS(mp);
+
+    // get the fiber vector in local coordinates
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d a0 = Q * fiber;
     
     // deviatoric cauchy-stress, trs = trace[s]/3
     mat3ds devs = pt.m_s.dev();
@@ -155,10 +174,10 @@ tens4ds FETransIsoMREstrada::DevTangent(FEMaterialPoint& mp)
     tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
     
     // add the passive fiber stiffness
-    c += m_fib.DevFiberTangent(mp,m_fib.FiberVector(mp));
+    c += m_fib.DevFiberTangent(mp, a0);
     
     // add the active fiber stiffness
-    if (m_ac) c += m_ac->ActiveStiffness(mp, m_fib.FiberVector(mp));
+    if (m_ac) c += m_ac->ActiveStiffness(mp, a0);
     
     return c;
 }
@@ -174,6 +193,15 @@ double FETransIsoMREstrada::DevStrainEnergyDensity(FEMaterialPoint& mp)
     // calculate square of B
     mat3ds B2 = B.sqr();
     
+    // material axes
+    mat3d Q = GetLocalCS(mp);
+
+    // get the fiber vector in local coordinates
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d a0 = Q * fiber;
+
     // Invariants of B (= invariants of C)
     // Note that these are the invariants of Btilde, not of B!
     double I1 = B.tr();
@@ -183,7 +211,7 @@ double FETransIsoMREstrada::DevStrainEnergyDensity(FEMaterialPoint& mp)
     double sed = c1*(I1-3) + c2*(I2-3);
     
     // add the fiber sed
-    sed += m_fib.DevFiberStrainEnergyDensity(mp,m_fib.FiberVector(mp));
+    sed += m_fib.DevFiberStrainEnergyDensity(mp, a0);
     
     return sed;
 }
@@ -192,8 +220,14 @@ double FETransIsoMREstrada::DevStrainEnergyDensity(FEMaterialPoint& mp)
 // update force-velocity material point
 void FETransIsoMREstrada::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& timeInfo)
 {
-    // get the material fiber axis
-    vec3d a0 = m_fib.m_fiber->unitVector(mp);
-    
+    // material axes
+    mat3d Q = GetLocalCS(mp);
+
+    // get the fiber vector in local coordinates
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d a0 = Q * fiber;
+
     if (m_ac) m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
 }

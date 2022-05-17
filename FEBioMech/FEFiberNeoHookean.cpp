@@ -35,13 +35,12 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberNH, FEElasticFiberMaterial)
+BEGIN_FECORE_CLASS(FEFiberNH, FEFiberMaterial)
 	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
-	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFiberNH::FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem) 
+FEFiberNH::FEFiberNH(FEModel* pfem) : FEFiberMaterial(pfem)
 { 
 	m_mu = 0; 
 	m_epsf = 0.0;
@@ -141,3 +140,8 @@ double FEFiberNH::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
     
     return sed;
 }
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEElasticFiberNH, FEElasticFiberMaterial)
+	ADD_PARAMETER(m_fib.m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
+END_FECORE_CLASS();
