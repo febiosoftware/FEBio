@@ -118,6 +118,7 @@ SOFTWARE.*/
 #include "FEFiberIntegrationTriangle.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
+#include "FEHGOCoronary.h"
 #include "FESpringMaterial.h"
 #include "FENonlinearSpring.h"
 #include "FEDiscreteElementMaterial.h"
@@ -319,6 +320,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
 	REGISTER_FECORE_CLASS(FEDamageFiberExponential, "damage fiber exponential");
 	REGISTER_FECORE_CLASS(FEDamageFiberExpLinear, "damage fiber exp-linear");
+	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
