@@ -39,6 +39,12 @@ FEGenericHyperelastic::FEGenericHyperelastic(FEModel* fem) : FEElasticMaterial(f
 
 bool FEGenericHyperelastic::Init()
 {
+	if (BuildMathExpressions() == false) return false;
+	return FEElasticMaterial::Init();
+}
+
+bool FEGenericHyperelastic::BuildMathExpressions()
+{
 	vector<string> vars = { "I1", "I2", "J" };
 
 	// add all user parameters
@@ -88,7 +94,19 @@ bool FEGenericHyperelastic::Init()
 	string sWJJ = o2s.Convert(m_WJJ); feLog("WJJ = %s\n", sWJJ.c_str());
 #endif
 
-	return FEElasticMaterial::Init();
+	return true;
+}
+
+
+// serialization
+void FEGenericHyperelastic::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	if ((ar.IsShallow() == false) && ar.IsLoading())
+	{
+		bool b = BuildMathExpressions();
+		assert(b);
+	}
 }
 
 mat3ds FEGenericHyperelastic::Stress(FEMaterialPoint& mp)

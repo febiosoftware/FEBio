@@ -34,6 +34,9 @@ public:
 	// initialization
 	bool Init() override;
 
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
 	//! Deviatoric Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp) override;
 
@@ -42,6 +45,9 @@ public:
 
 	//! Deviatoric strain energy density
 	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
+
+private:
+	bool BuildMathExpressions();
 
 private:
 	std::string			m_exp;			// the string with the strain energy expression
