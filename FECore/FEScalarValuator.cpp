@@ -221,7 +221,7 @@ double FEMappedValue::operator()(const FEMaterialPoint& pt)
 
 FEScalarValuator* FEMappedValue::copy()
 {
-	FEMappedValue* map = new FEMappedValue(GetFEModel());
+	FEMappedValue* map = fecore_alloc(FEMappedValue, GetFEModel());
 	map->setDataMap(m_val);
 	return map;
 }

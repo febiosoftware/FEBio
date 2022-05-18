@@ -714,7 +714,7 @@ void FEModelBuilder::ApplyParameterMaps()
 		if (p.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& v = p.value<FEParamDouble>(mp.index);
-			FEMappedValue* map = new FEMappedValue(&m_fem);
+			FEMappedValue* map = fecore_alloc(FEMappedValue, &m_fem);
 			if (data->DataType() != FE_DOUBLE)
 			{
 				std::stringstream ss;
@@ -729,7 +729,7 @@ void FEModelBuilder::ApplyParameterMaps()
 		else if (p.type() == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& v = p.value<FEParamVec3>();
-			FEMappedValueVec3* map = new FEMappedValueVec3(&m_fem);
+			FEMappedValueVec3* map = fecore_alloc(FEMappedValueVec3, &m_fem);
 			if (data->DataType() != FE_VEC3D)
 			{
 				std::stringstream ss;
