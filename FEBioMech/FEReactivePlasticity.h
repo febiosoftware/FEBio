@@ -43,6 +43,9 @@ public:
 public:
     //! data initialization and checking
     bool Init() override;
+
+    //! serialiation
+    void Serialize(DumpStream& ar) override;
     
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;
