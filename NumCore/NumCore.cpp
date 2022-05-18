@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
 #include "FEASTEigenSolver.h"
+#include "TestSolver.h"
 
 //=============================================================================
 // Call this to initialize the NumCore module
@@ -64,6 +65,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(BIPNSolver          , "bipn");
 	REGISTER_FECORE_CLASS(BiCGStabSolver      , "bicgstab");
 	REGISTER_FECORE_CLASS(StrategySolver      , "strategy");
+	REGISTER_FECORE_CLASS(TestSolver          , "test");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
