@@ -162,7 +162,7 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 
 	FEModelBuilder* feb = GetBuilder();
 
-	FELinearConstraint* lc = new FELinearConstraint(&fem);
+	FELinearConstraint* lc = fecore_alloc(FELinearConstraint, &fem);
 
 	++tag;
 	do
