@@ -38,6 +38,8 @@ public:
 	double	m_pg;	//!< pressure "gap" for biphasic contact
     double  m_mueff;    //!< effective friction coefficient
     double  m_fls;      //!< local fluid load support
+
+    void Serialize(DumpStream& ar) override;
 };
 
 //-----------------------------------------------------------------------------

@@ -54,9 +54,9 @@ void FESlidingSurface::FESlidingPoint::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
 
-	ar & m_gap & m_nu & m_eps & m_off;
+	ar & m_nu & m_eps & m_off;
 	ar & m_rs & m_rsp;
-	ar & m_Lm & m_Lt & m_Ln;
+	ar & m_Lm & m_Lt;
 	ar & m_M;
 }
 

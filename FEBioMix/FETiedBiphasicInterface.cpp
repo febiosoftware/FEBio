@@ -78,11 +78,9 @@ void FETiedBiphasicSurface::Data::Serialize(DumpStream& ar)
 	ar & m_nu;
 	ar & m_rs;
 	ar & m_Lmd;
-	ar & m_Lmp;
+	ar & m_tr;
 	ar & m_epsn;
 	ar & m_epsp;
-	ar & m_pg;
-	ar & m_tr;
 }
 
 //-----------------------------------------------------------------------------

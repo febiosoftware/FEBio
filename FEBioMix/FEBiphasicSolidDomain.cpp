@@ -60,6 +60,17 @@ const FEDofList& FEBiphasicSolidDomain::GetDOFList() const
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+
+    if (ar.IsShallow() == false)
+    {
+        ar & m_nodePressure;
+    }
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::SetMaterial(FEMaterial* pmat)
 {
 	FEDomain::SetMaterial(pmat);

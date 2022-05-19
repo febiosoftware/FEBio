@@ -39,11 +39,17 @@ public:
 
 	bool Init() override;
 
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
 	mat3ds Stress(FEMaterialPoint& mp) override;
 
 	tens4ds Tangent(FEMaterialPoint& mp) override;
 
 	double StrainEnergyDensity(FEMaterialPoint& mp) override;
+
+private:
+	bool BuildMathExpressions();
 
 private:
 	std::string			m_exp;

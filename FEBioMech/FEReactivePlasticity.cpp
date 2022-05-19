@@ -74,6 +74,15 @@ bool FEReactivePlasticity::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! serialiation
+void FEReactivePlasticity::Serialize(DumpStream& ar)
+{
+    FEElasticMaterial::Serialize(ar);
+    ar & m_n & m_isochrc & m_rtol;
+    ar & Ky & w;
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEReactivePlasticity::CreateMaterialPointData()
 {

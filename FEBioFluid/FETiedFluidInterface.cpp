@@ -79,11 +79,11 @@ void FETiedFluidSurface::Data::Serialize(DumpStream& ar)
 	ar & m_nu;
 	ar & m_rs;
 	ar & m_Lmd;
-	ar & m_Lmp;
+    ar & m_tv;
+    ar & m_Lmp;
 	ar & m_epst;
 	ar & m_epsn;
 	ar & m_pg;
-	ar & m_tv;
 	ar & m_vn;
 }
 

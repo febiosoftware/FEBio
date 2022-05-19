@@ -244,7 +244,8 @@ void FEUT4Domain::SetUT4Parameters(double alpha, bool bdev)
 //! override Create so we can grab the ut4 parameters
 bool FEUT4Domain::Create(int nelems, FE_Element_Spec espec)
 {
-	if (espec.m_but4 == false) return false;
+	// NOTE: Commented this out, since during restart the espec is a dummy variable. 
+//	if (espec.m_but4 == false) return false;
 
 	m_alpha = espec.m_ut4_alpha;
 	m_bdev = espec.m_ut4_bdev;

@@ -67,6 +67,9 @@ public:
 	//! get the total dof list
 	const FEDofList& GetDOFList() const override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 public:
 	// update domain data
 	void Update(const FETimeInfo& tp) override;

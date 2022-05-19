@@ -23,32 +23,42 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include "FEPreStrainElastic.h"
+#include "FEUncoupledMaterial.h"
+#include "FEUncoupledFiberExpLinear.h"
 
 //-----------------------------------------------------------------------------
-// A pre-strain gradient constructed from fiber stretches
-class FEInSituStretchGradient : public FEPrestrainGradient
+// Constitutive formulation from:
+// Holzapfel, et.a., "Determination of layer-specific mechanical properties of human
+// coronary arteries with nonatherosclerotic intimal thickening
+// and related constitutive modeling", Am J Physiol Heart Circ Physiol 289
+class FEHGOCoronary : public FEUncoupledMaterial
 {
 public:
-	FEInSituStretchGradient(FEModel* pfem);
-
-	bool Init() override;
-
-	mat3d Prestrain(FEMaterialPoint& mp) override;
-
-	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
-
-	void Serialize(DumpStream& ar) override;
-
-private:
-	FEParamVec3* GetFiberProperty();
+	FEHGOCoronary(FEModel* pfem);
 
 public:
-	FEParamDouble	m_lam;	//!< in-situ stretch
-	bool			m_biso;	//!< isochoric generator option
+	double		m_rho;
+	double		m_k1;
+	double		m_k2;
 
-	FEParamVec3*	m_fiber;	// fiber property of the elastic material.
+	FEVec3dValuator* m_fiber;
 
+public:
+	//! calculate deviatoric stress at material point
+	mat3ds DevStress(FEMaterialPoint& pt) override;
+
+	//! calculate deviatoric tangent stiffness at material point
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
+
+	//! calculate deviatoric strain energy density at material point
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+
+protected:
+
+	// declare parameter list
 	DECLARE_FECORE_CLASS();
 };

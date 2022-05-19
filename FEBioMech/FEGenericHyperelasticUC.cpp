@@ -42,6 +42,12 @@ FEGenericHyperelasticUC::FEGenericHyperelasticUC(FEModel* fem) : FEUncoupledMate
 // initialization
 bool FEGenericHyperelasticUC::Init()
 {
+	if (BuildMathExpressions() == false) return false;
+	return FEUncoupledMaterial::Init();
+}
+
+bool FEGenericHyperelasticUC::BuildMathExpressions()
+{
 	vector<string> vars = { "I1", "I2" };
 
 	// add all user parameters
@@ -85,7 +91,18 @@ bool FEGenericHyperelasticUC::Init()
 		string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
 	}
 
-	return FEUncoupledMaterial::Init();
+	return true;
+}
+
+// serialization
+void FEGenericHyperelasticUC::Serialize(DumpStream& ar)
+{
+	FEUncoupledMaterial::Serialize(ar);
+	if ((ar.IsShallow() == false) && ar.IsLoading())
+	{
+		bool b = BuildMathExpressions();
+		assert(b);
+	}
 }
 
 //! Deviatoric Cauchy stress

@@ -49,6 +49,12 @@ public:
 
 	// return the surface element
 	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
+
+	void Serialize(DumpStream& ar) override
+	{
+		FEMaterialPoint::Serialize(ar);
+		ar & dxr & dxs;
+	}
 };
 
 // helper class for describing shape functions at dofs in integration routines

@@ -53,6 +53,12 @@ FEFacetTiedSurface::Data::Data()
 	m_pme = (FESurfaceElement*) 0;
 }
 
+void FEFacetTiedSurface::Data::Serialize(DumpStream& ar)
+{
+	FEContactMaterialPoint::Serialize(ar);
+	ar & m_vgap & m_Lm & m_rs;
+}
+
 //-----------------------------------------------------------------------------
 FEFacetTiedSurface::FEFacetTiedSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
