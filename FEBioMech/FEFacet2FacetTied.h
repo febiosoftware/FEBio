@@ -41,6 +41,8 @@ public:
 	public:
 		Data();
 
+		void Serialize(DumpStream& ar);
+
 	public:
 		vec3d	m_vgap;	//!< gap function
 		vec3d	m_Lm;	//!< Lagrange multiplier

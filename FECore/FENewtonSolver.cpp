@@ -473,9 +473,6 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 			m_R1.assign(m_neq, 0);
 			m_ui.assign(m_neq, 0);
 			m_Fd.assign(m_neq, 0);
-
-			// reinitialize the linear system
-			if (AllocateLinearSystem() == false) throw DumpStream::ReadError();
 		}
 	}
 }

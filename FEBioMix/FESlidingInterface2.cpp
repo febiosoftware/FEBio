@@ -74,16 +74,12 @@ FESlidingSurface2::Data::Data()
 void FESlidingSurface2::Data::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactPoint::Serialize(ar);
-	ar & m_gap;
-	ar & m_nu;
-	ar & m_rs;
 	ar & m_Lmd;
-	ar & m_Lmp;
 	ar & m_epsn;
 	ar & m_epsp;
-	ar & m_pg;
 	ar & m_p1;
-	ar & m_Ln;
+	ar & m_nu;
+	ar & m_rs;
 }
 
 //-----------------------------------------------------------------------------

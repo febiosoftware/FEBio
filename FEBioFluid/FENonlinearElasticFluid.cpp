@@ -43,6 +43,13 @@ bool FENonlinearElasticFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
+// serialization
+void FENonlinearElasticFluid::Serialize(DumpStream& ar)
+{
+    ar& m_k& m_rhor;
+}
+
+//-----------------------------------------------------------------------------
 //! gage pressure
 double FENonlinearElasticFluid::Pressure(FEMaterialPoint& mp)
 {

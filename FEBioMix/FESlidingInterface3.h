@@ -43,7 +43,6 @@ public:
 		void Serialize(DumpStream& ar) override;
 
 	public:
-		double	m_gap;	//!< gap function at integration points
 		double	m_Lmd;	//!< Lagrange multipliers for displacements
 		double	m_Lmc;	//!< Lagrange multipliers for solute concentrations
 		double	m_epsn;	//!< displacement penalty factors
