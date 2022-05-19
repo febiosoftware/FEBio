@@ -469,6 +469,26 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSBMConcentration_T, 5, "sbm6");
 	REGISTER_FECORE_CLASS_T(FELogElemSBMConcentration_T, 6, "sbm7");
 	REGISTER_FECORE_CLASS_T(FELogElemSBMConcentration_T, 7, "sbm8");
-	
+
+	//-----------------------------------------------------------------------------
+	// domain log data
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 0, "sbm1_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 1, "sbm2_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 2, "sbm3_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 3, "sbm4_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 4, "sbm5_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 5, "sbm6_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 6, "sbm7_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 7, "sbm8_integral");
+
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 0, "c1_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 1, "c2_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 2, "c3_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 3, "c4_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 4, "c5_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 5, "c6_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 6, "c7_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 7, "c8_integral");
+
 	febio.SetActiveModule(0);
 }

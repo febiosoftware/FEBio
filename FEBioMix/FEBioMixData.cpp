@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 double FENodeConcentration::value(int nnode) 
@@ -362,4 +363,73 @@ double FELogElemSolidStress::value(FEElement& el)
 		}
 	}
 	return val / (double)nint;
+}
+
+//=============================================================================
+
+FELogDomainIntegralSBMConcentration::FELogDomainIntegralSBMConcentration(FEModel* fem, int sbm) : FELogDomainData(fem) 
+{
+	m_sbm = sbm;
+}
+
+double FELogDomainIntegralSBMConcentration::value(FEDomain& dom)
+{
+	double sum = 0.0;
+	if (dynamic_cast<FESolidDomain*>(&dom))
+	{
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		for (int i = 0; i < solidDomain.Elements(); ++i)
+		{
+			FESolidElement& el = solidDomain.Element(i);
+			double val = 0.0;
+			int nint = el.GaussPoints();
+			double* gw = el.GaussWeights();
+			for (int n = 0; n < nint; ++n)
+			{
+				FESolutesMaterialPoint* ppt = el.GetMaterialPoint(n)->ExtractData<FESolutesMaterialPoint>();
+				if (ppt)
+				{
+					double Jw = solidDomain.detJt(el, n) * gw[n];
+					val += ppt->m_sbmr[m_sbm] * Jw;
+				}
+			}
+
+			sum += val;
+		}
+	}
+	return sum;
+}
+
+//=============================================================================
+FELogDomainIntegralSoluteConcentration::FELogDomainIntegralSoluteConcentration(FEModel* fem, int sol) : FELogDomainData(fem)
+{
+	m_nsol = sol;
+}
+
+double FELogDomainIntegralSoluteConcentration::value(FEDomain& dom)
+{
+	double sum = 0.0;
+	if (dynamic_cast<FESolidDomain*>(&dom))
+	{
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		for (int i = 0; i < solidDomain.Elements(); ++i)
+		{
+			FESolidElement& el = solidDomain.Element(i);
+			double val = 0.0;
+			int nint = el.GaussPoints();
+			double* gw = el.GaussWeights();
+			for (int n = 0; n < nint; ++n)
+			{
+				FESolutesMaterialPoint* ppt = el.GetMaterialPoint(n)->ExtractData<FESolutesMaterialPoint>();
+				if (ppt)
+				{
+					double Jw = solidDomain.detJt(el, n) * gw[n];
+					val += ppt->m_ca[m_nsol] * Jw;
+				}
+			}
+
+			sum += val;
+		}
+	}
+	return sum;
 }
