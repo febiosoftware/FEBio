@@ -56,6 +56,9 @@ public:
     //! evaluate bearing pressure
     double ScalarLoad(FESurfaceMaterialPoint& mp) override;
 
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+
 public:
     //! calculate residual
     void LoadVector(FEGlobalVector& R) override;

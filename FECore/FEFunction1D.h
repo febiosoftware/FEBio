@@ -154,6 +154,8 @@ public:
 
 	bool Init() override;
 
+	void Serialize(DumpStream& ar) override;
+
 	FEFunction1D* copy() override;
 
 	double value(double t) const override;
@@ -166,6 +168,8 @@ public:
 
 private:
 	void evalParams(std::vector<double>& val, double t) const;
+
+	bool BuildMathExpressions();
 
 private:
 	std::string			m_s;

@@ -866,7 +866,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 		int dof = dofList[i];
 		if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
-		LC[i] = new FELinearConstraint(&fem);
+		LC[i] = fecore_alloc(FELinearConstraint, &fem);
 		LC[i]->SetParentDof(dof, parentNode);
 	}
 

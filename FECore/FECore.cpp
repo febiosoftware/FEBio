@@ -63,6 +63,7 @@ SOFTWARE.*/
 #include "FELogEnclosedVolume.h"
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
+#include "FELinearConstraint.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
 

@@ -38,10 +38,10 @@ class FECORE_API FELinearConstraintDOF : public FECoreClass
 public:
 	FELinearConstraintDOF(FEModel* fem);
 
-public:
-	int		node;	// node number
-	int		dof;	// degree of freedom
-	double	val;	// coefficient value (ignored for parent dof)
+	public:
+		int		node;	// node number
+		int		dof;	// degree of freedom
+		double	val;	// coefficient value (ignored for parent dof)
 
 private:
 	FELinearConstraintDOF(const FELinearConstraintDOF&) : FECoreClass(nullptr) {}

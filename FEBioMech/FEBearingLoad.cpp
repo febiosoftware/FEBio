@@ -246,6 +246,24 @@ void FEBearingLoad::Update()
 }
 
 //-----------------------------------------------------------------------------
+void FEBearingLoad::Serialize(DumpStream& ar)
+{
+    FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow() == false)
+    {
+        ar & m_er;
+
+        if (ar.IsSaving())
+            m_pc->Serialize(ar);
+        else
+        {
+            m_pc = new FESurfaceMap(FE_DOUBLE);
+            m_pc->Serialize(ar);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! evaluate bearing pressure
 double FEBearingLoad::ScalarLoad(FESurfaceMaterialPoint& mp)
 {

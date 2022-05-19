@@ -24,31 +24,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEPreStrainElastic.h"
+#include <FECore/LinearSolver.h>
+#include "CompactUnSymmMatrix.h"
+#include "CompactSymmMatrix.h"
 
-//-----------------------------------------------------------------------------
-// A pre-strain gradient constructed from fiber stretches
-class FEInSituStretchGradient : public FEPrestrainGradient
+
+// Test solver. Doesn't actually solve anything. Just returns 0 as solution. 
+class TestSolver : public LinearSolver
 {
 public:
-	FEInSituStretchGradient(FEModel* pfem);
+	TestSolver(FEModel* fem);
+	~TestSolver();
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
 
-	bool Init() override;
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
-	mat3d Prestrain(FEMaterialPoint& mp) override;
+protected:
+	CompactMatrix* m_pA;
+	int				m_mtype; // matrix type
 
-	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
-
-	void Serialize(DumpStream& ar) override;
-
-private:
-	FEVec3dValuator* GetFiberProperty();
-
-public:
-	FEParamDouble	m_lam;	//!< in-situ stretch
-	bool			m_biso;	//!< isochoric generator option
-
-	FEVec3dValuator*	m_fiber;	// fiber property of the elastic material.
+	// Matrix data
+	int m_n, m_nnz, m_nrhs;
 
 	DECLARE_FECORE_CLASS();
 };

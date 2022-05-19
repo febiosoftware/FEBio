@@ -235,23 +235,23 @@ void FELinearConstraint::Serialize(DumpStream& ar)
 
 	if (ar.IsSaving())
 	{
-		ar.write(m_parentDof, sizeof(FELinearConstraintDOF), 1);
+		m_parentDof->Serialize(ar);
 		int n = (int)m_childDof.size();
 		ar << n;
 		vector<FELinearConstraintDOF*>::iterator it = m_childDof.begin();
-		for (int i=0; i<n; ++i, ++it) ar << (*it)->val << (*it)->node << (*it)->dof;
+		for (int i = 0; i < n; ++i, ++it) (*it)->Serialize(ar);
 	}
 	else
 	{
 		m_childDof.clear();
 		if (m_parentDof == nullptr) m_parentDof = new FELinearConstraintDOF(GetFEModel());
-		ar.read(m_parentDof, sizeof(FELinearConstraintDOF), 1);
+		m_parentDof->Serialize(ar);
 		int n;
 		ar >> n;
 		for (int i=0; i<n; ++i)
 		{
 			FELinearConstraintDOF* dof = new FELinearConstraintDOF(GetFEModel());
-			ar >> dof->val >> dof->node >> dof->dof;
+			dof->Serialize(ar);
 			m_childDof.push_back(dof);
 		}
 	}

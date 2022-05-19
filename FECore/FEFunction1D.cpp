@@ -136,6 +136,12 @@ void FEMathFunction::SetMathString(const std::string& s)
 
 bool FEMathFunction::Init()
 {
+	if (BuildMathExpressions() == false) return false;
+	return FEFunction1D::Init();
+}
+
+bool FEMathFunction::BuildMathExpressions()
+{
 	// process the string
 	m_exp.Clear();
 	if (m_exp.Create(m_s, true) == false) return false;
@@ -193,7 +199,17 @@ bool FEMathFunction::Init()
     else
         m_d2exp.Create("0");
 
-	return FEFunction1D::Init();
+	return true;
+}
+
+void FEMathFunction::Serialize(DumpStream& ar)
+{
+	FEFunction1D::Serialize(ar);
+	if ((ar.IsShallow() == false) && (ar.IsLoading()))
+	{
+		bool b = BuildMathExpressions();
+		assert(b);
+	}
 }
 
 FEFunction1D* FEMathFunction::copy()
