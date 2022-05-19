@@ -304,3 +304,20 @@ template <int N> class FELogDomainIntegralSBMConcentration_T : public FELogDomai
 public:
 	FELogDomainIntegralSBMConcentration_T(FEModel* pfem) : FELogDomainIntegralSBMConcentration(pfem, N) {}
 };
+
+//-------------------------------------------------------------------------------------------
+class FELogDomainIntegralSoluteConcentration : public FELogDomainData
+{
+public:
+	FELogDomainIntegralSoluteConcentration(FEModel* fem, int sol);
+	double value(FEDomain& dom) override;
+
+protected:
+	int	m_nsol;
+};
+
+template <int N> class FELogDomainIntegralSoluteConcentration_T : public FELogDomainIntegralSoluteConcentration
+{
+public:
+	FELogDomainIntegralSoluteConcentration_T(FEModel* pfem) : FELogDomainIntegralSoluteConcentration(pfem, N) {}
+};
