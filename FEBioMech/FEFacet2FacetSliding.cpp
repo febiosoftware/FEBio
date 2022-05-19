@@ -71,12 +71,10 @@ FEFacetSlidingSurface::Data::Data()
 void FEFacetSlidingSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-	ar & m_gap;
-	ar & m_nu;
-	ar & m_rs;
 	ar & m_Lm;
 	ar & m_eps;
-	ar & m_Ln;
+	ar & m_nu;
+	ar & m_rs;
 }
 
 //-----------------------------------------------------------------------------

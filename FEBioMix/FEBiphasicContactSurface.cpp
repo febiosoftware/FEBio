@@ -31,6 +31,12 @@ SOFTWARE.*/
 #include "FEBiphasic.h"
 #include <FECore/FEModel.h>
 
+void FEBiphasicContactPoint::Serialize(DumpStream& ar)
+{
+    FEContactMaterialPoint::Serialize(ar);
+    ar & m_Lmp & m_pg & m_mueff & m_fls;
+}
+
 //-----------------------------------------------------------------------------
 FEBiphasicContactSurface::FEBiphasicContactSurface(FEModel* pfem) : FEContactSurface(pfem)
 {

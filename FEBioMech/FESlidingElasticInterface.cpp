@@ -90,18 +90,16 @@ void FESlidingElasticSurface::Data::Init()
 void FESlidingElasticSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-	ar & m_gap;
 	ar & m_dg;
-	ar & m_nu;
+    ar & m_Lmd;
+    ar & m_epsn;
+    ar & m_Lmt;
+    ar & m_nu;
 	ar & m_s1;
+    ar & m_tr;
 	ar & m_rs;
 	ar & m_rsp;
-	ar & m_Lmt;
-	ar & m_Lmd;
-	ar & m_epsn;
-	ar & m_Ln;
 	ar & m_bstick;
-	ar & m_tr;
 }
 
 //-----------------------------------------------------------------------------

@@ -36,6 +36,12 @@ public:
 	{
 	public:
 		vec3d	m_tc;
+
+		void Serialize(DumpStream& ar) override
+		{
+			FEContactMaterialPoint::Serialize(ar);
+			ar & m_tc;
+		}
 	};
 
 public:
