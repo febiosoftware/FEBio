@@ -63,7 +63,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	// create a temp surface of the facet set
 	FESurface* ps = fecore_alloc(FESurface, GetFEModel());
 	ps->Create(surf);
-
+	ps->InitSurface();
 	map.Create(&surf, 0.0, FMT_NODE);
 
 	// find surface boundary nodes

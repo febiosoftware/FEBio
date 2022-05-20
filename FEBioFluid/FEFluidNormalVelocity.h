@@ -60,6 +60,9 @@ public:
     //! activate
     void Activate() override;
     
+    //! parabolic velocity profile
+    bool SetParabolicVelocity();
+
     //! rim pressure
     bool SetRimPressure();
     

@@ -179,8 +179,32 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 	{
 	case FMT_NODE:
 		{
-			assert(pt.m_elem == nullptr);
-			return value<double>(pt.m_index, 0);
+			if (pt.m_elem)
+			{
+				// get the element this material point is in
+				FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+				assert(pe);
+
+				// make sure this element belongs to this domain
+				// TODO: Can't check this if map was created through FEFacetSet
+			//	assert(pe->GetMeshPartition() == m_dom);
+
+				// get shape functions
+				double* H = pe->H(pt.m_index);
+
+				int ne = pe->Nodes();
+				for (int i = 0; i < ne; ++i)
+				{
+					double vi = value<double>(pe->m_lnode[i], 0);
+					v += vi * H[i];
+				}
+				return v;
+			}
+			else
+			{
+				// assume material point is a node
+				return value<double>(pt.m_index, 0);
+			}
 		}
 		break;
 	case FMT_MULT:

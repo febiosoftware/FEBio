@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/LinearSolver.h"
 #include "FEBioFluid.h"
+#include <FECore/FEParabolicMap.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalVelocity, FESurfaceLoad)
@@ -205,6 +206,16 @@ void FEFluidNormalVelocity::Activate()
         }
     }
     
+    // Set parabolic velocity profile if requested.
+    // Note that this may override any maps assigned to velocity
+    if (m_bpar)
+    {
+        if (SetParabolicVelocity() == false)
+        {
+            feLogError("Unable to set parablic velocity\n");
+        }
+    }
+
     if (m_bpv) {
         for (int i = 0; i < surface.Nodes(); ++i)
         {
@@ -275,6 +286,29 @@ void FEFluidNormalVelocity::Update()
     if (m_brim) SetRimPressure();
     
     ForceMeshUpdate();
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate normal velocities by solving Poiseuille flow across the surface
+bool FEFluidNormalVelocity::SetParabolicVelocity()
+{
+    FEParabolicMap gen(GetFEModel());
+    FESurfaceMap* map = new FESurfaceMap(FE_DOUBLE);
+    FEFacetSet* surf = GetSurface().GetFacetSet(); assert(surf);
+    if (surf == nullptr) return false;
+    map->Create(surf);
+    if (gen.Generate(*map) == false)
+    {
+        assert(false);
+        return false;
+    }
+
+    FEMappedValue* val = fecore_alloc(FEMappedValue, GetFEModel());
+    val->setDataMap(map);
+
+    m_velocity.setValuator(val);
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
