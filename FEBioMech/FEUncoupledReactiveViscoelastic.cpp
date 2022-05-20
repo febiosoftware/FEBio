@@ -72,6 +72,9 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
     m_pBond = nullptr;
     m_pRelx = nullptr;
     m_pWCDF = nullptr;
+    
+    m_pDmg = nullptr;
+    m_pFtg = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,6 +85,9 @@ bool FEUncoupledReactiveViscoelasticMaterial::Init()
     if (!m_pBond->Init()) return false;
     if (!m_pRelx->Init()) return false;
     if (m_pWCDF && !m_pWCDF->Init()) return false;
+    
+    m_pDmg = dynamic_cast<FEDamageMaterialUC*>(m_pBase);
+    m_pFtg = dynamic_cast<FEUncoupledReactiveFatigue*>(m_pBase);
 
     return FEUncoupledMaterial::Init();
 }
@@ -393,7 +399,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
 {
     // calculate the base material Cauchy stress
     mat3ds s = DevStressStrongBonds(mp);
-    s+= DevStressWeakBonds(mp);
+    s+= DevStressWeakBonds(mp)*(1-Damage(mp));
     
     // return the total Cauchy stress
     return s;
@@ -479,7 +485,7 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangentWeakBonds(FEMaterialP
 tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
 {
     tens4ds c = DevTangentStrongBonds(mp);
-    c+= DevTangentWeakBonds(mp);
+    c+= DevTangentWeakBonds(mp)*(1-Damage(mp));
     
     // return the total tangent
     return c;
@@ -568,7 +574,7 @@ double FEUncoupledReactiveViscoelasticMaterial::WeakBondDevSED(FEMaterialPoint& 
 double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
     double sed = StrongBondDevSED(mp);
-    sed += WeakBondDevSED(mp);
+    sed += WeakBondDevSED(mp)*(1-Damage(mp));
     
     // return the total strain energy density
     return sed;
@@ -630,7 +636,12 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
 //! Update specialized material points
 void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {
+    FEMaterialPoint& sb = *GetBaseMaterialPoint(mp);
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);
+    
+    // start by updating specialized material points of base and bond materials
+    m_pBase->UpdateSpecializedMaterialPoints(sb, tp);
+    m_pBond->UpdateSpecializedMaterialPoints(wb, tp);
     
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *wb.ExtractData<FEReactiveVEMaterialPoint>();
@@ -732,3 +743,11 @@ double FEUncoupledReactiveViscoelasticMaterial::ScalarStrain(FEMaterialPoint& mp
     return d;
 }
 
+//-----------------------------------------------------------------------------
+double FEUncoupledReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
+{
+    double D = 0;
+    if (m_pDmg) D = m_pDmg->Damage(*GetBaseMaterialPoint(mp));
+    else if (m_pFtg) D = m_pFtg->Damage(*GetBaseMaterialPoint(mp));
+    return D;
+}

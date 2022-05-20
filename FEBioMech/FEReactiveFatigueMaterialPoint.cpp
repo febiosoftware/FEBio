@@ -202,6 +202,15 @@ void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
     
     // update damage response for fatigues bonds
     for (int ig=0; ig<m_fb.size(); ++ig) m_fb[ig].Update();
+
+    // evaluate total fatigue bond fraction
+    m_wft = 0;
+    for (int ig=0; ig<m_fb.size(); ++ig) m_wft += m_fb[ig].m_wft;
+    
+    // evaluate total damage at current time
+    m_D = 1 - m_wit - m_wft;
+    if (m_D < 0) m_D = 0;
+    if (m_D > 1) m_D = 1;
 }
 
 //-----------------------------------------------------------------------------
