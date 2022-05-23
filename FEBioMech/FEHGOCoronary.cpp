@@ -66,7 +66,8 @@ mat3ds FEHGOCoronary::DevStress(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// fiber vector
-	vec3d a0 = m_fiber->operator()(mp); a0.unit();
+	mat3d Q = GetLocalCS(mp);
+	vec3d a0 = Q*m_fiber->operator()(mp); a0.unit();
 	vec3d a = F * a0;
 	double lam = Jm13 * a.unit();
 	mat3ds m = dyad(a);
@@ -120,7 +121,8 @@ tens4ds FEHGOCoronary::DevTangent(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// fiber vector
-	vec3d a0 = m_fiber->operator()(mp); a0.unit();
+	mat3d Q = GetLocalCS(mp);
+	vec3d a0 = Q*m_fiber->operator()(mp); a0.unit();
 	vec3d a = F * a0;
 	double lam = Jm13 * a.unit();
 	mat3ds m = dyad(a);
@@ -195,7 +197,8 @@ double FEHGOCoronary::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// fiber vector
-	vec3d a0 = m_fiber->operator()(mp); a0.unit();
+	mat3d Q = GetLocalCS(mp);
+	vec3d a0 = Q*m_fiber->operator()(mp); a0.unit();
 	vec3d a = F * a0;
 	double lam = Jm13 * a.unit();
 
