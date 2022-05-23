@@ -60,8 +60,22 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 		switch (p.type())
 		{
 		case FE_PARAM_DOUBLE : feLog("%s : %lg\n", sz, p.value<double>()); break;
-		case FE_PARAM_INT    : feLog("%s : %d\n" , sz, p.value<int   >()); break;
-		case FE_PARAM_BOOL   : feLog("%s : %s\n" , sz, (p.value<bool>() ? "true" : "false")); break;
+		case FE_PARAM_INT    : 
+		{
+			if (p.enums())
+			{
+				int n = p.value<int>();
+				const char* szkey = p.enumKey();
+				if (sz)
+				{
+					feLog("%s : %s (%d)\n", sz, szkey, n);
+				}
+				else feLog("%s : %d\n", sz, n);
+			}
+			else feLog("%s : %d\n", sz, p.value<int   >());
+		}
+		break;
+		case FE_PARAM_BOOL   : feLog("%s : %s\n" , sz, (p.value<bool>() ? "yes (1)" : "no (0)")); break;
 		case FE_PARAM_STRING : feLog("%s : %s\n" , sz, p.cvalue()); break;
 		case FE_PARAM_STD_STRING: feLog("%s : %s\n", sz, p.value<string>().c_str()); break;
 		case FE_PARAM_VEC3D  :
@@ -247,13 +261,16 @@ void FEBioModel::echo_input()
 	int nelm2d = mesh.Elements(FE_DOMAIN_2D       ); if (nelm2d > 0) feLog("\tNumber of 2D elements .......................... : %d\n", nelm2d);
 	feLog("\n\n");
 
-	// print control info
-	feLog(" CONTROL DATA\n");
+	feLog(" MODULE\n");
 	feLog("===========================================================================\n");
 	const char* szmod = step.GetFESolver()->GetTypeStr();
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
-	feLog("\tModule type .................................... : %s\n", szmod);
+	feLog("\tModule type ....................................... : %s\n", szmod);
+	feLog("\n\n");
 
+	// print control info
+	feLog(" CONTROL DATA\n");
+	feLog("===========================================================================\n");
 	print_parameter_list(step.GetParameterList());
 
 	feLog("\tAuto time stepper activated ....................... : %s\n", (step.m_timeController ? "yes" : "no"));

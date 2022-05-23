@@ -211,6 +211,24 @@ const char* FEParam::enums() const
 }
 
 //-----------------------------------------------------------------------------
+// get the current enum value (or nullptr)
+const char* FEParam::enumKey() const
+{
+	const char* sz = enums();
+	if (sz == nullptr) return nullptr;
+	if (sz[0] == '$') return nullptr;
+
+	int n = value<int>();
+	if (n < 0) return nullptr;
+	for (int i = 0; i < n; ++i)
+	{
+		sz += strlen(sz) + 1;
+		if ((sz == nullptr) || (*sz == 0)) return nullptr;
+	}
+	return sz;
+}
+
+//-----------------------------------------------------------------------------
 const char* FEParam::units() const
 {
 	return m_szunit;

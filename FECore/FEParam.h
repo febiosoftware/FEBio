@@ -168,6 +168,9 @@ public:
 	// return the enum values
 	const char* enums() const;
 
+	// get the current enum value (or nullptr)
+	const char* enumKey() const;
+
 	// get the unit string
 	const char* units() const;
 	FEParam* setUnits(const char* szunit);
