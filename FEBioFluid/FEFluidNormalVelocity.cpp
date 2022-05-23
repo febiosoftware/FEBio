@@ -306,6 +306,10 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     FEMappedValue* val = fecore_alloc(FEMappedValue, GetFEModel());
     val->setDataMap(map);
 
+    if (m_velocity.isConst() == false) return false;
+    double vn = m_velocity.constValue();
+    val->setScaleFactor(vn);
+
     m_velocity.setValuator(val);
 
     return true;
