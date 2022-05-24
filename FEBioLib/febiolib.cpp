@@ -35,7 +35,6 @@ SOFTWARE.*/
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
-#include "FEBioFluid/FEBioFluidP.h"
 #include <FEBioFluid/FEBioFSI.h>
 #include <FEBioFluid/FEBioMultiphasicFSI.h>
 #include <FEBioFluid/FEBioFluidSolutes.h>
@@ -73,7 +72,6 @@ void InitLibrary()
 	FEBioMix::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
-    FEBioFluidP::InitModule();
 	FEBioFSI::InitModule();
     FEBioMultiphasicFSI::InitModule();
     FEBioFluidSolutes::InitModule();

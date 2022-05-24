@@ -34,13 +34,6 @@ public:
 	void InitModel(FEModel* fem) override;
 };
 
-class FEBIOFLUID_API FEFluidPModule : public FEModule
-{
-public:
-	FEFluidPModule();
-	void InitModel(FEModel* fem) override;
-};
-
 class FEBIOFLUID_API FEFluidFSIModule : public FEModule
 {
 public:
