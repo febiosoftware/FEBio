@@ -99713,350 +99713,437 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
@@ -103467,6 +103554,30 @@ debug
 cont 
 \shape default
 [ENTER] to continue the run in debug mode.
+ Alternatively, a break point can be specified on the command line or at
+ the FEBio prompt, which will instruct FEBio to break at a particular point
+ in the analysis.
+ At that point, the febio prompt will appear, and the debug mode can be
+ toggled.
+ For more information on setting breakpoints, consult section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Setting-break-points"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Another option is to use the -g2 flag, instead of the -g flag.
+ This flag will do all of the debug checks, but only output the non-converged
+ state that caused febio to fail to the plot file.
+ 
 \end_layout
 
 \begin_layout Section
@@ -103667,8 +103778,8 @@ name "subsec:No-loads-applied"
 \end_layout
 
 \begin_layout Standard
-Ironically, when no loads are applied, FEBio will often struggle to find
- a solution.
+Perhaps surprisingly, when no loads are applied, FEBio will often struggle
+ to find a solution.
  The reason (and solution!) is simple.
  Although no loads are applied, FEBio still performs many calculations and
  due to round-off errors, the result of these calculations may render the
@@ -103824,7 +103935,62 @@ Implicit Dynamics Solver
 \end_layout
 
 \begin_layout Standard
-Talk about the implicit solver.
+The implicit solid solver implements the generalized alpha integration rule,
+ which can be controlled via several parameters.
+ Although the default settings will usually suffice, there might be instances
+ where the parameters should be modified.
+ (For example, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:False-Transient-Analysis"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+The main parameter that controls the time integration of the solid solver
+ is the 
+\family typewriter
+rhoi
+\family default
+ parameter.
+ The following rules apply:
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\rho_{\infty}=-1$
+\end_inset
+
+, All other integration parameters are set to one.
+ 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $0\leqq\rho_{\infty}\leqq1$
+\end_inset
+
+, Newmark integration parameters are set to defaults, based on the value
+ of 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Any other value for 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+, default/user-specified values for Newmark integration parameters are not
+ modified.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -103832,12 +103998,44 @@ Explicit Dynamics Solver
 \end_layout
 
 \begin_layout Standard
-Talk about the explicit solver.
+The explicit solver uses a midpoint time integration rule.
+ 
+\end_layout
+
+\begin_layout Standard
+An important aspect of the explicit solver is that is uses a 
+\begin_inset Quotes eld
+\end_inset
+
+lumped
+\begin_inset Quotes erd
+\end_inset
+
+ mass matrix, which reduces the mass matrix to a diagonal form.
+ There are currently two lumping algorithms implemented: 
+\end_layout
+
+\begin_layout Description
+row-sum The matrix elements of each row are summed together and the sum
+ is assigned to the diagonal.
+ 
+\end_layout
+
+\begin_layout Description
+HRZ-lumping This is the preferred method of lumping for higher-order elements.
+ However, it should not be used for shells.
  
 \end_layout
 
 \begin_layout Subsection
 False Transient Analysis
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:False-Transient-Analysis"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
