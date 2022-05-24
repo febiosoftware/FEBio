@@ -9165,86 +9165,25 @@ type
 \emph default
 attribute.
  Additional parameters are then specified as child elements of this tag.
- The supported values are:
-\end_layout
 
-\begin_deeper
-\begin_layout Description
-BFGS The Broyden-Fletcher-G-S method.
- (default if qn_method is not specified).
- This method assumes the global stiffness matrix is symmetric.
- It can still be used with non–symmetric matrices, but the convergence might
- be compromised.
- 
-\end_layout
-
-\begin_layout Description
-Broyden The Broyden method is similar to BFGS, but works with both symmetric
- and non-symmetric matrices.
- Therefore, it is the recommended method for problems that generate a non-symmet
-ric stiffness matrix, such as (some) contact formulations, biphasic, multi-phasi
-c, fluid, fluid FSI.
- 
-\end_layout
-
-\begin_layout Description
-JFNK This is an implementation of the Jacobian-Free-Newton-Krylov method.
- When using this option, you must also use an iterative linear solver such
- as FGMRES.
- 
-\end_layout
-
-\begin_layout Standard
-The 
 \shape italic
-max_ups 
-\shape default
-and 
-\shape italic
-max_refs 
-\shape default
-parameters control the BFGS/Broyden method that FEBio uses to solve the
- nonlinear FE equations.
- In this method the global stiffness matrix is only calculated at the beginning
- of each time step.
- For each iteration, a matrix update is then done.
- The maximum number of such updates is set with 
-\shape italic
-max_ups
-\shape default
-.
- When FEBio reaches this number, or if the solution diverges and 
 \emph on
-diverge_reform
-\emph default
- is set to 1, it reforms the global stiffness matrix (that is, it recalculates
- it) and factorizes it, essentially taking a "full Newton" iteration.
- Then FEBio continues with BFGS/Broyden iterations.
- The 
-\shape italic
-max_refs 
-\shape default
-parameter is used to set the maximum of such reformations FEBio can do,
- before it fails the timestep.
- In that case, FEBio will either terminate or, if the auto-time stepper
- is enabled, retry with a smaller time step size.
  
-\end_layout
-
-\begin_layout Standard
-Note that when max_ups is set to 0, FEBio will use the Full-Newton method
- instead of the BFGS method.
- In other words, the stiffness matrix is reformed for every iteration.
- In this case it is recommended to increase the number of 
-\shape italic
-max_refs 
 \shape default
-(to e.g.
- 50), since the default value might cause FEBio to terminate prematurely
- when convergence is slow.
+\emph default
+See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Quasi-Newton-Solver-Parameters"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details.
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
 When the condition number of the stiffness matrix becomes too large, inversions
  of the stiffness matrix become inaccurate.
@@ -9328,6 +9267,113 @@ flag is used to set the symmetry of the global stiffness matrix.
 \end_inset
 
 - 2 = structurally symmetric
+\end_layout
+
+\begin_layout Subsection
+Quasi-Newton Solver Parameters
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Quasi-Newton-Solver-Parameters"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Most solvers in FEBio use the quasi-Newton method for solving the nonlinear
+ FE equations.
+ Several different QN algorithms are implemented as described below.
+ The specific QN method is selected using the 
+\emph on
+qn_method
+\emph default
+ property of the 
+\emph on
+solver
+\emph default
+.
+ The following QN methods are supported.
+ 
+\end_layout
+
+\begin_layout Description
+BFGS The Broyden-Fletcher-G-S method.
+ (default if qn_method is not specified).
+ This method assumes the global stiffness matrix is symmetric.
+ It can still be used with non–symmetric matrices, but the convergence might
+ be compromised.
+ 
+\end_layout
+
+\begin_layout Description
+Broyden The Broyden method is similar to BFGS, but works with both symmetric
+ and non-symmetric matrices.
+ Therefore, it is the recommended method for problems that generate a non-symmet
+ric stiffness matrix, such as (some) contact formulations, biphasic, multi-phasi
+c, fluid, fluid FSI.
+ 
+\end_layout
+
+\begin_layout Description
+JFNK This is an implementation of the Jacobian-Free-Newton-Krylov method.
+ When using this option, you must also use an iterative linear solver such
+ as FGMRES.
+ 
+\end_layout
+
+\begin_layout Standard
+Both the BFGS and Broyden methods calculate the global stiffness matrix
+ at the beginning of each time step.
+ For each iteration, a matrix update is then done.
+ The maximum number of such updates is set with 
+\shape italic
+max_ups
+\shape default
+.
+ When FEBio reaches this number, or if the solution diverges and 
+\emph on
+diverge_reform
+\emph default
+ is set to 1, it reforms the global stiffness matrix (that is, it recalculates
+ it) and factorizes it, essentially taking a "full Newton" iteration.
+ Then FEBio continues with BFGS/Broyden iterations.
+ The 
+\shape italic
+max_refs 
+\shape default
+parameter is used to set the maximum of such reformations FEBio can do,
+ before it fails the timestep.
+ In that case, FEBio will either terminate or, if the auto-time stepper
+ is enabled, retry with a smaller time step size.
+ 
+\end_layout
+
+\begin_layout Standard
+The BFGS and Broyden take the following parameters.
+\end_layout
+
+\begin_layout Description
+maxups 
+\shape italic
+\emph on
+This is the maximum number of updates between stiffness matrix reformations.
+
+\shape default
+\emph default
+ 
+\end_layout
+
+\begin_layout Standard
+Note that when max_ups is set to 0, FEBio effectively will use a Full-Newton
+ method since the stiffness matrix is reformed each iteration.
+ In this case it is recommended to increase the number of 
+\shape italic
+max_refs 
+\shape default
+(to e.g.
+ 50), since the default value might cause FEBio to terminate prematurely
+ when convergence is slow.
 \end_layout
 
 \begin_layout Subsection
