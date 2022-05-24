@@ -66,7 +66,7 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 			{
 				int n = p.value<int>();
 				const char* szkey = p.enumKey();
-				if (sz)
+				if (szkey)
 				{
 					feLog("%s : %s (%d)\n", sz, szkey, n);
 				}
@@ -231,9 +231,6 @@ void FEBioModel::print_parameter_list(FECoreBase* pc, int level)
 //! This function outputs the input data to the felog file.
 void FEBioModel::echo_input()
 {
-	// get the analysis step
-	FEAnalysis& step = *GetCurrentStep();
-
 	// get the FE mesh
 	FEBioModel& fem = *this;
 	FEMesh& mesh = GetMesh();
@@ -263,102 +260,67 @@ void FEBioModel::echo_input()
 
 	feLog(" MODULE\n");
 	feLog("===========================================================================\n");
-	const char* szmod = step.GetFESolver()->GetTypeStr();
+	string modName = fem.GetModuleName();
+	const char* szmod = modName.c_str();
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
 	feLog("\tModule type ....................................... : %s\n", szmod);
 	feLog("\n\n");
 
 	// print control info
-	feLog(" CONTROL DATA\n");
-	feLog("===========================================================================\n");
-	print_parameter_list(step.GetParameterList());
-
-	feLog("\tAuto time stepper activated ....................... : %s\n", (step.m_timeController ? "yes" : "no"));
-	if (step.m_timeController)
+	if (fem.Steps() == 1)
 	{
-		FETimeStepController& tc = *step.m_timeController;
-		print_parameter_list(tc.GetParameterList(), 1);
-	}
-	feLog("\tNumber of load controllers ..................... : %d\n", fem.LoadControllers());
+		// get the analysis step
+		FEAnalysis& step = *fem.GetStep(0);
 
-	feLog("\n\n");
+		feLog(" CONTROL DATA\n");
+		feLog("===========================================================================\n");
+		print_parameter_list(step.GetParameterList());
 
-	// output solver data
-	feLog(" SOLVER PARAMETERS\n");
-	feLog("===========================================================================\n");
-
-	FESolver* psolver = step.GetFESolver();
-	if (psolver)
-	{
-		print_parameter_list(psolver->GetParameterList());
-		feLog("\n\n");
-	}
-
-	// print output data
-	feLog(" OUTPUT DATA\n");
-	feLog("===========================================================================\n");
-	switch (step.m_nplot)
-	{
-	case FE_PLOT_NEVER      : feLog("\tplot level ................................ : never\n"); break;
-	case FE_PLOT_MAJOR_ITRS : feLog("\tplot level ................................ : major iterations\n"); break;
-	case FE_PLOT_MINOR_ITRS : feLog("\tplot level ................................ : minor iterations\n"); break;
-	case FE_PLOT_MUST_POINTS: feLog("\tplot level ................................ : must points only\n"); break;
-	case FE_PLOT_FINAL      : feLog("\tplot level ................................ : final state\n"); break;
-	case FE_PLOT_STEP_FINAL : feLog("\tplot level ................................ : step final state\n"); break;
-	}
-
-	PlotFile* pplt = fem.GetPlotFile();
-	if (dynamic_cast<FEBioPlotFile*>(pplt))
-	{
-		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
-		feLog("\tplotfile format ........................... : FEBIO\n");
-
-		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
-
-		for (int i=0; i<5; ++i)
+		feLog("\tAuto time stepper activated ....................... : %s\n", (step.m_timeController ? "yes" : "no"));
+		if (step.m_timeController)
 		{
-			const list<FEBioPlotFile::DICTIONARY_ITEM>* pl=0;
-			const char* szn = 0;
-			switch (i)
-			{
-			case 0: pl = &dic.GlobalVariableList  (); szn = "Global Variables"  ; break;
-			case 1: pl = &dic.MaterialVariableList(); szn = "Material Variables"; break;
-			case 2: pl = &dic.NodalVariableList   (); szn = "Nodal Variables"   ; break;
-			case 3: pl = &dic.DomainVariableList  (); szn = "Domain Variables"  ; break;
-			case 4: pl = &dic.SurfaceVariableList (); szn = "Surface Variables" ; break;
-			}
+			FETimeStepController& tc = *step.m_timeController;
+			print_parameter_list(tc.GetParameterList(), 1);
+		}
 
-			if (!pl->empty())
-			{
-				feLog("\t\t%s:\n", szn);
-				list<FEBioPlotFile::DICTIONARY_ITEM>::const_iterator it;
-				for (it = pl->begin(); it != pl->end(); ++it)
-				{
-					const char* szt = 0;
-					switch (it->m_ntype)
-					{
-					case PLT_FLOAT  : szt = "float"  ; break;
-					case PLT_VEC3F  : szt = "vec3f"  ; break;
-					case PLT_MAT3FS : szt = "mat3fs" ; break;
-					case PLT_MAT3FD : szt = "mat3fd" ; break;
-                    case PLT_TENS4FS: szt = "tens4fs"; break;
-					case PLT_MAT3F  : szt = "mat3f"  ; break;
-					}
+		// output solver data
+		feLog(" SOLVER PARAMETERS\n");
+		feLog("===========================================================================\n");
 
-					const char* szf = 0;
-					switch (it->m_nfmt)
-					{
-					case FMT_NODE: szf = "NODE"; break;
-					case FMT_ITEM: szf = "ITEM"; break;
-					case FMT_MULT: szf = "COMP"; break;
-					case FMT_REGION: szf = "REGION"; break;
-					}
-
-					feLog("\t\t\t%-20s (type = %5s, format = %4s)\n", it->m_szname, szt, szf);
-				}
-			}
+		FESolver* psolver = step.GetFESolver();
+		if (psolver)
+		{
+			print_parameter_list(psolver->GetParameterList());
+			feLog("\n\n");
 		}
 	}
+	else
+	{
+		feLog(" STEP DATA\n");
+		feLog("===========================================================================\n");
+		for (int i = 0; i < fem.Steps(); ++i)
+		{
+			if (i > 0) feLog("---------------------------------------------------------------------------\n");
+			feLog("step %3d - ", i + 1);
+
+			// get the step
+			FEAnalysis* pstep = fem.GetStep(i);
+
+			// get the name and type string
+			const char* szname = pstep->GetName().c_str();
+			const char* sztype = pstep->GetTypeStr();
+			if (szname[0] == 0) szname = 0;
+
+			// print type and name
+			feLog("%s", (szname ? szname : "(noname)"));
+			feLog(" (type: %s)", sztype);
+			feLog("\n");
+
+			// print the parameter list
+			print_parameter_list(pstep);
+		}
+	}
+	feLog("\n\n");
 
 	// material data
 	feLog("\n\n");
@@ -520,6 +482,7 @@ void FEBioModel::echo_input()
 		int NMA = fem.MeshAdaptors();
 		for (int i = 0; i < NMA; ++i)
 		{
+			if (i > 0) feLog("---------------------------------------------------------------------------\n");
 			FEMeshAdaptor* pma = fem.MeshAdaptor(i); assert(pma);
 			const char* sztype = pma->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
@@ -530,17 +493,92 @@ void FEBioModel::echo_input()
 		feLog("\n\n");
 	}
 
+	feLog(" LOAD CONTROLLER DATA\n");
+	feLog("===========================================================================\n");
+	for (int i = 0; i < fem.LoadControllers(); ++i)
+	{
+		if (i > 0) feLog("---------------------------------------------------------------------------\n");
+		feLog("load controller %3d - ", i + 1);
+
+		// get the load controller
+		FELoadController* plc = fem.GetLoadController(i);
+
+		// get the name and type string
+		const char* szname = plc->GetName().c_str();
+		const char* sztype = plc->GetTypeStr();
+		if (szname[0] == 0) szname = 0;
+
+		// print type and name
+		feLog("%s", (szname ? szname : "(noname)"));
+		feLog(" (type: %s)", sztype);
+		feLog("\n");
+
+		// print the parameter list
+		print_parameter_list(plc);
+	}
+	feLog("\n\n");
+
+	// print output data
+	feLog(" OUTPUT DATA\n");
+	feLog("===========================================================================\n");
+
+	PlotFile* pplt = fem.GetPlotFile();
+	if (dynamic_cast<FEBioPlotFile*>(pplt))
+	{
+		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
+		feLog("\tplotfile format ........................... : FEBIO\n");
+
+		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
+
+		for (int i = 0; i < 5; ++i)
+		{
+			const list<FEBioPlotFile::DICTIONARY_ITEM>* pl = 0;
+			const char* szn = 0;
+			switch (i)
+			{
+			case 0: pl = &dic.GlobalVariableList(); szn = "Global Variables"; break;
+			case 1: pl = &dic.MaterialVariableList(); szn = "Material Variables"; break;
+			case 2: pl = &dic.NodalVariableList(); szn = "Nodal Variables"; break;
+			case 3: pl = &dic.DomainVariableList(); szn = "Domain Variables"; break;
+			case 4: pl = &dic.SurfaceVariableList(); szn = "Surface Variables"; break;
+			}
+
+			if (!pl->empty())
+			{
+				feLog("\t\t%s:\n", szn);
+				list<FEBioPlotFile::DICTIONARY_ITEM>::const_iterator it;
+				for (it = pl->begin(); it != pl->end(); ++it)
+				{
+					const char* szt = 0;
+					switch (it->m_ntype)
+					{
+					case PLT_FLOAT: szt = "float"; break;
+					case PLT_VEC3F: szt = "vec3f"; break;
+					case PLT_MAT3FS: szt = "mat3fs"; break;
+					case PLT_MAT3FD: szt = "mat3fd"; break;
+					case PLT_TENS4FS: szt = "tens4fs"; break;
+					case PLT_MAT3F: szt = "mat3f"; break;
+					}
+
+					const char* szf = 0;
+					switch (it->m_nfmt)
+					{
+					case FMT_NODE: szf = "NODE"; break;
+					case FMT_ITEM: szf = "ITEM"; break;
+					case FMT_MULT: szf = "COMP"; break;
+					case FMT_REGION: szf = "REGION"; break;
+					}
+
+					feLog("\t\t\t%-20s (type = %5s, format = %4s)\n", it->m_szname, szt, szf);
+				}
+			}
+		}
+	}
+
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	feLog(" LINEAR SOLVER DATA\n");
 	feLog("===========================================================================\n");
 	feLog("\tDefault linear solver ............................. : %s\n", fecore.GetLinearSolverType());
-	feLog("\tMatrix format ..................................... : ");
-	switch (step.GetFESolver()->MatrixSymmetryFlag())
-	{
-	case REAL_UNSYMMETRIC   : feLog("unsymmetric\n"); break;
-	case REAL_SYMMETRIC     : feLog("symmetric\n"); break;
-	case REAL_SYMM_STRUCTURE: feLog("symmetric structure\n"); break;
-	}
 	FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, fecore.GetLinearSolverType());
 	if (fac) print_parameter_list(fac->GetParameterList());
 	feLog("\n");
