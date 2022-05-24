@@ -29,23 +29,23 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "LapackSolver.h"
+#include "AccelerateSparseSolver.h"
 #include "MatrixTools.h"
 #include <FECore/log.h>
 
 #ifdef __APPLE__
 
 //////////////////////////////////////////////////////////////
-// LapackSolver
+// AccelerateSparseSolver
 //////////////////////////////////////////////////////////////
 
-BEGIN_FECORE_CLASS(LapackSolver, LinearSolver)
-ADD_PARAMETER(m_print_cn, "print_condition_number");
-ADD_PARAMETER(m_iparm3  , "precondition");
+BEGIN_FECORE_CLASS(AccelerateSparseSolver, LinearSolver)
+    ADD_PARAMETER(m_print_cn, "print_condition_number");
+    ADD_PARAMETER(m_iparm3  , "precondition");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-LapackSolver::LapackSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
+AccelerateSparseSolver::AccelerateSparseSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
     m_print_cn = false;
     m_mtype = -2;
@@ -55,25 +55,25 @@ LapackSolver::LapackSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 }
 
 //-----------------------------------------------------------------------------
-LapackSolver::~LapackSolver()
+AccelerateSparseSolver::~AccelerateSparseSolver()
 {
     Destroy();
 }
 
 //-----------------------------------------------------------------------------
-void LapackSolver::PrintConditionNumber(bool b)
+void AccelerateSparseSolver::PrintConditionNumber(bool b)
 {
     m_print_cn = b;
 }
 
 //-----------------------------------------------------------------------------
-void LapackSolver::UseIterativeFactorization(bool b)
+void AccelerateSparseSolver::UseIterativeFactorization(bool b)
 {
     m_iparm3 = b;
 }
 
 //-----------------------------------------------------------------------------
-SparseMatrix* LapackSolver::CreateSparseMatrix(Matrix_Type ntype)
+SparseMatrix* AccelerateSparseSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
     // allocate the correct matrix format depending on matrix symmetry type
     switch (ntype)
@@ -90,7 +90,7 @@ SparseMatrix* LapackSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
-bool LapackSolver::SetSparseMatrix(SparseMatrix* pA)
+bool AccelerateSparseSolver::SetSparseMatrix(SparseMatrix* pA)
 {
     if (m_pA && m_isFactored) Destroy();
     m_pA = dynamic_cast<CompactMatrix*>(pA);
@@ -100,7 +100,7 @@ bool LapackSolver::SetSparseMatrix(SparseMatrix* pA)
 }
 
 //-----------------------------------------------------------------------------
-bool LapackSolver::PreProcess()
+bool AccelerateSparseSolver::PreProcess()
 {
     assert(m_isFactored == false);
     
@@ -133,7 +133,7 @@ bool LapackSolver::PreProcess()
     else {
         // Fallback on earlier versions
         fprintf(stderr, "\nERROR during preprocessing: ");
-        fprintf(stderr, "\nLAPACK solver not available for macOS earlier than 10.13!");
+        fprintf(stderr, "\naccelerate solver not available for macOS earlier than 10.13!");
         return false;
     }
     
@@ -141,7 +141,7 @@ bool LapackSolver::PreProcess()
 }
 
 //-----------------------------------------------------------------------------
-bool LapackSolver::Factor()
+bool AccelerateSparseSolver::Factor()
 {
     // make sure we have work to do
     if (m_pA->Rows() == 0) return true;
@@ -180,7 +180,7 @@ bool LapackSolver::Factor()
     else {
         // Fallback on earlier versions
         fprintf(stderr, "\nERROR during factorization: ");
-        fprintf(stderr, "\nLAPACK solver not available for macOS earlier than 10.13!");
+        fprintf(stderr, "\nAccelerate solver not available for macOS earlier than 10.13!");
         return false;
     }
     
@@ -197,7 +197,7 @@ bool LapackSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool LapackSolver::BackSolve(double* x, double* b)
+bool AccelerateSparseSolver::BackSolve(double* x, double* b)
 {
     // make sure we have work to do
     if (m_pA->Rows() == 0) return true;
@@ -213,7 +213,7 @@ bool LapackSolver::BackSolve(double* x, double* b)
     } else {
         // Fallback on earlier versions
         fprintf(stderr, "\nERROR during back solve: ");
-        fprintf(stderr, "\nLAPACK solver not available for macOS earlier than 10.13!");
+        fprintf(stderr, "\nAccelerate solver not available for macOS earlier than 10.13!");
         return false;
     }
     
@@ -231,7 +231,7 @@ bool LapackSolver::BackSolve(double* x, double* b)
 // c = ||A||.||A^-1|| >= ||A|| . ||x|| / ||b||
 // This algorithm tries for some random b vectors with norm ||b||=1 to maxize the ||x||.
 // The returned value will be an underestimate of the condition number
-double LapackSolver::condition_number()
+double AccelerateSparseSolver::condition_number()
 {
     // This assumes that the factorization is already done!
     int N = m_pA->Rows();
@@ -267,7 +267,7 @@ double LapackSolver::condition_number()
 }
 
 //-----------------------------------------------------------------------------
-void LapackSolver::Destroy()
+void AccelerateSparseSolver::Destroy()
 {
     if (m_pA && m_pA->Pointers() && m_isFactored)
     {
@@ -277,20 +277,20 @@ void LapackSolver::Destroy()
     m_isFactored = false;
 }
 #else
-BEGIN_FECORE_CLASS(LapackSolver, LinearSolver)
+BEGIN_FECORE_CLASS(AccelerateSparseSolver, LinearSolver)
 ADD_PARAMETER(m_print_cn, "print_condition_number");
 ADD_PARAMETER(m_iparm3, "precondition");
 END_FECORE_CLASS();
 
-LapackSolver::LapackSolver(FEModel* fem) : LinearSolver(fem) {}
-LapackSolver::~LapackSolver() {}
-bool LapackSolver::PreProcess() { return false; }
-bool LapackSolver::Factor() { return false; }
-bool LapackSolver::BackSolve(double* x, double* y) { return false; }
-void LapackSolver::Destroy() {}
-SparseMatrix* LapackSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
-bool LapackSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
-void LapackSolver::PrintConditionNumber(bool b) {}
-double LapackSolver::condition_number() { return 0; }
-void LapackSolver::UseIterativeFactorization(bool b) {}
+AccelerateSparseSolver::AccelerateSparseSolver(FEModel* fem) : LinearSolver(fem) {}
+AccelerateSparseSolver::~AccelerateSparseSolver() {}
+bool AccelerateSparseSolver::PreProcess() { return false; }
+bool AccelerateSparseSolver::Factor() { return false; }
+bool AccelerateSparseSolver::BackSolve(double* x, double* y) { return false; }
+void AccelerateSparseSolver::Destroy() {}
+SparseMatrix* AccelerateSparseSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
+bool AccelerateSparseSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
+void AccelerateSparseSolver::PrintConditionNumber(bool b) {}
+double AccelerateSparseSolver::condition_number() { return 0; }
+void AccelerateSparseSolver::UseIterativeFactorization(bool b) {}
 #endif

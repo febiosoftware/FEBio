@@ -34,11 +34,12 @@
 #include <Accelerate/Accelerate.h>
 #endif
 
-class LapackSolver : public LinearSolver
+// This sparse linear solver uses the Accelerate framework on MAC. 
+class AccelerateSparseSolver : public LinearSolver
 {
 public:
-    LapackSolver(FEModel* fem);
-    ~LapackSolver();
+    AccelerateSparseSolver(FEModel* fem);
+    ~AccelerateSparseSolver();
     bool PreProcess() override;
     bool Factor() override;
     bool BackSolve(double* x, double* y) override;
@@ -67,7 +68,7 @@ protected:
     std::vector<long> pointers;
 #endif
     
-    // Lapack control parameters
+    // solver control parameters
     
     bool m_iparm3;    // use direct-iterative method
     
