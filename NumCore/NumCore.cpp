@@ -45,7 +45,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include "FEASTEigenSolver.h"
 #include "TestSolver.h"
-#include "LapackSolver.h"
+#include "AccelerateSparseSolver.h"
 #include "numcore_api.h"
 
 //=============================================================================
@@ -66,7 +66,7 @@ NUMCORE_API void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(BiCGStabSolver      , "bicgstab");
 	REGISTER_FECORE_CLASS(StrategySolver      , "strategy");
 	REGISTER_FECORE_CLASS(TestSolver          , "test");
-    REGISTER_FECORE_CLASS(LapackSolver        , "lapack");
+    REGISTER_FECORE_CLASS(AccelerateSparseSolver, "accelerate");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
