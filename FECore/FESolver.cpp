@@ -165,6 +165,13 @@ double FESolver::ExtractSolutionNorm(const vector<double>& v, const FEDofList& d
 }
 
 //-----------------------------------------------------------------------------
+// return the solution vector
+std::vector<double> FESolver::GetSolutionVector() const
+{
+	return std::vector<double>();
+}
+
+//-----------------------------------------------------------------------------
 // see if the dofs in the dof list are active in this solver
 bool FESolver::HasActiveDofs(const FEDofList& dof)
 {

@@ -152,6 +152,9 @@ public:
 	//! Get the total solution vector (for current Newton iteration)
 	virtual void GetSolutionVector(std::vector<double>& U);
 
+	//! Get the total solution vector
+	std::vector<double> GetSolutionVector() const override;
+
 public:
 	//! do augmentations
 	bool DoAugmentations();

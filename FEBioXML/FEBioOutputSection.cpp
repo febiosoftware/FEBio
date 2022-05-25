@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/SurfaceDataRecord.h>
 #include <FECore/DomainDataRecord.h>
+#include <FECore/FEModelDataRecord.h>
 #include <FECore/FEModel.h>
 #include <FECore/FSPath.h>
 #include <FECore/FEPlotDataStore.h>
@@ -162,7 +163,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		if (tag == "node_data")
 		{
 			pdr = fecore_new<DataRecord>("node_data", &fem);
-			pdr->SetData(szdata);
 
 			const char* sztmp = "set";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
@@ -186,12 +186,10 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				string_to_int_vector(tag.szvalue(), items);
 				pdr->SetItemList(items);
 			}
-			GetFEBioImport()->AddDataRecord(pdr);
 		}
 		else if (tag == "face_data")
 		{
 			pdr = fecore_new<DataRecord>("face_data", &fem);
-			pdr->SetData(szdata);
 
 			const char* sz = tag.AttributeValue("surface");
 			FESurface* surf = mesh.FindSurface(sz);
@@ -204,12 +202,10 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			FEFacetSet* fset = surf->GetFacetSet();
 			fset->SetSurface(surf);
 			pdr->SetItemList(fset, items);
-			GetFEBioImport()->AddDataRecord(pdr);
 		}
 		else if (tag == "element_data")
 		{
 			pdr = fecore_new<DataRecord>("element_data", &fem);
-			pdr->SetData(szdata);
 
 			const char* sztmp = "elset";
 			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "elem_set";
@@ -228,34 +224,25 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				string_to_int_vector(tag.szvalue(), items);
 				pdr->SetItemList(items);
 			}
-			GetFEBioImport()->AddDataRecord(pdr);
 		}
 		else if (tag == "rigid_body_data")
 		{
 			pdr = fecore_new<DataRecord>("rigid_body_data", &fem);
-			pdr->SetData(szdata);
-
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
 			pdr->SetItemList(items);
-			GetFEBioImport()->AddDataRecord(pdr);
 		}
         else if (tag == "rigid_connector_data")
         {
 			pdr = fecore_new<DataRecord>("rigid_connector_data", &fem);
-			pdr->SetData(szdata);
-
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);
 			pdr->SetItemList(items);
-            
-			GetFEBioImport()->AddDataRecord(pdr);
         }
         else if (tag == "surface_data")
         {
             FESurfaceDataRecord* prec = new FESurfaceDataRecord(&fem);
-			pdr->SetData(szdata);
-
+			pdr = prec;
 			const char* sz = tag.AttributeValue("surface");
 			if (sz)
 			{
@@ -263,14 +250,11 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				if (surfIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 				prec->SetSurface(surfIndex);
 			}
-           
-			GetFEBioImport()->AddDataRecord(prec);
         }
         else if (tag == "domain_data")
         {
             FEDomainDataRecord* prec = new FEDomainDataRecord(&fem);
-			pdr->SetData(szdata);
-
+			pdr = prec;
 			const char* sz = tag.AttributeValue("domain");
 			if (sz)
 			{
@@ -278,10 +262,23 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				if (domainIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "domain", sz);
 				prec->SetDomain(domainIndex);
 			}
-           
-			GetFEBioImport()->AddDataRecord(prec);
+        }
+        else if (tag == "model_data")
+        {
+            pdr = new FEModelDataRecord(&fem);
         }
 		else throw XMLReader::InvalidTag(tag);
+
+		if (pdr)
+		{
+			pdr->SetData(szdata);
+			if (szname != 0) pdr->SetName(szname); else pdr->SetName(szdata);
+			if (szfile) pdr->SetFileName(szfile);
+			if (szdelim != 0) pdr->SetDelim(szdelim);
+			if (szformat != 0) pdr->SetFormat(szformat);
+			pdr->SetComments(bcomment);
+			GetFEBioImport()->AddDataRecord(pdr);
+		}
 
 		++tag;
 	}

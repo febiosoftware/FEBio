@@ -243,6 +243,7 @@ enum SUPER_CLASS_ID {
 	FELOGDOMAINDATA_ID,            	// derived from FELogDomainData
 	FELOGNLCONSTRAINTDATA_ID,      	// derived from FELogNLConstraintData
 	FELOGSURFACEDATA_ID,      		// derived from FELogSurfaceData
+	FELOGMODELDATA_ID,            	// derived from FEModelLogData
 	FEBC_ID,						// derived from FEBoundaryCondition
 	FEGLOBALDATA_ID,				// derived from FEGlobalData
 	FECALLBACK_ID,					// derived from FECallBack

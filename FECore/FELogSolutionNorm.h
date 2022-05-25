@@ -23,65 +23,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FECoreTask.h>
-#include <FECore/FECoreKernel.h>
+#include "FEModelDataRecord.h"
 
 //-----------------------------------------------------------------------------
-// This is the most commenly used task which will run a user-specified input 
-// file. The results are stored in the logfile and the plotfile.
-class FEBioStdSolver : public FECoreTask
+class FELogSolutionNorm : public FEModelLogData
 {
 public:
-	FEBioStdSolver(FEModel* pfem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
-};
-
-//-----------------------------------------------------------------------------
-class FEBioRestart : public FECoreTask
-{
-public:
-	FEBioRestart(FEModel* pfem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
-};
-
-//-----------------------------------------------------------------------------
-// class for testing reverse communication interface of FEModel
-class FEBioRCISolver : public FECoreTask
-{
-public:
-	FEBioRCISolver(FEModel* fem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
-};
-
-//-----------------------------------------------------------------------------
-// Configures the model for running in the nightly test suite. 
-class FEBioTestSuiteTask : public FECoreTask
-{
-public:
-	FEBioTestSuiteTask(FEModel* fem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
+	FELogSolutionNorm(FEModel* fem);
+	double value() override;
 };

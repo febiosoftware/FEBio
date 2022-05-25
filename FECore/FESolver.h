@@ -182,6 +182,9 @@ public:
 	// extract the (square) norm of a solution vector
 	double ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const;
 
+	// return the solution vector
+	virtual std::vector<double> GetSolutionVector() const;
+
 public: //TODO Move these parameters elsewhere
 	bool				m_bwopt;	    //!< bandwidth optimization flag
 	int					m_msymm;		//!< matrix symmetry flag for linear solver allocation
