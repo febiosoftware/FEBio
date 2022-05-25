@@ -44,9 +44,6 @@ SOFTWARE.*/
 #include "FESolutesDomain.h"
 #include "FESolutesDomainFactory.h"
 #include <FEBioMix/FESoluteFlux.h>
-#include "FEFluidSolutesSolver2.h"
-#include "FEFluidSolutesMaterial2.h"
-#include "FEFluidSolutesDomain2.h"
 #include "FEFluidModule.h"
 #include "FEFluidSoluteAnalysis.h"
 
@@ -101,14 +98,4 @@ void FEBioFluidSolutes::InitModule()
 	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
 	febio.SetActiveModule(0);
-
-	febio.CreateModule(new FEFluidSolutes2Module, "fluid-solutes2");
-	febio.SetModuleDependency("fluid-solutes");
-
-	// segragated fluid-solutes solver
-	REGISTER_FECORE_CLASS(FEFluidSolutesSolver2, "fluid-solutes2");
-	REGISTER_FECORE_CLASS(FEFluidSolutesMaterial2, "fluid-solutes2");
-	REGISTER_FECORE_CLASS(FEFluidSolutesDomain2, "fluid-solutes2");
-    
-    febio.SetActiveModule(0);
 }

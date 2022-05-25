@@ -9,7 +9,6 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include "FEFluidSolutes.h"
-#include "FEFluidSolutesMaterial2.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidResistanceBC is a fluid surface that has a normal
@@ -44,7 +43,6 @@ private:
     
 private:
     FEFluidSolutes*    m_pfs;   //!< pointer to fluid-solutes material
-    FEFluidSolutesMaterial2* m_pfs2; //!< pointer to fluid-solutes material2
     
     int        m_dofEF;
     int        m_dofC;

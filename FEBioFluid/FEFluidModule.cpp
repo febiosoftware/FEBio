@@ -264,34 +264,3 @@ void FEFluidSolutesModule::InitModel(FEModel* fem)
     int varC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), VAR_ARRAY);
     int varAC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), VAR_ARRAY);
 }
-
-//=============================================================================
-FEFluidSolutes2Module::FEFluidSolutes2Module() {}
-void FEFluidSolutes2Module::InitModel(FEModel* fem)
-{
-    // Allocate degrees of freedom
-    DOFS& dofs = fem->GetDOFS();
-    int varD = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::DISPLACEMENT), VAR_VEC3);
-    dofs.SetDOFName(varD, 0, "x");
-    dofs.SetDOFName(varD, 1, "y");
-    dofs.SetDOFName(varD, 2, "z");
-
-    int nW = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY), VAR_VEC3);
-    dofs.SetDOFName(nW, 0, "wx");
-    dofs.SetDOFName(nW, 1, "wy");
-    dofs.SetDOFName(nW, 2, "wz");
-
-    int nE = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), VAR_SCALAR);
-    dofs.SetDOFName(nE, 0, "ef");
-
-    int nAW = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
-    dofs.SetDOFName(nAW, 0, "awx");
-    dofs.SetDOFName(nAW, 1, "awy");
-    dofs.SetDOFName(nAW, 2, "awz");
-
-    int nAE = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION_TDERIV), VAR_SCALAR);
-    dofs.SetDOFName(nAE, 0, "aef");
-
-    int varC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), VAR_ARRAY);
-    int varAC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), VAR_ARRAY);
-}

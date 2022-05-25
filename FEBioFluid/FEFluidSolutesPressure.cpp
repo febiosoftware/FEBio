@@ -21,7 +21,6 @@ END_FECORE_CLASS();
 FEFluidSolutesPressure::FEFluidSolutesPressure(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_pfs = nullptr;
-    m_pfs2 = nullptr;
     m_p = 0;
     
 
@@ -48,8 +47,7 @@ bool FEFluidSolutesPressure::Init()
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
     m_pfs = dynamic_cast<FEFluidSolutes*>(pm);
-    m_pfs2 = dynamic_cast<FEFluidSolutesMaterial2*>(pm);
-    if ((m_pfs == nullptr) && (m_pfs2 == nullptr)) return false;
+    if (m_pfs == nullptr) return false;
     
     return true;
 }
@@ -82,11 +80,6 @@ void FEFluidSolutesPressure::Update()
         T = m_pfs->m_Tabs;
         R = m_pfs->m_Rgas;
     }
-    else {
-        nsol = m_pfs2->GetSolutesMaterial()->Solutes();
-        T = m_pfs2->GetSolutesMaterial()->m_Tabs;
-        R = m_pfs2->GetSolutesMaterial()->m_Rgas;
-    }
     
     std::map<int,vector<double>> oscNodes;
     std::map<int,vector<double>> caNodes;
@@ -117,8 +110,6 @@ void FEFluidSolutesPressure::Update()
                 {
                     if (m_pfs)
                         osci[j] = m_pfs->GetOsmoticCoefficient()->OsmoticCoefficient(*pt);
-                    else
-                        osci[j] = m_pfs2->GetSolutesMaterial()->GetOsmoticCoefficient()->OsmoticCoefficient(*pt);
                     cai[j] = fsp->m_ca[0];
                     for (int isol = 1; isol < nsol; ++isol)
                         cai[j] += fsp->m_ca[isol];
@@ -173,8 +164,6 @@ void FEFluidSolutesPressure::Update()
             bool good = false;
             if (m_pfs)
                 good = m_pfs->Fluid()->Dilatation(T, m_p, c, e);
-            else
-                good = m_pfs2->GetFluidMaterial()->Dilatation(T, m_p, c, e);
             assert(good);
             
             // set node as having prescribed DOF
@@ -219,7 +208,6 @@ void FEFluidSolutesPressure::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
     ar & m_pfs;
-    ar & m_pfs2;
     ar & m_dofC;
     ar & m_dofEF;
 }
