@@ -816,9 +816,9 @@ void FEModelBuilder::ApplyLoadcurvesToFunctions()
 		FELoadController* plc = fem.GetLoadController(m.lc); assert(plc);
 		FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
 
-		PointCurve& f = lc->GetFunction();
-
-		m.pf->CopyFrom(f);
+		m.pf->SetInterpolation(lc->GetInterpolation());
+		m.pf->SetExtendMode(lc->GetExtendMode());
+		m.pf->SetPoints(lc->GetPoints());
 		if (m.scale != 1.0) m.pf->Scale(m.scale);
 	}
 }

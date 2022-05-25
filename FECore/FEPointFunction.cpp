@@ -79,8 +79,14 @@ void FEPointFunction::Clear()
 //! return nr of points
 int FEPointFunction::Points() const
 { 
-	assert(m_fnc.Points() == m_points.size());
 	return (int) m_points.size(); 
+}
+
+//-----------------------------------------------------------------------------
+//! set the points
+void FEPointFunction::SetPoints(const std::vector<vec2d>& pts)
+{
+	m_points = pts;
 }
 
 //-----------------------------------------------------------------------------
@@ -94,11 +100,11 @@ void FEPointFunction::SetPoint(int i, double x, double y)
 
 //-----------------------------------------------------------------------------
 //! Set the type of interpolation
-void FEPointFunction::SetInterpolation(PointCurve::INTFUNC fnc) { m_int = fnc; }
+void FEPointFunction::SetInterpolation(int fnc) { m_int = fnc; }
 
 //-----------------------------------------------------------------------------
 //! Set the extend mode
-void FEPointFunction::SetExtendMode(PointCurve::EXTMODE mode) { m_ext = mode; }
+void FEPointFunction::SetExtendMode(int mode) { m_ext = mode; }
 
 //-----------------------------------------------------------------------------
 //! returns point i

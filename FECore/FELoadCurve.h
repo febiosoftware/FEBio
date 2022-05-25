@@ -57,8 +57,13 @@ public:
 
 	PointCurve& GetFunction() { return m_fnc; }
 
+	int GetInterpolation() const { return m_int; }
 	void SetInterpolation(PointCurve::INTFUNC f);
+
+	int GetExtendMode() const { return m_ext; }
 	void SetExtendMode(PointCurve::EXTMODE f);
+
+	std::vector<vec2d> GetPoints() const { return m_points; }
 
 	double GetValue(double time) override;
 

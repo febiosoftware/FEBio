@@ -67,16 +67,19 @@ public:
 	void SetPoint(int i, double x, double y);
 
 	//! Set the type of interpolation
-	void SetInterpolation(PointCurve::INTFUNC fnc);
+	void SetInterpolation(int n);
 
 	//! Set the extend mode
-	void SetExtendMode(PointCurve::EXTMODE mode);
+	void SetExtendMode(int n);
 
 	//! returns point i
 	LOADPOINT LoadPoint(int i) const;
 
 	//! return nr of points
 	int Points() const;
+
+	//! set the points
+	void SetPoints(const std::vector<vec2d>& pts);
 
 	//! Serialize data to archive
 	void Serialize(DumpStream& ar) override;
