@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include "FELogEnclosedVolume.h"
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
+#include "FELogSolutionNorm.h"
 #include "FELinearConstraint.h"
 
 #define FECORE_VERSION		0
@@ -166,4 +167,5 @@ REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
 REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
+REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 }
