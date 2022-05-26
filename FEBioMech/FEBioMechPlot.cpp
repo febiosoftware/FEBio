@@ -2095,7 +2095,7 @@ bool FEPlotShellStrain::Save(FEDomain& dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom); assert(sd);
+	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
 	if (sd == nullptr) return false;
 
 	FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
