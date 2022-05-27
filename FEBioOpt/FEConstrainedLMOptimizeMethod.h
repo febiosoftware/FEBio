@@ -44,10 +44,13 @@ public:
 protected:
 	FEOptimizeData* m_pOpt;
 
-	void ObjFun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda);
+	void ObjFun(double* p, double* hx, int m, int n);
 
-	static FEConstrainedLMOptimizeMethod* m_pThis;
-	static void objfun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda) { return m_pThis->ObjFun(x, a, y, dyda); }
+	static void objfun(double* p, double* hx, int m, int n, void* adata) 
+	{ 
+		FEConstrainedLMOptimizeMethod* clm = (FEConstrainedLMOptimizeMethod*)adata;
+		return clm->ObjFun(p, hx, m , n);
+	}
 
 public:
 	double	m_tau;		// scale factor for mu

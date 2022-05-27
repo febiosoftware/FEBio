@@ -45,32 +45,6 @@ BEGIN_FECORE_CLASS(FEConstrainedLMOptimizeMethod, FEOptimizeMethod)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEConstrainedLMOptimizeMethod* FEConstrainedLMOptimizeMethod::m_pThis = 0;
-
-//-----------------------------------------------------------------------------
-void clevmar_cb(double *p, double *hx, int m, int n, void *adata)
-{
-	FEConstrainedLMOptimizeMethod* pLM = (FEConstrainedLMOptimizeMethod*) adata;
-
-	// get the optimization data
-	FEOptimizeData& opt = *pLM->GetOptimizeData();
-	FEObjectiveFunction& obj = opt.GetObjective();
-
-	// evaluate at a
-	vector<double> a(m);
-	for (int i = 0; i<m; ++i) a[i] = p[i];
-	if (opt.FESolve(a) == false) throw FEErrorTermination();
-
-	// store the measurement vector
-	vector<double> y(n, 0.0);
-	opt.GetObjective().Evaluate(y);
-	for (int i = 0; i < n; ++i) hx[i] = y[i];
-
-	// store the last calculated values
-	pLM->m_yopt = y;
-}
-
-//-----------------------------------------------------------------------------
 FEConstrainedLMOptimizeMethod::FEConstrainedLMOptimizeMethod()
 {
 	m_tau = 1e-3;
@@ -109,9 +83,6 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	// allocate matrices
 	matrix covar(ma, ma), alpha(ma, ma);
 
-	// set the this pointer
-	m_pThis = this;
-
 	opt.m_niter = 0;
 
 	// return value
@@ -149,14 +120,14 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 				b[i] = con.b;
 			}
 
-			int ret = dlevmar_blec_dif(clevmar_cb, p, q, ma, ndata, lb, ub, A, b, NC, 0, itmax, opts, 0, 0, 0, (void*) this);
+			int ret = dlevmar_blec_dif(objfun, p, q, ma, ndata, lb, ub, A, b, NC, 0, itmax, opts, 0, 0, 0, (void*) this);
 
 			delete [] b;
 			delete [] A;
 		}
 		else
 		{
-			int ret = dlevmar_bc_dif(clevmar_cb, p, q, ma, ndata, lb, ub, 0, itmax, opts, 0, 0, 0, (void*) this);
+			int ret = dlevmar_bc_dif(objfun, p, q, ma, ndata, lb, ub, 0, itmax, opts, 0, 0, 0, (void*) this);
 		}
 
 		for (int i=0; i<ma; ++i) a[i] = p[i];
@@ -185,45 +156,40 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 }
 
 //-----------------------------------------------------------------------------
-void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda)
+void FEConstrainedLMOptimizeMethod::ObjFun(double* p, double* hx, int m, int n)
 {
 	// get the optimization data
-	FEOptimizeData& opt = *m_pOpt;
+	FEOptimizeData& opt = *GetOptimizeData();
+	FEObjectiveFunction& obj = opt.GetObjective();
+
+	// evaluate at a
+	vector<double> a(m);
+	for (int i = 0; i < m; ++i) a[i] = p[i];
 
 	// poor man's box constraints
-	int ma = (int)a.size();
-	vector<int> dir(ma,1);	// forward difference by default
-	for (int i=0; i<opt.InputParameters(); ++i)
+	for (int i = 0; i < opt.InputParameters(); ++i)
 	{
 		FEInputParameter& var = *opt.GetInputParameter(i);
 		if (a[i] < var.MinValue()) {
+			feLogEx(opt.GetFEModel(), "Warning: clamping %s to min (was %lg)\n", var.GetName().c_str(), a[i]);
 			a[i] = var.MinValue();
-		} else if (a[i] >= var.MaxValue()) {
+		}
+		else if (a[i] >= var.MaxValue()) {
+			feLogEx(opt.GetFEModel(), "Warning: clamping %s to max (was %lg)\n", var.GetName().c_str(), a[i]);
 			a[i] = var.MaxValue();
-			dir[i] = -1;	// use backward difference
 		}
 	}
-	
-	// evaluate at a
+
+	// solve the problem
 	if (opt.FESolve(a) == false) throw FEErrorTermination();
+
+	// store the measurement vector
+	vector<double> y(n, 0.0);
 	opt.GetObjective().Evaluate(y);
+	for (int i = 0; i < n; ++i) hx[i] = y[i];
+
+	// store the last calculated values
 	m_yopt = y;
-
-	// now calculate the derivatives using forward differences
-	int ndata = (int)x.size();
-	vector<double> a1(a);
-	vector<double> y1(ndata);
-	for (int i=0; i<ma; ++i)
-	{
-		double b = opt.GetInputParameter(i)->ScaleFactor();
-
-		a1[i] = a1[i] + dir[i]*m_fdiff*(b + fabs(a[i]));
-
-		if (opt.FESolve(a1) == false) throw FEErrorTermination();
-		opt.GetObjective().Evaluate(y1);
-		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
-		a1[i] = a[i];
-	}
 }
 
 #endif
