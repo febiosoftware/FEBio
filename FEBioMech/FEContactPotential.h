@@ -48,6 +48,8 @@ public:
 
 	void GetContactTraction(int nelem, vec3d& tc) override;
 
+	double GetContactArea() override;
+
 	FEMaterialPoint* CreateMaterialPoint() override;
 };
 

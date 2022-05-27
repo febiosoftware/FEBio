@@ -93,6 +93,28 @@ void FEContactPotentialSurface::GetContactTraction(int nelem, vec3d& tc)
 	tc /= (double)el.GaussPoints();
 }
 
+double FEContactPotentialSurface::GetContactArea()
+{
+	double area = 0.0;
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			if (mp.m_tc.norm2() != 0.0)
+			{
+				vec3d dA = mp.dxr ^ mp.dxs;
+				double da = dA.norm();
+				area += da * gw[n];
+			}
+		}
+	}
+	return area;
+}
+
+
 BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_p, "p");
@@ -103,6 +125,9 @@ END_FECORE_CLASS();
 
 FEContactPotential::FEContactPotential(FEModel* fem) : m_surf1(fem), m_surf2(fem)
 {
+	m_surf1.SetContactInterface(this);
+	m_surf2.SetContactInterface(this);
+
 	m_kc = 0.0;
 	m_p = 4;
 	m_Rin = 1.0;
@@ -224,6 +249,9 @@ public:
 		int ix = (int)(m_nx * (r.x - box.r0.x) / box.width());
 		int iy = (int)(m_ny * (r.y - box.r0.y) / box.height());
 		int iz = (int)(m_nz * (r.z - box.r0.z) / box.depth());
+		if (ix == m_nx) ix--;
+		if (iy == m_ny) iy--;
+		if (iz == m_nz) iz--;
 
 		int icell = iz * (m_nx * m_ny) + iy * m_nx + ix;
 		Cell* c = m_cell + icell;
@@ -543,6 +571,7 @@ void FEContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
 			FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			cp.m_Ln = 0.0;
 			cp.m_tc = vec3d(0, 0, 0);
 		}
 	}
@@ -552,6 +581,7 @@ void FEContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
 			FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			cp.m_Ln = 0.0;
 			cp.m_tc = vec3d(0, 0, 0);
 		}
 	}
@@ -595,6 +625,26 @@ void FEContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 			// assemble
 			R.Assemble(lm, fe);
+		}
+	}
+
+	// update contact pressures (only needed for plot output)
+	for (int i = 0; i < m_surf1.Elements(); ++i)
+	{
+		FESurfaceElement& el = m_surf1.Element(i);
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			cp.m_Ln = cp.m_tc.norm();
+		}
+	}
+	for (int i = 0; i < m_surf2.Elements(); ++i)
+	{
+		FESurfaceElement& el = m_surf2.Element(i);
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			cp.m_Ln = cp.m_tc.norm();
 		}
 	}
 }
