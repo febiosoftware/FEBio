@@ -42,6 +42,7 @@ BEGIN_FECORE_CLASS(FEConstrainedLMOptimizeMethod, FEOptimizeMethod)
 	ADD_PARAMETER(m_tau   , "tau"         );
 	ADD_PARAMETER(m_fdiff , "f_diff_scale");
 	ADD_PARAMETER(m_nmax  , "max_iter"    );
+	ADD_PARAMETER(m_scaleParams, "scale_parameters");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -51,6 +52,7 @@ FEConstrainedLMOptimizeMethod::FEConstrainedLMOptimizeMethod()
 	m_objtol = 0.001;
 	m_fdiff  = 0.001;
 	m_nmax   = 100;
+	m_scaleParams = false;
     m_loglevel = LogLevel::LOG_NEVER;
 }
 
@@ -60,27 +62,14 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
 
-	// set the variables
-	int ma = opt.InputParameters();
-	vector<double> a(ma);
-	for (int i=0; i<ma; ++i)
-	{
-		FEInputParameter& var = *opt.GetInputParameter(i);
-		a[i] = var.GetValue();
-	}
-
 	// get the data
 	FEObjectiveFunction& obj = opt.GetObjective();
 	int ndata = obj.Measurements();
 	vector<double> y(ndata, 0);
 	obj.GetMeasurements(y);
 
-	// set the sigma's
-	// for now we set them all to 1
-	vector<double> sig(ndata);
-	for (int i=0; i<ndata; ++i) sig[i] = 1;
-
 	// allocate matrices
+	int ma = opt.InputParameters();
 	matrix covar(ma, ma), alpha(ma, ma);
 
 	opt.m_niter = 0;
@@ -90,18 +79,36 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 
 	int niter = 1;
 
+	// if parameter scaling is not used, just set all scale factors to one
+	// to retain backward compatibility
+	if (m_scaleParams == false)
+	{
+		for (int i = 0; i < ma; ++i)
+		{
+			opt.GetInputParameter(i)->ScaleFactor() = 1.0;
+		}
+	}
+
 	try
 	{
-		double* p = new double[ma];
-		for (int i=0; i<ma; ++i) p[i] = a[i];
+		vector<double> p(ma);
+		vector<double> s(ma);
+		vector<double> lb(ma);
+		vector<double> ub(ma);
+		for (int i = 0; i < ma; ++i)
+		{
+			FEInputParameter& v = *opt.GetInputParameter(i);
+			double a = v.GetValue();
+			double sf = v.ScaleFactor();
 
-		double* lb = new double[ma];
-		for (int i=0; i<ma; ++i) lb[i] = opt.GetInputParameter(i)->MinValue();
+			s[i] = sf;
+			p[i] = a / sf;
 
-		double* ub = new double[ma];
-		for (int i=0; i<ma; ++i) ub[i] = opt.GetInputParameter(i)->MaxValue();
+			lb[i] = v.MinValue() / sf;
+			ub[i] = v.MaxValue() / sf;
+		}
 
-		double* q = new double[ndata];
+		vector<double> q(ndata);
 		for (int i=0; i<ndata; ++i) q[i] = y[i];
 
 		const double tol = m_objtol;
@@ -111,34 +118,30 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 		if (opt.Constraints() > 0)
 		{
 			int NC = opt.Constraints();
-			double* A = new double[NC*ma];
-			double* b = new double[NC];
+			vector<double> A(NC * ma);
+			vector<double> b(NC);
 			for (int i=0; i<NC; ++i)
 			{
 				OPT_LIN_CONSTRAINT& con = opt.Constraint(i);
-				for (int j=0; j<ma; ++j) A[i*ma + j] = con.a[j];
+				for (int j=0; j<ma; ++j) A[i*ma + j] = con.a[j] * s[j];
 				b[i] = con.b;
 			}
 
-			int ret = dlevmar_blec_dif(objfun, p, q, ma, ndata, lb, ub, A, b, NC, 0, itmax, opts, 0, 0, 0, (void*) this);
-
-			delete [] b;
-			delete [] A;
+			int ret = dlevmar_blec_dif(objfun, p.data(), q.data(), ma, ndata, lb.data(), ub.data(), A.data(), b.data(), NC, 0, itmax, opts, 0, 0, 0, (void*) this);
 		}
 		else
 		{
-			int ret = dlevmar_bc_dif(objfun, p, q, ma, ndata, lb, ub, 0, itmax, opts, 0, 0, 0, (void*) this);
+			int ret = dlevmar_bc_dif(objfun, p.data(), q.data(), ma, ndata, lb.data(), ub.data(), 0, itmax, opts, 0, 0, 0, (void*) this);
 		}
 
-		for (int i=0; i<ma; ++i) a[i] = p[i];
+		amin.resize(ma);
+		for (int i = 0; i < ma; ++i)
+		{
+			amin[i] = p[i] * s[i];
+		}
 
 		// store the optimal values
 		fret = obj.Evaluate(m_yopt);
-
-		delete [] q;
-		delete [] ub;
-		delete [] lb;
-		delete [] p;
 	}
 	catch (FEErrorTermination)
 	{
@@ -148,7 +151,6 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	}
 
 	// return optimal values
-	amin = a;
 	ymin = m_yopt;
 	if (minObj) *minObj = fret;
 
@@ -164,7 +166,11 @@ void FEConstrainedLMOptimizeMethod::ObjFun(double* p, double* hx, int m, int n)
 
 	// evaluate at a
 	vector<double> a(m);
-	for (int i = 0; i < m; ++i) a[i] = p[i];
+	for (int i = 0; i < m; ++i)
+	{
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		a[i] = p[i]*var.ScaleFactor();
+	}
 
 	// poor man's box constraints
 	for (int i = 0; i < opt.InputParameters(); ++i)

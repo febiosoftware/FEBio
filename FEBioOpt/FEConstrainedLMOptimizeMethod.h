@@ -58,6 +58,7 @@ public:
 	double	m_fdiff;	// forward difference step size
 	int		m_nmax;		// maximum number of iterations
     int     m_loglevel; // log file output level
+	bool	m_scaleParams;	// scale parameters flag
 
 public:
 	vector<double>	m_yopt;	// optimal y-values
