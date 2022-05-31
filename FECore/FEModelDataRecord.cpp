@@ -23,46 +23,53 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEModelDataRecord.h"
 
+REGISTER_SUPER_CLASS(FEModelLogData, FEMODELLOGDATA_ID);
 
+FEModelLogData::FEModelLogData(FEModel* fem) : FECoreBase(fem) {}
+FEModelLogData::~FEModelLogData() {}
 
-#pragma once
-#include "FEOptimizeMethod.h"
-#include <FECore/matrix.h>
-
-//----------------------------------------------------------------------------
-//! Optimization method using contrained Levenberg-Marquardt method
-#ifdef HAVE_LEVMAR
-class FEConstrainedLMOptimizeMethod : public FEOptimizeMethod
+FEModelDataRecord::FEModelDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_MODEL) {}
+double FEModelDataRecord::Evaluate(int item, int ndata)
 {
-public:
-	FEConstrainedLMOptimizeMethod();
-	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
+	assert(item == 0);
+	return m_data[ndata]->value();
+}
 
-	FEOptimizeData* GetOptimizeData() { return m_pOpt; }
+void FEModelDataRecord::ClearData()
+{
+	for (int i = 0; i < m_data.size(); ++i) delete m_data[i];
+	m_data.clear();
+}
 
-protected:
-	FEOptimizeData* m_pOpt;
+void FEModelDataRecord::SetData(const char* szexpr)
+{
+	char szcopy[MAX_STRING] = { 0 };
+	strcpy(szcopy, szexpr);
+	char* sz = szcopy, * ch;
+	ClearData();
+	strcpy(m_szdata, szexpr);
+	do
+	{
+		ch = strchr(sz, ';');
+		if (ch) *ch++ = 0;
+		FEModelLogData* pdata = fecore_new<FEModelLogData>(sz, m_pfem);
+		if (pdata) m_data.push_back(pdata);
+		else throw UnknownDataField(sz);
+		sz = ch;
+	} while (ch);
+}
 
-	void ObjFun(double* p, double* hx, int m, int n);
+void FEModelDataRecord::SelectAllItems()
+{
+	std::vector<int> items;
+	items.push_back(0);
+	SetItemList(items);
+}
 
-	static void objfun(double* p, double* hx, int m, int n, void* adata) 
-	{ 
-		FEConstrainedLMOptimizeMethod* clm = (FEConstrainedLMOptimizeMethod*)adata;
-		return clm->ObjFun(p, hx, m , n);
-	}
-
-public:
-	double	m_tau;		// scale factor for mu
-	double	m_objtol;	// objective tolerance
-	double	m_fdiff;	// forward difference step size
-	int		m_nmax;		// maximum number of iterations
-    int     m_loglevel; // log file output level
-	bool	m_scaleParams;	// scale parameters flag
-
-public:
-	vector<double>	m_yopt;	// optimal y-values
-
-	DECLARE_FECORE_CLASS();
-};
-#endif
+int FEModelDataRecord::Size() const
+{
+	return 1;
+}

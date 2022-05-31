@@ -157,6 +157,7 @@ SOFTWARE.*/
 #include "FEIsotropicLeeSacks.h"
 #include "FEIsotropicLeeSacksUncoupled.h"
 #include "FEPolynomialHyperElastic.h"
+#include "FEShenoyMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -369,6 +370,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEIsotropicLeeSacks, "isotropic Lee-Sacks");
 	REGISTER_FECORE_CLASS(FEIsotropicLeeSacksUncoupled, "uncoupled isotropic Lee-Sacks");
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
+	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 
 	// Fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExpPow, "fiber-exp-pow");

@@ -62,6 +62,7 @@ void InitLibrary()
 	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
 	REGISTER_FECORE_CLASS(FEBioRestart  , "restart");
 	REGISTER_FECORE_CLASS(FEBioRCISolver, "rci_solve");
+	REGISTER_FECORE_CLASS(FEBioTestSuiteTask, "test");
 
 	FECore::InitModule();
 	FEAMR::InitModule();

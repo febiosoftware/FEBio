@@ -23,46 +23,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEOptimizeMethod.h"
-#include <FECore/matrix.h>
+#include "FEModelDataRecord.h"
 
-//----------------------------------------------------------------------------
-//! Optimization method using contrained Levenberg-Marquardt method
-#ifdef HAVE_LEVMAR
-class FEConstrainedLMOptimizeMethod : public FEOptimizeMethod
+//-----------------------------------------------------------------------------
+class FELogSolutionNorm : public FEModelLogData
 {
 public:
-	FEConstrainedLMOptimizeMethod();
-	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
-
-	FEOptimizeData* GetOptimizeData() { return m_pOpt; }
-
-protected:
-	FEOptimizeData* m_pOpt;
-
-	void ObjFun(double* p, double* hx, int m, int n);
-
-	static void objfun(double* p, double* hx, int m, int n, void* adata) 
-	{ 
-		FEConstrainedLMOptimizeMethod* clm = (FEConstrainedLMOptimizeMethod*)adata;
-		return clm->ObjFun(p, hx, m , n);
-	}
-
-public:
-	double	m_tau;		// scale factor for mu
-	double	m_objtol;	// objective tolerance
-	double	m_fdiff;	// forward difference step size
-	int		m_nmax;		// maximum number of iterations
-    int     m_loglevel; // log file output level
-	bool	m_scaleParams;	// scale parameters flag
-
-public:
-	vector<double>	m_yopt;	// optimal y-values
-
-	DECLARE_FECORE_CLASS();
+	FELogSolutionNorm(FEModel* fem);
+	double value() override;
 };
-#endif

@@ -23,46 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FELogSolutionNorm.h"
+#include "FEModel.h"
+#include "FEAnalysis.h"
+#include "FESolver.h"
 
-
-
-#pragma once
-#include "FEOptimizeMethod.h"
-#include <FECore/matrix.h>
-
-//----------------------------------------------------------------------------
-//! Optimization method using contrained Levenberg-Marquardt method
-#ifdef HAVE_LEVMAR
-class FEConstrainedLMOptimizeMethod : public FEOptimizeMethod
+//================================================================================
+FELogSolutionNorm::FELogSolutionNorm(FEModel* fem) : FEModelLogData(fem) {}
+double FELogSolutionNorm::value()
 {
-public:
-	FEConstrainedLMOptimizeMethod();
-	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
+	FEModel* fem = GetFEModel(); assert(fem);
+	if (fem == nullptr) return 0.0;
 
-	FEOptimizeData* GetOptimizeData() { return m_pOpt; }
+	FEAnalysis* step = fem->GetCurrentStep();
+	if (step == nullptr) return 0.0;
 
-protected:
-	FEOptimizeData* m_pOpt;
+	FESolver* solver = step->GetFESolver();
+	if (solver == nullptr) return 0.0;
 
-	void ObjFun(double* p, double* hx, int m, int n);
+	std::vector<double> u = solver->GetSolutionVector();
+	double unorm = l2_norm(u);
 
-	static void objfun(double* p, double* hx, int m, int n, void* adata) 
-	{ 
-		FEConstrainedLMOptimizeMethod* clm = (FEConstrainedLMOptimizeMethod*)adata;
-		return clm->ObjFun(p, hx, m , n);
-	}
-
-public:
-	double	m_tau;		// scale factor for mu
-	double	m_objtol;	// objective tolerance
-	double	m_fdiff;	// forward difference step size
-	int		m_nmax;		// maximum number of iterations
-    int     m_loglevel; // log file output level
-	bool	m_scaleParams;	// scale parameters flag
-
-public:
-	vector<double>	m_yopt;	// optimal y-values
-
-	DECLARE_FECORE_CLASS();
-};
-#endif
+	return unorm;
+}
