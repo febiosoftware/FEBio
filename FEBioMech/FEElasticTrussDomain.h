@@ -43,6 +43,9 @@ public:
 	//! copy operator
 	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d);
 
+	//! initialize the domain
+	bool Init() override;
+
 	//! Reset data
 	void Reset() override;
 
@@ -96,6 +99,9 @@ protected:
 
 protected:
 	FETrussMaterial*	m_pMat;
+	double	m_a0;
 
 	FEDofList	m_dofU;
+
+	DECLARE_FECORE_CLASS();
 };

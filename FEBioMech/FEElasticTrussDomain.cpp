@@ -33,9 +33,15 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEElasticTrussDomain, FETrussDomain)
+	ADD_PARAMETER(m_a0, "cross_sectional_area");
+END_FECORE_CLASS();
+//-----------------------------------------------------------------------------
 //! Constructor
 FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem)
 {
+	m_a0 = 0.0;
+
 	m_pMat = 0;
 	// TODO: Can this be done in Init, since there is no error checking
 	if (pfem)
@@ -66,6 +72,21 @@ void FEElasticTrussDomain::SetMaterial(FEMaterial* pmat)
 	FETrussDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FETrussMaterial*>(pmat);
 	assert(m_pMat);
+}
+
+//-----------------------------------------------------------------------------
+//! initialize the domain
+bool FEElasticTrussDomain::Init()
+{
+	if (m_a0 != 0.0)
+	{
+		for (int i = 0; i < Elements(); ++i)
+		{
+			FETrussElement& el = Element(i);
+			el.m_a0 = m_a0;
+		}
+	}
+	return FETrussDomain::Init();
 }
 
 //-----------------------------------------------------------------------------
