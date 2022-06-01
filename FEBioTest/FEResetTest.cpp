@@ -30,6 +30,11 @@ SOFTWARE.*/
 #include "FEResetTest.h"
 #include <FEBioLib/FEBioModel.h>
 #include <FECore/log.h>
+#include <FEBioLib/Logfile.h>
+#include <FECore/FELogSolutionNorm.h>
+#include <iostream>
+#include <iomanip>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 FEResetTest::FEResetTest(FEModel*pfem) : FECoreTask(pfem)
@@ -42,6 +47,9 @@ bool FEResetTest::Init(const char* sz)
 {
 	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
 
+	Logfile& log = fem.GetLogFile();
+	log.SetMode(Logfile::MODE::LOG_FILE);
+
 	// do the FE initialization
 	return fem.Init();
 }
@@ -52,14 +60,27 @@ bool FEResetTest::Run()
 {
 	FEBioModel* fem = dynamic_cast<FEBioModel*>(GetFEModel());
 
+	FELogSolutionNorm sn(fem);
+
 	// try to run the model
+	cerr << "Running model for the first time.\n";
 	if (fem->Solve() == false)
 	{
 		feLogEx(fem, "Failed to run model.");
 		return false;
 	}
 
+	// collect results
+	ModelStats stats1 = fem->GetModelStats();
+	double norm1 = sn.value();
+	cerr << "time steps    = " << stats1.ntimeSteps    << endl;
+	cerr << "total iters   = " << stats1.ntotalIters   << endl;
+	cerr << "total reforms = " << stats1.ntotalReforms << endl;
+	cerr << "total rhs     = " << stats1.ntotalRHS     << endl;
+	cerr << "solution norm = " << std::setprecision(15) << norm1 << endl;
+
 	// reset the model
+	std::cerr << "Resetting model.\n";
 	if (fem->Reset() == false)
 	{
 		feLogEx(fem, "Failed to reset model.");
@@ -67,11 +88,29 @@ bool FEResetTest::Run()
 	}
 
 	// try to run it again
+	std::cerr << "Running model for the second time.\n";
 	if (fem->Solve() == false)
 	{
 		feLogEx(fem, "Failed to run model second time.");
 		return false;
 	}
 
-	return true;
+	// get model stats
+	ModelStats stats2 = fem->GetModelStats();
+	double norm2 = sn.value();
+	cerr << "time steps    = " << stats2.ntimeSteps    << endl;
+	cerr << "total iters   = " << stats2.ntotalIters   << endl;
+	cerr << "total reforms = " << stats2.ntotalReforms << endl;
+	cerr << "total rhs     = " << stats2.ntotalRHS     << endl;
+	cerr << "solution norm = " << norm2 << endl;
+
+	bool success = true;
+	if (stats1.ntimeSteps    != stats2.ntimeSteps   ) success = false;
+	if (stats1.ntotalIters   != stats2.ntotalIters  ) success = false;
+	if (stats1.ntotalReforms != stats2.ntotalReforms) success = false;
+	if (stats1.ntotalRHS     != stats2.ntotalRHS    ) success = false;
+	if (norm1 != norm2) success = false;
+	cerr << " --> Reset test " << (success ? "PASSED" : "FAILED") << endl;
+
+	return success;
 }
