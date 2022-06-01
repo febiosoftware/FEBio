@@ -1673,44 +1673,51 @@ void FEBioPlotFile::WriteDomainDataField(FEModel &fem, FEPlotData* pd)
 		return;
 	}
 
+	// get the domain name (if any)
+	string domName;
+	const char* szdom = pd->GetDomainName();
+	if (szdom) domName = szdom;
+
 	// loop over all domains in the item list
-	int N = (int)item.size();
 	for (int i = 0; i<ND; ++i)
 	{
 		// get the domain
 		FEDomain& D = m.Domain(item[i]);
 
-		// calculate the size of the data vector
-		int nsize = pd->VarSize(pd->DataType());
-		switch (pd->StorageFormat())
+		if (domName.empty() || (D.GetName() == domName))
 		{
-		case FMT_NODE: nsize *= D.Nodes(); break;
-		case FMT_ITEM: nsize *= D.Elements(); break;
-		case FMT_MULT:
-		{
-			// since all elements have the same type within a domain
-			// we just grab the number of nodes of the first element 
-			// to figure out how much storage we need
-			FEElement& e = D.ElementRef(0);
-			int n = e.Nodes();
-			nsize *= n*D.Elements();
-		}
-		break;
-		case FMT_REGION:
-			// one value for this domain so nsize remains unchanged
+			// calculate the size of the data vector
+			int nsize = pd->VarSize(pd->DataType());
+			switch (pd->StorageFormat())
+			{
+			case FMT_NODE: nsize *= D.Nodes(); break;
+			case FMT_ITEM: nsize *= D.Elements(); break;
+			case FMT_MULT:
+			{
+				// since all elements have the same type within a domain
+				// we just grab the number of nodes of the first element 
+				// to figure out how much storage we need
+				FEElement& e = D.ElementRef(0);
+				int n = e.Nodes();
+				nsize *= n * D.Elements();
+			}
 			break;
-		default:
-			assert(false);
-		}
-		assert(nsize > 0);
+			case FMT_REGION:
+				// one value for this domain so nsize remains unchanged
+				break;
+			default:
+				assert(false);
+			}
+			assert(nsize > 0);
 
-		// fill data vector and save
-		FEDataStream a;
-		a.reserve(nsize);
-		if (pd->Save(D, a))
-		{
-			assert(a.size() == nsize);
-			m_ar.WriteData(item[i] + 1, a.data());
+			// fill data vector and save
+			FEDataStream a;
+			a.reserve(nsize);
+			if (pd->Save(D, a))
+			{
+				assert(a.size() == nsize);
+				m_ar.WriteData(item[i] + 1, a.data());
+			}
 		}
 	}
 }
