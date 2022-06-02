@@ -222,27 +222,12 @@ void FEElasticTrussDomain::ElementMassMatrix(FETrussElement& el, matrix& me)
 		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 	}
 
-	// initial length
 	double L = (r0[1] - r0[0]).norm();
+	double A = el.m_a0;
+	double rho = mat->Density();
 
-	// elements initial volume
-	double V = L * el.m_a0;
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-	// create the element mass matrix
-	for (int n = 0; n < nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		double d = mat->Density(mp);
-
-		// TODO: Not sure this is correct yet!
-		for (int i = 0; i < neln; ++i)
-			for (int j = 0; j < neln; ++j)
-			{
-				double kab = V * d;
-				me[i][j] += kab;
-			}
-	}
+	me[0][0] = rho * A * L / 3.0; me[0][1] = rho * A * L / 6.0;
+	me[1][0] = rho * A * L / 6.0; me[1][1] = rho * A * L / 3.0;
 }
 
 //----------------------------------------------------------------------------

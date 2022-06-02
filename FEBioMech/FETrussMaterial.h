@@ -83,7 +83,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
 
 	//! material density
-	double Density(FEMaterialPoint& pt);
+	double Density();
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

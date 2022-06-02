@@ -49,7 +49,7 @@ FETrussMaterial::~FETrussMaterial()
 
 //-----------------------------------------------------------------------------
 //! material density
-double FETrussMaterial::Density(FEMaterialPoint& pt)
+double FETrussMaterial::Density()
 {
 	return m_rho;
 }
