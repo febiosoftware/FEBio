@@ -25,9 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FEModelDataRecord.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
-class FELogSolutionNorm : public FEModelLogData
+class FECORE_API FELogSolutionNorm : public FEModelLogData
 {
 public:
 	FELogSolutionNorm(FEModel* fem);
