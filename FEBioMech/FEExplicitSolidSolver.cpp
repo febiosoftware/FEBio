@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEExplicitSolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
+#include "FEElasticTrussDomain.h"
 #include "FERigidMaterial.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
@@ -221,6 +222,42 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 							el_lumped_mass[i] += kab;
 						}
 					}
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				}
+			}
+			else if (dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd)))
+			{
+				FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd));
+
+				// loop over all the elements
+				for (int iel = 0; iel < ptd->Elements(); ++iel)
+				{
+					FETrussElement& el = ptd->Element(iel);
+					ptd->UnpackLM(el, lm);
+
+					// create the element's stiffness matrix
+					FEElementMatrix ke(el);
+					int neln = el.Nodes();
+					ke.resize(neln, neln);
+					ke.zero();
+
+					// calculate inertial stiffness
+					ptd->ElementMassMatrix(el, ke);
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(3 * neln, 0.0);
+					for (int i = 0; i < neln; ++i)
+					{
+						for (int j = 0; j < neln; ++j)
+						{
+							double kab = ke[i][j];
+							el_lumped_mass[3 * i    ] += kab;
+							el_lumped_mass[3 * i + 1] += kab;
+							el_lumped_mass[3 * i + 2] += kab;
+						}
+					}
+
 					// assemble element matrix into inv_mass vector 
 					Mi.Assemble(el.m_node, lm, el_lumped_mass);
 				}

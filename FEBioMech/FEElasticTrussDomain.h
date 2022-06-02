@@ -90,6 +90,9 @@ public: // overloads from FEElasticDomain
 	//! body force stiffness matrix \todo implement this
 	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override { assert(false); }
 
+	//! elemental mass matrix
+	void ElementMassMatrix(FETrussElement& el, matrix& ke);
+
 protected:
 	//! calculates the truss element stiffness matrix
 	void ElementStiffness(int iel, matrix& ke);

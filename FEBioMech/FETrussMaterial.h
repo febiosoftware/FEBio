@@ -56,7 +56,7 @@ public:
 	}
 
 public:
-	double	m_l;	// strech
+	double	m_l;	// stretch
 	double	m_tau;	// Kirchoff stress
 };
 
@@ -65,10 +65,11 @@ public:
 class FETrussMaterial : public FEMaterial
 {
 public:
-	FETrussMaterial(FEModel* pfem) : FEMaterial(pfem) {}
-	~FETrussMaterial(){}
+	FETrussMaterial(FEModel* pfem);
+	~FETrussMaterial();
 
 public:
+	double	m_rho;	// density
 	double	m_E;	// Elastic modulus
 
 public:
@@ -80,6 +81,9 @@ public:
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
+
+	//! material density
+	double Density(FEMaterialPoint& pt);
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

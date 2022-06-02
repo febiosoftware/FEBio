@@ -31,8 +31,28 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FETrussMaterial, FEMaterial)
+	ADD_PARAMETER(m_rho, FE_RANGE_GREATER(0.0), "density");
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FETrussMaterial::FETrussMaterial(FEModel* pfem) : FEMaterial(pfem) 
+{
+	m_rho = 1.0;
+	m_E = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+FETrussMaterial::~FETrussMaterial() 
+{
+}
+
+//-----------------------------------------------------------------------------
+//! material density
+double FETrussMaterial::Density(FEMaterialPoint& pt)
+{
+	return m_rho;
+}
 
 //-----------------------------------------------------------------------------
 // Note that this function returns the Kirchhoff stress!
