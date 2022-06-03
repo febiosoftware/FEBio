@@ -1585,6 +1585,11 @@ void FEBioPlotFile::WriteNodeDataField(FEModel &fem, FEPlotData* pd)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 {
+	// get the domain name (if any)
+	string domName;
+	const char* szdom = pd->GetDomainName();
+	if (szdom) domName = szdom;
+
 	// loop over all surfaces
 	FEMesh& m = fem.GetMesh();
 	int NS = m.Surfaces();
@@ -1592,62 +1597,65 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 	{
 		FESurface& S = m.Surface(i);
 
-		Surface& surf = m_Surf[i];
-		assert(surf.surf == &S);
-
-		// Determine data size.
-		// Note that for the FMT_MULT case we are 
-		// assuming 9 data entries per facet
-		// regardless of the nr of nodes a facet really has
-		// this is because for surfaces, all elements are not
-		// necessarily of the same type
-		// TODO: Fix the assumption of the FMT_MULT
-		int datasize = pd->VarSize(pd->DataType());
-		int nsize = datasize;
-		switch (pd->StorageFormat())
+		if (domName.empty() || (domName == S.GetName()))
 		{
-		case FMT_NODE: nsize *= S.Nodes(); break;
-		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= surf.maxNodes * S.Elements(); break;
-		case FMT_REGION:
-			// one value per surface so nsize remains unchanged
-			break;
-		default:
-			assert(false);
-		}
+			Surface& surf = m_Surf[i];
+			assert(surf.surf == &S);
 
-		// save data
-		FEDataStream a; a.reserve(nsize);
-		if (pd->Save(S, a))
-		{
-			// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
-			// the data stream before we write it to the file
-			if (a.size() == nsize)
+			// Determine data size.
+			// Note that for the FMT_MULT case we are 
+			// assuming 9 data entries per facet
+			// regardless of the nr of nodes a facet really has
+			// this is because for surfaces, all elements are not
+			// necessarily of the same type
+			// TODO: Fix the assumption of the FMT_MULT
+			int datasize = pd->VarSize(pd->DataType());
+			int nsize = datasize;
+			switch (pd->StorageFormat())
 			{
-				// assumed padding is already there, or not needed
-				m_ar.WriteData(i + 1, a.data());
+			case FMT_NODE: nsize *= S.Nodes(); break;
+			case FMT_ITEM: nsize *= S.Elements(); break;
+			case FMT_MULT: nsize *= surf.maxNodes * S.Elements(); break;
+			case FMT_REGION:
+				// one value per surface so nsize remains unchanged
+				break;
+			default:
+				assert(false);
 			}
-			else
+
+			// save data
+			FEDataStream a; a.reserve(nsize);
+			if (pd->Save(S, a))
 			{
-				// this is only needed for FMT_MULT storage
-				assert(pd->StorageFormat() == FMT_MULT);
-
-				// add padding
-				const int M = surf.maxNodes;
-				int m = 0;
-				FEDataStream b; b.assign(nsize, 0.f);
-				for (int n = 0; n < S.Elements(); ++n)
+				// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
+				// the data stream before we write it to the file
+				if (a.size() == nsize)
 				{
-					FESurfaceElement& el = S.Element(n);
-					int ne = el.Nodes();
-					for (int j = 0; j < ne; ++j)
-					{
-						for (int k = 0; k < datasize; ++k) b[n*M*datasize + j*datasize + k] = a[m++];
-					}
+					// assumed padding is already there, or not needed
+					m_ar.WriteData(i + 1, a.data());
 				}
+				else
+				{
+					// this is only needed for FMT_MULT storage
+					assert(pd->StorageFormat() == FMT_MULT);
 
-				// write the padded data
-				m_ar.WriteData(i + 1, b.data());
+					// add padding
+					const int M = surf.maxNodes;
+					int m = 0;
+					FEDataStream b; b.assign(nsize, 0.f);
+					for (int n = 0; n < S.Elements(); ++n)
+					{
+						FESurfaceElement& el = S.Element(n);
+						int ne = el.Nodes();
+						for (int j = 0; j < ne; ++j)
+						{
+							for (int k = 0; k < datasize; ++k) b[n * M * datasize + j * datasize + k] = a[m++];
+						}
+					}
+
+					// write the padded data
+					m_ar.WriteData(i + 1, b.data());
+				}
 			}
 		}
 	}
