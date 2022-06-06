@@ -121,6 +121,7 @@ protected:
 	void ParseElementData(XMLTag& tag);
 
 private:
+	void ParseNodeData(XMLTag& tag, FENodeDataMap& map);
 	void ParseSurfaceData(XMLTag& tag, FESurfaceMap& map);
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
 	void ParseElementData(XMLTag& tag, FEDomainMap& map);

@@ -87,25 +87,88 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 	if (nset == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// get the type
-	const char* sztype = tag.AttributeValue("type");
+	const char* sztype = tag.AttributeValue("type", true);
 
 	// get the name (required!)
 	const char* szname = tag.AttributeValue("name");
 
-	// allocate the data generator
-	FENodeDataGenerator* gen = fecore_new<FENodeDataGenerator>(sztype, &fem);
-	if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	// see if there is a generator
+	if (sztype)
+	{
+		// allocate the data generator
+		FENodeDataGenerator* gen = fecore_new<FENodeDataGenerator>(sztype, &fem);
+		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-	gen->SetName(szname);
-	gen->SetNodeSet(nset);
+		gen->SetName(szname);
+		gen->SetNodeSet(nset);
 
-	GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
+		GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
-	// read the parameters
-	ReadParameterList(tag, gen);
+		// read the parameters
+		ReadParameterList(tag, gen);
 
-	// Add it to the list (will be applied after the rest of the model was read in)
-	GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
+		// Add it to the list (will be applied after the rest of the model was read in)
+		GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
+	}
+	else
+	{
+		// get the data type
+		const char* szdataType = tag.AttributeValue("datatype", true);
+		if (szdataType == nullptr) szdataType = "scalar";
+		FEDataType dataType = str2datatype(szdataType);
+		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
+
+		// create the data map
+		FENodeDataMap* map = new FENodeDataMap(dataType);
+		map->Create(nset);
+		map->SetName(szname);
+
+		// add it to the mesh
+		mesh.AddDataMap(map);
+
+		// read the data
+		ParseNodeData(tag, *map);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection4::ParseNodeData(XMLTag& tag, FENodeDataMap& map)
+{
+	// get the total nr of nodes
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nodes = map.DataCount();
+
+	FEDataType dataType = map.DataType();
+	int dataSize = map.DataSize();
+	double data[3]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
+
+	++tag;
+	do
+	{
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nodes)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		int nread = tag.value(data, dataSize);
+		if (nread == dataSize)
+		{
+			switch (dataType)
+			{
+			case FE_DOUBLE:	map.setValue(n, data[0]); break;
+			case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
+			case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+			default:
+				assert(false);
+			}
+		}
+		else throw XMLReader::InvalidValue(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
