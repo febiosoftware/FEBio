@@ -111,6 +111,12 @@ bool FETimeStepController::Init()
 		m_nmplc = plc->GetID();
 		fem->DetachLoadController(p);
 
+		// print a warning that dtmax is ignored
+		if (m_dtmax != 0)
+		{
+			feLogWarning("dtmax is ignored when specifying must points.");
+		}
+
 		// if a must-point curve is defined and the must-points are empty,
 		// we copy the load curve points to the must-points
 		if (m_must_points.empty())
