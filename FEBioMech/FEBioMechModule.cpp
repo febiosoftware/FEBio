@@ -222,6 +222,7 @@ SOFTWARE.*/
 #include "FEElasticEASShellDomain.h"
 #include "FEElasticANSShellDomain.h"
 #include "FEElasticTrussDomain.h"
+#include "FELinearTrussDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
 #include "FERemodelingElasticDomain.h"
@@ -542,6 +543,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEElasticShellDomainOld, "elastic-shell-old");
 	REGISTER_FECORE_CLASS(FEElasticEASShellDomain, "elastic-shell-eas");
 	REGISTER_FECORE_CLASS(FEElasticANSShellDomain, "elastic-shell-ans");
+	REGISTER_FECORE_CLASS(FELinearTrussDomain, "linear-truss");
 	REGISTER_FECORE_CLASS(FEElasticTrussDomain, "elastic-truss");
 	REGISTER_FECORE_CLASS(FEDiscreteElasticDomain, "discrete");
 	REGISTER_FECORE_CLASS(FEDeformableSpringDomain, "deformable-spring");

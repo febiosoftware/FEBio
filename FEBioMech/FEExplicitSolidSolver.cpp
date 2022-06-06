@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEExplicitSolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
-#include "FEElasticTrussDomain.h"
+#include "FELinearTrussDomain.h"
 #include "FERigidMaterial.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
@@ -226,9 +226,9 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					Mi.Assemble(el.m_node, lm, el_lumped_mass);
 				}
 			}
-			else if (dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd)))
+			else if (dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd)))
 			{
-				FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd));
+				FELinearTrussDomain* ptd = dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd));
 
 				// loop over all the elements
 				for (int iel = 0; iel < ptd->Elements(); ++iel)

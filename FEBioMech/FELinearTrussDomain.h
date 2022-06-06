@@ -29,21 +29,21 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FETrussDomain.h>
 #include "FEElasticDomain.h"
-#include "FESolidMaterial.h"
+#include "FETrussMaterial.h"
 #include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D truss elements
-class FEElasticTrussDomain : public FETrussDomain, public FEElasticDomain
+class FELinearTrussDomain : public FETrussDomain, public FEElasticDomain
 {
 public:
 	//! Constructor
-	FEElasticTrussDomain(FEModel* pfem);
+	FELinearTrussDomain(FEModel* pfem);
 
 	//! copy operator
-	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d);
+	FELinearTrussDomain& operator = (FELinearTrussDomain& d);
 
-	//! initialize the domain
+	//! Initialize data
 	bool Init() override;
 
 	//! Reset data
@@ -101,10 +101,9 @@ protected:
 	void ElementInternalForces(FETrussElement& el, vector<double>& fe);
 
 protected:
-	FESolidMaterial*	m_pMat;
+	FETrussMaterial*	m_pMat;
 	double	m_a0;
 
 	FEDofList	m_dofU;
-
 	DECLARE_FECORE_CLASS();
 };

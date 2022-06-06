@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEUncoupledMaterial.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
-#include "FEElasticTrussDomain.h"
+#include "FELinearTrussDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
 #include "FERemodelingElasticDomain.h"
@@ -162,7 +162,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	{
 		const char* sztype = nullptr;
 		if (dynamic_cast<FETrussMaterial*>(pmat))
-			if (eshape == ET_TRUSS2) sztype = "elastic-truss";
+			if (eshape == ET_TRUSS2) sztype = "linear-truss";
 
 		if (sztype) pd = fecore_new<FETrussDomain>(sztype, pfem);
 	}

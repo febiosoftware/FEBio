@@ -386,6 +386,9 @@ int FEElement::GetFace(int nface, int* nf) const
 FETrussElement::FETrussElement()
 {
 	m_a0 = 0.0;
+	m_lam = 1.0;
+	m_tau = 0.0;
+	m_L0 = 0.0;
 }
 
 FETrussElement::FETrussElement(const FETrussElement& el)
@@ -404,6 +407,9 @@ FETrussElement::FETrussElement(const FETrussElement& el)
 
 	// truss data
 	m_a0 = el.m_a0;
+	m_L0 = el.m_L0;
+	m_lam = el.m_lam;
+	m_tau = el.m_tau;
 }
 
 FETrussElement& FETrussElement::operator = (const FETrussElement& el) 
@@ -422,6 +428,9 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 
 	// copy truss data
 	m_a0 = el.m_a0;
+	m_L0 = el.m_L0;
+	m_lam = el.m_lam;
+	m_tau = el.m_tau;
 
 	return (*this); 
 }
