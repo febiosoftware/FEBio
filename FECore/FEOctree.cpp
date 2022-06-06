@@ -188,11 +188,9 @@ bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
 
 //-----------------------------------------------------------------------------
 // Find intersected octree leaves and return a set of their surface elements
-// hjs: use call by reference
 void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel, double srad)
 {
-	// hjs: check if octree node is within search radius from p.
-	// Note: search radius is not relative as stated in the documentation.
+	// Check if octree node is within search radius from p.
 	bool bNodeWithinSRad = ( (cmin.x - srad <= p.x) && (cmax.x + srad >= p.x) &&
 	                         (cmin.y - srad <= p.y) && (cmax.y + srad >= p.y) &&
 	                         (cmin.z - srad <= p.z) && (cmax.z + srad >= p.z) );

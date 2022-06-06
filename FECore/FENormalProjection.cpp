@@ -98,7 +98,7 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 {
 	// let's find all the candidate surface elements
 	set<int>selist;
-	m_OT.FindCandidateSurfaceElements(r, n, selist, m_rad); // TODO: is rad is this absolute coordinates?
+	m_OT.FindCandidateSurfaceElements(r, n, selist, m_rad);
 	
 	// now that we found candidate surface elements, lets see if we can find 
 	// those that intersect the ray, then pick the closest intersection
