@@ -100350,31 +100350,144 @@ name "subsec:Options-Section"
 This section defines the control parameters for the optimization.
  The options that can be defined will depend on the chosen optimization
  method, which is set with an attribute of the Options section.
- Currently the two implemented optimization methods are the 
-\begin_inset Quotes eld
+ The following table shows the currently supported optimization algorithms.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
 \end_inset
 
-Levenberg-Marquardt
-\begin_inset Quotes erd
-\end_inset
 
- method (type=
-\begin_inset Quotes eld
-\end_inset
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
 
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 levmar
-\begin_inset Quotes erd
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Levenberg-Marquardt 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+constrained levmar
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Levenberg-Marquardt with linear constraints (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+powell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Powell's method
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scan
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter domain scanning (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
 \end_inset
 
-) and the 
-\begin_inset Quotes eld
+
+\begin_inset VSpace defskip
 \end_inset
 
-Constrained Levenberg-Marquardt
-\begin_inset Quotes erd
-\end_inset
 
- method (type=
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The 
 \begin_inset Quotes eld
 \end_inset
 
@@ -100382,9 +100495,7 @@ constrained levmar
 \begin_inset Quotes erd
 \end_inset
 
-).
- Documentation for the Constrained Levenberg-Marquardt method can be found
- at 
+ uses the third-party levmar library
 \begin_inset ERT
 status open
 
@@ -100398,12 +100509,35 @@ url{http://users.ics.forth.gr/~lourakis/levmar/}
 \end_inset
 
 .
+ For additional information please see the library's home page.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\begin_inset Quotes eld
+\end_inset
+
+scan
+\begin_inset Quotes erd
+\end_inset
+
+ method will iterate over the parameter range in increments defined by the
+ fourth parameter value defined in the Parameter section.
+ It returns the parameters that resulted in the lowest objective value of
+ visited points, but it may not be the actual minimum.
+ 
 \end_layout
 
 \begin_layout Standard
-Note that this section is optional.
- When omitted, default values for the control parameters are chosen.
- The following parameters can be defined.
+Note that the Options section is optional.
+ When omitted, the levmar method is used with default values for the control
+ parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+The following parameters can be defined.
 \end_layout
 
 \begin_layout Standard
@@ -101669,8 +101803,8 @@ As explained above, a parameter optimization problem is described using
  two input files.
  First, a standard FEBio input file that defines the mesh, materials, boundary
  conditions, etc.
- The second input file describes the parameter optimization data, such as
- the objective and which model parameters are to be optimized.
+ The second input file describes the parameter optimization problem, such
+ as the objective and which model parameters are to be optimized.
  The format of the second file is described above.
  A parameter optimization can only be initiated from the command line.
  For example:
