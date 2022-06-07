@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "febiolib_api.h"
 #include "FEBioModel.h"
 #include "FEBioConfig.h"
+#include "cmdoptions.h"
 #include <ostream>
 
 class CompactMatrix;
@@ -72,6 +73,9 @@ namespace febio
 
 	// run an FEBioModel
 	FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask = nullptr, const char* szctrl = nullptr);
+
+	// run an FEBioModel
+	FEBIOLIB_API bool RunModel(FEBioModel& fem, CMDOPTIONS* ops);
 
 	// write a matrix to file
 	FEBIOLIB_API bool write_hb(CompactMatrix& K, const char* szfile, int mode = 0);

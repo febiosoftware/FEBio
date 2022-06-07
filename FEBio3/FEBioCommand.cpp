@@ -37,7 +37,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalMatrix.h>
 #include "FEBioCommand.h"
 #include "console.h"
-#include "cmdoptions.h"
+#include <FEBioLib/cmdoptions.h>
 #include <FEBioLib/febio.h>
 #include <FEBioLib/plugin.h>
 #include "FEBioApp.h"
@@ -296,7 +296,7 @@ int FEBioCmd_Config::run(int nargs, char* argv[])
 	if (fem) return model_already_running();
 
 	FEBioApp* feApp = FEBioApp::GetInstance();
-	CMDOPTIONS& ops = feApp->CommandOptions();
+	febio::CMDOPTIONS& ops = feApp->CommandOptions();
 
 	if (nargs == 1)
 	{

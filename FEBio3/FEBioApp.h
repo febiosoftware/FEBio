@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "cmdoptions.h"
+#include <FEBioLib/cmdoptions.h>
 #include <FEBioLib/FEBioConfig.h>
 
 class FEBioModel;
@@ -47,7 +47,7 @@ public:
 
 	void ProcessCommands();
 
-	CMDOPTIONS& CommandOptions();
+	febio::CMDOPTIONS& CommandOptions();
 
 	bool ParseCmdLine(int argc, char* argv[]);
 
@@ -72,7 +72,7 @@ public:
 	static FEBioApp* GetInstance();
 
 private:
-	CMDOPTIONS	m_ops;				// command line options
+	febio::CMDOPTIONS	m_ops;				// command line options
 	FEBioConfig	m_config;			// configuration options
 
 	FEBioModel*		m_fem;			// current model (or null if not model is running)
