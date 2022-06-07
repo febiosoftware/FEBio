@@ -79,6 +79,14 @@ mat3d FEMaterial::GetLocalCS(const FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+// set the (local) material axis valuator
+void FEMaterial::SetMaterialAxis(FEMat3dValuator* val)
+{
+	if (m_Q) delete m_Q;
+	m_Q = val;
+}
+
+//-----------------------------------------------------------------------------
 //! Initial material.
 bool FEMaterial::Init()
 {

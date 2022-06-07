@@ -73,6 +73,9 @@ public:
 	// evaluate local coordinate system at material point
 	mat3d GetLocalCS(const FEMaterialPoint& mp);
 
+	// set the (local) material axis valuator
+	void SetMaterialAxis(FEMat3dValuator* val);
+
 protected:
 	FEMat3dValuator*	m_Q;			//!< local material coordinate system
 
