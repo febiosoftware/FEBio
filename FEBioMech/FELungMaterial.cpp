@@ -24,10 +24,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-#include "FEBirzle.h"
+#include "FELungMaterial.h"
 #include <math.h>
 
-BEGIN_FECORE_CLASS(FEBirzle, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FELungMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER(m_v, FE_RANGE_GREATER(0.0), "v");
 	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
@@ -37,11 +37,11 @@ BEGIN_FECORE_CLASS(FEBirzle, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEBirzle::FEBirzle(FEModel* pfem) : FEElasticMaterial(pfem)
+FELungMaterial::FELungMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 }
 
-bool FEBirzle::Init()
+bool FELungMaterial::Init()
 {
 	if (FEElasticMaterial::Init() == false) return false;
 
@@ -51,7 +51,7 @@ bool FEBirzle::Init()
 	return true;
 }
 
-double FEBirzle::StrainEnergyDensity(FEMaterialPoint& mp)
+double FELungMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	mat3ds B = pt.LeftCauchyGreen();
@@ -65,7 +65,7 @@ double FEBirzle::StrainEnergyDensity(FEMaterialPoint& mp)
 		+m_c3*pow((pow(I3, 1.0/3.0)-1), m_d3);
 }
 
-mat3ds FEBirzle::Stress(FEMaterialPoint& mp)
+mat3ds FELungMaterial::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -86,7 +86,7 @@ mat3ds FEBirzle::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-tens4ds FEBirzle::Tangent(FEMaterialPoint& mp)
+tens4ds FELungMaterial::Tangent(FEMaterialPoint& mp)
 {
 	// As in the Stress function, we need the data from the FEElasticMaterialPoint
 	// class to calculate the tangent.

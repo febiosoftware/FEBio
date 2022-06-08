@@ -58168,10 +58168,10 @@ Example:
 \end_layout
 
 \begin_layout Subsubsection
-Birzle-Wall 
+Lung Material 
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Birzle-Wall"
+name "subsec:LungMaterial"
 
 \end_inset
 
@@ -58179,7 +58179,7 @@ name "subsec:Birzle-Wall"
 \end_layout
 
 \begin_layout Standard
-This material describes a Birzle-Wall material
+This is a material used for modeling human lung tissue as described by Birzle
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Birzle2019"
@@ -58494,7 +58494,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<material id="1" type="birzle">
+<material id="1" type="lung">
 \end_layout
 
 \begin_layout LyX-Code

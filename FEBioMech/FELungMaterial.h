@@ -27,10 +27,10 @@ SOFTWARE.*/
 #include <FEBioMech/FEElasticMaterial.h>
 
 //----------------------------------------------------------------------------
-class FEBirzle : public FEElasticMaterial
+class FELungMaterial : public FEElasticMaterial
 {
 public:
-	FEBirzle(FEModel* pfem);
+	FELungMaterial(FEModel* pfem);
 
 private:
 	double	m_c, m_c1, m_c3;

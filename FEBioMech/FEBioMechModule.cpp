@@ -156,7 +156,7 @@ SOFTWARE.*/
 #include "FEIsotropicLeeSacks.h"
 #include "FEIsotropicLeeSacksUncoupled.h"
 #include "FEPolynomialHyperElastic.h"
-#include "FEBirzle.h"
+#include "FELungMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -320,7 +320,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
 	REGISTER_FECORE_CLASS(FEDamageFiberExponential, "damage fiber exponential");
 	REGISTER_FECORE_CLASS(FEDamageFiberExpLinear, "damage fiber exp-linear");
-    REGISTER_FECORE_CLASS(FEBirzle, "birzle");
+    REGISTER_FECORE_CLASS(FELungMaterial, "lung");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
