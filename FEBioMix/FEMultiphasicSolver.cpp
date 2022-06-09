@@ -192,6 +192,26 @@ void FEMultiphasicSolver::PrepStep()
 	zero(m_Pi);
 	zero(m_Di);
 
+	// for concentration nodal loads we need to multiply the time step size
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i < fem.ModelLoads(); ++i)
+	{
+		FENodalDOFLoad* pl = dynamic_cast<FENodalDOFLoad*>(fem.ModelLoad(i));
+		if (pl && pl->IsActive())
+		{
+			bool adjust = false;
+			int dof = pl->GetDOF();
+			if      ((dof == m_dofP) || (dof == m_dofQ)) adjust = true;
+			else if ((m_dofC > -1) && (dof == m_dofC)) adjust = true;
+			else if ((m_dofD > -1) && (dof == m_dofD)) adjust = true;
+
+			if (adjust)
+			{
+				pl->SetDtScale(true);
+			}
+		}
+	}
+
 	FESolidSolver2::PrepStep();
 }
 

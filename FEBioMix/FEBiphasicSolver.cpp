@@ -158,6 +158,20 @@ void FEBiphasicSolver::PrepStep()
 	zero(m_Pi);
 	zero(m_Di);
 
+	// for pressure nodal loads we need to multiply the time step size
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i < fem.ModelLoads(); ++i)
+	{
+		FENodalDOFLoad* pl = dynamic_cast<FENodalDOFLoad*>(fem.ModelLoad(i));
+		if (pl && pl->IsActive())
+		{
+			if ((pl->GetDOF() == m_dofP[0]) || (pl->GetDOF() == m_dofQ[0]))
+			{
+				pl->SetDtScale(true);
+			}
+		}
+	}
+
 	FESolidSolver2::PrepStep();
 }
 

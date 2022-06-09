@@ -146,6 +146,27 @@ bool FEBiphasicSoluteSolver::InitEquations()
 void FEBiphasicSoluteSolver::PrepStep()
 {
 	for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
+
+	// for concentration nodal loads we need to multiply the time step size
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i < fem.ModelLoads(); ++i)
+	{
+		FENodalDOFLoad* pl = dynamic_cast<FENodalDOFLoad*>(fem.ModelLoad(i));
+		if (pl && pl->IsActive())
+		{
+			bool adjust = false;
+			int dof = pl->GetDOF();
+			if      ((m_dofC[0] > -1) && (dof == m_dofC[0])) adjust = true;
+			else if ((m_dofD[0] > -1) && (dof == m_dofD[0])) adjust = true;
+
+			if (adjust)
+			{
+				pl->SetDtScale(true);
+			}
+		}
+	}
+
+
 	FEBiphasicSolver::PrepStep();
 }
 

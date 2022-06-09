@@ -110,9 +110,13 @@ public:
 
 	double NodeValue(int n);
 
+	void SetDtScale(bool b);
+
 private:
 	int				m_dof;		//!< degree of freedom index
 	FEParamDouble	m_scale;	//!< applied load scale factor
+
+	bool m_dtscale;
 
 	DECLARE_FECORE_CLASS();
 };
