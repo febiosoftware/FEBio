@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FEDataGenerator.h"
+#include "FEDofList.h"
 
 class FESurface;
 
@@ -39,8 +40,12 @@ public:
 
 	bool Generate(FESurfaceMap& data) override;
 
+	void SetDOFConstraint(const FEDofList& dofs);
+
 private:
 	double	m_scale;
+
+	FEDofList	m_dofs;
 
 	DECLARE_FECORE_CLASS();
 };
