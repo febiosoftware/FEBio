@@ -249,7 +249,7 @@ enum SUPER_CLASS_ID {
 	FECALLBACK_ID,					// derived from FECallBack
 	FESOLIDDOMAIN_ID,				// derived from FESolidDomain
 	FESHELLDOMAIN_ID,				// derived from FEShellDomain
-	FETRUSSDOMAIN_ID,				// derived from FETrussDomain
+	FEBEAMDOMAIN_ID,				// derived from FEBeamDomain
 	FEDISCRETEDOMAIN_ID,			// derived from FEDiscreteDomain
 	FEDOMAIN2D_ID,					// derived from FEDomain2D
 	FESURFACE_ID,					// derived from FESurface
