@@ -106,8 +106,8 @@ bool FEConstraintNormalFlow::Init()
             FENode& node = m_surf.Node(i);
             switch (j) {
             case 0: pLC0->AddDOF(node.GetID(), dof_wx, 1.0 - m_nn[i].x * m_nn[i].x); break;
-            case 1: pLC0->AddDOF(node.GetID(), dof_wy,       m_nn[i].x * m_nn[i].y); break;
-            case 2: pLC0->AddDOF(node.GetID(), dof_wz,       m_nn[i].x * m_nn[i].z); break;
+            case 1: pLC0->AddDOF(node.GetID(), dof_wy,     - m_nn[i].x * m_nn[i].y); break;
+            case 2: pLC0->AddDOF(node.GetID(), dof_wz,     - m_nn[i].x * m_nn[i].z); break;
             }
         }
         // add the linear constraint to the system

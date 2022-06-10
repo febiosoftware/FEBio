@@ -26,10 +26,11 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
+#include "febiomix_api.h"
 
 class FESolidElement;
 
-class FESolutePointSource : public FEBodyLoad
+class FEBIOMIX_API FESolutePointSource : public FEBodyLoad
 {
 public:
 	FESolutePointSource(FEModel* fem);

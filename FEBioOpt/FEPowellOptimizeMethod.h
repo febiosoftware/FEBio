@@ -34,6 +34,8 @@ SOFTWARE.*/
 class FEPowellOptimizeMethod : public FEOptimizeMethod
 {
 public:
+	FEPowellOptimizeMethod(FEModel* fem);
+
 	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj);
 
 protected:

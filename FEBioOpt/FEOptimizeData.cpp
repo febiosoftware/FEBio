@@ -134,7 +134,7 @@ FEOptimizeData::~FEOptimizeData(void)
 bool FEOptimizeData::Init()
 {
 	// allocate default optimization solver if none specified in input file
-	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
+	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod(GetFEModel());
 
 	// allocate default solver if none specified in input file
 	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", m_fem);

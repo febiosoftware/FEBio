@@ -38,7 +38,7 @@ BEGIN_FECORE_CLASS(FEParabolicMap, FEFaceDataGenerator)
 	ADD_PARAMETER(m_scale, "value");
 END_FECORE_CLASS();
 
-FEParabolicMap::FEParabolicMap(FEModel* fem) : FEFaceDataGenerator(fem)
+FEParabolicMap::FEParabolicMap(FEModel* fem) : FEFaceDataGenerator(fem), m_dofs(fem)
 {
 	m_scale = 1.0;
 }
@@ -51,6 +51,11 @@ FEParabolicMap::~FEParabolicMap()
 bool FEParabolicMap::Init()
 {
 	return false;
+}
+
+void FEParabolicMap::SetDOFConstraint(const FEDofList& dofs)
+{
+	m_dofs = dofs;
 }
 
 bool FEParabolicMap::Generate(FESurfaceMap& map)
@@ -83,6 +88,24 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 				if (en[2] > -1) boundary[en[2]] = true;
 			}
 		}
+	}
+
+	// Apply dof constraints
+	if (m_dofs.IsEmpty() == false)
+	{
+		// only consider nodes with fixed dofs as boundary nodes
+		for (int i = 0; i < ps->Nodes(); ++i)
+			if (boundary[i]) {
+				FENode& node = ps->Node(i);
+
+				bool b = false;
+				for (int j = 0; j < m_dofs.Size(); ++j)
+				{
+					if (node.get_bc(m_dofs[j]) != DOF_FIXED) b = true;
+				}
+
+				if (b) boundary[i] = false;
+			}
 	}
 
 	// count number of non-boundary nodes

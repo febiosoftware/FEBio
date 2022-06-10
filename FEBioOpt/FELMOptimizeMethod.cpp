@@ -69,7 +69,7 @@ void mrqcof(vector<double>& x,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&));
 
 //-----------------------------------------------------------------------------
-FELMOptimizeMethod::FELMOptimizeMethod()
+FELMOptimizeMethod::FELMOptimizeMethod(FEModel* fem) : FEOptimizeMethod(fem)
 {
 	m_objtol = 0.001;
 	m_fdiff  = 0.001;

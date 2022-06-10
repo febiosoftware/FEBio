@@ -23,29 +23,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "FEDataGenerator.h"
-#include "FEDofList.h"
+#include "stdafx.h"
+#include "FEOptimizeMethod.h"
 
-class FESurface;
-
-class FECORE_API FEParabolicMap : public FEFaceDataGenerator
-{
-public:
-	FEParabolicMap(FEModel* fem);
-
-	~FEParabolicMap();
-
-	bool Init() override;
-
-	bool Generate(FESurfaceMap& data) override;
-
-	void SetDOFConstraint(const FEDofList& dofs);
-
-private:
-	double	m_scale;
-
-	FEDofList	m_dofs;
-
-	DECLARE_FECORE_CLASS();
-};
+FEOptimizeMethod::FEOptimizeMethod(FEModel* fem) : FECoreClass(fem)
+{ 
+	m_print_level = PRINT_ITERATIONS; 
+}

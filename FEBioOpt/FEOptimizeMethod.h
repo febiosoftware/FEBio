@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEParameterList.h>
+#include <FECore/FECoreClass.h>
 
 //-----------------------------------------------------------------------------
 class FEOptimizeData;
@@ -49,10 +49,12 @@ enum LogLevel {
 //-----------------------------------------------------------------------------
 //! Base class for optimization algorithms.
 //! Derived class implement specific optimization algorithms.
-class FEOptimizeMethod : public FEParamContainer
+class FEOptimizeMethod : public FECoreClass
 {
+	FECORE_BASE_CLASS(FEOptimizeMethod)
+
 public:
-	FEOptimizeMethod() { m_print_level = PRINT_ITERATIONS; }
+	FEOptimizeMethod(FEModel* fem);
 
 	// Implement this function for solve an optimization problem
 	// should return the optimal values for the input parameters in a, the optimal

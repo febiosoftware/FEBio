@@ -36,7 +36,7 @@ SOFTWARE.*/
 class FELMOptimizeMethod : public FEOptimizeMethod
 {
 public:
-	FELMOptimizeMethod();
+	FELMOptimizeMethod(FEModel* fem);
 	bool Solve(FEOptimizeData* pOpt, std::vector<double>& amin, std::vector<double>& ymin, double* minObj) override;
 
 protected:

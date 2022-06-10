@@ -105,19 +105,12 @@ void FEOptimizeInput::ParseTask(XMLTag& tag)
 //-------------------------------------------------------------------------------------------------
 void FEOptimizeInput::ParseOptions(XMLTag& tag)
 {
-	FEOptimizeMethod* popt = 0;
+	FEModel* fem = m_opt->GetFEModel();
+
 	const char* szt = tag.AttributeValue("type", true);
-	if (szt == 0) popt = new FELMOptimizeMethod;
-	else
-	{
-		if (strcmp(szt, "levmar") == 0) popt = new FELMOptimizeMethod;
-		else if (strcmp(szt, "powell") == 0) popt = new FEPowellOptimizeMethod;
-		else if (strcmp(szt, "scan") == 0) popt = new FEScanOptimizeMethod;
-#ifdef HAVE_LEVMAR
-		else if (strcmp(szt, "constrained levmar") == 0) popt = new FEConstrainedLMOptimizeMethod;
-#endif
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-	}
+	if (szt == 0) szt = "levmar";
+	FEOptimizeMethod* popt = fecore_new< FEOptimizeMethod>(szt, fem);
+	if (popt == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// get the parameter list
 	FEParameterList& pl = popt->GetParameterList();

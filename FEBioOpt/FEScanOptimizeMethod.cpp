@@ -35,9 +35,10 @@ BEGIN_FECORE_CLASS(FEScanOptimizeMethod, FEOptimizeMethod)
 
 END_FECORE_CLASS();
 
-//-----------------------------------------------------------------------------
-// FEScanOptimizeMethod
-//-----------------------------------------------------------------------------
+FEScanOptimizeMethod::FEScanOptimizeMethod(FEModel* fem) : FEOptimizeMethod(fem)
+{
+
+}
 
 bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
 {

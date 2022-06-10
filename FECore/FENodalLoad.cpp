@@ -161,6 +161,14 @@ FENodalDOFLoad::FENodalDOFLoad(FEModel* fem) : FENodalLoad(fem)
 {
 	m_dof = -1;
 	m_scale = 0.0;
+
+	m_dtscale = false;
+}
+
+//-----------------------------------------------------------------------------
+void FENodalDOFLoad::SetDtScale(bool b)
+{
+	m_dtscale = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,6 +197,12 @@ void FENodalDOFLoad::GetNodalValues(int n, std::vector<double>& val)
 	mp.m_index = n;
 
 	val[0] = m_scale(mp);
+
+	if (m_dtscale)
+	{
+		double dt = GetTimeInfo().timeIncrement;
+		val[0] *= dt;
+	}
 }
 
 double FENodalDOFLoad::NodeValue(int n)
@@ -201,5 +215,13 @@ double FENodalDOFLoad::NodeValue(int n)
 	mp.m_r0 = node.m_r0;
 	mp.m_index = n;
 
-	return m_scale(mp);
+	double val = m_scale(mp);
+
+	if (m_dtscale)
+	{
+		double dt = GetTimeInfo().timeIncrement;
+		val *= dt;
+	}
+
+	return val;
 }

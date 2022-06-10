@@ -55,7 +55,7 @@ FEBioApp* FEBioApp::GetInstance()
 	return m_This;
 }
 
-CMDOPTIONS& FEBioApp::CommandOptions()
+febio::CMDOPTIONS& FEBioApp::CommandOptions()
 {
 	return m_ops;
 }
@@ -228,7 +228,7 @@ int FEBioApp::prompt()
 //
 bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 {
-	CMDOPTIONS& ops = m_ops;
+	febio::CMDOPTIONS& ops = m_ops;
 
 	// set default options
 	ops.ndebug = 0;

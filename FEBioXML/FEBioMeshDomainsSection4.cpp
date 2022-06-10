@@ -356,7 +356,7 @@ void FEBioMeshDomainsSection4::ParseTrussDomainSection(XMLTag& tag)
 	if (sztype)
 	{
 		// if the type attribute is defined, try to allocate the domain class directly. 
-		dom = febio.CreateDomainExplicit(FETRUSSDOMAIN_ID, sztype, &fem);
+		dom = febio.CreateDomainExplicit(FEBEAMDOMAIN_ID, sztype, &fem);
 		if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, sztype);
 		dom->SetMaterial(mat);
 	}
