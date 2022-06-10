@@ -1002,7 +1002,7 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 			{
 			case FE_DOMAIN_SOLID   : WriteSolidDomain   (static_cast<FESolidDomain&   >(dom)); break;
 			case FE_DOMAIN_SHELL   : WriteShellDomain   (static_cast<FEShellDomain&   >(dom)); break;
-			case FE_DOMAIN_TRUSS   : WriteTrussDomain   (static_cast<FETrussDomain&   >(dom)); break;
+			case FE_DOMAIN_BEAM    : WriteBeamDomain    (static_cast<FEBeamDomain&    >(dom)); break;
 			case FE_DOMAIN_DISCRETE: WriteDiscreteDomain(static_cast<FEDiscreteDomain&>(dom)); break;
             case FE_DOMAIN_2D      : WriteDomain2D      (static_cast<FEDomain2D&      >(dom)); break;
 			}
@@ -1123,7 +1123,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
+void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -1133,7 +1133,7 @@ void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 
 	// figure out element type
 	int ne = 2;
-	int dtype = PLT_ELEM_TRUSS;
+	int dtype = PLT_ELEM_LINE2;
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);
@@ -1170,7 +1170,7 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 
 	// figure out element type
 	int ne = 2;
-	int dtype = PLT_ELEM_TRUSS;
+	int dtype = PLT_ELEM_LINE2;
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);

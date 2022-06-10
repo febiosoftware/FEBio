@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "PltArchive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
-#include "FECore/FETrussDomain.h"
+#include "FECore/FEBeamDomain.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEDomain2D.h"
 #include <list>
@@ -148,7 +148,7 @@ public:
 		PLT_ELEM_TET4, 
 		PLT_ELEM_QUAD, 
 		PLT_ELEM_TRI, 
-		PLT_ELEM_TRUSS, 
+		PLT_ELEM_LINE2, 
 		PLT_ELEM_HEX20, 
 		PLT_ELEM_TET10, 
 		PLT_ELEM_TET15, 
@@ -330,7 +330,7 @@ protected:
 
 	void WriteSolidDomain   (FESolidDomain&    dom);
 	void WriteShellDomain   (FEShellDomain&    dom);
-	void WriteTrussDomain   (FETrussDomain&    dom);
+	void WriteBeamDomain    (FEBeamDomain&    dom);
 	void WriteDiscreteDomain(FEDiscreteDomain& dom);
     void WriteDomain2D      (FEDomain2D&       dom);
 

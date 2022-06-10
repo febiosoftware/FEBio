@@ -1083,7 +1083,7 @@ void FEMesh::CopyFrom(FEMesh& mesh)
 		{
 		case FE_DOMAIN_SOLID   : pd = fecore_new<FESolidDomain   >(sz, nullptr); break;
 		case FE_DOMAIN_SHELL   : pd = fecore_new<FEShellDomain   >(sz, nullptr); break;
-		case FE_DOMAIN_TRUSS   : pd = fecore_new<FETrussDomain   >(sz, nullptr); break;
+		case FE_DOMAIN_BEAM    : pd = fecore_new<FEBeamDomain    >(sz, nullptr); break;
 		case FE_DOMAIN_2D      : pd = fecore_new<FEDomain2D      >(sz, nullptr); break;
 		case FE_DOMAIN_DISCRETE: pd = fecore_new<FEDiscreteDomain>(sz, nullptr); break;
 		}

@@ -1966,7 +1966,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		{
 		case FE_DOMAIN_SOLID   : pd = fecore_new<FESolidDomain   >(sz, this); break;
 		case FE_DOMAIN_SHELL   : pd = fecore_new<FEShellDomain   >(sz, this); break;
-		case FE_DOMAIN_TRUSS   : pd = fecore_new<FETrussDomain   >(sz, this); break;
+		case FE_DOMAIN_BEAM    : pd = fecore_new<FEBeamDomain    >(sz, this); break;
 		case FE_DOMAIN_2D      : pd = fecore_new<FEDomain2D      >(sz, this); break;
 		case FE_DOMAIN_DISCRETE: pd = fecore_new<FEDiscreteDomain>(sz, this); break;
 		}

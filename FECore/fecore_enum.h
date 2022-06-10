@@ -305,15 +305,13 @@ enum FE_Output_Level {
 //-----------------------------------------------------------------------------
 //! Domain classes
 //! The domain class defines the general catergory of element types
-//! NOTE: beams are not supported yet.
 #define	FE_DOMAIN_SOLID		1
 #define	FE_DOMAIN_SHELL		2
 #define	FE_DOMAIN_BEAM		3
 #define	FE_DOMAIN_SURFACE	4
-#define	FE_DOMAIN_TRUSS		5
-#define	FE_DOMAIN_DISCRETE	6
-#define	FE_DOMAIN_2D		7
-#define FE_DOMAIN_EDGE		8
+#define	FE_DOMAIN_DISCRETE	5
+#define	FE_DOMAIN_2D		6
+#define FE_DOMAIN_EDGE		7
 
 // --- data types ---
 enum Var_Type { 

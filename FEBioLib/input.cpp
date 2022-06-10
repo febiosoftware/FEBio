@@ -254,7 +254,7 @@ void FEBioModel::echo_input()
 	feLog("\tNumber of nodes ................................ : %d\n", mesh.Nodes());
 	int nsolid = mesh.Elements(FE_DOMAIN_SOLID    ); if (nsolid > 0) feLog("\tNumber of solid elements ....................... : %d\n", nsolid);
 	int nshell = mesh.Elements(FE_DOMAIN_SHELL    ); if (nshell > 0) feLog("\tNumber of shell elements ....................... : %d\n", nshell);
-	int ntruss = mesh.Elements(FE_DOMAIN_TRUSS    ); if (ntruss > 0) feLog("\tNumber of truss elements ....................... : %d\n", ntruss);
+	int nbeam  = mesh.Elements(FE_DOMAIN_BEAM     ); if (nbeam  > 0) feLog("\tNumber of beam elements ........................ : %d\n", nbeam );
 	int nelm2d = mesh.Elements(FE_DOMAIN_2D       ); if (nelm2d > 0) feLog("\tNumber of 2D elements .......................... : %d\n", nelm2d);
 	feLog("\n\n");
 
