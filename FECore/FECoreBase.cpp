@@ -313,7 +313,7 @@ bool FECoreBase::Init()
 		{
 			if (pi->Init() == false)
 			{
-				feLogError("The required property \"%s\" was not defined", pi->GetName());
+				feLogError("The property \"%s\" failed to initialize or was not defined.", pi->GetName());
 				return false;
 			}
 		}
