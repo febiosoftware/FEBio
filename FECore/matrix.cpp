@@ -173,16 +173,22 @@ matrix matrix::operator * (const matrix& m) const
 {
 	assert(m_nc == m.m_nr);
 	matrix a(m_nr, m.m_nc);
-
-	for (int i=0; i<m_nr; ++i)
+    
+    #pragma omp parallel for shared(a)
+	for (int i = 0; i < m_nr; ++i)
 	{
-		for (int j=0; j<m.m_nc; ++j)
+		double* pa = a.m_pr[i];
+		for (int j = 0; j < m.m_nc; ++j) pa[j] = 0.0;
+		for (int k = 0; k < m_nc; ++k)
 		{
-			a(i,j) = 0;
-			for (int k=0; k<m_nc; ++k) a(i,j) += m_pr[i][k]*m(k,j);
+			const double pik = m_pr[i][k];
+			const double* pm = m.m_pr[k];
+			for (int j = 0; j < m.m_nc; ++j)
+			{
+				pa[j] += pik * pm[j];
+			}
 		}
 	}
-
 	return a;
 }
 
