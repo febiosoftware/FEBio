@@ -33,7 +33,7 @@
 #include "MatrixTools.h"
 #include <FECore/log.h>
 
-#ifdef __APPLE__
+#ifdef HAS_ACCEL
 
 //////////////////////////////////////////////////////////////
 // AccelerateSparseSolver
