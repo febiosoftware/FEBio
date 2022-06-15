@@ -203,6 +203,7 @@ public:
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
+	std::vector<FEGlobalVariable*>	m_Var;
 
 	FEMODEL_MEMORY_STATS	m_memstats;
 };
@@ -224,6 +225,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PROPERTY(m_imp->m_CI  , "contact"        );
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );
 //	ADD_PROPERTY(m_imp->m_ML  , "model_load"     );
+	ADD_PROPERTY(m_imp->m_MA  , "mesh_adaptor"   );
 	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
 	ADD_PROPERTY(m_imp->m_Step, "step"           );
 	ADD_PROPERTY(m_imp->m_Data, "data"           );
@@ -297,6 +299,10 @@ void FEModel::Clear()
 	// global data
 	for (size_t i = 0; i<m_imp->m_GD.size(); ++i) delete m_imp->m_GD[i]; m_imp->m_GD.clear();
 	m_imp->m_Const.clear();
+
+	// global variables (TODO: Should I delete the corresponding parameters?)
+	for (size_t i = 0; i < m_imp->m_Var.size(); ++i) delete m_imp->m_Var[i];
+	m_imp->m_Var.clear();
 
 	// clear the linear constraints
 	if (m_imp->m_LCM) m_imp->m_LCM->Clear();
@@ -1657,7 +1663,7 @@ bool FEModel::EvaluateLoadParameters()
 			case FE_PARAM_BOOL: {
 				p->value<bool>() = (s > 0 ? true : false); 
 				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "false" : "true"));
+					feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "true" : "false"));
 			}
 			break;
 			case FE_PARAM_VEC3D: {
@@ -1788,6 +1794,27 @@ double FEModel::GetGlobalConstant(const string& s)
 }
 
 //-----------------------------------------------------------------------------
+int FEModel::GlobalVariables() const
+{
+	return (int)m_imp->m_Var.size();
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::AddGlobalVariable(const string& s, double v)
+{
+	FEGlobalVariable* var = new FEGlobalVariable;
+	var->v = v;
+	var->name = s;
+	AddParameter(var->v, var->name.c_str());
+	m_imp->m_Var.push_back(var);
+}
+
+const FEGlobalVariable& FEModel::GetGlobalVariable(int n)
+{
+	return *m_imp->m_Var[n];
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::AddGlobalData(FEGlobalData* psd)
 {
 	m_imp->m_GD.push_back(psd);
@@ -1834,32 +1861,32 @@ void FEModel::UpdateModelData()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* CopyMaterial(FEMaterial* pmat, FEModel* fem)
+FECoreBase* CopyClass(FECoreBase* pc, FEModel* fem)
 {
-	const char* sztype = pmat->GetTypeStr();
+	const char* sztype = pc->GetTypeStr();
 
 	// create a new material
-	FEMaterial* pnew = fecore_new<FEMaterial>(sztype, fem);
-	assert(pnew);
+	FECoreBase* pcnew = fecore_new<FECoreBase>(pc->GetSuperClassID(), sztype, fem);
+	assert(pcnew);
 
-	pnew->SetID(pmat->GetID());
+	pcnew->SetID(pc->GetID());
 
 	// copy parameters
-	pnew->GetParameterList() = pmat->GetParameterList();
+	pcnew->GetParameterList() = pc->GetParameterList();
 
 	// copy properties
-	for (int i = 0; i < pmat->Properties(); ++i)
+	for (int i = 0; i < pc->Properties(); ++i)
 	{
-		FEProperty* prop = pmat->PropertyClass(i);
-		FEMaterial* mati = dynamic_cast<FEMaterial*>(prop->get(0));
-		if (mati)
+		FEProperty* prop = pc->PropertyClass(i);
+		FECoreBase* pci = prop->get(0);
+		if (pc)
 		{
-			FEMaterial* newMati = CopyMaterial(mati, fem);
-			bool b = pnew->SetProperty(i, newMati); assert(b);
+			FECoreBase* pci_new = CopyClass(pci, fem); assert(pci_new);
+			bool b = pcnew->SetProperty(i, pci_new); assert(b);
 		}
 	}
 
-	return pnew;
+	return pcnew;
 }
 
 //-----------------------------------------------------------------------------
@@ -1877,6 +1904,21 @@ void FEModel::CopyFrom(FEModel& fem)
 	m_imp->m_timeInfo = fem.m_imp->m_timeInfo;
 	m_imp->m_ftime0 = fem.m_imp->m_ftime0;
 	m_imp->m_pStep = 0;
+
+	// copy model variables
+	// we only copy the user created parameters, which presumably don't exist yet
+	// in this model.
+	int NS = fem.GlobalVariables();
+	if (NS > 0)
+	{
+		assert(GlobalVariables() == 0);
+		FEParameterList& PL = GetParameterList();
+		for (int i = 0; i < NS; ++i)
+		{
+			const FEGlobalVariable& var = fem.GetGlobalVariable(i);
+			AddGlobalVariable(var.name, var.v);
+		}
+	}
 
 	// --- Steps ---
 
@@ -1920,7 +1962,8 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEMaterial* pmat = fem.GetMaterial(i);
 
 		// copy the material
-		FEMaterial* pnew = CopyMaterial(pmat, this);
+		FEMaterial* pnew = dynamic_cast<FEMaterial*>(CopyClass(pmat, this));
+		assert(pnew);
 
 		// copy the name
 		pnew->SetName(pmat->GetName());

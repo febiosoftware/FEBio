@@ -114,6 +114,8 @@ public:
 	FEMappedValue(FEModel* fem);
 	void setDataMap(FEDataMap* val);
 
+	FEDataMap* dataMap();
+
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEScalarValuator* copy() override;

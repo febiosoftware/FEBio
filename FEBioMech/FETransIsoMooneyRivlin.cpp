@@ -49,8 +49,22 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
-	m_ac = 0;
+	m_ac = nullptr;
 	m_fib.SetParent(this);
+}
+
+//-----------------------------------------------------------------------------
+//! create material point data
+FEMaterialPoint* FETransIsoMooneyRivlin::CreateMaterialPointData() {
+    // create the elastic solid material point
+    FEMaterialPoint* ep = new FEElasticMaterialPoint;
+    
+    // create the material point from the active contraction material
+    if (m_ac) {
+        FEMaterialPoint* pt = m_ac->CreateMaterialPointData(*ep);
+        if (pt != nullptr) return pt;
+    }
+    return ep;
 }
 
 //-----------------------------------------------------------------------------
@@ -87,7 +101,7 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds fs = m_fib.DevFiberStress(mp,m_fib.FiberVector(mp));
 
 	// calculate the active fiber stress (if provided)
-	if (m_ac) fs += m_ac->FiberStress(m_fib.FiberVector(mp), pt);
+	if (m_ac) fs += m_ac->ActiveStress(mp, m_fib.FiberVector(mp));
 
 	return s + fs;
 }
@@ -144,7 +158,7 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	c += m_fib.DevFiberTangent(mp,m_fib.FiberVector(mp));
 
 	// add the active fiber stiffness
-	if (m_ac) c += m_ac->FiberStiffness(m_fib.FiberVector(mp), mp);
+	if (m_ac) c += m_ac->ActiveStiffness(mp, m_fib.FiberVector(mp));
 
 	return c;
 }
@@ -173,3 +187,14 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
     
 	return sed;
 }
+
+//-----------------------------------------------------------------------------
+// update force-velocity material point
+void FETransIsoMooneyRivlin::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& timeInfo)
+{
+    // get the material fiber axis
+    vec3d a0 = m_fib.m_fiber.unitVector(mp);
+    
+    if (m_ac) m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
+}
+

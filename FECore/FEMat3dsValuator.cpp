@@ -76,7 +76,7 @@ mat3ds FEMappedValueMat3ds::operator()(const FEMaterialPoint& pt)
 
 FEMat3dsValuator* FEMappedValueMat3ds::copy()
 {
-	FEMappedValueMat3ds* map = new FEMappedValueMat3ds(GetFEModel());
+	FEMappedValueMat3ds* map = fecore_alloc(FEMappedValueMat3ds, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }

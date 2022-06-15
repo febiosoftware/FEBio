@@ -381,48 +381,46 @@ void FESurface::ForEachSurfaceElement(std::function<void(FESurfaceElement& el)> 
 	for (size_t i = 0; i < m_el.size(); ++i) f(m_el[i]);
 }
 
-// TODO: I should be able to speed this up
 void FESurface::FindElements(FESurfaceElement& el)
 {
-    // get the mesh to which this surface belongs
-    FEMesh* mesh = GetMesh();
-    int ndom = mesh->Domains();
-    // check all solid domains
-    for (int k = 0; k<ndom; ++k) {
-        FEDomain& pdom = mesh->Domain(k);
-        
-        // check each solid element in this domain
-        int nselem = pdom.Elements();
-#pragma omp parallel for shared (nselem)
-        for (int l = 0; l<nselem; ++l) {
-            FEElement& sel = pdom.ElementRef(l);
+	// get the mesh to which this surface belongs
+	FEMesh& mesh = *GetMesh();
+	FENodeElemList& NEL = mesh.NodeElementList();
+
+	vector<int>& sf = el.m_node;
+	int node = el.m_node[0];
+	int nval = NEL.Valence(node);
+	FEElement** ppe = NEL.ElementList(node);
+	for (int i = 0; i < nval; ++i)
+	{
+		FEElement& sel = *ppe[i];
             
-            // check all faces of this solid element
-            int nfaces = sel.Faces();
-            for (int j = 0; j<nfaces; ++j) {
-                int nf[9];
-                vec3d g[3];
-                int nn = sel.GetFace(j, nf);
+		// check all faces of this solid element
+		int nfaces = sel.Faces();
+		for (int j = 0; j<nfaces; ++j) 
+		{
+			int nf[9];
+			vec3d g[3];
+			int nn = sel.GetFace(j, nf);
                 
-                int found = 0;
-                if (nn == el.Nodes())
+			int found = 0;
+			if (nn == el.Nodes())
+			{
+                switch (nn)
                 {
-                    switch (nn)
-                    {
-                        case 3: found = el.HasNodes(nf,3); break;
-                        case 4: found = el.HasNodes(nf,4); break;
-                        case 6: found = el.HasNodes(nf,3); break;
-                        case 7: found = el.HasNodes(nf,3); break;
-                        case 8: found = el.HasNodes(nf,4); break;
-                        case 9: found = el.HasNodes(nf,4); break;
-                        default:
-                            assert(false);
-                    }
+                    case 3: found = el.HasNodes(nf,3); break;
+                    case 4: found = el.HasNodes(nf,4); break;
+                    case 6: found = el.HasNodes(nf,3); break;
+                    case 7: found = el.HasNodes(nf,3); break;
+                    case 8: found = el.HasNodes(nf,4); break;
+                    case 9: found = el.HasNodes(nf,4); break;
+                    default:
+                        assert(false);
                 }
-                if (found != 0) {
-                    if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; }
-                    else if (el.m_elem[0] != &sel) el.m_elem[1] = &sel;
-                }
+            }
+            if (found != 0) {
+                if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; }
+                else if (el.m_elem[0] != &sel) el.m_elem[1] = &sel;
             }
         }
     }
@@ -874,6 +872,60 @@ double FESurface::FaceArea(FESurfaceElement& el)
 		detJ = (dxr ^ dxs).norm();
 
 		area += w[n]*detJ;
+	}
+
+	return area;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the area of a surface element
+double FESurface::CurrentFaceArea(FESurfaceElement& el)
+{
+	// get the mesh to which this surface belongs
+	FEMesh& mesh = *m_pMesh;
+
+	// get the number of nodes
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+
+	// get the initial nodes
+	vec3d rt[FEElement::MAX_NODES];
+	if (!m_bshellb) for (int i = 0; i < neln; ++i) rt[i] = mesh.Node(el.m_node[i]).m_rt;
+	else for (int i = 0; i < neln; ++i) rt[i] = mesh.Node(el.m_node[i]).m_st();
+
+	// get the integration weights
+	double* w = el.GaussWeights();
+
+	double* Gr, * Gs;
+	vec3d dxr, dxs;
+
+	double detJ;
+
+	double area = 0;
+
+	int n, k;
+
+	for (n = 0; n < nint; ++n)
+	{
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+
+		// calculate jacobian
+		dxr = dxs = vec3d(0, 0, 0);
+		for (k = 0; k < neln; ++k)
+		{
+			dxr.x += Gr[k] * rt[k].x;
+			dxr.y += Gr[k] * rt[k].y;
+			dxr.z += Gr[k] * rt[k].z;
+
+			dxs.x += Gs[k] * rt[k].x;
+			dxs.y += Gs[k] * rt[k].y;
+			dxs.z += Gs[k] * rt[k].z;
+		}
+
+		detJ = (dxr ^ dxs).norm();
+
+		area += w[n] * detJ;
 	}
 
 	return area;

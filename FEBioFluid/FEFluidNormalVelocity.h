@@ -67,6 +67,9 @@ public:
     
     //! rim pressure
     bool SetRimPressure();
+    
+    double ScalarLoad(FESurfaceMaterialPoint& mp) override
+    { return NormalVelocity(mp)*m_velocity; }
 
 private:
 	double NormalVelocity(FESurfaceMaterialPoint& mp);

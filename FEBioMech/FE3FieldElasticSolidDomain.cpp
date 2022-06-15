@@ -535,6 +535,7 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        pt.m_p = ed.ep;
 
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution

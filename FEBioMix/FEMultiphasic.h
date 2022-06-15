@@ -47,6 +47,9 @@ public:
 
 	//! initialization
 	bool Init() override;
+    
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
@@ -130,13 +133,23 @@ public:
 	//! SBM charge number
 	int SBMChargeNumber(const int sbm) { return m_pSBM[sbm]->ChargeNumber(); }
 	
-	//! SBM actual concentration (molar concentration in current configuration)
+	//! SBM actual concentration (molar concentration per fluid volume in current configuration)
 	double SBMConcentration(FEMaterialPoint& pt, const int sbm) {
 		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 		return spt.m_sbmr[sbm]/(ept.m_J-bpt.m_phi0)/SBMMolarMass(sbm);
 	}
+    
+    //! SBM areal concentration (mole per shell area) -- should only be called from shell domains
+    double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) {
+        FEShellElement* sel = dynamic_cast<FEShellElement*>(pt.m_elem);
+        assert(sel);
+        double h = sel->Evaluate(sel->m_ht, pt.m_index);   // shell thickness
+        FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+        FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_sbmr[sbm]/SBMMolarMass(sbm)*h/ept.m_J;
+    }
 
 	//! SBM referential volume fraction
 	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
@@ -156,6 +169,12 @@ public:
     //! Add a membrane reaction
     void AddMembraneReaction(FEMembraneReaction* pcr);
 
+public:
+    //! Evaluate effective permeability
+    mat3ds EffectivePermeability(FEMaterialPoint& pt);
+    tens4dmm TangentPermeabilityStrain(FEMaterialPoint& pt, const mat3ds& Ke);
+    mat3ds TangentPermeabilityConcentration(FEMaterialPoint& pt, const int sol, const mat3ds& Ke);
+    
 // solute interface
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }

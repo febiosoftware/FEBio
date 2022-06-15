@@ -179,6 +179,11 @@ public:
 	mat3d operator - (const mat3d& t) const;
 	mat3d operator * (const mat3d& t) const;
 	
+    // arithmetic operators for mat3da objects
+    mat3d operator + (const mat3da& t) const;
+    mat3d operator - (const mat3da& t) const;
+    mat3d operator * (const mat3da& t) const;
+    
 	// unary operators
 	mat3ds operator - () const;
 	
@@ -298,6 +303,10 @@ public:
 
 	vec3d operator * (const vec3d& a);
 
+    // arithmetic operators for mat3ds objects
+    mat3d operator + (const mat3ds& t) const;
+    mat3d operator - (const mat3ds& t) const;
+    
 protected:
 	double	d[3];	// stores xy, yz, xz
 

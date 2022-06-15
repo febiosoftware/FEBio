@@ -49,6 +49,12 @@ bool FEDiscreteDomain::Create(int nelems, FE_Element_Spec espec)
 }
 
 //-----------------------------------------------------------------------------
+void FEDiscreteDomain::Reset()
+{
+	for (auto& el : m_Elem) el.setActive();
+}
+
+//-----------------------------------------------------------------------------
 bool FEDiscreteDomain::Init()
 {
 	if (FEDomain::Init() == false) return false;
@@ -57,6 +63,15 @@ bool FEDiscreteDomain::Init()
 	if (pmat) SetMatID(pmat->GetID());
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteDomain::CopyFrom(FEMeshPartition* pd)
+{
+	FEDomain::CopyFrom(pd);
+	FEDiscreteDomain* psd = dynamic_cast<FEDiscreteDomain*>(pd);
+	m_Elem = psd->m_Elem;
+	ForEachElement([=](FEElement& el) { el.SetMeshPartition(this); });
 }
 
 //-----------------------------------------------------------------------------

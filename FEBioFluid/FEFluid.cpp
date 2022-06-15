@@ -61,7 +61,7 @@ bool FEFluid::Init()
 {
     m_Tr = GetFEModel()->GetGlobalConstant("T");
     if (m_pElastic == nullptr) {
-        m_pElastic = new FELinearElasticFluid(GetFEModel());
+        m_pElastic = fecore_alloc(FELinearElasticFluid, GetFEModel());
     }
     FELinearElasticFluid* pLN = dynamic_cast<FELinearElasticFluid*>(m_pElastic);
     FENonlinearElasticFluid* pNL = dynamic_cast<FENonlinearElasticFluid*>(m_pElastic);

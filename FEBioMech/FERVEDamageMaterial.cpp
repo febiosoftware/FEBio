@@ -35,20 +35,20 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERVEDamageMaterial, FEElasticMaterial)
-// set material properties
-ADD_PROPERTY(m_pRVE , "viscoelastic");
-ADD_PROPERTY(m_pDamg, "damage");
-ADD_PROPERTY(m_pCrit, "criterion");
+    // set material properties
+    ADD_PROPERTY(m_pRVE , "viscoelastic");
+    ADD_PROPERTY(m_pDamg, "damage");
+    ADD_PROPERTY(m_pCrit, "criterion");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FERVEDamageMaterial::FERVEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-    m_pRVE  = 0;
-    m_pBase = 0;
-    m_pDamg = 0;
-    m_pCrit = 0;
+    m_pRVE  = nullptr;
+    m_pBase = nullptr;
+    m_pDamg = nullptr;
+    m_pCrit = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +64,22 @@ bool FERVEDamageMaterial::Init()
     
     m_pBase = m_pRVE->GetBaseMaterial();
     
-    return FEElasticMaterial::Init();
+    return m_pRVE->Init();
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FERVEDamageMaterial::CreateMaterialPointData()
+{
+    FEReactiveViscoelasticMaterialPoint* pt = new FEReactiveViscoelasticMaterialPoint();
+    // create damage materal point for strong bond (base) material
+    FEDamageMaterialPoint* pbase = new FEDamageMaterialPoint(m_pRVE->GetBaseMaterial()->CreateMaterialPointData());
+    pt->AddMaterialPoint(pbase);
+    
+    // create materal point for weak bond material
+    FEReactiveVEMaterialPoint* pbond = new FEReactiveVEMaterialPoint(m_pRVE->GetBondMaterial()->CreateMaterialPointData());
+    pt->AddMaterialPoint(pbond);
+    
+    return pt;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,18 +125,49 @@ double FERVEDamageMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate strong bond strain energy density at material point
+double FERVEDamageMaterial::StrongBondSED(FEMaterialPoint& pt)
+{
+    // evaluate the damage
+    double d = Damage(pt);
+    
+    // evaluate the strain energy density
+    double sed = m_pRVE->StrongBondSED(pt);
+    
+    // return damaged sed
+    return sed*(1-d);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate weak bond strain energy density at material point
+double FERVEDamageMaterial::WeakBondSED(FEMaterialPoint& pt)
+{
+    // evaluate the damage
+    double d = Damage(pt);
+    
+    // evaluate the strain energy density
+    double sed = m_pRVE->WeakBondSED(pt);
+    
+    // return damaged sed
+    return sed*(1-d);
+}
+
+//-----------------------------------------------------------------------------
 //! calculate damage at material point
 double FERVEDamageMaterial::Damage(FEMaterialPoint& pt)
 {
-    // get the damage material point data
-    FEDamageMaterialPoint& pd = *pt.ExtractData<FEDamageMaterialPoint>();
+    // get the reactive viscoelastic base material point
+    FEMaterialPoint* pb = m_pRVE->GetBaseMaterialPoint(pt);
+    
+    // get the damage material point data from its base material point
+    FEDamageMaterialPoint& pd = *pb->ExtractData<FEDamageMaterialPoint>();
     
     // evaluate the trial value of the damage criterion
     // this must be done before evaluating the damage
-    pd.m_Etrial = m_pCrit->DamageCriterion(pt);
+    pd.m_Etrial = m_pCrit->DamageCriterion(*pb);
     
     // evaluate and set the damage
-    double d = m_pDamg->Damage(pt);
+    double d = m_pDamg->Damage(*pb);
     pd.m_D = d;
     
     return d;

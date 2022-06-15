@@ -45,6 +45,9 @@ public:
 	//! return the elastic material property
 	FEElasticMaterial* GetElasticMaterial() override { return m_mat; }
 
+	//! calculate (pre-strained) density 
+	double Density(FEMaterialPoint& mp) override;
+
 public:
 	//! Cauchy stress 
 	mat3ds DevStress(FEMaterialPoint& mp) override;

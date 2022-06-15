@@ -30,6 +30,9 @@ SOFTWARE.*/
 class FEBIOMECH_API FEDiscreteElasticMaterialPoint : public FEDiscreteMaterialPoint
 {
 public:
+	FEMaterialPoint* Copy() override;
+
+public:
 	vec3d	m_Ft;	// current force	
 };
 

@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include "FEUncoupledMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include "FEDamageMaterialUC.h"
+#include "FEUncoupledReactiveFatigue.h"
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
@@ -100,10 +102,19 @@ public:
     //! get bond material point
     FEMaterialPoint* GetBondMaterialPoint(FEMaterialPoint& mp);
     
+    //! evaluate scalar strain measure (same type as trigger strain for bond breaking)
+    double ScalarStrain(FEMaterialPoint& mp);
+    
 private:
     FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEUncoupledMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
 	FEBondRelaxation*		m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
+    FEDamageCDF*            m_pWCDF;    //!< pointer to weak bond recruitment CDF
+    
+private:
+    FEDamageMaterialUC*                 m_pDmg; //!< pointer to base material if it is a FEDamageMaterialUC
+    FEUncoupledReactiveFatigue*         m_pFtg; //!< pointer to base material if it is a FEUncoupledReactiveFatigue
+    double Damage(FEMaterialPoint& mp);         //!< return damage in the base material
     
 public:
     double	m_wmin;		//!< minimum value of relaxation

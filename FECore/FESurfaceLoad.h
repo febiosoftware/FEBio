@@ -57,6 +57,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	const FEDofList& GetDofList() const;
+    
+public:
+    virtual double ScalarLoad(FESurfaceMaterialPoint& mp) { return 0; }
+    virtual vec3d VectorLoad(FESurfaceMaterialPoint& mp) { return vec3d(0,0,0); }
 
 protected:
 	FESurface*	m_psurf;

@@ -261,6 +261,13 @@ void FENewtonSolver::GetSolutionVector(std::vector<double>& U)
 }
 
 //-----------------------------------------------------------------------------
+//! Get the total solution vector
+std::vector<double> FENewtonSolver::GetSolutionVector() const
+{
+	return m_Ut;
+}
+
+//-----------------------------------------------------------------------------
 //!  Creates the global stiffness matrix
 //! \todo Can we move this to the FEGlobalMatrix::Create function?
 bool FENewtonSolver::CreateStiffness(bool breset)
@@ -487,9 +494,6 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 			m_R1.assign(m_neq, 0);
 			m_ui.assign(m_neq, 0);
 			m_Fd.assign(m_neq, 0);
-
-			// reinitialize the linear system
-			if (AllocateLinearSystem() == false) throw DumpStream::ReadError();
 		}
 	}
 }

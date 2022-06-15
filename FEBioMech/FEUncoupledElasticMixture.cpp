@@ -108,9 +108,9 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 
         FEUncoupledMaterial* uMat = dynamic_cast<FEUncoupledMaterial*>(m_pMat[i]);
         if (uMat)
-            s += epi.m_s = uMat->DevStress(*pt.GetPointData(i))*w[i];
+            s += epi.m_s = uMat->DevStress(epi)*w[i];
         else
-            s += epi.m_s = m_pMat[i]->Stress(*pt.GetPointData(i))*w[i];
+            s += epi.m_s = m_pMat[i]->Stress(epi)*w[i];
 	}
     
 	return s;
@@ -144,9 +144,9 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 
         FEUncoupledMaterial* uMat = dynamic_cast<FEUncoupledMaterial*>(m_pMat[i]);
         if (uMat)
-            c += uMat->DevTangent(*pt.GetPointData(i))*w[i];
+            c += uMat->DevTangent(epi)*w[i];
         else
-            c += m_pMat[i]->Tangent(*pt.GetPointData(i))*w[i];
+            c += m_pMat[i]->Tangent(epi)*w[i];
 	}
     
 	return c;
@@ -180,9 +180,9 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 
         FEUncoupledMaterial* uMat = dynamic_cast<FEUncoupledMaterial*>(m_pMat[i]);
         if (uMat)
-            sed += uMat->DevStrainEnergyDensity(*pt.GetPointData(i))*w[i];
+            sed += uMat->DevStrainEnergyDensity(epi)*w[i];
         else
-            sed += m_pMat[i]->StrainEnergyDensity(*pt.GetPointData(i))*w[i];
+            sed += m_pMat[i]->StrainEnergyDensity(epi)*w[i];
 	}
     
 	return sed;
@@ -216,9 +216,9 @@ double FEUncoupledElasticMixture::StrongBondDevSED(FEMaterialPoint& mp)
         
         FEUncoupledMaterial* uMat = dynamic_cast<FEUncoupledMaterial*>(m_pMat[i]);
         if (uMat)
-            sed += uMat->StrongBondDevSED(*pt.GetPointData(i))*w[i];
+            sed += uMat->StrongBondDevSED(epi)*w[i];
         else
-            sed += m_pMat[i]->StrongBondSED(*pt.GetPointData(i))*w[i];
+            sed += m_pMat[i]->StrongBondSED(epi)*w[i];
     }
     
     return sed;

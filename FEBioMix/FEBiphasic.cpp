@@ -101,25 +101,37 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// initialize
+bool FEBiphasic::Init()
+{
+    if (!m_pSolid->Init()) return false;
+    if (!m_pPerm->Init()) return false;
+    if (m_pSupp && !m_pSupp->Init()) return false;
+    if (m_pAmom && !m_pAmom->Init()) return false;
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
 FEMaterialPoint* FEBiphasic::CreateMaterialPointData() 
 {
-	// create biphasic material point
-	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(nullptr);
-
 	// create the solid material point
 	FEMaterialPoint* ep = m_pSolid->CreateMaterialPointData();
 
-	// create the permeability
-	FEMaterialPoint* pm = m_pPerm->CreateMaterialPointData();
-	if (pm)
-	{
-		pm->SetNext(ep);
-		pt->SetNext(pm);
-	}
-	else pt->SetNext(ep);
-
+    // create biphasic material point
+    FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(ep);
+    
 	return pt;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FEBiphasic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    if (m_pSupp) m_pSupp->UpdateSpecializedMaterialPoints(mp, tp);
+    if (m_pAmom) m_pAmom->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------

@@ -38,6 +38,9 @@ SOFTWARE.*/
 MITEM MDerive(const MITEM& a, const MVariable& x)
 {
 	MITEM e = MEvaluate(a);
+
+	if (is_dependent(e, x) == false) return 0.0;
+
 	switch (e.Type())
 	{
 	case MCONST:
@@ -76,8 +79,8 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 		{
 			MITEM l = e.Left();
 			MITEM r = e.Right();
-			if (isConst(r) || is_named(r) || is_frac(r)) return (r*(l^(r-1.0)))*MDerive(l, x);
-			else if (isConst(l) || is_named(l) || is_frac(l)) return (Log(l)*e)*MDerive(r, x);
+			if (is_dependent(r, x) == false) return (r*(l^(r-1.0)))*MDerive(l, x);
+			else if (is_dependent(l, x) == false) return (Log(l)*e)*MDerive(r, x);
 			else
 			{
 				MITEM dl = MDerive(l, x);
@@ -121,6 +124,10 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 			{
 				MITEM Pi = new MNamedCt(PI, "pi");
 				return -(2/Sqrt(Pi))*Exp(-(p^2))*dp;
+			}
+			if (s.compare("H") == 0)
+			{
+				return 0.0;
 			}
 			assert(false);
 		}

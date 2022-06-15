@@ -1091,5 +1091,5 @@ void FEBiphasicFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<doub
 void FEBiphasicFSIDomain3D::Serialize(DumpStream& ar)
 {
     FESolidDomain::Serialize(ar);
-    ar & m_sseps;
+    ar & m_sseps & m_btrans;
 }

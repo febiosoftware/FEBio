@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FERestartImport.h"
 #include "FECore/FESolver.h"
 #include "FECore/FEAnalysis.h"
+#include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
 #include "FEBioLoadDataSection.h"
@@ -75,6 +76,22 @@ void FERestartControlSection::Parse(XMLTag& tag)
 			else if (strcmp(szval, "PLOT_STEP_FINAL"   ) == 0) pstep->SetPlotLevel(FE_PLOT_STEP_FINAL);
 			else if (strcmp(szval, "PLOT_AUGMENTATIONS") == 0) pstep->SetPlotLevel(FE_PLOT_AUGMENTATIONS);
 			else throw XMLReader::InvalidValue(tag);
+		}
+		else if (tag == "solver")
+		{
+			FEAnalysis* step = fem.GetCurrentStep();
+			FESolver* solver = step->GetFESolver();
+			if (solver == nullptr) throw XMLReader::InvalidTag(tag);
+
+			++tag;
+			do
+			{
+				if (ReadParameter(tag, solver) == false)
+				{
+					throw XMLReader::InvalidTag(tag);
+				}
+				++tag;
+			} while (!tag.isend());
 		}
 		else throw XMLReader::InvalidTag(tag);
 

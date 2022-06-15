@@ -71,6 +71,7 @@ double FEFluidNormalVelocity::NormalVelocity(FESurfaceMaterialPoint& mp)
 	FESurfaceElement& el = *mp.SurfaceElement();
 	double vn = 0;
 	double* N = mp.m_shape;
+    if (N == nullptr) return 0;
 	int neln = el.Nodes();
 	for (int i = 0; i<neln; ++i)
 	{

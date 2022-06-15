@@ -87,6 +87,12 @@ bool FETriphasic::Init()
 	m_pSolute[0]->SetSoluteLocalID(0);
     m_pSolute[1]->SetSoluteLocalID(1);
 
+    if (m_pSolid->Init() == false) return false;
+    if (m_pPerm->Init() == false) return false;
+    if (m_pOsmC->Init() == false) return false;
+    for (int i=0; i<Solutes(); ++i)
+        if (m_pSolute[i]->Init() == false) return false;
+
 	// Call base class initialization. This will also initialize all properties.
 	if (FEMaterial::Init() == false) return false;
 
@@ -113,6 +119,17 @@ bool FETriphasic::Init()
 	if (m_Fc   <= 0) { feLogError("A positive Faraday constant Fc must be defined in Globals section"     ); return false; }
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FETriphasic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pOsmC->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<Solutes(); ++i)
+        m_pSolute[i]->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------

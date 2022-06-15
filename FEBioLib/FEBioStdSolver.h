@@ -71,3 +71,17 @@ public:
 	//! Run the FE model
 	bool Run() override;
 };
+
+//-----------------------------------------------------------------------------
+// Configures the model for running in the nightly test suite. 
+class FEBioTestSuiteTask : public FECoreTask
+{
+public:
+	FEBioTestSuiteTask(FEModel* fem);
+
+	//! initialization
+	bool Init(const char* szfile) override;
+
+	//! Run the FE model
+	bool Run() override;
+};

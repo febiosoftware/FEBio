@@ -41,6 +41,12 @@ FELinearConstraint::DOF::DOF()
 	AddParameter(val, "value");
 }
 
+void FELinearConstraint::DOF::Serialize(DumpStream& ar)
+{
+	FEParamContainer::Serialize(ar);
+	ar & node & dof & val;
+}
+
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint() : FEModelComponent(nullptr)
 {
@@ -222,23 +228,23 @@ void FELinearConstraint::Serialize(DumpStream& ar)
 
 	if (ar.IsSaving())
 	{
-		ar.write(m_parentDof, sizeof(DOF), 1);
+		m_parentDof->Serialize(ar);
 		int n = (int)m_childDof.size();
 		ar << n;
 		vector<DOF*>::iterator it = m_childDof.begin();
-		for (int i=0; i<n; ++i, ++it) ar << (*it)->val << (*it)->node << (*it)->dof;
+		for (int i = 0; i < n; ++i, ++it) (*it)->Serialize(ar);
 	}
 	else
 	{
 		m_childDof.clear();
 		if (m_parentDof == nullptr) m_parentDof = new DOF;
-		ar.read(m_parentDof, sizeof(DOF), 1);
+		m_parentDof->Serialize(ar);
 		int n;
 		ar >> n;
 		for (int i=0; i<n; ++i)
 		{
 			DOF* dof = new DOF;
-			ar >> dof->val >> dof->node >> dof->dof;
+			dof->Serialize(ar);
 			m_childDof.push_back(dof);
 		}
 	}

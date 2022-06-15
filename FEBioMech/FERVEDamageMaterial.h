@@ -57,13 +57,20 @@ public:
     bool Init() override;
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override
-    {
-        return new FEDamageMaterialPoint(m_pRVE->CreateMaterialPointData());
-    }
+    FEMaterialPoint* CreateMaterialPointData() override;
     
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
+    
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override
+    {
+        m_pRVE->UpdateSpecializedMaterialPoints(mp, tp);
+    }
+    
+public:
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
     
 public:
     FEReactiveViscoelasticMaterial* m_pRVE;     // reactive viscoelastic material

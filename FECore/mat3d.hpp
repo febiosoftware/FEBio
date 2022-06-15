@@ -302,6 +302,32 @@ inline mat3d mat3ds::operator * (const mat3d& d) const
 				 d.d[0][2]*m[XZ] + d.d[1][2]*m[YZ] + d.d[2][2]*m[ZZ]);
 }
 
+// operator + for mat3da objects
+inline mat3d mat3ds::operator + (const mat3da& d) const
+{
+    return mat3d(m[XX]       , m[XY]+d.xy(), m[XZ]+d.xz(),
+                 m[XY]-d.xy(), m[YY]       , m[YZ]+d.yz(),
+                 m[XZ]-d.xz(), m[YZ]-d.yz(), m[ZZ]       );
+}
+
+// operator - for mat3da objects
+inline mat3d mat3ds::operator - (const mat3da& d) const
+{
+    return mat3d(m[XX]       , m[XY]-d.xy(), m[XZ]-d.xz(),
+                 m[XY]+d.xy(), m[YY]       , m[YZ]-d.yz(),
+                 m[XZ]+d.xz(), m[YZ]+d.yz(), m[ZZ]       );
+}
+
+// operator * for mat3d objects
+inline mat3d mat3ds::operator * (const mat3da& d) const
+{
+    return mat3d(
+                 -d.xy()*m[XY]-d.xz()*m[XZ],d.xy()*m[XX]-d.yz()*m[XZ],d.xz()*m[XX]+d.yz()*m[XY],
+                 -d.xy()*m[YY]-d.xz()*m[YZ],d.xy()*m[XY]-d.yz()*m[YZ],d.xz()*m[XY]+d.yz()*m[YY],
+                 -d.xy()*m[YZ]-d.xz()*m[ZZ],d.xy()*m[XZ]-d.yz()*m[ZZ],d.xz()*m[XZ]+d.yz()*m[YZ]
+                 );
+}
+
 
 // unary operator -
 inline mat3ds mat3ds::operator - () const
@@ -553,6 +579,24 @@ inline mat3d mat3da::operator * (const mat3d& m)
 		-d[0]*m.d[0][0] + d[1]*m.d[2][0], -d[0]*m.d[0][1] + d[1]*m.d[2][1], -d[0]*m.d[0][2] + d[1]*m.d[2][2],
 		-d[2]*m.d[0][0] - d[1]*m.d[1][0], -d[2]*m.d[0][1] - d[1]*m.d[1][1], -d[2]*m.d[0][2] - d[1]*m.d[1][2]
 	);
+}
+
+inline mat3d mat3da::operator + (const mat3ds& a) const
+{
+    return mat3d(
+                 a.xx(),a.xy()+xy(),a.xz()+xz(),
+                 a.xy()-xy(),a.yy(),a.yz()+yz(),
+                 a.xz()-xz(),a.yz()-yz(),a.zz()
+                 );
+}
+
+inline mat3d mat3da::operator - (const mat3ds& a) const
+{
+    return mat3d(
+                  -a.xx(),-a.xy()+xy(),-a.xz()+xz(),
+                  -a.xy()-xy(),-a.yy(),-a.yz()+yz(),
+                  -a.xz()-xz(),-a.yz()-yz(),-a.zz()
+                  );
 }
 
 inline vec3d mat3da::operator * (const vec3d& a)

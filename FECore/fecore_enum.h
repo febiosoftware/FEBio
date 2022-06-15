@@ -241,6 +241,7 @@ enum SUPER_CLASS_ID {
 	FEFACELOGDATA_ID,				// derived from FEFaceLogData
 	FEELEMLOGDATA_ID,            	// derived from FELogElemata
 	FEOBJLOGDATA_ID,            	// derived from FELogObjectData
+	FEMODELLOGDATA_ID,            	// derived from FEModelLogData
 	FEBC_ID,						// derived from FEBoundaryCondition (TODO: This does not work yet)
 	FEGLOBALDATA_ID,				// derived from FEGlobalData
 	FERIGIDOBJECT_ID,				// derived from FECoreBase (TODO: work in progress)

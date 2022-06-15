@@ -81,11 +81,11 @@ void FETiedMultiphasicSurface::Data::Serialize(DumpStream& ar)
 	ar & m_nu;
 	ar & m_rs;
 	ar & m_Lmd;
-	ar & m_Lmp;
 	ar & m_epsn;
 	ar & m_epsp;
+    ar & m_Lmc;
 	ar & m_epsc;
-	ar & m_pg;
+    ar & m_cg;
 }
 
 //-----------------------------------------------------------------------------
@@ -317,6 +317,10 @@ FETiedMultiphasicInterface::FETiedMultiphasicInterface(FEModel* pfem) : FEContac
     m_dofP = pfem->GetDOFIndex("p");
     m_dofC = pfem->GetDOFIndex("concentration", 0);
     
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }

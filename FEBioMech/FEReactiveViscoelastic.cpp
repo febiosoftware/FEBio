@@ -53,6 +53,7 @@ BEGIN_FECORE_CLASS(FEReactiveViscoelasticMaterial, FEElasticMaterial)
 	ADD_PROPERTY(m_pBase, "elastic");
 	ADD_PROPERTY(m_pBond, "bond");
 	ADD_PROPERTY(m_pRelx, "relaxation");
+    ADD_PROPERTY(m_pWCDF, "recruitment", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -70,7 +71,10 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
 	m_pBase = nullptr;
 	m_pBond = nullptr;
 	m_pRelx = nullptr;
+    m_pWCDF = nullptr;
     
+    m_pDmg = nullptr;
+    m_pFtg = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +96,10 @@ bool FEReactiveViscoelasticMaterial::Init()
     if (!m_pBase->Init()) return false;
     if (!m_pBond->Init()) return false;
     if (!m_pRelx->Init()) return false;
+    if (m_pWCDF && !m_pWCDF->Init()) return false;
+    
+    m_pDmg = dynamic_cast<FEDamageMaterial*>(m_pBase);
+    m_pFtg = dynamic_cast<FEReactiveFatigue*>(m_pBase);
 
     return FEElasticMaterial::Init();
 }
@@ -245,24 +253,24 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
     
     // current time
     double time = GetFEModel()->GetTime().currentTime;
-    double tv = time - pt.m_v[ig];
+    double dtv = time - pt.m_v[ig];
 
     switch (m_btype) {
         case 1:
         {
-            if (tv >= 0)
-                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, tv, D);
+            if (dtv >= 0)
+                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, dtv, D);
         }
             break;
         case 2:
         {
             if (ig == 0) {
-                w = m_pRelx->Relaxation(mp, tv, D);
+                w = m_pRelx->Relaxation(mp, dtv, D);
             }
             else
             {
-                double tu = time - pt.m_v[ig-1];
-                w = m_pRelx->Relaxation(mp, tv, D) - m_pRelx->Relaxation(mp, tu, D);
+                double dtu = time - pt.m_v[ig-1];
+                w = m_pRelx->Relaxation(mp, dtv, D) - m_pRelx->Relaxation(mp, dtu, D);
             }
         }
             break;
@@ -271,7 +279,7 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
             break;
     }
     
-    assert((w >= 0) && (w <= 1));
+    assert(w >= 0);
     
     return w;
 }
@@ -295,7 +303,7 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
     // get current number of generations
     int ng = (int)pt.m_Uv.size();
     
-    double w = 1;
+    double f = (!pt.m_wv.empty()) ? pt.m_wv.back() : 1;
     
     for (int ig=0; ig<ng-1; ++ig)
     {
@@ -303,17 +311,17 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
         ep.m_F = pt.m_Uv[ig];
         ep.m_J = pt.m_Jv[ig];
         // evaluate the breaking bond mass fraction for this generation
-        w -= BreakingBondMassFraction(mp, ig, D);
+        f -= BreakingBondMassFraction(mp, ig, D);
     }
     
     // restore safe copy of deformation gradient
     ep.m_F = F;
     ep.m_J = J;
     
-    assert((w >= 0) && (w <= 1));
+    assert(f >= 0);
     
     // return the bond mass fraction of the reforming generation
-    return w;
+    return f;
 }
 
 //-----------------------------------------------------------------------------
@@ -402,7 +410,7 @@ mat3ds FEReactiveViscoelasticMaterial::StressWeakBonds(FEMaterialPoint& mp)
 mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
 {
     mat3ds s = StressStrongBonds(mp);
-    s+= StressWeakBonds(mp);
+    s+= StressWeakBonds(mp)*(1-Damage(mp));
     
 	// return the total Cauchy stress
 	return s;
@@ -488,7 +496,7 @@ tens4ds FEReactiveViscoelasticMaterial::TangentWeakBonds(FEMaterialPoint& mp)
 tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
 {
 	tens4ds c = TangentStrongBonds(mp);
-    c += TangentWeakBonds(mp);
+    c += TangentWeakBonds(mp)*(1-Damage(mp));
     
 	// return the total tangent
 	return c;
@@ -577,7 +585,7 @@ double FEReactiveViscoelasticMaterial::WeakBondSED(FEMaterialPoint& mp)
 double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     double sed = StrongBondSED(mp);
-    sed += WeakBondSED(mp);
+    sed += WeakBondSED(mp)*(1-Damage(mp));
     
     // return the total strain energy density
     return sed;
@@ -620,10 +628,12 @@ void FEReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
         pt.m_Uv[1] = (pt.m_Uv[0]*w0 + pt.m_Uv[1]*w1)/(w0+w1);
         pt.m_Jv[1] = pt.m_Uv[1].det();
         pt.m_f[1] = (w0*pt.m_f[0] + w1*pt.m_f[1])/(w0+w1);
+        pt.m_wv[1] = (w0*pt.m_wv[0] + w1*pt.m_wv[1])/(w0+w1);
         pt.m_Uv.pop_front();
         pt.m_Jv.pop_front();
         pt.m_v.pop_front();
         pt.m_f.pop_front();
+        pt.m_wv.pop_front();
     }
     
     // restore safe copy of deformation gradient
@@ -637,7 +647,12 @@ void FEReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
 //! Update specialized material points
 void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {
+    FEMaterialPoint& sb = *GetBaseMaterialPoint(mp);
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);
+    
+    // start by updating specialized material points of base and bond materials
+    m_pBase->UpdateSpecializedMaterialPoints(sb, tp);
+    m_pBond->UpdateSpecializedMaterialPoints(wb, tp);
     
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *wb.ExtractData<FEReactiveVEMaterialPoint>();
@@ -656,6 +671,14 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
             pt.m_v.push_back(tp.currentTime);
             pt.m_Uv.push_back(Uv);
             pt.m_Jv.push_back(Jv);
+            if (m_pWCDF) {
+                pt.m_Et = ScalarStrain(pt);
+                if (pt.m_Et > pt.m_Em)
+                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Et));
+                else
+                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Em));
+            }
+            else pt.m_wv.push_back(1);
             double f = (!pt.m_v.empty()) ? ReformingBondMassFraction(wb) : 1;
             pt.m_f.push_back(f);
             CullGenerations(wb);
@@ -665,6 +688,13 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
     else if (pt.m_v.back() == tp.currentTime) {
         pt.m_Uv.back() = Uv;
         pt.m_Jv.back() = Jv;
+        if (m_pWCDF) {
+            pt.m_Et = ScalarStrain(pt);
+            if (pt.m_Et > pt.m_Em)
+                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Et);
+            else
+                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Em);
+        }
         pt.m_f.back() = ReformingBondMassFraction(wb);
     }
 }
@@ -680,4 +710,55 @@ int FEReactiveViscoelasticMaterial::RVEGenerations(FEMaterialPoint& mp)
     
     // return the bond mass fraction of the reforming generation
     return (int)pt.m_v.size();
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate trigger strain
+double FEReactiveViscoelasticMaterial::ScalarStrain(FEMaterialPoint& mp)
+{
+    double d;
+    // get the elastic point data
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    switch (m_ttype) {
+        case 0:
+        {
+            // evaluate the Lagrangian strain
+            mat3ds E = ep.Strain();
+            
+            d = E.norm();
+        }
+            break;
+        case 1:
+        {
+            // distortional strain
+            // evaluate spatial Hencky (logarithmic) strain
+            mat3ds h = ep.LeftHencky();
+            
+            // evaluate distortion magnitude (always positive)
+            d = (h.dev()).norm();
+        }
+            break;
+        case 2:
+        {
+            // dilatational strain
+            d = fabs(log(ep.m_J));
+        }
+            break;
+            
+        default:
+            d = 0;
+            break;
+    }
+    
+    return d;
+}
+
+//-----------------------------------------------------------------------------
+double FEReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
+{
+    double D = 0;
+    if (m_pDmg) D = m_pDmg->Damage(*GetBaseMaterialPoint(mp));
+    else if (m_pFtg) D = m_pFtg->Damage(*GetBaseMaterialPoint(mp));
+    return D;
 }

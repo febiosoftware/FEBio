@@ -567,7 +567,7 @@ void CCSSparseMatrix::Create(SparseMatrixProfile& mp)
 	int nc = mp.Columns();
 
 	int* pointers = new int[nc + 1];
-	for (int i = 0; i <= nr; ++i) pointers[i] = 0;
+	for (int i = 0; i <= nc; ++i) pointers[i] = 0;
 
 	int nsize = 0;
 	for (int i = 0; i<nc; ++i)

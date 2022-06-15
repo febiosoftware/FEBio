@@ -133,6 +133,10 @@ FEPeriodicSurfaceConstraint::FEPeriodicSurfaceConstraint(FEModel* pfem) : FECont
 
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }
