@@ -41,6 +41,124 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.7   6/15/2022
+
+===========================================================================
+
+* Added support for setting solver parameters via restart input file.
+* Clarified error message when a property fails to initialize.
+* Improved speed of initialization of FSI problems.
+* Aded lung material and documentation.
+* Added warning that nonzero value for dtmax will be ignored when must points were defined.
+* Fixed some issues related to reset of contact problems. This bug could have affected outcome of parameter optimization for certain contact problems. 
+* Modified the reset test to print out some useful stats.
+* Allowed export to specific domains for domain plot variables. Previously this was only supported for some surface plot variables. 
+* Made a change to HGOCoronary so that fiber vector plot variable works for this material.
+* Contact potential now outputs nonzero values for contact pressure and contact area.
+* Implemented parameter scaling option for constrained levmar. To enable parameter scaling, set the control parameter "scale_parameter" to 1. 
+* Box constraints are now enforced explicitly in constrained levmar. 
+* Added model log data classes. Added log variable for printing solution vector norm.
+* For prestrain materials, the density now takes the prestrain into account.
+* Added Shenoy material and documented it in user manual.
+* Local coordinate system is now taken into account in FEHGOCoronary.
+* Updated reactive viscoelastic materials to properly account for damage when the elastic bond material is modeled with either a reactive damage or a reactive fatigue material.
+* Added integral of solute concentration log data.
+* Added log output option for printing integral of sbm concentration.
+* Fixed serialization of contact material point data.
+* Fixed issue with reallocation of linear system during restart.
+* Implemented missing Serialize functions for FELinearElasticFluid and FENonlinearElasticFluid.
+* Added serialization of FEBiphasicFSIDomain3D::m_btrans.
+* Added missing serialization of generic hyperelastic materials.
+* Fixed serialization of FEBearingLoad.
+* Fixed restart and serialization issues with linear constraints.
+* Fixed serialization issues for model parameters. Added missing serialization of FEInSituStretchGradient.
+* Added missing Serialize to FEReactivePlasticity.
+* Minor change to FEUT4Domain::Create to avoid problem with restart.
+* Added serialization for FEMathFunction.
+* Added missing serialization of FEBiphasicSolidDomain::m_nodePressure.
+* Added "test" solver, which doesn't solve anything, just returns zeroes. (Added to facilitate debugging of large problems.)
+* Fixed issue with allocation of default "elastic" property of FEFluid.
+* Implemented HGO-coronary material.
+* Added "facet area" plot variable.
+* Added small clarification about elasticity of some fiber models at strain origin.
+* Updated User Manual to include description of solute natural flux, CDF power, and plot variable RVE strain
+* Added new 'solute natural flux' surface load for biphasic-solute and multiphasic domains which prescribes a solute molar flux equal to (solute concentration)*(solvent volumetric flux) on a boundary, where concentration and fluid flux are averaged from the element underneath the selected boundary face. This allows a solute to naturally flow out of a boundary without the user having to prescribe a solute concentration or specific value of solute flux on that boundary.  Current implementation has a barebones stiffness matrix, may need to be fully populated in future implementation.
+* Minor cleaning up of reactive viscoelastic code.
+* Added a scaling parameter to FEDamageCDFPower.
+* E parameter of FEFiberPowLinearUncoupled a FEParamDouble.
+* Added description of auto time step algorithm for reducing the time step size in user manual.
+* Expanded user manual entry for fiber-exp-pow-linear
+* Fixed user manual entry for definition of formulas related to fiber-exp-pow-linear
+* Fixed bug in newly introduced fiber-exp-pow-linear, to enforce continuity of the elasticity at the exp-pow-linear transition.
+* Added FEGlobalVariable to prevent memory leak when adding global variables. Global variables are now also copied in FEModel::CopyFrom.
+* Added feature for developers, to plot scalar value of prescribed surface load.  Modified FEBearingLoad and FEFluidNormalVelocity to test it out.
+* Updated User Manual to describe new bearing load
+* Added functionality to prescribed a radial bearing load on a cylindrical surface (FEBearingLoad). Copied and adapted Quadric and QuadricFit functions from FEBioStudio to fit bearing surface and detect its axial and radial directions. Updated vec3d and matrix to reproduce missing functionalities that are available in their FEBioStudio equivalents. Updated surface element traits to include/return parametric coordinates of the surface centroid (in parametric space).
+* Added serialization of surface pairs.
+* Added operators for mat3d+/-/* mat3da and for mat3d+/-mat3ds operation
+* Added description of surface force load in User Manual
+* Added functionality for prescribing a force on a surface which is converted to a uniform traction.
+* Added description of fixed normal displacement constraint
+* Added functionality for prescribing a fixed normal displacement constraint.
+* Cleaned up FEForceVelocityMaterialPoint and provided missing default values for some of the material parameters.
+* Updated User Manual to describe the force-velocity-Estrada active fiber contraction model
+* Modified FERVEDamageMaterial to a working version
+* Fixed one more item to make FEDamageMaterialUC more consistent with FEDamageMaterial.
+* Added description of fiber-exp-pow-linear material
+* Added symbolic derivative for H (Heavyside function).
+* Modified FEDamageMaterialUC to be consistent with FEDamageMaterial. Replaced FEFiberPowerLinear (which was duplicate of FEFiberPowLinear) with FEFiberExpPowLinear, which uses exponential-power law in the toe region.
+* Deleted old (invalid) FEFatigueMaterial
+* Derived FEPolynomialHyperElastic from FEElasticMaterial instead of FEUncoupledMaterial, since this material won't work with the three-field formulation.
+* Fixed base class call in FEActiveFiberContraction::Init.
+* Added pre-stretch functions to FEElasticFiberMaterial to replicate capabilities previously implemented in FEElasticFiberMaterialUC
+* Added another example of parameter optimization specification in user manual. 
+* Fixed trans iso materials that use active fiber contraction to not crash when active fiber contraction is not included.
+* Updated FETransIsoMooney-Rivlin and FETransIsoVerandaWestmann to use FEActiveContractionMaterial class to accommodate multiple active fiber contraction materials.
+* Derived FEActiveFiberContraction from FEActiveContractionMaterial.
+* Added Ana Estrada's model for force-velocity contraction of the cardiac muscle, superposed on a trans iso Mooney-Rivlin material.
+* Added new materials "reactive fatigue" and "uncoupled reactive fatigue".
+* Added check for repeated time coordinates in load curves.
+* Added "infinitesimal strain" plot variable.
+* Modified plot parameter so that it maps directly for FMT_MULT data maps without projecting to nodes.
+* Fixed bug in closest-point-projection and FESurfaceElement::facet_edge.
+* Added getter for FEDataMap to FEMappedValue.
+* Fixed some issues with the MDerive operator.
+* Fixed issue with evaluating math expression's derivatives.
+* Implemented (uncoupled) polynomial hyperelastic material.
+* Created missing UpdateSpecializedMaterialPoints function for FEBiphasic, FEBiphasicSolute, FETriphasic and FEMultiphasic materials.  Also updated Init() function for these materials.
+* Fixed output issue when reporting boolean load parameter values.
+* Modified plot logic so that for multi-step analysis, first state is written after first step activation.
+* Now checking if the contact interface is active when writing contact plot variables.
+* Added support for shells in "density" plot variable.
+* Fixed bug in FELogElemSolidStress.
+* Implemented support for shells in "Lagrange Strain".
+* The "relative volume" plot variable now also supports shells.
+* Fixed bad cast issue in FEMassDamping::force.
+* Added method to store and plot correct value of uncoupled pressure (for uncoupled materials), including when using 3-field formulation.
+* Added trace-free neo-Hookean material, which can be used in ground matrix of solid component of biphasic materials, for equivalence with Mooney-Rivlin material when comparing short-term biphasic and uncoupled elastic responses.
+* Fixed bug when passing material point array data in uncoupled elastic mixtures.
+* Added FEBondRelaxationMalkinDist continuous spectrum relaxation function with distortional strain-dependent time constants. Added FEDamageCDFPower power-law (pseudo-)damage CDF, which can be useful for specifying weak bond recruitment in reactive viscoelastic materials.
+* Fixed issues with CopyFrom for discrete domains.
+* Fixed bug reading dump level from cmd + dump at must-points (#37)
+* Added log variables for solid stress.
+* Added log output for permeability.
+* Renamed the "general spring" to "nonlinear spring"
+* Implemented new general spring material.
+* Added example for reactive plasticity with PFC math flow curve
+* Added regression coefficient (R2) as output of parameter optimization analyses (linear regression between y=fitted and x=data). Added ability to fit the y-value of points on point functions representing material parameters.
+* Added recruitment module to reactive viscoelastic and uncoupled reactive viscoelastic materials to further accommodate nonlinear viscoelastic response with increasing strain. Added plot variable RVE strain to report the strain measure used for recruitment. Extended Weibull CDF to incorporate location parameter.
+* Fixed bug with assignment operator of model parameters.
+* Fixed issue with allocation and serialization of discrete element sets.
+* Fixed bug in ParseBCFix when reading comma-separated list of dofs.
+* Added Appendix A in Theory Manual as review of tensor calculus
+* Added scale parameter to nonlinear spring.
+* Added log options to output discrete element stretch, elongation, force.
+* Added mesh_adaptor property to FEModel.
+* Added option to repeat must-points.
+
+
+===========================================================================
+
  R E L E A S E   3.6   2/18/2022
 
 ===========================================================================
