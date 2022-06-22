@@ -126,6 +126,7 @@ public:
 	double inf_norm();
 
 	void mult(std::vector<double>& x, std::vector<double>& y);
+    void mult(const matrix& m, std::vector<double>& x, std::vector<double>& y);
 	void mult_transpose(std::vector<double>& x, std::vector<double>& y);
 	void mult_transpose_self(matrix& AAt);
 

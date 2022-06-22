@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "matrix.h"
 #include <assert.h>
 #include <math.h>
+#include <memory>
 using namespace std;
 
 //////////////////////////////////////////////////////////////////////
@@ -477,6 +478,39 @@ void matrix::mult(vector<double>& x, vector<double>& y)
 		y[i] = 0.0;
 		for (int j = 0; j < m_nc; ++j) y[i] += di[j] * x[j];
 	}
+}
+
+// Here y = this*m*x. This is useful if this*m is a very large matrix, 
+// but is then immediately multiplied by a vector, brining its size down 
+// to m_nr x 1. In this unique circumstance, the memory requrements can be 
+// drastically lower. 
+void matrix::mult(const matrix& m, std::vector<double>& x, std::vector<double>& y)
+{
+    assert(m_nc == m.m_nr);
+    assert(m_nr == x.size());
+    
+    #pragma omp parallel for
+	for (int i = 0; i < m_nr; ++i)
+	{
+        vector<double> temp(m.m_nc, 0.0);
+		for (int k = 0; k < m_nc; ++k)
+		{
+			const double pik = m_pr[i][k];
+			const double* pm = m.m_pr[k];
+			for (int j = 0; j < m.m_nc; ++j)
+			{
+				temp[j] += pik * pm[j];
+			}
+		}
+
+        y[i] = 0.0;
+        for(int j = 0; j < m_nr; j++)
+        {
+            y[i] += temp[j] * x[j];
+        }
+    
+	}
+
 }
 
 //-----------------------------------------------------------------------------
