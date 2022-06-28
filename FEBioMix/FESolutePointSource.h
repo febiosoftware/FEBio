@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
+#include <unordered_map>
 
 class FESolidElement;
 
@@ -54,6 +55,14 @@ public:
 
 	double GetRate() const;
 
+	double GetdC() const;
+
+	double GetdCp() const;
+
+	void SetdC(double dC);
+
+	void SetdCp(double dCp);
+
 	void SetAccumulateFlag(bool b);
 
 	void SetAccumulateCAFlag(bool b);
@@ -65,15 +74,20 @@ public:
 	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
 
 	//! return all the elements in the given radius
-	std::vector<FEMaterialPoint*> FindIntInRadius();
+	void FindNodesInRadius(std::vector<FEElement*>& possible_nodes, double& total_elem);
+
+	vec3d ClampNatC(double r[3]);
 
 private:
 	int		m_soluteId;	//!< solute ID
 	double	m_rate;		//!< production rate
 	vec3d	m_pos;		//!< position of source
-	bool	m_accumulate; //!< accumulate flag
+	bool	m_accumulate = false; //!< accumulate flag
 	bool	m_accumulate_ca; //! < accumulate actual concentration flag
 	double	m_radius;
+	double	m_Vc;
+	double	m_dC = 0.0;
+	double	m_dCp = 0.0;
 
 private:
 	FEOctreeSearch		m_search;
