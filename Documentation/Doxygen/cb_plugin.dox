@@ -68,7 +68,7 @@ In order to use a callback plugin, it must be registered with the framework. Thi
 REGISTER_FECORE_CLASS(MyCallbackPlugin, "my_callback");
 \endcode
 
-Once the plugin is registered, it can be referenced in the FEBio input file. A special Code section can be added where the callbacks can be defined. 
+Once the plugin is registered, it can be reference in the FEBio input file. A special Code section can be added where the callbacks can be defined. 
 
 \code
 <Code>

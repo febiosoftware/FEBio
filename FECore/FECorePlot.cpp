@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FESolidDomain.h"
 #include "FEModelParam.h"
 #include "FEBodyLoad.h"
-#include "FENodalLoad.h"
 #include "FEPlotData.h"
 #include "FESurface.h"
 #include "FEMaterialPointProperty.h"
@@ -84,9 +83,8 @@ bool FEPlotParameter::SetFilter(const char* sz)
 			if (itemList == 0)
 			{
 				// for some classes, the item list can be empty
-				if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
+				if      (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
 	//			else if (dynamic_cast<FESurfaceLoad*>(pc)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FESurfaceLoad*>(pc)->GetSurface().GetFacetSet(); }
-				else if (dynamic_cast<FENodalLoad*>(pc)) SetRegionType(FE_REGION_NODE);
 				else return false;
 			}
 			else
@@ -441,18 +439,10 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 	{
 		FEParamDouble& map = m_param.value<FEParamDouble>();
 		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
-		if (nset)
-			writeNodalValues<double>(*nset, a, map);
-		else
-		{
-			writeNodalValues<double>(mesh, a, [&](const FENode& node) {
-				FEMaterialPoint mp;
-				mp.m_r0 = node.m_r0;
-				mp.m_index = -1;
-				double v = map(mp);
-				return v;
-			});
-		}
+		if (nset == 0) return false;
+
+		// write the nodal values
+		writeNodalValues<double>(*nset, a, map);
 
 		return true;
 	}

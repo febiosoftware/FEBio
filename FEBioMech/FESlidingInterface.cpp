@@ -60,20 +60,6 @@ void FESlidingSurface::FESlidingPoint::Serialize(DumpStream& ar)
 	ar & m_M;
 }
 
-void FESlidingSurface::FESlidingPoint::Init()
-{
-	FEContactMaterialPoint::Init();
-	m_gap = 0.0;
-	m_nu = vec3d(0, 0, 0);
-	m_rs = vec2d(0, 0);
-	m_rsp = vec2d(0, 0);
-	m_Lm = 0.0;
-	m_M.zero();
-	m_Lt = vec2d(0, 0);
-	m_off = 0.0;
-	m_eps = 1.0;
-}
-
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
@@ -196,11 +182,6 @@ bool FESlidingSurface::Init()
 
 	// allocate integration point data
 	m_data.resize(nn);
-	for (int i = 0; i < nn; ++i)
-	{
-		FESlidingPoint& d = m_data[i];
-		d.Init();
-	}
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account

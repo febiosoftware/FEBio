@@ -48,7 +48,7 @@ bool FEGenericHyperelasticUC::Init()
 
 bool FEGenericHyperelasticUC::BuildMathExpressions()
 {
-	vector<string> vars = { "I1", "I2", "X", "Y", "Z" };
+	vector<string> vars = { "I1", "I2" };
 
 	// add all user parameters
 	FEParameterList& pl = GetParameterList();
@@ -125,7 +125,7 @@ mat3ds FEGenericHyperelasticUC::DevStress(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// get strain energy derivatives
-	vector<double> v = { I1, I2, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
+	vector<double> v = { I1, I2 };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 	double W1 = m_W1.value_s(v);
 	double W2 = m_W2.value_s(v);
@@ -158,7 +158,7 @@ tens4ds FEGenericHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// get strain energy derivatives
-	vector<double> v = { I1, I2, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
+	vector<double> v = { I1, I2 };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 	double W1 = m_W1.value_s(v);
 	double W2 = m_W2.value_s(v);
@@ -213,7 +213,7 @@ double FEGenericHyperelasticUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// evaluate (deviatoric) strain energy
-	vector<double> v = { I1, I2, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
+	vector<double> v = { I1, I2 };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 	double W = m_W.value_s(v);
 

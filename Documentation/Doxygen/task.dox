@@ -25,9 +25,9 @@ class MyTask : public FECoreTask
 public:
 	MyTask(FEModel* pfem);
 	
-	bool Init(const char* szfile) override;
+	bool Init(const char* szfile);
 	
-	bool Run() override;
+	bool Run();
 }
 \endcode
 
@@ -46,7 +46,9 @@ This function should at least call the FEModel::Init function to initialize the 
 after these changes. Once FEModel::Init is called, a task should not add to or remove any model components to the FEModel.
 
 \subsection task_sec13 Implement the Run function
-After FEBio is done initializing the model data, it will call the selected task's Run function and passes the main execution loop to the task.
+After FEBio is done initializing the model data, it will call the selected task's Run function and passes the main execution loop to the task. The parameter passed to the Run
+function is a (optional) filename that was passed on the command line after the -task=[task_name] command. Note that this will not be the model input file (specified with -i) and
+this parameter can be NULL.   
 
 Inside the Run() function, the task can execute the code that implements the task. After completing, the Run() function must return a boolean indicating whether the task was executed
 successfully (true) or not (false). 
