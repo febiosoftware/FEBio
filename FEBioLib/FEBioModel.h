@@ -45,6 +45,14 @@ enum FE_Dump_Level {
 };
 
 //-----------------------------------------------------------------------------
+struct ModelStats {
+	int		ntimeSteps;		//!< total nr of time steps
+	int		ntotalIters;	//!< total nr of equilibrium iterations
+	int		ntotalRHS;		//!< total nr of right hand side evaluations
+	int		ntotalReforms;	//!< total nr of stiffness reformations
+};
+
+//-----------------------------------------------------------------------------
 //! The FEBio model specializes the FEModel class to implement FEBio specific
 //! functionality.
 //!
@@ -172,6 +180,9 @@ public:
 	//! Set the log level
 	void SetLogLevel(int logLevel);
 
+	//! Get the stats 
+	ModelStats GetModelStats() const;
+
 private:
 	void print_parameter(FEParam& p, int level = 0);
 	void print_parameter_list(FEParameterList& pl, int level = 0);
@@ -197,10 +208,7 @@ private:
 
 private:
 	// accumulative statistics
-	int		m_ntimeSteps;		//!< total nr of time steps
-	int		m_ntotalIters;		//!< total nr of equilibrium iterations
-	int		m_ntotalRHS;		//!< total nr of right hand side evaluations
-	int		m_ntotalReforms;	//!< total nr of stiffness reformations
+	ModelStats	m_stats;
 
 protected: // file names
 	std::string		m_sfile_title;		//!< input file title 
