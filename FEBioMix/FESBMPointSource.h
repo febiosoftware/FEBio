@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
+#include <unordered_map>
 
 class FESolidElement;
 
@@ -54,6 +55,12 @@ public:
 
 	double GetRate() const;
 
+	double GetdC() const;
+
+	double GetdCp() const;
+
+	void SetdC(double dC);
+
 	void SetWeighVolume(bool b);
 
 	void SetResetFlag(bool b);
@@ -63,6 +70,9 @@ public:
 	//std::vector<FEMaterialPoint*> FindIntInRadius();
 	void FindIntInRadius(std::vector<FEMaterialPoint*> &possible_ints, double &total_elem);
 
+	//! return all the elements in the given radius
+	void FindNodesInRadius(std::vector<FEMaterialPoint*>& possible_ints, double& total_elem);
+
 private:
 	//void ResetSBM();
 
@@ -71,10 +81,13 @@ private:
 	vec3d	m_pos;	// the position (in reference coordinates)
 	double	m_rate;	// density value at point source
 	double	m_radius;
+	double	m_Vc;
 	bool	m_reset;
 	bool	m_doReset;
 	bool	m_weighVolume;
 	bool	m_accumulate;	// accumulate species flag for the update
+	double	m_dC = 0.0;		// total change of a species
+	double	m_dCp = 0.0;
 
 private:
 	FEOctreeSearch		m_search;
