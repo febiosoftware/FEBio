@@ -111,6 +111,7 @@ SOFTWARE.*/
 #include "FEFiberDensityDistribution.h"
 #include "FEContinuousFiberDistribution.h"
 #include "FEContinuousFiberDistributionUC.h"
+#include "FECustomFiberDistribution.h"
 #include "FEFiberIntegrationGauss.h"
 #include "FEFiberIntegrationTrapezoidal.h"
 #include "FEFiberIntegrationGeodesic.h"
@@ -335,6 +336,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
 	REGISTER_FECORE_CLASS(FECarterHayesOld, "Carter-Hayes (old)");
 	REGISTER_FECORE_CLASS(FEContinuousFiberDistribution, "continuous fiber distribution");
+    REGISTER_FECORE_CLASS(FECustomFiberDistribution, "custom fiber distribution");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, "coupled trans-iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, "coupled trans-iso Mooney-Rivlin");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
