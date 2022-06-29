@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include <iostream>
 #include <unordered_set>
 #include <unordered_map>
-#include <FECore\FEAnalysis.h>
+#include <FECore/FEAnalysis.h>
 
 BEGIN_FECORE_CLASS(FESBMPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_sbmId, "sbm");
