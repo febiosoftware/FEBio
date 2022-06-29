@@ -1733,6 +1733,10 @@ bool FEModel::DoCallback(unsigned int nevent)
 	{
 		throw;
 	}
+	catch (DoRunningRestart)
+	{
+		throw;
+	}
 	catch (std::exception e)
 	{
 		throw;
