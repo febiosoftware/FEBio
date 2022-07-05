@@ -236,9 +236,9 @@ void FESolutePointSource::Update()
 				for (int j = 0; j < neln; ++j)
 				{
 					// only allow internalization if the species won't go negative
-					//if (cxx > 0.0) {
+					if (cxx > 0.0) {
 						total_change += m_rate * H[n] * H_int[j] * dt * w[n];
-					//}
+					}
 				}
 			}
 		}
@@ -268,9 +268,9 @@ void FESolutePointSource::Update()
 					for (int j = 0; j < neln; ++j)
 					{
 						// only allow internalization if the species won't go negative
-						//if (cxx > 0.0) {
+						if (cxx > 0.0) {
 							total_change += m_rate * H[n] * H_int[j] * dt * w[n] / n_elem;
-						//}
+						}
 					}
 				}
 			}
