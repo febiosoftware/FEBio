@@ -35,7 +35,6 @@ SOFTWARE.*/
 
 //  This material is a container for a fiber material, a fiber density
 //  distribution, and an integration scheme.
-//
 class FECustomFiberDistribution : public FEElasticMaterial
 {
 public:
@@ -69,6 +68,9 @@ protected:
 
 private:
     std::vector<double>         m_ODF;
-    std::vector<int>            m_posIndices;
-    std::vector<int>            m_zeroIndices;
+    std::vector<vec3d>          m_nodePos;
+
+    double m_lengthScale;
+    double m_hausd;
+    double m_grad;
 };

@@ -42,10 +42,11 @@ BEGIN_FECORE_CLASS(FECustomFiberDistribution, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FECustomFiberDistribution::FECustomFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
+FECustomFiberDistribution::FECustomFiberDistribution(FEModel* pfem) 
+    : FEElasticMaterial(pfem), m_lengthScale(10), m_hausd(0.05), m_grad(1.3)
 {
+
 	m_pFmat = 0;
-    m_ODF.reserve(NPTS);
 }
 
 //-----------------------------------------------------------------------------
@@ -68,48 +69,82 @@ bool FECustomFiberDistribution::Init()
     // Get harmonic order by looking at number of coefficients
     int order = (sqrt(8*m_shpHar.size() + 1) - 3)/2;
 
-    double* theta = new double[NPTS] {};
-    double* phi = new double[NPTS] {};
+    std::vector<double> gradient;
+    altGradient(order, m_shpHar, gradient);
+    
+    vector<vec3i> elems;
+    remesh(gradient, m_lengthScale, m_hausd, m_grad, m_nodePos, elems);
 
-    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, theta, phi);
+    int NN = m_nodePos.size();
+    int NE = elems.size();
 
-    auto T = compSH(order, NPTS, theta, phi);
+    double* xCoords = new double[NN] {};
+    double* yCoords = new double[NN] {};
+    double* zCoords = new double[NN] {};
+    for(int index = 0; index < NN; index++)
+    {
+        vec3d vec = m_nodePos[index];
 
+        xCoords[index] = vec.x;
+        yCoords[index] = vec.y;
+        zCoords[index] = vec.z;
+    }
+
+    double* theta = new double[NN] {};
+    double* phi = new double[NN] {};
+
+    getSphereCoords(NN, xCoords, yCoords, zCoords, theta, phi);
+
+    auto T = compSH(order, NN, theta, phi);
+
+    delete[] xCoords;
+    delete[] yCoords;
+    delete[] zCoords;
     delete[] theta;
     delete[] phi;
 
+    m_ODF.resize(NN);
+
     (*T).mult(m_shpHar, m_ODF);
 
-    // Many of the ODF values end up being 0. This allows us to skip them
-    // during the later evaluations.
+    vector<double> area(NN, 0);
 
-    std::vector<int> indices;
-
-    double mean = 0;
-    for(int index = 0; index < NPTS; index++)
+    for(int index = 0; index < NE; index++)
     {
-        mean += m_ODF[index];
-    }
-    mean /= NPTS*100;
+        int n0 = elems[index].x;
+        int n1 = elems[index].y;
+        int n2 = elems[index].z;
 
-    for(int index = 0; index < NPTS; index++)
-    {
-        if(m_ODF[index] > mean)
-        {
-            indices.push_back(index);
-        }
+        vec3d n01 = m_nodePos[n0] - m_nodePos[n1];
+        vec3d n02 = m_nodePos[n0] - m_nodePos[n2];
+
+        double temp = (n01^n02).Length()/2;
+
+        area[n0] += temp;
+        area[n1] += temp;
+        area[n2] += temp;
     }
 
-    for(auto index : indices)
+    double sum = 0;
+    for(int index = 0; index < NN; index++)
     {
-        if(ZCOORDS[index] > 0)
+        double val = m_ODF[index];
+
+        if(m_nodePos[index].z != 0)
         {
-            m_posIndices.push_back(index);
+            val *= 2;
         }
-        else if(ZCOORDS[index] == 0)
-        {
-            m_zeroIndices.push_back(index);
-        }
+
+        val *= area[index];
+
+        m_ODF[index] = val;
+
+        sum += val;
+    }
+
+    for(int index = 0; index < NN; index++)
+    {
+        m_ODF[index] /= sum;
     }
 
 	return true;
@@ -135,36 +170,18 @@ mat3ds FECustomFiberDistribution::Stress(FEMaterialPoint& mp)
 
 	// get the local coordinate system
 	mat3d Q = GetLocalCS(mp);
-    
-    for(int index : m_posIndices)
+
+    for(int index = 0; index < m_ODF.size(); index++)
     {
-        // get the fiber direction for that fiber distribution
-        vec3d N(XCOORDS[index], YCOORDS[index], ZCOORDS[index]);
-
-        // evaluate ellipsoidally distributed material coefficients
-        double R = m_ODF[index]*2;
-        
-        // convert fiber to global coordinates
-        vec3d n0 = Q*N;
-        
-        // calculate the stress
-        s += m_pFmat->FiberStress(pt, fp.FiberPreStretch(n0))*(R);
-	}
-
-    for(int index : m_zeroIndices)
-    {
-        // get the fiber direction for that fiber distribution
-        vec3d N(XCOORDS[index], YCOORDS[index], ZCOORDS[index]);
-
         // evaluate ellipsoidally distributed material coefficients
         double R = m_ODF[index];
         
         // convert fiber to global coordinates
-        vec3d n0 = Q*N;
+        vec3d n0 = Q*m_nodePos[index];
         
         // calculate the stress
         s += m_pFmat->FiberStress(pt, fp.FiberPreStretch(n0))*(R);
-	}
+    }
 
 	return s;
 }
@@ -178,35 +195,17 @@ tens4ds FECustomFiberDistribution::Tangent(FEMaterialPoint& mp)
 
 	// get the local coordinate system
 	mat3d Q = GetLocalCS(mp);
-    
-	// initialize stress tensor
+
+    // initialize stress tensor
 	tens4ds c;
 	c.zero();
-    for(int index : m_posIndices)
+    for(int index = 0; index < m_ODF.size(); index++)
     {
-        // get the fiber direction for that fiber distribution
-        vec3d N(XCOORDS[index], YCOORDS[index], ZCOORDS[index]);
-        
-        // evaluate ellipsoidally distributed material coefficients
-        double R = m_ODF[index]*2;
-        
-        // convert fiber to global coordinates
-        vec3d n0 = Q*N;
-
-        // calculate the tangent
-        c += m_pFmat->FiberTangent(mp, fp.FiberPreStretch(n0))*(R);
-	}
-
-    for(int index : m_zeroIndices)
-    {
-        // get the fiber direction for that fiber distribution
-        vec3d N(XCOORDS[index], YCOORDS[index], ZCOORDS[index]);
-        
-        // evaluate ellipsoidally distributed material coefficients
+        //evaluate ellipsoidally distributed material coefficients
         double R = m_ODF[index];
         
         // convert fiber to global coordinates
-        vec3d n0 = Q*N;
+        vec3d n0 = Q*m_nodePos[index];
 
         // calculate the tangent
         c += m_pFmat->FiberTangent(mp, fp.FiberPreStretch(n0))*(R);
@@ -217,7 +216,6 @@ tens4ds FECustomFiberDistribution::Tangent(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! calculate strain energy density at material point
-//double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->StrainEnergyDensity(pt); }
 double FECustomFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -225,33 +223,15 @@ double FECustomFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 
 	// get the local coordinate system
 	mat3d Q = GetLocalCS(mp);
-    
-	double sed = 0.0;
-    for(int index : m_posIndices)
-    {
-        // get the fiber direction for that fiber distribution
-        vec3d N(XCOORDS[index], YCOORDS[index], ZCOORDS[index]);
-        
-        // evaluate ellipsoidally distributed material coefficients
-        double R = m_ODF[index]*2;
-        
-        // convert fiber to global coordinates
-        vec3d n0 = Q*N;
 
-        // calculate the stress
-        sed += m_pFmat->FiberStrainEnergyDensity(mp, fp.FiberPreStretch(n0))*(R);
-    }
-
-    for(int index : m_zeroIndices)
+    double sed = 0.0;
+    for(int index = 0; index < m_ODF.size(); index++)
     {
-        // get the fiber direction for that fiber distribution
-        vec3d N(XCOORDS[index], YCOORDS[index], ZCOORDS[index]);
-        
         // evaluate ellipsoidally distributed material coefficients
         double R = m_ODF[index];
         
         // convert fiber to global coordinates
-        vec3d n0 = Q*N;
+        vec3d n0 = Q*m_nodePos[index];
 
         // calculate the stress
         sed += m_pFmat->FiberStrainEnergyDensity(mp, fp.FiberPreStretch(n0))*(R);

@@ -127,14 +127,18 @@ else()
         PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
         PATH_SUFFIXES "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
 		DOC "MMG library path")
+    find_library(MMGS_LIB mmgs 
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATH_SUFFIXES "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
+		DOC "MMGS library path")
 endif()	
 
-if(MMG_INC AND MMG_LIB)		
+if(MMG_INC AND MMG_LIB AND MMGS_LIB)		
 	option(USE_MMG "Required for MMG use" ON)
-    mark_as_advanced(MMG_INC MMG_LIB)
+    mark_as_advanced(MMG_INC MMG_LIB MMGS_LIB)
 else()
 	option(USE_MMG "Required for MMG use" OFF)
-    mark_as_advanced(CLEAR MMG_INC MMG_LIB)
+    mark_as_advanced(CLEAR MMG_INC MMG_LIB MMGS_LIB)
 endif()
 
 # LEVMAR

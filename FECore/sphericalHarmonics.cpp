@@ -26,6 +26,16 @@ SOFTWARE.*/
 
 #include "sphericalHarmonics.h"
 #include "spherePoints.h"
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
+
+#ifdef HAS_MMG
+#include <mmg/mmgs/libmmgs.h>
+#endif
+
+using std::vector;
+using std::unordered_map;
 
 enum NUMTYPE { REALTYPE, IMAGTYPE, COMPLEXTYPE };
 
@@ -146,4 +156,228 @@ double harmonicY(int degree, int order, double theta, double phi, int numType)
     }
 
     return normalization*std::assoc_legendre(degree, order, cos(theta))*pow(-1, degree)*e*negate;
+}
+
+void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient)
+{
+    double* theta = new double[NPTS] {};
+    double* phi = new double[NPTS] {};
+
+    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, theta, phi);
+
+    std::vector<double> ODF(NPTS, 0);  
+    auto T = compSH(order, NPTS, theta, phi);
+    (*T).mult(sphHarm, ODF);
+
+    delete[] theta;
+    delete[] phi;
+
+    gradient.resize(NPTS);
+    for(int index = 0; index < NPTS; index++)
+    {
+        gradient[index] = 0;
+    }
+
+    std::vector<int> count(NPTS, 0);
+
+    for(int index = 0; index < NCON; index++)
+    {
+        int n0 = CONN1[index]-1;
+        int n1 = CONN2[index]-1;
+        int n2 = CONN3[index]-1;
+
+        double val0 = ODF[n0];
+        double val1 = ODF[n1];
+        double val2 = ODF[n2];
+
+        double diff0 = abs(val0 - val1);
+        double diff1 = abs(val0 - val2);
+        double diff2 = abs(val1 - val2);
+
+        gradient[n0] += diff0 + diff1;
+        gradient[n1] += diff0 + diff2;
+        gradient[n2] += diff1 + diff2;
+
+        count[n0]++;
+        count[n1]++;
+        count[n2]++;
+    }
+
+    for(int index = 0; index < NPTS; index++)
+    {
+        gradient[index] /= count[index];
+    }
+
+}
+
+void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
+{
+#ifdef HAS_MMG
+	int NN = NPTS;
+	int NF = NCON;
+    int NC;
+
+    // we only want to remesh half of the sphere, so here we discard 
+    // any nodes that have a z coordinate < 0, and any elements defined
+    // with those nodes.
+    unordered_map<int, int> newNodeIDs;
+    int newNodeID = 1;
+    for(int index = 0; index < NN; index++)
+    {
+        if(ZCOORDS[index] >= 0)
+        {
+            newNodeIDs[index] = newNodeID;
+            newNodeID++;
+        }
+    }
+
+    unordered_map<int, int> newElemIDs;
+    int newElemID = 1;
+    for(int index = 0; index < NF; index++)
+    {
+        if(newNodeIDs.count(CONN1[index]-1) == 0 || newNodeIDs.count(CONN2[index]-1) == 0 || newNodeIDs.count(CONN3[index]-1) == 0)
+        {
+            continue;
+        }
+
+        newElemIDs[index] = newElemID;
+        newElemID++;
+    }
+
+	// build the MMG mesh
+	MMG5_pMesh mmgMesh;
+	MMG5_pSol  mmgSol;
+	mmgMesh = NULL;
+	mmgSol = NULL;
+	MMGS_Init_mesh(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh,
+		MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+
+	// allocate mesh size
+	if (MMGS_Set_meshSize(mmgMesh, newNodeID-1, newElemID-1, 0) != 1)
+	{
+		assert(false);
+		// SetError("Error in MMGS_Set_meshSize");
+		// return nullptr;
+	}
+
+	// build the MMG mesh
+	for (int i = 0; i < NN; ++i)
+	{
+        if(newNodeIDs.count(i))
+        {
+            MMGS_Set_vertex(mmgMesh, XCOORDS[i], YCOORDS[i], ZCOORDS[i], 0, newNodeIDs[i]);
+        }
+	}
+
+	for (int i = 0; i < NF; ++i)
+	{
+        if(newElemIDs.count(i))
+        {
+            MMGS_Set_triangle(mmgMesh, newNodeIDs[CONN1[i]-1], newNodeIDs[CONN2[i]-1], newNodeIDs[CONN3[i]-1], 0, newElemIDs[i]);
+        }
+	}
+	
+    // Now, we build the "solution", i.e. the target element size.
+	// If no elements are selected, we set a homogenous remeshing using the element size parameter.
+	// set the "solution", i.e. desired element size
+	if (MMGS_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, newNodeID-1, MMG5_Scalar) != 1)
+	{
+		assert(false);
+		// SetError("Error in MMG3D_Set_solSize");
+		// return nullptr;
+	}
+
+    int n0 = CONN1[0]-1;
+    int n1 = CONN2[0]-1;
+
+    vec3d pos0(XCOORDS[n0], YCOORDS[n0], ZCOORDS[n0]);
+    vec3d pos1(XCOORDS[n1], YCOORDS[n1], ZCOORDS[n1]);
+
+    double minLength = (pos0 - pos1).Length();
+    double maxLength = minLength*lengthScale;
+
+    double min = *std::min_element(gradient.begin(), gradient.end());
+    double max = *std::max_element(gradient.begin(), gradient.end());
+    double range = max-min;
+
+
+    for (int k = 0; k < NN; k++) {
+        if(newNodeIDs.count(k))
+        {
+            double val = (maxLength - minLength)*(1-(gradient[k] - min)/range) + minLength;
+            MMGS_Set_scalarSol(mmgSol, val, newNodeIDs[k]);
+        }
+    }
+
+	// set the control parameters
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hmin, minLength);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hausd, hausd);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hgrad, grad);
+
+	// run the mesher
+	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
+
+	if (ier == MMG5_STRONGFAILURE) {
+		// if (min == 0.0) SetError("Element size cannot be zero.");
+		// else SetError("MMG was not able to remesh the mesh.");
+		// return nullptr;
+	}
+	else if (ier == MMG5_LOWFAILURE)
+	{
+		// SetError("MMG return low failure error");
+	}
+
+	// convert back to prv mesh
+	// FSMesh* newMesh = new FSMesh();
+
+	// get the new mesh sizes
+	MMGS_Get_meshSize(mmgMesh, &NN, &NF, &NC);
+	// newMesh->Create(NN, NF);
+
+    nodePos.resize(NN);
+
+	// get the vertex coordinates
+	for (int i = 0; i < NN; ++i)
+	{
+		// FSNode& vi = newMesh->Node(i);
+		// vec3d& ri = vi.r;
+
+        double x,y,z;
+        int g;
+		int isCorner = 0;
+		MMGS_Get_vertex(mmgMesh, &x, &y, &z, &g, &isCorner, NULL);
+
+        nodePos[i] = vec3d(x,y,z);
+	}
+
+    elems.resize(NF);
+
+    // create elements
+	for (int i=0; i<NF; ++i)
+	{
+        int n0, n1, n2, id;
+
+        MMGS_Get_triangle(mmgMesh, &n0, &n1, &n2, &id, NULL);
+		n0--;
+		n1--;
+		n2--;
+
+        elems[i] = vec3i(n0, n1,n2);
+	}
+
+	// Clean up
+	MMGS_Free_all(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh, MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+
+    // newMesh->RebuildMesh();
+
+	// return newMesh;
+
+#else
+	SetError("This version does not have MMG support");
+	return nullptr;
+#endif
 }
