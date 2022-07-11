@@ -266,7 +266,7 @@ int enumValue(const char* val, const char* szenum)
 
 	// get the string's length. 
 	// there could be a comma, so correct for that.
-	int L = strlen(val);
+	size_t L = strlen(val);
 	const char* c = strchr(val, ',');
 	if (c) L = c - val;
 
