@@ -33,12 +33,14 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEMembraneReactionRateIonChannel, FEMembraneReactionRate)
 	ADD_PARAMETER(m_g, FE_RANGE_GREATER_OR_EQUAL(0.0), "g");
 	ADD_PARAMETER(m_sol, "sol");
+    ADD_PARAMETER(m_sbm, "sbm");
 END_FECORE_CLASS();
 
 bool FEMembraneReactionRateIonChannel::Init()
 {
-    // reset m_sol to be zero-based
+    // reset m_sol and m_sbm to be zero-based
     m_sol -= 1;
+    m_sbm -= 1;
     
     // membrane reaction rate is child of membrane reaction
     FEMembraneReaction* m_MRp = dynamic_cast<FEMembraneReaction*>(GetParent());
@@ -55,12 +57,26 @@ double FEMembraneReactionRateIonChannel::ReactionRate(FEMaterialPoint& pt)
     double R = GetFEModel()->GetGlobalConstant("R");
     double T = GetFEModel()->GetGlobalConstant("T");
     double Fc = GetFEModel()->GetGlobalConstant("Fc");
+    FEMultiphasic* pMP = m_pReact->m_pMP;
+    assert(pMP);
+    double ksi = pMP->SBMArealConcentration(pt, m_sbm);
     
     double k = 0;
     if ((ci > 0) && (ce > 0))
-        k = (ci != ce) ? R*T*m_g/pow(Fc*m_z,2)*log(ci/ce)/(ci-ce) : R*T*m_g/pow(Fc*m_z,2)/ce;
+        k = (ci != ce) ? R*T*m_g/ksi/pow(Fc*m_z,2)*log(ci/ce)/(ci-ce) : R*T*m_g/pow(Fc*m_z,2)/ce;
     
     return k;
+}
+
+//! tangent of reaction rate with strain at material point
+double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
+{
+    // get the areal strain
+    FEElasticMaterialPoint& pe = *(pt.ExtractData<FEElasticMaterialPoint>());
+    FEShellElement*sel = dynamic_cast<FEShellElement*>(pt.m_elem);
+    assert(sel);
+    double Jg = pe.m_J*sel->Evaluate(sel->m_h0, pt.m_index)/sel->Evaluate(sel->m_ht, pt.m_index);
+    return ReactionRate(pt)/Jg;
 }
 
 double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ci(FEMaterialPoint& pt, const int isol)
@@ -73,10 +89,13 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ci(FEMaterialPoint
     double R = GetFEModel()->GetGlobalConstant("R");
     double T = GetFEModel()->GetGlobalConstant("T");
     double Fc = GetFEModel()->GetGlobalConstant("Fc");
-    
+    FEMultiphasic* pMP = m_pReact->m_pMP;
+    assert(pMP);
+    double ksi = pMP->SBMArealConcentration(pt, m_sbm);
+
     double dkdc = 0;
     if ((ci > 0) && (ce > 0))
-        dkdc = (ci != ce) ? R*T/pow(Fc*m_z,2)*m_g*(ci*(1-log(ci/ce))-ce)/pow(ci-ce,2)/ci : -R*T*m_g/pow(ci*Fc*m_z,2)/2;
+        dkdc = (ci != ce) ? R*T/pow(Fc*m_z,2)*m_g/ksi*(ci*(1-log(ci/ce))-ce)/pow(ci-ce,2)/ci : -R*T*m_g/pow(ci*Fc*m_z,2)/2;
     
     return dkdc;
 }
@@ -91,10 +110,13 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ce(FEMaterialPoint
     double R = GetFEModel()->GetGlobalConstant("R");
     double T = GetFEModel()->GetGlobalConstant("T");
     double Fc = GetFEModel()->GetGlobalConstant("Fc");
-    
+    FEMultiphasic* pMP = m_pReact->m_pMP;
+    assert(pMP);
+    double ksi = pMP->SBMArealConcentration(pt, m_sbm);
+
     double dkdc = 0;
     if ((ci > 0) && (ce > 0))
-        dkdc = (ci != ce) ? R*T*m_g/pow(Fc*m_z,2)*(ce*(1+log(ci/ce))-ci)/pow(ci-ce,2)/ce : -R*T*m_g/pow(ci*Fc*m_z,2)/2;
+        dkdc = (ci != ce) ? R*T*m_g/ksi/pow(Fc*m_z,2)*(ce*(1+log(ci/ce))-ci)/pow(ci-ce,2)/ce : -R*T*m_g/pow(ci*Fc*m_z,2)/2;
     
     return dkdc;
 }

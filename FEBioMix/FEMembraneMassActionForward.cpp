@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMembraneMassActionForward.h"
-#include "FECore/DOFS.h"
+#include <FECore/DOFS.h>
 
 //-----------------------------------------------------------------------------
 //! molar supply at material point
@@ -57,7 +57,7 @@ double FEMembraneMassActionForward::ReactionSupply(FEMaterialPoint& pt)
     for (int i=0; i<nsbm; ++i) {
         int vR = m_vR[nsol+i];
         if (vR > 0) {
-            double c = m_pMP->SBMConcentration(pt, i);
+            double c = m_pMP->SBMArealConcentration(pt, i);
             zhat *= pow(c, vR);
         }
     }
