@@ -63,14 +63,15 @@ void FESymmetryPlane::Activate()
     // create linear constraints
     // for a symmetry plane the constraint on (ux, uy, uz) is
     // nx*ux + ny*uy + nz*uz = 0
-    for (int i=0; i<N; ++i) {
-        FENode node = m_surf.Node(i);
-        if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
-            FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
-            for (int j=0; j<3; ++j) {
-                FEAugLagLinearConstraint::DOF dof;
-                dof.node = node.GetID() - 1;    // zero-based
-                switch (j) {
+    if (m_binit == false) {
+        for (int i = 0; i < N; ++i) {
+            FENode node = m_surf.Node(i);
+            if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
+                for (int j = 0; j < 3; ++j) {
+                    FEAugLagLinearConstraint::DOF dof;
+                    dof.node = node.GetID() - 1;    // zero-based
+                    switch (j) {
                     case 0:
                         dof.bc = dofs.GetDOF("x");
                         dof.val = nu.x;
@@ -85,23 +86,23 @@ void FESymmetryPlane::Activate()
                         break;
                     default:
                         break;
+                    }
+                    pLC->m_dof.push_back(dof);
                 }
-                pLC->m_dof.push_back(dof);
+                // add the linear constraint to the system
+                add(pLC);
             }
-            // add the linear constraint to the system
-            add(pLC);
         }
-    }
-    
-    // for nodes that belong to shells, also constraint the shell bottom face displacements
-    for (int i=0; i<N; ++i) {
-        FENode node = m_surf.Node(i);
-        if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.HasFlags(FENode::SHELL)) && (node.m_rid == -1)) {
-            FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
-            for (int j=0; j<3; ++j) {
-                FEAugLagLinearConstraint::DOF dof;
-                dof.node = node.GetID() - 1;    // zero-based
-                switch (j) {
+
+        // for nodes that belong to shells, also constraint the shell bottom face displacements
+        for (int i = 0; i < N; ++i) {
+            FENode node = m_surf.Node(i);
+            if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.HasFlags(FENode::SHELL)) && (node.m_rid == -1)) {
+                FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
+                for (int j = 0; j < 3; ++j) {
+                    FEAugLagLinearConstraint::DOF dof;
+                    dof.node = node.GetID() - 1;    // zero-based
+                    switch (j) {
                     case 0:
                         dof.bc = dofs.GetDOF("sx");
                         dof.val = nu.x;
@@ -116,12 +117,15 @@ void FESymmetryPlane::Activate()
                         break;
                     default:
                         break;
+                    }
+                    pLC->m_dof.push_back(dof);
                 }
-                pLC->m_dof.push_back(dof);
+                // add the linear constraint to the system
+                add(pLC);
             }
-            // add the linear constraint to the system
-            add(pLC);
         }
+
+        m_binit = true;
     }
 }
 

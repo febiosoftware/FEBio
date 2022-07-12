@@ -1,7 +1,7 @@
 /**
 \page restart Restart Capabilities
 
-FEBio has several mechanism for restarting a problem. The "running restart" capability allows the model to recover from a fatal error during runtime and restart
+FEBio has several mechanism for restarting a problem. The "running restart" capability allows the model to recover from an otherwise fatal error during runtime and restart
 from the last converged state. The "cold restart" allows the user to restart an analysis using a restart file. Again, the analysis will restart from the last converged state (for which a dump file was created). 
 The "reset" feature allows a user to reset all data and restart the analysis from scratch. The following sections describe these features in more detail.
 

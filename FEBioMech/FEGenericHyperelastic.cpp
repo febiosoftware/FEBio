@@ -45,7 +45,7 @@ bool FEGenericHyperelastic::Init()
 
 bool FEGenericHyperelastic::BuildMathExpressions()
 {
-	vector<string> vars = { "I1", "I2", "J" };
+	vector<string> vars = { "I1", "I2", "J", "X", "Y", "Z"};
 
 	// add all user parameters
 	FEParameterList& pl = GetParameterList();
@@ -122,7 +122,7 @@ mat3ds FEGenericHyperelastic::Stress(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
-	vector<double> v = { I1, I2, J };
+	vector<double> v = { I1, I2, J, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W1 = m_W1.value_s(v);
@@ -149,7 +149,7 @@ tens4ds FEGenericHyperelastic::Tangent(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
-	vector<double> v = { I1, I2, J };
+	vector<double> v = { I1, I2, J, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W1 = m_W1.value_s(v);
@@ -195,7 +195,7 @@ double FEGenericHyperelastic::StrainEnergyDensity(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
-	vector<double> v = { I1, I2, J };
+	vector<double> v = { I1, I2, J, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W = m_W.value_s(v);

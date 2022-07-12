@@ -113,10 +113,10 @@ FEBioModel::FEBioModel()
 	m_plot = nullptr;
 	m_writeMesh = false;
 
-	m_ntimeSteps = 0;
-	m_ntotalIters = 0;
-	m_ntotalRHS = 0;
-	m_ntotalReforms = 0;
+	m_stats.ntimeSteps = 0;
+	m_stats.ntotalIters = 0;
+	m_stats.ntotalRHS = 0;
+	m_stats.ntotalReforms = 0;
 
 	m_pltAppendOnRestart = true;
 
@@ -164,6 +164,12 @@ int FEBioModel::GetDumpLevel() const { return m_dumpLevel; }
 
 //! Set the log level
 void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
+
+//! Get the stats 
+ModelStats FEBioModel::GetModelStats() const
+{
+	return m_stats;
+}
 
 //-----------------------------------------------------------------------------
 //! Set the title of the model
@@ -1494,10 +1500,10 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	m_ntimeSteps = 0;
-	m_ntotalIters = 0;
-	m_ntotalRHS = 0;
-	m_ntotalReforms = 0;
+	m_stats.ntimeSteps = 0;
+	m_stats.ntotalIters = 0;
+	m_stats.ntotalRHS = 0;
+	m_stats.ntotalReforms = 0;
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1520,10 +1526,10 @@ void FEBioModel::on_cb_solved()
 	if (Steps() > 1)
 	{
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_stats.ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_stats.ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_stats.ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_stats.ntotalReforms);
 	}
 
 	// get and print elapsed time
@@ -1631,8 +1637,8 @@ void FEBioModel::on_cb_stepSolved()
 	}
 
 	// add to stats
-	m_ntimeSteps    += step->m_ntimesteps;
-	m_ntotalIters   += step->m_ntotiter;
-	m_ntotalRHS     += step->m_ntotrhs;
-	m_ntotalReforms += step->m_ntotref;
+	m_stats.ntimeSteps    += step->m_ntimesteps;
+	m_stats.ntotalIters   += step->m_ntotiter;
+	m_stats.ntotalRHS     += step->m_ntotrhs;
+	m_stats.ntotalReforms += step->m_ntotref;
 }
