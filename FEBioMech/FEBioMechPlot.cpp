@@ -119,29 +119,33 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 		FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&m.Domain(i));
 		if (dom)
 		{
-			int NE = dom->Elements();
-			for (int i = 0; i < NE; ++i)
+			FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(dom->GetMaterial());
+			if (prm == nullptr)
 			{
-				// get the element
-				FESolidElement& el = dom->Element(i);
+				int NE = dom->Elements();
+				for (int i = 0; i < NE; ++i)
+				{
+					// get the element
+					FESolidElement& el = dom->Element(i);
 
-				if (el.isActive()) {
-					// element force vector
-					vector<double> fe;
-					vector<int> lm;
+					if (el.isActive()) {
+						// element force vector
+						vector<double> fe;
+						vector<int> lm;
 
-					// get the element force vector and initialize it to zero
-					int ndof = 3 * el.Nodes();
-					fe.assign(ndof, 0);
+						// get the element force vector and initialize it to zero
+						int ndof = 3 * el.Nodes();
+						fe.assign(ndof, 0);
 
-					// calculate internal force vector
-					dom->ElementInternalForce(el, fe);
+						// calculate internal force vector
+						dom->ElementInternalForce(el, fe);
 
-					// assemble into F
-					for (size_t j = 0; j < el.Nodes(); ++j)
-					{
-						vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
-						F[el.m_node[j]] += rj;
+						// assemble into F
+						for (size_t j = 0; j < el.Nodes(); ++j)
+						{
+							vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
+							F[el.m_node[j]] += rj;
+						}
 					}
 				}
 			}
@@ -637,9 +641,6 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
     
-    // Evaluate this field only for a specific domain, by checking domain name
-    if (pcs->GetName() != GetDomainName()) return false;
-
 	writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 		FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
 		int n = mp.m_index;
@@ -657,9 +658,6 @@ bool FEPlotSurfaceArea::Save(FESurface &surf, FEDataStream &a)
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
     
-    // Evaluate this field only for a specific domain, by checking domain name
-    if (pcs->GetName() != GetDomainName()) return false;
-    
     writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
         FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
         int n = mp.m_index;
@@ -675,9 +673,6 @@ bool FEPlotFacetArea::Save(FESurface& surf, FEDataStream& a)
 {
 	FESurface* pcs = &surf;
 	if (pcs == 0) return false;
-
-	// Evaluate this field only for a specific domain, by checking domain name
-	if (pcs->GetName() != GetDomainName()) return false;
 
 	writeElementValue<double>(surf, a, [=](int nface) {
 		double A = pcs->CurrentFaceArea(pcs->Element(nface));
