@@ -142,7 +142,7 @@ public:
 	}
 
 	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
-	double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) {
+	double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) override {
 		FEShellElement* sel = dynamic_cast<FEShellElement*>(pt.m_elem);
 		assert(sel);
 		double h = sel->Evaluate(sel->m_ht, pt.m_index);   // shell thickness

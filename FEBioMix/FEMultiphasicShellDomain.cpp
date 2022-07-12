@@ -195,9 +195,6 @@ bool FEMultiphasicShellDomain::Init()
     const int nsbm = m_pMat->SBMs();
     const int nsol = m_pMat->Solutes();
     vector<double> sbmr(nsbm, 0);
-    for (int i = 0; i<nsbm; ++i) {
-        sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
-    }
     
     for (int i = 0; i<(int)m_Elem.size(); ++i)
     {
@@ -215,6 +212,11 @@ bool FEMultiphasicShellDomain::Init()
             FEMaterialPoint& mp = *el.GetMaterialPoint(n);
             FEBiphasicMaterialPoint& pb = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+            double h = el.Evaluate(el.m_ht, n);   // shell thickness
+
+            // extract the initial apparent densities of the solid-bound molecules
+            for (int i = 0; i<nsbm; ++i)
+                sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
             
             ps.m_sbmr = sbmr;
             ps.m_sbmrp = sbmr;
@@ -251,14 +253,13 @@ bool FEMultiphasicShellDomain::Init()
                 // multiphasic material point data
                 FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 
-                double phi0 = pb.m_phi0;
                 for (int isbm=0; isbm<nsbm; ++isbm) {
                     // combine the molar supplies from all the reactions
                     for (int k=0; k<mreact; ++k) {
                         double zetahat = m_pMat->GetMembraneReaction(k)->ReactionSupply(mp);
                         double v = m_pMat->GetMembraneReaction(k)->m_v[nsol+isbm];
                         // remember to convert from molar supply to referential mass supply
-                        ps.m_sbmrhat[isbm] += (pt.m_J-phi0)*m_pMat->SBMMolarMass(isbm)*v*zetahat;
+                        ps.m_sbmrhat[isbm] += pt.m_J/h*m_pMat->SBMMolarMass(isbm)*v*zetahat;
                     }
                 }
             }
@@ -398,12 +399,7 @@ void FEMultiphasicShellDomain::Reset()
     
     const int nsol = m_pMat->Solutes();
     const int nsbm = m_pMat->SBMs();
-    
-    // extract the initial concentrations of the solid-bound molecules
     vector<double> sbmr(nsbm,0);
-    for (int i=0; i<nsbm; ++i) {
-        sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
-    }
     
     for (int i=0; i<(int) m_Elem.size(); ++i)
     {
@@ -422,6 +418,10 @@ void FEMultiphasicShellDomain::Reset()
 
             // initialize referential solid volume fraction
             pt.m_phi0 = m_pMat->m_phi0(mp);
+            
+            // extract the initial apparent densities of the solid-bound molecules
+            for (int i = 0; i<nsbm; ++i)
+                sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
             
             // initialize multiphasic solutes
             ps.m_nsol = nsol;

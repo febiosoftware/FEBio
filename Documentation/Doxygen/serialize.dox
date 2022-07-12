@@ -1,15 +1,16 @@
 /**
 \page serialize Data Serialization
 
-Data serialization refers to the process of reading and writing class data to or from an external file. This feature is used for the restart capabilities, that
+Data serialization refers to the process of reading and writing class data to or from an external file. This feature is used for the (cold) restart capability, that
 allows an analysis to restart from a previous state.
 
 Most aspects of serialization is taken care of by the framework, however in some cases a class needs to implement additional support by implementing the \c Serialize member. 
-This function takes a single parameter, namely the dump stream. 
+This function takes a single parameter, namely the so-called dump file. 
 
 \code
-void MyClass::Serialize(DumpStream& ar)
+void MyClass::Serialize(DumpFile& ar)
 {
+	FEModel& fem = *ar.GetFEModel();
 	if (ar.IsSaving())
 	{
 		// write data using the << operator
@@ -21,52 +22,7 @@ void MyClass::Serialize(DumpStream& ar)
 }
 \endcode
 
-Data is written to the dump stream using the << operators (just like when using std::cout). Data is read from the dump file using the >> operators (just like using std::cin). Note that it is important that data is read in the same order as it was written. 
-
-Alternatively, you can use the ampersand operator (&), which will write on saving and read on loading. 
-
-For instance, consider a class, MyClass, that defines two parameters, m_a and m_b. You can serialize using either the explicit read and write operators. 
-
-\code
-void MyClass::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_a << m_b;
-	}
-	else
-	{
-		ar >> m_a >> m_b;
-	}
-}
-\endcode
-
-Alternatively, the following code is equivalent. 
-
-\code
-void MyClass::Serialize(DumpStream& ar)
-{
-	ar & m_a & m_b;
-}
-\endcode
-
-\section ser_sec1 Shallow vs Deep Serialization
-
-The serialization is used during running restarts and cold restarts. A running restart happens when a time step fails and the model's state needs to be restored to the last converged time step so that a new time step size can be tried. A cold restart happens when a model is restarted from a dump file (or restart input file). 
-
-During a running restart, not all of the model data needs to be serialized. (For instance, initial nodal coordinates, constant material parameter, and other values that do not change during the solution process.) In this case, only a "shallow" copy of the model needs to be stored to the dumpstream. This is in contrast to the cold restart, when a "deep" copy needs to be read, since all model parameters need to be restored from the dumpstream. 
-
-You can check whether a shallow or deep copy needs to be serialized using the \c DumpStream::IsShallow function. For instance, the following code illustrates how to serialize data for cold restarts. 
-
-\code
-void MyClass::Serialize(DumpStream& ar)
-{
-	if (ar.IsShallow() == false)
-	{
-		ar & m_a & m_b;
-	}
-}
-\endcode
-
-
+The FEModel that the class belongs to can be recovered from <c>DumpFile::GetFEModel()</c>. Data is written to the dump file using the << operators (just like when
+using std::cout). Data is read from the dump file using the >> operators (just like using std::cin). Note that it is important that data is read in the same order
+as it was written. 
 */

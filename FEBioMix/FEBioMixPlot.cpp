@@ -88,6 +88,9 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
     
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (pcs->GetName() != GetDomainName()) return false;
+    
     int NF = pcs->Elements();
     double fn = 0;    // initialize
     

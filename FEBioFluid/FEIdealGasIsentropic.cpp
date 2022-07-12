@@ -69,6 +69,14 @@ bool FEIdealGasIsentropic::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! elastic pressure
+double FEIdealGasIsentropic::Pressure(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    return Pressure(fp.m_ef,0);
+}
+
+//-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
 double FEIdealGasIsentropic::Pressure(const double e, const double T)
 {

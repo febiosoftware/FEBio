@@ -62,9 +62,11 @@ mat3ds FEFiberPowLinearUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
     
     // initialize material constants
     double E = m_E(mp);
-	double I0 = m_lam0*m_lam0;
-	double ksi = m_E(mp) / 4.0 / (m_beta - 1)*pow(I0, -3.0 / 2.0)*pow(I0 - 1.0, 2.0 - m_beta);
-	double b = ksi*pow(I0 - 1.0, m_beta - 1.0) + E / 2.0 / sqrt(I0);
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+	double I0 = lam0*lam0;
+	double ksi = E / 4.0 / (beta - 1)*pow(I0, -3.0 / 2.0)*pow(I0 - 1.0, 2.0 - beta);
+	double b = ksi*pow(I0 - 1.0, beta - 1.0) + E / 2.0 / sqrt(I0);
 
     // only take fibers in tension into consideration
 	const double eps = 0;
@@ -78,8 +80,8 @@ mat3ds FEFiberPowLinearUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
         
         // calculate the fiber stress magnitude
         double sn = (In < I0) ?
-        2*In*ksi*pow(In-1, m_beta-1) :
-        2*b*In - m_E(mp)*sqrt(In);
+        2*In*ksi*pow(In-1, beta-1) :
+        2*b*In - E*sqrt(In);
         
         // calculate the fiber stress
         s = N*(sn/J);
@@ -122,20 +124,22 @@ tens4ds FEFiberPowLinearUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0
         
         // initialize material constants
         double E = m_E(mp);
-        double I0 = m_lam0 * m_lam0;
-        double ksi = m_E(mp) / 4.0 / (m_beta - 1) * pow(I0, -3.0 / 2.0) * pow(I0 - 1.0, 2.0 - m_beta);
-        double b = ksi * pow(I0 - 1.0, m_beta - 1.0) + E / 2.0 / sqrt(I0);
+        double lam0 = m_lam0(mp);
+        double beta = m_beta(mp);
+        double I0 = lam0*lam0;
+        double ksi = E / 4.0 / (beta - 1)*pow(I0, -3.0 / 2.0)*pow(I0 - 1.0, 2.0 - beta);
+        double b = ksi*pow(I0 - 1.0, beta - 1.0) + E / 2.0 / sqrt(I0);
 
         // calculate the fiber stress magnitude
         double sn = (In < I0) ?
-        2*In*ksi*pow(In-1, m_beta-1) :
+        2*In*ksi*pow(In-1, beta-1) :
         2*b*In - E*sqrt(In);
         
         // calculate the fiber stress
         s = N*(sn/J);
         
         // calculate modulus
-        double cn = (In < I0) ? 4*In*In*ksi*(m_beta-1)*pow(In-1, m_beta-2) : E*sqrt(In);
+        double cn = (In < I0) ? 4*In*In*ksi*(beta-1)*pow(In-1, beta-2) : E*sqrt(In);
         
         // calculate the fiber tangent
         c = NxN*(cn/J);
@@ -173,14 +177,16 @@ double FEFiberPowLinearUC::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, cons
     {
         // initialize material constants
         double E = m_E(mp);
-        double I0 = m_lam0 * m_lam0;
-        double ksi = m_E(mp) / 4.0 / (m_beta - 1) * pow(I0, -3.0 / 2.0) * pow(I0 - 1.0, 2.0 - m_beta);
-        double b = ksi * pow(I0 - 1.0, m_beta - 1.0) + E / 2.0 / sqrt(I0);
+        double lam0 = m_lam0(mp);
+        double beta = m_beta(mp);
+        double I0 = lam0*lam0;
+        double ksi = E / 4.0 / (beta - 1)*pow(I0, -3.0 / 2.0)*pow(I0 - 1.0, 2.0 - beta);
+        double b = ksi*pow(I0 - 1.0, beta - 1.0) + E / 2.0 / sqrt(I0);
 
         // calculate strain energy density
         sed = (In < I0) ?
-        ksi/m_beta*pow(In-1, m_beta) :
-        b*(In-I0) - E*(sqrt(In) - sqrt(I0)) + ksi/m_beta*pow(I0-1, m_beta);
+        ksi/beta*pow(In-1, beta) :
+        b*(In-I0) - E*(sqrt(In) - sqrt(I0)) + ksi/beta*pow(I0-1, beta);
     }
     
     return sed;

@@ -42,8 +42,6 @@ class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 
 		void Serialize(DumpStream& ar) override;
 
-		void Init() override;
-
 	public:
 		vec3d				m_nu;	  //!< secondary surface normal at primary surface node
 		vec2d				m_rs;	  //!< natural coordinates of primary surface projection on secondary surface element

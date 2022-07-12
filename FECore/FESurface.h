@@ -170,6 +170,9 @@ public:
 	//! Get the spatial position given natural coordinates
 	vec3d Position(FESurfaceElement& el, double r, double s);
 
+    //! Get the spatial position of an integration point
+    vec3d Position(FESurfaceElement& el, int n);
+    
 	//! Get the nodal coordinates of an element
 	void NodalCoordinates(FESurfaceElement& el, vec3d* re);
     

@@ -5,7 +5,7 @@ In this section we will look at the details of setting up a plugin that implemen
 
 The basic procedure for creating a new material for FEBio requires the following steps.
 
-1.	Defining a new material class by deriving it from an suitable base class.
+1.	Defining a new material class by deriving it from an available base class.
 2.	Registering the material with FEBio's framework.
 3.	Defining the material parameters.
 4.	Implementing the Init() and Validate() functions (optional)
@@ -277,14 +277,14 @@ FEBio will recognize the type identifier as the name of the MyFancyMaterial clas
 Material parameters are identified in a similar way. For each material parameter, the ADD_PARAMETER macro associates a name with the parameter. For example, imagine that for our new class MyFancyMaterial the following parameter is defined,
 
 \code
-ADD_PARAMETER(m_a, "a");
+ADD_PARAMETER(m_a, "param_a");
 \endcode
 
 The user can now enter a value for this parameter in the FEBio input file as follows,
 
 \code
 <material id="1" type="fancy material">
-	<a>0.123</a>
+	<param_a>0.123</param_a>
 </material>
 \endcode
 

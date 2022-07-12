@@ -289,7 +289,7 @@ public:
 	double					m_rhoT;		//!< true SBM density
 	double					m_M;		//!< SBM molar mass
 	int						m_z;		//!< charge number of SBM
-	double					m_rho0;		//!< initial referential (apparent) density of SBM
+	FEParamDouble			m_rho0;		//!< initial referential (apparent) density of SBM
 	double					m_rhomin;	//!< minimum referential (apparent) density of SBM
 	double					m_rhomax;	//!< maximum referential (apparent) density of SBM
 	

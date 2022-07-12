@@ -19,7 +19,7 @@ If you wish to load many plugins, and these plugins are all located in the same 
 <import>$(PluginFolder)\plugin.dll</import>
 \endcode
 
-When FEBio starts, it will read the configuration file and try to load all plugins listed therein. A message will be printed on the screen at the start of an FEBio analysis indicating if FEBio was successful in loading the plugin.
+When FEBio starts it will read the configuration file and try to load all plugins listed therein. A message will be printed on the screen at the start of an FEBio analysis indicating if FEBio was successful in loading the plugin.
 
 Alternatively, you can add the path to a plugin to the FEBio command line with the <c>-import</c> command line option. 
 

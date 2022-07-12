@@ -637,6 +637,9 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
     
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (pcs->GetName() != GetDomainName()) return false;
+
 	writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 		FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
 		int n = mp.m_index;
@@ -654,6 +657,9 @@ bool FEPlotSurfaceArea::Save(FESurface &surf, FEDataStream &a)
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
     
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (pcs->GetName() != GetDomainName()) return false;
+    
     writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
         FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
         int n = mp.m_index;
@@ -669,6 +675,9 @@ bool FEPlotFacetArea::Save(FESurface& surf, FEDataStream& a)
 {
 	FESurface* pcs = &surf;
 	if (pcs == 0) return false;
+
+	// Evaluate this field only for a specific domain, by checking domain name
+	if (pcs->GetName() != GetDomainName()) return false;
 
 	writeElementValue<double>(surf, a, [=](int nface) {
 		double A = pcs->CurrentFaceArea(pcs->Element(nface));
