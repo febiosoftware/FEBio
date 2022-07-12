@@ -284,13 +284,9 @@ endif()
 
 # Link MMG
 if(USE_MMG)
-    target_include_directories(fecore PRIVATE ${MMG_INC})
-    target_compile_definitions(fecore PRIVATE HAS_MMG)
-    target_link_libraries(fecore PRIVATE ${MMGS_LIB})
-
 	target_include_directories(feamr PRIVATE ${MMG_INC})
     target_compile_definitions(feamr PRIVATE HAS_MMG)
-    target_link_libraries(feamr PRIVATE ${MMG_LIB})
+    target_link_libraries(feamr PRIVATE ${MMG_LIB} ${MMGS_LIB})
 endif()
 
 # Link ZLIB

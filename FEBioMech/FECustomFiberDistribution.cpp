@@ -28,8 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FECustomFiberDistribution.h"
-#include <FECore/sphericalHarmonics.h>
-#include <FECore/spherePoints.h>
+#include <FEAMR/sphericalHarmonics.h>
+#include <FEAMR/spherePoints.h>
 
 BEGIN_FECORE_CLASS(FECustomFiberDistribution, FEElasticMaterial)
 
