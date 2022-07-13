@@ -367,8 +367,8 @@ double FEDamageCDFUser::pdf(const double X)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageCDFPower, FEDamageCDF)
-    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(1.0), "alpha" );
-    ADD_PARAMETER(m_mu0  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0"   );
+    ADD_PARAMETER(m_alpha, "alpha" );
+    ADD_PARAMETER(m_mu0  , "mu0"   );
     ADD_PARAMETER(m_mu1  , "mu1"   );
     ADD_PARAMETER(m_s    , FE_RANGE_GREATER(0.0)         , "scale" );
 END_FECORE_CLASS();
@@ -414,6 +414,51 @@ double FEDamageCDFPower::pdf(const double X)
     // this CDF only admits positive values
     if (X > 0)
         pdf = m_mu1*m_alpha/m_s*pow(X/m_s,m_alpha-1);
+    
+    return pdf;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEDamageCDFExp, FEDamageCDF)
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(1.0), "alpha" );
+    ADD_PARAMETER(m_mu0  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0"   );
+    ADD_PARAMETER(m_mu1  , "mu1"   );
+    ADD_PARAMETER(m_s    , FE_RANGE_GREATER(0.0)         , "scale" );
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEDamageCDFExp::FEDamageCDFExp(FEModel* pfem) : FEDamageCDF(pfem)
+{
+    m_alpha = 2;
+    m_mu0 = 1;
+    m_mu1 = 0;
+    m_s = 1;
+}
+
+//-----------------------------------------------------------------------------
+// Exponential cumulative distribution function
+double FEDamageCDFExp::cdf(const double X)
+{
+    double cdf = 0;
+    
+    // this CDF only admits positive values
+    if (X > 0)
+        cdf = m_mu0*exp(m_mu1*pow(X/m_s,m_alpha));
+    
+    return cdf;
+}
+
+// Exponential probability density function
+double FEDamageCDFExp::pdf(const double X)
+{
+    double pdf = 0;
+    
+    // this CDF only admits positive values
+    if (X > 0)
+        pdf = m_mu0*m_mu1*m_alpha/m_s*pow(X/m_s,m_alpha-1)*exp(m_mu1*pow(X/m_s,m_alpha));
     
     return pdf;
 }

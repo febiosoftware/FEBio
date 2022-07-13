@@ -63,12 +63,12 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEReaction(pfem)
 //-----------------------------------------------------------------------------
 bool FEChemicalReaction::Init() 
 {
-    // initialize base class
-    FEReaction::Init();
-
     // set the parents for the reaction rates
     if (m_pFwd) m_pFwd->m_pReact = this;
     if (m_pRev) m_pRev->m_pReact = this;
+    
+    // initialize base class
+    FEReaction::Init();
     
 	// initialize the reaction coefficients
 	int isol, isbm, itot;

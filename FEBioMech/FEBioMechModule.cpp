@@ -470,6 +470,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
     REGISTER_FECORE_CLASS(FEDamageCDFPower, "CDF power");
+    REGISTER_FECORE_CLASS(FEDamageCDFExp, "CDF exponential");
 
 	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");

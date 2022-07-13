@@ -68,6 +68,14 @@ bool FEIdealGasIsothermal::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! elastic pressure
+double FEIdealGasIsothermal::Pressure(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    return Pressure(fp.m_ef,0);
+}
+
+//-----------------------------------------------------------------------------
 //! elastic pressure from dilatation
 double FEIdealGasIsothermal::Pressure(const double e, const double T)
 {

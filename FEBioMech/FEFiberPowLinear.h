@@ -51,9 +51,9 @@ public:
     DECLARE_FECORE_CLASS();
     
 public:
-    double	m_E;		// fiber modulus
-    double  m_lam0;     // stretch ratio at end of toe region
-    double  m_beta;     // power law exponent in toe region
+    FEParamDouble   m_E;		// fiber modulus
+    FEParamDouble   m_lam0;     // stretch ratio at end of toe region
+    FEParamDouble   m_beta;     // power law exponent in toe region
 	double	m_epsf;
 };
 
@@ -77,16 +77,11 @@ public:
 	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
-	double	m_E;		// fiber modulus
-	double  m_lam0;     // stretch ratio at end of toe region
-    double  m_alpha;    // exponential coefficient
-	double  m_beta;     // power law exponent in toe region
+    FEParamDouble   m_E;		// fiber modulus
+    FEParamDouble   m_lam0;     // stretch ratio at end of toe region
+    FEParamDouble   m_alpha;    // exponential coefficient
+    FEParamDouble   m_beta;     // power law exponent in toe region
 	double	m_epsf;
-
-private:
-	double  m_I0;       // m_lam0^2
-	double  m_ksi;      // power law coefficient in toe region
-	double  m_b;        // coefficient in linear region
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
