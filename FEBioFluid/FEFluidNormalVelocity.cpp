@@ -297,7 +297,7 @@ void FEFluidNormalVelocity::Update()
             {
                 FEMaterialPoint mp;
                 mp.m_elem = &el;
-                mp.m_index = j;
+                mp.m_index = j + 0x10000;
 
                 double vnj = m_velocity(mp);
 
