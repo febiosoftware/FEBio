@@ -59,6 +59,9 @@ public:
 	//! Find the j-th neighbor element of element n
 	int NeighborIndex(int n, int j) { return m_peli[m_ref[n] + j]; }
 
+	//! Return the size of the neighbor vector
+	int NeighborSize() { return m_pel.size()/m_ref.size(); }
+
 protected:
 	//! Initialization
 	void Init();

@@ -100,6 +100,9 @@ public:
 	//! SBM actual concentration (molar concentration in current configuration)
 	virtual double SBMConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
 
+	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
+	virtual double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
+
 // additional member functions
 public:
 	// return the local index of a global solute ID (or -1, if the solute is not in this material)

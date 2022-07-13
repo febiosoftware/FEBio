@@ -119,29 +119,33 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 		FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&m.Domain(i));
 		if (dom)
 		{
-			int NE = dom->Elements();
-			for (int i = 0; i < NE; ++i)
+			FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(dom->GetMaterial());
+			if (prm == nullptr)
 			{
-				// get the element
-				FESolidElement& el = dom->Element(i);
+				int NE = dom->Elements();
+				for (int i = 0; i < NE; ++i)
+				{
+					// get the element
+					FESolidElement& el = dom->Element(i);
 
-				if (el.isActive()) {
-					// element force vector
-					vector<double> fe;
-					vector<int> lm;
+					if (el.isActive()) {
+						// element force vector
+						vector<double> fe;
+						vector<int> lm;
 
-					// get the element force vector and initialize it to zero
-					int ndof = 3 * el.Nodes();
-					fe.assign(ndof, 0);
+						// get the element force vector and initialize it to zero
+						int ndof = 3 * el.Nodes();
+						fe.assign(ndof, 0);
 
-					// calculate internal force vector
-					dom->ElementInternalForce(el, fe);
+						// calculate internal force vector
+						dom->ElementInternalForce(el, fe);
 
-					// assemble into F
-					for (size_t j = 0; j < el.Nodes(); ++j)
-					{
-						vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
-						F[el.m_node[j]] += rj;
+						// assemble into F
+						for (size_t j = 0; j < el.Nodes(); ++j)
+						{
+							vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
+							F[el.m_node[j]] += rj;
+						}
 					}
 				}
 			}

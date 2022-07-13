@@ -104041,6 +104041,36 @@ When an element inverts, the element becomes so distorted that in certain
 on.
 \end_layout
 
+\begin_layout Standard
+By default, when FEBio encounters inverted elements, it will print an error
+ message stating that 
+\begin_inset Quotes eld
+\end_inset
+
+negative jacobians
+\begin_inset Quotes erd
+\end_inset
+
+ were detected.
+ You can request FEBio to print out a detailed list of the inverted elements,
+ by setting the 
+\emph on
+output_negative_jacobian
+\emph default
+ configuration flag in the FEBio configuration file.
+ (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Configuration-File"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
 \begin_layout Subsubsection
 Material instability
 \begin_inset CommandInset label
@@ -106568,7 +106598,7 @@ specifies the version number of the format.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -106679,7 +106709,7 @@ Process child tags only for debug versions of FEBio (4)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -106688,11 +106718,32 @@ if_release
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Process child tags only for release versions of FEBio (4)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+output_negative_jacobian
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Output a detailed list of inverted elements when negative jacobians are
+ encountered (5)
 \end_layout
 
 \end_inset
@@ -106784,6 +106835,25 @@ if_debug/if_release
  distributed through the website are release versions.
  A debug version of FEBio can only be obtained by building FEBio with the
  _DEBUG preprocessor command.
+ 
+\end_layout
+
+\begin_layout Enumerate
+When elements become inverted, FEBio prints an error message that 
+\begin_inset Quotes eld
+\end_inset
+
+negative jacobians
+\begin_inset Quotes erd
+\end_inset
+
+ are encountered.
+ If you wish to see a detailed list of the inverted elements, you can set
+ the 
+\emph on
+output_negative_jacobian
+\emph default
+ flag to 1.
  
 \end_layout
 

@@ -108,7 +108,7 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
             
 			// calculate the stress
 			double wn = it->m_weight;
-			s += m_pFmat->FiberStress(pt, fp.FiberPreStretch(n0))*(R*wn);
+			s += m_pFmat->FiberStress(mp, fp.FiberPreStretch(n0))*(R*wn);
 		}
 		while (it->Next());
 	}

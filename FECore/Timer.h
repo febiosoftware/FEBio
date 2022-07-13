@@ -31,6 +31,11 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include <vector>
 #include <string>
+#include <chrono>
+
+using dseconds = std::chrono::duration<double>;
+using dminutes = std::chrono::duration<double, std::ratio<60>>;
+using dhours = std::chrono::duration<double, std::ratio<3600>>;
 
 //-----------------------------------------------------------------------------
 //! This class implements a simple timer. 
@@ -80,7 +85,7 @@ private:
 	void*	m_pimpl;	//!< local timing data (using PIMPL ididom to hide OS specifics)
 
 	bool	m_brunning;	//!< flag indicating whether start was called
-	double	m_sec;		//!< accumulated time so far in seconds
+    dseconds m_total; //!< accumulated time so far in seconds
 };
 
 //-----------------------------------------------------------------------------

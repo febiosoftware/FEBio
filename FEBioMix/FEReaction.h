@@ -53,7 +53,7 @@ public:
     //! set stoichiometric coefficient
     void SetStoichiometricCoefficient(intmap& RP, int id, int v) { RP.insert(std::pair<int, int>(id, v)); }
 
-protected:
+public: //TODO: Make this protected again
     FESoluteInterface* m_psm;   //!< solute interface to parent class
 };
 

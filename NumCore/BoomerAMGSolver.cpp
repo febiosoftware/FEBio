@@ -71,6 +71,7 @@ public:
     int         m_interpType;
     int         m_PMaxElmts;
     int         m_NumSweeps;
+    int         m_AggInterpType;
     int         m_AggNumLevels;
     double      m_strong_threshold;
 	int			m_nodal;
@@ -93,6 +94,7 @@ public:
         m_strong_threshold = 0.5;
         m_PMaxElmts = 4;
         m_NumSweeps = 1;
+        m_AggInterpType = 0;
         m_AggNumLevels = 0;
 		m_nodal = 0;
 		m_jacobi_pc = false;
@@ -239,6 +241,7 @@ public:
 		HYPRE_BoomerAMGSetNumSweeps(m_solver, m_NumSweeps);   /* Sweeps on each level */
 		HYPRE_BoomerAMGSetMaxLevels(m_solver, m_maxLevels);  /* maximum number of levels */
         HYPRE_BoomerAMGSetStrongThreshold(m_solver, m_strong_threshold);
+        HYPRE_BoomerAMGSetAggInterpType(m_solver, m_AggInterpType);
         HYPRE_BoomerAMGSetAggNumLevels(m_solver, m_AggNumLevels);
 		HYPRE_BoomerAMGSetMaxIter(m_solver, m_maxIter);
 		HYPRE_BoomerAMGSetTol(m_solver, m_tol);      /* conv. tolerance */
@@ -324,6 +327,7 @@ BEGIN_FECORE_CLASS(BoomerAMGSolver, LinearSolver)
     ADD_PARAMETER(imp->m_strong_threshold, "strong_threshold");
     ADD_PARAMETER(imp->m_PMaxElmts       , "p_max_elmts");
     ADD_PARAMETER(imp->m_NumSweeps       , "num_sweeps");
+    ADD_PARAMETER(imp->m_AggInterpType   , "agg_interp_type");
     ADD_PARAMETER(imp->m_AggNumLevels    , "agg_num_levels");
 	ADD_PARAMETER(imp->m_nodal           , "nodal");
 	ADD_PARAMETER(imp->m_jacobi_pc       , "do_jacobi");
@@ -394,6 +398,11 @@ void BoomerAMGSolver::SetPMaxElmts(int pmax)
 void BoomerAMGSolver::SetNumSweeps(int nswp)
 {
     imp->m_NumSweeps = nswp;
+}
+
+void BoomerAMGSolver::SetAggInterpType(int aggit)
+{
+    imp->m_AggInterpType = aggit;
 }
 
 void BoomerAMGSolver::SetAggNumLevels(int anlv)
@@ -515,6 +524,7 @@ void BoomerAMGSolver::SetInterpType(int inptyp) {}
 void BoomerAMGSolver::SetStrongThreshold(double thresh) {}
 void BoomerAMGSolver::SetPMaxElmts(int pmax) {}
 void BoomerAMGSolver::SetNumSweeps(int nswp) {}
+void BoomerAMGSolver::SetAggInterpType(int aggit) {}
 void BoomerAMGSolver::SetAggNumLevels(int anlv) {}
 SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
 bool BoomerAMGSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }

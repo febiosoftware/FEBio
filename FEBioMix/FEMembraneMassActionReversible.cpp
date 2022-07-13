@@ -55,7 +55,7 @@ double FEMembraneMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)
     for (int i=0; i<nsbm; ++i) {
         int vR = m_vR[nsol+i];
         if (vR > 0) {
-            double c = m_psm->SBMConcentration(pt, i);
+            double c = m_psm->SBMArealConcentration(pt, i);
             zhat *= pow(c, vR);
         }
     }
@@ -110,7 +110,7 @@ double FEMembraneMassActionReversible::RevReactionSupply(FEMaterialPoint& pt)
     for (int i=0; i<nsbm; ++i) {
         int vP = m_vP[nsol+i];
         if (vP > 0) {
-            double c = m_psm->SBMConcentration(pt, i);
+            double c = m_psm->SBMArealConcentration(pt, i);
             zhat *= pow(c, vP);
         }
     }

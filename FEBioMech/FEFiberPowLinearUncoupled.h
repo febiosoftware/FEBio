@@ -40,18 +40,18 @@ public:
     FEFiberPowLinearUC(FEModel* pfem);
    
     //! Cauchy stress
-    virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& n0) override;
+    mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& n0) override;
     
     // Spatial tangent
-    virtual tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0) override;
+    tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0) override;
     
     //! Strain energy density
-    virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0) override;
+    double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
-    FEParamDouble	m_E;		// fiber modulus
-    double  m_lam0;     // stretch ratio at end of toe region
-	double  m_beta;     // power law exponent in toe region
+    FEParamDouble   m_E;		// fiber modulus
+    FEParamDouble   m_lam0;     // stretch ratio at end of toe region
+    FEParamDouble   m_beta;     // power law exponent in toe region
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
