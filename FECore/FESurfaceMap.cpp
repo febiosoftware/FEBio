@@ -70,6 +70,12 @@ FEItemList* FESurfaceMap::GetItemList()
 }
 
 //-----------------------------------------------------------------------------
+int FESurfaceMap::StorageFormat() const
+{
+	return m_format;
+}
+
+//-----------------------------------------------------------------------------
 bool FESurfaceMap::Create(const FEFacetSet* ps, double val, Storage_Fmt fmt)
 {
 	m_surf = ps;

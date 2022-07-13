@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FECore/LinearSolver.h"
 #include "FEBioFluid.h"
 #include <FECore/FEParabolicMap.h>
+#include <FECore/FEFacetSet.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalVelocity, FESurfaceLoad)
@@ -213,6 +214,43 @@ void FEFluidNormalVelocity::Activate()
         if (SetParabolicVelocity() == false)
         {
             feLogError("Unable to set parablic velocity\n");
+        }
+    }
+    else
+    {
+        // We need to make sure that mapped values are defined at nodes. 
+        FEMappedValue* val = dynamic_cast<FEMappedValue*>(m_velocity.valuator());
+        if (val)
+        {
+            FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(val->dataMap());
+            if (map && map->StorageFormat() == Storage_Fmt::FMT_MULT)
+            {
+                const FEFacetSet* surf = map->GetFacetSet();
+                FESurfaceMap* nodeMap = new FESurfaceMap(FE_DOUBLE);
+                nodeMap->Create(map->GetFacetSet(), 0.0, FMT_NODE);
+
+                vector<double> v(surface.Nodes(), 0.0);
+                vector<int> tag(surface.Nodes(), 0);
+                for (int i = 0; i < surface.Elements(); ++i)
+                {
+                    FESurfaceElement& el = surface.Element(i);
+                    for (int j = 0; j < el.Nodes(); ++j)
+                    {
+                        double vj = map->value<double>(i, j);
+                        v[el.m_lnode[j]] += vj;
+                        tag[el.m_lnode[j]]++;
+                    }
+                }
+
+                for (int i = 0; i < surface.Nodes(); ++i)
+                {
+                    int n = tag[i];
+                    if (n != 0) v[i] /= (double)n;
+                    nodeMap->set(i, v[i]);
+                }
+
+                val->setDataMap(nodeMap);
+            }
         }
     }
 
