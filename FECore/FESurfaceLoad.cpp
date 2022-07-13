@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "FEModel.h"
 
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem)
 {
 	m_psurf = 0;
 }
@@ -40,11 +40,6 @@ FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
 FESurfaceLoad::~FESurfaceLoad(void)
 {
 
-}
-
-const FEDofList& FESurfaceLoad::GetDofList() const
-{
-	return m_dof;
 }
 
 //! Set the surface to apply the load to
@@ -62,10 +57,9 @@ bool FESurfaceLoad::Init()
 
 void FESurfaceLoad::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEModelLoad::Serialize(ar);
 	if (ar.IsShallow()) return;
 
-	ar & m_dof;
 	ar & m_psurf;
 }
 

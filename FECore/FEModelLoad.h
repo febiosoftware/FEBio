@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEStepComponent.h"
 #include "FEGlobalVector.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 class FELinearSystem;
@@ -46,6 +47,10 @@ public:
 	//! constructor
 	FEModelLoad(FEModel* pfem);
 
+	const FEDofList& GetDofList() const;
+	
+	void Serialize(DumpStream& ar) override;
+
 public:
 	// all classes derived from this base class must implement
 	// the following functions.
@@ -55,4 +60,7 @@ public:
 
 	//! evaluate the contribution to the global stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& LS);
+
+protected:
+	FEDofList	m_dof;
 };

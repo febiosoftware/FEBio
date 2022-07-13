@@ -878,6 +878,14 @@ void FEFluidFSISolver::PrepStep()
         FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
         if (bc.IsActive()) bc.PrepStep(ui);
     }
+
+    // apply prescribed DOFs for specialized surface loads
+    int nsl = fem.ModelLoads();
+    for (int i = 0; i < nsl; ++i)
+    {
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.Update();
+    }
     
     // do the linear constraints
     fem.GetLinearConstraintManager().PrepStep();

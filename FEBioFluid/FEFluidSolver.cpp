@@ -535,6 +535,14 @@ void FEFluidSolver::PrepStep()
         if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.PrepStep(ui);
     }
   
+    // apply prescribed DOFs for specialized surface loads
+    int nsl = fem.ModelLoads();
+    for (int i = 0; i < nsl; ++i)
+    {
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.Update();
+    }
+
     // intialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
