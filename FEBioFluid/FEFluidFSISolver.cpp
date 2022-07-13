@@ -675,14 +675,6 @@ void FEFluidFSISolver::Update(vector<double>& ui)
 
 	// update element stresses
 	UpdateModel();
-
-	// update other stuff that may depend on the deformation
-	int NML = fem.ModelLoads();
-	for (int i = 0; i<NML; ++i)
-	{
-		FEModelLoad* pml = fem.ModelLoad(i);
-		if (pml->IsActive()) pml->Update();
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1387,6 +1379,14 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     // update rigid bodies
     if (pstep->m_nanalysis == FEFluidFSIAnalysis::DYNAMIC) m_rigidSolver.InertialForces(RHS, tp);
 
+    // add model loads
+    int NML = fem.ModelLoads();
+    for (int i = 0; i < NML; ++i)
+    {
+        FEModelLoad& mli = *fem.ModelLoad(i);
+        if (mli.IsActive()) mli.LoadVector(RHS);
+    }
+
     // calculate contact forces
     ContactForces(RHS);
     
@@ -1394,14 +1394,6 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     // note that these are the linear constraints
     // enforced using the augmented lagrangian
     NonLinearConstraintForces(RHS, tp);
-    
-    // add model loads
-    int NML = fem.ModelLoads();
-    for (int i=0; i<NML; ++i)
-    {
-        FEModelLoad& mli = *fem.ModelLoad(i);
-        if (mli.IsActive()) mli.LoadVector(RHS);
-    }
     
     // set the nodal reaction forces
     // TODO: Is this a good place to do this?
