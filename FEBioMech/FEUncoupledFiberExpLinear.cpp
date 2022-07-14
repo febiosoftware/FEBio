@@ -128,7 +128,7 @@ tens4ds FEFiberExpLinearUC::DevFiberTangent(FEMaterialPoint &mp, const vec3d& a0
 
 	double I4 = lamd*lamd;
 
-	const double eps = std::numeric_limits<double>::epsilon();
+	const double eps = 0;// std::numeric_limits<double>::epsilon();
 
 	double W4, W44;
 	if (lamd >= 1 + eps)
