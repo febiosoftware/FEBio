@@ -1208,14 +1208,14 @@ bool FEFluidFSISolver::StiffnessMatrix()
     // calculate contact stiffness
     ContactStiffness(LS);
 
+    // calculate the stiffness contributions for the loads
+    for (int i = 0; i < fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
+
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
     // constrainst enforced with augmented lagrangian
-    NonLinearConstraintStiffness(LS, tp);
-    
-    // calculate the stiffness contributions for the rigid forces
-    for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
-    
+    NonLinearConstraintStiffness(LS, tp);    
+   
     // add contributions from rigid bodies
     m_rigidSolver.StiffnessMatrix(*m_pK, tp);
     
