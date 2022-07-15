@@ -237,13 +237,22 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 			int lid = pe->GetLocalID();
 
 			// get shape functions
-			double* H = pe->H(pt.m_index);
-
-			int ne = pe->Nodes();
-			for (int i = 0; i < ne; ++i)
+			if (pt.m_index < 0x10000)
 			{
-				double vi = value<double>(lid, i);
-				v += vi*H[i];
+				double* H = pe->H(pt.m_index);
+
+				int ne = pe->Nodes();
+				for (int i = 0; i < ne; ++i)
+				{
+					double vi = value<double>(lid, i);
+					v += vi * H[i];
+				}
+			}
+			else
+			{
+				// element node
+				int n = pt.m_index - 0x10000;
+				v = value<double>(lid, n);
 			}
 		}
 		break;

@@ -63,6 +63,21 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
 }
 
 //-----------------------------------------------------------------------------
+double FEFluidNormalVelocity::NormalVelocity(FESurfaceMaterialPoint& mp)
+{
+    FESurfaceElement& el = *mp.SurfaceElement();
+    double vn = 0;
+    double* N = mp.m_shape;
+    if (N == nullptr) return 0;
+    int neln = el.Nodes();
+    for (int i = 0; i < neln; ++i)
+    {
+        vn += N[i] * m_VN[el.m_lnode[i]];
+    }
+    return vn;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 {
@@ -83,7 +98,7 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
 
 		// normal velocity
-		double vn = m_velocity(mp);
+		double vn = NormalVelocity(mp);
 		double da = (dxr ^ dxs).norm();
 
 		double H = dof_a.shape;
@@ -119,7 +134,8 @@ void FEFluidNormalVelocity::Activate()
 	// evaluate surface normals
 	vector<vec3d> sn(surface.Elements(), vec3d(0, 0, 0));
 	m_nu.resize(surface.Nodes(), vec3d(0, 0, 0));
-	vector<int> nf(surface.Nodes(), 0);
+    m_VN.resize(surface.Nodes(), 0.0);
+    vector<int> nf(surface.Nodes(), 0);
 	vec3d r0[FEElement::MAX_NODES];
 	for (int iel = 0; iel< surface.Elements(); ++iel)
 	{
@@ -216,43 +232,6 @@ void FEFluidNormalVelocity::Activate()
             feLogError("Unable to set parablic velocity\n");
         }
     }
-    else
-    {
-        // We need to make sure that mapped values are defined at nodes. 
-        FEMappedValue* val = dynamic_cast<FEMappedValue*>(m_velocity.valuator());
-        if (val)
-        {
-            FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(val->dataMap());
-            if (map && map->StorageFormat() == Storage_Fmt::FMT_MULT)
-            {
-                const FEFacetSet* surf = map->GetFacetSet();
-                FESurfaceMap* nodeMap = new FESurfaceMap(FE_DOUBLE);
-                nodeMap->Create(map->GetFacetSet(), 0.0, FMT_NODE);
-
-                vector<double> v(surface.Nodes(), 0.0);
-                vector<int> tag(surface.Nodes(), 0);
-                for (int i = 0; i < surface.Elements(); ++i)
-                {
-                    FESurfaceElement& el = surface.Element(i);
-                    for (int j = 0; j < el.Nodes(); ++j)
-                    {
-                        double vj = map->value<double>(i, j);
-                        v[el.m_lnode[j]] += vj;
-                        tag[el.m_lnode[j]]++;
-                    }
-                }
-
-                for (int i = 0; i < surface.Nodes(); ++i)
-                {
-                    int n = tag[i];
-                    if (n != 0) v[i] /= (double)n;
-                    nodeMap->set(i, v[i]);
-                }
-
-                val->setDataMap(nodeMap);
-            }
-        }
-    }
 
     if (m_bpv) {
         for (int i = 0; i < surface.Nodes(); ++i)
@@ -288,7 +267,7 @@ void FEFluidNormalVelocity::Update()
         // However, we need to have (unique) values at the nodes
         // so we need to convert this to nodal data. 
         int N = ps->Nodes();
-        vector<double> VN(N, 0.0);
+        m_VN.assign(N, 0.0);
         vector<int> tag(N, 0);
         for (int i = 0; i < ps->Elements(); ++i)
         {
@@ -301,19 +280,19 @@ void FEFluidNormalVelocity::Update()
 
                 double vnj = m_velocity(mp);
 
-                VN[el.m_lnode[j]] += vnj;
+                m_VN[el.m_lnode[j]] += vnj;
                 tag[el.m_lnode[j]]++;
             }
         }
         for (int i = 0; i < N; ++i)
         {
-            if (tag[i] != 0) VN[i] /= (double)tag[i];
+            if (tag[i] != 0) m_VN[i] /= (double)tag[i];
         }
 
         for (int i=0; i<ps->Nodes(); ++i)
         {
             // evaluate the velocity
-            vec3d v = m_nu[i]*VN[i];
+            vec3d v = m_nu[i]*m_VN[i];
             FENode& node = ps->Node(i);
             if (node.get_bc(m_dofW[0]) == DOF_PRESCRIBED) node.set(m_dofW[0], v.x);
             if (node.get_bc(m_dofW[1]) == DOF_PRESCRIBED) node.set(m_dofW[1], v.y);
