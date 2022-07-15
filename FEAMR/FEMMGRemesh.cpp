@@ -59,7 +59,6 @@ public:
 #endif
 
 BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
-	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_hmin, "min_element_size");
 	ADD_PARAMETER(m_hausd, "hausdorff");
 	ADD_PARAMETER(m_hgrad, "gradation");
@@ -72,7 +71,6 @@ END_FECORE_CLASS();
 
 FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 {
-	m_maxiter = 1;
 	m_maxelem = 0;
 	m_relativeSize = true;
 	m_meshCoarsen = false;
