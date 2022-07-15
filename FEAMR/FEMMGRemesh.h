@@ -44,7 +44,6 @@ private:
 	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
 
 private:
-	int		m_maxiter;
 	bool	m_relativeSize;
 	bool	m_meshCoarsen;
 	bool	m_normalizeData;
