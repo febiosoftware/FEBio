@@ -66,17 +66,18 @@ if(MKLROOT)
 	
 endif()
 
+if(NOT WIN32)
+message(Here)
+    # OpenMP
+    find_package(OpenMP QUIET)
+endif()
+
 if(MKL_INC AND MKL_LIB_DIR AND MKL_OMP_LIB)
 	option(USE_MKL "Required for pardiso and iterative solvers" ON)
     mark_as_advanced(MKL_INC MKL_LIB_DIR MKL_OMP_LIB)
     set(OpenMP_C_FOUND true)
 else()
 	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
-endif()
-
-if(NOT USE_MKL AND NOT WIN32)
-    # OpenMP
-    find_package(OpenMP QUIET)
 endif()
 
 # HYPRE

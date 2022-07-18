@@ -253,7 +253,7 @@ endif()
 
 # Link MKL
 if(USE_MKL)
-    target_include_directories(numcore PRIVATE ${MKL_INC})
+    target_include_directories(numcore PRIVATE ${MKL_INC} ${OpenMP_C_LIBRARIES})
     target_compile_definitions(numcore PRIVATE MKL_ISS PARDISO)
     
     target_include_directories(febioopt PRIVATE ${MKL_INC})
