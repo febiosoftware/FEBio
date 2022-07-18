@@ -236,6 +236,7 @@ endif()
 
 ##### Temp fix for Gerard to fix HYPRE's MPI include problem #####
 set(EXTRA_INC "" CACHE STRING "Enter extra include paths separated by spaces")
+set(EXTRA_LIB "" CACHE STRING "Enter extra library paths separated by spaces")
 mark_as_advanced(EXTRA_INC)
 
 ##### Setup includes, defnitions, and linking options #####
@@ -302,6 +303,10 @@ target_include_directories(febioopt PRIVATE ${EXTRA_INC})
 target_include_directories(numcore PRIVATE ${EXTRA_INC})
 target_include_directories(feamr PRIVATE ${EXTRA_INC})
 target_include_directories(febiolib PRIVATE ${EXTRA_INC})
+
+# Extra Libs
+target_link_libraries(numcore PRIVATE ${EXTRA_LIB})
+
 
 if(WIN32)
 	target_link_libraries(febio4 psapi.lib ws2_32.lib)
