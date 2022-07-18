@@ -67,7 +67,6 @@ if(MKLROOT)
 endif()
 
 if(NOT WIN32)
-message(Here)
     # OpenMP
     find_package(OpenMP QUIET)
 endif()

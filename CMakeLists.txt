@@ -234,6 +234,10 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
     endif()
 endif()
 
+##### Temp fix for Gerard to fix HYPRE's MPI include problem #####
+set(EXTRA_INC "" CACHE STRING "Enter extra include paths separated by spaces")
+mark_as_advanced(EXTRA_INC)
+
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
 
@@ -292,6 +296,12 @@ if(USE_ZLIB)
     target_compile_definitions(febioplot PRIVATE HAVE_ZLIB)
 	target_link_libraries(febioplot PRIVATE ${ZLIB_LIBRARY_RELEASE})
 endif()
+
+# Extra Includes
+target_include_directories(febioopt PRIVATE ${EXTRA_INC})
+target_include_directories(numcore PRIVATE ${EXTRA_INC})
+target_include_directories(feamr PRIVATE ${EXTRA_INC})
+target_include_directories(febiolib PRIVATE ${EXTRA_INC})
 
 if(WIN32)
 	target_link_libraries(febio4 psapi.lib ws2_32.lib)
