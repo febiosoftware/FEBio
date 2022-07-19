@@ -425,7 +425,7 @@ DerivedData/
 
 ## cmake build directories
 cbuild/
-cmbuild/
+cmbuild*/
 
 ##cmake files
 CMakeLists.txt
