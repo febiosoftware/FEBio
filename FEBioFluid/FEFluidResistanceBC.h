@@ -44,7 +44,7 @@ public:
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
     
     //! calculate load vector
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override {}
     
     //! set the dilatation
     void Update() override;
@@ -58,17 +58,11 @@ public:
     //! activate
     void Activate() override;
 
-	//! serialization
-	void Serialize(DumpStream& ar) override;
-
 private:
     double			m_R;        //!< flow resistance
 	double          m_p0;       //!< fluid pressure offset
 
 private:
-	double          m_alpha;
-    double          m_alphaf;
-    
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
     
 	FEDofList	m_dofW;

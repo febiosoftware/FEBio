@@ -29,8 +29,7 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidResistanceBC is a fluid surface that has a normal
-//! pressure proportional to the flow rate (resistance).
+//! FEFluidRCRBC is a fluid surface load that implements a 3-element Windkessel model
 //!
 class FEBIOFLUID_API FEFluidRCRBC : public FESurfaceLoad
 {
@@ -65,15 +64,15 @@ private:
     double          m_p0;       //!< initial fluid pressure
     double          m_C;        //!< capacitance
     double          m_pd;       //!< downstream pressure
-    bool            m_Bern;     //!< Use Bernoulli's Relation (Q*|Q|)
-    
-    vector<double> m_stepHist;  //!< history of time step size (recorded each step)
-    vector<double> m_timeHist;  //!< history of time at each step
-    vector<double> m_flowHist;  //!< history of flow rate at each step
     
 private:
-    double              m_alpha;
-    double              m_alphaf;
+    double              m_pn;   //!< fluid pressure at current time point
+    double              m_pp;   //!< fluid pressure at previous time point
+    double              m_qn;   //!< flow rate at current time point
+    double              m_qp;   //!< flow rate at previous time point
+    double              m_pdn;  //!< downstream fluid pressure at current time point
+    double              m_pdp;  //!< downstream fluid pressure at previous time point
+    double              m_tp;   //!< previous time
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
     
     FEDofList   m_dofW;
