@@ -70,6 +70,12 @@ FEItemList* FESurfaceMap::GetItemList()
 }
 
 //-----------------------------------------------------------------------------
+int FESurfaceMap::StorageFormat() const
+{
+	return m_format;
+}
+
+//-----------------------------------------------------------------------------
 bool FESurfaceMap::Create(const FEFacetSet* ps, double val, Storage_Fmt fmt)
 {
 	m_surf = ps;
@@ -189,14 +195,24 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 				// TODO: Can't check this if map was created through FEFacetSet
 			//	assert(pe->GetMeshPartition() == m_dom);
 
-				// get shape functions
-				double* H = pe->H(pt.m_index);
-
-				int ne = pe->Nodes();
-				for (int i = 0; i < ne; ++i)
+				if (pt.m_index < 0x10000)
 				{
-					double vi = value<double>(pe->m_lnode[i], 0);
-					v += vi * H[i];
+					// integration point
+					// get shape functions
+					double* H = pe->H(pt.m_index);
+
+					int ne = pe->Nodes();
+					for (int i = 0; i < ne; ++i)
+					{
+						double vi = value<double>(pe->m_lnode[i], 0);
+						v += vi * H[i];
+					}
+				}
+				else
+				{
+					// element node
+					int n = pt.m_index - 0x10000;
+					v = value<double>(pe->m_lnode[n], 0);
 				}
 				return v;
 			}
@@ -221,13 +237,22 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 			int lid = pe->GetLocalID();
 
 			// get shape functions
-			double* H = pe->H(pt.m_index);
-
-			int ne = pe->Nodes();
-			for (int i = 0; i < ne; ++i)
+			if (pt.m_index < 0x10000)
 			{
-				double vi = value<double>(lid, i);
-				v += vi*H[i];
+				double* H = pe->H(pt.m_index);
+
+				int ne = pe->Nodes();
+				for (int i = 0; i < ne; ++i)
+				{
+					double vi = value<double>(lid, i);
+					v += vi * H[i];
+				}
+			}
+			else
+			{
+				// element node
+				int n = pt.m_index - 0x10000;
+				v = value<double>(lid, n);
 			}
 		}
 		break;

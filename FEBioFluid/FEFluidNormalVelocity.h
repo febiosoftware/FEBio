@@ -69,6 +69,9 @@ public:
     double ScalarLoad(FESurfaceMaterialPoint& mp) override;
 
 private:
+    double NormalVelocity(FESurfaceMaterialPoint& mp);
+
+private:
     FEParamDouble	m_velocity;	//!< average velocity
     bool            m_brim;     //!< flag for setting rim pressure
 
@@ -78,6 +81,7 @@ private:
 
 private:
     vector<vec3d>   m_nu;       //!< nodal normals
+    vector<double>  m_VN;       //!< nodal values for velocity
     vector<int>     m_rim;      //!< list of nodes on the rim
 
 	FEDofList	m_dofW;

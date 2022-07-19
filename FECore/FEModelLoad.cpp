@@ -31,8 +31,21 @@ SOFTWARE.*/
 #include "FESolver.h"
 
 //-----------------------------------------------------------------------------
-FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem)
+FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
 {
+}
+
+//-----------------------------------------------------------------------------
+const FEDofList& FEModelLoad::GetDofList() const
+{
+	return m_dof;
+}
+
+//-----------------------------------------------------------------------------
+void FEModelLoad::Serialize(DumpStream& ar)
+{
+	FEStepComponent::Serialize(ar);
+	ar & m_dof;
 }
 
 //-----------------------------------------------------------------------------

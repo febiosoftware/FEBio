@@ -31,10 +31,12 @@ SOFTWARE.*/
 #include <vector>
 #include <iostream>
 #include <typeinfo>
+#include <stdlib.h>
 #include "matrix.h"
 #include "mat3d.h"
 #include "vec3d.h"
 #include "tens4d.h"
+#include "fecore_api.h"
 
 // This file defines template constructions that are used by the FECore debugger.
 // Don't use anything in here or include this file directly. 
@@ -53,20 +55,20 @@ template <> void fecore_print_T<std::vector<int> >(std::vector<int>* pv);
 
 class FECoreBreakPoint;
 
-class FECoreDebugger
+class FECORE_API FECoreDebugger
 {
 public:
 	class Variable
 	{
 	public:
 		Variable(void* pd, const char* sz) { m_pd = pd; m_szname = sz; }
-		virtual ~Variable(){}
+		virtual ~Variable() {}
 
 		virtual void print() = 0;
 
 	public:
-		void*			m_pd;
-		const char*		m_szname;
+		void* m_pd;
+		const char* m_szname;
 	};
 
 	template <typename T> class Variable_T : public Variable
@@ -74,10 +76,10 @@ public:
 	public:
 		Variable_T(void* pd, const char* sz) : Variable(pd, sz) {}
 
-		void print() 
-		{ 
+		void print()
+		{
 			std::cout << typeid(T).name() << std::endl;
-			fecore_print_T<T>((T*)m_pd); 
+			fecore_print_T<T>((T*)m_pd);
 		}
 	};
 
@@ -87,10 +89,13 @@ public:
 	static void Add(Variable* pvar);
 	static void Remove(Variable* pvar);
 
+	static void Print(const char* szformat, ...);
+
 private:
-	FECoreDebugger(){}
+	FECoreDebugger() {}
 
 	static std::list<Variable*>	m_var;
+	static FILE* m_fp;
 };
 
 class FECoreWatchVariable
