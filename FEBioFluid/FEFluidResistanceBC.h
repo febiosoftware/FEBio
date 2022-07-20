@@ -44,7 +44,7 @@ public:
     void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-	void LoadVector(FEGlobalVector& R) override;
+    void LoadVector(FEGlobalVector& R) override {}
     
     //! set the dilatation
     void Update() override;
@@ -57,9 +57,6 @@ public:
     
     //! activate
     void Activate() override;
-
-	//! serialization
-	void Serialize(DumpStream& ar) override;
 
 private:
     double			m_R;        //!< flow resistance

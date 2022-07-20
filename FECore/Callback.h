@@ -51,7 +51,9 @@ class FEModel;
 #define CB_RESET            0x00000800		//!< Called after FEModel::Reset
 #define CB_MODEL_UPDATE		0x00001000		//!< Called at the end of FEModel::Update
 #define CB_TIMESTEP_SOLVED	0x00002000		//!< Called at FEAnalysis::SolveTimeStep after the solver returns.
-#define CB_USER1			0x00010000		//!< can be used by users
+#define CB_SERIALIZE_SAVE	0x00004000		//!< Called at the end of FEModel::Serialize when saving
+#define CB_SERIALIZE_LOAD	0x00008000		//!< Called at the end of FEModel::Serialize when loading
+#define CB_USER1			0x01000000		//!< can be used by users
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef bool(*FECORE_CB_FNC)(FEModel*, unsigned int, void*);

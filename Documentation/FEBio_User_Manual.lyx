@@ -23500,7 +23500,7 @@ name "subsec:Fluid-Resistance"
 \begin_layout Standard
 In a fluid or fluid-FSI analysis, this boundary condition prescribes an
  elastic pressure 
-\begin_inset Formula $p=R\,Q+p_{0}$
+\begin_inset Formula $p=R\,q+p_{d}$
 \end_inset
 
  on a surface, where 
@@ -23508,12 +23508,12 @@ In a fluid or fluid-FSI analysis, this boundary condition prescribes an
 \end_inset
 
  is the flow resistance and 
-\begin_inset Formula $Q$
+\begin_inset Formula $q$
 \end_inset
 
  is the volumetric flow rate across the surface (calculated internally);
  
-\begin_inset Formula $p_{0}$
+\begin_inset Formula $p_{d}$
 \end_inset
 
  is an optional offset pressure.
@@ -23539,6 +23539,164 @@ In a fluid or fluid-FSI analysis, this boundary condition prescribes an
 
 \begin_layout LyX-Code
 <surface_load>
+\end_layout
+
+\begin_layout Subsubsection
+Fluid RCR
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-RCR"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This surface load models a three-element Windkessel outflow condition on
+ a surface, as described in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Vignon-Clementel06"
+literal "false"
+
+\end_inset
+
+.
+ It prescribes an elastic pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ on a surface, which satisfies the ordinary differential equation
+\begin_inset Formula 
+\[
+p+\tau\frac{dp}{dt}=\left(R_{d}+R\right)q+R\tau\frac{dq}{dt}+p_{d}+\tau\frac{dp_{d}}{dt},\quad\tau=R_{d}C
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ is the upstream flow resistance, 
+\begin_inset Formula $R_{d}$
+\end_inset
+
+ is the downstream flow resistance, and 
+\begin_inset Formula $C$
+\end_inset
+
+ is the downstream flow capacitance, whereas 
+\begin_inset Formula $q$
+\end_inset
+
+ is the volumetric flow rate across the surface (calculated internally);
+ 
+\begin_inset Formula $p_{d}$
+\end_inset
+
+ is an optional downstream offset pressure, which may be associated with
+ a loadcurve to produce a function of time.
+ The pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ obtained by solving this differential equation is converted to a dilatation
+ and prescribed as an essential boundary condition at the nodes of the facets.
+ Since the pressure is the solution of an ordinary differential equation,
+ the user may also specify the initial condition for the pressure.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load name="FluidRCR1" type="fluid RCR" surface="FluidRCR1">
+\end_layout
+
+\begin_layout LyX-Code
+  <R>1</R>
+\end_layout
+
+\begin_layout LyX-Code
+  <Rd>10</Rd>
+\end_layout
+
+\begin_layout LyX-Code
+  <capacitance>0.5</capacitance>
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure_offset>0</pressure_offset>
+\end_layout
+
+\begin_layout LyX-Code
+  <initial_pressure>0</initial_pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+By setting 
+\begin_inset Formula $C=0$
+\end_inset
+
+ we recover the fluid resistance surface load described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Resistance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with flow resistance equal to 
+\begin_inset Formula $R_{d}+R$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Internally, the ordinary differential equation presented above is solved
+ numerically using a standard finite difference scheme,
+\begin_inset Formula 
+\[
+p_{n+1}=\left(\frac{R_{d}}{1+\frac{\tau}{\Delta t}}+R\right)q_{n+1}+\frac{\tau}{\Delta t+\tau}\left(p_{n}-p_{d,n}-Rq_{n}\right)+p_{d,n+1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $f_{n+1}$
+\end_inset
+
+ is the value of any function 
+\begin_inset Formula $f\left(t\right)$
+\end_inset
+
+ at the current time step 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+, 
+\begin_inset Formula $f_{n}$
+\end_inset
+
+ is its value at the previous time step 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Delta t=t_{n+1}-t_{n}$
+\end_inset
+
+ is the time increment.
 \end_layout
 
 \begin_layout Subsubsection
@@ -100079,6 +100237,7 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
@@ -100088,206 +100247,257 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
@@ -100297,74 +100507,92 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
@@ -100374,58 +100602,72 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
