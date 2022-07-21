@@ -32,9 +32,9 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberPowLinear, FEFiberMaterial)
-    ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    )->setUnits(UNIT_PRESSURE);
-    ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
-    ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+    ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    )->setUnits(UNIT_PRESSURE)->setLongName("fiber modulus E");
+    ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" )->setLongName("toe stretch ratio");
+    ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" )->setLongName("toe power exponent");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

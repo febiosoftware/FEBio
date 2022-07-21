@@ -58,7 +58,7 @@ double FEEllipsoidalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, 
 //-----------------------------------------------------------------------------
 // define the 3d von Mises fiber density distribution material parameters
 BEGIN_FECORE_CLASS(FEVonMises3DFiberDensityDistribution, FEFiberDensityDistribution)
-	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
+	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" )->setLongName("concentration");
 END_FECORE_CLASS();
 
 double FEVonMises3DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
@@ -118,7 +118,7 @@ double FEEllipticalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, c
 //-----------------------------------------------------------------------------
 // define the 2d von Mises fiber density distribution material parameters
 BEGIN_FECORE_CLASS(FEVonMises2DFiberDensityDistribution, FEFiberDensityDistribution)
-	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
+	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" )->setLongName("concentration");
 END_FECORE_CLASS();
 
 double FEVonMises2DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)

@@ -33,8 +33,8 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)
-    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits("P.t");
-    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits("P.t");
+    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits("P.t")->setLongName("bulk viscosity");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits("P.t")->setLongName("shear viscosity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

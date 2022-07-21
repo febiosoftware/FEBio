@@ -36,8 +36,8 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FESolventSupplyStarling, FESolventSupply)
-	ADD_PARAMETER(m_kp, "kp");
-	ADD_PARAMETER(m_pv, "pv");
+	ADD_PARAMETER(m_kp, "kp")->setLongName("filtration coefficient");
+	ADD_PARAMETER(m_pv, "pv")->setLongName("external pressure");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

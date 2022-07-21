@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEIncompNeoHookean, FEUncoupledMaterial)
-	ADD_PARAMETER(m_G, FE_RANGE_GREATER(0.0), "G")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G, FE_RANGE_GREATER(0.0), "G")->setUnits(UNIT_PRESSURE)->setLongName("shear modulus");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -367,9 +367,9 @@ double FEDamageCDFUser::pdf(const double X)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageCDFPower, FEDamageCDF)
-    ADD_PARAMETER(m_alpha, "alpha" );
-    ADD_PARAMETER(m_mu0  , "mu0"   );
-    ADD_PARAMETER(m_mu1  , "mu1"   );
+    ADD_PARAMETER(m_alpha, "alpha" )->setLongName("power exponent");
+    ADD_PARAMETER(m_mu0  , "mu0"   )->setLongName("constant mu0");
+    ADD_PARAMETER(m_mu1  , "mu1"   )->setLongName("power coefficient");
     ADD_PARAMETER(m_s    , FE_RANGE_GREATER(0.0)         , "scale" );
 END_FECORE_CLASS();
 
