@@ -143,6 +143,18 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Solute volumetric flux
+class FEPlotSoluteVolumetricFlux : public FEPlotDomainData
+{
+public:
+    FEPlotSoluteVolumetricFlux(FEModel* pfem);
+    bool Save(FEDomain& dom, FEDataStream& a);
+    
+protected:
+    vector<int>    m_sol;
+};
+
+//-----------------------------------------------------------------------------
 //! Osmolarity
 class FEPlotOsmolarity : public FEPlotDomainData
 {
@@ -159,6 +171,16 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 protected:
 	vector<int>	m_sbm;
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotSBMArealConcentration : public FEPlotDomainData
+{
+public:
+    FEPlotSBMArealConcentration(FEModel* pfem);
+    bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+    vector<int>    m_sbm;
 };
 
 //-----------------------------------------------------------------------------

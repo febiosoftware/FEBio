@@ -322,6 +322,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
     REGISTER_FECORE_CLASS(FEPlotPartitionCoefficient             , "partition coefficient");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
+    REGISTER_FECORE_CLASS(FEPlotSoluteVolumetricFlux             , "solute volumetric flux"          );
 	REGISTER_FECORE_CLASS(FEPlotOsmolarity                       , "osmolarity");
 	REGISTER_FECORE_CLASS(FEPlotCurrentDensity                   , "current density"     );
 	REGISTER_FECORE_CLASS(FEPlotFixedChargeDensity               , "fixed charge density");
@@ -450,7 +451,8 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData
 	REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration      , "receptor-ligand concentration"   );
-	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"			    );
+	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"			     );
+    REGISTER_FECORE_CLASS(FEPlotSBMArealConcentration            , "sbm areal concentration"         );
 	REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density");
 	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient" );
 

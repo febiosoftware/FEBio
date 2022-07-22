@@ -57,7 +57,10 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
-        
+        FEShellElement* sel = dynamic_cast<FEShellElement*>(mp.m_elem);
+        assert(sel);
+        double h = sel->Evaluate(sel->m_ht, mp.m_index);   // shell thickness
+
         double phi0 = ppt.m_phi0;
         int nsbm = SBMs();
         int nsol = Solutes();
@@ -77,7 +80,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
                 double zetahat = GetMembraneReaction(k)->ReactionSupply(mp);
                 double v = GetMembraneReaction(k)->m_v[nsol+isbm];
                 // remember to convert from molar supply to referential mass supply
-                spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
+                spt.m_sbmrhat[isbm] += pt.m_J/h*SBMMolarMass(isbm)*v*zetahat;
             }
             // perform the time integration (midpoint rule)
             sbmr[isbm] = spt.m_sbmrp[isbm] + dt*(spt.m_sbmrhat[isbm]+spt.m_sbmrhatp[isbm])/2;

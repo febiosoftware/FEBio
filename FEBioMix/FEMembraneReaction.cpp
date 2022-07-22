@@ -60,12 +60,12 @@ END_FECORE_CLASS();
 BEGIN_FECORE_CLASS(FEMembraneReaction, FEReaction)
 	ADD_PARAMETER(&m_Vbar  , FE_PARAM_DOUBLE, 1, "Vbar", &m_Vovr);
 
-    ADD_PROPERTY(m_vRtmp, "vR");
-    ADD_PROPERTY(m_vPtmp, "vP");
-    ADD_PROPERTY(m_vRitmp, "vRi");
-    ADD_PROPERTY(m_vPitmp, "vPi");
-    ADD_PROPERTY(m_vRetmp, "vRe");
-    ADD_PROPERTY(m_vPetmp, "vPe");
+    ADD_PROPERTY(m_vRtmp, "vR", FEProperty::Optional);
+    ADD_PROPERTY(m_vPtmp, "vP", FEProperty::Optional);
+    ADD_PROPERTY(m_vRitmp, "vRi", FEProperty::Optional);
+    ADD_PROPERTY(m_vPitmp, "vPi", FEProperty::Optional);
+    ADD_PROPERTY(m_vRetmp, "vRe", FEProperty::Optional);
+    ADD_PROPERTY(m_vPetmp, "vPe", FEProperty::Optional);
 
 	// set material properties
 	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
