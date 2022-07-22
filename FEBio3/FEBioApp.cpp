@@ -215,7 +215,7 @@ int FEBioApp::prompt()
 	Console* pShell = Console::GetHandle();
 
 	// set the title
-	pShell->SetTitle("FEBio3");
+	pShell->SetTitle("FEBio4");
 
 	// process commands
 	ProcessCommands();
