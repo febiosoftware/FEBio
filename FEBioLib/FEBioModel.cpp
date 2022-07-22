@@ -676,6 +676,26 @@ private:
 	FERigidBody* m_rb;
 };
 
+class FEPlotRigidBodyRotation : public FEPlotObjectData
+{
+public:
+	FEPlotRigidBodyRotation(FEModel* fem, FERigidBody* prb) : FEPlotObjectData(fem), m_rb(prb) {}
+
+	bool Save(FEBioPlotFile::PlotObject* po, FEDataStream& ar)
+	{
+		assert(m_rb);
+		quatd q = m_rb->GetRotation();
+		vec3d e;
+		q.GetEuler(e.x, e.y, e.z);
+		e *= RAD2DEG;
+		ar << e;
+		return true;
+	}
+
+private:
+	FERigidBody* m_rb;
+};
+
 class FEPlotRigidBodyForce : public FEPlotObjectData
 {
 public:
@@ -837,6 +857,7 @@ void FEBioModel::UpdatePlotObjects()
 			po->m_rot = quatd(0, vec3d(1,0,0));
 
 			po->AddData("Position", PLT_VEC3F, new FEPlotRigidBodyPosition(this, rb));
+			po->AddData("Euler angles", PLT_VEC3F, new FEPlotRigidBodyRotation(this, rb));
 			po->AddData("Force" , PLT_VEC3F, new FEPlotRigidBodyForce(this, rb));
 			po->AddData("Moment", PLT_VEC3F, new FEPlotRigidBodyMoment(this, rb));
 
