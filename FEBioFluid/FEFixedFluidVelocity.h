@@ -26,9 +26,14 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEFixedBC.h>
 
-class FEFixedFluidVelocity : public FEFixedDOF
+class FEFixedFluidVelocity : public FEFixedBC
 {
 public:
 	FEFixedFluidVelocity(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	bool	m_dof[3];
 	DECLARE_FECORE_CLASS();
 };

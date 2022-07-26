@@ -34,7 +34,7 @@ public:
 	bool Init() override;
 
 private:
-	std::vector<int>	m_dofs;
+	bool	m_dof_sx, m_dof_sy, m_dof_sz;
 
 	DECLARE_FECORE_CLASS();
 };

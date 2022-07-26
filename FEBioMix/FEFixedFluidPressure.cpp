@@ -29,13 +29,14 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFixedFluidPressure, FEFixedBC)
 END_FECORE_CLASS();
 
-FEFixedFluidPressure::FEFixedFluidPressure(FEModel* fem) : FEFixedDOF(fem)
+FEFixedFluidPressure::FEFixedFluidPressure(FEModel* fem) : FEFixedBC(fem)
 {
 }
 
 bool FEFixedFluidPressure::Init()
 {
-	m_dofs.clear();
-	m_dofs.push_back(GetDOFIndex("p"));
-	return FEFixedDOF::Init();
+	vector<int> dofs;
+	dofs.push_back(GetDOFIndex("p"));
+	SetDOFList(dofs);
+	return FEFixedBC::Init();
 }

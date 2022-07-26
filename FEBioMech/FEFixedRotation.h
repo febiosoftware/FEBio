@@ -26,9 +26,15 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEFixedBC.h>
 
-class FEFixedRotation : public FEFixedDOF
+class FEFixedRotation : public FEFixedBC
 {
 public:
 	FEFixedRotation(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	bool	m_dof[3];
+
 	DECLARE_FECORE_CLASS();
 };

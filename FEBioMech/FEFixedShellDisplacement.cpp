@@ -26,16 +26,26 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedShellDisplacement.h"
 
-BEGIN_FECORE_CLASS(FEFixedShellDisplacement, FENodalBC)
-	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:shell displacement)");
+BEGIN_FECORE_CLASS(FEFixedShellDisplacement, FEFixedBC)
+	ADD_PARAMETER(m_dof_sx, "sx_dof")->setLongName("sx-displacement");
+	ADD_PARAMETER(m_dof_sy, "sy_dof")->setLongName("sy-displacement");
+	ADD_PARAMETER(m_dof_sz, "sz_dof")->setLongName("sz-displacement");
 END_FECORE_CLASS();
 
 FEFixedShellDisplacement::FEFixedShellDisplacement(FEModel* fem) : FEFixedBC(fem)
 {
+	m_dof_sx = false;
+	m_dof_sy = false;
+	m_dof_sz = false;
 }
 
 bool FEFixedShellDisplacement::Init()
 {
-	SetDOFList(m_dofs);
+	vector<int> dofs;
+	if (m_dof_sx) dofs.push_back(GetDOFIndex("sx"));
+	if (m_dof_sy) dofs.push_back(GetDOFIndex("sy"));
+	if (m_dof_sz) dofs.push_back(GetDOFIndex("sz"));
+
+	SetDOFList(dofs);
 	return FEFixedBC::Init();
 }
