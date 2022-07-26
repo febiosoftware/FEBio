@@ -58,8 +58,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
         FEShellElement* sel = dynamic_cast<FEShellElement*>(mp.m_elem);
-        assert(sel);
-        double h = sel->Evaluate(sel->m_ht, mp.m_index);   // shell thickness
+        double h = (sel) ? sel->Evaluate(sel->m_ht, mp.m_index) : 0;   // shell thickness
 
         double phi0 = ppt.m_phi0;
         int nsbm = SBMs();
