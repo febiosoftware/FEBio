@@ -129,6 +129,10 @@ void FEFluidNormalVelocity::Activate()
 {
 	FESurface& surface = GetSurface();
 
+    // This is needed to reproduce the same behavior as feb3. 
+    FESurfaceMap VC(FE_DOUBLE); 
+    VC.Create(surface.GetFacetSet(), 1.0);
+
 	// evaluate surface normals
 	vector<vec3d> sn(surface.Elements(), vec3d(0, 0, 0));
 	m_nu.resize(surface.Nodes(), vec3d(0, 0, 0));
@@ -148,7 +152,8 @@ void FEFluidNormalVelocity::Activate()
 		// nodal coordinates
 		for (int i = 0; i<neln; ++i) {
 			r0[i] = surface.Node(el.m_lnode[i]).m_r0;
-			++nf[el.m_lnode[i]];
+            m_VN[el.m_lnode[i]] += VC.value<double>(iel, i);
+            ++nf[el.m_lnode[i]];
 		}
 
 		double* Nr, *Ns;
@@ -180,7 +185,8 @@ void FEFluidNormalVelocity::Activate()
 
 	for (int i = 0; i< surface.Nodes(); ++i) {
 		m_nu[i].unit();
-	}
+        m_VN[i] /= nf[i];
+    }
 
     // Set up data structure for setting rim pressure
     if (m_brim) {
