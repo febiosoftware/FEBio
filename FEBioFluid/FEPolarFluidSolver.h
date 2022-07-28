@@ -60,7 +60,8 @@ public:
     
     //! Initialize linear equation system
     bool InitEquations() override;
-    
+    bool InitEquations2() override;
+
     //! Generate warnings if needed
     void SolverWarnings();
     
@@ -68,7 +69,8 @@ public:
     //{ --- evaluation and update ---
     //! Perform an update
     void Update(vector<double>& ui) override;
-    
+    void Update2(const vector<double>& ui) override;
+
     //! update nodal positions, velocities, accelerations, etc.
     void UpdateKinematics(vector<double>& ui);
     

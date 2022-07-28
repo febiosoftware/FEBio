@@ -230,6 +230,9 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
     const int dof_WX = fem.GetDOFIndex("wx");
     const int dof_WY = fem.GetDOFIndex("wy");
     const int dof_WZ = fem.GetDOFIndex("wz");
+    const int dof_GX = fem.GetDOFIndex("gx");
+    const int dof_GY = fem.GetDOFIndex("gy");
+    const int dof_GZ = fem.GetDOFIndex("gz");
 
 	// see if a set is defined
 	const char* szset = tag.AttributeValue("set", true);
@@ -269,6 +272,10 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
             else if (strcmp(sz, "wyz" ) == 0) { AddFixedBC(ps, dof_WY); AddFixedBC(ps, dof_WZ); }
             else if (strcmp(sz, "wxz" ) == 0) { AddFixedBC(ps, dof_WX); AddFixedBC(ps, dof_WZ); }
             else if (strcmp(sz, "wxyz") == 0) { AddFixedBC(ps, dof_WX); AddFixedBC(ps, dof_WY); AddFixedBC(ps, dof_WZ); }
+            else if (strcmp(sz, "gxy" ) == 0) { AddFixedBC(ps, dof_GX); AddFixedBC(ps, dof_GY); }
+            else if (strcmp(sz, "gyz" ) == 0) { AddFixedBC(ps, dof_GY); AddFixedBC(ps, dof_GZ); }
+            else if (strcmp(sz, "gxz" ) == 0) { AddFixedBC(ps, dof_GX); AddFixedBC(ps, dof_GZ); }
+            else if (strcmp(sz, "gxyz") == 0) { AddFixedBC(ps, dof_GX); AddFixedBC(ps, dof_GY); AddFixedBC(ps, dof_GZ); }
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		}
 	}
@@ -312,6 +319,9 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
         const int dof_WX = fem.GetDOFIndex("wx");
         const int dof_WY = fem.GetDOFIndex("wy");
         const int dof_WZ = fem.GetDOFIndex("wz");
+        const int dof_GX = fem.GetDOFIndex("gx");
+        const int dof_GY = fem.GetDOFIndex("gy");
+        const int dof_GZ = fem.GetDOFIndex("gz");
 
 		// The supported fixed BC strings don't quite follow the dof naming convention.
 		// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
@@ -334,6 +344,10 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
         else if (strcmp(szbc, "wyz" ) == 0) { bc.push_back(dof_WY); bc.push_back(dof_WZ); }
         else if (strcmp(szbc, "wxz" ) == 0) { bc.push_back(dof_WX); bc.push_back(dof_WZ); }
         else if (strcmp(szbc, "wxyz") == 0) { bc.push_back(dof_WX); bc.push_back(dof_WY); bc.push_back(dof_WZ); }
+        else if (strcmp(szbc, "gxy" ) == 0) { bc.push_back(dof_GX); bc.push_back(dof_GY); }
+        else if (strcmp(szbc, "gyz" ) == 0) { bc.push_back(dof_GY); bc.push_back(dof_GZ); }
+        else if (strcmp(szbc, "gxz" ) == 0) { bc.push_back(dof_GX); bc.push_back(dof_GZ); }
+        else if (strcmp(szbc, "gxyz") == 0) { bc.push_back(dof_GX); bc.push_back(dof_GY); bc.push_back(dof_GZ); }
 		else if (strcmp(szbc, "xyzuvw") == 0)
 		{
 			bc.push_back(dof_X); bc.push_back(dof_Y); bc.push_back(dof_Z);

@@ -1303,3 +1303,37 @@ bool FEPlotFluidShearStressError::Save(FEDomain& dom, FEDataStream& a)
 
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+//! Store the average polar fluid stresses for each element.
+bool FEPlotPolarFluidStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEViscousPolarFluid* vpfluid = dom.GetMaterial()->ExtractProperty<FEViscousPolarFluid>();
+    if (vpfluid == 0) return false;
+    FEViscousFluid* vfluid = dom.GetMaterial()->ExtractProperty<FEViscousFluid>();
+
+    // write solid element data
+    writeAverageElementValue<mat3d>(dom, a, [&](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return (vpfluid->SkewStress(mp_noconst) + vfluid->Stress(mp_noconst));
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average polar fluid couple stresses for each element.
+bool FEPlotPolarFluidCoupleStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEViscousPolarFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEViscousPolarFluid>();
+    if (pfluid == 0) return false;
+
+    // write solid element data
+    writeAverageElementValue<mat3d>(dom, a, [&](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->CoupleStress(mp_noconst);
+    });
+    
+    return true;
+}
+

@@ -74,6 +74,7 @@ SOFTWARE.*/
 #include "FEFixedFluidDilatation.h"
 #include "FEPrescribedFluidDilatation.h"
 #include "FEInitialFluidDilatation.h"
+#include "FEInitialFluidVelocity.h"
 
 #include "FEConstFluidBodyForce.h"
 
@@ -173,6 +174,7 @@ REGISTER_FECORE_CLASS(FEFluidRotationalVelocity     , "fluid rotational velocity
 //-----------------------------------------------------------------------------
 // initial conditions
 REGISTER_FECORE_CLASS(FEInitialFluidDilatation, "initial fluid dilatation");
+REGISTER_FECORE_CLASS(FEInitialFluidVelocity  , "initial fluid velocity");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces
@@ -241,6 +243,8 @@ REGISTER_FECORE_CLASS(FEPlotNodalPolarFluidAngularVelocity  , "nodal polar fluid
 REGISTER_FECORE_CLASS(FEPlotPolarFluidAngularVelocity  , "polar fluid angular velocity"  );
 REGISTER_FECORE_CLASS(FEPlotPolarFluidRelativeAngularVelocity  , "polar fluid relative angular velocity");
 REGISTER_FECORE_CLASS(FEPlotPolarFluidRegionalAngularVelocity  , "polar fluid regional angular velocity");
+REGISTER_FECORE_CLASS(FEPlotPolarFluidStress           , "polar fluid stress");
+REGISTER_FECORE_CLASS(FEPlotPolarFluidCoupleStress     , "polar fluid couple stress");
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");

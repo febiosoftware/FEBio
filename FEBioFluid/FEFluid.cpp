@@ -112,6 +112,12 @@ double FEFluid::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+double FEFluid::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
+{
+    return m_pElastic->Tangent_Strain_Strain(mp);
+}
+
+//-----------------------------------------------------------------------------
 //! The stress of a fluid material is the sum of the fluid pressure
 //! and the viscous stress.
 

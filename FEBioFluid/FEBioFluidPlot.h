@@ -567,3 +567,22 @@ public:
 	FEPlotFluidShearStressError(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Element polar fluid  stresses
+class FEPlotPolarFluidStress : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element polar fluid couple stresses
+class FEPlotPolarFluidCoupleStress : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidCoupleStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

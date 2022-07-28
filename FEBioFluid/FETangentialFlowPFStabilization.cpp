@@ -46,15 +46,21 @@ FETangentialFlowPFStabilization::FETangentialFlowPFStabilization(FEModel* pfem) 
     m_betv = m_betg = 1.0;
     
     // get the degrees of freedom
-    m_dofW.Clear();
-    m_dofW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY));
-    
-    m_dofG.Clear();
-    m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY));
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDofs(m_dofG);
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofW.Clear();
+        m_dofW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY));
+
+        m_dofG.Clear();
+        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY));
+        
+        m_dof.Clear();
+        m_dof.AddDofs(m_dofW);
+        m_dof.Clear();
+        m_dof.AddDofs(m_dofW);
+        m_dof.AddDofs(m_dofG);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -111,9 +117,10 @@ vec3d FETangentialFlowPFStabilization::FluidAngularVelocity(FESurfaceMaterialPoi
 //-----------------------------------------------------------------------------
 void FETangentialFlowPFStabilization::LoadVector(FEGlobalVector& R)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    
     m_psurf->LoadVector(R, m_dof, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
         
-        const FETimeInfo& tp = GetFEModel()->GetTime();
         FESurfaceElement& el = *mp.SurfaceElement();
         
         // get the density
@@ -122,7 +129,7 @@ void FETangentialFlowPFStabilization::LoadVector(FEGlobalVector& R)
         FEPolarFluid* pfluid = pm->ExtractProperty<FEPolarFluid>();
         FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
         double rho = fluid->ReferentialDensity();
-        double kg = pfluid->m_kg;
+        double kg = (pfluid) ? pfluid->m_kg : 0;
         
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
@@ -164,9 +171,10 @@ void FETangentialFlowPFStabilization::LoadVector(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FETangentialFlowPFStabilization::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    
     m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
         
-        const FETimeInfo& tp = GetFEModel()->GetTime();
         FESurfaceElement& el = *mp.SurfaceElement();
         
         // fluid velocity
@@ -181,8 +189,8 @@ void FETangentialFlowPFStabilization::StiffnessMatrix(FELinearSystem& LS)
         FEPolarFluid* pfluid = pm->ExtractProperty<FEPolarFluid>();
         FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
         double rho = fluid->ReferentialDensity();
-        double kg = pfluid->m_kg;
-        
+        double kg = (pfluid) ? pfluid->m_kg : 0;
+
         // tangent vectors
         vec3d rt[FEElement::MAX_NODES];
         m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
