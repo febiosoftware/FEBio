@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FEIdealGasIsothermal.h"
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
+#include "FELogNonlinearElasticFluid.h"
 #include "FEPolarFluid.h"
 #include "FEViscousPolarLinear.h"
 
@@ -135,6 +136,7 @@ REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
 REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
 REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
 REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
+REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
 REGISTER_FECORE_CLASS(FEPolarFluid        , "polar fluid"  );
 REGISTER_FECORE_CLASS(FEViscousPolarLinear, "polar linear"  );
 
