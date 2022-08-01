@@ -264,34 +264,33 @@ void FEFluidNormalVelocity::Update()
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
 
-   
+    // The velocity map is read in as surface data with MULT format. 
+    // However, we need to have (unique) values at the nodes
+    // so we need to convert this to nodal data. 
+    int N = ps->Nodes();
+    m_VN.assign(N, 0.0);
+    vector<int> tag(N, 0);
+    for (int i = 0; i < ps->Elements(); ++i)
+    {
+        FESurfaceElement& el = ps->Element(i);
+        for (int j = 0; j < el.Nodes(); ++j)
+        {
+            FEMaterialPoint mp;
+            mp.m_elem = &el;
+            mp.m_index = j + 0x10000;
+
+            double vnj = m_velocity(mp);
+
+            m_VN[el.m_lnode[j]] += vnj;
+            tag[el.m_lnode[j]]++;
+        }
+    }
+    for (int i = 0; i < N; ++i)
+    {
+        if (tag[i] != 0) m_VN[i] /= (double)tag[i];
+    }
+  
     if (m_bpv) {
-
-        // The velocity map is read in as surface data with MULT format. 
-        // However, we need to have (unique) values at the nodes
-        // so we need to convert this to nodal data. 
-        int N = ps->Nodes();
-        m_VN.assign(N, 0.0);
-        vector<int> tag(N, 0);
-        for (int i = 0; i < ps->Elements(); ++i)
-        {
-            FESurfaceElement& el = ps->Element(i);
-            for (int j = 0; j < el.Nodes(); ++j)
-            {
-                FEMaterialPoint mp;
-                mp.m_elem = &el;
-                mp.m_index = j + 0x10000;
-
-                double vnj = m_velocity(mp);
-
-                m_VN[el.m_lnode[j]] += vnj;
-                tag[el.m_lnode[j]]++;
-            }
-        }
-        for (int i = 0; i < N; ++i)
-        {
-            if (tag[i] != 0) m_VN[i] /= (double)tag[i];
-        }
 
         for (int i=0; i<ps->Nodes(); ++i)
         {
