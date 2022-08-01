@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "ObjectDataRecord.h"
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/FENLConstraint.h>
+#include <FECore/SurfaceDataRecord.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -1415,3 +1416,13 @@ public:
     double value(FENLConstraint& rc);
 };
 
+//=============================================================================
+// S U R F A C E   D A T A
+//=============================================================================
+
+class FELogContactArea : public FELogSurfaceData
+{
+public:
+	FELogContactArea(FEModel* fem) : FELogSurfaceData(fem) {}
+	double value(FESurface& surface) override;
+};

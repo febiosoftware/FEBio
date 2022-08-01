@@ -1957,3 +1957,20 @@ double FELogVolumePressure::value(FENLConstraint& rc)
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
     return (prc ? prc->m_s.m_p : 0);
 }
+
+//=============================================================================
+double FELogContactArea::value(FESurface& surface)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surface);
+	if (pcs == 0) return 0.0;
+
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		double area = pcs->GetContactArea();
+		return area;
+	}
+	return 0.0;
+}
