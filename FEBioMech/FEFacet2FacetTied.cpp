@@ -53,6 +53,12 @@ FEFacetTiedSurface::Data::Data()
 	m_pme = (FESurfaceElement*) 0;
 }
 
+void FEFacetTiedSurface::Data::Serialize(DumpStream& ar)
+{
+	FEContactMaterialPoint::Serialize(ar);
+	ar & m_vgap & m_Lm & m_rs;
+}
+
 //-----------------------------------------------------------------------------
 FEFacetTiedSurface::FEFacetTiedSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
@@ -153,6 +159,10 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	// give this interface an ID
 	static int count = 1;
 	SetID(count++);
+
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
 
 	// define sibling relationships
 	m_ss.SetSibling(&m_ms);

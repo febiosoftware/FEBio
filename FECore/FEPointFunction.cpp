@@ -45,6 +45,39 @@ class FEPointFunction::Imp
 {
 public:
 	BSpline*    m_spline;   //!< B-spline
+
+public:
+	bool InitSpline(FEPointFunction* pf)
+	{
+		const int N = pf->Points();
+		// initialize B-spline
+		if (m_spline) delete m_spline;
+		m_spline = new BSpline();
+		switch (pf->m_fnc) {
+		case CSPLINE:
+		{
+			int korder = min(N, 4);
+			if (!m_spline->init_interpolation(korder, pf->m_points)) return false;
+		}
+		break;
+		case CPOINTS:
+		{
+			int korder = min(N, 4);
+			if (!m_spline->init(korder, pf->m_points)) return false;
+		}
+		break;
+		case APPROX:
+		{
+			int korder = min(N / 2 + 1, 4);
+			if (!m_spline->init_approximation(korder, N / 2 + 1, pf->m_points)) return false;
+		}
+		break;
+		default:
+			break;
+		}
+
+		return true;
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -65,34 +98,9 @@ FEPointFunction::~FEPointFunction()
 //! Clears the loadcurve data
 bool FEPointFunction::Init()
 {
-    if (m_fnc > SMOOTH) {
-        const int N = Points();
-        // initialize B-spline
-        if (imp->m_spline) delete imp->m_spline;
-        imp->m_spline = new BSpline();
-        switch (m_fnc) {
-            case CSPLINE:
-            {
-                int korder = min(N,4);
-				if (!imp->m_spline->init_interpolation(korder, m_points)) return false;
-            }
-                break;
-            case CPOINTS:
-            {
-                int korder = min(N,4);
-				if (!imp->m_spline->init(korder, m_points)) return false;
-            }
-                break;
-            case APPROX:
-            {
-                int korder = min(N/2+1,4);
-				if (!imp->m_spline->init_approximation(korder, N/2+1, m_points)) return false;
-            }
-                break;
-
-            default:
-                break;
-        }
+    if (m_fnc > SMOOTH) 
+	{
+		imp->InitSpline(this);
     }
     return FEFunction1D::Init();
 }
@@ -439,6 +447,12 @@ void FEPointFunction::Serialize(DumpStream& ar)
 		ar >> n; m_fnc = (INTFUNC)n;
 		ar >> n; m_ext = (EXTMODE)n;
 		ar >> m_points;
+
+		if (ar.IsShallow() == false)
+		{
+			bool b = imp->InitSpline(this);
+			assert(b);
+		}
 	}
 }
 

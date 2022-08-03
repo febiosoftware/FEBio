@@ -71,12 +71,10 @@ FEFacetSlidingSurface::Data::Data()
 void FEFacetSlidingSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-	ar & m_gap;
-	ar & m_nu;
-	ar & m_rs;
 	ar & m_Lm;
 	ar & m_eps;
-	ar & m_Ln;
+	ar & m_nu;
+	ar & m_rs;
 }
 
 //-----------------------------------------------------------------------------
@@ -265,6 +263,10 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	// Note that friction has not been implemented yet
 	m_mu = 0;
 	m_epsf = 0;
+
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
 
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);

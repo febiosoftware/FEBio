@@ -24,10 +24,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEKamensky.h"
+#include "FEIsotropicLeeSacks.h"
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEKamensky, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEIsotropicLeeSacks, FEElasticMaterial)
 	ADD_PARAMETER(m_c0, "c0");
 	ADD_PARAMETER(m_c1, "c1");
 	ADD_PARAMETER(m_c2, "c2");
@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FEKamensky, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEKamensky::FEKamensky(FEModel* pfem) : FEElasticMaterial(pfem)
+FEIsotropicLeeSacks::FEIsotropicLeeSacks(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_c0 = 0.0;
 	m_c1 = 0.0;
@@ -47,7 +47,7 @@ FEKamensky::FEKamensky(FEModel* pfem) : FEElasticMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 //! Calculates the strain energy density
-double FEKamensky::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEIsotropicLeeSacks::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -72,7 +72,7 @@ double FEKamensky::StrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
-mat3ds FEKamensky::Stress(FEMaterialPoint& mp)
+mat3ds FEIsotropicLeeSacks::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -96,7 +96,7 @@ mat3ds FEKamensky::Stress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric tangent
-tens4ds FEKamensky::Tangent(FEMaterialPoint& mp)
+tens4ds FEIsotropicLeeSacks::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 

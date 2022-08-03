@@ -41,6 +41,8 @@ public:
         Data();
 
 		void Serialize(DumpStream& ar) override;
+
+        void Init() override;
         
     public:
         vec3d    m_Gap;     //!< initial gap in reference configuration

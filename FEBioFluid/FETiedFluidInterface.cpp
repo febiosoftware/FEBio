@@ -79,11 +79,11 @@ void FETiedFluidSurface::Data::Serialize(DumpStream& ar)
 	ar & m_nu;
 	ar & m_rs;
 	ar & m_Lmd;
-	ar & m_Lmp;
+    ar & m_tv;
+    ar & m_Lmp;
 	ar & m_epst;
 	ar & m_epsn;
 	ar & m_pg;
-	ar & m_tv;
 	ar & m_vn;
 }
 
@@ -213,6 +213,10 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(p
     m_naugmin = 0;
     m_naugmax = 10;
     
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }

@@ -65,7 +65,7 @@ public:
 
 	// evaluate objective function
 	// also returns the function values in f
-	virtual double Evaluate(vector<double>& f);
+	virtual double Evaluate(std::vector<double>& f);
 
 	// evaluate objective function
 	double Evaluate();
@@ -75,6 +75,9 @@ public:
 
 	// return the FE model
 	FEModel* GetFEModel() { return m_fem; }
+
+public:
+	double RegressionCoefficient(const std::vector<double>& y0, const std::vector<double>& y);
 
 public: // These functions need to be implemented by derived classes
 

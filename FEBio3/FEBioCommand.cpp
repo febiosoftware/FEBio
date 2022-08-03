@@ -158,9 +158,10 @@ int FEBioCmd_Restart::run(int nargs, char** argv)
 	printf("Restart level set to: ");
 	switch (dumpLevel)
 	{
-	case FE_DUMP_NEVER     : printf("NEVER (0)\n"); break;
-	case FE_DUMP_MAJOR_ITRS: printf("MAJOR_ITRS (1)\n"); break;
-	case FE_DUMP_STEP      : printf("STEP (2)\n"); break;
+	case FE_DUMP_NEVER      : printf("NEVER (0)\n"); break;
+	case FE_DUMP_MAJOR_ITRS : printf("MAJOR_ITRS (1)\n"); break;
+	case FE_DUMP_STEP       : printf("STEP (2)\n"); break;
+	case FE_DUMP_MUST_POINTS: printf("MUST POINTS (3)\n"); break;
 	default:
 		printf("(unknown value)\n");
 		break;

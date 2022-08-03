@@ -23,6 +23,10 @@ Next, we'll need to tell Visual Studio where to find the FEBio header (.h) and l
 Locate the VC++ Directories in the Configuration Properties. In the Include Directories, add the path to the include files (e.g. "C:\Program Files\FEBio2\sdk\include"). To do this, select the "Include Directories" property and click the button on the right of the text edit field. Select "Edit..," from the popup menu. In the dialog box that pops up, the FEBio include folder can be added. Close OK when done. Then,
 add the path to the FEBio library files to the "Library Directories field" (e.g. "C:\Program Files\FEBio3\sdk\lib\"). When done, press the OK button.
 
+It is also necessary to define the WIN32 preprocessor macro. This can be set in the Properties dialog box under the Configuration Properties\C/C++\Preprocessor. Then add WIN32 to the Preprocessor definitions. 
+
+Note that the previous steps need to be done for both the Debug and Release configurations separately. Also make sure to link to the FEBio debug libraries when building the Debug configuration of your plugin, and similarly link to the FEBui release libraries when building the Release configuration. Using the wrong libraries may lead to build or runtime errors. Keep in mind that using the debug libraries may result in poor performance. This is to be expected. The debug libraries should only be used for initial testing and debugging. The release libraries should be used for the actual simulations. 
+
 \image html create_plugin_with_vs_step_4.png
 
 Now you are ready to write your plugin. 

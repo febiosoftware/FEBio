@@ -55,6 +55,8 @@ SOFTWARE.*/
 #include "FELogEnclosedVolume.h"
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
+#include "FELogSolutionNorm.h"
+#include "FELinearConstraint.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -115,7 +117,7 @@ REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 REGISTER_FECORE_CLASS(FEConstValue , "const");
 REGISTER_FECORE_CLASS(FEMathValue  , "math" );
 REGISTER_FECORE_CLASS(FEMappedValue, "map"  );
-
+REGISTER_FECORE_CLASS_EXPLICIT(FELinearConstraint, FEBC_ID, "linear constraint");
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator          , "local");
 REGISTER_FECORE_CLASS(FEConstValueVec3                , "vector");
@@ -165,4 +167,5 @@ REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
 REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
+REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 }

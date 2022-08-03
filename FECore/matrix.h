@@ -122,6 +122,9 @@ public:
 	// infinity-norm
 	double inf_norm();
 
+    // find eigenvectors and eigenvalues
+    bool eigen_vectors(matrix& Eigen, vector<double>& eigen_values);
+    
 public:
 	void set(int i, int j, const mat3d& a);
 	

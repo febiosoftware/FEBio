@@ -621,6 +621,75 @@ double FEBondRelaxationMalkin::Relaxation(FEMaterialPoint& mp, const double t, c
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+// FEBondRelaxationMalkinDist
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRelaxationMalkinDist, FEBondRelaxation)
+    ADD_PARAMETER(m_t1c0 , FE_RANGE_GREATER(0.0), "t1c0");
+    ADD_PARAMETER(m_t1c1 , "t1c1");
+    ADD_PARAMETER(m_t1s0 , FE_RANGE_GREATER(0.0), "t1s0");
+    ADD_PARAMETER(m_t2c0 , FE_RANGE_GREATER(0.0), "t2c0");
+    ADD_PARAMETER(m_t2c1 , "t2c1");
+    ADD_PARAMETER(m_t2s0 , FE_RANGE_GREATER(0.0), "t2s0");
+    ADD_PARAMETER(m_beta , FE_RANGE_GREATER(0.0), "beta");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationMalkinDist::FEBondRelaxationMalkinDist(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+    m_t1c0 = 0;
+    m_t1c1 = 0;
+    m_t1s0 = 1;
+    m_t2c0 = 0;
+    m_t2c1 = 0;
+    m_t2s0 = 1;
+    m_beta = 1;
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationMalkinDist::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    double g = 1.0;
+    if (t == 0) return g;
+    
+    // get the elastic material point data
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // evaluate spatial Hencky (logarithmic) strain
+    mat3ds h = pt.LeftHencky();
+    
+    // evaluate distortion magnitude (always positive)
+    double K2 = (h.dev()).norm();
+    
+    double tau1 = m_t1c0(mp) + m_t1c1(mp)*exp(-K2/m_t1s0(mp));
+    double tau2 = m_t2c0(mp) + m_t2c1(mp)*exp(-K2/m_t2s0(mp));
+    double beta = m_beta(mp);
+    
+    if (beta != 1) {
+        double bm1 = beta - 1;
+#ifdef __APPLE__
+        double Ga = tgamma(bm1);
+#else
+        double Ga = gamma(bm1);
+#endif
+        double Q1 = gamma_inc_Q(bm1, t/tau1);
+        double G1 = Ga*Q1;
+        double Q2 = gamma_inc_Q(bm1, t/tau2);
+        double G2 = Ga*Q2;
+        g = bm1*pow(t,-bm1)/(pow(tau1, -bm1) - pow(tau2, -bm1))*(G2-G1);
+    }
+    else {
+        g = (expint_Ei(-t/tau2) - expint_Ei(-t/tau1))/(log(tau1/tau2));
+    }
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
 // FEBondRelaxationMalkinDistUser
 //
 ///////////////////////////////////////////////////////////////////////////////

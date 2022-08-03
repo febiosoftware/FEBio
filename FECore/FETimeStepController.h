@@ -80,6 +80,8 @@ public:
 	double	m_cutback;		//!< cut back factor used in aggressive time stepping
 
 	std::vector<double>	m_must_points;	//!< the list of must-points
+	bool				m_mp_repeat;	//!< repeat must-points
+	double				m_mp_toff;		//!< offset for repeat must-points
 
 private:
 	double	m_ddt;			//!< used by auto-time stepper

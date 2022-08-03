@@ -53,6 +53,7 @@ BEGIN_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, FEUncoupledMaterial)
 	ADD_PROPERTY(m_pBase, "elastic");
     ADD_PROPERTY(m_pBond, "bond");
 	ADD_PROPERTY(m_pRelx, "relaxation");
+    ADD_PROPERTY(m_pWCDF, "recruitment", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -70,7 +71,12 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
     m_pBase = nullptr;
     m_pBond = nullptr;
     m_pRelx = nullptr;
+    m_pWCDF = nullptr;
+    
+    m_pDmg = nullptr;
+    m_pFtg = nullptr;
 }
+
 //-----------------------------------------------------------------------------
 //! data initialization
 bool FEUncoupledReactiveViscoelasticMaterial::Init()
@@ -78,6 +84,10 @@ bool FEUncoupledReactiveViscoelasticMaterial::Init()
     if (!m_pBase->Init()) return false;
     if (!m_pBond->Init()) return false;
     if (!m_pRelx->Init()) return false;
+    if (m_pWCDF && !m_pWCDF->Init()) return false;
+    
+    m_pDmg = dynamic_cast<FEDamageMaterialUC*>(m_pBase);
+    m_pFtg = dynamic_cast<FEUncoupledReactiveFatigue*>(m_pBase);
 
     return FEUncoupledMaterial::Init();
 }
@@ -232,24 +242,24 @@ double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMater
     
     // current time
     double time = GetFEModel()->GetTime().currentTime;
-    double tv = time - pt.m_v[ig];
+    double dtv = time - pt.m_v[ig];
 
     switch (m_btype) {
         case 1:
         {
-            if (tv >= 0)
-                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, tv, D);
+            if (dtv >= 0)
+                w = pt.m_f[ig]*m_pRelx->Relaxation(mp, dtv, D);
         }
             break;
         case 2:
         {
             if (ig == 0) {
-                w = m_pRelx->Relaxation(mp, tv, D);
+                w = m_pRelx->Relaxation(mp, dtv, D);
             }
             else
             {
-                double tu = time - pt.m_v[ig-1];
-                w = m_pRelx->Relaxation(mp, tv, D) - m_pRelx->Relaxation(mp, tu, D);
+                double dtu = time - pt.m_v[ig-1];
+                w = m_pRelx->Relaxation(mp, dtv, D) - m_pRelx->Relaxation(mp, dtu, D);
             }
         }
             break;
@@ -258,7 +268,7 @@ double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMater
             break;
     }
     
-    assert((w >= 0) && (w <= 1));
+    assert(w >= 0);
     
     return w;
 }
@@ -282,7 +292,7 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
     // get current number of generations
     int ng = (int)pt.m_Uv.size();
     
-    double w = 1;
+    double f = (!pt.m_wv.empty()) ? pt.m_wv.back() : 1;
     
     for (int ig=0; ig<ng-1; ++ig)
     {
@@ -290,17 +300,17 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
         ep.m_F = pt.m_Uv[ig];
         ep.m_J = pt.m_Jv[ig];
         // evaluate the breaking bond mass fraction for this generation
-        w -= BreakingBondMassFraction(mp, ig, D);
+        f -= BreakingBondMassFraction(mp, ig, D);
     }
     
     // restore safe copy of deformation gradient
     ep.m_F = F;
     ep.m_J = J;
     
-    assert((w >= 0) && (w <= 1));
+    assert(f >= 0);
     
     // return the bond mass fraction of the reforming generation
-    return w;
+    return f;
 }
 
 //-----------------------------------------------------------------------------
@@ -389,7 +399,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
 {
     // calculate the base material Cauchy stress
     mat3ds s = DevStressStrongBonds(mp);
-    s+= DevStressWeakBonds(mp);
+    s+= DevStressWeakBonds(mp)*(1-Damage(mp));
     
     // return the total Cauchy stress
     return s;
@@ -475,7 +485,7 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangentWeakBonds(FEMaterialP
 tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
 {
     tens4ds c = DevTangentStrongBonds(mp);
-    c+= DevTangentWeakBonds(mp);
+    c+= DevTangentWeakBonds(mp)*(1-Damage(mp));
     
     // return the total tangent
     return c;
@@ -545,9 +555,9 @@ double FEUncoupledReactiveViscoelasticMaterial::WeakBondDevSED(FEMaterialPoint& 
                 ep.m_J = J;
                 if (fp) fp->ResetPreStretch();
             }
-            // evaluate bond stress
+            // evaluate bond strain energy density
             sedb = m_pBond->DevStrainEnergyDensity(wb);
-            // add bond stress to total stress
+            // add bond stress to total strain energy density
             sed += sedb*w;
         }
         
@@ -564,7 +574,7 @@ double FEUncoupledReactiveViscoelasticMaterial::WeakBondDevSED(FEMaterialPoint& 
 double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
     double sed = StrongBondDevSED(mp);
-    sed += WeakBondDevSED(mp);
+    sed += WeakBondDevSED(mp)*(1-Damage(mp));
     
     // return the total strain energy density
     return sed;
@@ -607,10 +617,12 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
         pt.m_Uv[1] = (pt.m_Uv[0]*w0 + pt.m_Uv[1]*w1)/(w0+w1);
         pt.m_Jv[1] = pt.m_Uv[1].det();
         pt.m_f[1] = (w0*pt.m_f[0] + w1*pt.m_f[1])/(w0+w1);
+        pt.m_wv[1] = (w0*pt.m_wv[0] + w1*pt.m_wv[1])/(w0+w1);
         pt.m_Uv.pop_front();
         pt.m_Jv.pop_front();
         pt.m_v.pop_front();
         pt.m_f.pop_front();
+        pt.m_wv.pop_front();
     }
     
     // restore safe copy of deformation gradient
@@ -624,7 +636,12 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
 //! Update specialized material points
 void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {
+    FEMaterialPoint& sb = *GetBaseMaterialPoint(mp);
     FEMaterialPoint& wb = *GetBondMaterialPoint(mp);
+    
+    // start by updating specialized material points of base and bond materials
+    m_pBase->UpdateSpecializedMaterialPoints(sb, tp);
+    m_pBond->UpdateSpecializedMaterialPoints(wb, tp);
     
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *wb.ExtractData<FEReactiveVEMaterialPoint>();
@@ -645,6 +662,14 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
             pt.m_Jv.push_back(Jv);
             double f = (!pt.m_v.empty()) ? ReformingBondMassFraction(wb) : 1;
             pt.m_f.push_back(f);
+            if (m_pWCDF) {
+                pt.m_Et = ScalarStrain(pt);
+                if (pt.m_Et > pt.m_Em)
+                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Et));
+                else
+                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Em));
+            }
+            else pt.m_wv.push_back(1);
             CullGenerations(wb);
         }
     }
@@ -652,6 +677,13 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
     else if (pt.m_v.back() == tp.currentTime) {
         pt.m_Uv.back() = Uv;
         pt.m_Jv.back() = Jv;
+        if (m_pWCDF) {
+            pt.m_Et = ScalarStrain(pt);
+            if (pt.m_Et > pt.m_Em)
+                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Et);
+            else
+                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Em);
+        }
         pt.m_f.back() = ReformingBondMassFraction(wb);
     }
 }
@@ -667,4 +699,55 @@ int FEUncoupledReactiveViscoelasticMaterial::RVEGenerations(FEMaterialPoint& mp)
     
     // return the bond mass fraction of the reforming generation
     return (int)pt.m_v.size();
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate trigger strain
+double FEUncoupledReactiveViscoelasticMaterial::ScalarStrain(FEMaterialPoint& mp)
+{
+    double d;
+    // get the elastic point data
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    switch (m_ttype) {
+        case 0:
+        {
+            // evaluate the Lagrangian strain
+            mat3ds E = ep.Strain();
+            
+            d = E.norm();
+        }
+            break;
+        case 1:
+        {
+            // distortional strain
+            // evaluate spatial Hencky (logarithmic) strain
+            mat3ds h = ep.LeftHencky();
+            
+            // evaluate distortion magnitude (always positive)
+            d = (h.dev()).norm();
+        }
+            break;
+        case 2:
+        {
+            // dilatational strain
+            d = fabs(log(ep.m_J));
+        }
+            break;
+            
+        default:
+            d = 0;
+            break;
+    }
+    
+    return d;
+}
+
+//-----------------------------------------------------------------------------
+double FEUncoupledReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
+{
+    double D = 0;
+    if (m_pDmg) D = m_pDmg->Damage(*GetBaseMaterialPoint(mp));
+    else if (m_pFtg) D = m_pFtg->Damage(*GetBaseMaterialPoint(mp));
+    return D;
 }

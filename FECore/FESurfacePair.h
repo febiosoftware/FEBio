@@ -50,6 +50,8 @@ public:
 	FEFacetSet* GetSecondarySurface();
 	void SetSecondarySurface(FEFacetSet* pf);
 
+	void Serialize(DumpStream& ar);
+
 private:
 	std::string		m_name;
 	FEFacetSet*		m_surface1;	// the primary surface

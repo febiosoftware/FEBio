@@ -41,6 +41,8 @@ public:
 	public:
 		DOF();
 
+		void Serialize(DumpStream& ar);
+
 	public:
 		int		node;	// node number
 		int		dof;	// degree of freedom

@@ -23,31 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "FEElasticMaterial.h"
+#include "stdafx.h"
+#include "FELogSolutionNorm.h"
+#include "FEModel.h"
+#include "FEAnalysis.h"
+#include "FESolver.h"
 
-class FEKamensky : public FEElasticMaterial
+//================================================================================
+FELogSolutionNorm::FELogSolutionNorm(FEModel* fem) : FEModelLogData(fem) {}
+double FELogSolutionNorm::value()
 {
-public:
-	FEKamensky(FEModel* pfem);
+	FEModel* fem = GetFEModel(); assert(fem);
+	if (fem == nullptr) return 0.0;
 
-	//! calculate deviatoric stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) override;
+	FEAnalysis* step = fem->GetCurrentStep();
+	if (step == nullptr) return 0.0;
 
-	//! calculate deviatoric tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt) override;
+	FESolver* solver = step->GetFESolver();
+	if (solver == nullptr) return 0.0;
 
-	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+	std::vector<double> u = solver->GetSolutionVector();
+	double unorm = l2_norm(u);
 
-public:
-	double	m_c0;
-	double	m_c1;
-	double	m_c2;
-	double	m_k;
-	double	m_tangent_scale;
-
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
-};
-
+	return unorm;
+}

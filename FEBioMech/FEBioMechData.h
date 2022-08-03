@@ -968,6 +968,33 @@ public:
     double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+//! Discrete element stretch
+class FELogDiscreteElementStretch : public FELogElemData
+{
+public:
+	FELogDiscreteElementStretch(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element elongation
+class FELogDiscreteElementElongation : public FELogElemData
+{
+public:
+	FELogDiscreteElementElongation(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForce : public FELogElemData
+{
+public:
+	FELogDiscreteElementForce(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================

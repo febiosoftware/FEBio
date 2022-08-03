@@ -39,6 +39,11 @@ public:
 
 	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
 
+	void Serialize(DumpStream& ar) override;
+
+private:
+	FEParamVec3* GetFiberProperty();
+
 public:
 	FEParamDouble	m_lam;	//!< in-situ stretch
 	bool			m_biso;	//!< isochoric generator option

@@ -81,6 +81,15 @@ enum TimerID {
 };
 
 //-----------------------------------------------------------------------------
+// helper class for managing global (user-defined) variables.
+class FEGlobalVariable
+{
+public:
+	double	v;
+	string	name;
+};
+
+//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
@@ -405,6 +414,10 @@ public: // Global data
 	// get/set global data
 	void SetGlobalConstant(const string& s, double v);
 	double GetGlobalConstant(const string& s);
+
+	int GlobalVariables() const;
+	void AddGlobalVariable(const string& s, double v);
+	const FEGlobalVariable& GetGlobalVariable(int n);
 
 public: // model data
 	void AddModelData(FEModelData* data);

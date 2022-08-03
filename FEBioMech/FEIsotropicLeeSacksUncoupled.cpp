@@ -24,10 +24,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEKamenskyUncoupled.h"
+#include "FEIsotropicLeeSacksUncoupled.h"
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEKamenskyUncoupled, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEIsotropicLeeSacksUncoupled, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c0, "c0");
 	ADD_PARAMETER(m_c1, "c1");
 	ADD_PARAMETER(m_c2, "c2");
@@ -35,7 +35,7 @@ BEGIN_FECORE_CLASS(FEKamenskyUncoupled, FEUncoupledMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEKamenskyUncoupled::FEKamenskyUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem)
+FEIsotropicLeeSacksUncoupled::FEIsotropicLeeSacksUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	m_c0 = 0.0;
 	m_c1 = 0.0;
@@ -45,7 +45,7 @@ FEKamenskyUncoupled::FEKamenskyUncoupled(FEModel* pfem) : FEUncoupledMaterial(pf
 
 //-----------------------------------------------------------------------------
 //! Calculates the strain energy density
-double FEKamenskyUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
+double FEIsotropicLeeSacksUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -65,7 +65,7 @@ double FEKamenskyUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
-mat3ds FEKamenskyUncoupled::DevStress(FEMaterialPoint& mp)
+mat3ds FEIsotropicLeeSacksUncoupled::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -86,7 +86,7 @@ mat3ds FEKamenskyUncoupled::DevStress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric tangent
-tens4ds FEKamenskyUncoupled::DevTangent(FEMaterialPoint& mp)
+tens4ds FEIsotropicLeeSacksUncoupled::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 

@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FEBioXML/FERestartImport.h>
 #include <FECore/DumpFile.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/FEModelDataRecord.h>
 
 //-----------------------------------------------------------------------------
 FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem) {}
@@ -189,4 +190,32 @@ bool FEBioRCISolver::Run()
 	if (fem->RCI_Finish() == false) return false;
 
 	return true;
+}
+
+//==========================================================================
+FEBioTestSuiteTask::FEBioTestSuiteTask(FEModel* fem) : FECoreTask(fem) {}
+
+//! initialization
+bool FEBioTestSuiteTask::Init(const char* szfile)
+{
+	FEModel* fem = GetFEModel(); assert(fem);
+	if (fem == nullptr) return false;
+
+	// See if the model defines any data records
+	DataStore& data = fem->GetDataStore();
+	if (data.Size() == 0)
+	{
+		FEModelDataRecord* rec = new FEModelDataRecord(fem, nullptr);
+		rec->SetData("solution_norm");
+		rec->SetName("solution_norm");
+		data.AddRecord(rec);
+	}
+
+	return (GetFEModel() ? GetFEModel()->Init() : false);
+}
+
+//! Run the FE model
+bool FEBioTestSuiteTask::Run()
+{
+	return (GetFEModel() ? GetFEModel()->Solve() : false);
 }

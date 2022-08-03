@@ -26,10 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "FEUncoupledMaterial.h"
 
-class FEKamenskyUncoupled : public FEUncoupledMaterial
+class FEIsotropicLeeSacksUncoupled : public FEUncoupledMaterial
 {
 public:
-	FEKamenskyUncoupled(FEModel* pfem);
+	FEIsotropicLeeSacksUncoupled(FEModel* pfem);
 
 	//! calculate deviatoric stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt) override;

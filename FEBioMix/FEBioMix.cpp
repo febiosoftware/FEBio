@@ -78,6 +78,7 @@ SOFTWARE.*/
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
+#include "FESoluteNaturalFlux.hpp"
 #include "FEPressureStabilization.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
 
@@ -201,6 +202,18 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxY            , "wy");
 	REGISTER_FECORE_CLASS(FELogElemFluidFluxZ            , "wz");
 	REGISTER_FECORE_CLASS(FELogElemPorosity              , "porosity");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 0     , "Kpxx");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 1     , "Kpyy");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 2     , "Kpzz");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 3     , "Kpxy");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 4     , "Kpyz");
+	REGISTER_FECORE_CLASS_T(FELogElemPermeability_T, 5     , "Kpxz");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 0, "esxx");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 1, "esyy");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 2, "eszz");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 3, "esxy");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 4, "esyz");
+	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 5, "esxz");
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
@@ -242,6 +255,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
+    REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
@@ -384,6 +398,26 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSBMConcentration_T, 5, "sbm6");
 	REGISTER_FECORE_CLASS_T(FELogElemSBMConcentration_T, 6, "sbm7");
 	REGISTER_FECORE_CLASS_T(FELogElemSBMConcentration_T, 7, "sbm8");
-	
+
+	//-----------------------------------------------------------------------------
+	// domain log data
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 0, "sbm1_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 1, "sbm2_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 2, "sbm3_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 3, "sbm4_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 4, "sbm5_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 5, "sbm6_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 6, "sbm7_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSBMConcentration_T, 7, "sbm8_integral");
+
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 0, "c1_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 1, "c2_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 2, "c3_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 3, "c4_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 4, "c5_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 5, "c6_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 6, "c7_integral");
+	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 7, "c8_integral");
+
 	febio.SetActiveModule(0);
 }

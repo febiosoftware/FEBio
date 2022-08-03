@@ -236,7 +236,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 			ReadParameterList(tag, pl);
 
 			// create an element set for this domain
-			FEElementSet* elset = new FEElementSet(&fem);
+			FEElementSet* elset = fecore_alloc(FEElementSet, &fem);
 			elset->Create(pd);
 			elset->SetName(pd->GetName());
 			mesh.AddElementSet(elset);

@@ -77,6 +77,9 @@ public:
     virtual double WeakBondDevSED(FEMaterialPoint& pt) { return 0; }
 
 public:
+    // TODO: removing virtual from the following 3 functions causes changes
+    // to the convergence criteria on macOS, despite these functions not
+    // being overridden anywhere.
 	//! strain energy density U(J)
     virtual double U(double J) {
         switch (m_npmodel) {

@@ -255,6 +255,33 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Surface facet area
+//!
+class FEPlotFacetArea : public FEPlotSurfaceData
+{
+private:
+	FEModel* m_pfem;
+	bool                m_binit;
+	vector<FEElement*>  m_elem;
+	vector<vec3d>       m_area;
+
+public:
+	FEPlotFacetArea(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { m_binit = true; }
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+
+//-----------------------------------------------------------------------------
+//! Scalar surface load
+//!
+class FEPlotScalarSurfaceLoad : public FEPlotSurfaceData
+{
+public:
+    FEPlotScalarSurfaceLoad(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
@@ -486,6 +513,14 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+// NOTE: Deprecated, but maintained for backward compatibility
+class FEPlotShellRelativeVolume : public FEPlotDomainData
+{
+public:
+	FEPlotShellRelativeVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //-----------------------------------------------------------------------------
 //! Material fibers
 class FEPlotFiberVector : public FEPlotDomainData
@@ -592,6 +627,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fatigue bond fraction (fatigue)
+class FEPlotFatigueBondFraction : public FEPlotDomainData
+{
+public:
+    FEPlotFatigueBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Yielded bond fraction (fatigue)
 class FEPlotYieldedBondFraction : public FEPlotDomainData
 {
@@ -634,24 +678,6 @@ class FEPlotUT4NodalStresses : public FEPlotDomainData
 public:
 	FEPlotUT4NodalStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_NODE) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Store shell strains
-class FEPlotShellStrain : public FEPlotDomainData
-{
-public:
-	FEPlotShellStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Shell relative volume
-class FEPlotShellRelativeVolume : public FEPlotDomainData
-{
-public:
-    FEPlotShellRelativeVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -799,6 +825,23 @@ class FEPlotLagrangeStrain : public FEPlotDomainData
 {
 public:
 	FEPlotLagrangeStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//! NOTE: Deprecated, but maintained for backward compatibility
+class FEPlotShellStrain : public FEPlotDomainData
+{
+public:
+	FEPlotShellStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+// Infinitesimal strain
+class FEPlotInfStrain : public FEPlotDomainData
+{
+public:
+	FEPlotInfStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -1043,6 +1086,15 @@ class FEPlotRVEbonds : public FEPlotDomainData
 {
 public:
     FEPlotRVEbonds(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Reactive viscoelastic strain measure for bond-breaking trigger and bond recruitment
+class FEPlotRVEstrain : public FEPlotDomainData
+{
+public:
+    FEPlotRVEstrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

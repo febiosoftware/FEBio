@@ -86,6 +86,12 @@ public:
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
 	
 public:
+    //! initialize
+    bool Init() override;
+    
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	

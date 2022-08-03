@@ -57,6 +57,18 @@ FEMaterialPoint* FEPreStrainUncoupledElastic::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
+//! calculate (pre-strained) density 
+double FEPreStrainUncoupledElastic::Density(FEMaterialPoint& mp)
+{
+	double d0 = FEElasticMaterial::Density(mp);
+
+	mat3d Fp = PrestrainGradient(mp);
+	double Jp = Fp.det();
+
+	return d0 / Jp;
+}
+
+//-----------------------------------------------------------------------------
 mat3d FEPreStrainUncoupledElastic::PrestrainGradient(FEMaterialPoint& mp)
 {
 	mat3d F0 = mat3d::identity();

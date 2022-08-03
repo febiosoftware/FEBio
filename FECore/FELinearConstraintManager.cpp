@@ -58,7 +58,7 @@ void FELinearConstraintManager::CopyFrom(const FELinearConstraintManager& lcm)
 	Clear();
 	for (int i=0; i<lcm.LinearConstraints(); ++i)
 	{
-		FELinearConstraint* lc = new FELinearConstraint(m_fem);
+		FELinearConstraint* lc = fecore_alloc(FELinearConstraint, m_fem);
 		lc->CopyFrom(lcm.LinearConstraint(i));
 		m_LinC.push_back(lc);
 	}

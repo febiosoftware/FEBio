@@ -119,6 +119,7 @@ public:
 public:
 	double	m_alpha;            //!< exponent alpha
 	double	m_mu;               //!< mean mu
+    double  m_ploc;             //!< location parameter
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
@@ -215,3 +216,55 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+// Power law cumulative distribution function
+
+class FEDamageCDFPower : public FEDamageCDF
+{
+public:
+    FEDamageCDFPower(FEModel* pfem);
+    ~FEDamageCDFPower() {}
+    
+    bool Validate() override;
+    
+    //! cumulative distribution function
+    double cdf(const double X) override;
+    
+    //! probability density function
+    double pdf(const double X) override;
+    
+public:
+    double    m_alpha;            //!< power exponent alpha
+    double    m_mu0;              //!< constant coeff
+    double    m_mu1;              //!< coeff of power
+    double    m_s;                //!< scale factor for argument
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Quadratic polynomial cumulative distribution function
+
+class FEDamageCDFPoly2 : public FEDamageCDF
+{
+public:
+    FEDamageCDFPoly2(FEModel* pfem);
+    ~FEDamageCDFPoly2() {}
+    
+    //! cumulative distribution function
+    double cdf(const double X) override;
+    
+    //! probability density function
+    double pdf(const double X) override;
+    
+public:
+    double    m_mu0;              //!< constant coeff
+    double    m_mu1;              //!< coeff of linear term
+    double    m_mu2;              //!< coeff of quadratic term
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+

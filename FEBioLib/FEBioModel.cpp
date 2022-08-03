@@ -113,10 +113,10 @@ FEBioModel::FEBioModel()
 	m_plot = nullptr;
 	m_writeMesh = false;
 
-	m_ntimeSteps = 0;
-	m_ntotalIters = 0;
-	m_ntotalRHS = 0;
-	m_ntotalReforms = 0;
+	m_stats.ntimeSteps = 0;
+	m_stats.ntotalIters = 0;
+	m_stats.ntotalRHS = 0;
+	m_stats.ntotalReforms = 0;
 
 	m_pltAppendOnRestart = true;
 
@@ -164,6 +164,12 @@ int FEBioModel::GetDumpLevel() const { return m_dumpLevel; }
 
 //! Set the log level
 void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
+
+//! Get the stats 
+ModelStats FEBioModel::GetModelStats() const
+{
+	return m_stats;
+}
 
 //-----------------------------------------------------------------------------
 //! Set the title of the model
@@ -426,9 +432,26 @@ void FEBioModel::WritePlot(unsigned int nevent)
 					// if we're using the fixed time stepper, we check the plot range and zero state flag
 					if (pstep->m_timeController == nullptr) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
 
+					// for multi-step analyses, some plot variables can't be plot until the first step
+					// is activated. So, in that case, we'll wait. 
+					if ((nevent == CB_INIT) && (Steps() > 1)) bout = false;
+
 					// store initial time step (i.e. time step zero)
+					if (bout)
+					{
+						double time = GetTime().currentTime;
+						m_plot->Write((float)time);
+					}
+				}
+			}
+			else
+			{
+				// for multi-step analyses, we did not write the initial time step during CB_INIT
+				// so we'll do it during the activation of the first step. 
+				if ((nevent == CB_STEP_ACTIVE) && (Steps() > 1) && (GetCurrentStepIndex() == 0))
+				{
 					double time = GetTime().currentTime;
-					if (bout) m_plot->Write((float)time);
+					m_plot->Write((float)time);
 				}
 			}
 		}
@@ -587,12 +610,21 @@ void FEBioModel::WriteData(unsigned int nevent)
 //! Dump state to archive for restarts
 void FEBioModel::DumpData(int nevent)
 {
+	// get the current step
+	FEAnalysis* pstep = GetCurrentStep();
 	int ndump = GetDumpLevel();
 	if (ndump == FE_DUMP_NEVER) return;
 
 	bool bdump = false;
-	if ((nevent == CB_STEP_SOLVED) && (ndump == FE_DUMP_STEP)) bdump = true;
-	if ((nevent == CB_MAJOR_ITERS) && (ndump == FE_DUMP_MAJOR_ITRS)) bdump = true;
+	switch (nevent)
+	{
+	case CB_MAJOR_ITERS:
+		if (ndump == FE_DUMP_MAJOR_ITRS) bdump = true;
+		if ((ndump == FE_DUMP_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bdump = true;
+		break;
+	case CB_STEP_SOLVED: if (ndump == FE_DUMP_STEP) bdump = true; break;
+	}
+	
 	if (bdump)
 	{
 		DumpFile ar(*this);
@@ -1468,10 +1500,10 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	m_ntimeSteps = 0;
-	m_ntotalIters = 0;
-	m_ntotalRHS = 0;
-	m_ntotalReforms = 0;
+	m_stats.ntimeSteps = 0;
+	m_stats.ntotalIters = 0;
+	m_stats.ntotalRHS = 0;
+	m_stats.ntotalReforms = 0;
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1494,10 +1526,10 @@ void FEBioModel::on_cb_solved()
 	if (Steps() > 1)
 	{
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_stats.ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_stats.ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_stats.ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_stats.ntotalReforms);
 	}
 
 	// get and print elapsed time
@@ -1605,8 +1637,8 @@ void FEBioModel::on_cb_stepSolved()
 	}
 
 	// add to stats
-	m_ntimeSteps    += step->m_ntimesteps;
-	m_ntotalIters   += step->m_ntotiter;
-	m_ntotalRHS     += step->m_ntotrhs;
-	m_ntotalReforms += step->m_ntotref;
+	m_stats.ntimeSteps    += step->m_ntimesteps;
+	m_stats.ntotalIters   += step->m_ntotiter;
+	m_stats.ntotalRHS     += step->m_ntotrhs;
+	m_stats.ntotalReforms += step->m_ntotref;
 }

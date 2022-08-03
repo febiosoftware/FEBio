@@ -65,6 +65,18 @@ FEPrestrainElastic::FEPrestrainElastic(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// evaluate density in (pre-strained) reference configuration
+double FEPrestrainElastic::Density(FEMaterialPoint& mp)
+{
+	double d0 = FEElasticMaterial::Density(mp);
+
+	mat3d Fp = PrestrainGradient(mp);
+	double Jp = Fp.det();
+
+	return d0 / Jp;
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEPrestrainElastic::CreateMaterialPointData()
 { 

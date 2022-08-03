@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FE2DFiberNeoHookean.h"
 #include "FE2DTransIsoMooneyRivlin.h"
 #include "FE2DTransIsoVerondaWestmann.h"
+#include "FEActiveFiberContraction.h"
 #include "FEArrudaBoyce.h"
 #include "FECarreauYasudaViscousSolid.h"
 #include "FECarterHayesOld.h"
@@ -52,7 +53,6 @@ SOFTWARE.*/
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEEllipsoidalFiberDistribution.h"
-#include "FEFatigueMaterial.h"
 #include "FEFiberExpPow.h"
 #include "FEFiberExpPowUncoupled.h"
 #include "FEFiberNaturalNeoHookean.h"
@@ -63,6 +63,7 @@ SOFTWARE.*/
 #include "FEFiberExponentialPowerUC.h"
 #include "FEFiberNHUC.h"
 #include "FEFiberKiousisUncoupled.h"
+#include "FEForceVelocityContraction.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEHolmesMow.h"
@@ -86,13 +87,17 @@ SOFTWARE.*/
 #include "FEOrthotropicCLE.h"
 #include "FEOsmoticVirialExpansion.h"
 #include "FEPerfectOsmometer.h"
+#include "FEReactiveFatigue.h"
+#include "FEUncoupledReactiveFatigue.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FERigidMaterial.h"
 #include "FESphericalFiberDistribution.h"
 #include "FEStVenantKirchhoff.h"
 #include "FETCNonlinearOrthotropic.h"
 #include "FETendonMaterial.h"
+#include "FETraceFreeNeoHookean.h"
 #include "FETransIsoMooneyRivlin.h"
+#include "FETransIsoMREstrada.h"
 #include "FETransIsoVerondaWestmann.h"
 #include "FETrussMaterial.h"
 #include "FEUncoupledActiveContraction.h"
@@ -113,7 +118,9 @@ SOFTWARE.*/
 #include "FEFiberIntegrationTriangle.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
+#include "FEHGOCoronary.h"
 #include "FESpringMaterial.h"
+#include "FENonlinearSpring.h"
 #include "FEDiscreteElementMaterial.h"
 #include "FEElasticMultigeneration.h"
 #include "FEPRLig.h"
@@ -147,11 +154,16 @@ SOFTWARE.*/
 #include "FEActiveFiberStress.h"
 #include "FEActiveFiberStressUC.h"
 #include "FEContinuousElasticDamage.h"
-#include "FEKamensky.h"
-#include "FEKamenskyUncoupled.h"
+#include "FEIsotropicLeeSacks.h"
+#include "FEIsotropicLeeSacksUncoupled.h"
+#include "FEPolynomialHyperElastic.h"
+#include "FEShenoyMaterial.h"
+#include "FELungMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
+#include "FESurfaceForceUniform.h"
+#include "FEBearingLoad.h"
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -196,6 +208,7 @@ SOFTWARE.*/
 #include "FEDiscreteContact.h"
 #include "FERigidFollowerForce.h"
 #include "FERigidFollowerMoment.h"
+#include "FEFixedNormalDisplacement.h"
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -288,6 +301,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FENaturalNeoHookean, "natural neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookeanTransIso, "neo-Hookean transiso");
+    REGISTER_FECORE_CLASS(FETraceFreeNeoHookean, "trace-free neo-Hookean");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolid, "Newtonian viscous solid");
 	REGISTER_FECORE_CLASS(FEOgdenUnconstrained, "Ogden unconstrained");
 	REGISTER_FECORE_CLASS(FEOrthoElastic, "orthotropic elastic");
@@ -308,6 +322,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageFiberPower, "damage fiber power");
 	REGISTER_FECORE_CLASS(FEDamageFiberExponential, "damage fiber exponential");
 	REGISTER_FECORE_CLASS(FEDamageFiberExpLinear, "damage fiber exp-linear");
+	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
+    REGISTER_FECORE_CLASS(FELungMaterial, "lung");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -315,7 +331,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial, "reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterial, "elastic damage");
 	REGISTER_FECORE_CLASS(FERVEDamageMaterial, "reactive viscoelastic damage");
-	REGISTER_FECORE_CLASS(FEFatigueMaterial, "reactive fatigue");
+	REGISTER_FECORE_CLASS(FEReactiveFatigue, "reactive fatigue");
 	REGISTER_FECORE_CLASS(FEReactivePlasticity, "reactive plasticity");
 	REGISTER_FECORE_CLASS(FEReactivePlasticDamage, "reactive plastic damage");
 
@@ -339,6 +355,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FETCNonlinearOrthotropic, "TC nonlinear orthotropic");
 	REGISTER_FECORE_CLASS(FETendonMaterial, "tendon material");
 	REGISTER_FECORE_CLASS(FETransIsoMooneyRivlin, "trans iso Mooney-Rivlin");
+    REGISTER_FECORE_CLASS(FETransIsoMREstrada, "trans iso MR-Estrada");
 	REGISTER_FECORE_CLASS(FETransIsoVerondaWestmann, "trans iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FEUncoupledElasticMixture, "uncoupled solid mixture");
 	REGISTER_FECORE_CLASS(FEVerondaWestmann, "Veronda-Westmann");
@@ -349,10 +366,13 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPRLig, "PRLig");
 	REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, "uncoupled reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterialUC, "uncoupled elastic damage");
+    REGISTER_FECORE_CLASS(FEUncoupledReactiveFatigue, "uncoupled reactive fatigue");
 	REGISTER_FECORE_CLASS(FEGenericHyperelasticUC, "uncoupled hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, "uncoupled trans-iso hyperelastic");
-	REGISTER_FECORE_CLASS(FEKamensky, "Kamensky");
-	REGISTER_FECORE_CLASS(FEKamenskyUncoupled, "Kamensky uncoupled");
+	REGISTER_FECORE_CLASS(FEIsotropicLeeSacks, "isotropic Lee-Sacks");
+	REGISTER_FECORE_CLASS(FEIsotropicLeeSacksUncoupled, "uncoupled isotropic Lee-Sacks");
+	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
+	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 
 	// Fiber materials
 	REGISTER_FECORE_CLASS(FEFiberExpPow, "fiber-exp-pow");
@@ -364,7 +384,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEFiberNH, "fiber-NH");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH, "fiber-natural-NH");
 	REGISTER_FECORE_CLASS(FEFiberNHUC, "fiber-NH-uncoupled");
-	REGISTER_FECORE_CLASS(FEFiberPowerLinear, "fiber-power-linear");
+	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberExpLinear, "fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear, "uncoupled fiber-exp-linear");
     REGISTER_FECORE_CLASS(FEFiberKiousisUncoupled, "fiber-Kiousis-uncoupled");
@@ -398,6 +418,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FETrussMaterial, "linear truss");
 	REGISTER_FECORE_CLASS(FEHuiskesSupply, "Huiskes-supply");
 	REGISTER_FECORE_CLASS(FEActiveFiberContraction, "active_contraction");
+    REGISTER_FECORE_CLASS(FEForceVelocityContraction, "force-velocity-Estrada");
 	REGISTER_FECORE_CLASS(FEWrinkleOgdenMaterial, "wrinkle Ogden");
 	REGISTER_FECORE_CLASS(FEElasticMembrane, "elastic membrane");
 
@@ -416,7 +437,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FECompositeDiscreteMaterial, "discrete composite");
 	REGISTER_FECORE_CLASS(FELinearSpring, "linear spring");
 	REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, "tension-only linear spring");
-	REGISTER_FECORE_CLASS(FENonLinearSpring, "nonlinear spring");
+	REGISTER_FECORE_CLASS(FENonlinearSpringMaterial, "nonlinear spring");
 	REGISTER_FECORE_CLASS(FEExperimentalSpring, "experimental spring");
 	REGISTER_FECORE_CLASS(FEDiscreteContractileMaterial, "Hill");
 	REGISTER_FECORE_CLASS(FETorsionalSpring, "torsion spring");
@@ -435,6 +456,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEBondRelaxationCarreau, "relaxation-Carreau");
     REGISTER_FECORE_CLASS(FEBondRelaxationProny, "relaxation-Prony");
     REGISTER_FECORE_CLASS(FEBondRelaxationMalkin, "relaxation-Malkin");
+    REGISTER_FECORE_CLASS(FEBondRelaxationMalkinDist, "relaxation-Malkin-distortion");
     REGISTER_FECORE_CLASS(FEBondRelaxationMalkinDistUser, "relaxation-Malkin-dist-user");
     REGISTER_FECORE_CLASS(FEBondRelaxationCSexp, "relaxation-CSexp");
     REGISTER_FECORE_CLASS(FEBondRelaxationCSexpDistUser, "relaxation-CSexp-dist-user");
@@ -447,6 +469,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFPQP, "CDF quintic");
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
+    REGISTER_FECORE_CLASS(FEDamageCDFPower, "CDF power");
 
 	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");
@@ -512,6 +535,8 @@ void FEBioMech::InitModule()
 	// classes derived from FESurfaceLoad
 	REGISTER_FECORE_CLASS(FEPressureLoad, "pressure");
 	REGISTER_FECORE_CLASS(FETractionLoad, "traction");
+    REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
+    REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
@@ -548,6 +573,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGPAConstraint, "prestrain");
 	REGISTER_FECORE_CLASS(FEInSituStretchConstraint, "in-situ stretch");
 	REGISTER_FECORE_CLASS(FEAzimuthConstraint, "azimuth constraint");
+    REGISTER_FECORE_CLASS(FEFixedNormalDisplacement, "fixed normal displacement");
 
 	// Lagrange multiplier constraints
 	REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node");
@@ -605,6 +631,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
 	REGISTER_FECORE_CLASS(FEPlotRelativeVolume, "relative volume");
+	REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume, "shell relative volume"); // NOTE: deprecated
 	REGISTER_FECORE_CLASS(FEPlotFiberVector, "fiber vector");
 	REGISTER_FECORE_CLASS(FEPlotFiberStretch, "fiber stretch");
 	REGISTER_FECORE_CLASS(FEPlotDevFiberStretch, "deviatoric fiber stretch");
@@ -614,13 +641,12 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDamage, "damage");
 	REGISTER_FECORE_CLASS(FEPlotNestedDamage, "nested damage");
 	REGISTER_FECORE_CLASS(FEPlotIntactBondFraction, "intact bond fraction");
+    REGISTER_FECORE_CLASS(FEPlotFatigueBondFraction, "fatigue bond fraction");
 	REGISTER_FECORE_CLASS(FEPlotYieldedBondFraction, "yielded bond fraction");
 	REGISTER_FECORE_CLASS(FEPlotOctahedralPlasticStrain, "octahedral plastic strain");
 	REGISTER_FECORE_CLASS(FEPlotReactivePlasticityHeatSupply, "plasticity heat supply density");
 	REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, "volume fraction");
 	REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses, "ut4 nodal stress");
-	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain");
-	REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume, "shell relative volume");
 	REGISTER_FECORE_CLASS(FEPlotContactGap, "contact gap");
 	REGISTER_FECORE_CLASS(FEPlotNodalContactGap, "nodal contact gap");
 	REGISTER_FECORE_CLASS(FEPlotVectorGap, "vector gap");
@@ -638,7 +664,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRLinearStresses, "SPR-P1 stress");
 	REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses, "SPR principal stress");
 	REGISTER_FECORE_CLASS(FEPlotNodalStresses, "nodal stress");
+	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain"); // NOTE: Deprecated
 	REGISTER_FECORE_CLASS(FEPlotLagrangeStrain, "Lagrange strain");
+	REGISTER_FECORE_CLASS(FEPlotInfStrain, "infinitesimal strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
     REGISTER_FECORE_CLASS(FEPlotRightStretch, "right stretch");
     REGISTER_FECORE_CLASS(FEPlotLeftStretch, "left stretch");
@@ -650,6 +678,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
 	REGISTER_FECORE_CLASS(FEPlotEnclosedVolume, "enclosed volume");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceArea, "surface area");
+	REGISTER_FECORE_CLASS(FEPlotFacetArea, "facet area");
 	REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity, "strain energy density");
 	REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity, "deviatoric strain energy density");
 	REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy, "specific strain energy");
@@ -681,6 +710,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy, "rigid kinetic energy");
 	REGISTER_FECORE_CLASS(FEPlotRigidEuler, "Euler angle");
 	REGISTER_FECORE_CLASS(FEPlotRigidRotationVector, "rigid rotation vector");
+    REGISTER_FECORE_CLASS(FEPlotScalarSurfaceLoad, "scalar surface load");
 	REGISTER_FECORE_CLASS(FEPlotStressError, "stress error");
 	REGISTER_FECORE_CLASS(FEPlotFiberTargetStretch, "in-situ target stretch");
 	REGISTER_FECORE_CLASS(FEPlotPreStrainStretch, "prestrain stretch");
@@ -705,6 +735,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D2beta, "continuous damage D2beta");
     REGISTER_FECORE_CLASS(FEPlotRVEgenerations, "RVE generations");
     REGISTER_FECORE_CLASS(FEPlotRVEbonds, "RVE reforming bonds");
+    REGISTER_FECORE_CLASS(FEPlotRVEstrain, "RVE strain");
     REGISTER_FECORE_CLASS(FEPlotStrongBondSED, "strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotWeakBondSED, "weak bond SED");
     REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
@@ -862,6 +893,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
     REGISTER_FECORE_CLASS(FELogOctahedralPlasticStrain, "ops");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData

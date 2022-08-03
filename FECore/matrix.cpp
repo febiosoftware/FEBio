@@ -460,3 +460,102 @@ matrix matrix::operator - (const matrix& m) const
 
 	return s;
 }
+
+#define ROTATE(a, i, j, k, l) g=a[i][j]; h=a[k][l];a[i][j]=g-s*(h+g*tau); a[k][l] = h + s*(g - h*tau);
+
+//-----------------------------------------------------------------------------
+bool matrix::eigen_vectors(matrix& Eigen, vector<double>& eigen_values)
+{
+    matrix& A = *this;
+    int N = m_nc;
+    int R = m_nr;
+    const int NMAX = 50;
+    double sm, tresh, g, h, t, c, tau, s, th;
+    const double eps = 0;//1.0e-15;
+    int k ;
+    
+    //initialize Eigen to identity
+    for(int i = 0; i< R ; i++)
+    {
+        for(int j = 0;j<N;j++) Eigen[i][j] = 0;
+        Eigen[i][i] = 1;
+    }
+    vector<double> b;
+    b.reserve(R);
+    vector<double> z;
+    z.reserve(R);
+    
+    // initialize b and eigen_values to the diagonal of A
+    for(int i = 0; i<R;i++)
+    {
+        b.push_back(A[i][i]);
+        eigen_values.push_back(A[i][i]);
+        z.push_back(0);
+    }
+    // loop
+    int n, nrot = 0;
+    for (n=0; n<NMAX; ++n)
+    {
+        // sum off-diagonal elements
+        sm = 0;
+        for(int i = 0; i<N-1;i++){
+            for(int j = i+1; j<N; j++)
+                sm += fabs(A[i][j]);
+        }
+        if (sm <= eps) {
+            break;
+        }
+        // set the treshold
+        if (n < 3) tresh = 0.2*sm/(R*R); else tresh = 0.0;
+        
+        // loop over off-diagonal elements
+        for(int i = 0; i<N-1;i++){
+            for(int j = i+1; j<N; j++){
+                
+                g = 100.0*fabs(A[i][j]);
+                // after four sweeps, skip the rotation if the off-diagonal element is small
+                if ((n > 3) && ((fabs(eigen_values[i])+g) == fabs(eigen_values[i])) && ((fabs(eigen_values[j])+g) == fabs(eigen_values[j])))
+                {
+                    A[i][j] = 0.0;
+                }
+                else if (fabs(A[i][j]) > tresh){
+                    h = eigen_values[j] - eigen_values[i];
+                    if ((fabs(h)+g) == fabs(h))
+                        t = A[i][j]/h;
+                    else
+                    {
+                        th = 0.5*h/A[i][j];
+                        t = 1.0/(fabs(th) + sqrt(1+th*th));
+                        if (th < 0.0) t = -t;
+                    }
+                    c = 1.0/sqrt(1.0 + t*t);
+                    s = t*c;
+                    tau = s/(1.0+c);
+                    h = t*A[i][j];
+                    z[i] -= h;
+                    z[j] += h;
+                    eigen_values[i] -= h;
+                    eigen_values[j] += h;
+                    A[i][j] = 0;
+                    for (k=  0; k<=i-1; ++k) { ROTATE(A, k, i, k, j) }
+                    for (k=i+1; k<=j-1; ++k) { ROTATE(A, i, k, k, j) }
+                    for (k=j+1; k<N; ++k) { ROTATE(A, i, k, j, k) }
+                    for (k=  0; k<N; ++k) { ROTATE(Eigen, k, i, k, j) }
+                    ++nrot;
+                }
+            }
+        }//end of for loop
+        
+        //Update eigen_values with the sum. Reinitialize z.
+        for (int i=0; i<R; ++i)
+        {
+            b[i] += z[i];
+            eigen_values[i] = b[i];
+            z[i] = 0.0;
+        }
+    }
+    
+    // we sure we converged
+    assert(n < NMAX);
+    return true;
+}

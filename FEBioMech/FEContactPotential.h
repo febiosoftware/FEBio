@@ -36,12 +36,20 @@ public:
 	{
 	public:
 		vec3d	m_tc;
+
+		void Serialize(DumpStream& ar) override
+		{
+			FEContactMaterialPoint::Serialize(ar);
+			ar & m_tc;
+		}
 	};
 
 public:
 	FEContactPotentialSurface(FEModel* fem);
 
 	void GetContactTraction(int nelem, vec3d& tc) override;
+
+	double GetContactArea() override;
 
 	FEMaterialPoint* CreateMaterialPoint() override;
 };

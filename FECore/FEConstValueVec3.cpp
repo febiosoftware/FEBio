@@ -125,7 +125,7 @@ vec3d FEMappedValueVec3::operator()(const FEMaterialPoint& pt)
 
 FEVec3dValuator* FEMappedValueVec3::copy()
 {
-	FEMappedValueVec3* map = new FEMappedValueVec3(GetFEModel());
+	FEMappedValueVec3* map = fecore_alloc(FEMappedValueVec3, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }

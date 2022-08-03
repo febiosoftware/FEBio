@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
+#include <FECore/DomainDataRecord.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -250,4 +251,73 @@ class FELogElemPorosity : public FELogElemData
 public:
 	FELogElemPorosity(FEModel* fem) : FELogElemData(fem) {}
 	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPermeability : public FELogElemData
+{
+public:
+	FELogElemPermeability(FEModel* fem, int n) : FELogElemData(fem) { m_comp = n; }
+	double value(FEElement& el);
+protected:
+	int	m_comp;
+};
+
+template <int n>
+class FELogElemPermeability_T : public FELogElemPermeability
+{
+public: FELogElemPermeability_T(FEModel* fem) : FELogElemPermeability(fem, n) {}
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemSolidStress : public FELogElemData
+{
+public:
+	FELogElemSolidStress(FEModel* fem, int n) : FELogElemData(fem) { m_comp = n; }
+	double value(FEElement& el);
+protected:
+	int	m_comp;
+};
+
+template <int n>
+class FELogElemSolidStress_T : public FELogElemSolidStress
+{
+public: FELogElemSolidStress_T(FEModel* fem) : FELogElemSolidStress(fem, n) {}
+};
+
+//=============================================================================
+// D O M A I N   D A T A
+//=============================================================================
+
+class FELogDomainIntegralSBMConcentration : public FELogDomainData
+{
+public:
+	FELogDomainIntegralSBMConcentration(FEModel* fem, int sbm);
+	double value(FEDomain& dom) override;
+
+protected:
+	int	m_sbm;
+};
+
+template <int N> class FELogDomainIntegralSBMConcentration_T : public FELogDomainIntegralSBMConcentration
+{
+public:
+	FELogDomainIntegralSBMConcentration_T(FEModel* pfem) : FELogDomainIntegralSBMConcentration(pfem, N) {}
+};
+
+//-------------------------------------------------------------------------------------------
+class FELogDomainIntegralSoluteConcentration : public FELogDomainData
+{
+public:
+	FELogDomainIntegralSoluteConcentration(FEModel* fem, int sol);
+	double value(FEDomain& dom) override;
+
+protected:
+	int	m_nsol;
+};
+
+template <int N> class FELogDomainIntegralSoluteConcentration_T : public FELogDomainIntegralSoluteConcentration
+{
+public:
+	FELogDomainIntegralSoluteConcentration_T(FEModel* pfem) : FELogDomainIntegralSoluteConcentration(pfem, N) {}
 };

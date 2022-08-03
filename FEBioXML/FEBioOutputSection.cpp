@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/SurfaceDataRecord.h>
 #include <FECore/DomainDataRecord.h>
+#include <FECore/FEModelDataRecord.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelData.h>
 #include <FECore/FSPath.h>
@@ -350,6 +351,21 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
            
 			GetFEBioImport()->AddDataRecord(prec);
         }
+        else if (tag == "model_data")
+        {
+            FEModelDataRecord* prec = new FEModelDataRecord(&fem, szfile);
+            
+            const char* szdata = tag.AttributeValue("data");
+            prec->SetData(szdata);
+            
+            const char* szname = tag.AttributeValue("name", true);
+            if (szname   != 0) prec->SetName(szname); else prec->SetName(szdata);
+            if (szdelim  != 0) prec->SetDelim(szdelim);
+            if (szformat != 0) prec->SetFormat(szformat);
+			prec->SetComments(bcomment);
+
+			GetFEBioImport()->AddDataRecord(prec);
+        }
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
@@ -412,15 +428,16 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 				if (tag.isempty() == false) tag.value(item);
 
                 // see if a surface is referenced
-                const char* szset = tag.AttributeValue("surface", true);
-                if (szset)
+                const char* szsurf = tag.AttributeValue("surface", true);
+                const char* szeset = tag.AttributeValue("elem_set", true);
+                if (szsurf)
                 {
                     // make sure this tag does not have any children
                     if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
                     
                     // see if we can find the facet set
                     FEMesh& m = GetFEModel()->GetMesh();
-					FEFacetSet* ps = m.FindFacetSet(szset);
+					FEFacetSet* ps = m.FindFacetSet(szsurf);
                     
                     // create a surface from the facet set
                     if (ps)
@@ -434,8 +451,25 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
                         const std::string& surfName = psurf->GetName();
 						plotData.AddPlotVariable(szt, item, surfName.c_str());
                     }
-                    else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+                    else throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
                 }
+				else if (szeset)
+				{
+					// make sure this tag does not have any children
+					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+
+					// see if we can find the facet set
+					FEMesh& m = GetFEModel()->GetMesh();
+					FEElementSet* ps = m.FindElementSet(szeset);
+
+					// create a surface from the facet set
+					if (ps)
+					{
+						// Add the plot variable
+						plotData.AddPlotVariable(szt, item, szeset);
+					}
+					else throw XMLReader::InvalidAttributeValue(tag, "elem_set", szeset);
+				}
                 else
                 {
                     // Add the plot variable
