@@ -168,8 +168,9 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	
 	// relative volume
 	double J = et.m_J;
-	double phi0 = pet.m_phi0t;
-	double cF = m_cFr(pt)*(1-phi0)/(J-phi0);
+    double phi0 = pet.m_phi0;
+	double phisr = pet.m_phi0t;
+	double cF = m_cFr(pt)*(1-phi0)/(J-phisr);
 	
 	return cF;
 }
@@ -615,6 +616,6 @@ double FETriphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
 	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
 	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
-	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0t);
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
 	return cf;
 }

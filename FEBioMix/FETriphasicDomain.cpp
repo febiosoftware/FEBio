@@ -226,7 +226,7 @@ void FETriphasicDomain::Reset()
 		FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
 		// initialize referential solid volume fraction
-		pt.m_phi0t = pmb->m_phi0(mp);
+		pt.m_phi0 = pt.m_phi0t = pmb->m_phi0(mp);
 			
 		// initialize multiphasic solutes
 		ps.m_nsol = nsol;

@@ -466,7 +466,7 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 		ce += SBMChargeNumber(isbm)*spt.m_sbmr[isbm]/SBMMolarMass(isbm);
     
     double cFr = m_cFr(pt);
-	double cF = (cFr*(1-phi0)+ce)/(J-phi0);
+	double cF = (cFr*(1-bt.m_phi0)+ce)/(J-phi0);
 
 	return cF;
 }

@@ -417,7 +417,7 @@ void FEMultiphasicShellDomain::Reset()
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 
             // initialize referential solid volume fraction
-            pt.m_phi0t = m_pMat->m_phi0(mp);
+            pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
             
             // extract the initial apparent densities of the solid-bound molecules
             for (int i = 0; i<nsbm; ++i)
@@ -458,6 +458,7 @@ void FEMultiphasicShellDomain::Reset()
             }
         }
     }
+    m_breset = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -2382,6 +2383,7 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp
         
         // evaluate referential solid volume fraction
         ppt.m_phi0t = pmb->SolidReferentialVolumeFraction(mp);
+        if (m_breset) ppt.m_phi0 = ppt.m_phi0t;
         
         // evaluate fluid pressure at gauss-point
         ppt.m_p = evaluate(el, pn, qn, n);
@@ -2424,6 +2426,7 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp
             pmb->GetMembraneReaction(j)->UpdateElementData(mp);
         
     }
+    if (m_breset) m_breset = false;
 }
 
 //-----------------------------------------------------------------------------

@@ -78,7 +78,8 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0t;
+    double phi0 = pt.m_phi0;
+	double phisr = pt.m_phi0t;
 	
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
@@ -94,13 +95,13 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	double f;
     double M0 = m_M0(mp);
     double alpha0 = m_alpha0(mp);
-	double k0 = m_perm0(mp)*pow((J-phi0)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
+	double k0 = m_perm0(mp)*pow((J-phisr)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
 	double k1[3] = { m_perm1[0](mp), m_perm1[1](mp), m_perm1[2](mp) };
 	double k2[3] = { m_perm2[0](mp), m_perm2[1](mp), m_perm2[2](mp) };
 	double alpha[3] = { m_alpha[0](mp), m_alpha[1](mp), m_alpha[2](mp) };
 	double M[3] = { m_M[0](mp), m_M[1](mp), m_M[2](mp) };
 	for (a=0; a<3; a++) {
-		f = pow((J-phi0)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
+		f = pow((J-phisr)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
 		k1[a] *= f/(J*J);
 		k2[a] *= 0.5*f/pow(J,4);
 	}
@@ -134,8 +135,9 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0t;
-	
+	double phi0 = pt.m_phi0;
+    double phisr = pt.m_phi0t;
+
 	// get local coordinates
 	mat3d Q = GetLocalCS(mp);
 
@@ -149,8 +151,8 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds k0hat, k1hat, k2hat;
     double M0 = m_M0(mp);
     double alpha0 = m_alpha0(mp);
-	k0 = m_perm0(mp)*pow((J-phi0)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
-	K0prime = (1+J*(alpha0/(J-phi0)+M0*J))*k0;
+	k0 = m_perm0(mp)*pow((J-phisr)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
+	K0prime = (1+J*(alpha0/(J-phisr)+M0*J))*k0;
 	k0hat = mat3dd(K0prime);
 	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0);
 	double k1[3] = { m_perm1[0](mp), m_perm1[1](mp), m_perm1[2](mp) };
@@ -158,11 +160,11 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double alpha[3] = { m_alpha[0](mp), m_alpha[1](mp), m_alpha[2](mp) };
 	double M[3] = { m_M[0](mp), m_M[1](mp), m_M[2](mp) };
 	for (a=0; a<3; a++) {
-		f = pow((J-phi0)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
+		f = pow((J-phisr)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
 		k1[a] *= f/(J*J);
 		k2[a] *= 0.5*f/pow(J,4);
-		K1prime = (J*J*M[a]+(J*(alpha[a]-1)+phi0)/(J-phi0))*k1[a];
-		K2prime = (J*J*M[a]+(J*(alpha[a]-3)+3*phi0)/(J-phi0))*k2[a];
+		K1prime = (J*J*M[a]+(J*(alpha[a]-1)+phi0)/(J-phisr))*k1[a];
+		K2prime = (J*J*M[a]+(J*(alpha[a]-3)+3*phi0)/(J-phisr))*k2[a];
 		k1hat = mat3dd(K1prime);
 		k2hat = mat3dd(K2prime);
 		K4 += dyad1mm(m[a],k1hat) + dyad1mm((m[a]*b).sym()*2.0,k2hat)

@@ -246,7 +246,7 @@ void FEBiphasicSolidDomain::Reset()
 		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 
 		// initialize referential solid volume fraction
-		pt.m_phi0t = m_pMat->m_phi0(mp);
+		pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
 	});
 }
 
