@@ -7533,7 +7533,7 @@ When multiple solid species are present, the net solid mass content may
 , may be evaluated from 
 \begin_inset Formula 
 \begin{equation}
-\varphi_{r}^{s}=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}/\rho_{T}^{\sigma},\label{eq156}
+\varphi_{r}^{s}=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}/\rho_{T}^{\sigma},\label{eq:referential-solid-volume-fraction}
 \end{equation}
 
 \end_inset
@@ -7551,10 +7551,10 @@ where
 \end_inset
 
  per volume of 
-\begin_inset Formula $\sigma)$
+\begin_inset Formula $\sigma$
 \end_inset
 
- and 
+) and 
 \begin_inset Formula $\varphi_{0}^{s}$
 \end_inset
 
@@ -7591,48 +7591,175 @@ reference "eq154"
 \end_layout
 
 \begin_layout Standard
-The various constituents of the solid matrix may be electrically charged.
- Let 
-\begin_inset Formula $z^{\sigma}$
+At the start of an analysis, the formula of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:referential-solid-volume-fraction"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
- be the charge number (equivalent charge per mole) of solid constituent
- 
-\begin_inset Formula $\sigma$
-\end_inset
-
-, then the net referential fixed charge density of the solid matrix (equivalent
- charge per fluid volume in the referential configuration) is given by 
+ takes the form
 \begin_inset Formula 
 \begin{equation}
-c_{r}^{F}=\frac{1}{1-\varphi_{r}^{s}}\sum\limits _{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\,,\label{eq157}
+\varphi_{r}^{s}\left(0\right)=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}\left(0\right)/\rho_{T}^{\sigma}\label{eq:initial-referential-solid-fraction}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $M^{\sigma}$
+\begin_inset Formula $\rho_{r}^{\sigma}\left(0\right)$
 \end_inset
 
- is the molar mass of 
+ represents the initial apparent mass densities of solid constituents.
+ This initial value of 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ must satisfy 
+\begin_inset Formula $0\le\varphi_{r}^{s}\left(0\right)\le1$
+\end_inset
+
+, since 
+\begin_inset Formula $J=1$
+\end_inset
+
+ at the start of an analysis.
+\end_layout
+
+\begin_layout Standard
+The various constituents of the porous solid matrix of a multiphasic mixture
+ may be electrically charged.
+ The charge density in the current configuration, normalized by the mixture
+ volume in the current configuration, is given by 
+\begin_inset Formula 
+\begin{equation}
+\check{c}^{F}=\frac{z^{F}dn^{F}+\sum_{\sigma}z^{\sigma}dn^{\sigma}}{dV}\,,\label{eq:FCD-mixture-volume}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $z^{F}$
+\end_inset
+
+ is the charge number (equivalent charge per mole) and 
+\begin_inset Formula $dn^{F}$
+\end_inset
+
+ is the elemental number of moles associated with fixed charges present
+ in the initial volume fraction 
+\begin_inset Formula $\varphi_{0}^{s}$
+\end_inset
+
+ of the solid matrix.
+ Similarly, 
+\begin_inset Formula $z^{\sigma}$
+\end_inset
+
+ is the charge number of evolving solid constituent 
 \begin_inset Formula $\sigma$
 \end_inset
 
- (an invariant quantity) and 
-\begin_inset Formula $1-\varphi_{r}^{s}$
+.
+ By convention however, the fixed charge density 
+\begin_inset Formula $c^{F}$
 \end_inset
 
- represents the referential volume fraction of all fluid constituents (solvent
- 
-\begin_inset Formula $+$
-\end_inset
-
- solutes) in a saturated mixture.
- Based on the kinematics of the continuum, the fixed charge density in the
- current configuration is 
+ of a multiphasic material is normalized by the fluid volume of the mixture,
+ thus it can be shown that
 \begin_inset Formula 
 \begin{equation}
-c^{F}=\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}c_{r}^{F}\,.\label{eq158}
+c^{F}=\frac{\check{c}^{F}}{1-\varphi^{s}}=\frac{1}{J-\varphi_{r}^{s}}\left(\frac{z^{F}dn^{F}}{dV_{r}}+\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\right)\,.\label{eq:FCD-fluid-volume}
+\end{equation}
+
+\end_inset
+
+In particular, in the reference configuration this formula produces
+\begin_inset Formula 
+\begin{equation}
+c^{F}\left(0\right)=\frac{1}{1-\varphi_{r}^{s}\left(0\right)}\left(\frac{z^{F}dn^{F}\left(0\right)}{dV_{r}}+\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}\left(0\right)}{M^{\sigma}}\right)\,.\label{eq:FCD-initial-time}
+\end{equation}
+
+\end_inset
+
+We define the first term on the right-hand-side of this equation as the
+ initial value of the user-specified fixed charge density 
+\begin_inset Formula $c_{0}^{F}$
+\end_inset
+
+ (which is not associated with solid species 
+\begin_inset Formula $\sigma$
+\end_inset
+
+),
+\begin_inset Formula 
+\begin{equation}
+c_{0}^{F}\equiv\frac{1}{1-\varphi_{r}^{s}\left(0\right)}\frac{z^{F}dn^{F}\left(0\right)}{dV_{r}}\,.\label{eq:user-specified-cF0}
+\end{equation}
+
+\end_inset
+
+Therefore, in the current configuration, we may rewrite
+\begin_inset Formula 
+\begin{equation}
+c^{F}=\frac{1-\varphi_{r}^{s}\left(0\right)}{J-\varphi_{r}^{s}}c_{0}^{F}+\frac{1}{J-\varphi_{r}^{s}}\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\,.\label{eq158}
+\end{equation}
+
+\end_inset
+
+where the user-specified 
+\begin_inset Formula $c_{0}^{F}$
+\end_inset
+
+ may optionally be associated with a load curve representing the scale factor
+ 
+\begin_inset Formula $dn^{F}/dn^{F}\left(0\right)$
+\end_inset
+
+, in case the user would like to allow 
+\begin_inset Formula $c_{0}^{F}$
+\end_inset
+
+ to evolve.
+ By analogy, we may now define the referential fixed-charge density 
+\begin_inset Formula $c_{r}^{F}$
+\end_inset
+
+ of the mixture as
+\begin_inset Formula 
+\begin{equation}
+c_{r}^{F}\equiv\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}\left(0\right)}c^{F}=c_{0}^{F}+\frac{1}{1-\varphi_{r}^{s}\left(0\right)}\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\label{eq157}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $c_{r}^{F}$
+\end_inset
+
+ may evolve with time, but it represents the number of fixed equivalent
+ charges in the current configuration, per fluid volume in the reference
+ configuration.
+ Hence we may also write
+\begin_inset Formula 
+\[
+c^{F}=\frac{1-\varphi_{r}^{s}\left(0\right)}{J-\varphi_{r}^{s}}c_{r}^{F}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The molar concentration of a solid-bound molecular constituent, which may
+ be needed in a reactive process involving solutes, is given by
+\begin_inset Formula 
+\begin{equation}
+c^{\sigma}=\frac{1}{J-\varphi_{r}^{s}}\frac{\rho_{r}^{\sigma}}{M^{\sigma}}\,.\label{eq:sbm-molar-concentration}
 \end{equation}
 
 \end_inset
@@ -37789,7 +37916,7 @@ where
  is evaluated from 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq156"
+reference "eq:referential-solid-volume-fraction"
 
 \end_inset
 
