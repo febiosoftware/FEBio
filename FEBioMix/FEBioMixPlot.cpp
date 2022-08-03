@@ -990,7 +990,7 @@ bool FEPlotPorosity::Save(FEDomain &dom, FEDataStream& a)
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
             const FEElasticMaterialPoint* et = (mp.ExtractData<FEElasticMaterialPoint>());
             const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-            return (pt ? (1 - pt->m_phi0/et->m_J) : 0.0);
+            return (pt ? (1 - pt->m_phi0t/et->m_J) : 0.0);
         });
         return true;
     }

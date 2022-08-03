@@ -79,7 +79,7 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+	double phi0 = pt.m_phi0t;
 	
 	// --- strain-dependent permeability ---
 	
@@ -108,7 +108,7 @@ tens4dmm FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+	double phi0 = pt.m_phi0t;
 	
 	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double k0 = m_perm0*f;

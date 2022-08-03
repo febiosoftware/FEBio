@@ -128,7 +128,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 //	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
@@ -356,6 +356,6 @@ double FEBiphasicSolute::GetReferentialFixedChargeDensity(const FEMaterialPoint&
 	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
 	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
-	double cf = (ept->m_J - bpt->m_phi0) * spt->m_cF / (1 - bpt->m_phi0);
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0t);
 	return cf;
 }

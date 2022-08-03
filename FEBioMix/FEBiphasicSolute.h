@@ -74,7 +74,7 @@ public:
 public: // overridden from FEBiphasicInterface
 	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-		return pt->m_phi0;
+		return pt->m_phi0t;
 	}
 
 	double GetActualFluidPressure(const FEMaterialPoint& mp) override {
