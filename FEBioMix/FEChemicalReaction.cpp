@@ -41,8 +41,8 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEChemicalReaction, FEReaction)
 	ADD_PARAMETER(&m_Vbar , FE_PARAM_DOUBLE, 1, "Vbar", &m_Vovr);
 
-	ADD_PROPERTY(m_vRtmp, "vR", FEProperty::Optional);
-    ADD_PROPERTY(m_vPtmp, "vP", FEProperty::Optional);
+	ADD_PROPERTY(m_vRtmp, "vR", FEProperty::Optional)->SetLongName("Reactants");
+    ADD_PROPERTY(m_vPtmp, "vP", FEProperty::Optional)->SetLongName("Products");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
