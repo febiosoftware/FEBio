@@ -413,8 +413,15 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 	return rhosr;
 }
 
+//! Return solid referential apparent density
+double FEMultiphasic::GetReferentialSolidVolumeFraction(const FEMaterialPoint& pt)
+{
+    const FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    return bt.m_phi0t;
+}
+
 //-----------------------------------------------------------------------------
-//! Solid referential volume fraction
+//! Evaluate and return solid referential volume fraction
 double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 {
 	// get referential apparent density of base solid (assumed constant)
@@ -424,6 +431,9 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		phisr += SBMReferentialVolumeFraction(pt, isbm);
 	
+    FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    bt.m_phi0t = phisr;
+    
 	return phisr;
 }
 

@@ -91,11 +91,14 @@ public:
                                        vector< vector<double> >& dkdJr,
                                        vector< vector< vector<double> > >& dkdrc);
 	
-	//! solid referential apparent density
-	double SolidReferentialApparentDensity(FEMaterialPoint& pt);
+    //! return solid referential apparent density
+    double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override;
+    
+	//! evaluate and return solid referential apparent density
+	double SolidReferentialApparentDensity(FEMaterialPoint& pt) override;
 
-	//! solid referential volume fraction
-	double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
+	//! evaluate and return solid referential volume fraction
+	double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
@@ -134,7 +137,7 @@ public:
 	int SBMChargeNumber(const int sbm) { return m_pSBM[sbm]->ChargeNumber(); }
 
 	//! SBM actual concentration (molar concentration per fluid volume in current configuration)
-	double SBMConcentration(FEMaterialPoint& pt, const int sbm) {
+	double SBMConcentration(FEMaterialPoint& pt, const int sbm) override {
 		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
@@ -191,9 +194,9 @@ public:
 public:
 	FEElasticMaterial* GetSolid() { return m_pSolid; }
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
-	FEOsmoticCoefficient* GetOsmoticCoefficient() { return m_pOsmC; }
+	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 	FESolventSupply* GetSolventSupply() { return m_pSupp; }
-	FESolidBoundMolecule* GetSBM(int i) { return m_pSBM[i]; }
+	FESolidBoundMolecule* GetSBM(int i) override { return m_pSBM[i]; }
 	FEChemicalReaction* GetReaction(int i) { return m_pReact[i]; }
 	FEMembraneReaction* GetMembraneReaction(int i) { return m_pMReact[i]; }
 

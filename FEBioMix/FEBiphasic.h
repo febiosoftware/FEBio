@@ -162,6 +162,14 @@ public: // overridden from FEBiphasicInterface
 		return pt->m_pa;
 	}
 
+    //! evaluate and return solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& mp) override {
+        double phisr = m_phi0(mp);
+        FEBiphasicMaterialPoint* bp = (mp.ExtractData<FEBiphasicMaterialPoint>());
+        bp->m_phi0 = bp->m_phi0t = phisr;
+        return phisr;
+    };
+    
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	FEParamDouble               m_phi0;		//!< solid volume fraction in reference configuration
