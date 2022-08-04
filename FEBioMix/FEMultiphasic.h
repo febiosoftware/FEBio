@@ -169,6 +169,14 @@ public:
 	//! Add a membrane reaction
 	void AddMembraneReaction(FEMembraneReaction* pcr);
 
+public: // solute interface
+	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+
+	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_cF;
+	}
+
 public:
 	//! Evaluate effective permeability
 	mat3ds EffectivePermeability(FEMaterialPoint& pt);

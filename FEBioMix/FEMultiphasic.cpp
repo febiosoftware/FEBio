@@ -1120,3 +1120,12 @@ mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, cons
     
     return -(Ke*dKedc*Ke).sym();
 }
+
+double FEMultiphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
+}
