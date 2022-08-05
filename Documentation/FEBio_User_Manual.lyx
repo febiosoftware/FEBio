@@ -83104,7 +83104,7 @@ literal "true"
 where, 
 \begin_inset Formula 
 \[
-k\left(J\right)=k_{0}\left(\frac{J-\varphi_{0}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,,
+k\left(J\right)=k_{0}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,,
 \]
 
 \end_inset
@@ -83127,6 +83127,16 @@ and
  
 \series default
 is the deformation gradient.
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.
 \end_layout
 
 \begin_layout Standard
@@ -83456,7 +83466,7 @@ This material uses a strain-dependent permeability tensor that accommodates
  strain-induced anisotropy: 
 \begin_inset Formula 
 \[
-\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
+\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
 \]
 
 \end_inset
@@ -83479,7 +83489,17 @@ where
 \end_inset
 
  is the left Cauchy-Green tensor.
- Note that the permeability in the reference state (
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.Note that the permeability in
+ the reference state (
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset
 
@@ -83919,9 +83939,9 @@ This material uses a strain-dependent permeability tensor that accommodates
 where, 
 \begin_inset Formula 
 \[
-\begin{aligned}k_{0} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
-k_{1}^{a} & =\frac{k_{1r}^{a}}{J^{2}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
-k_{2}^{a} & =\frac{k_{2r}^{a}}{2J^{4}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
+\begin{aligned}k_{0} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
+k_{1}^{a} & =\frac{k_{1r}^{a}}{J^{2}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
+k_{2}^{a} & =\frac{k_{2r}^{a}}{2J^{4}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,\quad a=1,2,3\,.
 \]
@@ -83972,6 +83992,16 @@ reference "subsec:Orthotropic-Materials"
 \end_inset
 
 ).
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.
  Note that the permeability in the reference state (
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset
@@ -84576,9 +84606,9 @@ This material uses a strain-dependent permeability tensor that accommodates
  strain-induced anisotropy: 
 \begin_inset Formula 
 \[
-\begin{aligned}\mathbf{k} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{0}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\mathbf{I}\\
- & +\left(\frac{k_{1r}^{T}}{J^{2}}\left(\mathbf{b}-\mathbf{m}\right)+\frac{k_{2r}^{T}}{2J^{4}}\left[2\mathbf{b}^{2}-\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right]\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{T}}e^{M_{T}\left(J^{2}-1\right)/2}\\
- & +\left(\frac{1}{J^{2}}k_{1r}^{A}\mathbf{m}+\frac{1}{2J^{4}}k_{2r}^{A}\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{A}}e^{M_{A}\left(J^{2}-1\right)/2}
+\begin{aligned}\mathbf{k} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{0}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\mathbf{I}\\
+ & +\left(\frac{k_{1r}^{T}}{J^{2}}\left(\mathbf{b}-\mathbf{m}\right)+\frac{k_{2r}^{T}}{2J^{4}}\left[2\mathbf{b}^{2}-\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right]\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{T}}e^{M_{T}\left(J^{2}-1\right)/2}\\
+ & +\left(\frac{1}{J^{2}}k_{1r}^{A}\mathbf{m}+\frac{1}{2J^{4}}k_{2r}^{A}\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{A}}e^{M_{A}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,
 \]
@@ -84632,6 +84662,16 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 ).
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.
  Note that the permeability in the reference state (
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset

@@ -6111,6 +6111,164 @@ FEBio does not use this calculation for solid mixtures, as all internal
 \end_layout
 
 \begin_layout Subsection
+Frame Indifference
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Frame-Indifference"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To maintain frame indifference for constrained mixtures we must satisfy
+ 
+\begin_inset Formula $\boldsymbol{\sigma}\left(\mathbf{Q}\cdot\mathbf{F}^{s}\right)=\mathbf{Q}\cdot\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)\cdot\mathbf{Q}^{T}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is an orthogonal transformation that maintains the symmetry group of 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian22a"
+literal "false"
+
+\end_inset
+
+.
+ Here, we abbreviated the list of state variables for 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ to just 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+, for notational simplicity.
+ This frame indifference is automatically satisfied for 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ based on the hyperelasticity relation of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and the invariance of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+.
+ By the same argument, 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}^{\sigma}$
+\end_inset
+
+ as given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-stress-function"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}^{\sigma}\left(\mathbf{Q}\cdot\mathbf{F}^{\sigma}\right)=\mathbf{Q}\cdot\boldsymbol{\sigma}_{0}^{\sigma}\left(\mathbf{F}^{\sigma}\right)\cdot\mathbf{Q}^{T}$
+\end_inset
+
+ for transformations that maintain the symmetry group of 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+.
+ Since the symmetry transformations 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ must also belong to the symmetry groups of all 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+, we need to ensure that 
+\begin_inset Formula $\mathbf{F}^{s*}=\mathbf{Q}\cdot\mathbf{F}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}^{\sigma*}=\mathbf{Q}\cdot\mathbf{F}^{\sigma}$
+\end_inset
+
+ also satisfy the kinematic constraint of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for those transformations 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+, namely 
+\begin_inset Formula $\mathbf{F}^{s*}=\mathbf{F}^{\sigma*}\cdot\mathbf{F}^{\sigma s}$
+\end_inset
+
+.
+ This can be achieved if and only if 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ is invariant under a change of frame.
+ It follows from this argument that the right Cauchy-Green tensors are invariant
+, 
+\begin_inset Formula $\mathbf{C}^{s*}=\left(\mathbf{F}^{s*}\right)^{T}\cdot\mathbf{F}^{s*}=\left(\mathbf{F}^{s}\right)^{T}\cdot\mathbf{F}^{s}=\mathbf{C}^{s}$
+\end_inset
+
+ and similarly 
+\begin_inset Formula $\mathbf{C}^{\sigma*}=\mathbf{C}^{\sigma}$
+\end_inset
+
+, while also satisfying 
+\begin_inset Formula $\mathbf{C}^{s*}=\mathbf{C}^{s}=\left(\mathbf{F}^{\sigma s}\right)^{T}\cdot\mathbf{C}^{\sigma}\cdot\mathbf{F}^{\sigma s}$
+\end_inset
+
+.
+ Right stretch tensors 
+\begin_inset Formula $\mathbf{U}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}^{\sigma}$
+\end_inset
+
+ are also invariant.
+\end_layout
+
+\begin_layout Subsection
 Simple Solid Mixtures
 \begin_inset CommandInset label
 LatexCommand label
@@ -6303,16 +6461,26 @@ literal "false"
 \end_inset
 
 .
- An alternative form of this constitutive model is that 
-\begin_inset Formula $\mathbf{F}^{\sigma}\left(\mathbf{X}^{s},t^{\sigma}\right)=\mathbf{I}$
+ An alternative form of this constitutive model, which satisfies frame-indiffere
+nce, is that 
+\begin_inset Formula $\mathbf{F}^{\sigma}\left(\mathbf{X}^{s},t^{\sigma}\right)=\mathbf{R}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
- while the new generation 
+ at the time the new generation 
 \begin_inset Formula $\sigma$
 \end_inset
 
- is being deposited, or equivalently 
-\begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)=\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+ is being deposited, where 
+\begin_inset Formula $\mathbf{R}^{s}$
+\end_inset
+
+ is the rotation tensor in the polar decomposition of 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{R}^{s}\cdot\mathbf{U}^{s}$
+\end_inset
+
+.
+ Equivalently, 
+\begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)=\mathbf{U}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
  according to eq.
@@ -6326,11 +6494,16 @@ noprefix "false"
 \end_inset
 
 .
+ Since 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ is a right-stretch tensor, it satisfies frame indifference.
 \end_layout
 
 \begin_layout Standard
 The underlying assumption of multigenerational growth is that 
-\begin_inset Formula $\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+\begin_inset Formula $\mathbf{U}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
  evolves for each generation 
@@ -6659,6 +6832,15 @@ and
 
  and 
 \begin_inset Formula $\mathbf{a}_{j}$
+\end_inset
+
+.
+ All of these constitutive models for 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ satisy frame indifference since they depend on material vectors 
+\begin_inset Formula $\mathbf{a}_{i}$
 \end_inset
 
 .
@@ -31319,7 +31501,7 @@ Reactive viscoelasticity models a material as a mixture of strong bonds,
  to loading 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian15"
+key "Ateshian15,Ateshian22"
 literal "true"
 
 \end_inset
@@ -31396,7 +31578,7 @@ generation weak bonds relative to their reference configuration
 , which may be evaluated from the chain rule, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\mathbf{U}\left(\mathbf{X},u\right)\,,\label{eq492}
+\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\bar{\mathbf{R}}\left(\mathbf{X},u\right)\cdot\mathbf{U}\left(\mathbf{X},u\right)\,,\label{eq492}
 \end{equation}
 
 \end_inset
@@ -31406,10 +31588,18 @@ where
 \end_inset
 
  is the right-stretch tensor of 
-\begin_inset Formula $\mathbf{F}$
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
 \end_inset
 
-.
+ and 
+\begin_inset Formula $\bar{\mathbf{R}}=\left(\mathbf{R}^{u}\right)^{T}\cdot\mathbf{R}$
+\end_inset
+
+ is the relative rotation between generation 
+\begin_inset Formula $u$
+\end_inset
+
+ and the master generation.
  The strain energy density 
 \begin_inset Formula $\Psi_{r}$
 \end_inset
@@ -31715,6 +31905,428 @@ reference "eq492"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Constitutive Model for 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Constitutive-Model-Rbar"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In reactive viscoelasticity we adopt the constitutive assumption that 
+\begin_inset Formula $\mathbf{U}^{u}=\mathbf{I}$
+\end_inset
+
+, thus 
+\begin_inset Formula $\mathbf{F}^{u}=\mathbf{R}^{u}$
+\end_inset
+
+, at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+ when generation 
+\begin_inset Formula $u$
+\end_inset
+
+ must come into existence in a stress-free state.
+ Since 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq492"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ must be a proper orthogonal transformation, we may select
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\bar{\mathbf{R}} & =\mathbf{I}\,.\end{aligned}
+\label{eq:A-R-identity}
+\end{equation}
+
+\end_inset
+
+Since this choice is invariant to any transformation 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ it remains valid for all material symmetries, ranging from triclinic to
+ isotropic.
+ Therefore, eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq492"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ now takes the form
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{u}\left(\mathbf{X},t\right)=\mathbf{F}\left(\mathbf{X},t\right)\cdot\mathbf{U}^{-1}\left(\mathbf{X},u\right)\label{eq:rv-Fu-model}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is the right stretch tensor of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+There remains one special case that must be addressed with a separate choice
+ for 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+.
+ In biomechanics we often find it convenient to model fibrous or fibrillar
+ materials using one-dimensional fibers that can only sustain tension.
+ Typically, such fibers are represented with a strain energy density function
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\Psi_{0}\left(\mathbf{C}\right) & =H\left(I_{n}-1\right)\Psi_{n}\left(I_{n}\right)\,, & I_{n} & =\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}\end{aligned}
+\label{eq:A-fiber-models}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the unit vector along the fiber in its reference configuration, and
+ 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the square of the stretch ratio along the fiber.
+ The Heaviside unit step function 
+\begin_inset Formula $H\left(I_{n}-1\right)$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-fiber-models"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ ensures that the fiber contributes strain energy only when it is under
+ tension (
+\begin_inset Formula $I_{n}>1$
+\end_inset
+
+); thus, the constitutive model 
+\begin_inset Formula $\Psi_{n}\left(I_{n}\right)$
+\end_inset
+
+ for the tensile response of the fiber must reduce to zero when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the reactive viscoelasticity framework, each generation 
+\begin_inset Formula $u$
+\end_inset
+
+ comes into existence at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+, thus the constitutive model for the fiber must account for the fact that
+ the fiber orientation is no longer along 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+.
+ Indeed, the total weak bond free energy in a reactive viscoelastic material
+ now reduces to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\sum_{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\left(t\right)\right) & =\sum_{u}w^{u}H\left(I_{n}^{u}-1\right)\Psi_{n}\left(I_{n}^{u}\right)\\
+I_{n}^{u} & =\mathbf{n}_{r}^{u}\cdot\mathbf{C}^{u}\cdot\mathbf{n}_{r}^{u}
+\end{aligned}
+\label{eq:A-fiber-SED}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ is the fiber orientation at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $I_{n}^{u}$
+\end_inset
+
+ is the square of the stretch ratio of the fiber relative to its reference
+ configuration at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+.
+ Recall that the elemental line along 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ gets transformed in the material frame at any time 
+\begin_inset Formula $t$
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ to 
+\begin_inset Formula $\lambda_{n}\mathbf{n}=\mathbf{U}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\lambda_{n} & =\sqrt{\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}}\,, & \mathbf{n} & =\frac{1}{\lambda_{n}}\mathbf{U}\cdot\mathbf{n}_{r}\end{aligned}
+\label{eq:A-fiber-current}
+\end{equation}
+
+\end_inset
+
+At time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+ when generation 
+\begin_inset Formula $u$
+\end_inset
+
+ forms in a stress-free state, it follows that the fiber material is now
+ based on the orientation 
+\begin_inset Formula $\mathbf{n}_{r}^{u}\equiv\mathbf{n}\left(t^{u}\right)$
+\end_inset
+
+, evaluated using 
+\begin_inset Formula $\mathbf{U}\left(\mathbf{X},t^{u}\right)$
+\end_inset
+
+ as shown in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-fiber-current"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In general, 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ need not be collinear, therefore we can find the rotation 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ that transforms 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\bar{\mathbf{R}}=\left(1-\cos\gamma\right)\mathbf{m}\otimes\mathbf{m}+\cos\gamma\mathbf{I}-\mathbb{E}\cdot\left(\sin\gamma\,\mathbf{m}\right)\label{eq:A-R-fiber}
+\end{equation}
+
+\end_inset
+
+with 
+\begin_inset Formula $\cos\gamma=\mathbf{n}_{r}^{u}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $\sin\gamma\,\mathbf{m}=\mathbf{n}_{r}^{u}\times\mathbf{n}_{r}$
+\end_inset
+
+.
+ In this expression, 
+\begin_inset Formula $\mathbf{m}$
+\end_inset
+
+ is the unit vector along the rotation axis, 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ is the rotation angle about the axis, and 
+\begin_inset Formula $\mathbb{E}$
+\end_inset
+
+ represents the (pseudo-)third-order permutation tensor whose components
+ are equal to the permutation symbol 
+\begin_inset Formula $\varepsilon_{ijk}$
+\end_inset
+
+.
+ Thus, 
+\begin_inset Formula $-\mathbb{E}\cdot\boldsymbol{\omega}$
+\end_inset
+
+ is the antisymmetric second-order tensor 
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ whose dual vector is 
+\begin_inset Formula $\boldsymbol{\omega}$
+\end_inset
+
+, from which it follows that 
+\begin_inset Formula $\boldsymbol{\Omega}\cdot\mathbf{a}=\boldsymbol{\omega}\times\mathbf{a}$
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+.
+ Here again, since 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ represents a relative rotation between the material vectors 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, it is invariant to any transformation 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In practice it is not necessary to evaluate 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-R-fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for each generation 
+\begin_inset Formula $u$
+\end_inset
+
+ of each fiber in a material model; instead one can reset the fiber direction
+ from 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{n}_{r}^{u}=\mathbf{n}\left(u\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is evaluated as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-fiber-current"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, requiring only the storage of 
+\begin_inset Formula $\mathbf{U}\left(\mathbf{X},u\right)$
+\end_inset
+
+ for each generation 
+\begin_inset Formula $u$
+\end_inset
+
+.
+ This scheme may also be used with continuous fiber distributions 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou16"
+literal "false"
+
+\end_inset
+
+.
+ As explained in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian22"
+literal "false"
+
+\end_inset
+
+, this constitutive model for 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ ensures that cyclical loading of a reactive viscoelastic fibrous material
+ never produces compressive fiber stresses.
 \end_layout
 
 \begin_layout Subsection
