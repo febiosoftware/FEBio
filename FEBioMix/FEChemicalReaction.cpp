@@ -39,8 +39,8 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEChemicalReaction, FEReaction)
-	ADD_PARAMETER(&m_Vbar , FE_PARAM_DOUBLE, 1, "Vbar", &m_Vovr);
-
+    ADD_PARAMETER(m_Vovr, "override_vbar")->SetFlags(FE_PARAM_WATCH);
+	ADD_PARAMETER(m_Vbar , "Vbar")->SetWatchVariable(&m_Vovr);
 	ADD_PROPERTY(m_vRtmp, "vR", FEProperty::Optional)->SetLongName("Reactants");
     ADD_PROPERTY(m_vPtmp, "vP", FEProperty::Optional)->SetLongName("Products");
 END_FECORE_CLASS();
@@ -49,7 +49,9 @@ END_FECORE_CLASS();
 FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEReaction(pfem)
 {
     // additional initializations
+    m_Vbar = 0.0;
 	m_Vovr = false; 
+    m_nsol = -1;
 
 	m_pFwd = m_pRev = 0;
 }
