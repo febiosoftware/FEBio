@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPermRefTransIso.h"
+#include <FECore/log.h>
 
 
 // define the material parameters
@@ -81,6 +82,9 @@ mat3ds FEPermRefTransIso::Permeability(FEMaterialPoint& mp)
 	double phi0 = pt.m_phi0;
     double phisr = pt.m_phi0t;
 	
+    // check for potential error
+    if (J <= phisr) feLogError("The perm-ref-trans-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
 
@@ -131,6 +135,9 @@ tens4dmm FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double phi0 = pt.m_phi0;
     double phisr = pt.m_phi0t;
 	
+    // check for potential error
+    if (J <= phisr) feLogError("The perm-ref-trans-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
 

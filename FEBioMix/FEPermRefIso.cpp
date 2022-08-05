@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include <FECore/log.h>
 #include "FEPermRefIso.h"
+#include <FECore/log.h>
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 
@@ -77,6 +78,9 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 	// referential solid volume fraction
 	double phisr = pt.m_phi0t;
 	
+    // check for potential error
+    if (J <= phisr) feLogError("The perm-ref-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    
 	// --- strain-dependent permeability ---
 	
 	double f = pow((J-phisr)/(1-pt.m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
@@ -107,6 +111,9 @@ tens4dmm FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double phisr = pt.m_phi0t;
     double phi0 = pt.m_phi0;
 	
+    // check for potential error
+    if (J <= phisr) feLogError("The perm-ref-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    
 	double f = pow((J-phisr)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double k0 = m_perm0*f;
 	double k1 = m_perm1/(J*J)*f;
