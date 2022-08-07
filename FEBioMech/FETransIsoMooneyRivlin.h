@@ -43,8 +43,8 @@ public:
 	FETransIsoMooneyRivlin(FEModel* pfem);
 
 public:
-	double			c1;			//!< Mooney-Rivlin coefficient C1
-	double			c2;			//!< Mooney-Rivlin coefficient C2
+	double			m_c1;			//!< Mooney-Rivlin coefficient C1
+	double			m_c2;			//!< Mooney-Rivlin coefficient C2
 
 public:
 	//! calculate deviatoric stress at material point
