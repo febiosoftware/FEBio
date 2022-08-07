@@ -31,8 +31,8 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(c1          , "c1");
-	ADD_PARAMETER(c2          , "c2");
+	ADD_PARAMETER(m_c1          , "c1");
+	ADD_PARAMETER(m_c2          , "c2");
 	ADD_PARAMETER(m_fib.m_c3  , "c3");
 	ADD_PARAMETER(m_fib.m_c4  , "c4");
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
@@ -50,6 +50,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+
 	m_ac = nullptr;
 	m_fib.SetParent(this);
 	m_fiber = nullptr;
@@ -98,8 +101,8 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
-	double W1 = c1;
-	double W2 = c2;
+	double W1 = m_c1;
+	double W2 = m_c2;
 	// ------------------------------------------------
 
 	// calculate T = F*dW/dC*Ft
@@ -149,8 +152,8 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
 	double W1, W2;
-	W1 = c1;
-	W2 = c2;
+	W1 = m_c1;
+	W2 = m_c2;
 	// ------------------------------------
 
 	// calculate dWdC:C
@@ -209,7 +212,7 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
     
 	// calculate sed
-	double sed = c1*(I1-3) + c2*(I2-3);
+	double sed = m_c1*(I1-3) + m_c2*(I2-3);
     
 	// add the fiber sed
 	sed += m_fib.DevFiberStrainEnergyDensity(mp, a0);

@@ -49,6 +49,14 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FECoupledTransIsoVerondaWestmann::FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+	m_c3 = 0.0;
+	m_c4 = 0.0;
+	m_c5 = 0.0;
+	m_flam = 1.0;
+	m_K = 0.0;
+
 	m_fiber = nullptr;
 }
 
