@@ -135,12 +135,12 @@ int FEBioCmd_Run::run(int nargs, char** argv)
 
 	if (febio->ParseCmdLine(nargs, argv) == false) return 0;
 
-	// run FEBio3 on the ops
+	// run FEBio on the ops
 	febio->RunModel();
 
 	// reset the title after computation.
 	Console* pShell = Console::GetHandle();
-	pShell->SetTitle("FEBio3");
+	pShell->SetTitle("FEBio4");
 
 	return 0;
 }

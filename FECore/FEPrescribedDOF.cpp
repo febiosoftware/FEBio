@@ -87,6 +87,7 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 bool FEPrescribedDOF::Init()
 {
 	// set the dof first before calling base class
+	if (m_dof < 0) return false;
 	SetDOFList(m_dof);
 
 	// don't forget to call the base class

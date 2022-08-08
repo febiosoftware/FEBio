@@ -85,7 +85,7 @@ private:
     vector<int>     m_rim;      //!< list of nodes on the rim
 
 	FEDofList	m_dofW;
-    int         m_dofEF;
+    FEDofList   m_dofEF;
     
     DECLARE_FECORE_CLASS();
 };

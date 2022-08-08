@@ -100,8 +100,8 @@ void FECore::InitModule()
 REGISTER_FECORE_CLASS(FETimeStepController, "default");
 
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      );
-REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
+REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      , 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe", 0x300);	// obsolete in 4.0
 REGISTER_FECORE_CLASS(FELinearConstraint, "linear constraint");
 REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 

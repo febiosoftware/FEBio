@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <FEBioFluid/FEBioMultiphasicFSI.h>
 #include <FEBioFluid/FEBioFluidSolutes.h>
 #include <FEBioFluid/FEBioThermoFluid.h>
+#include <FEBioFluid/FEBioPolarFluid.h>
 #include <FEBioTest/FEBioTest.h>
 #include <FEBioRVE/FEBioRVE.h>
 #include <FEImgLib/FEImgLib.h>
@@ -77,6 +78,7 @@ void InitLibrary()
     FEBioMultiphasicFSI::InitModule();
     FEBioFluidSolutes::InitModule();
     FEBioThermoFluid::InitModule();
+    FEBioPolarFluid::InitModule();
 	FEBioTest::InitModule();
 	FEBioRVE::InitModule();
 	FEImgLib::InitModule();

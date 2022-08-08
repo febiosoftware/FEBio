@@ -1088,7 +1088,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 	// Set the watch flag since the parameter was read in successfully
 	// (This requires that the parameter was declared with a watch variable)
-	pp->SetWatch(true);
+	pp->SetWatchFlag(true);
 
 	return true;
 }

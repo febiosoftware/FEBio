@@ -32,8 +32,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEHolmesMowUC, FEUncoupledMaterial)
-    ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu");
-    ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
+    ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu")->setLongName("shear modulus");
+    ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta")->setLongName("power exponent");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

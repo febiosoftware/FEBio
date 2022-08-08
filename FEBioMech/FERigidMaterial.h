@@ -45,7 +45,6 @@ public:
 public:
 	double	m_E;		//!< Young's modulus
 	double	m_v;		//!< Poisson's ratio
-	bool	m_auto_com;	//!< Calculate the com automatically (and ignore the rc parameter)
 	vec3d	m_rc;		//!< center of mass
 
 public:

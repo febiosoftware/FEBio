@@ -412,12 +412,15 @@ bool FENewtonSolver::AllocateLinearSystem()
 bool FENewtonSolver::Init()
 {
 	// choose a solution strategy
-	if (m_qnstrategy == nullptr) return false;
-	else
+	if (m_qnstrategy == nullptr)
 	{
-		// make sure the QN strategy knows what solver it belongs to
-		m_qnstrategy->SetNewtonSolver(this);
+		m_qnstrategy = fecore_new<FENewtonStrategy>("BFGS", GetFEModel());
+		assert(m_qnstrategy);
+		if (m_qnstrategy == nullptr) return false;
 	}
+
+	// make sure the QN strategy knows what solver it belongs to
+	m_qnstrategy->SetNewtonSolver(this);
 
 	// allocate data vectors
 	m_R0.assign(m_neq, 0);

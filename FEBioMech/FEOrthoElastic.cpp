@@ -33,15 +33,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOrthoElastic, FEElasticMaterial)
-	ADD_PARAMETER(E1 , FE_RANGE_GREATER(0.0), "E1");
-	ADD_PARAMETER(E2 , FE_RANGE_GREATER(0.0), "E2");
-	ADD_PARAMETER(E3 , FE_RANGE_GREATER(0.0), "E3");
-	ADD_PARAMETER(G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12");
-	ADD_PARAMETER(G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23");
-	ADD_PARAMETER(G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31");
-	ADD_PARAMETER(v12, "v12");
-	ADD_PARAMETER(v23, "v23");
-	ADD_PARAMETER(v31, "v31");
+	ADD_PARAMETER(E1 , FE_RANGE_GREATER(0.0), "E1")->setLongName("E1 modulus");
+	ADD_PARAMETER(E2 , FE_RANGE_GREATER(0.0), "E2")->setLongName("E2 modulus");
+	ADD_PARAMETER(E3 , FE_RANGE_GREATER(0.0), "E3")->setLongName("E3 modulus");
+	ADD_PARAMETER(G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12")->setLongName("G12 shear modulus");
+	ADD_PARAMETER(G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23")->setLongName("G23 shear modulus");
+	ADD_PARAMETER(G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31")->setLongName("G31 shear modulus");
+	ADD_PARAMETER(v12, "v12")->setLongName("Poisson's ratio v12");
+	ADD_PARAMETER(v23, "v23")->setLongName("Poisson's ratio v23");
+	ADD_PARAMETER(v31, "v31")->setLongName("Poisson's ratio v31");
 
 	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 

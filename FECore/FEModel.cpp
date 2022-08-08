@@ -2163,7 +2163,7 @@ void FEModel::Serialize(DumpStream& ar)
 	TRACK_TIME(TimerID::Timer_Update);
 
 	m_imp->Serialize(ar);
-	if (ar.IsShallow()) return;
+	DoCallback(ar.IsSaving() ? CB_SERIALIZE_SAVE : CB_SERIALIZE_LOAD);
 }
 
 //-----------------------------------------------------------------------------

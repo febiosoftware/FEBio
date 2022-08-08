@@ -27,9 +27,15 @@ SOFTWARE.*/
 #include <FECore/FEFixedBC.h>
 #include "febiomix_api.h"
 
-class FEBIOMIX_API FEFixedConcentration : public FEFixedDOF
+class FEBIOMIX_API FEFixedConcentration : public FEFixedBC
 {
 public:
 	FEFixedConcentration(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	int	m_dof;
+
 	DECLARE_FECORE_CLASS();
 };

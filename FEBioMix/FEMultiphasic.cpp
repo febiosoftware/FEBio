@@ -404,7 +404,7 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 		
 	// evaluate referential apparent density of base solid
 	double density = m_pSolid->Density(pt);
-	double rhosr = pet.m_phi0*density;
+	double rhosr = pet.m_phi0t*density;
 
 	// add contribution from solid-bound molecules
 	for (int isbm=0; isbm<(int)spt.m_sbmr.size(); ++isbm)
@@ -413,8 +413,15 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 	return rhosr;
 }
 
+//! Return solid referential apparent density
+double FEMultiphasic::GetReferentialSolidVolumeFraction(const FEMaterialPoint& pt)
+{
+    const FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    return bt.m_phi0t;
+}
+
 //-----------------------------------------------------------------------------
-//! Solid referential volume fraction
+//! Evaluate and return solid referential volume fraction
 double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 {
 	// get referential apparent density of base solid (assumed constant)
@@ -424,6 +431,9 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		phisr += SBMReferentialVolumeFraction(pt, isbm);
 	
+    FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    bt.m_phi0t = phisr;
+    
 	return phisr;
 }
 
@@ -435,7 +445,7 @@ double FEMultiphasic::Porosity(FEMaterialPoint& pt)
 	FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// solid referential volume fraction
-	double phisr = bt.m_phi0;
+	double phisr = bt.m_phi0t;
     
 	// relative volume
 	double J = et.m_J;
@@ -458,7 +468,7 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	
 	// relative volume
 	double J = et.m_J;
-	double phi0 = bt.m_phi0;
+	double phi0 = bt.m_phi0t;
 	double ce = 0;
 
 	// add contribution from charged solid-bound molecules
@@ -466,7 +476,7 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 		ce += SBMChargeNumber(isbm)*spt.m_sbmr[isbm]/SBMMolarMass(isbm);
     
     double cFr = m_cFr(pt);
-	double cF = (cFr*(1-phi0)+ce)/(J-phi0);
+	double cF = (cFr*(1-bt.m_phi0)+ce)/(J-phi0);
 
 	return cF;
 }
@@ -607,7 +617,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
 	
 	// get the charge density and its derivatives
 	double J = ept.m_J;
-	double phi0 = ppt.m_phi0;
+	double phi0 = ppt.m_phi0t;
 	double cF = FixedChargeDensity(mp);
 	double dcFdJ = -cF/(J - phi0);
 	double dcFdJJ = 2*cF/SQR(J-phi0);
@@ -776,7 +786,7 @@ tens4ds FEMultiphasic::Tangent(FEMaterialPoint& mp)
 	
 	// relative volume and solid volume fraction
 	double J = ept.m_J;
-	double phi0 = bpt.m_phi0;
+	double phi0 = bpt.m_phi0t;
 	
 	// get the charge density and its derivatives
 	double cF = FixedChargeDensity(mp);
@@ -1119,4 +1129,13 @@ mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, cons
     dKedc *= m_Rgas*m_Tabs/phiw;
     
     return -(Ke*dKedc*Ke).sym();
+}
+
+double FEMultiphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
 }

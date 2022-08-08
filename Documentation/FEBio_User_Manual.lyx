@@ -168,7 +168,7 @@ User's Manual Version 4.0
 \begin_layout Date
 
 \series bold
-Last Updated: June 14, 2022
+Last Updated: August 2, 2022
 \end_layout
 
 \begin_layout Standard
@@ -520,9 +520,9 @@ url{http://febio.org}
 \end_layout
 
 \begin_layout Standard
-FEBio can solve different kinds of physics.
- It can solve problems in structural mechanics, biphasic and multiphasic
- physics, fluid mechanics, and fluid-solid interaction (FSI).
+FEBio is a multi-physics code and can solve problems in structural mechanics,
+ biphasic and multiphasic physics, fluid mechanics, and fluid-solid interaction
+ (FSI).
  Both (quasi-) static (or steady-state) and dynamic (or transient) analyses
  can be performed in each of the different physics modules.
  For instance, in the structural mechanics module, the (quasi-) static response
@@ -637,7 +637,7 @@ literal "true"
 \end_inset
 
  and Abaqus input files can be imported in FEBioStudio and can be exported
- from as a FEBio input file.
+ as a FEBio input file.
  
 \end_layout
 
@@ -654,9 +654,22 @@ name "sec:about"
 
 \begin_layout Standard
 This document is part of a set of three manuals that accompany FEBio: the
- User's Manual, describing how to use FEBio (this manual), a Developer's
- Manual for users who wish to modify or add features to the code, and a
- 
+ User's Manual, describing how to use FEBio (this manual), a 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://help.febio.org/doxygen/html/index.html}{
+\backslash
+emph{Developer's Manual}}
+\end_layout
+
+\end_inset
+
+ for users who wish to modify or add features to the code, and a 
 \begin_inset ERT
 status open
 
@@ -672,6 +685,17 @@ emph{FEBio Theory Manual}}
 \end_inset
 
 , which describes the theory behind the FEBio algorithms.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The User and Theory manuals are also available in pdf form, but the Developer's
+ manual is only available online.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -772,74 +796,6 @@ reference "chap:Troubleshooting"
  guidelines that help users avoid common problems.
 \end_layout
 
-\begin_layout Standard
-Although this document describes some of the theoretical aspects of FEBio,
- a complete theoretical development can be found in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-href{https://febio.org/knowledgebase/}{
-\backslash
-emph{FEBio Theory Manual}}
-\end_layout
-
-\end_inset
-
-
-\begin_inset Formula $.$
-\end_inset
-
- Developers who are interested in modifying or extending the FEBio code
- will find the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-href{https://febio.org/knowledgebase/}{
-\backslash
-emph{FEBio Developer's 
-\end_layout
-
-\begin_layout Plain Layout
-
-Manual}}
-\end_layout
-
-\end_inset
-
-
-\begin_inset Foot
-status open
-
-\begin_layout Plain Layout
-The developers manual is only available online (see 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-url{http://febio.org}
-\end_layout
-
-\end_inset
-
- for more information)
-\end_layout
-
-\end_inset
-
- very useful.
-\end_layout
-
 \begin_layout Section
 FEBio Basics
 \end_layout
@@ -867,7 +823,7 @@ emph{FEBio Theory Manual}}
 \end_layout
 
 \begin_layout Standard
-When FEBio starts, first it will load the configuration file, where it will
+When FEBio starts, first it will load the configuration file where it will
  find instructions on what linear solver to use, what plugins to load, etc.
  Please see section 
 \begin_inset CommandInset ref
@@ -2404,7 +2360,7 @@ Specify the optimization input file.
 \begin_inset Text
 
 \begin_layout Plain Layout
-optimization input file.
+optimization input file
 \end_layout
 
 \end_inset
@@ -2781,7 +2737,7 @@ Example:
 \end_layout
 
 \begin_layout Standard
-This is the most common way to start a FEBio run.
+This is the most common way to start an FEBio run.
  However, FEBio allows the omission of the -i when only a filename is given.
 \end_layout
 
@@ -2797,13 +2753,23 @@ On Windows, this allows for starting FEBio by double-clicking on an input
  must be present.
 \end_layout
 
+\begin_layout Standard
+It is also allowed to omit the .feb extension for FEBio input files.
+ If no extension is given, FEBio will assume that .feb is the file extension.
+ Thus, the following command will run the file input.feb:
+\end_layout
+
+\begin_layout LyX-Code
+> febio input
+\end_layout
+
 \begin_layout Description
 
 \series bold
 -r
 \series default
  The -r option allows you to restart a previous analysis.
- The filename that must follow this option is a FEBio 
+ The filename that must follow this option is an FEBio 
 \shape italic
 restart input file 
 \shape default
@@ -2902,7 +2868,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –p out.plt
+> febio -i input.feb –p out.xplt
 \end_layout
 
 \begin_layout Description
@@ -4455,8 +4421,12 @@ reference "subsec:Setting-break-points"
 \end_layout
 
 \begin_layout Enumerate
-The force command is useful, for example, when a time step is having difficulty
- satisfying the convergence criteria.
+The 
+\emph on
+force
+\emph default
+ command is useful, for example, when a time step is having difficulty satisfyin
+g the convergence criteria.
  The user can then manually force the convergence of the time step.
  However, if the convergence difficulties are due to instabilities, forcing
  a time step to converge could cause the solution to become unstable or
@@ -4704,11 +4674,11 @@ emph{PARDISO}}
 
 \end_inset
 
- linear solver, which is a parallel linear solver using OpenMP.
+ linear solver, which is a parallel linear solver that uses OpenMP.
 \end_layout
 
 \begin_layout Standard
-To use multiple processors set the environment variable OMP_NUM_THREADS
+To use multiple processors, set the environment variable OMP_NUM_THREADS
  to the number of desired threads.
  You should set the number of threads to be equal or less than the number
  of processors on your system (Setting it higher may actually decrease performan
@@ -4863,7 +4833,7 @@ log file
 \shape default
 , the 
 \shape italic
-plot file
+plot file,
 \shape default
  and optionally the 
 \shape italic
@@ -4886,9 +4856,9 @@ status open
 
 
 \backslash
-href{http://febio.org/postview/}{
+href{https://febio.org/febio-studio/}{
 \backslash
-emph{PostView}}
+emph{FEBio Studio}}
 \end_layout
 
 \end_inset
@@ -5032,7 +5002,7 @@ reference "sec:FEBio-prompt"
  This may be because the program is in the middle of a call to the linear
  solver or another time-consuming part of the analysis procedure that cannot
  be interrupted.
- NOTE: This feature may not work properly on all systems, although it will
+ NOTE: This feature may not work properly on all systems, although it should
  always work on Windows systems.
 \end_layout
 
@@ -5097,8 +5067,8 @@ name "subsec:Setting-break-points"
 \begin_layout Standard
 Although ctrl+c can be used to interrupt a run, it might sometimes be difficult
  to interrupt a run at a desired point.
- For this reason, you can set break points, that will pause the execution
- and bring up the febio prompt.
+ For this reason, you can set break points that will pause the execution
+ and bring up the FEBio prompt.
  Breakpoints are set on the command line using the 
 \series bold
 -break
@@ -5115,8 +5085,12 @@ option.
 
 \begin_layout Standard
 To break at a particular time point, simply add the value of the time after
- the -break option.
- This example will break the run after time 0.45 completed (or the first
+ the 
+\emph on
+-break
+\emph default
+ option.
+ This example will pause the run after time 0.45 completed (or the first
  time point past 0.45): 
 \end_layout
 
@@ -5125,7 +5099,7 @@ To break at a particular time point, simply add the value of the time after
 \end_layout
 
 \begin_layout Standard
-Instead of breaking at a particular time, you can also interrupt the run
+Instead of pausing at a particular time, you can also interrupt the run
  when a certain event happens.
  To break at an event, specify the event name at which to pause the run.
  The following list of events are defined.
@@ -5451,11 +5425,17 @@ When the creation of a restart dump file is requested, the analysis can
  be restarted from the last converged timestep.
  This is useful when the run terminated unexpectedly or when the user wishes
  to modify some parameters during the analysis.
- To request the creation of a dump file, simply add the -dump flag on the
- command line.
+ To request the creation of a dump file, simply add the
+\emph on
+ -dump
+\emph default
+ flag on the command line.
  This will generate a 
 \shape italic
-dump 
+\emph on
+dump
+\emph default
+ 
 \shape default
 file which then can be used to restart the analysis.
  You can specify an optional dump level, which sets how often the dump file
@@ -5476,9 +5456,9 @@ With the optional arguments, the complete syntax would be:
 \end_layout
 
 \begin_layout Standard
-The dump level can set to 1 (= write dump file after each converged time
- step), 2 (= write dump file after each completed step),  or 3 (= write
- dump file after each converged  
+The dump level can be set to 1 (= write dump file after each converged time
+ step), 2 (= write dump file after each completed analysis step),  or 3
+ (= write dump file after each converged
 \shape italic
  must-point 
 \shape default
@@ -5766,21 +5746,21 @@ Module
 
 \shape italic
 \emph on
-Control
+Globals
 \shape default
 \emph default
- specifies control and solver parameters.
- 
+ Defines the global variables in the model
 \end_layout
 
 \begin_layout Description
 
 \shape italic
 \emph on
-Globals
+Control
 \shape default
 \emph default
- Defines the global variables in the model 
+ specifies control and solver parameters.
+ 
 \end_layout
 
 \begin_layout Description
@@ -5821,6 +5801,11 @@ MeshData
 \emph default
  Defines element, facet, edge or nodal data that can be mapped to material
  parameters or certain boundary conditions and loads.
+ 
+\end_layout
+
+\begin_layout Description
+MeshAdaptor Defines mesh adaptors that modify the mesh.
  
 \end_layout
 
@@ -5939,7 +5924,7 @@ Although there is some flexibility in the order in which these sections
  can be listed, it is recommended to list them in the same order as given
  above.
  Not all sections are required.
- Empty sections can be omitted and some are optional.
+ Empty sections can be omitted.
  A minimal file must contain at least the Module, Control, Material, Mesh,
  and MeshDomains sections.
  The rest of this chapter describes each of these sections in more detail.
@@ -6324,7 +6309,7 @@ keyword
 status collapsed
 
 \begin_layout Plain Layout
- Supported from FEBio version 2.3 and up.
+Supported from FEBio version 2.3 and up.
 \end_layout
 
 \end_inset
@@ -6628,7 +6613,8 @@ solid
 \begin_inset Text
 
 \begin_layout Plain Layout
-Structural mechanics analysis: quasi-static or dynamic 
+Structural mechanics analysis: quasi-static or dynamic, implicit and explicit
+ solver available 
 \end_layout
 
 \end_inset
@@ -6796,7 +6782,7 @@ Comments
 \end_layout
 
 \begin_layout Enumerate
-The heat module requires a plugin.
+The heat module requires the FEBioHeat plugin.
  
 \end_layout
 
@@ -7000,7 +6986,7 @@ name "subsec:Control-Parameters"
 \end_layout
 
 \begin_layout Standard
-The following parameters are common for all analysis.
+The following parameters are common for all analysis types.
  If not specified they are assigned default values, which are found in the
  last column.
  An asterisk (*) after the name indicates a required parameter.
@@ -7362,8 +7348,9 @@ The
 analysis 
 \shape default
 element sets the analysis type.
- Currently, FEBio defines three analysis types: (quasi-)static, steady-state,
- and dynamic.
+ The text value of this element is tdetermined by the module, but the numeric
+ value should be 0 for (quasi-)static or steady-state analysis and 1 for
+ dynamic or transient analysis.
  In a quasi-static analysis, inertial effects are ignored and an equilibrium
  solution is sought.
  Note that in this analysis mode it is still possible to simulate time dependant
@@ -7477,7 +7464,7 @@ dynamic analysis for solid, fluid and fluid-FSI analyses
 
 \end_deeper
 \begin_layout Enumerate
-The total running time of the analysis is determined by 
+The total simulation time of the analysis is determined by 
 \shape italic
 ntime 
 \shape default
@@ -7489,7 +7476,7 @@ dt
  Note that when the auto-time stepper is enabled (see below), the actual
  number of time steps and time step size may be different than specified
  in the input file.
- However, the total running time will always be determined by 
+ However, the total simulation time will always be determined by 
 \shape italic
 ntime 
 \shape default
@@ -9353,15 +9340,94 @@ parameter is used to set the maximum of such reformations FEBio can do,
 The BFGS and Broyden take the following parameters.
 \end_layout
 
-\begin_layout Description
-maxups 
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_ups
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \shape italic
 \emph on
 This is the maximum number of updates between stiffness matrix reformations.
+\end_layout
 
-\shape default
-\emph default
- 
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10093,7 +10159,8 @@ name "subsec:Constants"
 \end_layout
 
 \begin_layout Standard
-Global constants currently include the universal gas constant 
+Global constants are predefined variables that some modules may rely on
+ and currently include the universal gas constant 
 \begin_inset Formula $R$
 \end_inset
 
@@ -10441,6 +10508,11 @@ Users can define custom, global variables, that can be referenced in other
  This offers a convenient way to parameterize a model.
  Global user variables can also be used in optimizations.
  Currently, only scalar values can be defined.
+ User variables are defined in the 
+\emph on
+Variables 
+\emph default
+child element.
  
 \end_layout
 
@@ -10465,7 +10537,7 @@ The following example defines a global variable, called A, and assigns the
 \end_layout
 
 \begin_layout LyX-Code
-<Globals>
+<Variables>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10475,12 +10547,13 @@ The following example defines a global variable, called A, and assigns the
 \end_layout
 
 \begin_layout LyX-Code
-</Globals>
+</Variables>
 \end_layout
 
 \begin_layout Standard
 As mentioned, these global variables can be used to define other model variables
 , for example, in variables that are defined with mathematical expressions.
+ To use a global variable, prefix the name with 'fem.'.
  
 \end_layout
 
@@ -10495,7 +10568,7 @@ As mentioned, these global variables can be used to define other model variables
 \begin_layout LyX-Code
 
 \series bold
-    <E type="math">3*A</E>
+    <E type="math">3*fem.A</E>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10511,69 +10584,7 @@ As mentioned, these global variables can be used to define other model variables
 \end_layout
 
 \begin_layout Standard
-To define a global variable, specify the 
-\emph on
-var 
-\emph default
-element, add the 
-\emph on
-name 
-\emph default
-attribute to name the variable, and specify the variable's value as the
- tag's value.
- 
-\end_layout
 
-\begin_layout Standard
-The following example defines a global variable, called A, and assigns the
- value 1.23 to it.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<Globals>
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-  <var name="A">1.23</var>
-\end_layout
-
-\begin_layout LyX-Code
-</Globals>
-\end_layout
-
-\begin_layout Standard
-As mentioned, these global variables can be used to define other model variables
-, for example, in variables that are defined with mathematical expressions.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<Material>
-\end_layout
-
-\begin_layout LyX-Code
-  <material name="mymat" type="neo-Hookean">
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-    <E type="math">3*A</E>
-\end_layout
-
-\begin_layout LyX-Code
-    <v>0.3</v>
-\end_layout
-
-\begin_layout LyX-Code
-  </material>
-\end_layout
-
-\begin_layout LyX-Code
-</Globals>
 \end_layout
 
 \begin_layout Standard
@@ -12269,7 +12280,7 @@ Use the
 SolidDomain 
 \emph default
 section to define a solid domain.
- This section takes two required parameters: 
+ This section takes the following parameters: 
 \end_layout
 
 \begin_layout Description
@@ -12290,30 +12301,229 @@ section).
 mat The name of the material that will be assigned to this domain
 \end_layout
 
+\begin_layout Description
+type (optional) the specific formulation used for this domain.
+ 
+\end_layout
+
 \begin_layout Standard
-In addition, the optional 
+The optional 
 \series bold
 type 
 \series default
 attribute can be added to specify a specific solid formulation.
+ If omitted, FEBio will determine the proper domain type by inspecting the
+ material and element types used.
+ However, users can explicitly set the type attribute.
+ The following solid domain types are defined.
  
 \end_layout
 
 \begin_layout Standard
-The 
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \series bold
-elem_type 
-\series default
-can be used to request a particular element integration rule.
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard solid formulation (default for most materials) (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+three-field-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A three-field formulation used for modeling (nearly) incompressible materials.
+ (default for uncoupled materials) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rigid-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rigid solid domain.
+ (default for rigid materials.)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+udg-hex
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+uniform deformation gradient hex formulation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sri-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Formulation that uses a selective reduced integration rule
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+remodeling-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Formulation used for elastic remodeling problems.
  
 \end_layout
 
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ut4-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uniform nodal strain tetrahedron.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
-The values of the rule elements depend on the 
-\shape italic
-elem 
-\shape default
-attribute.
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Standard
+1.
+ For the elastic-solid domain, the elem_type attribute can be specified
+ to further specialize the integration rule.
+ The values of the rule depend on the specific element type.
  The tables below show the available integration rules for the different
  element types.
  The values marked with an asterisk (*) are the default.
@@ -12414,6 +12624,7 @@ Alternative integration rule for bricks using 6 integration point
 
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
 For the 
 \shape italic
@@ -12526,7 +12737,7 @@ element, the following values are allowed.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="3" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -12575,7 +12786,7 @@ Gaussian integration rule using 4 integration points.
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -12584,32 +12795,11 @@ GAUSS1*
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Gaussian integration rule using one integration point.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-UT4
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Nodally integrated tetrahedron.
- (1)
+Gaussian integration rule using one integration point.
 \end_layout
 
 \end_inset
@@ -12627,87 +12817,6 @@ Nodally integrated tetrahedron.
 \end_layout
 
 \end_deeper
-\begin_layout Standard
-
-\shape italic
-Comments:
-\end_layout
-
-\begin_layout Standard
-1.
- The UT4 is a special formulation for tetrahedral elements that uses a nodally
- averaged integration rule, as proposed by Gee et al 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Gee09"
-literal "true"
-
-\end_inset
-
-.
- This formulation requires additional parameters.
- To override the default values, use the following alternative syntax:
-\end_layout
-
-\begin_layout LyX-Code
-<SolidDomain name="Part1" type="ut4">
-\end_layout
-
-\begin_layout LyX-Code
-  <alpha>0.05</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-  <iso_stab>0</iso_stab>
-\end_layout
-
-\begin_layout LyX-Code
-</SolidDomain>
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-alpha 
-\shape default
-parameter defines the amount of 
-\begin_inset Quotes eld
-\end_inset
-
-blending
-\begin_inset Quotes erd
-\end_inset
-
- between the regular tet-contribution and the nodally integrated contribution.
- The value must be between 0 and 1, where 0 means no contribution from the
- regular tet and 1 means no contribution from the nodally averaged tet.
- The 
-\shape italic
-iso_stab 
-\shape default
-parameter is a flag that chooses between two slightly different formulations
- of the nodally integrated tet.
- When set to 0, the stabilization is applied to the entire virtual work,
- whereas when set to 1 the stabilization is applied only to the isochoric
- part.
- See the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-href{https://febio.org/knowledgebase/}{
-\backslash
-emph{FEBio Theory Manual}}
-\end_layout
-
-\end_inset
-
- for a detailed description of this formulation.
-\end_layout
-
 \begin_layout Itemize
 For the 
 \shape italic
@@ -12823,13 +12932,6 @@ Gauss-Lobatto integration rule using 11 integration points
 
 \end_layout
 
-\end_deeper
-\begin_layout Standard
-
-\shape italic
-Notes:
-\end_layout
-
 \begin_layout Standard
 The Lobatto integration rule differs from a regular Gauss integration rule
  in that it includes the vertices of the tetrahedral element.
@@ -12841,6 +12943,7 @@ Lobatto11
  located at the center of the element.
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
 For the 
 \shape italic
@@ -13304,19 +13407,97 @@ Gauss-Lobatto integration with 7 integration points.
 
 \end_layout
 
-\end_deeper
-\begin_layout Standard
-
-\shape italic
-Notes:
-\end_layout
-
 \begin_layout Standard
 The GAUSS6 rule has only nonzero weights at the edge nodes, which effectively
  reduces this rule to a 3-node rule.
 \end_layout
 
 \end_deeper
+\begin_layout Standard
+2.
+ The ut4-solid is a special formulation for tetrahedral elements that uses
+ a nodally averaged integration rule, as proposed by Gee et al 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Gee09"
+literal "true"
+
+\end_inset
+
+.
+ This formulation requires additional parameters.
+ To override the default values, use the following alternative syntax:
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<SolidDomain name="Part1" 
+\series bold
+type="ut4-solid"
+\series default
+ mat="material1">
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>0.05</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <iso_stab>0</iso_stab>
+\end_layout
+
+\begin_layout LyX-Code
+</SolidDomain>
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+The 
+\shape italic
+alpha 
+\shape default
+parameter defines the amount of 
+\begin_inset Quotes eld
+\end_inset
+
+blending
+\begin_inset Quotes erd
+\end_inset
+
+ between the regular tet-contribution and the nodally integrated contribution.
+ The value must be between 0 and 1, where 0 means no contribution from the
+ regular tet and 1 means no contribution from the nodally averaged tet.
+ The 
+\shape italic
+iso_stab 
+\shape default
+parameter is a flag that chooses between two slightly different formulations
+ of the nodally integrated tet.
+ When set to 0, the stabilization is applied to the entire virtual work,
+ whereas when set to 1 the stabilization is applied only to the isochoric
+ part.
+ See the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+ for a detailed description of this formulation.
+\end_layout
+
 \begin_layout Subsection
 ShellDomain Section
 \end_layout
@@ -13348,6 +13529,10 @@ section).
 mat The name of the material that will be assigned to this domain
 \end_layout
 
+\begin_layout Description
+type (optional) the specific shell formulation 
+\end_layout
+
 \begin_layout Standard
 Similar to solid domains, the particular shell formulation can be requested
  via the 
@@ -13355,7 +13540,190 @@ Similar to solid domains, the particular shell formulation can be requested
 type
 \series default
  attribute.
+ If omitted, FEBio will determine the formulation from the material and
+ shell element types.
+ The following shell domain types are available.
  
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-shell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard shell formulation (default for most materials) (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+three-field-shell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A three-field formulation used for modeling (nearly) incompressible materials.
+ (default for uncoupled materials)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rigid-shell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rigid shell domain.
+ (default for rigid materials.)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-shell-old
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The 
+\begin_inset Quotes eld
+\end_inset
+
+old
+\begin_inset Quotes erd
+\end_inset
+
+ shell formulation, used in FEBio version 2.0 and older.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-shell-eas
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Enhanced-Assumed-Strain shell; an alternative shell formulation for incompressib
+le shells.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-shell-ans
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Assumed-Natural-Strain shell; an alternative shell formulation for incompressibl
+e shells.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -13407,7 +13775,7 @@ The
 MeshData 
 \shape default
 section is where data is specified that can be mapped to the mesh.
- The data can be applied to a parameter of the model, e.g.
+ The data can then be applied to a parameter of the model, e.g.
  a material parameter, or a pressure load.
  
 \end_layout
@@ -13433,7 +13801,8 @@ The following attributes can be added.
 \end_layout
 
 \begin_layout Description
-name All mesh data require a name, which can be specified with the 
+name All mesh data sections require a name, which can be specified with
+ the 
 \emph on
 name 
 \emph default
@@ -13654,7 +14023,11 @@ generator="math"
 \end_layout
 
 \begin_layout Standard
-The following generators are currently suppored.
+The following generic generators are currently supported for all mesh data
+ sections.
+ Additional generators that can only be used for a specific mesh data are
+ described in the sections below.
+ 
 \end_layout
 
 \begin_layout Description
@@ -13751,100 +14124,6 @@ Part1
 Note that in math expressions, only the variables X, Y, and Z can be used,
  which refer to reference coordinates.
  
-\end_layout
-
-\begin_layout Description
-parabolic_map The 
-\begin_inset Quotes eld
-\end_inset
-
-
-\emph on
-parabolic map
-\emph default
-
-\begin_inset Quotes erd
-\end_inset
-
- defines a scalar data field with a parabolic profile on a surface.
- The data is determined by solving a heat-type problem with a constant source
- and homogeneous boundary conditions on the edge of the surface.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data name="pressure" 
-\series bold
-generator="parabolic map"
-\series default
- surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-    <value>1.0</value>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Description
-surface-to-surface_map The 
-\begin_inset Quotes eld
-\end_inset
-
-
-\emph on
-surface-to-surface map
-\emph default
-
-\begin_inset Quotes erd
-\end_inset
-
- generator defines a data field on the domain bounded by two surfaces.
- The data values are interpolated using a user-defined function between
- the surfaces.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data name="E" 
-\series bold
-generator="surface-to-surface map"
-\series default
- elem_set="Part1">
-\end_layout
-
-\begin_layout LyX-Code
-    <function type="math">x*x+1</function>
-\end_layout
-
-\begin_layout LyX-Code
-    <bottom_surface surface="surface1"/>
-\end_layout
-
-\begin_layout LyX-Code
-    <top_surface surface="surface2"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
 \end_layout
 
 \begin_layout Subsection
@@ -14151,6 +14430,62 @@ var="fem.material[0].E"
 </MeshData>
 \end_layout
 
+\begin_layout Standard
+The following data generators are available for element data sections.
+ 
+\end_layout
+
+\begin_layout Description
+surface-to-surface_map The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+surface-to-surface map
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ generator defines a data field on the domain bounded by two surfaces.
+ The data values are interpolated using a user-defined function between
+ the surfaces.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData name="Emap" 
+\series bold
+generator="surface-to-surface map"
+\series default
+ elem_set="Part1">
+\end_layout
+
+\begin_layout LyX-Code
+    <function type="math">x*x+1</function>
+\end_layout
+
+\begin_layout LyX-Code
+    <bottom_surface surface="surface1"/>
+\end_layout
+
+\begin_layout LyX-Code
+    <top_surface surface="surface2"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
 \begin_layout Subsection
 SurfaceData
 \begin_inset CommandInset label
@@ -14262,6 +14597,54 @@ Optionally, the surface data may be described with a mathematical expression
 
 \begin_layout LyX-Code
 </SurfaceData>
+\end_layout
+
+\begin_layout Standard
+The following data generators are available for surface data.
+ 
+\end_layout
+
+\begin_layout Description
+parabolic_map The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+parabolic map
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ defines a scalar data field with a parabolic profile on a surface.
+ The data is determined by solving a heat-type problem with a constant source
+ and homogeneous boundary conditions on the edge of the surface.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <SurfaceData name="pressure" 
+\series bold
+generator="parabolic map"
+\series default
+ surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+    <value>1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <SurfaceData>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
 \end_layout
 
 \begin_layout Subsection
@@ -14407,12 +14790,164 @@ attribute defines the set of nodes that this initial condition affects.
  
 \end_layout
 
-\begin_layout LyX-Code
-<ic type="init_dof" node_set="set1">
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+init_dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the initial value of a specific degree of freedom.
+ (obsolete)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the initial value for the nodal velocities.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the initial value for the shell (back) nodal velocities.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+initial fluid velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the initial values for the fluid velocity (in fluid analysis)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+prestrain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Used to initialize the prestrain analysis.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <dof>x</dof>
+<ic type="init_dof" node_set="set1">
 \end_layout
 
 \begin_layout LyX-Code
@@ -14438,6 +14973,14 @@ The prestrain initial condition can be used to accomplish one of two things.
  Or it can be used to fix the prestrain gradient.
  In either case the current geometry is used as the new reference geometry
  of the following analysis step.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -14553,6 +15096,14 @@ Make current geometry the reference geometry of the following steps
 \end_layout
 
 \begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The following example shows how a forward analysis can be converted to a
  prestrain analysis.
  
@@ -14632,45 +15183,337 @@ attribute.
  
 \end_layout
 
-\begin_layout Description
-fix Define a fixed boundary condition.
- A fixed boundary condition is usually identical to a zero prescribed boundary
- condition.
- 
-\end_layout
-
-\begin_layout Description
-prescribe Define a prescribed boundary condition.
- The nodal values of a prescribed boundary condition are define by the user
- and can vary as a function of time and position.
- 
-\end_layout
-
-\begin_layout Description
-rigid Define a rigid node set.
- The nodes in a rigid node set move with the rigid body to which they are
- assigned.
- 
-\end_layout
-
-\begin_layout Description
-linear
-\begin_inset space ~
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \series bold
-constraint 
-\series default
-Define a linear constraint between nodal degrees of freedom.
- 
+type
 \end_layout
 
-\begin_layout Subsection
-Prescribed Nodal Degrees of Freedom
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Prescribed-Nodal-Degrees"
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+module
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+zero displacement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fix the x, y, or z displacement degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+zero shell displacement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fix the x, y, or z shell (back) displacement dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+prescribed displacement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the x, y, or z displacement dof 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+prescribed shell displacement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the x, y, or z shell (back) displacement dof 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+prescribed deformation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the motion via a deformation gradient
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+normal displacement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the motion normal to a surface (in reference configuration)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+rigid deformation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the motion via a rigid motion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+rigid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The nodes are attached to a rigid body
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+linear constraint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The motion is constrained to satisfy a linear constraint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(all)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
 
 \end_inset
 
@@ -14678,76 +15521,23 @@ name "subsec:Prescribed-Nodal-Degrees"
 \end_layout
 
 \begin_layout Standard
-Nodal degrees of freedom (dof) can be prescribed using the 
-\shape italic
-prescribe
-\shape default
- boundary condition.
- This element has two required attributes: the 
-\emph on
-type 
-\emph default
-is set to 
-\begin_inset Quotes eld
+\align center
+\begin_inset VSpace defskip
 \end_inset
 
-prescribe
-\begin_inset Quotes erd
-\end_inset
 
- and the node set to which this boundary condition applies is defined vua
- 
-\shape italic
-node_set
-\shape default
-.
- The optional 
-\emph on
-name 
-\emph default
-attribute can be used to give the boundary condition a name.
- The value is defined via the 
-\emph on
-scale 
-\emph default
-parameter.
- (If omitted the default value is 1.0).
- The degree of freedom is defined via the 
-\emph on
-dof 
-\emph default
-parameter.
- A loadcurve can be associated with the scale parameter.
- The relative parameter defines wheter the values are absolute or relative
- to the current displacement.
-\end_layout
-
-\begin_layout LyX-Code
-<bc type="prescribe" node_set="nodeset1">
-\end_layout
-
-\begin_layout LyX-Code
-  <dof>x</dof>
-\end_layout
-
-\begin_layout LyX-Code
-  <scale lc="1">2.0</scale>
-\end_layout
-
-\begin_layout LyX-Code
-  <relative>0</relative>
-\end_layout
-
-\begin_layout LyX-Code
-</bc>
 \end_layout
 
 \begin_layout Standard
-Here, 
-\shape italic
-nodeset1 
-\shape default
-is the name of a node set defined in the Mesh section.
+Most of these boundary conditions require the node set to which to apply
+ the boundary condition to.
+ That nodeset can be defined via the 
+\emph on
+node_set 
+\emph default
+attribute.
+ The value of this attribute should be set to the name of a nodeset defined
+ in the Mesh section.
  See Section
 \begin_inset space ~
 \end_inset
@@ -14760,7 +15550,7 @@ reference "subsec:NodeSet-Section"
 \end_inset
 
  for more information on how to define node sets.
- Node sets can also be defined via surfaces or element sets.
+ Nodesets can also be defined via surfaces or element sets.
  To define a node set via a surface, use the following syntax.
  
 \end_layout
@@ -14782,292 +15572,13 @@ Mesh
  Similarly, defining a node set via an element set is done using 
 \emph on
 @elem_set:.
- 
-\end_layout
-
-\begin_layout Standard
-The 
-\emph on
-dof
-\emph default
- parameter specifies the particular degree of freedom.
- The following values are allowed:
-\end_layout
-
-\begin_layout Description
-x apply displacement in 
-\begin_inset Formula $x$
-\end_inset
-
--direction
-\end_layout
-
-\begin_layout Description
-y apply displacement in 
-\begin_inset Formula $y$
-\end_inset
-
--direction
-\end_layout
-
-\begin_layout Description
-z apply displacement in 
-\begin_inset Formula $z$
-\end_inset
-
--direction
-\end_layout
-
-\begin_layout Description
-sx apply shell back-face displacement in 
-\begin_inset Formula $x$
-\end_inset
-
--direction (new shell formulation)
-\end_layout
-
-\begin_layout Description
-sy apply shell back-face displacement in 
-\begin_inset Formula $y$
-\end_inset
-
--direction (new shell formulation)
-\end_layout
-
-\begin_layout Description
-sz apply shell back-face displacement in 
-\begin_inset Formula $z$
-\end_inset
-
--direction (new shell formulation)
-\end_layout
-
-\begin_layout Description
-u apply shell director component in 
-\begin_inset Formula $x$
-\end_inset
-
--direction (old shell formulation)
-\end_layout
-
-\begin_layout Description
-v apply shell director component in 
-\begin_inset Formula $y$
-\end_inset
-
--direction(old shell formulation)
-\end_layout
-
-\begin_layout Description
-w apply shell director component in 
-\begin_inset Formula $z$
-\end_inset
-
--direction(old shell formulation)
-\end_layout
-
-\begin_layout Description
-p apply prescribed effective fluid pressure (biphasic and multiphasic analyses)
-\end_layout
-
-\begin_layout Description
-T apply prescribed temperature (heat transfer analysis)
-\end_layout
-
-\begin_layout Description
-c apply prescribed effective solute concentration (solute analysis)
-\end_layout
-
-\begin_layout Description
-c[
-\begin_inset Formula $n$
-\end_inset
-
-] apply prescribed effective solute concentration on solute 
-\begin_inset Formula $n$
-\end_inset
-
- (multiphasic analysis)
-\end_layout
-
-\begin_layout Description
-wx apply prescribed fluid velocity relative to mesh in 
-\begin_inset Formula $x$
-\end_inset
-
--direction (fluid and FSI analyses)
-\end_layout
-
-\begin_layout Description
-wy apply prescribed fluid velocity relative to mesh in 
-\begin_inset Formula $y$
-\end_inset
-
--direction (fluid and FSI analyses)
-\end_layout
-
-\begin_layout Description
-wz apply prescribed fluid velocity relative to mesh in 
-\begin_inset Formula $z$
-\end_inset
-
--direction (fluid and FSI analyses)
-\end_layout
-
-\begin_layout Description
-
-\series bold
-ef
-\series default
- apply prescribed fluid dilatation (fluid analysis)
-\end_layout
-
-\begin_layout Standard
-For solutes, replace 
-\begin_inset Quotes eld
-\end_inset
-
-
-\begin_inset Formula $n$
-\end_inset
-
-
-\begin_inset Quotes erd
-\end_inset
-
- with the solute id from the global solute table (Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Solutes"
-
-\end_inset
-
-); for example, 
-\begin_inset Quotes eld
-\end_inset
-
-c2
-\begin_inset Quotes erd
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The loadcurve for the scale parameter is specified with the 
-\shape italic
-lc
-\shape default
- attribute.
- The value of the 
-\shape italic
-lc
-\shape default
- attribute is the ID of the loadcurve that is defined in the 
-\shape italic
-LoadData
-\shape default
- section of the input file.
-\end_layout
-
-\begin_layout Standard
-The optional 
-\shape italic
-relative 
-\shape default
-parameter allows users to choose between absolute (default) and relative
- boundary conditions.
- Absolute boundary conditions assign the specified value to the desired
- nodal degree of freedom.
- Relative boundary conditions are meaningful only in multi-step analyses.
- When a nodal degree of freedom is specified to be relative at a particular
- step, the value prescribed for that node is superposed over the value of
- that degree of freedom at the end of the preceding step.
-\end_layout
-
-\begin_layout Standard
-To define a different displacement value for each node, a 
-\emph on
-mesh_data
-\emph default
- section needs to be defined.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<Boundary>
-\end_layout
-
-\begin_layout LyX-Code
-  <bc type="prescribe" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-    <dof>x</dof>
-\end_layout
-
-\begin_layout LyX-Code
-    <scale lc="1">2.0</scale>
-\end_layout
-
-\begin_layout LyX-Code
-    <relative>0</relative>
-\end_layout
-
-\begin_layout LyX-Code
-  </bc>
-\end_layout
-
-\begin_layout LyX-Code
-</Boundary>
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data param="fem.bc_prescribed[0]">
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="1">1.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="2">2.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="3">3.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-  </mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-Keep in mind that the 
-\emph on
-scale
-\emph default
- parameter of the prescribed bc will scale the values defined in the mesh
- data section.
 \end_layout
 
 \begin_layout Subsection
-Fixed Nodal Degrees of Freedom
+Zero Displacement
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Fixed-Nodal-Degrees"
+name "subsec:Zero-Displacement"
 
 \end_inset
 
@@ -15075,16 +15586,335 @@ name "subsec:Fixed-Nodal-Degrees"
 \end_layout
 
 \begin_layout Standard
-Degrees of freedom that are fixed (in other words, constrained, or are always
- zero) can be defined using the 
+To fix the nodal displacement degrees of freedom (dof) use the 
 \shape italic
-fix
+zero displacement
 \shape default
- boundary condition:
+ boundary condition.
+ This element has two required attributes: the 
+\emph on
+type 
+\emph default
+is set to 
+\begin_inset Quotes eld
+\end_inset
+
+zero displacement
+\begin_inset Quotes erd
+\end_inset
+
+ and the node set to which this boundary condition applies is defined vua
+ 
+\shape italic
+node_set
+\shape default
+.
+ The optional 
+\emph on
+name 
+\emph default
+attribute can be used to give the boundary condition a name.
+ 
+\end_layout
+
+\begin_layout Standard
+This boundary condition has three parameters, one for each degree of freedom.
+ Set the value of each parameter to 1 to constrain the corresponding dof.
+ 
 \end_layout
 
 \begin_layout LyX-Code
-<bc type="fix" node_set="
+<bc type="zero displacement" node_set="nodeset1">
+\end_layout
+
+\begin_layout LyX-Code
+  <x_dof>1</x_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <y_dof>1</y_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <z_dof>1</z_dof>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
+\end_layout
+
+\begin_layout Subsection
+Zero Shell Displacement
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Zero-Shell-Displacement"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To fix the nodal back-displacement degrees of freedom (dof) of a shell use
+ the 
+\shape italic
+zero 
+\shape default
+\emph on
+shell displacement
+\emph default
+ boundary condition.
+ This element has two required attributes: the 
+\emph on
+type 
+\emph default
+is set to 
+\begin_inset Quotes eld
+\end_inset
+
+zero shell displacement
+\begin_inset Quotes erd
+\end_inset
+
+ and the node set to which this boundary condition applies is defined vua
+ 
+\shape italic
+node_set
+\shape default
+.
+ The optional 
+\emph on
+name 
+\emph default
+attribute can be used to give the boundary condition a name.
+ 
+\end_layout
+
+\begin_layout Standard
+This boundary condition has three parameters, one for each degree of freedom.
+ Set the value of each parameter to 1 to constrain the corresponding dof.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="zero shell displacement" node_set="nodeset1">
+\end_layout
+
+\begin_layout LyX-Code
+  <sx_dof>1</sx_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <sy_dof>1</sy_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <sz_dof>1</sz_dof>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
+\end_layout
+
+\begin_layout Standard
+This boundary condition can only be applied to nodes that belong to shells.
+ 
+\end_layout
+
+\begin_layout Subsection
+Prescribed Displacement
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prescribed-Displacement"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The prescribed displacement boundary condition can be used to prescribe
+ the value of the nodal displacement degrees of freedom.
+ This boundary condition takes the following parameters.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The displacement dof to prescribe, x, y, or z
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag that defines whether the value is absolute or relative (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set to 1, then the value is relative with respect
+ to the current position of the node at the time the boundary condition
+ becomes active.
+ This only has an effect in multi-step analyses.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="prescribed displacement" node_set="
 \shape italic
 \emph on
 set1
@@ -15094,7 +15924,15 @@ set1
 \end_layout
 
 \begin_layout LyX-Code
-  <dofs>x,y,z</dofs>
+  <dof>x</dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
 \end_layout
 
 \begin_layout LyX-Code
@@ -15102,54 +15940,921 @@ set1
 \end_layout
 
 \begin_layout Standard
-The node set must be defined in the 
-\emph on
-Mesh
-\shape italic
-\emph default
- 
-\shape default
-section.
- 
-\end_layout
-
-\begin_layout Standard
-The fix boundary condition can be assigned to multiple degrees of freedom
- of the node set and the list of degrees of freedom is defined via the 
-\emph on
-dofs 
-\emph default
-parameter
-\emph on
-.
-\end_layout
-
-\begin_layout Standard
 Although the 
 \shape italic
-prescribe 
+prescribe displacement 
 \shape default
-element with a value of zero for the 
-\shape italic
-node 
-\shape default
-tags can also be used to fix a certain nodal degree of freedom, the user
- should use the 
-\shape italic
-fix 
-\shape default
-element whenever possible, since this option causes the equation corresponding
- to the constrained degree of freedom to be removed from the linear system
- of equations.
+element with a value of zero can also be used to fix a certain nodal degree
+ of freedom, the user should use the 
+\emph on
+zero displacement
+\emph default
+ boundary condition whenever possible, since this option causes the equation
+ corresponding to the constrained degree of freedom to be removed from the
+ linear system of equations.
  This results in fewer equations that need to be solved for and thus reduces
  the run time of the FE analysis.
 \end_layout
 
 \begin_layout Subsection
-Rigid Nodes
+Prescribed Shell Displacement
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Rigid-Nodes"
+name "subsec:Prescribed-Shell-Displacement"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prescribed shell displacement
+\emph default
+ boundary condition can be used to prescribe the value of the nodal back-displac
+ement degrees of freedom of a shell.
+ This boundary condition takes the following parameters.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The displacement dof to prescribe, sx, sy, or sz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag that defines whether the value is absolute or relative (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set to 1, then the value is relative with respect
+ to the current position of the node at the time the boundary condition
+ becomes active.
+ This only has an effect in multi-step analyses.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="prescribed shell displacement" node_set="
+\shape italic
+\emph on
+set1
+\shape default
+\emph default
+">
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>sx</dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Standard
+Although the 
+\shape italic
+prescribe shell displacement 
+\shape default
+element with a value of zero can also be used to fix a certain nodal degree
+ of freedom, the user should use the 
+\emph on
+zero shell displacement
+\emph default
+ boundary condition whenever possible, since this option causes the equation
+ corresponding to the constrained degree of freedom to be removed from the
+ linear system of equations.
+ This results in fewer equations that need to be solved for and thus reduces
+ the run time of the FE analysis.
+\end_layout
+
+\begin_layout Subsection
+Prescribed Deformation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prescribed-Deformation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prescribed deformation 
+\emph default
+boundary condition can be used to prescribe the displacement of a node using
+ the following equation.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}=s\left(\boldsymbol{F}-\boldsymbol{I}\right)\boldsymbol{X}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\boldsymbol{u}$
+\end_inset
+
+ is the displacement vector, 
+\begin_inset Formula $\boldsymbol{X}$
+\end_inset
+
+ the reference position vector, 
+\begin_inset Formula $\boldsymbol{F}$
+\end_inset
+
+a 
+\begin_inset Quotes eld
+\end_inset
+
+deformation gradient
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{I}$
+\end_inset
+
+ the identity tensor, and 
+\begin_inset Formula $s$
+\end_inset
+
+ a scale factor.
+ 
+\end_layout
+
+\begin_layout Standard
+The following parameters are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+scale
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The scale factor 
+\begin_inset Formula $s$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+F
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The deformation gradient
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{I}$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="prescribed deformation" node_set="
+\shape italic
+\emph on
+set1
+\shape default
+\emph default
+">
+\end_layout
+
+\begin_layout LyX-Code
+  <scale lc="1">0.1</scale>
+\end_layout
+
+\begin_layout LyX-Code
+  <F>2,0,0, 0,2,0, 0,0.25,0</F>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Subsection
+Normal Displacement
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Normal-Displacement"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+normal displacement 
+\emph default
+boundary condition prescribes the displacement of a node along the normal
+ vector to the surface on which the node lies.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}=s\boldsymbol{N}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\boldsymbol{u}$
+\end_inset
+
+ is the displacement vector, 
+\begin_inset Formula $\boldsymbol{N}$
+\end_inset
+
+ is the normal to the surface in the reference configuration, and 
+\begin_inset Formula $s$
+\end_inset
+
+ is a scale factor.
+ 
+\end_layout
+
+\begin_layout Standard
+Note that this boundary condition requires a 
+\emph on
+surface 
+\emph default
+attribute, instead of the 
+\emph on
+node_set 
+\emph default
+attribute.
+ The following parameters are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+scale
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The scale factor 
+\begin_inset Formula $s$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+surface_hint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag indicating the type of surface (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+surface_hint 
+\emph default
+parameter indicates the shape of the surface.
+ Set this value to 1 if the surface is spherical.
+ This will calculate a more accurate normal vector.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="normal displacement" surface="surf1">
+\end_layout
+
+\begin_layout LyX-Code
+  <scale lc="1">0.1</scale>
+\end_layout
+
+\begin_layout LyX-Code
+  <surface_hint>1</surface_hint>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Subsection
+Rigid Deformation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid-Deformation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid deformation 
+\emph default
+boundary condition can be used to prescribe the motion of a nodeset via
+ a rigid transformation.
+ The displacement is given by the following equation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}=\boldsymbol{Q}\left(\boldsymbol{X}-\boldsymbol{r}_{0}\right)+\boldsymbol{r}_{t}-\boldsymbol{X}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\boldsymbol{u}$
+\end_inset
+
+ is the displacement vector, 
+\begin_inset Formula $\boldsymbol{Q}$
+\end_inset
+
+ is a rotation tensor, 
+\begin_inset Formula $\boldsymbol{X}$
+\end_inset
+
+ is the initial position of the node, and 
+\begin_inset Formula $\boldsymbol{r}_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{r}_{t}$
+\end_inset
+
+ are the reference and current position respectively of the rigid coordinate
+ system.
+ The following parameters are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+pos
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Position vector of the rigid coordinate system
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+{0,0,0}
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+rot
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rotation vector of the rigid coordinate system (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+{0,0,0}
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The rotation of the rigid coordinate system is given by a rotation vector.
+ The direction of this vector defines the (instantaneous) axis or rotation,
+ and the magnitude is the rotation angle (in radians) around this axis.
+ 
+\end_layout
+
+\begin_layout Subsection
+Rigid 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid"
 
 \end_inset
 
@@ -22020,7 +23725,7 @@ Unlike the mixture and effective traction, the fluid pressure
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Prescribed-Nodal-Degrees"
+reference "subsec:Zero-Displacement"
 
 \end_inset
 
@@ -23500,7 +25205,7 @@ name "subsec:Fluid-Resistance"
 \begin_layout Standard
 In a fluid or fluid-FSI analysis, this boundary condition prescribes an
  elastic pressure 
-\begin_inset Formula $p=R\,Q+p_{0}$
+\begin_inset Formula $p=R\,q+p_{d}$
 \end_inset
 
  on a surface, where 
@@ -23508,12 +25213,12 @@ In a fluid or fluid-FSI analysis, this boundary condition prescribes an
 \end_inset
 
  is the flow resistance and 
-\begin_inset Formula $Q$
+\begin_inset Formula $q$
 \end_inset
 
  is the volumetric flow rate across the surface (calculated internally);
  
-\begin_inset Formula $p_{0}$
+\begin_inset Formula $p_{d}$
 \end_inset
 
  is an optional offset pressure.
@@ -23539,6 +25244,164 @@ In a fluid or fluid-FSI analysis, this boundary condition prescribes an
 
 \begin_layout LyX-Code
 <surface_load>
+\end_layout
+
+\begin_layout Subsubsection
+Fluid RCR
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-RCR"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This surface load models a three-element Windkessel outflow condition on
+ a surface, as described in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Vignon-Clementel06"
+literal "false"
+
+\end_inset
+
+.
+ It prescribes an elastic pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ on a surface, which satisfies the ordinary differential equation
+\begin_inset Formula 
+\[
+p+\tau\frac{dp}{dt}=\left(R_{d}+R\right)q+R\tau\frac{dq}{dt}+p_{d}+\tau\frac{dp_{d}}{dt},\quad\tau=R_{d}C
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ is the upstream flow resistance, 
+\begin_inset Formula $R_{d}$
+\end_inset
+
+ is the downstream flow resistance, and 
+\begin_inset Formula $C$
+\end_inset
+
+ is the downstream flow capacitance, whereas 
+\begin_inset Formula $q$
+\end_inset
+
+ is the volumetric flow rate across the surface (calculated internally);
+ 
+\begin_inset Formula $p_{d}$
+\end_inset
+
+ is an optional downstream offset pressure, which may be associated with
+ a loadcurve to produce a function of time.
+ The pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ obtained by solving this differential equation is converted to a dilatation
+ and prescribed as an essential boundary condition at the nodes of the facets.
+ Since the pressure is the solution of an ordinary differential equation,
+ the user may also specify the initial condition for the pressure.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load name="FluidRCR1" type="fluid RCR" surface="FluidRCR1">
+\end_layout
+
+\begin_layout LyX-Code
+  <R>1</R>
+\end_layout
+
+\begin_layout LyX-Code
+  <Rd>10</Rd>
+\end_layout
+
+\begin_layout LyX-Code
+  <capacitance>0.5</capacitance>
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure_offset>0</pressure_offset>
+\end_layout
+
+\begin_layout LyX-Code
+  <initial_pressure>0</initial_pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+By setting 
+\begin_inset Formula $C=0$
+\end_inset
+
+ we recover the fluid resistance surface load described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Resistance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with flow resistance equal to 
+\begin_inset Formula $R_{d}+R$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Internally, the ordinary differential equation presented above is solved
+ numerically using a standard finite difference scheme,
+\begin_inset Formula 
+\[
+p_{n+1}=\left(\frac{R_{d}}{1+\frac{\tau}{\Delta t}}+R\right)q_{n+1}+\frac{\tau}{\Delta t+\tau}\left(p_{n}-p_{d,n}-Rq_{n}\right)+p_{d,n+1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $f_{n+1}$
+\end_inset
+
+ is the value of any function 
+\begin_inset Formula $f\left(t\right)$
+\end_inset
+
+ at the current time step 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+, 
+\begin_inset Formula $f_{n}$
+\end_inset
+
+ is its value at the previous time step 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Delta t=t_{n+1}-t_{n}$
+\end_inset
+
+ is the time increment.
 \end_layout
 
 \begin_layout Subsubsection
@@ -81241,7 +83104,7 @@ literal "true"
 where, 
 \begin_inset Formula 
 \[
-k\left(J\right)=k_{0}\left(\frac{J-\varphi_{0}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,,
+k\left(J\right)=k_{0}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,,
 \]
 
 \end_inset
@@ -81264,6 +83127,16 @@ and
  
 \series default
 is the deformation gradient.
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.
 \end_layout
 
 \begin_layout Standard
@@ -81593,7 +83466,7 @@ This material uses a strain-dependent permeability tensor that accommodates
  strain-induced anisotropy: 
 \begin_inset Formula 
 \[
-\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
+\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
 \]
 
 \end_inset
@@ -81616,7 +83489,17 @@ where
 \end_inset
 
  is the left Cauchy-Green tensor.
- Note that the permeability in the reference state (
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.Note that the permeability in
+ the reference state (
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset
 
@@ -82056,9 +83939,9 @@ This material uses a strain-dependent permeability tensor that accommodates
 where, 
 \begin_inset Formula 
 \[
-\begin{aligned}k_{0} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
-k_{1}^{a} & =\frac{k_{1r}^{a}}{J^{2}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
-k_{2}^{a} & =\frac{k_{2r}^{a}}{2J^{4}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
+\begin{aligned}k_{0} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
+k_{1}^{a} & =\frac{k_{1r}^{a}}{J^{2}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
+k_{2}^{a} & =\frac{k_{2r}^{a}}{2J^{4}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,\quad a=1,2,3\,.
 \]
@@ -82109,6 +83992,16 @@ reference "subsec:Orthotropic-Materials"
 \end_inset
 
 ).
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.
  Note that the permeability in the reference state (
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset
@@ -82713,9 +84606,9 @@ This material uses a strain-dependent permeability tensor that accommodates
  strain-induced anisotropy: 
 \begin_inset Formula 
 \[
-\begin{aligned}\mathbf{k} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{0}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\mathbf{I}\\
- & +\left(\frac{k_{1r}^{T}}{J^{2}}\left(\mathbf{b}-\mathbf{m}\right)+\frac{k_{2r}^{T}}{2J^{4}}\left[2\mathbf{b}^{2}-\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right]\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{T}}e^{M_{T}\left(J^{2}-1\right)/2}\\
- & +\left(\frac{1}{J^{2}}k_{1r}^{A}\mathbf{m}+\frac{1}{2J^{4}}k_{2r}^{A}\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{A}}e^{M_{A}\left(J^{2}-1\right)/2}
+\begin{aligned}\mathbf{k} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{0}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\mathbf{I}\\
+ & +\left(\frac{k_{1r}^{T}}{J^{2}}\left(\mathbf{b}-\mathbf{m}\right)+\frac{k_{2r}^{T}}{2J^{4}}\left[2\mathbf{b}^{2}-\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right]\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{T}}e^{M_{T}\left(J^{2}-1\right)/2}\\
+ & +\left(\frac{1}{J^{2}}k_{1r}^{A}\mathbf{m}+\frac{1}{2J^{4}}k_{2r}^{A}\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{A}}e^{M_{A}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,
 \]
@@ -82769,6 +84662,16 @@ reference "subsec:Specifying-Fiber-Orientation"
 \end_inset
 
 ).
+ Here, 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ is the referential solid volume fraction in the current configuration and
+ 
+\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\end_inset
+
+ is its value in the reference configuration.
  Note that the permeability in the reference state (
 \begin_inset Formula $\mathbf{F}=\mathbf{I})$
 \end_inset
@@ -86706,7 +88609,7 @@ relative
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Prescribed-Nodal-Degrees"
+reference "subsec:Zero-Displacement"
 
 \end_inset
 
@@ -100079,6 +101982,7 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
@@ -100088,206 +101992,257 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
@@ -100297,74 +102252,92 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
@@ -100374,58 +102347,72 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
@@ -104880,7 +106867,7 @@ relative
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Prescribed-Nodal-Degrees"
+reference "subsec:Zero-Displacement"
 
 \end_inset
 
@@ -105515,7 +107502,7 @@ A viscous fluid satisfies the no-slip condition on a physical boundary surface.
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Fixed-Nodal-Degrees"
+reference "subsec:Prescribed-Displacement"
 
 \end_inset
 

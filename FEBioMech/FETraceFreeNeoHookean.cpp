@@ -32,7 +32,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FETraceFreeNeoHookean, FEElasticMaterial)
-    ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu");
+    ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu")->setLongName("shear modulus");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

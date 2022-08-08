@@ -455,24 +455,22 @@ FEBIOLIB_API bool RunModel(FEBioModel& fem, CMDOPTIONS* ops)
 	}
 
 	// read the input file if specified
-	int nret = 0;
+	bool bret = false;
 	if (ops && ops->szfile[0])
 	{
 		// read the input file
-		if (fem.Input(ops->szfile) == false) nret = 1;
+		if (fem.Input(ops->szfile) == false) bret = false;
 	}
 
 	// solve the model with the task and control file
-	if (nret == 0)
+	if (bret == false)
 	{
 		const char* sztask = (ops && ops->sztask[0] ? ops->sztask : nullptr);
 		const char* szctrl = (ops && ops->szctrl[0] ? ops->szctrl : nullptr);
-		bool bret = febio::SolveModel(fem, sztask, szctrl);
-
-		nret = (bret ? 0 : 1);
+		bret = febio::SolveModel(fem, sztask, szctrl);
 	}
 
-	return nret;
+	return bret;
 }
 
 // write a matrix to file

@@ -6111,6 +6111,164 @@ FEBio does not use this calculation for solid mixtures, as all internal
 \end_layout
 
 \begin_layout Subsection
+Frame Indifference
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Frame-Indifference"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To maintain frame indifference for constrained mixtures we must satisfy
+ 
+\begin_inset Formula $\boldsymbol{\sigma}\left(\mathbf{Q}\cdot\mathbf{F}^{s}\right)=\mathbf{Q}\cdot\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)\cdot\mathbf{Q}^{T}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is an orthogonal transformation that maintains the symmetry group of 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian22a"
+literal "false"
+
+\end_inset
+
+.
+ Here, we abbreviated the list of state variables for 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ to just 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+, for notational simplicity.
+ This frame indifference is automatically satisfied for 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ based on the hyperelasticity relation of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mixture-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and the invariance of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+.
+ By the same argument, 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}^{\sigma}$
+\end_inset
+
+ as given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:febio-stress-function"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\boldsymbol{\sigma}_{0}^{\sigma}\left(\mathbf{Q}\cdot\mathbf{F}^{\sigma}\right)=\mathbf{Q}\cdot\boldsymbol{\sigma}_{0}^{\sigma}\left(\mathbf{F}^{\sigma}\right)\cdot\mathbf{Q}^{T}$
+\end_inset
+
+ for transformations that maintain the symmetry group of 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+.
+ Since the symmetry transformations 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ must also belong to the symmetry groups of all 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+, we need to ensure that 
+\begin_inset Formula $\mathbf{F}^{s*}=\mathbf{Q}\cdot\mathbf{F}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}^{\sigma*}=\mathbf{Q}\cdot\mathbf{F}^{\sigma}$
+\end_inset
+
+ also satisfy the kinematic constraint of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for those transformations 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+, namely 
+\begin_inset Formula $\mathbf{F}^{s*}=\mathbf{F}^{\sigma*}\cdot\mathbf{F}^{\sigma s}$
+\end_inset
+
+.
+ This can be achieved if and only if 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ is invariant under a change of frame.
+ It follows from this argument that the right Cauchy-Green tensors are invariant
+, 
+\begin_inset Formula $\mathbf{C}^{s*}=\left(\mathbf{F}^{s*}\right)^{T}\cdot\mathbf{F}^{s*}=\left(\mathbf{F}^{s}\right)^{T}\cdot\mathbf{F}^{s}=\mathbf{C}^{s}$
+\end_inset
+
+ and similarly 
+\begin_inset Formula $\mathbf{C}^{\sigma*}=\mathbf{C}^{\sigma}$
+\end_inset
+
+, while also satisfying 
+\begin_inset Formula $\mathbf{C}^{s*}=\mathbf{C}^{s}=\left(\mathbf{F}^{\sigma s}\right)^{T}\cdot\mathbf{C}^{\sigma}\cdot\mathbf{F}^{\sigma s}$
+\end_inset
+
+.
+ Right stretch tensors 
+\begin_inset Formula $\mathbf{U}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}^{\sigma}$
+\end_inset
+
+ are also invariant.
+\end_layout
+
+\begin_layout Subsection
 Simple Solid Mixtures
 \begin_inset CommandInset label
 LatexCommand label
@@ -6303,16 +6461,26 @@ literal "false"
 \end_inset
 
 .
- An alternative form of this constitutive model is that 
-\begin_inset Formula $\mathbf{F}^{\sigma}\left(\mathbf{X}^{s},t^{\sigma}\right)=\mathbf{I}$
+ An alternative form of this constitutive model, which satisfies frame-indiffere
+nce, is that 
+\begin_inset Formula $\mathbf{F}^{\sigma}\left(\mathbf{X}^{s},t^{\sigma}\right)=\mathbf{R}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
- while the new generation 
+ at the time the new generation 
 \begin_inset Formula $\sigma$
 \end_inset
 
- is being deposited, or equivalently 
-\begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)=\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+ is being deposited, where 
+\begin_inset Formula $\mathbf{R}^{s}$
+\end_inset
+
+ is the rotation tensor in the polar decomposition of 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{R}^{s}\cdot\mathbf{U}^{s}$
+\end_inset
+
+.
+ Equivalently, 
+\begin_inset Formula $\mathbf{F}^{\sigma s}\left(\mathbf{X}^{s}\right)=\mathbf{U}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
  according to eq.
@@ -6326,11 +6494,16 @@ noprefix "false"
 \end_inset
 
 .
+ Since 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ is a right-stretch tensor, it satisfies frame indifference.
 \end_layout
 
 \begin_layout Standard
 The underlying assumption of multigenerational growth is that 
-\begin_inset Formula $\mathbf{F}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
+\begin_inset Formula $\mathbf{U}^{s}\left(\mathbf{X}^{s},t^{\sigma}\right)$
 \end_inset
 
  evolves for each generation 
@@ -6659,6 +6832,15 @@ and
 
  and 
 \begin_inset Formula $\mathbf{a}_{j}$
+\end_inset
+
+.
+ All of these constitutive models for 
+\begin_inset Formula $\mathbf{F}^{\sigma s}$
+\end_inset
+
+ satisy frame indifference since they depend on material vectors 
+\begin_inset Formula $\mathbf{a}_{i}$
 \end_inset
 
 .
@@ -7533,7 +7715,7 @@ When multiple solid species are present, the net solid mass content may
 , may be evaluated from 
 \begin_inset Formula 
 \begin{equation}
-\varphi_{r}^{s}=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}/\rho_{T}^{\sigma},\label{eq156}
+\varphi_{r}^{s}=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}/\rho_{T}^{\sigma},\label{eq:referential-solid-volume-fraction}
 \end{equation}
 
 \end_inset
@@ -7551,10 +7733,10 @@ where
 \end_inset
 
  per volume of 
-\begin_inset Formula $\sigma)$
+\begin_inset Formula $\sigma$
 \end_inset
 
- and 
+) and 
 \begin_inset Formula $\varphi_{0}^{s}$
 \end_inset
 
@@ -7591,48 +7773,175 @@ reference "eq154"
 \end_layout
 
 \begin_layout Standard
-The various constituents of the solid matrix may be electrically charged.
- Let 
-\begin_inset Formula $z^{\sigma}$
+At the start of an analysis, the formula of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:referential-solid-volume-fraction"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
- be the charge number (equivalent charge per mole) of solid constituent
- 
-\begin_inset Formula $\sigma$
-\end_inset
-
-, then the net referential fixed charge density of the solid matrix (equivalent
- charge per fluid volume in the referential configuration) is given by 
+ takes the form
 \begin_inset Formula 
 \begin{equation}
-c_{r}^{F}=\frac{1}{1-\varphi_{r}^{s}}\sum\limits _{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\,,\label{eq157}
+\varphi_{r}^{s}\left(0\right)=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}\left(0\right)/\rho_{T}^{\sigma}\label{eq:initial-referential-solid-fraction}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $M^{\sigma}$
+\begin_inset Formula $\rho_{r}^{\sigma}\left(0\right)$
 \end_inset
 
- is the molar mass of 
+ represents the initial apparent mass densities of solid constituents.
+ This initial value of 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ must satisfy 
+\begin_inset Formula $0\le\varphi_{r}^{s}\left(0\right)\le1$
+\end_inset
+
+, since 
+\begin_inset Formula $J=1$
+\end_inset
+
+ at the start of an analysis.
+\end_layout
+
+\begin_layout Standard
+The various constituents of the porous solid matrix of a multiphasic mixture
+ may be electrically charged.
+ The charge density in the current configuration, normalized by the mixture
+ volume in the current configuration, is given by 
+\begin_inset Formula 
+\begin{equation}
+\check{c}^{F}=\frac{z^{F}dn^{F}+\sum_{\sigma}z^{\sigma}dn^{\sigma}}{dV}\,,\label{eq:FCD-mixture-volume}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $z^{F}$
+\end_inset
+
+ is the charge number (equivalent charge per mole) and 
+\begin_inset Formula $dn^{F}$
+\end_inset
+
+ is the elemental number of moles associated with fixed charges present
+ in the initial volume fraction 
+\begin_inset Formula $\varphi_{0}^{s}$
+\end_inset
+
+ of the solid matrix.
+ Similarly, 
+\begin_inset Formula $z^{\sigma}$
+\end_inset
+
+ is the charge number of evolving solid constituent 
 \begin_inset Formula $\sigma$
 \end_inset
 
- (an invariant quantity) and 
-\begin_inset Formula $1-\varphi_{r}^{s}$
+.
+ By convention however, the fixed charge density 
+\begin_inset Formula $c^{F}$
 \end_inset
 
- represents the referential volume fraction of all fluid constituents (solvent
- 
-\begin_inset Formula $+$
-\end_inset
-
- solutes) in a saturated mixture.
- Based on the kinematics of the continuum, the fixed charge density in the
- current configuration is 
+ of a multiphasic material is normalized by the fluid volume of the mixture,
+ thus it can be shown that
 \begin_inset Formula 
 \begin{equation}
-c^{F}=\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}c_{r}^{F}\,.\label{eq158}
+c^{F}=\frac{\check{c}^{F}}{1-\varphi^{s}}=\frac{1}{J-\varphi_{r}^{s}}\left(\frac{z^{F}dn^{F}}{dV_{r}}+\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\right)\,.\label{eq:FCD-fluid-volume}
+\end{equation}
+
+\end_inset
+
+In particular, in the reference configuration this formula produces
+\begin_inset Formula 
+\begin{equation}
+c^{F}\left(0\right)=\frac{1}{1-\varphi_{r}^{s}\left(0\right)}\left(\frac{z^{F}dn^{F}\left(0\right)}{dV_{r}}+\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}\left(0\right)}{M^{\sigma}}\right)\,.\label{eq:FCD-initial-time}
+\end{equation}
+
+\end_inset
+
+We define the first term on the right-hand-side of this equation as the
+ initial value of the user-specified fixed charge density 
+\begin_inset Formula $c_{0}^{F}$
+\end_inset
+
+ (which is not associated with solid species 
+\begin_inset Formula $\sigma$
+\end_inset
+
+),
+\begin_inset Formula 
+\begin{equation}
+c_{0}^{F}\equiv\frac{1}{1-\varphi_{r}^{s}\left(0\right)}\frac{z^{F}dn^{F}\left(0\right)}{dV_{r}}\,.\label{eq:user-specified-cF0}
+\end{equation}
+
+\end_inset
+
+Therefore, in the current configuration, we may rewrite
+\begin_inset Formula 
+\begin{equation}
+c^{F}=\frac{1-\varphi_{r}^{s}\left(0\right)}{J-\varphi_{r}^{s}}c_{0}^{F}+\frac{1}{J-\varphi_{r}^{s}}\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\,.\label{eq158}
+\end{equation}
+
+\end_inset
+
+where the user-specified 
+\begin_inset Formula $c_{0}^{F}$
+\end_inset
+
+ may optionally be associated with a load curve representing the scale factor
+ 
+\begin_inset Formula $dn^{F}/dn^{F}\left(0\right)$
+\end_inset
+
+, in case the user would like to allow 
+\begin_inset Formula $c_{0}^{F}$
+\end_inset
+
+ to evolve.
+ By analogy, we may now define the referential fixed-charge density 
+\begin_inset Formula $c_{r}^{F}$
+\end_inset
+
+ of the mixture as
+\begin_inset Formula 
+\begin{equation}
+c_{r}^{F}\equiv\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}\left(0\right)}c^{F}=c_{0}^{F}+\frac{1}{1-\varphi_{r}^{s}\left(0\right)}\sum_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\label{eq157}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $c_{r}^{F}$
+\end_inset
+
+ may evolve with time, but it represents the number of fixed equivalent
+ charges in the current configuration, per fluid volume in the reference
+ configuration.
+ Hence we may also write
+\begin_inset Formula 
+\[
+c^{F}=\frac{1-\varphi_{r}^{s}\left(0\right)}{J-\varphi_{r}^{s}}c_{r}^{F}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The molar concentration of a solid-bound molecular constituent, which may
+ be needed in a reactive process involving solutes, is given by
+\begin_inset Formula 
+\begin{equation}
+c^{\sigma}=\frac{1}{J-\varphi_{r}^{s}}\frac{\rho_{r}^{\sigma}}{M^{\sigma}}\,.\label{eq:sbm-molar-concentration}
 \end{equation}
 
 \end_inset
@@ -31192,7 +31501,7 @@ Reactive viscoelasticity models a material as a mixture of strong bonds,
  to loading 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian15"
+key "Ateshian15,Ateshian22"
 literal "true"
 
 \end_inset
@@ -31269,7 +31578,7 @@ generation weak bonds relative to their reference configuration
 , which may be evaluated from the chain rule, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\mathbf{U}\left(\mathbf{X},u\right)\,,\label{eq492}
+\mathbf{F}\left(\mathbf{X},t\right)=\mathbf{F}^{u}\left(\mathbf{X},t\right)\cdot\bar{\mathbf{R}}\left(\mathbf{X},u\right)\cdot\mathbf{U}\left(\mathbf{X},u\right)\,,\label{eq492}
 \end{equation}
 
 \end_inset
@@ -31279,10 +31588,18 @@ where
 \end_inset
 
  is the right-stretch tensor of 
-\begin_inset Formula $\mathbf{F}$
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
 \end_inset
 
-.
+ and 
+\begin_inset Formula $\bar{\mathbf{R}}=\left(\mathbf{R}^{u}\right)^{T}\cdot\mathbf{R}$
+\end_inset
+
+ is the relative rotation between generation 
+\begin_inset Formula $u$
+\end_inset
+
+ and the master generation.
  The strain energy density 
 \begin_inset Formula $\Psi_{r}$
 \end_inset
@@ -31588,6 +31905,428 @@ reference "eq492"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Constitutive Model for 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Constitutive-Model-Rbar"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In reactive viscoelasticity we adopt the constitutive assumption that 
+\begin_inset Formula $\mathbf{U}^{u}=\mathbf{I}$
+\end_inset
+
+, thus 
+\begin_inset Formula $\mathbf{F}^{u}=\mathbf{R}^{u}$
+\end_inset
+
+, at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+ when generation 
+\begin_inset Formula $u$
+\end_inset
+
+ must come into existence in a stress-free state.
+ Since 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq492"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ must be a proper orthogonal transformation, we may select
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\bar{\mathbf{R}} & =\mathbf{I}\,.\end{aligned}
+\label{eq:A-R-identity}
+\end{equation}
+
+\end_inset
+
+Since this choice is invariant to any transformation 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ it remains valid for all material symmetries, ranging from triclinic to
+ isotropic.
+ Therefore, eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq492"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ now takes the form
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{u}\left(\mathbf{X},t\right)=\mathbf{F}\left(\mathbf{X},t\right)\cdot\mathbf{U}^{-1}\left(\mathbf{X},u\right)\label{eq:rv-Fu-model}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is the right stretch tensor of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+There remains one special case that must be addressed with a separate choice
+ for 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+.
+ In biomechanics we often find it convenient to model fibrous or fibrillar
+ materials using one-dimensional fibers that can only sustain tension.
+ Typically, such fibers are represented with a strain energy density function
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\Psi_{0}\left(\mathbf{C}\right) & =H\left(I_{n}-1\right)\Psi_{n}\left(I_{n}\right)\,, & I_{n} & =\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}\end{aligned}
+\label{eq:A-fiber-models}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the unit vector along the fiber in its reference configuration, and
+ 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the square of the stretch ratio along the fiber.
+ The Heaviside unit step function 
+\begin_inset Formula $H\left(I_{n}-1\right)$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-fiber-models"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ ensures that the fiber contributes strain energy only when it is under
+ tension (
+\begin_inset Formula $I_{n}>1$
+\end_inset
+
+); thus, the constitutive model 
+\begin_inset Formula $\Psi_{n}\left(I_{n}\right)$
+\end_inset
+
+ for the tensile response of the fiber must reduce to zero when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the reactive viscoelasticity framework, each generation 
+\begin_inset Formula $u$
+\end_inset
+
+ comes into existence at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+, thus the constitutive model for the fiber must account for the fact that
+ the fiber orientation is no longer along 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+.
+ Indeed, the total weak bond free energy in a reactive viscoelastic material
+ now reduces to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\sum_{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\left(t\right)\right) & =\sum_{u}w^{u}H\left(I_{n}^{u}-1\right)\Psi_{n}\left(I_{n}^{u}\right)\\
+I_{n}^{u} & =\mathbf{n}_{r}^{u}\cdot\mathbf{C}^{u}\cdot\mathbf{n}_{r}^{u}
+\end{aligned}
+\label{eq:A-fiber-SED}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ is the fiber orientation at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $I_{n}^{u}$
+\end_inset
+
+ is the square of the stretch ratio of the fiber relative to its reference
+ configuration at time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+.
+ Recall that the elemental line along 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ gets transformed in the material frame at any time 
+\begin_inset Formula $t$
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ to 
+\begin_inset Formula $\lambda_{n}\mathbf{n}=\mathbf{U}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\lambda_{n} & =\sqrt{\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}}\,, & \mathbf{n} & =\frac{1}{\lambda_{n}}\mathbf{U}\cdot\mathbf{n}_{r}\end{aligned}
+\label{eq:A-fiber-current}
+\end{equation}
+
+\end_inset
+
+At time 
+\begin_inset Formula $t^{u}$
+\end_inset
+
+ when generation 
+\begin_inset Formula $u$
+\end_inset
+
+ forms in a stress-free state, it follows that the fiber material is now
+ based on the orientation 
+\begin_inset Formula $\mathbf{n}_{r}^{u}\equiv\mathbf{n}\left(t^{u}\right)$
+\end_inset
+
+, evaluated using 
+\begin_inset Formula $\mathbf{U}\left(\mathbf{X},t^{u}\right)$
+\end_inset
+
+ as shown in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-fiber-current"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In general, 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ need not be collinear, therefore we can find the rotation 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ that transforms 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\bar{\mathbf{R}}=\left(1-\cos\gamma\right)\mathbf{m}\otimes\mathbf{m}+\cos\gamma\mathbf{I}-\mathbb{E}\cdot\left(\sin\gamma\,\mathbf{m}\right)\label{eq:A-R-fiber}
+\end{equation}
+
+\end_inset
+
+with 
+\begin_inset Formula $\cos\gamma=\mathbf{n}_{r}^{u}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $\sin\gamma\,\mathbf{m}=\mathbf{n}_{r}^{u}\times\mathbf{n}_{r}$
+\end_inset
+
+.
+ In this expression, 
+\begin_inset Formula $\mathbf{m}$
+\end_inset
+
+ is the unit vector along the rotation axis, 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ is the rotation angle about the axis, and 
+\begin_inset Formula $\mathbb{E}$
+\end_inset
+
+ represents the (pseudo-)third-order permutation tensor whose components
+ are equal to the permutation symbol 
+\begin_inset Formula $\varepsilon_{ijk}$
+\end_inset
+
+.
+ Thus, 
+\begin_inset Formula $-\mathbb{E}\cdot\boldsymbol{\omega}$
+\end_inset
+
+ is the antisymmetric second-order tensor 
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ whose dual vector is 
+\begin_inset Formula $\boldsymbol{\omega}$
+\end_inset
+
+, from which it follows that 
+\begin_inset Formula $\boldsymbol{\Omega}\cdot\mathbf{a}=\boldsymbol{\omega}\times\mathbf{a}$
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+.
+ Here again, since 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ represents a relative rotation between the material vectors 
+\begin_inset Formula $\mathbf{n}_{r}^{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, it is invariant to any transformation 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In practice it is not necessary to evaluate 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-R-fiber"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for each generation 
+\begin_inset Formula $u$
+\end_inset
+
+ of each fiber in a material model; instead one can reset the fiber direction
+ from 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{n}_{r}^{u}=\mathbf{n}\left(u\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is evaluated as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-fiber-current"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, requiring only the storage of 
+\begin_inset Formula $\mathbf{U}\left(\mathbf{X},u\right)$
+\end_inset
+
+ for each generation 
+\begin_inset Formula $u$
+\end_inset
+
+.
+ This scheme may also be used with continuous fiber distributions 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou16"
+literal "false"
+
+\end_inset
+
+.
+ As explained in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian22"
+literal "false"
+
+\end_inset
+
+, this constitutive model for 
+\begin_inset Formula $\bar{\mathbf{R}}$
+\end_inset
+
+ ensures that cyclical loading of a reactive viscoelastic fibrous material
+ never produces compressive fiber stresses.
 \end_layout
 
 \begin_layout Subsection
@@ -37789,7 +38528,7 @@ where
  is evaluated from 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq156"
+reference "eq:referential-solid-volume-fraction"
 
 \end_inset
 

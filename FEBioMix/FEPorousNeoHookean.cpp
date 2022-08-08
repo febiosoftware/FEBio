@@ -35,8 +35,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPorousNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E    , FE_RANGE_GREATER   (      0.0), "E"       )->setUnits(UNIT_PRESSURE);
-	ADD_PARAMETER(m_phisr, FE_RANGE_CLOSED    (0.0 , 1.0), "phi0"    );
+	ADD_PARAMETER(m_E    , FE_RANGE_GREATER   (      0.0), "E"       )->setUnits(UNIT_PRESSURE)->setLongName("Young's modulus");
+	ADD_PARAMETER(m_phisr, FE_RANGE_CLOSED    (0.0 , 1.0), "phi0"    )->setLongName("solid volume fraction");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -128,5 +128,5 @@ double FEPorousNeoHookean::ReferentialSolidVolumeFraction(FEMaterialPoint& mp)
     if (m_phisr < 1) return m_phisr;
     
     FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-    return pt.m_phi0;
+    return pt.m_phi0t;
 }

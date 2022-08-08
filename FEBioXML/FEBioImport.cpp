@@ -354,7 +354,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio3 only supports file version 1.2, 2.0, 2.5, 3.0, and 4.0
+		// FEBio4 only supports file version 1.2, 2.0, 2.5, 3.0, and 4.0
 		int nversion = GetFileVersion();
 		if ((nversion != 0x0102) && 
 			(nversion != 0x0200) && 

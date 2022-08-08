@@ -47,7 +47,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
+FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem), m_dofEF(pfem)
 {
     m_velocity = 0.0;
     m_bpv = true;
@@ -58,7 +58,7 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
     if (pfem)
     {
         m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-        m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+        m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
     }
 }
 
@@ -83,9 +83,7 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 {
     const FETimeInfo& tp = GetTimeInfo();
 
-	FEDofList dofE(GetFEModel());
-	dofE.AddDof(m_dofEF);
-	m_psurf->LoadVector(R, dofE, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofEF, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -120,7 +118,7 @@ bool FEFluidNormalVelocity::Init()
     
     m_dof.Clear();
     m_dof.AddDofs(m_dofW);
-    m_dof.AddDof(m_dofEF);
+    m_dof.AddDofs(m_dofEF);
 
     return true;
 }
@@ -130,6 +128,10 @@ bool FEFluidNormalVelocity::Init()
 void FEFluidNormalVelocity::Activate()
 {
 	FESurface& surface = GetSurface();
+
+    // This is needed to reproduce the same behavior as feb3. 
+    FESurfaceMap VC(FE_DOUBLE); 
+    VC.Create(surface.GetFacetSet(), 1.0);
 
 	// evaluate surface normals
 	vector<vec3d> sn(surface.Elements(), vec3d(0, 0, 0));
@@ -150,7 +152,8 @@ void FEFluidNormalVelocity::Activate()
 		// nodal coordinates
 		for (int i = 0; i<neln; ++i) {
 			r0[i] = surface.Node(el.m_lnode[i]).m_r0;
-			++nf[el.m_lnode[i]];
+            m_VN[el.m_lnode[i]] += VC.value<double>(iel, i);
+            ++nf[el.m_lnode[i]];
 		}
 
 		double* Nr, *Ns;
@@ -182,7 +185,8 @@ void FEFluidNormalVelocity::Activate()
 
 	for (int i = 0; i< surface.Nodes(); ++i) {
 		m_nu[i].unit();
-	}
+        m_VN[i] /= nf[i];
+    }
 
     // Set up data structure for setting rim pressure
     if (m_brim) {
@@ -248,7 +252,7 @@ void FEFluidNormalVelocity::Activate()
         for (int i=0; i<m_rim.size(); ++i) {
             FENode& node = surface.Node(m_rim[i]);
             // mark node as having prescribed DOF
-            if (node.get_bc(m_dofEF) != DOF_FIXED) node.set_bc(m_dofEF, DOF_PRESCRIBED);
+            if (node.get_bc(m_dofEF[0]) != DOF_FIXED) node.set_bc(m_dofEF[0], DOF_PRESCRIBED);
         }
     }
 }
@@ -260,34 +264,33 @@ void FEFluidNormalVelocity::Update()
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
 
-   
+    // The velocity map is read in as surface data with MULT format. 
+    // However, we need to have (unique) values at the nodes
+    // so we need to convert this to nodal data. 
+    int N = ps->Nodes();
+    m_VN.assign(N, 0.0);
+    vector<int> tag(N, 0);
+    for (int i = 0; i < ps->Elements(); ++i)
+    {
+        FESurfaceElement& el = ps->Element(i);
+        for (int j = 0; j < el.Nodes(); ++j)
+        {
+            FEMaterialPoint mp;
+            mp.m_elem = &el;
+            mp.m_index = j + 0x10000;
+
+            double vnj = m_velocity(mp);
+
+            m_VN[el.m_lnode[j]] += vnj;
+            tag[el.m_lnode[j]]++;
+        }
+    }
+    for (int i = 0; i < N; ++i)
+    {
+        if (tag[i] != 0) m_VN[i] /= (double)tag[i];
+    }
+  
     if (m_bpv) {
-
-        // The velocity map is read in as surface data with MULT format. 
-        // However, we need to have (unique) values at the nodes
-        // so we need to convert this to nodal data. 
-        int N = ps->Nodes();
-        m_VN.assign(N, 0.0);
-        vector<int> tag(N, 0);
-        for (int i = 0; i < ps->Elements(); ++i)
-        {
-            FESurfaceElement& el = ps->Element(i);
-            for (int j = 0; j < el.Nodes(); ++j)
-            {
-                FEMaterialPoint mp;
-                mp.m_elem = &el;
-                mp.m_index = j + 0x10000;
-
-                double vnj = m_velocity(mp);
-
-                m_VN[el.m_lnode[j]] += vnj;
-                tag[el.m_lnode[j]]++;
-            }
-        }
-        for (int i = 0; i < N; ++i)
-        {
-            if (tag[i] != 0) m_VN[i] /= (double)tag[i];
-        }
 
         for (int i=0; i<ps->Nodes(); ++i)
         {
@@ -347,8 +350,8 @@ bool FEFluidNormalVelocity::SetRimPressure()
     int neq = 0;
     for (int i=0; i<ps->Nodes(); ++i) {
         FENode& node = ps->Node(i);
-        if (node.get_bc(m_dofEF) == DOF_OPEN) {
-            es += node.get(m_dofEF);
+        if (node.get_bc(m_dofEF[0]) == DOF_OPEN) {
+            es += node.get(m_dofEF[0]);
             ++neq;
         }
     }
@@ -357,7 +360,7 @@ bool FEFluidNormalVelocity::SetRimPressure()
     // set the rim pressure (dilatation)
     for (int i=0; i<m_rim.size(); ++i) {
         FENode& node = ps->Node(m_rim[i]);
-        node.set(m_dofEF,es);
+        node.set(m_dofEF[0],es);
     }
     
     return true;

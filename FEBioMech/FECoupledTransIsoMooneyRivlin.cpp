@@ -40,7 +40,11 @@ BEGIN_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
 	ADD_PARAMETER(m_c3  , "c3")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c4  , "c4");
 	ADD_PARAMETER(m_c5  , "c5");
-	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
+
+	// NOTE: This was changed from "lambda" to make it consistent with febio3, but in febiostudio1 it 
+	// was defined as "lambda". This means that old fsm files that use this material might not read in correctly. 
+	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
+
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
 	
 	ADD_PROPERTY(m_fiber, "fiber");
@@ -49,6 +53,14 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FECoupledTransIsoMooneyRivlin::FECoupledTransIsoMooneyRivlin(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+	m_c3 = 0.0;
+	m_c4 = 0.0;
+	m_c5 = 0.0;
+	m_flam = 1.0;
+	m_K = 0.0;
+
 	m_fiber = nullptr;
 }
 

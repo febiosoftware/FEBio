@@ -32,9 +32,9 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEHolmesMow, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE);
-	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE)->setLongName("Young's modulus");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v")->setLongName("Poisson's ratio");
+	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta")->setLongName("power exponent");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

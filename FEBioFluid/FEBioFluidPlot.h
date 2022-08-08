@@ -78,6 +78,15 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Nodal polar fluid angular velocity
+class FEPlotNodalPolarFluidAngularVelocity : public FEPlotNodeData
+{
+public:
+    FEPlotNodalPolarFluidAngularVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE){}
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
 //=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================
@@ -308,6 +317,33 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element polar fluid angular velocity
+class FEPlotPolarFluidAngularVelocity : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidAngularVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element polar fluid relative angular velocity
+class FEPlotPolarFluidRelativeAngularVelocity : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidRelativeAngularVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element polar fluid rregional angular velocity
+class FEPlotPolarFluidRegionalAngularVelocity : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidRegionalAngularVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid heat flux
 class FEPlotFluidHeatFlux : public FEPlotDomainData
 {
@@ -531,3 +567,22 @@ public:
 	FEPlotFluidShearStressError(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Element polar fluid  stresses
+class FEPlotPolarFluidStress : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element polar fluid couple stresses
+class FEPlotPolarFluidCoupleStress : public FEPlotDomainData
+{
+public:
+    FEPlotPolarFluidCoupleStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

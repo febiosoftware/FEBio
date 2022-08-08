@@ -458,21 +458,28 @@ void FEFluidFSISolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
-    
-    ar & m_nreq;
-    ar & m_ndeq;
-    ar & m_nfeq;
-    ar & m_nveq;
+    if (ar.IsShallow()) return;
+
+    ar & m_nrhs;
+    ar & m_niter;
+    ar & m_nref & m_ntotref;
+
+    ar & m_nreq & m_ndeq & m_nfeq & m_nveq;
 
 	ar & m_rhoi & m_alphaf & m_alpham;
 	ar & m_beta & m_gamma;
 	ar & m_pred;
 
-	ar & m_Fn & m_Ui & m_Ut & m_Fr;
-	ar & m_di & m_Di;
-	ar & m_vi & m_Vi;
-	ar & m_fi & m_Fi;
+	ar & m_Ui & m_Ut & m_Fr;
+	ar & m_Di & m_Vi & m_Fi;
     
+    if (ar.IsLoading())
+    {
+        m_Fr.assign(m_neq, 0);
+        m_Di.assign(m_ndeq,0);
+        m_Vi.assign(m_nveq,0);
+        m_Fi.assign(m_nfeq,0);
+    }
     // serialize rigid solver
     m_rigidSolver.Serialize(ar);
 }
@@ -494,15 +501,9 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     vector<double> U(m_Ut.size());
     for (size_t i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
     
-    scatter(U, mesh, m_dofU[0]);
-    scatter(U, mesh, m_dofU[1]);
-    scatter(U, mesh, m_dofU[2]);
-    scatter(U, mesh, m_dofSU[0]);
-    scatter(U, mesh, m_dofSU[1]);
-    scatter(U, mesh, m_dofSU[2]);
-    scatter(U, mesh, m_dofW[0]);
-    scatter(U, mesh, m_dofW[1]);
-    scatter(U, mesh, m_dofW[2]);
+    scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
+    scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+    scatter3(U, mesh, m_dofW[0], m_dofW[1], m_dofW[2]);
     scatter(U, mesh, m_dofEF[0]);
     
     // force dilatations to remain greater than -1
@@ -658,7 +659,7 @@ void FEFluidFSISolver::Update(vector<double>& ui)
 
 	// NOTE: The FSI solver does not call FEModel::Update (should it?)
 	//       so we need to increment the update counter here.
-	fem.IncrementUpdateCounter();
+//	fem.IncrementUpdateCounter();
 
     // update EAS
     UpdateEAS(ui);
@@ -721,6 +722,9 @@ void FEFluidFSISolver::UpdateModel()
 	{
 		if (mesh.Domain(i).IsActive()) mesh.Domain(i).Update(tp);
 	}
+    
+    // update model state
+    GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------

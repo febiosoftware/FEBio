@@ -45,13 +45,13 @@ public:
     ~FEConstraintFrictionlessWall() {}
     
     //! Activation
-    void Activate();
+    void Activate() override;
 
     //! initialization
-    bool Init();
+    bool Init() override;
     
     //! Get the surface
-    FESurface* GetSurface() { return &m_surf; }
+    FESurface* GetSurface() override { return &m_surf; }
     
 public:
     //! serialize data to archive

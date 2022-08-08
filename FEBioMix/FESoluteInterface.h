@@ -103,6 +103,33 @@ public:
 	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
 	virtual double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
 
+    // return the number of solutes on external side
+    virtual int SolutesExternal(FEMaterialPoint& pt) { return 0; }
+    
+    // return the number of solutes on internal side
+    virtual int SolutesInternal(FEMaterialPoint& pt) { return 0; }
+    
+    //! return the solute ID on external side
+    virtual int GetSoluteIDExternal(FEMaterialPoint& mp, int soluteIndex) { return -1; }
+    
+    //! return the solute ID on internal side
+    virtual int GetSoluteIDInternal(FEMaterialPoint& mp, int soluteIndex) { return -1; }
+    
+    //! return the effective solute concentration on external side
+    virtual double GetEffectiveSoluteConcentrationExternal(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+    
+    //! return the effective solute concentration on internal side
+    virtual double GetEffectiveSoluteConcentrationInternal(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+    
+    //! return the effective pressure on external side
+    virtual double GetEffectiveFluidPressureExternal(FEMaterialPoint& mp) { return 0.0; }
+    
+    //! return the effective pressure on internal side
+    virtual double GetEffectiveFluidPressureInternal(FEMaterialPoint& mp) { return 0.0; }
+
+    //! return the membrane areal strain
+    virtual double GetMembraneArealStrain(FEMaterialPoint& mp) { return 0.0; }
+    
 // additional member functions
 public:
 	// return the local index of a global solute ID (or -1, if the solute is not in this material)

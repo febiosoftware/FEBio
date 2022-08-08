@@ -153,7 +153,7 @@ void FEBiphasicSoluteShellDomain::InitMaterialPoints()
             pt.m_pa = m_pMat->Pressure(mp);
             
             // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->m_phi0(mp);
+            pt.m_phi0t = m_pMat->m_phi0(mp);
             
             // calculate stress
             pm.m_s = m_pMat->Stress(mp);
@@ -218,7 +218,7 @@ void FEBiphasicSoluteShellDomain::Reset()
         FESolutesMaterialPoint&  ps = *(mp.ExtractData<FESolutesMaterialPoint >());
             
         // initialize referential solid volume fraction
-        pt.m_phi0 = m_pMat->m_phi0(mp);
+        pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
             
         // initialize multiphasic solutes
         ps.m_nsol = nsol;
@@ -286,7 +286,7 @@ void FEBiphasicSoluteShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             
             pb.m_p = p;
             pb.m_gradp = gradient(el, pn, qn, j);
-            pb.m_phi0p = pb.m_phi0;
+            pb.m_phi0p = pb.m_phi0t;
             
             ps.m_c[0] = c;
             ps.m_gradc[0] = gradient(el, cn, dn, j);
@@ -1326,7 +1326,7 @@ void FEBiphasicSoluteShellDomain::UpdateElementStress(int iel)
                 ppt.m_phi0hat = 0;
                 //				ppt.m_phi0hat = pmb->GetSolid()->MolarMass()/pmb->GetSolid()->Density()*pmb->GetSolute()->m_pSupp->SolidSupply(mp);
                 
-                ppt.m_phi0 = ppt.m_phi0p + ppt.m_phi0hat*dt;
+                ppt.m_phi0t = ppt.m_phi0p + ppt.m_phi0hat*dt;
             }
         }
         

@@ -28,9 +28,17 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEFixedConcentration, FEFixedBC)
-	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:concentration)");
+	ADD_PARAMETER(m_dof, "c_dof", 0, "$(dof_list:concentration)")->setLongName("species");
 END_FECORE_CLASS();
 
-FEFixedConcentration::FEFixedConcentration(FEModel* fem) : FEFixedDOF(fem)
+FEFixedConcentration::FEFixedConcentration(FEModel* fem) : FEFixedBC(fem)
 {
+	m_dof = -1;
+}
+
+bool FEFixedConcentration::Init()
+{
+	if (m_dof == -1) return false;
+	SetDOFList(m_dof);
+	return FEFixedBC::Init();
 }

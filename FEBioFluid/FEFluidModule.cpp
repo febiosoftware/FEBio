@@ -23,7 +23,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
+
 #include "FEFluidModule.h"
 #include <FECore/FEModel.h>
 #include "FEBioFluid.h"
@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEBioMultiphasicFSI.h"
 #include "FEBioThermoFluid.h"
 #include "FEBioFluidSolutes.h"
+#include "FEBioPolarFluid.h"
 
 FEFluidModule::FEFluidModule() {}
 void FEFluidModule::InitModel(FEModel* fem)
@@ -232,6 +233,45 @@ void FEThermoFluidModule::InitModel(FEModel* fem)
 
     int nAT = dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), VAR_SCALAR);
     dofs.SetDOFName(nAT, 0, "aT");
+}
+
+//=============================================================================
+FEPolarFluidModule::FEPolarFluidModule() {}
+void FEPolarFluidModule::InitModel(FEModel* fem)
+{
+    // Allocate degrees of freedom
+    DOFS& dofs = fem->GetDOFS();
+    
+    int varD = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::DISPLACEMENT), VAR_VEC3);
+    dofs.SetDOFName(varD, 0, "x");
+    dofs.SetDOFName(varD, 1, "y");
+    dofs.SetDOFName(varD, 2, "z");
+    
+    int nW = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY), VAR_VEC3);
+    dofs.SetDOFName(nW, 0, "wx");
+    dofs.SetDOFName(nW, 1, "wy");
+    dofs.SetDOFName(nW, 2, "wz");
+    
+    int nAW = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
+    dofs.SetDOFName(nAW, 0, "awx");
+    dofs.SetDOFName(nAW, 1, "awy");
+    dofs.SetDOFName(nAW, 2, "awz");
+    
+    int nG = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY), VAR_VEC3);
+    dofs.SetDOFName(nG, 0, "gx");
+    dofs.SetDOFName(nG, 1, "gy");
+    dofs.SetDOFName(nG, 2, "gz");
+    
+    int nAG = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_ACCELERATION), VAR_VEC3);
+    dofs.SetDOFName(nAG, 0, "agx");
+    dofs.SetDOFName(nAG, 1, "agy");
+    dofs.SetDOFName(nAG, 2, "agz");
+    
+    int nE = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_DILATATION), VAR_SCALAR);
+    dofs.SetDOFName(nE, 0, "ef");
+    
+    int nAE = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_DILATATION_TDERIV), VAR_SCALAR);
+    dofs.SetDOFName(nAE, 0, "aef");
 }
 
 //=============================================================================

@@ -162,7 +162,7 @@ BEGIN_FECORE_CLASS(FEPlasticFlowCurveMath, FEPlasticFlowCurve)
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
     ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "e0"  );
     ADD_PARAMETER(m_emax   , FE_RANGE_GREATER(0)           , "emax");
-    ADD_PARAMETER(m_Ymath, "plastic_response");
+    ADD_PARAMETER(m_Ymath, "plastic_response")->setLongName("plastic flow curve");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

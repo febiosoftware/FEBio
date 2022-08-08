@@ -29,6 +29,9 @@ SOFTWARE.*/
 #pragma once
 #include "FEMultiphasic.h"
 
+//-----------------------------------------------------------------------------
+//! constant membrane reaction rate
+//!
 class FEBIOMIX_API FEMembraneReactionRateConst : public FEMembraneReactionRate
 {
 public:

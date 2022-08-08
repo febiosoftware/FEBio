@@ -32,8 +32,8 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDiffConstOrtho, FESoluteDiffusivity)
-	ADD_PARAMETER(m_free_diff, FE_RANGE_GREATER(0.0), "free_diff")->setUnits(UNIT_DIFFUSIVITY);
-	ADD_PARAMETER(m_diff     , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff" )->setUnits(UNIT_DIFFUSIVITY);
+	ADD_PARAMETER(m_free_diff,    FE_RANGE_GREATER(0.0)         , "free_diff")->setUnits(UNIT_DIFFUSIVITY)->setLongName("free diffusivity");
+	ADD_PARAMETER(m_diff     , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff"     )->setUnits(UNIT_DIFFUSIVITY)->setLongName("diffusivity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEBiphasicSoluteDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicDomain.h"
+#include <FECore/FEShellDomain.h>
 
 //-----------------------------------------------------------------------------
 FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)

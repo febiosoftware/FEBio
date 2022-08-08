@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include <FECore/FEFixedBC.h>
 #include "febiomix_api.h"
 
-class FEBIOMIX_API FEFixedFluidPressure : public FEFixedDOF
+class FEBIOMIX_API FEFixedFluidPressure : public FEFixedBC
 {
 public:
 	FEFixedFluidPressure(FEModel* fem);

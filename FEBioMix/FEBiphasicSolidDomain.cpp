@@ -121,7 +121,7 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             pb.m_p = p;
             pb.m_gradp = gradient(el, pn, j);
             pb.m_gradpp = pb.m_gradp;
-            pb.m_phi0p = pb.m_phi0;
+            pb.m_phi0p = pb.m_phi0t;
             
             mp.Update(timeInfo);
 		}
@@ -246,7 +246,7 @@ void FEBiphasicSolidDomain::Reset()
 		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 
 		// initialize referential solid volume fraction
-		pt.m_phi0 = m_pMat->m_phi0(mp);
+		pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
 	});
 }
 

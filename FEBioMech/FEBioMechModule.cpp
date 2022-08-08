@@ -938,6 +938,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
     REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
+	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData

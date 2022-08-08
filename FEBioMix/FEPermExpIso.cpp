@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPermExpIso.h"
 #include "FEBiphasic.h"
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPermExpIso, FEHydraulicPermeability)
@@ -57,6 +58,9 @@ mat3ds FEPermExpIso::Permeability(FEMaterialPoint& mp)
     // referential solid volume fraction
     double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
 
+    // check for potential error
+    if (J <= phi0) feLogError("The perm-exp-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phi0);
+    
     // --- strain-dependent isotropic permeability ---
     double k0 = m_perm*exp(m_M*(J-1)/(J-phi0));
     
@@ -76,6 +80,9 @@ tens4dmm FEPermExpIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
     // referential solid volume fraction
     double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
 
+    // check for potential error
+    if (J <= phi0) feLogError("The perm-exp-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phi0);
+    
     mat3dd I(1);    // Identity
     
     double k0 = m_perm*exp(m_M*(J-1)/(J-phi0));

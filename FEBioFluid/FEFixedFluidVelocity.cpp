@@ -27,9 +27,25 @@ SOFTWARE.*/
 #include "FEFixedFluidVelocity.h"
 
 BEGIN_FECORE_CLASS(FEFixedFluidVelocity, FEFixedBC)
-	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list:relative fluid velocity)");
+	ADD_PARAMETER(m_dof[0], "wx_dof")->setLongName("x-velocity");
+	ADD_PARAMETER(m_dof[1], "wy_dof")->setLongName("y-velocity");
+	ADD_PARAMETER(m_dof[2], "wz_dof")->setLongName("z-velocity");
 END_FECORE_CLASS();
 
-FEFixedFluidVelocity::FEFixedFluidVelocity(FEModel* fem) : FEFixedDOF(fem)
+FEFixedFluidVelocity::FEFixedFluidVelocity(FEModel* fem) : FEFixedBC(fem)
 {
+	m_dof[0] = false;
+	m_dof[1] = false;
+	m_dof[2] = false;
+}
+
+bool FEFixedFluidVelocity::Init()
+{
+	vector<int> dofs;
+	if (m_dof[0]) dofs.push_back(GetDOFIndex("wx"));
+	if (m_dof[1]) dofs.push_back(GetDOFIndex("wy"));
+	if (m_dof[2]) dofs.push_back(GetDOFIndex("wz"));
+	SetDOFList(dofs);
+
+	return FEFixedBC::Init();
 }
