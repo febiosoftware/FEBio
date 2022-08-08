@@ -724,7 +724,9 @@ void FEFluidFSISolver::UpdateModel()
 	}
     
     // update model state
-    GetFEModel()->Update();
+    // NOTE: Commented this out, since this is not called in FEBio3. Not 
+    // sure why it is here.
+//    GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------
