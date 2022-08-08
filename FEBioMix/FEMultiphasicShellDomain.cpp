@@ -2001,17 +2001,16 @@ void FEMultiphasicShellDomain::ElementMembraneReactionFlux(FEShellElement& el, v
         vector<double> je(nse,0), ji(nsi,0);
         for (int ireact=0; ireact<m_pMat->MembraneReactions(); ++ireact) {
             FEMembraneReaction* react = m_pMat->GetMembraneReaction(ireact);
+            FESoluteInterface* psm = react->m_psm;
             double zbar = react->ReactionSupply(mp);
             double zve = 0, zvi = 0;
             for (int k=0; k<nse; ++k) {
                 int id = ps.m_ide[k];
-                FESoluteData* sd = react->FindSoluteData(id);
-                zve += sd->m_z*react->m_ve[id];
+                zve += react->m_z[id]*react->m_ve[id];
             }
             for (int k=0; k<nsi; ++k) {
                 int id = ps.m_idi[k];
-                FESoluteData* sd = react->FindSoluteData(id);
-                zvi += sd->m_z*react->m_vi[id];
+                zvi += react->m_z[id]*react->m_vi[id];
             }
             // Divide fluxes by two because we are integrating over the shell volume
             // but we should only integrate over the shell surface.
@@ -2133,6 +2132,7 @@ bool FEMultiphasicShellDomain::ElementMembraneFluxStiffness(FEShellElement& el, 
         vector< vector<double> > djidc(nsi,vector<double>(nsi,0));
         for (int ireact=0; ireact<m_pMat->MembraneReactions(); ++ireact) {
             FEMembraneReaction* react = m_pMat->GetMembraneReaction(ireact);
+            FESoluteInterface* psm = react->m_psm;
             double zbar = react->ReactionSupply(mp);
             double dzdJ = react->Tangent_ReactionSupply_Strain(mp);
             double dzdpe = react->Tangent_ReactionSupply_Pe(mp);
@@ -2142,14 +2142,12 @@ bool FEMultiphasicShellDomain::ElementMembraneFluxStiffness(FEShellElement& el, 
             for (int k=0; k<nse; ++k) {
                 dzdce[k] = react->Tangent_ReactionSupply_Ce(mp, k);
                 int id = ps.m_ide[k];
-                FESoluteData* sd = react->FindSoluteData(id);
-                zve += sd->m_z*react->m_ve[id];
+                zve += react->m_z[id]*react->m_ve[id];
             }
             for (int k=0; k<nsi; ++k) {
                 dzdci[k] = react->Tangent_ReactionSupply_Ci(mp, k);
                 int id = ps.m_idi[k];
-                FESoluteData* sd = react->FindSoluteData(id);
-                zvi += sd->m_z*react->m_vi[id];
+                zvi += react->m_z[id]*react->m_vi[id];
             }
             // Divide fluxes by two because we are integrating over the shell volume
             // but we should only integrate over the shell surface.

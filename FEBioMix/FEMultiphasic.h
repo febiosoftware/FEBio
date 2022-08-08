@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FEMembraneReaction.h"
 #include "FESoluteInterface.h"
 #include <FECore/FEModelParam.h>
+#include <FECore/FEShellElement.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
@@ -154,6 +155,60 @@ public:
 		return spt.m_sbmr[sbm] / SBMMolarMass(sbm) * h / ept.m_J;
 	}
 
+    // return the number of solutes on external side
+    int SolutesExternal(FEMaterialPoint& pt) override {
+        FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ce.size();
+    }
+    
+    // return the number of solutes on internal side
+    int SolutesInternal(FEMaterialPoint& pt) override {
+        FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ci.size();
+    }
+    
+    //! return the solute ID on external side
+    int GetSoluteIDExternal(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ide[soluteIndex];
+    }
+    
+    //! return the solute ID on internal side
+    int GetSoluteIDInternal(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_idi[soluteIndex];
+    }
+    
+    //! return the effective solute concentration on external side
+    double GetEffectiveSoluteConcentrationExternal(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ce[soluteIndex];
+    }
+    
+    //! return the effective solute concentration on internal side
+    double GetEffectiveSoluteConcentrationInternal(FEMaterialPoint& mp, int soluteIndex)  override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ci[soluteIndex];
+    }
+    
+    //! return the effective pressure on external side
+    double GetEffectiveFluidPressureExternal(FEMaterialPoint& mp) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_pe;
+    }
+    
+    //! return the effective pressure on internal side
+    double GetEffectiveFluidPressureInternal(FEMaterialPoint& mp) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_pi;
+    }
+    
+    //! return the membrane areal strain
+    double GetMembraneArealStrain(FEMaterialPoint& mp) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_strain;
+    }
+    
 	//! SBM referential volume fraction
 	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
