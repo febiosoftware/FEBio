@@ -659,7 +659,7 @@ void FEFluidFSISolver::Update(vector<double>& ui)
 
 	// NOTE: The FSI solver does not call FEModel::Update (should it?)
 	//       so we need to increment the update counter here.
-//	fem.IncrementUpdateCounter();
+	fem.IncrementUpdateCounter();
 
     // update EAS
     UpdateEAS(ui);
