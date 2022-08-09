@@ -152,7 +152,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	// calculate local rigid displacements
 	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
 		if (DC.IsActive()) DC.InitTimeStep();
 	}
 
@@ -183,7 +183,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 						bool br[3] = { false, false, false };
 						for (int j = 3; j < 6; ++j)
 						{
-							FERigidBodyDisplacement* dc = RB.m_pDC[j];
+							FERigidPrescribedBC* dc = RB.m_pDC[j];
 							if (dc && dc->GetRelativeFlag()) br[j - 3] = true;
 						}
 
@@ -1151,7 +1151,7 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 	const int NRD = fem.RigidPrescribedBCs();
 	for (int i = 0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
 		if (dc.IsActive())
 		{
 			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
@@ -1298,10 +1298,9 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 		// first do the displacements
 		if (RB.m_prb == 0)
 		{
-			FERigidBodyDisplacement* pdc;
 			for (int j = 0; j<3; ++j)
 			{
-				pdc = RB.m_pDC[j];
+				FERigidPrescribedBC* pdc = RB.m_pDC[j];
 				if (pdc)
 				{
 					// TODO: do I need to take the line search step into account here?

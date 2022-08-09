@@ -52,10 +52,11 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
-	int		m_rigidMat;		// rigid material ID
 	int		m_rb;			// rigid body ID
 
-	DECLARE_FECORE_CLASS();
+protected:
+	int		m_rigidMat;		// rigid material ID
+	bool	m_binit;
 };
 
 //-----------------------------------------------------------------------------
@@ -83,35 +84,57 @@ private:
 
 //-----------------------------------------------------------------------------
 //! fixed rigid body constraint
-class FEBIOMECH_API FERigidBodyFixedBC : public FERigidBC
+class FEBIOMECH_API FERigidFixedBC : public FERigidBC
 {
 public:
-	FERigidBodyFixedBC(FEModel* pfem);
+	FERigidFixedBC(FEModel* pfem);
+};
 
-	bool Init() override;
-
-	void Serialize(DumpStream& ar) override;
+//-----------------------------------------------------------------------------
+//! fixed rigid body constraint
+class FEBIOMECH_API FERigidFixedBCNew : public FERigidFixedBC
+{
+public:
+	FERigidFixedBCNew(FEModel* pfem);
 
 	void Activate() override;
 
 	void Deactivate() override;
 
 public:
-	vector<int>		m_dofs;		//!< constrained dof list
+	bool	m_dof[6];		//!< constrained dof list
 
 private:
-	bool	m_binit;
-
 	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
-//! rigid body displacement
-
-class FEBIOMECH_API FERigidBodyDisplacement : public FERigidBC
+//! fixed rigid body constraint
+class FEBIOMECH_API FERigidFixedBCOld : public FERigidFixedBC
 {
 public:
-	FERigidBodyDisplacement(FEModel* pfem);
+	FERigidFixedBCOld(FEModel* pfem);
+
+	bool Init() override;
+
+	void Activate() override;
+
+	void Deactivate() override;
+
+public:
+	vector<int>	m_dofs;		//!< constrained dof list
+
+	DECLARE_FECORE_CLASS();
+};
+
+
+//-----------------------------------------------------------------------------
+//! rigid body displacement
+
+class FEBIOMECH_API FERigidPrescribedBC : public FERigidBC
+{
+public:
+	FERigidPrescribedBC(FEModel* pfem);
 
 	bool Init() override;
 
@@ -133,15 +156,52 @@ public:
 
 	void SetValue(double v) { m_val = v; }
 
-private:
+protected:
 	int		m_dof;		//!< displacement direction
 	double	m_val;	//!< displacement value
 	double	m_ref;	//!< reference value for relative displacement
 	bool	m_brel;	//!< relative displacement flag
 
-private:
 	bool	m_binit;	//!init flag
+};
 
+//-----------------------------------------------------------------------------
+//! prescribed rigid body rotation
+
+class FEBIOMECH_API FERigidDisplacement : public FERigidPrescribedBC
+{
+public:
+	FERigidDisplacement(FEModel* pfem);
+
+	bool Init() override;
+
+private:
+	int	m_bc;
+	DECLARE_FECORE_CLASS();
+};
+
+
+//-----------------------------------------------------------------------------
+//! prescribed rigid body rotation
+
+class FEBIOMECH_API FERigidRotation : public FERigidPrescribedBC
+{
+public:
+	FERigidRotation(FEModel* pfem);
+
+	bool Init() override;
+
+private:
+	int	m_bc;
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+//! Obsolete rigid prescribed bc class. Used only for backward compatibility.
+class FEBIOMECH_API FERigidPrescribedOld : public FERigidPrescribedBC
+{
+public:
+	FERigidPrescribedOld(FEModel* pfem);
 	DECLARE_FECORE_CLASS();
 };
 
