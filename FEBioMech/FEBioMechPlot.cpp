@@ -842,7 +842,8 @@ bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
 
 	// make sure this is a mixture
 	FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pmat);
-	if (pmm == nullptr) return false;
+	FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
+	if ((pmm == nullptr) && (pum == nullptr)) return false;
 
 	// get the mixture component
 	if (m_comp < 0) return false;
