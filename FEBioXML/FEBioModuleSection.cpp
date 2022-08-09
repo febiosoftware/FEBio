@@ -56,4 +56,16 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	}
 
 	GetBuilder()->SetActiveModule(szt);
+
+	if (tag.isempty()) return;
+
+	++tag;
+	do {
+		if (tag == "units")
+		{
+			// TODO: store this somewhere 
+		}
+		
+		++tag;
+	} while (!tag.isend());
 }
