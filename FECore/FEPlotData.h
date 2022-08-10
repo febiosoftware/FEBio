@@ -112,13 +112,17 @@ public: // used by array variables
 	void SetArrayNames(vector<string>& s) { m_arrayNames = s; }
 	vector<string>& GetArrayNames() { return m_arrayNames; }
 
+public:
+	void SetUnits(const char* sz) { m_szunit = sz; }
+	const char* GetUnits() const { return m_szunit; }
+
 private:
 	Region_Type		m_nregion;		//!< region type
 	Var_Type		m_ntype;		//!< data type
 	Storage_Fmt		m_sfmt;			//!< data storage format
 	vector<int>		m_item;			//!< Data will only be stored for the item's in this list
     char			m_szdom[64];	//!< Data will only be stored for the domain with this name
-
+	const char*		m_szunit;
 	int				m_arraySize;	//!< size of arrays (used by arrays)
 	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)
 };

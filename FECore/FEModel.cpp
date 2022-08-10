@@ -175,6 +175,8 @@ public:
 	bool			m_printParams;	//!< print parameters
 	bool			m_meshUpdate;	//!< mesh update flag
 
+	std::string		m_units;	// units string
+
 public:
 	// The model
 	FEModel*	m_fem;
@@ -2242,4 +2244,20 @@ FEMeshAdaptor* FEModel::MeshAdaptor(int i)
 void FEModel::AddMeshAdaptor(FEMeshAdaptor* meshAdaptor)
 {
 	m_imp->m_MA.push_back(meshAdaptor);
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::SetUnits(const char* szunits)
+{
+	if (szunits)
+		m_imp->m_units = szunits;
+	else
+		m_imp->m_units.clear();
+}
+
+//-----------------------------------------------------------------------------
+const char* FEModel::GetUnits() const
+{
+	if (m_imp->m_units.empty()) return nullptr;
+	else return m_imp->m_units.c_str();
 }

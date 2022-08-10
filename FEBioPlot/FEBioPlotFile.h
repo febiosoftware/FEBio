@@ -56,6 +56,7 @@ public:
 			PLT_HDR_COMPRESSION			= 0x01010004,
 			PLT_HDR_AUTHOR				= 0x01010005,	// new in 2.0
 			PLT_HDR_SOFTWARE			= 0x01010006,	// new in 2.0
+			PLT_HDR_UNITS				= 0x01010007,	// new in 4.0
 		PLT_DICTIONARY					= 0x01020000,
 			PLT_DIC_ITEM				= 0x01020001,
 			PLT_DIC_ITEM_TYPE			= 0x01020002,
@@ -63,6 +64,7 @@ public:
 			PLT_DIC_ITEM_NAME			= 0x01020004,
 			PLT_DIC_ITEM_ARRAYSIZE		= 0x01020005,	// added in version 0x05
 			PLT_DIC_ITEM_ARRAYNAME		= 0x01020006,	// added in version 0x05
+			PLT_DIC_ITEM_UNITS			= 0x01020007,	// added in version 4.0
 			PLT_DIC_GLOBAL				= 0x01021000,
 //			PLT_DIC_MATERIAL			= 0x01022000,	// this was removed
 			PLT_DIC_NODAL				= 0x01023000,
@@ -183,6 +185,7 @@ public:
 		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
 		std::vector<string>	m_arrayNames;	// names of array components (optional)
 		char			m_szname[STR_SIZE];
+		char			m_szunit[STR_SIZE];
 	};
 
 	class Dictionary
@@ -358,6 +361,7 @@ protected:
 	int			m_ncompress;	// compression level
 	int			m_meshesWritten;	// nr of meshes written
 	string		m_softwareString;	// the software string
+	bool		m_exportUnitsFlag;	// flag that indicates whether to write units
 
 	std::vector<Surface>	m_Surf;
 

@@ -838,6 +838,7 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 FEPlotElementMixtureStress::FEPlotElementMixtureStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) 
 {
 	m_comp = -1;
+	SetUnits(UNIT_PRESSURE);
 }
 
 bool FEPlotElementMixtureStress::SetFilter(const char* szfilter)

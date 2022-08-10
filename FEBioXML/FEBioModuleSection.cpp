@@ -63,7 +63,8 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	do {
 		if (tag == "units")
 		{
-			// TODO: store this somewhere 
+			const char* szunits = tag.szvalue();
+			GetFEModel()->SetUnits(szunits);
 		}
 		
 		++tag;
