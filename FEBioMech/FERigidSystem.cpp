@@ -141,14 +141,14 @@ void FERigidSystem::Activate()
 	// rigid body displacements
 	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& rc = *m_RDC[i];
+		FERigidPrescribedBC& rc = *m_RDC[i];
 		if (rc.IsActive()) rc.Activate();
 	}
 
 	// fixed rigid body dofs
 	for (int i=0; i<(int) m_RBC.size(); ++i)
 	{
-		FERigidBodyFixedBC& rc = *m_RBC[i];
+		FERigidFixedBC& rc = *m_RBC[i];
 		if (rc.IsActive()) rc.Activate();
 	}
 
@@ -172,12 +172,12 @@ bool FERigidSystem::Init()
 	FEModel& fem = m_fem;
 	for (int i=0; i<(int) m_RBC.size(); ++i)
 	{
-		FERigidBodyFixedBC& BC = *m_RBC[i];
+		FERigidFixedBC& BC = *m_RBC[i];
 		if (BC.Init() == false) return false;
 	}
 	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *m_RDC[i];
+		FERigidPrescribedBC& DC = *m_RDC[i];
 		if (DC.Init() == false) return false;
 	}
 	for (int i=0; i<(int) m_RIC.size(); ++i)

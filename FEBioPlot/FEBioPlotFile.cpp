@@ -43,6 +43,7 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 	m_nfmt = 0;
 	m_arraySize = 0;
 	m_szname[0] = 0;
+	m_szunit[0] = 0;
 }
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_ITEM& item)
@@ -53,7 +54,9 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_
 	m_arraySize = item.m_arraySize;
 	m_arrayNames = item.m_arrayNames;
 	m_szname[0] = 0;
+	m_szunit[0] = 0;
 	if (item.m_szname[0]) strcpy(m_szname, item.m_szname);
+	if (item.m_szunit[0]) strcpy(m_szunit, item.m_szunit);
 }
 
 class FEPlotSurfaceDataExport : public FEPlotData
@@ -491,6 +494,10 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Node.push_back(it);
 		return true;
 	}
@@ -510,6 +517,10 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Elem.push_back(it);
 		return true;
 	}
@@ -529,6 +540,10 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Face.push_back(it);
 		return true;
 	}
@@ -588,6 +603,7 @@ FEBioPlotFile::FEBioPlotFile(FEModel* fem) : PlotFile(fem)
 {
 	m_ncompress = 0;
 	m_meshesWritten = 0;
+	m_exportUnitsFlag = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -801,6 +817,15 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 		m_ar.WriteChunk(PLT_HDR_SOFTWARE, sz);
 	}
 
+	// units flag
+	m_exportUnitsFlag = false;
+	const char* szunits = fem.GetUnits();
+	if (szunits != nullptr)
+	{
+		m_exportUnitsFlag = true;
+		m_ar.WriteChunk(PLT_HDR_UNITS, szunits);
+	}
+
 	return true;
 }
 
@@ -885,6 +910,11 @@ void FEBioPlotFile::WriteDictionaryItem(DICTIONARY_ITEM& it)
 		}
 	}
 	m_ar.WriteChunk(PLT_DIC_ITEM_NAME, it.m_szname, STR_SIZE);
+
+	if (m_exportUnitsFlag && it.m_szunit && it.m_szunit[0])
+	{
+		m_ar.WriteChunk(PLT_DIC_ITEM_UNITS, it.m_szunit, STR_SIZE);
+	}
 }
 
 //-----------------------------------------------------------------------------

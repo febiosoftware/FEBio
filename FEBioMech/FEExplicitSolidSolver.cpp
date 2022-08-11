@@ -567,7 +567,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	const int NRD = fem.RigidPrescribedBCs();
 	for (int i=0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
 		if (dc.IsActive())
 		{
 			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
@@ -739,7 +739,7 @@ void FEExplicitSolidSolver::PrepStep()
 	// calculate local rigid displacements
 	for (i=0; i<(int) fem.RigidPrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
 		FERigidBody& RB = *fem.GetRigidBody(DC.GetID());
 		if (DC.IsActive())
 		{

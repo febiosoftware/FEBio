@@ -37,6 +37,7 @@ END_FECORE_CLASS();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem)
 {
+    m_density = 1.0;
 }
 
 //! set the material density

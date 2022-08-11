@@ -379,7 +379,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				double val = 0.0;
 				value(tag, val);
 
-				FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", &fem);
+				FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidPrescribedOld", &fem);
 				feb.AddRigidComponent(pDC);
 
 				pDC->SetParameter("rb", nmat);
@@ -432,7 +432,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
-				FEStepComponent* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC", &fem);
+				FEStepComponent* pBC = fecore_new_class<FEBoundaryCondition>("FERigidFixedBCOld", &fem);
 				feb.AddRigidComponent(pBC);
 
 				pBC->SetParameter("rb", nmat);
@@ -460,7 +460,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				double val = 0.0;
 				value(tag, val);
 
-				FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", &fem);
+				FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidPrescribedOld", &fem);
 				feb.AddRigidComponent(pDC);
 
 				pDC->SetParameter("rb", nmat);
@@ -504,7 +504,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
-				FEStepComponent* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC", &fem);
+				FEStepComponent* pBC = fecore_new_class<FEBoundaryCondition>("FERigidFixedBCOld", &fem);
 				feb.AddRigidComponent(pBC);
 
 				pBC->SetParameter("rb", nmat);
@@ -566,7 +566,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			double val = 0.0;
 			value(tag, val);
 
-			FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", &fem);
+			FEStepComponent* pDC = fecore_new_class<FEBoundaryCondition>("FERigidPrescribedOld", &fem);
 			feb.AddRigidComponent(pDC);
 
 			pDC->SetParameter("rb", nmat);
@@ -658,7 +658,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			else if (strcmp(szbc, "Rz") == 0) bc = 5;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
-			FEStepComponent* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC", &fem);
+			FEStepComponent* pBC = fecore_new_class<FEBoundaryCondition>("FERigidFixedBCOld", &fem);
 			feb.AddRigidComponent(pBC);
 
 			pBC->SetParameter("rb", nmat);

@@ -418,6 +418,10 @@ public:
 	// this can be used to change the update counter
 	void IncrementUpdateCounter();
 
+public:
+	void SetUnits(const char* szunits);
+	const char* GetUnits() const;
+
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 

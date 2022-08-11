@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 class FEModel;
-class FERigidBodyDisplacement;
+class FERigidPrescribedBC;
 
 //-----------------------------------------------------------------------------
 //! rigid body class
@@ -139,7 +139,7 @@ public:
     bool    m_bpofr;    //!< flag for all or none of rotation dofs prescribed/fixed
     
 public:
-	FERigidBodyDisplacement*	m_pDC[6];	//!< active displacement constraints
+	FERigidPrescribedBC*	m_pDC[6];	//!< active displacement constraints
 	FERigidBody*	m_prb;	//!< parent rigid body
 
 public:

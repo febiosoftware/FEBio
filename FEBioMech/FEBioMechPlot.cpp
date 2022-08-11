@@ -838,6 +838,7 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 FEPlotElementMixtureStress::FEPlotElementMixtureStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) 
 {
 	m_comp = -1;
+	SetUnits(UNIT_PRESSURE);
 }
 
 bool FEPlotElementMixtureStress::SetFilter(const char* szfilter)
@@ -854,7 +855,8 @@ bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
 
 	// make sure this is a mixture
 	FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pmat);
-	if (pmm == nullptr) return false;
+	FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
+	if ((pmm == nullptr) && (pum == nullptr)) return false;
 
 	// get the mixture component
 	if (m_comp < 0) return false;

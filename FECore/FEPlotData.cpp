@@ -38,6 +38,7 @@ FEPlotData::FEPlotData(FEModel* fem) : FECoreBase(fem)
 
 	m_arraySize = 0;
 	m_szdom[0] = 0;
+	m_szunit = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,6 +50,8 @@ FEPlotData::FEPlotData(FEModel* fem, Region_Type R, Var_Type t, Storage_Fmt s) :
 
 	m_arraySize = 0;
 	m_szdom[0] = 0;
+
+	m_szunit = nullptr;
 }
 
 //-----------------------------------------------------------------------------
