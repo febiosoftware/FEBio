@@ -73,6 +73,7 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnect
     m_bq = false;
 	m_bautopen = false;
 	m_laugon = 1;	// default to augmented Lagrangian
+	m_eps = m_ups = 1.0;
 
 	m_F = vec3d(0, 0, 0);
 	m_u = 0;

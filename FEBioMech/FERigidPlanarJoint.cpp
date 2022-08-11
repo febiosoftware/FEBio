@@ -70,6 +70,7 @@ FERigidPlanarJoint::FERigidPlanarJoint(FEModel* pfem) : FERigidConnector(pfem)
     m_bdy = false;
     m_bdz = false;
 	m_bautopen = false;
+    m_eps = m_ups = 1.0;
 }
 
 //-----------------------------------------------------------------------------
