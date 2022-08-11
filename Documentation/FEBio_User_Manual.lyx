@@ -17324,7 +17324,7 @@ constraint fixes one or multiple rigid degrees of freedom.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
+<lyxtabular version="3" rows="8" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -17368,30 +17368,139 @@ rb
 \begin_inset Text
 
 \begin_layout Plain Layout
-The rigid body's material ID (1)
+The rigid material name (1)
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \emph on
-dofs
+Rx_dof
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-The list of rigid degrees of freedom to fix.
- (2) 
+fix x-displacement degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Ry_dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fix y-displacement degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Rz_dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fix z-displacement degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Ru_dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fix x-rotational degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Rv_dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fix y-rotational degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Rw_dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fix z-rotational degree of freedom
 \end_layout
 
 \end_inset
@@ -17415,27 +17524,8 @@ Comments:
 \end_layout
 
 \begin_layout Enumerate
-This is the 
-\begin_inset Quotes eld
-\end_inset
-
-id
-\begin_inset Quotes erd
-\end_inset
-
- attribute assigned to the corresponding rigid body material defined in
- the Material section.
+The name of the rigid material defined in the Material section.
  
-\end_layout
-
-\begin_layout Enumerate
-The values allowed for the 
-\emph on
-dofs 
-\emph default
-parameter are: Rx, Ry, Rz, Ru, Rv, Rw.
- The first three (Rx, Ry, Rz) represent the displacement degrees of freedom.
- The other three (Ru, Rv, Rw) are the rotational degrees of freedom.
 \end_layout
 
 \begin_layout Standard
@@ -17452,7 +17542,15 @@ The following example fixes the displacement degrees of freedom.
 \end_layout
 
 \begin_layout LyX-Code
-  <dofs>Rx,Ry,Rz</dofs>
+  <Rx_dof>1</Rx_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <Ry_dof>1</Ry_dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <Rz_dof>1</Rz_dof>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17460,15 +17558,15 @@ The following example fixes the displacement degrees of freedom.
 \end_layout
 
 \begin_layout Subsubsection
-Rigid_prescribed Constraint
+Rigid_displacement Constraint
 \end_layout
 
 \begin_layout Standard
 The 
 \emph on
-rigid_prescribed
+rigid_displacement
 \emph default
- constraint prescribes the value of a rigid degree of freedom.
+ constraint prescribes the value of a rigid displacement degree of freedom.
  It requires the following parameters.
  
 \end_layout
@@ -17524,8 +17622,7 @@ rb
 \begin_inset Text
 
 \begin_layout Plain Layout
-The rigid body's material ID.
- (1)
+The rigid body's material name (1)
 \end_layout
 
 \end_inset
@@ -17617,16 +17714,8 @@ Comments:
 \end_layout
 
 \begin_layout Enumerate
-This is the 
-\begin_inset Quotes eld
-\end_inset
-
-id
-\begin_inset Quotes erd
-\end_inset
-
- attribute assigned to the corresponding rigid body material as defined
- in the Material section.
+This is the name attribute assigned to the corresponding rigid body material
+ as defined in the Material section.
 \end_layout
 
 \begin_layout Enumerate
@@ -17634,9 +17723,8 @@ The values allowed for the
 \emph on
 dof 
 \emph default
-parameter are: Rx, Ry, Rz, Ru, Rv, Rw.
- The first three (Rx, Ry, Rz) represent the displacement degrees of freedom.
- The other three (Ru, Rv, Rw) are the rotational degrees of freedom.
+parameter are: x, y, or z.
+ 
 \end_layout
 
 \begin_layout Enumerate
@@ -17650,15 +17738,15 @@ The following example prescribes the x-displacement degree of freedom.
 \end_layout
 
 \begin_layout LyX-Code
-<rigid_bc type="rigid_prescribed">
+<rigid_bc type="rigid_displacement">
 \end_layout
 
 \begin_layout LyX-Code
-  <rb>1</rb>
+  <rb>rigid</rb>
 \end_layout
 
 \begin_layout LyX-Code
-  <dof>Rx</dofs>
+  <dof>x</dof>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17666,7 +17754,207 @@ The following example prescribes the x-displacement degree of freedom.
 \end_layout
 
 \begin_layout LyX-Code
-</rigid_constraint>
+</rigid_bc>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_rotation Constraint
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_rotation
+\emph default
+ constraint prescribes the value of a rigid rotational degree of freedom.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material name (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid degree of freedom to prescribe.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defines the value as relative or absolute.
+ (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the name attribute assigned to the corresponding rigid body material
+ as defined in the Material section.
+\end_layout
+
+\begin_layout Enumerate
+The values allowed for the 
+\emph on
+dof 
+\emph default
+parameter are: Ru, Rv, or Rw.
+ 
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set, the value is taken relative to the dof value
+ at the start of the step.
+\end_layout
+
+\begin_layout Standard
+The following example prescribes a rotation around the x-axis.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_bc type="rigid_rotation">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>rigid</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>Ru</dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_bc>
 \end_layout
 
 \begin_layout Subsection
@@ -17839,8 +18127,7 @@ rb
 \begin_inset Text
 
 \begin_layout Plain Layout
-The rigid body's material ID.
- (1)
+The rigid body's material name (1)
 \end_layout
 
 \end_inset
@@ -17890,7 +18177,7 @@ This is the
 \begin_inset Quotes eld
 \end_inset
 
-id
+name
 \begin_inset Quotes erd
 \end_inset
 
@@ -17908,15 +18195,11 @@ The following example defines an initial velocity for a rigid body.
 \end_layout
 
 \begin_layout LyX-Code
-  <rb>1</rb>
+  <rb>rigid</rb>
 \end_layout
 
 \begin_layout LyX-Code
-  <dof>Rx</dofs>
-\end_layout
-
-\begin_layout LyX-Code
-  <value lc="1">3.14</value>
+  <value>1,0,0</value>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17989,7 +18272,7 @@ rb
 \begin_inset Text
 
 \begin_layout Plain Layout
-The rigid body's material ID.
+The rigid body's material name.
  (1)
 \end_layout
 
@@ -18040,7 +18323,7 @@ This is the
 \begin_inset Quotes eld
 \end_inset
 
-id
+name
 \begin_inset Quotes erd
 \end_inset
 
@@ -18058,7 +18341,7 @@ The following example defines an initial angular velocity for a rigid body.
 \end_layout
 
 \begin_layout LyX-Code
-  <rb>1</rb>
+  <rb>rigid</rb>
 \end_layout
 
 \begin_layout LyX-Code
@@ -18257,10 +18540,7 @@ The
 rigid_force
 \emph default
  load applies a load directly to the rigid degree of freedom.
- For a displacement degree of freedom, this is similar to applying a force
- in the corresponding direction.
- For a rotational degree of freedom, this is similar to applying a moment
- to the corresponding direction.It requires the following parameters.
+ It requires the following parameters.
  
 \end_layout
 
@@ -18315,8 +18595,7 @@ rb
 \begin_inset Text
 
 \begin_layout Plain Layout
-The rigid body's material ID.
- (1)
+The rigid body's material name (1)
 \end_layout
 
 \end_inset
@@ -18412,7 +18691,7 @@ This is the
 \begin_inset Quotes eld
 \end_inset
 
-id
+name
 \begin_inset Quotes erd
 \end_inset
 
@@ -18425,9 +18704,7 @@ The values allowed for the
 \emph on
 dof 
 \emph default
-parameter are: Rx, Ry, Rz, Ru, Rv, Rw.
- The first three (Rx, Ry, Rz) represent the displacement degrees of freedom.
- The other three (Ru, Rv, Rw) are the rotational degrees of freedom.
+parameter are: Rx, Ry, Rz.
  
 \end_layout
 
@@ -18480,6 +18757,856 @@ The following example applies a force in the x-direction.
 
 \begin_layout LyX-Code
   <value lc="1">3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_load>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_moment Load
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_moment
+\emph default
+ load applies a moment about a partical coordinate axis.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material name (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid degree of freedom to prescribe.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed moment value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defines the type of load.
+ (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+name
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Enumerate
+The values allowed for the 
+\emph on
+dof 
+\emph default
+parameter are: Ru, Rv, Rw.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The relative flag indicates whether the applied value should be absolute
+ or relative to the value at the end of the previous analysis step.
+\end_layout
+
+\begin_layout Standard
+The following example applies a moment about the x-axis.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_load type="rigid_moment">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>rigid</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>Ru</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_load>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_follower_force Load
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_follower_force
+\emph default
+ load applies a force in the local rigid body coortinate system.
+ The direction of the force in global coordinates therefore depends on orientati
+on of the rigid body.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material name (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+insertion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Location where the force is applied.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The vector force value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Relative flag (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+name
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Enumerate
+This is the position in the reference coordinate system of the point where
+ the force is applied.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The relative flag indicates whether the applied value should be absolute
+ or relative to the value at the end of the previous analysis step.
+\end_layout
+
+\begin_layout Standard
+The following example applies a moment about the x-axis.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_load type="rigid_follower_force">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>rigid</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion>1,2,3</dofs>
+\end_layout
+
+\begin_layout LyX-Code
+  <force>100,0,0</force>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_load>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_follower_moment Load
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_follower_
+\emph default
+moment load applies a moment in the local rigid body coortinate system.
+ The direction of the moment in global coordinates therefore depends on
+ orientation of the rigid body.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material name (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+moment
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The vector moment value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the 
+\begin_inset Quotes eld
+\end_inset
+
+name
+\begin_inset Quotes erd
+\end_inset
+
+ attribute assigned to the corresponding rigid body material as defined
+ in the Material section.
+\end_layout
+
+\begin_layout Standard
+The following example applies a moment about the x-axis.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_load type="rigid_follower_moment">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>rigid</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment>100,0,0</force>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_load>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_cable Load
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_cable
+\emph default
+ load emulates the effect of a force applied on one end of a cable that
+ is connected to one or more rigid bodies.
+ It requires the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The scalar force magnitude
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+force_direction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The unit vector defining the force direction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0,0,0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Indicates whether the through-points are defined in global or relative coordinat
+es (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rigid_cable_point
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A point on a rigid body that the cable runs through.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(none)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+relative 
+\emph default
+flag indicates whether the location of the cable's via-points are defined
+ in global coordinates (relative=0) or in the local coordinates of the correspon
+ding rigid body (relative=1).
+ 
+\end_layout
+
+\begin_layout Enumerate
+One or more rigid cable points must be defined that define the points that
+ the cable runs through.
+ The first point defined is the anchor, where the cable is attached to.
+ The other points define the via points, i.e.
+ a point where the cable runs through.
+ Each cable point is defined by the rigid body that it connects to and a
+ point on the rigid body that the cable runs through.
+ The point's coordinates are either in the global or the local coordinate
+ system of the rigid body, as determined by the 
+\emph on
+relative 
+\emph default
+flag.
+ 
+\end_layout
+
+\begin_layout Standard
+The following example illustrates a rigid cable setup.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_load type="rigid_cable">
+\end_layout
+
+\begin_layout LyX-Code
+  <force lc="1">100</force>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_direction>1,0,0</force_direction>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>1</relative>
+\end_layout
+
+\begin_layout LyX-Code
+  <rigid_cable_point>
+\end_layout
+
+\begin_layout LyX-Code
+    <rigid_body_id>rigid1</rigid_body_id>
+\end_layout
+
+\begin_layout LyX-Code
+    <position>0, -1, 1</position>
+\end_layout
+
+\begin_layout LyX-Code
+  </rigid_cable_point>
+\end_layout
+
+\begin_layout LyX-Code
+  <rigid_cable_point>
+\end_layout
+
+\begin_layout LyX-Code
+    <rigid_body_id>rigid2</rigid_body_id>
+\end_layout
+
+\begin_layout LyX-Code
+    <position>0, 1, 1</position>
+\end_layout
+
+\begin_layout LyX-Code
+  </rigid_cable_point>
 \end_layout
 
 \begin_layout LyX-Code
