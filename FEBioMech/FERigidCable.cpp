@@ -31,7 +31,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreClass)
-	ADD_PARAMETER(m_rb, "rigid_body_id");
+	ADD_PARAMETER(m_rb, "rigid_body_id")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 	ADD_PARAMETER(m_pos, "position");
 END_FECORE_CLASS();
 
