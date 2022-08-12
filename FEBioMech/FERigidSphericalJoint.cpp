@@ -59,6 +59,8 @@ FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(p
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
+    m_eps = 1.0;
+    m_ups = 1.0;
     m_naugmin = 0;
     m_naugmax = 10;
     m_qpx = m_qpy = m_qpz = 0;

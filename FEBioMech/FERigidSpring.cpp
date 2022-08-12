@@ -46,6 +46,7 @@ FERigidSpring::FERigidSpring(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
     m_L0 = 0;
+    m_k = 1.0;
 }
 
 //-----------------------------------------------------------------------------
