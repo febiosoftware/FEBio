@@ -38,6 +38,7 @@
 #include "FETangentialFlowFSIStabilization.h"
 #include "FEMultiphasicFSISoluteFlux.h"
 #include "FEMultiphasicFSIPressure.h"
+#include "FEMultiphasicFSIPressureBC.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEMultiphasicFSISoluteBackflowStabilization.h"
 #include "FEFluidModule.h"
@@ -97,9 +98,13 @@ void FEBioMultiphasicFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FETangentialFlowFSIStabilization, "fluid tangential stabilization");
     
+    // loads
     REGISTER_FECORE_CLASS(FEMultiphasicFSISoluteFlux, "solute flux");
     REGISTER_FECORE_CLASS(FEMultiphasicFSISoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressure, "fluid pressure");
-    
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressure, "fluid pressure", 0x0300); // deprecated, use BC version
+
+    // bcs
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressureBC, "fluid pressure");
+
     febio.SetActiveModule(0);
 }

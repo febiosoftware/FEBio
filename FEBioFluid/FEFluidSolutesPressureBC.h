@@ -23,29 +23,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
 #pragma once
 #include <FECore/FEPrescribedBC.h>
-#include "FEFluidMaterial.h"
+#include "FEFluidSolutes.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidRCRBC is a fluid surface load that implements a 3-element Windkessel model
+//! FEFluidResistanceBC is a fluid surface that has a normal
+//! pressure proportional to the flow rate (resistance).
 //!
-class FEBIOFLUID_API FEFluidRCRBC : public FEPrescribedSurface
+class FEBIOFLUID_API FEFluidSolutesPressureBC : public FEPrescribedSurface
 {
 public:
     //! constructor
-    FEFluidRCRBC(FEModel* pfem);
-    
+    FEFluidSolutesPressureBC(FEModel* pfem);
+
     //! set the dilatation
     void Update() override;
-    
-    //! evaluate flow rate
-    double FlowRate();
-    
+
     //! initialize
     bool Init() override;
-    
+
     //! serialization
     void Serialize(DumpStream& ar) override;
 
@@ -57,25 +54,14 @@ public:
     void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
-    double          m_R;        //!< flow resistance
-    double          m_Rd;       //!< distal resistance
-    double          m_p0;       //!< initial fluid pressure
-    double          m_C;        //!< capacitance
-    double          m_pd;       //!< downstream pressure
-    
+    double          m_p;       //!< prescribed fluid pressure
+    vector<double>  m_e;
+
 private:
-    double              m_pn;   //!< fluid pressure at current time point
-    double              m_pp;   //!< fluid pressure at previous time point
-    double              m_qn;   //!< flow rate at current time point
-    double              m_qp;   //!< flow rate at previous time point
-    double              m_pdn;  //!< downstream fluid pressure at current time point
-    double              m_pdp;  //!< downstream fluid pressure at previous time point
-    double              m_tp;   //!< previous time
-    double              m_e;
-    FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
-    
-    FEDofList   m_dofW;
-    int         m_dofEF;
-    
+    FEFluidSolutes* m_pfs;   //!< pointer to fluid-solutes material
+
+    int        m_dofEF;
+    int        m_dofC;
+
     DECLARE_FECORE_CLASS();
 };

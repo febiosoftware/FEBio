@@ -57,11 +57,16 @@ SOFTWARE.*/
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FEFluidResistanceBC.h"
+#include "FEFluidResistanceLoad.h"
 #include "FEFluidRCRBC.h"
+#include "FEFluidRCRLoad.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidRCBC.h"
+#include "FEFluidRCLoad.h"
+#include "FEPrescribedFluidPressure.h"
+
 #include "FETiedFluidInterface.h"
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
@@ -147,19 +152,18 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D, "fluid-2D");
 
 //-----------------------------------------------------------------------------
 // Surface loads
-REGISTER_FECORE_CLASS(FEFluidPressureLoad          , "fluid pressure");
-REGISTER_FECORE_CLASS(FEFluidTractionLoad          , "fluid viscous traction");
+REGISTER_FECORE_CLASS(FEFluidPressureLoad          , "fluid pressure"                , 0x0300); // Deprecated, use the BC version.
+REGISTER_FECORE_CLASS(FEFluidTractionLoad          , "fluid viscous traction"        );
 REGISTER_FECORE_CLASS(FEFluidMixtureTractionLoad   , "fluid mixture viscous traction");
-REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction");
-REGISTER_FECORE_CLASS(FEFluidNormalVelocity        , "fluid normal velocity");
-REGISTER_FECORE_CLASS(FEFluidVelocity              , "fluid velocity");
-REGISTER_FECORE_CLASS(FEFluidResistanceBC          , "fluid resistance");
-REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
-REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping");
+REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction"         );
+REGISTER_FECORE_CLASS(FEFluidNormalVelocity        , "fluid normal velocity"         );
+REGISTER_FECORE_CLASS(FEFluidVelocity              , "fluid velocity"                );
+REGISTER_FECORE_CLASS(FEFluidResistanceLoad        , "fluid resistance"              , 0x0300);  // Deprecated, use the BC version.
+REGISTER_FECORE_CLASS(FEFluidRCRLoad               , "fluid RCR"                     , 0x0300);  // Deprecated, use the BC version.
+REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping"      );
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
-REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
-REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
-
+REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization"  );
+REGISTER_FECORE_CLASS(FEFluidRCLoad                , "fluid RC"                      , 0x0300);  // Deprecated, use the BC version.
 
 //-----------------------------------------------------------------------------
 // body loads
@@ -167,11 +171,15 @@ REGISTER_FECORE_CLASS(FEConstFluidBodyForce, "const");
 
 //-----------------------------------------------------------------------------
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedFluidVelocity          , "zero fluid velocity");
-REGISTER_FECORE_CLASS(FEPrescribedFluidVelocity     , "prescribed fluid velocity");
-REGISTER_FECORE_CLASS(FEFixedFluidDilatation        , "zero fluid dilatation");
-REGISTER_FECORE_CLASS(FEPrescribedFluidDilatation   , "prescribed fluid dilatation");
-REGISTER_FECORE_CLASS(FEFluidRotationalVelocity     , "fluid rotational velocity");
+REGISTER_FECORE_CLASS(FEFixedFluidVelocity       , "zero fluid velocity");
+REGISTER_FECORE_CLASS(FEPrescribedFluidVelocity  , "prescribed fluid velocity");
+REGISTER_FECORE_CLASS(FEFixedFluidDilatation     , "zero fluid dilatation");
+REGISTER_FECORE_CLASS(FEPrescribedFluidDilatation, "prescribed fluid dilatation");
+REGISTER_FECORE_CLASS(FEFluidRotationalVelocity  , "fluid rotational velocity");
+REGISTER_FECORE_CLASS(FEPrescribedFluidPressure  , "fluid pressure");
+REGISTER_FECORE_CLASS(FEFluidRCBC                , "fluid RC");
+REGISTER_FECORE_CLASS(FEFluidRCRBC               , "fluid RCR");
+REGISTER_FECORE_CLASS(FEFluidResistanceBC        , "fluid resistance");
 
 //-----------------------------------------------------------------------------
 // initial conditions

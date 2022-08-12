@@ -23,41 +23,47 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
-#include "FEMatchingOsmoticCoefficientBC.h"
+#include "FEMatchingOsmoticCoefficientLoad.h"
 #include "FEBioMix.h"
 #include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, FEPrescribedSurface)
-    ADD_PARAMETER(m_ambp , "ambient_pressure");
-    ADD_PARAMETER(m_ambc , "ambient_osmolarity");
-    ADD_PARAMETER(m_bshellb , "shell_bottom");
+BEGIN_FECORE_CLASS(FEMatchingOsmoticCoefficientLoad, FESurfaceLoad)
+    ADD_PARAMETER(m_ambp, "ambient_pressure");
+    ADD_PARAMETER(m_ambc, "ambient_osmolarity");
+    ADD_PARAMETER(m_bshellb, "shell_bottom");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEMatchingOsmoticCoefficientBC::FEMatchingOsmoticCoefficientBC(FEModel* pfem) : FEPrescribedSurface(pfem)
+FEMatchingOsmoticCoefficientLoad::FEMatchingOsmoticCoefficientLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_ambp = m_ambc = 0.0;
     m_bshellb = false;
-    
+
     m_dofP = pfem->GetDOFIndex("p");
     m_dofQ = pfem->GetDOFIndex("q");
 }
 
 //-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEMatchingOsmoticCoefficientBC::Activate()
+//! initialize
+bool FEMatchingOsmoticCoefficientLoad::Init()
 {
-    FESurface* ps = GetSurface();
-    
+    if (FESurfaceLoad::Init() == false) return false;
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Activate the degrees of freedom for this BC
+void FEMatchingOsmoticCoefficientLoad::Activate()
+{
+    FESurface* ps = &GetSurface();
+
     FEModel* fem = GetFEModel();
 
-    for (int i=0; i<ps->Elements(); ++i) {
+    for (int i = 0; i < ps->Elements(); ++i) {
         FESurfaceElement& el = ps->Element(i);
         // get the element connected to this surface
         FEElement* elem = el.m_elem[0];
@@ -66,7 +72,7 @@ void FEMatchingOsmoticCoefficientBC::Activate()
         FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pm);
         // if the material is multiphasic, set prescribable fluid dofs
         if (pmp) {
-            for (int j=0; j<el.Nodes(); ++j) {
+            for (int j = 0; j < el.Nodes(); ++j) {
                 FENode& node = ps->Node(el.m_lnode[j]);
                 // mark node as having prescribed DOF
                 if (!m_bshellb) node.set_bc(m_dofP, DOF_PRESCRIBED);
@@ -74,24 +80,20 @@ void FEMatchingOsmoticCoefficientBC::Activate()
             }
         }
     }
-
-    // NOTE: Hmmm, not sure about this one. Maybe skip immediate base class?
-//    FEPrescribedSurface::Activate();
-    FESurfaceBC::Activate();
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the ambient effective fluid pressure, using the multiphasic osmotic coefficient
-void FEMatchingOsmoticCoefficientBC::Update()
+void FEMatchingOsmoticCoefficientLoad::Update()
 {
-    FESurface* ps = GetSurface();
-    
-    FEModel* fem = GetFEModel();
-    
-    vector<double> pn(ps->Nodes(),0);
-    vector<int> cnt(ps->Nodes(),0);
+    FESurface* ps = &GetSurface();
 
-    for (int i=0; i<ps->Elements(); ++i) {
+    FEModel* fem = GetFEModel();
+
+    vector<double> pn(ps->Nodes(), 0);
+    vector<int> cnt(ps->Nodes(), 0);
+
+    for (int i = 0; i < ps->Elements(); ++i) {
         FESurfaceElement& el = ps->Element(i);
         // get the element connected to this surface
         FEElement* elem = el.m_elem[0];
@@ -102,15 +104,15 @@ void FEMatchingOsmoticCoefficientBC::Update()
         if (pmp) {
             // get average osmotic coefficient in this multiphasic element
             int nint = elem->GaussPoints();
-            for (int n=0; n<nint; ++n) {
+            for (int n = 0; n < nint; ++n) {
                 FEMaterialPoint& mp = *elem->GetMaterialPoint(n);
                 Phi += pmp->GetOsmoticCoefficient()->OsmoticCoefficient(mp);
             }
             Phi /= nint;
             // evaluate effective fluid pressure on the boundary
-            double pe = m_ambp - pmp->m_Rgas*pmp->m_Tabs*Phi*m_ambc;
+            double pe = m_ambp - pmp->m_Rgas * pmp->m_Tabs * Phi * m_ambc;
             // project to nodes of that face
-            for (int j=0; j<el.Nodes(); ++j) {
+            for (int j = 0; j < el.Nodes(); ++j) {
                 int n = el.m_lnode[j];
                 pn[n] += pe;
                 ++cnt[n];
@@ -119,42 +121,25 @@ void FEMatchingOsmoticCoefficientBC::Update()
     }
 
     // prescribe the projected nodal values of the effective fluid pressure
-    for (int i=0; i<ps->Nodes(); ++i)
+    for (int i = 0; i < ps->Nodes(); ++i)
     {
         if (ps->Node(i).m_ID[m_dofP] < -1)
         {
             assert(cnt[i]);
             FENode& node = ps->Node(i);
             // prescribe effective pressure at this node
-            double pe = pn[i]/cnt[i];
+            double pe = pn[i] / cnt[i];
             if (!m_bshellb) node.set(m_dofP, pe);
             else node.set(m_dofQ, pe);
         }
     }
-}
 
-//-----------------------------------------------------------------------------
-void FEMatchingOsmoticCoefficientBC::GetNodalValues(int nodelid, std::vector<double>& val)
-{
-    // TODO: implement this
-    assert(false);
-}
-
-//-----------------------------------------------------------------------------
-void FEMatchingOsmoticCoefficientBC::CopyFrom(FEBoundaryCondition* pbc)
-{
-    // TODO: implement this
-    assert(false);
+    fem->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
 //! serialization
-void FEMatchingOsmoticCoefficientBC::Serialize(DumpStream& ar)
+void FEMatchingOsmoticCoefficientLoad::Serialize(DumpStream& ar)
 {
-    FEPrescribedSurface::Serialize(ar);
-    if (ar.IsShallow() == false)
-    {
-        ar& m_dofP;
-        ar& m_dofQ;
-    }
+    FESurfaceLoad::Serialize(ar);
 }
