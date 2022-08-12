@@ -35,6 +35,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedNormalDisplacement, FEPrescribedSurface)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_hint, "surface_hint");
+	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS()
 
 FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : FEPrescribedSurface(fem)
