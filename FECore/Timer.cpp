@@ -29,35 +29,10 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "Timer.h"
 #include <stdio.h>
-// #include <time.h>
 #include <string>
 #include "FEModel.h"
 
 using namespace std::chrono;
-
-//-----------------------------------------------------------------------------
-// Define the data types used for measuring times.
-// This depends on the system
-// #ifdef WIN32
-// #define TIMER_TYPE clock_t
-// #else
-// #define TIMER_TYPE	time_t
-// #endif
-
-// //-----------------------------------------------------------------------------
-// // forward declaration of the functions to retrieve timing info
-// void sys_get_time(TIMER_TYPE& t);
-// double sys_diff_time(TIMER_TYPE& t1, TIMER_TYPE& t0);
-
-// //-----------------------------------------------------------------------------
-// // OS-dependent timing functions
-// #ifdef WIN32
-// void sys_get_time(TIMER_TYPE& t) { t = clock(); }
-// double sys_diff_time(TIMER_TYPE& t1, TIMER_TYPE& t0) { return (double) (t1 - t0) / CLOCKS_PER_SEC; }
-// #else
-// void sys_get_time(TIMER_TYPE& t) { time(&t); }
-// double sys_diff_time(TIMER_TYPE& t1, TIMER_TYPE& t0) { return difftime(t1, t0); }
-// #endif
 
 //-----------------------------------------------------------------------------
 // data storing timing info
