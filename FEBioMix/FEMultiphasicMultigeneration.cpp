@@ -86,7 +86,7 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
         FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
         FEMultigenSBMMaterialPoint& mpt = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
         
-        double phi0 = ppt.m_phi0;
+        double phi0 = ppt.m_phi0t;
         int nsbm = SBMs();
         int nsol = Solutes();
         int ngen = mpt.m_ngen;

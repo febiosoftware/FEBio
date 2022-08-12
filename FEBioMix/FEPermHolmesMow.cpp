@@ -58,7 +58,7 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 	// referential solid volume fraction also check if bfsi
     double phi0 = 0.0;
     if (pt)
-        phi0 = pt->m_phi0;
+        phi0 = pt->m_phi0t;
     else if (bpt)
         phi0 = bpt->m_phi0;
 	
@@ -83,7 +83,7 @@ tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// referential solid volume fraction
     double phi0 = 0.0;
     if (pt)
-        phi0 = pt->m_phi0;
+        phi0 = pt->m_phi0t;
     else if (bpt)
         phi0 = bpt->m_phi0;
 	

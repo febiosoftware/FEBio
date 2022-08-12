@@ -131,7 +131,7 @@ mat3ds FEMichaelisMenten::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 		double J = ept.m_J;
         double phi0 = 0.0;
         if (m_pMP)
-            phi0 = bpt.m_phi0;
+            phi0 = bpt.m_phi0t;
         else if (m_pSM || m_pMF || m_pFS)
             phi0 = bfpt.m_phi0;
 		dcdJ = -c/(J-phi0);

@@ -115,7 +115,7 @@ mat3ds FEMassActionForwardEffective::Tangent_ReactionSupply_Strain(FEMaterialPoi
     else
     {
         double J = ept.m_J;
-        double phi0 = bpt.m_phi0;
+        double phi0 = bpt.m_phi0t;
         
         double kF = m_pFwd->ReactionRate(pt);
         mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);

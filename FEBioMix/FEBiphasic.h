@@ -64,7 +64,8 @@ public:
     vec3d		m_gradpp;	//!< gradp at previous time
 	vec3d		m_w;		//!< fluid flux
 	double		m_pa;		//!< actual fluid pressure
-	double		m_phi0;		//!< referential solid volume fraction at current time
+    double      m_phi0;     //!< initial referential solid volume fraction
+	double		m_phi0t;	//!< referential solid volume fraction at current time
 	double		m_phi0p;	//!< referential solid volume fraction at previous time
 	double		m_phi0hat;	//!< referential solid volume fraction supply at current time
     double      m_Jp;       //!< determinant of solid deformation gradient at previous time

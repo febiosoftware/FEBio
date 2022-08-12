@@ -63,7 +63,7 @@ void FEBiphasicMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
 	ar & m_p & m_gradp & m_gradpp;
-	ar & m_w & m_pa & m_phi0 & m_phi0p & m_phi0hat & m_Jp;
+	ar & m_w & m_pa & m_phi0 & m_phi0t & m_phi0p & m_phi0hat & m_Jp;
     ar & m_ss;
 }
 
@@ -73,7 +73,7 @@ void FEBiphasicMaterialPoint::Init()
 	m_p = m_pa = 0;
 	m_gradp = m_gradpp = vec3d(0,0,0);
 	m_w = vec3d(0,0,0);
-	m_phi0 = m_phi0p = 0;
+    m_phi0 = m_phi0t = m_phi0p = 0;
 	m_phi0hat = 0;
 	m_Jp = 1;
     m_ss.zero();
@@ -145,7 +145,7 @@ double FEBiphasic::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 //	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse

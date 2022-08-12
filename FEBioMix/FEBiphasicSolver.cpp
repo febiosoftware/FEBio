@@ -176,13 +176,13 @@ bool FEBiphasicSolver::Quasin()
 	double	normE1;		// energy norm
 	double	normD;		// displacement norm
 	double	normd;		// displacement increment norm
-	double	normRi;		// initial residual norm
-	double	normEi;		// initial energy norm
-	double	normEm;		// max energy norm
-	double	normDi;		// initial displacement norm
+	double	normRi = 0; // initial residual norm
+	double	normEi = 0; // initial energy norm
+	double	normEm = 0;	// max energy norm
+	double	normDi = 0;	// initial displacement norm
 
 	// poro convergence norms data
-	double	normPi;		// initial pressure norm
+	double	normPi = 0;	// initial pressure norm
 	double	normP;		// current pressure norm
 	double	normp;		// incremement pressure norm
 

@@ -157,7 +157,7 @@ mat3ds FEDiffAlbroIso::Diffusivity(FEMaterialPoint& mp)
 	// solid volume fraction in reference configuration
 	double phi0 = 0;
     if (ppt)
-        phi0 = ppt->m_phi0;
+        phi0 = ppt->m_phi0t;
     else if (bfpt)
         phi0 = bfpt->m_phi0;
     // porosity in current configuration
@@ -200,7 +200,7 @@ tens4dmm FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	// solid volume fraction in reference configuration
     double phi0 = 0;
     if (ppt)
-        phi0 = ppt->m_phi0;
+        phi0 = ppt->m_phi0t;
     else if (bfpt)
         phi0 = bfpt->m_phi0;
     // porosity in current configuration
@@ -256,7 +256,7 @@ mat3ds FEDiffAlbroIso::Tangent_Diffusivity_Concentration(FEMaterialPoint &mp, co
 	// solid volume fraction in reference configuration
     double phi0 = 0;
     if (ppt)
-        phi0 = ppt->m_phi0;
+        phi0 = ppt->m_phi0t;
     else if (bfpt)
         phi0 = bfpt->m_phi0;
     // porosity in current configuration
