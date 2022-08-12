@@ -49,6 +49,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+
 	m_ac = nullptr;
 	m_fib.SetParent(this);
 	m_fiber = nullptr;

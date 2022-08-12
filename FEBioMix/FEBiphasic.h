@@ -64,7 +64,8 @@ public:
     vec3d		m_gradpp;	//!< gradp at previous time
 	vec3d		m_w;		//!< fluid flux
 	double		m_pa;		//!< actual fluid pressure
-	double		m_phi0;		//!< referential solid volume fraction at current time
+    double      m_phi0;     //!< referential solid volume fraction at initial time
+	double		m_phi0t;	//!< referential solid volume fraction at current time
 	double		m_phi0p;	//!< referential solid volume fraction at previous time
 	double		m_phi0hat;	//!< referential solid volume fraction supply at current time
     double      m_Jp;       //!< determinant of solid deformation gradient at previous time
@@ -153,7 +154,7 @@ public: // overridden from FEBiphasicInterface
 
 	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-		return pt->m_phi0;
+		return pt->m_phi0t;
 	}
 
 	double GetActualFluidPressure(const FEMaterialPoint& mp) override { 
@@ -161,6 +162,14 @@ public: // overridden from FEBiphasicInterface
 		return pt->m_pa;
 	}
 
+    //! evaluate and return solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& mp) override {
+        double phisr = m_phi0(mp);
+        FEBiphasicMaterialPoint* bp = (mp.ExtractData<FEBiphasicMaterialPoint>());
+        bp->m_phi0 = bp->m_phi0t = phisr;
+        return phisr;
+    };
+    
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	FEParamDouble               m_phi0;		//!< solid volume fraction in reference configuration

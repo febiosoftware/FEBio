@@ -60,7 +60,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
         FEShellElement* sel = dynamic_cast<FEShellElement*>(mp.m_elem);
         double h = (sel) ? sel->Evaluate(sel->m_ht, mp.m_index) : 0;   // shell thickness
 
-        double phi0 = ppt.m_phi0;
+        double phi0 = ppt.m_phi0t;
         int nsbm = SBMs();
         int nsol = Solutes();
         // create a temporary container for spt.m_sbmr so that this variable remains

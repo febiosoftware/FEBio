@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #include "stdafx.h"
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicMultigeneration.h"
@@ -163,7 +162,7 @@ bool FEMultiphasicSolidDomain::Init()
             ps.m_sbmrp.assign(nsbm, 0);
             ps.m_sbmrhat.assign(nsbm, 0);
             ps.m_sbmrhatp.assign(nsbm, 0);
-            pb.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
+            pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
             ps.m_cF = m_pMat->FixedChargeDensity(mp);
             
             // evaluate reaction rates at initial time
@@ -175,7 +174,7 @@ bool FEMultiphasicSolidDomain::Init()
                 // multiphasic material point data
                 FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 
-                double phi0 = pb.m_phi0;
+                double phi0 = pb.m_phi0t;
                 for (int isbm=0; isbm<nsbm; ++isbm) {
                     // combine the molar supplies from all the reactions
                     for (int k=0; k<nreact; ++k) {
@@ -351,7 +350,7 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
             pt.m_pa = m_pMat->Pressure(mp);
             
             // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
+            pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
             
             // calculate FCD, current and stress
             ps.m_cF = m_pMat->FixedChargeDensity(mp);
@@ -389,7 +388,7 @@ void FEMultiphasicSolidDomain::Reset()
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
             // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->m_phi0(mp);
+            pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
             
             // initialize sbm apparent densities
             for (int i = 0; i<nsbm; ++i)
@@ -418,6 +417,7 @@ void FEMultiphasicSolidDomain::Reset()
                 m_pMat->GetReaction(j)->ResetElementData(mp);
         }
     }
+    m_breset = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -459,7 +459,7 @@ void FEMultiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             pt.m_Jp = pe.m_J;
             
             // reset referential solid volume fraction at previous time
-            pt.m_phi0p = pt.m_phi0;
+            pt.m_phi0p = pt.m_phi0t;
             
             // reset referential actual solute concentration at previous time
             for (int j=0; j<m_pMat->Solutes(); ++j) {
@@ -929,7 +929,7 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
         
         // evaluate the porosity and its derivative
         double phiw = m_pMat->Porosity(mp);
-        double phi0 = ppt.m_phi0;
+        double phi0 = ppt.m_phi0t;
         double phis = 1. - phiw;
         double dpdJ = phis/J;
         
@@ -1674,8 +1674,9 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         pmb->UpdateSolidBoundMolecules(mp);
         
         // evaluate referential solid volume fraction
-        ppt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
-        
+        ppt.m_phi0t = pmb->SolidReferentialVolumeFraction(mp);
+        if (m_breset) ppt.m_phi0 = ppt.m_phi0t;
+
         // evaluate fluid pressure at gauss-point
         ppt.m_p = el.Evaluate(pn, n);
         
@@ -1720,4 +1721,5 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
             pmb->GetReaction(j)->UpdateElementData(mp);
         
     }
+    if (m_breset) m_breset = false;
 }

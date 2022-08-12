@@ -33,8 +33,8 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FERigidMaterial, FESolidMaterial)
 	ADD_PARAMETER(m_E      , FE_RANGE_GREATER(0.0), "E"         )->setLongName("Young's modulus");
 	ADD_PARAMETER(m_v      , FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v")->setLongName("Poisson's ratio");
-	ADD_PARAMETER(m_auto_com, "auto_com");
-	ADD_PARAMETER(&m_rc    , FE_PARAM_VEC3D, 1, "center_of_mass", &m_com);
+	ADD_PARAMETER(m_com    , "override_com")->SetFlags(FE_PARAM_WATCH);
+	ADD_PARAMETER(m_rc    , "center_of_mass")->SetWatchVariable(&m_com);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -43,7 +43,6 @@ FERigidMaterial::FERigidMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 {
 	m_E = 1;
 	m_v = 0;
-	m_auto_com = false;
 	m_rc = vec3d(0, 0, 0);
 
 	m_com = false;	// calculate COM automatically
@@ -61,14 +60,6 @@ bool FERigidMaterial::Init()
 
 	if (m_binit == false)
 	{
-		// In older files the logic was that if the center_of_mass parameter
-		// was not specified in the input file, i.e. com is false, the com was calculated automatically.
-		if ((m_com == false) && (m_auto_com == false))
-		{
-			feLogWarning("Since center_of_mass parameter was not defined, the auto_com setting was enabled.");
-			m_auto_com = true;
-		}
-		
 		// get this rigid body's ID
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidBody& rb = *fem.GetRigidBody(GetRigidBodyID());
@@ -80,7 +71,7 @@ bool FERigidMaterial::Init()
 			rb.UpdateMass();
 
 			// next, calculate the center of mass, or just set it
-			if (m_auto_com)
+			if (m_com == false)
 			{
 				rb.UpdateCOM();
 			}

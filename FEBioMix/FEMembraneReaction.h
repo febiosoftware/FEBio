@@ -27,10 +27,8 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
-#include "FEBioMix/FESolutesMaterialPoint.h"
-#include <FEBioMech/FESSIShellDomain.h>
 #include "FEReaction.h"
+#include "febiomix_api.h"
 #include "FESolute.h"
 
 //-----------------------------------------------------------------------------
@@ -40,7 +38,7 @@ class FEBIOMIX_API FEMembraneReactionRate : public FEMaterialProperty
 {
 public:
     //! constructor
-    FEMembraneReactionRate(FEModel* pfem) : FEMaterialProperty(pfem) {}
+    FEMembraneReactionRate(FEModel* pfem) : FEMaterialProperty(pfem), m_pReact(nullptr) {}
     
     //! reaction rate at material point
     virtual double ReactionRate(FEMaterialPoint& pt) = 0;
@@ -104,6 +102,9 @@ public:
     //! constructor
     FEMembraneReaction(FEModel* pfem);
     
+    //! get solute (use only during initialization)
+    FESoluteData* GetSolute(int nsol);
+    
     //! initialization
     bool Init() override;
     
@@ -133,13 +134,6 @@ public:
     }
     
 public:
-    //! Serialization
-    void Serialize(DumpStream& ar) override;
-    
-    //! get solute data
-    FESoluteData* FindSoluteData(int nid);
-    
-public:
     //! molar supply at material point
     virtual double ReactionSupply(FEMaterialPoint& pt) = 0;
     
@@ -157,10 +151,13 @@ public:
     virtual double Tangent_ReactionSupply_Ci(FEMaterialPoint& pt, const int sol) = 0;
 
 public:
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+    
+public:
     FEMembraneReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
     FEMembraneReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
     
-private:
     vector<FEReactantSpeciesRef*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
     vector<FEProductSpeciesRef*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
     vector<FEInternalReactantSpeciesRef*> m_vRitmp;	//!< helper variable for reading in stoichiometric coefficients for internal reactants
@@ -185,6 +182,7 @@ public:
     vector<int>     m_vP;           //!< stoichiometric coefficients of products
     vector<int>     m_v;            //!< net stoichiometric coefficients of reactants and products
     int             m_NSOL;         //!< number of solutes in the model
+    vector<int>     m_z;            //!< charge number of all solutes
     vector<int>     m_vRi;          //!< stoichiometric coefficients of reactants
     vector<int>     m_vPi;          //!< stoichiometric coefficients of products
     vector<int>     m_vi;           //!< net stoichiometric coefficients of reactants and products

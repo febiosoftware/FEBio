@@ -39,7 +39,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FERigidWallInterface, FESurfaceConstraint)
-	ADD_PARAMETER(m_laugon , "laugon"    );
+	ADD_PARAMETER(m_laugon , "laugon"    )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol   , "tolerance" );
 	ADD_PARAMETER(m_eps    , "penalty"   );
 	ADD_PARAMETER(m_d	   , "offset"    );
@@ -212,6 +212,8 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FESurfaceConstraint(
 {
 	static int count = 1;
 	SetID(count++);
+
+	m_laugon = 0;
 
 	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0.0;
 

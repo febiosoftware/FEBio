@@ -241,13 +241,14 @@ void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS)
 BEGIN_FECORE_CLASS(FERigidBodyForce, FERigidLoad)
 	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz");
-	ADD_PARAMETER(m_force, "value")->setUnits(UNIT_FORCE);
+	ADD_PARAMETER(m_force, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE)->setUnits(UNIT_FORCE);
 	ADD_PARAMETER(m_ntype, "load_type")->setEnums("LOAD\0FOLLOW\0TARGET");
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
 FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FERigidLoad(pfem)
 {
+	m_rigidMat = -1;
 	m_ntype = FORCE_LOAD;
 	m_trg = 0.0;
 	m_rid = -1;
@@ -382,12 +383,13 @@ void FERigidBodyForce::StiffnessMatrix(FELinearSystem& LS)
 BEGIN_FECORE_CLASS(FERigidBodyMoment, FERigidLoad)
 	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 	ADD_PARAMETER(m_dof, "dof", 0, "Ru\0Rv\0Rw\0");
-	ADD_PARAMETER(m_value, "value")->setUnits(UNIT_MOMENT);
+	ADD_PARAMETER(m_value, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE)->setUnits(UNIT_MOMENT);
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
 FERigidBodyMoment::FERigidBodyMoment(FEModel* pfem) : FERigidLoad(pfem)
 {
+	m_rigidMat = -1;
 	m_rid = -1;
 	m_brelative = false;
 	m_value0 = 0.0;

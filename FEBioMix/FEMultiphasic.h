@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FEMembraneReaction.h"
 #include "FESoluteInterface.h"
 #include <FECore/FEModelParam.h>
+#include <FECore/FEShellElement.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
@@ -91,11 +92,14 @@ public:
                                        vector< vector<double> >& dkdJr,
                                        vector< vector< vector<double> > >& dkdrc);
 	
-	//! solid referential apparent density
-	double SolidReferentialApparentDensity(FEMaterialPoint& pt);
+    //! return solid referential apparent density
+    double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override;
+    
+	//! evaluate and return solid referential apparent density
+	double SolidReferentialApparentDensity(FEMaterialPoint& pt) override;
 
-	//! solid referential volume fraction
-	double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
+	//! evaluate and return solid referential volume fraction
+	double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
@@ -134,11 +138,11 @@ public:
 	int SBMChargeNumber(const int sbm) { return m_pSBM[sbm]->ChargeNumber(); }
 
 	//! SBM actual concentration (molar concentration per fluid volume in current configuration)
-	double SBMConcentration(FEMaterialPoint& pt, const int sbm) {
+	double SBMConcentration(FEMaterialPoint& pt, const int sbm) override {
 		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm] / (ept.m_J - bpt.m_phi0) / SBMMolarMass(sbm);
+		return spt.m_sbmr[sbm] / (ept.m_J - bpt.m_phi0t) / SBMMolarMass(sbm);
 	}
 
 	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
@@ -151,6 +155,60 @@ public:
 		return spt.m_sbmr[sbm] / SBMMolarMass(sbm) * h / ept.m_J;
 	}
 
+    // return the number of solutes on external side
+    int SolutesExternal(FEMaterialPoint& pt) override {
+        FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ce.size();
+    }
+    
+    // return the number of solutes on internal side
+    int SolutesInternal(FEMaterialPoint& pt) override {
+        FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ci.size();
+    }
+    
+    //! return the solute ID on external side
+    int GetSoluteIDExternal(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ide[soluteIndex];
+    }
+    
+    //! return the solute ID on internal side
+    int GetSoluteIDInternal(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_idi[soluteIndex];
+    }
+    
+    //! return the effective solute concentration on external side
+    double GetEffectiveSoluteConcentrationExternal(FEMaterialPoint& mp, int soluteIndex) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ce[soluteIndex];
+    }
+    
+    //! return the effective solute concentration on internal side
+    double GetEffectiveSoluteConcentrationInternal(FEMaterialPoint& mp, int soluteIndex)  override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_ci[soluteIndex];
+    }
+    
+    //! return the effective pressure on external side
+    double GetEffectiveFluidPressureExternal(FEMaterialPoint& mp) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_pe;
+    }
+    
+    //! return the effective pressure on internal side
+    double GetEffectiveFluidPressureInternal(FEMaterialPoint& mp) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_pi;
+    }
+    
+    //! return the membrane areal strain
+    double GetMembraneArealStrain(FEMaterialPoint& mp) override {
+        FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+        return spt.m_strain;
+    }
+    
 	//! SBM referential volume fraction
 	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
@@ -169,6 +227,14 @@ public:
 	//! Add a membrane reaction
 	void AddMembraneReaction(FEMembraneReaction* pcr);
 
+public: // solute interface
+	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+
+	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_cF;
+	}
+
 public:
 	//! Evaluate effective permeability
 	mat3ds EffectivePermeability(FEMaterialPoint& pt);
@@ -183,9 +249,9 @@ public:
 public:
 	FEElasticMaterial* GetSolid() { return m_pSolid; }
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
-	FEOsmoticCoefficient* GetOsmoticCoefficient() { return m_pOsmC; }
+	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 	FESolventSupply* GetSolventSupply() { return m_pSupp; }
-	FESolidBoundMolecule* GetSBM(int i) { return m_pSBM[i]; }
+	FESolidBoundMolecule* GetSBM(int i) override { return m_pSBM[i]; }
 	FEChemicalReaction* GetReaction(int i) { return m_pReact[i]; }
 	FEMembraneReaction* GetMembraneReaction(int i) { return m_pMReact[i]; }
 

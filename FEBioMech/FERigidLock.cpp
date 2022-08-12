@@ -51,6 +51,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
 {
+    m_eps = 1.0;
+    m_ups = 1.0;
+
     m_nID = m_ncount++;
     m_atol = 0;
     m_gtol = 0;
@@ -58,6 +61,7 @@ FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
     m_naugmin = 0;
     m_naugmax = 10;
 	m_bautopen = false;
+    m_eps = m_ups = 1.0;
 }
 
 //-----------------------------------------------------------------------------

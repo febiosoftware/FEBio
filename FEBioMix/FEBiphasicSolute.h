@@ -72,11 +72,19 @@ public:
 	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
 
 public: // overridden from FEBiphasicInterface
+    //! Evaluate and return solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& mp) override {
+        double phisr = m_phi0(mp);
+        FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+        pt->m_phi0 = pt->m_phi0t = phisr;
+        return phisr;
+    };
+    // Return solid referential volume fraction
 	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-		return pt->m_phi0;
+		return pt->m_phi0t;
 	}
-
+    // Return actual fluid pressure
 	double GetActualFluidPressure(const FEMaterialPoint& mp) override {
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 		return pt->m_pa;

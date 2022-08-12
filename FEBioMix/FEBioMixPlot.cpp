@@ -493,6 +493,7 @@ FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) 
 	}
 	assert(nsol == (int)s.size());
 	SetArrayNames(s);
+    SetUnits(UNIT_CONCENTRATION);
 }
 
 //-----------------------------------------------------------------------------
@@ -630,6 +631,7 @@ FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_A
 	}
 	assert(nsol == (int)s.size());
 	SetArrayNames(s);
+    SetUnits(UNIT_MOLAR_FLUX);
 }
 
 //-----------------------------------------------------------------------------
@@ -697,6 +699,7 @@ FEPlotSoluteVolumetricFlux::FEPlotSoluteVolumetricFlux(FEModel* pfem) : FEPlotDo
     }
     assert(nsol == (int)s.size());
     SetArrayNames(s);
+    SetUnits(UNIT_VELOCITY);
 }
 
 //-----------------------------------------------------------------------------
@@ -826,6 +829,7 @@ FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEPlotDomainData
 
 	SetArraySize(sbms);
 	SetArrayNames(names);
+    SetUnits(UNIT_CONCENTRATION);
 }
 
 //-----------------------------------------------------------------------------
@@ -895,6 +899,7 @@ FEPlotSBMArealConcentration::FEPlotSBMArealConcentration(FEModel* pfem) : FEPlot
     
     SetArraySize(sbms);
     SetArrayNames(names);
+    SetUnits(UNIT_MOLAR_AREAL_CONCENTRATION);
 }
 
 //-----------------------------------------------------------------------------
@@ -990,7 +995,7 @@ bool FEPlotPorosity::Save(FEDomain &dom, FEDataStream& a)
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
             const FEElasticMaterialPoint* et = (mp.ExtractData<FEElasticMaterialPoint>());
             const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-            return (pt ? (1 - pt->m_phi0/et->m_J) : 0.0);
+            return (pt ? (1 - pt->m_phi0t/et->m_J) : 0.0);
         });
         return true;
     }
@@ -1206,6 +1211,7 @@ FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* 
 	}
 	assert(nsol == (int)s.size());
 	SetArrayNames(s);
+    SetUnits(UNIT_CONCENTRATION);
 }
 
 //-----------------------------------------------------------------------------
@@ -1330,6 +1336,7 @@ FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEPlotDomainData
 
 	SetArraySize(sbms);
 	SetArrayNames(names);
+    SetUnits(UNIT_DENSITY);
 }
 
 //-----------------------------------------------------------------------------

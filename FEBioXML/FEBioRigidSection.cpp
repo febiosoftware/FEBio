@@ -61,14 +61,14 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	if (strcmp(sztype, "fix") == 0)
 	{
 		// create the fixed dof
-		FEBoundaryCondition* pBC = fecore_new_class<FEBoundaryCondition>("FERigidBodyFixedBC", fem);
+		FEBoundaryCondition* pBC = fecore_new_class<FEBoundaryCondition>("FERigidFixedBCOld", fem);
 		feb.AddRigidComponent(pBC);
 		ReadParameterList(tag, pBC);
 	}
 	else if (strcmp(sztype, "prescribe") == 0)
 	{
 		// create the rigid displacement constraint
-		FEBoundaryCondition* pDC = fecore_new_class<FEBoundaryCondition>("FERigidBodyDisplacement", fem);
+		FEBoundaryCondition* pDC = fecore_new_class<FEBoundaryCondition>("FERigidPrescribedOld", fem);
 		feb.AddRigidComponent(pDC);
 		ReadParameterList(tag, pDC);
 	}

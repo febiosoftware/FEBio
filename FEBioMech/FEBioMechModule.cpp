@@ -641,8 +641,12 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidBC
-	REGISTER_FECORE_CLASS(FERigidBodyFixedBC        , "rigid_fixed"           );
-	REGISTER_FECORE_CLASS(FERigidBodyDisplacement   , "rigid_prescribed"      );
+	REGISTER_FECORE_CLASS(FERigidFixedBCNew     , "rigid_fixed"           );
+	REGISTER_FECORE_CLASS(FERigidDisplacement   , "rigid_displacement"    );
+	REGISTER_FECORE_CLASS(FERigidRotation       , "rigid_rotation"        );
+
+	REGISTER_FECORE_CLASS(FERigidFixedBCOld     , "rigid_fixed_old"     , 0x300);	// obsolete in 4.0
+	REGISTER_FECORE_CLASS(FERigidPrescribedOld  , "rigid_prescribed_old", 0x300);	// obsolete in 4.0
 	
 	// classes derived directly from FERigidIC
 	REGISTER_FECORE_CLASS(FERigidBodyVelocity       , "initial_rigid_velocity"        );

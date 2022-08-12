@@ -30,8 +30,8 @@ SOFTWARE.*/
 //---------------------------------------------------------------------------------------
 class FERigidSystem;
 class FERigidBody;
-class FERigidBodyDisplacement;
-class FERigidBodyFixedBC;
+class FERigidPrescribedBC;
+class FERigidFixedBC;
 class FERigidIC;
 class FERigidNodeSet;
 
@@ -89,13 +89,13 @@ public:
 	int RigidPrescribedBCs() const;
 
 	// return the rigid prescribed displacement
-	FERigidBodyDisplacement* GetRigidPrescribedBC(int i);
+	FERigidPrescribedBC* GetRigidPrescribedBC(int i);
 
 	// add a rigid presribed BC
-	void AddRigidPrescribedBC(FERigidBodyDisplacement* pDC);
+	void AddRigidPrescribedBC(FERigidPrescribedBC* pDC);
 
 	// add a rigid fixed BC
-	void AddRigidFixedBC(FERigidBodyFixedBC* pBC);
+	void AddRigidFixedBC(FERigidFixedBC* pBC);
 
 	// add a rigid initial condition
 	void AddRigidInitialCondition(FERigidIC* pIC);

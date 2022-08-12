@@ -50,8 +50,8 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 
 	BEGIN_PARAM_GROUP("Time stepping");
 		ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
-		ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME);
-		ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
+		ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME)->SetFlags(0);
+		ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time")->SetFlags(FE_PARAM_HIDDEN);
 	END_PARAM_GROUP();
 
 	BEGIN_PARAM_GROUP("Output");

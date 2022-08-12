@@ -77,7 +77,7 @@ mat3ds FEConcentrationIndependentReaction::Tangent_ReactionSupply_Strain(FEMater
 	const int nsol = m_nsol;
 	const int nsbm = (int)m_v.size() - nsol;
 	double J = ept.m_J;
-	double phi0 = bpt.m_phi0;
+	double phi0 = bpt.m_phi0t;
     
 	double kF = m_pFwd->ReactionRate(pt);
 	mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);

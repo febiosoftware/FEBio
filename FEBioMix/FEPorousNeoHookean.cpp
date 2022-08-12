@@ -128,5 +128,5 @@ double FEPorousNeoHookean::ReferentialSolidVolumeFraction(FEMaterialPoint& mp)
     if (m_phisr < 1) return m_phisr;
     
     FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-    return pt.m_phi0;
+    return pt.m_phi0t;
 }

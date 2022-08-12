@@ -622,7 +622,19 @@ void FEParam::setParent(FEParamContainer* pc) { m_parent = pc; }
 FEParamContainer* FEParam::parent() { return m_parent; }
 
 //-----------------------------------------------------------------------------
-void FEParam::SetWatch(bool b)
+void FEParam::SetWatchVariable(bool* watchvar)
+{
+	m_watch = watchvar;
+}
+
+//-----------------------------------------------------------------------------
+bool* FEParam::GetWatchVariable()
+{
+	return m_watch;
+}
+
+//-----------------------------------------------------------------------------
+void FEParam::SetWatchFlag(bool b)
 {
 	if (m_watch) *m_watch = b;
 }

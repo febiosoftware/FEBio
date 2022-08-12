@@ -150,7 +150,7 @@ double FETriphasic::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 	//	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
@@ -168,8 +168,9 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	
 	// relative volume
 	double J = et.m_J;
-	double phi0 = pet.m_phi0;
-	double cF = m_cFr(pt)*(1-phi0)/(J-phi0);
+    double phi0 = pet.m_phi0;
+	double phisr = pet.m_phi0t;
+	double cF = m_cFr(pt)*(1-phi0)/(J-phisr);
 	
 	return cF;
 }
@@ -275,7 +276,7 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 	
 	// relative volume and solid volume fraction
 	double J = ept.m_J;
-	double phi0 = ppt.m_phi0;
+	double phi0 = ppt.m_phi0t;
 	
 	// get the charge density and its derivatives
 	double cF = FixedChargeDensity(mp);
@@ -542,7 +543,7 @@ void FETriphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<doub
     
     // get the charge density and its derivatives
     double J = ept.m_J;
-    double phi0 = ppt.m_phi0;
+    double phi0 = ppt.m_phi0t;
     double cF = FixedChargeDensity(mp);
     double dcFdJ = -cF/(J - phi0);
     double dcFdJJ = 2*cF/SQR(J-phi0);
@@ -615,6 +616,6 @@ double FETriphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
 	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
 	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
-	double cf = (ept->m_J - bpt->m_phi0) * spt->m_cF / (1 - bpt->m_phi0);
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
 	return cf;
 }

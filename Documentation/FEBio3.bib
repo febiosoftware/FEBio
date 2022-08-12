@@ -1,7 +1,7 @@
 %% This BibTeX bibliography file was created using BibDesk.
 %% http://bibdesk.sourceforge.net/
 
-%% Created for Gerard Ateshian at 2022-04-16 18:28:43 -0400 
+%% Created for Gerard Ateshian at 2022-08-05 09:28:01 -0400 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
@@ -10,6 +10,98 @@
 @comment{jabref-meta: databaseType:bibtex;}
 
 
+
+@article{Shim22a,
+	abstract = {Mixture theory is a general framework that has been used to model mixtures of solid, fluid, and solute constituents, leading to significant advances in modeling the mechanics of biological tissues and cells. Though versatile and applicable to a wide range of problems in biomechanics and biophysics, standard multiphasic mixture frameworks incorporate neither dynamics of viscous fluids nor fluid compressibility, both of which facilitate the finite element implementation of computational fluid dynamics solvers. This study formulates governing equations for reactive multiphasic mixtures where the interstitial fluid has a solvent which is viscous and compressible. This hybrid reactive multiphasic framework uses state variables that include the deformation gradient of the porous solid matrix, the volumetric strain and rate of deformation of the solvent, the solute concentrations, and the relative velocities between the various constituents. Unlike standard formulations which employ a Lagrange multiplier to model fluid pressure, this framework requires the formulation of a function of state for the pressure, which depends on solvent volumetric strain and solute concentrations. Under isothermal conditions the formulation shows that the solvent volumetric strain remains continuous across interfaces between hybrid multiphasic domains. Apart from the Lagrange multiplier-state function distinction for the fluid pressure, and the ability to accommodate viscous fluid dynamics, this hybrid multiphasic framework remains fully consistent with standard multiphasic formulations previously employed in biomechanics. With these additional features, the hybrid multiphasic mixture theory makes it possible to address a wider range of problems that are important in biomechanics and mechanobiology.},
+	author = {Shim, Jay J and Ateshian, Gerard A},
+	date-added = {2022-08-05 09:25:40 -0400},
+	date-modified = {2022-08-05 09:25:40 -0400},
+	doi = {10.1115/1.4051926},
+	journal = {J Biomech Eng},
+	journal-full = {Journal of biomechanical engineering},
+	mesh = {Biomechanical Phenomena; Finite Element Analysis; Porosity; Solutions; Solvents; Viscosity},
+	month = {01},
+	number = {1},
+	pmc = {PMC8547015},
+	pmid = {34318318},
+	pst = {ppublish},
+	title = {A Hybrid Reactive Multiphasic Mixture With a Compressible Fluid Solvent},
+	volume = {144},
+	year = {2022},
+	bdsk-url-1 = {https://doi.org/10.1115/1.4051926}}
+
+@article{Zimmerman22,
+	abstract = {The frictional response of porous and permeable hydrated biological tissues such as articular cartilage is significantly dependent on interstitial fluid pressurization. To model this response, it is common to represent such tissues as biphasic materials, consisting of a binary mixture of a porous solid matrix and an interstitial fluid. However, no computational algorithms currently exist in either commercial or open-source software that can model frictional contact between such materials. Therefore, this study formulates and implements a finite element algorithm for large deformation biphasic frictional contact in the open-source finite element software FEBio. This algorithm relies on a local form of a biphasic friction model that has been previously validated against experiments, and implements the model into our recently-developed surface-to-surface (STS) contact algorithm. Contact constraints, including those specific to pressurized porous media, are enforced with the penalty method regularized with an active-passive augmented Lagrangian scheme. Numerical difficulties specific to challenging finite deformation biphasic contact problems are overcome with novel smoothing schemes for fluid pressures and Lagrange multipliers. Implementation accuracy is verified against semi-analytical solutions for biphasic frictional contact, with extensive validation performed using canonical cartilage friction experiments from prior literature. Essential details of the formulation are provided in this paper, and the source code of this biphasic frictional contact algorithm is made available to the general public.},
+	author = {Zimmerman, Brandon K and Maas, Steve A and Weiss, Jeffrey A and Ateshian, Gerard A},
+	date-added = {2022-08-05 09:25:40 -0400},
+	date-modified = {2022-08-05 09:25:40 -0400},
+	doi = {10.1115/1.4052114},
+	journal = {J Biomech Eng},
+	journal-full = {Journal of biomechanical engineering},
+	mesh = {Algorithms; Biomechanical Phenomena; Cartilage, Articular; Finite Element Analysis; Friction; Models, Biological; Porosity; Stress, Mechanical},
+	month = {02},
+	number = {2},
+	pmc = {PMC8547016},
+	pmid = {34382640},
+	pst = {ppublish},
+	title = {A Finite Element Algorithm for Large Deformation Biphasic Frictional Contact Between Porous-Permeable Hydrated Soft Tissues},
+	volume = {144},
+	year = {2022},
+	bdsk-url-1 = {https://doi.org/10.1115/1.4052114}}
+
+@article{Ateshian22a,
+	abstract = {Mixture theory models continua consisting of multiple constituents with independent motions. In constrained mixtures, all constituents share the same velocity but they may have different reference configurations. The theory of constrained reactive mixtures was formulated to analyze growth and remodeling in living biological tissues. It can also reproduce and extend classical frameworks of damage mechanics and viscoelasticity under isothermal conditions, when modeling bonds that can break and reform. This study focuses on establishing the thermodynamic foundations of constrained reactive mixtures under more general conditions, for arbitrary reactive processes where temperature varies in time and space. By incorporating general expressions for reaction kinetics, it is shown that the residual dissipation statement of the Clausius-Duhem inequality must include a reactive power density, while the axiom of energy balance must include a reactive heat supply density. Both of these functions are proportional to the molar production rate of a reaction, and they depend on the chemical potentials of the mixture constituents. We present novel formulas for the classical thermodynamic concepts of energy of formation and heat of reaction, making it possible to evaluate the heat supply generated by reactive processes from the knowledge of the specific free energy of mixture constituents as well as the reaction rate. We illustrate these novel concepts with mixtures of ideal gases, and isothermal reactive damage mechanics and viscoelasticity, as well as reactive thermoelasticity. This framework facilitates the analysis of reactive tissue biomechanics and physiological and biomedical engineering processes where temperature variations cannot be neglected.},
+	author = {Ateshian, Gerard A and Zimmerman, Brandon K},
+	date-added = {2022-08-05 09:25:40 -0400},
+	date-modified = {2022-08-05 09:25:40 -0400},
+	doi = {10.1115/1.4053084},
+	journal = {J Biomech Eng},
+	journal-full = {Journal of biomechanical engineering},
+	keywords = {constrained reactive mixtures; energy of formation; heat of reaction; ideal gas mixtures; thermodynamics; thermoelasticity},
+	mesh = {Biomechanical Phenomena; Entropy; Kinetics; Thermodynamics; Viscosity},
+	month = {04},
+	number = {4},
+	pmc = {PMC8719048},
+	pmid = {34802058},
+	pst = {ppublish},
+	title = {Continuum Thermodynamics of Constrained Reactive Mixtures},
+	volume = {144},
+	year = {2022},
+	bdsk-url-1 = {https://doi.org/10.1115/1.4053084}}
+
+@article{Shim22,
+	abstract = {The primary aim of this study is to establish the theoretical foundations for a solid-fluid biphasic mixture domain that can accommodate inertial effects and a viscous interstitial fluid, which can interface with a dynamic viscous fluid domain. Most mixture formulations consist of constituents that are either all intrinsically incompressible or compressible, thereby introducing inherent limitations. In particular, mixtures with intrinsically incompressible constituents can only model wave propagation in the porous solid matrix, whereas those with compressible constituents require internal variables, and related evolution equations, to distinguish the compressibility of the solid and fluid under hydrostatic pressure. In this study, we propose a hybrid framework for a biphasic mixture where the skeleton of the porous solid is intrinsically incompressible but the interstitial fluid is compressible. We define a state variable as a measure of the fluid volumetric strain. Within an isothermal framework, the Clausius-Duhem inequality shows that a function of state arises for the fluid pressure as a function of this strain measure. We derive jump conditions across hybrid biphasic interfaces, which are suitable for modeling hydrated biological tissues. We then illustrate this framework using confined compression and dilatational wave propagation analyses. The governing equations for this hybrid biphasic framework reduce to those of the classical biphasic theory whenever the bulk modulus of the fluid is set to infinity and inertia terms and viscous fluid effects are neglected. The availability of this novel framework facilitates the implementation of finite element solvers for fluid-structure interactions at interfaces between viscous fluids and porous-deformable biphasic domains, which can include fluid exchanges across those interfaces.},
+	author = {Shim, Jay J and Ateshian, Gerard A},
+	date-added = {2022-08-05 09:25:13 -0400},
+	date-modified = {2022-08-05 09:25:13 -0400},
+	doi = {10.1007/s00419-020-01851-8},
+	journal = {Arch Appl Mech},
+	journal-full = {Archive of applied mechanics = Ingenieur-Archiv},
+	month = {Feb},
+	number = {2},
+	pages = {491-511},
+	pmc = {PMC8939891},
+	pmid = {35330673},
+	pst = {ppublish},
+	title = {A Hybrid Biphasic Mixture Formulation for Modeling Dynamics in Porous Deformable Biological Tissues},
+	volume = {92},
+	year = {2022},
+	bdsk-url-1 = {https://doi.org/10.1007/s00419-020-01851-8}}
+
+@article{Ateshian22,
+	abstract = {Reactive viscoelasticity is a theoretical framework based on the theory of reactive constrained mixtures that encompasses nonlinear viscoelastic responses. It models a viscoelastic solid as a mixture of strong and weak bonds that maintain the cohesiveness of the molecular constitutents of the solid matter. Strong bonds impart the elastic response while weak bonds break and reform into a stress-free state in response to loading. The process of bonds breaking and reforming is modeled as a reaction where loaded bonds are the reactants and bonds reformed into a stress-free state are the products of a reaction. The reaction is triggered by the evolving state of loading. The state of stress in strong bonds is a function of the total strain in the material, whereas the state of stress in weak bonds is based on the state of strain relative to the time that these bonds were reformed. This study introduces two important practical contributions to the reactive nonlinear viscoelasticity framework: (1) Normally, the evaluation of the stress tensor involves taking a summation over a continually increasing number of weak bond generations, which is poorly suited for a computational scheme. Therefore, this study presents an effective numerical scheme for evaluating the strain energy density, the Cauchy stress, and spatial elasticity tensors of reactive viscoelastic materials. (2) We provide the conditions for satisfying frame indifference for anisotropic nonlinear viscoelasticity, including for tension-bearing fiber models. Code verifications and model validations against experimental data provide evidence in support of this updated formulation.},
+	author = {Ateshian, Gerard A and Petersen, Courtney A and Maas, Steve A and Weiss, Jeffrey A},
+	date-added = {2022-08-05 09:25:07 -0400},
+	date-modified = {2022-08-05 09:25:07 -0400},
+	doi = {10.1115/1.4054983},
+	journal = {J Biomech Eng},
+	journal-full = {Journal of biomechanical engineering},
+	month = {Jul},
+	pmid = {35838330},
+	pst = {aheadofprint},
+	title = {A Numerical Scheme for Anisotropic Reactive Nonlinear Viscoelasticity},
+	year = {2022},
+	bdsk-url-1 = {https://doi.org/10.1115/1.4054983}}
 
 @article{Hunter98,
 	abstract = {A model of passive and active cardiac muscle mechanics is presented, suitable for use in continuum mechanics models of the whole heart. The model is based on an extensive review of experimental data from a variety of preparations (intact trabeculae, skinned fibres and myofibrils) and species (mainly rat and ferret) at temperatures from 20 to 27 degrees C. Experimental tests include isometric tension development, isotonic loading, quick-release/restretch, length step and sinusoidal perturbations. We show that all of these experiments can be interpreted with a four state variable model which includes (i) the passive elasticity of myocardial tissue, (ii) the rapid binding of Ca2+ to troponin C and its slower tension-dependent release, (iii) the kinetics of tropomyosin movement and availability of crossbridge binding sites and the length dependence of this process and (iv) the kinetics of crossbridge tension development under perturbations of myofilament length.},
@@ -299,21 +391,6 @@
 	year = {2009},
 	bdsk-url-1 = {https://doi.org/10.1016/j.jbiomech.2009.04.040}}
 
-@article{Zimmerman21a,
-	abstract = {The frictional response of porous and permeable hydrated biological tissues such as articular cartilage is significantly dependent on interstitial fluid pressurization. To model this response, it is common to represent such tissues as biphasic materials, consisting of a binary mixture of a porous solid matrix and an interstitial fluid. However, no computational algorithms currently exist in either commercial or open-source software that can model frictional contact between such materials. Therefore, this study formulates and implements a finite element algorithm for large deformation biphasic frictional contact in the open-source finite element software FEBio. This algorithm relies on a local form of a biphasic friction model that has been previously validated against experiments, and implements the model into our recently-developed surface-to-surface contact algorithm. Contact constraints, including those specific to pressurized porous media, are enforced with the penalty method regularized with an active-passive augmented Lagrangian scheme. Numerical difficulties specific to challenging finite deformation biphasic contact problems are overcome with novel smoothing schemes for fluid pressures and Lagrange multipliers. Implementation accuracy is verified against semi-analytical solutions for biphasic frictional contact, with extensive validation performed using canonical cartilage friction experiments from prior literature. Essential details of the formulation are provided in this paper, and the source code of this biphasic frictional contact algorithm is made available to the general public.},
-	author = {Zimmerman, Brandon and Maas, Steve A and Weiss, Jeffrey A and Ateshian, Gerard A},
-	date-added = {2021-08-16 13:59:48 -0400},
-	date-modified = {2021-08-16 13:59:56 -0400},
-	doi = {10.1115/1.4052114},
-	journal = {J Biomech Eng},
-	journal-full = {Journal of biomechanical engineering},
-	month = {Aug},
-	pmid = {34382640},
-	pst = {aheadofprint},
-	title = {A Finite Element Algorithm for Large Deformation Biphasic Frictional Contact Between Porous-Permeable Hydrated Soft Tissues},
-	year = {2021},
-	bdsk-url-1 = {https://doi.org/10.1115/1.4052114}}
-
 @article{Kiousis08,
 	author = {Kiousis, DE and Gasser, TC and Holzapfel, GA},
 	date-added = {2021-08-16 11:00:46 -0400},
@@ -436,16 +513,6 @@
 	volume = {111},
 	year = {1989},
 	bdsk-url-1 = {https://doi.org/10.1115/1.3168343}}
-
-@article{Shim21a,
-	author = {Shim, Jay J and Ateshian, Gerard A},
-	date-added = {2021-03-26 16:03:44 -0400},
-	date-modified = {2021-03-26 16:03:53 -0400},
-	journal = {Archive of Applied Mechanics},
-	pages = {1--21},
-	publisher = {Springer},
-	title = {A hybrid biphasic mixture formulation for modeling dynamics in porous deformable biological tissues},
-	year = {2021}}
 
 @article{Shim19,
 	abstract = {Many physiological systems involve strong interactions between fluids and solids, posing a signicant challenge when modeling biomechanics. The objective of this study was to implement a fluid-structure interaction (FSI) solver in the free, open-source finite element code FEBio (febio.org), that combined the existing solid mechanics and rigid body dynamics solver with a recently-developed computational fluid dynamics (CFD) solver. A novel Galerkin-based finite element FSI formulation was introduced based on mixture theory, where the FSI domain was described as a mixture of fluid and solid constituents that have distinct motions. The mesh was defined on the solid domain, specialized to have zero mass, negligible stiffness and zero frictional interactions with the fluid, whereas the fluid was modeled as isothermal and compressible. The mixture framework provided the foundation for evaluating material time derivatives in a material frame for the solid and in a spatial frame for the fluid. Similar to our recently reported CFD solver, our FSI formulation did not require stabilization methods to achieve good convergence, producing a compact set of equations and code implementation. The code was successfully verified against benchmark problems and an analytical solution for squeeze-film lubrication. It was validated against experimental measurements of the flow rate in a peristaltic pump, and illustrated using non-Newtonian blood flow through a bifurcated carotid artery with a thick arterial wall. The successful formulation and implementation of this FSI solver enhances the multiphysics modeling capabilities in FEBio relevant to the biomechanics and biophysics communities.},
@@ -2127,11 +2194,12 @@
 	bdsk-url-1 = {https://www.sciencedirect.com/science/article/pii/S0045782511003616},
 	bdsk-url-2 = {https://doi.org/10.1016/j.cma.2011.11.015}}
 
- @article{Birzle2019, 
-    title={A coupled approach for identification of nonlinear and compressible material models for soft tissue based on different experimental setups – exemplified and detailed for Lung Parenchyma}, 
-    volume={94},
-    DOI={10.1016/j.jmbbm.2019.02.019}, 
-    journal={Journal of the Mechanical Behavior of Biomedical Materials}, 
-    author={Birzle, Anna M. and Martin, Christian and Uhlig, Stefan and Wall, Wolfgang A.}, 
-    year={2019}, 
-    pages={126–143}} 
+@article{Birzle2019,
+	author = {Birzle, Anna M. and Martin, Christian and Uhlig, Stefan and Wall, Wolfgang A.},
+	date-modified = {2022-07-20 20:08:15 -0400},
+	journal = {Journal of the Mechanical Behavior of Biomedical Materials},
+	pages = {126--143},
+	title = {A coupled approach for identification of nonlinear and compressible material models for soft tissue based on different experimental setups - exemplified and detailed for Lung Parenchyma},
+	volume = {94},
+	year = {2019},
+	bdsk-url-1 = {https://doi.org/10.1016/j.jmbbm.2019.02.019}}
