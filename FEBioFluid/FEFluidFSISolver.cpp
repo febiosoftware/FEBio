@@ -33,11 +33,6 @@ SOFTWARE.*/
 #include "FEFluidFSIDomain.h"
 #include "FEFluidDomain.h"
 #include "FEBiphasicFSIDomain.h"
-#include "FEFluidResistanceBC.h"
-#include "FEBackFlowStabilization.h"
-#include "FEFluidNormalVelocity.h"
-#include "FEFluidVelocity.h"
-#include "FEFluidRotationalVelocity.h"
 #include <FEBioMech/FEElasticDomain.h>
 #include <FEBioMech/FEPressureLoad.h>
 #include <FEBioMech/FERigidConnector.h>
@@ -55,8 +50,6 @@ SOFTWARE.*/
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/sys.h>
 #include <FECore/FEBoundaryCondition.h>
-#include <FECore/FENodalLoad.h>
-#include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
