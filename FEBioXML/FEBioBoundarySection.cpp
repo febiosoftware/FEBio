@@ -437,16 +437,13 @@ void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 	if (nset == m_NodeSet.end()) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 	FENodeSet* nodeSet = (*nset).second;
 
-	// create the fixed BC's
-	for (int i=0; i<nbc; ++i)
-	{
-		FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
-		pbc->SetDOFList(bc[i]);
-		pbc->SetNodeSet(nodeSet);
+	// create the fixed BC
+	FEFixedDOF* pbc = dynamic_cast<FEFixedDOF*>(fecore_new<FEBoundaryCondition>("fix", &fem));
+	pbc->SetDOFS(bc);
+	pbc->SetNodeSet(nodeSet);
 
-		// add it to the model
-		GetBuilder()->AddBC(pbc);
-	}
+	// add it to the model
+	GetBuilder()->AddBC(pbc);
 }
 
 //-----------------------------------------------------------------------------
