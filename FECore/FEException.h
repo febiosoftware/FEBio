@@ -35,15 +35,26 @@ class FEElement;
 class FECORE_API FEException
 {
 public:
-	FEException(const char* msg = nullptr);
+	enum {
+		Error = 0,
+		Warning = 1
+	};
+
+public:
+	// level = 0, error
+	// level = 1, warning
+	FEException(const char* msg = nullptr, int level = 0);
 	virtual ~FEException();
 
 	const char* what();
 
 	void what(const char* msg, ...);
 
+	int level() const;
+
 private:
 	std::string	m_what;
+	int	m_level;
 };
 
 class FECORE_API NegativeJacobian : public FEException
@@ -79,34 +90,60 @@ public:
 	ZeroDiagonal(int node, int dof);
 };
 
-class FECORE_API EnergyDiverging : public FEException {};
-
-class FECORE_API MaxStiffnessReformations : public FEException {};
-
-class FECORE_API ZeroLinestepSize : public FEException {};
-
-class FECORE_API ForceConversion {};
-
-class FECORE_API IterationFailure {};
-
-class FECORE_API MaxResidualError {};
-
-class FECORE_API NANDetected : public FEException {};
-
-class FECORE_API FatalError {};
-
-class FECORE_API FEMultiScaleException
-{
-public:
-	FEMultiScaleException(int eid, int gpt) : elemId(eid), gptIndex(gpt) {}
-
-public:
-	int elemId;
-	int gptIndex;
+class FECORE_API EnergyDiverging : public FEException {
+public: EnergyDiverging() : FEException("Problem diverging uncontrollably.") {}
 };
 
-class FECORE_API LinearSolverFailed {};
+class FECORE_API MaxStiffnessReformations : public FEException {
+public: MaxStiffnessReformations() : FEException("Max nr of reformations reached.") {}
+};
 
-class FECORE_API FactorizationError {};
+class FECORE_API ZeroLinestepSize : public FEException {
+public: ZeroLinestepSize() : FEException("Zero line step size.") {}
+};
 
-class FECORE_API DoRunningRestart{};
+class FECORE_API ForceConversion : public FEException {
+public: ForceConversion() : FEException("User forced conversion.\nSolution might not be stable.", FEException::Warning) {}
+};
+
+class FECORE_API IterationFailure : public FEException {
+public: IterationFailure() : FEException("User forced iteration failure.", FEException::Warning) {}
+};
+
+class FECORE_API MaxResidualError : public FEException {
+public: MaxResidualError() : FEException("Maximum residual exceeded.", FEException::Warning) {}
+};
+
+struct FECORE_API FENodalDofInfo;
+
+class FECORE_API NANDetected : public FEException {
+public: 
+	NANDetected() : FEException("NAN detected") {}
+	NANDetected(const FENodalDofInfo& ndi);
+};
+
+class FECORE_API FatalError : public FEException{
+public: FatalError() : FEException("Fatal error") {}
+};
+
+class FECORE_API DoRunningRestart : public FEException {
+public: DoRunningRestart() : FEException("Running restart requested", FEException::Warning) {}
+};
+
+class FECORE_API FEMultiScaleException : public FEException
+{
+public:
+	FEMultiScaleException(int eid, int gpt);
+};
+
+class FECORE_API LinearSolverFailed : public FEException {
+public: LinearSolverFailed() : FEException("Linear solver failed to find solution. Aborting run.") {}
+};
+
+class FECORE_API FactorizationError : public FEException{
+public: FactorizationError() : FEException("Fatal error in factorization of stiffness matrix. Aborting run.") {}
+};
+
+class FECORE_API NegativeJacobianDetected : public FEException {
+public: NegativeJacobianDetected() : FEException("Negative jacobian was detected.") {}
+};
