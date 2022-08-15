@@ -1071,9 +1071,7 @@ void XMLReader::rewind(int64_t nstep)
 char XMLReader::GetChar()
 {
 	char ch;
-	// while ((ch=readNextChar())=='\n') ++m_nline;
     if ((ch=readNextChar())=='\n') ++m_nline;
-
 
 	// read entity references
 	if (ch=='&')
