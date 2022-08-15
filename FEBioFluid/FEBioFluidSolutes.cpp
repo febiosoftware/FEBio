@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEFluidSolutesFlux.h"
 #include "FEFluidSolutesNaturalFlux.h"
 #include "FEFluidSolutesPressure.h"
+#include "FEFluidSolutesPressureBC.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESolutesSolver.h"
@@ -85,12 +86,15 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FEFluidSolutes, "fluid-solutes");
     REGISTER_FECORE_CLASS(FEFluidSolutesDomain3D, "fluid-solutes-3D");
     
-    REGISTER_FECORE_CLASS(FEFluidSolutesFlux, "solute flux");
+    // loads
+    REGISTER_FECORE_CLASS(FEFluidSolutesFlux           , "solute flux"                  );
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux, "solute natural flux");
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressure, "fluid pressure");
-    
-    REGISTER_FECORE_CLASS(FESoluteConvectiveFlow, "solute convective flow");
+    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          );
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressure       , "fluid pressure"               , 0x0300); // deprecated, use BC version
+    REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       );
+
+    // bcs
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC, "fluid pressure");
 
 	// solutes solver classes
 	febio.RegisterDomain(new FESolutesDomainFactory);

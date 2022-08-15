@@ -202,7 +202,6 @@ void FEPrescribedNodeSet::Repair()
 //=============================================================================
 
 BEGIN_FECORE_CLASS(FEPrescribedSurface, FESurfaceBC)
-	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
 FEPrescribedSurface::FEPrescribedSurface(FEModel* fem) : FESurfaceBC(fem)

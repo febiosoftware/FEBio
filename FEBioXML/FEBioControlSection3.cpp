@@ -40,7 +40,7 @@ SOFTWARE.*/
 class FEObsoleteStepParamHandler : public FEObsoleteParamHandler
 {
 public:
-	FEObsoleteStepParamHandler(XMLTag& tag, FEAnalysis* step) : m_step(step), FEObsoleteParamHandler(tag, step)
+	FEObsoleteStepParamHandler(XMLTag& tag, FEAnalysis* step, FEModelBuilder* feb) : m_step(step), m_feb(feb), FEObsoleteParamHandler(tag, step)
 	{
 		AddParam("solver.max_ups"           , "solver.qn_method.max_ups"        , FE_PARAM_INT);
 		AddParam("solver.qn_max_buffer_size", "solver.qn_method.max_buffer_size", FE_PARAM_INT);
@@ -77,6 +77,21 @@ public:
 			}
 			return true;
 		}
+		else if (tag == "shell_formulation")
+		{
+			int nshell = 0;
+			tag.value(nshell);
+			switch (nshell)
+			{
+			case 0: m_feb->m_default_shell = OLD_SHELL; break;
+			case 1: m_feb->m_default_shell = NEW_SHELL; break;
+			case 2: m_feb->m_default_shell = EAS_SHELL; break;
+			case 3: m_feb->m_default_shell = ANS_SHELL; break;
+			default:
+				return false;
+			}
+			return true;
+		}
 		else return FEObsoleteParamHandler::ProcessTag(tag);
 	}
 
@@ -106,6 +121,7 @@ public:
 private:
 	int	m_qnmethod = -1;
 	FEAnalysis* m_step;
+	FEModelBuilder* m_feb;
 };
 
 //-----------------------------------------------------------------------------
@@ -132,7 +148,7 @@ void FEBioControlSection3::Parse(XMLTag& tag)
 	}
 
 	// prepare obsolete parameter mapping.
-	FEObsoleteStepParamHandler stepParamHandler(tag, pstep);
+	FEObsoleteStepParamHandler stepParamHandler(tag, pstep, GetBuilder());
 
 	// read the step parameters
 	SetInvalidTagHandler(&stepParamHandler);

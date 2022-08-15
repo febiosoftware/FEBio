@@ -23,59 +23,61 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
 #pragma once
-#include <FECore/FEPrescribedBC.h>
+#include <FECore/FESurfaceLoad.h>
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidRCRBC is a fluid surface load that implements a 3-element Windkessel model
+//! FEFluidRCLoad is a fluid surface that has an RC-equivalent circuit for outflow conditions
 //!
-class FEBIOFLUID_API FEFluidRCRBC : public FEPrescribedSurface
+class FEBIOFLUID_API FEFluidRCLoad : public FESurfaceLoad
 {
 public:
     //! constructor
-    FEFluidRCRBC(FEModel* pfem);
-    
+    FEFluidRCLoad(FEModel* pfem);
+
+    //! calculate traction stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS) override {}
+
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override;
+
     //! set the dilatation
     void Update() override;
-    
+
     //! evaluate flow rate
     double FlowRate();
-    
+
     //! initialize
     bool Init() override;
-    
+
+    //! activate
+    void Activate() override;
+
     //! serialization
     void Serialize(DumpStream& ar) override;
 
-public:
-    // return the value for node i, dof j
-    void GetNodalValues(int nodelid, std::vector<double>& val) override;
-
-    // copy data from another class
-    void CopyFrom(FEBoundaryCondition* pbc) override;
-
 private:
     double          m_R;        //!< flow resistance
-    double          m_Rd;       //!< distal resistance
     double          m_p0;       //!< initial fluid pressure
     double          m_C;        //!< capacitance
-    double          m_pd;       //!< downstream pressure
-    
+    bool            m_Bern;     //!< Use Bernoulli's Relation (Q*|Q|)
+
+    double          m_qt;       //!< flow rate at current time step
+    double          m_dqt;      //!< flow rate time derivative at current time step
+    double          m_pt;       //!< pressure at current time step
+    double          m_dpt;      //!< pressure derivative at current time step
+    double          m_qp;       //!< flow rate at previous time step
+    double          m_dqp;      //!< flow rate time derivative at previous time step
+    double          m_pp;       //!< pressure at previoust time step
+    double          m_dpp;      //!< pressure derivative at previoust time step
+
 private:
-    double              m_pn;   //!< fluid pressure at current time point
-    double              m_pp;   //!< fluid pressure at previous time point
-    double              m_qn;   //!< flow rate at current time point
-    double              m_qp;   //!< flow rate at previous time point
-    double              m_pdn;  //!< downstream fluid pressure at current time point
-    double              m_pdp;  //!< downstream fluid pressure at previous time point
-    double              m_tp;   //!< previous time
-    double              m_e;
-    FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
-    
+    FEFluidMaterial* m_pfluid;   //!< pointer to fluid
+
     FEDofList   m_dofW;
     int         m_dofEF;
-    
+
     DECLARE_FECORE_CLASS();
 };
+

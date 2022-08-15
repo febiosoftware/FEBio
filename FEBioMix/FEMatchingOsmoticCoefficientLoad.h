@@ -24,58 +24,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+
+
 #pragma once
-#include <FECore/FEPrescribedBC.h>
-#include "FEFluidMaterial.h"
+#include <FECore/FESurfaceLoad.h>
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidRCRBC is a fluid surface load that implements a 3-element Windkessel model
-//!
-class FEBIOFLUID_API FEFluidRCRBC : public FEPrescribedSurface
+//! FEMatchingOsmoticCoefficientBC is a surface boundary condition that imposes the same osmotic
+//! coefficient in the bath as in the multiphasic material bounded by tha surface
+class FEBIOMIX_API FEMatchingOsmoticCoefficientLoad : public FESurfaceLoad
 {
 public:
     //! constructor
-    FEFluidRCRBC(FEModel* pfem);
-    
+    FEMatchingOsmoticCoefficientLoad(FEModel* pfem);
+
+    //! calculate traction stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS) override {}
+
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override {}
+
     //! set the dilatation
     void Update() override;
-    
-    //! evaluate flow rate
-    double FlowRate();
-    
+
     //! initialize
     bool Init() override;
-    
+
+    //! activate
+    void Activate() override;
+
     //! serialization
     void Serialize(DumpStream& ar) override;
 
-public:
-    // return the value for node i, dof j
-    void GetNodalValues(int nodelid, std::vector<double>& val) override;
-
-    // copy data from another class
-    void CopyFrom(FEBoundaryCondition* pbc) override;
-
 private:
-    double          m_R;        //!< flow resistance
-    double          m_Rd;       //!< distal resistance
-    double          m_p0;       //!< initial fluid pressure
-    double          m_C;        //!< capacitance
-    double          m_pd;       //!< downstream pressure
-    
+    double          m_ambc;     //!<ambient osmolarity
+    double          m_ambp;     //!< ambient fluid pressure
+    bool            m_bshellb;  //!< shell bottom flag
 private:
-    double              m_pn;   //!< fluid pressure at current time point
-    double              m_pp;   //!< fluid pressure at previous time point
-    double              m_qn;   //!< flow rate at current time point
-    double              m_qp;   //!< flow rate at previous time point
-    double              m_pdn;  //!< downstream fluid pressure at current time point
-    double              m_pdp;  //!< downstream fluid pressure at previous time point
-    double              m_tp;   //!< previous time
-    double              m_e;
-    FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
-    
-    FEDofList   m_dofW;
-    int         m_dofEF;
-    
+    int             m_dofP, m_dofQ;
+
     DECLARE_FECORE_CLASS();
 };
+

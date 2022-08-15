@@ -80,6 +80,7 @@ SOFTWARE.*/
 #include "FESoluteFlux.h"
 #include "FESoluteNaturalFlux.h"
 #include "FEPressureStabilization.h"
+#include "FEMatchingOsmoticCoefficientLoad.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
 
 #include "FESlidingInterface2.h"
@@ -435,7 +436,11 @@ void FEBioMix::InitModule()
     
 	//-----------------------------------------------------------------------------
 	// Surface loads
-	REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, "matching_osm_coef"     );
+	REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientLoad, "matching_osm_coef", 0x0300); // deprecated, use BC version
+
+	//-----------------------------------------------------------------------------
+	// Boundary conditions
+	REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, "matching_osm_coef");
 
 	//-----------------------------------------------------------------------------
 	// Body loads

@@ -27,37 +27,31 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEPrescribedBC.h>
 #include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! FEMatchingOsmoticCoefficientBC is a surface boundary condition that imposes the same osmotic
 //! coefficient in the bath as in the multiphasic material bounded by tha surface
-//!
-//! TODO: Derive from FESurfaceBC (once I have it)? 
-class FEBIOMIX_API FEMatchingOsmoticCoefficientBC : public FESurfaceLoad
+class FEBIOMIX_API FEMatchingOsmoticCoefficientBC : public FEPrescribedSurface
 {
 public:
     //! constructor
     FEMatchingOsmoticCoefficientBC(FEModel* pfem);
     
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS) override {}
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R) override {}
-    
     //! set the dilatation
     void Update() override;
-    
-    //! initialize
-    bool Init() override;
     
     //! activate
     void Activate() override;
 
     //! serialization
     void Serialize(DumpStream& ar) override;
+
+public:
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+    void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
     double          m_ambc;     //!<ambient osmolarity
