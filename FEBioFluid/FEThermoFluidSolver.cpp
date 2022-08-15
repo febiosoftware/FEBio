@@ -501,7 +501,7 @@ void FEThermoFluidSolver::Update(vector<double>& ui)
     UpdateKinematics(ui);
     
     // update model state
-    GetFEModel()->Update();
+    UpdateModel();
 }
 
 //-----------------------------------------------------------------------------
