@@ -229,6 +229,71 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidSurfaceMoment::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    vec3d mn(0,0,0);    // initialize
+    
+    // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    if (m_binit) {
+        m_area.resize(NF);
+        for (int j=0; j<NF; ++j)
+        {
+            FESurfaceElement& el = pcs->Element(j);
+            m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+        }
+        m_binit = false;
+    }
+    
+    // calculate net fluid moment
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0];
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            
+            if (!pfluid) {
+                pe = el.m_elem[1];
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            
+            // see if this is a fluid element
+            if (pfluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    if (pfluid->GetViscousPolar())
+                        s += pfluid->GetViscousPolar()->CoupleStress(mp);
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net moment on surface.
+                // Negate the fluid couple vector since we want the couple vector on the surface,
+                // which is the opposite of the traction on the fluid.
+                mn -= s*m_area[j];
+            }
+        }
+    }
+    
+    // save results
+    a << mn;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 // Plot contact pressure
 bool FEPlotFluidSurfacePressure::Save(FESurface &surf, FEDataStream& a)
 {

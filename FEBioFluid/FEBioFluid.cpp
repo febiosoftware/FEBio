@@ -255,6 +255,7 @@ REGISTER_FECORE_CLASS(FEPlotPolarFluidRelativeAngularVelocity  , "polar fluid re
 REGISTER_FECORE_CLASS(FEPlotPolarFluidRegionalAngularVelocity  , "polar fluid regional angular velocity");
 REGISTER_FECORE_CLASS(FEPlotPolarFluidStress           , "polar fluid stress");
 REGISTER_FECORE_CLASS(FEPlotPolarFluidCoupleStress     , "polar fluid couple stress");
+REGISTER_FECORE_CLASS(FEPlotFluidSurfaceMoment         , "fluid surface moment"     );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");
