@@ -996,6 +996,24 @@ public:
 	double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+class FELogElementMixtureStress : public FELogElemData
+{
+public:
+	FELogElementMixtureStress(FEModel* fem, int n, int m) : FELogElemData(fem), m_comp(n), m_metric(m) {}
+	double value(FEElement& el);
+
+private:
+	int	m_comp;
+	int	m_metric;
+};
+
+template <int N, int M> class FELogElementMixtureStress_T : public FELogElementMixtureStress
+{
+public:
+	FELogElementMixtureStress_T(FEModel* fem) : FELogElementMixtureStress(fem, N, M) {}
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================

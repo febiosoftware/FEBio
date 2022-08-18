@@ -898,6 +898,24 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
     REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
 	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 0, "mixture_stress[0].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 1, "mixture_stress[0].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 2, "mixture_stress[0].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 3, "mixture_stress[0].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 4, "mixture_stress[0].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 5, "mixture_stress[0].zz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 0, "mixture_stress[1].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 1, "mixture_stress[1].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 2, "mixture_stress[1].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 3, "mixture_stress[1].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 4, "mixture_stress[1].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 5, "mixture_stress[1].zz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 0, "mixture_stress[2].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 1, "mixture_stress[2].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 2, "mixture_stress[2].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 3, "mixture_stress[2].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 4, "mixture_stress[2].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 5, "mixture_stress[2].zz");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData

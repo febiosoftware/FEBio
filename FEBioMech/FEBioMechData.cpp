@@ -1806,6 +1806,39 @@ double FELogDiscreteElementForce::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElementMixtureStress::value(FEElement& el)
+{
+	if (m_comp < 0) return 0.0;
+
+	double s = 0.0;
+	for (int n = 0; n < el.GaussPoints(); ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+		if (mmp)
+		{
+			if (m_comp < mmp->Components())
+			{
+				FEElasticMaterialPoint& ep = *mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
+
+				switch (m_metric)
+				{
+				case 0: s += ep.m_s.xx(); break;
+				case 1: s += ep.m_s.xy(); break;
+				case 2: s += ep.m_s.yy(); break;
+				case 3: s += ep.m_s.xz(); break;
+				case 4: s += ep.m_s.yz(); break;
+				case 5: s += ep.m_s.zz(); break;
+				}
+			}
+		}
+	}
+	s /= (double)el.GaussPoints();
+
+	return s;
+}
+
+//-----------------------------------------------------------------------------
 double FELogRigidBodyR11::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(0,0)); }
 double FELogRigidBodyR12::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(0, 1)); }
 double FELogRigidBodyR13::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(0, 2)); }
