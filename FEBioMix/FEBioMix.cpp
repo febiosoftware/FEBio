@@ -459,7 +459,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"			     );
     REGISTER_FECORE_CLASS(FEPlotSBMArealConcentration            , "sbm areal concentration"         );
 	REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density");
-	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient" );
+	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient"             );
 
 	//-----------------------------------------------------------------------------
 	// Element log data
