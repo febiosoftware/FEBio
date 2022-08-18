@@ -429,6 +429,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC, "uncoupled prescribed trans iso active contraction");
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic, "prescribed isotropic active contraction");
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, "uncoupled prescribed isotropic active contraction");
+	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionFiber, "prescribed fiber active contraction");
+	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionFiberUC, "uncoupled prescribed fiber active contraction");
 
 	REGISTER_FECORE_CLASS(FEActiveFiberStress, "active fiber stress");
 	REGISTER_FECORE_CLASS(FEActiveFiberStressUC, "uncoupled active fiber stress");
