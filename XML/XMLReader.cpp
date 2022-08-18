@@ -520,12 +520,14 @@ XMLReader::XMLReader()
 	m_bufSize = 0;
 	m_eof = false;
 	m_currentPos = 0;
+	m_buf = new char[BUF_SIZE];
 }
 
 //-----------------------------------------------------------------------------
 XMLReader::~XMLReader()
 {
 	Close();
+	delete[] m_buf;
 }
 
 //-----------------------------------------------------------------------------
