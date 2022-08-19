@@ -1147,7 +1147,7 @@ const std::string& XMLReader::GetLastComment()
 		{
 			m_comment.erase(m_comment.begin());
 		}
-		if (*m_comment.end() == '\n')
+		if (*m_comment.rbegin() == '\n')
 		{
 			m_comment.erase(m_comment.end());
 		}
