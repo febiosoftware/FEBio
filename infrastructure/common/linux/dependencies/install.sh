@@ -13,7 +13,6 @@ main() {
 	pushd $dir
 
 	local installers=(hypre levmar mmg)
-	#local installers=(dep-levmar)
 	for installer in ${installers[@]}; do
 		./${installer}.sh
 	done
