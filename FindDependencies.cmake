@@ -22,33 +22,50 @@ endif()
 if(MKLROOT)
     if(${MKLROOT} MATCHES "oneapi")
         find_path(MKL_INC mkl.h 
-            PATHS ${MKLROOT}/latest/include
+            PATHS
+              ${MKLROOT}/latest/include
+              ${MKLROOT}/include
             DOC "MKL include directory")
             
         find_library(MKL_CORE mkl_core
-            PATHS ${MKLROOT}/latest/lib
+            PATHS
+              ${MKLROOT}/latest/lib
+              ${MKLROOT}/lib
+            PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
         find_library(MKL_OMP_LIB 
             NAMES iomp5 iomp5md libiomp5md.lib
-            PATHS ${MKLROOT}/../compiler/latest/*/compiler/lib
+            PATHS
+              ${MKLROOT}/../compiler/latest/*/compiler/lib/
+              ${MKLROOT}/../../compiler/latest/*/compiler/lib/
+            PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
             
     else()
         find_path(MKL_INC mkl.h 
-            PATHS ${MKLROOT}/include
+            PATHS
+              ${MKLROOT}/latest/include
+              ${MKLROOT}/include
             DOC "MKL include directory")
             
         find_library(MKL_CORE mkl_core
-            PATHS ${MKLROOT}/lib
-            PATH_SUFFIXES "intel64" "intel32"
+            PATHS
+              ${MKLROOT}/latest/lib
+              ${MKLROOT}/lib
+            PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
         find_library(MKL_OMP_LIB 
             NAMES iomp5 iomp5md libiomp5md.lib
-            PATHS ${MKLROOT}/lib ${MKLROOT}/../lib ${MKLROOT}/../compiler/lib
-            PATH_SUFFIXES "intel64" "intel32"
+
+            PATHS ${MKLROOT}/lib
+                  ${MKLROOT}/../lib
+                  ${MKLROOT}/../compiler/lib
+                  ${MKLROOT}/../../windows/compiler/lib/
+                  ${MKLROOT}/../../compiler/latest/*/compiler/lib/
+            PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
     
@@ -83,12 +100,14 @@ endif()
 if(WIN32)
 	find_path(HYPRE_INC HYPRE_IJ_mv.h
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		PATH_SUFFIXES "include" "include/hypre" "src" "src/include" "src/hypre/include"
+        PATH_SUFFIXES "include" "include/hypre" "src" "src/include" "src/hypre/include"
         DOC "HYPRE include directory")
+
 	find_library(HYPRE_LIB HYPRE 
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
         PATH_SUFFIXES "src" "src/build" "src/mbuild" "/src/vs2017/Release"
 		DOC "HYPRE library path")
+
 else()
 	find_path(HYPRE_INC HYPRE_IJ_mv.h
         PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*

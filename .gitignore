@@ -425,12 +425,18 @@ DerivedData/
 
 ## cmake build directories
 cbuild/
-cmbuild/
-
+cmbuild*/
+CMakeFiles
 ##cmake files
-CMakeLists.txt
+!CMakeLists.txt
 CMakeCache.txt
-*.cmake
+!*.cmake
 
 ## Visual Studio Code
 .vscode/
+
+## Docker
+!Docker/build
+
+## direnv
+.env*

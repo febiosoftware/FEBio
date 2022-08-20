@@ -1,0 +1,42 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: github.event.schedule == '30 6 * * *'
+    name: Clone and build
+    runs-on: self-hosted # run the job on the newly created runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          ci/mac.sh
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: febio3-${{runner.os}}-${{runner.arch}}
+          path: cmbuild/bin
+  tests:
+    if: github.event.schedule == '30 6 * * *'
+    name: Run test suite
+    runs-on: self-hosted # run the job on the newly created runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - uses: actions/download-artifact@v3
+        with:
+          name: febio3-${{runner.os}}-${{runner.arch}}
+          path: cmbuild/bin
+      - name: Run test suite
+        run: |
+          ci/linux-test.sh
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: testsuite-${{runner.os}}-${{runner.arch}}-logs
+          path: |
+            TestSuite/Verify3/*.log
+            TestSuite/Logs*.txt

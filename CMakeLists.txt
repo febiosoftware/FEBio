@@ -117,6 +117,7 @@ endif()
 
 ##### Set appropriate defines and includes #####
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories("C:/Program Files (x86)/Intel/oneAPI/mpi/latest/include")
 
 if(USE_MKL)
 	add_definitions(-DMKL_ISS)
@@ -127,6 +128,7 @@ endif(USE_MKL)
 if(USE_HYPRE)
 	add_definitions(-DHYPRE)
 	include_directories(${HYPRE_INC})
+	include_directories(${MSMPI_INC})
 endif(USE_HYPRE)
 
 if(USE_MMG)
@@ -270,12 +272,13 @@ endif()
 
 # Link HYPRE
 if(USE_HYPRE)
-	target_link_libraries(febio3 ${HYPRE_LIB})
+  target_link_libraries(febio3 ${HYPRE_LIB} ${MSMPI_LIB})
 endif()
 
 # Link MKL
 if(USE_MKL)
     if(WIN32 OR APPLE)
+        MESSAGE(STATUS "MKL_LIBS ${MKL_LIBS} ${MKL_OMP_LIB}")
         target_link_libraries(febio3 ${MKL_LIBS} ${MKL_OMP_LIB})
     else()
         target_link_libraries(febio3 -Wl,--start-group ${MKL_LIBS} ${MKL_OMP_LIB} -Wl,--end-group)
@@ -290,7 +293,7 @@ endif()
 if(WIN32)
 	target_link_libraries(febio3 psapi.lib ws2_32.lib)
 else()
-    target_link_libraries(febio3 -pthread -ldl)
+    target_link_libraries(febio3 -pthread -ldl -lirc -lmpi -llapack -lblas -lsvml)
 endif()
 
 # Link MMG
