@@ -22,13 +22,18 @@ data "amazon-ami" "ubuntu" {
   region      = "us-east-1"
 }
 
+variable "skip_create_ami" {
+  type    = bool
+  default = true
+}
+
 source "amazon-ebs" "ubuntu" {
   ami_name      = "packer-provisioned-ubuntu-18.04-intel-oneapi-${local.buildtime}"
   instance_type = "c5a.4xlarge"
   source_ami    = data.amazon-ami.ubuntu.id
   ssh_username  = "ubuntu"
 
-  # skip_create_ami = true
+  skip_create_ami = var.skip_create_ami
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
