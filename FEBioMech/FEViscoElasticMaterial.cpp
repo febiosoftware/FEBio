@@ -74,13 +74,14 @@ void FEViscoElasticMaterialPoint::Init()
 	// intialize data to zero
 	m_Se.zero();
 	m_Sep.zero();
-//	m_sed = 0.0;
-//  m_sedp = 0.0;
+	m_sed = 0.0;
+    m_sedp = 0.0;
 	for (int i=0; i<MAX_TERMS; ++i) {
 		m_H[i].zero();
 		m_Hp[i].zero();
 //      m_Hsed[i] = 0;
 //      m_Hsedp[i] = 0;
+        m_alpha[i] = m_alphap[i] = 1.0;
 	}
 
     // don't forget to initialize the base class
@@ -96,14 +97,14 @@ void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
 	// the elastic stress stored in pt is the Cauchy stress.
 	// however, we need to store the 2nd PK stress
 	m_Sep = m_Se;
-//  m_sedp = m_sed;
+    m_sedp = m_sed;
 
 	// copy previous data
 	for (int i=0; i<MAX_TERMS; ++i) {
 		m_Hp[i] = m_H[i];
-//      m_Hsedp[i] = m_Hsed[i];
+        m_alphap[i] = m_alpha[i];
     }
-
+    
     // don't forget to call the base class
     FEMaterialPoint::Update(timeInfo);
 }
@@ -116,6 +117,8 @@ void FEViscoElasticMaterialPoint::Serialize(DumpStream& ar)
 	ar & m_Se;
 	ar & m_Sep;
 	ar & m_H & m_Hp;
+    ar & m_sed & m_sedp;
+    ar & m_alpha & m_alphap;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,33 +223,103 @@ tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 //! Strain energy density function
 double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
-/*    if (mp.dt == 0) return 0;
-    
 	// get the viscoelastic point data
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
-    
+    FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3d Fsafe = et.m_F; double Jsafe = et.m_J;
+
 	// Calculate the new elastic strain energy density
-	pt.m_sed = m_pBase->StrainEnergyDensity(mp);
+	pt.m_sed = m_Base->StrainEnergyDensity(et);
     double sed = pt.m_sed;
     
-	// get elastic strain energy density of previous timestep
-	double sedp = pt.m_sedp;
-    
-	// calculate new history variables
-	// terms are accumulated in sedt, the total strain energy density
 	double sedt = sed*m_g0;
-	double dt = mp.dt, g, h;
-	for (int i=0; i<MAX_TERMS; ++i)
-	{
-		g = exp(-dt/m_t[i]);
-		h = (1 - g)/(dt/m_t[i]);
-        
-		pt.m_Hsed[i] = pt.m_Hsedp[i]*g + (sed - sedp)*h;
-		sedt += pt.m_Hsed[i]*m_g[i];
-	}
-    
+    if (SeriesStretchExponent(mp)) {
+        // get the elastic point data and evaluate the right-stretch tensor
+        for (int i=0; i<MAX_TERMS; ++i)
+        {
+            if (m_g[i] > 0) {
+                mat3ds C = et.RightCauchyGreen();
+                double l2[3], l[3];
+                vec3d v[3];
+                C.eigen2(l2, v);
+                l[0] = sqrt(l2[0]); l[1] = sqrt(l2[1]); l[2] = sqrt(l2[2]);
+                mat3ds Ua = dyad(v[0])*pow(l[0],pt.m_alpha[i])
+                + dyad(v[1])*pow(l[1],pt.m_alpha[i]) + dyad(v[2])*pow(l[2],pt.m_alpha[i]);
+                et.m_F = Ua; et.m_J = Ua.det();
+                sedt += m_g[i]*m_Base->StrainEnergyDensity(et);
+            }
+        }
+    }
+    et.m_F = Fsafe; et.m_J = Jsafe;
+
 	// return the total strain energy density
-	return sedt; */
-	throw std::runtime_error("FEViscoElasticMaterial::StrainEnergyDensity NOT implemented!");
-	return 0;
+	return sedt;
+    
+    /*	throw std::runtime_error("FEViscoElasticMaterial::StrainEnergyDensity NOT implemented!");
+	return 0; */
 }
+
+//-----------------------------------------------------------------------------
+//! calculate exponent of right-stretch tensor in series spring
+bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
+{
+    const double errrel = 1e-3;
+    const int maxiter = 50;
+    // get the elastic point data and evaluate the right-stretch tensor
+    FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+
+    // get the right stretch tensor
+    mat3ds C = et.RightCauchyGreen();
+    double l2[3], l[3];
+    vec3d v[3];
+    C.eigen2(l2, v);
+    l[0] = sqrt(l2[0]); l[1] = sqrt(l2[1]); l[2] = sqrt(l2[2]);
+    mat3ds U = dyad(v[0])*l[0] + dyad(v[1])*l[1] + dyad(v[2])*l[2];
+    double gamma = 0;
+    for (int i=0; i<MAX_TERMS; ++i) gamma += m_g[i];
+    
+    // get the viscoelastic point data
+    FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
+
+    // use previous time solution as initial guess for the exponent
+    mat3ds Se = pt.m_Se;
+    mat3ds S = et.pull_back(et.m_s);
+    double fmag = Se.dotdot(U);
+    mat3d Fsafe = et.m_F; double Jsafe = et.m_J;
+    for (int i=0; i<MAX_TERMS; ++i) {
+        if (m_g[i] > 0) {
+            double alpha = pt.m_alphap[i];
+            bool done = false;
+            int iter = 0;
+            do {
+                mat3ds Ua = dyad(v[0])*pow(l[0],alpha) + dyad(v[1])*pow(l[1],alpha) + dyad(v[2])*pow(l[2],alpha);
+                et.m_F = Ua; et.m_J = Ua.det();
+                mat3ds Sea = et.pull_back(m_Base->Stress(et));
+                double f = (Sea*m_g[i] - S + Se).dotdot(U);
+//                tens4ds Cea = et.pull_back(m_Base->Tangent(et));
+                tens4ds Cea = m_Base->Tangent(et);
+                mat3ds U2am1 = dyad(v[0])*pow(l[0],2*alpha-1) + dyad(v[1])*pow(l[1],2*alpha-1) + dyad(v[2])*pow(l[2],2*alpha-1);
+                double fprime = (Cea.dot(U2am1)).dotdot(U)*(alpha*m_g[i]);
+                if (fprime != 0) {
+                    double dalpha = -f/fprime;
+                    alpha += dalpha;
+                    if (fabs(f) < errrel*fmag) done = true;
+                    else if (fabs(dalpha) < errrel*fabs(alpha)) done = true;
+                    else if (alpha > 1) { alpha = 1; done = true; }
+                    else if (alpha < 0) { alpha = 0; done = true; }
+                    else if (++iter > maxiter) done = true;
+                }
+                else
+                    done = true;
+            } while (!done);
+            if (iter > maxiter) {
+                et.m_F = Fsafe; et.m_J = Jsafe;
+                return false;
+            }
+            pt.m_alpha[i] = alpha;
+        }
+    }
+    et.m_F = Fsafe; et.m_J = Jsafe;
+    return true;
+}
+

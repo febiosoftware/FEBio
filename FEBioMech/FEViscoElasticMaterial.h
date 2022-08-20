@@ -58,12 +58,12 @@ public:
 
 	mat3ds	m_H[MAX_TERMS];		//!< internal variables
 	mat3ds	m_Hp[MAX_TERMS];	//!< internal variables at previous timestep
+
+    double  m_alpha[MAX_TERMS];     //!< exponent of right-stretch tensor in series spring
+    double  m_alphap[MAX_TERMS];    //!< alpha at previous time step
     
-//	double	m_sed;	//!< elastic strain energy density
-//	double	m_sedp;	//!< elastic strain energy density at previous time
-    
-//	double	m_Hsed[MAX_TERMS];	//!< sed internal variables
-//	double	m_Hsedp[MAX_TERMS];	//!< sed internal variables at previous timestep
+	double	m_sed;	//!< elastic strain energy density
+	double	m_sedp;	//!< elastic strain energy density at previous time
 };
 
 
@@ -96,6 +96,9 @@ public:
 
 	//! strain energy density
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+    
+    //! calculate exponent of right-stretch tensor in series spring
+    bool SeriesStretchExponent(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
