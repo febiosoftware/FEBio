@@ -285,12 +285,6 @@ else()
     endif()
 endif()
 
-if(WIN32)
-	target_link_libraries(febio4 psapi.lib ws2_32.lib)
-else()
-    target_link_libraries(febio4 -pthread -ldl -lirc -lmpi -llapack -lblas -lsvml)
-endif()
-
 # Link MMG
 if(USE_MMG)
 	target_include_directories(feamr PRIVATE ${MMG_INC})
