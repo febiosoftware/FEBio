@@ -1,11 +1,32 @@
 # FEBio Build Guide
 
 ### Table of contents
+- [Docker](#docker)
 - [Prerequisites](#prereq) 
 - [Running CMake](#runCMake)
 - [Building FEBio](#build)
 - [Limitations of CMake](#limits)
 - [Troubleshooting](#trouble)
+## Docker <a name="docker"></a>
+A Linux image can be built that circumvents depedency installations.
+### Install docker
+Download and install docker for your respective system https://docs.docker.com/get-docker/
+
+### Build image
+FEBio image is build on the `intel/oneapi-hpckit` layer.
+
+To build the image:
+
+```
+:/FEBIO# docker-compose run febio-build
+```
+
+### Build FEBio
+To build the FEBio:
+```
+:/FEBIO# docker-compose run febio-build
+```
+
 
 ## Prerequisites <a name="prereq"></a>
 

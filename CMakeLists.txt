@@ -254,7 +254,7 @@ endif()
 if(USE_HYPRE)
     target_include_directories(numcore PRIVATE ${HYPRE_INC})
     target_compile_definitions(numcore PRIVATE HYPRE)
-	target_link_libraries(numcore PRIVATE ${HYPRE_LIB})
+    target_link_libraries(numcore PRIVATE ${HYPRE_LIB})
 endif()
 
 # Link MKL
@@ -283,6 +283,12 @@ else()
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
+endif()
+
+if(WIN32)
+	target_link_libraries(febio3 psapi.lib ws2_32.lib)
+else()
+    target_link_libraries(febio3 -pthread -ldl -lirc -lmpi -llapack -lblas -lsvml)
 endif()
 
 # Link MMG

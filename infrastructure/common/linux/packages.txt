@@ -1,0 +1,15 @@
+curl
+build-essential
+dos2unix
+f2c
+intel-basekit
+libf2c2-dev
+libiomp-dev
+libiomp5
+liblapack-dev
+liblapack3
+libopenmpi-dev
+libopenmpi2
+pkg-config
+unzip
+zlib1g-dev
