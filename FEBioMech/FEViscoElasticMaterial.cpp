@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
 #include <FECore/DumpStream.h>
 
@@ -79,8 +79,6 @@ void FEViscoElasticMaterialPoint::Init()
 	for (int i=0; i<MAX_TERMS; ++i) {
 		m_H[i].zero();
 		m_Hp[i].zero();
-//      m_Hsed[i] = 0;
-//      m_Hsedp[i] = 0;
         m_alpha[i] = m_alphap[i] = 1.0;
 	}
 

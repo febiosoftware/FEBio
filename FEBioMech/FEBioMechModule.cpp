@@ -104,6 +104,7 @@ SOFTWARE.*/
 #include "FEUncoupledElasticMixture.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEVerondaWestmann.h"
+#include "FEViscoElasticDamage.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticFiberMaterial.h"
@@ -330,6 +331,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPerfectOsmometer, "perfect osmometer");
 	REGISTER_FECORE_CLASS(FESphericalFiberDistribution, "spherical fiber distribution");
 	REGISTER_FECORE_CLASS(FEStVenantKirchhoff, "St.Venant-Kirchhoff");
+    REGISTER_FECORE_CLASS(FEViscoElasticDamage, "viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEViscoElasticMaterial, "viscoelastic");
 	REGISTER_FECORE_CLASS(FEElasticMultigeneration, "multigeneration");
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
