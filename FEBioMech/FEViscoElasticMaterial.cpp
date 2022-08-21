@@ -250,20 +250,21 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
             }
         }
     }
+    else
+        throw std::runtime_error("FEViscoElasticMaterial::strain energy density calculation did not converge!");
+    
     et.m_F = Fsafe; et.m_J = Jsafe;
 
 	// return the total strain energy density
 	return sedt;
-    
-    /*	throw std::runtime_error("FEViscoElasticMaterial::StrainEnergyDensity NOT implemented!");
-	return 0; */
 }
 
 //-----------------------------------------------------------------------------
 //! calculate exponent of right-stretch tensor in series spring
 bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
 {
-    const double errrel = 1e-3;
+    const double errrel = 1e-6;
+    const double almin = 0.001;
     const int maxiter = 50;
     // get the elastic point data and evaluate the right-stretch tensor
     FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -296,17 +297,18 @@ bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
                 et.m_F = Ua; et.m_J = Ua.det();
                 mat3ds Sea = et.pull_back(m_Base->Stress(et));
                 double f = (Sea*m_g[i] - S + Se).dotdot(U);
-//                tens4ds Cea = et.pull_back(m_Base->Tangent(et));
-                tens4ds Cea = m_Base->Tangent(et);
-                mat3ds U2am1 = dyad(v[0])*pow(l[0],2*alpha-1) + dyad(v[1])*pow(l[1],2*alpha-1) + dyad(v[2])*pow(l[2],2*alpha-1);
-                double fprime = (Cea.dot(U2am1)).dotdot(U)*(alpha*m_g[i]);
+                tens4ds Cea = et.pull_back(m_Base->Tangent(et));
+                mat3ds U2ap = dyad(v[0])*(pow(l[0],2*alpha)*log(l[0]))
+                + dyad(v[1])*(pow(l[1],2*alpha)*log(l[1]))
+                + dyad(v[2])*(pow(l[2],2*alpha)*log(l[2]));
+                double fprime = (Cea.dot(U2ap)).dotdot(U)*m_g[i];
                 if (fprime != 0) {
                     double dalpha = -f/fprime;
                     alpha += dalpha;
                     if (fabs(f) < errrel*fmag) done = true;
                     else if (fabs(dalpha) < errrel*fabs(alpha)) done = true;
                     else if (alpha > 1) { alpha = 1; done = true; }
-                    else if (alpha < 0) { alpha = 0; done = true; }
+                    else if (alpha < almin) { alpha = 0; done = true; }
                     else if (++iter > maxiter) done = true;
                 }
                 else

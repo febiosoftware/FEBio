@@ -62,7 +62,10 @@ public:
 	
 	//! deviatoric strain energy density function
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
-	
+    
+    //! calculate exponent of right-stretch tensor in series spring
+    bool SeriesStretchExponent(FEMaterialPoint& pt);
+
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
 	
