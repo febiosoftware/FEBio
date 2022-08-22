@@ -20,7 +20,7 @@ public:
 	void SetRange(vec3d r0, vec3d r1);
 
 	// map a vector to the image domain
-	POINT map(vec3d p);
+	POINT map(const vec3d& p);
 
 	// evaluate image
 	double value(const POINT& p);

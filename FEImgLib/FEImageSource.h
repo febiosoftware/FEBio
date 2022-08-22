@@ -49,6 +49,10 @@ public:
 
 	bool GetImage3D(Image& im) override;
 
+private:
+	// load raw data from file
+	bool Load(const char* szfile, Image& im, Image::ImageFormat fmt, bool endianess = false);
+
 protected:
 	std::string		m_file;
 	int				m_dim[3];

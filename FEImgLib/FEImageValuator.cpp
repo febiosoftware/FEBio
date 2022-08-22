@@ -50,7 +50,7 @@ bool FEImageValuator::Init()
 
 double FEImageValuator::operator()(const FEMaterialPoint& pt)
 {
-	return m_transform->value(m_map.value(m_map.map(pt.m_r0)));
+	return m_transform->value(m_map.value(pt.m_r0));
 }
 
 FEScalarValuator* FEImageValuator::copy()
