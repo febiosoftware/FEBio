@@ -1650,16 +1650,20 @@ void FEBioModel::on_cb_stepSolved()
 	feLog("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
 
 	// print linear solver stats
-	LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
-	if (ls)
+	FESolver* ps = step->GetFESolver();
+	if (ps)
 	{
-		LinearSolverStats stats = ls->GetStats();
-		int nsolves = stats.backsolves;
-		int niters = stats.iterations;
-		double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
-		feLog("\n L I N E A R   S O L V E R   S T A T S\n\n");
-		feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
-		feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
+		LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
+		if (ls)
+		{
+			LinearSolverStats stats = ls->GetStats();
+			int nsolves = stats.backsolves;
+			int niters = stats.iterations;
+			double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
+			feLog("\n L I N E A R   S O L V E R   S T A T S\n\n");
+			feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
+			feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
+		}
 	}
 
 	// add to stats

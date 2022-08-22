@@ -354,6 +354,8 @@ bool FEAnalysis::InitSolver()
 
 	// initialize equations
 	FESolver* psolver = GetFESolver();
+	if (psolver == nullptr) return false;
+
 	if (psolver->InitEquations() == false) return false;
 
 	// do initialization of solver data
