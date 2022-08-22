@@ -77,7 +77,7 @@ FECoreKernel::FECoreKernel()
 	m_activeModule = -1;
 	m_alloc_id = 0;
 	m_next_alloc_id = 1;
-
+	m_nspec = -1;
 	m_default_solver = nullptr;
 
 	// build the super class ID table
@@ -174,7 +174,7 @@ LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 	{
 		const char* sztype = m_default_solver_type.c_str();
 		FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-		return (LinearSolver*)fac->CreateInstance(fem);
+		return (LinearSolver*)CreateInstance(fac, fem);
 	}
 	else
 	{
@@ -294,7 +294,7 @@ FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* 
 						int nspec = pfac->GetSpecID();
 						if ((nspec == -1) || (m_nspec <= nspec))
 						{
-							return pfac->CreateInstance(pfem);
+							return CreateInstance(pfac, pfem);
 						}
 					}
 				}
@@ -323,7 +323,7 @@ FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* 
 						int nspec = pfac->GetSpecID();
 						if ((nspec == -1) || (m_nspec <= nspec))
 						{
-							return pfac->CreateInstance(pfem);
+							return CreateInstance(pfac, pfem);
 						}
 					}
 				}
@@ -370,7 +370,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 						int nspec = pfac->GetSpecID();
 						if ((nspec == -1) || (m_nspec <= nspec))
 						{
-							return pfac->CreateInstance(pfem);
+							return CreateInstance(pfac, pfem);
 						}
 					}
 				}
@@ -399,7 +399,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 						int nspec = pfac->GetSpecID();
 						if ((nspec == -1) || (m_nspec <= nspec))
 						{
-							return pfac->CreateInstance(pfem);
+							return CreateInstance(pfac, pfem);
 						}
 					}
 				}
@@ -420,7 +420,7 @@ FECoreBase* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 		const char* szfacName = pfac->GetClassName();
 		if (szfacName && (strcmp(szfacName, szclassName) == 0))
 		{
-			return pfac->CreateInstance(fem);
+			return CreateInstance(pfac, fem);
 		}
 	}
 	return nullptr;
@@ -434,6 +434,21 @@ FECoreBase* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassD
 	FECoreBase* pc = (FECoreBase*)Create(superClassID, root->m_type.c_str(), pfem);
 	if (pc == nullptr) return nullptr;
 	pc->SetParameters(cd);
+	return pc;
+}
+
+//-----------------------------------------------------------------------------
+FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
+{
+	FECoreBase* pc = fac->CreateInstance(fem);
+	if (pc && (m_createHandlers.empty() == false))
+	{
+		for (int i = 0; i < m_createHandlers.size(); ++i)
+		{
+			FECreateHandler* ph = m_createHandlers[i];
+			if (ph) ph->handle(pc);
+		}
+	}
 	return pc;
 }
 
@@ -721,4 +736,10 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 {
 	FEDomain* domain = (FEDomain*)Create(superClass, sztype, fem);
 	return domain;
+}
+
+//-----------------------------------------------------------------------------
+void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
+{
+	m_createHandlers.push_back(pf);
 }

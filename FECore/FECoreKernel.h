@@ -41,6 +41,16 @@ class FEModel;
 class LinearSolver;
 class FEModule;
 
+
+//-----------------------------------------------------------------------------
+// base class for handling create events.
+class FECreateHandler{
+public:
+	FECreateHandler() {}
+	virtual ~FECreateHandler() {}
+	virtual void handle(FECoreBase*) = 0;
+};
+
 //-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
 //! different modules. In particular, it manages the factory classes
@@ -110,6 +120,8 @@ public:
 	//! generate a allocator ID
 	int GenerateAllocatorID();
 
+	FECoreBase* CreateInstance(const FECoreFactory* fac, FEModel* fem);
+
 public: // Modules
 
 	//! count modules
@@ -163,9 +175,14 @@ public:
 	//! Get a linear solver
 	LinearSolver* CreateDefaultLinearSolver(FEModel* fem);
 
+public:
+	void OnCreateEvent(FECreateHandler* pf);
+
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
+
+	std::vector<FECreateHandler*>		m_createHandlers;
 
 	std::map<unsigned int, const char*>	m_sidMap;	// super class ID map
 
