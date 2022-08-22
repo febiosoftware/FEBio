@@ -267,6 +267,7 @@ SOFTWARE.*/
 #include "FESolidModule.h"
 
 #include "FESolidAnalysis.h"
+#include <FECore/FEModelUpdate.h>
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -1039,6 +1040,16 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// Derived from FEElemDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
+
+	//-----------------------------------------------------------------------------
+	// Model update requests
+	febio.OnCreateEvent(UpdateModelWhenCreating<FESolidAnalysis>([](FEModelUpdate& fem) {
+			fem.AddPlotVariable("displacement");
+			fem.AddPlotVariable("stress");
+		}));
+
+	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact pressure"));
+	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact gap"));
 
 	febio.SetActiveModule(0);
 }

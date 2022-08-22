@@ -123,6 +123,7 @@ SOFTWARE.*/
 #include "FEBiphasicAnalysis.h"
 #include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
+#include <FECore/FEModelUpdate.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -255,6 +256,15 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 3, "esxy");
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 4, "esyz");
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 5, "esxz");
+
+	//-----------------------------------------------------------------------------
+	// Model update requests (for biphasic module)
+	febio.OnCreateEvent(UpdateModelWhenCreating<FEBiphasicAnalysis>([](FEModelUpdate& fem) {
+		fem.AddPlotVariable("effective fluid pressure");
+		fem.AddPlotVariable("fluid flux");
+		})
+	);
+
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
