@@ -79,6 +79,7 @@ FECoreKernel::FECoreKernel()
 	m_next_alloc_id = 1;
 	m_nspec = -1;
 	m_default_solver = nullptr;
+	m_blockEvents = true;
 
 	// build the super class ID table
 	ADD_SUPER_CLASS(FEINVALID_ID);
@@ -441,7 +442,7 @@ FECoreBase* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassD
 FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 {
 	FECoreBase* pc = fac->CreateInstance(fem);
-	if (pc && (m_createHandlers.empty() == false))
+	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))
 	{
 		for (int i = 0; i < m_createHandlers.size(); ++i)
 		{
@@ -742,4 +743,10 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
 {
 	m_createHandlers.push_back(pf);
+}
+
+//-----------------------------------------------------------------------------
+void FECoreKernel::BlockEvents(bool b)
+{
+	m_blockEvents = b;
 }
