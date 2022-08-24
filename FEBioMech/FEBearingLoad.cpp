@@ -98,7 +98,7 @@ bool FEBearingLoad::Init()
     }
     else {
         for (int i=0; i<nl.Size(); ++i)
-            pc.push_back(mesh->Node(nl[i]).m_s0());
+            pc.push_back(mesh->Node(nl[i]).s0());
     }
     
     // find the best fit quadric

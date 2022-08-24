@@ -1563,7 +1563,7 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             vec3d rt[NELN], st[NELN], rn[NELN];
             for (int j=0; j<el.Nodes(); ++j) {
                 rt[j] = mesh.Node(el.m_node[j]).m_rt;
-                st[j] = mesh.Node(el.m_node[j]).m_st();
+                st[j] = mesh.Node(el.m_node[j]).st();
             }
             
             // evaluate velocities at integration points
@@ -1737,7 +1737,7 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d vt[NELN], wt[NELN], vn[NELN];
             for (int j=0; j<el.Nodes(); ++j) {
                 rt[j] = mesh.Node(el.m_node[j]).m_rt;
-                st[j] = mesh.Node(el.m_node[j]).m_st();
+                st[j] = mesh.Node(el.m_node[j]).st();
                 vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
                 wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_SVX, dof_SVY, dof_SVZ);
             }

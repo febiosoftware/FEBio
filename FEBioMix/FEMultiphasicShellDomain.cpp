@@ -1977,7 +1977,7 @@ void FEMultiphasicShellDomain::ElementMembraneReactionFlux(FEShellElement& el, v
         FENode& nd = GetFEModel()->GetMesh().Node(el.m_node[j]);
         // nodal positions at front and back surfaces
         re[j] = nd.m_rt;
-        ri[j] = nd.m_st();
+        ri[j] = nd.st();
     }
     
     double *Mr, *Ms;
@@ -2102,7 +2102,7 @@ bool FEMultiphasicShellDomain::ElementMembraneFluxStiffness(FEShellElement& el, 
     for (int j=0; j<neln; ++j) {
         FENode& nd = GetFEModel()->GetMesh().Node(el.m_node[j]);
         re[j] = nd.m_rt;
-        ri[j] = nd.m_st();
+        ri[j] = nd.st();
     }
     
     double *Mr, *Ms;

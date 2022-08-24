@@ -74,7 +74,7 @@ void FEShellDomain::GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* 
     if (!back)
         for (int i = 0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
     else
-        for (int i = 0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_st();
+        for (int i = 0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).st();
 }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ void FEShellDomain::GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* 
     else {
         for (int i = 0; i<neln; ++i) {
             FENode& nd = m_pMesh->Node(el.m_node[i]);
-            rt[i] = nd.m_st()*alpha + nd.m_sp()*(1 - alpha);
+            rt[i] = nd.st()*alpha + nd.sp()*(1 - alpha);
         }
     }
 }
@@ -104,7 +104,7 @@ void FEShellDomain::GetReferenceNodalCoordinates(const FEShellElement& el, vec3d
     if (!back)
         for (int i = 0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
     else
-        for (int i = 0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_s0();
+        for (int i = 0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).s0();
 }
 
 //-----------------------------------------------------------------------------
@@ -115,7 +115,7 @@ void FEShellDomain::GetPreviousNodalCoordinates(const FEShellElement& el, vec3d*
     if (!back)
         for (int i = 0; i<neln; ++i) rp[i] = m_pMesh->Node(el.m_node[i]).m_rp;
     else
-        for (int i = 0; i<neln; ++i) rp[i] = m_pMesh->Node(el.m_node[i]).m_sp();
+        for (int i = 0; i<neln; ++i) rp[i] = m_pMesh->Node(el.m_node[i]).sp();
 }
 
 //-----------------------------------------------------------------------------
