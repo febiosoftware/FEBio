@@ -264,74 +264,9 @@ void FECoreKernel::SetAllocatorID(int alloc_id)
 //! and the type-string. 
 FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 {
-	if (sztype == 0) return 0;
-
-	unsigned int activeID = 0;
-	vector<int> moduleDepends;
-	if (m_activeModule != -1)
-	{
-		FEModule& activeModule = *m_modules[m_activeModule];
-		activeID = activeModule.GetModuleID();
-		moduleDepends = activeModule.GetDependencies();
-	}
-
-	// first check active module
-	if ((activeID > 0) || (activeID == 0))
-	{
-		std::vector<FECoreFactory*>::iterator pf;
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
-		{
-			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == superClassID) {
-
-				// see if we can match module first
-				unsigned int mid = pfac->GetModuleID();
-				if ((mid == activeID) || (mid== 0))
-				{
-					// see if the type name matches
-					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
-					{
-						// check the spec (TODO: What is this for?)
-						int nspec = pfac->GetSpecID();
-						if ((nspec == -1) || (m_nspec <= nspec))
-						{
-							return CreateInstance(pfac, pfem);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// check dependencies in order in which they are defined
-	std::vector<FECoreFactory*>::iterator pf;
-	for (int i = 0; i < moduleDepends.size(); ++i)
-	{
-		unsigned modId = moduleDepends[i];
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
-		{
-			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == superClassID) {
-
-				// see if we can match module first
-				unsigned int mid = pfac->GetModuleID();
-				if ((mid == 0) || (mid == modId))
-				{
-					// see if the type name matches
-					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
-					{
-						// check the spec (TODO: What is this for?)
-						int nspec = pfac->GetSpecID();
-						if ((nspec == -1) || (m_nspec <= nspec))
-						{
-							return CreateInstance(pfac, pfem);
-						}
-					}
-				}
-			}
-		}
-	}
-	return 0;
+	FECoreFactory* fac = FindFactoryClass(superClassID, sztype);
+	if (fac == nullptr) return nullptr;
+	return CreateInstance(fac, pfem);
 }
 
 //-----------------------------------------------------------------------------
@@ -524,15 +459,76 @@ int FECoreKernel::GetFactoryIndex(int superClassId, const char* sztype)
 
 
 //-----------------------------------------------------------------------------
-FECoreFactory* FECoreKernel::FindFactoryClass(int classID, const char* sztype)
+FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype)
 {
-	for (size_t i=0; i<m_Fac.size(); ++i)
+	if (sztype == nullptr) return nullptr;
+
+	unsigned int activeID = 0;
+	vector<int> moduleDepends;
+	if (m_activeModule != -1)
 	{
-		FECoreFactory* fac = m_Fac[i];
-		if ((fac->GetSuperClassID() == classID) &&
-			(strcmp(fac->GetTypeStr(), sztype) == 0)) return fac;
+		FEModule& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.GetModuleID();
+		moduleDepends = activeModule.GetDependencies();
 	}
-	return 0;
+
+	// first check active module
+	if ((activeID > 0) || (activeID == 0))
+	{
+		std::vector<FECoreFactory*>::iterator pf;
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == superID) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == activeID) || (mid == 0))
+				{
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// check dependencies in order in which they are defined
+	std::vector<FECoreFactory*>::iterator pf;
+	for (int i = 0; i < moduleDepends.size(); ++i)
+	{
+		unsigned modId = moduleDepends[i];
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == superID) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == 0) || (mid == modId))
+				{
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac;
+						}
+					}
+				}
+			}
+		}
+	}
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
