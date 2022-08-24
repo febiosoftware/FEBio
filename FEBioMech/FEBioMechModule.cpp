@@ -104,6 +104,7 @@ SOFTWARE.*/
 #include "FEUncoupledElasticMixture.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEVerondaWestmann.h"
+#include "FEViscoElasticDamage.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticFiberMaterial.h"
@@ -267,6 +268,7 @@ SOFTWARE.*/
 #include "FESolidModule.h"
 
 #include "FESolidAnalysis.h"
+#include <FECore/FEModelUpdate.h>
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -331,6 +333,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPerfectOsmometer, "perfect osmometer");
 	REGISTER_FECORE_CLASS(FESphericalFiberDistribution, "spherical fiber distribution");
 	REGISTER_FECORE_CLASS(FEStVenantKirchhoff, "St.Venant-Kirchhoff");
+    REGISTER_FECORE_CLASS(FEViscoElasticDamage, "viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEViscoElasticMaterial, "viscoelastic");
 	REGISTER_FECORE_CLASS(FEElasticMultigeneration, "multigeneration");
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
@@ -466,6 +469,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC, "uncoupled prescribed trans iso active contraction");
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic, "prescribed isotropic active contraction");
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, "uncoupled prescribed isotropic active contraction");
+	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionFiber, "prescribed fiber active contraction");
+	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionFiberUC, "uncoupled prescribed fiber active contraction");
 
 	REGISTER_FECORE_CLASS(FEActiveFiberStress, "active fiber stress");
 	REGISTER_FECORE_CLASS(FEActiveFiberStressUC, "uncoupled active fiber stress");
@@ -709,7 +714,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRLinearStresses, "SPR-P1 stress");
 	REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses, "SPR principal stress");
 	REGISTER_FECORE_CLASS(FEPlotNodalStresses, "nodal stress");
-	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain", FECORE_SPEC(3,0)); // NOTE: Deprecated
+	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain");
 	REGISTER_FECORE_CLASS(FEPlotLagrangeStrain, "Lagrange strain");
 	REGISTER_FECORE_CLASS(FEPlotInfStrain, "infinitesimal strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
@@ -943,6 +948,24 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
     REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
 	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 0, "mixture_stress[0].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 1, "mixture_stress[0].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 2, "mixture_stress[0].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 3, "mixture_stress[0].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 4, "mixture_stress[0].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 5, "mixture_stress[0].zz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 0, "mixture_stress[1].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 1, "mixture_stress[1].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 2, "mixture_stress[1].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 3, "mixture_stress[1].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 4, "mixture_stress[1].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 5, "mixture_stress[1].zz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 0, "mixture_stress[2].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 1, "mixture_stress[2].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 2, "mixture_stress[2].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 3, "mixture_stress[2].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 4, "mixture_stress[2].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 5, "mixture_stress[2].zz");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData
@@ -1019,6 +1042,16 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// Derived from FEElemDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
+
+	//-----------------------------------------------------------------------------
+	// Model update requests
+	febio.OnCreateEvent(UpdateModelWhenCreating<FESolidAnalysis>([](FEModelUpdate& fem) {
+			fem.AddPlotVariable("displacement");
+			fem.AddPlotVariable("stress");
+		}));
+
+	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact pressure"));
+	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact gap"));
 
 	febio.SetActiveModule(0);
 }

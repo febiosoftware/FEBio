@@ -650,10 +650,6 @@ void FEFluidFSISolver::Update(vector<double>& ui)
     FETimeInfo& tp = fem.GetTime();
     tp.currentIteration = m_niter;
 
-	// NOTE: The FSI solver does not call FEModel::Update (should it?)
-	//       so we need to increment the update counter here.
-	fem.IncrementUpdateCounter();
-
     // update EAS
     UpdateEAS(ui);
     UpdateIncrementsEAS(ui, true);
@@ -661,12 +657,6 @@ void FEFluidFSISolver::Update(vector<double>& ui)
     // update kinematics
     UpdateKinematics(ui);
     
-	// update contact
-	if (fem.SurfacePairConstraints() > 0) UpdateContact();
-
-	// update constraints
-	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
-
 	// update element stresses
 	UpdateModel();
 }
@@ -699,56 +689,6 @@ void FEFluidFSISolver::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
         FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
         if (sdom && sdom->IsActive()) sdom->UpdateIncrementsEAS(ui, binc);
     }
-}
-
-
-//-----------------------------------------------------------------------------
-//!  Updates the element stresses
-void FEFluidFSISolver::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	const FETimeInfo& tp = fem.GetTime();
-
-	// update the stresses on all domains
-	for (int i = 0; i<mesh.Domains(); ++i)
-	{
-		if (mesh.Domain(i).IsActive()) mesh.Domain(i).Update(tp);
-	}
-    
-    // update model state
-    // NOTE: Commented this out, since this is not called in FEBio3. Not 
-    // sure why it is here.
-//    GetFEModel()->Update();
-}
-
-//-----------------------------------------------------------------------------
-//! Update contact interfaces.
-void FEFluidFSISolver::UpdateContact()
-{
-	FEModel& fem = *GetFEModel();
-	// Update all contact interfaces
-	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		if (pci->IsActive()) pci->Update();
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Update nonlinear constraints
-void FEFluidFSISolver::UpdateConstraints()
-{
-	FEModel& fem = *GetFEModel();
-	FETimeInfo& tp = fem.GetTime();
-	tp.currentIteration = m_niter;
-
-	// Update all nonlinear constraints
-	for (int i = 0; i<fem.NonlinearConstraints(); ++i)
-	{
-		FENLConstraint* pci = fem.NonlinearConstraint(i);
-		if (pci->IsActive()) pci->Update();
-	}
 }
 
 //-----------------------------------------------------------------------------

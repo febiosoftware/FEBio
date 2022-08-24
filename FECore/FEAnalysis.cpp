@@ -354,6 +354,8 @@ bool FEAnalysis::InitSolver()
 
 	// initialize equations
 	FESolver* psolver = GetFESolver();
+	if (psolver == nullptr) return false;
+
 	if (psolver->InitEquations() == false) return false;
 
 	// do initialization of solver data
@@ -588,19 +590,19 @@ int FEAnalysis::SolveTimeStep()
 		}
 		nerr = (bconv ? 0 : 1);
 	}
-	catch (LinearSolverFailed)
+	catch (LinearSolverFailed e)
 	{
-		feLogError("Linear solver failed to find solution. Aborting run.");
+		feLogError(e.what());
 		nerr = 2;
 	}
-	catch (FactorizationError)
+	catch (FactorizationError e)
 	{
-		feLogError("Fatal error in factorization of stiffness matrix. Aborting run.");
+		feLogError(e.what());
 		nerr = 2;
 	}
 	catch (NANDetected e)
 	{
-		feLogError("NAN Detected:\n%s", e.what());
+		feLogError(e.what());
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
 	catch (FEMultiScaleException)

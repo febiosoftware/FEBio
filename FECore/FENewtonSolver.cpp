@@ -507,66 +507,12 @@ bool FENewtonSolver::SolveStep()
 		// let's try to call Quasin
 		bret = Quasin();
 	}
-	catch (NegativeJacobian e)
-	{
-		// A negative jacobian was detected
-		feLogError("Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
-		return false;
-	}
-	catch (MaxStiffnessReformations)
-	{
-		// max nr of reformations is reached
-		feLogError("Max nr of reformations reached.");
-		return false;
-	}
-	catch (ForceConversion)
-	{
-		// user forced conversion of problem
-		feLogWarning("User forced conversion.\nSolution might not be stable.");
-		return true;
-	}
-	catch (IterationFailure)
-	{
-		// user caused a forced iteration failure
-		feLogWarning("User forced iteration failure.");
-		return false;
-	}
-	catch (MaxResidualError)
-	{
-		// user caused a forced iteration failure
-		feLogWarning("Maximum residual exceeded.");
-		return false;
-	}
-	catch (ZeroLinestepSize)
-	{
-		// a zero line step size was detected
-		feLogError("Zero line step size.");
-		return false;
-	}
-	catch (EnergyDiverging)
-	{
-		// problem was diverging after stiffness reformation
-		feLogError("ERROR", "Problem diverging uncontrollably.");
-		return false;
-	}
-	catch (FEMultiScaleException e)
-	{
-		// the RVE problem didn't solve
-		// logging was turned off during multi-scale runs
-		// so we need to turn it back on
-		GetFEModel()->UnBlockLog();
-		feLogError("The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", e.elemId, e.gptIndex+1);
-
-		return false;
-	}
-	catch (DoRunningRestart)
-	{
-		// a request to fail the iteration and restart the time step
-		return false;
-	}
 	catch (FEException e)
 	{
-		feLogError("%s", e.what());
+		if (e.level() == FEException::Error)
+			feLogError("%s", e.what());
+		else
+			feLogWarning("%s", e.what());
 		return false;
 	}
 
@@ -893,26 +839,16 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 	if (ISNAN(r2))
 	{
 		FENodalDofInfo info;
-		const char* sz = "";
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		for (int i = 0; i < u.size(); ++i)
 		{
 			if (ISNAN(R[i]))
 			{
 				info = GetDOFInfoFromEquation(i);
-				if (info.m_node != -1)
-				{
-					info.m_node = mesh.Node(info.m_node).GetID();
-					DOFS& Dofs = GetFEModel()->GetDOFS();
-					sz = Dofs.GetDOFName(info.m_dof);
-					if (sz == nullptr) sz = "???";
-				}
 				break;
 			}
 		}
-		NANDetected e;
-		e.what("NAN detected in residual vector at index %d.\nNode id = %d, dof = %d ('%s')", info.m_eq, info.m_node, info.m_dof, sz);
-		throw (e);
+		throw NANDetected(info);
 	}
 
 	// call the qn strategy to actuall solve the equations
@@ -923,26 +859,16 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 	if (ISNAN(u2))
 	{
 		FENodalDofInfo info;
-		const char* sz = "";
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		for (int i = 0; i < u.size(); ++i)
 		{
 			if (ISNAN(u[i]))
 			{
 				info = GetDOFInfoFromEquation(i);
-				if (info.m_node != -1)
-				{
-					info.m_node = mesh.Node(info.m_node).GetID();
-					DOFS& Dofs = GetFEModel()->GetDOFS();
-					sz = Dofs.GetDOFName(info.m_dof);
-					if (sz == nullptr) sz = "???";
-				}
 				break;
 			}
 		}
-		NANDetected e;
-		e.what("NAN detected in solution vector at index %d.\nNode id = %d, dof = %d ('%s')", info.m_eq, info.m_node, info.m_dof, sz);
-		throw (e);
+		throw (NANDetected(info));
 	}
 
 	// store the last solution for iterative solvers

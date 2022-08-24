@@ -796,6 +796,7 @@ FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
 	info.m_eq = ieq;
 	info.m_node = -1;
 	info.m_dof = -1;
+	info.szdof = "";
 
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -807,8 +808,11 @@ FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
 		{
 			if (id[j] == ieq)
 			{
-				info.m_node = i;
+				info.m_node = node.GetID();
 				info.m_dof = j;
+				DOFS& Dofs = GetFEModel()->GetDOFS();
+				info.szdof = Dofs.GetDOFName(info.m_dof);
+				if (info.szdof == nullptr) info.szdof = "???";
 				return info;
 			}
 		}

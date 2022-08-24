@@ -52,9 +52,6 @@ public:
 	// allocate storage for image data
 	void Create(int nx, int ny, int nz);
 
-	// load raw data from file
-	bool Load(const char* szfile, ImageFormat fmt, bool endianess = false);
-
 	// return size attributes
 	int width () { return m_nx; }
 	int height() { return m_ny; }
@@ -65,6 +62,9 @@ public:
 
 	// zero image data
 	void zero();
+
+	// get the data pointer
+	float* data();
 
 protected:
 	float*	m_pf;				// image data

@@ -114,8 +114,7 @@ void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             pt.m_r0 = el.Evaluate(x0, j);
             
             if (pt.m_ef <= -1) {
-                feLogError("Negative jacobian was detected.");
-                throw DoRunningRestart();
+                throw NegativeJacobianDetected();
             }
             
             mp.Update(timeInfo);
@@ -630,12 +629,7 @@ void FEFluidDomain3D::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------

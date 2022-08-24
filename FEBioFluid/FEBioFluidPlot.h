@@ -107,6 +107,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fluid surface moment (polar fluids)
+//!
+class FEPlotFluidSurfaceMoment : public FEPlotSurfaceData
+{
+private:
+    bool                m_binit;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotFluidSurfaceMoment(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION){ m_binit = true; SetUnits(UNIT_MOMENT); }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Fluid surface pressure
 //!
 class FEPlotFluidSurfacePressure : public FEPlotSurfaceData

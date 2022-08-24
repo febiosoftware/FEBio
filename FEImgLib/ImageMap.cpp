@@ -18,7 +18,7 @@ void ImageMap::SetRange(vec3d r0, vec3d r1)
 	m_r1 = r1;
 }
 
-ImageMap::POINT ImageMap::map(vec3d p)
+ImageMap::POINT ImageMap::map(const vec3d& p)
 {
 	int nx = m_img.width ();
 	int ny = m_img.height();

@@ -77,8 +77,9 @@ FECoreKernel::FECoreKernel()
 	m_activeModule = -1;
 	m_alloc_id = 0;
 	m_next_alloc_id = 1;
-
+	m_nspec = -1;
 	m_default_solver = nullptr;
+	m_blockEvents = true;
 
 	// build the super class ID table
 	ADD_SUPER_CLASS(FEINVALID_ID);
@@ -174,7 +175,7 @@ LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 	{
 		const char* sztype = m_default_solver_type.c_str();
 		FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-		return (LinearSolver*)fac->CreateInstance(fem);
+		return (LinearSolver*)CreateInstance(fac, fem);
 	}
 	else
 	{
@@ -263,74 +264,9 @@ void FECoreKernel::SetAllocatorID(int alloc_id)
 //! and the type-string. 
 FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 {
-	if (sztype == 0) return 0;
-
-	unsigned int activeID = 0;
-	vector<int> moduleDepends;
-	if (m_activeModule != -1)
-	{
-		FEModule& activeModule = *m_modules[m_activeModule];
-		activeID = activeModule.GetModuleID();
-		moduleDepends = activeModule.GetDependencies();
-	}
-
-	// first check active module
-	if ((activeID > 0) || (activeID == 0))
-	{
-		std::vector<FECoreFactory*>::iterator pf;
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
-		{
-			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == superClassID) {
-
-				// see if we can match module first
-				unsigned int mid = pfac->GetModuleID();
-				if ((mid == activeID) || (mid== 0))
-				{
-					// see if the type name matches
-					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
-					{
-						// check the spec (TODO: What is this for?)
-						int nspec = pfac->GetSpecID();
-						if ((nspec == -1) || (m_nspec <= nspec))
-						{
-							return pfac->CreateInstance(pfem);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// check dependencies in order in which they are defined
-	std::vector<FECoreFactory*>::iterator pf;
-	for (int i = 0; i < moduleDepends.size(); ++i)
-	{
-		unsigned modId = moduleDepends[i];
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
-		{
-			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == superClassID) {
-
-				// see if we can match module first
-				unsigned int mid = pfac->GetModuleID();
-				if ((mid == 0) || (mid == modId))
-				{
-					// see if the type name matches
-					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
-					{
-						// check the spec (TODO: What is this for?)
-						int nspec = pfac->GetSpecID();
-						if ((nspec == -1) || (m_nspec <= nspec))
-						{
-							return pfac->CreateInstance(pfem);
-						}
-					}
-				}
-			}
-		}
-	}
-	return 0;
+	FECoreFactory* fac = FindFactoryClass(superClassID, sztype);
+	if (fac == nullptr) return nullptr;
+	return CreateInstance(fac, pfem);
 }
 
 //-----------------------------------------------------------------------------
@@ -370,7 +306,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 						int nspec = pfac->GetSpecID();
 						if ((nspec == -1) || (m_nspec <= nspec))
 						{
-							return pfac->CreateInstance(pfem);
+							return CreateInstance(pfac, pfem);
 						}
 					}
 				}
@@ -399,7 +335,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 						int nspec = pfac->GetSpecID();
 						if ((nspec == -1) || (m_nspec <= nspec))
 						{
-							return pfac->CreateInstance(pfem);
+							return CreateInstance(pfac, pfem);
 						}
 					}
 				}
@@ -420,7 +356,7 @@ FECoreBase* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 		const char* szfacName = pfac->GetClassName();
 		if (szfacName && (strcmp(szfacName, szclassName) == 0))
 		{
-			return pfac->CreateInstance(fem);
+			return CreateInstance(pfac, fem);
 		}
 	}
 	return nullptr;
@@ -434,6 +370,21 @@ FECoreBase* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassD
 	FECoreBase* pc = (FECoreBase*)Create(superClassID, root->m_type.c_str(), pfem);
 	if (pc == nullptr) return nullptr;
 	pc->SetParameters(cd);
+	return pc;
+}
+
+//-----------------------------------------------------------------------------
+FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
+{
+	FECoreBase* pc = fac->CreateInstance(fem);
+	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))
+	{
+		for (int i = 0; i < m_createHandlers.size(); ++i)
+		{
+			FECreateHandler* ph = m_createHandlers[i];
+			if (ph) ph->handle(pc);
+		}
+	}
 	return pc;
 }
 
@@ -508,15 +459,76 @@ int FECoreKernel::GetFactoryIndex(int superClassId, const char* sztype)
 
 
 //-----------------------------------------------------------------------------
-FECoreFactory* FECoreKernel::FindFactoryClass(int classID, const char* sztype)
+FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype)
 {
-	for (size_t i=0; i<m_Fac.size(); ++i)
+	if (sztype == nullptr) return nullptr;
+
+	unsigned int activeID = 0;
+	vector<int> moduleDepends;
+	if (m_activeModule != -1)
 	{
-		FECoreFactory* fac = m_Fac[i];
-		if ((fac->GetSuperClassID() == classID) &&
-			(strcmp(fac->GetTypeStr(), sztype) == 0)) return fac;
+		FEModule& activeModule = *m_modules[m_activeModule];
+		activeID = activeModule.GetModuleID();
+		moduleDepends = activeModule.GetDependencies();
 	}
-	return 0;
+
+	// first check active module
+	if ((activeID > 0) || (activeID == 0))
+	{
+		std::vector<FECoreFactory*>::iterator pf;
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == superID) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == activeID) || (mid == 0))
+				{
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// check dependencies in order in which they are defined
+	std::vector<FECoreFactory*>::iterator pf;
+	for (int i = 0; i < moduleDepends.size(); ++i)
+	{
+		unsigned modId = moduleDepends[i];
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == superID) {
+
+				// see if we can match module first
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == 0) || (mid == modId))
+				{
+					// see if the type name matches
+					if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+					{
+						// check the spec (TODO: What is this for?)
+						int nspec = pfac->GetSpecID();
+						if ((nspec == -1) || (m_nspec <= nspec))
+						{
+							return pfac;
+						}
+					}
+				}
+			}
+		}
+	}
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -721,4 +733,16 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 {
 	FEDomain* domain = (FEDomain*)Create(superClass, sztype, fem);
 	return domain;
+}
+
+//-----------------------------------------------------------------------------
+void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
+{
+	m_createHandlers.push_back(pf);
+}
+
+//-----------------------------------------------------------------------------
+void FECoreKernel::BlockEvents(bool b)
+{
+	m_blockEvents = b;
 }

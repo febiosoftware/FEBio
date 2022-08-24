@@ -104,7 +104,7 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 	// those that intersect the ray, then pick the closest intersection
 	set<int>::iterator it;
 	bool found = false;
-	double rsl[2], gl, g;
+	double rsl[2], gl, g = 0;
 	FESurfaceElement* pei = 0;
 	for (it=selist.begin(); it!=selist.end(); ++it) {
 		// get the surface element
@@ -118,7 +118,7 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 				rs[0] = rsl[0];
 				rs[1] = rsl[1];
 				pei = pe;
-			} else if ((fabs(gl) < fabs(g)) && (fabs(gl) < m_rad)) {
+			} else if ((fabs(gl) < m_rad) && (fabs(gl) < fabs(g))) {
 				g = gl;
 				rs[0] = rsl[0];
 				rs[1] = rsl[1];

@@ -72,11 +72,12 @@ public:
 
 //-----------------------------------------------------------------------------
 // structure identifying nodal dof info
-struct FENodalDofInfo
+struct FECORE_API FENodalDofInfo
 {
 	int		m_eq = -1;		// equation number
 	int		m_node = -1;		// 0-based index into mesh!
 	int		m_dof = -1;		// index into nodal m_ID array
+	const char* szdof = nullptr;
 };
 
 //-----------------------------------------------------------------------------

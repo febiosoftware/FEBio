@@ -24,40 +24,49 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "Image.h"
-#include <FECore/FECoreClass.h>
-#include "feimglib_api.h"
+#include "fecore_api.h"
+#include "FECoreBase.h"
+#include <functional>
 
-//---------------------------------------------------------------------------
-// Base class for image sources. 
-class FEIMGLIB_API FEImageSource : public FECoreClass
+// This interface class is used in the DoModelUpdate create handlers. 
+class FECORE_API FEModelUpdate
 {
-	FECORE_BASE_CLASS(FEImageSource)
+public:
+	FEModelUpdate();
+	virtual ~FEModelUpdate();
+
+	static FEModelUpdate* Instance();
 
 public:
-	FEImageSource(FEModel* fem);
+	virtual void AddPlotVariable(const char* szplt) = 0;
 
-	virtual bool GetImage3D(Image& im) = 0;
+	static FEModelUpdate* m_pThis;
 };
 
-//---------------------------------------------------------------------------
-// Class for reading raw images
-class FEIMGLIB_API FERawImage : public FEImageSource
+// template class the applies a model update when an FECore class is created. 
+template <class T> class DoModelUpdate : public FECreateHandler
 {
 public:
-	FERawImage(FEModel* fem);
+	DoModelUpdate(std::function<void(FEModelUpdate&)> f) : m_f(f) {}
 
-	bool GetImage3D(Image& im) override;
+	void handle(FECoreBase* pc) override
+	{
+		FEModelUpdate* fem = FEModelUpdate::Instance();
+		if (fem && dynamic_cast<T*>(pc)) m_f(*fem);
+	}
 
 private:
-	// load raw data from file
-	bool Load(const char* szfile, Image& im, Image::ImageFormat fmt, bool endianess = false);
-
-protected:
-	std::string		m_file;
-	int				m_dim[3];
-	int				m_format;
-	bool			m_bend;
-
-	DECLARE_FECORE_CLASS();
+	std::function<void(FEModelUpdate&)>	m_f;
 };
+
+// special function that allocates a model update class that adds a plot variable
+// when an FECore class of a particular type is allocated.
+template <class T> FECreateHandler* AddPlotVariableWhenCreating(const char* szplt)
+{
+	return new DoModelUpdate<T>([=](FEModelUpdate& fem) { fem.AddPlotVariable(szplt); });
+}
+
+template <class T> FECreateHandler* UpdateModelWhenCreating(std::function<void(FEModelUpdate&)> f)
+{
+	return new DoModelUpdate<T>(f);
+}

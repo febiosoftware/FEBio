@@ -520,12 +520,14 @@ XMLReader::XMLReader()
 	m_bufSize = 0;
 	m_eof = false;
 	m_currentPos = 0;
+	m_buf = new char[BUF_SIZE];
 }
 
 //-----------------------------------------------------------------------------
 XMLReader::~XMLReader()
 {
 	Close();
+	delete[] m_buf;
 }
 
 //-----------------------------------------------------------------------------
@@ -1139,14 +1141,17 @@ int XMLReader::GetCurrentLine() { return m_nline; }
 const std::string& XMLReader::GetLastComment()
 {
     // Get rid of starting and trailing new lines in comments
-    if(*m_comment.begin() == '\n')
-    {
-        m_comment.erase(m_comment.begin());
-    }
-    if(*m_comment.end() == '\n')
-    {
-        m_comment.erase(m_comment.end());
-    }
+	if (m_comment.empty() == false)
+	{
+		if (*m_comment.begin() == '\n')
+		{
+			m_comment.erase(m_comment.begin());
+		}
+		if (*m_comment.rbegin() == '\n')
+		{
+			m_comment.erase(m_comment.end());
+		}
+	}
 
     return m_comment;
 }

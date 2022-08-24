@@ -374,4 +374,3 @@ public:
     FEPlotFluidLoadSupport(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
-

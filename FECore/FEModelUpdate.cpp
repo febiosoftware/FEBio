@@ -23,41 +23,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "Image.h"
-#include <FECore/FECoreClass.h>
-#include "feimglib_api.h"
+#include "stdafx.h"
+#include "FEModelUpdate.h"
 
-//---------------------------------------------------------------------------
-// Base class for image sources. 
-class FEIMGLIB_API FEImageSource : public FECoreClass
+FEModelUpdate* FEModelUpdate::m_pThis = nullptr;
+
+FEModelUpdate::FEModelUpdate()
 {
-	FECORE_BASE_CLASS(FEImageSource)
+	m_pThis = this;
+}
 
-public:
-	FEImageSource(FEModel* fem);
-
-	virtual bool GetImage3D(Image& im) = 0;
-};
-
-//---------------------------------------------------------------------------
-// Class for reading raw images
-class FEIMGLIB_API FERawImage : public FEImageSource
+FEModelUpdate::~FEModelUpdate()
 {
-public:
-	FERawImage(FEModel* fem);
+	m_pThis = nullptr;
+}
 
-	bool GetImage3D(Image& im) override;
-
-private:
-	// load raw data from file
-	bool Load(const char* szfile, Image& im, Image::ImageFormat fmt, bool endianess = false);
-
-protected:
-	std::string		m_file;
-	int				m_dim[3];
-	int				m_format;
-	bool			m_bend;
-
-	DECLARE_FECORE_CLASS();
-};
+FEModelUpdate* FEModelUpdate::Instance()
+{
+	return m_pThis;
+}

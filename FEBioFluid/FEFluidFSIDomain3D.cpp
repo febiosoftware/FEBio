@@ -139,8 +139,7 @@ void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
                 et.m_Wp = et.m_Wt;
                 
                 if ((pt.m_ef <= -1) || (et.m_J <= 0)) {
-                    feLogError("Negative jacobian was detected.");
-                    throw DoRunningRestart();
+                    throw NegativeJacobianDetected();
                 }
                 
                 mp.Update(timeInfo);
@@ -772,12 +771,7 @@ void FEFluidFSIDomain3D::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------

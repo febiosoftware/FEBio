@@ -331,14 +331,13 @@ protected: // helper functions
 	
 protected:
     std::istream* m_stream;
-	bool	m_ownFile;		//!< flag that inidicates whether the reader owns the file pointer or not
 
 	int		m_nline;		//!< current line (used only as temp storage)
     int64_t	m_currentPos;	//!< current file position
 
 	std::string	m_comment;	//!< last comment that was read
 
-	char		m_buf[BUF_SIZE];
+	char*		m_buf;
     int64_t    m_bufIndex, m_bufSize;
 	bool		m_eof;
 };
