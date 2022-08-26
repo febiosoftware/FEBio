@@ -316,6 +316,9 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hausd, hausd);
 	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hgrad, grad);
 
+    // prevent MMG from outputing information to stdout
+    MMGS_Set_iparameter(mmgMesh, mmgSol, MMGS_IPARAM_verbose, -1);
+
 	// run the mesher
 	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
 
