@@ -3,7 +3,7 @@
  
  See Copyright-FEBio.txt for details.
  
- Copyright (c) 2022 University of Utah, The Trustees of Columbia University in
+ Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
  the City of New York, and others.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,48 +23,17 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FESurfaceLoad.h>
-#include "febiofluid_api.h"
+#include <FECore/FEFixedBC.h>
 
-//-----------------------------------------------------------------------------
-//! Tangential flow stabilization prescribes a shear traction that opposes
-//! tangential fluid velocity on a boundary surface, in the presence of normal
-//! flow.  This can help stabilize inflow/outflow conditions.
-class FEBIOFLUID_API FETangentialFlowPFStabilization : public FESurfaceLoad
+class FEFixedFluidAngularVelocity : public FEFixedBC
 {
 public:
-    //! constructor
-    FETangentialFlowPFStabilization(FEModel* pfem);
+    FEFixedFluidAngularVelocity(FEModel* fem);
     
-    //! Initialization
     bool Init() override;
     
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
-    
-    //! calculate pressure stiffness
-    void StiffnessMatrix(FELinearSystem& LS) override;
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R) override;
-    
-    //! serialize data
-    void Serialize(DumpStream& ar) override;
-    
-protected:
-    vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
-    vec3d FluidAngularVelocity(FESurfaceMaterialPoint& mp, double alpha);
-
-protected:
-    double  m_beta;     //!< damping coefficient for viscous surface traction and coupld
-
-    // degrees of freedom
-    FEDofList    m_dofW;
-    FEDofList    m_dofG;
-
+private:
+    bool    m_dof[3];
     DECLARE_FECORE_CLASS();
 };

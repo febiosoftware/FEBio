@@ -257,12 +257,12 @@ void FEPolarFluidModule::InitModel(FEModel* fem)
     dofs.SetDOFName(nAW, 1, "awy");
     dofs.SetDOFName(nAW, 2, "awz");
     
-    int nG = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY), VAR_VEC3);
+    int nG = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_VELOCITY), VAR_VEC3);
     dofs.SetDOFName(nG, 0, "gx");
     dofs.SetDOFName(nG, 1, "gy");
     dofs.SetDOFName(nG, 2, "gz");
     
-    int nAG = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_ACCELERATION), VAR_VEC3);
+    int nAG = dofs.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(nAG, 0, "agx");
     dofs.SetDOFName(nAG, 1, "agy");
     dofs.SetDOFName(nAG, 2, "agz");

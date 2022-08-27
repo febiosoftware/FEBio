@@ -115,8 +115,8 @@ m_dofW(pfem), m_dofAW(pfem), m_dofG(pfem), m_dofAG(pfem), m_dofEF(pfem)
     {
         m_dofW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY));
         m_dofAW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_ACCELERATION));
-        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY));
-        m_dofAG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_ACCELERATION));
+        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_VELOCITY));
+        m_dofAG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_ACCELERATION));
         m_dofEF.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_DILATATION));
         m_dofAEF = pfem->GetDOFIndex(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_DILATATION_TDERIV), 0);
     }
@@ -504,7 +504,7 @@ void FEPolarFluidSolver::UpdateKinematics(vector<double>& ui)
             awt = awp*cgi + (wt - wp)/(m_gamma*dt);
             n.set_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2], awt);
             
-            // angular fluid velocity material time derivative
+            // fluid angular velocity material time derivative
             vec3d gt = n.get_vec3d(m_dofG[0], m_dofG[1], m_dofG[2]);
             vec3d gp = n.get_vec3d_prev(m_dofG[0], m_dofG[1], m_dofG[2]);
             vec3d agt = n.get_vec3d(m_dofAG[0], m_dofAG[1], m_dofAG[2]);

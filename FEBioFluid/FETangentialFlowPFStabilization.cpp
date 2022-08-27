@@ -35,15 +35,14 @@
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FETangentialFlowPFStabilization, FESurfaceLoad)
-    ADD_PARAMETER(m_betv, "betv");
-    ADD_PARAMETER(m_betg, "betg");
+    ADD_PARAMETER(m_beta, "beta");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
 FETangentialFlowPFStabilization::FETangentialFlowPFStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem), m_dofG(pfem)
 {
-    m_betv = m_betg = 1.0;
+    m_beta = 1.0;
     
     // get the degrees of freedom
     // TODO: Can this be done in Init, since there is no error checking
@@ -53,7 +52,7 @@ FETangentialFlowPFStabilization::FETangentialFlowPFStabilization(FEModel* pfem) 
         m_dofW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY));
 
         m_dofG.Clear();
-        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY));
+        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_VELOCITY));
         
         m_dof.Clear();
         m_dof.AddDofs(m_dofW);
@@ -155,8 +154,8 @@ void FETangentialFlowPFStabilization::LoadVector(FEGlobalVector& R)
         double gmag = gtau.norm();
 
         // force vector (change sign for inflow vs outflow)
-        vec3d fv = vtau*(-m_betv*rho*vmag*da);
-        vec3d fg = gtau*(-m_betg*rho*pow(kg,3)*gmag*da);
+        vec3d fv = vtau*(-m_beta*rho*vmag*da);
+        vec3d fg = gtau*(-m_beta*rho*pow(kg,3)*gmag*da);
 
         double H = dof_a.shape;
         fa[0] = H * fv.x;
@@ -203,11 +202,11 @@ void FETangentialFlowPFStabilization::StiffnessMatrix(FELinearSystem& LS)
         mat3dd I(1.0);
         vec3d vtau = (I - dyad(n))*v;
         double vmag = vtau.unit();
-        mat3d Kv = (I - dyad(n) + dyad(vtau))*(-m_betv*rho*vmag*da);
+        mat3d Kv = (I - dyad(n) + dyad(vtau))*(-m_beta*rho*vmag*da);
         
         vec3d gtau = (I - dyad(n))*g;
         double gmag = gtau.unit();
-        mat3d Kg = (I - dyad(n) + dyad(gtau))*(-m_betg*rho*pow(kg,3)*gmag*da);
+        mat3d Kg = (I - dyad(n) + dyad(gtau))*(-m_beta*rho*pow(kg,3)*gmag*da);
         
         // shape functions and derivatives
         double H_i  = dof_a.shape;

@@ -26,13 +26,20 @@
 
 
 #pragma once
-#include "FEFluid.h"
+#include "FEFluidMaterial.h"
+#include "FEFluidMaterialPoint.h"
+#include "FEElasticFluid.h"
 #include "FEPolarFluidMaterialPoint.h"
+#include <FEBioMix/FEBiphasic.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for polar fluid materials.
 
-class FEBIOFLUID_API FEPolarFluid : public FEMaterial
+//! NOTE: This inherits from FEBiphasicInterface in order to override the GetActualFluidPressure,
+//!       which is used in FEReactionRateExpSED and FEReactionRateHuiskes.
+//!       Note sure yet if there is a better alternative.
+
+class FEBIOFLUID_API FEPolarFluid : public FEFluidMaterial, public FEBiphasicInterface
 {
 public:
     FEPolarFluid(FEModel* pfem);
@@ -40,17 +47,55 @@ public:
     // returns a pointer to a new material point object
     FEMaterialPoint* CreateMaterialPointData() override;
     
+public:
     //! performs initialization
     bool Init() override;
     
+    //! calculate stress at material point
+    mat3ds Stress(FEMaterialPoint& pt) override;
+    
+    //! tangent of stress with respect to strain J
+    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
+    
+    //! elastic pressure
+    double Pressure(FEMaterialPoint& mp) override;
+    double Pressure(const double e, const double T = 0) override;
+    
+    //! tangent of elastic pressure with respect to strain J
+    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override;
+    
+    //! 2nd tangent of elastic pressure with respect to strain J
+    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) override;
+    
+    //! bulk modulus
+    double BulkModulus(FEMaterialPoint& mp) override;
+    
+    //! strain energy density
+    double StrainEnergyDensity(FEMaterialPoint& mp) override;
+    
+    //! evaluate temperature
+    double Temperature(FEMaterialPoint& mp) override { return m_Tr; }
+    
+    //! evaluate dilatation from pressure
+    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    
+    //! return elastic fluid
+    FEElasticFluid* GetElastic() { return m_pElastic; }
+    
+private: // material properties
+    FEElasticFluid*             m_pElastic;     //!< pointer to elastic part of fluid material
+    
+    
+public: // from FEBiphasicInterface
+    double GetActualFluidPressure(const FEMaterialPoint& mp) override {
+        const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+        return pt->m_pf;
+    }
+    
 public:
-    FEFluid* Fluid() { return m_pFluid; }
-    
-protected: // material properties
-    FEFluid*    m_pFluid;    //!< pointer to fluid material
-    
-public:
-    double  m_kg;   //!< radius of gyration
-    
+    double      m_kg;       //!< radius of gyration
+    double      m_k;        //!< bulk modulus at J=1
+    double      m_Tr;       //!< ambient temperature
+
     DECLARE_FECORE_CLASS();
 };
