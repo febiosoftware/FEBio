@@ -10,7 +10,7 @@ CLEANCOMMAND = ["make", "clean"]
 
 FEBIODIR = os.getcwd()
 FEBIOBUILDDIR = path.join(FEBIODIR, "cmbuild")
-FEBIOPATH = path.join(FEBIOBUILDDIR, "bin", "febio3")
+FEBIOPATH = path.join(FEBIOBUILDDIR, "bin", "febio4")
 FEBIOUPLOADPATH = FEBIOPATH
 
 # FEBIOREMOTEDIR = "Linux/stage/bin"

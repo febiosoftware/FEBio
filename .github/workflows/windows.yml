@@ -1,8 +1,8 @@
 on:
-  schedule:
-    - cron: '00 7 * * *' #0630 UTC kick off full build and regression
-  push:
-    branches: [ ci/* ]
+  #schedule:
+  #  - cron: '00 7 * * *' #0630 UTC kick off full build and regression
+  #push:
+  #  branches: [ ci/* ]
   workflow_dispatch:
     inputs:
       runTests:
@@ -65,7 +65,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: febio3-${{runner.os}}-${{runner.arch}}
+          name: febio4-${{runner.os}}-${{runner.arch}}
           path: cmbuild/bin
   tests:
     if: ${{inputs.runTests}}
@@ -81,7 +81,7 @@ jobs:
           submodules: 'true'
       - uses: actions/download-artifact@v3
         with:
-          name: febio3-${{runner.os}}-${{runner.arch}}
+          name: febio4-${{runner.os}}-${{runner.arch}}
           path: cmbuild/bin
       - name: Run test suite
         run: |
