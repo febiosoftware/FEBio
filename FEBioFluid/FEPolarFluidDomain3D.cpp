@@ -52,8 +52,8 @@ FEPolarFluidDomain3D::FEPolarFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem),
         m_dofW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY));
         m_dofAW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_ACCELERATION));
         
-        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_VELOCITY));
-        m_dofAG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::ANGULAR_FLUID_ACCELERATION));
+        m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_VELOCITY));
+        m_dofAG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_ACCELERATION));
         
         m_dofEF = pfem->GetDOFIndex(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_DILATATION), 0);
         m_dofAEF = pfem->GetDOFIndex(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_DILATATION_TDERIV), 0);
@@ -180,9 +180,8 @@ void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doubl
     
     double*    gw = el.GaussWeights();
     
-    FEFluid* Fluid = m_pMat->Fluid();
-    FEViscousFluid* Viscous = Fluid->GetViscous();
-    FEViscousPolarFluid* ViscPol = Fluid->GetViscousPolar();
+    FEViscousFluid* Viscous = m_pMat->GetViscous();
+    FEViscousPolarFluid* ViscPol = m_pMat->GetViscousPolar();
     
     // repeat for all integration points
     for (n=0; n<nint; ++n)
@@ -203,7 +202,7 @@ void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doubl
         sv = sva + Viscous->Stress(mp);
         M = ViscPol->CoupleStress(mp);
         // get the gradient of the elastic pressure
-        gradp = pt.m_gradef*Fluid->Tangent_Pressure_Strain(mp);
+        gradp = pt.m_gradef*m_pMat->Tangent_Pressure_Strain(mp);
         
         H = el.H(n);
         Gr = el.Gr(n);
@@ -291,7 +290,7 @@ void FEPolarFluidDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
-        double dens = m_pMat->Fluid()->Density(mp);
+        double dens = m_pMat->Density(mp);
         
         pt.m_r0 = el.Evaluate(r0, n);
         
@@ -338,7 +337,7 @@ void FEPolarFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
         
         H = el.H(n);
         
-        double dens = m_pMat->Fluid()->Density(mp);
+        double dens = m_pMat->Density(mp);
         
         // get the force
         f = BF.force(mp);
@@ -382,9 +381,8 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, cons
     // weights at gauss points
     const double *gw = el.GaussWeights();
     
-    FEFluid* Fluid = m_pMat->Fluid();
-    FEViscousFluid* Viscous = Fluid->GetViscous();
-    FEViscousPolarFluid* ViscPol = Fluid->GetViscousPolar();
+    FEViscousFluid* Viscous = m_pMat->GetViscous();
+    FEViscousPolarFluid* ViscPol = m_pMat->GetViscousPolar();
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -410,12 +408,12 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, cons
         // get the tangents
         mat3d svJ = Viscous->Tangent_Strain(mp) + ViscPol->SkewTangent_Strain(mp);
         vec3d thJ = ViscPol->SkewTangent_Strain(mp).vec();
-        tens4ds cvs = Fluid->Tangent_RateOfDeformation(mp);
+        tens4ds cvs = m_pMat->Tangent_RateOfDeformation(mp);
         mat3d cva = ViscPol->SkewTangent_RateOfRotation(mp);
         tens4d m = ViscPol->CoupleTangent_RateOfRotation(mp);
         mat3d mJ = ViscPol->CoupleTangent_Strain(mp);
-        double dp = Fluid->Tangent_Pressure_Strain(mp);
-        double d2p = Fluid->Tangent_Pressure_Strain_Strain(mp);
+        double dp = m_pMat->Tangent_Pressure_Strain(mp);
+        double d2p = m_pMat->Tangent_Pressure_Strain_Strain(mp);
         // Jdot/J
         double dJoJ = pt.m_efdot/Jf;
         
@@ -636,7 +634,7 @@ void FEPolarFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, con
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEPolarFluidMaterialPoint& pf = *(mp.ExtractData<FEPolarFluidMaterialPoint>());
         
-        double dens = m_pMat->Fluid()->Density(mp);
+        double dens = m_pMat->Density(mp);
         double kg = m_pMat->m_kg;
         double moi = dens*kg*kg;
         double J = 1+pt.m_ef;
@@ -789,11 +787,11 @@ void FEPolarFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         if (m_btrans) pt.m_efdot += el.Evaluate(aet, n)*alpham + el.Evaluate(aep, n)*(1-alpham);
         
         // calculate the stress at this material point
-        pt.m_sf = m_pMat->Fluid()->Stress(mp);
-        pf.m_sfa = m_pMat->Fluid()->GetViscousPolar()->SkewStress(mp);
+        pt.m_sf = m_pMat->Stress(mp);
+        pf.m_sfa = m_pMat->GetViscousPolar()->SkewStress(mp);
         
         // calculate the fluid pressure
-        pt.m_pf = m_pMat->Fluid()->Pressure(mp);
+        pt.m_pf = m_pMat->Pressure(mp);
     }
 }
 
@@ -846,7 +844,7 @@ void FEPolarFluidDomain3D::ElementInertialForce(FESolidElement& el, vector<doubl
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEPolarFluidMaterialPoint& pf = *(mp.ExtractData<FEPolarFluidMaterialPoint>());
-        double dens = m_pMat->Fluid()->Density(mp);
+        double dens = m_pMat->Density(mp);
         double kg = m_pMat->m_kg;
         
         // calculate the jacobian

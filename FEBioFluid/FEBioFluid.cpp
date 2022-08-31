@@ -42,8 +42,6 @@ SOFTWARE.*/
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
 #include "FELogNonlinearElasticFluid.h"
-#include "FEPolarFluid.h"
-#include "FEViscousPolarLinear.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
@@ -142,8 +140,6 @@ REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
 REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
 REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
 REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
-REGISTER_FECORE_CLASS(FEPolarFluid        , "polar fluid"  );
-REGISTER_FECORE_CLASS(FEViscousPolarLinear, "polar linear"  );
 
 //-----------------------------------------------------------------------------
 // Domain classes
@@ -249,13 +245,6 @@ REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity   , "fluid thermal conducti
 REGISTER_FECORE_CLASS(FEPlotBFSIPorosity               , "porosity"                 );
 REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"             );
 REGISTER_FECORE_CLASS(FEPlotFluidShearStressError      , "fluid shear stress error");
-REGISTER_FECORE_CLASS(FEPlotNodalPolarFluidAngularVelocity  , "nodal polar fluid angular velocity");
-REGISTER_FECORE_CLASS(FEPlotPolarFluidAngularVelocity  , "polar fluid angular velocity"  );
-REGISTER_FECORE_CLASS(FEPlotPolarFluidRelativeAngularVelocity  , "polar fluid relative angular velocity");
-REGISTER_FECORE_CLASS(FEPlotPolarFluidRegionalAngularVelocity  , "polar fluid regional angular velocity");
-REGISTER_FECORE_CLASS(FEPlotPolarFluidStress           , "polar fluid stress");
-REGISTER_FECORE_CLASS(FEPlotPolarFluidCoupleStress     , "polar fluid couple stress");
-REGISTER_FECORE_CLASS(FEPlotFluidSurfaceMoment         , "fluid surface moment"     );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");

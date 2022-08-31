@@ -3,7 +3,7 @@
  
  See Copyright-FEBio.txt for details.
  
- Copyright (c) 2022 University of Utah, The Trustees of Columbia University in
+ Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
  the City of New York, and others.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,25 +23,29 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
+#include "stdafx.h"
+#include "FEFixedFluidAngularVelocity.h"
 
+BEGIN_FECORE_CLASS(FEFixedFluidAngularVelocity, FEFixedBC)
+    ADD_PARAMETER(m_dof[0], "gx_dof")->setLongName("x-angular-velocity");
+    ADD_PARAMETER(m_dof[1], "gy_dof")->setLongName("y-angular-velocity");
+    ADD_PARAMETER(m_dof[2], "gz_dof")->setLongName("z-angular-velocity");
+END_FECORE_CLASS();
 
+FEFixedFluidAngularVelocity::FEFixedFluidAngularVelocity(FEModel* fem) : FEFixedBC(fem)
+{
+    m_dof[0] = false;
+    m_dof[1] = false;
+    m_dof[2] = false;
+}
 
-#pragma once
-#include "febiofluid_api.h"
-
-namespace FEBioPolarFluid {
-
-FEBIOFLUID_API void InitModule();
-
-enum POLAR_FLUID_VARIABLE {
-    DISPLACEMENT,
-    RELATIVE_FLUID_VELOCITY,
-    RELATIVE_FLUID_ACCELERATION,
-    FLUID_ANGULAR_VELOCITY,
-    FLUID_ANGULAR_ACCELERATION,
-    FLUID_DILATATION,
-    FLUID_DILATATION_TDERIV
-};
-
-FEBIOFLUID_API const char* GetVariableName(POLAR_FLUID_VARIABLE var);
+bool FEFixedFluidAngularVelocity::Init()
+{
+    vector<int> dofs;
+    if (m_dof[0]) dofs.push_back(GetDOFIndex("gx"));
+    if (m_dof[1]) dofs.push_back(GetDOFIndex("gy"));
+    if (m_dof[2]) dofs.push_back(GetDOFIndex("gz"));
+    SetDOFList(dofs);
+    
+    return FEFixedBC::Init();
 }

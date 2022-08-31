@@ -397,9 +397,9 @@ void FESolidDomain::GetCurrentNodalCoordinates(const FESolidElement& el, vec3d* 
 		{
 			if (el.m_bitfc[i]) {
 				FENode& nd = m_pMesh->Node(el.m_node[i]);
-				rt[i] -= nd.m_d0 + rt[i] - nd.m_r0
-					- nd.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2])*alpha
-					- nd.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2])*(1 - alpha);
+				rt[i] = nd.m_r0 - nd.m_d0 \
+					+ nd.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2])*alpha \
+					+ nd.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2])*(1 - alpha);
 			}
 		}
 	}

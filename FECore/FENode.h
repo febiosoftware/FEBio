@@ -149,9 +149,10 @@ public:
 	int dofs() const { return (int) m_ID.size(); }
     
 public:
-    vec3d   m_s0() { return m_r0 - m_d0; }
-    vec3d   m_st() { return m_rt - m_dt; }
-    vec3d   m_sp() { return m_rp - m_dp; }
+	// return position of shell back-node
+    vec3d s0() const { return m_r0 - m_d0; }
+    vec3d st() const { return m_rt - m_dt; }
+    vec3d sp() const { return m_rp - m_dp; }
 
 private:
 	std::vector<int>		m_BC;		//!< boundary condition array

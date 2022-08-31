@@ -31,11 +31,16 @@
 #include <FECore/FECoreKernel.h>
 #include "FEPolarFluidSolver.h"
 #include "FEPolarFluid.h"
+#include "FEViscousPolarLinear.h"
 #include "FEPolarFluidDomain3D.h"
 #include "FEPolarFluidDomainFactory.h"
 #include "FEPolarFluidAnalysis.h"
 #include "FETangentialFlowPFStabilization.h"
 #include "FEFluidModule.h"
+#include "FEInitialFluidAngularVelocity.h"
+#include "FEFixedFluidAngularVelocity.h"
+#include "FEPrescribedFluidAngularVelocity.h"
+#include "FEBioFluidPlot.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioPolarFluid::GetVariableName(FEBioPolarFluid::POLAR_FLUID_VARIABLE var)
@@ -45,8 +50,8 @@ const char* FEBioPolarFluid::GetVariableName(FEBioPolarFluid::POLAR_FLUID_VARIAB
         case DISPLACEMENT                : return "displacement"               ; break;
         case RELATIVE_FLUID_VELOCITY     : return "relative fluid velocity"    ; break;
         case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
-        case ANGULAR_FLUID_VELOCITY      : return "angular fluid velocity"     ; break;
-        case ANGULAR_FLUID_ACCELERATION  : return "angular fluid acceleration" ; break;
+        case FLUID_ANGULAR_VELOCITY      : return "fluid angular velocity"     ; break;
+        case FLUID_ANGULAR_ACCELERATION  : return "fluid angular acceleration" ; break;
         case FLUID_DILATATION            : return "fluid dilatation"           ; break;
         case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
     }
@@ -74,13 +79,41 @@ void FEBioPolarFluid::InitModule()
     // analyis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEPolarFluidAnalysis, "polar fluid");
     
-    REGISTER_FECORE_CLASS(FEPolarFluidSolver, "polar fluid");
+    //-----------------------------------------------------------------------------
+    // solver classes
+    REGISTER_FECORE_CLASS(FEPolarFluidSolver  , "polar fluid");
     
-    REGISTER_FECORE_CLASS(FEPolarFluid, "polar fluid");
-    
+    //-----------------------------------------------------------------------------
+    // Materials
+    REGISTER_FECORE_CLASS(FEPolarFluid        , "polar fluid" );
+    REGISTER_FECORE_CLASS(FEViscousPolarLinear, "polar linear");
+
+    //-----------------------------------------------------------------------------
+    // Domain classes
     REGISTER_FECORE_CLASS(FEPolarFluidDomain3D, "polar-fluid-3D");
     
-    REGISTER_FECORE_CLASS(FETangentialFlowPFStabilization, "fluid tangential stabilization");
+    //-----------------------------------------------------------------------------
+    // initial conditions
+    REGISTER_FECORE_CLASS(FEInitialFluidAngularVelocity  , "initial fluid angular velocity");
+    
+    //-----------------------------------------------------------------------------
+    // boundary conditions
+    REGISTER_FECORE_CLASS(FEFixedFluidAngularVelocity       , "zero fluid angular velocity"      );
+    REGISTER_FECORE_CLASS(FEPrescribedFluidAngularVelocity  , "prescribed fluid angular velocity");
+    
+    //-----------------------------------------------------------------------------
+    // Surface loads
+    REGISTER_FECORE_CLASS(FETangentialFlowPFStabilization   , "fluid tangential stabilization"   );
+    
+    //-----------------------------------------------------------------------------
+    // classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotNodalPolarFluidAngularVelocity   , "nodal polar fluid angular velocity"   );
+    REGISTER_FECORE_CLASS(FEPlotPolarFluidAngularVelocity        , "polar fluid angular velocity"         );
+    REGISTER_FECORE_CLASS(FEPlotPolarFluidRelativeAngularVelocity, "polar fluid relative angular velocity");
+    REGISTER_FECORE_CLASS(FEPlotPolarFluidRegionalAngularVelocity, "polar fluid regional angular velocity");
+    REGISTER_FECORE_CLASS(FEPlotPolarFluidStress                 , "polar fluid stress"                   );
+    REGISTER_FECORE_CLASS(FEPlotPolarFluidCoupleStress           , "polar fluid couple stress"            );
+    REGISTER_FECORE_CLASS(FEPlotFluidSurfaceMoment               , "fluid surface moment"                 );
     
     febio.SetActiveModule(0);
 }

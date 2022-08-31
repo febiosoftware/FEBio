@@ -511,9 +511,9 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
                     rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
                 }
                 else {
-                    r0 = ss.Node(el.m_lnode[ j         ]).m_st();
-                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_st();
-                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_st();
+                    r0 = ss.Node(el.m_lnode[ j         ]).st();
+                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).st();
+                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).st();
                 }
                 vec3d n = (rp - r0)^(rm - r0);
                 normal[el.m_lnode[j]] += n;
@@ -528,7 +528,7 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
             FENode& node = ss.Node(i);
             
             // get the spatial nodal coordinates
-            vec3d rt = ss.IsShellBottom() ? node.m_st() : node.m_rt;
+            vec3d rt = ss.IsShellBottom() ? node.st() : node.m_rt;
             vec3d nu = normal[i];
             
             // project onto the secondary surface
