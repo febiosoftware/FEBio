@@ -30,14 +30,14 @@ SOFTWARE.*/
 //! Class for stroing pre-strain gradient data
 //! This material point class stores the initial pre-strain "guess" and
 //! the correction term. The total prestrain gradient is the product of these two.
-class FEPrestrainMaterialPoint : public FEMaterialPoint
+class FEPrestrainMaterialPoint : public FEMaterialPointData
 {
 public:
 	//! constructor
-	FEPrestrainMaterialPoint(FEMaterialPoint* pt);
+	FEPrestrainMaterialPoint(FEMaterialPointData* mp);
 
 	//! copy
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! initialization
 	void Init(bool bflag);
@@ -105,7 +105,7 @@ public:
 	FEPrestrainElastic(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! return the pre-strain gradient property
 	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }

@@ -37,7 +37,7 @@ FEMaterialBase::FEMaterialBase(FEModel* fem) : FEModelComponent(fem)
 
 //-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
-FEMaterialPoint* FEMaterialBase::CreateMaterialPointData() { return nullptr; };
+FEMaterialPointData* FEMaterialBase::CreateMaterialPointData() { return nullptr; };
 
 //-----------------------------------------------------------------------------
 //! Update specialized material points at each iteration

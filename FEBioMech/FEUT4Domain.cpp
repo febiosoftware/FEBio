@@ -361,8 +361,9 @@ void FEUT4Domain::Update(const FETimeInfo& tp)
 	//		 in other words, we loose the material axis orientation
 	//		 For now, I solve this by copying the Q parameter
 	//       from the first element that the node connects to
-	FEElasticMaterialPoint pt;
-	pt.Init();
+	FEElasticMaterialPoint ep;
+	FEMaterialPoint mp(&ep);
+	mp.Init();
 
 	// loop over all the nodes
 	for (i=0; i<(int) m_NODE.size(); ++i)
@@ -370,14 +371,14 @@ void FEUT4Domain::Update(const FETimeInfo& tp)
 		UT4NODE& node = m_NODE[i];
 
 		// set the material point data
-		pt.m_r0 = m_pMesh->Node(node.inode).m_r0;
-		pt.m_rt = m_pMesh->Node(node.inode).m_rt;
+		mp.m_r0 = m_pMesh->Node(node.inode).m_r0;
+		mp.m_rt = m_pMesh->Node(node.inode).m_rt;
 
-		pt.m_F = node.Fi;
-		pt.m_J = pt.m_F.det();
+		ep.m_F = node.Fi;
+		ep.m_J = ep.m_F.det();
 
 		// calculate the stress
-		node.si = m_pMat->Stress(pt);
+		node.si = m_pMat->Stress(mp);
 	}
 }
 
@@ -824,28 +825,29 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	int* peli = m_NEL.ElementIndexList(node.inode);
 
 	// create a material point
-	FEElasticMaterialPoint pt;
-	pt.Init();
+	FEElasticMaterialPoint ep;
+	FEMaterialPoint mp(&ep);
+	mp.Init();
 
 	// set the material point data
-	pt.m_r0 = m_pMesh->Node(node.inode).m_r0;
-	pt.m_rt = m_pMesh->Node(node.inode).m_rt;
+	mp.m_r0 = m_pMesh->Node(node.inode).m_r0;
+	mp.m_rt = m_pMesh->Node(node.inode).m_rt;
 
-	pt.m_F = node.Fi;
-	pt.m_J = pt.m_F.det();
+	ep.m_F = node.Fi;
+	ep.m_J = ep.m_F.det();
 
 	// set the Cauchy-stress
-	pt.m_s = node.si;
+	ep.m_s = node.si;
 
 	// Calculate the spatial tangent
-	tens4ds C = pme->Tangent(pt);
+	tens4ds C = pme->Tangent(mp);
 
 	// Next, we need to subtract the volumetric contribution Cvol
 	if (m_bdev)
 	{
 		// subtract the isochoric component from C;
 		// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
-		C = C*(1 - m_alpha) + Cvol(C, pt.m_s)*m_alpha;
+		C = C*(1 - m_alpha) + Cvol(C, ep.m_s)*m_alpha;
 	}
 	else
 	{
@@ -853,7 +855,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	}
 
 	// convert spatial matrix to material
-	C = spatial_to_material(C, pt.m_F);
+	C = spatial_to_material(C, ep.m_F);
 
 	// extract the 'D' matrix
 	double D[6][6] = {0};

@@ -39,7 +39,7 @@ public:
 	FEMultiphasicStandard(FEModel* pfem);
     
     //! returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPointData* CreateMaterialPointData();
 	
     //! Update solid bound molecules
     void UpdateSolidBoundMolecules(FEMaterialPoint& mp);

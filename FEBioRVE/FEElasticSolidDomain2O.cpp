@@ -222,8 +222,8 @@ bool FEElasticSolidDomain2O::FEInternalSurface2O::Initialize(FEElasticSolidDomai
 		int nint = face.GaussPoints();
 		for (int n=0; n<nint; ++n, ++nnf)
 		{
-			m_data[nnf].m_pt[0] = pmat->CreateMaterialPointData();
-			m_data[nnf].m_pt[1] = pmat->CreateMaterialPointData();
+			m_data[nnf].m_pt[0] = new FEMaterialPoint(pmat->CreateMaterialPointData());
+			m_data[nnf].m_pt[1] = new FEMaterialPoint(pmat->CreateMaterialPointData());
 
 			m_data[nnf].m_pt[0]->Init();
 			m_data[nnf].m_pt[1]->Init();
@@ -543,8 +543,8 @@ void FEElasticSolidDomain2O::UpdateElementStress(int iel, const FETimeInfo& tp)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(rt, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(rt, n);
 
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);

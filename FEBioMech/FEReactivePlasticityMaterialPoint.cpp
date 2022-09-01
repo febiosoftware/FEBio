@@ -31,7 +31,7 @@ SOFTWARE.*/
 
 ////////////////////// PLASTICITY MATERIAL POINT //////////////////////////////
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEReactivePlasticityMaterialPoint::Copy()
+FEMaterialPointData* FEReactivePlasticityMaterialPoint::Copy()
 {
     FEReactivePlasticityMaterialPoint* pt = new FEReactivePlasticityMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -75,7 +75,7 @@ void FEReactivePlasticityMaterialPoint::Init()
     m_Rhat = 0;
 
     // don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -92,13 +92,13 @@ void FEReactivePlasticityMaterialPoint::Update(const FETimeInfo& timeInfo)
     m_Fp = pt.m_F;
     
     // don't forget to update the base class
-    FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
 void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 
     if (ar.IsSaving())
     {

@@ -37,7 +37,7 @@ class FEElasticFiberMaterial : public FEElasticMaterial
 public:
     FEElasticFiberMaterial(FEModel* pfem);
 
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
 	// get the fiber vector (in global coordinates)
 	vec3d FiberVector(FEMaterialPoint& mp);
@@ -83,11 +83,9 @@ public:
 
 	bool Init() override { return m_fib.Init(); }
 	bool Validate() override { return m_fib.Validate(); }
-	FEMaterialPoint* CreateMaterialPointData() override 
+	FEMaterialPointData* CreateMaterialPointData() override 
 	{ 
-		FEMaterialPoint* mp = new FEElasticMaterialPoint;
-		mp->SetNext(m_fib.CreateMaterialPointData());
-		return mp; 
+		return new FEElasticMaterialPoint(m_fib.CreateMaterialPointData());
 	}
 	void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override 
 	{

@@ -37,14 +37,14 @@ SOFTWARE.*/
 class FEBIOFLUID_API FESolutesMaterial : public FEMaterial, public FESoluteInterface
 {
 public:
-	class Point : public FEMaterialPoint
+	class Point : public FEMaterialPointData
 	{
 	public:
 		//! constructor
-		Point(FEMaterialPoint* pt);
+		Point(FEMaterialPointData* pt);
 
 		//! create a shallow copy
-		FEMaterialPoint* Copy();
+		FEMaterialPointData* Copy();
 
 		//! data serialization
 		void Serialize(DumpStream& ar);
@@ -75,7 +75,7 @@ public:
 	FESolutesMaterial(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! performs initialization
 	bool Init() override;

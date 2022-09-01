@@ -33,14 +33,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Class for storing material point data for solute materials
 
-class FEBIOMIX_API FESolutesMaterialPoint : public FEMaterialPoint
+class FEBIOMIX_API FESolutesMaterialPoint : public FEMaterialPointData
 {
 public:
 	//! Constructor
-	FESolutesMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+	FESolutesMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
 	
 	//! Create a shallow copy
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 	
 	//! serialize data
 	void Serialize(DumpStream& ar);

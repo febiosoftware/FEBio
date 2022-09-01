@@ -535,8 +535,8 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are not used by most materials.
-		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(r, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(r, n);
 
 		// get the deformation gradient and determinant
         double Jt, Jp;

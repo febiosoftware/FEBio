@@ -30,7 +30,7 @@
 // FEPolarFluidMaterialPoint
 //============================================================================
 //-----------------------------------------------------------------------------
-FEPolarFluidMaterialPoint::FEPolarFluidMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt)
+FEPolarFluidMaterialPoint::FEPolarFluidMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt)
 {
     m_gf = m_gfdot = m_hf = vec3d(0,0,0);
     m_sfa = mat3da(0,0,0);
@@ -38,7 +38,7 @@ FEPolarFluidMaterialPoint::FEPolarFluidMaterialPoint(FEMaterialPoint* pt) : FEMa
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEPolarFluidMaterialPoint::Copy()
+FEMaterialPointData* FEPolarFluidMaterialPoint::Copy()
 {
     FEPolarFluidMaterialPoint* pt = new FEPolarFluidMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -48,7 +48,7 @@ FEMaterialPoint* FEPolarFluidMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEPolarFluidMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_gf & m_gfdot & m_hf & m_sfa & m_Psi;
 }
 
@@ -60,5 +60,5 @@ void FEPolarFluidMaterialPoint::Init()
     m_Psi = mat3d(0,0,0,0,0,0,0,0,0);
 
     // don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }

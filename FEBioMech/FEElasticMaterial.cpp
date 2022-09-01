@@ -46,6 +46,12 @@ FEElasticMaterial::~FEElasticMaterial()
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPointData* FEElasticMaterial::CreateMaterialPointData()
+{ 
+	return new FEElasticMaterialPoint;
+}
+
+//-----------------------------------------------------------------------------
 //! calculate spatial tangent stiffness at material point, using secant method
 mat3ds FEElasticMaterial::SecantStress(FEMaterialPoint& mp)
 {

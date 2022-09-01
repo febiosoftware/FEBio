@@ -43,7 +43,7 @@ public:
 	FEBiphasicSolute(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }

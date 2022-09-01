@@ -39,7 +39,7 @@ public:
 	FEElasticMixtureMaterialPoint();
 
 	//! Copy material point data
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! material point initialization
 	void Init();
@@ -66,7 +66,7 @@ public:
 	FEElasticMixture(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// return number of materials
 	int Materials() { return (int)m_pMat.size(); }

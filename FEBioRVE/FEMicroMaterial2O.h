@@ -38,14 +38,14 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
-class FEMicroMaterialPoint2O : public FEMaterialPoint
+class FEMicroMaterialPoint2O : public FEMaterialPointData
 {
 public:
 	//! constructor
-	FEMicroMaterialPoint2O(FEMaterialPoint* mp);
+	FEMicroMaterialPoint2O(FEMaterialPointData* mp);
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! serialize material point data
 	void Serialize(DumpStream& ar);
@@ -85,7 +85,7 @@ public:
 	bool Init() override;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 public:
 	int Probes() { return (int) m_probe.size(); }

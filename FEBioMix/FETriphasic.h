@@ -48,7 +48,7 @@ public:
 	void Serialize(DumpStream& ar) override;
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override
+	FEMaterialPointData* CreateMaterialPointData() override
 	{ 
 		return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}

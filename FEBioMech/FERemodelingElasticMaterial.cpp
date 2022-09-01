@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FERemodelingMaterialPoint::Copy()
+FEMaterialPointData* FERemodelingMaterialPoint::Copy()
 {
 	FERemodelingMaterialPoint* pt = new FERemodelingMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -46,7 +46,7 @@ void FERemodelingMaterialPoint::Init()
 	m_rhor = m_rhorp = 0;
         
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -55,13 +55,13 @@ void FERemodelingMaterialPoint::Update(const FETimeInfo& timeInfo)
 	m_rhorp = m_rhor;
         
 	// don't forget to initialize the base class
-    FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
 void FERemodelingMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_sed & m_dsed;
 	ar & m_rhor & m_rhorp;
 }

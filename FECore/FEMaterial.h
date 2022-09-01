@@ -45,7 +45,7 @@ public:
 	FEMaterialBase(FEModel* fem);
 
 	//! returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData();
+	virtual FEMaterialPointData* CreateMaterialPointData();
 
 	//! Update specialized material points at each iteration
 	virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp);

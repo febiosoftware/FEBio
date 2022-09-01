@@ -32,14 +32,14 @@
 //-----------------------------------------------------------------------------
 //! Polar fluid material point class.
 //
-class FEBIOFLUID_API FEPolarFluidMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEPolarFluidMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEPolarFluidMaterialPoint(FEMaterialPoint* pt = 0);
+    FEPolarFluidMaterialPoint(FEMaterialPointData* pt = 0);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);

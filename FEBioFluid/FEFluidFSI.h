@@ -33,14 +33,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEFSIMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEFSIMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEFSIMaterialPoint(FEMaterialPoint* pt);
+    FEFSIMaterialPoint(FEMaterialPointData* pt);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);
@@ -65,7 +65,7 @@ public:
     FEFluidFSI(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     // Get the elastic component (overridden from FEMaterial)
     FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }

@@ -55,12 +55,12 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Material point data for remodeling elastic materials
-class FEBIOMECH_API FERemodelingMaterialPoint : public FEMaterialPoint
+class FEBIOMECH_API FERemodelingMaterialPoint : public FEMaterialPointData
 {
 public:
-	FERemodelingMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FERemodelingMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
 	void Init();
     
@@ -115,7 +115,7 @@ public:
 	mat3ds Tangent_Stress_Density(FEMaterialPoint& pt);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override
+	FEMaterialPointData* CreateMaterialPointData() override
 	{
 		return new FERemodelingMaterialPoint(m_pBase->CreateMaterialPointData());
 	}

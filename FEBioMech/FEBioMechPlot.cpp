@@ -1251,10 +1251,10 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			double m = 0;
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				double detJ = bd.detJ0(el, j)*gw[j];
-				ew += pt.m_rt*(pme->Density(pt)*detJ);
-				m += pme->Density(pt)*detJ;
+				ew += mp.m_rt*(pme->Density(mp)*detJ);
+				m += pme->Density(mp)*detJ;
 			}
 
 			a << ew / m;
@@ -1275,7 +1275,7 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			double m = 0;
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& pt = *el.GetMaterialPoint(j);
 				double detJ = bd->detJ0(el, j)*gw[j];
 				ew += pt.m_rt*(pme->Density(pt)*detJ);
 				m += pme->Density(pt)*detJ;
@@ -1333,7 +1333,7 @@ public:
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
 		const FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		return (pt.m_rt ^ pt.m_v)*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
+		return (mp.m_rt ^ pt.m_v)*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
 	}
 
 private:

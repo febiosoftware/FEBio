@@ -30,16 +30,16 @@
 #include "FEActiveContractionMaterial.h"
 
 //-----------------------------------------------------------------------------
-class FEForceVelocityMaterialPoint : public FEMaterialPoint
+class FEForceVelocityMaterialPoint : public FEMaterialPointData
 {
 public:
     enum { MAX_TERMS = 3 };
     
 public:
     
-    FEForceVelocityMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FEForceVelocityMaterialPoint();
     
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     void Init();
     
@@ -74,7 +74,7 @@ public:
     tens4ds ActiveStiffness(FEMaterialPoint& mp, const vec3d& a0) override;
     
     //! create material point data
-    FEMaterialPoint* CreateMaterialPointData(FEMaterialPoint& ep) override { return new FEForceVelocityMaterialPoint(&ep); }
+    FEMaterialPointData* CreateMaterialPointData() override { return new FEForceVelocityMaterialPoint; }
     
 public:
     //! update force-velocity material point

@@ -31,12 +31,12 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the fiber pre-stretch
-class FEFiberMaterialPoint : public FEMaterialPoint
+class FEFiberMaterialPoint : public FEMaterialPointData
 {
 public:
-    FEFiberMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FEFiberMaterialPoint(FEMaterialPointData* pt);
     
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     void Init();
     

@@ -57,7 +57,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
     //! create material point data
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
     
     // update force-velocity material point
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;

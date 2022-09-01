@@ -31,17 +31,17 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Material point data for visco-elastic materials
-class FEViscoElasticMaterialPoint : public FEMaterialPoint
+class FEViscoElasticMaterialPoint : public FEMaterialPointData
 {
 public:
 	enum { MAX_TERMS = 6 };
 
 public:
 	//! constructor
-	FEViscoElasticMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FEViscoElasticMaterialPoint(FEMaterialPointData* mp = nullptr);
 
 	//! copy material point data
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! Initialize material point data
 	void Init();
@@ -101,7 +101,7 @@ public:
     bool SeriesStretchExponent(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 public: 
 	// material parameters

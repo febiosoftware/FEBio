@@ -307,8 +307,8 @@ void FEMultiphasicFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
                 FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
                 FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
                 
-                et.m_r0 = r0;
-                et.m_rt = rt;
+                mp.m_r0 = r0;
+                mp.m_rt = rt;
                 et.m_Wp = et.m_Wt;
                 
                 if ((pt.m_ef <= -1) || (et.m_J <= 0)) {
@@ -1572,8 +1572,8 @@ void FEMultiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp
         FEMultiphasicFSIMaterialPoint& spt = *(mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
         
         // elastic material point data
-        ept.m_r0 = el.Evaluate(r0, n);
-        ept.m_rt = el.Evaluate(r, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(r, n);
         mat3d Ft, Fp;
         double Jt, Jp;
         Jt = defgrad(el, Ft, n);

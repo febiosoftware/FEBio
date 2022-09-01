@@ -37,7 +37,7 @@ public:
 	FEPreStrainUncoupledElastic(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! return the pre-strain gradient property
 	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }

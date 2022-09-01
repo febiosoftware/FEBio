@@ -70,8 +70,10 @@ void FatigueBond::Update()
 ////////////////////// FATIGUE MATERIAL POINT /////////////////////////////////
 //-----------------------------------------------------------------------------
 // default constructor
-FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt)
+FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt)
 {
+	// TODO: Is this working properly? I don't see how this ExtractData could work?
+	 
     // get the reactive fatigue material point data
     FEReactiveFatigueMaterialPoint& rfmp = *pt->ExtractData<FEReactiveFatigueMaterialPoint>();
     
@@ -139,7 +141,7 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEReactiveFatigue
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEReactiveFatigueMaterialPoint::Copy()
+FEMaterialPointData* FEReactiveFatigueMaterialPoint::Copy()
 {
     FEReactiveFatigueMaterialPoint* pt = new FEReactiveFatigueMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -149,7 +151,7 @@ FEMaterialPoint* FEReactiveFatigueMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEReactiveFatigueMaterialPoint::Init()
 {
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
     
     // intialize total damate
     m_D = 0;
@@ -171,7 +173,7 @@ void FEReactiveFatigueMaterialPoint::Init()
 //-----------------------------------------------------------------------------
 void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
-    FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
     
     // let's check overlapping generations of fatigued bonds
     if (m_fb.size() > 1) {
@@ -216,7 +218,7 @@ void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEReactiveFatigueMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_D;
     ar & m_wit & m_wip & m_Ximax & m_Xitrl & m_Xip & m_aXit & m_aXip & m_Fit & m_Fip;
     ar & m_wbt & m_wbp & m_wft;

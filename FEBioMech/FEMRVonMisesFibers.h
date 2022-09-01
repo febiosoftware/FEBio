@@ -31,12 +31,12 @@ SOFTWARE.*/
 #include "FEUncoupledFiberExpLinear.h"
 
 //-----------------------------------------------------------------------------
-class FEMRVonMisesMaterialPoint : public FEMaterialPoint
+class FEMRVonMisesMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEMRVonMisesMaterialPoint(FEMaterialPoint* mp = 0);
+	FEMRVonMisesMaterialPoint(FEMaterialPointData* mp = nullptr);
 
-	FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
 
 	void Serialize(DumpStream& ar) override;
 
@@ -73,7 +73,7 @@ public:
 	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

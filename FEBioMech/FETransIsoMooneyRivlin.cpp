@@ -60,16 +60,15 @@ FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMater
 
 //-----------------------------------------------------------------------------
 //! create material point data
-FEMaterialPoint* FETransIsoMooneyRivlin::CreateMaterialPointData() {
+FEMaterialPointData* FETransIsoMooneyRivlin::CreateMaterialPointData() 
+{
     // create the elastic solid material point
-    FEMaterialPoint* ep = new FEElasticMaterialPoint;
+    FEMaterialPointData* ep = new FEElasticMaterialPoint;
     
     // create the material point from the active contraction material
-    if (m_ac) {
-        FEMaterialPoint* pt = m_ac->CreateMaterialPointData(*ep);
-        if (pt != nullptr) return pt;
-    }
-    return ep;
+    if (m_ac) ep->Append(m_ac->CreateMaterialPointData());
+
+	return ep;
 }
 
 //-----------------------------------------------------------------------------

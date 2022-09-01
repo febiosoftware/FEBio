@@ -65,6 +65,13 @@ FEReactiveFatigue::FEReactiveFatigue(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPointData* FEReactiveFatigue::CreateMaterialPointData()
+{
+	return new FEReactiveFatigueMaterialPoint(m_pBase->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization.
 bool FEReactiveFatigue::Init()
 {

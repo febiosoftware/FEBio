@@ -37,14 +37,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
 //
-class FEBIOMIX_API FEBiphasicMaterialPoint : public FEMaterialPoint
+class FEBIOMIX_API FEBiphasicMaterialPoint : public FEMaterialPointData
 {
 public:
 	//! constructor
-	FEBiphasicMaterialPoint(FEMaterialPoint* ppt);
+	FEBiphasicMaterialPoint(FEMaterialPointData* ppt);
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
 
 	//! data serialization
 	void Serialize(DumpStream& ar) override;
@@ -102,7 +102,7 @@ public:
 	FEBiphasic(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }

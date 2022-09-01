@@ -31,16 +31,14 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-class FEJ2PlasticMaterialPoint : public FEMaterialPoint
+class FEJ2PlasticMaterialPoint : public FEElasticMaterialPoint
 {
 public:
-	FEJ2PlasticMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt){}
+	FEJ2PlasticMaterialPoint() {}
 
-	FEMaterialPoint* Copy()
+	FEMaterialPointData* Copy() 
 	{
-		FEJ2PlasticMaterialPoint* pt = new FEJ2PlasticMaterialPoint(*this);
-		if (m_pNext) pt->m_pNext = m_pNext->Copy();
-		return pt;
+		return new FEJ2PlasticMaterialPoint(*this);
 	}
 
 	void Init()
@@ -53,23 +51,22 @@ public:
 		Y1 = Y0;
 
 		// don't forget to intialize the nested data
-		FEMaterialPoint::Init();
+		FEMaterialPointData::Init();
 	}
 
 	void Update(const FETimeInfo& timeInfo)
 	{
-		FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
 		e0 = e1;
-		sn = pt.m_s;
+		sn = m_s;
 		Y0 = Y1;
 
 		// don't forget to call the base class
-		FEMaterialPoint::Update(timeInfo);
+		FEElasticMaterialPoint::Update(timeInfo);
 	}
 
 	void Serialize(DumpStream& ar)
 	{
-		FEMaterialPoint::Serialize(ar);
+		FEElasticMaterialPoint::Serialize(ar);
 		ar & e0 & e1 & sn;
 		ar & Y0 & Y1 & b;
 	}
@@ -99,7 +96,7 @@ public:
 	double	m_H;	//!< hardening modulus 
 
 public:
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;

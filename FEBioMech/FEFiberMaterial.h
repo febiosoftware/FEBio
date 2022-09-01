@@ -35,7 +35,7 @@ class FEFiberMaterial : public FEMaterialProperty
 public:
 	FEFiberMaterial(FEModel* fem);
 
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPointData* CreateMaterialPointData();
 
 	virtual mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& fiber) = 0;
 
@@ -52,7 +52,7 @@ class FEFiberMaterialUncoupled : public FEMaterialProperty
 public:
 	FEFiberMaterialUncoupled(FEModel* fem);
 
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPointData* CreateMaterialPointData();
 
 	virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& fiber) = 0;
 

@@ -38,9 +38,9 @@ class FEReactivePlasticDamageMaterialPoint : public FEDamageMaterialPoint
 {
 public:
     //! constructor
-    FEReactivePlasticDamageMaterialPoint(FEMaterialPoint *pt, FEReactivePlasticDamage* pmat) : FEDamageMaterialPoint(pt) { m_pMat = pmat; }
+    FEReactivePlasticDamageMaterialPoint(FEMaterialPointData *pt, FEReactivePlasticDamage* pmat) : FEDamageMaterialPoint(pt) { m_pMat = pmat; }
     
-    FEMaterialPoint* Copy();
+    FEMaterialPointData* Copy();
     
     //! Initialize material point data
     void Init();

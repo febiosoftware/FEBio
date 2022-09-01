@@ -105,16 +105,16 @@ bool FEReactiveViscoelasticMaterial::Init()
 
 //-----------------------------------------------------------------------------
 //! Create material point data  arrayfor this material
-FEMaterialPoint* FEReactiveViscoelasticMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEReactiveViscoelasticMaterial::CreateMaterialPointData()
 {
     FEReactiveViscoelasticMaterialPoint* pt = new FEReactiveViscoelasticMaterialPoint();
     // create materal point for strong bond (base) material
-    FEMaterialPoint* pbase = m_pBase->CreateMaterialPointData();
+    FEMaterialPoint* pbase = new FEMaterialPoint(m_pBase->CreateMaterialPointData());
     pt->AddMaterialPoint(pbase);
 
     // create materal point for weak bond material
     FEReactiveVEMaterialPoint* pbond = new FEReactiveVEMaterialPoint(m_pBond->CreateMaterialPointData());
-    pt->AddMaterialPoint(pbond);
+    pt->AddMaterialPoint(new FEMaterialPoint(pbond));
     
 	return pt;
 }
@@ -133,11 +133,11 @@ FEMaterialPoint* FEReactiveViscoelasticMaterial::GetBaseMaterialPoint(FEMaterial
     FEMaterialPoint* sb = rvp.GetPointData(0);
     sb->m_elem = mp.m_elem;
     sb->m_index = mp.m_index;
-    
+	sb->m_rt = mp.m_rt;
+	sb->m_r0 = mp.m_r0;
+
     // copy the elastic material point data to the strong bond component
     FEElasticMaterialPoint& epi = *sb->ExtractData<FEElasticMaterialPoint>();
-    epi.m_rt = ep.m_rt;
-    epi.m_r0 = mp.m_r0;
     epi.m_F = ep.m_F;
     epi.m_J = ep.m_J;
     epi.m_v = ep.m_v;
@@ -161,11 +161,11 @@ FEMaterialPoint* FEReactiveViscoelasticMaterial::GetBondMaterialPoint(FEMaterial
     FEMaterialPoint* wb = rvp.GetPointData(1);
     wb->m_elem = mp.m_elem;
     wb->m_index = mp.m_index;
-    
+	wb->m_rt = mp.m_rt;
+	wb->m_r0 = mp.m_r0;
+
     // copy the elastic material point data to the weak bond component
     FEElasticMaterialPoint& epi = *wb->ExtractData<FEElasticMaterialPoint>();
-    epi.m_rt = ep.m_rt;
-    epi.m_r0 = mp.m_r0;
     epi.m_F = ep.m_F;
     epi.m_J = ep.m_J;
     epi.m_v = ep.m_v;
@@ -348,7 +348,7 @@ mat3ds FEReactiveViscoelasticMaterial::StressWeakBonds(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
     
     // get fiber material point data (if it exists)
-    FEFiberMaterialPoint* fp = pt.ExtractData<FEFiberMaterialPoint>();
+    FEFiberMaterialPoint* fp = mp.ExtractData<FEFiberMaterialPoint>();
     
     mat3ds D = ep.RateOfDeformation();
     
@@ -436,7 +436,7 @@ tens4ds FEReactiveViscoelasticMaterial::TangentWeakBonds(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
 
     // get fiber material point data (if it exists)
-    FEFiberMaterialPoint* fp = pt.ExtractData<FEFiberMaterialPoint>();
+    FEFiberMaterialPoint* fp = mp.ExtractData<FEFiberMaterialPoint>();
     
     mat3ds D = ep.RateOfDeformation();
     
@@ -525,7 +525,7 @@ double FEReactiveViscoelasticMaterial::WeakBondSED(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
 
     // get fiber material point data (if it exists)
-    FEFiberMaterialPoint* fp = pt.ExtractData<FEFiberMaterialPoint>();
+    FEFiberMaterialPoint* fp = mp.ExtractData<FEFiberMaterialPoint>();
     
     // get the viscous point data
     mat3ds D = ep.RateOfDeformation();
@@ -671,7 +671,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
             pt.m_Uv.push_back(Uv);
             pt.m_Jv.push_back(Jv);
             if (m_pWCDF) {
-                pt.m_Et = ScalarStrain(pt);
+                pt.m_Et = ScalarStrain(mp);
                 if (pt.m_Et > pt.m_Em)
                     pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Et));
                 else
@@ -688,7 +688,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
         pt.m_Uv.back() = Uv;
         pt.m_Jv.back() = Jv;
         if (m_pWCDF) {
-            pt.m_Et = ScalarStrain(pt);
+            pt.m_Et = ScalarStrain(mp);
             if (pt.m_Et > pt.m_Em)
                 pt.m_wv.back() = m_pWCDF->cdf(pt.m_Et);
             else

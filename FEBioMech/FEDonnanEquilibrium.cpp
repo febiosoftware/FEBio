@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 
-FEMaterialPoint* FEDonnanEquilibriumMaterialPoint::Copy()
+FEMaterialPointData* FEDonnanEquilibriumMaterialPoint::Copy()
 {
     FEDonnanEquilibriumMaterialPoint* pt = new FEDonnanEquilibriumMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -40,18 +40,13 @@ FEMaterialPoint* FEDonnanEquilibriumMaterialPoint::Copy()
 
 void FEDonnanEquilibriumMaterialPoint::Init()
 {
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
     
     // intialize data to zero
     m_cF = 0;
     m_osm = 0;
     m_p = 0;
     m_bpi = 0;
-}
-
-void FEDonnanEquilibriumMaterialPoint::Update(const FETimeInfo& timeInfo)
-{
-    FEMaterialPoint::Update(timeInfo);
 }
 
 void FEDonnanEquilibriumMaterialPoint::Serialize(DumpStream& ar)
@@ -64,7 +59,7 @@ void FEDonnanEquilibriumMaterialPoint::Serialize(DumpStream& ar)
     {
         ar >> m_cF >> m_osm >> m_p >> m_bpi;
     }
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
