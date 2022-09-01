@@ -45,7 +45,6 @@ SOFTWARE.*/
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
-#include "FEFluidDomain2D.h"
 
 #include "FEFluidPressureLoad.h"
 #include "FEFluidTractionLoad.h"
@@ -144,7 +143,6 @@ REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEFluidDomain3D, "fluid-3D");
-REGISTER_FECORE_CLASS(FEFluidDomain2D, "fluid-2D");
 
 //-----------------------------------------------------------------------------
 // Surface loads

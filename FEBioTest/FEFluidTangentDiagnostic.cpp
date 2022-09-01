@@ -335,8 +335,8 @@ bool FEFluidTangentDiagnostic::Run()
     // set up the element stiffness matrix
     matrix k0(4*N, 4*N);
     k0.zero();
-    bd.ElementStiffness(el, k0, tp);
-    bd.ElementMassMatrix(el,k0, tp);
+    bd.ElementStiffness(el, k0);
+    bd.ElementMassMatrix(el,k0);
     
     // print the element stiffness matrix
 	feLog("\nActual stiffness matrix:\n");
@@ -419,8 +419,8 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     // first calculate the initial residual
     vector<double> f0(4*N);
     zero(f0);
-    bd.ElementInternalForce(el, f0, tp);
-    bd.ElementInertialForce(el, f0, tp);
+    bd.ElementInternalForce(el, f0);
+    bd.ElementInertialForce(el, f0);
     
     // now calculate the perturbed residuals
     ke.resize(4*N, 4*N);
@@ -444,8 +444,8 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
 		fem.Update();
         
         zero(f1);
-        bd.ElementInternalForce(el, f1, tp);
-        bd.ElementInertialForce(el, f1, tp);
+        bd.ElementInternalForce(el, f1);
+        bd.ElementInertialForce(el, f1);
         
         switch (nj)
         {

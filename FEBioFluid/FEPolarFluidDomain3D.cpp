@@ -128,7 +128,7 @@ void FEPolarFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::InternalForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
@@ -146,7 +146,7 @@ void FEPolarFluidDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& t
         fe.assign(ndof, 0);
         
         // calculate internal force vector
-        ElementInternalForce(el, fe, tp);
+        ElementInternalForce(el, fe);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -159,7 +159,7 @@ void FEPolarFluidDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& t
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
     int i, n;
     
@@ -239,7 +239,7 @@ void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF)
+void FEPolarFluidDomain3D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
@@ -255,7 +255,7 @@ void FEPolarFluidDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FE
         fe.assign(ndof, 0);
         
         // apply body forces
-        ElementBodyForce(BF, el, fe, tp);
+        ElementBodyForce(BF, el, fe);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -268,7 +268,7 @@ void FEPolarFluidDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FE
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEPolarFluidDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
 {
     // jacobian
     double detJ;
@@ -312,8 +312,9 @@ void FEPolarFluidDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FEPolarFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int neln = el.Nodes();
     
     // jacobian
@@ -359,8 +360,9 @@ void FEPolarFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i7, j, j7, n;
     
     // Get the current element's data
@@ -494,7 +496,7 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, cons
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::StiffnessMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -513,7 +515,7 @@ void FEPolarFluidDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
         ke.zero();
         
         // calculate material stiffness
-        ElementStiffness(el, ke, tp);
+        ElementStiffness(el, ke);
         
         // get the element's LM vector
         vector<int> lm;
@@ -526,7 +528,7 @@ void FEPolarFluidDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::MassMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -544,7 +546,7 @@ void FEPolarFluidDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
         ke.zero();
         
         // calculate inertial stiffness
-        ElementMassMatrix(el, ke, tp);
+        ElementMassMatrix(el, ke);
         
         // get the element's LM vector
         vector<int> lm;
@@ -557,7 +559,7 @@ void FEPolarFluidDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
+void FEPolarFluidDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -575,7 +577,7 @@ void FEPolarFluidDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeIn
         ke.zero();
         
         // calculate inertial stiffness
-        ElementBodyForceStiffness(bf, el, ke, tp);
+        ElementBodyForceStiffness(bf, el, ke);
         
         // get the element's LM vector
         vector<int> lm;
@@ -589,8 +591,9 @@ void FEPolarFluidDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeIn
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEPolarFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i7, j, j7, n;
     
     // Get the current element's data
@@ -796,7 +799,7 @@ void FEPolarFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
@@ -813,7 +816,7 @@ void FEPolarFluidDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& t
         fe.assign(ndof, 0);
         
         // calculate internal force vector
-        ElementInertialForce(el, fe, tp);
+        ElementInertialForce(el, fe);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -824,7 +827,7 @@ void FEPolarFluidDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& t
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarFluidDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEPolarFluidDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
     int i, n;
     

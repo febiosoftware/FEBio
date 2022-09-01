@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioFluidPlot.h"
 #include "FEFluidDomain3D.h"
-#include "FEFluidDomain2D.h"
 #include "FEFluidMaterial.h"
 #include "FEFluid.h"
 #include "FEPolarFluid.h"

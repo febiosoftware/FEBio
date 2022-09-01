@@ -225,7 +225,7 @@ void FESolutesDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-void FESolutesDomain::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FESolutesDomain::InternalForces(FEGlobalVector& R)
 {
 	int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
@@ -244,7 +244,7 @@ void FESolutesDomain::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
-		ElementInternalForce(el, fe, tp);
+		ElementInternalForce(el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -257,8 +257,9 @@ void FESolutesDomain::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FESolutesDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FESolutesDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
 	// jacobian matrix, inverse jacobian matrix and determinants
 	double Ji[3][3];
 
@@ -337,8 +338,9 @@ void FESolutesDomain::ElementInternalForce(FESolidElement& el, vector<double>& f
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FESolutesDomain::ElementStiffness(FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FESolutesDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
 	// Get the current element's data
 	const int nint = el.GaussPoints();
 	const int neln = el.Nodes();
@@ -431,7 +433,7 @@ void FESolutesDomain::ElementStiffness(FESolidElement &el, matrix &ke, const FET
 }
 
 //-----------------------------------------------------------------------------
-void FESolutesDomain::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FESolutesDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
@@ -451,7 +453,7 @@ void FESolutesDomain::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.zero();
 
 		// calculate material stiffness
-		ElementStiffness(el, ke, tp);
+		ElementStiffness(el, ke);
 
 		// get the element's LM vector
 		vector<int> lm;

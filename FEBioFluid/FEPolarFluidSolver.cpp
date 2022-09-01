@@ -980,11 +980,28 @@ bool FEPolarFluidSolver::StiffnessMatrix(FELinearSystem& LS)
         if (dom.IsActive()) {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEPolarFluidDomain* pfdom = dynamic_cast<FEPolarFluidDomain*>(&dom);
-            if (fdom) fdom->StiffnessMatrix(LS, tp);
-            else if (pfdom) pfdom->StiffnessMatrix(LS, tp);
+            if (fdom) fdom->StiffnessMatrix(LS);
+            else if (pfdom) pfdom->StiffnessMatrix(LS);
         }
     }
     
+    // calculate the body force stiffness matrix for each domain
+    int NBL = fem.ModelLoads();
+    for (int j = 0; j<NBL; ++j)
+    {
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
+        if (pbf && pbf->IsActive())
+        {
+            for (int i = 0; i<pbf->Domains(); ++i)
+            {
+                FEFluidDomain& fdom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
+                FEPolarFluidDomain& pfdom = dynamic_cast<FEPolarFluidDomain&>(*pbf->Domain(i));
+                if (&fdom) fdom.BodyForceStiffness(LS, *pbf);
+                else if (&pfdom) pfdom.BodyForceStiffness(LS, *pbf);
+            }
+        }
+    }
+
     // calculate the body force stiffness matrix for each domain
     for (int j = 0; j<fem.ModelLoads(); ++j)
     {
@@ -1001,8 +1018,8 @@ bool FEPolarFluidSolver::StiffnessMatrix(FELinearSystem& LS)
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEPolarFluidDomain* pfdom = dynamic_cast<FEPolarFluidDomain*>(&dom);
-            if (fdom) fdom->MassMatrix(LS, tp);
-            else if (pfdom) pfdom->MassMatrix(LS, tp);
+            if (fdom) fdom->MassMatrix(LS);
+            else if (pfdom) pfdom->MassMatrix(LS);
         }
     }
     
@@ -1093,8 +1110,24 @@ bool FEPolarFluidSolver::Residual(vector<double>& R)
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEPolarFluidDomain* pfdom = dynamic_cast<FEPolarFluidDomain*>(&dom);
-            if (fdom) fdom->InternalForces(RHS, tp);
-            else if (pfdom) pfdom->InternalForces(RHS, tp);
+            if (fdom) fdom->InternalForces(RHS);
+            else if (pfdom) pfdom->InternalForces(RHS);
+        }
+    }
+    
+    // calculate the body forces
+    for (int j = 0; j<fem.ModelLoads(); ++j)
+    {
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
+        if (pbf && pbf->IsActive())
+        {
+            for (int i = 0; i<pbf->Domains(); ++i)
+            {
+                FEFluidDomain& fdom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
+                FEPolarFluidDomain& pfdom = dynamic_cast<FEPolarFluidDomain&>(*pbf->Domain(i));
+                if (&fdom) fdom.BodyForce(RHS, *pbf);
+                else if (&pfdom) pfdom.BodyForce(RHS, *pbf);
+            }
         }
     }
     
@@ -1113,8 +1146,8 @@ bool FEPolarFluidSolver::Residual(vector<double>& R)
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEPolarFluidDomain* pfdom = dynamic_cast<FEPolarFluidDomain*>(&dom);
-            if (fdom) fdom->InertialForces(RHS, tp);
-            else if (pfdom) pfdom->InertialForces(RHS, tp);
+            if (fdom) fdom->InertialForces(RHS);
+            else if (pfdom) pfdom->InertialForces(RHS);
         }
     }
     
