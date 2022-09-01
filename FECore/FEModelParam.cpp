@@ -134,6 +134,11 @@ FEParamVec3::FEParamVec3(const FEParamVec3& p)
 	m_dom = p.m_dom;
 }
 
+bool FEParamVec3::Init()
+{
+	return (m_val ? m_val->Init() : true);
+}
+
 // set the value
 void FEParamVec3::operator = (const vec3d& v)
 {
@@ -200,6 +205,11 @@ void FEParamMat3d::operator = (const FEParamMat3d& p)
 	m_val = p.m_val->copy();
 	m_scl = p.m_scl;
 //	m_dom = p.m_dom;
+}
+
+bool FEParamMat3d::Init()
+{
+	return (m_val ? m_val->Init() : true);
 }
 
 // set the valuator
