@@ -123,7 +123,7 @@ void FERigidFixedBCNew::Activate()
 		// rigid degree of freedom, then we make sure the prescribed takes precedence.
 		for (int i = 0; i < 6; ++i)
 		{
-			if (m_dof[i]) RB.m_BC[i] = DOF_FIXED;
+			if (m_dof[i] && (RB.m_BC[i] == DOF_OPEN)) RB.m_BC[i] = DOF_FIXED;
 		}
 	}
 }
