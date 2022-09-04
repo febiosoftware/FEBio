@@ -70,7 +70,10 @@ public: // overrides from FEElasticDomain
     void InternalForces(FEGlobalVector& R) override;
     
     //! body forces
-    void BodyForce(FEGlobalVector& R, FEBodyForce& BF) override;
+    void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
+    
+    //! body moments
+    void BodyMoment(FEGlobalVector& R, FEBodyMoment& bm) override;
     
     //! intertial forces for dynamic problems
     void InertialForces(FEGlobalVector& R) override;
@@ -84,6 +87,9 @@ public: // overrides from FEElasticDomain
     //! body force stiffness
     void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override;
     
+    //! body momdent stiffness
+    void BodyMomentStiffness(FELinearSystem& LS, FEBodyMoment& bm) override;
+    
 public:
     // --- S T I F F N E S S ---
     
@@ -96,6 +102,9 @@ public:
     //! calculates the stiffness matrix due to body forces
     void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
     
+    //! calculates the stiffness matrix due to body moments
+    void ElementBodyMomentStiffness(FEBodyMoment& bm, FESolidElement& el, matrix& ke);
+    
     // --- R E S I D U A L ---
     
     //! Calculates the internal stress vector for solid elements
@@ -103,6 +112,9 @@ public:
     
     //! Calculatess external body forces for solid elements
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
+    
+    //! Calculatess external body moments for solid elements
+    void ElementBodyMoment(FEBodyMoment& bm, FESolidElement& elem, vector<double>& fe);
     
     //! Calculates the inertial force vector for solid elements
     void ElementInertialForce(FESolidElement& el, vector<double>& fe);

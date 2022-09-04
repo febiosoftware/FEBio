@@ -38,6 +38,7 @@
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FEPolarFluidAnalysis.h"
+#include "FEBodyMoment.h"
 #include <FEBioMech/FEBodyForce.h>
 #include <FEBioMech/FEContactInterface.h>
 #include <FEBioMech/FEResidualVector.h>
@@ -83,7 +84,7 @@ m_dofW(pfem), m_dofAW(pfem), m_dofG(pfem), m_dofAG(pfem), m_dofEF(pfem)
     m_Gtol = 0.001;
     m_Ftol = 0.001;
     m_Rmin = 1.0e-20;
-    m_Rmax = 0;    // not used if zero
+    m_Rmax = 1.0e+20;    // not used if zero
     m_minJf = 0;
     
     m_nveq = 0;
@@ -105,10 +106,17 @@ m_dofW(pfem), m_dofAW(pfem), m_dofG(pfem), m_dofAG(pfem), m_dofEF(pfem)
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
+    FENewtonStrategy&
+    m_maxref = 5;
+//    m_qnstrategy->m_maxups = 50;
     
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
     
+    // turn off reform on each time step and diverge reform
+    m_breformtimestep = false;
+    m_bdivreform = false;
+
     // get the dof indices
     // TODO: Can this be done in Init, since there is no error checking
     if (pfem)
@@ -1000,6 +1008,15 @@ bool FEPolarFluidSolver::StiffnessMatrix(FELinearSystem& LS)
                 else if (&pfdom) pfdom.BodyForceStiffness(LS, *pbf);
             }
         }
+        FEBodyMoment* pbm = dynamic_cast<FEBodyMoment*>(fem.ModelLoad(j));
+        if (pbm && pbm->IsActive())
+        {
+            for (int i = 0; i<pbm->Domains(); ++i)
+            {
+                FEPolarFluidDomain& pfdom = dynamic_cast<FEPolarFluidDomain&>(*pbm->Domain(i));
+                if (&pfdom) pfdom.BodyMomentStiffness(LS, *pbm);
+            }
+        }
     }
 
     // calculate the body force stiffness matrix for each domain
@@ -1127,6 +1144,15 @@ bool FEPolarFluidSolver::Residual(vector<double>& R)
                 FEPolarFluidDomain& pfdom = dynamic_cast<FEPolarFluidDomain&>(*pbf->Domain(i));
                 if (&fdom) fdom.BodyForce(RHS, *pbf);
                 else if (&pfdom) pfdom.BodyForce(RHS, *pbf);
+            }
+        }
+        FEBodyMoment* pbm = dynamic_cast<FEBodyMoment*>(fem.ModelLoad(j));
+        if (pbm && pbm->IsActive())
+        {
+            for (int i = 0; i<pbm->Domains(); ++i)
+            {
+                FEPolarFluidDomain& pfdom = dynamic_cast<FEPolarFluidDomain&>(*pbm->Domain(i));
+                if (&pfdom) pfdom.BodyMoment(RHS, *pbm);
             }
         }
     }

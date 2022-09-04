@@ -34,6 +34,7 @@ using namespace std;
 class FEModel;
 class FELinearSystem;
 class FEBodyForce;
+class FEBodyMoment;
 class FEGlobalVector;
 class FETimeInfo;
 
@@ -59,6 +60,9 @@ public:
     //! Calculate the body force vector
     virtual void BodyForce(FEGlobalVector& R, FEBodyForce& bf) = 0;
     
+    //! Calculate the body moment vector
+    virtual void BodyMoment(FEGlobalVector& R, FEBodyMoment& bm) = 0;
+    
     //! calculate the interial forces (for dynamic problems)
     virtual void InertialForces(FEGlobalVector& R) = 0;
     
@@ -70,6 +74,9 @@ public:
     
     //! Calculate stiffness contribution of body forces
     virtual void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) = 0;
+    
+    //! Calculate stiffness contribution of body moments
+    virtual void BodyMomentStiffness(FELinearSystem& LS, FEBodyMoment& bm) = 0;
     
     //! calculate the mass matrix (for dynamic problems)
     virtual void MassMatrix(FELinearSystem& LS) = 0;

@@ -24,30 +24,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEModelParam.h>
 #include <FECore/FEMaterialPoint.h>
-#include <FEBioMech/FEBodyForce.h>
+#include <FECore/FEModelParam.h>
+#include "FEBodyMoment.h"
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for body forces
 //! Derived classes need to implement the force and stiffness functions.
 //
-class FEBIOFLUID_API FEConstFluidBodyForce : public FEBodyForce
+class FEBIOFLUID_API FEConstFluidBodyMoment : public FEBodyMoment
 {
 public:
 	//! constructor
-	FEConstFluidBodyForce(FEModel* pfem);
+    FEConstFluidBodyMoment(FEModel* pfem);
 
 public:
 	//! calculate the body force at a material point
-	vec3d force(FEMaterialPoint& pt) override;
+	vec3d moment(FEMaterialPoint& pt) override;
 
 	//! calculate constribution to stiffness matrix
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 
 protected:
-    FEParamVec3 m_force;
+    FEParamVec3 m_moment;
 
 	DECLARE_FECORE_CLASS();
 };

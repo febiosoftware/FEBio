@@ -23,31 +23,34 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEModelParam.h>
-#include <FECore/FEMaterialPoint.h>
-#include <FEBioMech/FEBodyForce.h>
-#include "febiofluid_api.h"
 
-//-----------------------------------------------------------------------------
-//! This class is the base class for body forces
-//! Derived classes need to implement the force and stiffness functions.
-//
-class FEBIOFLUID_API FEConstFluidBodyForce : public FEBodyForce
+
+
+#include "stdafx.h"
+#include "FECentrifugalFluidBodyForce.h"
+#include <FEBioMech/FEElasticMaterial.h>
+
+BEGIN_FECORE_CLASS(FECentrifugalFluidBodyForce, FEBodyForce);
+	ADD_PARAMETER(w, "angular_speed")->setUnits(UNIT_ANGULAR_VELOCITY);
+	ADD_PARAMETER(n, "rotation_axis");
+	ADD_PARAMETER(c, "rotation_center")->setUnits(UNIT_LENGTH);
+END_FECORE_CLASS();
+
+FECentrifugalFluidBodyForce::FECentrifugalFluidBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 {
-public:
-	//! constructor
-	FEConstFluidBodyForce(FEModel* pfem);
+	w = 0.0;
+	n = vec3d(0,0,1);
+	c = vec3d(0,0,0);
+}
 
-public:
-	//! calculate the body force at a material point
-	vec3d force(FEMaterialPoint& pt) override;
+vec3d FECentrifugalFluidBodyForce::force(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3ds K = stiffness(mp);
+	return K*(pt.m_rt - c);
+}
 
-	//! calculate constribution to stiffness matrix
-	mat3ds stiffness(FEMaterialPoint& pt) override;
-
-protected:
-    FEParamVec3 m_force;
-
-	DECLARE_FECORE_CLASS();
-};
+mat3ds FECentrifugalFluidBodyForce::stiffness(FEMaterialPoint& mp) 
+{ 
+	return (mat3dd(1) - dyad(n))*(-w*w); 
+}

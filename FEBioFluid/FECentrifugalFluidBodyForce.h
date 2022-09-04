@@ -23,31 +23,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FECore/FEModelParam.h>
 #include <FECore/FEMaterialPoint.h>
 #include <FEBioMech/FEBodyForce.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! This class is the base class for body forces
-//! Derived classes need to implement the force and stiffness functions.
-//
-class FEBIOFLUID_API FEConstFluidBodyForce : public FEBodyForce
+//! This class defines a centrigufal force
+
+class FEBIOFLUID_API FECentrifugalFluidBodyForce : public FEBodyForce
 {
 public:
-	//! constructor
-	FEConstFluidBodyForce(FEModel* pfem);
+    FECentrifugalFluidBodyForce(FEModel* pfem);
+
+	vec3d force(FEMaterialPoint& mp) override;
+
+	mat3ds stiffness(FEMaterialPoint& mp) override;
 
 public:
-	//! calculate the body force at a material point
-	vec3d force(FEMaterialPoint& pt) override;
-
-	//! calculate constribution to stiffness matrix
-	mat3ds stiffness(FEMaterialPoint& pt) override;
-
-protected:
-    FEParamVec3 m_force;
+	vec3d	n;	// rotation axis
+	vec3d	c;	// point on axis of rotation (e.g., center of rotation)
+	double	w;	// angular speed
 
 	DECLARE_FECORE_CLASS();
 };

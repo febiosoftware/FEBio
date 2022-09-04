@@ -37,6 +37,7 @@
 #include <FECore/sys.h>
 #include "FEBioPolarFluid.h"
 #include <FECore/FELinearSystem.h>
+#include "FEBodyMoment.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -358,6 +359,125 @@ void FEPolarFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 }
 
 //-----------------------------------------------------------------------------
+void FEPolarFluidDomain3D::BodyMoment(FEGlobalVector& R, FEBodyMoment& bm)
+{
+    int NE = (int)m_Elem.size();
+    for (int i=0; i<NE; ++i)
+    {
+        vector<double> fe;
+        vector<int> lm;
+        
+        // get the element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the element force vector and initialize it to zero
+        int ndof = 7*el.Nodes();
+        fe.assign(ndof, 0);
+        
+        // apply body forces
+        ElementBodyMoment(bm, el, fe);
+        
+        // get the element's LM vector
+        UnpackLM(el, lm);
+        
+        // assemble element 'fe'-vector into global R vector
+        R.Assemble(el.m_node, lm, fe);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the body forces
+
+void FEPolarFluidDomain3D::ElementBodyMoment(FEBodyMoment& bm, FESolidElement& el, vector<double>& fe)
+{
+    // jacobian
+    double detJ;
+    double *H;
+    double* gw = el.GaussWeights();
+    vec3d m;
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    // nodal coordinates
+    vec3d r0[FEElement::MAX_NODES];
+    for (int i=0; i<neln; ++i)
+        r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    
+    // loop over integration points
+    int nint = el.GaussPoints();
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        double dens = m_pMat->Density(mp);
+        
+        pt.m_r0 = el.Evaluate(r0, n);
+        
+        detJ = detJ0(el, n)*gw[n];
+        
+        // get the moment
+        m = bm.moment(mp);
+        
+        H = el.H(n);
+        
+        for (int i=0; i<neln; ++i)
+        {
+            fe[7*i+3] -= H[i]*dens*m.x*detJ;
+            fe[7*i+4] -= H[i]*dens*m.y*detJ;
+            fe[7*i+5] -= H[i]*dens*m.z*detJ;
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the stiffness due to body moments
+void FEPolarFluidDomain3D::ElementBodyMomentStiffness(FEBodyMoment& bm, FESolidElement &el, matrix &ke)
+{
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    int neln = el.Nodes();
+    
+    // jacobian
+    double detJ;
+    double *H;
+    double* gw = el.GaussWeights();
+    vec3d m, k;
+    
+    // gradient of shape functions
+    vec3d gradN;
+    
+    // loop over integration points
+    int nint = el.GaussPoints();
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        
+        // calculate the jacobian
+        detJ = detJ0(el, n)*gw[n]*tp.alphaf;
+        
+        H = el.H(n);
+        
+        double dens = m_pMat->Density(mp);
+        
+        // get the force
+        m = bm.moment(mp);
+        
+        H = el.H(n);
+        
+        for (int i=0; i<neln; ++i) {
+            for (int j=0; j<neln; ++j)
+            {
+                k = m*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
+                ke[7*i+3][7*j+6] += k.x;
+                ke[7*i+4][7*j+6] += k.y;
+                ke[7*i+5][7*j+6] += k.z;
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
 void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
@@ -578,6 +698,37 @@ void FEPolarFluidDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& b
         
         // calculate inertial stiffness
         ElementBodyForceStiffness(bf, el, ke);
+        
+        // get the element's LM vector
+        vector<int> lm;
+        UnpackLM(el, lm);
+        ke.SetIndices(lm);
+        
+        // assemble element matrix in global stiffness matrix
+        LS.Assemble(ke);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEPolarFluidDomain3D::BodyMomentStiffness(FELinearSystem& LS, FEBodyMoment& bm)
+{
+    // repeat over all solid elements
+    int NE = (int)m_Elem.size();
+    
+    for (int iel=0; iel<NE; ++iel)
+    {
+        FESolidElement& el = m_Elem[iel];
+        
+        // element stiffness matrix
+        FEElementMatrix ke(el);
+        
+        // create the element's stiffness matrix
+        int ndof = 7*el.Nodes();
+        ke.resize(ndof, ndof);
+        ke.zero();
+        
+        // calculate inertial stiffness
+        ElementBodyMomentStiffness(bm, el, ke);
         
         // get the element's LM vector
         vector<int> lm;

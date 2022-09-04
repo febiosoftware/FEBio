@@ -82,7 +82,7 @@ FEThermoFluidSolver::FEThermoFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), 
     m_Ftol = 0.001;
     m_Ttol = 0.001;
     m_Rmin = 1.0e-20;
-    m_Rmax = 0;     // not used if zero
+    m_Rmax = 1.0e+20;    // not used if zero
     m_minJf = 0;    // not used if zero
     
     m_nveq = 0;
@@ -98,10 +98,16 @@ FEThermoFluidSolver::FEThermoFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), 
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
+    m_maxref = 5;
+//    m_qnstrategy->m_maxups = 50;
 
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
 
+    // turn off reform on each time step and diverge reform
+    m_breformtimestep = false;
+    m_bdivreform = false;
+    
     // get the dof indices
     // TODO: Can this be done in Init, since there is no error checking
     if (pfem)

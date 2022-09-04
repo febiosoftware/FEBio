@@ -41,6 +41,7 @@
 #include "FEFixedFluidAngularVelocity.h"
 #include "FEPrescribedFluidAngularVelocity.h"
 #include "FEBioFluidPlot.h"
+#include "FEConstFluidBodyMoment.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioPolarFluid::GetVariableName(FEBioPolarFluid::POLAR_FLUID_VARIABLE var)
@@ -104,6 +105,10 @@ void FEBioPolarFluid::InitModule()
     //-----------------------------------------------------------------------------
     // Surface loads
     REGISTER_FECORE_CLASS(FETangentialFlowPFStabilization   , "fluid tangential stabilization"   );
+    
+    //-----------------------------------------------------------------------------
+    // Body loads
+    REGISTER_FECORE_CLASS(FEConstFluidBodyMoment   , "polar fluid body moment");
     
     //-----------------------------------------------------------------------------
     // classes derived from FEPlotData
