@@ -85,6 +85,7 @@ SOFTWARE.*/
 #include "FEFluidModule.h"
 
 #include "FEFluidAnalysis.h"
+#include <FECore/FEModelUpdate.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
@@ -286,6 +287,10 @@ REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptorCriterion
 REGISTER_FECORE_CLASS(FEFluidStressCriterion     , "fluid shear stress");
+
+febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+	pc->m_maxups = 50;
+	}));
 
     febio.SetActiveModule(0);
 }
