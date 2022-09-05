@@ -158,6 +158,9 @@ bool FEFluidFSITangentUniaxial::Init()
 FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
     m_pscn = 0;
+
+	// make sure the correct module is active
+	fem.SetActiveModule("fluid-FSI");
     
     FEAnalysis* pstep = new FEAnalysis(&fem);
     

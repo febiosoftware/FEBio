@@ -100,13 +100,7 @@ FEModelBuilder::~FEModelBuilder()
 //-----------------------------------------------------------------------------
 void FEModelBuilder::SetActiveModule(const std::string& moduleName)
 {
-	m_fem.SetModuleName(moduleName);
-	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	fecore.SetActiveModule(moduleName.c_str());
-
-	FEModel& fem = m_fem;
-	FEModule* pmod = fecore.GetActiveModule();
-	pmod->InitModel(&fem);
+	m_fem.SetActiveModule(moduleName);
 }
 
 //-----------------------------------------------------------------------------

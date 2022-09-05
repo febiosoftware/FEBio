@@ -64,6 +64,7 @@ SOFTWARE.*/
 #include "FEDomain2D.h"
 #include "FEDiscreteDomain.h"
 #include "FEDataGenerator.h"
+#include "FEModule.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -310,9 +311,13 @@ void FEModel::Clear()
 
 //-----------------------------------------------------------------------------
 //! set the module name
-void FEModel::SetModuleName(const std::string& moduleName)
+void FEModel::SetActiveModule(const std::string& moduleName)
 {
 	m_imp->m_moduleName = moduleName;
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	fecore.SetActiveModule(moduleName.c_str());
+	FEModule* pmod = fecore.GetActiveModule();
+	pmod->InitModel(this);
 }
 
 //-----------------------------------------------------------------------------

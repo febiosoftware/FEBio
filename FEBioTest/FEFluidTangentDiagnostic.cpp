@@ -241,6 +241,9 @@ bool FEFluidTangentUniaxialSS::Init()
 // Constructor
 FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem.SetActiveModule("fluid");
+
     m_pscn = 0;
     
     FEAnalysis* pstep = new FEAnalysis(&fem);
