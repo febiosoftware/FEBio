@@ -167,10 +167,6 @@ void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doubl
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3], detJ;
     
-    mat3d sv, M;
-    mat3da sva;
-    vec3d th, gradp;
-    
     const double *H, *Gr, *Gs, *Gt;
     
     int nint = el.GaussPoints();
@@ -198,12 +194,12 @@ void FEPolarFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doubl
         vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
         // get the viscous stress tensor for this integration point
-        sva = ViscPol->SkewStress(mp);
-        th = sva.vec();
-        sv = sva + Viscous->Stress(mp);
-        M = ViscPol->CoupleStress(mp);
+        vec3d th = ViscPol->SkewStressDualVector(mp);
+        mat3d sva = mat3da(th);
+        mat3d sv = sva + Viscous->Stress(mp);
+        mat3d M = ViscPol->CoupleStress(mp);
         // get the gradient of the elastic pressure
-        gradp = pt.m_gradef*m_pMat->Tangent_Pressure_Strain(mp);
+        vec3d gradp = pt.m_gradef*m_pMat->Tangent_Pressure_Strain(mp);
         
         H = el.H(n);
         Gr = el.Gr(n);
@@ -549,11 +545,13 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
             for (j=0, j7 = 0; j<neln; ++j, j7 += 7)
             {
                 mat3da gNa(gradN[i]), gNb(gradN[j]);
-                mat3d Kvv = vdotTdotv(gradN[i], cvs, gradN[j]) - gNa*cva*gNb/2;
+                mat3d Kvv = vdotTdotv(gradN[i], cvs, gradN[j]) + gNa*cva*gNb/2;
                 mat3d Kgv = cva*gNb*H[i];
                 vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
                 mat3d Kvg = -gNa*cva*H[j];
-                mat3d Kgg = vdotTdotv(gradN[i], m, gradN[j])-cva*(2*H[i]*H[j]);
+                //! TODO: There may be a mistake in vdotTdotv when using tens4d object, evaluates as b.T.a instead of a.T.b
+//                mat3d Kgg = vdotTdotv(gradN[i], m, gradN[j])-cva*(2*H[i]*H[j]);
+                mat3d Kgg = vdotTdotv(gradN[j], m, gradN[i])-cva*(2*H[i]*H[j]);
                 vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dp+pt.m_gradef*(H[j]*d2p))*H[i];
                 vec3d kgJ = mJ*gradN[i]*H[j] - thJ*(2*H[i]*H[j]);
                 double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
@@ -803,7 +801,7 @@ void FEPolarFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
             for (j=0, j7 = 0; j<neln; ++j, j7 += 7)
             {
                 mat3d Mv = ((mat3dd(ksi/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
-                mat3d Jgg = (mat3dd(ksi/dt)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*moi*detJ);
+                mat3d Jgg = mat3dd(ksi/dt*H[j] + gradN[j]*pt.m_vft)*(H[i]*moi*detJ);
                 mat3d Jgv = pf.m_Psi*(H[i]*H[j]*moi*detJ);
                 vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/J*detJ);
                 vec3d jJ = pf.m_gfdot*(-H[i]*H[j]*moi/J*detJ);

@@ -106,6 +106,7 @@ m_dofW(pfem), m_dofAW(pfem), m_dofG(pfem), m_dofAG(pfem), m_dofEF(pfem)
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
+    m_maxref = 5;
     
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
