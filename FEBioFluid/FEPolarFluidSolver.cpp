@@ -84,7 +84,7 @@ m_dofW(pfem), m_dofAW(pfem), m_dofG(pfem), m_dofAG(pfem), m_dofEF(pfem)
     m_Gtol = 0.001;
     m_Ftol = 0.001;
     m_Rmin = 1.0e-20;
-    m_Rmax = 1.0e+20;    // not used if zero
+    m_Rmax = 0;         // not used if zero
     m_minJf = 0;
     
     m_nveq = 0;
@@ -106,15 +106,10 @@ m_dofW(pfem), m_dofAW(pfem), m_dofG(pfem), m_dofAG(pfem), m_dofEF(pfem)
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
-    m_maxref = 5;
     
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
     
-    // turn off reform on each time step and diverge reform
-    m_breformtimestep = false;
-    m_bdivreform = false;
-
     // get the dof indices
     // TODO: Can this be done in Init, since there is no error checking
     if (pfem)

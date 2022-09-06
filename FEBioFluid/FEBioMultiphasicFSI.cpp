@@ -43,6 +43,8 @@
 #include "FEMultiphasicFSISoluteBackflowStabilization.h"
 #include "FEFluidModule.h"
 #include "FEMultiphasicFSIAnalysis.h"
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASIC_FSI_VARIABLE var)
@@ -106,5 +108,27 @@ void FEBioMultiphasicFSI::InitModule()
     // bcs
     REGISTER_FECORE_CLASS(FEMultiphasicFSIPressureBC, "fluid pressure");
 
+    //-----------------------------------------------------------------------------
+    // Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEMultiphasicFSIAnalysis>([](FEMultiphasicFSIAnalysis* pc) {
+        pc->m_nanalysis = FEMultiphasicFSIAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = false;
+        pc->m_bdivreform = false;
+    }));
+    
     febio.SetActiveModule(0);
 }
