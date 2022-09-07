@@ -96,7 +96,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_dofW(pfem)
 
 	// turn off checking for a zero diagonal
 	CheckZeroDiagonal(false);
-
+    
 	// get the dof indices
     // TODO: Can this be done in Init, since  there is no error checking
     if (pfem)
@@ -751,7 +751,7 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.StiffnessMatrix(LS, tp);
+        dom.StiffnessMatrix(LS);
     }
     
     // calculate the body force stiffness matrix for each domain
@@ -764,7 +764,7 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
-				dom.BodyForceStiffness(LS, tp, *pbf);
+				dom.BodyForceStiffness(LS, *pbf);
 			}
         }
     }
@@ -786,7 +786,7 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.MassMatrix(LS, tp);
+        dom.MassMatrix(LS);
     }
     
     // calculate nonlinear constraint stiffness
@@ -869,7 +869,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.InternalForces(RHS, tp);
+        dom.InternalForces(RHS);
     }
     
     // calculate the body forces
@@ -881,7 +881,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
-				dom.BodyForce(RHS, tp, *pbf);
+				dom.BodyForce(RHS, *pbf);
 			}
         }
     }
@@ -890,7 +890,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.InertialForces(RHS, tp);
+        dom.InertialForces(RHS);
     }
 
     // calculate contact forces

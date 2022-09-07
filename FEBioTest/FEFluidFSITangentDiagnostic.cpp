@@ -158,6 +158,9 @@ bool FEFluidFSITangentUniaxial::Init()
 FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
     m_pscn = 0;
+
+	// make sure the correct module is active
+	fem.SetActiveModule("fluid-FSI");
     
     FEAnalysis* pstep = new FEAnalysis(&fem);
     
@@ -254,8 +257,8 @@ bool FEFluidFSITangentDiagnostic::Run()
     const int ndpn = 7;
     matrix k0(ndpn*N, ndpn*N);
     k0.zero();
-    bd.ElementStiffness(el, k0, tp);
-    bd.ElementMassMatrix(el,k0, tp);
+    bd.ElementStiffness(el, k0);
+    bd.ElementMassMatrix(el,k0);
     
     // print the element stiffness matrix
     feLog("\nActual stiffness matrix:\n");
@@ -341,8 +344,8 @@ void FEFluidFSITangentDiagnostic::deriv_residual(matrix& ke)
     const int ndpn = 7;
     vector<double> f0(ndpn*N);
     zero(f0);
-    bd.ElementInternalForce(el, f0, tp);
-    bd.ElementInertialForce(el, f0, tp);
+    bd.ElementInternalForce(el, f0);
+    bd.ElementInertialForce(el, f0);
     
     // now calculate the perturbed residuals
     ke.resize(ndpn*N, ndpn*N);
@@ -369,8 +372,8 @@ void FEFluidFSITangentDiagnostic::deriv_residual(matrix& ke)
 		fem.Update();
         
         zero(f1);
-        bd.ElementInternalForce(el, f1, tp);
-        bd.ElementInertialForce(el, f1, tp);
+        bd.ElementInternalForce(el, f1);
+        bd.ElementInertialForce(el, f1);
         
         switch (nj)
         {

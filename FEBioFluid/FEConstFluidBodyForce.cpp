@@ -27,19 +27,16 @@ SOFTWARE.*/
 #include "FEConstFluidBodyForce.h"
 
 BEGIN_FECORE_CLASS(FEConstFluidBodyForce, FEBodyForce);
-	ADD_PARAMETER(m_f.x, "x");
-	ADD_PARAMETER(m_f.y, "y");
-	ADD_PARAMETER(m_f.z, "z");
+    ADD_PARAMETER(m_force, "force")->setUnits(UNIT_SPECIFIC_FORCE);
 END_FECORE_CLASS();
 
 FEConstFluidBodyForce::FEConstFluidBodyForce(FEModel* pfem) : FEBodyForce(pfem) 
 { 
-	m_f = vec3d(0, 0, 0); 
 }
 
 vec3d FEConstFluidBodyForce::force(FEMaterialPoint& pt) 
 { 
-	return m_f; 
+    return m_force(pt);
 }
 
 mat3ds FEConstFluidBodyForce::stiffness(FEMaterialPoint& pt) 

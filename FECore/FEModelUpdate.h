@@ -70,3 +70,23 @@ template <class T> FECreateHandler* UpdateModelWhenCreating(std::function<void(F
 {
 	return new DoModelUpdate<T>(f);
 }
+
+template <class T> class CreateHandlerFunction : public FECreateHandler
+{
+public:
+	CreateHandlerFunction(std::function<void(T*)> f) : m_f(f) {}
+
+	void handle(FECoreBase* pc) override
+	{
+		T* pT = dynamic_cast<T*>(pc);
+		if (pT) m_f(pT);
+	}
+
+private:
+	std::function<void(T* pc)> m_f;
+};
+
+template <class T> FECreateHandler* CallWhenCreating(std::function<void(T*)> f)
+{
+	return new CreateHandlerFunction<T>(f);
+}

@@ -27,45 +27,43 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEFluidHeatSupply.h"
-#include "FEThermoFluid.h"
-#include "FEThermoFluidDomain.h"
+#include "FEBodyMoment.h"
+#include "FEFluidMaterial.h"
+#include "FEPolarFluidDomain.h"
 
 //-----------------------------------------------------------------------------
-FEFluidHeatSupply::FEFluidHeatSupply(FEModel* pfem) : FEBodyLoad(pfem)
+FEBodyMoment::FEBodyMoment(FEModel* pfem) : FEBodyLoad(pfem)
 {
 }
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEFluidHeatSupply::LoadVector(FEGlobalVector& R)
+void FEBodyMoment::LoadVector(FEGlobalVector& R)
 {
-    const FETimeInfo& tp = GetTimeInfo();
-    for (int i = 0; i<Domains(); ++i)
-    {
-        FEDomain* dom = Domain(i);
-        FEThermoFluid* mat = dynamic_cast<FEThermoFluid*>(dom->GetMaterial());
-        if (mat == nullptr)
-        {
-            FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupply(R, *this);
-        }
-    }
+	for (int i = 0; i<Domains(); ++i)
+	{
+		FEDomain* dom = Domain(i);
+        FEFluidMaterial* mat = dynamic_cast<FEFluidMaterial*>(dom->GetMaterial());
+		if (mat == nullptr)
+		{
+			FEPolarFluidDomain* pfdom = dynamic_cast<FEPolarFluidDomain*>(dom);
+			if (pfdom) pfdom->BodyMoment(R, *this);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS)
+void FEBodyMoment::StiffnessMatrix(FELinearSystem& LS)
 {
-    const FETimeInfo& tp = GetTimeInfo();
-    for (int i = 0; i<Domains(); ++i)
-    {
-        FEDomain* dom = Domain(i);
-        FEThermoFluid* mat = dynamic_cast<FEThermoFluid*>(dom->GetMaterial());
-        if (mat==nullptr)
-        {
-            FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupplyStiffness(LS, *this);
-        }
-    }
+	for (int i = 0; i<Domains(); ++i)
+	{
+		FEDomain* dom = Domain(i);
+        FEFluidMaterial* mat = dynamic_cast<FEFluidMaterial*>(dom->GetMaterial());
+		if (mat==nullptr)
+		{
+            FEPolarFluidDomain* pfdom = dynamic_cast<FEPolarFluidDomain*>(dom);
+			if (pfdom) pfdom->BodyMomentStiffness(LS, *this);
+		}
+	}
 }

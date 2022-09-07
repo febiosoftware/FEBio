@@ -31,9 +31,9 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 
 BEGIN_FECORE_CLASS(FECentrifugalBodyForce, FEBodyForce);
-	ADD_PARAMETER(w, "angular_speed");
+	ADD_PARAMETER(w, "angular_speed")->setUnits(UNIT_ANGULAR_VELOCITY);
 	ADD_PARAMETER(n, "rotation_axis");
-	ADD_PARAMETER(c, "rotation_center");
+	ADD_PARAMETER(c, "rotation_center")->setUnits(UNIT_LENGTH);
 END_FECORE_CLASS();
 
 FECentrifugalBodyForce::FECentrifugalBodyForce(FEModel* pfem) : FEBodyForce(pfem)

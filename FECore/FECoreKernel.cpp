@@ -374,6 +374,26 @@ FECoreBase* FECoreKernel::Create(int superClassID, FEModel* pfem, const FEClassD
 }
 
 //-----------------------------------------------------------------------------
+bool FECoreKernel::IsModuleActive(int moduleID)
+{
+	if (moduleID <= 0) return true;
+	if (m_activeModule < 0) return false;
+
+	FEModule* mod = GetActiveModule();
+	if (mod == nullptr) return false;
+
+	if (mod->GetModuleID() == moduleID) return true;
+
+	std::vector<int> deps = mod->GetDependencies();
+	for (int i = 0; i < deps.size(); ++i)
+	{
+		if (deps[i] == moduleID) return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 {
 	FECoreBase* pc = fac->CreateInstance(fem);
@@ -382,7 +402,10 @@ FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 		for (int i = 0; i < m_createHandlers.size(); ++i)
 		{
 			FECreateHandler* ph = m_createHandlers[i];
-			if (ph) ph->handle(pc);
+			if (ph && (IsModuleActive(ph->GetModuleID())))
+			{
+				ph->handle(pc);
+			}
 		}
 	}
 	return pc;
@@ -738,6 +761,7 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 //-----------------------------------------------------------------------------
 void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
 {
+	pf->SetModuleID(GetActiveModuleID());
 	m_createHandlers.push_back(pf);
 }
 

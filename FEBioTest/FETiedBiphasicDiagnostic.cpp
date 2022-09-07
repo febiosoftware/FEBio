@@ -40,6 +40,9 @@ SOFTWARE.*/
 
 FETiedBiphasicDiagnostic::FETiedBiphasicDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem.SetActiveModule("biphasic");
+
     m_pscn = 0;
     
     FEAnalysis* pstep = new FEAnalysis(&fem);

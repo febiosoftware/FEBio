@@ -715,7 +715,7 @@ bool FESolutesSolver::StiffnessMatrix(FELinearSystem& LS)
     for (int i=0; i<mesh.Domains(); ++i)
     {
 		FESolutesDomain& dom = dynamic_cast<FESolutesDomain&>(mesh.Domain(i));
-        dom.StiffnessMatrix(LS, tp);
+        dom.StiffnessMatrix(LS);
     }
     
     // calculate stiffness matrix due to model loads
@@ -759,7 +759,7 @@ bool FESolutesSolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FESolutesDomain& dom = dynamic_cast<FESolutesDomain&>(mesh.Domain(i));
-        dom.InternalForces(RHS, tp);
+        dom.InternalForces(RHS);
     }
     
     // add model loads

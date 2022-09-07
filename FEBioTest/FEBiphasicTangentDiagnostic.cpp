@@ -141,6 +141,9 @@ FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel& fem) : FEDiagn
 {
 	m_pscn = 0;
 
+	// make sure the correct module is active
+	fem.SetActiveModule("biphasic");
+
 	FEAnalysis* pstep = new FEAnalysis(&fem);
 
 	// create a new solver

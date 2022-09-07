@@ -98,6 +98,9 @@ bool FEEASShellTangentUnloaded::Init()
 // Constructor
 FEEASShellTangentDiagnostic::FEEASShellTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem.SetActiveModule("solid");
+
     m_pscn = 0;
     
     // create an analysis step

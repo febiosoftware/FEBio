@@ -109,6 +109,8 @@ public:
 
 	FEParamVec3(const FEParamVec3& p);
 
+	bool Init();
+
 	// set the value
 	void operator = (const vec3d& v);
 	void operator = (const FEParamVec3& p);
@@ -149,6 +151,8 @@ public:
 	// set the value
 	void operator = (const mat3d& v);
 	void operator = (const FEParamMat3d& v);
+
+	bool Init();
 
 	// set the valuator
 	void setValuator(FEMat3dValuator* val);

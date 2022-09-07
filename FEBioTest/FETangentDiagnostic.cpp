@@ -253,6 +253,9 @@ bool FETangentSimpleShear::Init()
 // Constructor
 FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem.SetActiveModule("solid");
+
 	m_pscn = 0;
 
 	// create an analysis step

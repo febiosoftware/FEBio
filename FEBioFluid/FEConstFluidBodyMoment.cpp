@@ -23,31 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEModelParam.h>
-#include <FECore/FEMaterialPoint.h>
-#include <FEBioMech/FEBodyForce.h>
-#include "febiofluid_api.h"
+#include "stdafx.h"
+#include "FEConstFluidBodyMoment.h"
 
-//-----------------------------------------------------------------------------
-//! This class is the base class for body forces
-//! Derived classes need to implement the force and stiffness functions.
-//
-class FEBIOFLUID_API FEConstFluidBodyForce : public FEBodyForce
-{
-public:
-	//! constructor
-	FEConstFluidBodyForce(FEModel* pfem);
+BEGIN_FECORE_CLASS(FEConstFluidBodyMoment, FEBodyMoment);
+    ADD_PARAMETER(m_moment, "moment")->setUnits(UNIT_SPECIFIC_FORCE);
+END_FECORE_CLASS();
 
-public:
-	//! calculate the body force at a material point
-	vec3d force(FEMaterialPoint& pt) override;
+FEConstFluidBodyMoment::FEConstFluidBodyMoment(FEModel* pfem) : FEBodyMoment(pfem)
+{ 
+}
 
-	//! calculate constribution to stiffness matrix
-	mat3ds stiffness(FEMaterialPoint& pt) override;
+vec3d FEConstFluidBodyMoment::moment(FEMaterialPoint& pt)
+{ 
+	return m_moment(pt);
+}
 
-protected:
-    FEParamVec3 m_force;
-
-	DECLARE_FECORE_CLASS();
-};
+mat3ds FEConstFluidBodyMoment::stiffness(FEMaterialPoint& pt)
+{ 
+	return mat3ds(0, 0, 0, 0, 0, 0); 
+}

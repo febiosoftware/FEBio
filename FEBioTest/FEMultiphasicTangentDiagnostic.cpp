@@ -185,6 +185,9 @@ bool FEMultiphasicTangentUniaxial::Init()
 // Constructor
 FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem.SetActiveModule("multiphasic");
+
     m_pscn = 0;
 
 	FEAnalysis* pstep = new FEAnalysis(&fem);

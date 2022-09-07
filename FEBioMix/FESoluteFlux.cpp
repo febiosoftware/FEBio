@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FESoluteFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux   , "flux");
 	ADD_PARAMETER(m_blinear, "linear");
     ADD_PARAMETER(m_bshellb, "shell_bottom");
-	ADD_PARAMETER(m_isol   , "solute_id");
+	ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

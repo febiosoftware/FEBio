@@ -27,39 +27,36 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEFluidTangentDiagnostic.h"
+#include "FEPolarFluidTangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
-#include "FEBioFluid/FEFluidSolver.h"
-#include "FEBioFluid/FEFluidDomain3D.h"
-#include "FEBioFluid/FEFluidAnalysis.h"
-#include "FECore/log.h"
+#include <FEBioFluid/FEPolarFluidSolver.h>
+#include <FEBioFluid/FEPolarFluidDomain3D.h>
+#include <FEBioFluid/FEPolarFluidAnalysis.h>
+#include <FECore/log.h>
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEFixedBC.h>
 #include <FECore/FELoadCurve.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEFluidTangentUniaxial, FEFluidScenario)
+BEGIN_FECORE_CLASS(FEPolarFluidTangentUniaxial, FEPolarFluidScenario)
 	ADD_PARAMETER(m_velocity, "fluid_velocity");
-	ADD_PARAMETER(m_dt      , "time_step"     );
-END_FECORE_CLASS();
-
-BEGIN_FECORE_CLASS(FEFluidTangentUniaxialSS, FEFluidScenario)
-	ADD_PARAMETER(m_velocity, "fluid_velocity");
+    ADD_PARAMETER(m_angular_velocity, "fluid_angular_velocity");
 	ADD_PARAMETER(m_dt      , "time_step"     );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFluidTangentUniaxial::FEFluidTangentUniaxial(FEDiagnostic* pdia) : FEFluidScenario(pdia)
+FEPolarFluidTangentUniaxial::FEPolarFluidTangentUniaxial(FEDiagnostic* pdia) : FEPolarFluidScenario(pdia)
 {
     m_velocity = 0;
-    m_dt = 1;
+    m_angular_velocity = 0;
+    m_dt = 0;
 }
 
 //-----------------------------------------------------------------------------
 // Build the uniaxial loading scenario
 // Cube with uniaxial velocity prescribed along x on left face and dilatation
 // fixed on right face. Dynamic analysis.
-bool FEFluidTangentUniaxial::Init()
+bool FEPolarFluidTangentUniaxial::Init()
 {
     int i;
     vec3d r[8] = {
@@ -67,19 +64,29 @@ bool FEFluidTangentUniaxial::Init()
         vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
     };
     
-    int BC[8][4] = {
-        { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0},
-        { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0}
+    int BC[8][7] = {
+        { 0, 0, 0, 0, 0, 0,-1},
+        {-1,-1,-1, 0, 0, 0, 0},
+        {-1,-1,-1, 0, 0, 1,-1},
+        { 1, 0, 0, 0, 0, 1,-1},
+        { 0, 0, 0,-1,-1,-1,-1},
+        {-1,-1,-1,-1,-1,-1, 0},
+        {-1,-1,-1,-1,-1,-1, 0},
+        { 1, 0, 0,-1,-1,-1,-1}
     };
     
     FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    pstep->m_nanalysis = FEFluidAnalysis::DYNAMIC;
+//    pstep->m_nanalysis = FEPolarFluidAnalysis::DYNAMIC;
+    pstep->m_nanalysis = FEPolarFluidAnalysis::STEADY_STATE;
 
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_WX = fem.GetDOFIndex("wx");
 	const int dof_WY = fem.GetDOFIndex("wy");
 	const int dof_WZ = fem.GetDOFIndex("wz");
+    const int dof_GX = fem.GetDOFIndex("gx");
+    const int dof_GY = fem.GetDOFIndex("gy");
+    const int dof_GZ = fem.GetDOFIndex("gz");
 	const int dof_EF  = fem.GetDOFIndex("ef");
 
     // --- create the FE problem ---
@@ -88,11 +95,8 @@ bool FEFluidTangentUniaxial::Init()
     m.CreateNodes(8);
 	m.SetDOFS(MAX_DOFS);
 
-	FENodeSet* nset[4] = { 0 };
-	nset[0] = new FENodeSet(&fem);
-	nset[1] = new FENodeSet(&fem);
-	nset[2] = new FENodeSet(&fem);
-	nset[3] = new FENodeSet(&fem);
+	FENodeSet* nfset[7] = { 0 };
+    for (int i=0; i<7; ++i)	nfset[i] = new FENodeSet(&fem);
 	for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
@@ -100,22 +104,23 @@ bool FEFluidTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) nset[0]->Add(i);
-        if (BC[i][1] == -1) nset[1]->Add(i);
-        if (BC[i][2] == -1) nset[2]->Add(i);
-        if (BC[i][3] == -1) nset[3]->Add(i);
+        for (int j=0; j<7; ++j)
+            if (BC[i][j] == 0) nfset[j]->Add(i);
     }
     
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WX, nset[0]));
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WY, nset[1]));
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WZ, nset[2]));
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_EF, nset[3]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WX, nfset[0]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WY, nfset[1]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WZ, nfset[2]));
+    fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_GX, nfset[3]));
+    fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_GY, nfset[4]));
+    fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_GZ, nfset[5]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_EF, nfset[6]));
 
     // get the material
     FEMaterial* pmat = fem.GetMaterial(0);
     
     // create a fluid domain
-    FEFluidDomain3D* pd = new FEFluidDomain3D(&fem);
+    FEPolarFluidDomain3D* pd = new FEPolarFluidDomain3D(&fem);
     pd->SetMaterial(pmat);
     pd->Create(1, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 	pd->SetMatID(0);
@@ -132,124 +137,38 @@ bool FEFluidTangentUniaxial::Init()
 	plc->Add(1.0, 1.0);
     fem.AddLoadController(plc);
     
-    // Add a prescribed BC
-	FENodeSet* dc = new FENodeSet(&fem);
-	dc->Add({ 0, 3, 4, 7 });
-	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_WX, dc);
-    pdc->SetScale(m_velocity, 0);
-	fem.AddBoundaryCondition(pdc);
+    // Add a prescribed velocity BC
+	FENodeSet* dcv = new FENodeSet(&fem);
+	dcv->Add({ 3, 7 });
+	FEPrescribedDOF* pdcv = new FEPrescribedDOF(&fem, dof_WX, dcv);
+    pdcv->SetScale(m_velocity, 0);
+	fem.AddBoundaryCondition(pdcv);
 
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-FEFluidTangentUniaxialSS::FEFluidTangentUniaxialSS(FEDiagnostic* pdia) : FEFluidScenario(pdia)
-{
-    m_velocity = 0;
-    m_dt = 1;
-}
-
-//-----------------------------------------------------------------------------
-// Build the uniaxial loading scenario
-// Cube with uniaxial velocity prescribed along x on left face and dilatation
-// fixed on right face. Steady-state analysis.
-bool FEFluidTangentUniaxialSS::Init()
-{
-    int i;
-    vec3d r[8] = {
-        vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
-        vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
-    };
+    // Add a prescribed angular velocity BC
+    FENodeSet* dcg = new FENodeSet(&fem);
+    dcg->Add({ 2, 3 });
+    FEPrescribedDOF* pdcg = new FEPrescribedDOF(&fem, dof_GZ, dcg);
+    pdcg->SetScale(m_angular_velocity, 0);
+    fem.AddBoundaryCondition(pdcg);
     
-/*    int BC[8][4] = {
-        { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0},
-        { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0}
-    };*/
-    int BC[8][4] = {
-        { 0, 0, 0, 0},{ 0, 0, 0, 0},{ 0, 0, 0, 0}, { 0, 0, 0, 0},
-        { 0, 0, 0, 0},{ 0, 0, 0, 0},{ 0, 0, 0, 0}, { 0, 0, 0, 0}
-    };
-    
-    FEModel& fem = *GetDiagnostic()->GetFEModel();
-    FEAnalysis* pstep = fem.GetCurrentStep();
-    pstep->m_nanalysis = FEFluidAnalysis::STEADY_STATE;
-    
-    int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-    const int dof_WX = fem.GetDOFIndex("wx");
-    const int dof_WY = fem.GetDOFIndex("wy");
-    const int dof_WZ = fem.GetDOFIndex("wz");
-    const int dof_EF  = fem.GetDOFIndex("ef");
-    
-    // --- create the FE problem ---
-    // create the mesh
-    FEMesh& m = fem.GetMesh();
-    m.CreateNodes(8);
-    m.SetDOFS(MAX_DOFS);
-	FENodeSet* nset[4] = { 0 };
-	nset[0] = new FENodeSet(&fem);
-	nset[1] = new FENodeSet(&fem);
-	nset[2] = new FENodeSet(&fem);
-	nset[3] = new FENodeSet(&fem);
-	for (i = 0; i<8; ++i)
-	{
-		FENode& n = m.Node(i);
-		n.m_rt = n.m_r0 = r[i];
-		n.m_rid = -1;
-
-		// set displacement BC's
-		if (BC[i][0] == -1) nset[0]->Add(i);
-		if (BC[i][1] == -1) nset[1]->Add(i);
-		if (BC[i][2] == -1) nset[2]->Add(i);
-		if (BC[i][3] == -1) nset[3]->Add(i);
-	}
-
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WX, nset[0]));
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WY, nset[1]));
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WZ, nset[2]));
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_EF, nset[3]));
-
-    // get the material
-    FEMaterial* pmat = fem.GetMaterial(0);
-    
-    // create a fluid domain
-    FEFluidDomain3D* pd = new FEFluidDomain3D(&fem);
-    pd->SetMaterial(pmat);
-    pd->Create(1, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
-    pd->SetMatID(0);
-    m.AddDomain(pd);
-    FESolidElement& el = pd->Element(0);
-    el.SetID(1);
-    for (i=0; i<8; ++i) el.m_node[i] = i;
-    
-    pd->CreateMaterialPointData();
-    
-    // Add a loadcurve
-/*  FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
-    fem.AddLoadCurve(plc);
-    
-    // Add a prescribed BC
-    int nd[4] = {0, 3, 4, 7};
-    FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-    fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_WX).SetScale(m_velocity, 0);
-    for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);*/
+    m_time_increment = m_dt;
     
     return true;
 }
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEPolarFluidTangentDiagnostic::FEPolarFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
-	// make sure the correct module is active
-	fem.SetActiveModule("fluid");
-
     m_pscn = 0;
+    
+    // make sure the correct module is active
+    fem.SetActiveModule("polar fluid");
     
     FEAnalysis* pstep = new FEAnalysis(&fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("fluid", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("polar fluid", &fem);
     assert(pnew_solver);
     pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
@@ -259,17 +178,16 @@ FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(
 }
 
 //-----------------------------------------------------------------------------
-FEDiagnosticScenario* FEFluidTangentDiagnostic::CreateScenario(const std::string& sname)
+FEDiagnosticScenario* FEPolarFluidTangentDiagnostic::CreateScenario(const std::string& sname)
 {
-    if (sname == "fluid uni-axial") return (m_pscn = new FEFluidTangentUniaxial(this));
-    else if (sname == "fluid uni-axial-SS") return (m_pscn = new FEFluidTangentUniaxialSS(this));
+    if (sname == "polar fluid uni-axial") return (m_pscn = new FEPolarFluidTangentUniaxial(this));
     return 0;
 }
 
 //-----------------------------------------------------------------------------
 // Initialize the diagnostic. In this function we build the FE model depending
 // on the scenario.
-bool FEFluidTangentDiagnostic::Init()
+bool FEPolarFluidTangentDiagnostic::Init()
 {
     if (m_pscn == 0) return false;
     
@@ -280,7 +198,7 @@ bool FEFluidTangentDiagnostic::Init()
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix
-void FEFluidTangentDiagnostic::print_matrix(matrix& m)
+void FEPolarFluidTangentDiagnostic::print_matrix(matrix& m)
 {
     int i, j;
     int N = m.rows();
@@ -306,12 +224,12 @@ void FEFluidTangentDiagnostic::print_matrix(matrix& m)
 // Run the tangent diagnostic. After we run the FE model, we calculate
 // the element stiffness matrix and compare that to a finite difference
 // of the element residual.
-bool FEFluidTangentDiagnostic::Run()
+bool FEPolarFluidTangentDiagnostic::Run()
 {
     // solve the problem
     FEModel& fem = *GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    double dt = m_pscn->m_dt;
+    double dt = m_pscn->m_time_increment;
 	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
@@ -322,21 +240,22 @@ bool FEFluidTangentDiagnostic::Run()
 	fem.UnBlockLog();
     FETimeInfo tp;
     tp.timeIncrement = dt;
-    tp.alpha = 1;
+    tp.alpha = 0.5;
     tp.beta = 0.25;
     tp.gamma = 0.5;
-    tp.alphaf = 1;
-    tp.alpham = 1;
+    tp.alphaf = 0.5;
+    tp.alpham = 0.5;
     
     FEMesh& mesh = fem.GetMesh();
-    FEFluidDomain3D& bd = dynamic_cast<FEFluidDomain3D&>(mesh.Domain(0));
+    FEPolarFluidDomain3D& bd = dynamic_cast<FEPolarFluidDomain3D&>(mesh.Domain(0));
     
     // get the one and only element
     FESolidElement& el = bd.Element(0);
     int N = mesh.Nodes();
     
     // set up the element stiffness matrix
-    matrix k0(4*N, 4*N);
+    const int ndpn = 7;
+    matrix k0(ndpn*N, ndpn*N);
     k0.zero();
     bd.ElementStiffness(el, k0);
     bd.ElementMassMatrix(el,k0);
@@ -346,7 +265,7 @@ bool FEFluidTangentDiagnostic::Run()
     print_matrix(k0);
     
     // now calculate the derivative of the residual
-    matrix k1;
+    matrix k1(ndpn*N, ndpn*N);
     deriv_residual(k1);
     
     // print the approximate element stiffness matrix
@@ -355,11 +274,11 @@ bool FEFluidTangentDiagnostic::Run()
     
     // finally calculate the difference matrix
 	feLog("\n");
-    matrix kd(4*N, 4*N);
+    matrix kd(ndpn*N, ndpn*N);
     double kmax = 0, kij;
     int i0 = -1, j0 = -1, i, j;
-    for (i=0; i<4*N; ++i)
-        for (j=0; j<4*N; ++j)
+    for (i=0; i<ndpn*N; ++i)
+        for (j=0; j<ndpn*N; ++j)
         {
             kd[i][j] = k0[i][j] - k1[i][j];
             kij = 100.0*fabs(kd[i][j] / k0[0][0]);
@@ -383,19 +302,19 @@ bool FEFluidTangentDiagnostic::Run()
 //-----------------------------------------------------------------------------
 // Calculate a finite difference approximation of the derivative of the
 // element residual.
-void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
+void FEPolarFluidTangentDiagnostic::deriv_residual(matrix& ke)
 {
     int i, j, nj;
     
     // get the solver
     FEModel& fem = *GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    double dt = m_pscn->m_dt;
+    double dt = m_pscn->m_time_increment;
 	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
     pstep->m_final_time = dt;
-    FEFluidSolver& solver = static_cast<FEFluidSolver&>(*pstep->GetFESolver());
+    FEPolarFluidSolver& solver = static_cast<FEPolarFluidSolver&>(*pstep->GetFESolver());
     FETimeInfo tp;
     tp.timeIncrement = dt;
     tp.alpha = 1;
@@ -408,39 +327,45 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
 	const int dof_WX = fem.GetDOFIndex("wx");
 	const int dof_WY = fem.GetDOFIndex("wy");
 	const int dof_WZ = fem.GetDOFIndex("wz");
+    const int dof_GX = fem.GetDOFIndex("gx");
+    const int dof_GY = fem.GetDOFIndex("gy");
+    const int dof_GZ = fem.GetDOFIndex("gz");
 	const int dof_EF  = fem.GetDOFIndex("ef");
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
-    FEFluidDomain3D& bd = dynamic_cast<FEFluidDomain3D&>(mesh.Domain(0));
+    FEPolarFluidDomain3D& bd = dynamic_cast<FEPolarFluidDomain3D&>(mesh.Domain(0));
     
     // get the one and only element
     FESolidElement& el = bd.Element(0);
     int N = mesh.Nodes();
     
     // first calculate the initial residual
-    vector<double> f0(4*N);
+    const int ndpn = 7;
+    vector<double> f0(ndpn*N);
     zero(f0);
     bd.ElementInternalForce(el, f0);
     bd.ElementInertialForce(el, f0);
     
     // now calculate the perturbed residuals
-    ke.resize(4*N, 4*N);
     ke.zero();
     double dx = 1e-8;
-    vector<double> f1(4*N);
-    for (j=0; j<4*N; ++j)
+    vector<double> f1(ndpn*N);
+    for (j=0; j<ndpn*N; ++j)
     {
-        FENode& node = mesh.Node(el.m_node[j/4]);
-        nj = j%4;
+        FENode& node = mesh.Node(el.m_node[j/ndpn]);
+        nj = j%ndpn;
         
         switch (nj)
         {
             case 0: node.add(dof_WX, dx); break;
             case 1: node.add(dof_WY, dx); break;
             case 2: node.add(dof_WZ, dx); break;
-            case 3: node.add(dof_EF, dx); break;
+            case 3: node.add(dof_GX, dx); break;
+            case 4: node.add(dof_GY, dx); break;
+            case 5: node.add(dof_GZ, dx); break;
+            case 6: node.add(dof_EF, dx); break;
         }
         
         
@@ -455,11 +380,14 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.sub(dof_WX, dx); break;
             case 1: node.sub(dof_WY, dx); break;
             case 2: node.sub(dof_WZ, dx); break;
-            case 3: node.sub(dof_EF, dx); break;
+            case 3: node.sub(dof_GX, dx); break;
+            case 4: node.sub(dof_GY, dx); break;
+            case 5: node.sub(dof_GZ, dx); break;
+            case 6: node.sub(dof_EF, dx); break;
         }
         
 		fem.Update();
         
-        for (i=0; i<4*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
+        for (i=0; i<ndpn*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
     }
 }

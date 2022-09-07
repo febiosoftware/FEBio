@@ -26,46 +26,57 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
-#include "FEFluidHeatSupply.h"
-#include "FEThermoFluid.h"
-#include "FEThermoFluidDomain.h"
+#pragma once
+#include "FEDiagnostic.h"
 
 //-----------------------------------------------------------------------------
-FEFluidHeatSupply::FEFluidHeatSupply(FEModel* pfem) : FEBodyLoad(pfem)
+class FEPolarFluidScenario : public FEDiagnosticScenario
 {
-}
+public:
+    FEPolarFluidScenario(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_time_increment = 0.0; }
+
+public:
+    double m_time_increment;
+};
 
 //-----------------------------------------------------------------------------
-// NOTE: Work in progress! Working on integrating body loads as model loads
-void FEFluidHeatSupply::LoadVector(FEGlobalVector& R)
+class FEPolarFluidTangentUniaxial : public FEPolarFluidScenario
 {
-    const FETimeInfo& tp = GetTimeInfo();
-    for (int i = 0; i<Domains(); ++i)
-    {
-        FEDomain* dom = Domain(i);
-        FEThermoFluid* mat = dynamic_cast<FEThermoFluid*>(dom->GetMaterial());
-        if (mat == nullptr)
-        {
-            FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupply(R, *this);
-        }
-    }
-}
+public:
+    FEPolarFluidTangentUniaxial(FEDiagnostic* pdia);
+    
+    bool Init() override;
+    
+private:
+    double		m_velocity;
+    double      m_angular_velocity;
+    double      m_dt;
+
+    DECLARE_FECORE_CLASS();
+};
 
 //-----------------------------------------------------------------------------
-// NOTE: Work in progress! Working on integrating body loads as model loads
-void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS)
+//! The FEBiphasicTangentDiagnostic class tests the stiffness matrix implementation
+//! by comparing it to a numerical approximating of the derivative of the
+//! residual.
+
+class FEPolarFluidTangentDiagnostic : public FEDiagnostic
 {
-    const FETimeInfo& tp = GetTimeInfo();
-    for (int i = 0; i<Domains(); ++i)
-    {
-        FEDomain* dom = Domain(i);
-        FEThermoFluid* mat = dynamic_cast<FEThermoFluid*>(dom->GetMaterial());
-        if (mat==nullptr)
-        {
-            FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupplyStiffness(LS, *this);
-        }
-    }
-}
+public:
+    FEPolarFluidTangentDiagnostic(FEModel& fem);
+    virtual ~FEPolarFluidTangentDiagnostic(){}
+    
+    bool Init();
+    
+    bool Run();
+    
+    FEDiagnosticScenario* CreateScenario(const std::string& sname);
+    
+protected:
+    void deriv_residual(matrix& ke);
+    
+    void print_matrix(matrix& m);
+    
+public:
+    FEPolarFluidScenario*	m_pscn;
+};

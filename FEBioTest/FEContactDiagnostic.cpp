@@ -65,6 +65,9 @@ void FEContactDiagnostic::print_matrix(DenseMatrix& m)
 
 FEContactDiagnostic::FEContactDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem.SetActiveModule("solid");
+
 	FEAnalysis* pstep = new FEAnalysis(&fem);
     fem.AddStep(pstep);
     fem.SetCurrentStep(pstep);
