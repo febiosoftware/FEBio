@@ -27,11 +27,46 @@ SOFTWARE.*/
 
 
 #pragma once
+#include <FECore/FECoreClass.h>
 #include "FEElasticMaterial.h"
 #include "FEFiberMaterial.h"
 #include "FEFiberDensityDistribution.h"
 #include "FEFiberIntegrationScheme.h"
 #include "FEFiberMaterialPoint.h"
+#include <unordered_map>
+
+class FECustomFiberDistribution;
+
+class FEFiberODF : public FECoreClass
+{
+public:
+	FEFiberODF(FEModel* fem) : FECoreClass(fem) {}
+
+public:
+	std::vector<double>		m_shpHar;	//!< spherical harmonics Values
+	vec3d	m_pos;	//!< position
+
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEFiberODF);
+
+private:
+    std::vector<double> m_ODF;
+
+    friend class FECustomFiberDistribution;
+};
+
+class FEElementODF
+{
+public:
+    FEElementODF(int ODFSize, int weightsSize) : m_ODF(ODFSize), m_pos(0,0,0), m_weights(weightsSize) {}
+
+    void calcODF(std::vector<std::vector<double>>& ODFs);
+
+public:
+    std::vector<double> m_ODF; //!< ODF values
+	vec3d m_pos; //!< position
+    std::vector<double> m_weights; //!< ODF values
+};
 
 //  This material is a container for a fiber material, a fiber density
 //  distribution, and an integration scheme.
@@ -62,13 +97,18 @@ public:
 
 protected:
 	FEFiberMaterial*			m_pFmat;    // pointer to fiber material
-    std::vector<double>         m_shpHar;   // spherical harmonic coefficients
+    std::vector<FEFiberODF*>    m_ODF;     // ODF objects
+    std::unordered_map<int, FEElementODF*> m_ElODF; // element ODF objects
 
 	DECLARE_FECORE_CLASS();
 
+// private:
+    // void ODFInterpolation(std::vector<double>&);
+
 private:
-    std::vector<double>         m_ODF;
-    std::vector<vec3d>          m_nodePos;
+    std::unordered_map<int, std::vector<double>> m_interpolatedODFs;
+    // std::vector<double>         m_ODF;
+    // std::vector<vec3d>          m_nodePos;
 
     double m_lengthScale;
     double m_hausd;

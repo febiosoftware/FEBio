@@ -158,6 +158,35 @@ double harmonicY(int degree, int order, double theta, double phi, int numType)
     return normalization*std::assoc_legendre(degree, order, cos(theta))*pow(-1, degree)*e*negate;
 }
 
+void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF)
+{
+    int order = (sqrt(8*sphHarm.size() + 1) - 3)/2;
+
+    double* theta = new double[NPTS] {};
+    double* phi = new double[NPTS] {};
+
+    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, theta, phi);
+
+    ODF.resize(NPTS);  
+    auto T = compSH(order, NPTS, theta, phi);
+    (*T).mult(sphHarm, ODF);
+
+    delete[] theta;
+    delete[] phi;
+
+    // Normalize ODF
+    double sum = 0;
+    for(int index = 0; index < NPTS; index++)
+    {
+        sum += ODF[index];
+    }
+
+    for(int index = 0; index < NPTS; index++)
+    {
+        ODF[index] /= sum;
+    }
+}
+
 void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient)
 {
     double* theta = new double[NPTS] {};

@@ -32,6 +32,8 @@ void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, c
 std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi);
 double harmonicY(int degree, int order, double theta, double phi, int numType);
 
+void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF);
+
 void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
 
 void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
