@@ -151,6 +151,21 @@ FEBioImport::MeshDataError::MeshDataError()
 	SetErrorString("An error occurred processing mesh_data section.");
 }
 
+FEBioImport::RepeatedNodeSet::RepeatedNodeSet(const std::string& name)
+{
+	SetErrorString("A nodeset with name \"%s\" was already defined.", name.c_str());
+}
+
+FEBioImport::RepeatedSurface::RepeatedSurface(const std::string& name)
+{
+	SetErrorString("A surface with name \"%s\" was already defined.", name.c_str());
+}
+
+FEBioImport::RepeatedElementSet::RepeatedElementSet(const std::string& name)
+{
+	SetErrorString("An element set with name \"%s\" was already defined.", name.c_str());
+}
+
 //-----------------------------------------------------------------------------
 FEBioImport::FEBioImport()
 {

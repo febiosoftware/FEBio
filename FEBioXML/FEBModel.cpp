@@ -217,6 +217,26 @@ FEBModel::Surface* FEBModel::Part::FindSurface(const string& name)
 	return nullptr;
 }
 
+FEBModel::NodeSet* FEBModel::Part::FindNodeSet(const string& name)
+{
+	for (size_t i = 0; i < m_NSet.size(); ++i)
+	{
+		NodeSet* nset = m_NSet[i];
+		if (nset->Name() == name) return nset;
+	}
+	return nullptr;
+}
+
+FEBModel::ElementSet* FEBModel::Part::FindElementSet(const string& name)
+{
+	for (size_t i = 0; i < m_ESet.size(); ++i)
+	{
+		ElementSet* eset = m_ESet[i];
+		if (eset->Name() == name) return eset;
+	}
+	return nullptr;
+}
+
 //=============================================================================
 FEBModel::FEBModel()
 {
