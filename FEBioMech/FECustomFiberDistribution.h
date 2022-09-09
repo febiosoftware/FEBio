@@ -37,35 +37,39 @@ SOFTWARE.*/
 
 class FECustomFiberDistribution;
 
-class FEFiberODF : public FECoreClass
+class FEBaseODF
+{
+public:
+    FEBaseODF() : m_pos(0,0,0) {}
+    virtual ~FEBaseODF() {}
+
+public:
+    vec3d	m_pos;	//!< position
+    std::vector<double> m_ODF; //!< ODF values
+    std::vector<vec3d> m_nodePos; //!< node positions
+};
+
+class FEFiberODF : public FECoreClass, public FEBaseODF
 {
 public:
 	FEFiberODF(FEModel* fem) : FECoreClass(fem) {}
 
 public:
-	std::vector<double>		m_shpHar;	//!< spherical harmonics Values
-	vec3d	m_pos;	//!< position
+    std::vector<double> m_shpHar;	//!< spherical harmonics Values
 
 	DECLARE_FECORE_CLASS();
 	FECORE_BASE_CLASS(FEFiberODF);
-
-private:
-    std::vector<double> m_ODF;
-
-    friend class FECustomFiberDistribution;
 };
 
-class FEElementODF
+class FEElementODF : public FEBaseODF
 {
 public:
-    FEElementODF(int ODFSize, int weightsSize) : m_ODF(ODFSize), m_pos(0,0,0), m_weights(weightsSize) {}
+    FEElementODF(int weightsSize) : m_weights(weightsSize) {}
 
     void calcODF(std::vector<std::vector<double>>& ODFs);
 
 public:
-    std::vector<double> m_ODF; //!< ODF values
-	vec3d m_pos; //!< position
-    std::vector<double> m_weights; //!< ODF values
+    std::vector<double> m_weights; //!< weights for interpolation
 };
 
 //  This material is a container for a fiber material, a fiber density
@@ -102,13 +106,12 @@ protected:
 
 	DECLARE_FECORE_CLASS();
 
-// private:
-    // void ODFInterpolation(std::vector<double>&);
+private:
+    void reduceODF(FEBaseODF* ODF);
 
 private:
-    std::unordered_map<int, std::vector<double>> m_interpolatedODFs;
-    // std::vector<double>         m_ODF;
-    // std::vector<vec3d>          m_nodePos;
+    bool m_interpolate; // whether or not we're interpolating at each element
+    int m_order; // Spherical Harmonic Order
 
     double m_lengthScale;
     double m_hausd;

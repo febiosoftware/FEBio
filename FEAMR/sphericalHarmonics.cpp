@@ -51,6 +51,54 @@ double fact(int val)
     return ans;
 }
 
+void getSphereCoords(double* theta, double* phi)
+{
+    static double* THETA = nullptr;
+    static double* PHI = nullptr;
+
+    if(!THETA && !PHI)
+    {
+        THETA = new double[NPTS] {};
+        PHI = new double[NPTS] {};
+
+        // get spherical coordinates
+        for(int index = 0; index < NPTS; index++)
+        {
+            theta[index] = acos(ZCOORDS[index]);
+        }
+
+        for(int index = 0; index < NPTS; index++)
+        {
+            double x = XCOORDS[index];
+            double y = YCOORDS[index];
+
+            if(x > 0)
+            {
+                phi[index] = atan(y/x);
+            }
+            else if(x < 0 && y >= 0)
+            {
+                phi[index] = atan(y/x) + M_PI;
+            }
+            else if(x < 0 && y < 0)
+            {
+                phi[index] = atan(y/x) - M_PI;
+            }
+            else if(x == 0 && y > 0)
+            {
+                phi[index] = M_PI/2;
+            }
+            else if(x == 0 && y < 0)
+            {
+                phi[index] = -M_PI/2;
+            }
+        }
+    }
+
+    theta = THETA;
+    phi = PHI;
+}
+
 void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi)
 {
     // get spherical coordinates
@@ -86,6 +134,52 @@ void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, c
         }
     }
 
+}
+
+matrix* compSH(int order)
+{
+    static matrix* out = nullptr;
+    static int oldOrder = -1;
+
+    if(!out || order != oldOrder)
+    {
+        oldOrder = order;
+
+        double *theta, *phi;
+        getSphereCoords(theta, phi);
+
+        int numCols = (order+1)*(order+2)/2;
+        out = new matrix(NPTS, numCols);
+        out->fill(0,0,NPTS, numCols, 0.0);
+
+        for(int k = 0; k <= order; k+=2)
+        {
+            for(int m = -k; m <= k; m++)
+            {
+                int j = (k*k + k + 2)/2 + m - 1;
+
+                int numType = COMPLEXTYPE;
+                double factor = 1;
+                if(m < 0)
+                {
+                    numType = REALTYPE;
+                    factor = sqrt(2);
+                }
+                else if(m > 0)
+                {
+                    numType = IMAGTYPE;
+                    factor = sqrt(2);
+                }
+
+                for(int index = 0; index < NPTS; index++)
+                {
+                    (*out)[index][j] = factor*harmonicY(k, m, theta[index], phi[index], numType);
+                }
+            }
+        }
+    }
+
+    return out;
 }
 
 std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi)
@@ -162,17 +256,13 @@ void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF)
 {
     int order = (sqrt(8*sphHarm.size() + 1) - 3)/2;
 
-    double* theta = new double[NPTS] {};
-    double* phi = new double[NPTS] {};
+    double *theta, *phi;
 
-    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, theta, phi);
+    getSphereCoords(theta, phi);
 
     ODF.resize(NPTS);  
-    auto T = compSH(order, NPTS, theta, phi);
+    auto T = compSH(order);
     (*T).mult(sphHarm, ODF);
-
-    delete[] theta;
-    delete[] phi;
 
     // Normalize ODF
     double sum = 0;
@@ -187,20 +277,8 @@ void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF)
     }
 }
 
-void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient)
+void altGradient(int order, std::vector<double>& ODF, std::vector<double>& gradient)
 {
-    double* theta = new double[NPTS] {};
-    double* phi = new double[NPTS] {};
-
-    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, theta, phi);
-
-    std::vector<double> ODF(NPTS, 0);  
-    auto T = compSH(order, NPTS, theta, phi);
-    (*T).mult(sphHarm, ODF);
-
-    delete[] theta;
-    delete[] phi;
-
     gradient.resize(NPTS);
     for(int index = 0; index < NPTS; index++)
     {
@@ -236,7 +314,6 @@ void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& g
     {
         gradient[index] /= count[index];
     }
-
 }
 
 void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
