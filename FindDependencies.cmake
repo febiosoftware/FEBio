@@ -119,8 +119,8 @@ if(WIN32)
         PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
 		DOC "MMG library path")
     find_library(MMGS_LIB mmgs 
-        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
+        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
 		DOC "MMGS library path")
 else()
 	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
