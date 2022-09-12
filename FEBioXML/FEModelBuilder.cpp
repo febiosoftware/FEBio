@@ -525,6 +525,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
     else if (strcmp(sztype, "q4eas"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = EAS_SHELL; }   // default shell type for q4eas
     else if (strcmp(sztype, "q4ans"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = ANS_SHELL; }   // default shell type for q4ans
 	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
+	else if (strcmp(sztype, "line2"  ) == 0) eshape = ET_TRUSS2;
 	else if (strcmp(sztype, "ut4"    ) == 0) { eshape = ET_TET4; m_but4 = true; }
 	else
 	{

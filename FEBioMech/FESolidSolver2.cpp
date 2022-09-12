@@ -51,6 +51,8 @@ SOFTWARE.*/
 #include "FESolidLinearSystem.h"
 #include "FEBioMech.h"
 #include "FESolidAnalysis.h"
+#include "FETrussMaterial.h"
+#include "FELinearTrussDomain.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -1081,16 +1083,11 @@ bool FESolidSolver2::StiffnessMatrix()
 		double dt = tp.timeIncrement;
 		double a = tp.alpham / (m_beta*dt*dt);
 
-		// loop over all domains (except rigid)
+		// loop over all elastic domains
 		for (int i = 0; i<mesh.Domains(); ++i)
 		{
-			FEDomain& dom = mesh.Domain(i);
-			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-			if (mat && (mat->IsRigid() == false))
-			{
-				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-				edom.MassMatrix(LS, a);
-			}
+			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
+			if (edom) edom->MassMatrix(LS, a);
 		}
 
 		m_rigidSolver.RigidMassMatrix(LS, tp);
@@ -1256,13 +1253,8 @@ void FESolidSolver2::InternalForces(FEGlobalVector& R)
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (int i = 0; i<mesh.Domains(); ++i)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-		if ((mat == nullptr) || (mat->IsRigid() == false))
-		{
-			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-			edom.InternalForces(R);
-		}
+		FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
+		if (edom) edom->InternalForces(R);
 	}
 }
 
@@ -1295,16 +1287,11 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		// allocate F
 		vector<double> F;
 
-		// calculate the inertial forces for all elastic domains (except rigid domains)
+		// calculate the inertial forces for all elastic domains
 		for (int nd = 0; nd < mesh.Domains(); ++nd)
 		{
-			FEDomain& dom = mesh.Domain(nd);
-			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-			if (mat && (mat->IsRigid() == false))
-			{
-				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-				edom.InertialForces(RHS, F);
-			}
+			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(nd));
+			if (edom) edom->InertialForces(RHS, F);
 		}
 
 		// update rigid bodies
