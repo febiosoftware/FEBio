@@ -27,15 +27,13 @@ SOFTWARE.*/
 #include <memory>
 #include <FECore/matrix.h>
 
-void getSphereCoords(double* theta, double* phi);
 void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi);
 
-matrix* compSH(int order);
 std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi);
 
 double harmonicY(int degree, int order, double theta, double phi, int numType);
 
-void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF);
+void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi);
 
 void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
 

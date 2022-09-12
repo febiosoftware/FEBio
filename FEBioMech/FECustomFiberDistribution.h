@@ -107,11 +107,16 @@ protected:
 	DECLARE_FECORE_CLASS();
 
 private:
-    void reduceODF(FEBaseODF* ODF);
+    void reduceODF(FEBaseODF* ODF, matrix& B);
 
 private:
     bool m_interpolate; // whether or not we're interpolating at each element
     int m_order; // Spherical Harmonic Order
+
+    std::unique_ptr<matrix> m_T;
+
+    double* m_theta;
+    double* m_phi;
 
     double m_lengthScale;
     double m_hausd;

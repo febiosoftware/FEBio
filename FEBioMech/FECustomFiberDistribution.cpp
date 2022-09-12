@@ -158,14 +158,18 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECustomFiberDistribution::FECustomFiberDistribution(FEModel* pfem) 
-    : FEElasticMaterial(pfem), m_lengthScale(10), m_hausd(0.05), m_grad(1.3), m_interpolate(false)
+    : FEElasticMaterial(pfem), m_lengthScale(10), m_hausd(0.05), m_grad(1.3), m_interpolate(false),
+        m_theta(nullptr), m_phi(nullptr)
 {
-
 	m_pFmat = 0;
 }
 
 //-----------------------------------------------------------------------------
-FECustomFiberDistribution::~FECustomFiberDistribution() {}
+FECustomFiberDistribution::~FECustomFiberDistribution()
+{
+    if(m_theta) delete[] m_theta;
+    if(m_phi) delete[] m_phi;
+}
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FECustomFiberDistribution::CreateMaterialPointData()
@@ -186,10 +190,16 @@ bool FECustomFiberDistribution::Init()
     // Get harmonic order by looking at number of coefficients of first ODF
     m_order = (sqrt(8*m_ODF[0]->m_shpHar.size() + 1) - 3)/2;
 
+    // Initialize spherical coordinates and T matrix
+    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, m_theta, m_phi);
+    m_T = compSH(m_order, NPTS, m_theta, m_phi);
+    matrix transposeT = m_T->transpose();
+    matrix B = (transposeT*(*m_T)).inverse()*transposeT;
+
     // Calculate the ODFs for each of the image subregions
     for(auto& ODF : m_ODF)
     {
-        reconstructODF(ODF->m_shpHar, ODF->m_ODF);
+        reconstructODF(ODF->m_shpHar, ODF->m_ODF, NPTS, m_theta, m_phi);
     }
 
     if(m_interpolate)
@@ -250,7 +260,7 @@ bool FECustomFiberDistribution::Init()
                 odf->calcODF(pODF);
 
                 // Reduce the number of points in the ODF
-                reduceODF(odf);
+                reduceODF(odf, B);
 
                 // Add element odf object to map
                 m_ElODF[element.GetID()] = odf;
@@ -259,13 +269,13 @@ bool FECustomFiberDistribution::Init()
     }
     else
     {
-        reduceODF(m_ODF[0]);
+        reduceODF(m_ODF[0], B);
     }
 
 	return true;
 }
 
-void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF)
+void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B)
 {
     vector<double>* sphHar;
 
@@ -275,10 +285,6 @@ void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF)
         int sphrHarmSize = (m_order+1)*(m_order+2)/2;
         sphHar = new vector<double>(sphrHarmSize);
 
-        matrix* fullT = compSH(m_order);
-
-        matrix transposeT = fullT->transpose();
-        matrix B = (transposeT*(*fullT)).inverse()*transposeT;
         B.mult(ODF->m_ODF, *sphHar);
     }
     else
