@@ -38,7 +38,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFiberODF, FECoreClass)
-	ADD_PARAMETER(m_shpHar, "odf");
+	ADD_PARAMETER(m_shpHar, "shp_harmonics");
 	ADD_PARAMETER(m_pos, "position");
 END_FECORE_CLASS();
 
@@ -150,7 +150,7 @@ BEGIN_FECORE_CLASS(FECustomFiberDistribution, FEElasticMaterial)
 
 	// material properties
 	ADD_PROPERTY(m_pFmat, "fibers");
-    ADD_PROPERTY(m_ODF, "shp_harmonics");
+    ADD_PROPERTY(m_ODF, "fiber-odf");
 
 	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
@@ -191,6 +191,8 @@ bool FECustomFiberDistribution::Init()
     m_order = (sqrt(8*m_ODF[0]->m_shpHar.size() + 1) - 3)/2;
 
     // Initialize spherical coordinates and T matrix
+    m_theta = new double[NPTS];
+    m_phi = new double[NPTS];
     getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, m_theta, m_phi);
     m_T = compSH(m_order, NPTS, m_theta, m_phi);
     matrix transposeT = m_T->transpose();
@@ -271,6 +273,9 @@ bool FECustomFiberDistribution::Init()
     {
         reduceODF(m_ODF[0], B);
     }
+
+    delete[] m_theta; m_theta = nullptr;
+    delete[] m_phi; m_phi = nullptr;
 
 	return true;
 }
@@ -402,7 +407,7 @@ mat3ds FECustomFiberDistribution::Stress(FEMaterialPoint& mp)
     }
     else
     {
-        ODF;
+        ODF = m_ODF[0];
     }
 
 	// calculate stress
@@ -440,7 +445,7 @@ tens4ds FECustomFiberDistribution::Tangent(FEMaterialPoint& mp)
     }
     else
     {
-        ODF;
+        ODF = m_ODF[0];
     }
 
 	// get the local coordinate system
@@ -478,7 +483,7 @@ double FECustomFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
     }
     else
     {
-        ODF;
+        ODF = m_ODF[0];
     }
 
 	// get the local coordinate system
