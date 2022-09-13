@@ -65,7 +65,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
     while(nPhi < prevPhi)
     {
         // compute logmaps from current meanPODF to every other ODF
-        for(int index = 0; index < m_ODF.size(); index++)
+        for(int index = 0; index < ODFs.size(); index++)
         {
             auto& currentLogmap = logmaps[index];
             auto& currentODF = ODFs[index];
@@ -199,8 +199,10 @@ bool FECustomFiberDistribution::Init()
     matrix B = (transposeT*(*m_T)).inverse()*transposeT;
 
     // Calculate the ODFs for each of the image subregions
-    for(auto& ODF : m_ODF)
+    #pragma omp parallel for
+    for(int index = 0; index < m_ODF.size(); index++)
     {
+        FEFiberODF* ODF = m_ODF[index];
         reconstructODF(ODF->m_shpHar, ODF->m_ODF, NPTS, m_theta, m_phi);
     }
 
@@ -210,6 +212,7 @@ bool FECustomFiberDistribution::Init()
         std::vector<std::vector<double>> pODF;
         pODF.resize(m_ODF.size());
 
+        #pragma omp parallel for
         for(int index = 0; index < m_ODF.size(); index++)
         {
             auto& currentODF = m_ODF[index]->m_ODF;
@@ -225,11 +228,16 @@ bool FECustomFiberDistribution::Init()
 
         FEMesh& mesh = GetFEModel()->GetMesh();
         
-        auto& domainList = GetDomainList();
-        for(int index = 0; index < domainList.Domains(); index++)
+        for(int index = 0; index < mesh.Domains(); index++)
         {
-            FEDomain* domain = domainList.GetDomain(index);
+            FEDomain* domain = &mesh.Domain(index);
+			FEMaterial* mat = dynamic_cast<FEMaterial*>(domain->GetMaterial());
+			if (mat != this->GetParent())
+			{
+                continue;
+            }
 
+            #pragma omp parallel for
             for(int el = 0; el < domain->Elements(); el++)
             {
                 FEElement& element = domain->ElementRef(el);
@@ -416,7 +424,7 @@ mat3ds FECustomFiberDistribution::Stress(FEMaterialPoint& mp)
 	// get the local coordinate system
 	mat3d Q = GetLocalCS(mp);
 
-    for(int index = 0; index < m_ODF.size(); index++)
+    for(int index = 0; index < ODF->m_ODF.size(); index++)
     {
         // evaluate ellipsoidally distributed material coefficients
         double R = ODF->m_ODF[index];
@@ -454,7 +462,7 @@ tens4ds FECustomFiberDistribution::Tangent(FEMaterialPoint& mp)
     // initialize stress tensor
 	tens4ds c;
 	c.zero();
-    for(int index = 0; index < m_ODF.size(); index++)
+    for(int index = 0; index < ODF->m_ODF.size(); index++)
     {
         //evaluate ellipsoidally distributed material coefficients
         double R = ODF->m_ODF[index];
@@ -490,7 +498,7 @@ double FECustomFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3d Q = GetLocalCS(mp);
 
     double sed = 0.0;
-    for(int index = 0; index < m_ODF.size(); index++)
+    for(int index = 0; index < ODF->m_ODF.size(); index++)
     {
         // evaluate ellipsoidally distributed material coefficients
         double R = ODF->m_ODF[index];

@@ -168,8 +168,13 @@ void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int 
 
     // Normalize ODF
     double sum = 0;
-    for(int index = 0; index < NPTS; index++)
+    for(int index = 0; index < ODF.size(); index++)
     {
+        if((ODF)[index] < 0)
+        {
+            ODF[index] = 0;
+        }
+        
         sum += ODF[index];
     }
 
