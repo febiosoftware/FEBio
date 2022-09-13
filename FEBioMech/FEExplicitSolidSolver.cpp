@@ -833,7 +833,9 @@ void FEExplicitSolidSolver::PrepStep()
 	// intialize material point data
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	fem.Update();
+	// NOTE: Commenting this out since I don't think anything needs to be updated here. 
+	//       This also halves the number of update calls, so gives a performance boost. 
+//	fem.Update();
 }
 
 //-----------------------------------------------------------------------------
