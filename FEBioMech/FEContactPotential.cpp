@@ -236,6 +236,8 @@ public:
 			m_elemList.insert(el);
 		}
 
+		bool empty() const { return m_elemList.empty(); }
+
 	public:
 		BOX m_box;
 		set<FESurfaceElement*>	m_elemList;
@@ -268,7 +270,7 @@ public:
 		for (int i = 0; i < 27; ++i)
 		{
 			Cell* ci = c->m_nbr[i];
-			if (ci != nullptr) cellList[n++] = ci;
+			if ((ci != nullptr) && (ci->empty() == false)) cellList[n++] = ci;
 		}
 		return n;
 	}
@@ -437,7 +439,7 @@ void FEContactPotential::Update()
 		set<FESurfaceElement*>& activeElems = m_activeElements[i];
 		activeElems.clear();
 
-		set<FESurfaceElement*> nbrList = m_elemNeighbors[i];
+		const set<FESurfaceElement*>& nbrList = m_elemNeighbors[i];
 
 		for (int n = 0; n < el1.GaussPoints(); ++n)
 		{
@@ -463,7 +465,7 @@ void FEContactPotential::Update()
 						// integration point of el1. 
 						for (int m = 0; m < el2->GaussPoints(); ++m)
 						{
-							FECPContactPoint& mp2 = static_cast<FECPContactPoint&>(*el2->GetMaterialPoint(m));
+							const FECPContactPoint& mp2 = static_cast<FECPContactPoint&>(*el2->GetMaterialPoint(m));
 
 							vec3d r12 = r1 - mp2.m_rt;
 							if ((r12.x < m_Rout) && (r12.x > -m_Rout) &&
