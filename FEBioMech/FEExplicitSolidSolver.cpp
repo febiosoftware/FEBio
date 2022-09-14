@@ -61,7 +61,7 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 	m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem),
 	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
-	m_dyn_damping = 0.99;
+	m_dyn_damping = 1;
 	m_niter = 0;
 	m_nreq = 0;
 
@@ -913,13 +913,13 @@ bool FEExplicitSolidSolver::DoSolve()
 	{
 		FENode& node = mesh.Node(i);
 		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], m_dyn_damping*vnp1[n]); node.m_at.x = anp1[n]; }
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], m_dyn_damping*vnp1[n]); node.m_at.y = anp1[n]; }
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], m_dyn_damping*vnp1[n]); node.m_at.z = anp1[n]; }
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], m_dyn_damping*vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], m_dyn_damping*vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], m_dyn_damping*vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
 	}
 
 	// do minor iterations callbacks
