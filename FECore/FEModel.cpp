@@ -1824,6 +1824,12 @@ int FEModel::GlobalDataItems()
 //-----------------------------------------------------------------------------
 FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem)
 {
+	if ((pc == nullptr) || (fem == nullptr))
+	{
+		assert(false);
+		return nullptr;
+	}
+
 	const char* sztype = pc->GetTypeStr();
 
 	// create a new material
@@ -1836,14 +1842,20 @@ FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem)
 	pcnew->GetParameterList() = pc->GetParameterList();
 
 	// copy properties
-	for (int i = 0; i < pc->Properties(); ++i)
+	for (int i = 0; i < pc->PropertyClasses(); ++i)
 	{
 		FEProperty* prop = pc->PropertyClass(i);
-		FECoreBase* pci = prop->get(0);
-		if (pc)
+		if (prop->size() > 0)
 		{
-			FECoreBase* pci_new = CopyFEBioClass(pci, fem); assert(pci_new);
-			bool b = pcnew->SetProperty(i, pci_new); assert(b);
+			for (int j = 0; j < prop->size(); ++j)
+			{
+				FECoreBase* pci = prop->get(j);
+				if (pc)
+				{
+					FECoreBase* pci_new = CopyFEBioClass(pci, fem); assert(pci_new);
+					bool b = pcnew->SetProperty(i, pci_new); assert(b);
+				}
+			}
 		}
 	}
 
