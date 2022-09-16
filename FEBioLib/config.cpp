@@ -32,8 +32,10 @@ SOFTWARE.*/
 #include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
+#include <FECore/FEMaterial.h>
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
+#include <FEBioTest/FEMaterialTest.h>
 #include "plugin.h"
 #include <map>
 #include <iostream>
@@ -489,6 +491,43 @@ void print_svg(CompactMatrix* m, std::ostream &out, int i0, int j0, int i1, int 
 bool write_vector(const vector<double>& a, const char* szfile, int mode)
 {
 	return NumCore::write_vector(a, szfile, mode);
+}
+
+bool RunMaterialTest(FEMaterial* mat, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out)
+{
+	FEModel fem;
+
+	FEMaterial* matcopy = dynamic_cast<FEMaterial*>(CopyFEBioClass(mat, &fem));
+	if (matcopy == nullptr) return false;
+
+	fem.AddMaterial(matcopy);
+
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+
+	FEMaterialTest diag(&fem);
+	diag.SetOutputFileName(nullptr);
+
+	FEDiagnosticScenario* s = diag.CreateScenario(sztest);
+	s->GetParameterList();
+	s->SetParameter<double>("strain", strain);
+
+	FEAnalysis* step = fem.GetStep(0);
+	step->m_ntime = steps;
+	step->m_dt0 = 1.0 / steps;
+	fem.SetCurrentStepIndex(0);
+
+	if (diag.Init() == false) return false;
+
+	if (fem.Init() == false) return false;
+
+	bool b = diag.Run();
+
+	if (b)
+	{
+		out = diag.GetOutputData();
+	}
+
+	return b;
 }
 
 } // namespace febio

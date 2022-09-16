@@ -251,24 +251,24 @@ bool FETangentSimpleShear::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FETangentDiagnostic::FETangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	// make sure the correct module is active
-	fem.SetActiveModule("solid");
+	fem->SetActiveModule("solid");
 
 	m_pscn = 0;
 
 	// create an analysis step
-	FEAnalysis* pstep = new FEAnalysis(&fem);
+	FEAnalysis* pstep = new FEAnalysis(fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("solid", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("solid", fem);
 	assert(pnew_solver);
 	pstep->SetFESolver(pnew_solver);
 
 	// keep a pointer to the fem object
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

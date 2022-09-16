@@ -1822,7 +1822,7 @@ int FEModel::GlobalDataItems()
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* CopyClass(FECoreBase* pc, FEModel* fem)
+FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem)
 {
 	const char* sztype = pc->GetTypeStr();
 
@@ -1842,7 +1842,7 @@ FECoreBase* CopyClass(FECoreBase* pc, FEModel* fem)
 		FECoreBase* pci = prop->get(0);
 		if (pc)
 		{
-			FECoreBase* pci_new = CopyClass(pci, fem); assert(pci_new);
+			FECoreBase* pci_new = CopyFEBioClass(pci, fem); assert(pci_new);
 			bool b = pcnew->SetProperty(i, pci_new); assert(b);
 		}
 	}
@@ -1923,7 +1923,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEMaterial* pmat = fem.GetMaterial(i);
 
 		// copy the material
-		FEMaterial* pnew = dynamic_cast<FEMaterial*>(CopyClass(pmat, this));
+		FEMaterial* pnew = dynamic_cast<FEMaterial*>(CopyFEBioClass(pmat, this));
 		assert(pnew);
 
 		// copy the name

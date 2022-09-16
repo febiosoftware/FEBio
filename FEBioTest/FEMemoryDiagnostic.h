@@ -32,7 +32,7 @@ SOFTWARE.*/
 class FEMemoryDiagnostic :	public FEDiagnostic
 {
 public:
-	FEMemoryDiagnostic(FEModel& fem);
+	FEMemoryDiagnostic(FEModel* fem);
 	~FEMemoryDiagnostic();
 
 	bool Init();

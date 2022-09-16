@@ -158,23 +158,23 @@ bool FEPolarFluidTangentUniaxial::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEPolarFluidTangentDiagnostic::FEPolarFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEPolarFluidTangentDiagnostic::FEPolarFluidTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
     m_pscn = 0;
     
     // make sure the correct module is active
-    fem.SetActiveModule("polar fluid");
+    fem->SetActiveModule("polar fluid");
     
-    FEAnalysis* pstep = new FEAnalysis(&fem);
+    FEAnalysis* pstep = new FEAnalysis(fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("polar fluid", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("polar fluid", fem);
     assert(pnew_solver);
     pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
     
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------
