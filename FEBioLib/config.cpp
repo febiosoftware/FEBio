@@ -493,7 +493,7 @@ bool write_vector(const vector<double>& a, const char* szfile, int mode)
 	return NumCore::write_vector(a, szfile, mode);
 }
 
-bool RunMaterialTest(FEMaterial* mat, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out)
+bool RunMaterialTest(FEMaterial* mat, double simtime, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out)
 {
 	FEModel fem;
 
@@ -513,7 +513,7 @@ bool RunMaterialTest(FEMaterial* mat, int steps, double strain, const char* szte
 
 	FEAnalysis* step = fem.GetStep(0);
 	step->m_ntime = steps;
-	step->m_dt0 = 1.0 / steps;
+	step->m_dt0 = simtime / steps;
 	fem.SetCurrentStepIndex(0);
 
 	if (diag.Init() == false) return false;

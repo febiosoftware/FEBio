@@ -142,10 +142,14 @@ bool FETangentUniaxial::Init()
 	// convert strain to a displacement
 	double d = sqrt(2*m_strain+1) - 1;
 
+	// get the simulation time
+	FEAnalysis* step = fem.GetStep(0);
+	double tend = step->m_ntime * step->m_dt0;
+
 	// Add a loadcurve
 	FELoadCurve* plc = new FELoadCurve(&fem);
 	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	plc->Add(tend, 1.0);
 	fem.AddLoadController(plc);
 
 	// Add a prescribed BC

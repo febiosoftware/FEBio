@@ -87,5 +87,5 @@ namespace febio
 	FEBIOLIB_API bool write_vector(const vector<double>& a, const char* szfile, int mode = 0);
 
 	// run a material test
-	FEBIOLIB_API bool RunMaterialTest(FEMaterial* mat, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out);
+	FEBIOLIB_API bool RunMaterialTest(FEMaterial* mat, double simtime, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out);
 }
