@@ -31,7 +31,7 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FERigidMaterial, FESolidMaterial)
-	ADD_PARAMETER(m_E      , FE_RANGE_GREATER(0.0), "E"         )->setLongName("Young's modulus");
+	ADD_PARAMETER(m_E      , FE_RANGE_GREATER_OR_EQUAL(0.0), "E"         )->setLongName("Young's modulus");
 	ADD_PARAMETER(m_v      , FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v")->setLongName("Poisson's ratio");
 	ADD_PARAMETER(m_com    , "override_com")->SetFlags(FE_PARAM_WATCH);
 	ADD_PARAMETER(m_rc    , "center_of_mass")->SetWatchVariable(&m_com);
