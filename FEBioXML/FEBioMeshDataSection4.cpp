@@ -584,6 +584,7 @@ void FEBioMeshDataSection4::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 	// get the mat_axis property
 	FEProperty* pQ = mat->FindProperty("mat_axis", true);
+	if (pQ == nullptr) throw XMLReader::InvalidAttributeValue(tag, "var", "mat_axis");
 	if (pQ->GetSuperClassID() != FEMAT3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
 	// create the map's name: material_name.mat_axis
