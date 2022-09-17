@@ -75,7 +75,7 @@ namespace febio
 	FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask = nullptr, const char* szctrl = nullptr);
 
 	// run an FEBioModel
-	FEBIOLIB_API bool RunModel(FEBioModel& fem, CMDOPTIONS* ops);
+	FEBIOLIB_API int RunModel(FEBioModel& fem, CMDOPTIONS* ops);
 
 	// write a matrix to file
 	FEBIOLIB_API bool write_hb(CompactMatrix& K, const char* szfile, int mode = 0);
