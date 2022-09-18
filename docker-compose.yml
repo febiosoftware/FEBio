@@ -16,4 +16,9 @@ services:
   febio-build:
     <<: *default
     container_name: febio-build
-    command: ./infrastructure/docker/build/build.sh
+    command: ci/linux.sh
+
+  febio-tests:
+    <<: *default
+    container_name: febio-tests
+    command: ci/linux-test.sh
