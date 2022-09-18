@@ -75,15 +75,29 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FECORE_API FEMathValue : public FEScalarValuator
+class FEMathExpression : public MSimpleExpression
 {
 	struct MathParam
 	{
 		int			type;	// 0 = param, 1 = map
-		FEParam*	pp;
-		FEDataMap*	map;
+		FEParam* pp;
+		FEDataMap* map;
 	};
 
+public:
+	bool Init(const std::string& expr, FECoreBase* pc = nullptr);
+
+	void operator = (const FEMathExpression& me);
+
+	double value(FEModel* fem, const FEMaterialPoint& pt);
+
+private:
+	std::vector<MathParam>	m_vars;
+};
+
+//---------------------------------------------------------------------------------------
+class FECORE_API FEMathValue : public FEScalarValuator
+{
 public:
 	FEMathValue(FEModel* fem) : FEScalarValuator(fem) {}
 	~FEMathValue();
@@ -101,8 +115,7 @@ public:
 
 private:
 	std::string			m_expr;
-	MSimpleExpression	m_math;
-	std::vector<MathParam>	m_vars;
+	FEMathExpression	m_math;
 
 	DECLARE_FECORE_CLASS();
 };

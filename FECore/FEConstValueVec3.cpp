@@ -24,6 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
+#include "FEModel.h"
 #include "FEConstValueVec3.h"
 #include "FEMaterialPoint.h"
 #include "FEMeshPartition.h"
@@ -69,29 +70,34 @@ bool FEMathValueVec3::Init()
 //---------------------------------------------------------------------------------------
 bool FEMathValueVec3::create(const std::string& sx, const std::string& sy, const std::string& sz)
 {
-	for (int i = 0; i < 3; ++i)
+	FECoreBase* pc = nullptr;
+	if (pc == nullptr)
 	{
-		m_math[i].AddVariable("X");
-		m_math[i].AddVariable("Y");
-		m_math[i].AddVariable("Z");
+		// try to find the owner of this parameter
+		// First, we need the model parameter
+		FEModelParam* param = GetModelParam();
+		if (param == nullptr) return false;
+
+		// we'll need the model for this
+		FEModel* fem = GetFEModel();
+		if (fem == nullptr) return false;
+
+		// Now try to find the owner of this parameter
+		pc = fem->FindParameterOwner(param);
 	}
-	bool b;
-	b = m_math[0].Create(sx); assert(b);
-	b = m_math[1].Create(sy); assert(b);
-	b = m_math[2].Create(sz); assert(b);
+
+	if (m_math[0].Init(sx, pc) == false) return false;
+	if (m_math[1].Init(sy, pc) == false) return false;
+	if (m_math[2].Init(sz, pc) == false) return false;
 
 	return true;
 }
 
 vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 {
-	std::vector<double> var(3);
-	var[0] = pt.m_r0.x;
-	var[1] = pt.m_r0.y;
-	var[2] = pt.m_r0.z;
-	double vx = m_math[0].value_s(var);
-	double vy = m_math[1].value_s(var);
-	double vz = m_math[2].value_s(var);
+	double vx = m_math[0].value(GetFEModel(), pt);
+	double vy = m_math[1].value(GetFEModel(), pt);
+	double vz = m_math[2].value(GetFEModel(), pt);
 	return vec3d(vx, vy, vz);
 }
 

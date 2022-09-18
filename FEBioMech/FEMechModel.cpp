@@ -166,8 +166,8 @@ void FEMechModel::Reactivate()
 //-----------------------------------------------------------------------------
 bool FEMechModel::Reset()
 {
-	if (FEModel::Reset() == false) return false;
-	return m_prs->Reset();
+	if (m_prs->Reset() == false) return false;
+	return FEModel::Reset();
 }
 
 //-----------------------------------------------------------------------------
