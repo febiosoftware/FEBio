@@ -41,8 +41,11 @@ public:
     FEViscousPolarFluid(FEModel* pfem) : FEMaterial(pfem) {}
     virtual ~FEViscousPolarFluid() {}
     
+    //! dual vector non-symmetric part of viscous stress in polar fluid
+    virtual vec3d SkewStressDualVector(FEMaterialPoint& pt) = 0;
+    
     //! non-symmetric part of viscous stress in polar fluid
-    virtual mat3da SkewStress(FEMaterialPoint& pt) = 0;
+    virtual mat3da SkewStress(FEMaterialPoint& pt) { return mat3da(SkewStressDualVector(pt)); }
     
     //! tangent of stress with respect to strain J
     virtual mat3da SkewTangent_Strain(FEMaterialPoint& mp) = 0;

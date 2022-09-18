@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FELinearTrussDomain, FETrussDomain)
@@ -74,14 +75,18 @@ void FELinearTrussDomain::SetMaterial(FEMaterial* pmat)
 //! initialize the domain
 bool FELinearTrussDomain::Init()
 {
-	if (m_a0 != 0.0)
+	if (m_a0 <= 0.0)
 	{
-		for (int i = 0; i < Elements(); ++i)
-		{
-			FETrussElement& el = Element(i);
-			el.m_a0 = m_a0;
-		}
+		feLogError("Cross sectional area of \"%s\" must be positive.", GetName().c_str());
+		return false;
 	}
+
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FETrussElement& el = Element(i);
+		el.m_a0 = m_a0;
+	}
+	
 	return FETrussDomain::Init();
 }
 
@@ -147,6 +152,37 @@ void FELinearTrussDomain::StiffnessMatrix(FELinearSystem& LS)
 		UnpackLM(el, lm);
 		ke.SetIndices(lm);
 		LS.Assemble(ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! intertial stiffness matrix \todo implement this
+void FELinearTrussDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	for (int n = 0; n < Elements(); ++n)
+	{
+		FETrussElement& el = Element(n);
+
+		matrix me(2, 2); me.zero();
+		ElementMassMatrix(el, me);
+
+		FEElementMatrix Me(6, 6); Me.zero();
+		for (int i=0; i<2; ++i)
+		{ 
+			for (int j = 0; j < 2; ++j)
+			{
+				Me[3 * i    ][3 * j    ] = me[i][j];
+				Me[3 * i + 1][3 * j + 1] = me[i][j];
+				Me[3 * i + 2][3 * j + 2] = me[i][j];
+			}
+		}
+
+		vector<int> lm;
+		UnpackLM(el, lm);
+
+		Me.SetIndices(lm);
+
+		LS.Assemble(Me);
 	}
 }
 

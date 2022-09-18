@@ -30,14 +30,14 @@ SOFTWARE.*/
 #include "FEMemoryDiagnostic.h"
 #include "FECore/log.h"
 
-FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	m_szfile[0] = 0;
 	m_iters = 1;
 
-	FEAnalysis* pstep = new FEAnalysis(&fem);
-	fem.AddStep(pstep);
-	fem.SetCurrentStep(pstep);
+	FEAnalysis* pstep = new FEAnalysis(fem);
+	fem->AddStep(pstep);
+	fem->SetCurrentStep(pstep);
 }
 
 FEMemoryDiagnostic::~FEMemoryDiagnostic(void)

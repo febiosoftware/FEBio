@@ -64,7 +64,7 @@ public:
 class FETiedBiphasicDiagnostic : public FEDiagnostic
 {
 public:
-    FETiedBiphasicDiagnostic(FEModel& fem);
+    FETiedBiphasicDiagnostic(FEModel* fem);
     ~FETiedBiphasicDiagnostic();
     
     bool Run();

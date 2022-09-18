@@ -183,20 +183,23 @@ bool FEMultiphasicTangentUniaxial::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem->SetActiveModule("multiphasic");
+
     m_pscn = 0;
 
-	FEAnalysis* pstep = new FEAnalysis(&fem);
+	FEAnalysis* pstep = new FEAnalysis(fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("multiphasic", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("multiphasic", fem);
 	assert(pnew_solver);
 	pnew_solver->m_msymm = REAL_UNSYMMETRIC;
 	pstep->SetFESolver(pnew_solver);
 
-	fem.AddStep(pstep);
-	fem.SetCurrentStep(pstep);
+	fem->AddStep(pstep);
+	fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

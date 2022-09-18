@@ -1,8 +1,8 @@
 on:
   #schedule:
   #  - cron: '00 7 * * *' #0630 UTC kick off full build and regression
-  #push:
-  #  branches: [ ci/* ]
+  push:
+    branches: [ ci/* ]
   workflow_dispatch:
     inputs:
       runTests:
@@ -15,7 +15,7 @@ env:
   AWS_SUBNET_ID: subnet-097642e5c610e7583
   AWS_SG_ID: sg-0ca7912782cf1538b
   AMI_ID: ami-04bb42ae8c0b24120
-  AWS_INSTANCE_TYPE: c5a.8xlarge
+  AWS_INSTANCE_TYPE: c5a.16xlarge
   OS: windows
   KEY_PAIR: win
 jobs:

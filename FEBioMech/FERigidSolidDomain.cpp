@@ -85,3 +85,15 @@ void FERigidSolidDomain::Update(const FETimeInfo& tp)
 {
 	// Nothing to see here. Please move on.
 }
+
+//-----------------------------------------------------------------------------
+void FERigidSolidDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	// Only crickets here ... 
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSolidDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
+{
+	// chirp, chirp ...
+}

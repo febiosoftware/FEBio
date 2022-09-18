@@ -77,21 +77,21 @@ public: // overrides from FEElasticDomain
 	void UpdateElementStress(int iel, const FETimeInfo& tp);
 
 	//! internal stress forces
-	void InternalForces(FEGlobalVector& R, const FETimeInfo& tp);
+	void InternalForces(FEGlobalVector& R);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
+	void StiffnessMatrix(FELinearSystem& LS);
 
 public:
 	// --- S T I F F N E S S ---
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
+	void ElementStiffness(FESolidElement& el, matrix& ke);
 
 	// --- R E S I D U A L ---
 
 	//! Calculates the internal stress vector for solid elements
-	void ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
+	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 
 protected:
 	bool	m_btrans;

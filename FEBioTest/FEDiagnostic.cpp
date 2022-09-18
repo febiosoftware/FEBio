@@ -39,7 +39,9 @@ SOFTWARE.*/
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FEFluidTangentDiagnostic.h"
 #include "FEFluidFSITangentDiagnostic.h"
+#include "FEPolarFluidTangentDiagnostic.h"
 #include "FEContactDiagnosticBiphasic.h"
+#include "FEMaterialTest.h"
 #include "FECore/log.h"
 #include "FEBioXML/FEBioControlSection.h"
 #include "FEBioXML/FEBioMaterialSection.h"
@@ -51,7 +53,7 @@ SOFTWARE.*/
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEDiagnostic::FEDiagnostic(FEModel& fem) : m_fem(fem)
+FEDiagnostic::FEDiagnostic(FEModel* fem) : FECoreClass(fem)
 {
 
 }
@@ -103,18 +105,20 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		if (xml.FindTag("febio_diagnostic", tag) == false) return 0;
 
 		XMLAtt& att = tag.m_att[0];
-        if      (att == "tangent test"            ) { fecore.SetActiveModule("solid"      ); m_pdia = new FETangentDiagnostic           (fem); }
-        else if (att == "shell tangent test"      ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEEASShellTangentDiagnostic   (fem); }
-        else if (att == "contact test"            ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEContactDiagnostic           (fem); }
-        else if (att == "print matrix"            ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEPrintMatrixDiagnostic       (fem); }
-        else if (att == "print hbmatrix"          ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEPrintHBMatrixDiagnostic     (fem); }
-        else if (att == "memory test"             ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEMemoryDiagnostic            (fem); }
-        else if (att == "biphasic tangent test"   ) { fecore.SetActiveModule("biphasic"   ); m_pdia = new FEBiphasicTangentDiagnostic   (fem); }
-        else if (att == "biphasic contact test"   ) { fecore.SetActiveModule("biphasic"   ); m_pdia = new FEContactDiagnosticBiphasic   (fem); }
-        else if (att == "tied biphasic test"      ) { fecore.SetActiveModule("biphasic"   ); m_pdia = new FETiedBiphasicDiagnostic      (fem); }
-        else if (att == "multiphasic tangent test") { fecore.SetActiveModule("multiphasic"); m_pdia = new FEMultiphasicTangentDiagnostic(fem); }
-        else if (att == "fluid tangent test"      ) { fecore.SetActiveModule("fluid"      ); m_pdia = new FEFluidTangentDiagnostic      (fem); }
-        else if (att == "fluid-FSI tangent test"  ) { fecore.SetActiveModule("fluid-FSI"  ); m_pdia = new FEFluidFSITangentDiagnostic   (fem); }
+        if      (att == "tangent test"            ) { fecore.SetActiveModule("solid"      ); m_pdia = new FETangentDiagnostic           (&fem); }
+        else if (att == "shell tangent test"      ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEEASShellTangentDiagnostic   (&fem); }
+        else if (att == "contact test"            ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEContactDiagnostic           (&fem); }
+        else if (att == "print matrix"            ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEPrintMatrixDiagnostic       (&fem); }
+        else if (att == "print hbmatrix"          ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEPrintHBMatrixDiagnostic     (&fem); }
+        else if (att == "memory test"             ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEMemoryDiagnostic            (&fem); }
+        else if (att == "biphasic tangent test"   ) { fecore.SetActiveModule("biphasic"   ); m_pdia = new FEBiphasicTangentDiagnostic   (&fem); }
+        else if (att == "biphasic contact test"   ) { fecore.SetActiveModule("biphasic"   ); m_pdia = new FEContactDiagnosticBiphasic   (&fem); }
+        else if (att == "tied biphasic test"      ) { fecore.SetActiveModule("biphasic"   ); m_pdia = new FETiedBiphasicDiagnostic      (&fem); }
+        else if (att == "multiphasic tangent test") { fecore.SetActiveModule("multiphasic"); m_pdia = new FEMultiphasicTangentDiagnostic(&fem); }
+        else if (att == "fluid tangent test"      ) { fecore.SetActiveModule("fluid"      ); m_pdia = new FEFluidTangentDiagnostic      (&fem); }
+        else if (att == "fluid-FSI tangent test"  ) { fecore.SetActiveModule("fluid-FSI"  ); m_pdia = new FEFluidFSITangentDiagnostic   (&fem); }
+        else if (att == "polar fluid tangent test") { fecore.SetActiveModule("polar fluid"); m_pdia = new FEPolarFluidTangentDiagnostic (&fem); }
+        else if (att == "material test"           ) { fecore.SetActiveModule("solid"      ); m_pdia = new FEMaterialTest                (&fem); }
 		else
 		{
 			feLog("\nERROR: unknown diagnostic\n\n");

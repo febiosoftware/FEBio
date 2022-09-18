@@ -65,8 +65,7 @@ private:
 class FETangentDiagnostic : public FEDiagnostic  
 {
 public:
-	FETangentDiagnostic(FEModel& fem);
-	virtual ~FETangentDiagnostic(){}
+	FETangentDiagnostic(FEModel* fem);
 
 	FEDiagnosticScenario* CreateScenario(const std::string& sname);
 

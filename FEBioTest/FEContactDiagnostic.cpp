@@ -63,11 +63,14 @@ void FEContactDiagnostic::print_matrix(DenseMatrix& m)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEContactDiagnostic::FEContactDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEContactDiagnostic::FEContactDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
-	FEAnalysis* pstep = new FEAnalysis(&fem);
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+	// make sure the correct module is active
+	fem->SetActiveModule("solid");
+
+	FEAnalysis* pstep = new FEAnalysis(fem);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 FEContactDiagnostic::~FEContactDiagnostic()

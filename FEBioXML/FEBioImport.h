@@ -137,6 +137,24 @@ public:
 		MeshDataError();
 	};
 
+	// repeated node set
+	class RepeatedNodeSet : public FEFileException
+	{
+	public: RepeatedNodeSet(const std::string& name);
+	};
+
+	// repeated surface
+	class RepeatedSurface : public FEFileException
+	{
+	public: RepeatedSurface(const std::string& name);
+	};
+
+	// repeated element set
+	class RepeatedElementSet : public FEFileException
+	{
+	public: RepeatedElementSet(const std::string& name);
+	};
+
 public:
 	//! constructor
 	FEBioImport();

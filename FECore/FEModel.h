@@ -358,8 +358,8 @@ public:	// --- Miscellaneous routines ---
 	//! Derived classes can override this
 	virtual void SerializeGeometry(DumpStream& ar);
 
-	//! set the module name
-	void SetModuleName(const std::string& moduleName);
+	//! set the active module
+	void SetActiveModule(const std::string& moduleName);
 
 	//! get the module name
 	string GetModuleName() const;
@@ -431,3 +431,5 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+FECORE_API FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem);

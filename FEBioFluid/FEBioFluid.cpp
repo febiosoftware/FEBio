@@ -45,7 +45,6 @@ SOFTWARE.*/
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
-#include "FEFluidDomain2D.h"
 
 #include "FEFluidPressureLoad.h"
 #include "FEFluidTractionLoad.h"
@@ -81,10 +80,13 @@ SOFTWARE.*/
 #include "FEInitialFluidVelocity.h"
 
 #include "FEConstFluidBodyForce.h"
+#include "FECentrifugalFluidBodyForce.h"
 
 #include "FEFluidModule.h"
 
 #include "FEFluidAnalysis.h"
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
@@ -144,7 +146,6 @@ REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEFluidDomain3D, "fluid-3D");
-REGISTER_FECORE_CLASS(FEFluidDomain2D, "fluid-2D");
 
 //-----------------------------------------------------------------------------
 // Surface loads
@@ -163,7 +164,8 @@ REGISTER_FECORE_CLASS(FEFluidRCLoad                , "fluid RC"                 
 
 //-----------------------------------------------------------------------------
 // body loads
-REGISTER_FECORE_CLASS(FEConstFluidBodyForce, "const");
+REGISTER_FECORE_CLASS(FEConstFluidBodyForce      , "fluid body force");
+REGISTER_FECORE_CLASS(FECentrifugalFluidBodyForce, "fluid centrifugal force");
 
 //-----------------------------------------------------------------------------
 // boundary conditions
@@ -287,5 +289,28 @@ REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
 // Derived from FEMeshAdaptorCriterion
 REGISTER_FECORE_CLASS(FEFluidStressCriterion     , "fluid shear stress");
 
-    febio.SetActiveModule(0);
+//-----------------------------------------------------------------------------
+// Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEFluidAnalysis>([](FEFluidAnalysis* pc) {
+        pc->m_nanalysis = FEFluidAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = false;
+        pc->m_bdivreform = false;
+    }));
+    
+febio.SetActiveModule(0);
+
 }

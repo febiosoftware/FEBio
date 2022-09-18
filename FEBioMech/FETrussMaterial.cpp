@@ -32,14 +32,12 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FETrussMaterial, FEMaterial)
 	ADD_PARAMETER(m_rho, FE_RANGE_GREATER(0.0), "density");
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FETrussMaterial::FETrussMaterial(FEModel* pfem) : FEMaterial(pfem) 
 {
 	m_rho = 1.0;
-	m_E = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -54,16 +52,28 @@ double FETrussMaterial::Density()
 	return m_rho;
 }
 
+//=============================================================================
+// define the material parameters
+BEGIN_FECORE_CLASS(FELinearTrussMaterial, FETrussMaterial)
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FELinearTrussMaterial::FELinearTrussMaterial(FEModel* fem) : FETrussMaterial(fem)
+{
+	m_E = 0.0;
+}
+
 //-----------------------------------------------------------------------------
 // Note that this function returns the Kirchhoff stress!
-double FETrussMaterial::Stress(FEMaterialPoint &mp)
+double FELinearTrussMaterial::Stress(FEMaterialPoint &mp)
 {
 	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
 	return m_E*log(pt.m_l);
 }
 
 //-----------------------------------------------------------------------------
-double FETrussMaterial::Tangent(FEMaterialPoint &pt)
+double FELinearTrussMaterial::Tangent(FEMaterialPoint &pt)
 {
 	return m_E;
 }

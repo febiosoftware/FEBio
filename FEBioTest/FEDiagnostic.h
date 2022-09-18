@@ -50,11 +50,14 @@ private:
 //! The FEDiagnostic class is a base class that can be used to create
 //! diagnostic classes to test FEBio's performance.
 
-class FEDiagnostic
+class FEDiagnostic : public FECoreClass
 {
 public:
+	FECORE_BASE_CLASS(FEDiagnostic)
+
+public:
 	//! constructor
-	FEDiagnostic(FEModel& fem);
+	FEDiagnostic(FEModel* fem);
 
 	//! destructor
 	virtual ~FEDiagnostic();
@@ -71,13 +74,10 @@ public:
 	//! create a scenario class
 	virtual FEDiagnosticScenario* CreateScenario(const std::string& sname) { return 0; }
 
-	FEModel* GetFEModel() { return &m_fem; }
-
 	void SetFileName(const std::string& fileName);
 	const std::string& GetFileName();
 
 private:
-	FEModel&	m_fem;	//!< the FEModel object the diagnostic is performed on
 	std::string	m_file;	//!< the input file used
 };
 

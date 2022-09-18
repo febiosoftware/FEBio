@@ -64,6 +64,7 @@ SOFTWARE.*/
 #include "FEDomain2D.h"
 #include "FEDiscreteDomain.h"
 #include "FEDataGenerator.h"
+#include "FEModule.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -310,9 +311,13 @@ void FEModel::Clear()
 
 //-----------------------------------------------------------------------------
 //! set the module name
-void FEModel::SetModuleName(const std::string& moduleName)
+void FEModel::SetActiveModule(const std::string& moduleName)
 {
 	m_imp->m_moduleName = moduleName;
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	fecore.SetActiveModule(moduleName.c_str());
+	FEModule* pmod = fecore.GetActiveModule();
+	pmod->InitModel(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1817,8 +1822,14 @@ int FEModel::GlobalDataItems()
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* CopyClass(FECoreBase* pc, FEModel* fem)
+FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem)
 {
+	if ((pc == nullptr) || (fem == nullptr))
+	{
+		assert(false);
+		return nullptr;
+	}
+
 	const char* sztype = pc->GetTypeStr();
 
 	// create a new material
@@ -1831,14 +1842,20 @@ FECoreBase* CopyClass(FECoreBase* pc, FEModel* fem)
 	pcnew->GetParameterList() = pc->GetParameterList();
 
 	// copy properties
-	for (int i = 0; i < pc->Properties(); ++i)
+	for (int i = 0; i < pc->PropertyClasses(); ++i)
 	{
 		FEProperty* prop = pc->PropertyClass(i);
-		FECoreBase* pci = prop->get(0);
-		if (pc)
+		if (prop->size() > 0)
 		{
-			FECoreBase* pci_new = CopyClass(pci, fem); assert(pci_new);
-			bool b = pcnew->SetProperty(i, pci_new); assert(b);
+			for (int j = 0; j < prop->size(); ++j)
+			{
+				FECoreBase* pci = prop->get(j);
+				if (pc)
+				{
+					FECoreBase* pci_new = CopyFEBioClass(pci, fem); assert(pci_new);
+					bool b = pcnew->SetProperty(i, pci_new); assert(b);
+				}
+			}
 		}
 	}
 
@@ -1918,7 +1935,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEMaterial* pmat = fem.GetMaterial(i);
 
 		// copy the material
-		FEMaterial* pnew = dynamic_cast<FEMaterial*>(CopyClass(pmat, this));
+		FEMaterial* pnew = dynamic_cast<FEMaterial*>(CopyFEBioClass(pmat, this));
 		assert(pnew);
 
 		// copy the name

@@ -1256,10 +1256,10 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
             FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
             FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(&dom);
             FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-            if (fdom) fdom->StiffnessMatrix(LS, tp);
-            else if (fsidom) fsidom->StiffnessMatrix(LS, tp);
-            else if (bfsidom) bfsidom->StiffnessMatrix(LS, tp);
-            else if (mfsidom) mfsidom->StiffnessMatrix(LS, tp);
+            if (fdom) fdom->StiffnessMatrix(LS);
+            else if (fsidom) fsidom->StiffnessMatrix(LS);
+            else if (bfsidom) bfsidom->StiffnessMatrix(LS);
+            else if (mfsidom) mfsidom->StiffnessMatrix(LS);
             else if (edom) edom->StiffnessMatrix(LS);
         }
     }
@@ -1282,10 +1282,10 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
                     FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(dom);
                     FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(dom);
                     FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-                    if (fdom) fdom->BodyForceStiffness(LS, tp, *pbf);
-                    else if (fsidom) fsidom->BodyForceStiffness(LS, tp, *pbf);
-                    else if (bfsidom) bfsidom->StiffnessMatrix(LS, tp);
-                    else if (mfsidom) mfsidom->StiffnessMatrix(LS, tp);
+                    if (fdom) fdom->BodyForceStiffness(LS, *pbf);
+                    else if (fsidom) fsidom->BodyForceStiffness(LS, *pbf);
+                    else if (bfsidom) bfsidom->BodyForceStiffness(LS, *pbf);
+                    else if (mfsidom) mfsidom->BodyForceStiffness(LS, *pbf);
                     else if (edom)
                     {
                         FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
@@ -1316,10 +1316,10 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
                 FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
                 FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(&dom);
                 FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-                if (fdom) fdom->MassMatrix(LS, tp);
-                else if (fsidom) fsidom->MassMatrix(LS, tp);
-                else if (bfsidom) bfsidom->MassMatrix(LS, tp);
-                else if (mfsidom) mfsidom->MassMatrix(LS, tp);
+                if (fdom) fdom->MassMatrix(LS);
+                else if (fsidom) fsidom->MassMatrix(LS);
+                else if (bfsidom) bfsidom->MassMatrix(LS);
+                else if (mfsidom) mfsidom->MassMatrix(LS);
                 else if (edom)
                 {
                     FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
@@ -1430,10 +1430,10 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
             FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
             FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(&dom);
             FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-            if (fdom) fdom->InternalForces(RHS, tp);
-            else if (fsidom) fsidom->InternalForces(RHS, tp);
-            else if (bfsidom) bfsidom->InternalForces(RHS, tp);
-            else if (mfsidom) mfsidom->InternalForces(RHS, tp);
+            if (fdom) fdom->InternalForces(RHS);
+            else if (fsidom) fsidom->InternalForces(RHS);
+            else if (bfsidom) bfsidom->InternalForces(RHS);
+            else if (mfsidom) mfsidom->InternalForces(RHS);
             else if (edom)
             {
                 FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
@@ -1458,10 +1458,10 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
                     FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(dom);
                     FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(dom);
                     FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-                    if (fdom) fdom->BodyForce(RHS, tp, *pbf);
-                    else if (fsidom) fsidom->BodyForce(RHS, tp, *pbf);
-                    else if (bfsidom) bfsidom->BodyForce(RHS, tp, *pbf);
-                    else if (mfsidom) mfsidom->BodyForce(RHS, tp, *pbf);
+                    if (fdom) fdom->BodyForce(RHS, *pbf);
+                    else if (fsidom) fsidom->BodyForce(RHS, *pbf);
+                    else if (bfsidom) bfsidom->BodyForce(RHS, *pbf);
+                    else if (mfsidom) mfsidom->BodyForce(RHS, *pbf);
                     else if (edom)
                     {
                         FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
@@ -1496,10 +1496,10 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
             FEBiphasicFSIDomain* bfsidom = dynamic_cast<FEBiphasicFSIDomain*>(&dom);
             FEMultiphasicFSIDomain* mfsidom = dynamic_cast<FEMultiphasicFSIDomain*>(&dom);
             FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-            if (fdom) fdom->InertialForces(RHS, tp);
-            else if (fsidom) fsidom->InertialForces(RHS, tp);
-            else if (bfsidom) bfsidom->InertialForces(RHS, tp);
-            else if (mfsidom) mfsidom->InertialForces(RHS, tp);
+            if (fdom) fdom->InertialForces(RHS);
+            else if (fsidom) fsidom->InertialForces(RHS);
+            else if (bfsidom) bfsidom->InertialForces(RHS);
+            else if (mfsidom) mfsidom->InertialForces(RHS);
             else if (edom && (pstep->m_nanalysis == FEMultiphasicFSIAnalysis::DYNAMIC))
             {
                 FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());

@@ -74,6 +74,18 @@ void FERigidShellDomainOld::Update(const FETimeInfo& tp)
 	// Nothing to see here. Please move on.
 }
 
+//-----------------------------------------------------------------------------
+void FERigidShellDomainOld::MassMatrix(FELinearSystem& LS, double scale)
+{
+	// Only crickets here ... 
+}
+
+//-----------------------------------------------------------------------------
+void FERigidShellDomainOld::InertialForces(FEGlobalVector& R, std::vector<double>& F)
+{
+	// chirp, chirp ...
+}
+
 //===========================================================================================================
 
 //-----------------------------------------------------------------------------
@@ -119,4 +131,17 @@ void FERigidShellDomain::InternalForces(FEGlobalVector& R)
 void FERigidShellDomain::Update(const FETimeInfo& tp)
 {
 	// Nothing to see here. Please move on.
+}
+
+
+//-----------------------------------------------------------------------------
+void FERigidShellDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	// Only crickets here ... 
+}
+
+//-----------------------------------------------------------------------------
+void FERigidShellDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
+{
+	// chirp, chirp ...
 }

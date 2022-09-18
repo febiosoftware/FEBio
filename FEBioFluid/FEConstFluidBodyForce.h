@@ -24,6 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
+#include <FECore/FEModelParam.h>
 #include <FECore/FEMaterialPoint.h>
 #include <FEBioMech/FEBodyForce.h>
 #include "febiofluid_api.h"
@@ -46,7 +47,7 @@ public:
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 
 protected:
-	vec3d	m_f;
+    FEParamVec3 m_force;
 
 	DECLARE_FECORE_CLASS();
 };

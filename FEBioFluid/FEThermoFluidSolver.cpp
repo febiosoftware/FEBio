@@ -843,8 +843,8 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
         if (dom.IsActive()) {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->StiffnessMatrix(LS, tp);
-            else if (tdom) tdom->StiffnessMatrix(LS, tp);
+            if (fdom) fdom->StiffnessMatrix(LS);
+            else if (tdom) tdom->StiffnessMatrix(LS);
         }
     }
     
@@ -864,8 +864,8 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
                 {
                     FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
                     FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
-                    if (fdom) fdom->BodyForceStiffness(LS, tp, *pbf);
-                    else if (tdom) tdom->BodyForceStiffness(LS, tp, *pbf);
+                    if (fdom) fdom->BodyForceStiffness(LS, *pbf);
+                    else if (tdom) tdom->BodyForceStiffness(LS, *pbf);
                 }
             }
         }
@@ -877,7 +877,7 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
                 if (dom->IsActive())
                 {
                     FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
-                    if (tdom) tdom->HeatSupplyStiffness(LS, tp, *phs);
+                    if (tdom) tdom->HeatSupplyStiffness(LS, *phs);
                 }
             }
         }
@@ -897,8 +897,8 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->MassMatrix(LS, tp);
-            else if (tdom) tdom->MassMatrix(LS, tp);
+            if (fdom) fdom->MassMatrix(LS);
+            else if (tdom) tdom->MassMatrix(LS);
         }
     }
     
@@ -986,8 +986,8 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->InternalForces(RHS, tp);
-            else if (tdom) tdom->InternalForces(RHS, tp);
+            if (fdom) fdom->InternalForces(RHS);
+            else if (tdom) tdom->InternalForces(RHS);
         }
     }
     
@@ -1006,8 +1006,8 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
                 {
                     FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
                     FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
-                    if (fdom) fdom->BodyForce(RHS, tp, *pbf);
-                    else if (tdom) tdom->BodyForce(RHS, tp, *pbf);
+                    if (fdom) fdom->BodyForce(RHS, *pbf);
+                    else if (tdom) tdom->BodyForce(RHS, *pbf);
                 }
             }
         }
@@ -1019,7 +1019,7 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
                 if (dom->IsActive())
                 {
                     FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
-                    if (tdom) tdom->HeatSupply(RHS, tp, *phs);
+                    if (tdom) tdom->HeatSupply(RHS, *phs);
                 }
             }
         }
@@ -1035,8 +1035,8 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
             FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->InertialForces(RHS, tp);
-            else if (tdom) tdom->InertialForces(RHS, tp);
+            if (fdom) fdom->InertialForces(RHS);
+            else if (tdom) tdom->InertialForces(RHS);
         }
     }
 

@@ -48,7 +48,7 @@ void FEFluidHeatSupply::LoadVector(FEGlobalVector& R)
         if (mat == nullptr)
         {
             FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupply(R, tp, *this);
+            if (edom) edom->HeatSupply(R, *this);
         }
     }
 }
@@ -65,7 +65,7 @@ void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS)
         if (mat==nullptr)
         {
             FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupplyStiffness(LS, tp, *this);
+            if (edom) edom->HeatSupplyStiffness(LS, *this);
         }
     }
 }

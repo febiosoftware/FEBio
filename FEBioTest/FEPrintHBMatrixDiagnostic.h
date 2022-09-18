@@ -37,7 +37,7 @@ SOFTWARE.*/
 class FEPrintHBMatrixDiagnostic :	public FEDiagnostic
 {
 public:
-	FEPrintHBMatrixDiagnostic(FEModel& fem);
+	FEPrintHBMatrixDiagnostic(FEModel* fem);
 	~FEPrintHBMatrixDiagnostic(void);
 
 	bool ParseSection(XMLTag& tag);

@@ -47,7 +47,7 @@ void FEBioMeshDomainsSection4::Parse(XMLTag& tag)
 		{
 			if      (tag == "SolidDomain") ParseSolidDomainSection(tag);
 			else if (tag == "ShellDomain") ParseShellDomainSection(tag);
-			else if (tag == "TrussDomain") ParseTrussDomainSection(tag);
+			else if (tag == "BeamDomain" ) ParseBeamDomainSection(tag);
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		} while (!tag.isend());
@@ -300,7 +300,7 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	}
 }
 
-void FEBioMeshDomainsSection4::ParseTrussDomainSection(XMLTag& tag)
+void FEBioMeshDomainsSection4::ParseBeamDomainSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
