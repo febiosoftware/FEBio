@@ -75,7 +75,11 @@ mat3d FEMaterial::GetLocalCS(const FEMaterialPoint& mp)
 		mat3d Qp = parent->GetLocalCS(mp);
 		return Qp*Q;
 	}
-	else return Q;
+	else
+	{
+		mat3d A = mp.m_Q.RotationMatrix();
+		return A*Q;
+	}
 }
 
 //-----------------------------------------------------------------------------

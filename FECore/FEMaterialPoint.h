@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 
 #include "mat3d.h"
+#include "quatd.h"
 #include "FETimeInfo.h"
 #include <vector>
 
@@ -124,6 +125,16 @@ template <class T> inline T* FEMaterialPointData::ExtractData()
 		if (p) return p;
 	}
 
+	if (Components() > 0)
+	{
+		for (int i = 0; i < Components(); ++i)
+		{
+			FEMaterialPoint* mpi = GetPointData(i);
+			p = mpi->ExtractData<T>();
+			if (p) return p;
+		}
+	}
+
 	// Everything has failed. Material point data can not be found
 	return 0;
 }
@@ -198,7 +209,8 @@ public:
 	vec3d		m_rt;		//!< current point position
 	double		m_J0;		//!< reference Jacobian
 	double		m_Jt;		//!< current Jacobian
-	FEElement* m_elem;		//!< Element where this material point is
+	quatd		m_Q;		//!< local coordinates
+	FEElement*	m_elem;		//!< Element where this material point is
 	int			m_index;	//!< local integration point index 
 
 	// pointer to element's shape function values
