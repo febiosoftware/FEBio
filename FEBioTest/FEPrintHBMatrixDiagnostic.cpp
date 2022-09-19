@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include <NumCore/MatrixTools.h>
 
 //-----------------------------------------------------------------------------
-FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 }
 

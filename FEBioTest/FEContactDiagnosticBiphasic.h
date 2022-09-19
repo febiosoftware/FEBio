@@ -67,7 +67,7 @@ public:
 class FEContactDiagnosticBiphasic : public FEDiagnostic
 {
 public:
-    FEContactDiagnosticBiphasic(FEModel& fem);
+    FEContactDiagnosticBiphasic(FEModel* fem);
     ~FEContactDiagnosticBiphasic();
     
     bool Run();

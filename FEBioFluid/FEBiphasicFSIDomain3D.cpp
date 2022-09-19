@@ -205,7 +205,7 @@ void FEBiphasicFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::InternalForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
@@ -224,7 +224,7 @@ void FEBiphasicFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& 
             fe.assign(ndof, 0);
             
             // calculate internal force vector
-            ElementInternalForce(el, fe, tp);
+            ElementInternalForce(el, fe);
             
             // get the element's LM vector
             UnpackLM(el, lm);
@@ -238,8 +238,9 @@ void FEBiphasicFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, n;
     
     // jacobian matrix, inverse jacobian matrix and determinants
@@ -325,7 +326,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF)
+void FEBiphasicFSIDomain3D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
@@ -342,7 +343,7 @@ void FEBiphasicFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, F
             fe.assign(ndof, 0);
             
             // apply body forces
-            ElementBodyForce(BF, el, fe, tp);
+            ElementBodyForce(BF, el, fe);
             
             // get the element's LM vector
             UnpackLM(el, lm);
@@ -356,8 +357,9 @@ void FEBiphasicFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, F
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEBiphasicFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     // jacobian
     double detJ;
     double *H;
@@ -399,8 +401,9 @@ void FEBiphasicFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
 //! For now, we assume that the body force is constant
-void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int neln = el.Nodes();
     int ndof = ke.columns()/neln;
     
@@ -481,8 +484,9 @@ void FEBiphasicFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i7, j, j7, n;
     
     // Get the current element's data
@@ -637,7 +641,7 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, con
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::StiffnessMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -657,7 +661,7 @@ void FEBiphasicFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
             ke.zero();
             
             // calculate material stiffness
-            ElementStiffness(el, ke, tp);
+            ElementStiffness(el, ke);
             
             // get the element's LM vector
             vector<int> lm;
@@ -671,7 +675,7 @@ void FEBiphasicFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::MassMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -690,7 +694,7 @@ void FEBiphasicFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
             ke.zero();
             
             // calculate inertial stiffness
-            ElementMassMatrix(el, ke, tp);
+            ElementMassMatrix(el, ke);
             
             // get the element's LM vector
             vector<int> lm;
@@ -704,7 +708,7 @@ void FEBiphasicFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
+void FEBiphasicFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
     FEBiphasicFSI* pme = dynamic_cast<FEBiphasicFSI*>(GetMaterial()); assert(pme);
     
@@ -725,7 +729,7 @@ void FEBiphasicFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeI
             ke.zero();
             
             // calculate inertial stiffness
-            ElementBodyForceStiffness(bf, el, ke, tp);
+            ElementBodyForceStiffness(bf, el, ke);
             
             // get the element's LM vector
             vector<int> lm;
@@ -740,8 +744,9 @@ void FEBiphasicFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeI
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i7, j, j7, n;
     
     // Get the current element's data
@@ -1007,7 +1012,7 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
@@ -1025,7 +1030,7 @@ void FEBiphasicFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& 
             fe.assign(ndof, 0);
             
             // calculate internal force vector
-            ElementInertialForce(el, fe, tp);
+            ElementInertialForce(el, fe);
             
             // get the element's LM vector
             UnpackLM(el, lm);
@@ -1037,8 +1042,9 @@ void FEBiphasicFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& 
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEBiphasicFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, n;
     
     // jacobian determinant

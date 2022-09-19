@@ -67,57 +67,57 @@ public: // overrides from FEElasticDomain
     void UpdateElementStress(int iel, const FETimeInfo& tp);
     
     //! internal stress forces
-    void InternalForces(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void InternalForces(FEGlobalVector& R) override;
     
     //! body forces
-    void BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF) override;
+    void BodyForce(FEGlobalVector& R, FEBodyForce& BF) override;
     
     //! Calculate the heat supply
-    void HeatSupply(FEGlobalVector& R, const FETimeInfo& tp, FEFluidHeatSupply& r) override;
+    void HeatSupply(FEGlobalVector& R, FEFluidHeatSupply& r) override;
 
     //! intertial forces for dynamic problems
-    void InertialForces(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void InertialForces(FEGlobalVector& R) override;
     
     //! calculates the global stiffness matrix for this domain
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+    void StiffnessMatrix(FELinearSystem& LS) override;
     
     //! Calculate stiffness contribution of heat supplies
-    void HeatSupplyStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEFluidHeatSupply& bf) override;
+    void HeatSupplyStiffness(FELinearSystem& LS, FEFluidHeatSupply& bf) override;
     
     //! calculates inertial stiffness
-    void MassMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+    void MassMatrix(FELinearSystem& LS) override;
     
     //! body force stiffness
-    void BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf) override;
+    void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override;
     
 public:
     // --- S T I F F N E S S ---
     
     //! calculates the solid element stiffness matrix
-    void ElementStiffness(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
+    void ElementStiffness(FESolidElement& el, matrix& ke);
     
     //! calculates the solid element mass matrix
-    void ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
+    void ElementMassMatrix(FESolidElement& el, matrix& ke);
     
     //! calculates the stiffness matrix due to body forces
-    void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke, const FETimeInfo& tp);
+    void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
     
     //! calculates the stiffness matrix due to heat supplies
-    void ElementHeatSupplyStiffness(FEFluidHeatSupply& bf, FESolidElement& el, matrix& ke, const FETimeInfo& tp);
+    void ElementHeatSupplyStiffness(FEFluidHeatSupply& bf, FESolidElement& el, matrix& ke);
     
     // --- R E S I D U A L ---
     
     //! Calculates the internal stress vector for solid elements
-    void ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
+    void ElementInternalForce(FESolidElement& el, vector<double>& fe);
     
     //! Calculatess external body forces for solid elements
-    void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe, const FETimeInfo& tp);
+    void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
     
     //! Calculatess external supplies for solid elements
-    void ElementHeatSupply(FEFluidHeatSupply& BF, FESolidElement& elem, vector<double>& fe, const FETimeInfo& tp);
+    void ElementHeatSupply(FEFluidHeatSupply& BF, FESolidElement& elem, vector<double>& fe);
     
     //! Calculates the inertial force vector for solid elements
-    void ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
+    void ElementInertialForce(FESolidElement& el, vector<double>& fe);
     
 protected:
     FEThermoFluid*  m_pMat;

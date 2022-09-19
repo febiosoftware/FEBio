@@ -39,5 +39,5 @@ public:
 protected:
 	void ParseSolidDomainSection(XMLTag& tag);
 	void ParseShellDomainSection(XMLTag& tag);
-	void ParseTrussDomainSection(XMLTag& tag);
+	void ParseBeamDomainSection(XMLTag& tag);
 };

@@ -35,6 +35,119 @@ SOFTWARE.*/
 #include "log.h"
 
 //=============================================================================
+bool FEMathExpression::Init(const std::string& expr, FECoreBase* pc)
+{
+	Clear();
+
+	AddVariable("X");
+	AddVariable("Y");
+	AddVariable("Z");
+	AddVariable("t");
+	bool b = Create(expr, true);
+
+	// lookup all the other variables.
+	if (Variables() > 4)
+	{
+		if (pc == nullptr) return false;
+
+		for (int i = 4; i < Variables(); ++i)
+		{
+			MVariable* vari = Variable(i);
+
+			ParamString ps(vari->Name().c_str());
+			FEParam* p = pc->FindParameter(ps);
+			if (p)
+			{
+				assert((p->type() == FE_PARAM_DOUBLE_MAPPED) || (p->type() == FE_PARAM_DOUBLE) || (p->type() == FE_PARAM_INT));
+
+				MathParam mp;
+				mp.type = 0;
+				mp.pp = p;
+				m_vars.push_back(mp);
+			}
+			else
+			{
+				// see if it's a data map
+				FEModel* fem = pc->GetFEModel();
+
+				// see if it's a global variable
+				p = fem->FindParameter(ps);
+				if (p)
+				{
+					MathParam mp;
+					mp.type = 0;
+					mp.pp = p;
+					m_vars.push_back(mp);
+				}
+				else
+				{
+					FEMesh& mesh = fem->GetMesh();
+
+					FEDataMap* map = mesh.FindDataMap(vari->Name());
+					assert(map);
+					if (map == nullptr) {
+						const char* szvar = vari->Name().c_str();
+						feLogErrorEx(fem, "Don't understand variable name \"%s\" in math expression.", szvar);
+						return false;
+					}
+					if (map->DataType() != FEDataType::FE_DOUBLE) {
+						const char* szvar = vari->Name().c_str();
+						feLogErrorEx(fem, "Variable \"%s\" is not a scalar variable.", szvar);
+						return false;
+					}
+
+					MathParam mp;
+					mp.type = 1;
+					mp.map = map;
+					m_vars.push_back(mp);
+				}
+			}
+		}
+	}
+
+	assert(b);
+	return b;
+}
+
+void FEMathExpression::operator = (const FEMathExpression& me)
+{
+	MSimpleExpression::operator=(me);
+	m_vars = me.m_vars;
+}
+
+double FEMathExpression::value(FEModel* fem, const FEMaterialPoint& pt)
+{
+	std::vector<double> var(4 + m_vars.size());
+	var[0] = pt.m_r0.x;
+	var[1] = pt.m_r0.y;
+	var[2] = pt.m_r0.z;
+	var[3] = fem->GetTime().currentTime;
+	if (m_vars.empty() == false)
+	{
+		for (int i = 0; i < (int)m_vars.size(); ++i)
+		{
+			MathParam& mp = m_vars[i];
+			if (mp.type == 0)
+			{
+				FEParam* pi = mp.pp;
+				switch (pi->type())
+				{
+				case FE_PARAM_INT: var[4 + i] = (double)pi->value<int>(); break;
+				case FE_PARAM_DOUBLE: var[4 + i] = pi->value<double>(); break;
+				case FE_PARAM_DOUBLE_MAPPED: var[4 + i] = pi->value<FEParamDouble>()(pt); break;
+				}
+			}
+			else
+			{
+				FEDataMap& map = *mp.map;
+				var[4 + i] = map.value(pt);
+			}
+		}
+	}
+	return value_s(var);
+}
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
 	ADD_PARAMETER(m_val, "const");
 END_FECORE_CLASS();
@@ -67,87 +180,23 @@ bool FEMathValue::create(FECoreBase* pc)
 	// see if this is already initialized
 	if (m_math.Variables() > 0) return true;
 
-	m_math.AddVariable("X");
-	m_math.AddVariable("Y");
-	m_math.AddVariable("Z");
-	m_math.AddVariable("t");
-	bool b = m_math.Create(m_expr, true);
-
-	// lookup all the other variables.
-	if (m_math.Variables() > 4)
+	if (pc == nullptr)
 	{
-		if (pc == nullptr)
-		{
-			// try to find the owner of this parameter
-			// First, we need the model parameter
-			FEModelParam* param = GetModelParam();
-			if (param == nullptr) return false;
+		// try to find the owner of this parameter
+		// First, we need the model parameter
+		FEModelParam* param = GetModelParam();
+		if (param == nullptr) return false;
 
-			// we'll need the model for this
-			FEModel* fem = GetFEModel();
-			if (fem == nullptr) return false;
+		// we'll need the model for this
+		FEModel* fem = GetFEModel();
+		if (fem == nullptr) return false;
 
-			// Now try to find the owner of this parameter
-			pc = fem->FindParameterOwner(param);
-			if (pc == nullptr) return false;
-		}
-
-		for (int i = 4; i < m_math.Variables(); ++i)
-		{
-			MVariable* vari = m_math.Variable(i);
-
-			ParamString ps(vari->Name().c_str());
-			FEParam* p = pc->FindParameter(ps);
-			if (p)
-			{
-				assert((p->type() == FE_PARAM_DOUBLE_MAPPED) || (p->type() == FE_PARAM_DOUBLE) || (p->type() == FE_PARAM_INT));
-
-				MathParam mp;
-				mp.type = 0;
-				mp.pp = p;
-				m_vars.push_back(mp);
-			}
-			else
-			{
-				// see if it's a data map
-				FEModel* fem = GetFEModel();
-
-				// see if it's a global variable
-				p = fem->FindParameter(ps);
-				if (p)
-				{
-					MathParam mp;
-					mp.type = 0;
-					mp.pp = p;
-					m_vars.push_back(mp);
-				}
-				else
-				{
-					FEMesh& mesh = fem->GetMesh();
-
-					FEDataMap* map = mesh.FindDataMap(vari->Name());
-					assert(map);
-					if (map == nullptr) { 
-						const char* szvar = vari->Name().c_str();
-						feLogError("Don't understand variable name \"%s\" in math expression.", szvar);
-						return false;
-					}
-					if (map->DataType() != FEDataType::FE_DOUBLE) {
-						const char* szvar = vari->Name().c_str();
-						feLogError("Variable \"%s\" is not a scalar variable.", szvar);
-						return false;
-					}
-
-					MathParam mp;
-					mp.type = 1;
-					mp.map = map;
-					m_vars.push_back(mp);
-				}
-			}
-		}
+		// Now try to find the owner of this parameter
+		pc = fem->FindParameterOwner(param);
 	}
 
-	assert(b);
+	// initialize the math expression
+	bool b = m_math.Init(m_expr, pc);
 	return b;
 }
 
@@ -160,40 +209,12 @@ FEScalarValuator* FEMathValue::copy()
 	FEMathValue* newExpr = new FEMathValue(GetFEModel());
 	newExpr->m_expr = m_expr;
 	newExpr->m_math = m_math;
-	newExpr->m_vars = m_vars;
 	return newExpr;
 }
 
 double FEMathValue::operator()(const FEMaterialPoint& pt)
 {
-	std::vector<double> var(4 + m_vars.size());
-	var[0] = pt.m_r0.x;
-	var[1] = pt.m_r0.y;
-	var[2] = pt.m_r0.z;
-	var[3] = GetFEModel()->GetTime().currentTime;
-	if (m_vars.empty() == false)
-	{
-		for (int i = 0; i < (int)m_vars.size(); ++i)
-		{
-			MathParam& mp = m_vars[i];
-			if (mp.type == 0)
-			{
-				FEParam* pi = mp.pp;
-				switch (pi->type())
-				{
-				case FE_PARAM_INT: var[4 + i] = (double)pi->value<int>(); break;
-				case FE_PARAM_DOUBLE: var[4 + i] = pi->value<double>(); break;
-				case FE_PARAM_DOUBLE_MAPPED: var[4 + i] = pi->value<FEParamDouble>()(pt); break;
-				}
-			}
-			else
-			{
-				FEDataMap& map = *mp.map;
-				var[4+i] = map.value(pt);
-			}
-		}
-	}
-	return m_math.value_s(var);
+	return m_math.value(GetFEModel(), pt);
 }
 
 //---------------------------------------------------------------------------------------

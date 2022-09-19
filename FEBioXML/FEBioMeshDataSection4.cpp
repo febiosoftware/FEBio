@@ -113,10 +113,10 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 	else
 	{
 		// get the data type
-		const char* szdataType = tag.AttributeValue("datatype", true);
+		const char* szdataType = tag.AttributeValue("data_type", true);
 		if (szdataType == nullptr) szdataType = "scalar";
 		FEDataType dataType = str2datatype(szdataType);
-		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
+		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "data_type", szdataType);
 
 		// create the data map
 		FENodeDataMap* map = new FENodeDataMap(dataType);
@@ -205,10 +205,10 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 	else
 	{
 		// get the data type
-		const char* szdataType = tag.AttributeValue("datatype", true);
+		const char* szdataType = tag.AttributeValue("data_type", true);
 		if (szdataType == nullptr) szdataType = "scalar";
 		FEDataType dataType = str2datatype(szdataType);
-		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
+		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "data_type", szdataType);
 
 		// create the data map
 		FESurfaceMap* map = new FESurfaceMap(dataType);
@@ -269,10 +269,10 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		string name = szname;
 
 		// get the data type
-		const char* szdataType = tag.AttributeValue("datatype", true);
+		const char* szdataType = tag.AttributeValue("data_type", true);
 		if (szdataType == nullptr) szdataType = "scalar";
 		FEDataType dataType = str2datatype(szdataType);
-		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
+		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "data_type", szdataType);
 
 		// default format
 		Storage_Fmt fmt = (((dataType == FE_MAT3D) || (dataType == FE_MAT3DS)) ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
@@ -584,6 +584,7 @@ void FEBioMeshDataSection4::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 	// get the mat_axis property
 	FEProperty* pQ = mat->FindProperty("mat_axis", true);
+	if (pQ == nullptr) throw XMLReader::InvalidAttributeValue(tag, "var", "mat_axis");
 	if (pQ->GetSuperClassID() != FEMAT3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
 	// create the map's name: material_name.mat_axis

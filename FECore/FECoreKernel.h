@@ -46,9 +46,15 @@ class FEModule;
 // base class for handling create events.
 class FECreateHandler{
 public:
-	FECreateHandler() {}
+	FECreateHandler() { m_moduleId = -1; }
 	virtual ~FECreateHandler() {}
 	virtual void handle(FECoreBase*) = 0;
+
+	int GetModuleID() const { return m_moduleId; }
+	void SetModuleID(int n) { m_moduleId = n; }
+
+private:
+	int	m_moduleId;
 };
 
 //-----------------------------------------------------------------------------
@@ -121,6 +127,8 @@ public:
 	int GenerateAllocatorID();
 
 	FECoreBase* CreateInstance(const FECoreFactory* fac, FEModel* fem);
+
+	bool IsModuleActive(int moduleID);
 
 public: // Modules
 

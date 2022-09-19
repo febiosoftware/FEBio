@@ -220,10 +220,12 @@ public:
 		int NodeSets() const { return (int) m_NSet.size(); }
 		void AddNodeSet(NodeSet* nset) { m_NSet.push_back(nset); }
 		NodeSet* GetNodeSet(int i) { return m_NSet[i]; }
+		NodeSet* FindNodeSet(const std::string& name);
 
 		int ElementSets() const { return (int) m_ESet.size(); }
 		void AddElementSet(ElementSet* eset) { m_ESet.push_back(eset); }
 		ElementSet* GetElementSet(int i) { return m_ESet[i]; }
+		ElementSet* FindElementSet(const std::string& name);
 
 		int SurfacePairs() const { return (int)m_SurfPair.size(); }
 		void AddSurfacePair(SurfacePair* sp) { m_SurfPair.push_back(sp); }

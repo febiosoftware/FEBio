@@ -32,8 +32,10 @@ SOFTWARE.*/
 #include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
+#include <FECore/FEMaterial.h>
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
+#include <FEBioTest/FEMaterialTest.h>
 #include "plugin.h"
 #include <map>
 #include <iostream>
@@ -440,7 +442,7 @@ FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* sz
 
 //-----------------------------------------------------------------------------
 // run an FEBioModel
-FEBIOLIB_API bool RunModel(FEBioModel& fem, CMDOPTIONS* ops)
+FEBIOLIB_API int RunModel(FEBioModel& fem, CMDOPTIONS* ops)
 {
 	// set options that were passed on the command line
 	if (ops)
@@ -455,22 +457,23 @@ FEBIOLIB_API bool RunModel(FEBioModel& fem, CMDOPTIONS* ops)
 	}
 
 	// read the input file if specified
-	bool bret = false;
+	int nret = 0;
 	if (ops && ops->szfile[0])
 	{
 		// read the input file
-		if (fem.Input(ops->szfile) == false) bret = false;
+		if (fem.Input(ops->szfile) == false) nret = 1;
 	}
 
 	// solve the model with the task and control file
-	if (bret == false)
+	if (nret == 0)
 	{
 		const char* sztask = (ops && ops->sztask[0] ? ops->sztask : nullptr);
 		const char* szctrl = (ops && ops->szctrl[0] ? ops->szctrl : nullptr);
-		bret = febio::SolveModel(fem, sztask, szctrl);
+		bool b = febio::SolveModel(fem, sztask, szctrl);
+		nret = (b ? 0 : 1);
 	}
 
-	return bret;
+	return nret;
 }
 
 // write a matrix to file
@@ -489,6 +492,43 @@ void print_svg(CompactMatrix* m, std::ostream &out, int i0, int j0, int i1, int 
 bool write_vector(const vector<double>& a, const char* szfile, int mode)
 {
 	return NumCore::write_vector(a, szfile, mode);
+}
+
+bool RunMaterialTest(FEMaterial* mat, double simtime, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out)
+{
+	FEModel fem;
+
+	FEMaterial* matcopy = dynamic_cast<FEMaterial*>(CopyFEBioClass(mat, &fem));
+	if (matcopy == nullptr) return false;
+
+	fem.AddMaterial(matcopy);
+
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+
+	FEMaterialTest diag(&fem);
+	diag.SetOutputFileName(nullptr);
+
+	FEDiagnosticScenario* s = diag.CreateScenario(sztest);
+	s->GetParameterList();
+	s->SetParameter<double>("strain", strain);
+
+	FEAnalysis* step = fem.GetStep(0);
+	step->m_ntime = steps;
+	step->m_dt0 = simtime / steps;
+	fem.SetCurrentStepIndex(0);
+
+	if (diag.Init() == false) return false;
+
+	if (fem.Init() == false) return false;
+
+	bool b = diag.Run();
+
+	if (b)
+	{
+		out = diag.GetOutputData();
+	}
+
+	return b;
 }
 
 } // namespace febio

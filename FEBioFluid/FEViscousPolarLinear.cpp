@@ -46,15 +46,21 @@ FEViscousPolarLinear::FEViscousPolarLinear(FEModel* pfem) : FEViscousPolarFluid(
     m_tau = m_alpha = m_beta = m_gamma = 0;
 }
 
-//! non-symmetric part of viscous stress in polar fluid
-mat3da FEViscousPolarLinear::SkewStress(FEMaterialPoint& mp)
+//! dual vector of non-symmetric part of viscous stress in polar fluid
+vec3d FEViscousPolarLinear::SkewStressDualVector(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
     FEPolarFluidMaterialPoint* pf = (mp.ExtractData<FEPolarFluidMaterialPoint>());
     
     vec3d h = pf ? pf->m_gf - pt->Vorticity()/2 : - pt->Vorticity()/2;
+    
+    return h*(-2*m_tau);
+}
 
-    return mat3da(h*(-2*m_tau));
+//! non-symmetric part of viscous stress in polar fluid
+mat3da FEViscousPolarLinear::SkewStress(FEMaterialPoint& mp)
+{
+    return mat3da(SkewStressDualVector(mp));
 }
 
 //! tangent of stress with respect to strain J

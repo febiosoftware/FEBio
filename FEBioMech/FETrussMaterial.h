@@ -70,20 +70,39 @@ public:
 
 public:
 	double	m_rho;	// density
-	double	m_E;	// Elastic modulus
 
 public:
 	//! calculate Kirchhoff stress of truss
-	virtual double Stress(FEMaterialPoint& pt);
+	virtual double Stress(FEMaterialPoint& pt) = 0;
 
 	//! calculate elastic tangent
-	virtual double Tangent(FEMaterialPoint& pt);
+	virtual double Tangent(FEMaterialPoint& pt) = 0;
 
 	//! create material point data
 	FEMaterialPointData* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
 
 	//! material density
 	double Density();
+
+	// declare the parameter list
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FETrussMaterial);
+};
+
+//-----------------------------------------------------------------------------
+class FELinearTrussMaterial : public FETrussMaterial
+{
+public:
+	FELinearTrussMaterial(FEModel* fem);
+
+	//! calculate Kirchhoff stress of truss
+	double Stress(FEMaterialPoint& pt) override;
+
+	//! calculate elastic tangent
+	double Tangent(FEMaterialPoint& pt) override;
+
+private:
+	double	m_E;	// Elastic modulus
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

@@ -61,7 +61,7 @@ private:
 class FEBiphasicTangentDiagnostic : public FEDiagnostic
 {
 public:
-    FEBiphasicTangentDiagnostic(FEModel& fem);
+    FEBiphasicTangentDiagnostic(FEModel* fem);
     virtual ~FEBiphasicTangentDiagnostic(){}
     
     bool Init();

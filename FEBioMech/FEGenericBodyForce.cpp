@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 
 BEGIN_FECORE_CLASS(FEGenericBodyForce, FEBodyForce);
-	ADD_PARAMETER(m_force, "force");
+	ADD_PARAMETER(m_force, "force")->setUnits(UNIT_SPECIFIC_FORCE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -38,6 +38,9 @@ public:
     //! constructor
     FEViscousPolarLinear(FEModel* pfem);
     
+    //! dual vector non-symmetric part of viscous stress in polar fluid
+    vec3d SkewStressDualVector(FEMaterialPoint& pt) override;
+    
     //! non-symmetric part of viscous stress in polar fluid
     mat3da SkewStress(FEMaterialPoint& pt) override;
     
