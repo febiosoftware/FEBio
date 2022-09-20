@@ -239,7 +239,8 @@ double FERealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint* fmt = new FEThermoFluidMaterialPoint(fmp);
     fmp->m_ef = e;
     fmt->m_T = tf.m_T;
-    double a0 = SpecificFreeEnergy(FEMaterialPoint(fmt));
+    FEMaterialPoint tmp(fmt);
+    double a0 = SpecificFreeEnergy(tmp);
     
     delete fmt;
 
@@ -388,7 +389,8 @@ double FERealLiquid::Pressure(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double p = Pressure(FEMaterialPoint(ft));
+    FEMaterialPoint tmp(ft);
+    double p = Pressure(tmp);
     delete ft;
     return p;
 }
