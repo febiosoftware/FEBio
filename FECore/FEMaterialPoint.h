@@ -101,6 +101,58 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+class FECORE_API FEMaterialPoint
+{
+public:
+	FEMaterialPoint(FEMaterialPointData* data = nullptr);
+	virtual ~FEMaterialPoint();
+
+	//! The init function is used to intialize data
+	virtual void Init();
+
+	virtual FEMaterialPoint* Copy();
+
+	//! The Update function is used to update material point data
+	//! Note that this gets called at the start of the time step during PreSolveUpdate
+	virtual void Update(const FETimeInfo& timeInfo);
+
+	virtual void Serialize(DumpStream& ar);
+
+	void Append(FEMaterialPointData* pt);
+
+public:
+	int Components() const { return (m_data ? m_data->Components() : 0); }
+
+	FEMaterialPoint* GetPointData(int i = 0)
+	{
+		if (m_data == nullptr) return this;
+		FEMaterialPoint* mp = m_data->GetPointData(i);
+		if (mp == nullptr) mp = this;
+		return mp;
+	}
+
+public:
+	//! Extract data (\todo Is it safe for a plugin to use this function?)
+	template <class T> T* ExtractData();
+	template <class T> const T* ExtractData() const;
+
+public:
+	vec3d		m_r0;		//!< material point position
+	vec3d		m_rt;		//!< current point position
+	double		m_J0;		//!< reference Jacobian
+	double		m_Jt;		//!< current Jacobian
+	quatd		m_Q;		//!< local coordinates
+	FEElement* m_elem;		//!< Element where this material point is
+	int			m_index;	//!< local integration point index 
+
+	// pointer to element's shape function values
+	double* m_shape;
+
+protected:
+	FEMaterialPointData* m_data;
+};
+
+//-----------------------------------------------------------------------------
 template <class T> inline T* FEMaterialPointData::ExtractData()
 {
 	// first see if this is the correct type
@@ -167,58 +219,6 @@ template <class T> inline const T* FEMaterialPointData::ExtractData() const
 	// Everything has failed. Material point data can not be found
 	return 0;
 }
-
-//-----------------------------------------------------------------------------
-class FECORE_API FEMaterialPoint
-{
-public:
-	FEMaterialPoint(FEMaterialPointData* data = nullptr);
-	virtual ~FEMaterialPoint();
-
-	//! The init function is used to intialize data
-	virtual void Init();
-
-	virtual FEMaterialPoint* Copy();
-
-	//! The Update function is used to update material point data
-	//! Note that this gets called at the start of the time step during PreSolveUpdate
-	virtual void Update(const FETimeInfo& timeInfo);
-
-	virtual void Serialize(DumpStream& ar);
-
-	void Append(FEMaterialPointData* pt);
-
-public:
-	int Components() const { return (m_data ? m_data->Components() : 0); }
-
-	FEMaterialPoint* GetPointData(int i = 0) 
-	{ 
-		if (m_data == nullptr) return this;
-		FEMaterialPoint* mp = m_data->GetPointData(i);
-		if (mp == nullptr) mp = this;
-		return mp;
-	}
-
-public:
-	//! Extract data (\todo Is it safe for a plugin to use this function?)
-	template <class T> T* ExtractData();
-	template <class T> const T* ExtractData() const;
-
-public:
-	vec3d		m_r0;		//!< material point position
-	vec3d		m_rt;		//!< current point position
-	double		m_J0;		//!< reference Jacobian
-	double		m_Jt;		//!< current Jacobian
-	quatd		m_Q;		//!< local coordinates
-	FEElement*	m_elem;		//!< Element where this material point is
-	int			m_index;	//!< local integration point index 
-
-	// pointer to element's shape function values
-	double* m_shape;
-
-protected:
-	FEMaterialPointData* m_data;
-};
 
 //-----------------------------------------------------------------------------
 template <class T> inline T* FEMaterialPoint::ExtractData()
