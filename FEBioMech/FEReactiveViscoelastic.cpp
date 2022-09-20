@@ -348,7 +348,7 @@ mat3ds FEReactiveViscoelasticMaterial::StressWeakBonds(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
     
     // get fiber material point data (if it exists)
-    FEFiberMaterialPoint* fp = mp.ExtractData<FEFiberMaterialPoint>();
+    FEFiberMaterialPoint* fp = wb.ExtractData<FEFiberMaterialPoint>();
     
     mat3ds D = ep.RateOfDeformation();
     
@@ -436,7 +436,7 @@ tens4ds FEReactiveViscoelasticMaterial::TangentWeakBonds(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
 
     // get fiber material point data (if it exists)
-    FEFiberMaterialPoint* fp = mp.ExtractData<FEFiberMaterialPoint>();
+    FEFiberMaterialPoint* fp = wb.ExtractData<FEFiberMaterialPoint>();
     
     mat3ds D = ep.RateOfDeformation();
     
@@ -525,7 +525,7 @@ double FEReactiveViscoelasticMaterial::WeakBondSED(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
 
     // get fiber material point data (if it exists)
-    FEFiberMaterialPoint* fp = mp.ExtractData<FEFiberMaterialPoint>();
+    FEFiberMaterialPoint* fp = wb.ExtractData<FEFiberMaterialPoint>();
     
     // get the viscous point data
     mat3ds D = ep.RateOfDeformation();
