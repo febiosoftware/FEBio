@@ -35,41 +35,25 @@ SOFTWARE.*/
 using namespace std::chrono;
 
 //-----------------------------------------------------------------------------
-// data storing timing info
-struct	timer_data {
-	time_point<steady_clock>	m_start;	//!< time at start
-	time_point<steady_clock>	m_stop;		//!< time at last stop
-};
-
-//-----------------------------------------------------------------------------
 Timer::Timer()
 {
-	m_pimpl = new timer_data;
 	reset(); 
-}
-
-//-----------------------------------------------------------------------------
-Timer::~Timer()
-{
-	delete (timer_data*)m_pimpl;
 }
 
 //-----------------------------------------------------------------------------
 void Timer::start()
 {
-	timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-    t.m_start = steady_clock::now();
+    m_start = steady_clock::now();
 	m_brunning = true;
 }
 
 //-----------------------------------------------------------------------------
 void Timer::stop()
 {
-	timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-	t.m_stop = steady_clock::now();
+	m_stop = steady_clock::now();
 	m_brunning = false;
 
-	m_total += t.m_stop - t.m_start;
+	m_total += m_stop - m_start;
 }
 
 //-----------------------------------------------------------------------------
@@ -85,8 +69,7 @@ double Timer::peek()
 	if (m_brunning)
 	{
         time_point<steady_clock> pause = steady_clock::now();
-		timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-        return duration_cast<dseconds>(m_total + (pause - t.m_start)).count();
+        return duration_cast<dseconds>(m_total + (pause - m_start)).count();
 	}
 	else 
 	{

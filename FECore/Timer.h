@@ -33,9 +33,11 @@ SOFTWARE.*/
 #include <string>
 #include <chrono>
 
-using dseconds = std::chrono::duration<double>;
-using dminutes = std::chrono::duration<double, std::ratio<60>>;
-using dhours = std::chrono::duration<double, std::ratio<3600>>;
+using namespace std::chrono;
+
+using dseconds = duration<double>;
+using dminutes = duration<double, std::ratio<60>>;
+using dhours = duration<double, std::ratio<3600>>;
 
 //-----------------------------------------------------------------------------
 //! This class implements a simple timer. 
@@ -49,9 +51,6 @@ class FECORE_API Timer
 public:
 	//! constructor
 	Timer();
-
-	//! constructor
-	~Timer();
 
 	//! Start the timer
 	void start();
@@ -82,9 +81,9 @@ public:
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
 
 private:
-	void*	m_pimpl;	//!< local timing data (using PIMPL ididom to hide OS specifics)
-
 	bool	m_brunning;	//!< flag indicating whether start was called
+    time_point<steady_clock>	m_start;	//!< time at start
+	time_point<steady_clock>	m_stop;		//!< time at last stop
     dseconds m_total; //!< accumulated time so far in seconds
 };
 
