@@ -56,7 +56,20 @@ void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, c
     // get spherical coordinates
     for(int index = 0; index < numPts; index++)
     {
-        theta[index] = acos(zCoords[index]);
+        double val = zCoords[index];
+
+        if (val<=-1)
+        {
+            theta[index] = M_PI;
+        } 
+        else if (val>=1)
+        {
+             theta[index] = 0;
+        } 
+        else 
+        {
+            theta[index] = acos(zCoords[index]);
+        }
     }
 
     for(int index = 0; index < numPts; index++)
