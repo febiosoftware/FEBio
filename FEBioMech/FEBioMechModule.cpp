@@ -458,7 +458,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEFiberODF, "fiber-odf");
 
 	// Other materials 
-	REGISTER_FECORE_CLASS(FETrussMaterial, "linear truss");
+	REGISTER_FECORE_CLASS(FELinearTrussMaterial, "linear truss");
 	REGISTER_FECORE_CLASS(FEHuiskesSupply, "Huiskes-supply");
 	REGISTER_FECORE_CLASS(FEActiveFiberContraction, "active_contraction");
     REGISTER_FECORE_CLASS(FEForceVelocityContraction, "force-velocity-Estrada");

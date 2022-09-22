@@ -431,3 +431,5 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+FECORE_API FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem);

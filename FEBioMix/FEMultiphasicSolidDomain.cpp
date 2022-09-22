@@ -450,8 +450,8 @@ void FEMultiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             FEMultigenSBMMaterialPoint* pmg = mp.ExtractData<FEMultigenSBMMaterialPoint>();
             
-            pe.m_r0 = r0;
-            pe.m_rt = rt;
+            mp.m_r0 = r0;
+            mp.m_rt = rt;
             
             pe.m_J = defgrad(el, pe.m_F, j);
             
@@ -1651,8 +1651,8 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //		 since the material point coordinates are used by most materials.
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(rt, n);
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);

@@ -57,8 +57,15 @@ BEGIN_FECORE_CLASS(FEViscoElasticMaterial, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEViscoElasticMaterialPoint::FEViscoElasticMaterialPoint(FEMaterialPointData* mp) : FEMaterialPointData(mp)
+{
+	m_sed = 0.0;
+	m_sedp = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 //! Create a shallow copy of the material point data
-FEMaterialPoint* FEViscoElasticMaterialPoint::Copy()
+FEMaterialPointData* FEViscoElasticMaterialPoint::Copy()
 {
 	FEViscoElasticMaterialPoint* pt = new FEViscoElasticMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -69,8 +76,6 @@ FEMaterialPoint* FEViscoElasticMaterialPoint::Copy()
 //! Initializes material point data.
 void FEViscoElasticMaterialPoint::Init()
 {
-	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-
 	// intialize data to zero
 	m_Se.zero();
 	m_Sep.zero();
@@ -83,15 +88,13 @@ void FEViscoElasticMaterialPoint::Init()
 	}
 
     // don't forget to initialize the base class
-    FEMaterialPoint::Init();
+    FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
 //! Update material point data.
 void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
-	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-
 	// the elastic stress stored in pt is the Cauchy stress.
 	// however, we need to store the 2nd PK stress
 	m_Sep = m_Se;
@@ -104,14 +107,14 @@ void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
     }
     
     // don't forget to call the base class
-    FEMaterialPoint::Update(timeInfo);
+    FEMaterialPointData::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
 void FEViscoElasticMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+    FEMaterialPointData::Serialize(ar);
 	ar & m_Se;
 	ar & m_Sep;
 	ar & m_H & m_Hp;
@@ -149,8 +152,8 @@ void FEViscoElasticMaterial::SetBaseMaterial(FEElasticMaterial* pbase)
 
 //-----------------------------------------------------------------------------
 //! Create material point data for this material
-FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
-{ 
+FEMaterialPointData* FEViscoElasticMaterial::CreateMaterialPointData()
+{
 	return new FEViscoElasticMaterialPoint(m_Base->CreateMaterialPointData());
 }
 
@@ -227,7 +230,7 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
     mat3d Fsafe = et.m_F; double Jsafe = et.m_J;
 
 	// Calculate the new elastic strain energy density
-	pt.m_sed = m_Base->StrainEnergyDensity(et);
+	pt.m_sed = m_Base->StrainEnergyDensity(mp);
     double sed = pt.m_sed;
     
 	double sedt = sed*m_g0;
@@ -244,7 +247,7 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
                 mat3ds Ua = dyad(v[0])*pow(l[0],pt.m_alpha[i])
                 + dyad(v[1])*pow(l[1],pt.m_alpha[i]) + dyad(v[2])*pow(l[2],pt.m_alpha[i]);
                 et.m_F = Ua; et.m_J = Ua.det();
-                sedt += m_g[i]*m_Base->StrainEnergyDensity(et);
+                sedt += m_g[i]*m_Base->StrainEnergyDensity(mp);
             }
         }
     }
@@ -293,9 +296,9 @@ bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
             do {
                 mat3ds Ua = dyad(v[0])*pow(l[0],alpha) + dyad(v[1])*pow(l[1],alpha) + dyad(v[2])*pow(l[2],alpha);
                 et.m_F = Ua; et.m_J = Ua.det();
-                mat3ds Sea = et.pull_back(m_Base->Stress(et));
+                mat3ds Sea = et.pull_back(m_Base->Stress(mp));
                 double f = (Sea*m_g[i] - S + Se).dotdot(U);
-                tens4ds Cea = et.pull_back(m_Base->Tangent(et));
+                tens4ds Cea = et.pull_back(m_Base->Tangent(mp));
                 mat3ds U2ap = dyad(v[0])*(pow(l[0],2*alpha)*log(l[0]))
                 + dyad(v[1])*(pow(l[1],2*alpha)*log(l[1]))
                 + dyad(v[2])*(pow(l[2],2*alpha)*log(l[2]));

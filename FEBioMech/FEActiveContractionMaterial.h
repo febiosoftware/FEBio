@@ -45,8 +45,6 @@ public:
     //! active contraction stiffness contribution
     virtual tens4ds ActiveStiffness(FEMaterialPoint& mp, const vec3d& a0) = 0;
     
-    virtual FEMaterialPoint* CreateMaterialPointData(FEMaterialPoint& mp) { return nullptr; }
-
     //! update force-velocity material point
     virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp, const vec3d& a0) {}
 

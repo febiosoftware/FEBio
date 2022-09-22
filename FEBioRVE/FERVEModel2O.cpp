@@ -595,7 +595,7 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 				Pa += Pn*(w[n] * Jn);
 
 				// now do the second order stress
-				vec3d X = ep.m_r0;
+				vec3d X = pt.m_r0;
 
 				tens3drs Qn = dyad3rs(Pn, X);
 

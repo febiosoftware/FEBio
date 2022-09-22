@@ -198,12 +198,16 @@ void FEBioMeshSection4::ParseNodeSetSection(XMLTag& tag, FEBModel::Part* part)
 	// make sure it's a leaf
 	if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
 
+	// see if a nodeset with this name already exists
+	FEBModel::NodeSet* set = part->FindNodeSet(szname);
+	if (set) throw FEBioImport::RepeatedNodeSet(szname);
+
 	// read the node IDs
 	vector<int> nodeList;
 	tag.value(nodeList);
 
 	// create the node set
-	FEBModel::NodeSet* set = new FEBModel::NodeSet(szname);
+	set = new FEBModel::NodeSet(szname);
 	part->AddNodeSet(set);
 
 	// add nodes to the list
@@ -220,11 +224,15 @@ void FEBioMeshSection4::ParseSurfaceSection(XMLTag& tag, FEBModel::Part* part)
 	// get the required name attribute
 	const char* szname = tag.AttributeValue("name");
 
+	// see if this surface was already defined
+	FEBModel::Surface* ps = part->FindSurface(szname);
+	if (ps) throw FEBioImport::RepeatedSurface(szname);
+
 	// count nr of faces
 	int faces = tag.children();
 
 	// allocate storage for faces
-	FEBModel::Surface* ps = new FEBModel::Surface(szname);
+	ps = new FEBModel::Surface(szname);
 	part->AddSurface(ps);
 	ps->Create(faces);
 
@@ -264,8 +272,12 @@ void FEBioMeshSection4::ParseElementSetSection(XMLTag& tag, FEBModel::Part* part
 	// get the required name attribute
 	const char* szname = tag.AttributeValue("name");
 
+	// see if this element set was already defined
+	FEBModel::ElementSet* ps = part->FindElementSet(szname);
+	if (ps) throw FEBioImport::RepeatedElementSet(szname);
+
 	// allocate storage for faces
-	FEBModel::ElementSet* ps = new FEBModel::ElementSet(szname);
+	ps = new FEBModel::ElementSet(szname);
 	part->AddElementSet(ps);
 
 	// read elements

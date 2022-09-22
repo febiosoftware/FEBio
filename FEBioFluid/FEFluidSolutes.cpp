@@ -260,10 +260,10 @@ bool solvepolyFS(int n, vector<double> a, double& x)
 //============================================================================
 // FEFluidSolutesMaterialPoint
 //============================================================================
-FEFluidSolutesMaterialPoint::FEFluidSolutesMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+FEFluidSolutesMaterialPoint::FEFluidSolutesMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEFluidSolutesMaterialPoint::Copy()
+FEMaterialPointData* FEFluidSolutesMaterialPoint::Copy()
 {
     FEFluidSolutesMaterialPoint* pt = new FEFluidSolutesMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -273,7 +273,7 @@ FEMaterialPoint* FEFluidSolutesMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEFluidSolutesMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_nsol & m_psi & m_Ie & m_pe;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
     ar & m_dkdc;
@@ -298,7 +298,7 @@ void FEFluidSolutesMaterialPoint::Init()
     m_dkdJc.clear();
     m_dkdcc.clear();
 
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -330,7 +330,7 @@ FEFluidSolutes::FEFluidSolutes(FEModel* pfem) : FEMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEFluidSolutes::CreateMaterialPointData()
+FEMaterialPointData* FEFluidSolutes::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint();
     return new FEFluidSolutesMaterialPoint(fpt);

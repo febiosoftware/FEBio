@@ -31,7 +31,7 @@ FEFiberMaterial::FEFiberMaterial(FEModel* fem) : FEMaterialProperty(fem)
 {
 }
 
-FEMaterialPoint* FEFiberMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEFiberMaterial::CreateMaterialPointData()
 {
 	return new FEFiberMaterialPoint(nullptr);
 }
@@ -41,7 +41,7 @@ FEFiberMaterialUncoupled::FEFiberMaterialUncoupled(FEModel* fem) : FEMaterialPro
 {
 }
 
-FEMaterialPoint* FEFiberMaterialUncoupled::CreateMaterialPointData()
+FEMaterialPointData* FEFiberMaterialUncoupled::CreateMaterialPointData()
 {
 	return new FEFiberMaterialPoint(nullptr);
 }

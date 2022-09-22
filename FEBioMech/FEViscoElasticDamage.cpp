@@ -76,7 +76,7 @@ bool FEViscoElasticDamage::Init()
 
 //-----------------------------------------------------------------------------
 //! Create material point data for this material
-FEMaterialPoint* FEViscoElasticDamage::CreateMaterialPointData()
+FEMaterialPointData* FEViscoElasticDamage::CreateMaterialPointData()
 {
     return new FEViscoElasticMaterialPoint(m_pDmg->CreateMaterialPointData());
 }
@@ -158,7 +158,7 @@ double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
     mat3d Fsafe = et.m_F; double Jsafe = et.m_J;
     
     // Calculate the new elastic strain energy density
-    pt.m_sed = m_pDmg->GetElasticMaterial()->StrainEnergyDensity(et);
+    pt.m_sed = m_pDmg->GetElasticMaterial()->StrainEnergyDensity(mp);
     double sed = pt.m_sed;
     
     double sedt = sed*m_g0;
@@ -175,7 +175,7 @@ double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
                 mat3ds Ua = dyad(v[0])*pow(l[0],pt.m_alpha[i])
                 + dyad(v[1])*pow(l[1],pt.m_alpha[i]) + dyad(v[2])*pow(l[2],pt.m_alpha[i]);
                 et.m_F = Ua; et.m_J = Ua.det();
-                sedt += m_g[i]*m_pDmg->GetElasticMaterial()->StrainEnergyDensity(et);
+                sedt += m_g[i]*m_pDmg->GetElasticMaterial()->StrainEnergyDensity(mp);
             }
         }
     }
@@ -184,7 +184,7 @@ double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
     
     et.m_F = Fsafe; et.m_J = Jsafe;
     
-    double D = m_pDmg->Damage(pt);
+    double D = m_pDmg->Damage(mp);
     
     // return the total strain energy density
     return sedt*(1-D);
@@ -226,9 +226,9 @@ bool FEViscoElasticDamage::SeriesStretchExponent(FEMaterialPoint& mp)
             do {
                 mat3ds Ua = dyad(v[0])*pow(l[0],alpha) + dyad(v[1])*pow(l[1],alpha) + dyad(v[2])*pow(l[2],alpha);
                 et.m_F = Ua; et.m_J = Ua.det();
-                mat3ds Sea = et.pull_back(m_pDmg->GetElasticMaterial()->Stress(et));
+                mat3ds Sea = et.pull_back(m_pDmg->GetElasticMaterial()->Stress(mp));
                 double f = (Sea*m_g[i] - S + Se).dotdot(U);
-                tens4ds Cea = et.pull_back(m_pDmg->GetElasticMaterial()->Tangent(et));
+                tens4ds Cea = et.pull_back(m_pDmg->GetElasticMaterial()->Tangent(mp));
                 mat3ds U2ap = dyad(v[0])*(pow(l[0],2*alpha)*log(l[0]))
                 + dyad(v[1])*(pow(l[1],2*alpha)*log(l[1]))
                 + dyad(v[2])*(pow(l[2],2*alpha)*log(l[2]));

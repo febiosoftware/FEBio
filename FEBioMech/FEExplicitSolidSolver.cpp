@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FELinearTrussDomain.h"
+#include "FEElasticTrussDomain.h"
 #include "FERigidMaterial.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
@@ -61,7 +62,7 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 	m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem),
 	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
-	m_dyn_damping = 0.99;
+	m_dyn_damping = 1;
 	m_niter = 0;
 	m_nreq = 0;
 
@@ -229,6 +230,42 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 			else if (dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd)))
 			{
 				FELinearTrussDomain* ptd = dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd));
+
+				// loop over all the elements
+				for (int iel = 0; iel < ptd->Elements(); ++iel)
+				{
+					FETrussElement& el = ptd->Element(iel);
+					ptd->UnpackLM(el, lm);
+
+					// create the element's stiffness matrix
+					FEElementMatrix ke(el);
+					int neln = el.Nodes();
+					ke.resize(neln, neln);
+					ke.zero();
+
+					// calculate inertial stiffness
+					ptd->ElementMassMatrix(el, ke);
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(3 * neln, 0.0);
+					for (int i = 0; i < neln; ++i)
+					{
+						for (int j = 0; j < neln; ++j)
+						{
+							double kab = ke[i][j];
+							el_lumped_mass[3 * i    ] += kab;
+							el_lumped_mass[3 * i + 1] += kab;
+							el_lumped_mass[3 * i + 2] += kab;
+						}
+					}
+
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				}
+			}
+			else if (dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd)))
+			{
+				FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd));
 
 				// loop over all the elements
 				for (int iel = 0; iel < ptd->Elements(); ++iel)
@@ -833,7 +870,9 @@ void FEExplicitSolidSolver::PrepStep()
 	// intialize material point data
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	fem.Update();
+	// NOTE: Commenting this out since I don't think anything needs to be updated here. 
+	//       This also halves the number of update calls, so gives a performance boost. 
+//	fem.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -911,13 +950,13 @@ bool FEExplicitSolidSolver::DoSolve()
 	{
 		FENode& node = mesh.Node(i);
 		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], m_dyn_damping*vnp1[n]); node.m_at.x = anp1[n]; }
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], m_dyn_damping*vnp1[n]); node.m_at.y = anp1[n]; }
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], m_dyn_damping*vnp1[n]); node.m_at.z = anp1[n]; }
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], m_dyn_damping*vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], m_dyn_damping*vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], m_dyn_damping*vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
 	}
 
 	// do minor iterations callbacks

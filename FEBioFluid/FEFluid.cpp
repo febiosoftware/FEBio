@@ -84,7 +84,7 @@ bool FEFluid::Init()
 
 //-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
-FEMaterialPoint* FEFluid::CreateMaterialPointData()
+FEMaterialPointData* FEFluid::CreateMaterialPointData()
 {
 	return new FEFluidMaterialPoint();
 }

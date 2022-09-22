@@ -152,10 +152,9 @@ double FEUncoupledMaterial::WeakBondSED(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEUncoupledMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEUncoupledMaterial::CreateMaterialPointData()
 {
-	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
-	FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-	pt.m_buncoupled = true;
+	FEElasticMaterialPoint* mp = new FEElasticMaterialPoint;
+	mp->m_buncoupled = true;
 	return mp;
 }

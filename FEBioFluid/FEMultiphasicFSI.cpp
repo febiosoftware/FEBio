@@ -260,10 +260,10 @@ bool solvepolyMP(int n, vector<double> a, double& x)
 //============================================================================
 // FEFSIMaterialPoint
 //============================================================================
-FEMultiphasicFSIMaterialPoint::FEMultiphasicFSIMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+FEMultiphasicFSIMaterialPoint::FEMultiphasicFSIMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMultiphasicFSIMaterialPoint::Copy()
+FEMaterialPointData* FEMultiphasicFSIMaterialPoint::Copy()
 {
     FEMultiphasicFSIMaterialPoint* pt = new FEMultiphasicFSIMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -273,7 +273,7 @@ FEMaterialPoint* FEMultiphasicFSIMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEMultiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_nsol & m_psi & m_Ie & m_cF & m_pe;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
     ar & m_dkdc;
@@ -298,7 +298,7 @@ void FEMultiphasicFSIMaterialPoint::Init()
     m_dkdJc.clear();
     m_dkdcc.clear();
     
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -330,7 +330,7 @@ FEMultiphasicFSI::FEMultiphasicFSI(FEModel* pfem) : FEBiphasicFSI(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEMultiphasicFSI::CreateMaterialPointData()
+FEMaterialPointData* FEMultiphasicFSI::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint(m_pSolid->CreateMaterialPointData());
     FEFSIMaterialPoint* fst = new FEFSIMaterialPoint(fpt);

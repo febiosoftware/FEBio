@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEDamageMaterialPoint.h"
 #include <FECore/DumpStream.h>
 
-FEMaterialPoint* FEDamageMaterialPoint::Copy()
+FEMaterialPointData* FEDamageMaterialPoint::Copy()
 {
     FEDamageMaterialPoint* pt = new FEDamageMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -39,7 +39,7 @@ FEMaterialPoint* FEDamageMaterialPoint::Copy()
 
 void FEDamageMaterialPoint::Init()
 {
-	FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 
 	// intialize data to zero
 	m_Emax = 0;
@@ -49,13 +49,13 @@ void FEDamageMaterialPoint::Init()
 
 void FEDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
-	FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 
 	m_Emax = max(m_Emax, m_Etrial);
 }
 
 void FEDamageMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_Etrial & m_Emax & m_D;
 }

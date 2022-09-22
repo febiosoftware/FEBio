@@ -54,16 +54,14 @@ BEGIN_FECORE_CLASS(FEMRVonMisesFibers, FEUncoupledMaterial)
 END_FECORE_CLASS();
 
 //=============================================================================
-FEMRVonMisesMaterialPoint::FEMRVonMisesMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+FEMRVonMisesMaterialPoint::FEMRVonMisesMaterialPoint(FEMaterialPointData* mp) : FEMaterialPointData(mp)
 {
 
 }
 
-FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
+FEMaterialPointData* FEMRVonMisesMaterialPoint::Copy()
 {
 	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(*this);
-	pt->m_kf = m_kf;
-	pt->m_pNext = m_pNext;
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
@@ -71,7 +69,7 @@ FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEMRVonMisesMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_kf & m_tp;
 }
 
@@ -162,7 +160,7 @@ FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()
+FEMaterialPointData* FEMRVonMisesFibers::CreateMaterialPointData()
 {
 	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(FEUncoupledMaterial::CreateMaterialPointData());
 	pt->m_kf = kf;

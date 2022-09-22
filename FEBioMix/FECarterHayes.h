@@ -64,7 +64,7 @@ public:
 	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! Create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 	
     //! calculate strain energy density at material point
     double StrainEnergyDensity(FEMaterialPoint& pt) override { return StrainEnergy(pt); }

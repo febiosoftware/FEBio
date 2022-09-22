@@ -453,11 +453,12 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             bool convgd = false;
             bool done = false;
             int iter = 0;
+			FEMaterialPoint mp(ft);
             do {
                 ++iter;
                 fp->m_ef = e;
-                double f = Pressure(*ft) - p;
-                double df = Tangent_Strain(*ft);
+                double f = Pressure(mp) - p;
+                double df = Tangent_Strain(mp);
                 double de = (df != 0) ? -f/df : 0;
                 e += de;
                 if ((fabs(de) < errrel*fabs(e)) ||
@@ -468,7 +469,7 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             delete ft;
             return convgd;
         }
-            break;
+        break;
     }
     return false;
 }

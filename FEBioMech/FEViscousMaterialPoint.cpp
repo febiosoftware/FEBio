@@ -31,7 +31,10 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include <FECore/DumpStream.h>
 
-FEMaterialPoint* FEViscousMaterialPoint::Copy()
+FEViscousMaterialPoint::FEViscousMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
+
+
+FEMaterialPointData* FEViscousMaterialPoint::Copy()
 {
     FEViscousMaterialPoint* pt = new FEViscousMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -46,32 +49,38 @@ void FEViscousMaterialPoint::Init()
 	m_dt = 0.0;
     
     // don't forget to intialize the nested data
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 void FEViscousMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
+	assert(false);
+/*
 	FEElasticMaterialPoint& pt = *this->ExtractData<FEElasticMaterialPoint>();
     m_Fp = pt.m_F;
 
 	m_dt = timeInfo.timeIncrement;
-    
+*/    
     // don't forget to call base class
-    FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 }
 
 void FEViscousMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_Fp;
 }
 
 mat3d FEViscousMaterialPoint::VelocityGradient()
 {
+	assert(false);
+/*
     FEElasticMaterialPoint& pt = *this->ExtractData<FEElasticMaterialPoint>();
     mat3d Fi = pt.m_F.inverse();
     mat3d L = (mat3dd(1) - m_Fp*Fi)/m_dt;
     return L;
+*/
+	return mat3d();
 }
 
 mat3ds FEViscousMaterialPoint::RateOfDeformation()

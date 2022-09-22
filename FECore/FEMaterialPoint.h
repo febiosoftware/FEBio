@@ -29,10 +29,12 @@ SOFTWARE.*/
 #pragma once
 
 #include "mat3d.h"
+#include "quatd.h"
 #include "FETimeInfo.h"
 #include <vector>
 
 class FEElement;
+class FEMaterialPoint;
 
 //-----------------------------------------------------------------------------
 //! Material point class
@@ -42,12 +44,13 @@ class FEElement;
 //! current configuration but also about the local deformation. In addition
 //! it contains the state information that is associated with the current
 //! point.
+//! 
 
-class FECORE_API FEMaterialPoint
+class FECORE_API FEMaterialPointData
 {
 public:
-	FEMaterialPoint(FEMaterialPoint* ppt = 0);
-	virtual ~FEMaterialPoint();
+	FEMaterialPointData(FEMaterialPointData* ppt = 0);
+	virtual ~FEMaterialPointData();
 
 public:
 	//! The init function is used to intialize data
@@ -58,63 +61,106 @@ public:
 	virtual void Update(const FETimeInfo& timeInfo);
 
 	//! copy material point data (for running restarts) \todo Is this still used?
-	virtual FEMaterialPoint* Copy() { return 0; }
+	virtual FEMaterialPointData* Copy() { return 0; }
 
-	//! get the number of material point components
-	virtual int Components() { return 1; }
+	// serialization
+	virtual void Serialize(DumpStream& ar);
 
-	//! Get the material point data
-	virtual FEMaterialPoint* GetPointData(int i) { return this; }
-
+public:
 	//! Get the next material point data
-	FEMaterialPoint* Next() { return m_pNext; }
+	FEMaterialPointData* Next() { return m_pNext; }
 
 	//! Get the previous (parent) material point data
-	FEMaterialPoint* Prev() { return m_pPrev; }
+	FEMaterialPointData* Prev() { return m_pPrev; }
     
-	//! Extract data (\todo Is it safe for a plugin to use this function?)
-	template <class T> T* ExtractData();
-	template <class T> const T* ExtractData() const;
-
 	// assign the previous pointer
-	void SetPrev(FEMaterialPoint* pt);
+	void SetPrev(FEMaterialPointData* pt);
 
 	//! assign the next pointer
 	//! this also sets the prev pointer of the passed pointer
 	//! in other words, it makes this the parent of the passed pointer
-	void SetNext(FEMaterialPoint* pt);
+	void SetNext(FEMaterialPointData* pt);
 
 	//! append a material point
-	void Append(FEMaterialPoint* pt);
+	void Append(FEMaterialPointData* pt);
 
-	// serialization
+protected:
+	virtual int Components() const { return 0; }
+	virtual FEMaterialPoint* GetPointData(int i) { return nullptr; }
+
+public:
+	//! Extract data (\todo Is it safe for a plugin to use this function?)
+	template <class T> T* ExtractData();
+	template <class T> const T* ExtractData() const;
+
+protected:
+	FEMaterialPointData*	m_pNext;    //!< next data in the list
+	FEMaterialPointData*	m_pPrev;    //!< previous data in the list
+
+	friend class FEMaterialPoint;
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEMaterialPoint
+{
+public:
+	FEMaterialPoint(FEMaterialPointData* data = nullptr);
+	virtual ~FEMaterialPoint();
+
+	//! The init function is used to intialize data
+	virtual void Init();
+
+	virtual FEMaterialPoint* Copy();
+
+	//! The Update function is used to update material point data
+	//! Note that this gets called at the start of the time step during PreSolveUpdate
+	virtual void Update(const FETimeInfo& timeInfo);
+
 	virtual void Serialize(DumpStream& ar);
+
+	void Append(FEMaterialPointData* pt);
+
+public:
+	int Components() const { return (m_data ? m_data->Components() : 0); }
+
+	FEMaterialPoint* GetPointData(int i = 0)
+	{
+		if (m_data == nullptr) return this;
+		FEMaterialPoint* mp = m_data->GetPointData(i);
+		if (mp == nullptr) mp = this;
+		return mp;
+	}
+
+public:
+	//! Extract data (\todo Is it safe for a plugin to use this function?)
+	template <class T> T* ExtractData();
+	template <class T> const T* ExtractData() const;
 
 public:
 	vec3d		m_r0;		//!< material point position
 	vec3d		m_rt;		//!< current point position
 	double		m_J0;		//!< reference Jacobian
 	double		m_Jt;		//!< current Jacobian
-	FEElement*	m_elem;		//!< Element where this material point is
+	quatd		m_Q;		//!< local coordinates
+	FEElement* m_elem;		//!< Element where this material point is
 	int			m_index;	//!< local integration point index 
 
 	// pointer to element's shape function values
-	double*		m_shape;
+	double* m_shape;
 
 protected:
-	FEMaterialPoint*	m_pNext;    //!< next data in the list
-	FEMaterialPoint*	m_pPrev;    //!< previous data in the list
+	FEMaterialPointData* m_data;
 };
 
 //-----------------------------------------------------------------------------
-template <class T> inline T* FEMaterialPoint::ExtractData()
+template <class T> inline T* FEMaterialPointData::ExtractData()
 {
 	// first see if this is the correct type
 	T* p = dynamic_cast<T*>(this);
 	if (p) return p;
 
 	// check all the child classes 
-	FEMaterialPoint* pt = this;
+	FEMaterialPointData* pt = this;
 	while (pt->m_pNext)
 	{
 		pt = pt->m_pNext;
@@ -131,19 +177,29 @@ template <class T> inline T* FEMaterialPoint::ExtractData()
 		if (p) return p;
 	}
 
+	if (Components() > 0)
+	{
+		for (int i = 0; i < Components(); ++i)
+		{
+			FEMaterialPoint* mpi = GetPointData(i);
+			p = mpi->ExtractData<T>();
+			if (p) return p;
+		}
+	}
+
 	// Everything has failed. Material point data can not be found
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-template <class T> inline const T* FEMaterialPoint::ExtractData() const
+template <class T> inline const T* FEMaterialPointData::ExtractData() const
 {
 	// first see if this is the correct type
 	const T* p = dynamic_cast<const T*>(this);
 	if (p) return p;
 
 	// check all the child classes 
-	const FEMaterialPoint* pt = this;
+	const FEMaterialPointData* pt = this;
 	while (pt->m_pNext)
 	{
 		pt = pt->m_pNext;
@@ -164,16 +220,24 @@ template <class T> inline const T* FEMaterialPoint::ExtractData() const
 	return 0;
 }
 
+//-----------------------------------------------------------------------------
+template <class T> inline T* FEMaterialPoint::ExtractData()
+{
+	return (m_data ? m_data->ExtractData<T>() : nullptr);
+}
+
+//-----------------------------------------------------------------------------
+template <class T> inline const T* FEMaterialPoint::ExtractData() const
+{
+	return (m_data ? m_data->ExtractData<T>() : nullptr);
+}
 
 //-----------------------------------------------------------------------------
 // Material point base class for materials that define vector properties
-class FECORE_API FEMaterialPointArray : public FEMaterialPoint
+class FECORE_API FEMaterialPointArray : public FEMaterialPointData
 {
 public:
-	FEMaterialPointArray(FEMaterialPoint* ppt = 0);
-
-	//! Add a child material point
-	void AddMaterialPoint(FEMaterialPoint* pt);
+	FEMaterialPointArray(FEMaterialPointData* ppt = nullptr);
 
 	//! initialization
 	void Init() override;
@@ -184,8 +248,12 @@ public:
 	//! material point update
 	void Update(const FETimeInfo& timeInfo) override;
 
+public:
+	//! Add a child material point
+	void AddMaterialPoint(FEMaterialPoint* pt);
+
 	//! get the number of material point components
-	int Components() override { return (int)m_mp.size(); }
+	int Components() const override { return (int)m_mp.size(); }
 
 	//! retrieve point data
 	FEMaterialPoint* GetPointData(int i) override { return m_mp[i]; }

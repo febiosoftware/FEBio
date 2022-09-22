@@ -52,9 +52,9 @@ FEContinuousFiberDistribution::FEContinuousFiberDistribution(FEModel* pfem) : FE
 FEContinuousFiberDistribution::~FEContinuousFiberDistribution() {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEContinuousFiberDistribution::CreateMaterialPointData()
+FEMaterialPointData* FEContinuousFiberDistribution::CreateMaterialPointData()
 {
-	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
+	FEMaterialPointData* mp = FEElasticMaterial::CreateMaterialPointData();
 	mp->SetNext(m_pFmat->CreateMaterialPointData());
     return mp;
 }
@@ -92,7 +92,7 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
     double IFD = IntegratedFiberDensity(mp);
 
 	// obtain an integration point iterator
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
+	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
 		do
@@ -136,7 +136,7 @@ tens4ds FEContinuousFiberDistribution::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
+	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
 		do
@@ -177,7 +177,7 @@ double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
     double IFD = IntegratedFiberDensity(mp);
 
 	double sed = 0.0;
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
+	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
 		do

@@ -63,8 +63,7 @@ private:
 class FEMultiphasicTangentDiagnostic : public FEDiagnostic
 {
 public:
-    FEMultiphasicTangentDiagnostic(FEModel& fem);
-    virtual ~FEMultiphasicTangentDiagnostic(){}
+    FEMultiphasicTangentDiagnostic(FEModel* fem);
     
     bool Init();
     

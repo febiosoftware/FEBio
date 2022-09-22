@@ -52,15 +52,15 @@ void print(SparseMatrix& m, FILE* fp, int i0, int j0, int i1, int j1)
 }
 
 //-----------------------------------------------------------------------------
-FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	m_szout[0] = 0;
 	m_rng[0] = m_rng[1] = 0;
 	m_rng[2] = m_rng[3] = -1;
 
-	FEAnalysis* pstep = new FEAnalysis(&fem);
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+	FEAnalysis* pstep = new FEAnalysis(fem);
+	fem->AddStep(pstep);
+	fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

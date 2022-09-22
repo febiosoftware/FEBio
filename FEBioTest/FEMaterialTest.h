@@ -23,46 +23,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FEDiagnostic.h"
+#include <FECore/ElementDataRecord.h>
 
 //-----------------------------------------------------------------------------
-class FEEASShellTangentUnloaded : public FEDiagnosticScenario
+//! The material test diagnostics evaluates the stress-strain of a material. 
+class FEMaterialTest : public FEDiagnostic
 {
 public:
-    FEEASShellTangentUnloaded(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_strain = 0.0; }
-    
-    bool Init() override;
-    
+	FEMaterialTest(FEModel* fem);
+	~FEMaterialTest();
+
+	FEDiagnosticScenario* CreateScenario(const std::string& sname);
+
+	bool Init();
+
+	bool Run();
+
+	void SetOutputFileName(const char* szfilename);
+
+	std::vector<std::pair<double, double> > GetOutputData() { return m_data; }
+
 private:
-    double    m_strain;
-    
-    DECLARE_FECORE_CLASS();
-};
+	static bool cb(FEModel* fem, unsigned int when, void* pd) { return ((FEMaterialTest*)pd)->cb(); }
+	bool cb();
 
-//-----------------------------------------------------------------------------
-//! The FETangentDiagnostic class tests the stiffness matrix implementation
-//! by comparing it to a numerical approximating of the derivative of the
-//! residual.
+public:
+	FEDiagnosticScenario* m_pscn;
+	
+	const char* m_szoutfile;
 
-class FEEASShellTangentDiagnostic : public FEDiagnostic
-{
-public:
-    FEEASShellTangentDiagnostic(FEModel* fem);
-    virtual ~FEEASShellTangentDiagnostic(){}
-    
-    FEDiagnosticScenario* CreateScenario(const std::string& sname);
-    
-    bool Init();
-    
-    bool Run();
-    
-protected:
-    void deriv_residual(matrix& ke);
-    void print_matrix(matrix& m);
-public:
-    FEDiagnosticScenario* m_pscn;
+	FELogElemData* m_strain;
+	FELogElemData* m_stress;
+
+	std::vector<std::pair<double, double> >	m_data;
 };

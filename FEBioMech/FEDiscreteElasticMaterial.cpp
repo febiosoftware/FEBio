@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEDiscreteElasticMaterial.h"
 
-FEMaterialPoint* FEDiscreteElasticMaterialPoint::Copy()
+FEMaterialPointData* FEDiscreteElasticMaterialPoint::Copy()
 {
 	FEDiscreteElasticMaterialPoint* pt = new FEDiscreteElasticMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -39,7 +39,7 @@ FEDiscreteElasticMaterial::FEDiscreteElasticMaterial(FEModel* pfem) : FEDiscrete
 
 }
 
-FEMaterialPoint* FEDiscreteElasticMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEDiscreteElasticMaterial::CreateMaterialPointData()
 {
 	return new FEDiscreteElasticMaterialPoint;
 }

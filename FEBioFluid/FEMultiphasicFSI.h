@@ -41,14 +41,14 @@
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEMultiphasicFSIMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEMultiphasicFSIMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEMultiphasicFSIMaterialPoint(FEMaterialPoint* pt);
+    FEMultiphasicFSIMaterialPoint(FEMaterialPointData* pt);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);
@@ -88,7 +88,7 @@ public:
     FEMultiphasicFSI(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     //! performs initialization
     bool Init() override;

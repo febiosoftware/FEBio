@@ -113,6 +113,8 @@ void FESRIElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<do
 
 		// setup the material point
 		FEElasticMaterialPoint pt;
+		FEMaterialPoint mp(&pt);
+
 		pt.m_J = defgrad(el, pt.m_F, r, s, t);
 
 		// calculate the jacobian
@@ -122,7 +124,7 @@ void FESRIElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<do
 		el.shape_deriv(Gr, Gs, Gt, r, s, t);
 
 		// calculate the stress
-		mat3ds stress = m_pMat->Stress(pt);
+		mat3ds stress = m_pMat->Stress(mp);
 
 		// evaluate the pressure
 		double p = -(stress.tr()/3.0);

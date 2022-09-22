@@ -47,9 +47,7 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& pt);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override {
-		return m_pMat->CreateMaterialPointData();
-	}
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 public:
 	double	btime;	//!< generation birth time
@@ -79,16 +77,13 @@ class FEElasticMultigeneration;
 //! second, third, etc. generations.  These relate the reference configuration of 
 //! each generation relative to the first generation.
 
-class FEMultigenerationMaterialPoint : public FEMaterialPoint
+class FEMultigenerationMaterialPoint : public FEMaterialPointArray
 {
 public:
     FEMultigenerationMaterialPoint();
 		
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
-	//! Add a child material point
-	void AddMaterialPoint(FEMaterialPoint* pt);
-		
 	//! data serialization
 	void Serialize(DumpStream& ar);
 
@@ -96,11 +91,8 @@ public:
 
 	void Update(const FETimeInfo& timeInfo);
 
-    FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
-    
 public:
 	// multigenerational material data
-    vector<FEMaterialPoint*>    m_mp;   //!< material point data for multigeneration components
 	double	m_tgen;		//!< last generation time
     int     m_ngen;     //!< number of active generations
 	FEElasticMultigeneration*	m_pmat;
@@ -115,7 +107,7 @@ public:
 	FEElasticMultigeneration(FEModel* pfem);
 		
 	// returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
 
     // return number of materials
     int Materials() { return (int)m_MG.size(); }

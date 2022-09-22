@@ -31,10 +31,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Material point data for discrete materials.
-class FECORE_API FEDiscreteMaterialPoint : public FEMaterialPoint
+class FECORE_API FEDiscreteMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
 
 	void Serialize(DumpStream& ar) override;
 

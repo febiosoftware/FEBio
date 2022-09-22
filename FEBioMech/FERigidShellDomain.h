@@ -52,6 +52,12 @@ public:
 	//! calculates the internal forces (nothing to do)
 	void InternalForces(FEGlobalVector& R) override;
 
+	//! calculates mass matrix (nothing to do)
+	void MassMatrix(FELinearSystem& LS, double scale) override;
+
+	//! calculates the inertial forces (nothing to do)
+	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
+
 	// update domain data
 	void Update(const FETimeInfo& tp) override;
 };
@@ -77,6 +83,12 @@ public:
 
 	//! calculates the internal forces (nothing to do)
 	void InternalForces(FEGlobalVector& R) override;
+
+	//! calculates mass matrix (nothing to do)
+	void MassMatrix(FELinearSystem& LS, double scale) override;
+
+	//! calculates the inertial forces (nothing to do)
+	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
 
 	// update domain data
 	void Update(const FETimeInfo& tp) override;

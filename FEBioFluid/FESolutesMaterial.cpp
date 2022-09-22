@@ -39,14 +39,14 @@ END_FECORE_CLASS();
 //============================================================================
 // FEFluidSolutesMaterialPoint
 //============================================================================
-FESolutesMaterial::Point::Point(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
+FESolutesMaterial::Point::Point(FEMaterialPointData* pt) : FEMaterialPointData(pt)
 {
 	m_vft = vec3d(0.0, 0.0, 0.0);
 	m_JfdotoJf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FESolutesMaterial::Point::Copy()
+FEMaterialPointData* FESolutesMaterial::Point::Copy()
 {
 	FESolutesMaterial::Point* pt = new FESolutesMaterial::Point(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -56,7 +56,7 @@ FEMaterialPoint* FESolutesMaterial::Point::Copy()
 //-----------------------------------------------------------------------------
 void FESolutesMaterial::Point::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_vft & m_JfdotoJf;
     ar & m_nsol;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
@@ -76,7 +76,7 @@ void FESolutesMaterial::Point::Init()
     m_dkdJ.clear();
     m_dkdc.clear();
 
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ FESolutesMaterial::FESolutesMaterial(FEModel* pfem) : FEMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FESolutesMaterial::CreateMaterialPointData()
+FEMaterialPointData* FESolutesMaterial::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint();
     return new FESolutesMaterial::Point(fpt);

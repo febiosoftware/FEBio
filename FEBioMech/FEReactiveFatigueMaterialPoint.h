@@ -57,16 +57,17 @@ public:
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the fatigue and damage variables.
-class FEReactiveFatigueMaterialPoint : public FEMaterialPoint
+class FEReactiveFatigueMaterialPoint : public FEMaterialPointData
 {
 public:
     // default constructor
-    FEReactiveFatigueMaterialPoint(FEMaterialPoint *pt);
-    // copy constructors
+    FEReactiveFatigueMaterialPoint(FEMaterialPointData*pt);
+    
+	// copy constructors
     FEReactiveFatigueMaterialPoint(const FEReactiveFatigueMaterialPoint& rfmp);
     FEReactiveFatigueMaterialPoint(FEReactiveFatigueMaterialPoint& rfmp);
     
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     void Init();
     void Update(const FETimeInfo& timeInfo);

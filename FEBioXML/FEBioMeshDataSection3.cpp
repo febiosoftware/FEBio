@@ -801,21 +801,87 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	FEMaterial* mat = dom->GetMaterial();
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
 
-	// get the mat_axis property
-	FEProperty* pQ = mat->FindProperty("mat_axis", true);
-	if (pQ->GetSuperClassID() != FEMAT3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
-
-	// create the map's name: material_name.mat_axis
-	stringstream ss;
-	ss << "material" << mat->GetID() << ".mat_axis";
-	string mapName = ss.str();
-
 	Storage_Fmt fmt = FMT_ITEM;
 	const char* szfmt = tag.AttributeValue("format", true);
 	if (szfmt)
 	{
 		if (szcmp(szfmt, "mat_points") == 0) fmt = FMT_MATPOINTS;
 	}
+
+	// get the mat_axis property
+	FEProperty* pQ = mat->FindProperty("mat_axis", true);
+	if (pQ == nullptr)
+	{
+		// if the material does not have the mat_axis property, we'll assign it directly to the material points
+		// This only works for ITEM storage
+		if (fmt != FMT_ITEM) throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
+
+		++tag;
+		do
+		{
+			if ((tag == "e") || (tag == "elem"))
+			{
+				// get the local element number
+				const char* szlid = tag.AttributeValue("lid");
+				int lid = atoi(szlid) - 1;
+
+				// make sure the number is valid
+				if ((lid < 0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+				// get the element
+				FEElement* el = mesh->FindElementFromID(set[lid]);
+				if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+				// read parameters
+				double a[3] = { 0 };
+				double d[3] = { 0 };
+				++tag;
+				do
+				{
+					if (tag == "a") tag.value(a, 3);
+					else if (tag == "d") tag.value(d, 3);
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				} while (!tag.isend());
+
+				vec3d v1(a[0], a[1], a[2]);
+				vec3d v2(d[0], d[1], d[2]);
+
+				vec3d e1(v1);
+				vec3d e3 = v1 ^ v2;
+				vec3d e2 = e3 ^ e1;
+
+				// normalize
+				e1.unit();
+				e2.unit();
+				e3.unit();
+
+				// set the value
+				mat3d A(e1, e2, e3);
+
+				// convert to quaternion
+				quatd Q(A);
+
+				// assign to all material points
+				int ni = el->GaussPoints();
+				for (int n = 0; n < ni; ++n)
+				{
+					FEMaterialPoint* mp = el->GetMaterialPoint(n);
+					mp->m_Q = Q;
+				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		} while (!tag.isend());
+		return;
+	}
+
+	if (pQ->GetSuperClassID() != FEMAT3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szname);
+
+	// create the map's name: material_name.mat_axis
+	stringstream ss;
+	ss << "material" << mat->GetID() << ".mat_axis";
+	string mapName = ss.str();
 
 	// the domain map we're about to create
 	FEDomainMap* map = nullptr;

@@ -227,7 +227,7 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 		}
 
 		writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
-			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			const FEContactMaterialPoint* pt = dynamic_cast<const FEContactMaterialPoint*>(&mp);
 			return (pt ? pt->m_gap : 0.0);
 			});
 
@@ -290,7 +290,7 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
 		}
 
 		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			const FEContactMaterialPoint* pt = dynamic_cast<const FEContactMaterialPoint*>(&mp);
 			return (pt ? pt->m_Ln : 0.0);
 		});
 		return true;
@@ -349,7 +349,7 @@ bool FEPlotNodalContactGap::Save(FESurface& surf, FEDataStream& a)
 		}
 
 		writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
-			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			const FEContactMaterialPoint* pt = dynamic_cast<const FEContactMaterialPoint*>(&mp);
 			return (pt ? pt->m_gap : 0.0);
 			});
 		return true;
@@ -399,7 +399,7 @@ bool FEPlotNodalContactPressure::Save(FESurface &surf, FEDataStream& a)
 	if ((pci == 0) || pci->IsActive())
 	{
 		writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
-			const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+			const FEContactMaterialPoint* pt = dynamic_cast<const FEContactMaterialPoint*>(&mp);
 			return (pt ? pt->m_Ln : 0.0);
 			});
 
@@ -566,8 +566,8 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 		if (ps)
 		{
 			writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-				const FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
-				return pt.m_eps;
+				const FEFacetSlidingSurface::Data* pt = dynamic_cast<const FEFacetSlidingSurface::Data*>(&mp);
+				return (pt ? pt->m_eps : 0);
 				});
 			return true;
 		}
@@ -576,8 +576,8 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 		if (pse)
 		{
 			writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
-				const FESlidingElasticSurface::Data& pt = *mp.ExtractData<FESlidingElasticSurface::Data>();
-				return pt.m_epsn;
+				const FESlidingElasticSurface::Data* pt = dynamic_cast<const FESlidingElasticSurface::Data*>(&mp);
+				return (pt ? pt->m_epsn : 0);
 				});
 			return true;
 		}
@@ -605,10 +605,8 @@ bool FEPlotContactStatus::Save(FESurface& surf, FEDataStream& a)
 			int nint = el.GaussPoints();
 			for (int j = 0; j < nint; ++j)
 			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
-
-				if (pt.m_pme) nc++;
+				FEContactMaterialPoint* mp = dynamic_cast<FEContactMaterialPoint*>(el.GetMaterialPoint(j));
+				if (mp && mp->m_pme) nc++;
 			}
 
 			a << nc;
@@ -698,8 +696,8 @@ bool FEPlotScalarSurfaceLoad::Save(FESurface &surf, FEDataStream& a)
     
     if (psl->IsActive()) {
         writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
-            const FESurfaceMaterialPoint* pt = mp.ExtractData<FESurfaceMaterialPoint>();
-            return (pt ? psl->ScalarLoad(*const_cast<FESurfaceMaterialPoint*>(pt)) : 0.0);
+			const FESurfaceMaterialPoint* pt = dynamic_cast<const FESurfaceMaterialPoint*>(&mp);
+			return (pt ? psl->ScalarLoad(*const_cast<FESurfaceMaterialPoint*>(pt)) : 0.0);
         });
         return true;
     }
@@ -1251,10 +1249,10 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			double m = 0;
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				double detJ = bd.detJ0(el, j)*gw[j];
-				ew += pt.m_rt*(pme->Density(pt)*detJ);
-				m += pme->Density(pt)*detJ;
+				ew += mp.m_rt*(pme->Density(mp)*detJ);
+				m += pme->Density(mp)*detJ;
 			}
 
 			a << ew / m;
@@ -1275,7 +1273,7 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			double m = 0;
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& pt = *el.GetMaterialPoint(j);
 				double detJ = bd->detJ0(el, j)*gw[j];
 				ew += pt.m_rt*(pme->Density(pt)*detJ);
 				m += pme->Density(pt)*detJ;
@@ -1333,7 +1331,7 @@ public:
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
 		const FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		return (pt.m_rt ^ pt.m_v)*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
+		return (mp.m_rt ^ pt.m_v)*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
 	}
 
 private:
@@ -3899,7 +3897,7 @@ bool FEPlotRVEgenerations::Save(FEDomain& dom, FEDataStream& a)
             int nint = el.GaussPoints();
             double bmf = 0;
             for (int j=0; j<nint; ++j)
-                bmf += rvmat->RVEGenerations(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
+                bmf += rvmat->RVEGenerations(*el.GetMaterialPoint(j));
             a << bmf/nint;
         }
     }
@@ -3911,7 +3909,7 @@ bool FEPlotRVEgenerations::Save(FEDomain& dom, FEDataStream& a)
             int nint = el.GaussPoints();
             double bmf = 0;
             for (int j=0; j<nint; ++j)
-                bmf += rumat->RVEGenerations(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)));
+                bmf += rumat->RVEGenerations(*el.GetMaterialPoint(j));
             a << bmf/nint;
         }
     }
@@ -3932,7 +3930,8 @@ bool FEPlotRVEgenerations::Save(FEDomain& dom, FEDataStream& a)
                     int nint = el.GaussPoints();
                     for (int j=0; j<nint; ++j)
                     {
-                        bmf += rvmat->RVEGenerations(*rvmat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
+						FEMaterialPoint& mp = *el.GetMaterialPoint(j)->GetPointData(ic);
+                        bmf += rvmat->RVEGenerations(mp);
                         ++n;
                     }
                 }
@@ -3940,7 +3939,8 @@ bool FEPlotRVEgenerations::Save(FEDomain& dom, FEDataStream& a)
                     int nint = el.GaussPoints();
                     for (int j=0; j<nint; ++j)
                     {
-                        bmf += rumat->RVEGenerations(*rumat->GetBondMaterialPoint(*el.GetMaterialPoint(j)->GetPointData(ic)));
+						FEMaterialPoint& mp = *el.GetMaterialPoint(j)->GetPointData(ic);
+						bmf += rumat->RVEGenerations(mp);
                         ++n;
                     }
                 }

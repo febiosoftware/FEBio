@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FECentrifugalFluidBodyForce.h"
-#include <FEBioMech/FEElasticMaterial.h>
 
 BEGIN_FECORE_CLASS(FECentrifugalFluidBodyForce, FEBodyForce);
 	ADD_PARAMETER(w, "angular_speed")->setUnits(UNIT_ANGULAR_VELOCITY);
@@ -45,9 +44,8 @@ FECentrifugalFluidBodyForce::FECentrifugalFluidBodyForce(FEModel* pfem) : FEBody
 
 vec3d FECentrifugalFluidBodyForce::force(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	mat3ds K = stiffness(mp);
-	return K*(pt.m_rt - c);
+	return K*(mp.m_rt - c);
 }
 
 mat3ds FECentrifugalFluidBodyForce::stiffness(FEMaterialPoint& mp) 

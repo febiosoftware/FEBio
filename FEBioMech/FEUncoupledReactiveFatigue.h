@@ -57,10 +57,7 @@ public:
     bool Init() override;
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override
-    {
-        return new FEReactiveFatigueMaterialPoint(m_pBase->CreateMaterialPointData());
-    }
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }

@@ -239,7 +239,8 @@ double FERealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint* fmt = new FEThermoFluidMaterialPoint(fmp);
     fmp->m_ef = e;
     fmt->m_T = tf.m_T;
-    double a0 = SpecificFreeEnergy(*fmt);
+    FEMaterialPoint tmp(fmt);
+    double a0 = SpecificFreeEnergy(tmp);
     
     delete fmt;
 
@@ -358,11 +359,12 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
             bool convgd = false;
             bool done = false;
             int iter = 0;
-            do {
+			FEMaterialPoint mp(ft);
+			do {
                 ++iter;
                 fp->m_ef = e;
-                double f = Pressure(*ft) - p;
-                double df = Tangent_Strain(*ft);
+                double f = Pressure(mp) - p;
+                double df = Tangent_Strain(mp);
                 double de = (df != 0) ? -f/df : 0;
                 e += de;
                 if ((fabs(de) < errrel*fabs(e)) ||
@@ -387,7 +389,8 @@ double FERealLiquid::Pressure(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double p = Pressure(*ft);
+    FEMaterialPoint tmp(ft);
+    double p = Pressure(tmp);
     delete ft;
     return p;
 }

@@ -37,7 +37,7 @@ FEMaterialBase::FEMaterialBase(FEModel* fem) : FEModelComponent(fem)
 
 //-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
-FEMaterialPoint* FEMaterialBase::CreateMaterialPointData() { return nullptr; };
+FEMaterialPointData* FEMaterialBase::CreateMaterialPointData() { return nullptr; };
 
 //-----------------------------------------------------------------------------
 //! Update specialized material points at each iteration
@@ -75,7 +75,11 @@ mat3d FEMaterial::GetLocalCS(const FEMaterialPoint& mp)
 		mat3d Qp = parent->GetLocalCS(mp);
 		return Qp*Q;
 	}
-	else return Q;
+	else
+	{
+		mat3d A = mp.m_Q.RotationMatrix();
+		return A*Q;
+	}
 }
 
 //-----------------------------------------------------------------------------

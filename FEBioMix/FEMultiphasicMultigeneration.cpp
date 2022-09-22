@@ -42,7 +42,7 @@ FEMultiphasicMultigeneration::FEMultiphasicMultigeneration(FEModel* pfem) : FEMu
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMultiphasicMultigeneration::CreateMaterialPointData()
+FEMaterialPointData* FEMultiphasicMultigeneration::CreateMaterialPointData()
 {
 	return new FEMultigenSBMMaterialPoint
     (this, new FESolutesMaterialPoint
@@ -219,7 +219,7 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMultigenSBMMaterialPoint::Copy()
+FEMaterialPointData* FEMultigenSBMMaterialPoint::Copy()
 {
 	FEMultigenSBMMaterialPoint* pt = new FEMultigenSBMMaterialPoint(*this);
     pt->m_ngen = m_ngen;
@@ -238,7 +238,7 @@ FEMaterialPoint* FEMultigenSBMMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEMultigenSBMMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_ngen & m_nsbm & m_tgen;
 	ar & m_Fi;
 	ar & m_Ji;
@@ -249,7 +249,7 @@ void FEMultigenSBMMaterialPoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FEMultigenSBMMaterialPoint::Init()
 {
-	FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
     
 	m_Fi.clear();
 	m_Ji.clear();
@@ -270,7 +270,7 @@ void FEMultigenSBMMaterialPoint::Init()
 //-----------------------------------------------------------------------------
 void FEMultigenSBMMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
-	FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 
 	// get the time
 	double t = timeInfo.currentTime;

@@ -239,23 +239,23 @@ bool FEFluidTangentUniaxialSS::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	// make sure the correct module is active
-	fem.SetActiveModule("fluid");
+	fem->SetActiveModule("fluid");
 
     m_pscn = 0;
     
-    FEAnalysis* pstep = new FEAnalysis(&fem);
+    FEAnalysis* pstep = new FEAnalysis(fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("fluid", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("fluid", fem);
     assert(pnew_solver);
     pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
     
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

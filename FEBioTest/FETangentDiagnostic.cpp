@@ -142,10 +142,14 @@ bool FETangentUniaxial::Init()
 	// convert strain to a displacement
 	double d = sqrt(2*m_strain+1) - 1;
 
+	// get the simulation time
+	FEAnalysis* step = fem.GetStep(0);
+	double tend = step->m_ntime * step->m_dt0;
+
 	// Add a loadcurve
 	FELoadCurve* plc = new FELoadCurve(&fem);
 	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	plc->Add(tend, 1.0);
 	fem.AddLoadController(plc);
 
 	// Add a prescribed BC
@@ -251,24 +255,24 @@ bool FETangentSimpleShear::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FETangentDiagnostic::FETangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	// make sure the correct module is active
-	fem.SetActiveModule("solid");
+	fem->SetActiveModule("solid");
 
 	m_pscn = 0;
 
 	// create an analysis step
-	FEAnalysis* pstep = new FEAnalysis(&fem);
+	FEAnalysis* pstep = new FEAnalysis(fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("solid", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("solid", fem);
 	assert(pnew_solver);
 	pstep->SetFESolver(pnew_solver);
 
 	// keep a pointer to the fem object
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

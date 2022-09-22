@@ -57,6 +57,12 @@ bool FEDamageMooneyRivlin::Validate()
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPointData* FEDamageMooneyRivlin::CreateMaterialPointData() 
+{ 
+	return new FEDamageMaterialPoint(new FEElasticMaterialPoint); 
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the deviatoric stress
 mat3ds FEDamageMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {

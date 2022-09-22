@@ -1046,8 +1046,8 @@ void FEElasticEASShellDomain::Update(const FETimeInfo& tp)
             // material point coordinates
             // TODO: I'm not entirly happy with this solution
             //         since the material point coordinates are used by most materials.
-            pt.m_r0 = el.Evaluate(r0, n);
-            pt.m_rt = el.Evaluate(rt, n);
+            mp.m_r0 = el.Evaluate(r0, n);
+            mp.m_rt = el.Evaluate(rt, n);
             
             // get the deformation gradient and determinant
             pt.m_J = defgrad(el, pt.m_F, n);

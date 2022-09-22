@@ -61,7 +61,7 @@ public:
     bool SeriesStretchExponent(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
     
 public:
     // material parameters

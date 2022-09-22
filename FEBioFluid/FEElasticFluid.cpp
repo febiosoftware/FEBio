@@ -75,7 +75,8 @@ double FEElasticFluid::Pressure(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double p = Pressure(*ft);
+    FEMaterialPoint tmp(ft);
+    double p = Pressure(tmp);
     delete ft;
     return p;
 }
@@ -88,7 +89,8 @@ double FEElasticFluid::Tangent_Strain(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double dpJ = Tangent_Strain(*ft);
+    FEMaterialPoint tmp(ft);
+    double dpJ = Tangent_Strain(tmp);
     delete ft;
     return dpJ;
 }
@@ -101,7 +103,8 @@ double FEElasticFluid::Tangent_Temperature(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double dpT = Tangent_Temperature(*ft);
+    FEMaterialPoint tmp(ft);
+    double dpT = Tangent_Temperature(tmp);
     delete ft;
     return dpT;
 }
@@ -114,7 +117,8 @@ double FEElasticFluid::Tangent_Strain_Strain(const double ef, const double T)
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double dpJ2 = Tangent_Strain_Strain(*ft);
+    FEMaterialPoint tmp(ft);
+    double dpJ2 = Tangent_Strain_Strain(tmp);
     delete ft;
     return dpJ2;
 }
@@ -127,7 +131,8 @@ double FEElasticFluid::Tangent_Strain_Temperature(const double ef, const double 
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double dpJT = Tangent_Strain_Temperature(*ft);
+    FEMaterialPoint tmp(ft);
+    double dpJT = Tangent_Strain_Temperature(tmp);
     delete ft;
     return dpJT;
 }
@@ -140,7 +145,8 @@ double FEElasticFluid::Tangent_Temperature_Temperature(const double ef, const do
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = ef;
     ft->m_T = T;
-    double dpT2 = Tangent_Temperature_Temperature(*ft);
+    FEMaterialPoint tmp(ft);
+    double dpT2 = Tangent_Temperature_Temperature(tmp);
     delete ft;
     return dpT2;
 }

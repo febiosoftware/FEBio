@@ -155,17 +155,17 @@ bool FEFluidFSITangentUniaxial::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
     m_pscn = 0;
 
 	// make sure the correct module is active
-	fem.SetActiveModule("fluid-FSI");
+	fem->SetActiveModule("fluid-FSI");
     
-    FEAnalysis* pstep = new FEAnalysis(&fem);
+    FEAnalysis* pstep = new FEAnalysis(fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("fluid-FSI", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("fluid-FSI", fem);
     assert(pnew_solver);
     pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     FEFluidFSISolver* fluid_solver = dynamic_cast<FEFluidFSISolver*>(pnew_solver);
@@ -173,8 +173,8 @@ FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel& fem) : FEDiagn
     fluid_solver->m_pred = 0;
     pstep->SetFESolver(pnew_solver);
     
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------
