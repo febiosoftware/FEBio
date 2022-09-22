@@ -36,6 +36,9 @@ SOFTWARE.*/
 #include <FEAMR/sphericalHarmonics.h>
 #include <FEAMR/spherePoints.h>
 
+#include <FECore/Timer.h>
+#include <iostream>
+
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFiberODF, FECoreClass)
 	ADD_PARAMETER(m_shpHar, "shp_harmonics");
@@ -182,6 +185,13 @@ FEMaterialPoint* FECustomFiberDistribution::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 bool FECustomFiberDistribution::Init()
 {
+    Timer totalTime, initTime, interpTime, reduceTime;
+
+    double remeshTime = 0;
+
+    totalTime.start();
+    initTime.start();
+
     // initialize base class
 	if (FEElasticMaterial::Init() == false) return false;
 
@@ -206,6 +216,8 @@ bool FECustomFiberDistribution::Init()
         reconstructODF(ODF->m_shpHar, ODF->m_ODF, NPTS, m_theta, m_phi);
     }
 
+    initTime.stop();
+
     if(m_interpolate)
     {
         // Apply the square root transform to each ODF
@@ -227,6 +239,8 @@ bool FECustomFiberDistribution::Init()
         }
 
         FEMesh& mesh = GetFEModel()->GetMesh();
+
+        std::vector<int> ids;
         
         for(int index = 0; index < mesh.Domains(); index++)
         {
@@ -267,29 +281,67 @@ bool FECustomFiberDistribution::Init()
                     odf->m_weights[index] /= sum;
                 }
 
-                odf->calcODF(pODF);
+                // interpTime.start();
+                // odf->calcODF(pODF);
+                // interpTime.stop();
 
                 // Reduce the number of points in the ODF
-                reduceODF(odf, B);
+                // reduceTime.start();
+                // reduceODF(odf, B);
+                
+                
+
+                // reduceTime.stop();
 
                 // Add element odf object to map
+                #pragma omp critical
                 m_ElODF[element.GetID()] = odf;
+
+                #pragma omp critical
+                ids.push_back(element.GetID());
+
             }
         }
+
+        interpTime.start();
+        #pragma omp parallel for
+        for(int index = 0; index < ids.size(); index++)
+        {
+            m_ElODF[ids[index]]->calcODF(pODF);
+        }
+        interpTime.stop();
+
+        reduceTime.start();
+        #pragma omp parallel for
+        for(int index = 0; index < ids.size(); index++)
+        {
+            reduceODF(m_ElODF[ids[index]], B, &remeshTime);
+        }
+        reduceTime.stop();
+
     }
     else
     {
-        reduceODF(m_ODF[0], B);
+        reduceODF(m_ODF[0], B, new double);
     }
 
     delete[] m_theta; m_theta = nullptr;
     delete[] m_phi; m_phi = nullptr;
 
+    totalTime.stop();
+
+    // std::cout << "Total Time: " << totalTime.peek() << std::endl;
+    // std::cout << "Init Time: " << initTime.peek() << std::endl;
+    // std::cout << "Interp Time: " << interpTime.peek() << std::endl;
+    // std::cout << "Reduce Time: " << reduceTime.peek() << std::endl;
+    // std::cout << "Remesh Time: " << remeshTime/36 << std::endl;
+
 	return true;
 }
 
-void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B)
+void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B, double* time)
 {
+    Timer remeshTime;
     vector<double>* sphHar;
 
     if(dynamic_cast<FEElementODF*>(ODF))
@@ -303,7 +355,7 @@ void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B)
     else
     {
         sphHar = &dynamic_cast<FEFiberODF*>(ODF)->m_shpHar;
-    }  
+    }
 
     // Calculate the graident
     std::vector<double> gradient;
@@ -311,7 +363,12 @@ void FECustomFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B)
     
     // Remesh the sphere
     vector<vec3i> elems;
+    remeshTime.start();
     remesh(gradient, m_lengthScale, m_hausd, m_grad, ODF->m_nodePos, elems);
+    remeshTime.stop();
+
+    #pragma omp critical
+    *time += remeshTime.peek();
 
     int NN = ODF->m_nodePos.size();
     int NE = elems.size();

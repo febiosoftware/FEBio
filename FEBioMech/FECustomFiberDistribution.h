@@ -47,6 +47,7 @@ public:
     vec3d	m_pos;	//!< position
     std::vector<double> m_ODF; //!< ODF values
     std::vector<vec3d> m_nodePos; //!< node positions
+    std::vector<int> m_indices;
 };
 
 class FEFiberODF : public FECoreClass, public FEBaseODF
@@ -107,7 +108,7 @@ protected:
 	DECLARE_FECORE_CLASS();
 
 private:
-    void reduceODF(FEBaseODF* ODF, matrix& B);
+    void reduceODF(FEBaseODF* ODF, matrix& B, double* time);
 
 private:
     bool m_interpolate; // whether or not we're interpolating at each element
