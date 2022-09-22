@@ -84,8 +84,8 @@ public: // overloads from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FELinearSystem& LS) override;
 
-	//! intertial stiffness matrix \todo implement this
-	void MassMatrix(FELinearSystem& LS, double scale) override { assert(false); }
+	//! intertial stiffness matrix
+	void MassMatrix(FELinearSystem& LS, double scale) override;
 
 	//! body force stiffness matrix \todo implement this
 	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override { assert(false); }
