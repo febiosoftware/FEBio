@@ -23,45 +23,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
-#pragma once
-#include "matrix.h"
-#include "FENewtonStrategy.h"
+#include "stdafx.h"
+#include "FEFullNewtonStrategy.h"
+#include "FESolver.h"
+#include "FEException.h"
+#include "FENewtonSolver.h"
 
 //-----------------------------------------------------------------------------
-//! This class implements the Broyden quasi-newton strategy. 
-class FECORE_API FEBroydenStrategy : public FENewtonStrategy
+FEFullNewtonStrategy::FEFullNewtonStrategy(FEModel* fem) : FENewtonStrategy(fem)
 {
-public:
-	//! constructor
-	FEBroydenStrategy(FEModel* fem);
+	m_plinsolve = nullptr;
+	m_maxups = 0;
+}
 
-	//! Initialization
-	bool Init() override;
+//-----------------------------------------------------------------------------
+bool FEFullNewtonStrategy::Init()
+{
+	if (m_pns == nullptr) return false;
+	m_plinsolve = m_pns->GetLinearSolver();
+	return true;
+}
 
-	//! perform a quasi-Newton udpate
-	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) override;
+//-----------------------------------------------------------------------------
+bool FEFullNewtonStrategy::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
+{
+	// always return false to force a matrix reformation
+	return false;
+}
 
-	//! solve the equations
-	void SolveEquations(vector<double>& x, vector<double>& b) override;
-
-	//! Presolve update
-	virtual void PreSolveUpdate() override;
-
-private:
-	// keep a pointer to the linear solver
-	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
-	int				m_neq;			//!< number of equations
-
-	bool		m_bnewStep;
-
-	// Broyden update vectors
-	matrix			m_R;		//!< Broyden update vector "r"
-	matrix			m_D;		//!< Broydeb update vector "delta"
-	vector<double>	m_rho;		//!< temp vectors for calculating Broyden update vectors
-	vector<double>	m_q;		//!< temp storage for q
-
-	DECLARE_FECORE_CLASS();
-};
+//-----------------------------------------------------------------------------
+void FEFullNewtonStrategy::SolveEquations(vector<double>& x, vector<double>& b)
+{
+	// perform a backsubstitution
+	if (m_plinsolve->BackSolve(x, b) == false)
+	{
+		throw LinearSolverFailed();
+	}
+}

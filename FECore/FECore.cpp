@@ -67,6 +67,8 @@ SOFTWARE.*/
 #include "FELinearConstraint.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
+#include "FEModifiedNewtonStrategy.h"
+#include "FEFullNewtonStrategy.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -169,6 +171,8 @@ REGISTER_FECORE_CLASS(FEPIDController         , "PID");
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
 REGISTER_FECORE_CLASS(FEBroydenStrategy, "Broyden");
 REGISTER_FECORE_CLASS(JFNKStrategy     , "JFNK");
+REGISTER_FECORE_CLASS(FEModifiedNewtonStrategy, "modified Newton");
+REGISTER_FECORE_CLASS(FEFullNewtonStrategy    , "full Newton");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");

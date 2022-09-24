@@ -23,45 +23,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
+
 #include "matrix.h"
+#include "vector.h"
+#include "LinearSolver.h"
 #include "FENewtonStrategy.h"
 
 //-----------------------------------------------------------------------------
-//! This class implements the Broyden quasi-newton strategy. 
-class FECORE_API FEBroydenStrategy : public FENewtonStrategy
+class FECORE_API FEFullNewtonStrategy : public FENewtonStrategy
 {
 public:
 	//! constructor
-	FEBroydenStrategy(FEModel* fem);
+	FEFullNewtonStrategy(FEModel* fem);
 
-	//! Initialization
+	//! New initialization method
 	bool Init() override;
 
-	//! perform a quasi-Newton udpate
+	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) override;
 
 	//! solve the equations
 	void SolveEquations(vector<double>& x, vector<double>& b) override;
 
-	//! Presolve update
-	virtual void PreSolveUpdate() override;
-
-private:
+public:
 	// keep a pointer to the linear solver
-	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
-	int				m_neq;			//!< number of equations
-
-	bool		m_bnewStep;
-
-	// Broyden update vectors
-	matrix			m_R;		//!< Broyden update vector "r"
-	matrix			m_D;		//!< Broydeb update vector "delta"
-	vector<double>	m_rho;		//!< temp vectors for calculating Broyden update vectors
-	vector<double>	m_q;		//!< temp storage for q
-
-	DECLARE_FECORE_CLASS();
+	LinearSolver* m_plinsolve;	//!< pointer to linear solver
 };
