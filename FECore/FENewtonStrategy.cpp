@@ -31,13 +31,6 @@ SOFTWARE.*/
 #include "FENewtonSolver.h"
 #include "LinearSolver.h"
 
-BEGIN_FECORE_CLASS(FENewtonStrategy, FECoreBase)
-	ADD_PARAMETER(m_maxups, "max_ups");
-	ADD_PARAMETER(m_max_buf_size, FE_RANGE_GREATER_OR_EQUAL(0), "max_buffer_size"); 
-	ADD_PARAMETER(m_cycle_buffer, "cycle_buffer");
-	ADD_PARAMETER(m_cmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax");
-END_FECORE_CLASS();
-
 FENewtonStrategy::FENewtonStrategy(FEModel* fem) : FECoreBase(fem)
 {
 	m_pns = nullptr;

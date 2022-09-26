@@ -193,7 +193,17 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			const char* sz = tag.AttributeValue("surface");
 			FESurface* surf = mesh.FindSurface(sz);
-			if (surf == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+			if (surf == nullptr)
+			{
+				FEFacetSet* pfs = mesh.FindFacetSet(sz);
+				if (pfs == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+
+				surf = new FESurface(&fem);
+				surf->Create(*pfs);
+				surf->SetName(sz);
+				surf->Init();
+				mesh.AddSurface(surf);
+			}
 
 			std::vector<int> items;
 			string_to_int_vector(tag.szvalue(), items);

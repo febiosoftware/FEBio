@@ -23,26 +23,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FELogElementVolume.h"
-#include "FEModel.h"
-#include "FESurface.h"
+#include "stdafx.h"
+#include "FEFullNewtonStrategy.h"
+#include "FESolver.h"
+#include "FEException.h"
+#include "FENewtonSolver.h"
 
-FELogElementVolume::FELogElementVolume(FEModel* fem) : FELogElemData(fem)
+//-----------------------------------------------------------------------------
+FEFullNewtonStrategy::FEFullNewtonStrategy(FEModel* fem) : FENewtonStrategy(fem)
 {
-
+	m_plinsolve = nullptr;
+	m_maxups = 0;
 }
 
-double FELogElementVolume::value(FEElement& el)
+//-----------------------------------------------------------------------------
+bool FEFullNewtonStrategy::Init()
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	return mesh.CurrentElementVolume(el);
+	if (m_pns == nullptr) return false;
+	m_plinsolve = m_pns->GetLinearSolver();
+	return true;
 }
 
-FELogFaceArea::FELogFaceArea(FEModel* fem) : FELogFaceData(fem) {}
-
-double FELogFaceArea::value(FESurfaceElement& el)
+//-----------------------------------------------------------------------------
+bool FEFullNewtonStrategy::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
-	FESurface* surface = dynamic_cast<FESurface*>(el.GetMeshPartition());
-	if (surface == nullptr) return 0.0;
-	return surface->CurrentFaceArea(el);
+	// always return false to force a matrix reformation
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+void FEFullNewtonStrategy::SolveEquations(vector<double>& x, vector<double>& b)
+{
+	// perform a backsubstitution
+	if (m_plinsolve->BackSolve(x, b) == false)
+	{
+		throw LinearSolverFailed();
+	}
 }

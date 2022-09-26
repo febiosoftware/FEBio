@@ -2040,6 +2040,20 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
+	writeAverageElementValue<mat3d>(dom, a, [](const FEMaterialPoint& mp) {
+		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		return pt.m_F;
+	});
+
+	return true;
+}
+
 //=============================================================================
 //! Store the average Lagrangian strain
 class FELagrangeStrain

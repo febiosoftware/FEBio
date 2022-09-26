@@ -25,10 +25,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "ElementDataRecord.h"
+#include "FaceDataRecord.h"
 
 class FELogElementVolume : public FELogElemData
 {
 public:
 	FELogElementVolume(FEModel* fem);
 	double value(FEElement& el) override;
+};
+
+class FELogFaceArea : public FELogFaceData
+{
+public:
+	FELogFaceArea(FEModel* fem);
+	double value(FESurfaceElement& el) override;
 };

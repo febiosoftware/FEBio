@@ -831,6 +831,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Deformation gradient
+class FEPlotDeformationGradient : public FEPlotDomainData
+{
+public:
+	FEPlotDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Lagrange strains
 class FEPlotLagrangeStrain : public FEPlotDomainData
 {

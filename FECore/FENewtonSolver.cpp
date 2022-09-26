@@ -57,7 +57,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 		ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
 		ADD_PARAMETER(m_breformAugment      , "reform_augment");
 		ADD_PARAMETER(m_bdivreform          , "diverge_reform");
-		ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
+//		ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
 		ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 		ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 	END_PARAM_GROUP();
@@ -917,33 +917,14 @@ bool FENewtonSolver::QNUpdate()
 	// see if the force reform flag was set
 	bool breform = m_bforceReform; m_bforceReform = false;
 
-	// for full-Newton, we skip QN update
-	if (m_qnstrategy->m_maxups == 0) breform = true;
-
-	// if not, do a QN update
+	// do a QN update
 	if (breform == false)
 	{
 		TRACK_TIME(TimerID::Timer_QNUpdate);
-
-		// make sure we didn't reach max updates
-		if (m_qnstrategy->m_nups >= m_qnstrategy->m_maxups - 1)
+		if (m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1) == false)
 		{
-			// print a warning only if the user did not intent full-Newton
-			if (m_qnstrategy->m_maxups > 0)
-				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+			// the qn update failed. Force matrix reformations
 			breform = true;
-		}
-		else {
-			// try to do an update
-			bool bret = m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1);
-			if (bret == false)
-			{
-				// Stiffness update has failed.
-				// this might be due a too large condition number
-				// or the update was no longer positive definite.
-				feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
-				breform = true;
-			}
 		}
 	}
 

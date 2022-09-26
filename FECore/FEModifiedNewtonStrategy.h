@@ -23,26 +23,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FELogElementVolume.h"
-#include "FEModel.h"
-#include "FESurface.h"
+#pragma once
 
-FELogElementVolume::FELogElementVolume(FEModel* fem) : FELogElemData(fem)
+#include "matrix.h"
+#include "vector.h"
+#include "LinearSolver.h"
+#include "FENewtonStrategy.h"
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEModifiedNewtonStrategy : public FENewtonStrategy
 {
+public:
+	//! constructor
+	FEModifiedNewtonStrategy(FEModel* fem);
 
-}
+	//! New initialization method
+	bool Init() override;
 
-double FELogElementVolume::value(FEElement& el)
-{
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	return mesh.CurrentElementVolume(el);
-}
+	//! perform a BFGS udpate
+	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) override;
 
-FELogFaceArea::FELogFaceArea(FEModel* fem) : FELogFaceData(fem) {}
+	//! solve the equations
+	void SolveEquations(vector<double>& x, vector<double>& b) override;
 
-double FELogFaceArea::value(FESurfaceElement& el)
-{
-	FESurface* surface = dynamic_cast<FESurface*>(el.GetMeshPartition());
-	if (surface == nullptr) return 0.0;
-	return surface->CurrentFaceArea(el);
-}
+public:
+	// keep a pointer to the linear solver
+	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
+};

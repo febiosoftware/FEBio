@@ -67,6 +67,8 @@ SOFTWARE.*/
 #include "FELinearConstraint.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
+#include "FEModifiedNewtonStrategy.h"
+#include "FEFullNewtonStrategy.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -169,6 +171,8 @@ REGISTER_FECORE_CLASS(FEPIDController         , "PID");
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
 REGISTER_FECORE_CLASS(FEBroydenStrategy, "Broyden");
 REGISTER_FECORE_CLASS(JFNKStrategy     , "JFNK");
+REGISTER_FECORE_CLASS(FEModifiedNewtonStrategy, "modified Newton");
+REGISTER_FECORE_CLASS(FEFullNewtonStrategy    , "full Newton");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
@@ -188,6 +192,7 @@ REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
 REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
+REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");
