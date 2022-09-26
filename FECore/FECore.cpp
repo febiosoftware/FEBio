@@ -168,4 +168,5 @@ REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
 REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
+REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
 }
