@@ -121,7 +121,6 @@ endif()
 if(WIN32)
     add_compile_options(/MP /openmp /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
-        add_compile_options(-framework Accelerate)
 
 else()
 	add_compile_options(-fopenmp -w)
@@ -285,6 +284,11 @@ else()
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
+endif()
+
+# Link Accelerate framework
+if (APPLE)
+  target_link_libraries(numcore PRIVATE "-framework Accelerate")
 endif()
 
 # Link MMG
