@@ -34,7 +34,7 @@ class FECORE_API PointCurve
 
 public:
 	//! Interpolation functions
-	enum INTFUNC { LINEAR = 0, STEP = 1, SMOOTH = 2, CSPLINE = 3, CPOINTS = 4, APPROX = 5 };
+	enum INTFUNC { LINEAR = 0, STEP = 1, SMOOTH = 2, CSPLINE = 3, CPOINTS = 4, APPROX = 5, SMOOTH_STEP = 6 };
 
 	//! Extend mode
 	enum EXTMODE { CONSTANT, EXTRAPOLATE, REPEAT, REPEAT_OFFSET };
