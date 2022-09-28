@@ -65,6 +65,7 @@ SOFTWARE.*/
 #include "FEReactiveVEMaterialPoint.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
+#include <FECore/FETrussDomain.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -4213,4 +4214,18 @@ bool FEPlotWeakBondDevSED::Save(FEDomain& dom, FEDataStream& a)
         return true;
     }
     return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+	FETrussDomain* td = dynamic_cast<FETrussDomain*>(&dom);
+	if (td == nullptr) return false;
+
+	for (int i = 0; i < td->Elements(); ++i)
+	{
+		FETrussElement& el = td->Element(i);
+		a << el.m_lam;
+	}
+	return true;
 }
