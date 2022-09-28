@@ -78,7 +78,7 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
     ADD_PARAMETER(m_naugmax  , "maxaug"               );
     ADD_PARAMETER(m_ambp     , "ambient_pressure"     );
 
-	ADD_PROPERTY(m_ambctmp, "ambient_concentration");
+	ADD_PROPERTY(m_ambctmp, "ambient_concentration",FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
