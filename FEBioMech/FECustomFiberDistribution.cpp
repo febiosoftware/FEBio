@@ -175,9 +175,9 @@ FECustomFiberDistribution::~FECustomFiberDistribution()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FECustomFiberDistribution::CreateMaterialPointData()
+FEMaterialPointData* FECustomFiberDistribution::CreateMaterialPointData()
 {
-	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
+	FEMaterialPointData* mp = FEElasticMaterial::CreateMaterialPointData();
 	mp->SetNext(m_pFmat->CreateMaterialPointData());
     return mp;
 }
@@ -468,7 +468,7 @@ mat3ds FECustomFiberDistribution::Stress(FEMaterialPoint& mp)
     FEBaseODF* ODF;
     if(m_interpolate)
     {
-        ODF = m_ElODF[pt.m_elem->GetID()];
+        ODF = m_ElODF[mp.m_elem->GetID()];
     }
     else
     {
@@ -490,7 +490,7 @@ mat3ds FECustomFiberDistribution::Stress(FEMaterialPoint& mp)
         vec3d n0 = Q*ODF->m_nodePos[index];
         
         // calculate the stress
-        s += m_pFmat->FiberStress(pt, fp.FiberPreStretch(n0))*(R);
+        s += m_pFmat->FiberStress(mp, fp.FiberPreStretch(n0))*(R);
     }
 
 	return s;
@@ -506,7 +506,7 @@ tens4ds FECustomFiberDistribution::Tangent(FEMaterialPoint& mp)
     FEBaseODF* ODF;
     if(m_interpolate)
     {
-        ODF = m_ElODF[pt.m_elem->GetID()];
+        ODF = m_ElODF[mp.m_elem->GetID()];
     }
     else
     {
@@ -544,7 +544,7 @@ double FECustomFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
     FEBaseODF* ODF;
     if(m_interpolate)
     {
-        ODF = m_ElODF[pt.m_elem->GetID()];
+        ODF = m_ElODF[mp.m_elem->GetID()];
     }
     else
     {

@@ -82,7 +82,7 @@ public:
     ~FECustomFiberDistribution();
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
     
     // Initialization
     bool Init() override;
