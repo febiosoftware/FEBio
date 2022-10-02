@@ -37,7 +37,7 @@ BEGIN_FECORE_CLASS(FEElasticFiberMaterial, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticFiberMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEElasticFiberMaterial::CreateMaterialPointData()
 {
     FEFiberMaterialPoint* mp = new FEFiberMaterialPoint(new FEElasticMaterialPoint);
     return mp;

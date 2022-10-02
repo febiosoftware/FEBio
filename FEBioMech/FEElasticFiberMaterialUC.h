@@ -84,9 +84,9 @@ public:
 
 	bool Init() override { return m_fib.Init(); }
 	bool Validate() override { return m_fib.Validate(); }
-	FEMaterialPoint* CreateMaterialPointData() override 
+	FEMaterialPointData* CreateMaterialPointData() override
 	{
-		FEMaterialPoint* mp = FEUncoupledMaterial::CreateMaterialPointData();
+		FEMaterialPointData* mp = FEUncoupledMaterial::CreateMaterialPointData();
 		mp->SetNext(m_fib.CreateMaterialPointData());
 		return mp;
 	}	

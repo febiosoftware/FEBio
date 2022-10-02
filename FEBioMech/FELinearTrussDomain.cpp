@@ -208,7 +208,7 @@ void FELinearTrussDomain::ElementStiffness(int iel, matrix& ke)
 	// get the elastic tangent
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
-	double E = m_pMat->Tangent(pt);
+	double E = m_pMat->Tangent(mp);
 
 	// element initial volume
 	double V = L*el.m_a0;
@@ -344,6 +344,6 @@ void FELinearTrussDomain::Update(const FETimeInfo& tp)
 		pt.m_l = l / L;
 
 		// calculate stress
-		pt.m_tau = m_pMat->Stress(pt);
+		pt.m_tau = m_pMat->Stress(mp);
 	}
 }

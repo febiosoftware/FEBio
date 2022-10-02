@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-FEElasticMaterialPoint2O::FEElasticMaterialPoint2O(FEMaterialPoint* pt) : FEMaterialPoint(pt)
+FEElasticMaterialPoint2O::FEElasticMaterialPoint2O(FEMaterialPointData* pt) : FEMaterialPointData(pt)
 {
 	m_PK1.zero();
 	m_G.zero();
@@ -39,7 +39,7 @@ FEElasticMaterialPoint2O::FEElasticMaterialPoint2O(FEMaterialPoint* pt) : FEMate
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticMaterialPoint2O::Copy()
+FEMaterialPointData* FEElasticMaterialPoint2O::Copy()
 {
 	FEElasticMaterialPoint2O* pt = new FEElasticMaterialPoint2O(0);
 	pt->m_PK1 = m_PK1;
@@ -53,7 +53,7 @@ FEMaterialPoint* FEElasticMaterialPoint2O::Copy()
 //-----------------------------------------------------------------------------
 void FEElasticMaterialPoint2O::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_PK1 & m_G & m_Q; 
 }
 
@@ -79,7 +79,7 @@ FEElasticMaterial2O::FEElasticMaterial2O(FEModel* pfem) : FEElasticMaterial(pfem
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticMaterial2O::CreateMaterialPointData()
+FEMaterialPointData* FEElasticMaterial2O::CreateMaterialPointData()
 {
 	return new FEElasticMaterialPoint2O(new FEElasticMaterialPoint);
 }

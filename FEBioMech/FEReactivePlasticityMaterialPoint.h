@@ -32,13 +32,13 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the plasticity variables.
-class FEReactivePlasticityMaterialPoint : public FEMaterialPoint
+class FEReactivePlasticityMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEReactivePlasticityMaterialPoint(FEMaterialPoint *pt, FEElasticMaterial* pmat) : FEMaterialPoint(pt) { m_pMat = pmat; }
+    FEReactivePlasticityMaterialPoint(FEMaterialPointData*pt, FEElasticMaterial* pmat) : FEMaterialPointData(pt) { m_pMat = pmat; }
 
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! Initialize material point data
     void Init();

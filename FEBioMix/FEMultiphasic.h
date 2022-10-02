@@ -55,9 +55,6 @@ public:
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
 
-	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() override = 0;
-	
 	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
 

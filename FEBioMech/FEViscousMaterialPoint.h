@@ -31,12 +31,13 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the deformation gradient at previous time point.
-class FEViscousMaterialPoint : public FEMaterialPoint
+// NOTE: This class does not appear to be used by anything. Delete? 
+class FEViscousMaterialPoint : public FEMaterialPointData
 {
 public:
-    FEViscousMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FEViscousMaterialPoint(FEMaterialPointData* pt);
     
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     void Init();
 

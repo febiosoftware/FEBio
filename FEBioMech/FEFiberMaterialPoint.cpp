@@ -32,7 +32,10 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEFiberMaterialPoint::Copy()
+FEFiberMaterialPoint::FEFiberMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
+
+//-----------------------------------------------------------------------------
+FEMaterialPointData* FEFiberMaterialPoint::Copy()
 {
     FEFiberMaterialPoint* pt = new FEFiberMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -47,13 +50,13 @@ void FEFiberMaterialPoint::Init()
     m_bUs = false;
     
     // don't forget to intialize the nested data
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
 void FEFiberMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_Us & m_bUs;
 }
 

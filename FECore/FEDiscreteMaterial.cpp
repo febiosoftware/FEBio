@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEDiscreteMaterial.h"
 
 //=============================================================================
-FEMaterialPoint* FEDiscreteMaterialPoint::Copy()
+FEMaterialPointData* FEDiscreteMaterialPoint::Copy()
 {
 	FEDiscreteMaterialPoint* pt = new FEDiscreteMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -39,7 +39,7 @@ FEMaterialPoint* FEDiscreteMaterialPoint::Copy()
 
 void FEDiscreteMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_dr0 & m_drp & m_drt & m_dvt;
 }
 

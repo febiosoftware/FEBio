@@ -32,6 +32,7 @@ if(WIN32)
 	add_definitions(-DWIN32 -DFECORE_DLL)
 elseif(APPLE)
     add_definitions(-D__APPLE__)
+    add_definitions(-DHAS_ACCEL)
 else()
 	add_definitions(-DLINUX)
 endif()
@@ -283,6 +284,11 @@ else()
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
+endif()
+
+# Link Accelerate framework
+if (APPLE)
+  target_link_libraries(numcore PRIVATE "-framework Accelerate")
 endif()
 
 # Link MMG

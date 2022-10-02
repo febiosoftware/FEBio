@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include "FERVEProbe.h"
 
 //-----------------------------------------------------------------------------
-FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPointData* mp) : FEMaterialPointData(mp)
 {
 	m_elem_id = -1;
 	m_gpt_id = -1;
@@ -47,7 +47,7 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
+FEMaterialPointData* FEMicroMaterialPoint2O::Copy()
 {
 	FEMicroMaterialPoint2O* pt = new FEMicroMaterialPoint2O(m_pNext?m_pNext->Copy():0);
 	return pt;
@@ -57,7 +57,7 @@ FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
 //! serialize material point data
 void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 }
 
 //=============================================================================
@@ -90,7 +90,7 @@ FEMicroMaterial2O::~FEMicroMaterial2O(void)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMicroMaterial2O::CreateMaterialPointData()
+FEMaterialPointData* FEMicroMaterial2O::CreateMaterialPointData()
 {
 	return new FEMicroMaterialPoint2O(new FEElasticMaterialPoint2O(new FEElasticMaterialPoint()));
 }

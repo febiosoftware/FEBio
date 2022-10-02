@@ -35,14 +35,14 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // second order continuum elastic material point
-class FEElasticMaterialPoint2O : public FEMaterialPoint
+class FEElasticMaterialPoint2O : public FEMaterialPointData
 {
 public:
 	//! constructor
-	FEElasticMaterialPoint2O(FEMaterialPoint* pt);
+	FEElasticMaterialPoint2O(FEMaterialPointData* pt);
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! serialize material point data
 	void Serialize(DumpStream& ar);
@@ -75,7 +75,7 @@ public: // these functions must be implemented by derived classes
 	virtual void Tangent(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J) = 0;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 public:
 	double			m_beta;			//!< beta parameter for DG

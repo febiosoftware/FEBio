@@ -1415,10 +1415,11 @@ void FERigidSolverNew::BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo,
         vector<int>	LM(3);
         
         // create a material point to evaluate the body force
-        FEElasticMaterialPoint mp;
+        FEElasticMaterialPoint ep;
+		FEMaterialPoint mp(&ep);
         mp.m_r0 = RB.m_r0;
         mp.m_rt = RB.m_rt;
-		mp.m_F = RB.GetRotation().RotationMatrix();
+		ep.m_F = RB.GetRotation().RotationMatrix();
         
         // body force = mass*body force per mass (recall that body forces are negated in FEBio)
         vec3d F = pbf.force(mp)*(-RB.m_mass);

@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-class FEMembraneMaterialPoint : public FEMaterialPoint
+class FEMembraneMaterialPoint : public FEMaterialPointData
 {
 public:
 	FEMembraneMaterialPoint()
@@ -39,14 +39,14 @@ public:
 		s[0] = s[1] = s[2] = 0;
 	}
 
-	FEMaterialPoint* Copy()
+	FEMaterialPointData* Copy()
 	{
-		return new FEMembraneMaterialPoint();
+		return new FEMembraneMaterialPoint(*this);
 	}
 
 	void Serialize(DumpStream& ar)
 	{
-		FEMaterialPoint::Serialize(ar);
+		FEMaterialPointData::Serialize(ar);
 		ar & g & s;
 	}
 
@@ -67,7 +67,7 @@ public:
 	virtual ~FEMembraneMaterial() {}
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() { return new FEMembraneMaterialPoint; }
+	FEMaterialPointData* CreateMaterialPointData() { return new FEMembraneMaterialPoint; }
 
 public:
 	//! calculate in-plane membrane stress

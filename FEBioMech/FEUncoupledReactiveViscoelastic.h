@@ -91,7 +91,7 @@ public:
     int RVEGenerations(FEMaterialPoint& pt);
     
     //! returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
 
     //! specialized material points
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;

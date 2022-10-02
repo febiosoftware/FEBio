@@ -16,7 +16,7 @@ env:
   AWS_SUBNET_ID: subnet-097642e5c610e7583
   AWS_SG_ID: sg-0ca7912782cf1538b
   AMI_ID: ami-03a6eb9ec6101d323
-  AWS_INSTANCE_TYPE: c5a.16xlarge
+  AWS_INSTANCE_TYPE: c5a.8xlarge
   OS: linux
   KEY_PAIR: win
 jobs:

@@ -830,8 +830,8 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		FEFSIMaterialPoint& ft = *(mp.ExtractData<FEFSIMaterialPoint>());
 
 		// elastic material point data
-		ept.m_r0 = el.Evaluate(r0, n);
-		ept.m_rt = el.Evaluate(r, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(r, n);
 		mat3d Ft, Fp;
 		double Jt, Jp;
 		Jt = defgrad(el, Ft, n);

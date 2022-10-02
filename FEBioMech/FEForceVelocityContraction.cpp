@@ -31,12 +31,14 @@
 #include "FEElasticMaterial.h"
 #include <FECore/log.h>
 
-//////////////////////////////////////////////////////////////////////
-// FEForceVelocityMaterialPoint
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+FEForceVelocityMaterialPoint::FEForceVelocityMaterialPoint()
+{
+
+}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEForceVelocityMaterialPoint::Copy()
+FEMaterialPointData* FEForceVelocityMaterialPoint::Copy()
 {
     FEForceVelocityMaterialPoint* pt = new FEForceVelocityMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -46,7 +48,7 @@ FEMaterialPoint* FEForceVelocityMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEForceVelocityMaterialPoint::Init()
 {
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
     
     m_lambdap = 1;
     
@@ -71,8 +73,7 @@ void FEForceVelocityMaterialPoint::Serialize(DumpStream& ar)
         for (int i=0; i<MAX_TERMS; ++i) ar >> m_H[i] >> m_Hp[i];
     }
     
-    FEMaterialPoint::Serialize(ar);
-    
+	FEMaterialPointData::Serialize(ar);
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -65,10 +65,7 @@ public:
 	bool Init() override;
 
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() override
-	{ 
-		return new FEDamageMaterialPoint(new FEElasticMaterialPoint);
-	}
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// calculate damage reduction factor
 	double Damage(FEMaterialPoint& pt);

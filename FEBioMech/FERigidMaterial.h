@@ -65,7 +65,7 @@ public:
 
 public:
 	//! Create a rigid material point
-	FEMaterialPoint* CreateMaterialPointData() override { return new FEElasticMaterialPoint(); }
+	FEMaterialPointData* CreateMaterialPointData() override { return new FEElasticMaterialPoint(); }
 
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt) override { return mat3ds(); }

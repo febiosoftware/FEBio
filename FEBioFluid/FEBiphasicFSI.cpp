@@ -43,10 +43,10 @@ END_FECORE_CLASS();
 //============================================================================
 // FEFSIMaterialPoint
 //============================================================================
-FEBiphasicFSIMaterialPoint::FEBiphasicFSIMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+FEBiphasicFSIMaterialPoint::FEBiphasicFSIMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEBiphasicFSIMaterialPoint::Copy()
+FEMaterialPointData* FEBiphasicFSIMaterialPoint::Copy()
 {
     FEBiphasicFSIMaterialPoint* pt = new FEBiphasicFSIMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -56,7 +56,7 @@ FEMaterialPoint* FEBiphasicFSIMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEBiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_phi0 & m_gradJ & m_Lw & m_ss;
 }
 
@@ -68,7 +68,7 @@ void FEBiphasicFSIMaterialPoint::Init()
     m_Lw = mat3d(0.0);
     m_ss.zero();
     
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //============================================================================
@@ -88,7 +88,7 @@ FEBiphasicFSI::FEBiphasicFSI(FEModel* pfem) : FEFluidFSI(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEBiphasicFSI::CreateMaterialPointData()
+FEMaterialPointData* FEBiphasicFSI::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint(m_pSolid->CreateMaterialPointData());
     FEFSIMaterialPoint* fst = new FEFSIMaterialPoint(fpt);

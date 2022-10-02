@@ -59,7 +59,7 @@ FEPolarFluid::FEPolarFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEPolarFluid::CreateMaterialPointData()
+FEMaterialPointData* FEPolarFluid::CreateMaterialPointData()
 {
     return new FEPolarFluidMaterialPoint(new FEFluidMaterialPoint());
 }

@@ -548,8 +548,8 @@ void FEUDGHexDomain::Update(const FETimeInfo& tp)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.m_r0 = el.Evaluate(r0, 0);
-		pt.m_rt = el.Evaluate(rt, 0);
+		mp.m_r0 = el.Evaluate(r0, 0);
+		mp.m_rt = el.Evaluate(rt, 0);
 
 		// get the average cartesian derivatives
 		double GX[8], GY[8], GZ[8];

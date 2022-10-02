@@ -67,7 +67,7 @@ public:
     bool SeriesStretchExponent(FEMaterialPoint& pt);
 
 	//! returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 	
 public:
 	double	m_t[MAX_TERMS];	//!< relaxation times

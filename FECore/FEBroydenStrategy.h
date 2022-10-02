@@ -62,4 +62,6 @@ private:
 	matrix			m_D;		//!< Broydeb update vector "delta"
 	vector<double>	m_rho;		//!< temp vectors for calculating Broyden update vectors
 	vector<double>	m_q;		//!< temp storage for q
+
+	DECLARE_FECORE_CLASS();
 };

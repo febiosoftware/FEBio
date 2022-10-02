@@ -34,17 +34,17 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! This class defines material point data for elastic materials.
-class FEBIOMECH_API FEElasticMaterialPoint : public FEMaterialPoint
+class FEBIOMECH_API FEElasticMaterialPoint : public FEMaterialPointData
 {
 public:
 	//! constructor
-	FEElasticMaterialPoint();
+	FEElasticMaterialPoint(FEMaterialPointData* mp = nullptr);
 
 	//! Initialize material point data
 	void Init() override;
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
 
 	//! serialize material point data
 	void Serialize(DumpStream& ar) override;

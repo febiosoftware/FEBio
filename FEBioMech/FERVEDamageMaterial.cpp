@@ -68,16 +68,16 @@ bool FERVEDamageMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FERVEDamageMaterial::CreateMaterialPointData()
+FEMaterialPointData* FERVEDamageMaterial::CreateMaterialPointData()
 {
     FEReactiveViscoelasticMaterialPoint* pt = new FEReactiveViscoelasticMaterialPoint();
     // create damage materal point for strong bond (base) material
     FEDamageMaterialPoint* pbase = new FEDamageMaterialPoint(m_pRVE->GetBaseMaterial()->CreateMaterialPointData());
-    pt->AddMaterialPoint(pbase);
+    pt->AddMaterialPoint(new FEMaterialPoint(pbase));
     
     // create materal point for weak bond material
     FEReactiveVEMaterialPoint* pbond = new FEReactiveVEMaterialPoint(m_pRVE->GetBondMaterial()->CreateMaterialPointData());
-    pt->AddMaterialPoint(pbond);
+    pt->AddMaterialPoint(new FEMaterialPoint(pbond));
     
     return pt;
 }

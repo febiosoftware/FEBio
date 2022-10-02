@@ -48,10 +48,10 @@ END_FECORE_CLASS();
 //============================================================================
 // FEBiphasicMaterialPoint
 //============================================================================
-FEBiphasicMaterialPoint::FEBiphasicMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+FEBiphasicMaterialPoint::FEBiphasicMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
+FEMaterialPointData* FEBiphasicMaterialPoint::Copy()
 {
 	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -61,7 +61,7 @@ FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEBiphasicMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_p & m_gradp & m_gradpp;
 	ar & m_w & m_pa & m_phi0 & m_phi0t & m_phi0p & m_phi0hat & m_Jp;
     ar & m_ss;
@@ -78,7 +78,7 @@ void FEBiphasicMaterialPoint::Init()
 	m_Jp = 1;
     m_ss.zero();
 
-	FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //============================================================================
@@ -113,10 +113,10 @@ bool FEBiphasic::Init()
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEBiphasic::CreateMaterialPointData() 
+FEMaterialPointData* FEBiphasic::CreateMaterialPointData()
 {
 	// create the solid material point
-	FEMaterialPoint* ep = m_pSolid->CreateMaterialPointData();
+	FEMaterialPointData* ep = m_pSolid->CreateMaterialPointData();
 
     // create biphasic material point
     FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(ep);

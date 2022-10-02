@@ -558,6 +558,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				// see if we need to write a new mesh section
 				if (m_writeMesh) {
 					FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
+					feLogDebug("writing mesh section to plot file");
 					plt->WriteMeshSection(*this);
 				}
 
@@ -571,7 +572,11 @@ void FEBioModel::WritePlot(unsigned int nevent)
 
 				// write the state section
 				double time = GetTime().currentTime;
-				if (m_plot) m_plot->Write((float)time, statusFlag);
+				if (m_plot)
+				{
+					feLogDebug("writing to plot file; time = %lg; flag = %d", time, statusFlag);
+					m_plot->Write((float)time, statusFlag);
+				}
 
 				// make sure to reset write mesh flag
 				m_writeMesh = false;
@@ -652,6 +657,11 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
 	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
 	else if (ntag == 3) m_log.printbox(nullptr, szmsg);
+	else if (ntag == 4)
+	{
+		if (GetDebugLevel() > 0)
+			m_log.printf("debug>%s\n", szmsg);
+	}
 
 	// Flushing the logfile each time we get here might be a bit overkill.
 	// For now, I'm flushing the log file in the output_cb method.

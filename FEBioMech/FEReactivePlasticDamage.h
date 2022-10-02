@@ -63,13 +63,13 @@ public:
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp) override;
     
 	// returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
     
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
     
     // get the yield surface normal
-    mat3ds YieldSurfaceNormal(FEElasticMaterialPoint& pe);
+    mat3ds YieldSurfaceNormal(FEMaterialPoint& mp);
     
     // evaluate octahedral plastic strain
     void OctahedralPlasticStrain(FEMaterialPoint& pt);

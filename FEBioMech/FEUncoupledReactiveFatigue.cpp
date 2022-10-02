@@ -64,6 +64,12 @@ FEUncoupledReactiveFatigue::FEUncoupledReactiveFatigue(FEModel* pfem) : FEUncoup
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPointData* FEUncoupledReactiveFatigue::CreateMaterialPointData()
+{
+	return new FEReactiveFatigueMaterialPoint(m_pBase->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization.
 bool FEUncoupledReactiveFatigue::Init()
 {

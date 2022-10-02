@@ -35,7 +35,7 @@
 
 ////////////////////// PLASTIC DAMAGE MATERIAL POINT //////////////////////////////
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEReactivePlasticDamageMaterialPoint::Copy()
+FEMaterialPointData* FEReactivePlasticDamageMaterialPoint::Copy()
 {
     FEReactivePlasticDamageMaterialPoint* pt = new FEReactivePlasticDamageMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -117,7 +117,7 @@ void FEReactivePlasticDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+    FEMaterialPointData::Serialize(ar);
     
     if (ar.IsSaving())
     {

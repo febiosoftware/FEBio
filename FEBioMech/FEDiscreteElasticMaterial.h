@@ -30,7 +30,7 @@ SOFTWARE.*/
 class FEBIOMECH_API FEDiscreteElasticMaterialPoint : public FEDiscreteMaterialPoint
 {
 public:
-	FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
 
 public:
 	vec3d	m_Ft;	// current force	
@@ -42,7 +42,7 @@ class FEBIOMECH_API FEDiscreteElasticMaterial : public FEDiscreteMaterial
 {
 public:
 	FEDiscreteElasticMaterial(FEModel* pfem);
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// evaluate the force at a discrete element
 	virtual vec3d Force(FEDiscreteMaterialPoint& mp) = 0;

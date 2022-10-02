@@ -611,7 +611,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// material point coordinates
-		pt.m_rt = el.Evaluate(r, n);
+		mp.m_rt = el.Evaluate(r, n);
 
 		// get the deformation gradient and determinant at intermediate time
         double Jt;

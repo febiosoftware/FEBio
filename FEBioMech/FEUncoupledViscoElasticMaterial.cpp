@@ -83,7 +83,7 @@ bool FEUncoupledViscoElasticMaterial::Init()
 
 //-----------------------------------------------------------------------------
 //! Create material point data
-FEMaterialPoint* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
 { 
 	return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
 }
@@ -161,7 +161,7 @@ double FEUncoupledViscoElasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& 
     mat3d Fsafe = et.m_F; double Jsafe = et.m_J;
 
 	// Calculate the new elastic strain energy density
-	pt.m_sed = m_pBase->DevStrainEnergyDensity(et);
+	pt.m_sed = m_pBase->DevStrainEnergyDensity(mp);
     double sed = pt.m_sed;
 	
     double sedt = sed*m_g0;
@@ -178,7 +178,7 @@ double FEUncoupledViscoElasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& 
                 mat3ds Ua = dyad(v[0])*pow(l[0],pt.m_alpha[i])
                 + dyad(v[1])*pow(l[1],pt.m_alpha[i]) + dyad(v[2])*pow(l[2],pt.m_alpha[i]);
                 et.m_F = Ua; et.m_J = Ua.det();
-                sedt += m_g[i]*m_pBase->DevStrainEnergyDensity(et);
+                sedt += m_g[i]*m_pBase->DevStrainEnergyDensity(mp);
             }
         }
     }
@@ -227,9 +227,9 @@ bool FEUncoupledViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
             do {
                 mat3ds Ua = dyad(v[0])*pow(l[0],alpha) + dyad(v[1])*pow(l[1],alpha) + dyad(v[2])*pow(l[2],alpha);
                 et.m_F = Ua; et.m_J = Ua.det();
-                mat3ds Sea = et.pull_back(m_pBase->DevStress(et));
+                mat3ds Sea = et.pull_back(m_pBase->DevStress(mp));
                 double f = (Sea*m_g[i] - S + Se).dotdot(U);
-                tens4ds Cea = et.pull_back(m_pBase->DevTangent(et));
+                tens4ds Cea = et.pull_back(m_pBase->DevTangent(mp));
                 mat3ds U2ap = dyad(v[0])*(pow(l[0],2*alpha)*log(l[0]))
                 + dyad(v[1])*(pow(l[1],2*alpha)*log(l[1]))
                 + dyad(v[2])*(pow(l[2],2*alpha)*log(l[2]));

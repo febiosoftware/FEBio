@@ -43,7 +43,7 @@ public:
 	~FEElasticMaterial();
 
 	//! create material point data for this material
-	FEMaterialPoint* CreateMaterialPointData() override { return new FEElasticMaterialPoint; }
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);

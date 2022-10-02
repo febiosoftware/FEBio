@@ -85,7 +85,7 @@ void FEReactivePlasticity::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Create material point data for this material
-FEMaterialPoint* FEReactivePlasticity::CreateMaterialPointData()
+FEMaterialPointData* FEReactivePlasticity::CreateMaterialPointData()
 {
     return new FEReactivePlasticityMaterialPoint(m_pBase->CreateMaterialPointData(), this);
 }
@@ -151,7 +151,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         Jtmp = pe.m_J;
         pe.m_F = Fv; pe.m_J = Fv.det();
         mat3ds Uv = pe.RightStretch();
-        mat3ds Nv = YieldSurfaceNormal(pe);
+        mat3ds Nv = YieldSurfaceNormal(pt);
         double Nvmag = Nv.norm();
         mat3dd I(1);
         double beta = 1;
@@ -330,11 +330,12 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 // get the yield surface normal
-mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEElasticMaterialPoint& pe)
+mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEMaterialPoint& mp)
 {
-    mat3ds s = m_pBase->Stress(pe);
-    tens4ds c = m_pBase->Tangent(pe);
-    mat3ds dPhi = m_pCrit->CriterionStressTangent(pe);
+	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3ds s = m_pBase->Stress(mp);
+    tens4ds c = m_pBase->Tangent(mp);
+    mat3ds dPhi = m_pCrit->CriterionStressTangent(mp);
     mat3d M = dPhi*s*2 - mat3dd((dPhi*s).trace()) + c.dot(dPhi);
     mat3ds Ui = pe.RightStretchInverse();
     mat3d R = pe.m_F*Ui;

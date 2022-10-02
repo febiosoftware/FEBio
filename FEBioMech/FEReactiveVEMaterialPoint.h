@@ -45,25 +45,19 @@ public:
     FEReactiveViscoelasticMaterialPoint();
     
     //! Copy material point data
-    FEMaterialPoint* Copy();
-    
-    //! material point initialization
-    void Init();
-    
-    //! data serialization
-    void Serialize(DumpStream& ar);
+    FEMaterialPointData* Copy();
 };
 
 //-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
-class FEReactiveVEMaterialPoint : public FEMaterialPoint
+class FEReactiveVEMaterialPoint : public FEMaterialPointData
 {
 public:
     //! olverloaded constructors
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+    FEReactiveVEMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
     //! copy material point data
-    FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
     
     //! Initialize material point data
     void Init() override;

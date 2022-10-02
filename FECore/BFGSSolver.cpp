@@ -31,11 +31,19 @@ SOFTWARE.*/
 #include "FESolver.h"
 #include "FEException.h"
 #include "FENewtonSolver.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // BFGSSolver
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(BFGSSolver, FENewtonStrategy)
+	ADD_PARAMETER(m_maxups, "max_ups");
+	ADD_PARAMETER(m_max_buf_size, FE_RANGE_GREATER_OR_EQUAL(0), "max_buffer_size"); 
+	ADD_PARAMETER(m_cycle_buffer, "cycle_buffer");
+	ADD_PARAMETER(m_cmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax");
+END_FECORE_CLASS();
 
+//-----------------------------------------------------------------------------
 BFGSSolver::BFGSSolver(FEModel* fem) : FENewtonStrategy(fem)
 {
 	m_neq = 0;
@@ -82,6 +90,16 @@ bool BFGSSolver::Init()
 
 bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
+	// for full-Newton, we skip QN update
+	if (m_maxups == 0) return false;
+
+	// make sure we didn't reach max updates
+	if (m_nups >= m_maxups - 1)
+	{
+		feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+		return false;
+	}
+
 	// calculate the BFGS update vectors
 	int neq = m_neq;
 	for (int i = 0; i<neq; ++i)
@@ -99,6 +117,7 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 	// check to see if this is still a pos definite update
 //	if (r <= 0) 
 //	{
+//		feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
 //		return false;
 //	}
 

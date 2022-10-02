@@ -38,7 +38,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Create a shallow copy of the material point data
-FEMaterialPoint* FESolutesMaterialPoint::Copy()
+FEMaterialPointData* FESolutesMaterialPoint::Copy()
 {
 	FESolutesMaterialPoint* pt = new FESolutesMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -83,14 +83,14 @@ void FESolutesMaterialPoint::Init()
     m_idi.clear();
     
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize material point data to the archive
 void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_nsol & m_psi & m_cF & m_Ie & m_nsbm;
 	ar & m_c & m_gradc & m_j & m_ca & m_crp & m_k & m_dkdJ;
 	ar & m_dkdc;

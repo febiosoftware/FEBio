@@ -23,14 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEBroydenStrategy.h"
 #include "LinearSolver.h"
 #include "FEException.h"
 #include "FENewtonSolver.h"
+#include "log.h"
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEBroydenStrategy, FENewtonStrategy)
+	ADD_PARAMETER(m_maxups, "max_ups");
+	ADD_PARAMETER(m_max_buf_size, FE_RANGE_GREATER_OR_EQUAL(0), "max_buffer_size"); 
+	ADD_PARAMETER(m_cycle_buffer, "cycle_buffer");
+	ADD_PARAMETER(m_cmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -76,6 +82,16 @@ void FEBroydenStrategy::PreSolveUpdate()
 //! perform a quasi-Newton udpate
 bool FEBroydenStrategy::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
+	// for full-Newton, we skip QN update
+	if (m_maxups == 0) return false;
+
+	// make sure we didn't reach max updates
+	if (m_nups >= m_maxups - 1)
+	{
+		feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+		return false;
+	}
+
 	// calculate q1
 	m_q.assign(m_neq, 0.0);
 	if (m_plinsolve->BackSolve(m_q, R1) == false)

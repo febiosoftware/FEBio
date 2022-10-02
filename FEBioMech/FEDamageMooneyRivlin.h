@@ -45,7 +45,7 @@ public:
 
 public:
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() override { return new FEDamageMaterialPoint(new FEElasticMaterialPoint); }
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 public:
 	//! calculate deviatoric stress at material point

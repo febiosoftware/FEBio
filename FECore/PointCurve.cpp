@@ -258,7 +258,7 @@ double PointCurve::value(double time) const
 
 	double tmax = points[N].x();
 	double tmin = points[0].x();
-	if (im->fnc > SMOOTH)
+	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
 	{
 		if (time > tmax) return im->spline->eval(tmax);
 		else if (time < tmin) return im->spline->eval(tmin);
@@ -287,6 +287,23 @@ double PointCurve::value(double time) const
 		while (points[n].x() <= time) ++n;
 
 		return points[n].y();
+	}
+	else if (im->fnc == SMOOTH_STEP)
+	{
+		int n = 0;
+		while (points[n].x() <= time) ++n;
+
+		double t0 = points[n - 1].x();
+		double t1 = points[n].x();
+
+		double f0 = points[n - 1].y();
+		double f1 = points[n].y();
+
+		double w = (time - t0) / (t1 - t0);
+		double w2 = w * w;
+		double w3 = w * w2;
+
+		return f0 + (f1 - f0)*w3*(10.0 - 15.0*w + 6.0*w2);
 	}
 	else if (im->fnc == SMOOTH)
 	{
@@ -390,6 +407,7 @@ double PointCurve::ExtendValue(double t) const
 		switch (im->fnc)
 		{
 		case STEP:
+		case SMOOTH_STEP:
 		{
 			if (t < points[0].x()) return points[0].y();
 			if (t > points[N].x()) return points[N].y();
@@ -488,7 +506,8 @@ double PointCurve::derive(double time) const
 	double tmax = im->points[N - 1].x();
 	double tmin = im->points[0].x();
 
-	if (im->fnc > SMOOTH) {
+	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
+	{
 		if (time > tmax) return im->spline->eval_deriv(tmax);
 		else if (time < tmin) return im->spline->eval_deriv(tmin);
 		else return im->spline->eval_deriv(time);
@@ -544,7 +563,8 @@ double PointCurve::deriv2(double time) const
 	double tmax = im->points[N - 1].x();
 	double tmin = im->points[0].x();
 
-	if (im->fnc > SMOOTH) {
+	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
+	{
 		if (time > tmax) return im->spline->eval_deriv2(tmax);
 		else if (time < tmin) return im->spline->eval_deriv2(tmin);
 		else return im->spline->eval_deriv2(time);
@@ -662,7 +682,7 @@ bool PointCurve::Update()
 	}
 
 	bool bvalid = true;
-	if (im->fnc > SMOOTH)
+	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
 	{
 		const int N = Points();
 

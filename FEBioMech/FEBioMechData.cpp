@@ -233,7 +233,7 @@ double FELogElemPosX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.x;
 	}
 	return val / (double) nint;
@@ -246,7 +246,7 @@ double FELogElemPosY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.y;
 	}
 	return val / (double) nint;
@@ -259,7 +259,7 @@ double FELogElemPosZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.z;
 	}
 	return val / (double) nint;
@@ -1668,8 +1668,8 @@ double FELogDamage::value(FEElement& el)
         else if (pmg) {
             for (int k=0; k<pmg->Components(); ++k)
             {
-                FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                FEDamageMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                 if (ppd) D += (float) ppd->m_D;
                 else if (pem)
                 {
@@ -1714,7 +1714,7 @@ double FELogOctahedralPlasticStrain::value(FEElement& el)
             {
                 FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
                 FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                 if (prp) D += (float) prp->m_gp[0];
                 else if (prd) D += (float) prd->m_gp[0];
                 else if (pem)

@@ -62,7 +62,7 @@ public:
 	//! Presolve update
 	virtual void PreSolveUpdate() {}
 
-	//! perform a Newton udpate
+	//! perform a Newton udpate (returning false will force a matrix reformations)
 	virtual bool Update(double s, std::vector<double>& ui, std::vector<double>& R0, std::vector<double>& R1) = 0;
 
 	//! solve the equations
@@ -83,6 +83,4 @@ public:
 
 protected:
 	FENewtonSolver*	m_pns;
-
-	DECLARE_FECORE_CLASS();
 };

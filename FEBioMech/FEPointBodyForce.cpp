@@ -23,12 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEPointBodyForce.h"
-#include "FEElasticMaterial.h"
 #include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
@@ -51,8 +47,7 @@ FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 //-----------------------------------------------------------------------------
 vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	vec3d x = pt.m_rt;
+	vec3d x = mp.m_rt;
 	vec3d n = x - m_rc;
 	double l = n.unit();
 
@@ -63,9 +58,7 @@ vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	vec3d x = pt.m_rt;
+	vec3d x = mp.m_rt;
 	vec3d n = x - m_rc;
 	double l = n.unit();
 

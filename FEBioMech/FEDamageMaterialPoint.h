@@ -35,12 +35,12 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the damage variable.
-class FEDamageMaterialPoint : public FEMaterialPoint
+class FEDamageMaterialPoint : public FEMaterialPointData
 {
 public:
-    FEDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+    FEDamageMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
-    FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
     
     void Init() override;
     void Update(const FETimeInfo& timeInfo) override;

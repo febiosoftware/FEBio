@@ -73,7 +73,7 @@ void FECarterHayes::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Create material point data
-FEMaterialPoint* FECarterHayes::CreateMaterialPointData()
+FEMaterialPointData* FECarterHayes::CreateMaterialPointData()
 {
 	return new FERemodelingMaterialPoint(new FEElasticMaterialPoint);
 }

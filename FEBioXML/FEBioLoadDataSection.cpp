@@ -69,6 +69,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
                 else if (type == "cubic spline") ntype = PointCurve::CSPLINE;
                 else if (type == "control points") ntype = PointCurve::CPOINTS;
                 else if (type == "approximation" ) ntype = PointCurve::APPROX;
+                else if (type == "smooth step"   ) ntype = PointCurve::SMOOTH_STEP;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 			}
 

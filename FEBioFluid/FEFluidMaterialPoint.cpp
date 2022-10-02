@@ -30,7 +30,7 @@ SOFTWARE.*/
 // FEFluidMaterialPoint
 //============================================================================
 //-----------------------------------------------------------------------------
-FEFluidMaterialPoint::FEFluidMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt)
+FEFluidMaterialPoint::FEFluidMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt)
 {
     m_pf = 0;
     m_Lf.zero();
@@ -41,7 +41,7 @@ FEFluidMaterialPoint::FEFluidMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoin
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEFluidMaterialPoint::Copy()
+FEMaterialPointData* FEFluidMaterialPoint::Copy()
 {
     FEFluidMaterialPoint* pt = new FEFluidMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -51,7 +51,7 @@ FEMaterialPoint* FEFluidMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_pf & m_Lf & m_ef & m_efdot & m_gradef & m_vft & m_aft & m_sf;
 }
 
@@ -66,5 +66,5 @@ void FEFluidMaterialPoint::Init()
     m_sf.zero();
     
     // don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
