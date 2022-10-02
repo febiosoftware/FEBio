@@ -116,3 +116,34 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN}}
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+  repo-artifacts:
+    name: Upload artifacts to repo
+    needs:
+      - build # required to get output from the start-runner job
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: febio4-Windows-X64
+          path: |
+            cmbuild
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/repo.key
+          chmod 600 ~/.ssh/repo.key
+          cat >>~/.ssh/config <<END
+          Host repo
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/repo.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_USER: ${{ secrets.REPO_USER }}
+          SSH_KEY: ${{ secrets.REPO_KEY }}
+          SSH_HOST: ${{ secrets.REPO_HOST }}
+      - name: Remote command
+        run: |
+          ssh repo 'du -sh ./*'
