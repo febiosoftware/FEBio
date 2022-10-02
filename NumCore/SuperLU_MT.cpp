@@ -127,8 +127,8 @@ bool SuperLU_MT_Solver::Factor()
 	if (m->isFactored)
 	{
 		m->isFactored = false;
-		Destroy_SuperNode_SCP(&m->L);
-		Destroy_CompCol_NCP(&m->U);
+//		Destroy_SuperNode_SCP(&m->L);
+//		Destroy_CompCol_NCP(&m->U);
 	}
 
 	int n = m_pA->Rows();
