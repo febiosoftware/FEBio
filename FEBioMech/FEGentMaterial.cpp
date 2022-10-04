@@ -122,7 +122,7 @@ mat3ds FECompressibleGentMaterial::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	double J = ep.m_J;
-	mat3ds b = ep.RightCauchyGreen();
+	mat3ds b = ep.LeftCauchyGreen();
 	double I1 = b.tr();
 
 	double mu = m_G;
@@ -146,7 +146,7 @@ tens4ds FECompressibleGentMaterial::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	double J = ep.m_J;
-	mat3ds b = ep.RightCauchyGreen();
+	mat3ds b = ep.LeftCauchyGreen();
 	double I1 = b.tr();
 
 	double mu = m_G;
