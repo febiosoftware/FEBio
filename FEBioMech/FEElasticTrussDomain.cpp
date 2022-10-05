@@ -36,12 +36,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEElasticTrussDomain, FETrussDomain)
 	ADD_PARAMETER(m_a0, "cross_sectional_area");
+	ADD_PARAMETER(m_v, "v")->setLongName("Poisson's ratio");
 END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! Constructor
 FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem)
 {
 	m_a0 = 0.0;
+	m_v = 0.5;
 
 	m_pMat = 0;
 	// TODO: Can this be done in Init, since there is no error checking
@@ -295,11 +297,17 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 	// elements initial volume
 	double V = L*el.m_a0;
 
+	// current volume
+	double v = V * pt.m_J;
+
+	// current area
+	double a = v / l;
+
 	// calculate nodal forces
 	fe.resize(6);
-	fe[0] = tau*V/l*n.x;
-	fe[1] = tau*V/l*n.y;
-	fe[2] = tau*V/l*n.z;
+	fe[0] = tau*a*n.x;
+	fe[1] = tau*a*n.y;
+	fe[2] = tau*a*n.z;
 	fe[3] = -fe[0];
 	fe[4] = -fe[1];
 	fe[5] = -fe[2];
@@ -327,7 +335,7 @@ void FEElasticTrussDomain::Update(const FETimeInfo& tp)
 		double L = (r0[1] - r0[0]).norm();
 
 		double lam = l / L;
-		double linv2 = 1.0 / sqrt(lam);
+		double linv2 = 1.0 / sqrt(pow(lam, 2.0*m_v));
 
 		// calculate strain
 		el.m_lam = l / L;
