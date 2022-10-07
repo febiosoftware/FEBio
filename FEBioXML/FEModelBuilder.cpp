@@ -567,6 +567,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 		else if (strcmp(sztype, "TRI6G14"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }
 		else if (strcmp(sztype, "TRI6G21"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G21; }
 		else if (strcmp(sztype, "HEX8G1"      ) == 0) { eshape = ET_HEX8; m_nhex8 = FE_HEX8G1; }
+		else if (strcmp(sztype, "HEX8G8"      ) == 0) { eshape = ET_HEX8; m_nhex8 = FE_HEX8G8; }
 		else
 		{
 			assert(false);
