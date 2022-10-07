@@ -760,7 +760,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy, "rigid kinetic energy");
 	REGISTER_FECORE_CLASS(FEPlotRigidEuler, "Euler angle");
 	REGISTER_FECORE_CLASS(FEPlotRigidRotationVector, "rigid rotation vector");
-    REGISTER_FECORE_CLASS(FEPlotScalarSurfaceLoad, "scalar surface load");
+	REGISTER_FECORE_CLASS(FEPlotScalarSurfaceLoad, "scalar surface load");
+	REGISTER_FECORE_CLASS(FEPlotNetSurfaceReactionForce, "surface reaction force");
+	REGISTER_FECORE_CLASS(FEPlotNetSurfaceReactionMoment, "surface reaction moment");
 	REGISTER_FECORE_CLASS(FEPlotStressError, "stress error");
 	REGISTER_FECORE_CLASS(FEPlotFiberTargetStretch, "in-situ target stretch");
 	REGISTER_FECORE_CLASS(FEPlotPreStrainStretch, "prestrain stretch");
