@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEElasticTrussDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
+#include "FEUncoupledMaterial.h"
 #include "FEElasticMaterialPoint.h"
 #include "FEBioMech.h"
 
@@ -317,6 +318,8 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 //! Update the truss' stresses
 void FEElasticTrussDomain::Update(const FETimeInfo& tp)
 {
+	FEUncoupledMaterial* um = dynamic_cast<FEUncoupledMaterial*>(GetMaterial());
+
 	// loop over all elements
 	vec3d r0[2], rt[2];
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -348,6 +351,16 @@ void FEElasticTrussDomain::Update(const FETimeInfo& tp)
 		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 		ep.m_F = F;
 		ep.m_J = F.det();
-		ep.m_s = m_pMat->Stress(mp);
+
+		if (um)
+		{
+			mat3ds devs = um->DevStress(mp);
+			double p = -devs.yy();
+			ep.m_s = devs + mat3dd(p);
+		}
+		else
+		{
+			ep.m_s = m_pMat->Stress(mp);
+		}
 	}
 }
