@@ -25,13 +25,13 @@
  SOFTWARE.*/
 
 
-#include "FEViscoElasticDamage.h"
+#include "FEUncoupledViscoElasticDamage.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
 
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEViscoElasticDamage, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEUncoupledViscoElasticDamage, FEUncoupledMaterial)
 
     // material parameters
     ADD_PARAMETER(m_t[0], "t1")->setUnits(UNIT_TIME);
@@ -55,7 +55,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEViscoElasticDamage::FEViscoElasticDamage(FEModel* pfem) : FEElasticMaterial(pfem)
+FEUncoupledViscoElasticDamage::FEUncoupledViscoElasticDamage(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
     m_g0 = 1;
     for (int i=0; i<MAX_TERMS; ++i)
@@ -63,31 +63,40 @@ FEViscoElasticDamage::FEViscoElasticDamage(FEModel* pfem) : FEElasticMaterial(pf
         m_t[i] = 1;
         m_g[i] = 0;
     }
-    
+    m_binit = false;
+
     m_pDmg = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! data initialization
-bool FEViscoElasticDamage::Init()
+bool FEUncoupledViscoElasticDamage::Init()
 {
-    if (dynamic_cast<FEDamageMaterial*>(m_pDmg) == 0) {
-        feLogError("elastic component of viscoelastic damage material must be of type elastic damage!");
+    if (dynamic_cast<FEDamageMaterialUC*>(m_pDmg) == 0) {
+        feLogError("elastic component of viscoelastic damage material must be of type uncoupled elastic damage!");
         return false;
     }
-    return m_pDmg->Init();
+    
+    if (m_pDmg->Init() == false) return false;
+    
+    // combine bulk modulus from base material and uncoupled viscoelastic material
+    if (m_binit == false) m_K += m_pDmg->m_K;
+    
+    m_binit = true;
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Create material point data for this material
-FEMaterialPointData* FEViscoElasticDamage::CreateMaterialPointData()
+FEMaterialPointData* FEUncoupledViscoElasticDamage::CreateMaterialPointData()
 {
     return new FEViscoElasticMaterialPoint(m_pDmg->CreateMaterialPointData());
 }
 
 //-----------------------------------------------------------------------------
 //! Stress function
-mat3ds FEViscoElasticDamage::Stress(FEMaterialPoint& mp)
+mat3ds FEUncoupledViscoElasticDamage::DevStress(FEMaterialPoint& mp)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
@@ -99,7 +108,7 @@ mat3ds FEViscoElasticDamage::Stress(FEMaterialPoint& mp)
     FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
     
     // Calculate the new elastic Cauchy stress
-    mat3ds se = m_pDmg->GetElasticMaterial()->Stress(mp);
+    mat3ds se = m_pDmg->GetElasticMaterial()->DevStress(mp);
     
     // pull-back to get PK2 stress
     mat3ds Se = pt.m_Se = ep.pull_back(se);
@@ -129,12 +138,12 @@ mat3ds FEViscoElasticDamage::Stress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Material tangent
-tens4ds FEViscoElasticDamage::Tangent(FEMaterialPoint& pt)
+tens4ds FEUncoupledViscoElasticDamage::DevTangent(FEMaterialPoint& pt)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
     
     // calculate the spatial elastic tangent
-    tens4ds C = m_pDmg->GetElasticMaterial()->Tangent(pt);
+    tens4ds C = m_pDmg->GetElasticMaterial()->DevTangent(pt);
     if (dt == 0.0) return C;
     
     // calculate the visco scale factor
@@ -154,7 +163,7 @@ tens4ds FEViscoElasticDamage::Tangent(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density function
-double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEUncoupledViscoElasticDamage::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
     // get the viscoelastic point data
     FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
@@ -162,7 +171,7 @@ double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
     mat3d Fsafe = et.m_F; double Jsafe = et.m_J;
     
     // Calculate the new elastic strain energy density
-    pt.m_sed = m_pDmg->GetElasticMaterial()->StrainEnergyDensity(mp);
+    pt.m_sed = m_pDmg->GetElasticMaterial()->DevStrainEnergyDensity(mp);
     double sed = pt.m_sed;
     
     double sedt = sed*m_g0;
@@ -179,12 +188,12 @@ double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
                 mat3ds Ua = dyad(v[0])*pow(l[0],pt.m_alpha[i])
                 + dyad(v[1])*pow(l[1],pt.m_alpha[i]) + dyad(v[2])*pow(l[2],pt.m_alpha[i]);
                 et.m_F = Ua; et.m_J = Ua.det();
-                sedt += m_g[i]*m_pDmg->GetElasticMaterial()->StrainEnergyDensity(mp);
+                sedt += m_g[i]*m_pDmg->GetElasticMaterial()->DevStrainEnergyDensity(mp);
             }
         }
     }
     else
-        throw std::runtime_error("FEViscoElasticDamage::strain energy density calculation did not converge!");
+        throw std::runtime_error("FEUncoupledViscoElasticDamage::strain energy density calculation did not converge!");
     
     et.m_F = Fsafe; et.m_J = Jsafe;
     
@@ -196,7 +205,7 @@ double FEViscoElasticDamage::StrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! calculate exponent of right-stretch tensor in series spring
-bool FEViscoElasticDamage::SeriesStretchExponent(FEMaterialPoint& mp)
+bool FEUncoupledViscoElasticDamage::SeriesStretchExponent(FEMaterialPoint& mp)
 {
     const double errrel = 1e-6;
     const double almin = 0.001;
