@@ -448,7 +448,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();
-//	#pragma omp parallel for shared(NE, berr)
+	#pragma omp parallel for shared(NE, berr)
 	for (int i=0; i<NE; ++i)
 	{
 		try
@@ -543,7 +543,7 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
         mat3d Ft, Fp;
         Jt = defgrad(el, Ft, n);
         Jp = defgradp(el, Fp, n);
-        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+        pt.m_F = (m_alphaf==1.0? Ft : Ft*m_alphaf + Fp*(1-m_alphaf));
         pt.m_J = pt.m_F.det();
         mat3d Fi = pt.m_F.inverse();
         pt.m_L = (Ft - Fp)*Fi/dt;

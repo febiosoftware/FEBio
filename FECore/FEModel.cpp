@@ -109,7 +109,7 @@ public:
 
 		m_block_log = false;
 
-		m_printParams = true;
+		m_printParams = false;
 
 		m_meshUpdate = false;
 
