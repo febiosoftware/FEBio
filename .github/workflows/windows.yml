@@ -27,7 +27,7 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -102,7 +102,7 @@ jobs:
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -123,6 +123,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - uses: actions/download-artifact@v3
         with:
           name: febio4-Windows-X64
@@ -130,20 +132,14 @@ jobs:
             cmbuild
       - name: Configure SSH
         run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/repo.key
-          chmod 600 ~/.ssh/repo.key
-          cat >>~/.ssh/config <<END
-          Host repo
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/repo.key
-            StrictHostKeyChecking no
-          END
+          ci/configure-ssh.sh
         env:
           SSH_USER: ${{ secrets.REPO_USER }}
           SSH_KEY: ${{ secrets.REPO_KEY }}
           SSH_HOST: ${{ secrets.REPO_HOST }}
-      - name: Remote command
+      - name: Stage Build to Repo
         run: |
-          ssh repo 'du -sh ./*'
+          scp cmbuild/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
+      - name: Make Dev Release
+        run: |
+          ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -w"
