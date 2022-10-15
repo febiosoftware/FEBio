@@ -293,6 +293,25 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Total reaction force on surface
+class FEPlotNetSurfaceReactionForce : public FEPlotSurfaceData
+{
+public:
+	FEPlotNetSurfaceReactionForce(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION) {}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Total reaction moment on surface
+class FEPlotNetSurfaceReactionMoment : public FEPlotSurfaceData
+{
+public:
+	FEPlotNetSurfaceReactionMoment(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION) {}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

@@ -103,6 +103,7 @@ SOFTWARE.*/
 #include "FEUncoupledActiveContraction.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FEUncoupledViscoElasticMaterial.h"
+#include "FEUncoupledViscoElasticDamage.h"
 #include "FEVerondaWestmann.h"
 #include "FEViscoElasticDamage.h"
 #include "FEViscoElasticMaterial.h"
@@ -382,6 +383,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FETransIsoVerondaWestmann, "trans iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FEUncoupledElasticMixture, "uncoupled solid mixture");
 	REGISTER_FECORE_CLASS(FEVerondaWestmann, "Veronda-Westmann");
+    REGISTER_FECORE_CLASS(FEUncoupledViscoElasticDamage, "uncoupled viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEUncoupledViscoElasticMaterial, "uncoupled viscoelastic");
 	REGISTER_FECORE_CLASS(FEMRVonMisesFibers, "Mooney-Rivlin von Mises Fibers");
 	REGISTER_FECORE_CLASS(FEUncoupledActiveContraction, "uncoupled active contraction");
@@ -760,7 +762,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy, "rigid kinetic energy");
 	REGISTER_FECORE_CLASS(FEPlotRigidEuler, "Euler angle");
 	REGISTER_FECORE_CLASS(FEPlotRigidRotationVector, "rigid rotation vector");
-    REGISTER_FECORE_CLASS(FEPlotScalarSurfaceLoad, "scalar surface load");
+	REGISTER_FECORE_CLASS(FEPlotScalarSurfaceLoad, "scalar surface load");
+	REGISTER_FECORE_CLASS(FEPlotNetSurfaceReactionForce, "surface reaction force");
+	REGISTER_FECORE_CLASS(FEPlotNetSurfaceReactionMoment, "surface reaction moment");
 	REGISTER_FECORE_CLASS(FEPlotStressError, "stress error");
 	REGISTER_FECORE_CLASS(FEPlotFiberTargetStretch, "in-situ target stretch");
 	REGISTER_FECORE_CLASS(FEPlotPreStrainStretch, "prestrain stretch");

@@ -28,18 +28,18 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEUncoupledViscoElasticMaterial.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreKernel.h>
 #include <stdexcept>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
-	ADD_PARAMETER(m_t[0], "t1");
-	ADD_PARAMETER(m_t[1], "t2");
-	ADD_PARAMETER(m_t[2], "t3");
-	ADD_PARAMETER(m_t[3], "t4");
-	ADD_PARAMETER(m_t[4], "t5");
-	ADD_PARAMETER(m_t[5], "t6");
+    ADD_PARAMETER(m_t[0], "t1")->setUnits(UNIT_TIME);
+    ADD_PARAMETER(m_t[1], "t2")->setUnits(UNIT_TIME);
+    ADD_PARAMETER(m_t[2], "t3")->setUnits(UNIT_TIME);
+    ADD_PARAMETER(m_t[3], "t4")->setUnits(UNIT_TIME);
+    ADD_PARAMETER(m_t[4], "t5")->setUnits(UNIT_TIME);
+    ADD_PARAMETER(m_t[5], "t6")->setUnits(UNIT_TIME);
 	ADD_PARAMETER(m_g0  , "g0");
 	ADD_PARAMETER(m_g[0], "g1");
 	ADD_PARAMETER(m_g[1], "g2");

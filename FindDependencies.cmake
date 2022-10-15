@@ -171,6 +171,23 @@ else()
 		DOC "Levmar library path")
 endif()	
 
+# SuperLU_MT
+if (WIN32)
+    find_path(SUPERLU_MT_INC slu_mt_ddefs.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+    DOC "SuperLU_MT include directory")
+    find_library(SUPERLU_MT_LIB superlu PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+    DOC "SuperLU_MT library path")
+endif()
+
+if(SUPERLU_MT_INC AND SUPERLU_MT_LIB)		
+	option(USE_SUPERLU_MT "Option for using SuperLU_MT" ON)
+    mark_as_advanced(SUPERLU_MT_INC SUPERLU_MT_LIB)
+else()
+	option(USE_SUPERLU_MT "Option for using SuperLU_MT" OFF)
+    mark_as_advanced(CLEAR SUPERLU_MT_INC SUPERLU_MT_LIB)
+endif()
+
+
 if(LEVMAR_INC AND LEVMAR_LIB)		
 	option(USE_LEVMAR "Required for optimization in FEBio" ON)
     mark_as_advanced(LEVMAR_INC LEVMAR_LIB)
