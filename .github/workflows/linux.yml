@@ -28,7 +28,7 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -59,17 +59,16 @@ jobs:
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build
         run: |
           ci/linux.sh
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: febio4-${{runner.os}}-${{runner.arch}}
+          name: febio3-${{runner.os}}-${{runner.arch}}
           path: |
             cmbuild/bin
-            cmbuild/lib
   tests:
     if: ${{inputs.runTests}}
     name: Run test suite
@@ -79,12 +78,12 @@ jobs:
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
       - uses: actions/download-artifact@v3
         with:
-          name: febio4-${{runner.os}}-${{runner.arch}}
+          name: febio3-${{runner.os}}-${{runner.arch}}
           path: |
             cmbuild
       - name: Run test suite
@@ -106,7 +105,7 @@ jobs:
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -120,3 +119,30 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN}}
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+  repo-artifacts:
+    name: Upload artifacts to repo
+    needs:
+      - build # required to get output from the start-runner job
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: febio3-${{runner.os}}-${{runner.arch}}
+          path: |
+            cmbuild
+      - name: Configure SSH
+        run: |
+          ci/configure-ssh.sh
+        env:
+          SSH_USER: ${{ secrets.REPO_USER }}
+          SSH_KEY: ${{ secrets.REPO_KEY }}
+          SSH_HOST: ${{ secrets.REPO_HOST }}
+      - name: Stage Build to Repo
+        run: |
+          scp cmbuild/bin/* repo:~/update2/FEBioStudioDev/Linux/stage/bin
+      - name: Make Dev Release
+        run: |
+          ssh repo "python3 update2/FEBioStudioDev/makeDevRelease.py -l"
