@@ -70,6 +70,7 @@ jobs:
           path: |
             cmbuild/bin
             cmbuild/lib
+            !cmbuild/lib/*.a
   tests:
     if: ${{inputs.runTests}}
     name: Run test suite
