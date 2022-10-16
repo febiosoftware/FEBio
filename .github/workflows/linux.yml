@@ -146,6 +146,7 @@ jobs:
         run: |
           scp cmbuild/bin/* repo:~/update2/FEBioStudio2Dev/Linux/stage/bin
           scp cmbuild/lib/* repo:~/update2/FEBioStudio2Dev/Linux/stage/lib
+          ssh repo "chmod +x update2/FEBioStudio2Dev/Linux/stage/bin/febio4"
       - name: Make Dev Release
         run: |
           ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"
