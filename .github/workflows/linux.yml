@@ -69,6 +69,8 @@ jobs:
           name: febio3-${{runner.os}}-${{runner.arch}}
           path: |
             cmbuild/bin
+            cmbuild/lib
+            !cmbuild/lib/*.a
   tests:
     if: ${{inputs.runTests}}
     name: Run test suite
@@ -124,7 +126,7 @@ jobs:
     needs:
       - build # required to get output from the start-runner job
     runs-on: ubuntu-latest
-    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    if: ${{ always() }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -143,6 +145,7 @@ jobs:
       - name: Stage Build to Repo
         run: |
           scp cmbuild/bin/* repo:~/update2/FEBioStudioDev/Linux/stage/bin
+          ssh repo "chmod +x update2/FEBioStudioDev/Linux/stage/bin/febio3"
       - name: Make Dev Release
         run: |
           ssh repo "python3 update2/FEBioStudioDev/makeDevRelease.py -l"
