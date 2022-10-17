@@ -104,6 +104,7 @@ protected:
 	double	m_p;
 	double	m_Rin;
 	double	m_Rout;
+	double	m_Rmin;
 	double	m_wtol;
 
 	double	m_c1, m_c2;
