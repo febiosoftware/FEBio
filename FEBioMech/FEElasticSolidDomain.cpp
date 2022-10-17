@@ -140,8 +140,8 @@ void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
     m_alpham = timeInfo.alpham;
     m_beta = timeInfo.beta;
 
-	vec3d r0, rt;
-	for (size_t i=0; i<Elements(); ++i)
+#pragma omp parallel for
+	for (int i=0; i<Elements(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
 		if (el.isActive())
@@ -710,7 +710,8 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
     int NE = Elements();
-    for (int i=0; i<NE; ++i)
+#pragma omp parallel for shared(R, F)
+	for (int i=0; i<NE; ++i)
     {
 		// get the element
 		FESolidElement& el = m_Elem[i];

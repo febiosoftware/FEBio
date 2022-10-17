@@ -120,7 +120,8 @@ void FE3FieldElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     FEElasticSolidDomain::PreSolveUpdate(timeInfo);
     int NE = (int)m_Data.size();
-    for (int i=0; i<NE; ++i)
+#pragma omp parallel for
+	for (int i=0; i<NE; ++i)
     {
         ELEM_DATA& d = m_Data[i];
         d.eJp = d.eJt;

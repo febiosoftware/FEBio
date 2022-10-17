@@ -2279,14 +2279,16 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 {
 	int dofPerNode = dofList.Size();
 	int order = (dofPerNode == 1 ? dofList.InterpolationOrder(0) : -1);
-	vector<double> fe;
-	vector<int> lm;
-	vec3d re[FEElement::MAX_NODES];
-	std::vector<double> G(dofPerNode, 0.0);
-	FESurfaceDofShape dof_a;
+
 	int NE = Elements();
+	#pragma omp parallel for shared(R, dofList, f)
 	for (int i = 0; i < NE; ++i)
 	{
+		vector<double> fe;
+		vector<int> lm;
+		vec3d re[FEElement::MAX_NODES];
+		std::vector<double> G(dofPerNode, 0.0);
+
 		// get the next element
 		FESurfaceElement& el = Element(i);
 
@@ -2302,6 +2304,7 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 			GetNodalCoordinates(el, re);
 
 		// calculate element vector
+		FESurfaceDofShape dof_a;
 		double* w = el.GaussWeights();
 		int nint = el.GaussPoints();
 		for (int n = 0; n < nint; ++n)
