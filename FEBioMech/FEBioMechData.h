@@ -997,6 +997,33 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceX : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceX(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceY : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceY(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceZ : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceZ(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElementMixtureStress : public FELogElemData
 {
 public:

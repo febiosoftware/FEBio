@@ -1806,6 +1806,30 @@ double FELogDiscreteElementForce::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogDiscreteElementForceX::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.x;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceY::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.y;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceZ::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.z;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElementMixtureStress::value(FEElement& el)
 {
 	if (m_comp < 0) return 0.0;
