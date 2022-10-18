@@ -3815,6 +3815,35 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+bool FEPlotDiscreteElementSignedForce::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteElasticDomain* pdiscreteDomain = dynamic_cast<FEDiscreteElasticDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteElasticDomain& discreteDomain = *pdiscreteDomain;
+
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+
+		// get the (one) material point data
+		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+
+		vec3d ra1 = dom.Node(el.m_lnode[0]).m_rt;
+		vec3d rb1 = dom.Node(el.m_lnode[1]).m_rt;
+		vec3d e = rb1 - ra1; e.unit();
+
+		vec3d F = mp.m_Ft;
+
+		double Fm = F * e;
+
+		// write the force
+		a << Fm;
+	}
+
+	return true;
+}
+
 bool FEPlotDiscreteElementStrainEnergy::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEDiscreteElasticDomain* pdiscreteDomain = dynamic_cast<FEDiscreteElasticDomain*>(&dom);

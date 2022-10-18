@@ -1020,6 +1020,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEPlotDiscreteElementSignedForce : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementSignedForce(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+
+//-----------------------------------------------------------------------------
 class FEPlotDiscreteElementStrainEnergy : public FEPlotDomainData
 {
 public:
