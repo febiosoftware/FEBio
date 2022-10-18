@@ -776,6 +776,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementElongation, "discrete element elongation");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementPercentElongation, "discrete element percent elongation");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce, "discrete element force");
+	REGISTER_FECORE_CLASS(FEPlotDiscreteElementSignedForce, "discrete element signed force");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStrainEnergy, "discrete element strain energy");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D    , "continuous damage");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D1   , "continuous damage D1");
@@ -951,6 +952,9 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
     REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForceX    , "Fde.x");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForceY    , "Fde.y");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForceZ    , "Fde.z");
 	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 0, "mixture_stress[0].xx");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 1, "mixture_stress[0].xy");
