@@ -67,12 +67,8 @@ bool FEUDGHexDomain::Create(int nelems, FE_Element_Spec spec)
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 {
-	// element force vector
-	vector<double> fe;
-
-	vector<int> lm;
-
 	int NE = (int)m_Elem.size();
+#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -80,12 +76,16 @@ void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
+
+		// element force vector
+		vector<double> fe;
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
 		UDGInternalForces(el, fe);
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
