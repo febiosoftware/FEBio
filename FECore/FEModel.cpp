@@ -92,7 +92,7 @@ public:
 			ar & lc;
 			ar & m_scl & m_vscl;
 
-			if (param && (ar.IsShallow() == false))
+			if (ar.IsShallow() == false)
 			{
 				// we can't save the FEParam* directly, so we need to store meta data and try to find it on loading
 				if (ar.IsSaving())
