@@ -130,7 +130,7 @@ void FEPrescribedNodeSet::PrepStep(std::vector<double>& ui, bool brel)
 // serialization
 void FEPrescribedNodeSet::Serialize(DumpStream& ar)
 {
-	FEBoundaryCondition::Serialize(ar);
+	FENodalBC::Serialize(ar);
 	ar & m_rval;
 }
 

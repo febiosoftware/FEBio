@@ -91,7 +91,28 @@ public:
 		{
 			ar & lc;
 			ar & m_scl & m_vscl;
-			ar & param;
+
+			if (param && (ar.IsShallow() == false))
+			{
+				// we can't save the FEParam* directly, so we need to store meta data and try to find it on loading
+				if (ar.IsSaving())
+				{
+					FECoreBase* pc = dynamic_cast<FECoreBase*>(param->parent()); assert(pc);
+					ar << pc;
+					ar << param->name();
+				}
+				else
+				{
+					FECoreBase* pc = nullptr;
+					ar >> pc; assert(pc);
+					
+					char name[256] = { 0 };
+					ar >> name;
+
+					param = pc->FindParameter(name); assert(param);
+				}
+			}
+			else param = nullptr;
 		}
 	};
 

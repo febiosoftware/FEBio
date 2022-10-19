@@ -473,21 +473,25 @@ bool FEExplicitSolidSolver::Init()
 		return false;
 	}
 
-	// Calculate initial residual to be used on the first time step
-	if (Residual(m_R0) == false) return false;
-
 	// calculate the initial acceleration
-	for (int i = 0; i < mesh.Nodes(); ++i)
+	// (Only when the totiter == 0, in case of a restart)
+	if (GetFEModel()->GetCurrentStep()->m_ntotiter == 0)
 	{
-		FENode& node = mesh.Node(i);
-		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+		// Calculate initial residual to be used on the first time step
+		if (Residual(m_R0) == false) return false;
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			int n;
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+		}
 	}
 
 	// set the dynamic update flag only if we are running a dynamic analysis
@@ -670,6 +674,10 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug & m_neq & m_nreq;
+	if (ar.IsShallow() == false)
+	{
+		ar & m_Mi & m_Ut & m_R0 & m_R1;
+	}
 }
 
 //-----------------------------------------------------------------------------

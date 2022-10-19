@@ -124,7 +124,7 @@ BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
 	ADD_PARAMETER(m_wtol, "w_tol");
 END_FECORE_CLASS();
 
-FEContactPotential::FEContactPotential(FEModel* fem) : m_surf1(fem), m_surf2(fem)
+FEContactPotential::FEContactPotential(FEModel* fem) : FEContactInterface(fem), m_surf1(fem), m_surf2(fem)
 {
 	m_surf1.SetContactInterface(this);
 	m_surf2.SetContactInterface(this);
