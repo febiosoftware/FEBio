@@ -388,7 +388,12 @@ protected:
 bool FEContactPotential::Init()
 {
 	if (FEContactInterface::Init() == false) return false;
+	BuildNeighborTable();
+	return true;
+}
 
+void FEContactPotential::BuildNeighborTable()
+{
 	m_elemNeighbors.resize(m_surf1.Elements());
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{
@@ -406,8 +411,6 @@ bool FEContactPotential::Init()
 			}
 		}
 	}
-
-	return true;
 }
 
 // update
@@ -864,4 +867,14 @@ void FEContactPotential::ElementStiffness(FESurfaceElement& el1, FESurfaceElemen
 	}
 
 	ke *= -1.0;
+}
+
+void FEContactPotential::Serialize(DumpStream& ar)
+{
+	FEContactInterface::Serialize(ar);
+
+	m_surf1.Serialize(ar);
+	m_surf2.Serialize(ar);
+
+	BuildNeighborTable();
 }

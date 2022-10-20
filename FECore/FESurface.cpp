@@ -2177,6 +2177,7 @@ void FESurface::Serialize(DumpStream &ar)
 			for (int i = 0; i < Elements(); ++i)
 			{
 				FESurfaceElement& el = Element(i);
+				el.SetMeshPartition(this);
 				int nint = el.GaussPoints();
 				for (int n = 0; n < nint; ++n)
 				{

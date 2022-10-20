@@ -70,6 +70,9 @@ public:
 	//! Flush the archive
 	void Flush() { fflush(m_fp); }
 
+	size_t Size() { return m_size; }
+
 protected:
 	FILE*		m_fp;		//!< The actual file pointer
+	size_t		m_size;
 };

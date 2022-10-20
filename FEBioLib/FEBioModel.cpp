@@ -1218,9 +1218,6 @@ void FEBioModel::Serialize(DumpStream& ar)
 		// serialize model data
 		FEMechModel::Serialize(ar);
 
-		// serialize data store
-		SerializeDataStore(ar);
-
 		// --- Save IO Data
 		SerializeIOData(ar);
 	}
