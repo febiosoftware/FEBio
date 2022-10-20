@@ -94,7 +94,7 @@ bool FEBioRestart::Init(const char *szfile)
 	else
 	{
 		// By default, we are not going to append the log and plot file
-		fem.SetAppendOnRestart(false);
+//		fem.SetAppendOnRestart(false);
 
 		// the file is assumed to be a xml-text input file
 		FERestartImport file;

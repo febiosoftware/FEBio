@@ -101,8 +101,8 @@ void FERestartControlSection::Parse(XMLTag& tag)
 	while (!tag.isend());
 
 	// we need to reevaluate the time step size and end time
-	fem.GetTime().timeIncrement = pstep->m_dt0;
-	pstep->m_tend = pstep->m_tstart = pstep->m_ntime*pstep->m_dt0;
+	pstep->m_dt = pstep->m_dt0;
+//	pstep->m_tend = pstep->m_tstart = pstep->m_ntime*pstep->m_dt0;
 
 }
 
