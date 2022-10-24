@@ -493,14 +493,14 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				int currentStep = pstep->m_ntimesteps;
 				int lastStep = pstep->m_ntime;
 				int nmin = pstep->m_nplotRange[0]; if (nmin < 0) nmin = lastStep + nmin + 1;
-				int nmax = pstep->m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
+				int nmax = pstep->m_nplotRange[1]; if (nmax < -1) nmax = lastStep + nmax + 1;
 
 				bool inRange = true;
 				bool isStride = true;
 				if (pstep->m_timeController == nullptr)
 				{
 					inRange = false;
-					if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
+					if ((currentStep >= nmin) && ((currentStep <= nmax) || (nmax == -1))) inRange = true;
 
 				}
 				isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
@@ -1217,9 +1217,6 @@ void FEBioModel::Serialize(DumpStream& ar)
 
 		// serialize model data
 		FEMechModel::Serialize(ar);
-
-		// serialize data store
-		SerializeDataStore(ar);
 
 		// --- Save IO Data
 		SerializeIOData(ar);

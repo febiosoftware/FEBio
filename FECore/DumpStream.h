@@ -339,7 +339,7 @@ template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>
 {
 	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	int N = (int) o.size();
-	write(&N, sizeof(int), 1);
+	m_bytes_serialized += write(&N, sizeof(int), 1);
 	for (int i=0; i<N; ++i) (*this) << o[i];
 	return *this;
 }
@@ -349,7 +349,7 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
 	int N;
-	read(&N, sizeof(int), 1);
+	m_bytes_serialized += read(&N, sizeof(int), 1);
 	if (N > 0)
 	{
 		o.resize(N);
@@ -363,7 +363,7 @@ template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
 	int N = (int) o.size();
-	write(&N, sizeof(int), 1);
+	m_bytes_serialized += write(&N, sizeof(int), 1);
 	for (int i=0; i<N; ++i) 
 	{
 		bool b = o[i];
@@ -377,7 +377,7 @@ template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
 	int N;
-	read(&N, sizeof(int), 1);
+	m_bytes_serialized += read(&N, sizeof(int), 1);
 	if (N > 0)
 	{
 		o.resize(N);
@@ -468,7 +468,7 @@ template <typename T> DumpStream& DumpStream::operator << (std::vector<T*>& o)
 {
 	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
 	size_t N = o.size();
-	write(&N, sizeof(size_t), 1);
+	m_bytes_serialized += write(&N, sizeof(size_t), 1);
 	for (size_t i = 0; i < N; ++i)
 	{
 		(*this) << o[i];
@@ -509,7 +509,7 @@ template <typename T> DumpStream& DumpStream::operator >> (std::vector<T*>& o)
 {
 	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	size_t N = 0;
-	read(&N, sizeof(size_t), 1);
+	m_bytes_serialized += read(&N, sizeof(size_t), 1);
 	if (N > 0)
 	{
 		o.resize(N);

@@ -128,6 +128,10 @@ bool break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 // callback for ctrl+c interruptions
 bool interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
+	// Do not process this when we are writing or reading the dump file since
+	// this may cause problems
+	if ((nwhen == CB_SERIALIZE_LOAD) || (nwhen == CB_SERIALIZE_SAVE)) return true;
+
 	Interruption itr;
 	if (itr.m_bsig)
 	{

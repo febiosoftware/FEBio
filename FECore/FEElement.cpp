@@ -436,6 +436,16 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 }
 
 //-----------------------------------------------------------------------------
+void FETrussElement::Serialize(DumpStream& ar)
+{
+	FEElement::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		ar & m_a0 & m_L0 & m_lam & m_tau;
+	}
+}
+
+//-----------------------------------------------------------------------------
 FEDiscreteElement::FEDiscreteElement(const FEDiscreteElement& el)
 {
 	// set the traits of the element

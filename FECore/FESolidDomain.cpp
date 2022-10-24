@@ -991,8 +991,9 @@ double FESolidDomain::defgradp(FESolidElement &el, mat3d &F, int n)
 	GetPreviousNodalCoordinates(el, r);
     
     // calculate inverse jacobian
-    double Ji[3][3];
-    invjac0(el, Ji, n);
+//    double Ji[3][3];
+//    invjac0(el, Ji, n);
+	mat3d& Ji = el.m_J0i[n];
 
 	// shape function derivatives
 	double *Grn = el.Gr(n);

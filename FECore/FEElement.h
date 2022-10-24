@@ -247,6 +247,8 @@ public:
 
 	FETrussElement& operator = (const FETrussElement& el);
 
+	void Serialize(DumpStream& ar) override;
+
 public:
 	double	m_a0;	// cross-sectional area
 	double	m_lam;	// current stretch ratio

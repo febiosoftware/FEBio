@@ -1974,10 +1974,13 @@ path
 Edit
 \shape default
  button.
- At the end of the PATH's value (don't delete the current value) type a
- semi-colon and then the absolute path to the FEBio installation folder
- (e.g.
- C:/Program Files/FEBio/).
+ On older versions of Windows a semicolon delimited text string appears.
+ At the end of that string (don't delete the current value) type a semi-colon
+ and then the absolute path to the FEBio installation folder (e.g.
+ C:/Program Files/FEBio/bin/).
+ On Windows 10 or newer, the values are displayed in a list.
+ Either click New or double-click on the first empty slot in the list and
+ type the path the febio executable.
  Then click the 
 \shape italic
 OK
@@ -2007,6 +2010,10 @@ febio4
 Enter
 \shape default
 .
+ Note that if you already had a command prompt open when changing the PATH
+ environment variable, you'll nee to close this window and reopen it after
+ the changes to the environment variables are applied.
+  
 \end_layout
 
 \begin_layout Subsection

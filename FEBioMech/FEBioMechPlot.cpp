@@ -66,6 +66,7 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
+#include <FECore/FEElement.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -3816,10 +3817,41 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 		FEDiscreteElement& el = discreteDomain.Element(i);
 
 		// get the (one) material point data
-		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+		FEDiscreteElasticMaterialPoint& dmp = *mp.ExtractData<FEDiscreteElasticMaterialPoint>();
 
 		// write the force
-		a << mp.m_Ft;
+		a << dmp.m_Ft;
+	}
+
+	return true;
+}
+
+bool FEPlotDiscreteElementSignedForce::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteElasticDomain* pdiscreteDomain = dynamic_cast<FEDiscreteElasticDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteElasticDomain& discreteDomain = *pdiscreteDomain;
+
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+
+		// get the (one) material point data
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+		FEDiscreteElasticMaterialPoint& dmp = *mp.ExtractData<FEDiscreteElasticMaterialPoint>();
+
+		vec3d ra1 = dom.Node(el.m_lnode[0]).m_rt;
+		vec3d rb1 = dom.Node(el.m_lnode[1]).m_rt;
+		vec3d e = rb1 - ra1; e.unit();
+
+		vec3d F = dmp.m_Ft;
+
+		double Fm = F * e;
+
+		// write the force
+		a << Fm;
 	}
 
 	return true;
@@ -3839,10 +3871,11 @@ bool FEPlotDiscreteElementStrainEnergy::Save(FEDomain& dom, FEDataStream& a)
 		FEDiscreteElement& el = discreteDomain.Element(i);
 
 		// get the (one) material point data
-		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+		FEDiscreteElasticMaterialPoint& dmp = *mp.ExtractData<FEDiscreteElasticMaterialPoint>();
 
 		// write the strain energy
-		a << discreteMaterial->StrainEnergy(mp);
+		a << discreteMaterial->StrainEnergy(dmp);
 	}
 
 	return true;

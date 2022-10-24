@@ -254,13 +254,16 @@ void FEElasticTrussDomain::ElementMassMatrix(FETrussElement& el, matrix& me)
 void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
-	vector<double> fe;
-	vector<int> lm;
 	int NT = (int)m_Elem.size();
+#pragma omp parallel for
 	for (int i=0; i<NT; ++i)
 	{
 		FETrussElement& el = m_Elem[i];
+
+		vector<double> fe;
 		ElementInternalForces(el, fe);
+
+		vector<int> lm;
 		UnpackLM(el, lm);
 		R.Assemble(el.m_node, lm, fe);
 	}
@@ -321,13 +324,14 @@ void FEElasticTrussDomain::Update(const FETimeInfo& tp)
 	FEUncoupledMaterial* um = dynamic_cast<FEUncoupledMaterial*>(GetMaterial());
 
 	// loop over all elements
-	vec3d r0[2], rt[2];
+#pragma omp parallel for
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// unpack the element
 		FETrussElement& el = m_Elem[i];
 
 		// nodal coordinates
+		vec3d r0[2], rt[2];
 		for (int j=0; j<2; ++j)
 		{
 			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
