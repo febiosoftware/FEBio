@@ -518,8 +518,6 @@ void AccelerateSparseSolver::Destroy()
 
 #else
 BEGIN_FECORE_CLASS(AccelerateSparseSolver, LinearSolver)
-ADD_PARAMETER(m_print_cn, "print_condition_number");
-ADD_PARAMETER(m_iparm3, "precondition");
 END_FECORE_CLASS();
 
 AccelerateSparseSolver::AccelerateSparseSolver(FEModel* fem) : LinearSolver(fem) {}
@@ -534,4 +532,6 @@ void AccelerateSparseSolver::PrintConditionNumber(bool b) {}
 double AccelerateSparseSolver::condition_number() { return 0; }
 void AccelerateSparseSolver::UseIterativeFactorization(bool b) {}
 void AccelerateSparseSolver::SetFactorizationType(int ftype) {}
+void AccelerateSparseSolver::SetPrintLevel(int printlevel) {}
+bool AccelerateSparseSolver::IsIterative() const { return false; }
 #endif
