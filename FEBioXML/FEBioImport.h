@@ -149,6 +149,12 @@ public:
 	public: RepeatedSurface(const std::string& name);
 	};
 
+	// repeated edge set
+	class RepeatedEdgeSet : public FEFileException
+	{
+	public: RepeatedEdgeSet(const std::string& name);
+	};
+
 	// repeated element set
 	class RepeatedElementSet : public FEFileException
 	{

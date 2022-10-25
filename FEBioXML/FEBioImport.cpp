@@ -161,6 +161,11 @@ FEBioImport::RepeatedSurface::RepeatedSurface(const std::string& name)
 	SetErrorString("A surface with name \"%s\" was already defined.", name.c_str());
 }
 
+FEBioImport::RepeatedEdgeSet::RepeatedEdgeSet(const std::string& name)
+{
+	SetErrorString("An edge with name \"%s\" was already defined.", name.c_str());
+}
+
 FEBioImport::RepeatedElementSet::RepeatedElementSet(const std::string& name)
 {
 	SetErrorString("An element set with name \"%s\" was already defined.", name.c_str());
