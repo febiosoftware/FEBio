@@ -213,6 +213,7 @@ SOFTWARE.*/
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
 #include "FEExplicitSolidSolver.h"
+#include "FEJacobiSolidSolver.h"
 #include "FECGSolidSolver.h"
 
 #include "FEBioMechPlot.h"
@@ -295,6 +296,7 @@ void FEBioMech::InitModule()
 	// Solver classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
 	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
+	REGISTER_FECORE_CLASS(FEJacobiSolidSolver, "jacobi-solid");
 	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
 	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
