@@ -31293,34 +31293,622 @@ name "sec:Viscoelasticity"
 \end_layout
 
 \begin_layout Standard
-For a viscoelastic material the second Piola Kirchhoff stress can be written
- as follows 
+When some of the energy stored during mechanical loading of a material gets
+ dissipated into heat, the material's response is called inelastic.
+ Inelastic behaviors include viscoelasticity and plasticity, although this
+ presentation focuses exclusively on viscoelasticity.
+ In continuum mechanics, we can identify three forms of viscoelasticity
+ in materials.
+ Viscoelasticity may occur due to (1) friction between molecules of the
+ same material, (2) friction between solid and fluid matter in a porous
+ deformable medium, and (3) breaking and reforming of weak bonds between
+ molecules of the same material.
+ The first form is classically described as the viscous response of a material,
+ whereby the friction between molecules of the same material is represented
+ by the material's viscosity 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Puso98"
-literal "true"
+key "Coleman63"
+literal "false"
 
 \end_inset
 
-: 
+.
+ The second form is classically described by poroelasticity 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Cryer63,Rice76"
+literal "false"
+
+\end_inset
+
+ or biphasic 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Mow80"
+literal "false"
+
+\end_inset
+
+ theory, whereby the frictional drag between the porous solid and its interstiti
+al fluid is represented by the hydraulic permeability (also known as Darcy's
+ law of permeation).
+ The last form was proposed by Green and Tobolsky 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Green46,Tobolsky60"
+literal "false"
+
+\end_inset
+
+ as the fundamental mechanism for viscoelasticity in polymers.
+ Recently, we presented a constrained reactive mixture approach to formulate
+ a reactive viscoelasticity theory that embodies the molecular mechanism
+ of viscoelasticity proposed by those authors 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian15,Ateshian23"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Internal State Variable Theory
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Internal-State-Variable"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A conventional approach for modeling viscoelasticity uses the framework
+ of internal variables 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Coleman67"
+literal "false"
+
+\end_inset
+
+, whereby we may decompose the deformation gradient 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ into deformations occurring in a microstructural model of the material,
+ consisting of a spring and dashpot in series 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Lubliner85,Simo87,Holzapfel96"
+literal "false"
+
+\end_inset
+
+.
+ Thus, we may model a continuum version of the standard linear solid using
+ quasilinear viscoelasticity, as shown for example by Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, though we make minor modifications and extensions to his presentation
+ here.
+ Consider that the microstructural model of this viscoelastic material consists
+ of a spring and dashpot in series (a Maxwell model), combined with a spring
+ in parallel, which is equivalent to the Maxwell representation of a standard
+ linear solid in linear viscoelasticity (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+figurename
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:spring-dashpot-model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The total deformation gradient, associated with the parallel spring, is
+ 
+\begin_inset Formula $\mathbf{F}=\mathbf{F}_{s}\cdot\mathbf{F}_{d}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ is the internal state variable representing the deformation gradient associated
+ with the series spring of the Maxwell model, and 
+\begin_inset Formula $\mathbf{F}_{d}$
+\end_inset
+
+ is that associated with the dashpot.
+ The second Piola-Kirchhoff stress in the parallel spring is given by
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigStandardLinearSolid.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Spring-dashpot model for Maxwell representation of the standard solid.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:spring-dashpot-model"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}\left(t\right)=\int\limits _{-\infty}^{t}G\left(t-s\right)\frac{d\mathbf{S}^{e}}{ds}\,ds\,,\label{eq485}
+\mathbf{S}^{e}\left(\mathbf{F}\right)=\frac{\partial\Psi_{r}^{e}}{\partial\mathbf{E}}\,,\label{eq:IVT-parallel-spring-stress}
 \end{equation}
 
 \end_inset
 
 where 
+\begin_inset Formula $\mathbf{E}=\frac{1}{2}\left(\mathbf{F}^{T}\cdot\mathbf{F}-\mathbf{I}\right)$
+\end_inset
+
+ is the Lagrange strain tensor derived from 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ In this quasilinear viscoelasticity theory, the second Piola-Kirchhoff
+ stress in the Maxwell spring is given by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{M}\left(\mathbf{F}_{s}\right)=\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)\,,\label{eq:IVT-series-spring-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma\ge0$
+\end_inset
+
+ is a user-defined non-dimensional parameter that produces standard hyperelastic
+ity in the limit when 
+\begin_inset Formula $\gamma=0$
+\end_inset
+
+.
+ Note that 
 \begin_inset Formula $\mathbf{S}^{e}$
 \end_inset
 
- is the elastic stress and 
-\begin_inset Formula $G(t)$
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-series-spring-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
- is the relaxation function.
- Here we consider the special case where the relaxation function is given
- by 
+ uses the same constitutive model as in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-parallel-spring-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, but its argument is different (
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ instead of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+).
+ By recognizing that 
+\begin_inset Formula $\mathbf{M}$
+\end_inset
+
+ should also be the stress in the Maxwell dashpot, we use eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-series-spring-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to find that
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{S}}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)+\frac{1}{\tau}\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)=\dot{\mathbf{S}}^{e}\left(\mathbf{F}\left(t\right)\right)\,,\quad\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(0\right)\right)=\mathbf{0}\,,\label{eq:IVT-ODE}
+\end{equation}
+
+\end_inset
+
+where the time constant 
+\begin_inset Formula $\tau$
+\end_inset
+
+ is the ratio of the damping coefficient in the dashpot to the Maxwell spring
+ stiffness, and the dot operator represents the material time derivative
+ in the material frame.
+ The solution to this 
+\emph on
+linear
+\emph default
+ ordinary differential equation (hence, quasi
+\emph on
+-linear
+\emph default
+ viscoelasticity theory) is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)=\int_{0}^{t}e^{-\left(t-s\right)/\nu}\frac{d\mathbf{S}^{e}\left(\mathbf{F}\left(s\right)\right)}{ds}\,ds\,.\label{eq:IVT-P-solution}
+\end{equation}
+
+\end_inset
+
+Now, the total stress 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in this material, which is the sum of stresses in the two springs, 
+\begin_inset Formula $\mathbf{S}=\mathbf{S}^{e}\left(\mathbf{F}\right)+\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+, reduces to the familiar form
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=\int_{0}^{t}G\left(t-s\right)\frac{d\mathbf{S}^{e}\left(\mathbf{F}\left(s\right)\right)}{ds}\,ds\,,\label{eq:IVT-total-stress}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+G\left(t\right)=1+\gamma e^{-t/\tau}\label{eq:IVT-relaxation-fcn}
+\end{equation}
+
+\end_inset
+
+is called the relaxation function.
+ A convenient and efficient numerical scheme for solving for 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ was given previously by Puso and Weiss 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Puso98"
+literal "false"
+
+\end_inset
+
+, where they used 
+\begin_inset Formula $\mathbf{H}$
+\end_inset
+
+ to denote 
+\begin_inset Formula $\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+ (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Puso-Weiss-Scheme"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ Of course, the last step in this analysis is to evaluate the Cauchy stress
+ from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ using the standard push-forward formula 
+\begin_inset Formula $\boldsymbol{\sigma}=J^{-1}\mathbf{F}\cdot\mathbf{S}\cdot\mathbf{F}^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The strain energy density associated with this viscoelastic material corresponds
+ to that stored in the two springs.
+ Its continuum form is
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\Psi_{r}^{e}\left(\mathbf{F}\right)+\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)\,.\label{eq:IVT-SED}
+\end{equation}
+
+\end_inset
+
+It is important to note that this presentation does not provide an explicit
+ solution for 
+\begin_inset Formula $\mathbf{F}_{s}\left(t\right)$
+\end_inset
+
+.
+ In principle, it is possible to extract a suitable measure of strain associated
+ with 
+\begin_inset Formula $\mathbf{F}_{s}\left(t\right)$
+\end_inset
+
+ by inverting eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-P-solution"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, since 
+\begin_inset Formula $\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)$
+\end_inset
+
+ must be evaluated explicitly in this scheme as part of the solution for
+ 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ This inversion requires the adoption of suitable constitutive assumptions
+ about the multiplicative decomposition 
+\begin_inset Formula $\mathbf{F}=\mathbf{F}_{s}\cdot\mathbf{F}_{d}$
+\end_inset
+
+; it may possibly be numerically expensive.
+\end_layout
+
+\begin_layout Subsection
+Strain Energy Density in Standard Solid
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:SED-Standard-Solid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, in the special case of a stress-relaxation response to an instantan
+eous step strain, evaluated from 
+\begin_inset Formula $\mathbf{F}\left(0^{+}\right)$
+\end_inset
+
+, we may let 
+\begin_inset Formula $\mathbf{F}_{s}\left(0^{+}\right)=\mathbf{F}\left(0^{+}\right)$
+\end_inset
+
+ since the dashpot cannot deform instantaneously, under the reasonable constitut
+ive assumption that there is no rigid body rotation associated with the
+ dashpot distinct from that of the Maxwell series spring, thus 
+\begin_inset Formula $\mathbf{F}_{d}\left(0^{+}\right)=\mathbf{I}$
+\end_inset
+
+.
+ If we adopt this assumption for all times 
+\begin_inset Formula $t$
+\end_inset
+
+, then we can also conclude that the right stretch tensor 
+\begin_inset Formula $\mathbf{U}_{s}$
+\end_inset
+
+ of the Maxwell spring deformation gradient tends toward 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+ in the limit as 
+\begin_inset Formula $t\to\infty$
+\end_inset
+
+, as the dashpot elongates or contracts to match the right-stretch tensor
+ of the parallel spring, also implying that 
+\begin_inset Formula $\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)\to0$
+\end_inset
+
+ in this limit.
+\end_layout
+
+\begin_layout Standard
+Building upon this example, we can assume more generally that 
+\begin_inset Formula $\mathbf{U}=\mathbf{U}_{s}\cdot\mathbf{U}_{d}$
+\end_inset
+
+ under the constitutive assumption that the rotation tensor 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ in the polar decomposition of 
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
+\end_inset
+
+ is the same in both branches of the microstructural model.
+ However, for self-consistency, we must also assume that 
+\begin_inset Formula $\mathbf{U}_{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}_{d}$
+\end_inset
+
+ share the same eigenvectors as 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ to preserve the symmetry of all three right-stretch tensors.
+ Thus, a valid constitutive model for the multiplicative decomposition is
+ to let 
+\begin_inset Formula $\mathbf{U}_{s}=\mathbf{U}^{\alpha}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}_{d}=\mathbf{U}^{1-\alpha}$
+\end_inset
+
+, where the exponent 
+\begin_inset Formula $\alpha\left(t\right)$
+\end_inset
+
+ is a scalar function of time that can be obtained by solving eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in the form 
+\begin_inset Formula $\gamma\mathbf{S}^{e}\left(\mathbf{U}^{\alpha}\right)=\mathbf{S}\left(\mathbf{U}\right)-\mathbf{S}^{e}\left(\mathbf{U}\right)$
+\end_inset
+
+ at the current time 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ This constitutive model is insensitive to flipping the spring and dashopt
+ sequence in the Maxwell element, as should be expected.
+ Now, for an instantaneous step strain, we would have 
+\begin_inset Formula $\alpha\left(0^{+}\right)=1$
+\end_inset
+
+, whereas the steady-state response to a step strain would produce 
+\begin_inset Formula $\lim_{t\to\infty}\alpha\left(t\right)=0$
+\end_inset
+
+.
+ Logically, it would be reasonable to expect that 
+\begin_inset Formula $\alpha\left(t\right)$
+\end_inset
+
+ must remain in the range 
+\begin_inset Formula $0\le\alpha\le1$
+\end_inset
+
+, since we cannot physically justify that the Maxwell spring would stretch
+ (expand or contract) by a greater amount than the parallel spring.
+ A more formal enforcement of thermodynamic constraints of this internal
+ variable theory 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Coleman67"
+literal "false"
+
+\end_inset
+
+, not provided here, should confirm this expectation.
+\end_layout
+
+\begin_layout Subsection
+Puso and Weiss Numerical Scheme
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Puso-Weiss-Scheme"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here we consider the slightly more general case where the relaxation function
+ is given by a Prony series
 \begin_inset Formula 
 \begin{equation}
 G\left(t\right)=\gamma_{0}+\sum\limits _{i=1}^{N}\gamma_{i}\exp\left(-t/\tau_{i}\right)\,.\label{eq486}
@@ -31332,7 +31920,7 @@ With this function chosen for the relaxation function, we can write the
  total stress as 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}\left(t\right)=\int\limits _{-\infty}^{t}\left(\gamma_{0}+\sum\limits _{i=1}^{N}\gamma_{i}\exp\left(\left(-t+s\right)/\tau_{i}\right)\frac{d\mathbf{S}^{e}}{ds}\right)\,ds\,.\label{eq487}
+\mathbf{S}\left(t\right)=\int\limits _{0}^{t}\left(\gamma_{0}+\sum\limits _{i=1}^{N}\gamma_{i}\exp\left(\left(-t+s\right)/\tau_{i}\right)\frac{d\mathbf{S}^{e}}{ds}\right)\,ds\,.\label{eq487}
 \end{equation}
 
 \end_inset
@@ -31340,7 +31928,7 @@ With this function chosen for the relaxation function, we can write the
 Introducing the internal variables, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{H}^{\left(i\right)}\left(t\right)=\int\limits _{-\infty}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\,,\label{eq488}
+\mathbf{H}^{\left(i\right)}\left(t\right)=\int\limits _{0}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\,,\label{eq488}
 \end{equation}
 
 \end_inset
@@ -31394,8 +31982,8 @@ reference "eq488"
  
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{H}^{\left(i\right)}\left(t+\Delta t\right) & =\int\limits _{-\infty}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
- & =\exp\left(-\Delta t/\tau_{i}\right)\int\limits _{-\infty}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds+\int\limits _{t}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
+\begin{aligned}\mathbf{H}^{\left(i\right)}\left(t+\Delta t\right) & =\int\limits _{0}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
+ & =\exp\left(-\Delta t/\tau_{i}\right)\int\limits _{0}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds+\int\limits _{t}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
  & =\exp\left(-\Delta t/\tau_{i}\right)\mathbf{H}^{\left(i\right)}\left(t\right)+\int\limits _{t}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\,.
 \end{aligned}
 \label{eq490}
@@ -31445,7 +32033,7 @@ The following procedure can now be applied to calculate the new stress.
 calculate elastic stress: 
 \begin_inset Formula 
 \[
-\mathbf{S}_{n+1}^{e}=\frac{\partial W^{e}}{\partial\mathbf{C}_{n+1}}\,,
+\mathbf{S}_{n+1}^{e}=2\frac{\partial\Psi_{r}^{e}}{\partial\mathbf{C}_{n+1}}\,,
 \]
 
 \end_inset
