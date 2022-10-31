@@ -1238,10 +1238,11 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			double m = 0;
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 				double detJ = bd.detJ0(el, j)*gw[j];
-				ew += pt.m_rt*(pme->Density(pt)*detJ);
-				m += pme->Density(pt)*detJ;
+				ew += pt.m_rt*(pme->Density(mp)*detJ);
+				m += pme->Density(mp)*detJ;
 			}
 
 			a << ew / m;
