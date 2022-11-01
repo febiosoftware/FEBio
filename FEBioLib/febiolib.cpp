@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "febio.h"
 #include "plugin.h"
 #include "FEBioStdSolver.h"
+#include "FEBioRestart.h"
 
 namespace febio {
 
