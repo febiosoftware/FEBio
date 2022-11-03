@@ -55144,11 +55144,19 @@ literal "false"
 \begin_layout Standard
 \noindent
 where 
+\begin_inset Formula $I_{1}=\tr\mathbf{C}$
+\end_inset
+
+ is the first invariant of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+, 
 \begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left[\sqrt{\frac{I_{1}}{3N}}\right]}$
 \end_inset
 
  is the inverse Langevin equation, and 
-\begin_inset Formula ${\displaystyle \beta_{0}=\mathcal{L}^{-1}\left[\sqrt{\frac{1}{3N}}\right]}$
+\begin_inset Formula ${\displaystyle \beta_{0}=\mathcal{L}^{-1}\left[\sqrt{\frac{1}{N}}\right]}$
 \end_inset
 
 .
@@ -68364,7 +68372,7 @@ n nature of a biological fiber.
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Psi_{n}(I_{n})=\xi N\left(\sqrt{\frac{I_{n}}{N}}\beta+\text{ln}\frac{\beta}{\sinh\beta}\right)-\frac{n\theta k\sqrt{N}}{2}\beta_{0}I_{n}-\alpha_{00}
+\Psi_{n}\left(I_{n}\right)=\xi N\left(\sqrt{\frac{I_{n}}{N}}\beta+\ln\frac{\beta}{\sinh\beta}\right)-\frac{\xi\sqrt{N}}{2}\beta_{0}I_{n}-\alpha_{00}
 \]
 
 \end_inset
@@ -68397,11 +68405,23 @@ where
 \end_inset
 
  according to 
-\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left(\sqrt{\frac{I_{n}}{N}}\right)}$
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left[\sqrt{\frac{I_{n}}{N}}\right]}$
 \end_inset
 
 .
  Here, 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+, and
 \begin_inset Formula $\alpha_{00}$
 \end_inset
 
@@ -68437,10 +68457,15 @@ where
 \end_inset
 
  is the locking stretch, representing the extensibility of the fiber.
+ The Langevin function is given by 
+\begin_inset Formula $\mathcal{L}\left(x\right)=\coth x-\frac{1}{x}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-In evaluating the inverse Langevin equation, the Taylor series expansion
+When evaluating the inverse Langevin equation, a Taylor series expansion
  is applied for computational stability.
  The parameter 
 \begin_inset Formula $n_{\mathrm{term}}$
@@ -68514,7 +68539,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-Locking stretch
+Square of locking stretch
 \end_layout
 
 \end_inset
@@ -70160,7 +70185,7 @@ n nature of a biological fiber.
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Psi_{n}(\tilde{I}_{n})=\xi N\left(\sqrt{\frac{\tilde{I}_{n}}{N}}\beta+\text{ln}\frac{\beta}{\sinh\beta}\right)-\frac{n\theta k\sqrt{N}}{2}\beta_{0}\tilde{I}_{n}-\alpha_{00}
+\Psi_{n}(\tilde{I}_{n})=\xi N\left(\sqrt{\frac{\tilde{I}_{n}}{N}}\beta+\text{ln}\frac{\beta}{\sinh\beta}\right)-\frac{\xi\sqrt{N}}{2}\beta_{0}\tilde{I}_{n}-\alpha_{00}
 \]
 
 \end_inset
@@ -70198,6 +70223,18 @@ where
 
 .
  Here, 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+, and 
 \begin_inset Formula $\alpha_{00}$
 \end_inset
 
@@ -70233,10 +70270,15 @@ where
 \end_inset
 
  is the locking stretch, representing the extensibility of the fiber.
+ The Langevin function is given by 
+\begin_inset Formula $\mathcal{L}\left(x\right)=\coth x-\frac{1}{x}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-In evaluating the inverse Langevin equation, the Taylor series expansion
+When evaluating the inverse Langevin equation, a Taylor series expansion
  is applied for computational stability.
  The parameter 
 \begin_inset Formula $n_{\mathrm{term}}$
@@ -70310,7 +70352,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-Locking stretch
+Square of locking stretch
 \end_layout
 
 \end_inset
@@ -104215,437 +104257,350 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
-
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
-
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
-
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
-
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
-
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
-
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
-
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
-
 		</material>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
-
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
-
 			<points>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
-
 			</points>
 \end_layout
 
 \begin_layout Verbatim
-
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
-
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
-
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
-
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
-
 </febio_spec>
 \end_layout
 
