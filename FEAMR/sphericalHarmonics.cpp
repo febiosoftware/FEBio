@@ -34,6 +34,10 @@ SOFTWARE.*/
 #include <mmg/mmgs/libmmgs.h>
 #endif
 
+#ifndef M_PI
+#define M_PI 3.141592653589793238462643
+#endif
+
 using std::vector;
 using std::unordered_map;
 

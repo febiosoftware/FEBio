@@ -26,15 +26,16 @@ SOFTWARE.*/
 
 #include <memory>
 #include <FECore/matrix.h>
+#include "feamr_api.h"
 
-void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi);
+FEAMR_API void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi);
 
-std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi);
+FEAMR_API std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi);
 
-double harmonicY(int degree, int order, double theta, double phi, int numType);
+FEAMR_API double harmonicY(int degree, int order, double theta, double phi, int numType);
 
-void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi);
+FEAMR_API void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi);
 
-void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
+FEAMR_API void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
 
-void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
+FEAMR_API void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
