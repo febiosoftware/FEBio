@@ -34,6 +34,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FENewtonianViscousSolid, FEElasticMaterial)
 	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa")->setUnits("P.t")->setLongName("bulk viscosity");
 	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   )->setUnits("P.t")->setLongName("shear viscosity");
+    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -41,6 +42,7 @@ FENewtonianViscousSolid::FENewtonianViscousSolid(FEModel* pfem) : FEElasticMater
 {
     m_kappa = 0.0;
     m_mu = 0.0;
+    m_secant_tangent = false;
 }
 
 //-----------------------------------------------------------------------------

@@ -35,14 +35,12 @@ SOFTWARE.*/
 class FEOrthoElastic :	public FEElasticMaterial
 {
 public:
-	double	E1, E2, E3;		// Young's moduli
-	double	v12, v23, v31;	// Poisson's ratio
-	double	G12, G23, G31;	// Shear moduli
-	double	lam[3][3];		// first Lame coefficients
-	double	mu[3];			// second Lame coefficients
+	FEParamDouble	m_E1, m_E2, m_E3;		// Young's moduli
+	FEParamDouble	m_v12, m_v23, m_v31;	// Poisson's ratio
+	FEParamDouble	m_G12, m_G23, m_G31;	// Shear moduli
 
 public:
-	FEOrthoElastic(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FEOrthoElastic(FEModel* pfem);
 
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt) override;
@@ -55,6 +53,10 @@ public:
     
 	//! data initialization
 	bool Validate() override;
+
+private:
+	// Helper function for evaluating Lame coefficients at material point
+	bool EvaluateLameCoefficients(FEMaterialPoint& pt, double lam[3][3], double mu[3]);
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

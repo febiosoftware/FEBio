@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,54 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #pragma once
+#include "FEBioMech/FEUncoupledMaterial.h"
 
-#include <stdio.h>
-#include "DumpStream.h"
-
-//-----------------------------------------------------------------------------
-//! Class for serializing data to a binary archive.
-
-//! This class is used to read data from or write
-//! data to a binary file. The class defines several operators to 
-//! simplify in- and output.
-//! \sa FEM::Serialize()
-
-class FECORE_API DumpFile : public DumpStream
+class FEABUnconstrained : public FEElasticMaterial
 {
+//public:
+	//enum { MAX_TERMS = 6 };
 public:
-	// overloaded from DumpStream
-	size_t write(const void* pd, size_t size, size_t count) override;
-	size_t read(void* pd, size_t size, size_t count) override;
-	void clear() override {}
-	bool EndOfStream() const override;
-
-public:
-	DumpFile(FEModel& fem);
-	virtual ~DumpFile();
-
-	//! Open archive for reading
-	bool Open(const char* szfile);
-
-	//! Open archive for writing
-	bool Create(const char* szfile);
-
-	//! Open archive for appending
-	bool Append(const char* szfile);
-
-	//! Close archive
-	void Close();
-
-	//! See if the archive is valid
-	bool IsValid() { return (m_fp != 0); }
-
-	//! Flush the archive
-	void Flush() { fflush(m_fp); }
-
-	size_t Size() { return m_size; }
-
+	FEABUnconstrained(FEModel* pfem);
+	
+	//! calculate the stress
+	mat3ds Stress(FEMaterialPoint& pt) override;
+	
+	//! calculate the tangent
+	tens4ds Tangent(FEMaterialPoint& pt) override;
+	
+	//! calculate strain energy density at material point
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+    
 protected:
-	FILE*		m_fp;		//!< The actual file pointer
-	size_t		m_size;
+	void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);
+	double	m_eps;
+	
+public:
+	//FEParamDouble m_ksi;
+	double m_N; 
+	int m_term;
+	FEParamDouble m_ksi;
+	FEParamDouble m_kappa;
+	
+	DECLARE_FECORE_CLASS();
 };

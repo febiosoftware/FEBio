@@ -422,8 +422,16 @@ bool FEAnalysis::Solve()
 		// update time
 		FETimeInfo& tp = fem.GetTime();
 		double newTime = tp.currentTime + m_dt;
-		tp.currentTime = newTime;
-		tp.timeIncrement = m_dt;
+		if (newTime > endtime)
+		{
+			tp.timeIncrement = endtime - tp.currentTime;
+			tp.currentTime = endtime;
+		}
+		else
+		{
+			tp.currentTime = newTime;
+			tp.timeIncrement = m_dt;
+		}
 		tp.timeStep = m_ntimesteps;
 		feLog("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
 

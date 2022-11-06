@@ -56,6 +56,25 @@ void FEBModel::NodeSet::SetNodeList(const vector<int>& node) { m_node = node; }
 const vector<int>& FEBModel::NodeSet::NodeList() const { return m_node; }
 
 //=============================================================================
+FEBModel::EdgeSet::EdgeSet() {}
+
+FEBModel::EdgeSet::EdgeSet(const FEBModel::EdgeSet& set)
+{
+	m_name = set.m_name;
+	m_edge = set.m_edge;
+}
+
+FEBModel::EdgeSet::EdgeSet(const string& name) : m_name(name) {}
+
+void FEBModel::EdgeSet::SetName(const string& name) { m_name = name; }
+
+const string& FEBModel::EdgeSet::Name() const { return m_name; }
+
+void FEBModel::EdgeSet::SetEdgeList(const vector<EDGE>& edge) { m_edge = edge; }
+
+const vector<FEBModel::EDGE>& FEBModel::EdgeSet::EdgeList() const { return m_edge; }
+
+//=============================================================================
 FEBModel::ElementSet::ElementSet() {}
 
 FEBModel::ElementSet::ElementSet(const FEBModel::ElementSet& set)
@@ -223,6 +242,16 @@ FEBModel::NodeSet* FEBModel::Part::FindNodeSet(const string& name)
 	{
 		NodeSet* nset = m_NSet[i];
 		if (nset->Name() == name) return nset;
+	}
+	return nullptr;
+}
+
+FEBModel::EdgeSet* FEBModel::Part::FindEdgeSet(const string& name)
+{
+	for (size_t i = 0; i < m_LSet.size(); ++i)
+	{
+		EdgeSet* lset = m_LSet[i];
+		if (lset->Name() == name) return lset;
 	}
 	return nullptr;
 }
@@ -446,6 +475,34 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 
 		// add it to the mesh
 		mesh.AddNodeSet(feset);
+	}
+
+	// create edges
+	int Edges = part.EdgeSets();
+	for (int i = 0; i < Edges; ++i)
+	{
+		EdgeSet* edgeSet = part.GetEdgeSet(i);
+		int N = edgeSet->Edges();
+
+		// create a new segment set
+		FESegmentSet* segSet = new FESegmentSet(&fem);
+		string name = partName + edgeSet->Name();
+		segSet->SetName(name.c_str());
+
+		// copy data
+		segSet->Create(N);
+		for (int j = 0; j < N; ++j)
+		{
+			EDGE& edge = edgeSet->Edge(j);
+			FESegmentSet::SEGMENT& seg = segSet->Segment(j);
+
+			seg.ntype = edge.ntype;
+			int nn = edge.ntype;	// we assume that the type also identifies the number of nodes
+			for (int n = 0; n < nn; ++n) seg.node[n] = NLT[edge.node[n] - noff];
+		}
+
+		// add it to the mesh
+		mesh.AddSegmentSet(segSet);
 	}
 
 	// create surfaces

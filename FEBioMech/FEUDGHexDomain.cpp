@@ -54,8 +54,11 @@ void FEUDGHexDomain::SetHourGlassParameter(double hg)
 bool FEUDGHexDomain::Create(int nelems, FE_Element_Spec spec)
 {
 	// make sure these solid, hex8 elements are requested
-	if (spec.eclass != FE_Element_Class::FE_ELEM_SOLID) return false;
-	if (spec.eshape != FE_Element_Shape::ET_HEX8) return false;
+	if (spec.eclass == FE_Element_Class::FE_ELEM_INVALID_CLASS) spec.eclass = FE_Element_Class::FE_ELEM_SOLID;
+	else if (spec.eclass != FE_Element_Class::FE_ELEM_SOLID) return false;
+
+	if (spec.eshape == FE_Element_Shape::FE_ELEM_INVALID_SHAPE) spec.eshape = FE_Element_Shape::ET_HEX8;
+	else if (spec.eshape != FE_Element_Shape::ET_HEX8) return false;
 
 	// we need to enforce HEX8G1 integration rule
 	spec.etype = FE_HEX8G1;
@@ -67,12 +70,8 @@ bool FEUDGHexDomain::Create(int nelems, FE_Element_Spec spec)
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 {
-	// element force vector
-	vector<double> fe;
-
-	vector<int> lm;
-
 	int NE = (int)m_Elem.size();
+#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -80,12 +79,16 @@ void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
+
+		// element force vector
+		vector<double> fe;
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
 		UDGInternalForces(el, fe);
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector

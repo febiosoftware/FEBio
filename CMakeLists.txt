@@ -289,7 +289,7 @@ if(USE_MKL)
         target_link_libraries(numcore PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
         target_link_libraries(febioopt PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
     else()
-        target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_LIBS} -Wl,--end-group)
+        target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
         target_link_libraries(febioopt PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
     endif()
     

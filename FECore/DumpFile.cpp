@@ -32,6 +32,7 @@ SOFTWARE.*/
 DumpFile::DumpFile(FEModel& fem) : DumpStream(fem)
 {
 	m_fp = 0;
+	m_size = 0;
 }
 
 DumpFile::~DumpFile()
@@ -79,7 +80,8 @@ void DumpFile::Close()
 size_t DumpFile::write(const void* pd, size_t size, size_t count)
 {
 	assert(IsSaving());
-	int elemsWritten = fwrite(pd, size, count, m_fp);
+	size_t elemsWritten = fwrite(pd, size, count, m_fp);
+	m_size += size * elemsWritten;
 	return size * elemsWritten;
 }
 
@@ -87,7 +89,7 @@ size_t DumpFile::write(const void* pd, size_t size, size_t count)
 size_t DumpFile::read(void* pd, size_t size, size_t count)
 {
 	assert(IsLoading());
-	int elemsRead = fread(pd, size, count, m_fp);
+	size_t elemsRead = fread(pd, size, count, m_fp);
 	return size * elemsRead;
 }
 

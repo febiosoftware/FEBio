@@ -46,6 +46,7 @@ FENodeSet* FENodalBC::GetNodeSet()
 
 void FENodalBC::Serialize(DumpStream& ar)
 {
+	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_nodeSet;
 }

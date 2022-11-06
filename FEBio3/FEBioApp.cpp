@@ -162,6 +162,7 @@ int FEBioApp::RunModel()
 	// set options that were passed on the command line
 	fem.SetDebugLevel(m_ops.ndebug);
 	fem.SetDumpLevel(m_ops.dumpLevel);
+	fem.SetDumpStride(m_ops.dumpStride);
 
 	// set the output filenames
 	fem.SetLogFilename(m_ops.szlog);
@@ -284,6 +285,23 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		{
 			bplt = true;
 			strcpy(ops.szplt, argv[++i]);
+		}
+		else if (strncmp(sz, "-dump_stride", 12) == 0)
+		{
+			if (sz[12] == '=')
+			{
+				ops.dumpStride = atoi(sz + 13);
+				if (ops.dumpStride < 1)
+				{
+					fprintf(stderr, "FATAL ERROR: invalid dump stride.\n");
+					return false;
+				}
+			}
+			else
+			{
+				fprintf(stderr, "FATAL ERROR: missing '=' after -dump_stride.\n");
+				return false;
+			}
 		}
 		else if (strncmp(sz, "-dump", 5) == 0)
 		{

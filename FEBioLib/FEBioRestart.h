@@ -23,56 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-
-#include <stdio.h>
-#include "DumpStream.h"
+#include <FECore/FECoreTask.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
-//! Class for serializing data to a binary archive.
-
-//! This class is used to read data from or write
-//! data to a binary file. The class defines several operators to 
-//! simplify in- and output.
-//! \sa FEM::Serialize()
-
-class FECORE_API DumpFile : public DumpStream
+// Task that does a cold restart. 
+class FEBioRestart : public FECoreTask
 {
 public:
-	// overloaded from DumpStream
-	size_t write(const void* pd, size_t size, size_t count) override;
-	size_t read(void* pd, size_t size, size_t count) override;
-	void clear() override {}
-	bool EndOfStream() const override;
+	FEBioRestart(FEModel* pfem);
 
-public:
-	DumpFile(FEModel& fem);
-	virtual ~DumpFile();
+	//! initialization
+	bool Init(const char* szfile) override;
 
-	//! Open archive for reading
-	bool Open(const char* szfile);
-
-	//! Open archive for writing
-	bool Create(const char* szfile);
-
-	//! Open archive for appending
-	bool Append(const char* szfile);
-
-	//! Close archive
-	void Close();
-
-	//! See if the archive is valid
-	bool IsValid() { return (m_fp != 0); }
-
-	//! Flush the archive
-	void Flush() { fflush(m_fp); }
-
-	size_t Size() { return m_size; }
-
-protected:
-	FILE*		m_fp;		//!< The actual file pointer
-	size_t		m_size;
+	//! Run the FE model
+	bool Run() override;
 };

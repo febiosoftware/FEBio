@@ -177,6 +177,12 @@ public:
 	//! get the dump level
 	int GetDumpLevel() const;
 
+	//! Set the dump stride
+	void SetDumpStride(int n);
+
+	//! get the dump stride
+	int GetDumpStride() const;
+
 	//! Set the log level
 	void SetLogLevel(int logLevel);
 
@@ -205,6 +211,7 @@ private:
 	int			m_logLevel;		//!< output level for log file
 
 	int			m_dumpLevel;	//!< level or writing restart file
+	int			m_dumpStride;	//!< write dump file every nth iterations
 
 private:
 	// accumulative statistics

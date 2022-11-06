@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <vector>
 #include <string>
 #include "FEItemList.h"
+#include "FENodeList.h"
 
 //-----------------------------------------------------------------------------
 //! This class defines a set of segments. This can be used in the creation of edges.
@@ -67,6 +68,8 @@ public:
 	// return a segment
 	SEGMENT& Segment(int i);
 	const SEGMENT& Segment(int i) const;
+
+	FENodeList GetNodeList() const;
 
 public:
 	// serialization
