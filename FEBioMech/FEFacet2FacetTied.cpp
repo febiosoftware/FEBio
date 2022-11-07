@@ -42,12 +42,14 @@ BEGIN_FECORE_CLASS(FEFacet2FacetTied, FEContactInterface)
 	ADD_PARAMETER(m_naugmin, "minaug"          );
 	ADD_PARAMETER(m_naugmax, "maxaug"          );
 	ADD_PARAMETER(m_stol   , "search_tolerance");
+	ADD_PARAMETER(m_gapoff , "gap_offset"      );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFacetTiedSurface::Data::Data()
 {
-	m_vgap = vec3d(0,0,0);
+	m_vgap  = vec3d(0,0,0);
+	m_vgap0 = vec3d(0,0,0);
 	m_Lm = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
 	m_pme = (FESurfaceElement*) 0;
@@ -56,7 +58,7 @@ FEFacetTiedSurface::Data::Data()
 void FEFacetTiedSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-	ar & m_vgap & m_Lm & m_rs;
+	ar & m_vgap & m_vgap0 & m_Lm & m_rs;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +99,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar << d.m_vgap;
+					ar << d.m_vgap0;
 					ar << d.m_rs;
 					ar << d.m_Lm;
 				}
@@ -112,6 +115,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar >> d.m_vgap;
+					ar >> d.m_vgap0;
 					ar >> d.m_rs;
 					ar >> d.m_Lm;
 				}
@@ -130,6 +134,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar << d.m_vgap;
+					ar << d.m_vgap0;
 					ar << d.m_rs;
 					ar << d.m_Lm;
 				}
@@ -145,6 +150,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar >> d.m_vgap;
+					ar >> d.m_vgap0;
 					ar >> d.m_rs;
 					ar >> d.m_Lm;
 				}
@@ -174,6 +180,7 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	m_naugmin = 0;
 	m_naugmax = 10;
 	m_stol    = 0.0001;
+	m_gapoff  = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -263,6 +270,28 @@ void FEFacet2FacetTied::Activate()
 
 	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms);
+
+	if (m_gapoff)
+	{
+		// loop over all primary elements
+		for (int i = 0; i < m_ss.Elements(); ++i)
+		{
+			// get the primary element
+			FESurfaceElement& se = m_ss.Element(i);
+
+			// loop over all its integration points
+			int nint = se.GaussPoints();
+			for (int j = 0; j < nint; ++j)
+			{
+				// get integration point data
+				FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
+
+				pt.m_vgap0 = pt.m_vgap;
+				pt.m_vgap = vec3d(0, 0, 0);
+				pt.m_gap = 0.0;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -310,6 +339,8 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 
 				// calculate gap
 				pt.m_vgap = x - q;
+
+				pt.m_gap = pt.m_vgap.norm();
 			}
 			else pt.m_pme = 0;
 		}
@@ -365,7 +396,9 @@ void FEFacet2FacetTied::Update()
 				vec3d q = me.eval(y, r, s);
 
 				// calculate the gap function
-				pt.m_vgap = rn - q;
+				pt.m_vgap = (rn - q) - pt.m_vgap0;
+
+				pt.m_gap = pt.m_vgap.norm();
 			}
 		}
 	}
