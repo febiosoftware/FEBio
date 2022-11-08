@@ -631,20 +631,11 @@ public:
 class FEPlotDamage : public FEPlotDomainData
 {
 public:
-	FEPlotDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& m, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Damage reduction factor
-class FEPlotNestedDamage : public FEPlotDomainData
-{
-public:
-    FEPlotNestedDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
-    bool SetFilter(int nsol);
+    FEPlotDamage(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+	bool Save(FEDomain& m, FEDataStream& a) override;
 protected:
-    int			m_nmat;
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -652,8 +643,11 @@ protected:
 class FEPlotIntactBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotIntactBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotIntactBondFraction(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -661,8 +655,11 @@ public:
 class FEPlotFatigueBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotFatigueBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotFatigueBondFraction(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -670,8 +667,11 @@ public:
 class FEPlotYieldedBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotYieldedBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotYieldedBondFraction(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -679,8 +679,11 @@ public:
 class FEPlotOctahedralPlasticStrain : public FEPlotDomainData
 {
 public:
-    FEPlotOctahedralPlasticStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotOctahedralPlasticStrain(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -688,8 +691,11 @@ public:
 class FEPlotReactivePlasticityHeatSupply : public FEPlotDomainData
 {
 public:
-    FEPlotReactivePlasticityHeatSupply(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& dom, FEDataStream& a);
+    FEPlotReactivePlasticityHeatSupply(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------

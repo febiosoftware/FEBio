@@ -88,5 +88,6 @@ public:
     std::vector<double>  m_ci;       //!< effective solute concentration on internal side
     std::vector<int>     m_ide;      //!< solute IDs on external side
     std::vector<int>     m_idi;      //!< solute IDs on internal side
+    std::vector<bool>   m_bsb;  //!< flag indicating that solute is solid-bound
 };
 

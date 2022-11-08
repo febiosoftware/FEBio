@@ -697,7 +697,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotShellThickness, "shell thickness");
 	REGISTER_FECORE_CLASS(FEPlotShellDirector, "shell director");
 	REGISTER_FECORE_CLASS(FEPlotDamage, "damage");
-	REGISTER_FECORE_CLASS(FEPlotNestedDamage, "nested damage");
 	REGISTER_FECORE_CLASS(FEPlotIntactBondFraction, "intact bond fraction");
     REGISTER_FECORE_CLASS(FEPlotFatigueBondFraction, "fatigue bond fraction");
 	REGISTER_FECORE_CLASS(FEPlotYieldedBondFraction, "yielded bond fraction");

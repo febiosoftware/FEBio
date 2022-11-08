@@ -70,7 +70,7 @@ void FatigueBond::Update()
 ////////////////////// FATIGUE MATERIAL POINT /////////////////////////////////
 //-----------------------------------------------------------------------------
 // default constructor
-FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt)
+FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPointData*pt) : FEDamageMaterialPoint(pt)
 {
 	// TODO: Is this working properly? I don't see how this ExtractData could work?
 	 
@@ -98,7 +98,7 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPointDa
 
 //-----------------------------------------------------------------------------
 // copy constructor
-FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(const FEReactiveFatigueMaterialPoint& rfmp)
+FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(const FEReactiveFatigueMaterialPoint& rfmp) : FEDamageMaterialPoint(rfmp)
 {
     m_D = rfmp.m_D;
     m_wit = rfmp.m_wit;
@@ -119,7 +119,7 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(const FEReactiveF
         m_fb.push_back(rfmp.m_fb[ig]);
 }
 
-FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEReactiveFatigueMaterialPoint& rfmp)
+FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEReactiveFatigueMaterialPoint& rfmp) : FEDamageMaterialPoint(rfmp)
 {
     m_D = rfmp.m_D;
     m_wit = rfmp.m_wit;

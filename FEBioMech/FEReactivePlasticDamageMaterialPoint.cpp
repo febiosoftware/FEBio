@@ -136,7 +136,7 @@ void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //! Evaluate net mass fraction of yielded bonds
-double FEReactivePlasticDamageMaterialPoint::YieldedBonds()
+double FEReactivePlasticDamageMaterialPoint::YieldedBonds() const
 {
     double w = 0;
     for (int i=0; i<m_wy.size(); ++i) w += m_wy[i];
@@ -144,7 +144,7 @@ double FEReactivePlasticDamageMaterialPoint::YieldedBonds()
 }
 
 //! Evaluate net mass fraction of intact bonds
-double FEReactivePlasticDamageMaterialPoint::IntactBonds()
+double FEReactivePlasticDamageMaterialPoint::IntactBonds() const
 {
     double w = 0;
     int n = (int) m_wy.size();
