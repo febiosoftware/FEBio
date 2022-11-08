@@ -224,8 +224,8 @@ END_FECORE_CLASS();
 BEGIN_FECORE_CLASS(FEFiberExponentialPower, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-	ADD_PARAMETER(m_ksi  , "ksi"  );
-    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
+	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  )->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER_OR_EQUAL(1.0), "lam0");
 END_FECORE_CLASS();
 

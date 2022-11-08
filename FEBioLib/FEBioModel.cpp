@@ -108,6 +108,7 @@ FEBioModel::FEBioModel()
 	m_logLevel = 1;
 
 	m_dumpLevel = FE_DUMP_NEVER;
+	m_dumpStride = 1;
 
 	// --- I/O-Data ---
 	m_ndebug = 0;
@@ -163,6 +164,12 @@ void FEBioModel::SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
 
 //! get the dump level
 int FEBioModel::GetDumpLevel() const { return m_dumpLevel; }
+
+//! Set the dump stride
+void FEBioModel::SetDumpStride(int n) { m_dumpStride = n; }
+
+//! get the dump stride
+int FEBioModel::GetDumpStride() const { return m_dumpStride; }
 
 //! Set the log level
 void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
@@ -388,7 +395,7 @@ void FEBioModel::Write(unsigned int nevent)
 	FEAnalysis* pstep = GetCurrentStep();
 
 	// update plot file
-	if (m_plot) WritePlot(nevent);
+	WritePlot(nevent);
 
 	// Dump converged state to the archive
 	DumpData(nevent);
@@ -412,6 +419,9 @@ void FEBioModel::WritePlot(unsigned int nevent)
 		// try to open the plot file
 		if ((nevent == CB_INIT) || (nevent == CB_STEP_ACTIVE))
 		{
+			// If the first step did not request output, m_plot can still be null
+			if (m_plot == 0) InitPlotFile();
+
 			if (m_plot->IsValid() == false)
 			{
 				// Add the plot objects
@@ -623,13 +633,22 @@ void FEBioModel::DumpData(int nevent)
 	// get the current step
 	FEAnalysis* pstep = GetCurrentStep();
 	int ndump = GetDumpLevel();
+	int stride = GetDumpStride();
 	if (ndump == FE_DUMP_NEVER) return;
 
 	bool bdump = false;
 	switch (nevent)
 	{
 	case CB_MAJOR_ITERS:
-		if (ndump == FE_DUMP_MAJOR_ITRS) bdump = true;
+		if (ndump == FE_DUMP_MAJOR_ITRS)
+		{
+			if (stride <= 1) bdump = true;
+			else
+			{
+				int niter = pstep->m_ntimesteps;
+				bdump = ((niter % stride) == 0);
+			}
+		}
 		if ((ndump == FE_DUMP_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bdump = true;
 		break;
 	case CB_STEP_SOLVED: if (ndump == FE_DUMP_STEP) bdump = true; break;
@@ -1351,6 +1370,35 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+// Initialize plot file
+bool FEBioModel::InitPlotFile()
+{
+	FEBioPlotFile* pplt = new FEBioPlotFile(this);
+	m_plot = pplt;
+
+	// set the software string
+	const char* szver = febio::getVersionString();
+	char szbuf[256] = { 0 };
+	sprintf(szbuf, "FEBio %s", szver);
+	pplt->SetSoftwareString(szbuf);
+	
+	// see if a valid plot file name is defined.
+	const std::string& splt = GetPlotFileName();
+	if (splt.empty())
+	{
+		// if not, we take the input file name and set the extension to .xplt
+		char sz[1024] = { 0 };
+		strcpy(sz, GetInputFileName().c_str());
+		char* ch = strrchr(sz, '.');
+		if (ch) *ch = 0;
+		strcat(sz, ".xplt");
+		SetPlotFilename(sz);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! This function performs one-time-initialization stuff. All the different 
 //! modules are initialized here as well. This routine also performs some
 //! data checks
@@ -1372,30 +1420,7 @@ bool FEBioModel::Init()
 	FEAnalysis* step = GetCurrentStep();
 	if (step->GetPlotLevel() != FE_PLOT_NEVER)
 	{
-		if (m_plot == 0) 
-		{
-			pplt = new FEBioPlotFile(this);
-			m_plot = pplt;
-
-			// set the software string
-			const char* szver = febio::getVersionString();
-			char szbuf[256] = { 0 };
-			sprintf(szbuf, "FEBio %s", szver);
-			pplt->SetSoftwareString(szbuf);
-		}
-
-		// see if a valid plot file name is defined.
-		const std::string& splt = GetPlotFileName();
-		if (splt.empty())
-		{
-			// if not, we take the input file name and set the extension to .xplt
-			char sz[1024] = {0};
-			strcpy(sz, GetInputFileName().c_str());
-			char *ch = strrchr(sz, '.');
-			if (ch) *ch = 0;
-			strcat(sz, ".xplt");
-			SetPlotFilename(sz);
-		}
+		if (m_plot == 0) InitPlotFile();
 	}
 
 	// initialize model data

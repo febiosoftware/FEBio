@@ -23,34 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEElasticMaterial.h"
+#include <FECore/FECoreTask.h>
+#include <FECore/FECoreKernel.h>
 
-class FENewtonianViscousSolid : public FEElasticMaterial
+//-----------------------------------------------------------------------------
+// Task that does a cold restart. 
+class FEBioRestart : public FECoreTask
 {
 public:
-    FENewtonianViscousSolid(FEModel* pfem);
-    
-public:
-    double	m_kappa;	//!< bulk viscosity
-    double	m_mu;       //!< shear viscosity
-    bool    m_secant_tangent;   //!< flag for using secant tangent calculation
-    
-public:
-    //! calculate stress at material point
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! calculate tangent stiffness at material point
-    tens4ds Tangent(FEMaterialPoint& pt) override;
-    
-    //! calculate strain energy density at material point
-    double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
-    bool UseSecantTangent() override { return m_secant_tangent; }
-    
-    // declare the parameter list
-    DECLARE_FECORE_CLASS();
+	FEBioRestart(FEModel* pfem);
+
+	//! initialization
+	bool Init(const char* szfile) override;
+
+	//! Run the FE model
+	bool Run() override;
 };

@@ -55091,6 +55091,331 @@ reference "subsec:Uncoupled-Materials"
 \end_layout
 
 \begin_layout Subsubsection
+Arruda-Boyce Unconstrained
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Arruda-Boyce-Unconstrained"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for an unconstrained Arruda-Boyce material is 
+\emph on
+Arruda-Boyce unconstrained
+\emph default
+.
+ This isotropic Arruda-Boyce 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Arruda93"
+literal "false"
+
+\end_inset
+
+ 8-chain model has been used in the field of polymer modeling and in cervical
+ biomechanics 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shi22"
+literal "false"
+
+\end_inset
+
+.
+ It is based on the simple freely-jointed-chain model and can be derived
+ using the Langevin equation of statistical mechanics.
+ The strain energy density for this material takes the form
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Psi(I_{1},J)=\xi\left(\sqrt{\frac{I_{1}}{3N}}\beta+\ln\frac{\beta}{\sinh\beta}\right)-\frac{\xi}{3}\sqrt{N}\beta_{0}\ln J+\frac{1}{2}\kappa(\ln J^{2}-1-2\ln J)\label{eq2-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $I_{1}=\tr\mathbf{C}$
+\end_inset
+
+ is the first invariant of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+, 
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left[\sqrt{\frac{I_{1}}{3N}}\right]}$
+\end_inset
+
+ is the inverse Langevin equation, and 
+\begin_inset Formula ${\displaystyle \beta_{0}=\mathcal{L}^{-1}\left[\sqrt{\frac{1}{N}}\right]}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\xi=nk\Theta$
+\end_inset
+
+ is the initial fiber modulus with 
+\begin_inset Formula $n,k,\Theta$
+\end_inset
+
+ respectively representing the number of chains per unit volume, Boltzmann's
+ constant, and the absolute temperature.
+ The parameter 
+\begin_inset Formula $N=\zeta^{2}$
+\end_inset
+
+ is the number of chain segments, and 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ is the locking stretch that represents the extensibility of the material.
+\end_layout
+
+\begin_layout Standard
+A Taylor series expansion is used to evaluate the inverse Langevin equation.
+ The parameter 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ is used to control the number of terms used to evaluate the series; 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ must be an integer between 3 and 30.
+\end_layout
+
+\begin_layout Standard
+Langevin mechanics describes a stochastic process with non-Gaussian distribution.
+ It will reduce to a Gaussian distribution when the system approaches equilibriu
+m.
+ Thus, when the material is far from its maximum extensibility, i.e., when
+ 
+\begin_inset Formula $\zeta=\sqrt{N}$
+\end_inset
+
+ is much larger than the stretch, this model will reduce to a neo-Hookean
+ material.
+\end_layout
+
+\begin_layout Standard
+This material The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initial fiber modulus 
+\begin_inset Formula $\xi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<N>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of chain segments 
+\begin_inset Formula $N$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n_term>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of terms in the Taylor series expansion 
+\begin_inset Formula $n_{\text{term}}$
+\end_inset
+
+ (
+\begin_inset Formula $3\le n_{\text{term}}\le30$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kappa>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bulk modulus 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ of ground matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Soft Tissue" type="Arruda-Boyce unconstrained">
+\end_layout
+
+\begin_layout LyX-Code
+	<N>5</N>
+\end_layout
+
+\begin_layout LyX-Code
+	<ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+	<n_term>30</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+	<kappa>1</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Carter-Hayes
 \begin_inset CommandInset label
 LatexCommand label
@@ -67701,8 +68026,21 @@ Fiber Exp-Linear
 \end_layout
 
 \begin_layout Standard
-This constitutive fiber model has an initial exponential rise and then grows
- linearly after a user-specified stretch transition point.
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-exp-linear
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This constitutive fiber model has an initial exponential rise and then
+ grows linearly after a user-specified stretch transition point.
  This fiber material is based on the trans-iso Mooney-Rivlin model introduced
  in 
 \begin_inset CommandInset citation
@@ -67783,7 +68121,7 @@ is the modulus of the straightened fibers.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="4" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -67884,7 +68222,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -67893,7 +68231,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -67902,40 +68240,11 @@ Fiber stretch for straightened fibers
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<fiber>
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Fiber distribution option
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
+[ ]
 \end_layout
 
 \end_inset
@@ -68010,6 +68319,420 @@ Example
 
 \begin_layout LyX-Code
 </material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber as Entropy Chain
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Entropy-Chain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+fiber-entropy-chain
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It was proposed by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shi22"
+literal "false"
+
+\end_inset
+
+.
+ This fiber model is based on statistical mechanics to reflect the entropy-drive
+n nature of a biological fiber.
+ The model is derived from the freely-jointed-chain mechanism.
+ Its strain energy is directly related to the entropic change of the chains
+ in the material, given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{n}\left(I_{n}\right)=\xi N\left(\sqrt{\frac{I_{n}}{N}}\beta+\ln\frac{\beta}{\sinh\beta}\right)-\frac{\xi\sqrt{N}}{2}\beta_{0}I_{n}-\alpha_{00}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $I_{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the square of the stretch ratio along the referential fiber direction
+ 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+ The inverse Langevin equation relates the parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+ to 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $N$
+\end_inset
+
+ according to 
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left[\sqrt{\frac{I_{n}}{N}}\right]}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+, and
+\begin_inset Formula $\alpha_{00}$
+\end_inset
+
+ is needed to produce a state of zero energy at 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $\xi=nk\Theta$
+\end_inset
+
+ is the initial fiber stiffness, with 
+\begin_inset Formula $n$
+\end_inset
+
+, 
+\begin_inset Formula $k$
+\end_inset
+
+, and 
+\begin_inset Formula $\Theta$
+\end_inset
+
+ respectively representing the number of chains per unit volume, Boltzmann's
+ constant, and the absolute temperature.
+ The parameter 
+\begin_inset Formula $N=\zeta^{2}$
+\end_inset
+
+ is the number of chain segments, and 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ is the locking stretch, representing the extensibility of the fiber.
+ The Langevin function is given by 
+\begin_inset Formula $\mathcal{L}\left(x\right)=\coth x-\frac{1}{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When evaluating the inverse Langevin equation, a Taylor series expansion
+ is applied for computational stability.
+ The parameter 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ is used to control the number of terms used to evaluate the equation; it
+ must be an integer between 3 and 30.
+\end_layout
+
+\begin_layout Standard
+\noindent
+The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initial modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<N>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Square of locking stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n_term>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Taylor series terms
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shear modulus fir fiber-matrix interaction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Soft Tissue" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="Arruda-Boyce unconstrained">
+\end_layout
+
+\begin_layout LyX-Code
+	  <N>2</N>
+\end_layout
+
+\begin_layout LyX-Code
+	  <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+	  <n_term>30</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+	  <kappa>1</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+        </solid>
+\end_layout
+
+\begin_layout LyX-Code
+        <solid type="continuous fiber distribution">
+\end_layout
+
+\begin_layout LyX-Code
+          <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+            <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+            <phi>0</phi>
+\end_layout
+
+\begin_layout LyX-Code
+          </mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+          <fibers type="fiber-entropy-chain">
+\end_layout
+
+\begin_layout LyX-Code
+            <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+            <N>2</N>
+\end_layout
+
+\begin_layout LyX-Code
+            <n_term>30</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+          </fibers>
+\end_layout
+
+\begin_layout LyX-Code
+          <distribution type="von-Mises-3d">
+\end_layout
+
+\begin_layout LyX-Code
+            <b>0.3</b>
+\end_layout
+
+\begin_layout LyX-Code
+          </distribution>
+\end_layout
+
+\begin_layout LyX-Code
+          <scheme type="fibers-3d-fei">
+\end_layout
+
+\begin_layout LyX-Code
+            <resolution>196</resolution>
+\end_layout
+
+\begin_layout LyX-Code
+          </scheme>
+\end_layout
+
+\begin_layout LyX-Code
+        </solid>
+\end_layout
+
+\begin_layout LyX-Code
+      </material>
 \end_layout
 
 \begin_layout Standard
@@ -69405,6 +70128,339 @@ Example
 
 \begin_layout LyX-Code
   </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Uncoupled Fiber as Entropy Chain
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:UC-Fiber-Entropy-Chain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+uncoupled fiber-entropy-chain
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It was proposed by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shi22"
+literal "false"
+
+\end_inset
+
+.
+ This fiber model is based on statistical mechanics to reflect the entropy-drive
+n nature of a biological fiber.
+ The model is derived from the freely-jointed-chain mechanism.
+ Its strain energy is directly related to the entropic change of the chains
+ in the material, given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{n}(\tilde{I}_{n})=\xi N\left(\sqrt{\frac{\tilde{I}_{n}}{N}}\beta+\text{ln}\frac{\beta}{\sinh\beta}\right)-\frac{\xi\sqrt{N}}{2}\beta_{0}\tilde{I}_{n}-\alpha_{00}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\tilde{I}_{n}=\mathbf{n}_{r}\cdot\tilde{\mathbf{C}}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the deviatoric measure of the stretch ratio along the referential fiber
+ direction 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+ The inverse Langevin equation relates the parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+ to 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $N$
+\end_inset
+
+ according to 
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left(\sqrt{\frac{I_{n}}{N}}\right)}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+, and 
+\begin_inset Formula $\alpha_{00}$
+\end_inset
+
+ is needed to produce a state of zero energy at 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $\xi=nk\Theta$
+\end_inset
+
+ is the initial fiber stiffness, with 
+\begin_inset Formula $n$
+\end_inset
+
+, 
+\begin_inset Formula $k$
+\end_inset
+
+, and 
+\begin_inset Formula $\Theta$
+\end_inset
+
+ respectively representing the number of chains per unit volume, Boltzmann's
+ constant, and the absolute temperature.
+ The parameter 
+\begin_inset Formula $N=\zeta^{2}$
+\end_inset
+
+ is the number of chain segments, and 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ is the locking stretch, representing the extensibility of the fiber.
+ The Langevin function is given by 
+\begin_inset Formula $\mathcal{L}\left(x\right)=\coth x-\frac{1}{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When evaluating the inverse Langevin equation, a Taylor series expansion
+ is applied for computational stability.
+ The parameter 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ is used to control the number of terms used to evaluate the equation; it
+ must be an integer between 3 and 30.
+\end_layout
+
+\begin_layout Standard
+\noindent
+The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initial modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<N>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Square of locking stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n_term>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Taylor series terms
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Soft Tissue" type="uncoupled solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+	<k>1e4</k>
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+	  <c1>10.0</c1>
+\end_layout
+
+\begin_layout LyX-Code
+	  <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+	</solid>
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="uncoupled fiber-entropy-chain">
+\end_layout
+
+\begin_layout LyX-Code
+	  <N>2.3</N>
+\end_layout
+
+\begin_layout LyX-Code
+	  <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+	  <n_term>25</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+	  <fiber type="vector">0,0,1</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+	</solid>
 \end_layout
 
 \begin_layout LyX-Code

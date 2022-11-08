@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,50 +25,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #pragma once
-#include <FECore/FECoreTask.h>
-#include <FECore/FECoreKernel.h>
+#include "FEElasticFiberMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
-// This is the most commenly used task which will run a user-specified input 
-// file. The results are stored in the logfile and the plotfile.
-class FEBioStdSolver : public FECoreTask
+//! Exponential-power law
+//! (Variation that includes a shear term)
+class FEFiberEntropyChain : public FEFiberMaterial
 {
 public:
-	FEBioStdSolver(FEModel* pfem);
+	FEFiberEntropyChain(FEModel* pfem);
 
-	//! initialization
-	bool Init(const char* szfile) override;
+	//! Initialization
+	bool Validate() override;
 
-	//! Run the FE model
-	bool Run() override;
+	//! Cauchy stress
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// Spatial tangent
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	//! Strain energy density
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+
+public:
+	double          m_N;        // coefficient of micro-combination number
+	FEParamDouble	m_ksi;		// measure of fiber modulus which equals to nkT
+	int             m_term;     // how many Tayler approximation terms will be used
+	FEParamDouble   m_mu;       // shear modulus
+
+	double	m_epsf;
+
+	// declare the parameter list
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
-// class for testing reverse communication interface of FEModel
-class FEBioRCISolver : public FECoreTask
+class FEElasticFiberEntropyChain : public FEElasticFiberMaterial_T<FEFiberEntropyChain>
 {
 public:
-	FEBioRCISolver(FEModel* fem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
-};
-
-//-----------------------------------------------------------------------------
-// Configures the model for running in the nightly test suite. 
-class FEBioTestSuiteTask : public FECoreTask
-{
-public:
-	FEBioTestSuiteTask(FEModel* fem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
+    FEElasticFiberEntropyChain(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberEntropyChain>(fem) {}
+    DECLARE_FECORE_CLASS();
 };

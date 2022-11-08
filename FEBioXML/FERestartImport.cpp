@@ -78,6 +78,13 @@ void FERestartControlSection::Parse(XMLTag& tag)
 			else if (strcmp(szval, "PLOT_AUGMENTATIONS") == 0) pstep->SetPlotLevel(FE_PLOT_AUGMENTATIONS);
 			else throw XMLReader::InvalidValue(tag);
 		}
+		else if (tag == "plot_stride")
+		{
+			int n = 1;
+			tag.value(n);
+			if (n < 1) throw XMLReader::InvalidValue(tag);
+			pstep->SetPlotStride(n);
+		}
 		else if (tag == "solver")
 		{
 			FEAnalysis* step = fem.GetCurrentStep();

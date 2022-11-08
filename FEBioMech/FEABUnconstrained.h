@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,32 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEBioMech/FEUncoupledMaterial.h"
 
-class FENewtonianViscousSolid : public FEElasticMaterial
+class FEABUnconstrained : public FEElasticMaterial
 {
+//public:
+	//enum { MAX_TERMS = 6 };
 public:
-    FENewtonianViscousSolid(FEModel* pfem);
+	FEABUnconstrained(FEModel* pfem);
+	
+	//! calculate the stress
+	mat3ds Stress(FEMaterialPoint& pt) override;
+	
+	//! calculate the tangent
+	tens4ds Tangent(FEMaterialPoint& pt) override;
+	
+	//! calculate strain energy density at material point
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
+protected:
+	void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);
+	double	m_eps;
+	
 public:
-    double	m_kappa;	//!< bulk viscosity
-    double	m_mu;       //!< shear viscosity
-    bool    m_secant_tangent;   //!< flag for using secant tangent calculation
-    
-public:
-    //! calculate stress at material point
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! calculate tangent stiffness at material point
-    tens4ds Tangent(FEMaterialPoint& pt) override;
-    
-    //! calculate strain energy density at material point
-    double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
-    bool UseSecantTangent() override { return m_secant_tangent; }
-    
-    // declare the parameter list
-    DECLARE_FECORE_CLASS();
+	//FEParamDouble m_ksi;
+	double m_N; 
+	int m_term;
+	FEParamDouble m_ksi;
+	FEParamDouble m_kappa;
+	
+	DECLARE_FECORE_CLASS();
 };

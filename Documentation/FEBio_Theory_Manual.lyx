@@ -1610,21 +1610,157 @@ Df\left(\mathbf{x}\right)\left[\mathbf{u}\right]=Dg\left(h\left(\mathbf{x}\right
 \end_layout
 
 \begin_layout Section
-Deformation, Strain and Stress
+Cauchy Stress
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Deformation-Strain-Stress"
+name "sec:Cauchy-Stress"
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Let the plane with unit normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ bisect a loaded material body, such that 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ represents the outward normal (pointing away from the material) to one
+ of the two halves.
+ The traction vector 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ at any point 
+\begin_inset Formula $P$
+\end_inset
+
+ on this cross-section represents the limit of the reaction force 
+\begin_inset Formula $\Delta\mathbf{f}_{n}$
+\end_inset
+
+ acting over an elemental area 
+\begin_inset Formula $\Delta A_{n}$
+\end_inset
+
+ in the neighborhood of 
+\begin_inset Formula $P$
+\end_inset
+
+, as 
+\begin_inset Formula $\Delta A_{n}\to0$
+\end_inset
+
+.
+ For a non-polar medium, it is assumed that the reaction moment 
+\begin_inset Formula $\Delta\mathbf{m}_{n}$
+\end_inset
+
+ acting over 
+\begin_inset Formula $\Delta A_{n}$
+\end_inset
+
+ at 
+\begin_inset Formula $P$
+\end_inset
+
+ vanishes as 
+\begin_inset Formula $\Delta A_{n}\to0$
+\end_inset
+
+.
+ Since there can be an infinite number of planes passing through the point
+ 
+\begin_inset Formula $P$
+\end_inset
+
+, it follows that 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ may assume an infinity of values for each different 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ Therefore, we define a unique tensorial measure 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ at 
+\begin_inset Formula $P$
+\end_inset
+
+, which returns the traction 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ for any unit normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}.\label{eq:traction-stress-relation}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is the 
+\emph on
+Cauchy stress tensor
+\emph default
+ at any point 
+\begin_inset Formula $P$
+\end_inset
+
+ inside the material body.
+ The Cauchy stress tensor, a spatial tensor, is the actual physical stress,
+ since the corresponding traction vector is the force in the deformed configurat
+ion, per unit deformed area.
+\end_layout
+
+\begin_layout Section
+Axioms of Conservation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Axioms-of-Conservation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The governing equations of continuum mechanics are given by the axioms of
+ conservation of mass, linear and angular momentum, and energy.
+ These axioms produce differential equations that need to be solved for
+ the material response.
+ However, on their own, these equations are insufficient to solve for all
+ the unknowns in an analysis, therefore we must also provide equations of
+ state that describe the behavior of specific classes of materials, such
+ as elastic solids, viscoelastic solids, viscous fluids, etc.
+ These equations of state are formulated as constitutive models, which may
+ not be chosen arbitrarily: they must be constrained by the axiom of entropy
+ inequality.
+ In this section, we summarize all the axioms of conservation for a pure
+ substance, as well as the axiom of entropy inequality.
 \end_layout
 
 \begin_layout Subsection
-The deformation gradient tensor
+Axiom of Mass Balance
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:The-deformation-gradient"
+name "subsec:Axiom-Mass-Balance"
 
 \end_inset
 
@@ -1632,295 +1768,66 @@ name "subsec:The-deformation-gradient"
 \end_layout
 
 \begin_layout Standard
-Consider the deformation of an object from an initial or 
-\emph on
-reference configuration
-\emph default
- to a deformed or 
-\emph on
-current configuration
-\emph default
-.
- The location of the material particles in the reference configuration are
- denoted by 
-\series bold
-
-\begin_inset Formula $\mathbf{X}$
-\end_inset
-
-
-\series default
- and are known as the 
-\emph on
-material coordinates.
-
-\emph default
- Their location in the current configuration is denoted by 
-\begin_inset Formula $\mathbf{x}$
-\end_inset
-
- and known as the 
-\emph on
-spatial coordinates
-\emph default
-.
- The 
-\emph on
-deformation
-\emph default
- 
-\emph on
-map
-\emph default
- 
-\begin_inset Formula $\mathbf{\boldsymbol{\varphi}}$
-\end_inset
-
-, which is a mapping from 
-\begin_inset Formula $\mathbb{R}^{3}$
-\end_inset
-
-to
-\begin_inset Formula $\mathbb{R}^{3}$
-\end_inset
-
-, maps the coordinates of a material point to the spatial configuration:
- 
+The axiom of mass balance simply states that mass is conserved, or equivalently,
+ its time rate of change is zero.
+ Normally, we formulate this axiom in a volumetric domain (such as a fixed
+ control volume with permeable boundary, a material region with impermeable
+ boundary, or a material region with permeable boundary), then convert it
+ to its differential form.
+ In a spatial (Eulerian) frame, the differential statement of the axiom
+ of mass balance takes the form
 \begin_inset Formula 
 \begin{equation}
-\mathbf{x}=\boldsymbol{\mathbf{\varphi}}\left(\mathbf{X}\right)\,.\label{eq33}
+\frac{\partial\rho}{\partial t}+\divg\left(\rho\mathbf{v}\right)=0\,,\label{eq:axiom-mass-balance}
 \end{equation}
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/FigDeformationMap.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\series bold
-The deformation map
-\end_layout
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The displacement map 
-\series bold
-
-\begin_inset Formula $\mathbf{u}$
-\end_inset
-
- 
-\series default
-is defined as the difference between the spatial and material coordinates:
- 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{x}=\mathbf{X}+\mathbf{u}\left(\mathbf{X}\right)\,.\label{eq34}
-\end{equation}
-
-\end_inset
-
-The 
-\emph on
-deformation gradient
-\emph default
- is defined as 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{F}=\frac{\partial\mathbf{\boldsymbol{\varphi}}}{\partial\mathbf{X}}\,.\label{eq35}
-\end{equation}
-
-\end_inset
-
-The deformation gradient relates an infinitesimal vector in the reference
- configuration 
-\begin_inset Formula $d\mathbf{X}$
-\end_inset
-
- to the corresponding vector in the current configuration: 
-\begin_inset Formula 
-\begin{equation}
-d\mathbf{x}=\mathbf{F}\cdot d\mathbf{X}.\label{eq36}
-\end{equation}
-
-\end_inset
-
-The determinant of the deformation tensor 
-\begin_inset Formula $J=\det\mathbf{F}$
-\end_inset
-
- is called the 
-\emph on
-volume ratio
-\emph default
-; it gives the volume change, or equivalently the change in density: 
-\begin_inset Formula 
-\begin{equation}
-\rho_{0}=\rho J\,.\label{eq37}
-\end{equation}
-
-\end_inset
-
-Here 
-\begin_inset Formula $\rho_{0}$
-\end_inset
-
- is the density in the reference configuration and 
+where 
 \begin_inset Formula $\rho$
 \end_inset
 
- is the current density.
-\end_layout
-
-\begin_layout Standard
-When dealing with incompressible and nearly incompressible materials it
- will prove useful to separate the volumetric and the deviatoric (distortional)
- components of the deformation gradient.
- Such a separation must ensure that the deviatoric part of the deformation
- gradient, namely 
-\begin_inset Formula $\mathbf{\tilde{F}}$
+ is the mass density of the matter and 
+\begin_inset Formula $\mathbf{v}$
 \end_inset
 
-, does not produce any change in volume.
- Noting that the determinant of the deformation gradient gives the volume
- ratio, the determinant of 
-\begin_inset Formula $\mathbf{\tilde{F}}$
+ is its velocity vector.
+ Since 
+\begin_inset Formula $\divg\left(\rho\mathbf{v}\right)=\grad\rho\cdot\mathbf{v}+\rho\divg\mathbf{v}$
 \end_inset
 
- must therefore satisfy, 
+, we may also write this relation in the form
 \begin_inset Formula 
 \begin{equation}
-\det\mathbf{\tilde{F}}=1\,.\label{eq38}
+\frac{D\rho}{Dt}+\rho\divg\mathbf{v}=0\,,\label{eq:mass-balance-redux}
 \end{equation}
 
 \end_inset
 
-This condition can be achieved by choosing 
-\begin_inset Formula $\mathbf{\tilde{F}}$
-\end_inset
-
- as, 
+where
 \begin_inset Formula 
 \begin{equation}
-\mathbf{\tilde{F}}=J^{-1/3}\mathbf{F}\,.\label{eq39}
+\frac{D\rho}{Dt}=\frac{\partial\rho}{\partial t}+\grad\rho\cdot\mathbf{v}\label{eq:material-derivative-density}
 \end{equation}
 
 \end_inset
 
-Using the polar decomposition of a second order tensor, the deformation
- gradient can be written as a product of a positive definite symmetric tensor
- 
-\begin_inset Formula $\mathbf{V}$
-\end_inset
-
-
-\series bold
- 
-\series default
-(or 
-\begin_inset Formula $\mathbf{U}$
-\end_inset
-
-)
-\series bold
- 
-\series default
-and a proper orthogonal tensor 
-\series bold
-
-\begin_inset Formula $\mathbf{R}$
-\end_inset
-
-
-\series default
-: 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{F}=\mathbf{V}\cdot\mathbf{R}=\mathbf{R}\cdot\mathbf{U}\,.\label{eq40}
-\end{equation}
-
-\end_inset
-
-
-\begin_inset Formula $\mathbf{V}$
-\end_inset
-
- is called the 
+is the 
 \emph on
-left
+material time derivative
 \emph default
- 
+ of the mass density 
 \emph on
-stretch tensor
-\emph default
-, 
-\begin_inset Formula $\mathbf{U}$
-\end_inset
-
- is called the 
-\emph on
-right stretch tensor 
-\emph default
-and the orthogonal tensor 
-\begin_inset Formula $\mathbf{R}$
-\end_inset
-
- is called the 
-\emph on
-rotation
+in the spatial frame
 \emph default
 .
 \end_layout
 
 \begin_layout Subsection
-Strain
+Axioms of Momentum Balance
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:strain"
+name "subsec:Axiom-Linear-Momentum"
 
 \end_inset
 
@@ -1928,133 +1835,1427 @@ name "subsec:strain"
 \end_layout
 
 \begin_layout Standard
-The 
-\emph on
-right Cauchy-Green deformation tensor
-\emph default
- is defined as follows: 
+The axioms of linear and angular momentum balance are also known as Newton's
+ second law of motion.
+ The axiom of linear momentum balance states that the time rate of change
+ of linear momentum is equal to the sum of all surface and body forces.
+ The differential statement of the axiom of mass balance in a spatial frame
+ is given by
 \begin_inset Formula 
 \begin{equation}
-\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}\,.\label{eq:right-Cauchy-Green}
+\rho\frac{D\mathbf{v}}{Dt}=\divg\boldsymbol{\sigma}+\rho\mathbf{b}\,,\label{eq:axiom-linear-momentum}
 \end{equation}
 
 \end_inset
 
-This tensor is an example of a 
-\emph on
-material tensor
-\emph default
- and is typically expressed a function of the material coordinates 
-\series bold
+where 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
 
+ is the Cauchy stress tensor in the material, and 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ is the specific body force vector (body force per mass), which is typically
+ prescribed.
+ Note that 
+\begin_inset Formula $D\mathbf{v}/Dt$
+\end_inset
+
+ is the acceleration of the matter at every point in the continuum, as evaluated
+ in the spatial frame.
+\end_layout
+
+\begin_layout Standard
+The axiom of angular momentum balance states that the time rate of change
+ of angular momentum is equal to the sum of all surface and body moments.
+ The angular momentum represents the moment of the linear momentum about
+ a fixed point (such as the origin) in an inertial frame.
+ In a 
+\emph on
+non-polar medium
+\emph default
+, we assume that moments are only produces by surface and body forces.
+ In that case, the axiom of angular momentum balance is satisfied by the
+ linear momentum balance 
+\emph on
+and
+\emph default
+ by letting the Cauchy stress be symmetric,
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}^{T}=\boldsymbol{\sigma}\,.\label{eq:axiom-angular-momentum}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Axiom of Energy Balance
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Axiom-Energy-Balance"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The axiom of energy balance is also known as the first law of thermodynamics.
+ The time rate of change of internal and kinetic energy is balanced by the
+ rate of work done by body and surface forces, the rate of heat flow into
+ the medium, and rate of heat supply from external sources.
+ Its differential statement takes the form
+\begin_inset Formula 
+\begin{equation}
+\rho\frac{D\varepsilon}{Dt}=\boldsymbol{\sigma}:\mathbf{L}-\divg\mathbf{q}+\rho r\,,\label{eq:axiom-energy-balance}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the specific internal energy (internal energy per mass), 
+\begin_inset Formula $\mathbf{L}=\grad\mathbf{v}$
+\end_inset
+
+ is the velocity gradient, 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+ is the heat flux in the medium (units of power per area), and 
+\begin_inset Formula $r$
+\end_inset
+
+ is the heat supply per unit mass from external sources that are not modeled
+ explicitly (such as microwave heating in a framework that does not model
+ microwave radiation explicitly, or Joule heating in electrical conductors,
+ in a framework that does not model frictional interactions between electrons
+ and atomic nuclei explicitly).
+\end_layout
+
+\begin_layout Standard
+For non-polar media, since the Cauchy stress is symmetric according to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:axiom-angular-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it follows that 
+\begin_inset Formula $\boldsymbol{\sigma}:\mathbf{L}=\boldsymbol{\sigma}:\mathbf{D}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{D}=\frac{1}{2}\left(\mathbf{L}+\mathbf{L}^{T}\right)$
+\end_inset
+
+ is the symmetric part of the velocity gradient, also known as the 
+\emph on
+rate of deformation tensor
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Axiom of Entropy Inequality
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Axiom-Entropy-Inequality"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The axioms of conservation presented above have introduced several functions
+ of state that describe the behavior of specific materials, such as the
+ Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+, the specific internal energy 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+, and the heat flux 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+.
+ These axioms of conservation have a total of ten scalar unknowns (six compoment
+s of 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+, three components of 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+, and 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+), whereas the equations have five scalar components (three components of
+ the vectorial linear momentum balance, and one component for each of the
+ scalar mass and energy balance equations).
+ Therefore, there are too few equations to solve for all the unknowns.
+ Consequently, constitutive models must be provided for these functions
+ of state, which depend on a user-specified set of state variables (such
+ as strain for elastic solids, rate of deformation for viscous fluids, temperatu
+re for heat transfer, etc.).
+\end_layout
+
+\begin_layout Standard
+Constitutive relations must be formulated in a manner that does not violate
+ the axiom of entropy inequality, also known as the second law of thermodynamics.
+ The second law of thermodynamics stipulates that the time rate of change
+ of entropy in a medium is greater than the rate of entropy supply into
+ the medium by various sources of heat.
+ In a spatial frame, the differential statement of the axiom of entropy
+ inequality is given by
+\begin_inset Formula 
+\begin{equation}
+\rho\frac{D\eta}{Dt}+\divg\frac{\mathbf{q}}{\theta}-\rho\frac{r}{\theta}\geqslant0\,,\label{eq:axiom-entropy-inequality}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is the specific entropy (entropy per unit mass) of the matter.
+ Entropy is a measure of disorder in a medium.
+ It represents another function of state.
+\end_layout
+
+\begin_layout Standard
+Since Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:axiom-entropy-inequality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ does not include all of the functions of state, we may combine it with
+ the energy balance to recover 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ in the entropy inequality.
+ This may be achived by multiplying the entropy inequality in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:axiom-entropy-inequality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ by the absolute temperature 
+\begin_inset Formula $\theta$
+\end_inset
+
+ (recalling that 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is always positive) and adding it to the energy balance in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:axiom-energy-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to produce
+\begin_inset Formula 
+\[
+-\rho\left(\frac{D\varepsilon}{Dt}-\theta\frac{D\eta}{Dt}\right)+\boldsymbol{\sigma}:\mathbf{D}-\frac{1}{\theta}\mathbf{q}\cdot\grad\theta\geqslant0\,.
+\]
+
+\end_inset
+
+The term in parentheses may be rearranged as
+\begin_inset Formula 
+\[
+\frac{D\varepsilon}{Dt}-\theta\frac{D\eta}{Dt}=\frac{D}{Dt}\left(\varepsilon-\theta\eta\right)+\eta\frac{D\theta}{Dt}\,.
+\]
+
+\end_inset
+
+We now introduce the specific Helmholtz free energy, 
+\begin_inset Formula $\psi$
+\end_inset
+
+, which relates the specific internal energy and entropy according to 
+\begin_inset Formula 
+\begin{equation}
+\psi=\varepsilon-\theta\eta\,.\label{eq:specific-free-energy}
+\end{equation}
+
+\end_inset
+
+We may say that the free energy is the part of the internal energy which
+ is available to produce useful work.
+ Substituting this expression above produces the form of the Clausius-Duhem
+ inequality that involves all the independent functions of state appearing
+ in these axioms, (
+\begin_inset Formula $\psi$
+\end_inset
+
+, 
+\begin_inset Formula $\eta$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+), 
+\begin_inset Formula 
+\begin{equation}
+-\rho\left(\dot{\psi}+\eta\dot{\theta}\right)+\boldsymbol{\sigma}:\mathbf{D}-\frac{1}{\theta}\mathbf{q}\cdot\grad\theta\geqslant0\,,\label{eq:Clausius-Duhem-inequality}
+\end{equation}
+
+\end_inset
+
+where we have substituted 
+\begin_inset Formula $D\left(\cdot\right)/Dt$
+\end_inset
+
+ with the 
+\begin_inset Formula $\left(\dot{}\right)$
+\end_inset
+
+ operator, for notational simplicity.
+\end_layout
+
+\begin_layout Standard
+It is important to understant that all functions of state are non-observable
+ properties of matter: No instruments exist to measure the complete state
+ of stress inside a material, nor the heat flux, the internal energy, and
+ the entropy.
+ However, we can formulate constitutive models that relate these functions
+ of state to observable state variables, then calculate their value for
+ a specific state.
+ Observable state variables are all based on measurements of space (length,
+ area and volume) and time.
+ For example, we can measure (observe) displacement, velocity and acceleration
+ of matter at various spatial locations, from which we can calculate their
+ spatial gradients and treat these as observable state variables.
+ From measurements of length in calibrated materials, we can derive measurements
+ of force (using a load cell) and temperature (using a thermometer).
+\end_layout
+
+\begin_layout Standard
+To better understand the choice of state variables relevant to mechanics,
+ we proceed to describe the kinematics of a continuum in the next section.
+\end_layout
+
+\begin_layout Section
+Kinematics of the Continuum
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Kinematics-of-Continuum"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Motion and Path Lines
+\end_layout
+
+\begin_layout Standard
+At any instant of time 
+\begin_inset Formula $t$
+\end_inset
+
+, the 
+\emph on
+motion
+\emph default
+ of a material particle 
+\begin_inset Formula $P$
+\end_inset
+
+ in the continuum is given by the function
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/FigKinematicsContinuum.pdf
+	lyxscale 25
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Kinematics of the continuum.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig15"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{x}=\boldsymbol{\chi}\left(\mathbf{X},t\right)\label{eq:motion-chi}
+\end{equation}
+
+\end_inset
+
+where 
 \begin_inset Formula $\mathbf{X}$
 \end_inset
 
-
-\series default
-.
- The 
-\emph on
-left Cauchy-Green deformation tensor 
-\emph default
-is defined as follows: 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{b}=\mathbf{F}\cdot\mathbf{F}^{T}\,.\label{eq:left-Cauchy-Green}
-\end{equation}
-
+ is the reference position, at some reference time 
+\begin_inset Formula $t_{0}$
 \end_inset
 
-This tensor is an example of a 
-\emph on
-spatial tensor
-\emph default
- and is typically expressed as a function of the spatial coordinates 
-\series bold
+, of the material particle 
+\begin_inset Formula $P$
+\end_inset
 
+ currently located at the spatial location 
 \begin_inset Formula $\mathbf{x}$
 \end_inset
 
-
-\series default
 .
- The implementation of the updated Lagrangian finite element method used
- by FEBio is described in the spatial configuration.
+ This motion describes the 
+\emph on
+path line
+\emph default
+ of the particle that starts at 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ at 
+\begin_inset Formula $t=t_{0}$
+\end_inset
+
+ and passes through 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ at time 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ At a subsequent time 
+\begin_inset Formula $t^{\prime}$
+\end_inset
+
+, the material particle passing through 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ would have originated at a different location 
+\begin_inset Formula $\mathbf{X}^{\prime}$
+\end_inset
+
+ at 
+\begin_inset Formula $t_{0}$
+\end_inset
+
+, so that 
+\begin_inset Formula $\mathbf{x}=\boldsymbol{\chi}\left(\mathbf{X}^{\prime},t^{\prime}\right)=\boldsymbol{\chi}\left(\mathbf{X},t\right)$
+\end_inset
+
+.
+ The material particle 
+\begin_inset Formula $P$
+\end_inset
+
+ is uniquely identified by its position 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ in the reference configuration.
+ Therefore, any function 
+\begin_inset Formula $f$
+\end_inset
+
+ associated with each material point 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+, such as density, temperature, velocity, etc., may be expressed as 
+\begin_inset Formula $f=\hat{f}\left(\mathbf{X},t\right)$
+\end_inset
+
+ in the 
+\emph on
+material
+\emph default
+ (or 
+\emph on
+Lagrangian
+\emph default
+) frame.
+ Alternatively, the same function may be expressed in terms of the spatial
+ position 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ through which the material particle originating at 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ passes at time 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ In that case, 
+\begin_inset Formula $f=\tilde{f}\left(\mathbf{x},t\right)$
+\end_inset
+
+ expresses this function in the 
+\emph on
+spatial
+\emph default
+ (or 
+\emph on
+Eulerian
+\emph default
+) frame.
+ Importantly, since the function 
+\begin_inset Formula $f$
+\end_inset
+
+ is associated with the material, its time rate of change as the material
+ moves is called the 
+\emph on
+material time derivative
+\emph default
+ of 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ The material time derivative of 
+\begin_inset Formula $f$
+\end_inset
+
+ in the material frame is given by
+\begin_inset Formula 
+\begin{equation}
+\dot{f}=\frac{\partial\hat{f}\left(\mathbf{X},t\right)}{\partial t}\,.\label{eq:material-deriv-material}
+\end{equation}
+
+\end_inset
+
+Therefore, the velocity 
+\begin_inset Formula $\mathbf{v}\left(\mathbf{X},t\right)$
+\end_inset
+
+ of the particle 
+\begin_inset Formula $P$
+\end_inset
+
+ is defined in the material frame as the material time derivative 
+\begin_inset Formula $\dot{\boldsymbol{\chi}}\left(\mathbf{X},t\right)$
+\end_inset
+
+ of the motion,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}\left(\mathbf{X},t\right)=\frac{\partial\boldsymbol{\chi}\left(\mathbf{X},t\right)}{\partial t}\,.\label{eq75}
+\end{equation}
+
+\end_inset
+
+The material time derivative of 
+\begin_inset Formula $f$
+\end_inset
+
+ in the spatial frame may be evaluated by using the chain rule on 
+\begin_inset Formula $f=\tilde{f}\left(\mathbf{x},t\right)\equiv f\left(\boldsymbol{\chi}\left(\mathbf{X},t\right),t\right)$
+\end_inset
+
+, thus
+\begin_inset Formula 
+\[
+\dot{f}=\frac{\partial\tilde{f}\left(\boldsymbol{\chi},t\right)}{\partial t}+\frac{\partial\tilde{f}\left(\boldsymbol{\chi},t\right)}{\partial\boldsymbol{\chi}}\cdot\frac{\partial\boldsymbol{\chi}}{\partial t}\,.
+\]
+
+\end_inset
+
+Using Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq75"
+
+\end_inset
+
+ and recognizing that 
+\begin_inset Formula $\partial\tilde{f}/\partial\boldsymbol{\chi}\equiv\partial\tilde{f}/\partial\mathbf{x}=\grad\tilde{f}$
+\end_inset
+
+, this expression may be rewritten as
+\begin_inset Formula 
+\begin{equation}
+\dot{f}=\frac{\partial\tilde{f}}{\partial t}+\grad\tilde{f}\cdot\mathbf{v}\equiv\frac{D\tilde{f}\left(\mathbf{x},t\right)}{Dt}\,.\label{eq77}
+\end{equation}
+
+\end_inset
+
+We used the operator 
+\begin_inset Formula $D\left(\cdot\right)/Dt$
+\end_inset
+
+ to emphasize that this expression represents the material time derivative
+ of 
+\begin_inset Formula $f$
+\end_inset
+
+ in the spatial frame.
 \end_layout
 
 \begin_layout Standard
-The left and right deformation tensors can also be split into volumetric
- and deviatoric components.
- With the use of,
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq39"
-
+For a given particle 
+\begin_inset Formula $P$
 \end_inset
 
- the deviatoric deformation tensors are: 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{\tilde{C}} & =\tilde{\mathbf{F}}^{T}\cdot\tilde{\mathbf{F}}=J^{-2/3}\mathbf{C}\,,\\
-\mathbf{\tilde{b}} & =\tilde{\mathbf{F}}\cdot\tilde{\mathbf{F}}^{T}=J^{-2/3}\mathbf{b}\,.
-\end{aligned}
-\label{eq43}
-\end{equation}
-
+, the actual value of the function 
+\begin_inset Formula $f$
 \end_inset
 
-The deformation tensors defined above are not good candidates for strain
- measures since in the absence of strain they become the identity tensor
- 
-\begin_inset Formula $\mathbf{I}$
+ must be the same in the material and spatial frames, thus 
+\begin_inset Formula $f=\hat{f}\left(\mathbf{X},t\right)=\tilde{f}\left(\mathbf{x},t\right)$
 \end_inset
 
 .
- However, they can be used to define strain measures.
- The 
-\emph on
-Green-Lagrange strain tensor
-\emph default
- is defined as: 
+ Similarly, its material time derivative must have the same value in either
+ frame, 
+\begin_inset Formula $\dot{f}=\frac{\partial\hat{f}}{\partial t}=\frac{D\tilde{f}}{Dt}$
+\end_inset
+
+.
+ For notational convenience, we drop the caret and tilde symbols and assume
+ from the context that 
+\begin_inset Formula $f\left(\mathbf{X},t\right)\equiv\hat{f}\left(\mathbf{X},t\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $f\left(\mathbf{x},t\right)\equiv\tilde{f}\left(\mathbf{x},t\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Deformation Gradient
+\end_layout
+
+\begin_layout Standard
+For a continuum, the increment in motion between the neigboring points 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{X}+d\mathbf{X}$
+\end_inset
+
+ at a given time 
+\begin_inset Formula $t$
+\end_inset
+
+ is given by
 \begin_inset Formula 
 \begin{equation}
-\mathbf{E}=\frac{1}{2}\left(\mathbf{C}-\mathbf{I}\right)\,.\label{eq44}
+d\mathbf{x}=\boldsymbol{\chi}\left(\mathbf{X}+d\mathbf{X},t\right)-\boldsymbol{\chi}\left(\mathbf{X},t\right)=\left(\Grad\boldsymbol{\chi}\right)\cdot d\mathbf{X}\,.\label{eq:motion-gradient}
 \end{equation}
 
 \end_inset
 
-This tensor is a material tensor.
- Its spatial equivalent is known as the 
-\emph on
-Almansi strain tensor 
-\emph default
-and is defined as: 
+Since the differentiation of 
+\begin_inset Formula $\boldsymbol{\chi}\left(\mathbf{X},t\right)$
+\end_inset
+
+ is performed with respect to 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+, we denote this gradient as 
+\begin_inset Formula $\Grad\equiv\partial\left(\cdot\right)/\partial\mathbf{X}$
+\end_inset
+
+.
+ In particular,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{e}=\frac{1}{2}\left(\mathbf{I}-\mathbf{b}^{-1}\right)\,.\label{eq45}
+\mathbf{F}\equiv\frac{\partial\boldsymbol{\chi}}{\partial\mathbf{X}}=\Grad\boldsymbol{\chi}\label{eq:deformation-gradient}
 \end{equation}
 
 \end_inset
 
-In the limit of small displacement gradients, the components of both strain
- tensors are identical, resulting in the 
+is known as the 
 \emph on
-small strain tensor 
+deformation gradient
 \emph default
-or
-\emph on
- infinitesimal strain tensor
-\emph default
-: 
+.
+ It follows from this relationship that a material element 
+\begin_inset Formula $d\mathbf{X}$
+\end_inset
+
+ of solid constituent deforms into the material element 
+\begin_inset Formula $d\mathbf{x}$
+\end_inset
+
+ at the current time 
+\begin_inset Formula $t$
+\end_inset
+
+ such that 
+\begin_inset Formula $d\mathbf{x}=\mathbf{F}\cdot d\mathbf{X}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The length of the element, 
+\begin_inset Formula $ds$
+\end_inset
+
+, is given by 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\varepsilon}=\frac{1}{2}\left(\frac{\partial\mathbf{u}}{\partial\mathbf{x}}+\left(\frac{\partial\mathbf{u}}{\partial\mathbf{x}}\right)^{T}\right)\,.\label{eq46}
+ds^{2}=d\mathbf{x}\cdot d\mathbf{x}=\left(\mathbf{F}\cdot d\mathbf{X}\right)\cdot\left(\mathbf{F}\cdot d\mathbf{X}\right)=d\mathbf{X}\cdot\left(\mathbf{F}^{T}\cdot\mathbf{F}\right)\cdot d\mathbf{X}\equiv d\mathbf{X}\cdot\mathbf{C}\cdot d\mathbf{X}\label{eq82}
 \end{equation}
 
 \end_inset
 
-Note that the small strain tensor is also the linearization of the Green
- Lagrange strain, 
+ where 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}\label{eq83}
+\end{equation}
+
+\end_inset
+
+ is the 
+\shape italic
+right Cauchy-Green deformation tensor
+\shape default
+.
+ Note that 
+\begin_inset Formula $\mathbf{C}^{T}=\left(\mathbf{F}^{T}\cdot\mathbf{F}\right)^{T}=\mathbf{F}^{T}\cdot\mathbf{F}=\mathbf{C}$
+\end_inset
+
+, thus 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ is symmetric.
+ 
+\end_layout
+
+\begin_layout Standard
+Let the material element 
+\begin_inset Formula $d\mathbf{X}$
+\end_inset
+
+ be of length 
+\begin_inset Formula $dS$
+\end_inset
+
+ and directed along the unit normal 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, 
+\begin_inset Formula $d\mathbf{X}=dS\mathbf{n}_{r}$
+\end_inset
+
+.
+ Upon deformation, we have 
+\begin_inset Formula $d\mathbf{x}=\mathbf{F}\cdot d\mathbf{X}=dS\mathbf{F}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ and the length of the element in this deformed configuration is given by
+ 
+\begin_inset Formula $ds$
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{equation}
+ds^{2}=d\mathbf{x}\cdot d\mathbf{x}=\left(dS\mathbf{F}\cdot\mathbf{n}_{r}\right)\cdot\left(dS\mathbf{F}\cdot\mathbf{n}_{r}\right)=dS^{2}\mathbf{n}_{r}\cdot\left(\mathbf{F}^{T}\cdot\mathbf{F}\right)\cdot\mathbf{n}_{r}=dS^{2}\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}\label{eq84}
+\end{equation}
+
+\end_inset
+
+ The length of the element in the current configuration relative to its
+ length in the reference configuration is given by 
+\begin_inset Formula 
+\begin{equation}
+\frac{ds}{dS}=\sqrt{\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}}\equiv\lambda_{n}\label{eq85}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ is the relative change in length of the material element 
+\begin_inset Formula $d\mathbf{X}$
+\end_inset
+
+ which is oriented along 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ is known as the 
+\shape italic
+stretch ratio
+\shape default
+ along 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $\lambda_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the normal component of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ along 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+ If we let 
+\begin_inset Formula $d\mathbf{x}=ds\,\mathbf{n}$
+\end_inset
+
+, it follows from 
+\begin_inset Formula $d\mathbf{x}=\mathbf{F}\cdot d\mathbf{X}$
+\end_inset
+
+ that 
+\begin_inset Formula 
+\begin{equation}
+\lambda_{n}\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}\label{eq85a}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now consider two material elements 
+\begin_inset Formula $d\mathbf{X}_{m}=dS_{m}\mathbf{m}_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{X}_{n}=dS_{n}\mathbf{n}_{r}$
+\end_inset
+
+.
+ They each transform according to 
+\begin_inset Formula $d\mathbf{x}_{m}=\mathbf{F}\cdot d\mathbf{X}_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{x}_{n}=\mathbf{F}\cdot d\mathbf{X}_{n}$
+\end_inset
+
+ and their dot product produces
+\begin_inset Formula 
+\begin{equation}
+d\mathbf{x}_{m}\cdot d\mathbf{x}_{n}=\left(\mathbf{F}\cdot d\mathbf{X}_{m}\right)\cdot\left(\mathbf{F}\cdot d\mathbf{X}_{n}\right)=d\mathbf{X}_{n}\cdot\mathbf{C}\cdot d\mathbf{X}_{m}\label{eq85b}
+\end{equation}
+
+\end_inset
+
+or equivalently,
+\begin_inset Formula 
+\begin{equation}
+\lambda_{m}\lambda_{n}\mathbf{m}\cdot\mathbf{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{m}_{r}\,,\quad\lambda_{m}=\frac{ds_{m}}{dS_{m}},\,\lambda_{n}=\frac{ds_{n}}{dS_{n}}\label{eq85c}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $d\mathbf{x}_{m}=ds_{m}\mathbf{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{x}_{n}=ds_{n}\mathbf{n}$
+\end_inset
+
+.
+ Note that we may write 
+\begin_inset Formula $\mathbf{m}\cdot\mathbf{n}=\cos\theta=\sin\gamma$
+\end_inset
+
+, where 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the angle between 
+\begin_inset Formula $d\mathbf{x}_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{x}_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma=\frac{\pi}{2}-\theta$
+\end_inset
+
+ is its complementary angle (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+figurename
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig17"
+
+\end_inset
+
+), so that
+\begin_inset Formula 
+\begin{equation}
+\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{m}_{r}=\lambda_{m}\lambda_{n}\sin\gamma\,.\label{eq85d}
+\end{equation}
+
+\end_inset
+
+Now consider the case where 
+\begin_inset Formula $\mathbf{m}_{r}\cdot\mathbf{n}_{r}=0$
+\end_inset
+
+, i.e., the material elements 
+\begin_inset Formula $d\mathbf{X}_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{X}_{n}$
+\end_inset
+
+ are orthogonal, so that 
+\begin_inset Formula $\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{m}_{r}=C_{mn}$
+\end_inset
+
+ where 
+\begin_inset Formula $C_{mn}$
+\end_inset
+
+ is a shear component of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+.
+ It follows from this result that 
+\begin_inset Formula $C_{mn}$
+\end_inset
+
+ represents a combined measure of the change in angle between 
+\begin_inset Formula $\mathbf{m}_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, as well as the stretching of elements 
+\begin_inset Formula $d\mathbf{X}_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{X}_{n}$
+\end_inset
+
+.
+ The angle 
+\begin_inset Formula $\gamma$
+\end_inset
+
+, which represents the change in angle between initially orthogonal line
+ elements along 
+\begin_inset Formula $\mathbf{m}_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+, is called the 
+\emph on
+engineering shear strain
+\emph default
+.
+ In particular, in the range of small strains and rotations, 
+\begin_inset Formula $\lambda_{m}\approx1$
+\end_inset
+
+, 
+\begin_inset Formula $\lambda_{n}\approx1$
+\end_inset
+
+ and 
+\begin_inset Formula $\sin\gamma\approx\gamma$
+\end_inset
+
+, so that 
+\begin_inset Formula $C_{mn}\approx\gamma$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/FigShearStrain.pdf
+	lyxscale 25
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Change of angle between filaments.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig17"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+According to the 
+\emph on
+polar decomposition theorem
+\emph default
+, the deformation gradient may be decomposed uniquely into
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}=\mathbf{R}\cdot\mathbf{U}=\mathbf{V}\cdot\mathbf{R}\label{eq:polar-decomposition-RU}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is a proper orthogonal transformation (a rotation, with 
+\begin_inset Formula $\det\mathbf{R}=+1$
+\end_inset
+
+), 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is a symmetric tensor called the 
+\emph on
+right
+\emph default
+ (or 
+\emph on
+material
+\emph default
+) 
+\emph on
+stretch tensor
+\emph default
+, and 
+\begin_inset Formula $\mathbf{V}$
+\end_inset
+
+ is a symmetric tensor called the 
+\emph on
+left stretch tensor
+\emph default
+.
+ It follows from this decomposition that 
+\begin_inset Formula $d\mathbf{x}=\mathbf{F}\cdot d\mathbf{X}=\mathbf{R}\cdot\left(\mathbf{U}\cdot d\mathbf{X}\right)$
+\end_inset
+
+ may be viewed as a stretching of 
+\begin_inset Formula $d\mathbf{X}$
+\end_inset
+
+ by 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ followed by a rotation by 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+, whereas 
+\begin_inset Formula $d\mathbf{x}=\mathbf{V}\cdot\left(\mathbf{R}\cdot d\mathbf{X}\right)$
+\end_inset
+
+ is the rotation of 
+\begin_inset Formula $d\mathbf{X}$
+\end_inset
+
+, followed by stretching by 
+\begin_inset Formula $\mathbf{V}$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}=\mathbf{U}^{2}$
+\end_inset
+
+, it follows that the eigenvalues of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ are the square of the eigenvalues of 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+.
+ Thus, these eigenvalues provide a measure of the stretch, not a measure
+ of the rotation.
+ 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ also share the same eigenvectors.
+ Thus, if 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ is given by its spectral representation,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{C}=\lambda_{1}^{2}\mathbf{u}_{1}\otimes\mathbf{u}_{1}+\lambda_{2}^{2}\mathbf{u}_{2}\otimes\mathbf{u}_{2}+\lambda_{3}^{2}\mathbf{u}_{3}\otimes\mathbf{u}_{3}\label{eq:85-2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{u}_{i}$
+\end_inset
+
+'s are its eigenvectors, then 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ may be evaluated from
+\begin_inset Formula 
+\begin{equation}
+\mathbf{U}=\lambda_{1}\mathbf{u}_{1}\otimes\mathbf{u}_{1}+\lambda_{2}\mathbf{u}_{2}\otimes\mathbf{u}_{2}+\lambda_{3}\mathbf{u}_{3}\otimes\mathbf{u}_{3}\label{eq:85-3}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\mathbf{R}=\mathbf{F}\cdot\mathbf{U}^{-1}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{U}^{-1}=\lambda_{1}^{-1}\mathbf{u}_{1}\otimes\mathbf{u}_{1}+\lambda_{2}^{-1}\mathbf{u}_{2}\otimes\mathbf{u}_{2}+\lambda_{3}^{-1}\mathbf{u}_{3}\otimes\mathbf{u}_{3}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The motion can also be conveniently represented in terms of a 
+\shape italic
+displacement
+\shape default
+ function 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ in a material frame of reference such that 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{x}=\mathbf{X}+\mathbf{u}\left(\mathbf{X},t\right)\label{eq78}
+\end{equation}
+
+\end_inset
+
+ Then the deformation gradient for this motion is given by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}=\frac{\partial\mathbf{x}}{\partial\mathbf{X}}=\Grad\mathbf{x}=\mathbf{I}+\Grad\mathbf{u}\label{eq81}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{cl}
+\mathbf{C} & =\mathbf{F}^{T}\cdot\mathbf{F}=\left(\mathbf{I}+\Grad\mathbf{u}\right)^{T}\cdot\left(\mathbf{I}+\Grad\mathbf{u}\right)\\
+ & =\mathbf{I}+\Grad\mathbf{u}+\Grad^{T}\mathbf{u}+\left(\Grad^{T}\mathbf{u}\right)\cdot\left(\Grad\mathbf{u}\right)
+\end{array}\label{eq83-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, we can also define the 
+\shape italic
+Lagrangian strain tensor
+\shape default
+ 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ (also known as the 
+\emph on
+Green-Lagrange
+\emph default
+ strain) from the above relation such that 
+\begin_inset Formula $\mathbf{C}=\mathbf{I}+2\mathbf{E}$
+\end_inset
+
+, or 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{E}=\frac{1}{2}\left(\mathbf{C}-\mathbf{I}\right)=\frac{1}{2}\left[\Grad\mathbf{u}+\Grad^{T}\mathbf{u}+\left(\Grad^{T}\mathbf{u}\right)\cdot\left(\Grad\mathbf{u}\right)\right]\label{eq:E-C-relation}
+\end{equation}
+
+\end_inset
+
+In the case of rigid body motion (translation and/or rotation, 
+\begin_inset Formula $\mathbf{C}=\mathbf{I}$
+\end_inset
+
+), the Lagrangian strain tensor is equal to the null tensor.
+ Just as in the case of the stress tensor, the strain tensors 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ also have strain invariants, principal normal strains and principal directions
+ of normal strain, maximum shear strains and directions of maximum shear
+ strain.
+ If 
+\begin_inset Formula $\lambda^{2}$
+\end_inset
+
+ is an eigenvalue of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is its associated eigenvector, then 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is also an eigenvector of 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ since 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{E}\cdot\mathbf{v}=\frac{1}{2}\left(\mathbf{C}-\mathbf{I}\right)\cdot\mathbf{v}=\frac{1}{2}\left(\mathbf{C}\cdot\mathbf{v}-\mathbf{v}\right)=\frac{1}{2}\left(\lambda^{2}-1\right)\mathbf{v}\label{eq84-1}
+\end{equation}
+
+\end_inset
+
+Therefore the corresponding eigenvalue of 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ is 
+\begin_inset Formula $\left(\lambda^{2}-1\right)/2$
+\end_inset
+
+, which also established the relation between the normal components of 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+.
+ The shear components of 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ may be related to those of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ according to
+\begin_inset Formula 
+\[
+E_{mn}=\mathbf{m}\cdot\mathbf{E}\cdot\mathbf{n}=\frac{1}{2}\mathbf{m}\cdot\mathbf{C}\cdot\mathbf{n}=\frac{1}{2}C_{mn}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ are orthogonal unit vectors.
+ Therefore, the interpretation of 
+\begin_inset Formula $E_{mn}$
+\end_inset
+
+ is similar to that of 
+\begin_inset Formula $C_{mn}$
+\end_inset
+
+, with a factor of 
+\begin_inset Formula $1/2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the limit of small displacement gradients (small strains and rotations,
+ 
+\begin_inset Formula $\left\Vert \Grad\mathbf{u}\right\Vert \ll1$
+\end_inset
+
+), the expression for the Lagrangian strain tensor in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:E-C-relation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to the 
+\emph on
+infinitesimal strain tensor
+\emph default
+,
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\varepsilon}=\frac{1}{2}\left(\grad\mathbf{u}+\grad^{T}\mathbf{u}\right)\,.\label{eq46}
+\end{equation}
+
+\end_inset
+
+Note that this strain tensor is also the linearization of the Lagrangian
+ strain tensor, 
 \begin_inset Formula 
 \begin{equation}
 D\mathbf{E}\left[\mathbf{u}\right]=\mathbf{F}^{T}\cdot\boldsymbol{\varepsilon}\cdot\mathbf{F}\,.\label{eq47}
@@ -2066,10 +3267,10 @@ D\mathbf{E}\left[\mathbf{u}\right]=\mathbf{F}^{T}\cdot\boldsymbol{\varepsilon}\c
 \end_layout
 
 \begin_layout Subsection
-Stress
+Rate of Deformation
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:stress"
+name "sec:Rate-of-Deformation"
 
 \end_inset
 
@@ -2077,75 +3278,1440 @@ name "subsec:stress"
 \end_layout
 
 \begin_layout Standard
-The traction 
-\series bold
-
-\begin_inset Formula $\mathbf{t}$
+The material time derivative of the deformation gradient may be denoted
+ by 
+\begin_inset Formula $\dot{\mathbf{F}}$
 \end_inset
 
+.
+ Since 
+\begin_inset Formula $\mathbf{F}=\Grad\boldsymbol{\chi}$
+\end_inset
 
-\series default
- on a plane bisecting the body is given by, 
+, it follows that 
+\begin_inset Formula $\dot{\mathbf{F}}=\Grad\dot{\boldsymbol{\chi}}=\Grad\mathbf{v}$
+\end_inset
+
+.
+ Using the chain rule,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n},\label{eq48}
+\dot{\mathbf{F}}=\frac{\partial\mathbf{v}}{\partial\mathbf{X}}=\frac{\partial\mathbf{v}}{\partial\mathbf{x}}\cdot\frac{\partial\mathbf{x}}{\partial\mathbf{X}}=\grad\mathbf{v}\cdot\mathbf{F}\label{eq85e}
+\end{equation}
+
+\end_inset
+
+or simply
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{F}}=\mathbf{L}\cdot\mathbf{F}\label{eq85f}
+\end{equation}
+
+\end_inset
+
+Differentiating 
+\begin_inset Formula $\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}$
+\end_inset
+
+ with respect to time, and making use of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq85e"
+
+\end_inset
+
+ produces
+\begin_inset Formula 
+\begin{equation}
+\mbox{\dot{\mathbf{C}}}=\dot{\mathbf{F}}^{T}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\dot{\mathbf{F}}=\mathbf{F}^{T}\cdot\left(\mathbf{L}^{T}+\mathbf{L}\right)\cdot\mathbf{F}\label{eq85g}
+\end{equation}
+
+\end_inset
+
+ or equivalently,
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{C}}=2\mathbf{F}^{T}\cdot\mathbf{D}\cdot\mathbf{F}\label{eq85h}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\boldsymbol{\sigma}$
+\begin_inset Formula $\mathbf{D}$
 \end_inset
 
- is the 
-\emph on
-Cauchy stress tensor
-\emph default
- and 
-\series bold
-
-\begin_inset Formula $\mathbf{n}$
-\end_inset
-
-
-\series default
- is the outward unit normal vector to the plane.
- It can be shown that by the conservation of angular momentum that this
- tensor is symmetric (
-\begin_inset Formula $\sigma_{ij}=\sigma_{ji})$
-\end_inset
-
- 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Spencer84"
-literal "true"
+ is the rate of deformation tensor.
+ This result may now be used in the time differentiation of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq85d"
 
 \end_inset
 
-.
- The Cauchy stress tensor, a spatial tensor, is the actual physical stress,
- that is, the force per unit deformed area.
- To simplify the equations of continuum mechanics, especially when working
- in the material configuration, several other stress measures are often
- used.
- The 
-\emph on
-Kirchhoff stress tensor
-\emph default
- is defined as 
+,
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\tau}=J\boldsymbol{\sigma}\,.\label{eq49}
+\mathbf{n}_{r}\cdot\dot{\mathbf{C}}\cdot\mathbf{m}_{r}=\left(\dot{\lambda}_{m}\lambda_{n}+\lambda_{m}\dot{\lambda}_{n}\right)\sin\gamma+\lambda_{m}\lambda_{n}\dot{\gamma}\cos\gamma\label{eq85i}
 \end{equation}
 
 \end_inset
 
-The 
+where the left-hand-side reduces to 
+\begin_inset Formula $\mathbf{n}_{r}\cdot\dot{\mathbf{C}}\cdot\mathbf{m}_{r}=2\left(\mathbf{F}\cdot\mathbf{m}_{r}\right)\cdot\mathbf{D}\cdot\left(\mathbf{F}\cdot\mathbf{n}_{r}\right)=2\lambda_{m}\lambda_{n}\mathbf{m}\cdot\mathbf{D}\cdot\mathbf{n}$
+\end_inset
+
+.
+ Substituting this result above produces
+\begin_inset Formula 
+\begin{equation}
+\mathbf{m}\cdot\mathbf{D}\cdot\mathbf{n}=\frac{1}{2}\left(\frac{\dot{\lambda}_{m}}{\lambda_{m}}+\frac{\dot{\lambda}_{n}}{\lambda_{n}}\right)\sin\gamma+\frac{\dot{\gamma}}{2}\cos\gamma\label{eq85j}
+\end{equation}
+
+\end_inset
+
+We now consider two cases: When 
+\begin_inset Formula $\mathbf{m}=\mathbf{n}$
+\end_inset
+
+, it follows that 
+\begin_inset Formula $\gamma=\pi/2$
+\end_inset
+
+, so that 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq85j"
+
+\end_inset
+
+ reduces to
+\begin_inset Formula 
+\begin{equation}
+D_{nn}\equiv\mathbf{n}\cdot\mathbf{D}\cdot\mathbf{n}=\frac{\dot{\lambda}_{n}}{\lambda_{n}}\,.\label{eq:D-normal}
+\end{equation}
+
+\end_inset
+
+In other words, the normal component of the rate of deformation tensor along
+ 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is the rate of stretch per stretch of a differential line element along
+ 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $\mathbf{m}\cdot\mathbf{n}=0$
+\end_inset
+
+, it follows that 
+\begin_inset Formula $\gamma=0$
+\end_inset
+
+, so that 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq85j"
+
+\end_inset
+
+ reduces to
+\begin_inset Formula 
+\begin{equation}
+D_{mn}\equiv\mathbf{m}\cdot\mathbf{D}\cdot\mathbf{n}=\frac{\dot{\gamma}}{2}\,.\label{eq:D-shear}
+\end{equation}
+
+\end_inset
+
+Thus, the shear component of 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+ in the plane containing 
+\begin_inset Formula $\mathbf{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is equal to half the rate at which the angle between those line elements
+ changes with the deformation.
+ The quantity 
+\begin_inset Formula $\dot{\gamma}$
+\end_inset
+
+ is called the 
 \emph on
-first Piola-Kirchhoff stress tensor
+engineering shear rate
 \emph default
- is given as 
+, or simply the 
+\emph on
+shear rate
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+Finally, we note from eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:E-C-relation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq85h"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that the material time derivative of the Lagrangian strain is related to
+ the rate of deformation via
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{E}}=\mathbf{F}^{T}\cdot\mathbf{D}\cdot\mathbf{F}\,.\label{eq:Edot-D-relation}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Volume Deformation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Volume-Deformation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let us show that the deformation of a volume of material 
+\begin_inset Formula $dV_{r}$
+\end_inset
+
+ is given by 
+\begin_inset Formula 
+\begin{equation}
+dV=J\,dV_{r},\quad J=\det\mathbf{F}=\left(\det\mathbf{C}\right)^{1/2}\label{eq87}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/FigReferentialVolume.pdf
+	lyxscale 25
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Elemental volume.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Elemental-volume"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $\det\mathbf{C}=\det\left(\mathbf{F}^{T}\cdot\mathbf{F}\right)=\det\mathbf{F}^{T}\det\mathbf{F}=\left(\det\mathbf{F}\right)^{2}$
+\end_inset
+
+, thus 
+\begin_inset Formula $\det\mathbf{F}=\left(\det\mathbf{C}\right)^{1/2}$
+\end_inset
+
+, which proves the second equation above.
+ To prove the first equation, let us define three non-collinear material
+ elements in the undeformed reference state, 
+\begin_inset Formula $d\mathbf{X}_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $d\mathbf{X}_{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $d\mathbf{X}_{3}$
+\end_inset
+
+.
+ The elemental volume defined by these three elements has the magnitude
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+dV_{r}=\left(d\mathbf{X}_{1}\times d\mathbf{X}_{2}\right)\cdot d\mathbf{X}_{3}\tag{a}
+\]
+
+\end_inset
+
+ in the reference state, and the magnitude 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+dV=\left(d\mathbf{x}_{1}\times d\mathbf{x}_{2}\right)\cdot d\mathbf{x}_{3}=\left(\mathbf{F}\cdot d\mathbf{X}_{1}\times\mathbf{F}\cdot d\mathbf{X}_{2}\right)\cdot\mathbf{F}\cdot d\mathbf{X}_{3}\tag{b}
+\]
+
+\end_inset
+
+in the deformed state.
+ Let the elements 
+\begin_inset Formula $d\mathbf{X}_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $d\mathbf{X}_{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $d\mathbf{X}_{3}$
+\end_inset
+
+ be aligned with the orthogonal coordinate axes such that 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+d\mathbf{X}_{1}=dS_{1}\mathbf{e}_{1}\quad d\mathbf{X}_{2}=dS_{2}\mathbf{e}_{2}\quad d\mathbf{X}_{3}=dS_{3}\mathbf{e}_{3}\tag{c}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{e}_{i}\cdot\mathbf{e}_{j}=\delta_{ij}$
+\end_inset
+
+, then we find from (a) that 
+\begin_inset Formula $dV_{r}=dS_{1}dS_{2}dS_{3}$
+\end_inset
+
+.
+ From (b) we get that 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+dV=\left(\mathbf{F}\cdot\mathbf{e}_{1}\times\mathbf{F}\cdot\mathbf{e}_{2}\right)\cdot\mathbf{F}\cdot\mathbf{e}_{3}\,dS_{1}dS_{2}dS_{3}=\det\mathbf{F}\,dV_{r}\tag{d}
+\]
+
+\end_inset
+
+according to the definition of the determinant given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsubsec:determinant"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In a compressible material, the density will change with changes in volume.
+ If an elemental volume of mass 
+\begin_inset Formula $dm$
+\end_inset
+
+ occupies a volume 
+\begin_inset Formula $dV_{r}$
+\end_inset
+
+ in some 
+\emph on
+reference configuration
+\emph default
+, then the density in the current configuration is given by 
+\begin_inset Formula 
+\begin{equation}
+\rho=\frac{dm}{dV}=\frac{dm}{dV_{r}}\frac{dV_{r}}{dV}=\frac{\rho_{r}}{J}\label{eq88}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ represents the density of the material in the reference configuration,
+ which is a constant.
+ The result of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq88"
+
+\end_inset
+
+ is the solution to the axiom of mass balance.
+ To prove that point, we use the kinematic identity
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial J}{\partial\mathbf{F}}=J\mathbf{F}^{-T}\label{eq89-1}
+\end{equation}
+
+\end_inset
+
+to express the material time derivative of 
+\begin_inset Formula $J$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\dot{J}=\frac{\partial J}{\partial\mathbf{F}}:\dot{\mathbf{F}}\label{eq90-1}
+\end{equation}
+
+\end_inset
+
+Recalling that 
+\begin_inset Formula $\dot{\mathbf{F}}=\mathbf{L}\cdot\mathbf{F}$
+\end_inset
+
+, it follows that
+\begin_inset Formula 
+\begin{equation}
+\dot{J}=J\mathbf{F}^{-T}:\mathbf{L}\cdot\mathbf{F}=J\mathbf{I}:\mathbf{L}=J\tr\mathbf{L}=J\divg\mathbf{v}\label{eq91-1}
+\end{equation}
+
+\end_inset
+
+ or
+\begin_inset Formula 
+\begin{equation}
+\divg\mathbf{v}=\frac{\dot{J}}{J}\label{eq92-1}
+\end{equation}
+
+\end_inset
+
+Now, the axiom of mass balance in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-redux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be rewritten as
+\begin_inset Formula 
+\begin{equation}
+\frac{D\rho}{Dt}+\rho\divg\mathbf{v}=\dot{\rho}+\frac{\rho}{J}\dot{J}=0\label{eq93}
+\end{equation}
+
+\end_inset
+
+Multiplying this equation across by 
+\begin_inset Formula $J$
+\end_inset
+
+, we find that the resulting expression is equivalent to
+\begin_inset Formula 
+\begin{equation}
+\frac{D\left(\rho J\right)}{Dt}=0\label{eq93b}
+\end{equation}
+
+\end_inset
+
+Integrating this expression produces 
+\begin_inset Formula $\rho J=\rho_{r}$
+\end_inset
+
+, where 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\rho$
+\end_inset
+
+ when 
+\begin_inset Formula $J=1$
+\end_inset
+
+.
+ This result reproduces 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq88"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Finally, since we know that 
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
+\end_inset
+
+ according to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:polar-decomposition-RU"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it follows that
+\begin_inset Formula 
+\[
+J=\det\mathbf{F}=\left(\det\mathbf{R}\right)\left(\det\mathbf{U}\right)=\det\mathbf{U}=\lambda_{1}\lambda_{2}\lambda_{3}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+ are the principal stretches of 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Area Deformation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Area-Deformation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In general, we can express the position of a material point 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ as a function of parametric coordinates 
+\begin_inset Formula $\eta^{i}$
+\end_inset
+
+ (i=1,2,3), thus 
+\begin_inset Formula $\mathbf{X}=\mathbf{X}\left(\eta^{i}\right)$
+\end_inset
+
+.
+ Then, a line element in the reference configuration is given by
+\begin_inset Formula 
+\begin{equation}
+d\mathbf{X}=\frac{\partial\mathbf{X}}{\partial\eta^{i}}d\eta^{i}\equiv\mathbf{G}_{i}d\eta^{i}\,,\label{eq:covariant-basis-material}
+\end{equation}
+
+\end_inset
+
+where we use the implicit (Einstein) summation convention of indicial notation.
+ Here, the vectors 
+\begin_inset Formula $\mathbf{G}_{i}$
+\end_inset
+
+ are called the covariant basis vectors of 
+\begin_inset Formula $\mathbf{X}\left(\eta^{i}\right)$
+\end_inset
+
+, in the material frame.
+ We may also express the motion in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:motion-chi"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as a function of the same parametric coordinates, such that the corresponding
+ line element in the spatial frame is
+\begin_inset Formula 
+\begin{equation}
+d\mathbf{x}=\frac{\partial\boldsymbol{\chi}}{\partial\eta^{i}}d\eta^{i}\equiv\mathbf{g}_{i}d\eta^{i}\,,\label{eq:covariant-basis-spatial}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{g}_{i}$
+\end_inset
+
+'s represent the covariant basis vector at 
+\begin_inset Formula $\mathbf{x}=\boldsymbol{\chi}\left(\mathbf{X},t\right)$
+\end_inset
+
+ in the spatial frame.
+ Since 
+\begin_inset Formula $d\mathbf{x}$
+\end_inset
+
+ is related to 
+\begin_inset Formula $d\mathbf{X}$
+\end_inset
+
+ by the deformation gradient as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:motion-gradient"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, or 
+\begin_inset Formula $d\mathbf{x}=\mathbf{F}\cdot d\mathbf{X}$
+\end_inset
+
+, it can be shown that the deformation gradient is given by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}=\mathbf{g}_{i}\otimes\mathbf{G}^{i}\,,\label{eq:defgrad-cov-cont}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{G}^{i}$
+\end_inset
+
+'s represent the contravariant basis vector of 
+\begin_inset Formula $\mathbf{X}\left(\eta^{i}\right)$
+\end_inset
+
+, in the material frame.
+ Covariant and contravariant basis vectors satisfy 
+\begin_inset Formula $\mathbf{G}_{i}\cdot\mathbf{G}^{j}=\mathbf{G}^{i}\cdot\mathbf{G}_{j}=\delta_{j}^{i}$
+\end_inset
+
+, where 
+\begin_inset Formula $\delta_{j}^{i}$
+\end_inset
+
+ is the Kronecker delta.
+ The same is true in the spatial frame.
+ The expression for 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:defgrad-cov-cont"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ emphasizes that 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ is a 
+\emph on
+two-point tensor
+\emph default
+: It has one leg in the material frame (
+\begin_inset Formula $\mathbf{G}^{i}$
+\end_inset
+
+) and the other in the spatial frame (
+\begin_inset Formula $\mathbf{g}_{i}$
+\end_inset
+
+).
+ It follows from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:defgrad-cov-cont"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that covariant basis vectors in the material and spatial frames are related
+ by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}\cdot\mathbf{G}_{j}=\mathbf{g}_{j}\,.\label{eq:cov-basis-xformation}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now consider that an elemental volume 
+\begin_inset Formula $dV_{r}$
+\end_inset
+
+ in the reference configuration can be evaluated from
+\begin_inset Formula 
+\[
+dV_{r}=\left(\mathbf{G}_{1}d\eta^{1}\times\mathbf{G}_{2}d\eta^{2}\right)\cdot\mathbf{G}_{3}d\eta^{3}\equiv d\mathbf{A}\cdot\mathbf{G}_{3}d\eta^{3}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $d\mathbf{A}$
+\end_inset
+
+ is the vectorial representation of the elemental directed area 
+\begin_inset Formula $\mathbf{G}_{1}d\eta^{1}\times\mathbf{G}_{2}d\eta^{2}$
+\end_inset
+
+.
+ Similarly, the elemental volume 
+\begin_inset Formula $dV$
+\end_inset
+
+ in the current configuration is given by
+\begin_inset Formula 
+\[
+dV=\left(\mathbf{g}_{1}d\eta^{1}\times\mathbf{g}_{2}d\eta^{2}\right)\cdot\mathbf{g}_{3}d\eta^{3}\equiv d\mathbf{a}\cdot\mathbf{g}_{3}d\eta^{3}\,.
+\]
+
+\end_inset
+
+Using eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq87"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cov-basis-xformation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we may rewrite this expression as
+\begin_inset Formula 
+\[
+dV=d\mathbf{a}\cdot\mathbf{F}\cdot\mathbf{G}_{3}d\eta^{3}=JdV_{r}=Jd\mathbf{A}\cdot\mathbf{G}_{3}d\eta^{3}\,.
+\]
+
+\end_inset
+
+From this general expression, we can find the relation between 
+\begin_inset Formula $d\mathbf{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $d\mathbf{A}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+d\mathbf{a}=J\mathbf{F}^{-T}\cdot d\mathbf{A}\,,\label{eq:Nanson-formula}
+\end{equation}
+
+\end_inset
+
+which is known as Nanson's formula 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonet97"
+literal "false"
+
+\end_inset
+
+.
+ It relates the change in surface area, and the reorientation of the surface
+ normal, between the referential area 
+\begin_inset Formula $d\mathbf{A}$
+\end_inset
+
+ and its corresponding area 
+\begin_inset Formula $d\mathbf{a}$
+\end_inset
+
+ in the current configuration.
+\end_layout
+
+\begin_layout Standard
+Using the general expression for the deformation gradient in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:defgrad-cov-cont"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it follows that the right Cauchy-Green tensor is given by
+\begin_inset Formula 
+\[
+\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}=g_{ij}\mathbf{G}^{i}\otimes\mathbf{G}^{j}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $g_{ij}=\mathbf{g}_{i}\cdot\mathbf{g}_{j}$
+\end_inset
+
+ is called the covariant metric tensor in the spatial frame.
+\end_layout
+
+\begin_layout Section
+Hyperelasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Hyperelasticity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Constitutive Restrictions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Constitutive-Restrictions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, we need to make constitutive assumptions on the dependent variables
+ which appears in Clausius-Duhem inequality, eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Clausius-Duhem-inequality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, namely, 
+\begin_inset Formula $\psi$
+\end_inset
+
+, 
+\begin_inset Formula $\eta$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+.
+ These functions could depend on a number of 
+\emph on
+state variables
+\emph default
+, such as strain, rate of deformation, temperature, temperature gradient,
+ etc.
+ For example, the pressure in a gas is generally assumed to depend on temperatur
+e and density, so it would follow that 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ for a gas should exhibit the same dependencies.
+ 
+\end_layout
+
+\begin_layout Standard
+For solid materials we have found that that the mass density is dependent
+ on the strain (eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq88"
+
+\end_inset
+
+, 
+\begin_inset Formula $\rho=\rho_{r}\left(\det\mathbf{C}\right)^{-1/2}=\rho_{r}/J$
+\end_inset
+
+, where 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is a constant); so long as a dependence on the strain is provided, an explicit
+ dependency on mass density is not required.
+\end_layout
+
+\begin_layout Standard
+For the purpose of modeling elastic solids under isothermal conditions,
+ we would like to restrict our constitutive models to be independent of
+ the temperature or its gradient.
+ For an elastic solid, the rate of load application does not have an effect;
+ therefore, there should be no dependency on the rate of deformation 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+.
+ Furthermore, for an elastic solid, upon removal of the loading, deformations
+ should disappear completely.
+ This implies that there should be no dependence on the history (or path)
+ of loading, only on the current state of loading.
+\end_layout
+
+\begin_layout Standard
+Given these restrictions, we assume that the non-observable functions of
+ state 
+\begin_inset Formula $\psi$
+\end_inset
+
+, 
+\begin_inset Formula $\eta$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+ depend only on the observable solid matrix strain, such as 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+.
+ Based on the principle of equipresence, all functions of state depend only
+ on 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+.
+ In particular, since 
+\begin_inset Formula $\psi$
+\end_inset
+
+ is the only function of state which is differentiated with respect to time
+ in the Clausius-Duhem inequality, eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Clausius-Duhem-inequality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we express it explicitly as
+\begin_inset Formula 
+\begin{equation}
+\psi=\psi\left(\mathbf{E}\right)\,.\label{eq95-1}
+\end{equation}
+
+\end_inset
+
+Given this dependence, we can use the chain rule of differentiation to get
+ 
+\begin_inset Formula 
+\begin{equation}
+\dot{\psi}=\frac{d\psi}{d\mathbf{E}}:\dot{\mathbf{E}}=\frac{d\psi}{d\mathbf{E}}:\mathbf{F}^{T}\cdot\mathbf{D}\cdot\mathbf{F}\label{eq96-1}
+\end{equation}
+
+\end_inset
+
+where we have made use of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Edot-D-relation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Making use of the identity 
+\begin_inset Formula 
+\begin{equation}
+\frac{d\psi}{d\mathbf{E}}:\mathbf{F}^{T}\cdot\mathbf{D}\cdot\mathbf{F}=\mathbf{F}\cdot\frac{d\psi}{d\mathbf{E}}\cdot\mathbf{F}^{T}:\mathbf{D}\label{eq100-1}
+\end{equation}
+
+\end_inset
+
+ we find that the entropy inequality reduces to 
+\begin_inset Formula 
+\begin{equation}
+-\rho\eta\dot{\theta}-\frac{1}{\theta}\mathbf{q}\cdot\grad\theta+\left(\boldsymbol{\sigma}-\rho\mathbf{F}\cdot\frac{d\psi}{d\mathbf{E}}\cdot\mathbf{F}^{T}\right):\mathbf{D}\geqslant0\label{eq101-1}
+\end{equation}
+
+\end_inset
+
+This inequality must hold for arbitrary processes, i.e., for arbitrary changes
+ in 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\theta}$
+\end_inset
+
+ and 
+\begin_inset Formula $\grad\theta$
+\end_inset
+
+ (all of which are independent, observable variables of state), under our
+ self-imposed constraint that 
+\begin_inset Formula $\psi$
+\end_inset
+
+, 
+\begin_inset Formula $\eta$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{q}$
+\end_inset
+
+ only depend on the state variable 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+.
+ For example, since the temperature 
+\begin_inset Formula $\theta$
+\end_inset
+
+ in the leftmost term of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq101-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may either increase or decrease at various times in any process, the sign
+ of 
+\begin_inset Formula $\dot{\theta}$
+\end_inset
+
+ may be variably positive or negative.
+ However, the sign of the product 
+\begin_inset Formula $-\rho\eta\dot{\theta}$
+\end_inset
+
+ may not be set strictly positive since 
+\begin_inset Formula $\rho\eta$
+\end_inset
+
+ does not depend on 
+\begin_inset Formula $\dot{\theta}$
+\end_inset
+
+.
+ The same argument applies to the remaining terms in the entropy inequality,
+ each of which may vary independently of other terms.
+ Therefore, the only way that the entropy inequality may be satisfied for
+ arbitrary processes, given our choice of state variables, is to have each
+ term be independently equal to zero.
+ Thus, the entropy inequality requires that 
+\begin_inset Formula 
+\begin{equation}
+\eta=0\label{eq102-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\rho\mathbf{F}\cdot\frac{d\psi}{d\mathbf{E}}\cdot\mathbf{F}^{T}\label{eq103-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{q}=\mathbf{0}\label{eq105-1}
+\end{equation}
+
+\end_inset
+
+Equation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq102-1"
+
+\end_inset
+
+ shows that the entropy must be zero for our choice of state variable, whereas
+ Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq103-1"
+
+\end_inset
+
+ is the fundamental constraint we seek for formulating constitutive relations
+ in elasticity problems.
+ The constraint of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq105-1"
+
+\end_inset
+
+ implies that isothermal processes must be adiabatic, as there cannot be
+ heat flow in such problems.
+\end_layout
+
+\begin_layout Standard
+Let the Helmholtz free energy per unit 
+\shape italic
+reference
+\shape default
+ volume (
+\shape italic
+energy density
+\shape default
+) be denoted by 
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}\left(\mathbf{E}\right)\equiv\rho_{r}\psi\left(\mathbf{E}\right)\label{eq106-1}
+\end{equation}
+
+\end_inset
+
+ Then, using eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq88"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and recalling that 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is constant, eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq103-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=J^{-1}\mathbf{F}\cdot\frac{d\Psi_{r}}{d\mathbf{E}}\cdot\mathbf{F}^{T}\,.\label{eq:hyperelastic-stress-E}
+\end{equation}
+
+\end_inset
+
+This formula represents the constraint imposed by the second law of thermodynami
+cs on the formulation of a constitutive relation for an elastic solid.
+ For historical reasons, this formula is described as the 
+\emph on
+hyperelasticity
+\emph default
+ constraint.
+ The method described for obtaining this formula was first proposed by Coleman
+ and Noll in 1963 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Coleman63"
+literal "false"
+
+\end_inset
+
+.
+ Prior to that formulation, other constitutive relations had been proposed
+ for elastic solids (such as hypoelasticity), though it is now believed
+ that the only thermodynamically valid formulation is the one given here.
+ 
+\end_layout
+
+\begin_layout Standard
+In hyperelasticity theory, since the free energy density 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ only depends on the strain, we may also call it the 
+\emph on
+strain energy density
+\emph default
+.
+ A common alternative symbol for the strain energy density is 
+\begin_inset Formula $W\left(\mathbf{E}\right)$
+\end_inset
+
+.
+ Since it is common to include multiple state variables in a general formulation
+ of 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ for a material, the derivative 
+\begin_inset Formula $d\Psi_{r}/d\mathbf{E}$
+\end_inset
+
+ appearing in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq103-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is often written as a partial derivative, 
+\begin_inset Formula $\partial\Psi_{r}/\partial\mathbf{E}$
+\end_inset
+
+.
+ It is also common to use 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ instead of 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ as a suitable alternative measure of strain under finite deformation and
+ rotation.
+ In that case, based on eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:E-C-relation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the expression of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq103-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ takes the form
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=2J^{-1}\mathbf{F}\cdot\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\cdot\mathbf{F}^{T}\,.\label{eq:hyperelastic-stress-C}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Other Stress Tensors
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Other-Stress-Tensors"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The reaction force 
+\begin_inset Formula $\mathbf{f}$
+\end_inset
+
+ exerted on a surface 
+\begin_inset Formula $S$
+\end_inset
+
+ whose outward normal is 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\[
+\mathbf{f}=\int_{S}\mathbf{t}\,da=\int_{S}\boldsymbol{\sigma}\cdot\mathbf{n}\,da
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $da$
+\end_inset
+
+ is an elemental area of 
+\begin_inset Formula $S$
+\end_inset
+
+ in the current configuration.
+ Here, we used the relation between the traction vector 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ and the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+, given in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:traction-stress-relation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Note that the directed area 
+\begin_inset Formula $d\mathbf{a}=\mathbf{n}\,da$
+\end_inset
+
+ in this integral may be related to 
+\begin_inset Formula $d\mathbf{A}$
+\end_inset
+
+ in the reference configuration, using Nanson's formula in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Nanson-formula"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to produce
+\begin_inset Formula 
+\[
+\mathbf{f}=\int_{S_{r}}\boldsymbol{\sigma}\cdot J\mathbf{F}^{-T}\cdot d\mathbf{A}=\int_{S_{r}}J\boldsymbol{\sigma}\cdot\mathbf{F}^{-T}\cdot\mathbf{n}_{r}\,dA\,.
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the unit outward normal on 
+\begin_inset Formula $S_{r}$
+\end_inset
+
+ in the reference configuration.
+ Equating these two forms of 
+\begin_inset Formula $\mathbf{f}$
+\end_inset
+
+ and using the divergence theorem produces
+\begin_inset Formula 
+\[
+\mathbf{f}=\int_{V}\divg\boldsymbol{\sigma}\,dV=\int_{V_{r}}\Divg\left(J\boldsymbol{\sigma}\cdot\mathbf{F}^{-T}\right)dV_{r}\,,
+\]
+
+\end_inset
+
+where the divergence operator in the material frame is denoted by 
+\begin_inset Formula $\Divg\left(\cdot\right)$
+\end_inset
+
+.
+ The expression in the argument of this divergence operator is known as
+ the 
+\emph on
+first Piola-Kirchhoff stress tensor,
+\emph default
+ 
 \begin_inset Formula 
 \begin{equation}
 \mathbf{P}=J\boldsymbol{\sigma}\cdot\mathbf{F}^{-T}\,.\label{eq50}
@@ -2191,21 +4757,82 @@ is known as a
 two-point
 \emph default
  tensor, meaning it is neither a material nor a spatial tensor.
- Since we have two strain tensors, one spatial and one material tensor,
- it would be useful to have similar stress measures.
- The Cauchy stress is a spatial tensor and the 
-\emph on
-second Piola-Kirchhoff (2
-\emph default
-
-\begin_inset Formula $^{nd}$
+ This is demonstrated more easily by expressing 
+\begin_inset Formula $\boldsymbol{\sigma}$
 \end_inset
 
+ in terms of its contravariant components 
+\begin_inset Formula $\sigma^{ij}$
+\end_inset
 
+,
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\sigma^{ij}\mathbf{g}_{i}\otimes\mathbf{g}_{j}\label{eq:Cauchy-cov-cont}
+\end{equation}
+
+\end_inset
+
+and noting that 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{-1}=\mathbf{G}_{i}\otimes\mathbf{g}^{i}\label{eq:Finv-cov-cont}
+\end{equation}
+
+\end_inset
+
+so that the component form of 
+\begin_inset Formula $\mathbf{P}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq50"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to
+\begin_inset Formula 
+\[
+\mathbf{P}=J\sigma^{ij}\left(\mathbf{g}_{i}\otimes\mathbf{g}_{j}\right)\cdot\left(\mathbf{g}^{k}\otimes\mathbf{G}_{k}\right)=J\sigma^{ij}\mathbf{g}_{i}\otimes\mathbf{G}_{j}\,,
+\]
+
+\end_inset
+
+confirming that it is a two-point tensor.
+\end_layout
+
+\begin_layout Standard
+Two other stress measures are often used in continuum mechanics.
+ Examining eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hyperelastic-stress-E"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ or eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:hyperelastic-stress-C"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we may define the 
 \emph on
- PK) stress tensor
+second Piola-Kirchhoff (PK2) stress tensor
 \emph default
-, defined as 
+ as 
 \begin_inset Formula 
 \begin{equation}
 \mathbf{S}=J\mathbf{F}^{-1}\cdot\boldsymbol{\sigma}\cdot\mathbf{F}^{-T}\,,\label{eq51}
@@ -2213,8 +4840,90 @@ second Piola-Kirchhoff (2
 
 \end_inset
 
-is a material tensor.
- The inverse relations are: 
+where, for a hyperelastic material,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=\frac{\partial\Psi_{r}}{\partial\mathbf{E}}=2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\,.\label{eq:PK2-hyperelasticity}
+\end{equation}
+
+\end_inset
+
+Substituting the component form of 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Cauchy-cov-cont"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ into eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq51"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Finv-cov-cont"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=J\sigma^{ij}\mathbf{G}_{i}\otimes\mathbf{G}_{j}\,,\label{eq:PK2-cov-cont}
+\end{equation}
+
+\end_inset
+
+showing that 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ is a material tensor.
+ This component form suggests that may also define the 
+\emph on
+Kirchhoff stress tensor
+\emph default
+ as the spatial version of 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\tau}=J\boldsymbol{\sigma}=J\sigma^{ij}\mathbf{g}_{i}\otimes\mathbf{g}_{j}\,.\label{eq49}
+\end{equation}
+
+\end_inset
+
+Since 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is symmetric, it follows that 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is symmetric.
+\end_layout
+
+\begin_layout Standard
+The inverse relations for these various stresses are are 
 \begin_inset Formula 
 \begin{equation}
 \boldsymbol{\mathbf{\sigma}}=\frac{1}{J}\boldsymbol{\tau}\,,\quad\boldsymbol{\sigma}=\frac{1}{J}\mathbf{P}\cdot\mathbf{F}^{T}\,,\quad\boldsymbol{\sigma}=\frac{1}{J}\mathbf{F}\cdot\mathbf{S}\cdot\mathbf{F}^{T}\,.\label{eq52}
@@ -2222,29 +4931,18 @@ is a material tensor.
 
 \end_inset
 
-In many practical applications it is physically relevant to separate the
- hydrostatic stress and the deviatoric stress 
-\begin_inset Formula $\tilde{\boldsymbol{\sigma}}$
-\end_inset
 
- of the Cauchy stress tensor: 
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}=\tilde{\boldsymbol{\sigma}}+p\mathbf{I}\,.\label{eq53}
-\end{equation}
+\end_layout
+
+\begin_layout Subsection
+Directional Derivative of the Stress
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Stress-Directional-Derivative"
 
 \end_inset
 
-Here, the pressure is defined as 
-\begin_inset Formula $p=\frac{1}{3}\tr\boldsymbol{\sigma}$
-\end_inset
 
-.
- Note that the deviatoric Cauchy stress tensor satisfies 
-\begin_inset Formula $\tr\tilde{\boldsymbol{\sigma}}=0$
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -2254,8 +4952,17 @@ The directional derivative of the 2
 
  PK stress tensor needs to be calculated for the linearization of the finite
  element equations.
- For a hyperelastic material, a linear relationship between the directional
- derivative of 
+ For a hyperelastic material, as expressed in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PK2-hyperelasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, a linear relationship between the directional derivative of 
 \begin_inset Formula $\mathbf{S}$
 \end_inset
 
@@ -2280,23 +4987,18 @@ Here,
 material elasticity tensor
 \emph default
 .
- Its components are given by
+ Its Cartesian components and tensorial definition are given by
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbb{C}_{IJKL} & =\frac{\partial S_{IJ}}{\partial E_{KL}}=\frac{4\partial^{2}\Psi}{\partial C_{IJ}\partial C_{KL}}\\
-\boldsymbol{\mathbb{C}} & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\frac{4\partial^{2}\Psi}{\partial\mathbf{C}\partial\mathbf{C}}
+\begin{aligned}\mathbb{C}_{IJKL} & =\frac{\partial S_{IJ}}{\partial E_{KL}}=\frac{4\partial^{2}\Psi_{r}}{\partial C_{IJ}\partial C_{KL}}\\
+\boldsymbol{\mathbb{C}} & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=\frac{4\partial^{2}\Psi_{r}}{\partial\mathbf{C}\partial\mathbf{C}}
 \end{aligned}
-\,,\label{eq55}
+\,.\label{eq55}
 \end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $\Psi$
-\end_inset
-
- is the strain-energy density function for the hyperelastic material.
- The spatial equivalent – the 
+The spatial equivalent – the 
 \emph on
 spatial elasticity tensor 
 \emph default
@@ -2311,145 +5013,6 @@ spatial elasticity tensor
 \boldsymbol{\mathcal{C}} & =\frac{1}{J}\left(\mathbf{F}\oslash\mathbf{F}\right):\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)
 \end{aligned}
 .\label{eq56}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Hyperelasticity
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:hyperelasticity"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-When the constitutive behavior is only a function of the current state of
- deformation, the material is 
-\emph on
-elastic
-\emph default
-.
- In the special case when the work done by the stresses during a deformation
- is only dependent on the initial state and the final state, the material
- is termed 
-\emph on
-hyperelastic
-\emph default
- and its behavior is path-independent.
- As a consequence of the path-independence a 
-\emph on
-strain energy function 
-\emph default
-per unit undeformed volume can be defined as the work done by the stresses
- from the initial to the final configuration: 
-\begin_inset Formula 
-\begin{equation}
-\Psi\left(\mathbf{F}\left(\mathbf{X}\right),\mathbf{X}\right)=\int\limits _{t_{0}}^{t}\mathbf{P}\left(\mathbf{F}\left(\mathbf{X}\right),\mathbf{X}\right):\mathbf{\dot{F}}\,dt\,.\label{eq57}
-\end{equation}
-
-\end_inset
-
-The rate of change of the potential is then given by 
-\begin_inset Formula 
-\begin{equation}
-\dot{\Psi}\left(\mathbf{F}\left(\mathbf{X}\right),\mathbf{X}\right)=\mathbf{P}:\mathbf{\dot{F}}\,.\label{eq58}
-\end{equation}
-
-\end_inset
-
-Or alternatively, 
-\begin_inset Formula 
-\begin{equation}
-P_{iJ}=\sum\limits _{i,J=1}^{3}\frac{\partial\Psi}{\partial F_{iJ}}\dot{F}_{iJ}\,.\label{eq59}
-\end{equation}
-
-\end_inset
-
-Comparing 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq58"
-
-\end_inset
-
- with 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq59"
-
-\end_inset
-
- reveals that 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{P}\left(\mathbf{F}\left(\mathbf{X}\right),\mathbf{X}\right)=\frac{\partial\Psi\left(\mathbf{F}\left(\mathbf{X}\right),\mathbf{X}\right)}{\partial\mathbf{F}}.\label{eq60}
-\end{equation}
-
-\end_inset
-
-This general constitutive equation can be further simplified by observing
- that, as a consequence of the objectivity requirement, 
-\begin_inset Formula $\Psi$
-\end_inset
-
- may only depend on 
-\series bold
-
-\begin_inset Formula $\mathbf{F}$
-\end_inset
-
-
-\series default
- through the stretch tensor 
-\series bold
-
-\begin_inset Formula $\mathbf{U}$
-\end_inset
-
-
-\series default
- and must be independent of the rotation component 
-\series bold
-
-\begin_inset Formula $\mathbf{R}$
-\end_inset
-
-
-\series default
-.
- For convenience, however, 
-\begin_inset Formula $\Psi$
-\end_inset
-
-is often expressed as a function of 
-\begin_inset Formula $\mathbf{C}=\mathbf{U}^{2}=\mathbf{F}^{T}\cdot\mathbf{F}$
-\end_inset
-
-.
- Noting that 
-\begin_inset Formula $\frac{1}{2}\mathbf{\dot{C}}=\mathbf{\dot{E}}$
-\end_inset
-
- is work conjugate to the second Piola-Kirchhoff stress 
-\series bold
-
-\begin_inset Formula $\mathbf{S}$
-\end_inset
-
-
-\series default
-, establishes the following general relationships for hyperelastic materials:
- 
-\begin_inset Formula 
-\begin{equation}
-\dot{\Psi}=\frac{\partial\Psi}{\partial\mathbf{C}}:\mathbf{\dot{C}}=\frac{1}{2}\mathbf{S}:\mathbf{\dot{C}},\quad\boxed{\mathbf{S}\left(\mathbf{C}\left(\mathbf{X}\right),\mathbf{X}\right)=2\frac{\partial\Psi}{\partial\mathbf{C}}=\frac{\partial\Psi}{\partial\mathbf{E}}}\,.\label{eq61}
 \end{equation}
 
 \end_inset
@@ -2472,8 +5035,9 @@ name "subsec:isotropic-hyperelasticity"
 The hyperelastic constitutive equations discussed so far are unrestricted
  in their application.
  Isotropic material symmetry is defined by requiring the constitutive behavior
- to be independent of the material axis chosen and, consequently, 
-\begin_inset Formula $\Psi$
+ to be independent of any material axes.
+ Consequently, 
+\begin_inset Formula $\Psi_{r}$
 \end_inset
 
  must only be a function of the invariants of 
@@ -2484,22 +5048,30 @@ The hyperelastic constitutive equations discussed so far are unrestricted
 
 
 \series default
-, 
+ (or 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+), 
 \begin_inset Formula 
 \begin{equation}
-\Psi\left(\mathbf{C}\left(\mathbf{X}\right),\mathbf{X}\right)=\Psi\left(I_{1},I_{2},I_{3},\mathbf{X}\right)\,,\label{eq62}
+\Psi_{r}=\Psi_{r}\left(I_{1},I_{2},I_{3}\right)\,,\label{eq:isotropic-SED}
 \end{equation}
 
 \end_inset
 
 where the invariants of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+
 \series bold
-C 
+ 
 \series default
 are defined here as, 
 \begin_inset Formula 
 \begin{equation}
-I_{1}=\tr\mathbf{C}=\mathbf{C}:\mathbf{I},\,I_{2}=\frac{1}{2}\left[\left(\tr\mathbf{C}\right)^{2}-\tr\mathbf{C}^{2}\right],\,I_{3}=\det\mathbf{C}=J^{2}\,.\label{eq63}
+I_{1}=\tr\mathbf{C}=\mathbf{I}:\mathbf{C},\,I_{2}=\frac{1}{2}\left[\left(\tr\mathbf{C}\right)^{2}-\tr\mathbf{C}^{2}\right],\,I_{3}=\det\mathbf{C}=J^{2}\,.\label{eq:C-invariants}
 \end{equation}
 
 \end_inset
@@ -2508,20 +5080,20 @@ As a result of the isotropic restriction, the second Piola-Kirchhoff stress
  tensor can be written as, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}=2\frac{\partial\Psi}{\partial\mathbf{C}}=2\frac{\partial\Psi}{\partial I_{1}}\frac{\partial I_{1}}{\partial\mathbf{C}}+2\frac{\partial\Psi}{\partial I_{2}}\frac{\partial I_{2}}{\partial\mathbf{C}}+2\frac{\partial\Psi}{\partial I_{3}}\frac{\partial I_{3}}{\partial\mathbf{C}}\,.\label{eq64}
+\mathbf{S}=2\frac{\partial\Psi}{\partial\mathbf{C}}=2\frac{\partial\Psi}{\partial I_{1}}\frac{\partial I_{1}}{\partial\mathbf{C}}+2\frac{\partial\Psi}{\partial I_{2}}\frac{\partial I_{2}}{\partial\mathbf{C}}+2\frac{\partial\Psi}{\partial I_{3}}\frac{\partial I_{3}}{\partial\mathbf{C}}\,.\label{eq:PK2-isotropic}
 \end{equation}
 
 \end_inset
 
 The second order tensors formed by the derivatives of the invariants with
  respect to 
-\series bold
-C
-\series default
- can be evaluated as follows: 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ can be evaluated as 
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial I_{1}}{\partial\mathbf{C}}=\mathbf{I}\,,\,\frac{\partial I_{2}}{\partial\mathbf{C}}=I_{1}\mathbf{I}-\mathbf{C}\,,\,\frac{\partial I_{3}}{\partial\mathbf{C}}=I_{3}\mathbf{C}^{-1}\,.\label{eq65}
+\frac{\partial I_{1}}{\partial\mathbf{C}}=\mathbf{I}\,,\,\frac{\partial I_{2}}{\partial\mathbf{C}}=I_{1}\mathbf{I}-\mathbf{C}\,,\,\frac{\partial I_{3}}{\partial\mathbf{C}}=I_{3}\mathbf{C}^{-1}\,.\label{eq:C-invariant-deriv}
 \end{equation}
 
 \end_inset
@@ -2529,27 +5101,27 @@ C
 Introducing expressions 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq65"
+reference "eq:C-invariant-deriv"
 
 \end_inset
 
  into equation 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq64"
+reference "eq:PK2-isotropic"
 
 \end_inset
 
  enables the second Piola-Kirchhoff stress to be evaluated as, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}=2\left\{ \left(\Psi_{1}+I_{1}\Psi_{2}+I_{2}\Psi_{3})\right)\mathbf{I}-\left(\Psi_{2}+I_{1}\Psi_{3}\right)\mathbf{C}\right\} +\Psi_{3}\mathbf{C}^{2}\,,\label{eq66}
+\mathbf{S}=2\left(\Psi_{1}+I_{1}\Psi_{2}+I_{2}\Psi_{3})\right)\mathbf{I}-2\left(\Psi_{2}+I_{1}\Psi_{3}\right)\mathbf{C}+\Psi_{3}\mathbf{C}^{2}\,,\label{eq:PK2-isotropic-final}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\Psi_{I}=\partial\Psi/\partial I_{1}$
+\begin_inset Formula $\Psi_{1}=\partial\Psi/\partial I_{1}$
 \end_inset
 
 , 
@@ -2575,12 +5147,25 @@ reference "eq52"
 : 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}=\frac{2}{J}\left\{ \left(\Psi_{1}+I_{1}\Psi_{2}+I_{2}\Psi_{3})\right)\mathbf{b}-\left(\Psi_{2}+I_{1}\Psi_{3}\right)\mathbf{b}^{2}\right\} +\frac{1}{J}\Psi_{3}\mathbf{b}^{3}\,.\label{eq67}
+\boldsymbol{\sigma}=J^{-1}\left(2\left(\Psi_{1}+I_{1}\Psi_{2}+I_{2}\Psi_{3})\right)\mathbf{b}-2\left(\Psi_{2}+I_{1}\Psi_{3}\right)\mathbf{b}^{2}+\Psi_{3}\mathbf{b}^{3}\right)\,,\label{eq:Cauchy-isotropic}
 \end{equation}
 
 \end_inset
 
-Note that in this equation 
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{b}=\mathbf{F}\cdot\mathbf{F}^{T}\,.\label{eq:left-Cauchy-Green}
+\end{equation}
+
+\end_inset
+
+is the 
+\emph on
+left Cauchy-Green tensor
+\emph default
+.
+ Note that in this equation 
 \begin_inset Formula $\Psi_{1}$
 \end_inset
 
@@ -2745,7 +5330,7 @@ nt in the last term,
 
 \end_inset
 
-The double summations in 
+The double summations in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq72"
@@ -2798,348 +5383,6 @@ The spatial elasticity tensor is given by
  & +\sum\limits _{i=1}^{3}\sum\limits _{j=i+1}^{3}2\frac{\lambda_{j}^{2}\sigma_{i}-\lambda_{i}^{2}\sigma_{j}}{\lambda_{i}^{2}-\lambda_{j}^{2}}\left(\mathbf{a}_{i}\odot\mathbf{a}_{j}+\mathbf{a}_{j}\odot\mathbf{a}_{i}\right)
 \end{aligned}
 \,.\label{eq:IEPD-elasticity}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-Nearly-Incompressible Hyperelasticity
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Nearly-Incompressible-Hyperelast"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A material is considered incompressible if it shows no change in volume
- during deformation, or otherwise stated, if 
-\begin_inset Formula $J=1$
-\end_inset
-
- holds throughout the entire body.
- It can be shown 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Bonet97"
-literal "true"
-
-\end_inset
-
- that if the material is incompressible the hyperelastic constitutive equation
- becomes 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{S}=2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+pJ\mathbf{C}^{-1}\,,\label{eq:UC-PK2}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $\tilde{\Psi}=\Psi\left(\tilde{\mathbf{C}}\right)$
-\end_inset
-
-is the deviatoric strain energy function and 
-\begin_inset Formula $p$
-\end_inset
-
- is the hydrostatic pressure.
- The presence of 
-\begin_inset Formula $J$
-\end_inset
-
- may seem unnecessary, but retaining 
-\begin_inset Formula $J$
-\end_inset
-
- has the advantage that equation 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:UC-PK2"
-
-\end_inset
-
- remains valid in the nearly incompressible case.
- Further, in practical terms, a finite element analysis rarely enforces
- 
-\begin_inset Formula $J=1$
-\end_inset
-
- in a pointwise manner, and hence its retention may be important for the
- evaluation of stresses.
-\end_layout
-
-\begin_layout Standard
-The process of defining constitutive equations in the case of nearly incompressi
-ble hyperelasticity is simplified by adding a volumetric energy component
- 
-\begin_inset Formula $U\left(J\right)$
-\end_inset
-
- to the distortional component 
-\begin_inset Formula $\tilde{\Psi}\left(\mathbf{C}\right)$
-\end_inset
-
-: 
-\begin_inset Formula 
-\begin{equation}
-\Psi\left(\mathbf{C}\right)=\tilde{\Psi}\left(\mathbf{C}\right)+U\left(J\right)\,.\label{eq:UC-SED}
-\end{equation}
-
-\end_inset
-
-The second Piola-Kirchhoff tensor for a material defined by 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:UC-SED"
-
-\end_inset
-
- is obtained in the standard manner with the help of equation 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq64"
-
-\end_inset
-
-.
- 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{S} & =2\frac{\partial\Psi}{\partial\mathbf{C}}\\
- & =2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+2\frac{dU}{dJ}\frac{\partial J}{\partial C}\\
- & =2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+pJ\mathbf{C}^{-1}
-\end{aligned}
-\,,\label{eq:UC-PK2-redux}
-\end{equation}
-
-\end_inset
-
-where the pressure 
-\begin_inset Formula $p$
-\end_inset
-
- is defined as 
-\begin_inset Formula 
-\begin{equation}
-p=\frac{dU}{dJ}\,.\label{eq:UC-p}
-\end{equation}
-
-\end_inset
-
-An example for 
-\begin_inset Formula $U$
-\end_inset
-
- that will be used later in the definition of the constitutive models is
- 
-\begin_inset Formula 
-\begin{equation}
-U\left(J\right)=\frac{1}{2}\kappa\left(\ln J\right)^{2}\,.\label{eq:UC-U-exa}
-\end{equation}
-
-\end_inset
-
-The parameter 
-\begin_inset Formula $\kappa$
-\end_inset
-
- will be used later as a penalty factor that will enforce the (nearly-)
- incompressible constraint.
- However, 
-\begin_inset Formula $\kappa$
-\end_inset
-
- can represent a true material coefficient, namely the bulk modulus, for
- a compressible material that happens to have a hyperelastic strain energy
- function in the form of 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:UC-SED"
-
-\end_inset
-
-.
- In the case where the dilatational energy is given by 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:UC-U-exa"
-
-\end_inset
-
-, the pressure is 
-\begin_inset Formula 
-\begin{equation}
-p=\kappa\frac{\ln J}{J}\,.\label{eq:UC-p-exa}
-\end{equation}
-
-\end_inset
-
-Equation 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:UC-PK2-redux"
-
-\end_inset
-
- can be further developed by applying the chain rule to the first term:
- 
-\begin_inset Formula 
-\begin{equation}
-\mathbf{S}=pJ\mathbf{C}^{-1}+J^{-2/3}\dev\tilde{\mathbf{S}}\,,\label{eq:UC-PK2-redux2}
-\end{equation}
-
-\end_inset
-
-where the 
-\emph on
-fictitious second Piola-Kirchoff 
-\emph default
-tensor 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Holzapfel00"
-literal "true"
-
-\end_inset
-
- is defined by, 
-\begin_inset Formula 
-\begin{equation}
-\tilde{\mathbf{S}}=2\frac{\partial\tilde{\Psi}}{\partial\tilde{\mathbf{C}}}\,,\label{eq:UC-PK2-tilde}
-\end{equation}
-
-\end_inset
-
-and 
-\begin_inset Formula $\Dev$
-\end_inset
-
- is the deviator operator in the reference frame: 
-\begin_inset Formula 
-\begin{equation}
-\Dev\left(\cdot\right)=\left(\cdot\right)-\frac{1}{3}\left(\left(\cdot\right):\mathbf{C}\right)\mathbf{C}^{-1}.\label{eq:UC-Dev}
-\end{equation}
-
-\end_inset
-
-The Cauchy stress can then be obtained from equation 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq52"
-
-\end_inset
-
-
-\begin_inset Formula $_{\mathrm{3}}$
-\end_inset
-
-: 
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}=p\mathbf{I}+\dev\tilde{\boldsymbol{\sigma}}\,,\label{eq:UC-Cauchy-stress}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula 
-\begin{equation}
-\tilde{\boldsymbol{\sigma}}=\frac{2}{J}\mathbf{\tilde{F}}\cdot\frac{\partial\tilde{\Psi}}{\partial\mathbf{\tilde{C}}}\cdot\mathbf{\tilde{F}}^{T}\,.\label{eq:UC-Cauchy-stress-tilde}
-\end{equation}
-
-\end_inset
-
-The following expression will be useful in the following development.
- 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\frac{d\tilde{C}_{IJ}}{dC_{KL}} & =J^{-2/3}\left(\frac{1}{2}\left(\delta_{IK}\delta_{JL}+\delta_{IL}\delta_{JK}\right)-\frac{1}{3}\tilde{C}_{IJ}\tilde{C}_{KL}^{-1}\right)\\
-\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}} & =J^{-2/3}\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}\right)
-\end{aligned}
-\,.\label{eq89}
-\end{equation}
-
-\end_inset
-
-Notice that the contraction with a symmetric tensor 
-\series bold
-
-\begin_inset Formula $\mathbf{A}$
-\end_inset
-
-
-\series default
- results in, 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\frac{d\tilde{C}_{IJ}}{dC_{KL}}A_{IJ} & =J^{-2/3}\Dev A_{KL}\\
-\mathbf{A}:\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}} & =J^{-2/3}\Dev\mathbf{A}
-\end{aligned}
-\,.\label{eq90}
-\end{equation}
-
-\end_inset
-
-The elasticity tensor, defined in 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq55"
-
-\end_inset
-
-, takes on the following form.
- 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbb{C}_{IJKL} & =\left(J^{2}\frac{dp}{dJ}+Jp\right)C_{IJ}^{-1}C_{KL}^{-1}-2pJ\mathcal{I}_{IJKL}\\
- & -\frac{2}{3}J^{-2/3}\left(\Dev\tilde{S}_{IJ}C_{KL}^{-1}+C_{IJ}^{-1}\Dev\tilde{S}_{KL}\right)\\
- & +\frac{2}{3}\tilde{S}_{RS}\tilde{C}_{RS}\left(\mathcal{I}_{IJKL}-\frac{1}{3}C_{KL}^{-1}C_{IJ}^{-1}\right)+J^{-4/3}\hat{\mathbb{C}}_{IJKL}\\
-\boldsymbol{\mathbb{C}} & =\left(J^{2}\frac{dp}{dJ}+Jp\right)\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}-2pJ\boldsymbol{\mathcal{I}}\\
- & -\frac{2}{3}J^{-2/3}\left(\Dev\tilde{\mathbf{S}}\otimes\mathbf{C}^{-1}+\mathbf{C}^{-1}\otimes\Dev\tilde{\mathbf{S}}\right)\\
- & +\frac{2}{3}\left(\tilde{\mathbf{S}}:\tilde{\mathbf{C}}\right)\left(\boldsymbol{\mathcal{I}}-\frac{1}{3}\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}\right)+J^{-4/3}\hat{\boldsymbol{\mathbb{C}}}
-\end{aligned}
-\,,\label{eq91}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\hat{\mathcal{\mathbb{C}}}_{IJKL} & =\tilde{\mathcal{\mathbb{C}}}_{IJKL}-\frac{1}{3}\left(\tilde{\mathcal{\mathbb{C}}}_{IJRS}\tilde{C}_{RS}\tilde{C}_{KL}^{-1}+\tilde{\mathcal{\mathbb{C}}}_{RSKL}\tilde{C}_{RS}\tilde{C}_{IJ}^{-1}\right)+\frac{1}{9}\tilde{C}_{IJ}^{-1}\tilde{C}_{RS}\tilde{\mathbb{C}}_{RSMN}\tilde{C}_{MN}\tilde{C}_{KL}^{-1}\\
-\hat{\mathcal{\boldsymbol{\mathbb{C}}}} & =\tilde{\mathcal{\boldsymbol{\mathbb{C}}}}-\frac{1}{3}\left(\tilde{\mathcal{\boldsymbol{\mathbb{C}}}}:\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}+\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathcal{\mathbb{C}}}}\right)+\frac{1}{9}\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathbb{C}}}:\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}
-\end{aligned}
-\,.\label{eq92}
-\end{equation}
-
-\end_inset
-
-The spatial elasticity tensor follows from
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\boldsymbol{\mathcal{C}} & =\left(J\frac{dp}{dJ}+p\right)\mathbf{I}\otimes\mathbf{I}-2p\mathbf{I}\odot\mathbf{I}\\
- & -\frac{2}{3}\left(\dev\tilde{\boldsymbol{\sigma}}\otimes\mathbf{I}+\mathbf{I}\otimes\dev\tilde{\boldsymbol{\sigma}}\right)\\
- & +\frac{2}{3}\left(\tilde{\boldsymbol{\sigma}}:\mathbf{I}\right)\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)+\hat{\mathcal{\boldsymbol{C}}}
-\end{aligned}
-\,,\label{eq:UC-spatial-elasticity}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\hat{\mathcal{C}}_{ijkl} & =\frac{1}{J}\tilde{F}_{iI}\tilde{F}_{jJ}\tilde{F}_{kK}\tilde{F}_{lL}\hat{\mathcal{\mathbb{C}}}_{IJKL}\\
-\hat{\boldsymbol{\mathcal{C}}} & =\frac{1}{J}\left(\tilde{\mathbf{F}}\oslash\tilde{\mathbf{F}}\right):\hat{\boldsymbol{\mathbb{C}}}:\left(\tilde{\mathbf{F}}^{T}\oslash\tilde{\mathbf{F}}^{T}\right)\\
- & =\tilde{\boldsymbol{\mathcal{C}}}-\frac{1}{3}\left(\mathbf{I}\otimes\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}+\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\otimes\mathbf{I}\right)+\frac{1}{9}\left(\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\right)\mathbf{I}\otimes\mathbf{I}
-\end{aligned}
-\,.\label{eq:UC-spatial-elasticity-hat}
 \end{equation}
 
 \end_inset
@@ -3321,6 +5564,605 @@ literal "true"
  the general case, it also embodies almost all of the material behavior
  that one would expect from transversely isotropic, large deformation matrix-fib
 er composites.
+\end_layout
+
+\begin_layout Subsection
+Incompressibility
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Incompressibility"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A material is incompressible when its mass density remains constant, 
+\begin_inset Formula $\rho=\rho_{r}$
+\end_inset
+
+, or equivalently according to eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq87"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, its relative volume satisfies
+\begin_inset Formula 
+\begin{equation}
+J=1\label{eq:incompressibility-constraint}
+\end{equation}
+
+\end_inset
+
+everywhere throughout the material.
+ No real material is truly incompressible, since true incompressibility
+ implies that the speed of sound in that medium is infinite, which is not
+ physically possible.
+ Thus, one should view this assumption as an idealization of the behavior
+ of real materials.
+ We may replace eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:incompressibility-constraint"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ with the equivalent form 
+\begin_inset Formula $\dot{J}=0$
+\end_inset
+
+, and make use of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq91-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in the form
+\begin_inset Formula 
+\begin{equation}
+\divg\mathbf{v}=\mathbf{I}:\mathbf{D}=0\,,\label{eq:incompressibility-redux}
+\end{equation}
+
+\end_inset
+
+where we recognized that the divergence of the velocity is equal to the
+ trace of the velocity gradient 
+\begin_inset Formula $\mathbf{L}$
+\end_inset
+
+, hence, the trace of its symmetric part 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $J=\left(\det\mathbf{C}\right)^{1/2}$
+\end_inset
+
+, the incompressibility constraint of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:incompressibility-constraint"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ implies that the symmetric strain tensor 
+\begin_inset Formula $\mathbf{E}=\frac{1}{2}\left(\mathbf{C}-\mathbf{I}\right)$
+\end_inset
+
+ used as a state variable in the derivation of the hyperelasticity relation
+ (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Constitutive-Restrictions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) does not truly have six independent components.
+ Therefore, we cannot claim that 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ can vary arbitrarily when enforcing the entropy inequality.
+ Instead, we introduce the incompressbility constraint of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:incompressibility-redux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ into the Clausius-Duhem inequality, eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Clausius-Duhem-inequality"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, using the method of Lagrange multipliers,
+\begin_inset Formula 
+\[
+-\rho\left(\dot{\psi}+\eta\dot{\theta}\right)+\left(\boldsymbol{\sigma}+\lambda\mathbf{I}\right):\mathbf{D}-\frac{1}{\theta}\mathbf{q}\cdot\grad\theta\geqslant0\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is the Lagrange multiplier.
+ Now, we may proceed with the constitutive assumption that 
+\begin_inset Formula $\psi=\psi\left(\mathbf{E}\right)$
+\end_inset
+
+, as done in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Constitutive-Restrictions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, until we conclude that the stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is constrained to have the form
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=p\mathbf{I}+2J^{-1}\mathbf{F}\cdot\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\cdot\mathbf{F}^{T}\,,\quad p\equiv-\lambda\,.\label{eq:Cauchy-hyperelastic-incomp}
+\end{equation}
+
+\end_inset
+
+This expression shows that the incompressibility constraint requires us
+ to have a parameter 
+\begin_inset Formula $p$
+\end_inset
+
+ (a pressure) that accounts for that part of the strain energy density that
+ would normally be stored in the material as a result of volumetric strain.
+ Analytically, we would solve for this additional scalar parameter 
+\begin_inset Formula $p$
+\end_inset
+
+ using the constraint of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:incompressibility-constraint"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Finally, substituting eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Cauchy-hyperelastic-incomp"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ into eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq51"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the PK2 stress in an incompressible material takes the form
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=Jp\mathbf{C}^{-1}+2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\,.\label{eq:PK2-hyperelastic-incomp}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Nearly-Incompressible Hyperelasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Nearly-Incompressible-Hyperelast"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When dealing with incompressible and nearly incompressible materials, it
+ proves useful to separate the volumetric and the deviatoric (distortional)
+ components of the deformation gradient 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ Such a separation must ensure that the deviatoric part of the deformation
+ gradient, namely 
+\begin_inset Formula $\mathbf{\tilde{F}}$
+\end_inset
+
+, does not produce any change in volume.
+ Noting that the determinant of the deformation gradient gives the volume
+ ratio, the determinant of 
+\begin_inset Formula $\mathbf{\tilde{F}}$
+\end_inset
+
+ must therefore satisfy, 
+\begin_inset Formula 
+\begin{equation}
+\det\mathbf{\tilde{F}}=1\,.\label{eq38}
+\end{equation}
+
+\end_inset
+
+This condition can be achieved by choosing 
+\begin_inset Formula $\mathbf{\tilde{F}}$
+\end_inset
+
+ as, 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{\tilde{F}}=J^{-1/3}\mathbf{F}\,.\label{eq39}
+\end{equation}
+
+\end_inset
+
+The right Cauchy-Green tensor can also be split into volumetric and deviatoric
+ components.
+ With the use of,
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq39"
+
+\end_inset
+
+ the deviatoric right Cauchy-Green tensor is given by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{\tilde{C}}=\tilde{\mathbf{F}}^{T}\cdot\tilde{\mathbf{F}}=J^{-2/3}\mathbf{C}\,.\label{eq43-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The process of defining constitutive equations in the case of nearly incompressi
+ble hyperelasticity is simplified by uncoupling the strain energy density
+ 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{C}\right)$
+\end_inset
+
+ into a volumetric energy component 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ and a distortional component 
+\begin_inset Formula $\tilde{\Psi}\left(\mathbf{C}\right)$
+\end_inset
+
+: 
+\begin_inset Formula 
+\begin{equation}
+\Psi\left(\mathbf{C}\right)=\tilde{\Psi}\left(\mathbf{C}\right)+U\left(J\right)\,.\label{eq:UC-SED}
+\end{equation}
+
+\end_inset
+
+The second Piola-Kirchhoff tensor for a material defined by 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-SED"
+
+\end_inset
+
+ is obtained in the standard manner with the help of equation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PK2-isotropic"
+
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{S} & =2\frac{\partial\Psi}{\partial\mathbf{C}}\\
+ & =2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+2\frac{dU}{dJ}\frac{\partial J}{\partial C}\\
+ & =2\frac{\partial\tilde{\Psi}}{\partial\mathbf{C}}+pJ\mathbf{C}^{-1}
+\end{aligned}
+\,,\label{eq:UC-PK2-redux}
+\end{equation}
+
+\end_inset
+
+where the pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ is defined as 
+\begin_inset Formula 
+\begin{equation}
+p=\frac{dU}{dJ}\,.\label{eq:UC-p}
+\end{equation}
+
+\end_inset
+
+An example for 
+\begin_inset Formula $U$
+\end_inset
+
+ that will be used later in the definition of the constitutive models is
+ 
+\begin_inset Formula 
+\begin{equation}
+U\left(J\right)=\frac{1}{2}\kappa\left(\ln J\right)^{2}\,.\label{eq:UC-U-exa}
+\end{equation}
+
+\end_inset
+
+The parameter 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ will be used later as a penalty factor that will enforce the (nearly-)
+ incompressible constraint.
+ However, 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ can represent a true material coefficient, namely the bulk modulus, for
+ a compressible material that happens to have a hyperelastic strain energy
+ function in the form of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-SED"
+
+\end_inset
+
+.
+ In the case where the dilatational energy is given by 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-U-exa"
+
+\end_inset
+
+, the pressure is 
+\begin_inset Formula 
+\begin{equation}
+p=\kappa\frac{\ln J}{J}\,.\label{eq:UC-p-exa}
+\end{equation}
+
+\end_inset
+
+Equation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UC-PK2-redux"
+
+\end_inset
+
+ can be further developed by applying the chain rule to the first term:
+ 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=pJ\mathbf{C}^{-1}+J^{-2/3}\dev\tilde{\mathbf{S}}\,,\label{eq:UC-PK2-redux2}
+\end{equation}
+
+\end_inset
+
+where the 
+\emph on
+fictitious second Piola-Kirchoff 
+\emph default
+tensor 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Holzapfel00"
+literal "true"
+
+\end_inset
+
+ is defined by, 
+\begin_inset Formula 
+\begin{equation}
+\tilde{\mathbf{S}}=2\frac{\partial\tilde{\Psi}}{\partial\tilde{\mathbf{C}}}\,,\label{eq:UC-PK2-tilde}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\Dev$
+\end_inset
+
+ is the deviator operator in the reference frame: 
+\begin_inset Formula 
+\begin{equation}
+\Dev\left(\cdot\right)=\left(\cdot\right)-\frac{1}{3}\left(\left(\cdot\right):\mathbf{C}\right)\mathbf{C}^{-1}.\label{eq:UC-Dev}
+\end{equation}
+
+\end_inset
+
+The Cauchy stress can then be obtained from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq52"
+
+\end_inset
+
+
+\begin_inset Formula $_{\mathrm{3}}$
+\end_inset
+
+: 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=p\mathbf{I}+\dev\tilde{\boldsymbol{\sigma}}\,,\label{eq:UC-Cauchy-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}=\frac{2}{J}\mathbf{\tilde{F}}\cdot\frac{\partial\tilde{\Psi}}{\partial\mathbf{\tilde{C}}}\cdot\mathbf{\tilde{F}}^{T}\,,\label{eq:UC-Cauchy-stress-tilde}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\dev\left(\cdot\right)=\left(\cdot\right)-\frac{1}{3}\left(\left(\cdot\right):\mathbf{I}\right)\mathbf{I}\label{eq:UC-dev}
+\end{equation}
+
+\end_inset
+
+is the deviator operator in the spatial frame.
+\end_layout
+
+\begin_layout Standard
+The following expression will be useful in the following development.
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{d\tilde{C}_{IJ}}{dC_{KL}} & =J^{-2/3}\left(\frac{1}{2}\left(\delta_{IK}\delta_{JL}+\delta_{IL}\delta_{JK}\right)-\frac{1}{3}\tilde{C}_{IJ}\tilde{C}_{KL}^{-1}\right)\\
+\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}} & =J^{-2/3}\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}\right)
+\end{aligned}
+\,.\label{eq89}
+\end{equation}
+
+\end_inset
+
+Notice that the contraction with a symmetric tensor 
+\series bold
+
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+
+\series default
+ results in, 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{d\tilde{C}_{IJ}}{dC_{KL}}A_{IJ} & =J^{-2/3}\Dev A_{KL}\\
+\mathbf{A}:\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}} & =J^{-2/3}\Dev\mathbf{A}
+\end{aligned}
+\,.\label{eq90}
+\end{equation}
+
+\end_inset
+
+The elasticity tensor, defined in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq55"
+
+\end_inset
+
+, takes on the following form.
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbb{C}_{IJKL} & =\left(J^{2}\frac{dp}{dJ}+Jp\right)C_{IJ}^{-1}C_{KL}^{-1}-2pJ\mathcal{I}_{IJKL}\\
+ & -\frac{2}{3}J^{-2/3}\left(\Dev\tilde{S}_{IJ}C_{KL}^{-1}+C_{IJ}^{-1}\Dev\tilde{S}_{KL}\right)\\
+ & +\frac{2}{3}\tilde{S}_{RS}\tilde{C}_{RS}\left(\mathcal{I}_{IJKL}-\frac{1}{3}C_{KL}^{-1}C_{IJ}^{-1}\right)+J^{-4/3}\hat{\mathbb{C}}_{IJKL}\\
+\boldsymbol{\mathbb{C}} & =\left(J^{2}\frac{dp}{dJ}+Jp\right)\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}-2pJ\boldsymbol{\mathcal{I}}\\
+ & -\frac{2}{3}J^{-2/3}\left(\Dev\tilde{\mathbf{S}}\otimes\mathbf{C}^{-1}+\mathbf{C}^{-1}\otimes\Dev\tilde{\mathbf{S}}\right)\\
+ & +\frac{2}{3}\left(\tilde{\mathbf{S}}:\tilde{\mathbf{C}}\right)\left(\boldsymbol{\mathcal{I}}-\frac{1}{3}\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}\right)+J^{-4/3}\hat{\boldsymbol{\mathbb{C}}}
+\end{aligned}
+\,,\label{eq91}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\hat{\mathcal{\mathbb{C}}}_{IJKL} & =\tilde{\mathcal{\mathbb{C}}}_{IJKL}-\frac{1}{3}\left(\tilde{\mathcal{\mathbb{C}}}_{IJRS}\tilde{C}_{RS}\tilde{C}_{KL}^{-1}+\tilde{\mathcal{\mathbb{C}}}_{RSKL}\tilde{C}_{RS}\tilde{C}_{IJ}^{-1}\right)+\frac{1}{9}\tilde{C}_{IJ}^{-1}\tilde{C}_{RS}\tilde{\mathbb{C}}_{RSMN}\tilde{C}_{MN}\tilde{C}_{KL}^{-1}\\
+\hat{\mathcal{\boldsymbol{\mathbb{C}}}} & =\tilde{\mathcal{\boldsymbol{\mathbb{C}}}}-\frac{1}{3}\left(\tilde{\mathcal{\boldsymbol{\mathbb{C}}}}:\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}+\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathcal{\mathbb{C}}}}\right)+\frac{1}{9}\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathbb{C}}}:\tilde{\mathbf{C}}\otimes\tilde{\mathbf{C}}^{-1}
+\end{aligned}
+\,.\label{eq92}
+\end{equation}
+
+\end_inset
+
+The spatial elasticity tensor follows from
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\mathcal{C}} & =\left(J\frac{dp}{dJ}+p\right)\mathbf{I}\otimes\mathbf{I}-2p\mathbf{I}\odot\mathbf{I}\\
+ & -\frac{2}{3}\left(\dev\tilde{\boldsymbol{\sigma}}\otimes\mathbf{I}+\mathbf{I}\otimes\dev\tilde{\boldsymbol{\sigma}}\right)\\
+ & +\frac{2}{3}\left(\tilde{\boldsymbol{\sigma}}:\mathbf{I}\right)\left(\mathbf{I}\odot\mathbf{I}-\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)+\hat{\mathcal{\boldsymbol{C}}}
+\end{aligned}
+\,,\label{eq:UC-spatial-elasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\hat{\mathcal{C}}_{ijkl} & =\frac{1}{J}\tilde{F}_{iI}\tilde{F}_{jJ}\tilde{F}_{kK}\tilde{F}_{lL}\hat{\mathcal{\mathbb{C}}}_{IJKL}\\
+\hat{\boldsymbol{\mathcal{C}}} & =\frac{1}{J}\left(\tilde{\mathbf{F}}\oslash\tilde{\mathbf{F}}\right):\hat{\boldsymbol{\mathbb{C}}}:\left(\tilde{\mathbf{F}}^{T}\oslash\tilde{\mathbf{F}}^{T}\right)\\
+ & =\tilde{\boldsymbol{\mathcal{C}}}-\frac{1}{3}\left(\mathbf{I}\otimes\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}+\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\otimes\mathbf{I}\right)+\frac{1}{9}\left(\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\right)\mathbf{I}\otimes\mathbf{I}
+\end{aligned}
+\,.\label{eq:UC-spatial-elasticity-hat}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -3524,9 +6366,6 @@ noprefix "false"
 \end_inset
 
 , even when the ground matrix uses an uncoupled formulation.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
 
@@ -31279,6 +34118,10 @@ noprefix "false"
 
  to evaluate the final expressions for the Cauchy stress and spatial elasticity
  tensors, respectively.
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -31293,34 +34136,706 @@ name "sec:Viscoelasticity"
 \end_layout
 
 \begin_layout Standard
-For a viscoelastic material the second Piola Kirchhoff stress can be written
- as follows 
+When some of the energy stored during mechanical loading of a material gets
+ dissipated into heat, the material's response is called inelastic.
+ Inelastic behaviors include viscoelasticity and plasticity, although this
+ presentation focuses exclusively on viscoelasticity.
+ In continuum mechanics, we can identify three forms of viscoelasticity
+ in materials.
+ Viscoelasticity may occur due to (1) friction between molecules of the
+ same material, (2) friction between solid and fluid matter in a porous
+ deformable medium, and (3) breaking and reforming of weak bonds between
+ molecules of the same material.
+ The first form is classically described as the viscous response of a material,
+ whereby the friction between molecules of the same material is represented
+ by the material's viscosity 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Puso98"
-literal "true"
+key "Coleman63"
+literal "false"
 
 \end_inset
 
-: 
+.
+ The second form is classically described by poroelasticity 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Cryer63,Rice76"
+literal "false"
+
+\end_inset
+
+ or biphasic 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Mow80"
+literal "false"
+
+\end_inset
+
+ theory, whereby the frictional drag between the porous solid and its interstiti
+al fluid is represented by the hydraulic permeability (also known as Darcy's
+ law of permeation), see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Biphasic-Material"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The last form was proposed by Green and Tobolsky 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Green46,Tobolsky60"
+literal "false"
+
+\end_inset
+
+ as the fundamental mechanism for viscoelasticity in polymers.
+ Recently, we presented a constrained reactive mixture approach to formulate
+ a reactive viscoelasticity theory that embodies the molecular mechanism
+ of viscoelasticity proposed by those authors 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian15,Ateshian23"
+literal "false"
+
+\end_inset
+
+, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ A conventional approach for modeling viscoelasticity uses the framework
+ of internal state variables 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Coleman67"
+literal "false"
+
+\end_inset
+
+, whereby we may decompose the deformation gradient 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ into deformations occurring in a microstructural model of the material,
+ consisting of a spring and dashpot in series 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Lubliner85,Simo87,Holzapfel96"
+literal "false"
+
+\end_inset
+
+, see Section
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Internal-State-Variable"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Internal State Variable Theory
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Internal-State-Variable"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We may model a continuum version of the standard linear solid using quasilinear
+ viscoelasticity, as shown for example by Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, though we make minor modifications and extensions to his presentation
+ here.
+ Consider that the microstructural model of this viscoelastic material consists
+ of a spring and dashpot in series (a Maxwell model), combined with a spring
+ in parallel, which is equivalent to the Maxwell representation of a standard
+ linear solid in linear viscoelasticity (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+figurename
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:spring-dashpot-model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The total deformation gradient, associated with the parallel spring, is
+ 
+\begin_inset Formula $\mathbf{F}=\mathbf{F}_{s}\cdot\mathbf{F}_{d}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ is the internal state variable representing the deformation gradient associated
+ with the series spring of the Maxwell model, and 
+\begin_inset Formula $\mathbf{F}_{d}$
+\end_inset
+
+ is that associated with the dashpot.
+ The second Piola-Kirchhoff stress in the parallel spring is given by
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigStandardLinearSolid.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Spring-dashpot model for Maxwell representation of the standard solid.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:spring-dashpot-model"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}\left(t\right)=\int\limits _{-\infty}^{t}G\left(t-s\right)\frac{d\mathbf{S}^{e}}{ds}\,ds\,,\label{eq485}
+\mathbf{S}^{e}\left(\mathbf{F}\right)=\frac{\partial\Psi_{r}^{e}}{\partial\mathbf{E}}\,,\label{eq:IVT-parallel-spring-stress}
 \end{equation}
 
 \end_inset
 
 where 
+\begin_inset Formula $\mathbf{E}=\frac{1}{2}\left(\mathbf{F}^{T}\cdot\mathbf{F}-\mathbf{I}\right)$
+\end_inset
+
+ is the Lagrange strain tensor derived from 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ In this quasilinear viscoelasticity theory, the second Piola-Kirchhoff
+ stress in the Maxwell spring is given by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{M}\left(\mathbf{F}_{s}\right)=\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)\,,\label{eq:IVT-series-spring-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma\ge0$
+\end_inset
+
+ is a user-defined non-dimensional parameter that produces standard hyperelastic
+ity in the limit when 
+\begin_inset Formula $\gamma=0$
+\end_inset
+
+.
+ Note that 
 \begin_inset Formula $\mathbf{S}^{e}$
 \end_inset
 
- is the elastic stress and 
-\begin_inset Formula $G(t)$
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-series-spring-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
- is the relaxation function.
- Here we consider the special case where the relaxation function is given
- by 
+ uses the same constitutive model as in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-parallel-spring-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, but its argument is different (
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ instead of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+).
+ By recognizing that 
+\begin_inset Formula $\mathbf{M}$
+\end_inset
+
+ should also be the stress in the Maxwell dashpot, we use eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-series-spring-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to find that
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{S}}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)+\frac{1}{\tau}\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)=\dot{\mathbf{S}}^{e}\left(\mathbf{F}\left(t\right)\right)\,,\quad\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(0\right)\right)=\mathbf{0}\,,\label{eq:IVT-ODE}
+\end{equation}
+
+\end_inset
+
+where the time constant 
+\begin_inset Formula $\tau$
+\end_inset
+
+ is the ratio of the damping coefficient in the dashpot to the Maxwell spring
+ stiffness, and the dot operator represents the material time derivative
+ in the material frame.
+ The solution to this 
+\emph on
+linear
+\emph default
+ ordinary differential equation (hence, quasi
+\emph on
+-linear
+\emph default
+ viscoelasticity theory) is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)=\int_{0}^{t}e^{-\left(t-s\right)/\nu}\frac{d\mathbf{S}^{e}\left(\mathbf{F}\left(s\right)\right)}{ds}\,ds\,.\label{eq:IVT-P-solution}
+\end{equation}
+
+\end_inset
+
+Now, the total stress 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in this material, which is the sum of stresses in the two springs, 
+\begin_inset Formula $\mathbf{S}=\mathbf{S}^{e}\left(\mathbf{F}\right)+\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+, reduces to the familiar form
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=\int_{0}^{t}G\left(t-s\right)\frac{d\mathbf{S}^{e}\left(\mathbf{F}\left(s\right)\right)}{ds}\,ds\,,\label{eq:IVT-total-stress}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+G\left(t\right)=1+\gamma e^{-t/\tau}\label{eq:IVT-relaxation-fcn}
+\end{equation}
+
+\end_inset
+
+is called the relaxation function.
+ A convenient and efficient numerical scheme for solving for 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ was given previously by Puso and Weiss 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Puso98"
+literal "false"
+
+\end_inset
+
+, where they used 
+\begin_inset Formula $\mathbf{H}$
+\end_inset
+
+ to denote 
+\begin_inset Formula $\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+ (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Puso-Weiss-Scheme"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ Of course, the last step in this analysis is to evaluate the Cauchy stress
+ from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ using the standard push-forward formula 
+\begin_inset Formula $\boldsymbol{\sigma}=J^{-1}\mathbf{F}\cdot\mathbf{S}\cdot\mathbf{F}^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The strain energy density associated with this viscoelastic material corresponds
+ to that stored in the two springs.
+ Its continuum form is
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\Psi_{r}^{e}\left(\mathbf{F}\right)+\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)\,.\label{eq:IVT-SED}
+\end{equation}
+
+\end_inset
+
+It is important to note that this presentation does not provide an explicit
+ solution for 
+\begin_inset Formula $\mathbf{F}_{s}\left(t\right)$
+\end_inset
+
+.
+ In principle, it is possible to extract a suitable measure of strain associated
+ with 
+\begin_inset Formula $\mathbf{F}_{s}\left(t\right)$
+\end_inset
+
+ by inverting eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-P-solution"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, since 
+\begin_inset Formula $\mathbf{S}^{e}\left(\mathbf{F}_{s}\left(t\right)\right)$
+\end_inset
+
+ must be evaluated explicitly in this scheme as part of the solution for
+ 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ This inversion requires the adoption of suitable constitutive assumptions
+ about the multiplicative decomposition 
+\begin_inset Formula $\mathbf{F}=\mathbf{F}_{s}\cdot\mathbf{F}_{d}$
+\end_inset
+
+; it may possibly be numerically expensive.
+\end_layout
+
+\begin_layout Standard
+In the context of reactive viscoelasticity (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-SED"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we can refer to 
+\begin_inset Formula $\Psi_{r}^{e}\left(\mathbf{F}\right)$
+\end_inset
+
+ as the strong bond strain energy density, since it persists under a non-zero
+ strain, whereas 
+\begin_inset Formula $\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+ represents the weak bond strain energy density, since it decays to zero
+ under a constant strain as 
+\begin_inset Formula $t\to\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Strain Energy Density in Standard Solid
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:SED-Standard-Solid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, in the special case of a stress-relaxation response to an instantan
+eous step strain, evaluated from 
+\begin_inset Formula $\mathbf{F}\left(0^{+}\right)$
+\end_inset
+
+, we may let 
+\begin_inset Formula $\mathbf{F}_{s}\left(0^{+}\right)=\mathbf{F}\left(0^{+}\right)$
+\end_inset
+
+ since the dashpot cannot deform instantaneously, under the reasonable constitut
+ive assumption that there is no rigid body rotation associated with the
+ dashpot distinct from that of the Maxwell series spring, thus 
+\begin_inset Formula $\mathbf{F}_{d}\left(0^{+}\right)=\mathbf{I}$
+\end_inset
+
+.
+ If we adopt this assumption for all times 
+\begin_inset Formula $t$
+\end_inset
+
+, then we can also conclude that the right stretch tensor 
+\begin_inset Formula $\mathbf{U}_{s}$
+\end_inset
+
+ of the Maxwell spring deformation gradient tends toward 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+ in the limit as 
+\begin_inset Formula $t\to\infty$
+\end_inset
+
+, as the dashpot elongates or contracts to match the right-stretch tensor
+ of the parallel spring, also implying that 
+\begin_inset Formula $\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)\to0$
+\end_inset
+
+ in this limit.
+\end_layout
+
+\begin_layout Standard
+Building upon this example, we can assume more generally that 
+\begin_inset Formula $\mathbf{U}=\mathbf{U}_{s}\cdot\mathbf{U}_{d}$
+\end_inset
+
+ under the constitutive assumption that the rotation tensor 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ in the polar decomposition of 
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
+\end_inset
+
+ is the same in both branches of the microstructural model.
+ However, for self-consistency, we must also assume that 
+\begin_inset Formula $\mathbf{U}_{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}_{d}$
+\end_inset
+
+ share the same eigenvectors as 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ to preserve the symmetry of all three right-stretch tensors.
+ Thus, a valid constitutive model for the multiplicative decomposition is
+ to let 
+\begin_inset Formula $\mathbf{U}_{s}=\mathbf{U}^{\alpha}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}_{d}=\mathbf{U}^{1-\alpha}$
+\end_inset
+
+, where the exponent 
+\begin_inset Formula $\alpha\left(t\right)$
+\end_inset
+
+ is a scalar function of time that can be obtained by solving eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:IVT-total-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in the form 
+\begin_inset Formula $\gamma\mathbf{S}^{e}\left(\mathbf{U}^{\alpha}\right)=\mathbf{S}\left(\mathbf{U}\right)-\mathbf{S}^{e}\left(\mathbf{U}\right)$
+\end_inset
+
+ at the current time 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ This constitutive model is insensitive to flipping the spring and dashopt
+ sequence in the Maxwell element, as should be expected.
+ Now, for an instantaneous step strain, we would have 
+\begin_inset Formula $\alpha\left(0^{+}\right)=1$
+\end_inset
+
+, whereas the steady-state response to a step strain would produce 
+\begin_inset Formula $\lim_{t\to\infty}\alpha\left(t\right)=0$
+\end_inset
+
+.
+ Logically, it would be reasonable to expect that 
+\begin_inset Formula $\alpha\left(t\right)$
+\end_inset
+
+ must remain in the range 
+\begin_inset Formula $0\le\alpha\le1$
+\end_inset
+
+, since we cannot physically justify that the Maxwell spring would stretch
+ (expand or contract) by a greater amount than the parallel spring.
+ A more formal enforcement of thermodynamic constraints of this internal
+ variable theory 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Coleman67"
+literal "false"
+
+\end_inset
+
+, not provided here, should confirm this expectation.
+\end_layout
+
+\begin_layout Subsubsection
+Puso and Weiss Numerical Scheme
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Puso-Weiss-Scheme"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here we consider the slightly more general case where the relaxation function
+ is given by a Prony series
 \begin_inset Formula 
 \begin{equation}
 G\left(t\right)=\gamma_{0}+\sum\limits _{i=1}^{N}\gamma_{i}\exp\left(-t/\tau_{i}\right)\,.\label{eq486}
@@ -31332,7 +34847,7 @@ With this function chosen for the relaxation function, we can write the
  total stress as 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{S}\left(t\right)=\int\limits _{-\infty}^{t}\left(\gamma_{0}+\sum\limits _{i=1}^{N}\gamma_{i}\exp\left(\left(-t+s\right)/\tau_{i}\right)\frac{d\mathbf{S}^{e}}{ds}\right)\,ds\,.\label{eq487}
+\mathbf{S}\left(t\right)=\int\limits _{0}^{t}\left(\gamma_{0}+\sum\limits _{i=1}^{N}\gamma_{i}\exp\left(\left(-t+s\right)/\tau_{i}\right)\frac{d\mathbf{S}^{e}}{ds}\right)\,ds\,.\label{eq487}
 \end{equation}
 
 \end_inset
@@ -31340,7 +34855,7 @@ With this function chosen for the relaxation function, we can write the
 Introducing the internal variables, 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{H}^{\left(i\right)}\left(t\right)=\int\limits _{-\infty}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\,,\label{eq488}
+\mathbf{H}^{\left(i\right)}\left(t\right)=\int\limits _{0}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\,,\label{eq488}
 \end{equation}
 
 \end_inset
@@ -31394,8 +34909,8 @@ reference "eq488"
  
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{H}^{\left(i\right)}\left(t+\Delta t\right) & =\int\limits _{-\infty}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
- & =\exp\left(-\Delta t/\tau_{i}\right)\int\limits _{-\infty}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds+\int\limits _{t}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
+\begin{aligned}\mathbf{H}^{\left(i\right)}\left(t+\Delta t\right) & =\int\limits _{0}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
+ & =\exp\left(-\Delta t/\tau_{i}\right)\int\limits _{0}^{t}\exp\left[-\left(t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds+\int\limits _{t}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\\
  & =\exp\left(-\Delta t/\tau_{i}\right)\mathbf{H}^{\left(i\right)}\left(t\right)+\int\limits _{t}^{t+\Delta t}\exp\left[-\left(t+\Delta t-s\right)/\tau_{i}\right]\frac{d\mathbf{S}^{e}}{ds}\,ds\,.
 \end{aligned}
 \label{eq490}
@@ -31445,7 +34960,7 @@ The following procedure can now be applied to calculate the new stress.
 calculate elastic stress: 
 \begin_inset Formula 
 \[
-\mathbf{S}_{n+1}^{e}=\frac{\partial W^{e}}{\partial\mathbf{C}_{n+1}}\,,
+\mathbf{S}_{n+1}^{e}=2\frac{\partial\Psi_{r}^{e}}{\partial\mathbf{C}_{n+1}}\,,
 \]
 
 \end_inset
@@ -31484,7 +34999,7 @@ find the total stress:
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Reactive Viscoelasticity
 \begin_inset CommandInset label
 LatexCommand label
@@ -31907,7 +35422,7 @@ reference "eq492"
 .
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Constitutive Model for 
 \begin_inset Formula $\bar{\mathbf{R}}$
 \end_inset
@@ -32329,7 +35844,7 @@ literal "false"
  never produces compressive fiber stresses.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Reduced Relaxation Functions
 \begin_inset CommandInset label
 LatexCommand label
@@ -32649,6 +36164,161 @@ where
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Viscous Friction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Viscous-Friction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Cauchy stress in a viscous material 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Coleman63"
+literal "false"
+
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\boldsymbol{\sigma}^{e}+\boldsymbol{\tau}\,,\label{eq:viscous-friction-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ is the elastic part of the stress as given in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:elastic-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the viscous stress, which depends on the rate of deformation tensor
+ 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+ (the symmetric part of the velocity gradient).
+ For example, in an isotropic Newtonian viscous response, 
+\begin_inset Formula $\boldsymbol{\tau}=\lambda\left(\text{tr}\mathbf{D}\right)\mathbf{I}+2\mu\mathbf{D}$
+\end_inset
+
+, where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ are viscosity coefficients.
+ Since 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ reduces to zero under static loading (when 
+\begin_inset Formula $\mathbf{D}=\mathbf{0}$
+\end_inset
+
+), it follows that 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ is the equilibrium response of this type of viscoelastic material.
+ For a viscous fluid, the elastic stress tensor simplifies to 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}=-p\mathbf{I}$
+\end_inset
+
+, where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the fluid pressure.
+ In a compressible fluid, 
+\begin_inset Formula $p$
+\end_inset
+
+ is a function of the volumetric strain (e.g., a function of 
+\begin_inset Formula $J$
+\end_inset
+
+) and the absolute temperature.
+\end_layout
+
+\begin_layout Standard
+By the nature of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:viscous-friction-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we may interpret this type of viscous material microscopically as a spring
+ and dashpot in parallel, often called a Voigt model in linear viscoelasticity
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bland60,Coleman61"
+literal "false"
+
+\end_inset
+
+, though the general continuum mechanics expression of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:viscous-friction-stress"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may encompass nonlinear behaviors for 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ and for 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+.
+ The energy density dissipated in this type of material is 
+\begin_inset Formula $\boldsymbol{\tau}:\mathbf{D}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Though we include this type of viscoelastic model here for completeness,
+ in practice, investigators in biomechanics have rarely adopted this model
+ to describe biological tissues, because it predicts that the stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ becomes infinite under a step increase in strain.
 \end_layout
 
 \begin_layout Section
@@ -34018,6 +37688,14 @@ where
  is a unit vector along the principal direction of normal strain.
 \end_layout
 
+\begin_layout Standard
+Note that the maximum normal Lagrange strain is a kinematic measure, thus
+ it does not represent an intrinsic material property.
+ Though FEBio allows users to specify this criterion, it is strongly recommended
+ to employ stress- or strain-energy-density-based failure or yield criteria
+ in practice.
+\end_layout
+
 \begin_layout Subsubsection
 Octahedral Lagrange Strain
 \end_layout
@@ -34091,6 +37769,14 @@ and
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Note that the octahedral Lagrange strain is a kinematic measure, thus it
+ does not represent an intrinsic material property.
+ Though FEBio allows users to specify this criterion, it is strongly recommended
+ to employ stress- or strain-energy-density-based failure or yield criteria
+ in practice.
 \end_layout
 
 \begin_layout Standard
@@ -37142,7 +40828,7 @@ literal "false"
 
 \end_inset
 
-.]
+.
 \end_layout
 
 \begin_layout Standard
