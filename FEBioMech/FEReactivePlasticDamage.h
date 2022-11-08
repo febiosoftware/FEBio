@@ -78,7 +78,8 @@ public:
     void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
 
     bool UseSecantTangent() override { return m_secant_tangent; }
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
+    
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // yield criterion
@@ -89,8 +90,8 @@ public:
     FEDamageCriterion*  m_pIDCrit;  // intact damage criterion
     
 private:
-    vector<double>      Ky;
-    vector<double>      w;
+    vector<double>      Ky;         // bond yield measures in plastic flow curve
+    vector<double>      w;          // bond mass fractions in plastic flow curve
     
 public:
     int         m_n;        // number of yield levels

@@ -40,13 +40,13 @@ private:
 	double m_E, m_v;
 
 public:
-	virtual bool Init();
+	virtual bool Init() override;
 	
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	DECLARE_FECORE_CLASS();
 };
