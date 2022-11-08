@@ -850,7 +850,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 		F[1] = FB;
 		A[1] = AB;
 
-		if (FB < rmin) {
+		if (fabs(FB) < rmin) {
 			rmin = FB;
 			smin = s;
 		}
@@ -866,13 +866,13 @@ double FECGSolidSolver::LineSearchCG(double s)
 			{
 				if (n < 4) { // use linear fitting algorithm
 					if (fabs(FB - FA) < fabs(FB * 0.01)) { // if FB=FA (or nearly) the next step won't work, so make s bigger
-						if (AB != 0) s = AB * 200; // try a much bigger value
+						if (AB != 0) s = max(AA,AB) * 200; // try a much bigger value than the biggest previous one
 						else if (AA != 0) s = AA * 200;
 						else s = 1e-6; // should never happen!
 					}
 					else {
 						s = (AA * FB - AB * FA) / (FB - FA);  // use linear interpolation for first few attempts
-						s = min(s, 1e-3); // limit how much s can grow to avoid over-extrapolating
+						//s = min(s, 1e-3); // limit how much s can grow to avoid over-extrapolating
 					}
 				}
 				else { // use quadratic curve fit to try to find a minimum if multiple linear attempts have failed
@@ -1001,12 +1001,12 @@ double FECGSolidSolver::LineSearchCG(double s)
 				F[n + 2] = FC;
 				A[n + 2] = s;
 				++n;
-				 //feLog("\tF %15le %15le %15le %15le %15le\n", F[0], F[1], F[2], F[3], F[4]);
-				 //feLog("\tA %15le %15le %15le %15le %15le\n", A[0], A[1], A[2], A[3], A[4]);
-				 //if (n > 3) {
-					//feLog("\tF %15le %15le %15le %15le %15le\n", F[5], F[6], F[7], F[8], F[9]);
-					 //feLog("\tA %15le %15le %15le %15le %15le\n", A[5], A[6], A[7], A[8], A[9]);
-					 //}
+				 feLog("\tF %15le %15le %15le %15le %15le\n", F[0], F[1], F[2], F[3], F[4]);
+				 feLog("\tA %15le %15le %15le %15le %15le\n", A[0], A[1], A[2], A[3], A[4]);
+				 if (n > 3) {
+					feLog("\tF %15le %15le %15le %15le %15le\n", F[5], F[6], F[7], F[8], F[9]);
+					feLog("\tA %15le %15le %15le %15le %15le\n", A[5], A[6], A[7], A[8], A[9]);
+					}
 			}
 		} while ((((r > m_LStol) && (n <= 5)) || ((r >= 1) && (n > 3))) && (n < nmax));
 		// try to find a better solution within m_LStol, but if we haven't after five tries, accept any improvement
