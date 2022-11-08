@@ -349,6 +349,12 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
             }
             pt.m_pa = m_pMat->Pressure(mp);
             
+            // determine if solute is 'solid-bound'
+            for (int isol = 0; isol<nsol; ++isol) {
+                FESolute* soli = m_pMat->GetSolute(isol);
+                if (soli->m_pDiff->Diffusivity(mp).norm() == 0) ps.m_bsb[isol] = true;
+            }
+            
             // initialize referential solid volume fraction
             pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
             
@@ -404,6 +410,7 @@ void FEMultiphasicSolidDomain::Reset()
             ps.m_dkdJ.assign(nsol, 0);
             ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
             ps.m_j.assign(nsol,vec3d(0,0,0));
+            ps.m_bsb.assign(nsol, false);
             ps.m_nsbm = nsbm;
             ps.m_sbmr = sbmr;
             ps.m_sbmrp = sbmr;

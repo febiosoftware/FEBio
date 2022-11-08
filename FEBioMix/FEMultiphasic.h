@@ -155,13 +155,13 @@ public:
     // return the number of solutes on external side
     int SolutesExternal(FEMaterialPoint& pt) override {
         FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-        return spt.m_ce.size();
+        return (int)spt.m_ce.size();
     }
     
     // return the number of solutes on internal side
     int SolutesInternal(FEMaterialPoint& pt) override {
         FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-        return spt.m_ci.size();
+        return (int)spt.m_ci.size();
     }
     
     //! return the solute ID on external side
