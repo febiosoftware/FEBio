@@ -49,10 +49,10 @@ class FEBIOMECH_API ObjectDataRecord : public DataRecord
 {
 public:
 	ObjectDataRecord(FEModel* pfem);
-	double Evaluate(int item, int ndata);
+	double Evaluate(int item, int ndata) override;
 	void SetData(const char* sz) override;
-	void SelectAllItems();
-	int Size() const;
+	void SelectAllItems() override;
+	int Size() const override;
 
 private:
 	vector<FELogObjectData*>	m_Data;

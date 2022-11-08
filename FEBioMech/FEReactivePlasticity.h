@@ -82,8 +82,8 @@ public:
     FEPlasticFlowCurve* m_pFlow;    // plastic flow curve
     
 private:
-    vector<double> Ky;
-    vector<double> w;
+    vector<double> Ky;              // bond yield measures in plastic flow curve
+    vector<double> w;               // bond mass fractions in plastic flow curve
     
 public:
     int         m_n;        // number of yield levels

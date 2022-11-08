@@ -116,7 +116,7 @@ void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Evaluate net mass fraction of yielded bonds
-double FEReactivePlasticityMaterialPoint::YieldedBonds()
+double FEReactivePlasticityMaterialPoint::YieldedBonds() const
 {
     double w = 0;
     for (int i=0; i<m_w.size(); ++i) w += m_w[i];

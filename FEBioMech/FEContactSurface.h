@@ -55,7 +55,7 @@ public:
 		m_pmep = nullptr;
 	}
 
-	void Serialize(DumpStream& ar)
+	void Serialize(DumpStream& ar) override
 	{
 		FESurfaceMaterialPoint::Serialize(ar);
 		ar & m_gap & m_Ln;

@@ -45,7 +45,7 @@ public:
 
 	void Activate() override;
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	FERigidBody& GetRigidBody();
 
@@ -71,7 +71,7 @@ public:
 
 	void Activate() override;
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	FERigidBody& GetRigidBody();
 
