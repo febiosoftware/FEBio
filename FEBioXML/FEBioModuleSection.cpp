@@ -54,6 +54,11 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 		szt = "solid";
 		GetBuilder()->SetDefaultSolver("explicit-solid");
 	}
+	else if (strcmp(szt, "CG-solid") == 0)
+	{
+		szt = "solid";
+		GetBuilder()->SetDefaultSolver("CG-solid");
+	}
 
 	GetBuilder()->SetActiveModule(szt);
 
