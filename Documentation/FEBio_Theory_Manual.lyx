@@ -2158,7 +2158,7 @@ where we have substituted
 \begin_layout Standard
 It is important to understant that all functions of state are non-observable
  properties of matter: No instruments exist to measure the complete state
- of stress inside a material, nor the heat flux, the internal energy, and
+ of stress inside a material, nor the heat flux, the internal energy, or
  the entropy.
  However, we can formulate constitutive models that relate these functions
  of state to observable state variables, then calculate their value for
@@ -30495,7 +30495,10 @@ This chapter describes the theoretical background behind the constitutive
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:hyperelasticity"
+reference "sec:Hyperelasticity"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 

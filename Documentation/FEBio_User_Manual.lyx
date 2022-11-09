@@ -91169,6 +91169,101 @@ Osmotic effects can be neglected in a multiphasic analysis by setting the
 , as for the case of a biphasic mixture.
 \end_layout
 
+\begin_layout Subsubsection
+Solutes as 'Solid-Bound Molecules'
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Solutes-as-SBMs"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In multiphasic analyses, FEBio solves for the solid displacement 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, and the effective solute concentrations 
+\begin_inset Formula $\tilde{c}^{\alpha}$
+\end_inset
+
+, at all the nodes, representing all the degrees of freedom in an analysis.
+ Once the solution has converged at each time point, FEBio solves for the
+ referential mass densities 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ of solid-bound molecules by solving the corresponding mass balance equation
+ at integration points, in a single numerical integration step.
+ This approach reduces the number of degrees of freedom that need to be
+ solved simultaneously by the FEBio solver.
+ However, occasionally, the numerical solution for 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ may produce numerical round-off errors that may get amplified as the analysis
+ time progresses.
+\end_layout
+
+\begin_layout Standard
+An alternative to using solid-bound molecules is to define solutes 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ whose diffusivity 
+\begin_inset Formula $\mathbf{d}^{\alpha}$
+\end_inset
+
+ in the mixture is set to 
+\begin_inset Formula $\mathbf{0}$
+\end_inset
+
+ (however, the free diffusivity 
+\begin_inset Formula $d_{0}^{\alpha}$
+\end_inset
+
+ should not be set to zero, to prevent a division by zero; its exact value
+ is not important, thus let 
+\begin_inset Formula $d_{0}^{\alpha}=1$
+\end_inset
+
+).
+ Then, FEBio treats these solutes as equivalent to solid-bound molecules:
+ (1) Their concentration does not contribute to the osmolarity of the interstiti
+al fluid; (2) their concentration contributes to the fixed charge density
+ 
+\begin_inset Formula $c^{F}$
+\end_inset
+
+ in the current configuration; (3) these solutes do not contribute to the
+ effective hydraulic permeability 
+\begin_inset Formula $\tilde{\mathbf{k}}$
+\end_inset
+
+ of the porous multiphasic mixture; (4) these solutes can be involved in
+ chemical reactions; (5) while their initial effective concentration may
+ be prescribed, it must not contribute to the prescribed initial effective
+ fluid pressure, and the user should not prescribe any boundary conditions
+ on the effective concentration of these solutes.
+ However, unlike solid-bound molecules, these solutes always have negligible
+ volume fraction, therefore they don't alter the value of the referential
+ solid volume fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+.
+ Using these 'solid-bound' solutes increases the number of degrees of freedom
+ in an FEBio analysis; however, unlike solid-bound molecules, the solution
+ for the effective concentration of these solutes remains as accurate as
+ all other degrees of freedom in an analysis.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
