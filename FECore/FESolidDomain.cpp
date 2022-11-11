@@ -2535,11 +2535,10 @@ void FESolidDomain::LoadVector(
 
 	// degrees of freedom per node
 	int dofPerNode = dofList.Size();
-	std::vector<double> val(dofPerNode, 0.0);
 
 	// loop over all the elements
 	int NE = Elements();
-	//#pragma omp parallel for 
+	#pragma omp parallel for 
 	for (int i = 0; i<NE; ++i)
 	{
 		// get the next element
@@ -2549,6 +2548,8 @@ void FESolidDomain::LoadVector(
 		// only consider active elements
 		if (el.isActive()) 
 		{
+			std::vector<double> val(dofPerNode, 0.0);
+
 			// total size of the element vector
 			int ndof = dofPerNode * el.Nodes();
 
