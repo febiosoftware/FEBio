@@ -49,6 +49,9 @@ public:
 
 	//! Update specialized material points at each iteration
 	virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp);
+
+	// evaluate local coordinate system at material point
+	virtual mat3d GetLocalCS(const FEMaterialPoint& mp) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,7 +74,7 @@ public:
 	FEDomainParameter* FindDomainParameter(const std::string& paramName);
 
 	// evaluate local coordinate system at material point
-	mat3d GetLocalCS(const FEMaterialPoint& mp);
+	mat3d GetLocalCS(const FEMaterialPoint& mp) override;
 
 	// set the (local) material axis valuator
 	void SetMaterialAxis(FEMat3dValuator* val);
@@ -107,7 +110,7 @@ public:
 	FEMaterialProperty(FEModel* fem);
 
 	// evaluate local coordinate system at material point
-	mat3d GetLocalCS(const FEMaterialPoint& mp);
+	mat3d GetLocalCS(const FEMaterialPoint& mp) override;
 
 	DECLARE_FECORE_CLASS();
 };

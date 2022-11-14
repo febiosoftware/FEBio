@@ -56,6 +56,8 @@ BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PROPERTY(m_pReact , "reaction"           , FEProperty::Optional);
     ADD_PROPERTY(m_pMReact, "membrane_reaction"  , FEProperty::Optional);
 
+	ADD_PROPERTY(m_Q, "mat_axis", FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
