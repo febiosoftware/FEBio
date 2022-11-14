@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "TestSolver.h"
 #include "AccelerateSparseSolver.h"
 #include "SuperLU_MT.h"
+#include "MKLDSSolver.h"
 #include "numcore_api.h"
 
 //=============================================================================
@@ -69,6 +70,7 @@ NUMCORE_API void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(TestSolver          , "test");
     REGISTER_FECORE_CLASS(AccelerateSparseSolver, "accelerate");
     REGISTER_FECORE_CLASS(SuperLU_MT_Solver     , "superlu_mt");
+    REGISTER_FECORE_CLASS(MKLDSSolver           , "mkl_dss");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
