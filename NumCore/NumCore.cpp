@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "FEASTEigenSolver.h"
 #include "TestSolver.h"
 #include "AccelerateSparseSolver.h"
+#include "MKLDSSolver.h"
 
 //=============================================================================
 // Call this to initialize the NumCore module
@@ -68,6 +69,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(StrategySolver      , "strategy");
 	REGISTER_FECORE_CLASS(TestSolver          , "test");
     REGISTER_FECORE_CLASS(AccelerateSparseSolver, "accelerate");
+    REGISTER_FECORE_CLASS(MKLDSSolver, "mkl_dss");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
