@@ -60,6 +60,13 @@ void FEBioMeshDataSection4::Parse(XMLTag& tag)
 	// Make sure there is something in this tag
 	if (tag.isleaf()) return;
 
+	// make sure the MeshDomain section was processed. 
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	if (mesh.Domains() == 0)
+	{
+		throw FEFileException("MeshData must appear after MeshDomain section.");
+	}
+
 	// loop over all mesh data section
 	++tag;
 	do
