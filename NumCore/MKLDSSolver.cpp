@@ -97,7 +97,7 @@ bool MKLDSSolver::PreProcess()
 	if (m->handle == nullptr)
 	{
 		MKL_INT error = dss_create(m->handle, m->opt);
-		if (error != MKL_DSS_SUCCESS) return nullptr;
+		if (error != MKL_DSS_SUCCESS) return false;
 	}
 
 	// define the structure
