@@ -1625,39 +1625,45 @@ bool FEModel::EvaluateLoadParameters()
 		{
 			double s = GetLoadController(nlc)->Value();
 			FEParam* p = pi.param;
+			FECoreBase* parent = dynamic_cast<FECoreBase*>(p->parent());
+			if (m_imp->m_printParams)
+			{
+				if (parent && (parent->GetName().empty() == false))
+				{
+					const char* pname = parent->GetName().c_str();
+					feLog("Setting parameter \"%s.%s\" to : ", pname, p->name());
+				}
+				else
+					feLog("Setting parameter \"%s\" to : ", p->name());
+			};
 			assert(p->IsVolatile());
 			switch (p->type())
 			{
 			case FE_PARAM_INT: {
 				p->value<int>() = (int)s;
-				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %d\n", p->name(), p->value<int>());
+				if (m_imp->m_printParams) feLog("%d\n", p->value<int>());
 			}
 			break;
 			case FE_PARAM_DOUBLE: {
 				p->value<double>() = pi.m_scl*s;
-				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<double>());
+				if (m_imp->m_printParams) feLog("%lg\n", p->value<double>());
 			}
 			break;
 			case FE_PARAM_BOOL: {
 				p->value<bool>() = (s > 0 ? true : false); 
-				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "true" : "false"));
+				if (m_imp->m_printParams) feLog("%s\n", (p->value<bool>() ? "true" : "false"));
 			}
 			break;
 			case FE_PARAM_VEC3D: {
 				vec3d& v = p->value<vec3d>();
 				p->value<vec3d>() = pi.m_vscl*s;
-				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %lg, %lg, %lg\n", p->name(), v.x, v.y, v.z);
+				if (m_imp->m_printParams) feLog("%lg, %lg, %lg\n", v.x, v.y, v.z);
 			}
 			break;
 			case FE_PARAM_DOUBLE_MAPPED: 
 			{
 				p->value<FEParamDouble>().SetScaleFactor(s * pi.m_scl);
-				if (m_imp->m_printParams)
-					feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<FEParamDouble>().GetScaleFactor());
+				if (m_imp->m_printParams) feLog("%lg\n", p->value<FEParamDouble>().GetScaleFactor());
 			}
 			break;
 			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(s* pi.m_scl); break;
