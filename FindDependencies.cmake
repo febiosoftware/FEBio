@@ -158,6 +158,11 @@ if (WIN32)
     DOC "SuperLU_MT include directory")
     find_library(SUPERLU_MT_LIB superlu PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
     DOC "SuperLU_MT library path")
+else()
+    find_path(SUPERLU_MT_INC slu_mt_ddefs.h PATHS /usr/local/include/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+    DOC "SuperLU_MT include directory")
+    find_library(SUPERLU_MT_LIB superlu PATHS /usr/local/lib/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+    DOC "SuperLU_MT library path")
 endif()
 
 if(SUPERLU_MT_INC AND SUPERLU_MT_LIB)		
@@ -175,6 +180,31 @@ if(LEVMAR_INC AND LEVMAR_LIB)
 else()
 	option(USE_LEVMAR "Required for optimization in FEBio" OFF)
     mark_as_advanced(CLEAR LEVMAR_INC LEVMAR_LIB)
+endif()
+
+# PDL
+if(WIN32)
+	find_library(PDL_LIB libpardiso600-WIN-X86-64* 
+        PATHS C::/Program\ Files/* $ENV{HOME}/* $ENV{HOME}/*/*
+		DOC "PDL library path")
+elseif(APPLE)
+	find_library(PDL_LIB pardiso600-MACOS-X86-64 
+        PATHS /usr/local* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATH_SUFFIXES "lib" "pardiso/lib" "pardiso-project/lib"
+		DOC "PDL library path")
+else()
+	find_library(PDL_LIB pardiso600-GNU*-X86-64 
+        PATHS /usr/local* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATH_SUFFIXES "lib" "pardiso/lib" "pardiso-project/lib"
+		DOC "PDL library path")
+endif()	
+
+if(PDL_LIB)		
+	option(USE_PDL "Required for pardiso-project use" ON)
+    mark_as_advanced(PDL_LIB)
+else()
+	option(USE_PDL "Required for pardiso-project use" OFF)
+    mark_as_advanced(CLEAR PDL_LIB)
 endif()
 
 # ZLIB
