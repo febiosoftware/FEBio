@@ -279,14 +279,14 @@ endif()
 
 # Link MKL
 if(USE_MKL)
-    target_include_directories(numcore PRIVATE ${MKL_INC} ${OpenMP_C_LIBRARIES})
+    target_include_directories(numcore PRIVATE ${MKL_INC})
     target_compile_definitions(numcore PRIVATE MKL_ISS PARDISO)
     
     target_include_directories(febioopt PRIVATE ${MKL_INC})
 	target_compile_definitions(febioopt PRIVATE MKL_ISS PARDISO)
 
     if(WIN32 OR APPLE)
-        target_link_libraries(numcore PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
+        target_link_libraries(numcore PRIVATE ${MKL_LIBS})
         target_link_libraries(febioopt PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
     else()
         target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
@@ -294,13 +294,13 @@ if(USE_MKL)
     endif()
     
     if(FORCE_SYSTEM_OMP)
-        target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
+        #~ target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 else()
     # If not using MKL, we still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
-        target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
+        #~ target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 endif()
@@ -312,7 +312,7 @@ if(USE_PDL)
 
     # We still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
-        target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
+        #~ target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 endif()
