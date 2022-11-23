@@ -128,7 +128,7 @@ endif()
 
 ##### Set up compiler flags #####
 if(WIN32)
-    add_compile_options(/MP /openmp /wd4996 /wd4251 /wd4275)
+    add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
 
 else()
@@ -193,6 +193,22 @@ endforeach(name)
 file(GLOB SOURCES "FEBio3/*.cpp")
 add_executable (febio4 ${SOURCES})
 
+
+if(WIN32)
+    target_compile_definitions(febiofluid PRIVATE /openmp)
+    target_compile_definitions(febiolib PRIVATE /openmp)
+    target_compile_definitions(febiomech PRIVATE /openmp)
+    target_compile_definitions(febiomix PRIVATE /openmp)
+    target_compile_definitions(febioopt PRIVATE /openmp)
+    target_compile_definitions(fecore PRIVATE /openmp)
+    target_compile_definitions(feamr PRIVATE /openmp)
+    target_compile_definitions(febiorve PRIVATE /openmp)
+    target_compile_definitions(feimglib PRIVATE /openmp)
+    target_compile_definitions(febioplot PRIVATE /openmp)
+    target_compile_definitions(febiotest PRIVATE /openmp)
+    target_compile_definitions(febioxml PRIVATE /openmp)
+    target_compile_definitions(xml PRIVATE /openmp)
+endif()
 ##### Set dev commit information #####
 
 # Cross platform execute_process
@@ -279,7 +295,7 @@ endif()
 
 # Link MKL
 if(USE_MKL)
-    target_include_directories(numcore PRIVATE ${MKL_INC})
+    target_include_directories(numcore PRIVATE ${MKL_INC} ${OpenMP_C_LIBRARIES})
     target_compile_definitions(numcore PRIVATE MKL_ISS PARDISO)
     
     target_include_directories(febioopt PRIVATE ${MKL_INC})
