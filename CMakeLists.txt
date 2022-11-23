@@ -305,6 +305,18 @@ else()
     endif()
 endif()
 
+# Link Pardiso-project
+if(USE_PDL)
+    target_compile_definitions(numcore PRIVATE PARDISODL)
+    target_link_libraries(numcore PRIVATE ${PDL_LIB})
+
+    # We still need OpenMP from the system.
+    if(${OpenMP_C_FOUND})
+        target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
+        target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
+    endif()
+endif()
+
 # Link Accelerate framework
 if (APPLE)
   target_link_libraries(numcore PRIVATE "-framework Accelerate")
