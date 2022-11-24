@@ -128,7 +128,7 @@ endif()
 
 ##### Set up compiler flags #####
 if(WIN32)
-    add_compile_options(/MP /openmp /wd4996 /wd4251 /wd4275)
+    add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
 
 else()
@@ -192,6 +192,23 @@ endforeach(name)
 ##### Set up executable compilation #####
 file(GLOB SOURCES "FEBio3/*.cpp")
 add_executable (febio4 ${SOURCES})
+
+if(WIN32)
+    target_compile_options(febio4 PRIVATE /openmp)
+    target_compile_options(febiofluid PRIVATE /openmp)
+    target_compile_options(febiolib PRIVATE /openmp)
+    target_compile_options(febiomech PRIVATE /openmp)
+    target_compile_options(febiomix PRIVATE /openmp)
+    target_compile_options(febioopt PRIVATE /openmp)
+    target_compile_options(fecore PRIVATE /openmp)
+    target_compile_options(feamr PRIVATE /openmp)
+    target_compile_options(febiorve PRIVATE /openmp)
+    target_compile_options(feimglib PRIVATE /openmp)
+    target_compile_options(febioplot PRIVATE /openmp)
+    target_compile_options(febiotest PRIVATE /openmp)
+    target_compile_options(febioxml PRIVATE /openmp)
+    target_compile_options(xml PRIVATE /openmp)
+endif()
 
 ##### Set dev commit information #####
 

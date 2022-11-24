@@ -218,7 +218,7 @@ void FEFluidRCLoad::LoadVector(FEGlobalVector& R)
 //! serialization
 void FEFluidRCLoad::Serialize(DumpStream& ar)
 {
-    FEFluidRCLoad::Serialize(ar);
+	FESurfaceLoad::Serialize(ar);
     ar& m_pfluid;
     ar& m_pt;
     ar& m_dpt;
