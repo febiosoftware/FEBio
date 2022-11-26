@@ -23,37 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FECoreBase.h>
-#include <FECore/DataRecord.h>
-#include "FERigidBody.h"
+#include <FECore/LinearSolver.h>
 
-//-----------------------------------------------------------------------------
-//! Base class for object log data (e.g. rigid bodies)
-class FEBIOMECH_API FELogObjectData : public FELogData
+class MKLDSSolver : public LinearSolver
 {
-	FECORE_SUPER_CLASS(FELOGOBJECTDATA_ID)
-	FECORE_BASE_CLASS(FELogObjectData)
+	class Imp;
 
 public:
-	FELogObjectData(FEModel* fem) : FELogData(fem) {}
-	virtual ~FELogObjectData(){}
-	virtual double value(FERigidBody& rb) = 0;
+	MKLDSSolver(FEModel* fem);
+	~MKLDSSolver();
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
+
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
+
+protected:
+	Imp* m;
+
+	DECLARE_FECORE_CLASS();
 };
 
-//-----------------------------------------------------------------------------
-class FEBIOMECH_API ObjectDataRecord : public DataRecord
-{
-public:
-	ObjectDataRecord(FEModel* pfem);
-	double Evaluate(int item, int ndata) override;
-	void SetData(const char* sz) override;
-	void SelectAllItems() override;
-	int Size() const override;
-
-private:
-	vector<FELogObjectData*>	m_Data;
-};

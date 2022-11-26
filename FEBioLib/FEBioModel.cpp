@@ -88,7 +88,8 @@ bool FEBioModel::handleCB(FEModel* fem, int unsigned nwhen, void* pd)
 //-----------------------------------------------------------------------------
 bool FEBioModel::processEvent(int nevent)
 {
-	// write output files
+	// write output files (but not while serializing)
+	if ((nevent == CB_SERIALIZE_LOAD) || (nevent == CB_SERIALIZE_SAVE)) return true;
 	Write(nevent);
 
 	// process event handlers

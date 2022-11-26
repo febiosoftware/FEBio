@@ -323,6 +323,7 @@ void FEElasticShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el,
 void FEElasticShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // element force vector
@@ -478,6 +479,7 @@ void FEElasticShellDomain::MassMatrix(FELinearSystem& LS, double scale)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
 		FEShellElement& el = m_Elem[iel];

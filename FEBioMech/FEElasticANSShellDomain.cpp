@@ -312,6 +312,7 @@ void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& 
     // loop over all elements
     int NE = Elements();
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         vector<double> fe;

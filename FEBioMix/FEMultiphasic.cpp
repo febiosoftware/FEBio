@@ -28,9 +28,10 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMultiphasic.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
+#include <FECore/FECoreKernel.h>
 #include <FECore/log.h>
+#include <FECore/tens4d.h>
 #include <complex>
 using namespace std;
 
@@ -54,6 +55,8 @@ BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PROPERTY(m_pSBM   , "solid_bound"        , FEProperty::Optional);
 	ADD_PROPERTY(m_pReact , "reaction"           , FEProperty::Optional);
     ADD_PROPERTY(m_pMReact, "membrane_reaction"  , FEProperty::Optional);
+
+	ADD_PROPERTY(m_Q, "mat_axis", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -477,6 +480,11 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
     
     double cFr = m_cFr(pt);
 	double cF = (cFr*(1-bt.m_phi0)+ce)/(J-phi0);
+    
+    // add contribution from solid-bound 'solutes'
+    const int nsol = (int)m_pSolute.size();
+    for (int isol=0; isol<nsol; ++isol)
+        if (spt.m_bsb[isol]) cF += spt.m_ca[isol]*m_pSolute[isol]->ChargeNumber();
 
 	return cF;
 }
@@ -498,13 +506,15 @@ double FEMultiphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 	const int nsol = (int)m_pSolute.size();
 	double cF = FixedChargeDensity(pt);
 
-	vector<double> c(nsol);		// effective concentration
-	vector<double> khat(nsol);	// solubility
-	vector<int> z(nsol);		// charge number
+	vector<double> c(nsol,0);       // effective concentration
+	vector<double> khat(nsol,1);	// solubility
+	vector<int> z(nsol,0);          // charge number
 	for (i=0; i<nsol; ++i) {
-		c[i] = set.m_c[i];
-		khat[i] = m_pSolute[i]->m_pSolub->Solubility(pt);
-		z[i] = m_pSolute[i]->ChargeNumber();
+        if (!set.m_bsb[i]) {
+            c[i] = set.m_c[i];
+            khat[i] = m_pSolute[i]->m_pSolub->Solubility(pt);
+            z[i] = m_pSolute[i]->ChargeNumber();
+        }
 	}
 	
 	// evaluate polynomial coefficients
@@ -969,23 +979,20 @@ double FEMultiphasic::Pressure(FEMaterialPoint& pt)
 	int i;
 	
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	const int nsol = (int)m_pSolute.size();
 	
 	// effective pressure
 	double p = ppt.m_p;
 	
-	// effective concentration
-	vector<double> ca(nsol);
-	for (i=0; i<nsol; ++i)
-		ca[i] = Concentration(pt, i);
+	// osmolarity
+    double c = spt.Osmolarity();
 	
 	// osmotic coefficient
 	double osmc = m_pOsmC->OsmoticCoefficient(pt);
 	
 	// actual pressure
-	double pa = 0;
-	for (i=0; i<nsol; ++i) pa += ca[i];
-	pa = p + m_Rgas*m_Tabs*osmc*pa;
+	double pa = p + m_Rgas*m_Tabs*osmc*c;
 	
 	return pa;
 }
@@ -1032,16 +1039,18 @@ mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
 
     FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
 
-    // add solute contributions
+    // add solute contributions (but not 'solid-bound' solutes)
     for (int isol=0; isol<nsol; ++isol) {
-        // concentration
-        double ca = spt.m_ca[isol];
-        // solute diffusivity in mixture
-        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt);
-        // solute free diffusivity
-        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
-
-        Ke += (I - D/D0)*(tmp*ca/D0);
+        if (!spt.m_bsb[isol]) {
+            // concentration
+            double ca = spt.m_ca[isol];
+            // solute diffusivity in mixture
+            mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt);
+            // solute free diffusivity
+            double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+            
+            Ke += (I - D/D0)*(tmp*ca/D0);
+        }
     }
         
     return Ke.inverse();

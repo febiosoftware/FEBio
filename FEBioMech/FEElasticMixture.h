@@ -39,13 +39,13 @@ public:
 	FEElasticMixtureMaterialPoint();
 
 	//! Copy material point data
-	FEMaterialPointData* Copy();
+	FEMaterialPointData* Copy() override;
 
 	//! material point initialization
-	void Init();
+	void Init() override;
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	vector<double>				m_w;	//!< material weights

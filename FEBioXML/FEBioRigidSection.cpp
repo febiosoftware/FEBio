@@ -74,6 +74,10 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 	}
 	else if (strcmp(sztype, "force") == 0)
 	{
+		string name;
+		const char* szname = tag.AttributeValue("name", true);
+		if (szname) name = szname;
+
 		// we need to decide whether we want to apply a force or a moment, since these
 		// are now two separate classes. Unfortunately, this means we first need to 
 		// read all parameters, before we can allocate the correct class. 
@@ -138,6 +142,11 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 			FEParam* p = pFC->GetParameter("value");
 			if (p == nullptr) throw XMLReader::InvalidTag(tag);
 			GetFEModel()->AttachLoadController(p, lc);
+		}
+
+		if (name.empty() == false)
+		{
+			pFC->SetName(name);
 		}
 
 		feb.AddModelLoad(pFC);

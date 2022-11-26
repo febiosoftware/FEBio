@@ -928,6 +928,7 @@ void FEFluidSolutesDomain3D::MassMatrix(FELinearSystem& LS)
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -1200,6 +1201,7 @@ void FEFluidSolutesDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 void FEFluidSolutesDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // element force vector

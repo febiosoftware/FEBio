@@ -680,6 +680,7 @@ void FEBiphasicFSIDomain3D::MassMatrix(FELinearSystem& LS)
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -1015,6 +1016,7 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 void FEBiphasicFSIDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // get the element

@@ -38,16 +38,16 @@ public:
     FEMassActionForwardEffective(FEModel* pfem);
     
     //! molar supply at material point
-    double ReactionSupply(FEMaterialPoint& pt);
+    double ReactionSupply(FEMaterialPoint& pt) override;
     
     //! tangent of molar supply with strain (J) at material point
-    mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt);
+    mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
     
     //! tangent of molar supply with effective pressure at material point
-    double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt);
+    double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of molar supply with effective concentration at material point
-    double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol);
+    double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
 
     DECLARE_FECORE_CLASS();
 };

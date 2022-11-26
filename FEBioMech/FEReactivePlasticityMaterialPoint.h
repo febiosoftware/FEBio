@@ -50,7 +50,7 @@ public:
     void Serialize(DumpStream& ar);
     
     //! Evaluate net mass fraction of yielded bonds
-    double YieldedBonds();
+    double YieldedBonds() const;
     
 public:
     vector<mat3d>           m_Fusi;     //!< inverse of plastic deformation gradient at previous yield
