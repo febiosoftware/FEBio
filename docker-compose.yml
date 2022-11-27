@@ -3,7 +3,7 @@ services:
   febio: &default
     build:
       context: ./infrastructure
-    image: febiosoftware/febio:latest
+    image: febiosoftware/febio:ubuntu-22.04
     working_dir: /FEBio
     volumes:
       - ./:/FEBio

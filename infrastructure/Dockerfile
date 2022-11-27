@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 SHELL ["/bin/bash", "-c"]
 RUN pwd
 # Setup dependency installers
@@ -11,6 +11,9 @@ WORKDIR ${IMAGE_BUILD_PATH}
 RUN ./apt.sh
 RUN ./cmake.sh
 RUN ./git.sh
+RUN ./ffmpeg.sh
+RUN ./qt.sh
+RUN ./openapi.sh
 RUN ${IMAGE_BUILD_PATH}/dependencies/install.sh
 
 WORKDIR /FEBio
