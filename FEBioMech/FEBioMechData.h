@@ -180,26 +180,26 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FELogContactTractionX : public FEFaceLogData
+class FELogContactTractionX : public FELogFaceData
 {
 public:
-	FELogContactTractionX(FEModel* fem) : FEFaceLogData(fem) {}
+	FELogContactTractionX(FEModel* fem) : FELogFaceData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
 //-----------------------------------------------------------------------------
-class FELogContactTractionY : public FEFaceLogData
+class FELogContactTractionY : public FELogFaceData
 {
 public:
-	FELogContactTractionY(FEModel* fem) : FEFaceLogData(fem) {}
+	FELogContactTractionY(FEModel* fem) : FELogFaceData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
 //-----------------------------------------------------------------------------
-class FELogContactTractionZ : public FEFaceLogData
+class FELogContactTractionZ : public FELogFaceData
 {
 public:
-	FELogContactTractionZ(FEModel* fem) : FEFaceLogData(fem) {}
+	FELogContactTractionZ(FEModel* fem) : FELogFaceData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
