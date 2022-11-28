@@ -830,6 +830,9 @@ void FEBioMech::InitModule()
 	// Derived from FELogFaceData
 	REGISTER_FECORE_CLASS(FELogContactGap     , "contact gap");
 	REGISTER_FECORE_CLASS(FELogContactPressure, "contact pressure");
+	REGISTER_FECORE_CLASS(FELogContactTractionX, "contact_traction.x");
+	REGISTER_FECORE_CLASS(FELogContactTractionY, "contact_traction.y");
+	REGISTER_FECORE_CLASS(FELogContactTractionZ, "contact_traction.z");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogElemData
