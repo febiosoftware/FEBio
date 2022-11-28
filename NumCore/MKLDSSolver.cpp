@@ -27,8 +27,8 @@ SOFTWARE.*/
 #include <stdio.h>
 #include <stdlib.h>
 #include "MKLDSSolver.h"
-#include "CompactUnSymmMatrix.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include <FECore/CompactSymmMatrix.h>
 
 #ifdef PARDISO
 #undef PARDISO

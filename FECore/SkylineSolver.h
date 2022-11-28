@@ -23,29 +23,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FECore/LinearSolver.h>
-#include <FECore/CompactUnSymmMatrix.h>
-#include <FECore/CompactSymmMatrix.h>
 
-class SuperLU_MT_Solver: public LinearSolver
+#include "LinearSolver.h"
+#include "SkylineMatrix.h"
+#include "fecore_api.h"
+
+//-----------------------------------------------------------------------------
+//! Implements a linear solver that uses a skyline format
+
+class FECORE_API SkylineSolver : public LinearSolver
 {
-	class Impl;
-
 public:
-	SuperLU_MT_Solver(FEModel* fem);
-	~SuperLU_MT_Solver();
+	//! constructor
+	SkylineSolver(FEModel* fem);
+
+	//! Preprocess 
 	bool PreProcess() override;
+
+	//! Factor matrix
 	bool Factor() override;
-	bool BackSolve(double* x, double* y) override;
+
+	//! Backsolve the linear system
+	bool BackSolve(double* x, double* b) override;
+
+	//! Clean up
 	void Destroy() override;
 
+	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
-	bool SetSparseMatrix(SparseMatrix* pA) override;
 
-protected:
-	CompactMatrix*	m_pA;
-	Impl* m;
-
-	DECLARE_FECORE_CLASS();
+private:
+	SkylineMatrix*	m_pA;
 };

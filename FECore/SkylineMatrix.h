@@ -27,34 +27,52 @@ SOFTWARE.*/
 
 
 #pragma once
+#include "SparseMatrix.h"
+#include "fecore_api.h"
 
-#include <FECore/LinearSolver.h>
-#include "SkylineMatrix.h"
+//=============================================================================
+//! Implements a sparse matrix using the skyline storage
 
-//-----------------------------------------------------------------------------
-//! Implements a linear solver that uses a skyline format
+//! This class implements a symmetric sparse matrix where only the values
+//! below the skyline are stored.
 
-class SkylineSolver : public LinearSolver
+class FECORE_API SkylineMatrix : public SparseMatrix
 {
 public:
-	//! constructor
-	SkylineSolver(FEModel* fem);
+	SkylineMatrix();
+	virtual ~SkylineMatrix();
 
-	//! Preprocess 
-	bool PreProcess() override;
+public: // from SparseMatrix
 
-	//! Factor matrix
-	bool Factor() override;
+	void Zero() override;
 
-	//! Backsolve the linear system
-	bool BackSolve(double* x, double* b) override;
+	void Clear() override;
 
-	//! Clean up
-	void Destroy() override;
+	void Create(SparseMatrixProfile& mp) override;
 
-	//! Create a sparse matrix
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override;
 
-private:
-	SkylineMatrix*	m_pA;
+	//! assemble a matrix into the sparse matrix
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override;
+
+	void add(int i, int j, double v) override;
+
+	void set(int i, int j, double v) override;
+
+	// NOTE: This is not implemented yet!
+	bool check(int i, int j) override;
+
+	double get(int i, int j) override;
+
+	double diag(int i) override;
+
+	double* values() { return m_pd; }
+	int* pointers() { return m_ppointers; }
+
+protected:
+	void Create(double* pv, int* pp, int N);
+
+protected:
+	double*	m_pd;			//!< matrix values
+	int*	m_ppointers;	//!< arrays of indices to diagonal elements
 };

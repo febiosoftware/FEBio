@@ -27,51 +27,63 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/SparseMatrix.h>
+#include "CompactMatrix.h"
+#include "fecore_api.h"
 
 //=============================================================================
-//! Implements a sparse matrix using the skyline storage
+//! This class stores a sparse matrix in Harwell-Boeing format (i.e. column major, lower triangular compact).
 
-//! This class implements a symmetric sparse matrix where only the values
-//! below the skyline are stored.
+//! This class also assumes the matrix is symmetric and therefor only stores
+//! the lower triangular matrix
 
-class SkylineMatrix : public SparseMatrix
+class FECORE_API CompactSymmMatrix : public CompactMatrix
 {
 public:
-	SkylineMatrix();
-	virtual ~SkylineMatrix();
+	//! class constructor
+	CompactSymmMatrix(int offset = 0);
 
-public: // from SparseMatrix
-
-	void Zero() override;
-
-	void Clear() override;
-
+	//! Create the matrix structure from the SparseMatrixProfile.
 	void Create(SparseMatrixProfile& mp) override;
 
+	//! Assemble an element matrix into the global matrix
 	void Assemble(const matrix& ke, const std::vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
 	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override;
 
+	//! add a matrix item
 	void add(int i, int j, double v) override;
 
+	//! set matrix item
 	void set(int i, int j, double v) override;
 
-	// NOTE: This is not implemented yet!
-	bool check(int i, int j) override;
-
+	//! get a matrix item
 	double get(int i, int j) override;
 
-	double diag(int i) override;
+	// alternative access
+	double operator ()(int i, int j) { return get(i, j); }
 
-	double* values() { return m_pd; }
-	int* pointers() { return m_ppointers; }
+	//! return the diagonal component
+	double diag(int i) override { return m_pd[m_ppointers[i] - m_offset]; }
 
-protected:
-	void Create(double* pv, int* pp, int N);
+	//! multiply with vector
+	bool mult_vector(double* x, double* r) override;
 
-protected:
-	double*	m_pd;			//!< matrix values
-	int*	m_ppointers;	//!< arrays of indices to diagonal elements
+	//! see if a matrix element is defined
+	bool check(int i, int j) override;
+
+	//! is the matrix symmetric or not
+	bool isSymmetric() override { return true; }
+
+	//! this is a column based format
+	bool isRowBased() override { return false; }
+
+	//! calculate the inf norm
+	double infNorm() const override;
+
+	//! calculate the one norm
+	double oneNorm() const override;
+
+	//! do row (L) and column (R) scaling
+	void scale(const std::vector<double>& L, const std::vector<double>& R) override;
 };
