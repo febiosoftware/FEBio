@@ -13,7 +13,7 @@ locals {
 
 data "amazon-ami" "ubuntu" {
   filters = {
-    name             = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*"
+    name             = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server*"
     root-device-type = "ebs"
   }
 
@@ -28,16 +28,21 @@ variable "skip_create_ami" {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "packer-provisioned-ubuntu-18.04-intel-oneapi-${local.buildtime}"
+  ami_name      = "packer-provisioned-ubuntu-22.04-intel-oneapi-${local.buildtime}"
   instance_type = "c5a.4xlarge"
   source_ami    = data.amazon-ami.ubuntu.id
   ssh_username  = "ubuntu"
 
   skip_create_ami = var.skip_create_ami
 
+  aws_polling {
+    delay_seconds = 60
+    max_attempts  = 90
+  }
+
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
-    volume_size           = 30
+    volume_size           = 50
     volume_type           = "gp2"
     delete_on_termination = true
   }
@@ -73,9 +78,21 @@ build {
     script = "./common/linux/cmake.sh"
   }
 
-  # Latest version of git (v3.23.2)
+  # Latest version of git (v2.38.1)
   provisioner "shell" {
     script = "./common/linux/git.sh"
+  }
+
+  provisioner "shell" {
+    script = "./common/linux/ffmpeg.sh"
+  }
+
+  provisioner "shell" {
+    script = "./common/linux/openapi.sh"
+  }
+
+  provisioner "shell" {
+    script = "./common/linux/qt.sh"
   }
 
   provisioner "shell" {
