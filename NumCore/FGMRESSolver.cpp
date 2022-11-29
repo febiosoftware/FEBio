@@ -28,8 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FGMRESSolver.h"
-#include "CompactSymmMatrix.h"
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactSymmMatrix.h>
+#include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
 #include "MatrixTools.h"
 

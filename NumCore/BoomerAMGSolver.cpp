@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "BoomerAMGSolver.h"
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include <FECore/FESolver.h>

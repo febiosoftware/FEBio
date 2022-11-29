@@ -1283,6 +1283,7 @@ void FEMultiphasicFSIDomain3D::MassMatrix(FELinearSystem& LS)
     const int nsol = m_pMat->Solutes();
     const int ndpn = 7 + nsol;
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -1321,6 +1322,7 @@ void FEMultiphasicFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForc
     const int nsol = m_pMat->Solutes();
     const int ndpn = 7 + nsol;
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -1671,6 +1673,7 @@ void FEMultiphasicFSIDomain3D::InertialForces(FEGlobalVector& R)
     
     const int nsol = m_pMat->Solutes();
     const int ndpn = 7+nsol;
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // get the element

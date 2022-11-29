@@ -28,15 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "CompactUnSymmMatrix.h"
-// We must undef PARDISO since it is defined as a function in mkl_solver.h
-#ifdef MKL_ISS
-#ifdef PARDISO
-#undef PARDISO
-#endif
-#include "mkl_rci.h"
-#include "mkl_blas.h"
-#include "mkl_spblas.h"
-#endif // MKL_ISS
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -358,38 +349,24 @@ double CRSSparseMatrix::diag(int i)
 //-----------------------------------------------------------------------------
 bool CRSSparseMatrix::mult_vector(double* x, double* r)
 {
-#ifdef MKL_ISS
-
 	// get the matrix size
 	const int N = Rows();
 
-	if (Offset() == 1)
-	{
-		const char transa = 'N';
-		mkl_dcsrgemv(&transa, &N, m_pd, m_ppointers, m_pindices, x, r);
-	}
-	else
-	{
-		assert(m_offset == 0);
-		// loop over all rows
+	// loop over all rows
 	#pragma omp parallel for schedule(guided)
-		for (int i = 0; i < N; ++i)
+	for (int i = 0; i < N; ++i)
+	{
+		const double* pv = m_pd + (m_ppointers[i] - m_offset);
+		const int* pi = m_pindices + (m_ppointers[i] - m_offset);
+		const int n = m_ppointers[i + 1] - m_ppointers[i];
+		r[i] = 0.0;
+		for (int j = 0; j < n; j ++)
 		{
-			const double* pv = m_pd + (m_ppointers[i] - m_offset);
-			const int* pi = m_pindices + (m_ppointers[i] - m_offset);
-			const int n = m_ppointers[i + 1] - m_ppointers[i];
-			r[i] = 0.0;
-			for (int j = 0; j < n; j ++)
-			{
-				r[i] += (*pv++) * x[*pi++ - m_offset];
-			}
+			r[i] += (*pv++) * x[*pi++ - m_offset];
 		}
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 //! calculate the abs row sum 

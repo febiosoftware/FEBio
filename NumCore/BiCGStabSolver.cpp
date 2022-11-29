@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "BiCGStabSolver.h"
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------

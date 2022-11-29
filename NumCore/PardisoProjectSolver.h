@@ -28,8 +28,8 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include <FECore/CompactSymmMatrix.h>
 
 //! This Pardiso solver can be installed as a shared object library from
 //!		http://www.pardiso-project.org

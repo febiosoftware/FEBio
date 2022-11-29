@@ -40,4 +40,11 @@ protected:
 	void ParseSolidDomainSection(XMLTag& tag);
 	void ParseShellDomainSection(XMLTag& tag);
 	void ParseBeamDomainSection(XMLTag& tag);
+
+private:
+	void BuildNLT();
+
+private:
+	std::vector<int>	m_NLT;
+	int					m_noff;
 };
