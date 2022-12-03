@@ -272,7 +272,7 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
     for (int i=0; i<m_n; ++i) {
         if (pp.m_byldt[i] == false)
         {
-            pp.m_di[i] = m_pIDamg ? m_pIDamg->cdf(Es) : 0;
+            pp.m_di[i] = m_pIDamg ? m_pIDamg->cdf(pt,Es) : 0;
             pp.m_d[i] = pp.m_di[i]*w[i];
             // what if we iterate here, update damage, then the next iteration decides we actually are yielding?
             // no mechanism to undo the extra damage we've added
@@ -289,7 +289,7 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
             // calculate damage
             if (m_pYDCrit) pp.m_Eyt[i] = m_pYDCrit->DamageCriterion(pt);
             double Ey = max(pp.m_Eyt[i], pp.m_Eym[i]);
-            pp.m_dy[i] = m_pYDamg ? m_pYDamg->cdf(Ey) : 0;
+            pp.m_dy[i] = m_pYDamg ? m_pYDamg->cdf(pt,Ey) : 0;
             
             // restore total deformation gradient
             pe.m_F = Ftmp;
@@ -304,7 +304,7 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
         pp.m_D += pp.m_d[i];
     }
     // add damage to persistent elastic bonds
-    pp.m_di[m_n] = m_pIDamg ? m_pIDamg->cdf(Es) : 0;
+    pp.m_di[m_n] = m_pIDamg ? m_pIDamg->cdf(pt,Es) : 0;
     pp.m_d[m_n] = pp.m_di[m_n]*w[m_n];
     pp.m_D += pp.m_d[m_n];
 }

@@ -149,7 +149,7 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     // get damage criterion for intact bonds at current time
     pd.m_Xitrl = m_pIcrt->DamageCriterion(pt);
     if (pd.m_Xitrl > pd.m_Ximax)
-        pd.m_Fit = m_pIdmg->cdf(pd.m_Xitrl);
+        pd.m_Fit = m_pIdmg->cdf(pt,pd.m_Xitrl);
     else
         pd.m_Fit = pd.m_Fip;
 
@@ -158,7 +158,7 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     for (int ig=0; ig < pd.m_fb.size(); ++ig) {
         if (Xftrl > pd.m_fb[ig].m_Xfmax) {
             pd.m_fb[ig].m_Xftrl = Xftrl;
-            pd.m_fb[ig].m_Fft = m_pFdmg->cdf(pd.m_fb[ig].m_Xftrl);
+            pd.m_fb[ig].m_Fft = m_pFdmg->cdf(pt,pd.m_fb[ig].m_Xftrl);
         }
         else
             pd.m_fb[ig].m_Fft = pd.m_fb[ig].m_Ffp;
@@ -176,7 +176,7 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
         wbi = pd.m_wbt;
         // evaluate mass supply from fatigue of intact bonds
         double dwf = m_k0*dt/2*(pow(fabs(pd.m_aXit)*pd.m_wbt,m_beta)*pd.m_wit+pow(fabs(pd.m_aXip)*pd.m_wbp,m_beta)*pd.m_wip);
-        double Fdwf = m_pFdmg->cdf(Xftrl);
+        double Fdwf = m_pFdmg->cdf(pt,Xftrl);
         
         // kinetics of intact bonds
         pd.m_wit = (pd.m_Fip < 1) ? pd.m_wip*(1-pd.m_Fit)/(1-pd.m_Fip) - dwf : pd.m_wip;
