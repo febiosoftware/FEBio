@@ -106,6 +106,7 @@ FEBioModel::FEBioModel()
 	m_logLevel = 1;
 
 	m_dumpLevel = FE_DUMP_NEVER;
+	m_dumpStride = 1;
 
 	// --- I/O-Data ---
 	m_ndebug = 0;
@@ -161,6 +162,12 @@ void FEBioModel::SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
 
 //! get the dump level
 int FEBioModel::GetDumpLevel() const { return m_dumpLevel; }
+
+//! Set the dump stride
+void FEBioModel::SetDumpStride(int n) { m_dumpStride = n; }
+
+//! get the dump stride
+int FEBioModel::GetDumpStride() const { return m_dumpStride; }
 
 //! Set the log level
 void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
@@ -616,13 +623,22 @@ void FEBioModel::DumpData(int nevent)
 	// get the current step
 	FEAnalysis* pstep = GetCurrentStep();
 	int ndump = GetDumpLevel();
+	int stride = GetDumpStride();
 	if (ndump == FE_DUMP_NEVER) return;
 
 	bool bdump = false;
 	switch (nevent)
 	{
 	case CB_MAJOR_ITERS:
-		if (ndump == FE_DUMP_MAJOR_ITRS) bdump = true;
+		if (ndump == FE_DUMP_MAJOR_ITRS)
+		{
+			if (stride <= 1) bdump = true;
+			else
+			{
+				int niter = pstep->m_ntimesteps;
+				bdump = ((niter % stride) == 0);
+			}
+		}
 		if ((ndump == FE_DUMP_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bdump = true;
 		break;
 	case CB_STEP_SOLVED: if (ndump == FE_DUMP_STEP) bdump = true; break;
