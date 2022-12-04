@@ -62,6 +62,9 @@ FEReactiveFatigue::FEReactiveFatigue(FEModel* pfem) : FEElasticMaterial(pfem)
 	m_pFdmg = 0;
 	m_pIcrt = 0;
 	m_pFcrt = 0;
+    
+    m_k0 = 0;
+    m_beta = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -142,6 +145,8 @@ double FEReactiveFatigue::Damage(FEMaterialPoint& pt)
 void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp)
 {
     double dt = tp.timeIncrement;
+    double k0 = m_k0(pt);
+    double beta = m_beta(pt);
     
     // get the fatigue material point data
     FEReactiveFatigueMaterialPoint& pd = *pt.ExtractData<FEReactiveFatigueMaterialPoint>();
@@ -175,7 +180,7 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     do {
         wbi = pd.m_wbt;
         // evaluate mass supply from fatigue of intact bonds
-        double dwf = m_k0*dt/2*(pow(fabs(pd.m_aXit)*pd.m_wbt,m_beta)*pd.m_wit+pow(fabs(pd.m_aXip)*pd.m_wbp,m_beta)*pd.m_wip);
+        double dwf = k0*dt/2*(pow(fabs(pd.m_aXit)*pd.m_wbt,beta)*pd.m_wit+pow(fabs(pd.m_aXip)*pd.m_wbp,beta)*pd.m_wip);
         double Fdwf = m_pFdmg->cdf(pt,Xftrl);
         
         // kinetics of intact bonds
