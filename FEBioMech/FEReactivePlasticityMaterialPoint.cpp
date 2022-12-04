@@ -52,30 +52,30 @@ FEMaterialPointData* FEReactivePlasticityMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEReactivePlasticityMaterialPoint::Init()
 {
-    FEReactivePlasticity* prp = dynamic_cast<FEReactivePlasticity*>(m_pMat);
-    
-    // get size of vectors
-    int n = prp ? prp->m_n : 1;
-    
-    // intialize data
-    m_Fusi.assign(n, mat3d(1,0,0,
-                           0,1,0,
-                           0,0,1));
-    m_Fvsi.assign(n, mat3d(1,0,0,
-                           0,1,0,
-                           0,0,1));
-    m_Fp = mat3dd(1);
-    m_Ku.assign(n, 0);
-    m_Kv.assign(n, 0);
-    m_w.assign(n,0);
-    m_gp.assign(n, 0);
-    m_gpp.assign(n, 0);
-    m_gc.assign(n, 0);
-    m_byld.assign(n,false);
-    m_Rhat = 0;
+    FEPlasticFlowCurveMaterialPoint& fp = *ExtractData<FEPlasticFlowCurveMaterialPoint>();
 
-    // don't forget to initialize the base class
-	FEMaterialPointData::Init();
+    if (fp.m_binit) {
+        size_t n = fp.m_Ky.size();
+        // intialize data
+        m_Fusi.assign(n, mat3d(1,0,0,
+                               0,1,0,
+                               0,0,1));
+        m_Fvsi.assign(n, mat3d(1,0,0,
+                               0,1,0,
+                               0,0,1));
+        m_Fp = mat3dd(1);
+        m_Ku.assign(n, 0);
+        m_Kv.assign(n, 0);
+        m_w.assign(n,0);
+        m_gp.assign(n, 0);
+        m_gpp.assign(n, 0);
+        m_gc.assign(n, 0);
+        m_byld.assign(n,false);
+        m_Rhat = 0;
+
+        // don't forget to initialize the base class
+        FEMaterialPointData::Init();
+    }
 }
 
 //-----------------------------------------------------------------------------

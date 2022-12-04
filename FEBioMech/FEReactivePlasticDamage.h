@@ -89,12 +89,7 @@ public:
     FEDamageCDF*        m_pIDamg;   // intact damage model
     FEDamageCriterion*  m_pIDCrit;  // intact damage criterion
     
-private:
-    vector<double>      Ky;         // bond yield measures in plastic flow curve
-    vector<double>      w;          // bond mass fractions in plastic flow curve
-    
 public:
-    int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
     double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
