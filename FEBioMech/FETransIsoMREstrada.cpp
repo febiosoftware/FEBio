@@ -96,8 +96,8 @@ mat3ds FETransIsoMREstrada::DevStress(FEMaterialPoint& mp)
     
     // --- TODO: put strain energy derivatives here ---
     // Wi = dW/dIi
-    double W1 = c1;
-    double W2 = c2;
+    double W1 = c1(mp);
+    double W2 = c2(mp);
     // ------------------------------------------------
     
     // calculate T = F*dW/dC*Ft
@@ -138,8 +138,8 @@ tens4ds FETransIsoMREstrada::DevTangent(FEMaterialPoint& mp)
     // --- TODO: put strain energy derivatives here ---
     // Wi = dW/dIi
     double W1, W2;
-    W1 = c1;
-    W2 = c2;
+    W1 = c1(mp);
+    W2 = c2(mp);
     // ------------------------------------
     
     // calculate dWdC:C
@@ -207,7 +207,7 @@ double FETransIsoMREstrada::DevStrainEnergyDensity(FEMaterialPoint& mp)
     double I2 = 0.5*(I1*I1 - B2.tr());
     
     // calculate sed
-    double sed = c1*(I1-3) + c2*(I2-3);
+    double sed = c1(mp)*(I1-3) + c2(mp)*(I2-3);
     
     // add the fiber sed
     sed += m_fib.DevFiberStrainEnergyDensity(mp, a0);
