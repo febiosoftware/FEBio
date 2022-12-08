@@ -37,7 +37,7 @@ class FEPlasticFlowCurve;
  class FEPlasticFlowCurveMaterialPoint : public FEMaterialPointData
 {
 public:
-    FEPlasticFlowCurveMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
+    FEPlasticFlowCurveMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) { m_binit = false; }
     
     //! copy material point data
     FEMaterialPointData* Copy() override;
