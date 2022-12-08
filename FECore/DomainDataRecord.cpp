@@ -39,10 +39,39 @@ void FEDomainDataRecord::SetData(const char* szexpr)
     strcpy(m_szdata, szexpr);
     do
     {
+		const char* szparam = nullptr;
         ch = strchr(sz, ';');
         if (ch) *ch++ = 0;
+
+		// see if parameters are defined
+		char* cl = strchr(sz, '(');
+		if (cl)
+		{
+			char* cr = strrchr(sz, ')');
+			if (cr == nullptr) throw UnknownDataField(sz);
+
+			*cl++ = 0;
+			*cr = 0;
+
+			cl = strchr (cl, '\''); if (cl == nullptr) throw UnknownDataField(sz);
+			cr = strrchr(cl, '\''); if (cr == nullptr) throw UnknownDataField(sz);
+
+			*cl++ = 0;
+			*cr = 0;
+
+			szparam = cl;
+		}
+
         FELogDomainData* pdata = fecore_new<FELogDomainData>(sz, GetFEModel());
-        if (pdata) m_Data.push_back(pdata);
+		if (pdata)
+		{
+			m_Data.push_back(pdata);
+			if (szparam)
+			{
+				vector<string> params; params.push_back(szparam);
+				if (pdata->SetParameters(params) == false) throw UnknownDataField(sz);
+			}
+		}
         else throw UnknownDataField(sz);
         sz = ch;
     } while (ch);
