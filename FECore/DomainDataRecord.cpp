@@ -169,3 +169,47 @@ double FELogPctDomainData::value(FEDomain& dom)
     int n = (int) (m_pct * ((double)val.size() - 1.0));
     return val[n];
 }
+
+
+//============================================================================
+FELogIntegralDomainData::FELogIntegralDomainData(FEModel* pfem) : FELogDomainData(pfem)
+{
+	m_elemData = nullptr;
+}
+
+FELogIntegralDomainData::~FELogIntegralDomainData()
+{
+	if (m_elemData) delete m_elemData;
+	m_elemData = nullptr;
+}
+
+bool FELogIntegralDomainData::SetParameters(std::vector<std::string>& params)
+{
+	if (params.size() != 1) return false;
+	std::string& v1 = params[0];
+	if (v1.empty()) return false;
+
+	m_elemData = fecore_new<FELogElemData>(v1.c_str(), GetFEModel());
+	if (m_elemData == nullptr) return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+double FELogIntegralDomainData::value(FEDomain& dom)
+{
+	if (m_elemData == nullptr) return 0.0;
+
+	FEMesh* mesh = dom.GetMesh();
+
+	double sum = 0.0;
+	const int NE = dom.Elements();
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double eval = m_elemData->value(el);
+		double vol = mesh->ElementVolume(el);
+		sum += eval*vol;
+	}
+	return sum;
+}
