@@ -164,6 +164,8 @@ SOFTWARE.*/
 #include "FEPolynomialHyperElastic.h"
 #include "FEShenoyMaterial.h"
 #include "FELungMaterial.h"
+#include "FEGrowthTensor.h"
+#include "FERodriguezGrowth.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -353,6 +355,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGenerationMaterial, "generation");
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
+    REGISTER_FECORE_CLASS(FERodriguezGrowth, "Rodriguez growth");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -412,6 +415,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH   , "fiber-natural-NH"    );
     REGISTER_FECORE_CLASS(FEFiberEntropyChain, "fiber-entropy-chain" );
+    REGISTER_FECORE_CLASS(FEVolumeGrowth     , "volume growth"       );
+    REGISTER_FECORE_CLASS(FEAreaGrowth       , "area growth"         );
+    REGISTER_FECORE_CLASS(FEFiberGrowth      , "fiber growth"        );
 
 	// Elastic Fiber materials (derived from FEElasticFiberMaterial)
 	REGISTER_FECORE_CLASS(FEElasticFiberNH          , "fiber-NH"            );
