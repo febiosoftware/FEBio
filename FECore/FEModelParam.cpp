@@ -48,6 +48,10 @@ FEModelParam::~FEModelParam()
 void FEModelParam::Serialize(DumpStream& ar)
 {
 	ar & m_scl;
+	if (ar.IsShallow() == false)
+	{
+		ar & m_dom;
+	}
 }
 
 //---------------------------------------------------------------------------------------
