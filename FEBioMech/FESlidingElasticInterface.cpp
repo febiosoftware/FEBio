@@ -58,6 +58,7 @@ BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
     ADD_PARAMETER(m_bshellbs , "shell_bottom_primary"  );
     ADD_PARAMETER(m_bshellbm , "shell_bottom_secondary");
+    ADD_PARAMETER(m_offset   , "offset"             );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -311,6 +312,8 @@ FESlidingElasticInterface::FESlidingElasticInterface(FEModel* pfem) : FEContactI
     m_bfreeze = false;
     m_bflipm = m_bflips = false;
     m_bshellbm = m_bshellbs = false;
+    
+    m_offset = 0;
 
     // set parents
     m_ss.SetContactInterface(this);
@@ -613,7 +616,7 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
                 // calculate the gap function
                 // NOTE: this has the opposite sign compared
                 // to Gerard's notes.
-                double g = nu*(r - q);
+                double g = nu*(r - q) + m_offset;
                 
                 double eps = m_epsn*data.m_epsn*psf;
                 
