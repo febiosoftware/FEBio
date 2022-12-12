@@ -64,6 +64,8 @@ void FEFluidSolutesPressure::Activate()
         // mark node as having prescribed DOF
         node.set_bc(m_dofEF, DOF_PRESCRIBED);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

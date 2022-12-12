@@ -97,6 +97,8 @@ void FESoluteConvectiveFlow::Activate()
             node.set_bc(dofc, DOF_PRESCRIBED);
         }
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------
