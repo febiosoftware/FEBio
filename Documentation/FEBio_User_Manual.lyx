@@ -162,13 +162,13 @@ status open
 
 \end_inset
 
-User's Manual Version 3.7
+User's Manual Version 3.8
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: June 14, 2022
+Last Updated: December 12, 2022
 \end_layout
 
 \begin_layout Standard
@@ -98449,437 +98449,350 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
-
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
-
 <febio_spec version="3.0">
 \end_layout
 
 \begin_layout Verbatim
-
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
-
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
-
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
-
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
-
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
-
 		</material>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		<bc type="fix" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
-
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
-
 			<points>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
-
 			</points>
 \end_layout
 
 \begin_layout Verbatim
-
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
-
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 				<bc type="prescribe" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
-
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
-
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
-
 </febio_spec>
 \end_layout
 

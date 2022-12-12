@@ -41,6 +41,51 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   3.8   12/12/2022
+
+===========================================================================
+
+* Several issues with the cold restart capability were addressed. 
+* An issue was caused that could cause a crash when rigid rotational dofs are coupled to a biphasic element.
+* Added dump stride parameter, which allows users to specify how often the dump file is written.
+* Added "contact_traction" log variable.
+* Added names of parent when printing model parameter values.
+* Suppor for the MKL-DSS solver was added, which seems to work better for certain types of models than the default pardiso solver.
+* Added gap offset option to facet-2-facet sliding.
+* Fixed issue with plot output logic when first step does not request output.
+* Fixed bug in "element center of mass" plot variable.
+* Parameters of "orthotropic elastic" material can now be mapped.
+* Added "discrete element signed force" plot variable.
+* Added log variables for discrete element force components.
+* Fixed bug in compressible Gent material.
+* Added "facet area" log variable.
+* Added "deformation gradient" plot variable.
+* Fixed issue with initializationg of FEParamMat3d parameters.
+* Added FEMathExpression that refactored some of the logic previously in FEMathValue. FEMathValueVec3 now also uses FEMathExpression so that it can support maps.
+* Added prescribed fiber active contraction models. (Similar to uniaxial, but fiber direction can be defined by user.)
+* Added support for mixture stress log variable.
+* The "mixture stress" plot variable now also works for uncoupled mixtures.
+* Fixed calculation of fixed charge density in multiphasic and triphasic materials (in FEBio3)
+* Added error exception in Holmes-Mow permeability to catch pathological case.
+* Added "contact area" log variable.
+* Updated Theory Manual to fix calculation of fixed charge density in reactive multiphasic materials that use charged solid-bound molecules
+* Added description of fluid RCR surface load in User Manual
+* Fixed the fluid RCR surface load and made it ready for release. Simplified the fluid resistance to be consistent with fluid RCR.
+* Allow the initial referential mass density of solid-bound molecules, m_rho0, to be a FEParamDouble.
+* Updated FEMembraneMassActionForward and FEMembraneMassActionReversible to use areal concentration of solid-bound molecules. Updated FEMembraneReactionRateIonChannel to accommodate solid-bound molecules in the calculation of the reaction rate.
+* Added exponential damage CDF (useful for reactive viscoelastic materials with exponentially increasing weak bond fractions with increasing strain)
+* Added aggressive interpolation type as user-specifiable option in BoomerAMG solver.
+* Modified FEFiberPowLinear and FEFiberPowLinearUncoupled to use FEParamDouble material coefficients.
+* Updated FEIdealGasIsentropic and FEIdealGasIsothermal to run properly in current version of FEBio.
+* Point Source Updates
+* Fixed bug in FEContinuousFiberDistribution::Stress
+* Fixed issue with exporting plot parameter for mapped parameters of nodal loads.
+* Added support for X, Y, Z in generic hyperelastic material.
+* Restricted nodal reaction forces plot variable to non-rigid materials.
+
+
+===========================================================================
+
  R E L E A S E   3.7   6/15/2022
 
 ===========================================================================
