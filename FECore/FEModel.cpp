@@ -1153,6 +1153,14 @@ bool FEModel::RCI_Init()
 	return true;
 }
 
+bool FEModel::RCI_Restart()
+{
+	FEAnalysis* step = GetCurrentStep();
+	if (step == nullptr) return false;
+
+	return step->InitSolver();
+}
+
 bool FEModel::RCI_Advance()
 {
 	// get the current step
