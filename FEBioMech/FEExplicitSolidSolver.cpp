@@ -586,6 +586,18 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug & m_neq & m_nreq;
+
+	if (ar.IsShallow()) return;
+
+	ar & m_Ut;
+	ar & m_Mi;
+
+	if (ar.IsLoading())
+	{
+		m_Fn.assign(m_neq, 0);
+		m_Fr.assign(m_neq, 0);
+		m_ui.assign(m_neq, 0);
+	}
 }
 
 //-----------------------------------------------------------------------------

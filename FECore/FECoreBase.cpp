@@ -300,7 +300,32 @@ bool FECoreBase::Init()
 				}
 			}
 		}
+		else if (pi.type() == FE_PARAM_VEC3D_MAPPED)
+		{
+			for (int j = 0; j < pi.dim(); ++j)
+			{
+				FEParamVec3& pd = pi.value<FEParamVec3>(j);
+				if (pd.Init() == false)
+				{
+					feLogError("Failed to initialize parameter %s", pi.name());
+					return false;
+				}
+			}
+		}
+		else if (pi.type() == FE_PARAM_MAT3D_MAPPED)
+		{
+			for (int j = 0; j < pi.dim(); ++j)
+			{
+				FEParamMat3d& pd = pi.value<FEParamMat3d>(j);
+				if (pd.Init() == false)
+				{
+					feLogError("Failed to initialize parameter %s", pi.name());
+					return false;
+				}
+			}
+		}
 	}
+
 	// check the parameter ranges
 	if (Validate() == false) return false;
 

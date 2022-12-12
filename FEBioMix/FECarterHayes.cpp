@@ -47,7 +47,7 @@ bool FECarterHayes::Init()
 	if (FEElasticMaterial::Init() == false) return false;
 	
 	// get the parent material which must be a multiphasic material
-	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetParent());
+	FEMultiphasic* pMP = GetAncestor()->ExtractProperty<FEMultiphasic>();
 	if (pMP == 0) {
 		feLogError("Parent material must be multiphasic");
 		return false;

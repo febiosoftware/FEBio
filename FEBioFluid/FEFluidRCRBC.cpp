@@ -29,15 +29,15 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include "FEBioFluid.h"
 #include <FECore/FEAnalysis.h>
+#include <FECore/log.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidRCRBC, FESurfaceLoad)
-ADD_PARAMETER(m_R , "R");
-ADD_PARAMETER(m_Rd , "Rd");
-ADD_PARAMETER(m_p0, "initial_pressure");
-ADD_PARAMETER(m_pd, "pressure_offset");
-ADD_PARAMETER(m_C, "capacitance");
-ADD_PARAMETER(m_Bern, "Bernoulli");
+    ADD_PARAMETER(m_R , "R");
+    ADD_PARAMETER(m_Rd , "Rd");
+    ADD_PARAMETER(m_p0, "initial_pressure");
+    ADD_PARAMETER(m_pd, "pressure_offset");
+    ADD_PARAMETER(m_C, "capacitance");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -46,16 +46,10 @@ FEFluidRCRBC::FEFluidRCRBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_pfluid = nullptr;
-    m_alpha = 1.0;
     m_p0 = 0;
     m_Rd = 0.0;
     m_pd = 0.0;
     m_C = 0.0;
-    m_Bern = false;
-    
-    m_stepHist.clear();
-    m_timeHist.clear();
-    m_flowHist.clear();
     
     m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
     m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
@@ -83,9 +77,10 @@ bool FEFluidRCRBC::Init()
     m_pfluid = pm->ExtractProperty<FEFluidMaterial>();
     if (m_pfluid == nullptr) return false;
     
-    m_stepHist.resize(1,0.0);
-    m_timeHist.resize(1,0.0);
-    m_flowHist.resize(1,0.0);
+    m_pn = m_pp = m_p0;
+    m_pdn = m_pdp = m_pd;
+    m_qn = m_qp = 0;
+    m_tp = 0;
     
     return true;
 }
@@ -108,64 +103,30 @@ void FEFluidRCRBC::Activate()
 //! Evaluate and prescribe the resistance pressure
 void FEFluidRCRBC::Update()
 {
-    // evaluate the flow rate
-    double Q = FlowRate();
+    // Check if we started a new time, if so, update variables
+    FETimeInfo& timeInfo = GetFEModel()->GetTime();
+    double time = timeInfo.currentTime;
+    int iter = timeInfo.currentIteration;
+    double dt = timeInfo.timeIncrement;
+    if ((time > m_tp) && (iter == 0)) {
+        m_pp = m_pn;
+        m_qp = m_qn;
+        m_pdp = m_pdn;
+        m_tp = time;
+    }
     
-    int numsteps = GetFEModel()->GetCurrentStep()->m_ntimesteps;
-    FETimeInfo& tp = GetFEModel()->GetTime();
-    
-    m_flowHist.resize(numsteps + 1, 0);
-    m_timeHist.resize(numsteps + 1);
-    m_stepHist.resize(numsteps + 1);
-    
-    m_timeHist[numsteps] = tp.currentTime;
-    m_stepHist[numsteps] = tp.timeIncrement;
-    
-    m_flowHist[numsteps] = Q;
+    // evaluate the flow rate at the current time
+    m_qn = FlowRate();
+    m_pdn = m_pd;
     
     double tau = m_Rd*m_C;
     
-    // calculate the resistance pressure
-    double pR = 0;
-    if (m_Bern)
-        pR = m_R*Q*abs(Q);
-    else
-        pR = m_R*Q;
-    
-    //calculate initial pressure contribution
-    double pi = 0.0;
-    if (tau > 0)
-        pi = m_p0*exp(-m_timeHist[numsteps]/tau);
-    
-    //calculate pressure from capacitor contribution
-    double pC = 0.0;
-    if (m_C > 0 && m_Rd > 0)
-    {
-        for (int i = 0; i<=numsteps; ++i)
-        {
-            double p1 = 0;
-            double p2 = 0;
-            if (m_Bern)
-            {
-                if (i != 0)
-                    p1 = exp(-(m_timeHist[numsteps]-m_timeHist[i-1])/tau)/m_C*m_flowHist[i-1]*abs(m_flowHist[i-1]);
-                p2 = exp(-(m_timeHist[numsteps]-m_timeHist[i])/tau)/m_C*m_flowHist[i]*abs(m_flowHist[i]);
-            }
-            else
-            {
-                if (i != 0)
-                    p1 = exp(-(m_timeHist[numsteps]-m_timeHist[i-1])/tau)/m_C*m_flowHist[i-1];
-                p2 = exp(-(m_timeHist[numsteps]-m_timeHist[i])/tau)/m_C*m_flowHist[i];
-            }
-            pC += (p1+p2)/2.0*m_stepHist[i];
-        }
-    }
-    
-    double p = pR + pi + m_pd + pC;
+    // calculate the RCR pressure
+    m_pn = m_pdn + (m_Rd/(1+tau/dt)+m_R)*m_qn + tau/(dt+tau)*(m_pp - m_pdp - m_R*m_qp);
     
     // calculate the dilatation
     double e = 0;
-    bool good = m_pfluid->Dilatation(0,p,0,e);
+    bool good = m_pfluid->Dilatation(0,m_pn,0, e);
     assert(good);
     
     // prescribe this dilatation at the nodes
@@ -185,7 +146,7 @@ void FEFluidRCRBC::Update()
 }
 
 //-----------------------------------------------------------------------------
-//! evaluate the flow rate across this surface
+//! evaluate the flow rate across this surface at current time
 double FEFluidRCRBC::FlowRate()
 {
     double Q = 0;
@@ -206,8 +167,8 @@ double FEFluidRCRBC::FlowRate()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alphaf);
+            rt[i] = node.m_rt;
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
         }
         
         double* Nr, *Ns;
@@ -245,17 +206,6 @@ double FEFluidRCRBC::FlowRate()
 //! calculate residual
 void FEFluidRCRBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
-    
-    /*
-    int numsteps = GetFEModel()->GetCurrentStep()->m_ntimesteps;
-    m_flowHist.resize(numsteps + 1, 0);
-    m_timeHist.resize(numsteps + 1);
-    m_stepHist.resize(numsteps + 1);
-    
-    m_timeHist[numsteps] = tp.currentTime;
-    m_stepHist[numsteps] = tp.timeIncrement;
-    */
 }
 
 //-----------------------------------------------------------------------------
@@ -263,9 +213,5 @@ void FEFluidRCRBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 void FEFluidRCRBC::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar & m_alpha & m_alphaf;
-    ar & m_pfluid;
-    ar & m_timeHist;
-    ar & m_flowHist;
-    ar & m_stepHist;
+    ar & m_pn & m_pp & m_qn & m_qp & m_pdn & m_pdp & m_tp;
 }

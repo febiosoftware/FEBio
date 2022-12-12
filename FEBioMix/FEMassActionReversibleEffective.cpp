@@ -217,7 +217,7 @@ mat3ds FEMassActionReversibleEffective::Tangent_ReactionSupply_Strain(FEMaterial
     }
     else
     {
-        phi0 = bpt.m_phi0;
+        phi0 = bpt.m_phi0t;
     }
     
     // forward reaction

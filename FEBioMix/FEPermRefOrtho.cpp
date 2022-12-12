@@ -79,7 +79,7 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+	double phi0 = pt.m_phi0t;
 	
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
@@ -135,7 +135,7 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+	double phi0 = pt.m_phi0t;
 	
 	// get local coordinates
 	mat3d Q = GetLocalCS(mp);

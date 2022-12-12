@@ -219,7 +219,7 @@ mat3ds FEMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt
     else
     {
         J = ept.m_J;
-        phi0 = bpt.m_phi0;
+        phi0 = bpt.m_phi0t;
     }
 	
 	

@@ -232,6 +232,54 @@ double FELogContactPressure::value(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogContactTractionX::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.x;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionY::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.y;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionZ::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.z;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemPosX::value(FEElement& el)
 {
 	double val = 0.0;
@@ -1806,6 +1854,63 @@ double FELogDiscreteElementForce::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogDiscreteElementForceX::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.x;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceY::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.y;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceZ::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.z;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElementMixtureStress::value(FEElement& el)
+{
+	if (m_comp < 0) return 0.0;
+
+	double s = 0.0;
+	for (int n = 0; n < el.GaussPoints(); ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+		if (mmp)
+		{
+			if (m_comp < mmp->Components())
+			{
+				FEElasticMaterialPoint& ep = *mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
+
+				switch (m_metric)
+				{
+				case 0: s += ep.m_s.xx(); break;
+				case 1: s += ep.m_s.xy(); break;
+				case 2: s += ep.m_s.yy(); break;
+				case 3: s += ep.m_s.xz(); break;
+				case 4: s += ep.m_s.yz(); break;
+				case 5: s += ep.m_s.zz(); break;
+				}
+			}
+		}
+	}
+	s /= (double)el.GaussPoints();
+
+	return s;
+}
+
+//-----------------------------------------------------------------------------
 double FELogRigidBodyR11::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(0,0)); }
 double FELogRigidBodyR12::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(0, 1)); }
 double FELogRigidBodyR13::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(0, 2)); }
@@ -1956,4 +2061,21 @@ double FELogVolumePressure::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
     return (prc ? prc->m_s.m_p : 0);
+}
+
+//=============================================================================
+double FELogContactArea::value(FESurface& surface)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surface);
+	if (pcs == 0) return 0.0;
+
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		double area = pcs->GetContactArea();
+		return area;
+	}
+	return 0.0;
 }

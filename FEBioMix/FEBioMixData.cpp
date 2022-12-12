@@ -301,7 +301,7 @@ double FELogElemPorosity::value(FEElement& el)
 		const FEElasticMaterialPoint* et = (mp->ExtractData<FEElasticMaterialPoint>());
 		const FEBiphasicMaterialPoint* pt = (mp->ExtractData<FEBiphasicMaterialPoint>());
 
-		double p = (et && pt ? (1 - pt->m_phi0 / et->m_J) : 0.0);
+		double p = (et && pt ? (1 - pt->m_phi0t / et->m_J) : 0.0);
 		val += p;
 	}
 	return val / (double) nint;

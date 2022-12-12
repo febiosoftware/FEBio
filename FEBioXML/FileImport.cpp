@@ -266,7 +266,7 @@ int enumValue(const char* val, const char* szenum)
 
 	// get the string's length. 
 	// there could be a comma, so correct for that.
-	int L = strlen(val);
+	size_t L = strlen(val);
 	const char* c = strchr(val, ',');
 	if (c) L = c - val;
 
@@ -719,10 +719,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			// assign the valuator to the parameter
 			p.setValuator(val);
-
-			// do the initialization.
-			// TODO: Is this a good place to do this?
-			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
 		}
 		break;
 		case FE_PARAM_MAT3D_MAPPED:
@@ -757,10 +753,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			// assign the valuator to the parameter
 			p.setValuator(val);
-
-			// do the initialization.
-			// TODO: Is this a good place to do this?
-			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
 		}
 		break;
 		case FE_PARAM_MAT3DS_MAPPED:

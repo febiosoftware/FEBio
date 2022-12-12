@@ -81,6 +81,12 @@ public:
 		COARSE_OP_21 = 21,			// CGC coarsening
 		COARSE_OP_22 = 22,			// CGC-E coarsening
 	};
+    
+    enum AggInterpType {
+        AGG_IT_0 = 0,
+        AGG_IT_5 = 5,
+        AGG_IT_7 = 7,
+    };
 
 public:
 	BoomerAMGSolver(FEModel* fem);
@@ -98,6 +104,7 @@ public:
     void SetStrongThreshold(double thresh);
     void SetPMaxElmts(int pmax);
     void SetNumSweeps(int nswp);
+    void SetAggInterpType(int aggit);
     void SetAggNumLevels(int anlv);
 	void SetNodal(int nodal);
 	void SetJacobiPC(bool b);

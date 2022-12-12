@@ -69,7 +69,7 @@ public:
 
 private:
 	std::string			m_expr;
-	MSimpleExpression	m_math[3];
+	FEMathExpression	m_math[3];
 
 	DECLARE_FECORE_CLASS();
 };

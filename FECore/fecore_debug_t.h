@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <vector>
 #include <iostream>
 #include <typeinfo>
+#include <stdlib.h>
 #include "matrix.h"
 #include "mat3d.h"
 #include "vec3d.h"
@@ -40,7 +41,7 @@ SOFTWARE.*/
 // Don't use anything in here or include this file directly. 
 // Instead include fecore_debug.h and use the user functions and macros defined there.
 
-template <typename T> void fecore_print_T(T* pd) { cout << (*pd); }
+template <typename T> void fecore_print_T(T* pd) { std::cout << (*pd); }
 template <> void fecore_print_T<matrix>(matrix* pd);
 template <> void fecore_print_T<mat3d>(mat3d* pd);
 template <> void fecore_print_T<mat3ds>(mat3ds* pd);
@@ -60,13 +61,13 @@ public:
 	{
 	public:
 		Variable(void* pd, const char* sz) { m_pd = pd; m_szname = sz; }
-		virtual ~Variable(){}
+		virtual ~Variable() {}
 
 		virtual void print() = 0;
 
 	public:
-		void*			m_pd;
-		const char*		m_szname;
+		void* m_pd;
+		const char* m_szname;
 	};
 
 	template <typename T> class Variable_T : public Variable
@@ -74,10 +75,10 @@ public:
 	public:
 		Variable_T(void* pd, const char* sz) : Variable(pd, sz) {}
 
-		void print() 
-		{ 
-			cout << typeid(T).name() << endl;
-			fecore_print_T<T>((T*)m_pd); 
+		void print()
+		{
+			std::cout << typeid(T).name() << std::endl;
+			fecore_print_T<T>((T*)m_pd);
 		}
 	};
 
@@ -87,10 +88,13 @@ public:
 	static void Add(Variable* pvar);
 	static void Remove(Variable* pvar);
 
+	static void Print(const char* szformat, ...);
+
 private:
-	FECoreDebugger(){}
+	FECoreDebugger() {}
 
 	static std::list<Variable*>	m_var;
+	static FILE* m_fp;
 };
 
 class FECoreWatchVariable

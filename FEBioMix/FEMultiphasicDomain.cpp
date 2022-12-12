@@ -39,4 +39,6 @@ FEMultiphasicDomain::FEMultiphasicDomain(FEModel* pfem) : FEElasticDomain(pfem)
     
     m_dofC = pfem->GetDOFIndex("concentration", 0);
     m_dofD = pfem->GetDOFIndex("shell concentration", 0);
+    
+    m_breset = false;
 }

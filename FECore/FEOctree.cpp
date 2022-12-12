@@ -188,15 +188,19 @@ bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
 
 //-----------------------------------------------------------------------------
 // Find intersected octree leaves and return a set of their surface elements
-
-void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel)
+void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel, double srad)
 {
-	if (RayIntersectsNode(p, n)) {
+	// Check if octree node is within search radius from p.
+	bool bNodeWithinSRad = ( (cmin.x - srad <= p.x) && (cmax.x + srad >= p.x) &&
+	                         (cmin.y - srad <= p.y) && (cmax.y + srad >= p.y) &&
+	                         (cmin.z - srad <= p.z) && (cmax.z + srad >= p.z) );
+
+	if (bNodeWithinSRad && RayIntersectsNode(p, n)) {
 		int nc = (int)children.size();
 		// if this node has children, search them for intersections
 		if (nc) {
 			for (int ic=0; ic<nc; ++ic) {
-				children[ic].FindIntersectedLeaves(p, n, sel);
+				children[ic].FindIntersectedLeaves(p, n, sel, srad);
 			}
 		}
 		// otherwise we have reached the smallest intersected node in this
@@ -305,7 +309,7 @@ void FEOctree::Init(const double stol)
 	return;
 }
 
-void FEOctree::FindCandidateSurfaceElements(vec3d p, vec3d n, set<int>& sel)
+void FEOctree::FindCandidateSurfaceElements(vec3d p, vec3d n, set<int>& sel, double srad)
 {
-	root.FindIntersectedLeaves(p, n, sel);
+	root.FindIntersectedLeaves(p, n, sel, srad);
 }

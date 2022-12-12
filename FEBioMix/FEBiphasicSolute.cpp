@@ -128,7 +128,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 //	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse

@@ -73,4 +73,7 @@ protected:
     int                 m_dofVX;
     int                 m_dofVY;
     int                 m_dofVZ;
+    
+protected:
+    bool                m_breset;   //!< flag for when Reset() is called
 };

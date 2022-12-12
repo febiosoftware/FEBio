@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPermHolmesMow.h"
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPermHolmesMow, FEHydraulicPermeability)
@@ -57,10 +58,13 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 	// referential solid volume fraction also check if bfsi
     double phi0 = 0.0;
     if (pt)
-        phi0 = pt->m_phi0;
+        phi0 = pt->m_phi0t;
     else if (bpt)
         phi0 = bpt->m_phi0;
 	
+    // check for potential error
+    if (J <= phi0) feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phi0);
+    
 	// --- strain-dependent isotropic permeability ---
 	
 	return mat3dd(m_perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0));
@@ -79,10 +83,13 @@ tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// referential solid volume fraction
     double phi0 = 0.0;
     if (pt)
-        phi0 = pt->m_phi0;
+        phi0 = pt->m_phi0t;
     else if (bpt)
         phi0 = bpt->m_phi0;
 	
+    // check for potential error
+    if (J <= phi0) feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phi0);
+    
 	mat3dd I(1);	// Identity
 	
 	double k0 = m_perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);

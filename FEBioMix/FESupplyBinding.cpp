@@ -80,7 +80,7 @@ double FESupplyBinding::ReceptorLigandSupply(FEMaterialPoint& mp)
 	
 	double J = et.m_J;
 	double ca = spt.m_ca[0];
-	double phi0 = ppt.m_phi0;
+	double phi0 = ppt.m_phi0t;
 	double cr = (J-phi0)*ca;
 	double crc = spt.m_sbmr[0];
 	double crchat = m_kf*cr*(m_crt-crc) - m_kr*crc;
@@ -104,7 +104,7 @@ double FESupplyBinding::ReceptorLigandConcentrationSS(FEMaterialPoint& mp)
 	
 	double J = et.m_J;
 	double ca = spt.m_ca[0];
-	double phi0 = ppt.m_phi0;
+	double phi0 = ppt.m_phi0t;
 	double cr = (J-phi0)*ca;
 	double Kd = m_kr/m_kf;	// dissociation constant
 	double crc = m_crt*cr/(Kd+cr);

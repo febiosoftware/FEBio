@@ -24,41 +24,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <vector>
-#include "FERefineMesh.h"
-#include <FECore/FEFunction1D.h>
-#include <FECore/FEModelParam.h>
+#include <FECore/LinearSolver.h>
 
-class FEMMGRemesh : public FERefineMesh
+class MKLDSSolver : public LinearSolver
 {
-	class MMG;
+	class Imp;
 
 public:
-	FEMMGRemesh(FEModel* fem);
+	MKLDSSolver(FEModel* fem);
+	~MKLDSSolver();
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
 
-	bool Init() override;
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
-	bool RefineMesh() override;
-
-private:
-	FEMeshAdaptorCriterion* GetCriterion() { return m_criterion; }
-
-private:
-	bool	m_relativeSize;
-	bool	m_meshCoarsen;
-	bool	m_normalizeData;
-
-	double	m_hmin;		// minimum element size
-	double	m_hausd;	// Hausdorff value
-	double	m_hgrad;	// gradation
-
-	FEMeshAdaptorCriterion*	m_criterion;
-
-	FEFunction1D*	m_sfunc;	// sizing function
-
-	MMG*	mmg;
-
-	friend class MMG;
+protected:
+	Imp* m;
 
 	DECLARE_FECORE_CLASS();
 };
+

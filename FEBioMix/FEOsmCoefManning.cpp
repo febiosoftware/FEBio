@@ -219,7 +219,7 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Strain_Manning(FEMaterialPoi
     
     double phisr = 0.0;
     if (m_pMP)
-        phisr = bpt.m_phi0;
+        phisr = bpt.m_phi0t;
     if (m_pMF)
         phisr = bfpt.m_phi0;
     

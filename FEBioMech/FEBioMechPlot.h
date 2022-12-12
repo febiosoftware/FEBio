@@ -820,6 +820,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Deformation gradient
+class FEPlotDeformationGradient : public FEPlotDomainData
+{
+public:
+	FEPlotDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Lagrange strains
 class FEPlotLagrangeStrain : public FEPlotDomainData
 {
@@ -1009,6 +1018,15 @@ public:
 	FEPlotDiscreteElementForce(FEModel* fem) : FEPlotDomainData(fem, PLT_VEC3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotDiscreteElementSignedForce : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementSignedForce(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 
 //-----------------------------------------------------------------------------
 class FEPlotDiscreteElementStrainEnergy : public FEPlotDomainData

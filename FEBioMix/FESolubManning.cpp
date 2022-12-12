@@ -266,7 +266,7 @@ double FESolubManning::Tangent_Solubility_Strain_Manning(FEMaterialPoint &mp)
     double J = pt.m_J;
     double phisr = 0.0;
     if (m_pMP)
-        phisr = bpt.m_phi0;
+        phisr = bpt.m_phi0t;
     if (m_pMF)
         phisr = bfpt.m_phi0;
     

@@ -106,29 +106,33 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 		FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&m.Domain(i));
 		if (dom)
 		{
-			int NE = dom->Elements();
-			for (int i = 0; i < NE; ++i)
+			FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(dom->GetMaterial());
+			if (prm == nullptr)
 			{
-				// get the element
-				FESolidElement& el = dom->Element(i);
+				int NE = dom->Elements();
+				for (int i = 0; i < NE; ++i)
+				{
+					// get the element
+					FESolidElement& el = dom->Element(i);
 
-				if (el.isActive()) {
-					// element force vector
-					vector<double> fe;
-					vector<int> lm;
+					if (el.isActive()) {
+						// element force vector
+						vector<double> fe;
+						vector<int> lm;
 
-					// get the element force vector and initialize it to zero
-					int ndof = 3 * el.Nodes();
-					fe.assign(ndof, 0);
+						// get the element force vector and initialize it to zero
+						int ndof = 3 * el.Nodes();
+						fe.assign(ndof, 0);
 
-					// calculate internal force vector
-					dom->ElementInternalForce(el, fe);
+						// calculate internal force vector
+						dom->ElementInternalForce(el, fe);
 
-					// assemble into F
-					for (size_t j = 0; j < el.Nodes(); ++j)
-					{
-						vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
-						F[el.m_node[j]] += rj;
+						// assemble into F
+						for (size_t j = 0; j < el.Nodes(); ++j)
+						{
+							vec3d rj(fe[3 * j], fe[3 * j + 1], fe[3 * j + 2]);
+							F[el.m_node[j]] += rj;
+						}
 					}
 				}
 			}
@@ -838,7 +842,8 @@ bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
 
 	// make sure this is a mixture
 	FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pmat);
-	if (pmm == nullptr) return false;
+	FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
+	if ((pmm == nullptr) && (pum == nullptr)) return false;
 
 	// get the mixture component
 	if (m_comp < 0) return false;
@@ -1233,10 +1238,11 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			double m = 0;
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 				double detJ = bd.detJ0(el, j)*gw[j];
-				ew += pt.m_rt*(pme->Density(pt)*detJ);
-				m += pme->Density(pt)*detJ;
+				ew += pt.m_rt*(pme->Density(mp)*detJ);
+				m += pme->Density(mp)*detJ;
 			}
 
 			a << ew / m;
@@ -2022,6 +2028,20 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, FEDataStream& a)
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	writeSPRElementValueMat3dd(sd, a, FEPrincStresses());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
+	writeAverageElementValue<mat3d>(dom, a, [](const FEMaterialPoint& mp) {
+		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		return pt.m_F;
+	});
 
 	return true;
 }
@@ -3791,6 +3811,35 @@ bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 
 		// write the force
 		a << mp.m_Ft;
+	}
+
+	return true;
+}
+
+bool FEPlotDiscreteElementSignedForce::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteElasticDomain* pdiscreteDomain = dynamic_cast<FEDiscreteElasticDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteElasticDomain& discreteDomain = *pdiscreteDomain;
+
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+
+		// get the (one) material point data
+		FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+
+		vec3d ra1 = dom.Node(el.m_lnode[0]).m_rt;
+		vec3d rb1 = dom.Node(el.m_lnode[1]).m_rt;
+		vec3d e = rb1 - ra1; e.unit();
+
+		vec3d F = mp.m_Ft;
+
+		double Fm = F * e;
+
+		// write the force
+		a << Fm;
 	}
 
 	return true;

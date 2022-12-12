@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "ObjectDataRecord.h"
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/FENLConstraint.h>
+#include <FECore/SurfaceDataRecord.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -175,6 +176,30 @@ class FELogContactPressure : public FEFaceLogData
 {
 public:
 	FELogContactPressure(FEModel* fem) : FEFaceLogData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionX : public FEFaceLogData
+{
+public:
+	FELogContactTractionX(FEModel* fem) : FEFaceLogData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionY : public FEFaceLogData
+{
+public:
+	FELogContactTractionY(FEModel* fem) : FEFaceLogData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionZ : public FEFaceLogData
+{
+public:
+	FELogContactTractionZ(FEModel* fem) : FEFaceLogData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
@@ -995,6 +1020,51 @@ public:
 	double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceX : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceX(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceY : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceY(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceZ : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceZ(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElementMixtureStress : public FELogElemData
+{
+public:
+	FELogElementMixtureStress(FEModel* fem, int n, int m) : FELogElemData(fem), m_comp(n), m_metric(m) {}
+	double value(FEElement& el);
+
+private:
+	int	m_comp;
+	int	m_metric;
+};
+
+template <int N, int M> class FELogElementMixtureStress_T : public FELogElementMixtureStress
+{
+public:
+	FELogElementMixtureStress_T(FEModel* fem) : FELogElementMixtureStress(fem, N, M) {}
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================
@@ -1415,3 +1485,13 @@ public:
     double value(FENLConstraint& rc);
 };
 
+//=============================================================================
+// S U R F A C E   D A T A
+//=============================================================================
+
+class FELogContactArea : public FELogSurfaceData
+{
+public:
+	FELogContactArea(FEModel* fem) : FELogSurfaceData(fem) {}
+	double value(FESurface& surface) override;
+};

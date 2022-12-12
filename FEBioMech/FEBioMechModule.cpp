@@ -429,6 +429,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC, "uncoupled prescribed trans iso active contraction");
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic, "prescribed isotropic active contraction");
 	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, "uncoupled prescribed isotropic active contraction");
+	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionFiber, "prescribed fiber active contraction");
+	REGISTER_FECORE_CLASS(FEPrescribedActiveContractionFiberUC, "uncoupled prescribed fiber active contraction");
 
 	REGISTER_FECORE_CLASS(FEActiveFiberStress, "active fiber stress");
 	REGISTER_FECORE_CLASS(FEActiveFiberStressUC, "uncoupled active fiber stress");
@@ -470,6 +472,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
     REGISTER_FECORE_CLASS(FEDamageCDFPower, "CDF power");
+    REGISTER_FECORE_CLASS(FEDamageCDFExp, "CDF exponential");
 
 	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");
@@ -665,6 +668,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses, "SPR principal stress");
 	REGISTER_FECORE_CLASS(FEPlotNodalStresses, "nodal stress");
 	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain"); // NOTE: Deprecated
+	REGISTER_FECORE_CLASS(FEPlotDeformationGradient, "deformation gradient");
 	REGISTER_FECORE_CLASS(FEPlotLagrangeStrain, "Lagrange strain");
 	REGISTER_FECORE_CLASS(FEPlotInfStrain, "infinitesimal strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
@@ -722,6 +726,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementElongation, "discrete element elongation");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementPercentElongation, "discrete element percent elongation");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementForce, "discrete element force");
+	REGISTER_FECORE_CLASS(FEPlotDiscreteElementSignedForce, "discrete element signed force");
 	REGISTER_FECORE_CLASS(FEPlotDiscreteElementStrainEnergy, "discrete element strain energy");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D    , "continuous damage");
 	REGISTER_FECORE_CLASS(FEPlotContinuousDamage_D1   , "continuous damage D1");
@@ -767,6 +772,9 @@ void FEBioMech::InitModule()
 	// Derived from FELogFaceData
 	REGISTER_FECORE_CLASS(FELogContactGap     , "contact gap");
 	REGISTER_FECORE_CLASS(FELogContactPressure, "contact pressure");
+	REGISTER_FECORE_CLASS(FELogContactTractionX, "contact_traction.x");
+	REGISTER_FECORE_CLASS(FELogContactTractionY, "contact_traction.y");
+	REGISTER_FECORE_CLASS(FELogContactTractionZ, "contact_traction.z");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogElemData
@@ -896,6 +904,28 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
     REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForceX    , "Fde.x");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForceY    , "Fde.y");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForceZ    , "Fde.z");
+	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 0, "mixture_stress[0].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 1, "mixture_stress[0].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 2, "mixture_stress[0].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 3, "mixture_stress[0].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 4, "mixture_stress[0].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 5, "mixture_stress[0].zz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 0, "mixture_stress[1].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 1, "mixture_stress[1].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 2, "mixture_stress[1].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 3, "mixture_stress[1].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 4, "mixture_stress[1].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 5, "mixture_stress[1].zz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 0, "mixture_stress[2].xx");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 1, "mixture_stress[2].xy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 2, "mixture_stress[2].yy");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 3, "mixture_stress[2].xz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 4, "mixture_stress[2].yz");
+	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 5, "mixture_stress[2].zz");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData

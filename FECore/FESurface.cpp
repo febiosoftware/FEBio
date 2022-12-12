@@ -77,7 +77,6 @@ void FESurface::Create(const FEFacetSet& set)
 	assert(m_surf == &set);
 
 	FEMesh& m = *GetMesh();
-	int NN = m.Nodes();
 
 	// count nr of faces
 	int faces = set.Faces();
@@ -118,7 +117,6 @@ void FESurface::CreateMaterialPointData()
 	{
 		FESurfaceElement& el = m_el[i];
 		int nint = el.GaussPoints();
-		int neln = el.Nodes();
 		el.ClearData();
 		for (int n = 0; n < nint; ++n)
 		{
@@ -342,7 +340,6 @@ FEElement* FESurface::FindElement(FESurfaceElement& el)
 	FEMesh& mesh = *GetMesh();
 	FENodeElemList& NEL = mesh.NodeElementList();
 
-	vector<int>& sf = el.m_node;
 	int node = el.m_node[0];
 	int nval = NEL.Valence(node);
 	FEElement** ppe = NEL.ElementList(node);
@@ -697,6 +694,33 @@ vec3d FESurface::Position(FESurfaceElement& el, double r, double s)
 	}
 
 	return q;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the position of integration point n
+
+vec3d FESurface::Position(FESurfaceElement &el, int n)
+{
+    // get the mesh to which this surface belongs
+    FEMesh& mesh = *m_pMesh;
+    
+    // number of element nodes
+    int ne = el.Nodes();
+    
+    // get the elements nodal positions
+    vec3d y[FEElement::MAX_NODES];
+    if (!m_bshellb) for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+    else for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_st();
+    
+    double* H = el.H(n);
+    
+    vec3d q(0,0,0);
+    for (int i=0; i<ne; ++i)
+    {
+        q += y[i]*H[i];
+    }
+    
+    return q;
 }
 
 //-----------------------------------------------------------------------------
@@ -1530,7 +1554,7 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 	x1[2] = y[3]; x2[2] = y[1];
 
 	bool b = false;
-	double rp, sp;
+	double rp = 0, sp = 0;
 
 	if (IntersectTri(x1, r, n, rs, g, eps))
 	{
@@ -1836,7 +1860,7 @@ bool IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 	x1[2] = y[5]; x2[2] = y[4]; x3[2] = y[2]; x4[2] = y[3];
 	
 	bool b = false;
-	double rp, sp;
+	double rp = 0, sp = 0;
 	
 	if (IntersectTri(x1, r, n, rs, g, eps))
 	{
@@ -1969,7 +1993,7 @@ bool IntersectTri7(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 	x1[2] = y[5]; x2[2] = y[4]; x3[2] = y[2]; x4[2] = y[3];
 	
 	bool b = false;
-	double rp, sp;
+	double rp = 0, sp = 0;
 	
 	if (IntersectTri(x1, r, n, rs, g, eps))
 	{
@@ -2097,7 +2121,6 @@ void FESurface::Invert()
 {
 	ForEachSurfaceElement([](FESurfaceElement& el) {
 		int tmp;
-		int neln = el.Nodes();
 		switch (el.Shape())
 		{
 		case ET_TRI3 : tmp = el.m_node[1]; el.m_node[1] = el.m_node[2]; el.m_node[2] = tmp; break;
@@ -2288,7 +2311,6 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 		fe.assign(ndof, 0.0);
 
 		// get the nodal coordinates
-		FEMesh& mesh = *GetMesh();
 		if (breference)
 			GetReferenceNodalCoordinates(el, re);
 		else
@@ -2349,7 +2371,6 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 	int order_a = (dofPerNode_a == 1 ? dofList_a.InterpolationOrder(0) : -1);
 	int order_b = (dofPerNode_b == 1 ? dofList_b.InterpolationOrder(0) : -1);
 
-	FEMesh& mesh = *GetMesh();
 	vec3d rt[FEElement::MAX_NODES];
 
 	matrix kab(dofPerNode_a, dofPerNode_b);
@@ -2388,7 +2409,6 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 		{
 			FESurfaceMaterialPoint& pt = static_cast<FESurfaceMaterialPoint&>(*el.GetMaterialPoint(n));
 
-			double* N = el.H(n);
 			double* Gr = el.Gr(n);
 			double* Gs = el.Gs(n);
 
