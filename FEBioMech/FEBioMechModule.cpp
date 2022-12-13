@@ -165,7 +165,7 @@ SOFTWARE.*/
 #include "FEShenoyMaterial.h"
 #include "FELungMaterial.h"
 #include "FEGrowthTensor.h"
-#include "FERodriguezGrowth.h"
+#include "FEKinematicGrowth.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -355,7 +355,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGenerationMaterial, "generation");
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
-    REGISTER_FECORE_CLASS(FERodriguezGrowth, "Rodriguez growth");
+    REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");

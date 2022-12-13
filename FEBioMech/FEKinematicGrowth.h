@@ -34,10 +34,10 @@ SOFTWARE.*/
 //! Define a material point that stores the multiplicative decomposition
 //! of the deformation gradient and the solid referential density
 //
-class FERodriguezMaterialPoint : public FEMaterialPointData
+class FEKinematicMaterialPoint : public FEMaterialPointData
 {
 public:
-    FERodriguezMaterialPoint(FEMaterialPointData *pt) : FEMaterialPointData(pt) {}
+    FEKinematicMaterialPoint(FEMaterialPointData *pt) : FEMaterialPointData(pt) {}
     
     FEMaterialPointData* Copy() override;
     
@@ -53,12 +53,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Material class that implements Rodriguez growth model.
+//! Material class that implements Kinematic growth model.
 //
-class FERodriguezGrowth : public FEElasticMaterial
+class FEKinematicGrowth : public FEElasticMaterial
 {
 public:
-    FERodriguezGrowth(FEModel* pfem);
+    FEKinematicGrowth(FEModel* pfem);
     
     //! Initialization routine
     bool Init() override;

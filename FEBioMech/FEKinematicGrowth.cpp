@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-#include "FERodriguezGrowth.h"
+#include "FEKinematicGrowth.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
@@ -33,15 +33,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Material point
 //
-FEMaterialPointData* FERodriguezMaterialPoint::Copy()
+FEMaterialPointData* FEKinematicMaterialPoint::Copy()
 {
-    FERodriguezMaterialPoint* pt = new FERodriguezMaterialPoint(*this);
+    FEKinematicMaterialPoint* pt = new FEKinematicMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
     return pt;
 }
 
 //-----------------------------------------------------------------------------
-void FERodriguezMaterialPoint::Init()
+void FEKinematicMaterialPoint::Init()
 {
     FEMaterialPointData::Init();
     
@@ -50,13 +50,13 @@ void FERodriguezMaterialPoint::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FERodriguezMaterialPoint::Update(const FETimeInfo& timeInfo)
+void FEKinematicMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
     FEMaterialPointData::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
-void FERodriguezMaterialPoint::Serialize(DumpStream& ar)
+void FEKinematicMaterialPoint::Serialize(DumpStream& ar)
 {
     if (ar.IsSaving())
     {
@@ -72,14 +72,14 @@ void FERodriguezMaterialPoint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FERodriguezGrowth, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEKinematicGrowth, FEElasticMaterial)
     ADD_PROPERTY(m_pBase, "elastic");
     ADD_PROPERTY(m_pGrowth, "growth");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERodriguezGrowth::FERodriguezGrowth(FEModel* pfem) : FEElasticMaterial(pfem)
+FEKinematicGrowth::FEKinematicGrowth(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_pBase = nullptr;
     m_pGrowth = nullptr;
@@ -87,18 +87,18 @@ FERodriguezGrowth::FERodriguezGrowth(FEModel* pfem) : FEElasticMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 //! create material point
-FEMaterialPointData* FERodriguezGrowth::CreateMaterialPointData()
+FEMaterialPointData* FEKinematicGrowth::CreateMaterialPointData()
 {
     FEGrowthTensor* pmf = GetGrowthMaterial();
     FEMaterialPointData* mp = pmf->CreateMaterialPointData();
     FEMaterialPointData* ep = new FEElasticMaterialPoint();
     ep->SetNext(mp);
-    return new FERodriguezMaterialPoint(ep);
+    return new FEKinematicMaterialPoint(ep);
 }
 
 //-----------------------------------------------------------------------------
 //! data initialization
-bool FERodriguezGrowth::Init()
+bool FEKinematicGrowth::Init()
 {
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
     if (m_pMat != nullptr) {
@@ -111,7 +111,7 @@ bool FERodriguezGrowth::Init()
 
 //-----------------------------------------------------------------------------
 //! Returns the Cauchy stress
-mat3ds FERodriguezGrowth::Stress(FEMaterialPoint& mp)
+mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
 {
     // Get the growth tensor inverse
     FEGrowthTensor* gmat = GetGrowthMaterial();
@@ -147,7 +147,7 @@ mat3ds FERodriguezGrowth::Stress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Returns the spatial tangent
-tens4ds FERodriguezGrowth::Tangent(FEMaterialPoint& mp)
+tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 {
     // Get the growth tensor inverse
     FEGrowthTensor* gmat = GetGrowthMaterial();
@@ -183,7 +183,7 @@ tens4ds FERodriguezGrowth::Tangent(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Returns the strain energy density
-double FERodriguezGrowth::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEKinematicGrowth::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     // Get the growth tensor inverse
     FEGrowthTensor* gmat = GetGrowthMaterial();
@@ -219,7 +219,7 @@ double FERodriguezGrowth::StrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! update material point at each iteration
-void FERodriguezGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+void FEKinematicGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {
     // Get the growth tensor inverse
     FEGrowthTensor* gmat = GetGrowthMaterial();
@@ -230,8 +230,8 @@ void FERodriguezGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
     // convert to global coordinates
     vec3d a0 = Q * fiber;
     
-    // extract Rodriguez growth material point
-    FERodriguezMaterialPoint& pt = *mp.ExtractData<FERodriguezMaterialPoint>();
+    // extract Kinematic growth material point
+    FEKinematicMaterialPoint& pt = *mp.ExtractData<FEKinematicMaterialPoint>();
     
     pt.m_rhor = GetBaseMaterial()->Density(mp)*GetGrowthMaterial()->GrowthDensity(mp, a0);
 }
