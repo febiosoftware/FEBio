@@ -815,7 +815,7 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
             data.m_rs = data.m_rsp;
             
             // recalculate gap
-            data.m_dg = dg;
+            data.m_dg = dg + nu*m_offset;
         }
         else {
             // recalculate contact pressure for slip
@@ -878,7 +878,7 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
                     data.m_rs = data.m_rsp;
                     
                     // recalculate gap
-                    data.m_dg = dg;
+                    data.m_dg = dg + nu*m_offset;
                 }
                 else
                 {
