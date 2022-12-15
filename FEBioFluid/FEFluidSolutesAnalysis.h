@@ -27,16 +27,16 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include "febiofluid_api.h"
 
-class FEBIOFLUID_API FEFluidSoluteAnalysis : public FEAnalysis
+class FEBIOFLUID_API FEFluidSolutesAnalysis : public FEAnalysis
 {
 public:
-	enum FluidSoluteAnalysisType {
+	enum FluidSolutesAnalysisType {
 		STEADY_STATE,
 		DYNAMIC
 	};
 
 public:
-	FEFluidSoluteAnalysis(FEModel* fem);
+	FEFluidSolutesAnalysis(FEModel* fem);
 
 	DECLARE_FECORE_CLASS();
 };
