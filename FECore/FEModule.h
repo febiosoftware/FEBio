@@ -36,6 +36,12 @@ class FECORE_API FEModule
 	class Impl;
 
 public:
+	enum Status {
+		EXPERIMENTAL,
+		RELEASED
+	};
+
+public:
 	FEModule();
 
 	virtual ~FEModule();
@@ -54,6 +60,11 @@ public:
 	const char* GetName() const;
 
 	const char* GetDescription() const;
+
+	int GetStatus() const;
+
+protected:
+	void SetStatus(FEModule::Status status);
 
 private:
 	void SetID(int newId);

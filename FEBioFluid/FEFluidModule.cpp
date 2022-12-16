@@ -130,7 +130,7 @@ void FEFluidFSIModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEMultiphasicFSIModule::FEMultiphasicFSIModule() {}
+FEMultiphasicFSIModule::FEMultiphasicFSIModule() { SetStatus(EXPERIMENTAL); }
 void FEMultiphasicFSIModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom
@@ -202,7 +202,7 @@ void FEMultiphasicFSIModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEThermoFluidModule::FEThermoFluidModule() {}
+FEThermoFluidModule::FEThermoFluidModule() { SetStatus(EXPERIMENTAL); }
 void FEThermoFluidModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom
@@ -236,7 +236,7 @@ void FEThermoFluidModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEPolarFluidModule::FEPolarFluidModule() {}
+FEPolarFluidModule::FEPolarFluidModule() { SetStatus(EXPERIMENTAL); }
 void FEPolarFluidModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom
@@ -275,7 +275,7 @@ void FEPolarFluidModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEFluidSolutesModule::FEFluidSolutesModule() {}
+FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(EXPERIMENTAL); }
 void FEFluidSolutesModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom
