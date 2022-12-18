@@ -122,6 +122,7 @@ public:
 
 public: // reverse control solver interface
 	bool RCI_Init();
+	bool RCI_Restart();
 	bool RCI_Rewind();
 	bool RCI_Advance();
 	bool RCI_Finish();

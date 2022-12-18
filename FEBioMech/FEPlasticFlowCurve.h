@@ -30,24 +30,50 @@
 #include <FECore/FEMaterial.h>
 #include <FECore/FEPointFunction.h>
 
+class FEPlasticFlowCurve;
+
+//-----------------------------------------------------------------------------
+// Material point for plastic flow curve
+ class FEPlasticFlowCurveMaterialPoint : public FEMaterialPointData
+{
+public:
+    FEPlasticFlowCurveMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) { m_binit = false; }
+    
+    //! copy material point data
+    FEMaterialPointData* Copy() override;
+    
+    //! Initialize material point data
+    void Init() override;
+    
+    //! Serialize data to archive
+    void Serialize(DumpStream& ar) override;
+    
+public:
+    vector<double>  m_Ky;       //!< bond yield measures
+    vector<double>  m_w;        //!< bond mass fractions
+    bool            m_binit;    //!< flag for initialization
+};
+
 //-----------------------------------------------------------------------------
 // Virtual base class for plastic flow curve
 
 class FEPlasticFlowCurve : public FEMaterialProperty
 {
 public:
-    FEPlasticFlowCurve(FEModel* pfem) : FEMaterialProperty(pfem) { m_binit = false; }
+    FEPlasticFlowCurve(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
     //! return
-    vector<double> BondYieldMeasures() { return Ky; }
-    vector<double> BondMassFractions() { return w; }
-    size_t BondFamilies() { return Ky.size(); }
+    vector<double> BondYieldMeasures(FEMaterialPoint& mp);
+    vector<double> BondMassFractions(FEMaterialPoint& mp);
+    size_t BondFamilies(FEMaterialPoint& mp);
     
-protected:
-    vector<double> Ky;
-    vector<double> w;
-    bool    m_binit; //!< flag indicating whether the material has been initialized
-
+    // returns a pointer to a new material point object
+    FEMaterialPointData* CreateMaterialPointData() override;
+    
+    // initialize flow curve. Return true upon successful initialization,
+    // false otherwise
+    virtual bool InitFlowCurve(FEMaterialPoint& mp) = 0;
+    
     FECORE_BASE_CLASS(FEPlasticFlowCurve);
 };
 
@@ -59,16 +85,16 @@ class FEPlasticFlowCurvePaper : public FEPlasticFlowCurve
 public:
     FEPlasticFlowCurvePaper(FEModel* pfem);
     
-    bool Init() override;
+    bool InitFlowCurve(FEMaterialPoint& mp) override;
     
 public:
-    double      m_wmin;     // initial fraction of yielding bonds
-    double      m_wmax;     // final fraction of yielding bonds
-    double      m_we;       // fraction of unyielding bonds
-    double      m_Ymin;     // initial yield measure
-    double      m_Ymax;     // yield measure when all bonds have yielded
-    int         m_n;        // number of yield levels
-    double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
+    FEParamDouble   m_wmin;     // initial fraction of yielding bonds
+    FEParamDouble   m_wmax;     // final fraction of yielding bonds
+    FEParamDouble   m_we;       // fraction of unyielding bonds
+    FEParamDouble   m_Ymin;     // initial yield measure
+    FEParamDouble   m_Ymax;     // yield measure when all bonds have yielded
+    int             m_n;        // number of yield levels
+    FEParamDouble   m_bias;     // biasing factor for intervals in yield measures and bond fractions
 
     DECLARE_FECORE_CLASS();
 };
@@ -81,7 +107,7 @@ class FEPlasticFlowCurveUser : public FEPlasticFlowCurve
 public:
     FEPlasticFlowCurveUser(FEModel* pfem);
     
-    bool Init() override;
+    bool InitFlowCurve(FEMaterialPoint& mp) override;
     
 public:
     FEPointFunction*    m_Y;    //!< true stress-true strain flow curve
@@ -97,7 +123,7 @@ class FEPlasticFlowCurveMath : public FEPlasticFlowCurve
 public:
     FEPlasticFlowCurveMath(FEModel* pfem);
     
-    bool Init() override;
+    bool InitFlowCurve(FEMaterialPoint& mp) override;
     
 public:
     int                 m_n;    //!< number of yield levels

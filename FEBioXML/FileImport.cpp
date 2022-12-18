@@ -1250,6 +1250,25 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 									throw XMLReader::InvalidValue(tag);
 							}
 						}
+						else
+						{
+							// we get here if the property was defined with an empty tag.
+							// We should still validate it.
+							int NP = pp->PropertyClasses();
+							for (int i = 0; i < NP; ++i)
+							{
+								FEProperty* pi = pp->PropertyClass(i);
+								bool a = pi->IsRequired();
+								bool b = (pi->size() == 0);
+								if (a && b)
+								{
+									std::string name = pp->GetName();
+									if (name.empty()) name = prop->GetName();
+									throw FEBioImport::MissingProperty(name, pi->GetName());
+								}
+							}
+
+						}
 					}
 				}
 				return true;

@@ -32,17 +32,17 @@ SOFTWARE.*/
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! The FEConstraintNormalFlow class implements a fluid surface with zero
+//! The FEConstraintUniformFlow class implements a fluid surface with zero
 //! tangential velocity as a linear constraint.
 
-class FEBIOFLUID_API FEConstraintNormalFlow : public FESurfaceConstraint
+class FEBIOFLUID_API FEConstraintUniformFlow : public FESurfaceConstraint
 {
 public:
     //! constructor
-    FEConstraintNormalFlow(FEModel* pfem);
+    FEConstraintUniformFlow(FEModel* pfem);
     
     //! destructor
-    ~FEConstraintNormalFlow() {}
+    ~FEConstraintUniformFlow() {}
     
     //! Activation
     void Activate() override;
@@ -52,6 +52,9 @@ public:
     
     //! Get the surface
     FESurface* GetSurface() override { return &m_surf; }
+    
+    //! update
+    void Update() override;
     
 public:
     //! serialize data to archive
@@ -72,6 +75,9 @@ public:
 protected:
     FESurface	m_surf;
     FELinearConstraintSet   m_lc;
-
+    
+    double          m_vbar;     //! mean normal velocity
+    vector<vec3d>   m_nn;       //! nodal normals at initialization
+    
     DECLARE_FECORE_CLASS();
 };

@@ -175,6 +175,17 @@ void FESurfaceMap::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_maxFaceNodes;
 	ar & m_name;
+	if (ar.IsSaving())
+	{
+		FEFacetSet* fs = const_cast<FEFacetSet*>(m_surf);
+		ar << fs;
+	}
+	else
+	{
+		FEFacetSet* fs = nullptr;
+		ar >> fs;
+		m_surf = fs;
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -80,6 +80,8 @@ public:
 	vec2i() { x = y = 0; }
 	vec2i(int X, int Y) { x = X; y = Y; }
 
+    bool operator == (const vec2i& r) const { return (x == r.x) && (y == r.y); }
+
 public:
 	int		x, y;
 };

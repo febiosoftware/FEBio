@@ -227,6 +227,54 @@ double FELogContactPressure::value(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogContactTractionX::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.x;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionY::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.y;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionZ::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.z;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemPosX::value(FEElement& el)
 {
 	double val = 0.0;

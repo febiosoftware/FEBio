@@ -29,8 +29,8 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/SparseMatrix.h>
 #include <FECore/LinearSolver.h>
-#include "CompactSymmMatrix.h"
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactSymmMatrix.h>
+#include <FECore/CompactUnSymmMatrix.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a diagonally symmetric block-structured matrix. That is

@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
 
 //-----------------------------------------------------------------------------
 // This class implements the HYPRE GMRES solver

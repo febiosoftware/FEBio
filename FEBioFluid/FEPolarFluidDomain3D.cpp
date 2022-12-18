@@ -489,7 +489,7 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
     vector<vec3d> gradN(neln);
     
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
     
     double *H, *Gr, *Gs, *Gt;
     

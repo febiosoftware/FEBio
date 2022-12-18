@@ -94,6 +94,8 @@ void FEFluidVelocity::Activate()
         node.set_bc(m_dofW[1], DOF_PRESCRIBED);
         node.set_bc(m_dofW[2], DOF_PRESCRIBED);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

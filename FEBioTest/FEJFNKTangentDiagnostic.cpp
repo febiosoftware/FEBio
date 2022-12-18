@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FENewtonSolver.h>
 #include <FECore/JFNKMatrix.h>
-#include <NumCore/CompactUnSymmMatrix.h>
+#include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>

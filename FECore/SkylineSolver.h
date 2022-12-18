@@ -23,20 +23,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEAnalysis.h>
-#include "febiofluid_api.h"
 
-class FEBIOFLUID_API FEFluidSoluteAnalysis : public FEAnalysis
+
+
+#pragma once
+
+#include "LinearSolver.h"
+#include "SkylineMatrix.h"
+#include "fecore_api.h"
+
+//-----------------------------------------------------------------------------
+//! Implements a linear solver that uses a skyline format
+
+class FECORE_API SkylineSolver : public LinearSolver
 {
 public:
-	enum FluidSoluteAnalysisType {
-		STEADY_STATE,
-		DYNAMIC
-	};
+	//! constructor
+	SkylineSolver(FEModel* fem);
 
-public:
-	FEFluidSoluteAnalysis(FEModel* fem);
+	//! Preprocess 
+	bool PreProcess() override;
 
-	DECLARE_FECORE_CLASS();
+	//! Factor matrix
+	bool Factor() override;
+
+	//! Backsolve the linear system
+	bool BackSolve(double* x, double* b) override;
+
+	//! Clean up
+	void Destroy() override;
+
+	//! Create a sparse matrix
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+
+private:
+	SkylineMatrix*	m_pA;
 };

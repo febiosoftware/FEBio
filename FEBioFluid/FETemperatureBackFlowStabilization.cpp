@@ -68,6 +68,8 @@ void FETemperatureBackFlowStabilization::Activate()
         // mark node as having open DOF
         node.set_bc(m_dofT, DOF_OPEN);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

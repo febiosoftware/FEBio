@@ -71,3 +71,14 @@ void FEItemList::SetName(const std::string& name)
 {
 	m_name = name;
 }
+
+FEItemList* FEItemList::LoadClass(DumpStream& ar, FEItemList* p)
+{
+	assert(false);
+	return nullptr;
+}
+
+void FEItemList::SaveClass(DumpStream& ar, FEItemList* p)
+{
+	assert(false);
+}

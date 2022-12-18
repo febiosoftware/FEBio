@@ -46,7 +46,7 @@ SOFTWARE.*/
 #include "FESolutesDomainFactory.h"
 #include <FEBioMix/FESoluteFlux.h>
 #include "FEFluidModule.h"
-#include "FEFluidSoluteAnalysis.h"
+#include "FEFluidSolutesAnalysis.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_VARIABLE var)
@@ -79,7 +79,7 @@ void FEBioFluidSolutes::InitModule()
     
     //-----------------------------------------------------------------------------
     // analyis classes (default type must match module name!)
-    REGISTER_FECORE_CLASS(FEFluidSoluteAnalysis, "fluid-solutes");
+    REGISTER_FECORE_CLASS(FEFluidSolutesAnalysis, "fluid-solutes");
 
 	// monolithic fluid-solutes solver
     REGISTER_FECORE_CLASS(FEFluidSolutesSolver, "fluid-solutes");

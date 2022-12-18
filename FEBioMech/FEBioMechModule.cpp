@@ -164,6 +164,8 @@ SOFTWARE.*/
 #include "FEPolynomialHyperElastic.h"
 #include "FEShenoyMaterial.h"
 #include "FELungMaterial.h"
+#include "FEGrowthTensor.h"
+#include "FEKinematicGrowth.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -353,13 +355,14 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGenerationMaterial, "generation");
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
+    REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
 	REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial, "reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterial, "elastic damage");
 	REGISTER_FECORE_CLASS(FERVEDamageMaterial, "reactive viscoelastic damage");
-	REGISTER_FECORE_CLASS(FEReactiveFatigue, "reactive fatigue");
+	REGISTER_FECORE_CLASS(FEReactiveFatigue, "reactive fatigue", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEReactivePlasticity, "reactive plasticity");
 	REGISTER_FECORE_CLASS(FEReactivePlasticDamage, "reactive plastic damage");
 
@@ -395,7 +398,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPRLig, "PRLig");
 	REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, "uncoupled reactive viscoelastic");
 	REGISTER_FECORE_CLASS(FEDamageMaterialUC, "uncoupled elastic damage");
-    REGISTER_FECORE_CLASS(FEUncoupledReactiveFatigue, "uncoupled reactive fatigue");
+    REGISTER_FECORE_CLASS(FEUncoupledReactiveFatigue, "uncoupled reactive fatigue", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEGenericHyperelasticUC, "uncoupled hyperelastic");
 	REGISTER_FECORE_CLASS(FEGenericTransIsoHyperelasticUC, "uncoupled trans-iso hyperelastic");
 	REGISTER_FECORE_CLASS(FEIsotropicLeeSacks, "isotropic Lee-Sacks");
@@ -412,6 +415,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH   , "fiber-natural-NH"    );
     REGISTER_FECORE_CLASS(FEFiberEntropyChain, "fiber-entropy-chain" );
+    REGISTER_FECORE_CLASS(FEVolumeGrowth     , "volume growth"       );
+    REGISTER_FECORE_CLASS(FEAreaGrowth       , "area growth"         );
+    REGISTER_FECORE_CLASS(FEFiberGrowth      , "fiber growth"        );
 
 	// Elastic Fiber materials (derived from FEElasticFiberMaterial)
 	REGISTER_FECORE_CLASS(FEElasticFiberNH          , "fiber-NH"            );
@@ -830,6 +836,9 @@ void FEBioMech::InitModule()
 	// Derived from FELogFaceData
 	REGISTER_FECORE_CLASS(FELogContactGap     , "contact gap");
 	REGISTER_FECORE_CLASS(FELogContactPressure, "contact pressure");
+	REGISTER_FECORE_CLASS(FELogContactTractionX, "contact_traction.x");
+	REGISTER_FECORE_CLASS(FELogContactTractionY, "contact_traction.y");
+	REGISTER_FECORE_CLASS(FELogContactTractionZ, "contact_traction.z");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogElemData

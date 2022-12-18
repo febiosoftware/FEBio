@@ -668,6 +668,12 @@ const char* FECoreKernel::GetModuleDescription(int i) const
 	return m_modules[i]->GetDescription();
 }
 
+int FECoreKernel::GetModuleStatus(int i) const
+{
+	if ((i < 0) || (i >= m_modules.size())) return -1;
+	return m_modules[i]->GetStatus();
+}
+
 //! Get a module
 const char* FECoreKernel::GetModuleNameFromId(int id) const
 {

@@ -2685,8 +2685,8 @@ bool FEPlotOctahedralPlasticStrain::Save(FEDomain &dom, FEDataStream& a)
             float gp = 0.0;
             const FEReactivePlasticityMaterialPoint* prp = mp.ExtractData<FEReactivePlasticityMaterialPoint>();
             const FEReactivePlasticDamageMaterialPoint* ppp = mp.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-            if (prp) gp = (float) prp->m_gp[0];
-            else if (ppp) gp = (float) ppp->m_gp[0];
+            if (prp && prp->m_gp.size()) gp = (float) prp->m_gp[0];
+            else if (ppp && ppp->m_gp.size()) gp = (float) ppp->m_gp[0];
             return gp;
         });
         return true;
@@ -2705,8 +2705,8 @@ bool FEPlotOctahedralPlasticStrain::Save(FEDomain &dom, FEDataStream& a)
                 {
                     const FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
                     const FEReactivePlasticDamageMaterialPoint* ppp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                    if (prp) gp += (float) prp->m_gp[0];
-                    else if (ppp) gp += (float) ppp->m_gp[0];
+                    if (prp && prp->m_gp.size()) gp += (float) prp->m_gp[0];
+                    else if (ppp && ppp->m_gp.size()) gp += (float) ppp->m_gp[0];
                 }
             }
             gp /= (float)el.GaussPoints();

@@ -59,6 +59,9 @@ public:
 	// return the item list associated with this map
 	virtual FEItemList* GetItemList() = 0;
 
+public:
+	void Serialize(DumpStream& ar) override;
+
 protected:
 	std::string	m_name;					// name of data map TODO: Move to base class?
 };

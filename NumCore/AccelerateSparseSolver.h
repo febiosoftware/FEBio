@@ -28,8 +28,8 @@
 
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include <FECore/CompactSymmMatrix.h>
 #ifdef __APPLE__
 #include <Accelerate/Accelerate.h>
 #endif

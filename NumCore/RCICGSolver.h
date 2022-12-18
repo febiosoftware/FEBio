@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactSymmMatrix.h>
 
 // This class implements an interface to the RCI CG iterative solver from the MKL math library.
 class RCICGSolver : public IterativeLinearSolver

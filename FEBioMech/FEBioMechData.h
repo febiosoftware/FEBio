@@ -179,6 +179,30 @@ public:
 	double value(FESurfaceElement& el) override;
 };
 
+//-----------------------------------------------------------------------------
+class FELogContactTractionX : public FELogFaceData
+{
+public:
+	FELogContactTractionX(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionY : public FELogFaceData
+{
+public:
+	FELogContactTractionY(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionZ : public FELogFaceData
+{
+public:
+	FELogContactTractionZ(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
 //=============================================================================
 // E L E M E N T   D A T A
 //=============================================================================

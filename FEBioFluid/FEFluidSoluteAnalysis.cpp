@@ -23,15 +23,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEFluidSoluteAnalysis.h"
+#include "FEFluidSolutesAnalysis.h"
 
-BEGIN_FECORE_CLASS(FEFluidSoluteAnalysis, FEAnalysis)
+BEGIN_FECORE_CLASS(FEFluidSolutesAnalysis, FEAnalysis)
 	// The analysis parameter is already defined in the FEAnalysis base class. 
 	// Here, we just need to set the enum values for the analysis parameter.
 	FindParameterFromData(&m_nanalysis)->setEnums("STEADY-STATE\0DYNAMIC\0");
 END_FECORE_CLASS()
 
-FEFluidSoluteAnalysis::FEFluidSoluteAnalysis(FEModel* fem) : FEAnalysis(fem)
+FEFluidSolutesAnalysis::FEFluidSolutesAnalysis(FEModel* fem) : FEAnalysis(fem)
 {
 
 }

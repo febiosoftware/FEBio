@@ -185,5 +185,7 @@ public:
 	bool            m_bshellbs;     //!< flag for prescribing pressure on shell bottom for primary surface
 	bool            m_bshellbm;     //!< flag for prescribing pressure on shell bottom for secondary surface
 
+    double          m_offset;       //!< allow an offset that separates the contact surfaces
+
     DECLARE_FECORE_CLASS();
 };
