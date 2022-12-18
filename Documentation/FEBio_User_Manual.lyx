@@ -168,7 +168,7 @@ User's Manual Version 4.0
 \begin_layout Date
 
 \series bold
-Last Updated: December 12, 2022
+Last Updated: December 18, 2022
 \end_layout
 
 \begin_layout Standard
@@ -24478,7 +24478,8 @@ name "subsec:Bearing-Load"
 
 \begin_layout Standard
 A bearing load can be applied on a cylindrical surface that represents a
- journal bearing.
+ bearing journal, or the portion of a shaft that is supported by a bearing
+ journal.
  This load gets prescribed as a non-uniform compressive pressure distribution
  on that surface, representing the radial component of the bearing load.
  (The axial component of a bearing load may be prescribed using the surface
@@ -27360,7 +27361,7 @@ The following table lists the properties that are defined for sliding interfaces
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="25" columns="8">
+<lyxtabular version="3" rows="26" columns="8">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2in">
@@ -30078,7 +30079,7 @@ bullet$
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -30087,11 +30088,109 @@ shell_bottom_secondary
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 contact with back of shell on secondary surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+offset
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+offset distance between contacting surfaces (12)
 \end_layout
 
 \end_inset
@@ -30139,18 +30238,6 @@ bullet$
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-bullet$
-\end_layout
-
-\end_inset
-
 
 \end_layout
 
@@ -30169,7 +30256,7 @@ bullet$
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 (off)
+
 \end_layout
 
 \end_inset
@@ -30704,6 +30791,47 @@ tension
 \shape default
 =0).
  
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+offset
+\emph default
+ distance makes it possible to maintain the contact surfaces at a distance.
+ This option is useful, for example, in fluid-structure interaction problems,
+ where solid structures separated by a fluid domain are pushed against each
+ other.
+ Specifying a contact interface between the (internal) surfaces of the solid
+ structures would prevent them from overlapping, but adding an offset distance
+ will also prevent the fluid mesh from getting squished too thin or from
+ inverting.
+ These internal surfaces would also typically have FSI Traction interfaces
+ defined on them (see Sections
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-FSI-Traction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Biphasic-FSI-Traction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -33041,6 +33169,83 @@ maxaug
 \end_layout
 
 \begin_layout Subsection
+Frictionless Fluid Wall
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Frictionless-Fluid-Wall"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+One of the natural boundary conditions for fluid analyses is to enforce
+ zero fluid velocity normal to a boundary, implying that this boundary is
+ a frictionless fluid wall.
+ In some analyses however, this natural boundary condition may not be enforced
+ sufficiently well.
+ In such cases, use this frictionless fluid wall linear constraint to produce
+ a more strict enforcement of this condition.
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="frictionless fluid wall" name="FrictionlessFluidWall1"
+ surface="FrictionlessFluidWall1">
+\end_layout
+
+\begin_layout LyX-Code
+	<laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+	<tol>0.2</tol>
+\end_layout
+
+\begin_layout LyX-Code
+	<penalty>1</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<maxaug>10</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+In fluid-structure interaction analyses, this constraint may be used in
+ conjunction with the 
+\emph on
+symmetry plane
+\emph default
+ described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Symmetry-Plane"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, using a lower value of the 
+\emph on
+penalty
+\emph default
+ parameter, as may be necessary in practice.
+\end_layout
+
+\begin_layout Subsection
 Fixed Normal Displacement
 \begin_inset CommandInset label
 LatexCommand label
@@ -33172,6 +33377,11 @@ tol
 maxaug
 \emph default
 .
+\end_layout
+
+\begin_layout Standard
+For example, this constraint may be used on a cylindrical shaft, over the
+ portion of the shaft which is supported by a bearing journal.
 \end_layout
 
 \begin_layout Subsection
@@ -33310,6 +33520,81 @@ reference "subsec:Fluid-Normal-Velocity"
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Subsection
+Uniform Fluid Velocity Constraint
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Uniform-Fluid-Velocity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When an inlet boundary is subjected to a prescribed fluid pressure, the
+ profile of the inlet fluid velocity remains unconstrained, and this lack
+ of constraint often leads to poor numerical performance due to the production
+ of velocity spikes.
+ To avoid this problem, use this uniform fluid velocity constraint to help
+ stabilize inlet conditions along the direction normal to the bondary.
+ This constraint evaluates the average fluid velocity normal to the selected
+ boundary, 
+\begin_inset Formula $\bar{v}_{n}$
+\end_inset
+
+, then prescribes a linear constraint at every node such that 
+\begin_inset Formula $\mathbf{v}\cdot\mathbf{n}=\bar{v}_{n}$
+\end_inset
+
+ is enforced.
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+<constraint name="UniformFluidFlow1" surface="UniformFluidFlow1" type="uniform
+ fluid flow">
+\end_layout
+
+\begin_layout LyX-Code
+	<laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+	<tol>0.1</tol>
+\end_layout
+
+\begin_layout LyX-Code
+	<penalty>10000</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<maxaug>50</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+If a very strong enforcement of this constraint is desired, increase the
+ 
+\emph on
+penalty
+\emph default
+ and/or turn Lagrange augmentation on (
+\emph on
+laugon
+\emph default
+=1).
+ This constraint is not compatible with boundary conditions that prescribe
+ the normal component of the fluid velocity on that same boundary.
 \end_layout
 
 \begin_layout Subsection
@@ -104352,350 +104637,437 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
