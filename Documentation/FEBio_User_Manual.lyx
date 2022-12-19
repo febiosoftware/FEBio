@@ -8803,7 +8803,7 @@ Many of the solvers define the same parameters.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="16" columns="3">
+<lyxtabular version="3" rows="17" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -9254,7 +9254,7 @@ Set the equation allocation ordering
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9263,7 +9263,7 @@ optimize_bw
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9272,11 +9272,41 @@ Optimize bandwidth of stiffness matrix (5)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear_solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the preferred linear solver to use.
+ (8)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(default)
 \end_layout
 
 \end_inset
@@ -9495,6 +9525,30 @@ flag is used to set the symmetry of the global stiffness matrix.
 - 2 = structurally symmetric
 \end_layout
 
+\begin_layout Enumerate
+For portability reasons, the preferred method of setting the linear solver
+ is in the FEBio configuration file, but it can also be specified in the
+ solver section.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Configuring-Linear-Solvers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details on configuring linear solvers.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<linear_solver type="pardiso"/>
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Quasi-Newton Solver Parameters
 \begin_inset CommandInset label
@@ -112041,7 +112095,7 @@ type
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="4">
+<lyxtabular version="3" rows="8" columns="4">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -112165,6 +112219,45 @@ D
 
 \begin_layout Plain Layout
 S
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mkl_dss
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The DSS solver from the MKL library.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S/U
 \end_layout
 
 \end_inset
@@ -112572,6 +112665,21 @@ optimize_bw
  matrix bandwidth.
  It does not require any configuration parameters and only works with symmetric
  matrices.
+ 
+\end_layout
+
+\begin_layout Subsection
+MKL_DSS
+\end_layout
+
+\begin_layout Standard
+The MKL library also offers another direct solver, called DSS (Direct-Sparse-Sol
+ver).
+ This solver is very promising and appears to perform better for many problems
+ than the pardiso solver.
+ Currently, in FEBio4, pardiso remains the default mostly for backward compatibi
+lity reasons, but it is often worthwhile to see if the mkl_dss solver performs
+ better.
  
 \end_layout
 
