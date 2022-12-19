@@ -81,6 +81,8 @@ public:
 public:
 	void SetNodeSet(FENodeSet* nodeSet);
 
+	FENodeSet* GetNodeSet();
+
 protected:
 	FENodeSet* m_nodeSet;
 };

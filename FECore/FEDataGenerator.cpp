@@ -64,6 +64,11 @@ void FENodeDataGenerator::SetNodeSet(FENodeSet* nodeSet)
 	m_nodeSet = nodeSet;
 }
 
+FENodeSet* FENodeDataGenerator::GetNodeSet()
+{
+	return m_nodeSet;
+}
+
 // generate the data array for the given node set
 bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 {
