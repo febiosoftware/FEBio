@@ -56525,6 +56525,239 @@ Example (using units of mm, N, s, nmol, K)
 \end_layout
 
 \begin_layout Subsubsection
+Kinematic Growth
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Kinematic-Growth"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for kinematic growth is 
+\emph on
+kinematic growth
+\emph default
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic material undergoing kinematic growth
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<growth>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the growth model (
+\emph on
+volume growth
+\emph default
+, 
+\emph on
+area growth
+\emph default
+, 
+\emph on
+fiber growth
+\emph default
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Kinematic growth, based on the framework first proposed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Rodriguez94"
+literal "false"
+
+\end_inset
+
+, uses the multiplicative decomposition of the deformation gradient into
+\begin_inset Formula 
+\[
+\mathbf{F}=\mathbf{F}^{e}\cdot\mathbf{F}^{g}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}^{e}$
+\end_inset
+
+ represents the elastic deformation and 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+ represents the growth.
+ The related Jacobians are
+\begin_inset Formula 
+\[
+J^{e}=\det\mathbf{F}^{e}\quad J^{g}=\det\mathbf{F}^{g}\,.
+\]
+
+\end_inset
+
+A constitutive model for the growth tensor was provided by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Menzel12"
+literal "false"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mathbf{F}^{g}=\vartheta^{\text{iso}}\mathbf{I}+\left(\vartheta^{\text{ani}}-1\right)\mathbf{n}_{r}\otimes\mathbf{n}_{r}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the referential unit vector for a fiber direction (or normal to an area),
+ 
+\begin_inset Formula $\vartheta^{\text{iso}}$
+\end_inset
+
+ represents isotropic growth, and 
+\begin_inset Formula $\vartheta^{\text{ani}}$
+\end_inset
+
+ represents anisotropic growth.
+\end_layout
+
+\begin_layout Standard
+For 
+\emph on
+volume growth
+\emph default
+, let 
+\begin_inset Formula $\vartheta^{\text{iso}}=\vartheta^{g}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}=1$
+\end_inset
+
+, where 
+\begin_inset Formula $\vartheta^{g}$
+\end_inset
+
+ is called the growth 
+\emph on
+multiplier
+\emph default
+ in FEBio, which is typically prescribed using a loadcurve.
+ For 
+\emph on
+area growth
+\emph default
+ in the plane transverse to the normal direction 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+, let 
+\begin_inset Formula $\vartheta^{\text{iso}}=\sqrt{\vartheta^{g}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}=2-\sqrt{\vartheta^{g}}$
+\end_inset
+
+.
+ Finally, for 
+\emph on
+fiber growth
+\emph default
+, let 
+\begin_inset Formula $\vartheta^{\text{iso}}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}=\vartheta^{g}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
 Cubic CLE
 \begin_inset CommandInset label
 LatexCommand label
