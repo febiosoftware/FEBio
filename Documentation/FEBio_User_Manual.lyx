@@ -114224,7 +114224,7 @@ As of version 2.0 FEBio supports plugins.
 status collapsed
 
 \begin_layout Plain Layout
- When upgrading to a newer version of FEBio, it may be necessary to recompile
+When upgrading to a newer version of FEBio, it may be necessary to recompile
  the plugin if the plugin interface was changed.
  As long as the plugin remains compatible with the new interface, no code
  changes are required.
@@ -114233,7 +114233,12 @@ status collapsed
 \end_inset
 
 .
- The 
+ Using plugins, users can create custom materials, boundary conditions,
+ loads, output variables, etc., and even couple FEBio to other codes.
+\end_layout
+
+\begin_layout Standard
+The 
 \begin_inset ERT
 status open
 
@@ -114241,7 +114246,7 @@ status open
 
 
 \backslash
-href{https://febio.org/knowledgebase/}{
+href{https://help.febio.org/doxygen/html/index.html}{
 \backslash
 emph{FEBio Developer's 
 \end_layout
@@ -114255,9 +114260,7 @@ Manual}}
 
  explains in detail how to create these plugins.
  In this section we outline how to use the plugins with FEBio.
- Using plugins, users can create custom materials, boundary conditions,
- loads, output variables, etc.
- See the developer's manual for more information on what plugins can do.
+ 
 \end_layout
 
 \begin_layout Section
@@ -114268,9 +114271,9 @@ Using Plugins
 
 \begin_layout Standard
 A plugin is compiled into a dynamic library (dll or dylib) or shared object
- (so) and containes the compiled code of the library.
- In order to use this plugin, you must add the path to and name of the plugin
- file in the FEBio configuration file (see Chapter
+ (so) and contains the compiled code of the library.
+ In order to use this plugin, you must add the path to the plugin file in
+ the FEBio configuration file (see Chapter
 \begin_inset space ~
 \end_inset
 
@@ -114330,7 +114333,9 @@ An alternative way for loading a plugin is using the
 \end_layout
 
 \begin_layout LyX-Code
->febio -i input.feb -import myplugin.dll
+>febio -i input.feb 
+\series bold
+-import myplugin.dll
 \end_layout
 
 \begin_layout Standard
@@ -114469,7 +114474,7 @@ Invalid SDK version
 
 \emph default
 : The plugin was compiled with a version of the SDK that is not compatible
- with the FEBio version.
+ with the current FEBio version.
  This most likely means that the plugin must be rebuilt with a newer version
  of the SDK.
  
