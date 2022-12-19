@@ -36,7 +36,7 @@ SOFTWARE.*/
 // Base class for evaluating scalar parameters
 class FECORE_API FEScalarValuator : public FEValuator
 {
-	FECORE_SUPER_CLASS(FESCALARGENERATOR_ID)
+	FECORE_SUPER_CLASS(FESCALARVALUATOR_ID)
 	FECORE_BASE_CLASS(FEScalarValuator)
 
 public:
