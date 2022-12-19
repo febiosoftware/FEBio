@@ -786,6 +786,14 @@ void FEModel::AddLoadController(FELoadController* plc)
 }
 
 //-----------------------------------------------------------------------------
+void FEModel::ReplaceLoadController(int n, FELoadController* plc)
+{
+	assert((n >= 0) && (n < LoadControllers()));
+	delete m_imp->m_LC[n];
+	m_imp->m_LC[n] = plc;
+}
+
+//-----------------------------------------------------------------------------
 //! get a loadcurve
 FELoadController* FEModel::GetLoadController(int i)
 { 

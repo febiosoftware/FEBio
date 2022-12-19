@@ -155,6 +155,9 @@ public:	// --- Load controller functions ----
 	//! Add a load controller to the model
 	void AddLoadController(FELoadController* plc);
 
+	//! replace a load controller
+	void ReplaceLoadController(int n, FELoadController* plc);
+
 	//! get a load controller
 	FELoadController* GetLoadController(int i);
 
