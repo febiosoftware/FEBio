@@ -6355,10 +6355,10 @@ attribute discussed below, which can be used to include only certain sections
 \end_layout
 
 \begin_layout Subsubsection
-The `from' Attribute
+The 'from' Attribute
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:The-`from'-Attribute"
+name "subsec:The-'from'-Attribute"
 
 \end_inset
 
@@ -6472,6 +6472,10 @@ bc.feb
 
 \begin_layout LyX-Code
 <febio_spec version="4.0">
+\end_layout
+
+\begin_layout LyX-Code
+  <Module type="solid"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6759,6 +6763,199 @@ Fluid mechanics with fluid-structure interactions: steady-state or dynamic
 \end_layout
 
 \begin_layout Standard
+The module tag can also be used to specify the units of the model.
+ Although FEBio doesn't care about units, if the user specifies the unit
+ system, the proper units of variables are stored in the plot file and visible
+ in FEBio Studio when opening the plot file.
+ 
+\end_layout
+
+\begin_layout Standard
+To specify units, use the following syntax: 
+\end_layout
+
+\begin_layout LyX-Code
+<Module type="[type]">
+\end_layout
+
+\begin_layout LyX-Code
+  <units>[unit system]</units>
+\end_layout
+
+\begin_layout LyX-Code
+</Module>
+\end_layout
+
+\begin_layout Standard
+where 
+\emph on
+unit system
+\emph default
+ can be any of the following values.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+units
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units follow the standard definition of the international SI unit system.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mm-N-s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Millimeter-Newton-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mm-kg-s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Millimeter-kilogram-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+um-nN-s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Micron-nanoNewton-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CGS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Centimeter-gram-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the units are not defined, FEBio will not output any units for plot variables.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 For example:
 \end_layout
 
@@ -6770,6 +6967,41 @@ For example:
   
 \series bold
 <Module type="solid"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <!-- rest of file -->
+\end_layout
+
+\begin_layout LyX-Code
+</febio_spec>
+\end_layout
+
+\begin_layout Standard
+The following example defines the model's units explicitly.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<febio_spec version="4.0">
+\end_layout
+
+\begin_layout LyX-Code
+  
+\series bold
+<Module type="solid">
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+    <units>SI</units>
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+  </Module>
 \end_layout
 
 \begin_layout LyX-Code
