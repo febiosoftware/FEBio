@@ -3,22 +3,24 @@
 
 Introduction
 ------------
-FEBio has a plugin mechanism that allows users to add new capabilities to FEBio without changing or recompiling the source code. This makes it easy
-to implement new features, such as constitutive models, or boundary conditions. 
+FEBio has a plugin mechanism that allows users to add new capabilities to FEBio without changing or recompiling the source code. This makes it easy to implement new features, such as constitutive models, boundary conditions, loads, plot variables, and even couple FEBio to other codes. 
 
 Plugin documentation
 --------------------
-If you are new to plugins, it is recommended to checkout the following link first.
+If you are new to FEBio plugins, it is recommended to checkout the following link first, which introduces the basics of developing plugins for FEBio.
 
 \li \subpage plugin_basics
 
 If you are looking for information about a particular type of plugin, choose one of the following links.
 \li \subpage material
+\li \subpage plugin_bc
 \li \subpage plugin_plot
 \li \subpage cb_plugin
 \li \subpage task
 \li \subpage plugin_solver
 \li \subpage plugin_nlc
+\li \subpage plugin_lc
+\li \subpage plugin_datagenerator
 
 Advanced topics
 ---------------
@@ -26,6 +28,7 @@ The following articles discuss some advanced topics related to the FEBio plugin 
 
 \li \subpage plugin_log
 \li \subpage plugin_cast
-\li \subpage plugin_upgrade
+\li \subpage plugin_upgrade3
+\li \subpage plugin_upgrade4
 
 */

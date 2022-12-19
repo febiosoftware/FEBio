@@ -1,0 +1,42 @@
+/**
+\page plugin_bc Boundary Condition Plugin
+
+Boundary condition plugins can be developed for applying special boundary conditions that might be difficult to achieve using the regular boundary condition options. 
+
+There are two possible starting points for BC plugins: FEPrescribedNodeset can be used as a base class if the BC can be applied directly to a set of nodes. Alternatively, FEPrescribedSurface if the BC is prescribed more naturally on a surface (e.g. if the prescribed value relates to the surface normal). In either case, since FEBio requires the nodal prescribed values, the plugin class will need to be able to return the desired prescribed value for a particular nodal degree of freedom. 
+
+\section sec_bc_node Prescribed Nodesets
+For directly prescribing the values of nodal degrees of freedom, create a new class from FEPrescribedNodeSet and override the GetNodelValues function. 
+
+\code
+class MyBC : public FEPrescribedNodeSet
+{
+public:
+	MyBC(FEModel* fem) : FEPrescribedNodeSet(fem){}
+
+	void GetNodalValues(int lid, std::vector<double>& val) override;
+};
+\endcode
+
+The \c GetNodalValues takes two parameters:
+\li <b>int</b> : The local index into the node set associated with this bc. 
+\li <b>std::vector<double>&</b>: return value with the values of the prescribed nodal degrees of freedom. 
+
+\section sec_bc_surf Prescribed Surface
+Instead of a nodeset, boundary conditions can also be applied to surfaces. This allows plugin classes to use other information, e.g. surface normals, to define the nodal values. However, just like the node set approach above, the boundary condition derived from FEPrescribedSurface should also implement the GetNodalValues function. 
+
+\code
+class MySurfBC : public FEPrescribedSurface
+{
+public:
+	MySurfBC(FEModel* fem) : FEPrescribedSurface(fem){}
+
+	void GetNodalValues(int lid, std::vector<double>& val) override;
+};
+\endcode
+
+In this case, the lid parameter is the local node index of the nodes of the surface. 
+
+
+*/
+

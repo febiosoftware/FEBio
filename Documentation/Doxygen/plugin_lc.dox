@@ -1,0 +1,111 @@
+/**
+\page plugin_lc Load controller Plugin
+
+In FEBio, load controllers are used to manipulate the value of parameters in time. An example of a load controller is the load curve, which defines a function of time by interpolating between (time,value) pairs. Several other examples of load controllers are implemented in FEBio that provide different ways to modify parameter values as function of time. Users can create custom load controllers via a load controller plugin. 
+
+To create a load controller plugin, follow the following steps.
+
+1. Derive a new class from FELoadController. 
+2. Implement the constructor and override the GetValue(double) function.
+3. Register the plugin class.
+
+\section sec1 Create load controller class
+
+A load controller class should be derived from the <b>FELoadController</b> base class. 
+As an example, we'll build a load controller that toggles between two values after a particular duration. 
+
+\code
+class MyLoadController : public FELoadController
+{
+public:
+	// constructor
+	MyLoadController(FEModel* fem);
+
+	// initialization (optional)
+	bool Init() override;
+
+protected:
+	// required override
+	double GetValue(double currentTime) override;
+
+private:
+	double	m_val0;
+	double	m_val1;
+	double	m_duration;
+
+	DECLARE_FECORE_CLASS();
+}
+\endcode
+
+If the load controller defines parameters that should be specified in the input file, the class needs to have the DECLARE_FECORE_CLASS macro. 
+
+\section sec2 Implement class functions
+
+The contructor passes the FEModel pointer to the base class and initializes the parameters. 
+
+\code
+MyLoadController::MyLoadController(FEModel* fem) : FELoadController(fem)
+{
+	m_val0 = 0.0;
+	m_val1 = 1.0;
+	m_duration = 1.0;
+}
+\endcode
+
+The Init function is not required, but can be helpful for initialization and validation of the parameters. Make sure to call the base class as well. 
+
+\code
+bool MyLoadController::Init()
+{
+	// add initialization here
+
+	// call base class
+	return FELoadController::Init();
+}
+\endcode
+
+The GetValue(double) function evaluates the load controller and should return the value of the load controller at the particular time. 
+
+\code
+double MyLoadController::GetValue(double currentTime)
+{
+	return (currentTime > m_duration ? m_val1 : m_val0);
+}
+\endcode
+
+\section sec3 Register the plugin
+
+First, define the class parameters that will be exposed to the framework. To allows the class parameters to be recognized, for instance, by the FEBio input file reader. 
+
+\code
+BEGIN_FECORE_CLASS(MyLoadController, FELoadController)
+	ADD_PARAMETER(m_val0, "val0");
+	ADD_PARAMETER(m_val1, "val1");
+	ADD_PARAMETER(m_duration, "duration");
+END_FECORE_CLASS();
+\endcode
+
+Next, register the class in the PluginInitialize() function of the plugin.
+
+\code
+REGISTER_FECORE_CLASS(MyLoadController, "toggle");
+\endcode
+
+\section sec4 Using the load controller
+
+Load controllers are defined in the LoadData section of the FEBio input file. The \c type attribute defines which load controller will be allocated. 
+
+\code
+<LoadData>
+	<load_controller id="1" type="toggle">
+		<val0>0.0</val0>
+		<val1>1.0</val1>
+		<duration>3.14</duration>
+	</load_controller>
+</LoadData>
+\endcode
+
+The load controller can be assigned to any valid model parameter in the usual way with the "lc" attribute. 
+
+*/
+
