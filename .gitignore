@@ -391,6 +391,7 @@ MigrationBackup/
 
 # miscellaneous
 Documentation/Doxygen/doc
+Documentation/Doxygen/doc_only
 
 .DS_Store
 
