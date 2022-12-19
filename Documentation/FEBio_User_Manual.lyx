@@ -14996,6 +14996,1048 @@ attribute, if specified, will be ignored.
 \end_layout
 
 \begin_layout Section
+Mesh Adaptors Section
+\end_layout
+
+\begin_layout Standard
+The FEBio Adaptive Mesh Refinement framework (FEAMR, pronounced “femur”)
+ allows users to make modifications to the mesh during the analysis of the
+ model.
+ There are currently two mesh adaptor applications supported, namely mesh
+ erosion, which removes elements from the mesh, and remeshing, which can
+ be used to adaptively refine or coarsen the mesh based on the solution.
+ The mesh adaptors are controlled via user-defined criteria that determine
+ the conditions under which to modify the mesh.
+\end_layout
+
+\begin_layout Standard
+A mesh adaptor is applied at the end of a timestep, after the Newton-iterations
+ and augmentations have converged.
+ If the mesh adaptor modifies the mesh, then the timestep is solved again,
+ using the new mesh.
+ Several adaptors define the 
+\emph on
+criterion
+\emph default
+ property, which evaluates the variable or metric that is used by the adaptor,
+ and optionally, can be used to filter the elements to which the adaptor
+ will be applier.
+ How the criterion is used, depends on the adaptor.
+ For instance, the erosion adaptor uses it to identify the elements to deactivat
+e.
+ Remeshing adaptors will use it to set the new element size.
+ It is allowed to use several mesh adaptors in a single model, but keep
+ in mind that the order in which the mesh adaptors are listed in the input
+ file is important.
+ For instance, if two mesh adaptors are defined, the second adaptor will
+ operate on the mesh created by the first adaptor.
+ Mesh adaptors used for adaptive refinement will also map data between the
+ old mesh and the new mesh.
+ User data, defined in the MeshData section, is always mapped between meshes.
+ If the model is history-dependent, it might be important to map additional
+ data.
+ For instance, a visco-elastic material needs to map stress-history variables.
+ By default, mapping data (except for user-data) is not done unless the
+ user sets a specific flag (map_data).
+ New mesh adaptors and adaptor criteria can be defined via the plugin framework.
+ 
+\end_layout
+
+\begin_layout Subsection
+The MeshAdaptor Section
+\end_layout
+
+\begin_layout Standard
+Mesh adaptors are added to the FEBio Input file (version 3.0 and above) in
+ a new section, called 
+\series bold
+MeshAdaptor
+\series default
+.
+ This section must appear after the Mesh and MeshDomains sections.
+ The MeshAdaptor section may also be defined in a 
+\emph on
+step
+\emph default
+ section in order to apply the adaptor only during that step.
+ Inside the MeshAdaptor section, each mesh adaptor is defined via the 
+\series bold
+mesh_adaptor
+\series default
+ tag.
+ This tag allows the following attributes: 
+\end_layout
+
+\begin_layout Standard
+• 
+\series bold
+type
+\series default
+: set the type of the mesh adaptor (1).
+ [Required] 
+\end_layout
+
+\begin_layout Standard
+• 
+\series bold
+elem_set
+\series default
+: The element set to apply the adaptor to (2).
+ [Optional] 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+: 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\series bold
+type 
+\series default
+attribute defines the mesh adaptor.
+ It must be one of the mesh adaptors defined in Table 1, below.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\series bold
+elem_set 
+\series default
+attribute is optional, but can be used to apply the adaptor to only a part
+ of the mesh.
+ This is useful to limit the effect of an adaptor to a part of the mesh.
+ The element set must reference a domain (i.e.
+ defined via Elements) of a mesh, or a set of domains.
+ It cannot be an element set defined through the ElementSet tag.
+ (Note that not all mesh adaptors support this attribute.) If omitted, the
+ adaptor is applied to the entire mesh.
+ 
+\end_layout
+
+\begin_layout Standard
+The sections below list the properties of the available mesh adaptors and
+ the adaptor criteria.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+erosion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The erosion adaptor removes elements from a mesh.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mmg_remesh
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Adaptive mesh refinement of tetrahedral mesh using the MMG library.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hex_refine2d
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Refine a 2D hexahedral mesh.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tet_refine
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Refine a linear tetrahedral mesh (Whole mesh refinement only)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hex_refine
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Refine a hexahedral mesh.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+The erosion adaptor
+\end_layout
+
+\begin_layout Standard
+The erosion adaptor can be used to remove or deactivate elements in a mesh,
+ based on a user-defined criterion.
+ It defines the following properties: 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_iters
+\series default
+: Set the max number of adaption iterations, for each time step.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+remove_islands
+\series default
+: If true, removes small element sets that have become disconnected from
+ the main mesh.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_elems
+\series default
+: Set the max number of elements to erode, per adaptation.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+sort
+\series default
+: sort the element values returned by the criterion.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+criterion
+\series default
+: Set the criterion that determines the element metric to evaluate and which
+ elements to erode.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+: 
+\end_layout
+
+\begin_layout Standard
+In this example, elements that have an (integration point averaged) effective
+ stress larger than 0.3, are eroded.
+ Only three elements are eroded per adaptation cycle.
+\end_layout
+
+\begin_layout LyX-Code
+<mesh_adaptor type="erosion"> 
+\end_layout
+
+\begin_layout LyX-Code
+  <max_iters>1</max_iters>
+\end_layout
+
+\begin_layout LyX-Code
+  <max_elems>3</max_elems>
+\end_layout
+
+\begin_layout LyX-Code
+  <sort>1</sort>
+\end_layout
+
+\begin_layout LyX-Code
+  <criterion type="min-max filter">
+\end_layout
+
+\begin_layout LyX-Code
+    <min>0.3</min>
+\end_layout
+
+\begin_layout LyX-Code
+    <clamp>0</clamp>
+\end_layout
+
+\begin_layout LyX-Code
+    <data type="stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+  </criterion>
+\end_layout
+
+\begin_layout LyX-Code
+</mesh_adaptor> 
+\end_layout
+
+\begin_layout Subsubsection
+The mmg_remesh adaptor
+\end_layout
+
+\begin_layout Standard
+The mmg_remesh adaptor can be used for adaptive mesh refinement of linear
+ tetrahedral meshes.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_iters
+\series default
+: The maximum number of adaption iterations per time step.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_elements
+\series default
+: The maximum number of elements.
+ If the number of elements of the mesh is larger, the adaptor is not applied.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+min_element_size
+\series default
+: Set the desired minimal element size.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+hausdorff
+\series default
+: The Hausdorff distance.
+ This is used to preserve curved sections.
+ (default = 0.01).
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+gradation
+\series default
+: This parameter sets the spatial gradient of element size.
+ (default = 1.3).
+ Value should be larger than 1.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+mesh_coarsen
+\series default
+: Allow mesh-coarsening 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+normalize_data
+\series default
+: normalize the element values returned by the criterion between 0 and 1.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+relative_size
+\series default
+: Sets whether the size function is to be interpreted as a relative size
+ function (i.e.
+ a scale function to the current element size), or an absolute element size
+ metric.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+criterion
+\series default
+: The metric used to assign values to elements.
+ (See section 4) 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+size_function
+\series default
+: set the mesh size function.
+ This function is applied to the (optionally normalized) element values
+ returned by the criterion.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+: 
+\end_layout
+
+\begin_layout LyX-Code
+<mesh_adaptor type="mmg_remesh">
+\end_layout
+
+\begin_layout LyX-Code
+  <max_iters>1</max_iters>
+\end_layout
+
+\begin_layout LyX-Code
+  <criterion type="stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative_size>1</relative_size>
+\end_layout
+
+\begin_layout LyX-Code
+  <normalize_data>0</normalize_data>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_coarsen>0</mesh_coarsen>
+\end_layout
+
+\begin_layout LyX-Code
+  <size_function type="step">
+\end_layout
+
+\begin_layout LyX-Code
+    <x0>10</x0>
+\end_layout
+
+\begin_layout LyX-Code
+    <left_val>1</left_val>
+\end_layout
+
+\begin_layout LyX-Code
+    <right_val>0.5</right_val>
+\end_layout
+
+\begin_layout LyX-Code
+  </size_function>
+\end_layout
+
+\begin_layout LyX-Code
+</mesh_adaptor> 
+\end_layout
+
+\begin_layout Subsection
+Mesh Adaptor Criteria
+\end_layout
+
+\begin_layout Standard
+The purpose of the mesh adaptor criteria is to assign values to elements.
+ Some adaptors also act as filters, that limit the effect of the adaptor
+ to certain elements.
+ These values will then be used by the mesh adaptor to modify the mesh.
+ How these values are used depends on the adaptor.
+ For instance, the erosion uses it to decide which elements to erode.
+ The mesh refinement adaptors use it to define the size function.
+ 
+\end_layout
+
+\begin_layout Standard
+The following criteria are currently available.
+ A detailed description of these adaptor criteria is given below.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluates average of element’s nodal values of a model primary variable.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+element_selection
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the element selection to which the adaptor should be applied (only
+ for erosion)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the (integration point average) effective stress of each element.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+damage
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the (integration point average) damage value.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+relative error
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate a relative error measure.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the axial force of the spring.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the stretch of a spring.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+math
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify the element value based on a mathematical expression.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min-max filter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Selects elements whose value falls within a min-max range.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+max_variable
+\end_layout
+
+\begin_layout Standard
+The max_variable criterion evaluates elements based on a primary variable’s
+ degrees of freedom.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+dof
+\series default
+: The degree of freedom that defines the variable to inspect.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+element_selection
+\end_layout
+
+\begin_layout Standard
+Sets the selected elements directly.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+element_list:
+\series default
+ a comma-separated list of element indices.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+math
+\end_layout
+
+\begin_layout Standard
+Sets the scale factor for each element.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+scale
+\series default
+: the scale factor to use.
+ This can be a constant, or a mathematical expression of position (use X,
+ Y, Z for the nodal coordinates), or a scalar map defined in the MeshData
+ section.
+\end_layout
+
+\begin_layout Standard
+Example: 
+\end_layout
+
+\begin_layout LyX-Code
+<mesh_adaptor type="mmg_remesh">
+\end_layout
+
+\begin_layout LyX-Code
+  <max_iters>1</max_iters>
+\end_layout
+
+\begin_layout LyX-Code
+  <criterion type="math">
+\end_layout
+
+\begin_layout LyX-Code
+    <math>1*(1 - (X^2+Y^2)) + (X^2+Y^2)*(0.5*(Z-1)^2 - Z*(Z - 2))</math>
+\end_layout
+
+\begin_layout LyX-Code
+  </criterion>
+\end_layout
+
+\begin_layout LyX-Code
+</mesh_adaptor> 
+\end_layout
+
+\begin_layout Subsubsection
+stress
+\end_layout
+
+\begin_layout Standard
+This criterion selects elements that exceed a maximum stress value.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+metric
+\series default
+: The stress measure to use: 0=effective stress, 1=max principal stress.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+max_damage
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates the maximum damage value for each element.
+ This can only be used with materials that define the damage property.
+\end_layout
+
+\begin_layout Subsubsection
+relative error
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates a relative error metric for each element.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+error:
+\series default
+ If nonzero, this criterion will evaluate a relative size metric for each
+ element.
+ Otherwise, the actual relative error is evaluated.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+data:
+\series default
+ Specify the metric to evaluate the element values.
+ Any of the other criteria defined above can be used.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+min-max filter
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates a metric for each element, but then filters out
+ the element that have a value within a min-max range.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+min
+\series default
+: set the minimum value of the filter 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max
+\series default
+: set the maximum value of the filter 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+clamp
+\series default
+: If true, the element values will be clamped to the range.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+data
+\series default
+: Specify the metric to evaluate the element values.
+ Any of the other criteria defined above can be used.
+ 
+\end_layout
+
+\begin_layout Subsection
+Limitations
+\end_layout
+
+\begin_layout Standard
+Please take into account the following limitations of the FEAMR framework.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Although contact can be used with the FEAMR framework, currently no contact
+ data is mapped from the old mesh to the new mesh.
+ It is advised to only use penalty-based contact interfaces.
+ 
+\end_layout
+
+\begin_layout Enumerate
+It is not advised to erode elements that are in contact, since this will
+ not produce the correct result.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Mapping history-data is supported (if the proper flag is set), but can be
+ very time consuming since FEBio maps all material point data between meshes.
+\end_layout
+
+\begin_layout Enumerate
+The FEAMR framework does not work with the auto time-stepper.
+ It is advised to use fixed time stepping when using mesh adaptation.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Initial Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -107400,1044 +108442,6 @@ Options
 \shape default
 section is included here, but can be omitted.
  If omitted default values will be used for all control parameters.
-\end_layout
-
-\begin_layout Chapter
-Mesh Adaptors
-\end_layout
-
-\begin_layout Standard
-The FEBio Adaptive Mesh Refinement framework (FEAMR, pronounced “femur”)
- allows users to make modifications to the mesh during the analysis of the
- model.
- There are currently two mesh adaptor applications supported, namely mesh
- erosion, which removes elements from the mesh, and remeshing, which can
- be used to adaptively refine or coarsen the mesh based on the solution.
- The mesh adaptors are controlled via user-defined criteria that determine
- the conditions under which to modify the mesh.
-\end_layout
-
-\begin_layout Standard
-A mesh adaptor is applied at the end of a timestep, after the Newton-iterations
- and augmentations have converged.
- If the mesh adaptor modifies the mesh, then the timestep is solved again,
- using the new mesh.
- Several adaptors define the 
-\emph on
-criterion
-\emph default
- property, which evaluates the variable or metric that is used by the adaptor,
- and optionally, can be used to filter the elements to which the adaptor
- will be applier.
- How the criterion is used, depends on the adaptor.
- For instance, the erosion adaptor uses it to identify the elements to deactivat
-e.
- Remeshing adaptors will use it to set the new element size.
- It is allowed to use several mesh adaptors in a single model, but keep
- in mind that the order in which the mesh adaptors are listed in the input
- file is important.
- For instance, if two mesh adaptors are defined, the second adaptor will
- operate on the mesh created by the first adaptor.
- Mesh adaptors used for adaptive refinement will also map data between the
- old mesh and the new mesh.
- User data, defined in the MeshData section, is always mapped between meshes.
- If the model is history-dependent, it might be important to map additional
- data.
- For instance, a visco-elastic material needs to map stress-history variables.
- By default, mapping data (except for user-data) is not done unless the
- user sets a specific flag (map_data).
- New mesh adaptors and adaptor criteria can be defined via the plugin framework.
- 
-\end_layout
-
-\begin_layout Section
-The MeshAdaptor Section
-\end_layout
-
-\begin_layout Standard
-Mesh adaptors are added to the FEBio Input file (version 3.0 and above) in
- a new section, called 
-\series bold
-MeshAdaptor
-\series default
-.
- This section must appear after the Mesh and MeshDomains sections.
- The MeshAdaptor section may also be defined in a 
-\emph on
-step
-\emph default
- section in order to apply the adaptor only during that step.
- Inside the MeshAdaptor section, each mesh adaptor is defined via the 
-\series bold
-mesh_adaptor
-\series default
- tag.
- This tag allows the following attributes: 
-\end_layout
-
-\begin_layout Standard
-• 
-\series bold
-type
-\series default
-: set the type of the mesh adaptor (1).
- [Required] 
-\end_layout
-
-\begin_layout Standard
-• 
-\series bold
-elem_set
-\series default
-: The element set to apply the adaptor to (2).
- [Optional] 
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Comments
-\emph default
-: 
-\end_layout
-
-\begin_layout Enumerate
-The 
-\series bold
-type 
-\series default
-attribute defines the mesh adaptor.
- It must be one of the mesh adaptors defined in Table 1, below.
- 
-\end_layout
-
-\begin_layout Enumerate
-The 
-\series bold
-elem_set 
-\series default
-attribute is optional, but can be used to apply the adaptor to only a part
- of the mesh.
- This is useful to limit the effect of an adaptor to a part of the mesh.
- The element set must reference a domain (i.e.
- defined via Elements) of a mesh, or a set of domains.
- It cannot be an element set defined through the ElementSet tag.
- (Note that not all mesh adaptors support this attribute.) If omitted, the
- adaptor is applied to the entire mesh.
- 
-\end_layout
-
-\begin_layout Standard
-The sections below list the properties of the available mesh adaptors and
- the adaptor criteria.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-erosion
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The erosion adaptor removes elements from a mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-mmg_remesh 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Adaptive mesh refinement of tetrahedral mesh using the MMG library.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hex_refine2d
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a 2D hexahedral mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-tet_refine
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a linear tetrahedral mesh (Whole mesh refinement only)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hex_refine
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a hexahedral mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-The erosion adaptor
-\end_layout
-
-\begin_layout Standard
-The erosion adaptor can be used to remove or deactivate elements in a mesh,
- based on a user-defined criterion.
- It defines the following properties: 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_iters
-\series default
-: Set the max number of adaption iterations, for each time step.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-remove_islands
-\series default
-: If true, removes small element sets that have become disconnected from
- the main mesh.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_elems
-\series default
-: Set the max number of elements to erode, per adaptation.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-sort
-\series default
-: sort the element values returned by the criterion.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-criterion
-\series default
-: Set the criterion that determines the element metric to evaluate and which
- elements to erode.
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Example
-\emph default
-: 
-\end_layout
-
-\begin_layout Standard
-In this example, elements that have an (integration point averaged) effective
- stress larger than 0.3, are eroded.
- Only three elements are eroded per adaptation cycle.
-\end_layout
-
-\begin_layout LyX-Code
-<mesh_adaptor type="erosion"> 
-\end_layout
-
-\begin_layout LyX-Code
-  <max_iters>1</max_iters>
-\end_layout
-
-\begin_layout LyX-Code
-  <max_elems>3</max_elems>
-\end_layout
-
-\begin_layout LyX-Code
-  <sort>1</sort>
-\end_layout
-
-\begin_layout LyX-Code
-  <criterion type="min-max filter">
-\end_layout
-
-\begin_layout LyX-Code
-    <min>0.3</min>
-\end_layout
-
-\begin_layout LyX-Code
-    <clamp>0</clamp>
-\end_layout
-
-\begin_layout LyX-Code
-    <data type="stress"/>
-\end_layout
-
-\begin_layout LyX-Code
-  </criterion>
-\end_layout
-
-\begin_layout LyX-Code
-</mesh_adaptor> 
-\end_layout
-
-\begin_layout Subsection
-The mmg_remesh adaptor
-\end_layout
-
-\begin_layout Standard
-The mmg_remesh adaptor can be used for adaptive mesh refinement of linear
- tetrahedral meshes.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_iters
-\series default
-: The maximum number of adaption iterations per time step.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_elements
-\series default
-: The maximum number of elements.
- If the number of elements of the mesh is larger, the adaptor is not applied.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-min_element_size
-\series default
-: Set the desired minimal element size.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-hausdorff
-\series default
-: The Hausdorff distance.
- This is used to preserve curved sections.
- (default = 0.01).
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-gradation
-\series default
-: This parameter sets the spatial gradient of element size.
- (default = 1.3).
- Value should be larger than 1.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-mesh_coarsen
-\series default
-: Allow mesh-coarsening 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-normalize_data
-\series default
-: normalize the element values returned by the criterion between 0 and 1.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-relative_size
-\series default
-: Sets whether the size function is to be interpreted as a relative size
- function (i.e.
- a scale function to the current element size), or an absolute element size
- metric.
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-criterion
-\series default
-: The metric used to assign values to elements.
- (See section 4) 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-size_function
-\series default
-: set the mesh size function.
- This function is applied to the (optionally normalized) element values
- returned by the criterion.
- 
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Example
-\emph default
-: 
-\end_layout
-
-\begin_layout LyX-Code
-<mesh_adaptor type="mmg_remesh">
-\end_layout
-
-\begin_layout LyX-Code
-  <max_iters>1</max_iters>
-\end_layout
-
-\begin_layout LyX-Code
-  <criterion type="stress"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <relative_size>1</relative_size>
-\end_layout
-
-\begin_layout LyX-Code
-  <normalize_data>0</normalize_data>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_coarsen>0</mesh_coarsen>
-\end_layout
-
-\begin_layout LyX-Code
-  <size_function type="step">
-\end_layout
-
-\begin_layout LyX-Code
-    <x0>10</x0>
-\end_layout
-
-\begin_layout LyX-Code
-    <left_val>1</left_val>
-\end_layout
-
-\begin_layout LyX-Code
-    <right_val>0.5</right_val>
-\end_layout
-
-\begin_layout LyX-Code
-  </size_function>
-\end_layout
-
-\begin_layout LyX-Code
-</mesh_adaptor> 
-\end_layout
-
-\begin_layout Section
-Mesh Adaptor Criteria
-\end_layout
-
-\begin_layout Standard
-The purpose of the mesh adaptor criteria is to assign values to elements.
- Some adaptors also act as filters, that limit the effect of the adaptor
- to certain elements.
- These values will then be used by the mesh adaptor to modify the mesh.
- How these values are used depends on the adaptor.
- For instance, the erosion uses it to decide which elements to erode.
- The mesh refinement adaptors use it to define the size function.
- 
-\end_layout
-
-\begin_layout Standard
-The following criteria are currently available.
- A detailed description of these adaptor criteria is given below.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max_variable
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluates average of element’s nodal values of a model primary variable.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-element_selection
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Sets the element selection to which the adaptor should be applied (only
- for erosion)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-stress
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the (integration point average) effective stress of each element.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-damage
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the (integration point average) damage value.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-relative error
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate a relative error measure.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-spring force
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the axial force of the spring.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-spring stretch
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the stretch of a spring.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-math
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specify the element value based on a mathematical expression.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-min-max filter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Selects elements whose value falls within a min-max range.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-max_variable
-\end_layout
-
-\begin_layout Standard
-The max_variable criterion evaluates elements based on a primary variable’s
- degrees of freedom.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-dof
-\series default
-: The degree of freedom that defines the variable to inspect.
- 
-\end_layout
-
-\begin_layout Subsection
-element_selection
-\end_layout
-
-\begin_layout Standard
-Sets the selected elements directly.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-element_list:
-\series default
- a comma-separated list of element indices.
- 
-\end_layout
-
-\begin_layout Subsection
-math
-\end_layout
-
-\begin_layout Standard
-Sets the scale factor for each element.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-scale
-\series default
-: the scale factor to use.
- This can be a constant, or a mathematical expression of position (use X,
- Y, Z for the nodal coordinates), or a scalar map defined in the MeshData
- section.
-\end_layout
-
-\begin_layout Standard
-Example: 
-\end_layout
-
-\begin_layout LyX-Code
-<mesh_adaptor type="mmg_remesh">
-\end_layout
-
-\begin_layout LyX-Code
-  <max_iters>1</max_iters>
-\end_layout
-
-\begin_layout LyX-Code
-  <criterion type="math">
-\end_layout
-
-\begin_layout LyX-Code
-    <math>1*(1 - (X^2+Y^2)) + (X^2+Y^2)*(0.5*(Z-1)^2 - Z*(Z - 2))</math>
-\end_layout
-
-\begin_layout LyX-Code
-  </criterion>
-\end_layout
-
-\begin_layout LyX-Code
-</mesh_adaptor> 
-\end_layout
-
-\begin_layout Subsection
-stress
-\end_layout
-
-\begin_layout Standard
-This criterion selects elements that exceed a maximum stress value.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-metric
-\series default
-: The stress measure to use: 0=effective stress, 1=max principal stress.
- 
-\end_layout
-
-\begin_layout Subsection
-max_damage
-\end_layout
-
-\begin_layout Standard
-This criterion evaluates the maximum damage value for each element.
- This can only be used with materials that define the damage property.
-\end_layout
-
-\begin_layout Subsection
-relative error
-\end_layout
-
-\begin_layout Standard
-This criterion evaluates a relative error metric for each element.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-error:
-\series default
- If nonzero, this criterion will evaluate a relative size metric for each
- element.
- Otherwise, the actual relative error is evaluated.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-data:
-\series default
- Specify the metric to evaluate the element values.
- Any of the other criteria defined above can be used.
- 
-\end_layout
-
-\begin_layout Subsection
-min-max filter
-\end_layout
-
-\begin_layout Standard
-This criterion evaluates a metric for each element, but then filters out
- the element that have a value within a min-max range.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-min
-\series default
-: set the minimum value of the filter 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max
-\series default
-: set the maximum value of the filter 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-clamp
-\series default
-: If true, the element values will be clamped to the range.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-data
-\series default
-: Specify the metric to evaluate the element values.
- Any of the other criteria defined above can be used.
- 
-\end_layout
-
-\begin_layout Section
-Limitations
-\end_layout
-
-\begin_layout Standard
-Please take into account the following limitations of the FEAMR framework.
- 
-\end_layout
-
-\begin_layout Enumerate
-Although contact can be used with the FEAMR framework, currently no contact
- data is mapped from the old mesh to the new mesh.
- It is advised to only use penalty-based contact interfaces.
- 
-\end_layout
-
-\begin_layout Enumerate
-It is not advised to erode elements that are in contact, since this will
- not produce the correct result.
- 
-\end_layout
-
-\begin_layout Enumerate
-Mapping history-data is supported (if the proper flag is set), but can be
- very time consuming since FEBio maps all material point data between meshes.
-\end_layout
-
-\begin_layout Enumerate
-The FEAMR framework does not work with the auto time-stepper.
- It is advised to use fixed time stepping when using mesh adaptation.
- 
 \end_layout
 
 \begin_layout Chapter
