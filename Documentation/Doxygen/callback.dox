@@ -1,7 +1,7 @@
 /**
 \page callback FEBio callbacks
 
-An easy, although somewhat limited, way to extend FEBio's capabilities is by defining callbacks. A callback is a function that is defined by the user and is called by the FEBio framework at specific places in the code. 
+A callback is a function that is called by the FEBio framework at specific places in the code. 
 
 FEBio uses this callback mechanism to accomplish several things: A callback is used to update the title of the shell window to display the progress, to query for user interruptions (ctrl+c), and to write the output to the log and plot file.
 

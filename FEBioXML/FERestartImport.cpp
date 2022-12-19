@@ -184,6 +184,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 
 			// make sure we can redefine curves in the LoadData section
 			FEBioLoadDataSection3* lcSection = new FEBioLoadDataSection3(this);
+			lcSection->SetRedefineCurvesFlag(true);
 			m_map["LoadData"] = lcSection;
 
 			m_map["Step"] = new FEBioStepSection3(this);
