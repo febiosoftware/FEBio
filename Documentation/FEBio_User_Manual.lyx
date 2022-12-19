@@ -114494,8 +114494,13 @@ Heterogeneous model parameters
 
 \begin_layout Standard
 Many model parameters can be made dependent on the reference coordinates.
- This is useful, for instance, for defining inhomogeneous materials.
- There are two mechanisms for creating heterogeneous parameters: a mathematical
+ This is useful, for instance, for defining inhomogeneous materials, where
+ some material parameters depend on the spatial position.
+ 
+\end_layout
+
+\begin_layout Standard
+There are two mechanisms for creating heterogeneous parameters: a mathematical
  expression, or a map.
  The type of the parameter is set via the 
 \emph on
@@ -114635,6 +114640,17 @@ attribute can be omitted.
  
 \end_layout
 
+\begin_layout Standard
+FEBio performs parameter validation at the start of an analysis where the
+ values of parameters are checked against the valid ranges as defined in
+ the code.
+ However, it is important to keep in mind that this validation is only performed
+ on constant parameters.
+ For math and map parameters, it is up to the user to ensure that all values
+ over the relevant mesh partition are valid.
+ 
+\end_layout
+
 \begin_layout Section
 Math parameters
 \end_layout
@@ -114711,13 +114727,36 @@ type="math"
 </material>
 \end_layout
 
+\begin_layout Standard
+The names of maps are also allowed in mathematical expressions.
+ For instance, assume that a map, named 
+\begin_inset Quotes eld
+\end_inset
+
+E_map
+\begin_inset Quotes erd
+\end_inset
+
+ is defined in the MeshData section.
+ Then the following is a valid mathematical expression.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<E 
+\series bold
+type="math"
+\series default
+>2*E_map+X</E>
+\end_layout
+
 \begin_layout Section
 Mapped parameters
 \end_layout
 
 \begin_layout Standard
 For mapped parameters, use the attribute type=
-\begin_inset Quotes erd
+\begin_inset Quotes eld
 \end_inset
 
 map
@@ -114983,7 +115022,7 @@ fem.material[0].E
 \end_layout
 
 \begin_layout Standard
-Sub properties are referenced similarly.
+Sub-properties are referenced similarly.
  For example, assume that the first material is a biphasic material that
  defines the solid property.
  
@@ -115006,7 +115045,7 @@ fem.material[0].ksi[0]
 \begin_layout Standard
 In cases where the model parameter does not define a scalar it is possible
  to reference the components of the parameter.
- For instance, for a vec3 parameter,
+ For instance, a vec3 parameter defines an x, y, and z component.
 \end_layout
 
 \begin_layout LyX-Code
