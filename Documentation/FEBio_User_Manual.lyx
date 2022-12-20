@@ -14060,10 +14060,23 @@ attribute.
  
 \end_layout
 
+\begin_layout Standard
+Data maps can be defined in two ways: 1) explicitly, where the value of
+ each node (face, element) can be specified, or 2) implicitly, via data
+ generators that define the values of each node (face, element) procedurally.
+ 
+\end_layout
+
+\begin_layout Standard
+When mesh data maps are defined explicitly, the following attributes should
+ be specified in addition to the name attribute.
+ 
+\end_layout
+
 \begin_layout Description
 
 \series bold
-datatype 
+data_type 
 \series default
 defines the type of data 
 \end_layout
@@ -14079,7 +14092,7 @@ The following table lists the supported data types.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -14156,7 +14169,7 @@ A 2D vector defined as
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -14165,7 +14178,7 @@ vec3
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -14182,6 +14195,58 @@ A 3D vector defined as
 \end_inset
 
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mat3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A 3x3 tensor, row major sorted
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mat3s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A symmetric 3x3 tensor, defined as 
+\begin_inset Formula $xx$
+\end_inset
+
+, 
+\begin_inset Formula $yy$
+\end_inset
+
+, 
+\begin_inset Formula $zz,xy,yz,xz$
+\end_inset
+
+ 
 \end_layout
 
 \end_inset
@@ -14206,23 +14271,6 @@ scalar
 data type is assumed.
 \end_layout
 
-\begin_layout Description
-node_set/surface/elem_set Specifies the set for which to define the data.
- 
-\end_layout
-
-\begin_layout Standard
-There are two mechanisms to define mesh data: The values can be tabulated,
- which is detailed below, or can be generated via data generators, which
- is described in the next section.
- To use a data generator, specify the 
-\emph on
-generator 
-\emph default
-attribute.
- 
-\end_layout
-
 \begin_layout Subsection
 Data Generators
 \begin_inset CommandInset label
@@ -14235,15 +14283,18 @@ name "subsec:generator"
 \end_layout
 
 \begin_layout Standard
-The 
+Data generators can be used to populate the values of a data map procedurally.
+ To use a data generator, specify the 
 \emph on
-generator
+type
 \emph default
- attribute is optional, but can be defined if the user wishes to generate
- the data automatically instead of tabulating it.
- If the generator attribute is defined, the child tags must be the parameters
- of the generator.
- For example
+ attribute.
+ If the 
+\emph on
+type
+\emph default
+ attribute is defined, the child tags must be the parameters of the generator.
+ For example,
 \end_layout
 
 \begin_layout LyX-Code
@@ -14251,9 +14302,9 @@ generator
 \end_layout
 
 \begin_layout LyX-Code
-  <node_data name="E_map" 
+  <NodeData name="E_map" 
 \series bold
-generator="math"
+type="math"
 \series default
 >
 \end_layout
@@ -14263,7 +14314,7 @@ generator="math"
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data>
+  <NodeData>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14271,106 +14322,8 @@ generator="math"
 \end_layout
 
 \begin_layout Standard
-The following generic generators are currently supported for all mesh data
- sections.
- Additional generators that can only be used for a specific mesh data are
- described in the sections below.
- 
-\end_layout
-
-\begin_layout Description
-
-\series bold
-const
-\series default
- The 
-\emph on
-const
-\emph default
- generator takes a constant value and assigns it to the set.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data name="rotation" type="mat3"
-\series bold
- generator="const"
-\series default
- elem_set=
-\series bold
-"
-\series default
-Part1
-\series bold
-"
-\series default
->
-\end_layout
-
-\begin_layout LyX-Code
-    <value>1,0,0, 0,1,0, 0,0,1</value>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Description
-
-\series bold
-math
-\series default
- The 
-\emph on
-math 
-\emph default
-generator generates the data based on a mathematical expression.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data name="fiber" type="vec3" 
-\series bold
-generator="math"
-\series default
- elem_set=
-\series bold
-"
-\series default
-Part1
-\series bold
-"
-\series default
->
-\end_layout
-
-\begin_layout LyX-Code
-    <math>X,Y,Z</math>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-Note that in math expressions, only the variables X, Y, and Z can be used,
- which refer to reference coordinates.
+Data generators that can be used for a specific mesh data are described
+ in the sections below.
  
 \end_layout
 
@@ -14386,33 +14339,26 @@ name "subsec:ElementData"
 \end_layout
 
 \begin_layout Standard
-This section defines data that can be mapped to the elements of a part.
- The data can be defined either as a map, which can be assigned to mapped
- parameters, or can be used to assign values to some predefined variables.
- The former requires the 
+This section defines data that can be mapped to the elements of an element
+ set.
+ The element set is specified via the 
 \emph on
-name 
-\emph default
-attribute, the latter requires the 
-\shape italic
-var 
-\shape default
-attribute.
- The element set that this data will be mapped to is defined via the 
-\shape italic
 elem_set 
-\shape default
-attribute
+\emph default
+attribute.
+ 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
-Defining maps
-\end_layout
+Defining
+\begin_inset space ~
+\end_inset
 
-\begin_layout Standard
-A map is defined by using the 
+maps
+\series default
+ A map is defined by using the 
 \emph on
 name
 \emph default
@@ -14449,13 +14395,73 @@ name="my_map"
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-Predefined variables
+The following data generators are available for element data sections.
+ 
 \end_layout
 
-\begin_layout Standard
-The following table lists the currently supported predefined variables.
+\begin_layout Description
+surface-to-surface_map The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+surface-to-surface map
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ generator defines a data field on the domain bounded by two surfaces.
+ The data values are interpolated using a user-defined function between
+ the surfaces.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData name="Emap" 
+\series bold
+generator="surface-to-surface map"
+\series default
+ elem_set="Part1">
+\end_layout
+
+\begin_layout LyX-Code
+    <function type="math">x*x+1</function>
+\end_layout
+
+\begin_layout LyX-Code
+    <bottom_surface surface="surface1"/>
+\end_layout
+
+\begin_layout LyX-Code
+    <top_surface surface="surface2"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
+\begin_layout Description
+
+\series bold
+special
+\begin_inset space ~
+\end_inset
+
+generators
+\series default
+ A few special data generators do not generate maps, but instead modify
+ model data in a more direct way.
+ The following table lists the currently supported special generators.
 \end_layout
 
 \begin_layout Standard
@@ -14616,7 +14622,7 @@ For example, to assign shell thicknesses to an element set, use the following
 \begin_layout LyX-Code
   <ElementData 
 \series bold
-var="shell thickness"
+type="shell thickness"
 \series default
  elem_set="part1">
 \end_layout
@@ -14631,103 +14637,6 @@ var="shell thickness"
 
 \begin_layout LyX-Code
   </ElementData>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-In addtition, it is possible to reference most model parameters via the
- 
-\emph on
-var 
-\emph default
-attribute.
- This provides an alternative mechanism to defining mapped parameters, however,
- the mapped parameters approach as described in Appendix A should be preferred.
- See Appendix B for information on how to reference model parameters.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData 
-\series bold
-var="fem.material[0].E"
-\series default
- elem_set="part1">
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="1">1.2</elem>
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="2">3.4</elem>
-\end_layout
-
-\begin_layout LyX-Code
-  </ElementData>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-The following data generators are available for element data sections.
- 
-\end_layout
-
-\begin_layout Description
-surface-to-surface_map The 
-\begin_inset Quotes eld
-\end_inset
-
-
-\emph on
-surface-to-surface map
-\emph default
-
-\begin_inset Quotes erd
-\end_inset
-
- generator defines a data field on the domain bounded by two surfaces.
- The data values are interpolated using a user-defined function between
- the surfaces.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData name="Emap" 
-\series bold
-generator="surface-to-surface map"
-\series default
- elem_set="Part1">
-\end_layout
-
-\begin_layout LyX-Code
-    <function type="math">x*x+1</function>
-\end_layout
-
-\begin_layout LyX-Code
-    <bottom_surface surface="surface1"/>
-\end_layout
-
-\begin_layout LyX-Code
-    <top_surface surface="surface2"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14829,26 +14738,13 @@ attributes.
 \end_layout
 
 \begin_layout Standard
-Optionally, the surface data may be described with a mathematical expression
- as a function of the initial coordinates (X,Y,Z) of the centroid of each
- face:
-\end_layout
-
-\begin_layout LyX-Code
-<SurfaceData name="inlet" data_type="scalar" generator="math" surface="surface1"
->
-\end_layout
-
-\begin_layout LyX-Code
-  <math>2*(1-X^2-Y^2)</math>
-\end_layout
-
-\begin_layout LyX-Code
-</SurfaceData>
-\end_layout
-
-\begin_layout Standard
-The following data generators are available for surface data.
+Optionally, the surface data may be described with a data generator.
+ The data generator is specified via the 
+\emph on
+type 
+\emph default
+attribute.
+ The following data generators are available for surface data.
  
 \end_layout
 
@@ -14878,7 +14774,7 @@ parabolic map
 \begin_layout LyX-Code
   <SurfaceData name="pressure" 
 \series bold
-generator="parabolic map"
+type="parabolic map"
 \series default
  surface="surface1">
 \end_layout
@@ -14972,20 +14868,7 @@ For node data the
 data_format 
 \shape default
 attribute, if specified, will be ignored.
- Optionally, the node data may be described with a mathematical expression
- as a function of the initial nodal coordinates (X,Y,Z):
-\end_layout
-
-\begin_layout LyX-Code
-<NodeData name="data" generator="math" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-  <math>1e-3*Y</math>
-\end_layout
-
-\begin_layout LyX-Code
-</NodeData>
+ 
 \end_layout
 
 \begin_layout Standard
@@ -14996,7 +14879,7 @@ attribute, if specified, will be ignored.
 \end_layout
 
 \begin_layout Section
-Mesh Adaptors Section
+Mesh Adaptor Section
 \end_layout
 
 \begin_layout Standard
