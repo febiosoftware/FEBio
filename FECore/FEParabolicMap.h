@@ -36,9 +36,9 @@ public:
 
 	~FEParabolicMap();
 
-	bool Init() override;
-
 	bool Generate(FESurfaceMap& data) override;
+
+	FESurfaceMap* Generate() override;
 
 	void SetDOFConstraint(const FEDofList& dofs);
 

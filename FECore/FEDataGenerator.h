@@ -109,6 +109,15 @@ public:
 
 	// generate the data array for the given facet set
 	virtual bool Generate(FESurfaceMap& data);
+
+	virtual FESurfaceMap* Generate();
+
+public:
+	void SetFacetSet(FEFacetSet* surf);
+	FEFacetSet* GetFacetSet();
+
+private:
+	FEFacetSet* m_surf;
 };
 
 //-----------------------------------------------------------------------------

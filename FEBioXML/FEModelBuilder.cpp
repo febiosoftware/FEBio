@@ -881,6 +881,15 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 			}
 		}
 
+		FEFaceDataGenerator* fgen = dynamic_cast<FEFaceDataGenerator*>(gen);
+		if (fgen)
+		{
+			FESurfaceMap* map = fgen->Generate();
+			if (map == nullptr) return false;
+			map->SetName(fgen->GetName());
+			mesh.AddDataMap(map);
+		}
+
 		FEElemDataGenerator* egen = dynamic_cast<FEElemDataGenerator*>(gen);
 		if (egen)
 		{

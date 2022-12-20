@@ -110,9 +110,21 @@ FEEdgeDataGenerator::FEEdgeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem
 //-----------------------------------------------------------------------------
 FEFaceDataGenerator::FEFaceDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
-
+	m_surf = nullptr;
 }
 
+//-----------------------------------------------------------------------------
+void FEFaceDataGenerator::SetFacetSet(FEFacetSet* surf)
+{
+	m_surf = surf;
+}
+
+FEFacetSet* FEFaceDataGenerator::GetFacetSet()
+{
+	return m_surf;
+}
+
+//-----------------------------------------------------------------------------
 // generate the data array for the given facet set
 bool FEFaceDataGenerator::Generate(FESurfaceMap& map)
 {
@@ -144,6 +156,13 @@ bool FEFaceDataGenerator::Generate(FESurfaceMap& map)
 		}
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+FESurfaceMap* FEFaceDataGenerator::Generate()
+{
+	assert(false);
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------

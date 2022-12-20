@@ -103,7 +103,7 @@ void FEBioMeshDataSection4::ParseNodalData(XMLTag& tag)
 	if (sztype)
 	{
 		// allocate the data generator
-		FENodeDataGenerator* gen = fecore_new<FENodeDataGenerator>(sztype, &fem);
+		FENodeDataGenerator* gen = dynamic_cast<FENodeDataGenerator*>(fecore_new<FEMeshDataGenerator>(sztype, &fem));
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		gen->SetName(szname);
@@ -199,15 +199,19 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 	// see if there is a generator
 	if (sztype)
 	{
-		FEFaceDataGenerator* gen = fecore_new<FEFaceDataGenerator>(sztype, &fem);
+		FEFaceDataGenerator* gen = dynamic_cast<FEFaceDataGenerator*>(fecore_new<FEMeshDataGenerator>(sztype, &fem));
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+		gen->SetFacetSet(surf);
 		gen->SetName(szname);
 
 		GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 		// read the parameters
 		ReadParameterList(tag, gen);
+
+		// Add it to the list (will be applied after the rest of the model was read in)
+		GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
 	}
 	else
 	{
@@ -245,8 +249,6 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	// get the type
 	const char* sztype = tag.AttributeValue("type", true);
 
-	const char* szname = tag.AttributeValue("name", true);
-
 	if (sztype)
 	{
 		if      (strcmp(sztype, "shell thickness") == 0) ParseShellThickness(tag, *elset);
@@ -254,13 +256,18 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag, *elset);
 		else
 		{
-			// get the name or var (required!)
+			// get the name (required!)
 			const char* szname = tag.AttributeValue("name");
 
-			FEElemDataGenerator* gen = fecore_new<FEElemDataGenerator>(sztype, &fem);
+			// allocate generator
+			FEElemDataGenerator* gen = dynamic_cast<FEElemDataGenerator*>(fecore_new<FEMeshDataGenerator>(sztype, &fem));
+			if (gen == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			// set the name and element set
 			gen->SetElementSet(elset);
 			gen->SetName(szname);
 
+			// add it to the model
 			GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 			// read the parameters
@@ -272,6 +279,9 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	}
 	else
 	{
+		// get the name (required!)
+		const char* szname = tag.AttributeValue("name");
+
 		if (szname == nullptr) throw XMLReader::InvalidAttributeValue(tag, "name");
 		string name = szname;
 
