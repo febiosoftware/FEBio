@@ -102,6 +102,7 @@ protected:
 public: // geometry data
 	vec3d	m_r0;	//!< initial position
 	vec3d	m_rt;	//!< current position
+	vec3d	m_ra;	//!< used by rigid solver
 
 	vec3d	m_at;	//!< nodal acceleration
 
