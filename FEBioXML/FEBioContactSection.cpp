@@ -305,6 +305,8 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (GetBuilder()->BuildSurface(*ps->GetSurface(), *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
+	mesh.AddSurface(ps->GetSurface());
+
 	ReadParameterList(tag, ps);
 }
 
@@ -515,4 +517,58 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 	s.CreateMaterialPointData();
 
 	return true;
+}
+//-----------------------------------------------------------------------------
+//! Parse the Contact section (new in version 2.0)
+void FEBioContactSection4::Parse(XMLTag& tag)
+{
+	// make sure there are children
+	if (tag.isleaf()) return;
+
+	FEModel& fem = *GetFEModel();
+
+	// loop over tags
+	++tag;
+	do
+	{
+		if (tag == "contact")
+		{
+			// get the contact type
+			const char* sztype = tag.AttributeValue("type");
+
+			// Try to create a contact interface using the FEBio kernel. 
+			FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(sztype, &fem);
+			if (pci == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			GetBuilder()->AddContactInterface(pci);
+			ParseContactInterface(tag, pci);
+		}
+
+		++tag;
+	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioContactSection4::ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+
+	// get the surface pair
+	const char* szpair = tag.AttributeValue("surface_pair");
+	FESurfacePair* surfacePair = m.FindSurfacePair(szpair);
+	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+
+	// build the surfaces
+	if (GetBuilder()->BuildSurface(*pci->GetSecondarySurface(), *surfacePair->GetSecondarySurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (GetBuilder()->BuildSurface(*pci->GetPrimarySurface(), *surfacePair->GetPrimarySurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+
+	// get the parameter list
+	ReadParameterList(tag, pci);
+
+	// Make sure we have both surfaces
+	FESurface* pss = pci->GetPrimarySurface(); if ((pss == 0) || (pss->Elements() == 0)) throw MissingPrimarySurface();
+	m.AddSurface(pss);
+	FESurface* pms = pci->GetSecondarySurface(); if ((pms == 0) || (pms->Elements() == 0)) throw MissingSecondarySurface();
+	m.AddSurface(pms);
 }
