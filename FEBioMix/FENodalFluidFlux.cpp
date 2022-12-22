@@ -55,5 +55,8 @@ void FENodalFluidFlux::GetNodalValues(int inode, std::vector<double>& val)
 	mp.m_r0 = node.m_r0;
 	mp.m_index = inode;
 
-	val[0] = m_w(mp);
+	const FETimeInfo& tp = GetTimeInfo();
+
+	// for consistency with evaluation of residual and stiffness matrix
+	val[0] = m_w(mp)* tp.timeIncrement;
 }
