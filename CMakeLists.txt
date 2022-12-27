@@ -190,7 +190,7 @@ foreach(name IN LISTS STATIC_FEBIO_LIBS)
 endforeach(name)
 
 ##### Set up executable compilation #####
-file(GLOB SOURCES "FEBio3/*.cpp")
+file(GLOB SOURCES "FEBio/*.cpp")
 add_executable (febio4 ${SOURCES})
 
 if(WIN32)
