@@ -152,9 +152,6 @@ public:
 	//! return a node set
 	FENodeSet* NodeSet(int i) { return m_NodeSet[i]; }
 
-	//! Find a nodeset by ID
-	FENodeSet* FindNodeSet(int nid);
-
 	//! Find a nodeset by name
 	FENodeSet* FindNodeSet(const std::string& name);
 
@@ -188,6 +185,9 @@ public:
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 	FESurface* FindSurface(const std::string& name);
 	int FindSurfaceIndex(const std::string& name);
+
+	// create a surface from a facet set
+	FESurface* CreateSurface(FEFacetSet& facetSet);
 
 	// --- EDGES ---
 	int Edges() { return (int) m_Edge.size(); }

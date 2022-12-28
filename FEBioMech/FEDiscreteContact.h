@@ -133,4 +133,6 @@ protected:
 	FEDiscreteContactSurface	m_surf;
 	FEDeformableSpringDomain2*	m_dom;
 	vector<NODE>	m_nodeData;
+
+	DECLARE_FECORE_CLASS();
 };

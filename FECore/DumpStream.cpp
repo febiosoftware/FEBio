@@ -38,7 +38,7 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 	m_ptr_lock = false;
 
 #ifdef _DEBUG
-	m_btypeInfo = true;
+	m_btypeInfo = false;
 #else
 	m_btypeInfo = false;
 #endif
@@ -96,14 +96,15 @@ void DumpStream::check()
 {
 	if (IsSaving())
 	{
-		write(&m_bytes_serialized, sizeof(m_bytes_serialized), 1);
+		m_bytes_serialized += write(&m_bytes_serialized, sizeof(m_bytes_serialized), 1);
 	}
 	else
 	{
 		size_t nsize;
-		read(&nsize, sizeof(m_bytes_serialized), 1);
+		size_t tmp = read(&nsize, sizeof(m_bytes_serialized), 1);
 		assert(m_bytes_serialized == nsize);
 		if (m_bytes_serialized != nsize) throw DumpStream::ReadError();
+		m_bytes_serialized += tmp;
 	}
 }
 
@@ -124,7 +125,7 @@ DumpStream& DumpStream::operator << (const char* sz)
 { 
 	int n = (sz ? (int)strlen(sz) : 0);
 	m_bytes_serialized += write(&n, sizeof(int), 1);
-	if (sz) m_bytes_serialized += write(sz, sizeof(char), n);
+	if (sz && (n > 0)) m_bytes_serialized += write(sz, sizeof(char), n);
 	return (*this);
 }
 
@@ -133,7 +134,7 @@ DumpStream& DumpStream::operator << (char* sz)
 { 
 	int n = (sz ? (int)strlen(sz) : 0); 
 	m_bytes_serialized += write(&n, sizeof(int), 1);
-	if (sz) m_bytes_serialized += write(sz, sizeof(char), n);
+	if (sz && (n > 0)) m_bytes_serialized += write(sz, sizeof(char), n);
 	return (*this);
 }
 

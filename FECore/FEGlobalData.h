@@ -27,22 +27,17 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECoreBase.h"
-
-//-----------------------------------------------------------------------------
-class FEModel;
+#include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
 //! This class can be used to define global model data and will be placed in the
 //! global date section of the FEModel class
-class FECORE_API FEGlobalData : public FECoreBase
+class FECORE_API FEGlobalData : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEGLOBALDATA_ID)
+	FECORE_BASE_CLASS(FEGlobalData)
 
 public:
 	//! constructor
 	FEGlobalData(FEModel* fem);
-
-	// initialization
-	virtual bool Init();
 };

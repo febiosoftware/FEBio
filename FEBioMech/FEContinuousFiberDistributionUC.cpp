@@ -34,6 +34,9 @@ BEGIN_FECORE_CLASS(FEContinuousFiberDistributionUC, FEUncoupledMaterial)
 	ADD_PROPERTY(m_pFmat, "fibers");
 	ADD_PROPERTY(m_pFDD , "distribution");
 	ADD_PROPERTY(m_pFint, "scheme");
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -49,16 +52,18 @@ FEContinuousFiberDistributionUC::~FEContinuousFiberDistributionUC() {}
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEContinuousFiberDistributionUC::CreateMaterialPointData() 
+FEMaterialPointData* FEContinuousFiberDistributionUC::CreateMaterialPointData() 
 {
-	return m_pFmat->CreateMaterialPointData();
+	FEMaterialPointData* mp = FEUncoupledMaterial::CreateMaterialPointData();
+	mp->SetNext(m_pFmat->CreateMaterialPointData());
+	return mp;
 }
 
 //-----------------------------------------------------------------------------
 //! calculate stress at material point
 mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 { 
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// calculate stress
 	mat3ds s; s.zero();
@@ -69,7 +74,7 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 	double IFD = IntegratedFiberDensity(mp);
 
 	// obtain an integration point iterator
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
+	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
 		do
@@ -85,7 +90,7 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 
 			// calculate the stress
 			double wn = it->m_weight;
-			s += m_pFmat->DevFiberStress(pt, m_pFmat->FiberPreStretch(n0))*(R*wn);
+			s += m_pFmat->DevFiberStress(mp, fp.FiberPreStretch(n0))*(R*wn);
 		}
 		while (it->Next());
 	}
@@ -101,7 +106,7 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 //! calculate tangent stiffness at material point
 tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 { 
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// get the local coordinate system
 	mat3d Q = GetLocalCS(mp);
@@ -110,9 +115,9 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 
-	double IFD = IntegratedFiberDensity(pt);
+	double IFD = IntegratedFiberDensity(mp);
 
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
+	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
 		do
@@ -127,7 +132,7 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
             vec3d n0 = Q*N;
 
 			// calculate the tangent
-			c += m_pFmat->DevFiberTangent(mp, m_pFmat->FiberPreStretch(n0))*(R*it->m_weight);
+			c += m_pFmat->DevFiberTangent(mp, fp.FiberPreStretch(n0))*(R*it->m_weight);
 		}
 		while (it->Next());
 	}
@@ -143,14 +148,14 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 //! calculate deviatoric strain energy density
 double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 { 
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// get the local coordinate system
 	mat3d Q = GetLocalCS(mp);
 
 	double IFD = IntegratedFiberDensity(mp);
 	double sed = 0.0;
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
+	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
 		do
@@ -165,7 +170,7 @@ double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& 
             vec3d n0 = Q*N;
 
 			// calculate the stress
-			sed += m_pFmat->DevFiberStrainEnergyDensity(mp, m_pFmat->FiberPreStretch(n0))*(R*it->m_weight);
+			sed += m_pFmat->DevFiberStrainEnergyDensity(mp, fp.FiberPreStretch(n0))*(R*it->m_weight);
 		}
 		while (it->Next());
 	}

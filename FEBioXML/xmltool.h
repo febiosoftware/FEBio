@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "XMLReader.h"
+#include <XML/XMLReader.h>
 #include <FECore/FECoreBase.h>
 #include <FECore/ClassDescriptor.h>
 #include "febioxml_api.h"
@@ -53,6 +53,6 @@ void FEBIOXML_API readList(XMLTag& tag, vector<int>& l);
 
 //---------------------------------------------------------------------------------------
 // create a class descriptor from the current tag
-FEBIOXML_API ClassDescriptor* readParameterList(XMLTag& tag);
+FEBIOXML_API FEClassDescriptor* readParameterList(XMLTag& tag);
 
 }

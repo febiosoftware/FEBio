@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEGlobalMatrix.h"
 #include "matrix.h"
 #include <vector>
-using namespace std;
 
 class FESolver;
 
@@ -45,7 +44,7 @@ public:
 	// and a vector F which contains the assembled contribution of the prescribed 
 	// degrees of freedom. The F vector must be added to the "force" vector. The u 
 	// vector contains the nodal values of the prescribed degrees of freedom.
-	FELinearSystem(FESolver* solver, FEGlobalMatrix& K, vector<double>& F, vector<double>& u, bool bsymm);
+	FELinearSystem(FESolver* solver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm);
 
 	// virtual destructor
 	virtual ~FELinearSystem();
@@ -64,15 +63,15 @@ public:
 
 	// This assembles a matrix to the RHS by pre-multiplying the matrix with the 
 	// prescribed value array U and then adding it to F
-	void AssembleRHS(vector<int>& lm, matrix& ke, vector<double>& U);
+	void AssembleRHS(std::vector<int>& lm, matrix& ke, std::vector<double>& U);
 
 	// This assembles a vetor to the RHS
-	void AssembleRHS(vector<int>& lm, vector<double>& fe);
+	void AssembleRHS(std::vector<int>& lm, std::vector<double>& fe);
 
 protected:
-	bool			m_bsymm;	//!< symmetry flag
-	FESolver*		m_solver;
-	FEGlobalMatrix& m_K;	//!< The global stiffness matrix
-	vector<double>&	m_F;	//!< Contributions from prescribed degrees of freedom
-	vector<double>&	m_u;	//!< the array with prescribed values
+	bool					m_bsymm;	//!< symmetry flag
+	FESolver*				m_solver;
+	FEGlobalMatrix&			m_K;	//!< The global stiffness matrix
+	std::vector<double>&	m_F;	//!< Contributions from prescribed degrees of freedom
+	std::vector<double>&	m_u;	//!< the array with prescribed values
 };

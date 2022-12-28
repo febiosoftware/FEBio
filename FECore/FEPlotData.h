@@ -61,7 +61,7 @@ class FEElement;
 //!
 class FECORE_API FEPlotData : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEPLOTDATA_ID)
 
 public:
 	FEPlotData(FEModel* fem);
@@ -112,13 +112,17 @@ public: // used by array variables
 	void SetArrayNames(vector<string>& s) { m_arrayNames = s; }
 	vector<string>& GetArrayNames() { return m_arrayNames; }
 
+public:
+	void SetUnits(const char* sz) { m_szunit = sz; }
+	const char* GetUnits() const { return m_szunit; }
+
 private:
 	Region_Type		m_nregion;		//!< region type
 	Var_Type		m_ntype;		//!< data type
 	Storage_Fmt		m_sfmt;			//!< data storage format
 	vector<int>		m_item;			//!< Data will only be stored for the item's in this list
     char			m_szdom[64];	//!< Data will only be stored for the domain with this name
-
+	const char*		m_szunit;
 	int				m_arraySize;	//!< size of arrays (used by arrays)
 	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)
 };
@@ -128,6 +132,8 @@ private:
 //! associated with each node of the mesh, will use this base class.
 class FECORE_API FEPlotNodeData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotNodeData)
+
 public:
 	FEPlotNodeData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_NODE, t, s) {}
 };
@@ -137,6 +143,8 @@ public:
 //! associated with each element or node of a domain, will use this base class.
 class FECORE_API FEPlotDomainData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotDomainData)
+
 public:
 	FEPlotDomainData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_DOMAIN, t, s) {}
 };
@@ -146,6 +154,8 @@ public:
 //! associated with each node or facet of a surface, will use this base class.
 class FECORE_API FEPlotSurfaceData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotSurfaceData)
+
 public:
 	FEPlotSurfaceData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_SURFACE, t, s) {}
 };

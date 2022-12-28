@@ -29,7 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FETrussDomain.h>
 #include "FEElasticDomain.h"
-#include "FETrussMaterial.h"
+#include "FESolidMaterial.h"
 #include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
@@ -42,6 +42,9 @@ public:
 
 	//! copy operator
 	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d);
+
+	//! initialize the domain
+	bool Init() override;
 
 	//! Reset data
 	void Reset() override;
@@ -81,11 +84,14 @@ public: // overloads from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FELinearSystem& LS) override;
 
-	//! intertial stiffness matrix \todo implement this
-	void MassMatrix(FELinearSystem& LS, double scale) override { assert(false); }
+	//! intertial stiffness matrix
+	void MassMatrix(FELinearSystem& LS, double scale) override;
 
 	//! body force stiffness matrix \todo implement this
 	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override { assert(false); }
+
+	//! elemental mass matrix
+	void ElementMassMatrix(FETrussElement& el, matrix& ke);
 
 protected:
 	//! calculates the truss element stiffness matrix
@@ -95,7 +101,11 @@ protected:
 	void ElementInternalForces(FETrussElement& el, vector<double>& fe);
 
 protected:
-	FETrussMaterial*	m_pMat;
+	FESolidMaterial*	m_pMat;
+	double	m_a0;
+	double	m_v;
 
 	FEDofList	m_dofU;
+
+	DECLARE_FECORE_CLASS();
 };

@@ -60,7 +60,7 @@ SOFTWARE.*/
 class FEActiveFiberStressUC : public FEUncoupledMaterial
 {
 public:
-	class Data : public FEMaterialPoint
+	class Data : public FEMaterialPointData
 	{
 	public:
 		double	m_lamp;

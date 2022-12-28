@@ -56,7 +56,7 @@ public:
 	double	m_lam1;
 	double	m_alpha;	//!< activation parameter
 
-	FEParamVec3		m_fiber;
+	FEVec3dValuator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

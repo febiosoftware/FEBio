@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidLock.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
 
@@ -52,6 +51,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
 {
+    m_eps = 1.0;
+    m_ups = 1.0;
+
     m_nID = m_ncount++;
     m_atol = 0;
     m_gtol = 0;
@@ -59,6 +61,7 @@ FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
     m_naugmin = 0;
     m_naugmax = 10;
 	m_bautopen = false;
+    m_eps = m_ups = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -481,7 +484,7 @@ void FERigidLock::Update()
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	FETimeInfo& tp = GetFEModel()->GetTime();
+	const FETimeInfo& tp = GetTimeInfo();
 	double alpha = tp.alphaf;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);

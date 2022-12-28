@@ -33,41 +33,44 @@
 
 class FECORE_API BSpline
 {
+    struct Impl;
+
 public:
     // constructor
     BSpline();
+
     // copy constructor
     BSpline(const BSpline& bs);
+
     // destructor
-    ~BSpline() {}
+    ~BSpline();
+
+    // assignment operator
+    void operator = (const BSpline& bs);
 
 public:
     // spline function evaluations
-    double eval(double x, int korder, std::vector<double>xknot,
-                int ncoef, std::vector<double>coeff);
-    double eval(double x);
-    double eval_nderiv(double x, int n);
-    double eval_deriv(double x) { return eval_nderiv(x, 1); }
-    double eval_deriv2(double x) { return eval_nderiv(x, 2); }
+    double eval(double x, int korder, const std::vector<double>& xknot,
+                int ncoef, const std::vector<double>& coeff) const;
+    double eval(double x) const;
+    double eval_nderiv(double x, int n) const;
+    double eval_deriv(double x) const;
+    double eval_deriv2(double x) const;
     
 public:
     // spline fitting
-    std::vector<double> blending_functions(double x);
-    bool fit(int korder, int ncoef, std::vector<vec2d>p);
+    std::vector<double> blending_functions(double x) const;
+    bool fit(int korder, int ncoef, const std::vector<vec2d>& p);
     
 public:
     // initializations
     // use given points p as control points
-    bool init(int korder, std::vector<vec2d> p);
+    bool init(int korder, const std::vector<vec2d>& p);
     // use given points p as interpolation points
-    bool init_interpolation(int korder, std::vector<vec2d> p);
+    bool init_interpolation(int korder, const std::vector<vec2d>& p);
     // perform spline approximation over points p, using ncoef coefficients
-    bool init_approximation(int korder, int ncoef, std::vector<vec2d> p);
+    bool init_approximation(int korder, int ncoef, const std::vector<vec2d>& p);
 
 private:
-    int                 m_korder;   //! B-spline order
-    int                 m_ncoef;    //! number of B-spline coefficients
-    std::vector<double> m_xknot;    //! knot sequence
-    std::vector<double> m_coeff;    //! B-spline coefficients
-    
+    Impl* im;
 };

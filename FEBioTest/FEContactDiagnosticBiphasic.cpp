@@ -32,26 +32,30 @@ SOFTWARE.*/
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include "FEBioMix/FESlidingInterfaceBiphasic.h"
 #include "FEBioMech/FEResidualVector.h"
+#include <FECore/SparseMatrix.h>
 #include <FECore/log.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEContactDiagnosticBiphasic::FEContactDiagnosticBiphasic(FEModel& fem) : FEDiagnostic(fem)
+FEContactDiagnosticBiphasic::FEContactDiagnosticBiphasic(FEModel* fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem->SetActiveModule("biphasic");
+
     m_pscn = 0;
     
-    FEAnalysis* pstep = new FEAnalysis(&fem);
+    FEAnalysis* pstep = new FEAnalysis(fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("biphasic", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("biphasic", fem);
     assert(pnew_solver);
     pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
     
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

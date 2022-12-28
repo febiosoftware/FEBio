@@ -27,9 +27,6 @@ SOFTWARE.*/
 #include "EigenSolver.h"
 #include "fecore_enum.h"
 
-REGISTER_SUPER_CLASS(EigenSolver, FEEIGENSOLVER_ID);
-
-
 EigenSolver::EigenSolver(FEModel* fem) : FECoreBase(fem)
 {
 

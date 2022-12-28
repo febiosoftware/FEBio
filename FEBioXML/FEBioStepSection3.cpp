@@ -60,13 +60,6 @@ void FEBioStepSection3::Parse(XMLTag& tag)
 	{
 		if (tag == "step")
 		{
-			// get the (optional) type attribute
-			const char* sztype = tag.AttributeValue("type", true);
-			if (sztype)
-			{
-				GetBuilder()->SetModuleName(sztype);
-			}
-
 			// create next step
 			GetBuilder()->NextStep();
 

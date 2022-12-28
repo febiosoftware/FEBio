@@ -34,11 +34,14 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FESolver.h>
 #include <FECore/FEAnalysis.h>
+#include <FEBioFluid/FEFluid.h>
 
 BEGIN_FECORE_CLASS(FEContactInterface, FESurfacePairConstraint)
-	ADD_PARAMETER(m_laugon, "laugon"        );
-    ADD_PARAMETER(m_psf   , "penalty_sf"    );
-    ADD_PARAMETER(m_psfmax, "max_penalty_sf");
+	BEGIN_PARAM_GROUP("Augmentation");
+		ADD_PARAMETER(m_laugon, "laugon"        )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
+	    ADD_PARAMETER(m_psf   , "penalty_sf"    )->setLongName("penalty scale factor")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+		ADD_PARAMETER(m_psfmax, "max_penalty_sf")->setLongName("Max penalty scale factor")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+	END_PARAM_GROUP();
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
@@ -71,6 +74,13 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	if (pe == nullptr) return 0.0;
 
     double eps = 0;
+    
+    // make sure this is not a fluid-FSI or biphasic-FSI material
+    FEFluidMaterial* pmf = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+    if (pmf) {
+        pe = el.m_elem[1];
+        if (pe == nullptr) return 0.0;
+    }
     
 	// extract the elastic material
 	FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEElasticMaterial>();

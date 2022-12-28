@@ -29,8 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include "FEBioImport.h"
 
-class FEUncoupledMaterial;
-
 //-----------------------------------------------------------------------------
 // Material Section
 class FEBIOXML_API FEBioMaterialSection : public FEFileSection
@@ -42,11 +40,6 @@ public:
 protected:
 	FEMaterial* CreateMaterial(XMLTag& tag);
 
-	// In FEBio 3, the bulk modulus k must be defined at the top-level.
-	// However, this could break backward compatibility, so for older file version
-	// we apply this hack that collects the child moduli and assigns it to the top-level
-	void FixUncoupledMaterial(FEUncoupledMaterial* mat);
-
 protected:
 	int	m_nmat;
 };
@@ -56,7 +49,7 @@ protected:
 class FEBIOXML_API FEBioMaterialSection3 : public FEFileSection
 {
 public:
-	FEBioMaterialSection3(FEFileImport* pim) : FEFileSection(pim) {}
+	FEBioMaterialSection3(FEFileImport* pim) : FEFileSection(pim) { m_nmat = 0; }
 	void Parse(XMLTag& tag);
 
 protected:

@@ -29,8 +29,9 @@
 #include <string>
 #include "Quadric.h"
 #include "quatd.h"
+#include "fecore_api.h"
 
-class QuadricFit
+class FECORE_API QuadricFit
 {
 public:
     enum Q_TYPE { Q_ELLIPSOID, Q_ELLIPTIC_PARABOLOID, Q_HYPERBOLIC_PARABOLOID,

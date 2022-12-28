@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEInitialPreStrain.h"
 #include <FECore/FEDomain.h>
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 #include "FEConstPrestrain.h"
 
 
@@ -45,8 +45,7 @@ void FEInitialPreStrain::Activate()
 {
 	FEInitialCondition::Activate();
 
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// loop over all the domains
 	int ND = mesh.Domains();
@@ -98,9 +97,9 @@ void FEInitialPreStrain::Activate()
 	// reset the nodal coordinates
 	if (m_breset)
 	{
-		int dofX = fem.GetDOFIndex("x");
-		int dofY = fem.GetDOFIndex("y");
-		int dofZ = fem.GetDOFIndex("z");
+		int dofX = GetDOFIndex("x");
+		int dofY = GetDOFIndex("y");
+		int dofZ = GetDOFIndex("z");
 		int NN = mesh.Nodes();
 		for (int i=0; i<NN; ++i)
 		{

@@ -148,9 +148,6 @@ double FEMathExpression::value(FEModel* fem, const FEMaterialPoint& pt)
 }
 
 //=============================================================================
-REGISTER_SUPER_CLASS(FEScalarValuator, FESCALARGENERATOR_ID);
-
-//=============================================================================
 BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
 	ADD_PARAMETER(m_val, "const");
 END_FECORE_CLASS();
@@ -224,6 +221,7 @@ double FEMathValue::operator()(const FEMaterialPoint& pt)
 
 FEMappedValue::FEMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr)
 {
+	m_scale = 1.0;
 }
 
 void FEMappedValue::setDataMap(FEDataMap* val)
@@ -236,15 +234,21 @@ FEDataMap* FEMappedValue::dataMap()
 	return m_val;
 }
 
+void FEMappedValue::setScaleFactor(double s)
+{
+	m_scale = s;
+}
+
 double FEMappedValue::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->value(pt);
+	return m_scale*m_val->value(pt);
 }
 
 FEScalarValuator* FEMappedValue::copy()
 {
 	FEMappedValue* map = fecore_alloc(FEMappedValue, GetFEModel());
 	map->setDataMap(m_val);
+	map->m_scale = m_scale;
 	return map;
 }
 

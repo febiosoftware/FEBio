@@ -65,9 +65,9 @@ public:
 	void Serialize(DumpStream &ar) override;
 
 public:
-	vector<double>	m_h0;	//!< initial shell thicknesses
-	vector<double>	m_ht;	//!< current shell thickness
-	vector<vec3d>   m_d0;   //!< initial shell director
+	std::vector<double>	m_h0;	//!< initial shell thicknesses
+	std::vector<double>	m_ht;	//!< current shell thickness
+	std::vector<vec3d>   m_d0;   //!< initial shell director
 
 							// indices of solid elements this shell element is attached to.
 							// the first element is attached to the back of the shell
@@ -96,7 +96,7 @@ public:
 	void Serialize(DumpStream &ar) override;
 
 public:
-	vector<vec3d>	m_D0;	//!< initial shell directors
+	std::vector<vec3d>	m_D0;	//!< initial shell directors
 };
 
 //-----------------------------------------------------------------------------
@@ -125,8 +125,8 @@ public: // EAS parameters
 	matrix          m_alpha;
 	matrix          m_alphat;
 	matrix          m_alphai;
-	vector<matrix>  m_Kua;
-	vector<matrix>  m_Kwa;
-	vector<mat3ds>  m_E;
+	std::vector<matrix>  m_Kua;
+	std::vector<matrix>  m_Kwa;
+	std::vector<mat3ds>  m_E;
 };
 

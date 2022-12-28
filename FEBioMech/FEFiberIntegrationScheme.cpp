@@ -29,6 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFiberIntegrationScheme.h"
 
-FEFiberIntegrationScheme::FEFiberIntegrationScheme(FEModel* pfem) : FEMaterial(pfem)
+FEFiberIntegrationScheme::FEFiberIntegrationScheme(FEModel* pfem) : FEMaterialProperty(pfem)
 {
 }

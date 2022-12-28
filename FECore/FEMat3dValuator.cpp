@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FEDataMap.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEMat3dValuator, FEMAT3DGENERATOR_ID);
-
 //=============================================================================
 // FELocalMap
 //-----------------------------------------------------------------------------
@@ -468,6 +466,11 @@ void FEMat3dVectorMap::Serialize(DumpStream &ar)
 //=============================================================================
 // FEMappedValueMat3d
 //-----------------------------------------------------------------------------
+
+BEGIN_FECORE_CLASS(FEMappedValueMat3d, FEMat3dValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
+
 
 FEMappedValueMat3d::FEMappedValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 {

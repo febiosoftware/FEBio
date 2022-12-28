@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETendonMaterial.h"
+#include <FECore/FEConstValueVec3.h>
 
 #ifndef SQR
 	#define SQR(x) ((x)*(x))
@@ -40,7 +41,8 @@ BEGIN_FECORE_CLASS(FETendonMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_L1  , "l1");
 	ADD_PARAMETER(m_L2  , "l2");
 	ADD_PARAMETER(m_lam1, "lam_max");
-	ADD_PARAMETER(m_fiber, "fiber");
+
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 
@@ -49,7 +51,10 @@ END_FECORE_CLASS();
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-FETendonMaterial::FETendonMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+FETendonMaterial::FETendonMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem) 
+{
+	m_fiber = nullptr;
+}
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress at a material point.
@@ -69,7 +74,7 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	mat3d Q = GetLocalCS(mp);
 
 	// get the initial fiber direction
-	vec3d a0 = Q * m_fiber.unitVector(mp);
+	vec3d a0 = Q * m_fiber->unitVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -197,7 +202,7 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	mat3d Q = GetLocalCS(mp);
 
 	// get the initial fiber direction
-	vec3d a0 = Q * m_fiber.unitVector(mp);
+	vec3d a0 = Q * m_fiber->unitVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

@@ -28,12 +28,12 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidRotationalVelocity.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEGlobalVector.h"
 #include "FECore/log.h"
 #include "FECore/LinearSolver.h"
+#include <FECore/FENode.h>
 #include "FEBioFluid.h"
 
 //=============================================================================
@@ -50,6 +50,15 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescrib
     m_w = 0.0;
     m_n = vec3d(0,0,1);
     m_p = vec3d(0,0,0);
+
+	// Set the dof list
+	// TODO: Can this be done in Init, since  there is no error checking
+	if (pfem)
+	{
+		FEDofList dofs(pfem);
+		dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+		SetDOFList(dofs);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -72,13 +81,6 @@ void FEFluidRotationalVelocity::GetNodalValues(int nodelid, std::vector<double>&
 	val[0] = v.x;
 	val[1] = v.y;
 	val[2] = v.z;
-}
-
-//-----------------------------------------------------------------------------
-//! Set the dof list
-bool FEFluidRotationalVelocity::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 }
 
 //-----------------------------------------------------------------------------

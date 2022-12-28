@@ -31,6 +31,11 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include <vector>
 #include <string>
+#include <chrono>
+
+using dseconds = std::chrono::duration<double>;
+using dminutes = std::chrono::duration<double, std::ratio<60>>;
+using dhours = std::chrono::duration<double, std::ratio<3600>>;
 
 //-----------------------------------------------------------------------------
 //! This class implements a simple timer. 
@@ -80,7 +85,22 @@ private:
 	void*	m_pimpl;	//!< local timing data (using PIMPL ididom to hide OS specifics)
 
 	bool	m_brunning;	//!< flag indicating whether start was called
-	double	m_sec;		//!< accumulated time so far in seconds
+    dseconds m_total; //!< accumulated time so far in seconds
+};
+
+//-----------------------------------------------------------------------------
+class FEModel;
+
+//-----------------------------------------------------------------------------
+// Timer IDs
+enum TimerID {
+	Timer_Update,
+	Timer_LinSolve,
+	Timer_Reform,
+	Timer_Residual,
+	Timer_Stiffness,
+	Timer_QNUpdate,
+	Timer_ModelSolve
 };
 
 //-----------------------------------------------------------------------------
@@ -92,14 +112,12 @@ private:
 class FECORE_API TimerTracker
 {
 public:
-	TimerTracker(Timer* timer) { 
-		if (timer && (timer->isRunning() == false)) { m_timer = timer; timer->start(); }
-		else m_timer = nullptr; 
-	};
-	~TimerTracker() { if (m_timer) m_timer->stop(); }
+	TimerTracker(FEModel* fem, int timerId);
+	TimerTracker(Timer* timer);
+	~TimerTracker();
 
 private:
 	Timer*	m_timer;
 };
 
-#define TRACK_TIME(timerId) TimerTracker _trackTimer(GetFEModel()->GetTimer(timerId));
+#define TRACK_TIME(timerId) TimerTracker _trackTimer(GetFEModel(), timerId);

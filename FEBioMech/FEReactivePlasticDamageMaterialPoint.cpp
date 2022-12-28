@@ -35,7 +35,7 @@
 
 ////////////////////// PLASTIC DAMAGE MATERIAL POINT //////////////////////////////
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEReactivePlasticDamageMaterialPoint::Copy()
+FEMaterialPointData* FEReactivePlasticDamageMaterialPoint::Copy()
 {
     FEReactivePlasticDamageMaterialPoint* pt = new FEReactivePlasticDamageMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -62,37 +62,37 @@ FEMaterialPoint* FEReactivePlasticDamageMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEReactivePlasticDamageMaterialPoint::Init()
 {
-    FEReactivePlasticDamage* prp = dynamic_cast<FEReactivePlasticDamage*>(m_pMat);
+    FEPlasticFlowCurveMaterialPoint& fp = *ExtractData<FEPlasticFlowCurveMaterialPoint>();
     
-    // get size of vectors
-    int n = prp ? prp->m_n : 1;
-    
-    // intialize data
-    m_Fusi.assign(n, mat3d(1,0,0,
-                           0,1,0,
-                           0,0,1));
-    m_Fvsi.assign(n, mat3d(1,0,0,
-                           0,1,0,
-                           0,0,1));
-    m_Fp = mat3dd(1);
-    m_Ku.assign(n, 0);
-    m_Kv.assign(n, 0);
-    m_gp.assign(n, 0);
-    m_gpp.assign(n, 0);
-    m_gc.assign(n, 0);
-    m_Rhat = 0;
-    m_wy.assign(n,0);
-    m_gp.assign(n, 0);
-    m_Eyt.assign(n, 0);
-    m_Eym.assign(n, 0);
-    m_di.assign(n+1, 0);
-    m_dy.assign(n, 0);
-    m_d.assign(n+1, 0);
-    m_byld.assign(n, false);
-    m_byldt.assign(n, false);
-    
-    // don't forget to initialize the base class
-    FEDamageMaterialPoint::Init();
+    if (fp.m_binit) {
+        size_t n = fp.m_Ky.size();
+        // intialize data
+        m_Fusi.assign(n, mat3d(1,0,0,
+                               0,1,0,
+                               0,0,1));
+        m_Fvsi.assign(n, mat3d(1,0,0,
+                               0,1,0,
+                               0,0,1));
+        m_Fp = mat3dd(1);
+        m_Ku.assign(n, 0);
+        m_Kv.assign(n, 0);
+        m_gp.assign(n, 0);
+        m_gpp.assign(n, 0);
+        m_gc.assign(n, 0);
+        m_Rhat = 0;
+        m_wy.assign(n,0);
+        m_gp.assign(n, 0);
+        m_Eyt.assign(n, 0);
+        m_Eym.assign(n, 0);
+        m_di.assign(n+1, 0);
+        m_dy.assign(n, 0);
+        m_d.assign(n+1, 0);
+        m_byld.assign(n, false);
+        m_byldt.assign(n, false);
+        
+        // don't forget to initialize the base class
+        FEDamageMaterialPoint::Init();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void FEReactivePlasticDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+    FEMaterialPointData::Serialize(ar);
     
     if (ar.IsSaving())
     {
@@ -136,7 +136,7 @@ void FEReactivePlasticDamageMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //! Evaluate net mass fraction of yielded bonds
-double FEReactivePlasticDamageMaterialPoint::YieldedBonds()
+double FEReactivePlasticDamageMaterialPoint::YieldedBonds() const
 {
     double w = 0;
     for (int i=0; i<m_wy.size(); ++i) w += m_wy[i];
@@ -144,10 +144,11 @@ double FEReactivePlasticDamageMaterialPoint::YieldedBonds()
 }
 
 //! Evaluate net mass fraction of intact bonds
-double FEReactivePlasticDamageMaterialPoint::IntactBonds()
+double FEReactivePlasticDamageMaterialPoint::IntactBonds() const
 {
     double w = 0;
     int n = (int) m_wy.size();
+    if (n == 0) return 1.0;
     for (int i=0; i<n; ++i) w += m_wy[i] + m_d[i];
     w += m_d[n];
     return 1.0-w;

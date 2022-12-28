@@ -316,9 +316,13 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	// create the DC's
 	ClearBoundaryConditions();
 	FEPrescribedDOF* pdc[3] = { 0 };
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[2]);
+	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC);
+	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC);
+	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC);
+
+	AddBoundaryCondition(pdc[0]);
+	AddBoundaryCondition(pdc[1]);
+	AddBoundaryCondition(pdc[2]);
 
 	// assign nodes to BCs
 	pdc[0]->SetNodeSet(pset);
@@ -591,7 +595,7 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 				Pa += Pn*(w[n] * Jn);
 
 				// now do the second order stress
-				vec3d X = ep.m_r0;
+				vec3d X = pt.m_r0;
 
 				tens3drs Qn = dyad3rs(Pn, X);
 

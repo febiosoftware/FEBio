@@ -60,7 +60,7 @@ public:
 // for the FEBio input file. The code will use the GetIterator function to create an
 // iterator that can be used to loop over all the integration points of the scheme and to
 // evaluate the fiber vector and weights at each point.
-class FEFiberIntegrationScheme : public FEMaterial
+class FEFiberIntegrationScheme : public FEMaterialProperty
 {
 public:
     FEFiberIntegrationScheme(FEModel* pfem);
@@ -69,4 +69,6 @@ public:
 	// In general, the integration scheme may depend on the material point.
 	// The passed material point pointer will be zero when evaluating the integrated fiber density
 	virtual FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp = 0) = 0;
+
+	FECORE_BASE_CLASS(FEFiberIntegrationScheme)
 };

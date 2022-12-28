@@ -33,12 +33,14 @@ SOFTWARE.*/
 #include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
-	ADD_PARAMETER(m_f, "value");
+	ADD_PARAMETER(m_f, "value")->setUnits(UNIT_FORCE);
+	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
 
 FENodalForce::FENodalForce(FEModel* fem) : FENodalLoad(fem)
 {
 	m_f = vec3d(0, 0, 0);
+	m_shellBottom = false;
 }
 
 // set the value
@@ -49,7 +51,10 @@ void FENodalForce::SetValue(const vec3d& v)
 
 bool FENodalForce::SetDofList(FEDofList& dofList)
 {
-	return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	if (m_shellBottom)
+		return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	else
+		return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 void FENodalForce::GetNodalValues(int inode, std::vector<double>& val)

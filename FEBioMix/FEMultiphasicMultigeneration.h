@@ -39,12 +39,12 @@ class FEMultiphasicMultigeneration;
 //! and the increment in the mass of solid-bound molecular species in
 //! multiple generations.
 
-class FEBIOMIX_API FEMultigenSBMMaterialPoint : public FEMaterialPoint
+class FEBIOMIX_API FEMultigenSBMMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEMultigenSBMMaterialPoint(FEMultiphasicMultigeneration* pm, FEMaterialPoint* pt) : m_pmat(pm), FEMaterialPoint(pt) { m_tgen = 0.0; }
+	FEMultigenSBMMaterialPoint(FEMultiphasicMultigeneration* pm, FEMaterialPointData* pt) : m_pmat(pm), FEMaterialPointData(pt) { m_tgen = 0.0; }
     
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
 	void Serialize(DumpStream& ar);
     
@@ -76,7 +76,7 @@ public:
 	FEMultiphasicMultigeneration(FEModel* pfem);
     
     //! returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 	
     //! Update solid bound molecules
     void UpdateSolidBoundMolecules(FEMaterialPoint& mp) override;

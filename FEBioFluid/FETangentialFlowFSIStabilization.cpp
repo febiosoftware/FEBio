@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEBioFluid.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
@@ -45,15 +46,19 @@ FETangentialFlowFSIStabilization::FETangentialFlowFSIStabilization(FEModel* pfem
     m_beta = 1.0;
     
     // get the degrees of freedom
-    m_dofU.Clear();
-    m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
-    
-    m_dofW.Clear();
-    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofU);
-    m_dof.AddDofs(m_dofW);
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.Clear();
+        m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
+
+        m_dofW.Clear();
+        m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+
+        m_dof.Clear();
+        m_dof.AddDofs(m_dofU);
+        m_dof.AddDofs(m_dofW);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -95,8 +100,10 @@ vec3d FETangentialFlowFSIStabilization::FluidVelocity(FESurfaceMaterialPoint& mp
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowFSIStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETangentialFlowFSIStabilization::LoadVector(FEGlobalVector& R)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
     m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
         FESurfaceElement& el = *mp.SurfaceElement();
@@ -136,8 +143,10 @@ void FETangentialFlowFSIStabilization::LoadVector(FEGlobalVector& R, const FETim
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowFSIStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETangentialFlowFSIStabilization::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
     m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
         FESurfaceElement& el = *mp.SurfaceElement();

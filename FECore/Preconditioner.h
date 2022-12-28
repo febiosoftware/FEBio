@@ -37,8 +37,10 @@ class CompactMatrix;
 //-----------------------------------------------------------------------------
 // Preconditioner class is a special type of linear solver that should only be
 // used as a preconditioner for iterative linear solvers
-class Preconditioner : public LinearSolver
+class FECORE_API Preconditioner : public LinearSolver
 {
+	FECORE_BASE_CLASS(Preconditioner)
+
 public: 
 	Preconditioner(FEModel* fem) : LinearSolver(fem), m_A(nullptr) {}
 

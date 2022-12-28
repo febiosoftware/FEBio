@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEOsmoticVirialExpansion.h"
-#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters

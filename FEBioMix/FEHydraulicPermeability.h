@@ -35,10 +35,10 @@ SOFTWARE.*/
 //! Base class for hydraulic permeability of porous materials.
 //! These materials need to define the permeability and tangent permeability functions.
 //!
-class FEBIOMIX_API FEHydraulicPermeability : public FEMaterial
+class FEBIOMIX_API FEHydraulicPermeability : public FEMaterialProperty
 {
 public:
-	FEHydraulicPermeability(FEModel* pfem) : FEMaterial(pfem) {}
+	FEHydraulicPermeability(FEModel* pfem) : FEMaterialProperty(pfem) {}
 	virtual ~FEHydraulicPermeability(){}
     
 	//! hydraulic permeability
@@ -49,4 +49,6 @@ public:
     
 	//! tangent of hydraulic permeability with respect to concentration
 	mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp, const int isol);
+
+	FECORE_BASE_CLASS(FEHydraulicPermeability);
 };

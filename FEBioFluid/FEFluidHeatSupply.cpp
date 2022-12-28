@@ -38,8 +38,9 @@ FEFluidHeatSupply::FEFluidHeatSupply(FEModel* pfem) : FEBodyLoad(pfem)
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEFluidHeatSupply::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidHeatSupply::LoadVector(FEGlobalVector& R)
 {
+    const FETimeInfo& tp = GetTimeInfo();
     for (int i = 0; i<Domains(); ++i)
     {
         FEDomain* dom = Domain(i);
@@ -47,15 +48,16 @@ void FEFluidHeatSupply::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
         if (mat == nullptr)
         {
             FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupply(R, tp, *this);
+            if (edom) edom->HeatSupply(R, *this);
         }
     }
 }
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetTimeInfo();
     for (int i = 0; i<Domains(); ++i)
     {
         FEDomain* dom = Domain(i);
@@ -63,7 +65,7 @@ void FEFluidHeatSupply::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
         if (mat==nullptr)
         {
             FEThermoFluidDomain* edom = dynamic_cast<FEThermoFluidDomain*>(dom);
-            if (edom) edom->HeatSupplyStiffness(LS, tp, *this);
+            if (edom) edom->HeatSupplyStiffness(LS, *this);
         }
     }
 }

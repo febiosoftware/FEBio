@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioFluid.h"
 #include "FEFluid.h"
-#include "FEFluidP.h"
 #include "FENewtonianFluid.h"
 #include "FEBinghamFluid.h"
 #include "FECarreauFluid.h"
@@ -42,10 +41,10 @@ SOFTWARE.*/
 #include "FEIdealGasIsothermal.h"
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
+#include "FELogNonlinearElasticFluid.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
-#include "FEFluidDomain2D.h"
 
 #include "FEFluidPressureLoad.h"
 #include "FEFluidTractionLoad.h"
@@ -55,25 +54,40 @@ SOFTWARE.*/
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FEFluidResistanceBC.h"
+#include "FEFluidResistanceLoad.h"
 #include "FEFluidRCRBC.h"
+#include "FEFluidRCRLoad.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidRCBC.h"
+#include "FEFluidRCLoad.h"
+#include "FEPrescribedFluidPressure.h"
 
 #include "FETiedFluidInterface.h"
-
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
-
+#include "FEConstraintUniformFlow.h"
 #include "FEBioFluidPlot.h"
 #include "FEBioFluidData.h"
-
 #include "FEFluidDomainFactory.h"
-
 #include "FEFSIErosionVolumeRatio.h"
-
 #include "FEFluidStressCriterion.h"
+#include "FEFixedFluidVelocity.h"
+#include "FEPrescribedFluidVelocity.h"
+#include "FEFixedFluidDilatation.h"
+#include "FEPrescribedFluidDilatation.h"
+#include "FEInitialFluidDilatation.h"
+#include "FEInitialFluidVelocity.h"
+
+#include "FEConstFluidBodyForce.h"
+#include "FECentrifugalFluidBodyForce.h"
+
+#include "FEFluidModule.h"
+
+#include "FEFluidAnalysis.h"
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
@@ -82,9 +96,9 @@ const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
 	{
 	case DISPLACEMENT                    : return "displacement"                        ; break;
 	case RELATIVE_FLUID_VELOCITY         : return "relative fluid velocity"             ; break;
-	case FLUID_DILATATION                : return "fluid dilation"                      ; break;
+	case FLUID_DILATATION                : return "fluid dilatation"                    ; break;
 	case RELATIVE_FLUID_ACCELERATION     : return "relative fluid acceleration"         ; break;
-	case FLUID_DILATATION_TDERIV         : return "fluid dilation tderiv"               ; break;
+	case FLUID_DILATATION_TDERIV         : return "fluid dilatation tderiv"             ; break;
 	}
 	assert(false);
 	return nullptr;
@@ -101,8 +115,15 @@ void FEBioFluid::InitModule()
 	febio.RegisterDomain(new FEFluidDomainFactory);
 
 	// define the fluid module
-	febio.CreateModule("fluid");
-	febio.SetModuleDependency("solid");	// for body-loads (e.g. see fl08)
+	febio.CreateModule(new FEFluidModule, "fluid", 
+		"{"
+		"   \"title\" : \"Fluid Mechanics\","
+		"   \"info\"  : \"Steady-state or transient fluid dynamics analysis.\""
+		"}");
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEFluidAnalysis, "fluid");
 
 //-----------------------------------------------------------------------------
 // solver classes
@@ -111,7 +132,6 @@ REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
 //-----------------------------------------------------------------------------
 // Materials
 REGISTER_FECORE_CLASS(FEFluid             , "fluid"         );
-REGISTER_FECORE_CLASS(FEFluidP            , "fluidP"        );
 REGISTER_FECORE_CLASS(FENewtonianFluid    , "Newtonian fluid");
 REGISTER_FECORE_CLASS(FEBinghamFluid      , "Bingham"       )
 REGISTER_FECORE_CLASS(FECarreauFluid      , "Carreau"       );
@@ -122,28 +142,49 @@ REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
 REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
 REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
 REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
+REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
 
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEFluidDomain3D, "fluid-3D");
-REGISTER_FECORE_CLASS(FEFluidDomain2D, "fluid-2D");
 
 //-----------------------------------------------------------------------------
 // Surface loads
-REGISTER_FECORE_CLASS(FEFluidPressureLoad          , "fluid pressure");
-REGISTER_FECORE_CLASS(FEFluidTractionLoad          , "fluid viscous traction");
+REGISTER_FECORE_CLASS(FEFluidPressureLoad          , "fluid pressure"                , 0x0300); // Deprecated, use the BC version.
+REGISTER_FECORE_CLASS(FEFluidTractionLoad          , "fluid viscous traction"        );
 REGISTER_FECORE_CLASS(FEFluidMixtureTractionLoad   , "fluid mixture viscous traction");
-REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction");
-REGISTER_FECORE_CLASS(FEFluidNormalVelocity        , "fluid normal velocity");
-REGISTER_FECORE_CLASS(FEFluidVelocity              , "fluid velocity");
-REGISTER_FECORE_CLASS(FEFluidRotationalVelocity    , "fluid rotational velocity");
-REGISTER_FECORE_CLASS(FEFluidResistanceBC          , "fluid resistance");
-REGISTER_FECORE_CLASS(FEFluidRCRBC                 , "fluid RCR");
-REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping");
+REGISTER_FECORE_CLASS(FEFluidNormalTraction        , "fluid normal traction"         );
+REGISTER_FECORE_CLASS(FEFluidNormalVelocity        , "fluid normal velocity"         );
+REGISTER_FECORE_CLASS(FEFluidVelocity              , "fluid velocity"                );
+REGISTER_FECORE_CLASS(FEFluidResistanceLoad        , "fluid resistance"              , 0x0300);  // Deprecated, use the BC version.
+REGISTER_FECORE_CLASS(FEFluidRCRLoad               , "fluid RCR"                     , 0x0300);  // Deprecated, use the BC version.
+REGISTER_FECORE_CLASS(FETangentialDamping          , "fluid tangential damping"      );
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization, "fluid tangential stabilization");
-REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization");
-REGISTER_FECORE_CLASS(FEFluidRCBC                  , "fluid RC");
-    
+REGISTER_FECORE_CLASS(FEBackFlowStabilization      , "fluid backflow stabilization"  );
+REGISTER_FECORE_CLASS(FEFluidRCLoad                , "fluid RC"                      , 0x0300);  // Deprecated, use the BC version.
+
+//-----------------------------------------------------------------------------
+// body loads
+REGISTER_FECORE_CLASS(FEConstFluidBodyForce      , "fluid body force");
+REGISTER_FECORE_CLASS(FECentrifugalFluidBodyForce, "fluid centrifugal force");
+
+//-----------------------------------------------------------------------------
+// boundary conditions
+REGISTER_FECORE_CLASS(FEFixedFluidVelocity       , "zero fluid velocity");
+REGISTER_FECORE_CLASS(FEPrescribedFluidVelocity  , "prescribed fluid velocity");
+REGISTER_FECORE_CLASS(FEFixedFluidDilatation     , "zero fluid dilatation");
+REGISTER_FECORE_CLASS(FEPrescribedFluidDilatation, "prescribed fluid dilatation");
+REGISTER_FECORE_CLASS(FEFluidRotationalVelocity  , "fluid rotational velocity");
+REGISTER_FECORE_CLASS(FEPrescribedFluidPressure  , "fluid pressure");
+REGISTER_FECORE_CLASS(FEFluidRCBC                , "fluid RC");
+REGISTER_FECORE_CLASS(FEFluidRCRBC               , "fluid RCR");
+REGISTER_FECORE_CLASS(FEFluidResistanceBC        , "fluid resistance");
+
+//-----------------------------------------------------------------------------
+// initial conditions
+REGISTER_FECORE_CLASS(FEInitialFluidDilatation, "initial fluid dilatation");
+REGISTER_FECORE_CLASS(FEInitialFluidVelocity  , "initial fluid velocity");
+
 //-----------------------------------------------------------------------------
 // Contact interfaces
 REGISTER_FECORE_CLASS(FETiedFluidInterface, "tied-fluid");
@@ -152,6 +193,7 @@ REGISTER_FECORE_CLASS(FETiedFluidInterface, "tied-fluid");
 // constraint classes
 REGISTER_FECORE_CLASS(FEConstraintFrictionlessWall, "frictionless fluid wall");
 REGISTER_FECORE_CLASS(FEConstraintNormalFlow      , "normal fluid flow"      );
+REGISTER_FECORE_CLASS(FEConstraintUniformFlow     , "uniform fluid flow"     );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
@@ -249,5 +291,28 @@ REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
 // Derived from FEMeshAdaptorCriterion
 REGISTER_FECORE_CLASS(FEFluidStressCriterion     , "fluid shear stress");
 
-    febio.SetActiveModule(0);
+//-----------------------------------------------------------------------------
+// Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEFluidAnalysis>([](FEFluidAnalysis* pc) {
+        pc->m_nanalysis = FEFluidAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = false;
+        pc->m_bdivreform = false;
+    }));
+    
+febio.SetActiveModule(0);
+
 }

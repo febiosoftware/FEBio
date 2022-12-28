@@ -38,20 +38,23 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEFluidSolutesMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEFluidSolutesMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEFluidSolutesMaterialPoint(FEMaterialPoint* pt);
+    FEFluidSolutesMaterialPoint(FEMaterialPointData* pt);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);
     
     //! Data initialization
     void Init();
+
+public:
+    double Osmolarity() const;
     
 public:
     // solutes material data
@@ -75,13 +78,13 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface
+class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface_T<FEFluidSolutesMaterialPoint>
 {
 public:
     FEFluidSolutes(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     //! performs initialization
     bool Init() override;
@@ -129,9 +132,14 @@ public:
     
     // solute interface
 public:
+
+    typedef FEFluidSolutesMaterialPoint SoluteMaterialPoint_t;
+
     int Solutes() override { return (int)m_pSolute.size(); }
     FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC;  }
+
+public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     
     int Reactions         () { return (int) m_pReact.size();    }

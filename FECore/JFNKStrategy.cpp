@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "JFNKMatrix.h"
 #include "FEException.h"
 #include "LinearSolver.h"
-#include "FEModel.h"
 #include "log.h"
 
 BEGIN_FECORE_CLASS(JFNKStrategy, FENewtonStrategy)

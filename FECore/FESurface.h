@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FEDofList.h"
 #include "FESurfaceElement.h"
+#include "FENode.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -84,6 +85,9 @@ typedef std::function<void(FESurfaceMaterialPoint& mp, const FESurfaceDofShape& 
 
 class FECORE_API FESurface : public FEMeshPartition
 {
+	FECORE_SUPER_CLASS(FESURFACE_ID)
+	FECORE_BASE_CLASS(FESurface)
+
 public:
 	//! default constructor
 	FESurface(FEModel* fem);

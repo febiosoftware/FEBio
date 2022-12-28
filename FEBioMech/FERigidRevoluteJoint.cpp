@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include "FERigidRevoluteJoint.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
@@ -116,8 +114,6 @@ bool FERigidRevoluteJoint::Init()
         feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (revolute joint)\n", m_nID+1);
         return false;
     }
-    
-    FEModel& fem = *GetFEModel();
     
     // initialize joint basis
     m_e0[0].unit();
@@ -644,7 +640,7 @@ void FERigidRevoluteJoint::Update()
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	FETimeInfo& tp = GetFEModel()->GetTime();
+	const FETimeInfo& tp = GetTimeInfo();
 	double alpha = tp.alphaf;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);

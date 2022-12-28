@@ -411,12 +411,7 @@ void FE3FieldElasticShellDomain::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -494,8 +489,8 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //         since the material point coordinates are not used by most materials.
-        pt.m_r0 = evaluate(el, r0, s0, n);
-        pt.m_rt = evaluate(el, r, s, n);
+        mp.m_r0 = evaluate(el, r0, s0, n);
+        mp.m_rt = evaluate(el, r, s, n);
 
         // get the deformation gradient and determinant at intermediate time
         double Jt, Jp;
@@ -528,12 +523,15 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
         if (m_alphaf == 0.5)
         {
             // evaluate strain energy at current time
-            FEElasticMaterialPoint et = pt;
-            et.m_F = Ft;
-            et.m_J = Jt;
+			mat3d Ftmp = pt.m_F;
+			double Jtmp = pt.m_J;
+			pt.m_F = Ft;
+            pt.m_J = Jt;
             FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
-            pt.m_Wt = pme->StrainEnergyDensity(et);
-            
+            pt.m_Wt = pme->StrainEnergyDensity(mp);
+			pt.m_F = Ftmp;
+			pt.m_J = Jtmp;
+
             mat3ds D = pt.m_L.sym();
             double D2 = D.dotdot(D);
             if (D2 > 0)

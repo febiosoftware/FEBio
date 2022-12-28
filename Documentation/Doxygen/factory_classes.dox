@@ -1,7 +1,9 @@
 /**
 \page factory_classes Registering Plugin Classes
 
-Before a plugin class can be recognized by FEBio it must be registered with the framework. Registration is done in the PluginInitialize function, which is one of the required functions. 
+Before a plugin class can be recognized by FEBio it must be registered with the framework. Registration is done in the <b>PluginInitialize</b> function, which is one of the required functions. 
+
+First, make sure to include any header files for the plugin classes at the top of the file. 
 
 \section init_plugin Using PluginInitialize
 
@@ -18,8 +20,8 @@ FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
 }
 \endcode
 
-The first call the FECoreKernel::SetInstance is important to make sure that the plugin and FEBio are using the same kernel. Without this call, all classes will be registered to a local copy of the kernel and FEBio will not know of any new classes that are registered.
+The first call the FECoreKernel::SetInstance is important to make sure that the plugin and FEBio are using the same kernel. 
 
-The macro REGISTER_FECORE_CLASS takes two parameters. The first parameter is the name of a plugin class. The second parameter is a name that will be used to represent this class in the FEBio input file. 
+The macro <b>REGISTER_FECORE_CLASS</b> takes two parameters. The first parameter is the name of the c++ plugin class (here, MyMaterial). The second parameter is a name that will be used to represent this class in the FEBio input file (i.e. the value for the <i>type</i> attribute). 
 
 */

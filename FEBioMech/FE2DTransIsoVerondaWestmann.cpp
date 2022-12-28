@@ -32,14 +32,15 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, FE_RANGE_GREATER(0.0), "c2");
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c2, FE_RANGE_GREATER(0.0), "c2")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_w, 2, "w");
-	ADD_PARAMETER(m_c3, "c3");
+	ADD_PARAMETER(m_c3, "c3")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c4, "c4");
-	ADD_PARAMETER(m_c5, "c5");
+	ADD_PARAMETER(m_c5, "c5")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_lam1, "lam_max");
-	ADD_PARAMETER(m_epsf, "epsilon_scale");
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 double FE2DTransIsoVerondaWestmann::m_cth[FE2DTransIsoVerondaWestmann::NSTEPS];

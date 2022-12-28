@@ -85,13 +85,6 @@ FERigidBody* FEMechModel::GetRigidBody(int n)
 }
 
 //-----------------------------------------------------------------------------
-// find a rigid surface
-FERigidSurface* FEMechModel::FindRigidSurface(const std::string& name)
-{
-	return m_prs->FindRigidSurface(name);
-}
-
-//-----------------------------------------------------------------------------
 // find a rigid body from a material ID
 int FEMechModel::FindRigidbodyFromMaterialID(int matId)
 {
@@ -113,21 +106,21 @@ int FEMechModel::RigidPrescribedBCs() const
 
 //-----------------------------------------------------------------------------
 // return the rigid prescribed displacement
-FERigidBodyDisplacement* FEMechModel::GetRigidPrescribedBC(int i)
+FERigidPrescribedBC* FEMechModel::GetRigidPrescribedBC(int i)
 {
 	return m_prs->PrescribedBC(i);
 }
 
 //-----------------------------------------------------------------------------
 // add a rigid presribed BC
-void FEMechModel::AddRigidPrescribedBC(FERigidBodyDisplacement* pDC)
+void FEMechModel::AddRigidPrescribedBC(FERigidPrescribedBC* pDC)
 {
 	m_prs->AddPrescribedBC(pDC);
 }
 
 //-----------------------------------------------------------------------------
 // add a rigid fixed BC
-void FEMechModel::AddRigidFixedBC(FERigidBodyFixedBC* pBC)
+void FEMechModel::AddRigidFixedBC(FERigidFixedBC* pBC)
 {
 	m_prs->AddFixedBC(pBC);
 }
@@ -137,13 +130,6 @@ void FEMechModel::AddRigidFixedBC(FERigidBodyFixedBC* pBC)
 void FEMechModel::AddRigidInitialCondition(FERigidIC* pIC)
 {
 	m_prs->AddInitialCondition(pIC);
-}
-
-//-----------------------------------------------------------------------------
-// add a rigid nodeset
-void FEMechModel::AddRigidNodeSet(FERigidNodeSet* rns)
-{
-	m_prs->AddRigidNodeSet(rns);
 }
 
 //-----------------------------------------------------------------------------

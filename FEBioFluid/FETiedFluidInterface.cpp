@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 #include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -245,8 +246,7 @@ bool FETiedFluidInterface::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     
     vector<int> lm(4*FEElement::MAX_NODES*2);
     
@@ -346,7 +346,7 @@ void FETiedFluidInterface::CalcAutoPressurePenalty(FETiedFluidSurface& s)
 double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFluidSurface& s)
 {
     // get the mesh
-    FEMesh& m = GetFEModel()->GetMesh();
+    FEMesh& m = GetMesh();
     
     // evaluate element surface normal at parametric center
     vec3d t[2];
@@ -384,7 +384,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
 // Perform initial projection between tied surfaces in reference configuration
 void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
     vec3d r, nu;
     double rs[2];
@@ -460,7 +460,7 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
 // Evaluate gap functions for fluid velocity and fluid pressure
 void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
     vec3d r;
     

@@ -70,6 +70,12 @@ FEItemList* FESurfaceMap::GetItemList()
 }
 
 //-----------------------------------------------------------------------------
+int FESurfaceMap::StorageFormat() const
+{
+	return m_format;
+}
+
+//-----------------------------------------------------------------------------
 bool FESurfaceMap::Create(const FEFacetSet* ps, double val, Storage_Fmt fmt)
 {
 	m_surf = ps;
@@ -169,6 +175,17 @@ void FESurfaceMap::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_maxFaceNodes;
 	ar & m_name;
+	if (ar.IsSaving())
+	{
+		FEFacetSet* fs = const_cast<FEFacetSet*>(m_surf);
+		ar << fs;
+	}
+	else
+	{
+		FEFacetSet* fs = nullptr;
+		ar >> fs;
+		m_surf = fs;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -179,8 +196,42 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 	{
 	case FMT_NODE:
 		{
-			assert(pt.m_elem == nullptr);
-			return value<double>(pt.m_index, 0);
+			if (pt.m_elem)
+			{
+				// get the element this material point is in
+				FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+				assert(pe);
+
+				// make sure this element belongs to this domain
+				// TODO: Can't check this if map was created through FEFacetSet
+			//	assert(pe->GetMeshPartition() == m_dom);
+
+				if (pt.m_index < 0x10000)
+				{
+					// integration point
+					// get shape functions
+					double* H = pe->H(pt.m_index);
+
+					int ne = pe->Nodes();
+					for (int i = 0; i < ne; ++i)
+					{
+						double vi = value<double>(pe->m_lnode[i], 0);
+						v += vi * H[i];
+					}
+				}
+				else
+				{
+					// element node
+					int n = pt.m_index - 0x10000;
+					v = value<double>(pe->m_lnode[n], 0);
+				}
+				return v;
+			}
+			else
+			{
+				// assume material point is a node
+				return value<double>(pt.m_index, 0);
+			}
 		}
 		break;
 	case FMT_MULT:
@@ -197,13 +248,22 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 			int lid = pe->GetLocalID();
 
 			// get shape functions
-			double* H = pe->H(pt.m_index);
-
-			int ne = pe->Nodes();
-			for (int i = 0; i < ne; ++i)
+			if (pt.m_index < 0x10000)
 			{
-				double vi = value<double>(lid, i);
-				v += vi*H[i];
+				double* H = pe->H(pt.m_index);
+
+				int ne = pe->Nodes();
+				for (int i = 0; i < ne; ++i)
+				{
+					double vi = value<double>(lid, i);
+					v += vi * H[i];
+				}
+			}
+			else
+			{
+				// element node
+				int n = pt.m_index - 0x10000;
+				v = value<double>(lid, n);
 			}
 		}
 		break;

@@ -50,5 +50,5 @@ public:
 	virtual ~FENodeReorder();
 
 	//! calculates the permutation vector
-	void Apply(FEMesh& m, vector<int>& P);
+	void Apply(FEMesh& m, std::vector<int>& P);
 };

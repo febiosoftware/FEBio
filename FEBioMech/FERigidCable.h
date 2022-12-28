@@ -27,25 +27,25 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEModelLoad.h>
+#include "FERigidForce.h"
+#include <FECore/FECoreClass.h>
 
 class FERigidBody;
 
-class FERigidCablePoint : public FECoreBase
+class FERigidCablePoint : public FECoreClass
 {
-	FECORE_SUPER_CLASS
-
 public:
-	FERigidCablePoint(FEModel* fem) : FECoreBase(fem) {}
+	FERigidCablePoint(FEModel* fem) : FECoreClass(fem) {}
 
 public:
 	int		m_rb;	//!< rigid body ID
 	vec3d	m_pos;	//!< position of attachment point
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FERigidCablePoint);
 };
 
-class FERigidCable : public FEModelLoad
+class FERigidCable : public FERigidLoad
 {
 public:
 	FERigidCable(FEModel* fem);
@@ -54,10 +54,10 @@ public:
 	bool Init() override;
 
 	//! forces
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 private:
 	void applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d& d, FEGlobalVector& R);

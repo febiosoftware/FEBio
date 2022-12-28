@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "DOFS.h"
 #include "FEMesh.h"
 #include "FETimeInfo.h"
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include "Callback.h"
 #include "FECoreKernel.h"
 #include "DataStore.h"
@@ -41,23 +41,19 @@ SOFTWARE.*/
 class FELoadController;
 class FEMaterial;
 class FEModelLoad;
-class FENodalLoad;
 class FEBoundaryCondition;
 class FEInitialCondition;
-class FESurfaceLoad;
-class FEEdgeLoad;
-class FEBodyLoad;
 class FENLConstraint;
 class FESurfacePairConstraint;
 class FEAnalysis;
 class FEGlobalData;
 class FEGlobalMatrix;
 class FELinearConstraintManager;
-class FEModelData;
 class FEDataArray;
 class FEMeshAdaptor;
 class Timer;
 class FEPlotDataStore;
+class FEMeshDataGenerator;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel
@@ -69,18 +65,6 @@ struct FEMODEL_MEMORY_STATS {
 };
 
 //-----------------------------------------------------------------------------
-// Timer IDs
-enum TimerID {
-	Timer_Update,
-	Timer_LinSolve,
-	Timer_Reform,
-	Timer_Residual,
-	Timer_Stiffness,
-	Timer_QNUpdate,
-	Timer_ModelSolve
-};
-
-//-----------------------------------------------------------------------------
 // helper class for managing global (user-defined) variables.
 class FEGlobalVariable
 {
@@ -89,14 +73,13 @@ public:
 	string	name;
 };
 
-//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
 //!
 class FECORE_API FEModel : public FECoreBase, public CallbackHandler
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMODEL_ID)
 
 public:
 	enum {MAX_STRING = 256};
@@ -139,6 +122,7 @@ public:
 
 public: // reverse control solver interface
 	bool RCI_Init();
+	bool RCI_Restart();
 	bool RCI_Rewind();
 	bool RCI_Advance();
 	bool RCI_Finish();
@@ -171,6 +155,9 @@ public:	// --- Load controller functions ----
 	//! Add a load controller to the model
 	void AddLoadController(FELoadController* plc);
 
+	//! replace a load controller
+	void ReplaceLoadController(int n, FELoadController* plc);
+
 	//! get a load controller
 	FELoadController* GetLoadController(int i);
 
@@ -186,6 +173,17 @@ public:	// --- Load controller functions ----
 
 	//! Get a load controller for a parameter (returns null if the param is not under load control)
 	FELoadController* GetLoadController(FEParam* p);
+
+public:	// --- mesh data generators ---
+
+	//! Add a mesh data generator to the model
+	void AddMeshDataGenerator(FEMeshDataGenerator* pmd);
+
+	//! get a mesh data generator
+	FEMeshDataGenerator* GetMeshDataGenerator(int i);
+
+	//! get the number of mesh data generators
+	int MeshDataGenerators() const;
 
 public: // --- Material functions ---
 
@@ -221,35 +219,6 @@ public:
 	int InitialConditions();
 	FEInitialCondition* InitialCondition(int i);
 	void AddInitialCondition(FEInitialCondition* pbc);
-
-	// nodal loads
-	int NodalLoads();
-	FENodalLoad* NodalLoad(int i);
-	void AddNodalLoad(FENodalLoad* pfc);
-
-	// surface loads
-	int SurfaceLoads();
-	FESurfaceLoad* SurfaceLoad(int i);
-	void AddSurfaceLoad(FESurfaceLoad* psl);
-
-	// edge loads
-	int EdgeLoads();
-	FEEdgeLoad* EdgeLoad(int i);
-	void AddEdgeLoad(FEEdgeLoad* psl);
-
-public: // --- Body load functions --- 
-
-	//! Add a body load to the model
-	void AddBodyLoad(FEBodyLoad* pf);
-
-	//! get the number of body loads
-	int BodyLoads();
-
-	//! return a pointer to a body load
-	FEBodyLoad* GetBodyLoad(int i);
-
-	//! Init body loads
-	bool InitBodyLoads();
 
 public: // --- Analysis steps functions ---
 
@@ -337,9 +306,6 @@ public:	// --- Model Loads ----
 	//! initialize model loads
 	bool InitModelLoads();
 
-	//! find a surface load based on the name
-	FESurfaceLoad* FindSurfaceLoad(const std::string& loadName);
-
 public:	// --- Mesh adaptors ---
 	//! return number of mesh adaptors
 	int MeshAdaptors();
@@ -354,6 +320,9 @@ public: // --- parameter functions ---
 
 	//! evaluate all load controllers at some time
 	void EvaluateLoadControllers(double time);
+
+	// evaluate all mesh data
+	void EvaluateDataGenerators(double time);
 
 	//! evaluate all load parameters
 	virtual bool EvaluateLoadParameters();
@@ -383,8 +352,8 @@ public:	// --- Miscellaneous routines ---
 	DOFS& GetDOFS();
 
 	//! Get the index of a DOF
-	int GetDOFIndex(const char* sz);
-	int GetDOFIndex(const char* szvar, int n);
+	int GetDOFIndex(const char* sz) const;
+	int GetDOFIndex(const char* szvar, int n) const;
 
 	//! serialize data for restarts
 	void Serialize(DumpStream& ar) override;
@@ -393,22 +362,28 @@ public:	// --- Miscellaneous routines ---
 	//! Derived classes can override this
 	virtual void SerializeGeometry(DumpStream& ar);
 
-	//! set the module name
-	void SetModuleName(const std::string& moduleName);
+	//! set the active module
+	void SetActiveModule(const std::string& moduleName);
 
 	//! get the module name
 	string GetModuleName() const;
 
 public:
 	//! Log a message
-	virtual void Log(int ntag, const char* msg);
 	void Logf(int ntag, const char* msg, ...);
 	void BlockLog();
 	void UnBlockLog();
+	bool LogBlocked() const;
+
+public:
+	// Derived classes can use this to implement the actual logging mechanism
+	virtual void Log(int ntag, const char* msg);
 
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);
 	FEGlobalData* GetGlobalData(int i);
+	FEGlobalData* FindGlobalData(const char* szname);
+	int FindGlobalDataIndex(const char* szname);
 	int GlobalDataItems();
 
 	// get/set global data
@@ -418,14 +393,6 @@ public: // Global data
 	int GlobalVariables() const;
 	void AddGlobalVariable(const string& s, double v);
 	const FEGlobalVariable& GetGlobalVariable(int n);
-
-public: // model data
-	void AddModelData(FEModelData* data);
-	FEModelData* GetModelData(int i);
-	int ModelDataItems() const;
-
-	// update all model data
-	void UpdateModelData();
 
 public: // Data retrieval
 
@@ -455,6 +422,10 @@ public:
 	// this can be used to change the update counter
 	void IncrementUpdateCounter();
 
+public:
+	void SetUnits(const char* szunits);
+	const char* GetUnits() const;
+
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 
@@ -464,3 +435,5 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+FECORE_API FECoreBase* CopyFEBioClass(FECoreBase* pc, FEModel* fem);

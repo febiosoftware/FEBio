@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

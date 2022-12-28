@@ -28,8 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBCPrescribedDeformation.h"
-#include <FECore/FELinearConstraintManager.h>
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 #include "FEBioMech.h"
 
 BEGIN_FECORE_CLASS(FEBCPrescribedDeformation, FEPrescribedNodeSet)
@@ -41,12 +40,14 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 {
 	m_scale = 1.0;
 	m_F.unit();
-}
 
-//-----------------------------------------------------------------------------
-bool FEBCPrescribedDeformation::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		FEDofList dof(pfem);
+		dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		SetDOFList(dof);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -105,12 +106,10 @@ FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPres
 	m_F.unit();
 	m_G.zero();
 	m_refNode = -1;
-}
 
-//-----------------------------------------------------------------------------
-bool FEBCPrescribedDeformation2O::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	FEDofList dofs(pfem);
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 }
 
 //-----------------------------------------------------------------------------
@@ -126,11 +125,7 @@ bool FEBCPrescribedDeformation2O::Init()
 void FEBCPrescribedDeformation2O::SetScale(double s, int lc)
 {
 	m_scale = s;
-	if (lc >= 0)
-	{
-		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		GetFEModel()->AttachLoadController(&p, lc);
-	}
+	if (lc >= 0) AttachLoadController(&m_scale, lc);
 }
 
 //-----------------------------------------------------------------------------
@@ -165,8 +160,7 @@ void FEBCPrescribedDeformation2O::SetDeformationHessian(const tens3drs& G)
 //-----------------------------------------------------------------------------
 void FEBCPrescribedDeformation2O::GetNodalValues(int nodelid, std::vector<double>& val)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 	vec3d X1 = mesh.Node(m_refNode).m_r0;
 
 	vec3d X = GetNodeSet()->Node(nodelid)->m_r0;

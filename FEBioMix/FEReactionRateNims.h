@@ -27,10 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
-#include "FEBioFluid/FEFluidSolutes.h"
-#include "FEBioFluid/FESolutesMaterial.h"
-#include "FEBioFluid/FEMultiphasicFSI.h"
+#include "FEChemicalReaction.h"
 
 //-----------------------------------------------------------------------------
 //! Concentration-history-dependent reaction rate.
@@ -45,8 +42,7 @@ class FEBIOMIX_API FEReactionRateNims : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateNims(FEModel* pfem) : FEReactionRate(pfem)
-    { m_trel = 0; m_lid = m_cmax = -1; }
+	FEReactionRateNims(FEModel* pfem);
 	
 	//! data initialization and checking
 	bool Init() override;

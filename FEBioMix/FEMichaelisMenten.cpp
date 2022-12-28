@@ -28,17 +28,31 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMichaelisMenten.h"
+#include "FESoluteInterface.h"
+#include "FEMultiphasic.h"
 #include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEMichaelisMenten, FEChemicalReaction)
 	ADD_PARAMETER(m_Km, "Km");
 	ADD_PARAMETER(m_c0, "c0");
+
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
+
+//-----------------------------------------------------------------------------
+FEMichaelisMenten::FEMichaelisMenten(FEModel* pfem) : FEChemicalReaction(pfem) 
+{ 
+	m_Rid = m_Pid = -1; 
+	m_Km = m_c0 = 0; 
+	m_Rtype = false; 
+}
 
 //-----------------------------------------------------------------------------
 //! data initialization and checking
@@ -84,26 +98,14 @@ bool FEMichaelisMenten::Init()
 //! molar supply at material point
 double FEMichaelisMenten::ReactionSupply(FEMaterialPoint& pt)
 {
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
-
 	// get reaction rate
 	double Vmax = m_pFwd->ReactionRate(pt);
 	double c = 0.0;
 	if (m_Rtype) {
-		c = m_pMP->SBMConcentration(pt, m_Rid);
+		c = m_psm->SBMConcentration(pt, m_Rid);
 	}
 	else {
-        if (m_pMP)
-            c = spt.m_ca[m_Rid];
-        else if (m_pFS)
-            c = fspt.m_ca[m_Rid];
-        else if (m_pSM)
-            c = smpt.m_ca[m_Rid];
-        else if (m_pMF)
-            c = mfpt.m_ca[m_Rid];
+		c = m_psm->GetActualSoluteConcentration(pt, m_Rid);
 	}
 
 	double zhat = 0;
@@ -116,53 +118,27 @@ double FEMichaelisMenten::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 mat3ds FEMichaelisMenten::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-	FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint& bfpt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
-	
-	double c = 0.0;
+	double ca = 0.0;
 	double dcdJ = 0.0;
 	if (m_Rtype) {
-		c = m_pMP->SBMConcentration(pt, m_Rid);
+		FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor()); assert(pbm);
+		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+		ca = m_psm->SBMConcentration(pt, m_Rid);
 		double J = ept.m_J;
-        double phi0 = 0.0;
-        if (m_pMP)
-            phi0 = bpt.m_phi0t;
-        else if (m_pSM || m_pMF || m_pFS)
-            phi0 = bfpt.m_phi0;
-		dcdJ = -c/(J-phi0);
+        double phi0 = pbm->GetReferentialSolidVolumeFraction(pt);
+		dcdJ = -ca/(J-phi0);
 	}
 	else {
-        if (m_pMP)
-        {
-            c = spt.m_ca[m_Rid];
-            dcdJ = spt.m_dkdJ[m_Rid]*spt.m_c[m_Rid];
-        }
-        else if (m_pFS)
-        {
-            c = fspt.m_ca[m_Rid];
-            dcdJ = fspt.m_dkdJ[m_Rid]*fspt.m_c[m_Rid];
-        }
-        else if (m_pSM)
-        {
-            c = smpt.m_ca[m_Rid];
-            dcdJ = smpt.m_dkdJ[m_Rid]*smpt.m_c[m_Rid];
-        }
-        else if (m_pMF)
-        {
-            c = mfpt.m_ca[m_Rid];
-            dcdJ = mfpt.m_dkdJ[m_Rid]*mfpt.m_c[m_Rid];
-        }
+		ca = m_psm->GetActualSoluteConcentration(pt, m_Rid);
+		double c = m_psm->GetEffectiveSoluteConcentration(pt, m_Rid);
+		double dkdJ = m_psm->dkdJ(pt, m_Rid);
+		dcdJ = dkdJ*c;
 	}
 	
 	double dzhatdJ = 0;
-	if (c > m_c0) {
+	if (ca > m_c0) {
         double Vmax = m_pFwd->ReactionRate(pt);
-        dzhatdJ = dcdJ*m_Km*Vmax/SQR(m_Km + c);
+        dzhatdJ = dcdJ*m_Km*Vmax/SQR(m_Km + ca);
     }
 	
 	return mat3dd(1)*dzhatdJ;
@@ -179,38 +155,16 @@ double FEMichaelisMenten::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 //! tangent of molar supply with effective concentration at material point
 double FEMichaelisMenten::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
-	
-	if (m_Rtype) {
-        return 0;
-	}
-	else if (m_Rid != sol)
-        return 0;
-	
-    double c = 0.0;
-    if (m_pMP)
-        c = spt.m_ca[m_Rid];
-    else if (m_pFS)
-        c = fspt.m_ca[m_Rid];
-    else if (m_pSM)
-        c = smpt.m_ca[m_Rid];
-    else if (m_pMF)
-        c = mfpt.m_ca[m_Rid];
-    
+	if (m_Rtype || (m_Rid != sol)) return 0;
+
 	double dzhatdc = 0;
-	if (c > m_c0) {
+	double ca = m_psm->GetActualSoluteConcentration(pt, m_Rid);
+	if (ca > m_c0) {
         double Vmax = m_pFwd->ReactionRate(pt);
-        if (m_pMP)
-            dzhatdc = m_Km*Vmax/SQR(m_Km + c)*(spt.m_k[m_Rid] + spt.m_dkdc[m_Rid][m_Rid]*spt.m_c[m_Rid]);
-        else if (m_pFS)
-            dzhatdc = m_Km*Vmax/SQR(m_Km + c)*(fspt.m_k[m_Rid] + fspt.m_dkdc[m_Rid][m_Rid]*fspt.m_c[m_Rid]);
-        else if (m_pSM)
-            dzhatdc = m_Km*Vmax/SQR(m_Km + c)*(smpt.m_k[m_Rid] + smpt.m_dkdc[m_Rid][m_Rid]*smpt.m_c[m_Rid]);
-        else if (m_pMF)
-            dzhatdc = m_Km*Vmax/SQR(m_Km + c)*(mfpt.m_k[m_Rid] + mfpt.m_dkdc[m_Rid][m_Rid]*mfpt.m_c[m_Rid]);
+		double k = m_psm->GetPartitionCoefficient(pt, m_Rid);
+		double c = m_psm->GetEffectiveSoluteConcentration(pt, m_Rid);
+		double dkdc = m_psm->dkdc(pt, m_Rid, m_Rid);
+		dzhatdc = m_Km*Vmax/SQR(m_Km + ca)*(k + dkdc*c);
     }
 	
 	return dzhatdc;

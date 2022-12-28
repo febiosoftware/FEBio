@@ -32,12 +32,13 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
+#include "FELogNonlinearElasticFluid.h"
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFluid, FEFluidMaterial)
 
 	// material parameters
-    ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+    ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
     ADD_PROPERTY(m_pElastic, "elastic", FEProperty::Optional);
 
 END_FECORE_CLASS();
@@ -59,12 +60,13 @@ FEFluid::FEFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 //! FEFluid initialization
 bool FEFluid::Init()
 {
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
+    m_Tr = GetGlobalConstant("T");
     if (m_pElastic == nullptr) {
         m_pElastic = fecore_alloc(FELinearElasticFluid, GetFEModel());
     }
     FELinearElasticFluid* pLN = dynamic_cast<FELinearElasticFluid*>(m_pElastic);
     FENonlinearElasticFluid* pNL = dynamic_cast<FENonlinearElasticFluid*>(m_pElastic);
+    FELogNonlinearElasticFluid* pLNL = dynamic_cast<FELogNonlinearElasticFluid*>(m_pElastic);
     if (pLN) {
         pLN->m_k = m_k;
         pLN->m_rhor = m_rhor;
@@ -73,12 +75,16 @@ bool FEFluid::Init()
         pNL->m_k = m_k;
         pNL->m_rhor = m_rhor;
     }
+    else if (pLNL) {
+        pLNL->m_k = m_k;
+        pLNL->m_rhor = m_rhor;
+    }
     return true;
 }
 
 //-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
-FEMaterialPoint* FEFluid::CreateMaterialPointData()
+FEMaterialPointData* FEFluid::CreateMaterialPointData()
 {
 	return new FEFluidMaterialPoint();
 }
@@ -109,6 +115,12 @@ double FEFluid::Pressure(const double e, const double T)
 double FEFluid::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 {
     return m_pElastic->Tangent_Strain(mp);
+}
+
+//-----------------------------------------------------------------------------
+double FEFluid::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
+{
+    return m_pElastic->Tangent_Strain_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------

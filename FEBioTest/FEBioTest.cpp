@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include "FETangentDiagnostic.h"
 #include "FERestartDiagnostics.h"
 #include "FEJFNKTangentDiagnostic.h"
-#include "FEBioEigenSolver.h"
+#include "FEMaterialTest.h"
 #include "FEResetTest.h"
 
 namespace FEBioTest
@@ -44,7 +44,8 @@ void InitModule()
 	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
 	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
 	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
-	REGISTER_FECORE_CLASS(FEBioEigenSolver, "eigen");
 	REGISTER_FECORE_CLASS(FEResetTest, "reset_test");
+
+	REGISTER_FECORE_CLASS(FEMaterialTest, "material test");
 }
 }

@@ -38,17 +38,16 @@ void FEConstPrestrainGradient::MaterialPointData::Init(bool bflag)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEConstPrestrainGradient::MaterialPointData::Copy()
+FEMaterialPointData* FEConstPrestrainGradient::MaterialPointData::Copy()
 { 
-	MaterialPointData* pm = new MaterialPointData(); 
-	pm->Fp = Fp;
+	MaterialPointData* pm = new MaterialPointData(*this); 
 	return pm;
 }
 
 //-----------------------------------------------------------------------------
 void FEConstPrestrainGradient::MaterialPointData::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & Fp;
 }
 
@@ -66,7 +65,7 @@ FEConstPrestrainGradient::FEConstPrestrainGradient(FEModel* pfem) : FEPrestrainG
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEConstPrestrainGradient::CreateMaterialPointData()
+FEMaterialPointData* FEConstPrestrainGradient::CreateMaterialPointData()
 {
 	return new MaterialPointData;
 }

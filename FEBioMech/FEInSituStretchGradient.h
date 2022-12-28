@@ -42,13 +42,13 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 private:
-	FEParamVec3* GetFiberProperty();
+	FEVec3dValuator* GetFiberProperty();
 
 public:
 	FEParamDouble	m_lam;	//!< in-situ stretch
 	bool			m_biso;	//!< isochoric generator option
 
-	FEParamVec3*	m_fiber;	// fiber property of the elastic material.
+	FEVec3dValuator*	m_fiber;	// fiber property of the elastic material.
 
 	DECLARE_FECORE_CLASS();
 };

@@ -75,5 +75,5 @@ protected:
     int                 m_dofVZ;
     
 protected:
-    bool                m_breset;   //!< flag for when Reset() is called
+    bool                m_breset;   //! flag for calling reset
 };

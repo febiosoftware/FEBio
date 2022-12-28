@@ -37,10 +37,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // This class uses the deprecated "c" variable to denote concentrations.
-class FENodeConcentration : public FENodeLogData
+class FENodeConcentration : public FELogNodeData
 { 
 public: 
-	FENodeConcentration(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeConcentration(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 

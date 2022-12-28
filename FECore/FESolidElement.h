@@ -85,6 +85,6 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 public:
-	vector<bool>    m_bitfc;    //!< flag for interface nodes
-	vector<mat3d>	m_J0i;		//!< inverse of reference Jacobian
+	std::vector<bool>    m_bitfc;    //!< flag for interface nodes
+	std::vector<mat3d>	m_J0i;		//!< inverse of reference Jacobian
 };

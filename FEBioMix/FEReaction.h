@@ -27,15 +27,12 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
-#include "FEBioMix/FESolutesMaterialPoint.h"
+#include <FECore/FEMaterial.h>
+#include "febiomix_api.h"
 #include <map>
 
 //-----------------------------------------------------------------------------
-class FEMultiphasic;
-class FEFluidSolutes;
-class FESolutesMaterial;
-class FEMultiphasicFSI;
+class FESoluteInterface;
 
 //-----------------------------------------------------------------------------
 //! Base class for reactions.
@@ -43,7 +40,7 @@ class FEMultiphasicFSI;
 typedef std::map<int,int> intmap;
 typedef std::map<int,int>::iterator itrmap;
 
-class FEBIOMIX_API FEReaction : public FEMaterial
+class FEBIOMIX_API FEReaction : public FEMaterialProperty
 {
 public:
     //! constructor
@@ -55,10 +52,51 @@ public:
 public:
     //! set stoichiometric coefficient
     void SetStoichiometricCoefficient(intmap& RP, int id, int v) { RP.insert(std::pair<int, int>(id, v)); }
-    
+
+public: //TODO: Make this protected again
+    FESoluteInterface* m_psm;   //!< solute interface to parent class
+};
+
+
+//-----------------------------------------------------------------------------
+class FEBIOMIX_API FEReactionSpeciesRef : public FEMaterialProperty
+{
 public:
-    FEMultiphasic*    m_pMP;        //!< pointer to multiphasic material where reaction occurs
-    FEFluidSolutes*    m_pFS;        //!< pointer to fluid solutes material where reaction occurs
-    FESolutesMaterial* m_pSM;       //!< pointer to solute (split) material where reaction occurs
-    FEMultiphasicFSI* m_pMF;       //!< pointer to multiphasic fsi material where reaction occurs
+    enum SpeciesType { UnknownSpecies, SoluteSpecies, SBMSpecies };
+
+public:
+    FEReactionSpeciesRef(FEModel* fem);
+
+    bool Init() override;
+
+    int GetSpeciesType() const;
+
+    bool IsSolute() const;
+    bool IsSBM() const;
+
+public:
+    int     m_speciesID;        // the species ID
+    int     m_v;                // stoichiometric coefficient
+
+    // these parameters are mostly for parsing older files that used "sol" or "sbm"
+    int     m_solId;
+    int     m_sbmId;
+
+private:
+    int     m_speciesType;  // solute or sbm?
+
+    DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMIX_API FEReactantSpeciesRef : public FEReactionSpeciesRef
+{
+public: FEReactantSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEReactantSpeciesRef)
+};
+
+class FEBIOMIX_API FEProductSpeciesRef : public FEReactionSpeciesRef {
+public: FEProductSpeciesRef(FEModel* fem) : FEReactionSpeciesRef(fem) {}
+      DECLARE_FECORE_CLASS();
+      FECORE_BASE_CLASS(FEProductSpeciesRef)
 };

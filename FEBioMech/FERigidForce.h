@@ -31,8 +31,17 @@ SOFTWARE.*/
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
+class FERigidLoad : public FEModelLoad
+{
+public:
+	FERigidLoad(FEModel* fem) : FEModelLoad(fem) {}
+
+	FECORE_BASE_CLASS(FERigidLoad)
+};
+
+//-----------------------------------------------------------------------------
 //! an axial force between two rigid bodies
-class FEBIOMECH_API FERigidAxialForce : public FEModelLoad
+class FEBIOMECH_API FERigidAxialForce : public FERigidLoad
 {
 public:
 	//! constructor
@@ -45,10 +54,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! Residual
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 public:
 	int		m_ida, m_idb;		//!< rigid body ID's
@@ -66,7 +75,7 @@ public:
 //!       were the force is const, and one where the force is a follower force.
 //!       Perhaps I can derive the const force from FENodalLoad since it applies
 //!       a force directly to the rigid "node".
-class FEBIOMECH_API FERigidBodyForce : public FEModelLoad
+class FEBIOMECH_API FERigidBodyForce : public FERigidLoad
 {
 public:
 	enum { FORCE_LOAD, FORCE_FOLLOW, FORCE_TARGET };	// values for m_ntype
@@ -84,10 +93,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! forces
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 public:
 	void SetRigidMaterialID(int nid);
@@ -107,6 +116,47 @@ private:
 	double	m_force;		//!< applied force
 	double	m_force0;		//!< initial force at activation (used with brelative flag)
 	double	m_trg;			//!< target force for target case
+	int		m_rid;
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+//! rigid body moment
+class FEBIOMECH_API FERigidBodyMoment : public FERigidLoad
+{
+public:
+	FERigidBodyMoment(FEModel* pfem);
+
+	//! Activation
+	void Activate() override;
+
+	//! initialization
+	bool Init() override;
+
+	//! Serialization
+	void Serialize(DumpStream& ar) override;
+
+	//! forces
+	void LoadVector(FEGlobalVector& R) override;
+
+	//! Stiffness matrix
+	void StiffnessMatrix(FELinearSystem& LS) override;
+
+public:
+	void SetRigidMaterialID(int nid);
+
+	void SetDOF(int bc);
+
+	void SetValue(double f);
+
+private:
+	int		m_rigidMat;		//!< rigid body material id
+	int		m_dof;			//!< force direction
+	bool	m_brelative;	//!< relative flag
+	double	m_value;		//!< applied moment
+
+	double	m_value0;		//!< initial moment at activation (used with brelative flag)
 	int		m_rid;
 
 	DECLARE_FECORE_CLASS();

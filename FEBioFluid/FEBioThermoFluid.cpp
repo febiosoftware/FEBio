@@ -36,12 +36,15 @@ SOFTWARE.*/
 #include "FEFluidNormalHeatFlux.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
-#include "FEIdealLiquid.h"
 #include "FERealLiquid.h"
 #include "FEFluidConstantConductivity.h"
 #include "FETempDependentConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
+#include "FEFluidModule.h"
+#include "FEThermoFluidAnalysis.h"
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
@@ -51,8 +54,8 @@ const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARI
     case DISPLACEMENT                : return "displacement"               ; break;
     case RELATIVE_FLUID_VELOCITY     : return "relative fluid velocity"    ; break;
     case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
-    case FLUID_DILATATION            : return "fluid dilation"             ; break;
-    case FLUID_DILATATION_TDERIV     : return "fluid dilation tderiv"      ; break;
+    case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+    case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
     case TEMPERATURE                 : return "temperature"                ; break;
     case TEMPERATURE_TDERIV          : return "temperature tderiv"         ; break;
     }
@@ -68,9 +71,14 @@ void FEBioThermoFluid::InitModule()
     febio.RegisterDomain(new FEThermoFluidDomainFactory);
 
     // define the thermo-fluid module
-    febio.CreateModule("thermo-fluid");
+    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
     febio.SetModuleDependency("fluid");
 
+    //-----------------------------------------------------------------------------
+    // analyis classes (default type must match module name!)
+    REGISTER_FECORE_CLASS(FEThermoFluidAnalysis, "thermo-fluid");
+
+    //-----------------------------------------------------------------------------
     REGISTER_FECORE_CLASS(FEThermoFluidSolver, "thermo-fluid");
 
     REGISTER_FECORE_CLASS(FEThermoFluid, "thermo-fluid");
@@ -82,11 +90,32 @@ void FEBioThermoFluid::InitModule()
 
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
-    REGISTER_FECORE_CLASS(FEIdealLiquid, "ideal liquid");
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
     REGISTER_FECORE_CLASS(FETempDependentConductivity, "temp-dependent thermal conductivity");
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure");
 
+    //-----------------------------------------------------------------------------
+    // Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEThermoFluidAnalysis>([](FEThermoFluidAnalysis* pc) {
+        pc->m_nanalysis = FEThermoFluidAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = false;
+        pc->m_bdivreform = false;
+    }));
+    
     febio.SetActiveModule(0);
 }

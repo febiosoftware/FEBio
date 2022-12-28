@@ -33,12 +33,13 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
-class FEBIOMECH_API FELogObjectData : public FECoreBase
+class FEBIOMECH_API FELogObjectData : public FELogData
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FELOGOBJECTDATA_ID)
+	FECORE_BASE_CLASS(FELogObjectData)
 
 public:
-	FELogObjectData(FEModel* fem) : FECoreBase(fem) {}
+	FELogObjectData(FEModel* fem) : FELogData(fem) {}
 	virtual ~FELogObjectData(){}
 	virtual double value(FERigidBody& rb) = 0;
 };
@@ -47,11 +48,11 @@ public:
 class FEBIOMECH_API ObjectDataRecord : public DataRecord
 {
 public:
-	ObjectDataRecord(FEModel* pfem, const char* szfile);
-	double Evaluate(int item, int ndata);
-	void SetData(const char* sz);
-	void SelectAllItems();
-	int Size() const;
+	ObjectDataRecord(FEModel* pfem);
+	double Evaluate(int item, int ndata) override;
+	void SetData(const char* sz) override;
+	void SelectAllItems() override;
+	int Size() const override;
 
 private:
 	vector<FELogObjectData*>	m_Data;

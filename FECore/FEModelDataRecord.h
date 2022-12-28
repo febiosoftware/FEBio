@@ -29,9 +29,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! This is the base class for a model data
-class FECORE_API FEModelLogData : public FECoreBase
+class FECORE_API FEModelLogData : public FELogData
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FELOGMODELDATA_ID)
+	FECORE_BASE_CLASS(FEModelLogData)
 
 public:
 	FEModelLogData(FEModel* fem);
@@ -44,7 +45,7 @@ public:
 class FECORE_API FEModelDataRecord : public DataRecord
 {
 public:
-	FEModelDataRecord(FEModel* pfem, const char* szfile);
+	FEModelDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
 	void SetData(const char* sz);
 	void ClearData();

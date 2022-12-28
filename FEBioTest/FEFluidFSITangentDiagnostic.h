@@ -61,7 +61,7 @@ private:
 class FEFluidFSITangentDiagnostic : public FEDiagnostic
 {
 public:
-    FEFluidFSITangentDiagnostic(FEModel& fem);
+    FEFluidFSITangentDiagnostic(FEModel* fem);
     virtual ~FEFluidFSITangentDiagnostic(){}
     
     bool Init();

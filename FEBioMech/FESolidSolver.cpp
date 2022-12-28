@@ -43,15 +43,19 @@ SOFTWARE.*/
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FENLConstraint.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
 #include <assert.h>
 #include "FEBioMech.h"
+#include "FESolidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_FECORE_CLASS(FESolidSolver, FENewtonSolver)
-	ADD_PARAMETER(m_Dtol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
+	ADD_PARAMETER(m_Dtol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol");
+	ADD_PARAMETER(m_Etol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
+	ADD_PARAMETER(m_Rtol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 	ADD_PARAMETER(m_beta        , "beta"        );
 	ADD_PARAMETER(m_gamma       , "gamma"       );
 	ADD_PARAMETER(m_bnew_update , "use_new_rigid_update");
@@ -80,30 +84,15 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
 
 	m_rigidSolver.AllowMixedBCs(true);
 
-	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT), VAR_VEC3);
-	dofs.SetDOFName(varU, 0, "x");
-	dofs.SetDOFName(varU, 1, "y");
-	dofs.SetDOFName(varU, 2, "z");
-	int varSQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION), VAR_VEC3);
-	dofs.SetDOFName(varSQ, 0, "u");
-	dofs.SetDOFName(varSQ, 1, "v");
-	dofs.SetDOFName(varSQ, 2, "w");
-	int varRQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION), VAR_VEC3);
-	dofs.SetDOFName(varRQ, 0, "Ru");
-	dofs.SetDOFName(varRQ, 1, "Rv");
-	dofs.SetDOFName(varRQ, 2, "Rw");
-	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
-	dofs.SetDOFName(varV, 0, "vx");
-	dofs.SetDOFName(varV, 1, "vy");
-	dofs.SetDOFName(varV, 2, "vz");
-
 	// get the DOF indices
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
-	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
-	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -121,7 +110,7 @@ bool FESolidSolver::Init()
 
 	// allocate vectors
 	int neq = m_neq;
-	m_Fn.assign(neq, 0);
+//	m_Fn.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
@@ -137,7 +126,7 @@ bool FESolidSolver::Init()
 	gather(m_Ut, mesh, m_dofSQ[2]);
 
 	// set the dynamic update flag only if we are running a dynamic analysis
-	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
+	bool b = (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC ? true : false);
 	for (int i = 0; i < mesh.Domains(); ++i)
 	{
 		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
@@ -260,7 +249,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	// update velocity and accelerations
 	// for dynamic simulations
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		int N = mesh.Nodes();
 		double dt = fem.GetTime().timeIncrement;
@@ -317,10 +306,10 @@ void FESolidSolver::PrepStep()
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
+//	vector<double> dummy(m_neq, 0.0);
+//	zero(m_Fn);
+//	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
+//	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -543,17 +532,17 @@ bool FESolidSolver::StiffnessMatrix()
 		dom.StiffnessMatrix(LS);
 	}
 
-	// calculate the body force stiffness matrix for each domain
-	int NBL = fem.BodyLoads();
-	for (int j = 0; j<NBL; ++j)
+	// calculate the model load stiffness matrix
+	int NML = fem.ModelLoads();
+	for (int j = 0; j<NML; ++j)
 	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
+		FEModelLoad* pml = fem.ModelLoad(j);
+		if (pml->IsActive()) pml->StiffnessMatrix(LS);
 	}
 
 	// Add mass matrix for dynamic problems
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		// scale factor
 		double dt = tp.timeIncrement;
@@ -574,7 +563,7 @@ bool FESolidSolver::StiffnessMatrix()
 	}
 
 	// calculate stiffness matrices for surface loads
-	int nsl = fem.SurfaceLoads();
+/*	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
@@ -583,14 +572,14 @@ bool FESolidSolver::StiffnessMatrix()
 			psl->StiffnessMatrix(LS, tp); 
 		}
 	}
-
+*/
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(LS, tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS, tp);
+	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -652,7 +641,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);// = m_Fn;
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -674,23 +663,23 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.ModelLoads(); ++j)
 	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
+		FEModelLoad* pml = fem.ModelLoad(j);
+		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
 	// calculate inertial forces for dynamic problems
-	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
+	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
 
 	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
+/*	int nsl = fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
-
+*/
 	// calculate contact forces
 	ContactForces(RHS);
 
@@ -703,7 +692,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
 	// add model loads
-	int NML = fem.ModelLoads();
+/*	int NML = fem.ModelLoads();
 	for (int i=0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *fem.ModelLoad(i);
@@ -712,7 +701,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 			mli.LoadVector(RHS, tp);
 		}
 	}
-
+*/
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
 	for (int i=0; i<mesh.Nodes(); ++i)

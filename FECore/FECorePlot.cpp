@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "writeplot.h"
 #include "FESurfaceLoad.h"
 #include "FEDomainMap.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)

@@ -31,7 +31,7 @@ BEGIN_FECORE_CLASS(FEIsotropicLeeSacksUncoupled, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c0, "c0");
 	ADD_PARAMETER(m_c1, "c1");
 	ADD_PARAMETER(m_c2, "c2");
-	ADD_PARAMETER(m_tangent_scale, "tangent_scale")
+	ADD_PARAMETER(m_tangent_scale, "tangent_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

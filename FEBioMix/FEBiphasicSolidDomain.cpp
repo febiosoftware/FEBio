@@ -111,8 +111,8 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
             FEBiphasicMaterialPoint& pb = *mp.ExtractData<FEBiphasicMaterialPoint>();
-			pt.m_r0 = r0;
-			pt.m_rt = rt;
+			mp.m_r0 = r0;
+			mp.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
@@ -137,9 +137,9 @@ bool FEBiphasicSolidDomain::Init()
     // initialize body forces
 	FEModel& fem = *GetFEModel();
 	m_pMat->m_bf.clear();
-    for (int j=0; j<fem.BodyLoads(); ++j)
+    for (int j=0; j<fem.ModelLoads(); ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
         if (pbf) m_pMat->m_bf.push_back(pbf);
     }
 
@@ -198,7 +198,7 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 	int neln_p = el.ShapeFunctions(degree_p);
 
 	// allocate lm
-	lm.resize(neln_d*4);
+	lm.resize(neln_d*4 + 3*neln_d);
 
 	// displacement dofs
 	for (int i=0; i<neln_d; ++i)
@@ -214,6 +214,11 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		// now the pressure dofs
 		lm[4*i + 3] = id[m_dofP];
+
+		// rigid rotational dofs
+		lm[4 * neln_d + 3 * i    ] = id[m_dofR[0]];
+		lm[4 * neln_d + 3 * i + 1] = id[m_dofR[1]];
+		lm[4 * neln_d + 3 * i + 2] = id[m_dofR[2]];
 	}
 
     // substitute interface dofs for solid-shell interfaces
@@ -246,7 +251,7 @@ void FEBiphasicSolidDomain::Reset()
 		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 
 		// initialize referential solid volume fraction
-        pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
+		pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
 	});
 }
 
@@ -897,12 +902,8 @@ void FEBiphasicSolidDomain::Update(const FETimeInfo& tp)
 			}
 		}
 	}
-	// if we encountered an error, we request a running restart
-	if (berr)
-	{
-		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-		throw DoRunningRestart();
-	}
+
+    if (berr) throw NegativeJacobianDetected();
 
 	// also update the nodal pressures
 	UpdateNodalPressures();
@@ -961,8 +962,8 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(rt, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(rt, n);
 			
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
@@ -1167,13 +1168,13 @@ vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
     
     // body force contribution
 	FEModel& fem = *m_pMat->GetFEModel();
-    int nbf = fem.BodyLoads();
+    int nbf = fem.ModelLoads();
     if (nbf) {
         vec3d b(0,0,0);
         for (int i=0; i<nbf; ++i)
 		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
-			if (pbf->IsActive())
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(i));
+			if (pbf && pbf->IsActive())
 			{
 				// negate b because body forces are defined with a negative sign in FEBio
 				b -= pbf->force(mp);

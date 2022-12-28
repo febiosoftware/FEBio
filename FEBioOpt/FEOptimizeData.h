@@ -27,17 +27,14 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FEBioXML/XMLReader.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
 #include "FEObjectiveFunction.h"
 #include <vector>
 #include <string>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 class FEOptimizeMethod;
-
 
 //-----------------------------------------------------------------------------
 //! This class represents an input parameter. Input parameters define the parameter 
@@ -142,7 +139,7 @@ public:
 	FEModel* GetFEModel() { return m_fem; }
 
 	//! solve the FE problem with a new set of parameters
-	bool FESolve(const vector<double>& a);
+	bool FESolve(const std::vector<double>& a);
 
 public:
 	// return the number of input parameters

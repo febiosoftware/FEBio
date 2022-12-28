@@ -28,15 +28,17 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEException.h"
+#include "FESolver.h" // for FENodalDofInfo
 #include <stdarg.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEException::FEException(const char* msg)
+FEException::FEException(const char* msg, int level)
 {
 	if (msg) m_what = msg;
+	m_level = level;
 }
 
 FEException::~FEException()
@@ -61,6 +63,12 @@ void FEException::what(const char* msg, ...)
 	va_end(args);
 
 	m_what = sztxt;
+}
+
+//-----------------------------------------------------------------------------
+int FEException::level() const
+{
+	return m_level;
 }
 
 //-----------------------------------------------------------------------------
@@ -167,4 +175,16 @@ void NegativeJacobian::clearFlag()
 bool NegativeJacobian::IsThrown()
 {
 	return m_bthrown;
+}
+
+//-----------------------------------------------------------------------------
+NANDetected::NANDetected(const FENodalDofInfo& ndi)
+{
+	what("NAN detected in residual vector at index %d.\nNode id = %d, dof = %d ('%s')", ndi.m_eq, ndi.m_node, ndi.m_dof, ndi.szdof);
+}
+
+//-----------------------------------------------------------------------------
+FEMultiScaleException::FEMultiScaleException(int eid, int gpt)
+{
+	what("The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", eid, gpt + 1);
 }

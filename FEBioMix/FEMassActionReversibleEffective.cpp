@@ -28,17 +28,25 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMassActionReversibleEffective.h"
+#include "FESoluteInterface.h"
+#include "FEBiphasic.h"
 
+BEGIN_FECORE_CLASS(FEMassActionReversibleEffective, FEChemicalReaction)
+    // set material properties
+    ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+    ADD_PROPERTY(m_pRev, "reverse_rate", FEProperty::Optional);
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEMassActionReversibleEffective::FEMassActionReversibleEffective(FEModel* pfem) : FEChemicalReaction(pfem) 
+{
+
+}
 
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
 {
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
-    
     // get forward reaction rate
     double k = m_pFwd->ReactionRate(pt);
     
@@ -47,62 +55,22 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
     
     // start with contribution from solutes
     int nsol = 0;
-    if (m_pMP)
-    {
-        nsol = (int)spt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vR = m_vR[i];
-            if (vR > 0) {
-                double c = spt.m_c[i];
-                zhat *= pow(c, vR);
-            }
-        }
-    }
-    else if (m_pFS)
-    {
-        nsol = (int)fspt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vR = m_vR[i];
-            if (vR > 0) {
-                double c = fspt.m_c[i];
-                zhat *= pow(c, vR);
-            }
-        }
-    }
-    else if (m_pFS)
-    {
-        nsol = (int)smpt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vR = m_vR[i];
-            if (vR > 0) {
-                double c = smpt.m_c[i];
-                zhat *= pow(c, vR);
-            }
-        }
-    }
-    else if (m_pFS)
-    {
-        nsol = (int)mfpt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vR = m_vR[i];
-            if (vR > 0) {
-                double c = mfpt.m_c[i];
-                zhat *= pow(c, vR);
-            }
+    nsol = m_psm->Solutes();
+    for (int i=0; i<nsol; ++i) {
+        int vR = m_vR[i];
+        if (vR > 0) {
+            double c = m_psm->GetEffectiveSoluteConcentration(pt, i);
+            zhat *= pow(c, vR);
         }
     }
     
     // add contribution of solid-bound molecules
-    if (m_pMP)
-    {
-        // add contribution of solid-bound molecules
-        const int nsbm = (int)spt.m_sbmr.size();
-        for (int i=0; i<nsbm; ++i) {
-            int vR = m_vR[nsol+i];
-            if (vR > 0) {
-                double c = m_pMP->SBMConcentration(pt, i);
-                zhat *= pow(c, vR);
-            }
+    const int nsbm = m_psm->SBMs();
+    for (int i=0; i<nsbm; ++i) {
+        int vR = m_vR[nsol+i];
+        if (vR > 0) {
+            double c = m_psm->SBMConcentration(pt, i);
+            zhat *= pow(c, vR);
         }
     }
     
@@ -113,11 +81,6 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
 //! molar supply at material point
 double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
 {
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
-    
     // get forward reaction rate
     double k = m_pRev->ReactionRate(pt);
     
@@ -125,63 +88,22 @@ double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
     double zhat = k;
     
     // start with contribution from solutes
-    int nsol = 0;
-    if (m_pMP)
-    {
-        nsol = (int)spt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vP = m_vP[i];
-            if (vP > 0) {
-                double c = spt.m_c[i];
-                zhat *= pow(c, vP);
-            }
-        }
-    }
-    else if (m_pFS)
-    {
-        nsol = (int)fspt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vP = m_vP[i];
-            if (vP > 0) {
-                double c = fspt.m_c[i];
-                zhat *= pow(c, vP);
-            }
-        }
-    }
-    else if (m_pSM)
-    {
-        nsol = (int)smpt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vP = m_vP[i];
-            if (vP > 0) {
-                double c = smpt.m_c[i];
-                zhat *= pow(c, vP);
-            }
-        }
-    }
-    else if (m_pMF)
-    {
-        nsol = (int)mfpt.m_c.size();
-        for (int i=0; i<nsol; ++i) {
-            int vP = m_vP[i];
-            if (vP > 0) {
-                double c = mfpt.m_c[i];
-                zhat *= pow(c, vP);
-            }
+    int nsol = m_psm->Solutes();
+    for (int i=0; i<nsol; ++i) {
+        int vP = m_vP[i];
+        if (vP > 0) {
+            double c = m_psm->GetEffectiveSoluteConcentration(pt, i);
+            zhat *= pow(c, vP);
         }
     }
     
     // add contribution of solid-bound molecules
-    if(m_pMP)
-    {
-        // add contribution of solid-bound molecules
-        const int nsbm = (int)spt.m_sbmr.size();
-        for (int i=0; i<nsbm; ++i) {
-            int vP = m_vP[nsol+i];
-            if (vP > 0) {
-                double c = m_pMP->SBMConcentration(pt, i);
-                zhat *= pow(c, vP);
-            }
+    const int nsbm = m_psm->SBMs();
+    for (int i=0; i<nsbm; ++i) {
+        int vP = m_vP[nsol+i];
+        if (vP > 0) {
+            double c = m_psm->SBMConcentration(pt, i);
+            zhat *= pow(c, vP);
         }
     }
     
@@ -201,24 +123,13 @@ double FEMassActionReversibleEffective::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 mat3ds FEMassActionReversibleEffective::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
     FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
-    FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint& bfpt = *pt.ExtractData<FEBiphasicFSIMaterialPoint>();
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
     
     const int nsol = m_nsol;
     const int nsbm = (int)m_v.size() - nsol;
     double J = ept.m_J;
-    double phi0 = 0.0;
-    if (m_pMF)
-    {
-        phi0 = bfpt.m_phi0;
-    }
-    else
-    {
-        phi0 = bpt.m_phi0t;
-    }
+    double phi0 = pbm->GetReferentialSolidVolumeFraction(pt);
     
     // forward reaction
     double kF = m_pFwd->ReactionRate(pt);
@@ -273,50 +184,16 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
         return 0;
     }
     
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FEFluidSolutesMaterialPoint& fspt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FESolutesMaterial::Point& smpt = *pt.ExtractData<FESolutesMaterial::Point>();
-    FEMultiphasicFSIMaterialPoint& mfpt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
-    
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
     double dzhatFdc = 0;
-    if (m_pMP)
-    {
-        if ((zhatF > 0) && (spt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/spt.m_c[sol];
-    }
-    else if (m_pFS)
-    {
-        if ((zhatF > 0) && (fspt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/fspt.m_c[sol];
-    }
-    else if (m_pSM)
-    {
-        if ((zhatF > 0) && (smpt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/smpt.m_c[sol];
-    }
-    else if (m_pMF)
-    {
-        if ((zhatF > 0) && (mfpt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/mfpt.m_c[sol];
-    }
+    double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+    if ((zhatF > 0) && (c > 0)) dzhatFdc = m_vR[sol]*zhatF/c;
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double dzhatRdc = 0;
-    if (m_pMP)
-    {
-        if ((zhatR > 0) && (spt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/spt.m_c[sol];
-    }
-    else if (m_pFS)
-    {
-        if ((zhatR > 0) && (fspt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/fspt.m_c[sol];
-    }
-    else if (m_pSM)
-    {
-        if ((zhatR > 0) && (smpt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/smpt.m_c[sol];
-    }
-    else if (m_pMF)
-    {
-        if ((zhatR > 0) && (mfpt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/mfpt.m_c[sol];
-    }
+    if ((zhatR > 0) && (c > 0)) dzhatRdc = m_vP[sol]*zhatR/c;
 
     return dzhatFdc - dzhatRdc;
 }

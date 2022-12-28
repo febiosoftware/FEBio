@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FEDataMap.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEMat3dsValuator, FEMAT3DSGENERATOR_ID);
-
 //=============================================================================
 // FEConstValueMat3ds
 //-----------------------------------------------------------------------------
@@ -58,6 +56,10 @@ FEMat3dsValuator* FEConstValueMat3ds::copy()
 //=============================================================================
 // FEMappedValueMat3ds
 //-----------------------------------------------------------------------------
+
+BEGIN_FECORE_CLASS(FEMappedValueMat3ds, FEMat3dsValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
 
 FEMappedValueMat3ds::FEMappedValueMat3ds(FEModel* fem) : FEMat3dsValuator(fem)
 {

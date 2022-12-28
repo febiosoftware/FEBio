@@ -28,8 +28,8 @@
 
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include <FECore/CompactSymmMatrix.h>
 #ifdef __APPLE__
 #include <Accelerate/Accelerate.h>
 #endif
@@ -37,47 +37,60 @@
 // This sparse linear solver uses the Accelerate framework on MAC. 
 class AccelerateSparseSolver : public LinearSolver
 {
+    class   Implementation;
+    
+public:
+    enum FactorizationType {
+        FTSparseFactorizationCholesky = 0,
+        FTSparseFactorizationLDLT = 1,
+        FTSparseFactorizationLDLTUnpivoted = 2,
+        FTSparseFactorizationLDLTSBK = 3,
+        FTSparseFactorizationLDLTTPP = 4,
+        FTSparseFactorizationQR = 5,
+        FTSparseFactorizationCholeskyAtA = 6,
+    };
+    
+    enum OrderMethod {
+        OMSparseOrderAMD = 0,
+        OMSparseOrderMetis = 1,
+        OMSparseOrderCOLAMD = 2,
+    };
+
+    enum IterativeMethod {
+        ITSparseConjugateGradient = 0,
+        ITSparseGMRES = 1,
+        ITSparseDQGMRES = 2,
+        ITSparseFGMRES = 3,
+        ITSparseLSMR = 4,
+    };
+    
 public:
     AccelerateSparseSolver(FEModel* fem);
     ~AccelerateSparseSolver();
+    
+public:
+    void PrintConditionNumber(bool b);
+    void UseIterativeFactorization(bool b);
+    void SetFactorizationType(int ftype);
+    void SetOrderMethod(int order);
+    void SetPrintLevel(int printlevel) override;
+
+    double condition_number();
+    static void MyReportError(const char* message);
+    static void MyReportStatus(const char* message);
+
+public:
+    SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+    bool SetSparseMatrix(SparseMatrix* pA) override;
+    
     bool PreProcess() override;
     bool Factor() override;
     bool BackSolve(double* x, double* y) override;
     void Destroy() override;
+    bool IsIterative() const override;
     
-    SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
-    bool SetSparseMatrix(SparseMatrix* pA) override;
-    
-    void PrintConditionNumber(bool b);
-    
-    double condition_number();
-    
-    void UseIterativeFactorization(bool b);
-    
-protected:
-    
-    CompactMatrix*    m_pA;
-    int                m_mtype; // matrix type
-    
-#ifdef __APPLE__
-    SparseMatrixStructure SMS;
-    SparseMatrix_Double A;
-    SparseOpaqueSymbolicFactorization ASS;
-    SparseOpaqueFactorization_Double ASF;
-    long* colS;
-    std::vector<long> pointers;
-#endif
-    
-    // solver control parameters
-    
-    bool m_iparm3;    // use direct-iterative method
-    
-    // Matrix data
-    int m_n, m_nnz, m_nrhs;
-    
-    bool    m_print_cn;    // estimate and print the condition number
-    
-    bool    m_isFactored;
-    
+private:
+    Implementation*    imp;
+        
     DECLARE_FECORE_CLASS();
 };

@@ -156,13 +156,8 @@ double FENodeForceX::value(int nnode)
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<double>& Fn = psolid_solver->m_Fn;
 		vector<int>& id = mesh.Node(nnode).m_ID;
-
-		double Fx = 0.0;
-		if (id[0] >= 0) Fx = Fn[id[0]];
-		else if (-id[0] - 2 >= 0) Fx = Fr[-id[0] - 2];
-		return Fx;
+		return (-id[0] - 2 >= 0 ? Fr[-id[0] - 2] : 0);
 	}
 	return 0;
 }
@@ -232,13 +227,61 @@ double FELogContactPressure::value(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogContactTractionX::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.x;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionY::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.y;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionZ::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.z;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemPosX::value(FEElement& el)
 {
 	double val = 0.0;
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.x;
 	}
 	return val / (double) nint;
@@ -251,7 +294,7 @@ double FELogElemPosY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.y;
 	}
 	return val / (double) nint;
@@ -264,7 +307,7 @@ double FELogElemPosZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.z;
 	}
 	return val / (double) nint;
@@ -1673,8 +1716,8 @@ double FELogDamage::value(FEElement& el)
         else if (pmg) {
             for (int k=0; k<pmg->Components(); ++k)
             {
-                FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                FEDamageMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                 if (ppd) D += (float) ppd->m_D;
                 else if (pem)
                 {
@@ -1719,7 +1762,7 @@ double FELogOctahedralPlasticStrain::value(FEElement& el)
             {
                 FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
                 FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                 if (prp) D += (float) prp->m_gp[0];
                 else if (prd) D += (float) prd->m_gp[0];
                 else if (pem)
@@ -1803,6 +1846,30 @@ double FELogDiscreteElementForce::value(FEElement& el)
 	double Fm = F * e;
 
 	return Fm;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceX::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.x;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceY::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.y;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceZ::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.z;
+	else return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1981,14 +2048,14 @@ double FELogRigidConnectorRotationZ::value(FENLConstraint& rc)
 double FELogVolumeConstraint::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
-    return (prc ? prc->m_s.m_Vt : 0);
+    return (prc ? prc->EnclosedVolume() : 0);
 }
 
 //-----------------------------------------------------------------------------
 double FELogVolumePressure::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
-    return (prc ? prc->m_s.m_p : 0);
+    return (prc ? prc->Pressure() : 0);
 }
 
 //=============================================================================

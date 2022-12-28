@@ -38,8 +38,6 @@ public:
 protected:
 	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-	bool SetDofList(FEDofList& dofs) override;
-
 private:
 	vec3d	m_r0;
 

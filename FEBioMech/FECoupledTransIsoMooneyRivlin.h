@@ -40,15 +40,15 @@ public:
 	FECoupledTransIsoMooneyRivlin(FEModel* pfem);
 
 public:
-	double	m_c1;	//!< Mooney-Rivlin coefficient C1
-	double	m_c2;	//!< Mooney-Rivlin coefficient C2
-	double	m_c3;	//!< fiber stress scale factor
-	double	m_c4;	//!< exponential scale factor
-	double	m_c5;	//!< slope of linear stress region
-	double	m_flam;	//!< fiber stretch at which fibers are straight
-	double	m_K;	//!< "bulk"-modulus
+	FEParamDouble	m_c1;	//!< Mooney-Rivlin coefficient C1
+    FEParamDouble	m_c2;	//!< Mooney-Rivlin coefficient C2
+    FEParamDouble	m_c3;	//!< fiber stress scale factor
+    FEParamDouble	m_c4;	//!< exponential scale factor
+    FEParamDouble	m_c5;	//!< slope of linear stress region
+    FEParamDouble	m_flam;	//!< fiber stretch at which fibers are straight
+    FEParamDouble	m_K;	//!< "bulk"-modulus
 
-	FEParamVec3		m_fiber;
+	FEVec3dValuator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 void FEBioMeshAdaptorSection::Parse(XMLTag& tag)
 {
-	if (tag.isempty()) return;
+	if (tag.isleaf()) return;
 
 	++tag;
 	do

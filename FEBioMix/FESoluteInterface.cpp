@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <FECore/FEMaterialPoint.h>
 #include "FESoluteInterface.h"
 #include "FESolute.h"
 

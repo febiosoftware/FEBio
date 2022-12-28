@@ -37,6 +37,9 @@ BEGIN_FECORE_CLASS(FEPRLig, FEElasticMaterial)
 	ADD_PARAMETER(m_v0, "v0");
 	ADD_PARAMETER(m_m,  "m");
 	ADD_PARAMETER(m_k, "k");
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 extern tens4ds material_to_spatial(tens4ds& C, mat3d& F);

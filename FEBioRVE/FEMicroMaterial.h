@@ -35,11 +35,11 @@ class FERVEProbe;
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
-class FEMicroMaterialPoint : public FEMaterialPoint
+class FEMicroMaterialPoint : public FEElasticMaterialPoint
 {
 public:
 	//! constructor
-	FEMicroMaterialPoint(FEMaterialPoint* mp);
+	FEMicroMaterialPoint();
 
 	//! Initialize material point data
 	void Init();
@@ -48,7 +48,7 @@ public:
 	void Update(const FETimeInfo& timeInfo);
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! serialize material point data
 	void Serialize(DumpStream& ar);
@@ -96,7 +96,7 @@ public:
 	bool Init() override;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// calculate the average PK1 stress
 	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);

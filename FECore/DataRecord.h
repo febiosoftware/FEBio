@@ -31,12 +31,14 @@ SOFTWARE.*/
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include "FECoreBase.h"
 #include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration
 class FEModel;
 class DumpStream;
+class FEItemList;
 
 //-----------------------------------------------------------------------------
 enum FEDataRecordType {
@@ -60,17 +62,23 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class FECORE_API DataRecord
+class FECORE_API DataRecord : public FECoreBase
 {
+	FECORE_SUPER_CLASS(FEDATARECORD_ID)
+	FECORE_BASE_CLASS(DataRecord)
+
 public:
 	enum {MAX_DELIM=16, MAX_STRING=1024};
 public:
-	DataRecord(FEModel* pfem, const char* szfile, int ntype);
+	DataRecord(FEModel* pfem, int ntype);
 	virtual ~DataRecord();
+
+	bool SetFileName(const char* szfile);
 
 	bool Write();
 
 	void SetItemList(const std::vector<int>& items);
+	virtual void SetItemList(FEItemList* itemList, const std::vector<int>& selection);
 
 	void SetName(const char* sz);
 	void SetDelim(const char* sz);
@@ -103,7 +111,13 @@ protected:
 
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
-
-	FEModel*	m_pfem;
 	FILE*		m_fp;
+};
+
+//=========================================================================
+// Super class for log data classes. 
+class FECORE_API FELogData : public FECoreBase
+{
+public:
+	FELogData(FEModel* fem);
 };

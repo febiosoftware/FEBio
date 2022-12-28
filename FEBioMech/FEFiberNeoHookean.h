@@ -28,11 +28,11 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFiberMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Neo-Hookean law
-
-class FEFiberNH : public FEElasticFiberMaterial
+class FEFiberNH : public FEFiberMaterial
 {
 public:
 	FEFiberNH(FEModel* pfem);
@@ -51,5 +51,14 @@ public:
 	double	m_epsf;
 
 	// declare the parameter list
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+//! Neo-Hookean law
+class FEElasticFiberNH : public FEElasticFiberMaterial_T<FEFiberNH>
+{
+public:
+	FEElasticFiberNH(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberNH>(fem) {}
 	DECLARE_FECORE_CLASS();
 };

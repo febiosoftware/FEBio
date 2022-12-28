@@ -29,9 +29,10 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "MMath.h"
 #include "MEvaluate.h"
+using namespace std;
 
 #ifndef PI
-#define PI	3.1415926535897932385
+#define PI	3.141592653589793
 #endif
 
 //-----------------------------------------------------------------------------

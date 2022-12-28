@@ -26,12 +26,10 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEModelDataRecord.h"
 
-REGISTER_SUPER_CLASS(FEModelLogData, FEMODELLOGDATA_ID);
-
-FEModelLogData::FEModelLogData(FEModel* fem) : FECoreBase(fem) {}
+FEModelLogData::FEModelLogData(FEModel* fem) : FELogData(fem) {}
 FEModelLogData::~FEModelLogData() {}
 
-FEModelDataRecord::FEModelDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_MODEL) {}
+FEModelDataRecord::FEModelDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_MODEL) {}
 double FEModelDataRecord::Evaluate(int item, int ndata)
 {
 	assert(item == 0);
@@ -55,7 +53,7 @@ void FEModelDataRecord::SetData(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FEModelLogData* pdata = fecore_new<FEModelLogData>(sz, m_pfem);
+		FEModelLogData* pdata = fecore_new<FEModelLogData>(sz, GetFEModel());
 		if (pdata) m_data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;

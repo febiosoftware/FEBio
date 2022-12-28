@@ -37,7 +37,7 @@ SOFTWARE.*/
 #include <sstream>
 
 //=============================================================================
-FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+FEMicroMaterialPoint::FEMicroMaterialPoint()
 {
 	m_macro_energy = 0.;
 	m_micro_energy = 0.;
@@ -51,7 +51,7 @@ FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoin
 //! Initialize material point data
 void FEMicroMaterialPoint::Init()
 {
-	FEMaterialPoint::Init();
+	FEElasticMaterialPoint::Init();
 	m_F_prev.unit();
 }
 
@@ -59,9 +59,8 @@ void FEMicroMaterialPoint::Init()
 //! Initialize material point data
 void FEMicroMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
-	FEMaterialPoint::Update(timeInfo);
-	FEElasticMaterialPoint& pt = *ExtractData<FEElasticMaterialPoint>();
-	m_F_prev = pt.m_F;
+	FEElasticMaterialPoint::Update(timeInfo);
+	m_F_prev = m_F;
 
 	// clear rewind stack so the next rewind won't overwrite current state
 	m_rve.RCI_ClearRewindStack();
@@ -69,9 +68,10 @@ void FEMicroMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-FEMaterialPoint* FEMicroMaterialPoint::Copy()
+FEMaterialPointData* FEMicroMaterialPoint::Copy()
 {
-	FEMicroMaterialPoint* pt = new FEMicroMaterialPoint(m_pNext?m_pNext->Copy():0);
+	FEMicroMaterialPoint* pt = new FEMicroMaterialPoint();
+	if (m_pNext) pt->SetNext(m_pNext->Copy());
 	return pt;
 }
 
@@ -79,7 +79,7 @@ FEMaterialPoint* FEMicroMaterialPoint::Copy()
 //! serialize material point data
 void FEMicroMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_S & m_F_prev;
 	ar & m_macro_energy;
 	ar & m_micro_energy;
@@ -118,9 +118,9 @@ FEMicroMaterial::~FEMicroMaterial(void)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMicroMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEMicroMaterial::CreateMaterialPointData()
 {
-	return new FEMicroMaterialPoint(new FEElasticMaterialPoint);
+	return new FEMicroMaterialPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -164,15 +164,14 @@ bool FEMicroMaterial::Init()
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
 	// get the deformation gradient
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+	FEMicroMaterialPoint& pt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
 
 	// calculate the averaged Cauchy stress
-	mat3ds sa = mmpt.m_rve.StressAverage(F, mp);
+	mat3ds sa = pt.m_rve.StressAverage(F, mp);
 	
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
-	mmpt.m_micro_energy = micro_energy(mmpt.m_rve);	
+	pt.m_micro_energy = micro_energy(pt.m_rve);	
 	
 	return sa;
 }

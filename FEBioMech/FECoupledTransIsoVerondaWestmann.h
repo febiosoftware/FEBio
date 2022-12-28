@@ -47,7 +47,7 @@ public:
 	double	m_flam;	//!< fiber stretch at which fibers are straight
 	double	m_K;	//!< "bulk"-modulus
 
-	FEParamVec3		m_fiber;
+	FEVec3dValuator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

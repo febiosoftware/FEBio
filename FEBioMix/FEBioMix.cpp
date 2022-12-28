@@ -78,8 +78,9 @@ SOFTWARE.*/
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
-#include "FESoluteNaturalFlux.hpp"
+#include "FESoluteNaturalFlux.h"
 #include "FEPressureStabilization.h"
+#include "FEMatchingOsmoticCoefficientLoad.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
 
 #include "FESlidingInterface2.h"
@@ -108,6 +109,21 @@ SOFTWARE.*/
 
 #include "FESBMPointSource.h"
 #include "FESolutePointSource.h"
+
+#include "FEFixedFluidPressure.h"
+#include "FEPrescribedFluidPressure.h"
+#include "FEFixedConcentration.h"
+#include "FEPrescribedConcentration.h"
+
+#include "FEInitialFluidPressure.h"
+#include "FEInitialConcentration.h"
+#include "FENodalFluidFlux.h"
+
+#include "FEBiphasicModule.h"
+#include "FEBiphasicAnalysis.h"
+#include "FEBiphasicSoluteAnalysis.h"
+#include "FEMultiphasicAnalysis.h"
+#include <FECore/FEModelUpdate.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -139,8 +155,17 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "biphasic" module
-	febio.CreateModule("biphasic");
+	febio.CreateModule(new FEBiphasicModule, "biphasic", 
+		"{"
+		"   \"title\" : \"Biphasic Analysis\","
+		"   \"info\"  : \"Transient or quasi-static biphasic analysis.\""
+		"}");
+
 	febio.SetModuleDependency("solid");
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEBiphasicAnalysis, "biphasic");
 
 	//-----------------------------------------------------------------------------
 	// solver classes
@@ -162,6 +187,23 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPermRefTransIso      , "perm-ref-trans-iso");
 	REGISTER_FECORE_CLASS(FESolventSupplyStarling, "Starling");
 	REGISTER_FECORE_CLASS(FEActiveConstantSupply , "active-const-supply");
+
+	//-----------------------------------------------------------------------------
+	// Boundary conditions
+	REGISTER_FECORE_CLASS(FEFixedFluidPressure          , "zero fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure     , "prescribed fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedShellFluidPressure, "prescribed shell fluid pressure");
+
+	//-----------------------------------------------------------------------------
+	// Initial conditions
+	REGISTER_FECORE_CLASS(FEInitialFluidPressure     , "initial fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialShellFluidPressure, "initial shell fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
+	REGISTER_FECORE_CLASS(FEInitialShellConcentration, "initial shell concentration");
+
+	//-----------------------------------------------------------------------------
+	// Nodal loads
+	REGISTER_FECORE_CLASS(FENodalFluidFlux, "nodal fluidflux");
 
 	//-----------------------------------------------------------------------------
 	// Surface loads
@@ -215,9 +257,23 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 4, "esyz");
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 5, "esxz");
 
+	//-----------------------------------------------------------------------------
+	// Model update requests (for biphasic module)
+	febio.OnCreateEvent(UpdateModelWhenCreating<FEBiphasicAnalysis>([](FEModelUpdate& fem) {
+		fem.AddPlotVariable("effective fluid pressure");
+		fem.AddPlotVariable("fluid flux");
+		})
+	);
+
+
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
-	febio.CreateModule("solute");
+	febio.CreateModule(new FEBiphasicSoluteModule, "solute",
+		"{"
+		"   \"title\" : \"Biphasic Solute Analysis\","
+		"   \"info\"  : \"Transient or quasi-static biphasic analysis with a single solute.\""
+		"}");
+
 	febio.SetModuleDependency("biphasic");
 
 	//-----------------------------------------------------------------------------
@@ -225,7 +281,11 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FESoluteData, "solute");
 
 	//-----------------------------------------------------------------------------
-	// solver classes
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEBiphasicSoluteAnalysis, "solute");
+
+	//-----------------------------------------------------------------------------
+	// solver classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEBiphasicSoluteSolver, "solute");
 
 	//-----------------------------------------------------------------------------
@@ -237,7 +297,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Materials
 	REGISTER_FECORE_CLASS(FEBiphasicSolute        , "biphasic-solute");
-	REGISTER_FECORE_CLASS(FESolute                , "solute");
+	REGISTER_FECORE_CLASS(FESoluteMaterial        , "solute");
 	REGISTER_FECORE_CLASS(FETriphasic             , "triphasic");
 	REGISTER_FECORE_CLASS(FEDiffConstIso          , "diff-const-iso");
 	REGISTER_FECORE_CLASS(FEDiffConstOrtho        , "diff-const-ortho");
@@ -258,6 +318,11 @@ void FEBioMix::InitModule()
     REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
 
 	//-----------------------------------------------------------------------------
+	// boundary conditions
+	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
+	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
+
+	//-----------------------------------------------------------------------------
 	// Contact interfaces
 	REGISTER_FECORE_CLASS(FESlidingInterface3, "sliding-biphasic-solute");
 
@@ -276,7 +341,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElectricPotential                , "electric potential"  );
 
 	//-----------------------------------------------------------------------------
-	// classes derived from FENodeLogData
+	// classes derived from FELogNodeData
 	REGISTER_FECORE_CLASS(FENodeConcentration, "c");
 
 	//-----------------------------------------------------------------------------
@@ -323,12 +388,21 @@ void FEBioMix::InitModule()
 
 //======================================================================
 // setup the "multiphasic" module
-	febio.CreateModule("multiphasic");
+	febio.CreateModule(new FEMultiphasicModule, "multiphasic",
+		"{"
+		"   \"title\" : \"Multiphasic Analysis\","
+		"   \"info\"  : \"Transient or quasi-static analysis with solutes.\""
+		"}");
+
 	febio.SetModuleDependency("solute");
 
 	//-----------------------------------------------------------------------------
 	// Global data classes
 	REGISTER_FECORE_CLASS(FESBMData, "solid_bound");
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEMultiphasicAnalysis, "multiphasic");
 
 	//-----------------------------------------------------------------------------
 	// solver classes
@@ -362,10 +436,21 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-action-reversible");
 	REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 	REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );
+
+	REGISTER_FECORE_CLASS(FEReactantSpeciesRef, "vR");
+	REGISTER_FECORE_CLASS(FEProductSpeciesRef , "vP");
+	REGISTER_FECORE_CLASS(FEInternalReactantSpeciesRef, "vRi");
+	REGISTER_FECORE_CLASS(FEInternalProductSpeciesRef , "vPi");
+	REGISTER_FECORE_CLASS(FEExternalReactantSpeciesRef, "vRe");
+	REGISTER_FECORE_CLASS(FEExternalProductSpeciesRef , "vPe");
     
 	//-----------------------------------------------------------------------------
 	// Surface loads
-	REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, "matching_osm_coef"     );
+	REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientLoad, "matching_osm_coef", 0x0300); // deprecated, use BC version
+
+	//-----------------------------------------------------------------------------
+	// Boundary conditions
+	REGISTER_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, "matching_osm_coef");
 
 	//-----------------------------------------------------------------------------
 	// Body loads
@@ -375,6 +460,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
 	REGISTER_FECORE_CLASS(FESlidingInterfaceMP      , "sliding-multiphasic"    );
+	REGISTER_FECORE_CLASS(FEAmbientConcentration    , "ambient_concentration"  );
 	REGISTER_FECORE_CLASS(FETiedMultiphasicInterface, "tied-multiphasic"       );
 
 	//-----------------------------------------------------------------------------

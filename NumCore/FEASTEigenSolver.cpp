@@ -26,7 +26,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEASTEigenSolver.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactSymmMatrix.h>
 
 
 BEGIN_FECORE_CLASS(FEASTEigenSolver, EigenSolver)

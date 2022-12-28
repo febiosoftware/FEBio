@@ -70,10 +70,6 @@ public:
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
 
-	void UpdateModel() override;
-	void UpdateContact();
-	void UpdateConstraints();
-
 	//! Update EAS
 	void UpdateEAS(vector<double>& ui);
 	void UpdateIncrementsEAS(vector<double>& ui, const bool binc);

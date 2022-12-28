@@ -29,9 +29,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
 
-FETIMRDamageMaterialPoint::FETIMRDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+FETIMRDamageMaterialPoint::FETIMRDamageMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
 
-FEMaterialPoint* FETIMRDamageMaterialPoint::Copy()
+FEMaterialPointData* FETIMRDamageMaterialPoint::Copy()
 {
 	FETIMRDamageMaterialPoint* pt = new FETIMRDamageMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -40,7 +40,7 @@ FEMaterialPoint* FETIMRDamageMaterialPoint::Copy()
 
 void FETIMRDamageMaterialPoint::Init()
 {
-	FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 
 	// intialize data to zero
 	m_MEmax = 0;
@@ -54,7 +54,7 @@ void FETIMRDamageMaterialPoint::Init()
 
 void FETIMRDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
-	FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 
 	m_MEmax = max(m_MEmax, m_MEtrial);
 	m_FEmax = max(m_FEmax, m_FEtrial);
@@ -62,7 +62,7 @@ void FETIMRDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 void FETIMRDamageMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_MEtrial & m_MEmax & m_Dm;
 	ar & m_FEtrial & m_FEmax & m_Df;
 }
@@ -80,12 +80,21 @@ BEGIN_FECORE_CLASS(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_Fbeta, "Fbeta");
 	ADD_PARAMETER(m_Fsmin, "Fsmin");
 	ADD_PARAMETER(m_Fsmax, "Fsmax");
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEDamageTransIsoMooneyRivlin::FEDamageTransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPointData* FEDamageTransIsoMooneyRivlin::CreateMaterialPointData() 
+{ 
+	return new FETIMRDamageMaterialPoint(new FEElasticMaterialPoint); 
 }
 
 //-----------------------------------------------------------------------------

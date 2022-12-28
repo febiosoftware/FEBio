@@ -31,6 +31,9 @@ SOFTWARE.*/
 //! Abstract base class for shell element domains
 class FECORE_API FEShellDomain : public FEDomain
 {
+	FECORE_SUPER_CLASS(FESHELLDOMAIN_ID)
+	FECORE_BASE_CLASS(FEShellDomain)
+
 public:
 	//! constructor
 	FEShellDomain(FEModel* fem);
@@ -124,6 +127,13 @@ public:
 
 	double Volume(FEShellElement& el) override;
 
+	double DefaultShellThickness() const { return m_h0; }
+
+protected:
+	double	m_h0;
+
 protected:
 	vector<FEShellElementNew>	m_Elem;	//!< array of elements
+
+	DECLARE_FECORE_CLASS();
 };

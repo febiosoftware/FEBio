@@ -35,11 +35,11 @@ SOFTWARE.*/
 //! The solid supply has units of mass/(referential volume)/time
 //!
 
-class FEBIOMECH_API FESolidSupply : public FEMaterial
+class FEBIOMECH_API FESolidSupply : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESolidSupply(FEModel* pfem) : FEMaterial(pfem) {}
+	FESolidSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solid supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;
@@ -49,16 +49,18 @@ public:
 	
 	//! tangent of solute supply with respect to referential density
 	virtual double Tangent_Supply_Density(FEMaterialPoint& mp) = 0;	
+
+	FECORE_BASE_CLASS(FESolidSupply)
 };
 
 //-----------------------------------------------------------------------------
 //! Material point data for remodeling elastic materials
-class FEBIOMECH_API FERemodelingMaterialPoint : public FEMaterialPoint
+class FEBIOMECH_API FERemodelingMaterialPoint : public FEMaterialPointData
 {
 public:
-	FERemodelingMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FERemodelingMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
 	void Init();
     
@@ -113,7 +115,7 @@ public:
 	mat3ds Tangent_Stress_Density(FEMaterialPoint& pt);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override
+	FEMaterialPointData* CreateMaterialPointData() override
 	{
 		return new FERemodelingMaterialPoint(m_pBase->CreateMaterialPointData());
 	}

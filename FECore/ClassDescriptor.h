@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <vector>
 #include "fecore_api.h"
 
-class FECORE_API ClassDescriptor
+class FECORE_API FEClassDescriptor
 {
 public:
 	class Variable
@@ -62,6 +62,7 @@ public:
 
 		void AddVariable(Variable* v) { m_var.push_back(v); }
 
+		Variable* GetVariable(int i) { return m_var[i]; }
 		const Variable* GetVariable(int i) const { return m_var[i]; }
 
 	public:
@@ -70,12 +71,14 @@ public:
 	};
 
 public:
-	ClassDescriptor(const std::string& classType) : m_var("root", classType) {}
+	FEClassDescriptor(const std::string& classType) : m_var("root", classType) {}
 
 	void AddVariable(Variable* v) { m_var.AddVariable(v); }
 
 	ClassVariable* Root() { return &m_var; }
 	const ClassVariable* Root() const { return &m_var; }
+
+	SimpleVariable* FindParameter(const char* szparam);
 
 	const std::string& ClassType() const { return m_var.m_type; }
 

@@ -25,21 +25,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! Fluid material point class.
 //
-class FEBIOFLUID_API FEThermoFluidMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEThermoFluidMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEThermoFluidMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+	FEThermoFluidMaterialPoint(FEMaterialPointData* pt);
 
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
     //! data serialization
     void Serialize(DumpStream& ar);

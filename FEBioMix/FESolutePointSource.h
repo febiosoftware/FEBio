@@ -27,10 +27,11 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
 #include <unordered_map>
+#include "febiomix_api.h"
 
 class FESolidElement;
 
-class FESolutePointSource : public FEBodyLoad
+class FEBIOMIX_API FESolutePointSource : public FEBodyLoad
 {
 public:
 	FESolutePointSource(FEModel* fem);
@@ -68,10 +69,10 @@ public:
 	void SetAccumulateCAFlag(bool b);
 
 	//! Evaluate force vector
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! evaluate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& S) override;
 
 	//! return all the elements in the given radius
 	void FindNodesInRadius(std::vector<FEElement*>& possible_nodes, double& total_elem);

@@ -47,5 +47,31 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
-	GetBuilder()->SetModuleName(szt);
+
+	// some special case
+	if (strcmp(szt, "explicit-solid") == 0)
+	{
+		szt = "solid";
+		GetBuilder()->SetDefaultSolver("explicit-solid");
+	}
+	else if (strcmp(szt, "CG-solid") == 0)
+	{
+		szt = "solid";
+		GetBuilder()->SetDefaultSolver("CG-solid");
+	}
+
+	GetBuilder()->SetActiveModule(szt);
+
+	if (tag.isempty()) return;
+
+	++tag;
+	do {
+		if (tag == "units")
+		{
+			const char* szunits = tag.szvalue();
+			GetFEModel()->SetUnits(szunits);
+		}
+		
+		++tag;
+	} while (!tag.isend());
 }

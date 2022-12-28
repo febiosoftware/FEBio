@@ -1020,13 +1020,13 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		double TMT = Tt[0]*(Mki[0][0]*Tt[0]+Mki[0][1]*Tt[1])+Tt[1]*(Mki[1][0]*Tt[0]+Mki[1][1]*Tt[1]);
 		assert(TMT >= 0);
 
-		double phi = sqrt(TMT) - m_mu*Ln;
+		double phi = sqrt(TMT) - m_mu* tn;
 
 		// b. return map
 		if (phi > 0)
 		{
-			Tt[0] = m_mu*Ln*Tt[0]/sqrt(TMT);
-			Tt[1] = m_mu*Ln*Tt[1]/sqrt(TMT);
+			Tt[0] = m_mu* tn *Tt[0]/sqrt(TMT);
+			Tt[1] = m_mu* tn *Tt[1]/sqrt(TMT);
 		}
 
 		// tangential force vector

@@ -89,7 +89,7 @@ class FEDamageFiberPower : public FEDamageElasticFiber
 public:
 	FEDamageFiberPower(FEModel* fem);
 
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 protected:
 	double Psi0(FEMaterialPoint& mp, const vec3d& a0) override;
@@ -113,7 +113,7 @@ class FEDamageFiberExponential : public FEDamageElasticFiber
 public:
 	FEDamageFiberExponential(FEModel* fem);
 
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 protected:
 	double Psi0(FEMaterialPoint& mp, const vec3d& a0) override;
@@ -138,7 +138,7 @@ class FEDamageFiberExpLinear: public FEDamageElasticFiber
 public:
 	FEDamageFiberExpLinear(FEModel* fem);
 
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 protected:
 	double Psi0(FEMaterialPoint& mp, const vec3d& a0) override;

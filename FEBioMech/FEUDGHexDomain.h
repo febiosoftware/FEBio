@@ -40,6 +40,9 @@ public:
 	//! Set the hourglass parameter
 	void SetHourGlassParameter(double hg);
 
+	//! allocate elements
+	bool Create(int nelems, FE_Element_Spec spec) override;
+
 public:
 	//! calculates the residual
 	void InternalForces(FEGlobalVector& R) override;

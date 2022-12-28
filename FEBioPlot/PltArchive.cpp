@@ -38,13 +38,15 @@ static z_stream strm;
 //=============================================================================
 // FileStream
 //=============================================================================
-FileStream::FileStream()
+FileStream::FileStream(FILE* fp, bool owner)
 {
 	m_bufsize = 262144;	// = 256K
 	m_current = 0;
 	m_buf  = new unsigned char[m_bufsize];
 	m_pout = new unsigned char[m_bufsize];
 	m_ncompress = 0;
+	m_fp = fp;
+	m_fileOwner = owner;
 }
 
 FileStream::~FileStream()
@@ -77,7 +79,11 @@ bool FileStream::Create(const char* szfile)
 
 void FileStream::Close()
 {
-	if (m_fp) fclose(m_fp);
+	if (m_fp)
+	{
+		Flush();
+		if (m_fileOwner) fclose(m_fp);
+	}
 	m_fp = 0;
 }
 

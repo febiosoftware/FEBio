@@ -97,8 +97,8 @@ void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
             FEBiphasicMaterialPoint& pb = *mp.ExtractData<FEBiphasicMaterialPoint>();
-            pt.m_r0 = r0;
-            pt.m_rt = rt;
+            mp.m_r0 = r0;
+            mp.m_rt = rt;
             
             pt.m_J = defgrad(el, pt.m_F, j);
             
@@ -548,7 +548,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
         mat3ds s = ept.m_s;
         
         // get elasticity tensor
-        tens4ds c = m_pMat->Tangent(pt);
+        tens4ds c = m_pMat->Tangent(mp);
         
         // get the fluid flux and pressure gradient
         vec3d gradp = pt.m_gradp + (pt.m_gradp - pt.m_gradpp)*(tau/dt);
@@ -731,7 +731,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffnessSS(FEShellElement& el, matri
         mat3ds s = ept.m_s;
         
         // get elasticity tensor
-        tens4ds c = m_pMat->Tangent(pt);
+        tens4ds c = m_pMat->Tangent(mp);
         
         // get the fluid flux and pressure gradient
         vec3d gradp = pt.m_gradp;
@@ -873,12 +873,7 @@ void FEBiphasicShellDomain::Update(const FETimeInfo& tp)
             }
         }
     }
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -919,8 +914,8 @@ void FEBiphasicShellDomain::UpdateElementStress(int iel)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //		 since the material point coordinates are used by most materials.
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(rt, n);
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
@@ -1012,9 +1007,8 @@ void FEBiphasicShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(rt, n);
         
         detJt = detJ(el, n)*gw[n];
         
@@ -1212,13 +1206,13 @@ vec3d FEBiphasicShellDomain::FluidFlux(FEMaterialPoint& mp)
     
     // body force contribution
     FEModel& fem = *m_pMat->GetFEModel();
-    int nbf = fem.BodyLoads();
+    int nbf = fem.ModelLoads();
     if (nbf) {
         vec3d b(0,0,0);
         for (int i=0; i<nbf; ++i)
         {
-            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
-            if (pbf->IsActive())
+            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(i));
+            if (pbf && pbf->IsActive())
             {
                 // negate b because body forces are defined with a negative sign in FEBio
                 b -= pbf->force(mp);

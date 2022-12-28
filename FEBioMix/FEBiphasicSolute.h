@@ -37,13 +37,13 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
-class FEBIOMIX_API FEBiphasicSolute : public FEMaterial, public FESoluteInterface
+class FEBIOMIX_API FEBiphasicSolute : public FEMaterial, public FEBiphasicInterface, public FESoluteInterface_T<FESolutesMaterialPoint>
 {
 public:
 	FEBiphasicSolute(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
@@ -54,9 +54,6 @@ public:
 	//! Get the permeability
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
 
-	//! Get the osmotic coefficient
-	FEOsmoticCoefficient* GetOsmoticCoefficient() { return m_pOsmC; }
-
 // solute interface
 public:
 	// number of solutes 
@@ -64,6 +61,34 @@ public:
 
 	//! Get the solute
 	FESolute* GetSolute(int i=0) override { return (i==0 ? (FESolute*)m_pSolute : 0); }
+	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+
+	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_cF;
+	}
+
+	//! Get the osmotic coefficient
+	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
+
+public: // overridden from FEBiphasicInterface
+    //! Evaluate and return solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& mp) override {
+        double phisr = m_phi0(mp);
+        FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+        pt->m_phi0 = pt->m_phi0t = phisr;
+        return phisr;
+    };
+    // Return solid referential volume fraction
+	double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+		return pt->m_phi0t;
+	}
+    // Return actual fluid pressure
+	double GetActualFluidPressure(const FEMaterialPoint& mp) override {
+		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+		return pt->m_pa;
+	}
 
 public:
 	bool Init() override;

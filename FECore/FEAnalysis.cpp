@@ -38,25 +38,43 @@ SOFTWARE.*/
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
 #include "FEMeshAdaptor.h"
+#include "FETimeStepController.h"
+#include "FEModule.h"
 
-REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
-
+//---------------------------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
-	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
-	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
-	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
-	ADD_PARAMETER(m_bplotZero   , "plot_zero_state");
-	ADD_PARAMETER(m_nplotRange  , 2, "plot_range");
-	ADD_PARAMETER(m_nplot       , "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
-	ADD_PARAMETER(m_noutput     , "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
-	ADD_PARAMETER(m_nplot_stride, "plot_stride");
-	ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
-	ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve");
 
-	ADD_PROPERTY(m_psolver, "solver");
-	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Optional);
+	BEGIN_PARAM_GROUP("Analysis");
+		ADD_PARAMETER(m_nanalysis, "analysis");// , 0, "STATIC\0DYNAMIC\0STEADY-STATE\0TRANSIENT=1\0");
+	END_PARAM_GROUP();
 
-END_FECORE_CLASS()
+	BEGIN_PARAM_GROUP("Time stepping");
+		ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
+		ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size")->setUnits(UNIT_TIME)->SetFlags(0);
+		ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time")->SetFlags(FE_PARAM_HIDDEN);
+	END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Output");
+		ADD_PARAMETER(m_bplotZero, "plot_zero_state");
+		ADD_PARAMETER(m_nplotRange, 2, "plot_range");
+		ADD_PARAMETER(m_nplot, "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
+		ADD_PARAMETER(m_noutput, "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
+		ADD_PARAMETER(m_nplot_stride, "plot_stride");
+	END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Advanced settings");
+		ADD_PARAMETER(m_badaptorReSolve, "adaptor_re_solve")->setLongName("re-solve after adaptation");
+	END_PARAM_GROUP();
+
+	ADD_PROPERTY(m_timeController, "time_stepper", FEProperty::Preferred)->SetDefaultType("default").SetLongName("Auto time stepper");
+	FEProperty* solver = ADD_PROPERTY(m_psolver, "solver");
+
+	// the default type of the solver should match the active module's name
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	const char* szmod = fecore.GetActiveModule()->GetName();
+	solver->SetDefaultType(szmod);
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
@@ -67,13 +85,13 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 	m_timeController = nullptr;
 
 	// --- Analysis data ---
-	m_nanalysis = FE_STATIC;	// do quasi-static analysis
+	m_nanalysis = 0;
 	m_badaptorReSolve = true;
 
 	// --- Time Step Data ---
-	m_ntime = -1;
+	m_ntime = 10;
 	m_final_time = 0.0;
-	m_dt0 = 0;
+	m_dt0 = 0.1;
 	m_dt = 0;
 
 	// initialize counters
@@ -129,20 +147,20 @@ FEDomain* FEAnalysis::Domain(int i)
 }
 
 //-----------------------------------------------------------------------------
-void FEAnalysis::AddModelComponent(FEModelComponent* pmc)
+void FEAnalysis::AddStepComponent(FEStepComponent* pmc)
 {
 	if (pmc) m_MC.push_back(pmc);
 }
 
 //-----------------------------------------------------------------------------
-int FEAnalysis::ModelComponents() const
+int FEAnalysis::StepComponents() const
 {
 	return (int) m_MC.size();
 }
 
 //-----------------------------------------------------------------------------
 //! get a model component
-FEModelComponent* FEAnalysis::GetModelComponent(int i)
+FEStepComponent* FEAnalysis::GetStepComponent(int i)
 {
 	return m_MC[i];
 }
@@ -160,14 +178,14 @@ void FEAnalysis::SetPlotStride(int n) { m_nplot_stride = n; }
 void FEAnalysis::SetPlotRange(int n0, int n1)
 {
 	m_nplotRange[0] = n0;
-	m_nplotRange[1] = n1; 
+	m_nplotRange[1] = n1;
 }
 
 //-----------------------------------------------------------------------------
 //! sets the zero-state plot flag
 void FEAnalysis::SetPlotZeroState(bool b)
 {
-	m_bplotZero = b;	
+	m_bplotZero = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -336,6 +354,8 @@ bool FEAnalysis::InitSolver()
 
 	// initialize equations
 	FESolver* psolver = GetFESolver();
+	if (psolver == nullptr) return false;
+
 	if (psolver->InitEquations() == false) return false;
 
 	// do initialization of solver data
@@ -402,8 +422,17 @@ bool FEAnalysis::Solve()
 		// update time
 		FETimeInfo& tp = fem.GetTime();
 		double newTime = tp.currentTime + m_dt;
-		tp.currentTime = newTime;
-		tp.timeIncrement = m_dt;
+		if (newTime > endtime)
+		{
+			tp.timeIncrement = endtime - tp.currentTime;
+			tp.currentTime = endtime;
+		}
+		else
+		{
+			tp.currentTime = newTime;
+			tp.timeIncrement = m_dt;
+		}
+		tp.timeStep = m_ntimesteps;
 		feLog("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
 
 		// initialize the solver step
@@ -430,9 +459,6 @@ bool FEAnalysis::Solve()
 		m_ntotref  += psolver->m_ntotref;
 		m_ntotiter += psolver->m_niter;
 		m_ntotrhs  += psolver->m_nrhs;
-
-		// update model's data
-		fem.UpdateModelData();
 
 		// see if we have converged
 		if (ierr == 0)
@@ -572,19 +598,19 @@ int FEAnalysis::SolveTimeStep()
 		}
 		nerr = (bconv ? 0 : 1);
 	}
-	catch (LinearSolverFailed)
+	catch (LinearSolverFailed e)
 	{
-		feLogError("Linear solver failed to find solution. Aborting run.");
+		feLogError(e.what());
 		nerr = 2;
 	}
-	catch (FactorizationError)
+	catch (FactorizationError e)
 	{
-		feLogError("Fatal error in factorization of stiffness matrix. Aborting run.");
+		feLogError(e.what());
 		nerr = 2;
 	}
 	catch (NANDetected e)
 	{
-		feLogError("NAN Detected:\n%s", e.what());
+		feLogError(e.what());
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
 	catch (FEMultiScaleException)

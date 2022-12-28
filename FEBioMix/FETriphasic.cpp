@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETriphasic.h"
-#include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/log.h>
 
@@ -45,7 +44,7 @@ BEGIN_FECORE_CLASS(FETriphasic, FEMaterial)
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid , "solid"              );
+	ADD_PROPERTY(m_pSolid , "solid"              , FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm  , "permeability"       );
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSolute, "solute"             );
@@ -110,9 +109,9 @@ bool FETriphasic::Init()
 		return false;
 	}
 	
-	m_Rgas = GetFEModel()->GetGlobalConstant("R");
-	m_Tabs = GetFEModel()->GetGlobalConstant("T");
-	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
+	m_Rgas = GetGlobalConstant("R");
+	m_Tabs = GetGlobalConstant("T");
+	m_Fc   = GetGlobalConstant("Fc");
 	
 	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
 	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section"  ); return false; }
@@ -170,8 +169,8 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	// relative volume
 	double J = et.m_J;
     double phi0 = pet.m_phi0;
-	double phir = pet.m_phi0t;
-	double cF = m_cFr(pt)*(1-phi0)/(J-phir);
+	double phisr = pet.m_phi0t;
+	double cF = m_cFr(pt)*(1-phi0)/(J-phisr);
 	
 	return cF;
 }
@@ -610,4 +609,13 @@ void FETriphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<doub
             dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
         }
     }
+}
+
+double FETriphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
 }

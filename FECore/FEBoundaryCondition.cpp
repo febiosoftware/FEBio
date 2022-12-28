@@ -29,12 +29,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBoundaryCondition.h"
 #include "FEFacetSet.h"
-#include "FEModel.h"
-
-REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
 
 //-----------------------------------------------------------------------------
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem), m_dof(pfem)
+FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
 {
 }
 
@@ -52,6 +49,24 @@ void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
 
 void FEBoundaryCondition::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEStepComponent::Serialize(ar);
 	if (ar.IsShallow() == false) ar & m_dof;
+}
+
+//-----------------------------------------------------------------------------
+void FEBoundaryCondition::SetDOFList(int ndof)
+{
+	m_dof.Clear();
+	m_dof.AddDof(ndof);
+}
+
+//-----------------------------------------------------------------------------
+void FEBoundaryCondition::SetDOFList(const std::vector<int>& dofs)
+{
+	m_dof = dofs;
+}
+
+void FEBoundaryCondition::SetDOFList(const FEDofList& dofs)
+{
+	m_dof = dofs;
 }

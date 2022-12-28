@@ -43,6 +43,7 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 	m_nfmt = 0;
 	m_arraySize = 0;
 	m_szname[0] = 0;
+	m_szunit[0] = 0;
 }
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_ITEM& item)
@@ -53,14 +54,16 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_
 	m_arraySize = item.m_arraySize;
 	m_arrayNames = item.m_arrayNames;
 	m_szname[0] = 0;
+	m_szunit[0] = 0;
 	if (item.m_szname[0]) strcpy(m_szname, item.m_szname);
+	if (item.m_szunit[0]) strcpy(m_szunit, item.m_szunit);
 }
 
 class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
 	FEPlotSurfaceDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
-	void Save(FEModel& fem, Archive& ar)
+	void Save(FEModel& fem, PltArchive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NS = mesh.Surfaces();
@@ -93,7 +96,7 @@ class FEPlotDomainDataExport : public FEPlotData
 {
 public:
 	FEPlotDomainDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
-	void Save(FEModel& fem, Archive& ar)
+	void Save(FEModel& fem, PltArchive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NDOMS = mesh.Domains();
@@ -491,6 +494,10 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Node.push_back(it);
 		return true;
 	}
@@ -510,6 +517,10 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Elem.push_back(it);
 		return true;
 	}
@@ -529,6 +540,10 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Face.push_back(it);
 		return true;
 	}
@@ -588,6 +603,7 @@ FEBioPlotFile::FEBioPlotFile(FEModel* fem) : PlotFile(fem)
 {
 	m_ncompress = 0;
 	m_meshesWritten = 0;
+	m_exportUnitsFlag = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -801,6 +817,15 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 		m_ar.WriteChunk(PLT_HDR_SOFTWARE, sz);
 	}
 
+	// units flag
+	m_exportUnitsFlag = false;
+	const char* szunits = fem.GetUnits();
+	if (szunits != nullptr)
+	{
+		m_exportUnitsFlag = true;
+		m_ar.WriteChunk(PLT_HDR_UNITS, szunits);
+	}
+
 	return true;
 }
 
@@ -885,6 +910,11 @@ void FEBioPlotFile::WriteDictionaryItem(DICTIONARY_ITEM& it)
 		}
 	}
 	m_ar.WriteChunk(PLT_DIC_ITEM_NAME, it.m_szname, STR_SIZE);
+
+	if (m_exportUnitsFlag && it.m_szunit && it.m_szunit[0])
+	{
+		m_ar.WriteChunk(PLT_DIC_ITEM_UNITS, it.m_szunit, STR_SIZE);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1002,7 +1032,7 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 			{
 			case FE_DOMAIN_SOLID   : WriteSolidDomain   (static_cast<FESolidDomain&   >(dom)); break;
 			case FE_DOMAIN_SHELL   : WriteShellDomain   (static_cast<FEShellDomain&   >(dom)); break;
-			case FE_DOMAIN_TRUSS   : WriteTrussDomain   (static_cast<FETrussDomain&   >(dom)); break;
+			case FE_DOMAIN_BEAM    : WriteBeamDomain    (static_cast<FEBeamDomain&    >(dom)); break;
 			case FE_DOMAIN_DISCRETE: WriteDiscreteDomain(static_cast<FEDiscreteDomain&>(dom)); break;
             case FE_DOMAIN_2D      : WriteDomain2D      (static_cast<FEDomain2D&      >(dom)); break;
 			}
@@ -1123,7 +1153,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
+void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -1133,7 +1163,7 @@ void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 
 	// figure out element type
 	int ne = 2;
-	int dtype = PLT_ELEM_TRUSS;
+	int dtype = PLT_ELEM_LINE2;
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);
@@ -1170,7 +1200,7 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 
 	// figure out element type
 	int ne = 2;
-	int dtype = PLT_ELEM_TRUSS;
+	int dtype = PLT_ELEM_LINE2;
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);

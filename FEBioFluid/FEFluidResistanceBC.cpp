@@ -29,39 +29,37 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFluidResistanceBC.h"
 #include "FEBioFluid.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFluidResistanceBC, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEFluidResistanceBC, FEPrescribedSurface)
 	ADD_PARAMETER(m_R , "R");
 	ADD_PARAMETER(m_p0, "pressure_offset");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
+FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_pfluid = nullptr;
     m_p0 = 0;
-    
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-	m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDof(m_dofEF);
-
+    m_e = 0.0;
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidResistanceBC::Init()
 {
-	if (FESurfaceLoad::Init() == false) return false;
+    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    SetDOFList(m_dofEF);
+    
+	if (FEPrescribedSurface::Init() == false) return false;
 
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = m_psurf->Element(0);
+    FESurfaceElement& el = GetSurface()->Element(0);
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
 
@@ -70,23 +68,7 @@ bool FEFluidResistanceBC::Init()
 	m_pfluid = pm->ExtractProperty<FEFluidMaterial>();
 	if (m_pfluid == nullptr) return false;
     
-    
-    
     return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEFluidResistanceBC::Activate()
-{
-    FESurface* ps = &GetSurface();
-    
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        node.set_bc(m_dofEF, DOF_PRESCRIBED);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -100,24 +82,11 @@ void FEFluidResistanceBC::Update()
     double p = m_R*Q;
     
     // calculate the dilatation
-    double e = 0;
-    bool good = m_pfluid->Dilatation(0,p+m_p0,0, e);
+    m_e = 0;
+    bool good = m_pfluid->Dilatation(0,p+m_p0,0, m_e);
     assert(good);
     
-    // prescribe this dilatation at the nodes
-    FESurface* ps = &GetSurface();
-
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        if (ps->Node(i).m_ID[m_dofEF] < -1)
-        {
-            FENode& node = ps->Node(i);
-            // set node as having prescribed DOF
-            node.set(m_dofEF, e);
-        }
-    }
-    
-    GetFEModel()->SetMeshUpdateFlag(true);
+    FEPrescribedSurface::Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -129,9 +98,14 @@ double FEFluidResistanceBC::FlowRate()
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
-    for (int iel=0; iel<m_psurf->Elements(); ++iel)
+    const FETimeInfo& tp = GetTimeInfo();
+    double alpha = tp.alpha;
+    double alphaf = tp.alphaf;
+
+    FESurface& surf = *GetSurface();
+    for (int iel=0; iel<surf.Elements(); ++iel)
     {
-        FESurfaceElement& el = m_psurf->Element(iel);
+        FESurfaceElement& el = surf.Element(iel);
         
         // nr integration points
         int nint = el.GaussPoints();
@@ -141,7 +115,7 @@ double FEFluidResistanceBC::FlowRate()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
+            FENode& node = surf.Node(el.m_lnode[i]);
             rt[i] = node.m_rt;
             vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
         }
@@ -175,4 +149,18 @@ double FEFluidResistanceBC::FlowRate()
     }
 
     return Q;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidResistanceBC::GetNodalValues(int nodelid, std::vector<double>& val)
+{
+    val[0] = m_e;
+}
+
+//-----------------------------------------------------------------------------
+// copy data from another class
+void FEFluidResistanceBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+    // TODO: implement this
+    assert(false);
 }

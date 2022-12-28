@@ -57,7 +57,7 @@ void FEFluidSolutesFlux::SetSurface(FESurface* ps)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal component of velocity
-void FEFluidSolutesFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidSolutesFlux::LoadVector(FEGlobalVector& R)
 {
     FEFluidSolutesFlux* flux = this;
     m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {

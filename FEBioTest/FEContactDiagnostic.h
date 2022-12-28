@@ -33,7 +33,7 @@ SOFTWARE.*/
 class FEContactDiagnostic : public FEDiagnostic  
 {
 public:
-	FEContactDiagnostic(FEModel& fem);
+	FEContactDiagnostic(FEModel* fem);
 	virtual ~FEContactDiagnostic();
 
 	bool Run();

@@ -28,11 +28,12 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFiberMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a fiber material with an exponential toe-region
 //! and a linear region.
-class FEFiberExpLinear : public FEElasticFiberMaterial
+class FEFiberExpLinear : public FEFiberMaterial
 {
 public:
 	//! constructor
@@ -54,5 +55,13 @@ public:
 	double	m_lam1;		//!< fiber stretch for straightened fibers
 	double	m_epsf;
 
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+class FEElasticFiberExpLinear : public FEElasticFiberMaterial_T<FEFiberExpLinear>
+{
+public:
+	FEElasticFiberExpLinear(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberExpLinear>(fem) {}
 	DECLARE_FECORE_CLASS();
 };

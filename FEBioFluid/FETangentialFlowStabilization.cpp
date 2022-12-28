@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEBioFluid.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
@@ -45,11 +46,15 @@ FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FE
     m_beta = 1.0;
     
     // get the degrees of freedom
-    m_dofW.Clear();
-    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofW.Clear();
+        m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+
+        m_dof.Clear();
+        m_dof.AddDofs(m_dofW);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -89,8 +94,10 @@ vec3d FETangentialFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, d
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
         FESurfaceElement& el = *mp.SurfaceElement();
@@ -130,8 +137,10 @@ void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
 	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
 		FESurfaceElement& el = *mp.SurfaceElement();

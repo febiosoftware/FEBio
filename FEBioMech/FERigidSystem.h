@@ -36,11 +36,9 @@ SOFTWARE.*/
 class FEModel;
 class FERigidBody;
 class FEModelComponent;
-class FERigidNodeSet;
-class FERigidBodyFixedBC;
-class FERigidBodyDisplacement;
+class FERigidFixedBC;
+class FERigidPrescribedBC;
 class FERigidIC;
-class FERigidSurface;
 class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
@@ -90,26 +88,17 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
 public:
-	int RigidNodeSets() { return (int) m_RN.size(); }
-	FERigidNodeSet* RigidNodeSet(int i) { return m_RN[i]; }
-	void AddRigidNodeSet(FERigidNodeSet* prn) { m_RN.push_back(prn); }
-
 	int FixedBCs() { return (int) m_RBC.size(); }
-	FERigidBodyFixedBC* FixedBC(int i) { return m_RBC[i]; }
-	void AddFixedBC(FERigidBodyFixedBC* pbc) { m_RBC.push_back(pbc); }
+	FERigidFixedBC* FixedBC(int i) { return m_RBC[i]; }
+	void AddFixedBC(FERigidFixedBC* pbc) { m_RBC.push_back(pbc); }
 
 	int PrescribedBCs() { return (int) m_RDC.size(); }
-	FERigidBodyDisplacement* PrescribedBC(int i) { return m_RDC[i]; }
-	void AddPrescribedBC(FERigidBodyDisplacement* pdc) { m_RDC.push_back(pdc); }
+	FERigidPrescribedBC* PrescribedBC(int i) { return m_RDC[i]; }
+	void AddPrescribedBC(FERigidPrescribedBC* pdc) { m_RDC.push_back(pdc); }
 
 	void AddInitialCondition(FERigidIC* ric) { m_RIC.push_back(ric); }
 
 	std::vector<FERigidBody*>& RigidBodyList();
-
-public:
-	void AddRigidSurface(FERigidSurface* prs);
-
-	FERigidSurface* FindRigidSurface(const std::string& name);
 
 protected:
 	bool CreateObjects();
@@ -117,13 +106,11 @@ protected:
 protected:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
-	vector<FERigidNodeSet*>				m_RN;	//!< rigid node sets
-	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
-	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
-	vector<FERigidIC*>					m_RIC;	//!< rigid body initial conditions
+	vector<FERigidFixedBC*>			m_RBC;	//!< rigid body fixed
+	vector<FERigidPrescribedBC*>	m_RDC;	//!< rigid body displacements
+	vector<FERigidIC*>				m_RIC;	//!< rigid body initial conditions
 
 private:
-	FEModel&					m_fem;	//!< the FE model this system is attached to
+	FEModel&				m_fem;	//!< the FE model this system is attached to
 	vector<FERigidBody*>	m_RB;	//!< the list of rigid bodies in this system
-	vector<FERigidSurface*>	m_RS;	//!< rigid surfaces
 };

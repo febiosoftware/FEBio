@@ -31,16 +31,14 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "FEMaterialPoint.h"
 #include "FENode.h"
+#include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
-
-FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(pfem)
+FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEStepComponent(pfem)
 {
 }
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalIC, FEInitialCondition)
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -80,7 +78,7 @@ bool FENodalIC::Init()
 //-----------------------------------------------------------------------------
 void FENodalIC::Activate()
 {
-	FEModelComponent::Activate();
+	FEStepComponent::Activate();
 	if (m_dofs.IsEmpty()) return;
 
 	int dofs = (int)m_dofs.Size();
@@ -105,7 +103,7 @@ void FENodalIC::Activate()
 // serialization
 void FENodalIC::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEStepComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 
 	ar & m_dofs;
@@ -114,7 +112,7 @@ void FENodalIC::Serialize(DumpStream& ar)
 
 //======================================================================================
 BEGIN_FECORE_CLASS(FEInitialDOF, FENodalIC)
-	ADD_PARAMETER(m_dof, "dof", 0, "@dof_list");
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
@@ -135,6 +133,17 @@ FEInitialDOF::FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset) : FENodalIC(
 
 //-----------------------------------------------------------------------------
 void FEInitialDOF::SetDOF(int ndof) { m_dof = ndof; }
+
+//-----------------------------------------------------------------------------
+bool FEInitialDOF::SetDOF(const char* szdof)
+{
+	FEModel* fem = GetFEModel();
+	int ndof = fem->GetDOFIndex(szdof);
+	assert(ndof >= 0);
+	if (ndof < 0) return false;
+	SetDOF(ndof);
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 bool FEInitialDOF::Init()

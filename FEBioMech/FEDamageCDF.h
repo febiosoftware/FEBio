@@ -27,31 +27,32 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage cumulative distribution functions
 
-class FEDamageCDF : public FEMaterial
+class FEDamageCDF : public FEMaterialProperty
 {
 public:
-    FEDamageCDF(FEModel* pfem) : FEMaterial(pfem) { m_Dmax = 1; }
+    FEDamageCDF(FEModel* pfem) : FEMaterialProperty(pfem) { m_Dmax = 1; }
     
 	//! damage
 	double Damage(FEMaterialPoint& pt);
     
     //! cumulative distribution function
-    virtual double cdf(const double X) = 0;
+    virtual double cdf(FEMaterialPoint& mp, const double X) = 0;
     
     //! probability density function
-    virtual double pdf(const double X) = 0;
+    virtual double pdf(FEMaterialPoint& mp, const double X) = 0;
 
 public:
     double  m_Dmax;              //!< maximum allowable damage
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
+    FECORE_BASE_CLASS(FEDamageCDF)
 };
 
 //-----------------------------------------------------------------------------
@@ -65,14 +66,14 @@ public:
 	~FEDamageCDFSimo() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
 
 public:
-	double	m_alpha;			//!< parameter alpha
-	double	m_beta;             //!< parameter beta
+    FEParamDouble	m_alpha;			//!< parameter alpha
+    FEParamDouble	m_beta;             //!< parameter beta
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
@@ -88,14 +89,14 @@ public:
 	~FEDamageCDFLogNormal() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
 
 public:
-	double	m_mu;               //!< mean on log scale
-	double	m_sigma;            //!< standard deviation on log scale
+    FEParamDouble	m_mu;               //!< mean on log scale
+    FEParamDouble	m_sigma;            //!< standard deviation on log scale
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
@@ -111,15 +112,15 @@ public:
 	~FEDamageCDFWeibull() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
 
 public:
-	double	m_alpha;            //!< exponent alpha
-	double	m_mu;               //!< mean mu
-    double  m_ploc;             //!< location parameter
+    FEParamDouble	m_alpha;            //!< exponent alpha
+    FEParamDouble	m_mu;               //!< mean mu
+    FEParamDouble  m_ploc;             //!< location parameter
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
@@ -135,13 +136,13 @@ public:
 	~FEDamageCDFStep() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
 
 public:
-	double	m_mu;               //!< threshold mu
+    FEParamDouble	m_mu;               //!< threshold mu
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
@@ -157,16 +158,16 @@ public:
 	~FEDamageCDFPQP() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
 
 	bool Validate() override;
     
 public:
-	double	m_mumin;            //!< mu threshold
-	double	m_mumax;            //!< mu cap
+    FEParamDouble	m_mumin;            //!< mu threshold
+    FEParamDouble	m_mumax;            //!< mu cap
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
@@ -182,14 +183,14 @@ public:
     ~FEDamageCDFGamma() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
     
 public:
-    double    m_alpha;            //!< exponent alpha
-    double    m_mu;               //!< pdf expected mean mu
+    FEParamDouble    m_alpha;            //!< exponent alpha
+    FEParamDouble    m_mu;               //!< pdf expected mean mu
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
@@ -205,10 +206,10 @@ public:
     ~FEDamageCDFUser() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
     
 public:
     FEFunction1D*    m_cdf;           //!< user-defined CDF
@@ -226,19 +227,17 @@ public:
     FEDamageCDFPower(FEModel* pfem);
     ~FEDamageCDFPower() {}
     
-    bool Validate() override;
-    
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
     
 public:
-    double    m_alpha;            //!< power exponent alpha
-    double    m_mu0;              //!< constant coeff
-    double    m_mu1;              //!< coeff of power
-    double    m_s;                //!< scale factor for argument
+    FEParamDouble    m_alpha;            //!< power exponent alpha
+    FEParamDouble    m_mu0;              //!< constant coeff
+    FEParamDouble    m_mu1;              //!< coeff of power
+    FEParamDouble    m_s;                //!< scale factor for argument
 
     // declare parameter list
     DECLARE_FECORE_CLASS();
@@ -254,16 +253,16 @@ public:
     ~FEDamageCDFExp() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
     
 public:
-    double    m_alpha;            //!< power exponent alpha
-    double    m_mu0;              //!< constant coeff
-    double    m_mu1;              //!< coeff of power
-    double    m_s;                //!< scale factor for argument
+    FEParamDouble    m_alpha;            //!< power exponent alpha
+    FEParamDouble    m_mu0;              //!< constant coeff
+    FEParamDouble    m_mu1;              //!< coeff of power
+    FEParamDouble    m_s;                //!< scale factor for argument
 
     // declare parameter list
     DECLARE_FECORE_CLASS();
@@ -279,15 +278,15 @@ public:
     ~FEDamageCDFPoly2() {}
     
     //! cumulative distribution function
-    double cdf(const double X) override;
+    double cdf(FEMaterialPoint& mp, const double X) override;
     
     //! probability density function
-    double pdf(const double X) override;
+    double pdf(FEMaterialPoint& mp, const double X) override;
     
 public:
-    double    m_mu0;              //!< constant coeff
-    double    m_mu1;              //!< coeff of linear term
-    double    m_mu2;              //!< coeff of quadratic term
+    FEParamDouble    m_mu0;              //!< constant coeff
+    FEParamDouble    m_mu1;              //!< coeff of linear term
+    FEParamDouble    m_mu2;              //!< coeff of quadratic term
 
     // declare parameter list
     DECLARE_FECORE_CLASS();

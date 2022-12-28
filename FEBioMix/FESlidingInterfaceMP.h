@@ -30,31 +30,42 @@ SOFTWARE.*/
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBiphasicContactSurface.h"
 #include "FESolute.h"
+#include <FECore/FECoreClass.h>
 #include <map>
 
 //-----------------------------------------------------------------------------
 class FEBIOMIX_API FESlidingSurfaceMP : public FEBiphasicContactSurface
 {
 public:
-	//! integration point data
-	class Data : public FEBiphasicContactPoint
-	{
-	public:
-		Data();
-
-		void Serialize(DumpStream& ar) override;
+    //! integration point data
+    class Data : public FEBiphasicContactPoint
+    {
+    public:
+        Data();
         
-	public:
-		double	m_Lmd;	//!< Lagrange multipliers for displacements
-		double	m_epsn;	//!< displacement penalty factors
-		double	m_epsp;	//!< pressure penalty factors
-		vec3d	m_nu;	//!< normal at integration points
-		vec2d	m_rs;	//!< natural coordinates of projection of integration point
-		vector<double>	m_Lmc;	//!< Lagrange multipliers for solute concentrations
-		vector<double>	m_epsc;	//!< concentration penatly factors
-		vector<double>	m_cg;	//!< concentration "gap"
-	};
-    
+        void Init() override;
+        
+        void Serialize(DumpStream& ar) override;
+        
+    public:
+        vec3d   m_dg;       //!< vector gap
+        double  m_Lmd;      //!< Lagrange multipliers for displacements
+        vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
+        double  m_epsn;     //!< displacement penalty factors
+        double  m_epsp;     //!< pressure penalty factors
+        double  m_p1;       //!< fluid pressure
+        vec3d   m_nu;       //!< normal at integration points
+        vec3d   m_s1;       //!< tangent along slip direction
+        vec3d   m_tr;       //!< contact traction
+        vec2d   m_rs;       //!< natural coordinates of projection of integration point
+        vec2d   m_rsp;      //!< m_rs at the previous time step
+        bool    m_bstick;   //!< stick flag
+        vector<double>  m_Lmc;  //!< Lagrange multipliers for solute concentrations
+        vector<double>  m_epsc; //!< concentration penalty factors
+        vector<double>  m_cg;   //!< concentration "gap"
+        vector<double>  m_c1;   //!< solute concentration
+    };
+
 public:
 	//! constructor
 	FESlidingSurfaceMP(FEModel* pfem);
@@ -65,6 +76,9 @@ public:
 	//! initialization
 	bool Init() override;
 	
+    //! initialize sliding surface and store previous values
+    void InitSlidingSurface();
+    
 	//! evaluate net contact force
 	vec3d GetContactForce() override;
 	
@@ -87,10 +101,17 @@ public:
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetContactTraction(int nface, vec3d& pt) override;
-	void GetNodalContactPressure(int nface, double* pg) override;
-	void GetNodalContactTraction(int nface, vec3d* tn) override;
+    void GetVectorGap           (int nface, vec3d& pg) override;
+    void GetContactTraction     (int nface, vec3d& pt) override;
+    void GetSlipTangent         (int nface, vec3d& pt);
+    void GetMuEffective         (int nface, double& pg) override;
+    void GetLocalFLS            (int nface, double& pg) override;
+    void GetNodalVectorGap      (int nface, vec3d* pg) override;
+    void GetNodalContactPressure(int nface, double* pg) override;
+    void GetNodalContactTraction(int nface, vec3d* tn) override;
+    void GetStickStatus         (int nface, double& pg) override;
     void EvaluateNodalContactPressures();
+    void EvaluateNodalContactTractions();
 
 private:
 	void GetContactPressure(int nface, double& pg);
@@ -101,7 +122,8 @@ public:
 	
 	vector<vec3d>				m_nn;	//!< node normals
     vector<double>              m_pn;   //!< nodal contact pressures
-	
+    vector<vec3d>               m_tn;   //!< nodal contact tractions
+
 	vector<int>					m_sid;	//!< list of solute id's for this surface
     
     vec3d	m_Ft;                       //!< total contact force (from equivalent nodal forces)
@@ -110,12 +132,25 @@ protected:
 	int	m_dofC;
 };
 
-typedef std::map<int,double> idmap;     //!< map integer id with double value
-typedef std::map<int,double>::iterator itridmap;
+//-----------------------------------------------------------------------------
+// helper class for reading ambient concentrations
+class FEAmbientConcentration : public FECoreClass
+{
+public:
+	FEAmbientConcentration(FEModel* fem);
+
+public:
+	int			m_sol;
+	double		m_ambc;
+
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEAmbientConcentration);
+};
 
 //-----------------------------------------------------------------------------
 class FEBIOMIX_API FESlidingInterfaceMP : public FEContactInterface
 {
+
 public:
 	//! constructor
 	FESlidingInterfaceMP(FEModel* pfem);
@@ -129,6 +164,12 @@ public:
 	//! interface activation
 	void Activate() override;
 
+    //! calculate the slip direction on the primary surface
+    vec3d SlipTangent(FESlidingSurfaceMP& ss, const int nel, const int nint, FESlidingSurfaceMP& ms, double& dh, vec3d& r);
+
+    //! calculate contact traction
+    vec3d ContactTraction(FESlidingSurfaceMP& ss, const int nel, const int n, FESlidingSurfaceMP& ms, double& pn);
+    
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();
 	
@@ -150,14 +191,8 @@ public:
     
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
-    
-    //! set parameter attribute for ambient concentrations
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
-    
-	//! set the ambient concentration
-	void SetAmbientConcentration(int id, double ambc) { m_ambcinp.insert(std::pair<int, double>(id, ambc)); }
-    
-    //! get solute data
+ 
+	//! get solute data
     FESoluteData* FindSoluteData(int nid);
 
 public:
@@ -207,20 +242,25 @@ public:
 	int				m_nsegup;		//!< segment update parameter
     bool			m_breloc;		//!< node relocation on startup
     bool            m_bsmaug;       //!< smooth augmentation
-	
+    bool            m_bsmfls;       //!< smooth local fluid load support
+
 	double			m_epsn;         //!< normal penalty factor
 	bool			m_bautopen;     //!< use autopenalty factor
     bool            m_bupdtpen;     //!< update penalty at each time step
-	
+    
+    double          m_mu;           //!< friction coefficient
+    bool            m_bfreeze;      //!< freeze stick/slip status
+
 	// multiphasic contact parameters
+    double  m_phi;                  //!< solid-solid contact fraction
 	double	m_epsp;					//!< fluid volumetric flow rate penalty
 	double	m_epsc;					//!< solute molar flow rate penalty
 	double	m_Rgas;					//!< universal gas constant
 	double	m_Tabs;					//!< absolute temperature
 	double	m_ambp;					//!< ambient pressure
 	vector<double>	m_ambc;         //!< ambient concentration
-    double  m_ambctmp;              //!< helper variable for reading in ambient concentrations of solutes
-    idmap	m_ambcinp;                 //!< ambient concentration of solute (input)
+
+	vector<FEAmbientConcentration*>	m_ambctmp;
 	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
 	vector<int> m_ssl;				//!< list of primary surface solutes common to both contact surfaces
 	vector<int> m_msl;				//!< list of secondary surface solutes common to both contact surfaces

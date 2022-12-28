@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
-#include <FEBioMech/FERigidMaterial.h>
-#include <FEBioMech/FEInitialVelocity.h>
 
 //-----------------------------------------------------------------------------
 void FEBioInitialSection::Parse(XMLTag& tag)
@@ -54,13 +52,13 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "velocity")
 		{
-			FEInitialVelocity* pic = dynamic_cast<FEInitialVelocity*>(fecore_new<FEInitialCondition>("velocity", &fem));
+			FENodalIC* pic = fecore_new<FENodalIC>("velocity", &fem);
 
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
 
 			// create a node set
-			FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
+			FENodeSet* nset = new FENodeSet(&fem);
 			fem.GetMesh().AddNodeSet(nset);
 			pic->SetNodeSet(nset);
 
@@ -82,7 +80,9 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			while (!tag.isend());
 
 			// TODO: Fix this! I need to add a mechanism again for setting mapped data.
-			pic->SetValue(values[0]);
+			FEParam* param = pic->GetParameter("value"); assert(param);
+			FEParamVec3& val = param->value<FEParamVec3>();
+			val = values[0];
 //			for (int i = 0; i < values.size(); ++i) pic->SetValue(i, values[i]);
 
 		}
@@ -143,7 +143,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			GetBuilder()->AddInitialCondition(pic);
 
 			// create a node set
-			FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
+			FENodeSet* nset = new FENodeSet(&fem);
 			fem.GetMesh().AddNodeSet(nset);
 			pic->SetNodeSet(nset);
 
@@ -242,10 +242,6 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			int nmat = atoi(szm);
 			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
-			// make sure this is a valid rigid material
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat - 1));
-			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
 			++tag;
 			do
 			{
@@ -256,12 +252,12 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, v);
 
 					// create the initial condition
-					FERigidBodyVelocity* pic = fecore_alloc(FERigidBodyVelocity, &fem);
-					pic->m_rid = nmat;
-					pic->m_vel = v;
+					FEStepComponent* pic = fecore_new_class<FEInitialCondition>("FERigidBodyVelocity", &fem);
+					pic->SetParameter("rb", nmat);
+					pic->SetParameter("value", v);
 
 					// add this initial condition to the current step
-					GetBuilder()->AddRigidIC(pic);
+					GetBuilder()->AddRigidComponent(pic);
 				}
 				else if (tag == "initial_angular_velocity")
 				{
@@ -270,12 +266,12 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 					value(tag, w);
 
 					// create the initial condition
-					FERigidBodyAngularVelocity* pic = fecore_alloc(FERigidBodyAngularVelocity, &fem);
-					pic->m_rid = nmat;
-					pic->m_w = w;
+					FEStepComponent* pic = fecore_new_class<FEInitialCondition>("FERigidBodyAngularVelocity", &fem);
+					pic->SetParameter("rb", nmat);
+					pic->SetParameter("value", w);
 
 					// add this initial condition to the current step
-					GetBuilder()->AddRigidIC(pic);
+					GetBuilder()->AddRigidComponent(pic);
 				}
 
 				++tag;

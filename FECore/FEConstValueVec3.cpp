@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEMeshPartition.h"
 #include "FENode.h"
 #include "quatd.h"
+#include <assert.h>
 
 //==================================================================================
 BEGIN_FECORE_CLASS(FEConstValueVec3, FEVec3dValuator)
@@ -52,6 +53,8 @@ END_FECORE_CLASS();
 
 FEMathValueVec3::FEMathValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
+	m_expr = "0,0,0";
+	Init();
 }
 
 //---------------------------------------------------------------------------------------
@@ -93,6 +96,11 @@ bool FEMathValueVec3::create(const std::string& sx, const std::string& sy, const
 	return true;
 }
 
+bool FEMathValueVec3::UpdateParams()
+{
+	return Init();
+}
+
 vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 {
 	double vx = m_math[0].value(GetFEModel(), pt);
@@ -112,6 +120,9 @@ FEVec3dValuator* FEMathValueVec3::copy()
 }
 
 //---------------------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEMappedValueVec3, FEVec3dValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
 
 FEMappedValueVec3::FEMappedValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
@@ -232,7 +243,7 @@ vec3d FESphericalVectorGenerator::operator () (const FEMaterialPoint& mp)
 //=================================================================================================
 BEGIN_FECORE_CLASS(FECylindricalVectorGenerator, FEVec3dValuator)
 	ADD_PARAMETER(m_center, "center");
-	ADD_PARAMETER(m_axis, "axis")
+	ADD_PARAMETER(m_axis, "axis");
 	ADD_PARAMETER(m_vector, "vector");
 END_FECORE_CLASS();
 
@@ -314,4 +325,25 @@ FEVec3dValuator* FESphericalAnglesVectorGenerator::copy()
 	v->m_theta = m_theta;
 	v->m_phi = m_phi;
 	return v;
+}
+
+
+//=================================================================================================
+BEGIN_FECORE_CLASS(FEUserVectorGenerator, FEVec3dValuator)
+END_FECORE_CLASS();
+
+FEUserVectorGenerator::FEUserVectorGenerator(FEModel* fem) : FEVec3dValuator(fem)
+{
+}
+
+vec3d FEUserVectorGenerator::operator () (const FEMaterialPoint& mp)
+{
+	assert(false);
+	return vec3d(0, 0, 0);
+}
+
+FEVec3dValuator* FEUserVectorGenerator::copy()
+{
+	assert(false);
+	return fecore_alloc(FEUserVectorGenerator, GetFEModel());
 }

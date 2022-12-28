@@ -94,16 +94,15 @@ bool FETiedInterface::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the DOFS
-	const int dof_X = fem.GetDOFIndex("x");
-	const int dof_Y = fem.GetDOFIndex("y");
-	const int dof_Z = fem.GetDOFIndex("z");
-	const int dof_RU = fem.GetDOFIndex("Ru");
-	const int dof_RV = fem.GetDOFIndex("Rv");
-	const int dof_RW = fem.GetDOFIndex("Rw");
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	const int dof_RU = GetDOFIndex("Ru");
+	const int dof_RV = GetDOFIndex("Rv");
+	const int dof_RW = GetDOFIndex("Rw");
 
 	if (m_laugon != 2)
 	{
@@ -116,7 +115,7 @@ void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 			if (pe != 0)
 			{
 				FESurfaceElement& me = *pe;
-				int* en = &me.m_node[0];
+				int* en = &me.m_lnode[0];
 
 				int n = me.Nodes();
 				lm.assign(LMSIZE, -1);
@@ -130,7 +129,7 @@ void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 
 				for (int k = 0; k < n; ++k)
 				{
-					vector<int>& id = mesh.Node(en[k]).m_ID;
+					vector<int>& id = ms.Node(en[k]).m_ID;
 					lm[6 * (k + 1)] = id[dof_X];
 					lm[6 * (k + 1) + 1] = id[dof_Y];
 					lm[6 * (k + 1) + 2] = id[dof_Z];
@@ -152,7 +151,7 @@ void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 			if (pe != 0)
 			{
 				FESurfaceElement& me = *pe;
-				int* en = &me.m_node[0];
+				int* en = &me.m_lnode[0];
 
 				int n = me.Nodes();
 				lm.assign(3*(n+2), -1);
@@ -163,7 +162,7 @@ void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 
 				for (int k = 0; k < n; ++k)
 				{
-					vector<int>& id = mesh.Node(en[k]).m_ID;
+					vector<int>& id = ms.Node(en[k]).m_ID;
 					lm[3 * (k + 1)    ] = id[dof_X];
 					lm[3 * (k + 1) + 1] = id[dof_Y];
 					lm[3 * (k + 1) + 2] = id[dof_Z];
@@ -232,7 +231,7 @@ void FETiedInterface::Update()
 			// get the nodal coordinates
 			int ne = pme->Nodes();
 			vec3d y[FEElement::MAX_NODES];
-			for (int l=0; l<ne; ++l) y[l] = mesh.Node( pme->m_node[l] ).m_rt;
+			for (int l=0; l<ne; ++l) y[l] = ms.Node( pme->m_lnode[l] ).m_rt;
 
 			// calculate the primary node projection
 			vec3d q = pme->eval(y, r, s);

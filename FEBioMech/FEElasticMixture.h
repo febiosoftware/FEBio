@@ -39,13 +39,13 @@ public:
 	FEElasticMixtureMaterialPoint();
 
 	//! Copy material point data
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy() override;
 
 	//! material point initialization
-	void Init();
+	void Init() override;
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	vector<double>				m_w;	//!< material weights
@@ -66,7 +66,7 @@ public:
 	FEElasticMixture(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// return number of materials
 	int Materials() { return (int)m_pMat.size(); }

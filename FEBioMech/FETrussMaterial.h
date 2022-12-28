@@ -32,10 +32,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Material point class for truss materials
-class FETrussMaterialPoint : public FEMaterialPoint
+class FETrussMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEMaterialPoint* Copy()
+	FEMaterialPointData* Copy()
 	{
 		FETrussMaterialPoint* pt = new FETrussMaterialPoint(*this);
 		if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -44,19 +44,19 @@ public:
 
 	void Serialize(DumpStream& ar)
 	{
-		FEMaterialPoint::Serialize(ar);
+		FEMaterialPointData::Serialize(ar);
 		ar & m_l & m_tau;
 	}
 
 	void Init()
 	{
-		FEMaterialPoint::Init();
+		FEMaterialPointData::Init();
 		m_l = 1;
 		m_tau = 0;
 	}
 
 public:
-	double	m_l;	// strech
+	double	m_l;	// stretch
 	double	m_tau;	// Kirchoff stress
 };
 
@@ -65,21 +65,44 @@ public:
 class FETrussMaterial : public FEMaterial
 {
 public:
-	FETrussMaterial(FEModel* pfem) : FEMaterial(pfem) {}
-	~FETrussMaterial(){}
+	FETrussMaterial(FEModel* pfem);
+	~FETrussMaterial();
 
 public:
-	double	m_E;	// Elastic modulus
+	double	m_rho;	// density
 
 public:
 	//! calculate Kirchhoff stress of truss
-	virtual double Stress(FEMaterialPoint& pt);
+	virtual double Stress(FEMaterialPoint& pt) = 0;
 
 	//! calculate elastic tangent
-	virtual double Tangent(FEMaterialPoint& pt);
+	virtual double Tangent(FEMaterialPoint& pt) = 0;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
+	FEMaterialPointData* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
+
+	//! material density
+	double Density();
+
+	// declare the parameter list
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FETrussMaterial);
+};
+
+//-----------------------------------------------------------------------------
+class FELinearTrussMaterial : public FETrussMaterial
+{
+public:
+	FELinearTrussMaterial(FEModel* fem);
+
+	//! calculate Kirchhoff stress of truss
+	double Stress(FEMaterialPoint& pt) override;
+
+	//! calculate elastic tangent
+	double Tangent(FEMaterialPoint& pt) override;
+
+private:
+	double	m_E;	// Elastic modulus
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

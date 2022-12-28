@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include "Quadric.h"
 #include "matrix.h"
 #include <math.h>
-
+using namespace std;
 #ifndef M_PI
 #define M_PI 3.141592653589793238462643
 #endif

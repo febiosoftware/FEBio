@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
+#include <FECore/FETimeStepController.h>
 #include "FEBioLoadDataSection.h"
 #include "FEBioStepSection.h"
 #include "FEBioStepSection3.h"
@@ -77,6 +78,13 @@ void FERestartControlSection::Parse(XMLTag& tag)
 			else if (strcmp(szval, "PLOT_AUGMENTATIONS") == 0) pstep->SetPlotLevel(FE_PLOT_AUGMENTATIONS);
 			else throw XMLReader::InvalidValue(tag);
 		}
+		else if (tag == "plot_stride")
+		{
+			int n = 1;
+			tag.value(n);
+			if (n < 1) throw XMLReader::InvalidValue(tag);
+			pstep->SetPlotStride(n);
+		}
 		else if (tag == "solver")
 		{
 			FEAnalysis* step = fem.GetCurrentStep();
@@ -100,8 +108,8 @@ void FERestartControlSection::Parse(XMLTag& tag)
 	while (!tag.isend());
 
 	// we need to reevaluate the time step size and end time
-	fem.GetTime().timeIncrement = pstep->m_dt0;
-	pstep->m_tend = pstep->m_tstart = pstep->m_ntime*pstep->m_dt0;
+	pstep->m_dt = pstep->m_dt0;
+//	pstep->m_tend = pstep->m_tstart = pstep->m_ntime*pstep->m_dt0;
 
 }
 
@@ -176,6 +184,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 
 			// make sure we can redefine curves in the LoadData section
 			FEBioLoadDataSection3* lcSection = new FEBioLoadDataSection3(this);
+			lcSection->SetRedefineCurvesFlag(true);
 			m_map["LoadData"] = lcSection;
 
 			m_map["Step"] = new FEBioStepSection3(this);
@@ -195,7 +204,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		fem.Serialize(ar);
 
 		// set the module name
-		GetBuilder()->SetModuleName(fem.GetModuleName());
+		GetBuilder()->SetActiveModule(fem.GetModuleName());
 
 		// keep track of the number of steps
 		int steps0 = fem.Steps();

@@ -139,8 +139,7 @@ void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
                 et.m_Wp = et.m_Wt;
                 
                 if ((pt.m_ef <= -1) || (et.m_J <= 0)) {
-                    feLogError("Negative jacobian was detected.");
-                    throw DoRunningRestart();
+                    throw NegativeJacobianDetected();
                 }
                 
                 mp.Update(timeInfo);
@@ -192,7 +191,7 @@ void FEFluidFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::InternalForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
@@ -211,7 +210,7 @@ void FEFluidFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
             fe.assign(ndof, 0);
             
             // calculate internal force vector
-            ElementInternalForce(el, fe, tp);
+            ElementInternalForce(el, fe);
             
             // get the element's LM vector
             UnpackLM(el, lm);
@@ -225,8 +224,9 @@ void FEFluidFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEFluidFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, n;
     
     // jacobian matrix, inverse jacobian matrix and determinants
@@ -307,7 +307,7 @@ void FEFluidFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF)
+void FEFluidFSIDomain3D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
@@ -324,7 +324,7 @@ void FEFluidFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBo
             fe.assign(ndof, 0);
             
             // apply body forces
-            ElementBodyForce(BF, el, fe, tp);
+            ElementBodyForce(BF, el, fe);
             
             // get the element's LM vector
             UnpackLM(el, lm);
@@ -338,8 +338,9 @@ void FEFluidFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBo
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEFluidFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     // jacobian
     double detJ;
     double *H;
@@ -375,8 +376,9 @@ void FEFluidFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, v
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
 //! For now, we assume that the body force is constant
-void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int neln = el.Nodes();
     int ndof = ke.columns()/neln;
     
@@ -439,8 +441,9 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i7, j, j7, n;
     
     // Get the current element's data
@@ -559,7 +562,7 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const 
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::StiffnessMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -579,7 +582,7 @@ void FEFluidFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
             ke.zero();
             
             // calculate material stiffness
-            ElementStiffness(el, ke, tp);
+            ElementStiffness(el, ke);
             
             // get the element's LM vector
 			vector<int> lm;
@@ -593,11 +596,12 @@ void FEFluidFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::MassMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -612,7 +616,7 @@ void FEFluidFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
             ke.zero();
             
             // calculate inertial stiffness
-            ElementMassMatrix(el, ke, tp);
+            ElementMassMatrix(el, ke);
             
             // get the element's LM vector
 			vector<int> lm;
@@ -626,12 +630,13 @@ void FEFluidFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
+void FEFluidFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
     FEFluidFSI* pme = dynamic_cast<FEFluidFSI*>(GetMaterial()); assert(pme);
     
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -647,7 +652,7 @@ void FEFluidFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo
             ke.zero();
             
             // calculate inertial stiffness
-            ElementBodyForceStiffness(bf, el, ke, tp);
+            ElementBodyForceStiffness(bf, el, ke);
             
             // get the element's LM vector
 			vector<int> lm;
@@ -662,8 +667,9 @@ void FEFluidFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i7, j, j7, n;
     
     // Get the current element's data
@@ -772,12 +778,7 @@ void FEFluidFSIDomain3D::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -831,8 +832,8 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		FEFSIMaterialPoint& ft = *(mp.ExtractData<FEFSIMaterialPoint>());
 
 		// elastic material point data
-		ept.m_r0 = el.Evaluate(r0, n);
-		ept.m_rt = el.Evaluate(r, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(r, n);
 		mat3d Ft, Fp;
 		double Jt, Jp;
 		Jt = defgrad(el, Ft, n);
@@ -876,9 +877,10 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // get the element
@@ -894,7 +896,7 @@ void FEFluidFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
             fe.assign(ndof, 0);
             
             // calculate internal force vector
-            ElementInertialForce(el, fe, tp);
+            ElementInertialForce(el, fe);
             
             // get the element's LM vector
             UnpackLM(el, lm);
@@ -906,8 +908,9 @@ void FEFluidFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, n;
     
     // jacobian determinant

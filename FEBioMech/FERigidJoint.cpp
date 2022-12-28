@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidJoint.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
 
@@ -39,8 +38,6 @@ BEGIN_FECORE_CLASS(FERigidJoint, FERigidConnector);
 	ADD_PARAMETER(m_laugon , "laugon"   );
 	ADD_PARAMETER(m_atol   , "tolerance");
 	ADD_PARAMETER(m_eps    , "penalty"  );
-	ADD_PARAMETER(m_nRBa   , "body_a"   );
-	ADD_PARAMETER(m_nRBb   , "body_b"   );
 	ADD_PARAMETER(m_q0     , "joint"    );
 END_FECORE_CLASS();
 

@@ -27,9 +27,8 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <vector>
 #include "febiomech_api.h"
-using namespace std;
+#include <vector>
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -61,7 +60,7 @@ public:
 	virtual void BodyForce(FEGlobalVector& R, FEBodyForce& bf) = 0;
 
 	//! calculate the interial forces (for dynamic problems)
-	virtual void InertialForces(FEGlobalVector& R, vector<double>& F) = 0;
+	virtual void InertialForces(FEGlobalVector& R, std::vector<double>& F) = 0;
 
 	// --- S T I F F N E S S   M A T R I X ---
 

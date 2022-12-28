@@ -35,7 +35,8 @@ class DumpStream;
 // Class to control the time step
 class FECORE_API FETimeStepController : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FETIMECONTROLLER_ID)
+	FECORE_BASE_CLASS(FETimeStepController)
 
 public:
 	FETimeStepController(FEModel* fem);

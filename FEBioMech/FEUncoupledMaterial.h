@@ -131,11 +131,12 @@ public:
     double WeakBondSED(FEMaterialPoint& pt) final;
 
 	// Create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
 public:
 	double	m_K;			//!< bulk modulus
 	int     m_npmodel;      //!< pressure model for U(J)
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEUncoupledMaterial)
 };

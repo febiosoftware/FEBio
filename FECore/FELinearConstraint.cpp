@@ -32,32 +32,38 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "DumpStream.h"
 
-FELinearConstraint::DOF::DOF()
+BEGIN_FECORE_CLASS(FELinearConstraintDOF, FECoreClass)
+	ADD_PARAMETER(dof, "dof", 0, "$(dof_list)");
+	ADD_PARAMETER(node, "node");
+	ADD_PARAMETER(val, "value");
+END_FECORE_CLASS();
+
+FELinearConstraintDOF::FELinearConstraintDOF(FEModel* fem) : FECoreClass(fem)
 {
 	node = dof = -1;
 	val = 0.0;
-
-	GetParameterList();
-	AddParameter(val, "value");
 }
 
-void FELinearConstraint::DOF::Serialize(DumpStream& ar)
-{
-	FEParamContainer::Serialize(ar);
-	ar & node & dof & val;
-}
+//=============================================================================
+BEGIN_FECORE_CLASS(FELinearConstraint, FEBoundaryCondition)
+	ADD_PARAMETER(m_parentDof->dof, "dof", 0, "$(dof_list)");
+	ADD_PARAMETER(m_parentDof->node, "node");
+
+	ADD_PROPERTY(m_childDof, "child_dof");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint() : FEModelComponent(nullptr)
+FELinearConstraint::FELinearConstraint() : FEBoundaryCondition(nullptr)
 {
 	m_parentDof = nullptr;
 	m_off = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(pfem) 
+FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
-	m_parentDof = new DOF;
+	m_parentDof = new FELinearConstraintDOF(pfem);
+	m_parentDof->GetParameterList(); // we need to call this to make sure that the parameter list is created.
 	m_off = 0.0;
 }
 
@@ -83,29 +89,33 @@ void FELinearConstraint::Clear()
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(LC.GetFEModel())
+FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEBoundaryCondition(LC.GetFEModel())
 {
 	m_parentDof = nullptr;
-	CopyFrom(LC);
+	CopyFrom(&(const_cast<FELinearConstraint&>(LC)));
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
+void FELinearConstraint::CopyFrom(FEBoundaryCondition* pbc)
 {
+	FELinearConstraint& LC = dynamic_cast<FELinearConstraint&>(*pbc);
+
 	Clear();
 	if (LC.m_parentDof)
 	{
-		m_parentDof = new DOF;
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
 		m_parentDof->node = LC.m_parentDof->node;
 		m_parentDof->dof  = LC.m_parentDof->dof;
 		m_parentDof->val  = LC.m_parentDof->val;
 	}
 	m_off = LC.m_off;
 	int n = (int)LC.m_childDof.size();
-	vector<DOF*>::const_iterator it = LC.m_childDof.begin();
+	vector<FELinearConstraintDOF*>::const_iterator it = LC.m_childDof.begin();
 	for (int i = 0; i < n; ++i, ++it)
 	{
-		DOF* d = new DOF;
+		FELinearConstraintDOF* d = new FELinearConstraintDOF(GetFEModel());
+		d->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
 		d->node = (*it)->node;
 		d->dof  = (*it)->dof;
 		d->val  = (*it)->val;
@@ -116,7 +126,10 @@ void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentDof(int dof, int node)
 {
-	if (m_parentDof == nullptr) m_parentDof = new DOF;
+	if (m_parentDof == nullptr) {
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
+	}
 	m_parentDof->dof = dof;
 	m_parentDof->node = node;
 }
@@ -124,14 +137,20 @@ void FELinearConstraint::SetParentDof(int dof, int node)
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentNode(int node)
 {
-	if (m_parentDof == nullptr) m_parentDof = new DOF;
+	if (m_parentDof == nullptr) {
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
+	}
 	m_parentDof->node = node;
 }
 
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentDof(int dof)
 {
-	if (m_parentDof == nullptr) m_parentDof = new DOF;
+	if (m_parentDof == nullptr) {
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
+	}
 	m_parentDof->dof = dof;
 }
 
@@ -150,7 +169,7 @@ int FELinearConstraint::GetParentNode() const
 
 //-----------------------------------------------------------------------------
 // get the child DOF
-const FELinearConstraint::DOF& FELinearConstraint::GetChildDof(int n) const
+const FELinearConstraintDOF& FELinearConstraint::GetChildDof(int n) const
 {
 	return *m_childDof[n];
 }
@@ -170,7 +189,8 @@ FELinearConstraint::dof_iterator FELinearConstraint::begin()
 //-----------------------------------------------------------------------------
 void FELinearConstraint::AddChildDof(int dof, int node, double v)
 {
-	DOF* d = new DOF;
+	FELinearConstraintDOF* d = new FELinearConstraintDOF(GetFEModel());
+	d->GetParameterList();	// we need to call this to make sure that the parameter list is created.
 	d->dof = dof;
 	d->node = node;
 	d->val = v;
@@ -178,8 +198,9 @@ void FELinearConstraint::AddChildDof(int dof, int node, double v)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraint::AddChildDof(FELinearConstraint::DOF* dof)
+void FELinearConstraint::AddChildDof(FELinearConstraintDOF* dof)
 {
+	dof->GetParameterList(); 	// we need to call this to make sure that the parameter list is created.
 	m_childDof.push_back(dof);
 }
 
@@ -192,7 +213,7 @@ bool FELinearConstraint::Init()
 	int n = (int)m_childDof.size();
 	for (int i=0; i<n; ++i)
 	{
-		DOF& childNode = *m_childDof[i];
+		FELinearConstraintDOF& childNode = *m_childDof[i];
 		if ((childNode.node == m_parentDof->node) && (childNode.dof == m_parentDof->dof)) return false;
 	}
 	return true;
@@ -203,7 +224,7 @@ bool FELinearConstraint::Init()
 // The parent dof is fixed in order to make sure that they are not assigned an equation number.
 void FELinearConstraint::Activate()
 {
-	FEModelComponent::Activate();
+	FEStepComponent::Activate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	// we need the parent node to be fixed so that no equation is allocated
@@ -214,7 +235,7 @@ void FELinearConstraint::Activate()
 //-----------------------------------------------------------------------------
 void FELinearConstraint::Deactivate()
 {
-	FEModelComponent::Deactivate();
+	FEStepComponent::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	FENode& node = mesh.Node(m_parentDof->node);
@@ -231,19 +252,23 @@ void FELinearConstraint::Serialize(DumpStream& ar)
 		m_parentDof->Serialize(ar);
 		int n = (int)m_childDof.size();
 		ar << n;
-		vector<DOF*>::iterator it = m_childDof.begin();
+		vector<FELinearConstraintDOF*>::iterator it = m_childDof.begin();
 		for (int i = 0; i < n; ++i, ++it) (*it)->Serialize(ar);
 	}
 	else
 	{
 		m_childDof.clear();
-		if (m_parentDof == nullptr) m_parentDof = new DOF;
+		if (m_parentDof == nullptr) {
+			m_parentDof = new FELinearConstraintDOF(GetFEModel());
+			m_parentDof->GetParameterList(); // we need to call this to make sure that the parameter list is created.
+		}
 		m_parentDof->Serialize(ar);
 		int n;
 		ar >> n;
 		for (int i=0; i<n; ++i)
 		{
-			DOF* dof = new DOF;
+			FELinearConstraintDOF* dof = new FELinearConstraintDOF(GetFEModel());
+			dof->GetParameterList(); // we need to call this to make sure that the parameter list is created.
 			dof->Serialize(ar);
 			m_childDof.push_back(dof);
 		}

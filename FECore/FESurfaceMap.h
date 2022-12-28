@@ -70,6 +70,8 @@ public:
 	// return the item list associated with this map
 	FEItemList* GetItemList() override;
 
+	int StorageFormat() const;
+
 public: // from FEDataMap
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& mp) override;

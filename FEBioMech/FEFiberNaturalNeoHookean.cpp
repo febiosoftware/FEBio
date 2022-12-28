@@ -35,14 +35,13 @@
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberNaturalNH, FEElasticFiberMaterial)
+BEGIN_FECORE_CLASS(FEFiberNaturalNH, FEFiberMaterial)
     ADD_PARAMETER(m_ksi, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi");
-    ADD_PARAMETER(m_epsf, "epsilon_scale");
     ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER_OR_EQUAL(1.0), "lam0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFiberNaturalNH::FEFiberNaturalNH(FEModel* pfem) : FEElasticFiberMaterial(pfem)
+FEFiberNaturalNH::FEFiberNaturalNH(FEModel* pfem) : FEFiberMaterial(pfem)
 {
     m_ksi = 0;
     m_lam0 = 1;
@@ -147,3 +146,9 @@ double FEFiberNaturalNH::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
     
     return sed;
 }
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEElasticFiberNaturalNH, FEElasticFiberMaterial)
+    ADD_PARAMETER(m_fib.m_ksi, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi");
+    ADD_PARAMETER(m_fib.m_lam0 , FE_RANGE_GREATER_OR_EQUAL(1.0), "lam0");
+END_FECORE_CLASS();

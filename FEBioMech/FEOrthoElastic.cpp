@@ -33,16 +33,21 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOrthoElastic, FEElasticMaterial)
-	ADD_PARAMETER(E1 , FE_RANGE_GREATER(0.0), "E1");
-	ADD_PARAMETER(E2 , FE_RANGE_GREATER(0.0), "E2");
-	ADD_PARAMETER(E3 , FE_RANGE_GREATER(0.0), "E3");
-	ADD_PARAMETER(G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12");
-	ADD_PARAMETER(G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23");
-	ADD_PARAMETER(G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31");
-	ADD_PARAMETER(v12, "v12");
-	ADD_PARAMETER(v23, "v23");
-	ADD_PARAMETER(v31, "v31");
+	ADD_PARAMETER(m_E1 , FE_RANGE_GREATER(0.0), "E1")->setLongName("E1 modulus");
+	ADD_PARAMETER(m_E2 , FE_RANGE_GREATER(0.0), "E2")->setLongName("E2 modulus");
+	ADD_PARAMETER(m_E3 , FE_RANGE_GREATER(0.0), "E3")->setLongName("E3 modulus");
+	ADD_PARAMETER(m_G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12")->setLongName("G12 shear modulus");
+	ADD_PARAMETER(m_G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23")->setLongName("G23 shear modulus");
+	ADD_PARAMETER(m_G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31")->setLongName("G31 shear modulus");
+	ADD_PARAMETER(m_v12, "v12");
+	ADD_PARAMETER(m_v23, "v23");
+	ADD_PARAMETER(m_v31, "v31");
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEOrthoElastic::FEOrthoElastic(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 //-----------------------------------------------------------------------------
 //! Material initialization.
@@ -50,9 +55,42 @@ bool FEOrthoElastic::Validate()
 {
 	if (FEElasticMaterial::Validate() == false) return false;
 
-	if (v12 > sqrt(E1/E2)) { feLogError("Invalid value for v12. Let v12 <= sqrt(E1/E2)"); return false; }
-	if (v23 > sqrt(E2/E3)) { feLogError("Invalid value for v23. Let v23 <= sqrt(E2/E3)"); return false; }
-	if (v31 > sqrt(E3/E1)) { feLogError("Invalid value for v31. Let v31 <= sqrt(E3/E1)"); return false; }
+	// do some sanity checks
+	if (m_v12.isConst() && m_E1.isConst() && m_E2.isConst())
+	{
+		double v12 = m_v12.constValue();
+		double E1 = m_E1.constValue();
+		double E2 = m_E2.constValue();
+		if (v12 > sqrt(E1 / E2)) { feLogError("Invalid value for v12. Let v12 <= sqrt(E1/E2)"); return false; }
+	}
+
+	if (m_v23.isConst() && m_E2.isConst() && m_E3.isConst())
+	{
+		double v23 = m_v23.constValue();
+		double E2 = m_E2.constValue();
+		double E3 = m_E3.constValue();
+
+		if (v23 > sqrt(E2 / E3)) { feLogError("Invalid value for v23. Let v23 <= sqrt(E2/E3)"); return false; }
+	}
+
+	if (m_v31.isConst() && m_E1.isConst() && m_E3.isConst())
+	{
+		double v31 = m_v31.constValue();
+		double E1 = m_E1.constValue();
+		double E3 = m_E3.constValue();
+
+		if (v31 > sqrt(E3 / E1)) { feLogError("Invalid value for v31. Let v31 <= sqrt(E3/E1)"); return false; }
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEOrthoElastic::EvaluateLameCoefficients(FEMaterialPoint& mp, double lam[3][3], double mu[3])
+{
+	double E1  = m_E1 (mp); double  E2 = m_E2 (mp); double E3  = m_E3 (mp);
+	double v12 = m_v12(mp); double v23 = m_v23(mp); double v31 = m_v31(mp);
+	double G12 = m_G12(mp); double G23 = m_G23(mp); double G31 = m_G31(mp);
 
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;
@@ -61,14 +99,15 @@ bool FEOrthoElastic::Validate()
 	lam[0][0] = 1.0/E1; lam[0][1] = -v12/E1; lam[0][2] = -v31/E3;
 	lam[1][0] = -v12/E1; lam[1][1] = 1.0/E2; lam[1][2] = -v23/E2;
 	lam[2][0] = -v31/E3; lam[2][1] = -v23/E2; lam[2][2] = 1.0/E3;
-	
+
 	// check that compliance matrix is positive definite
-	mat3ds c(lam[0][0],lam[1][1],lam[2][2],lam[0][1],lam[1][2],lam[0][2]);
+	mat3ds c(lam[0][0], lam[1][1], lam[2][2], lam[0][1], lam[1][2], lam[0][2]);
 	double l[3];
 	c.exact_eigen(l);
 
 	if ((l[0] < 0) || (l[1] < 0) || (l[2] < 0)) {
 		feLogError("Stiffness matrix is not positive definite.");
+		assert(false);
 		return false;
 	}
 
@@ -118,6 +157,11 @@ mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
+
+	// evaluate the Lame coefficients
+	double lam[3][3] = { 0 };
+	double mu[3] = { 0 };
+	EvaluateLameCoefficients(mp, lam, mu);
 	
 	// Evaluate the stress
 	mat3ds s;
@@ -163,6 +207,11 @@ tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
+	// evaluate the Lame coefficients
+	double lam[3][3] = { 0 };
+	double mu[3] = { 0 };
+	EvaluateLameCoefficients(mp, lam, mu);
+
 	tens4ds C(0.0);
 	for (i=0; i<3; i++) {
 		C += mu[i]*K[i]*dyad4s(A[i],b);
@@ -199,6 +248,12 @@ double FEOrthoElastic::StrainEnergyDensity(FEMaterialPoint& mp)
         AE2[i] = A0[i].dotdot(E2);
 	}
     
+	// evaluate the Lame coefficients
+	double lam[3][3] = { 0 };
+	double mu[3] = { 0 };
+	EvaluateLameCoefficients(mp, lam, mu);
+
+	// calculate strain energy
     double sed = mu[0]*AE2[0] + mu[1]*AE2[1] + mu[2]*AE2[2]
     +0.5*(lam[0][0]*AE[0]*AE[0]+lam[1][1]*AE[1]*AE[1]+lam[2][2]*AE[2]*AE[2])
     +lam[0][1]*AE[0]*AE[1]+lam[1][2]*AE[1]*AE[2]+lam[2][0]*AE[2]*AE[0];

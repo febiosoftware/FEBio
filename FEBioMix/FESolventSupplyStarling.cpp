@@ -36,10 +36,8 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FESolventSupplyStarling, FESolventSupply)
-	ADD_PARAMETER(m_kp, "kp");
-	ADD_PARAMETER(m_pv, "pv");
-	ADD_PARAMETER(m_qctmp, "qc");
-	ADD_PARAMETER(m_cvtmp, "cv");
+	ADD_PARAMETER(m_kp, "kp")->setLongName("filtration coefficient");
+	ADD_PARAMETER(m_pv, "pv")->setLongName("external pressure");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -57,36 +55,6 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
         m_qc.assign(MAX_CDOFS,0);
         m_cv.assign(MAX_CDOFS,0);
     }
-}
-
-//-----------------------------------------------------------------------------
-bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    // get number of DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-	if (strcmp(p.name(), "qc") == 0)
-	{
-		if (strcmp(szatt, "sol") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if ((id < 0) || (id >= MAX_CDOFS)) return false;
-			SetIndexedParameter(m_qcinp, id, m_qctmp);
-			return true;
-		}
-	}
-	else if (strcmp(p.name(), "cv") == 0)
-	{
-		if (strcmp(szatt, "sol") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if ((id < 0) || (id >= MAX_CDOFS)) return false;
-			SetIndexedParameter(m_cvinp, id, m_cvtmp);
-			return true;
-		}
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------

@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
+#include "FEMembraneReaction.h"
 
 class FEBIOMIX_API FEMembraneReactionRateIonChannel : public FEMembraneReactionRate
 {
 public:
     //! constructor
-    FEMembraneReactionRateIonChannel(FEModel* pfem) : FEMembraneReactionRate(pfem) { m_g = 0; m_sol = -1; m_z = 0; m_sbm = -1;}
+    FEMembraneReactionRateIonChannel(FEModel* pfem);
     
     // initialization
     bool Init() override;
@@ -56,6 +56,7 @@ public:
     
 public:
     int     m_sol;      //!< solute id (1-based) for ion
+    int     m_lid;      //!< local id of solute (zero-based)
     int     m_z;        //!< charge number of channel ion
     int     m_sbm;      //!< sbm id (1-based) for channel protein
     double  m_g;        //!< channel conductance

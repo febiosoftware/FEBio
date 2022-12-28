@@ -28,8 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEIdealGasIsentropic.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
 #include <FECore/log.h>
 
 // define the material parameters
@@ -57,9 +55,9 @@ FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEFluid(pfem)
 //! initialization
 bool FEIdealGasIsentropic::Init() 
 {
-    m_R  = GetFEModel()->GetGlobalConstant("R");
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
-    m_Pr = GetFEModel()->GetGlobalConstant("P");
+    m_R  = GetGlobalConstant("R");
+    m_Tr = GetGlobalConstant("T");
+    m_Pr = GetGlobalConstant("P");
     
 	if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
 	if (m_Tr <= 0) { feLogError("A positive ambient absolute temperature T must be defined in Globals section"); return false; }

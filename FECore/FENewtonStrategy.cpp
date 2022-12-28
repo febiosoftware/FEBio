@@ -30,22 +30,13 @@ SOFTWARE.*/
 #include "FENewtonStrategy.h"
 #include "FENewtonSolver.h"
 #include "LinearSolver.h"
-#include "FEModel.h"
-
-REGISTER_SUPER_CLASS(FENewtonStrategy, FENEWTONSTRATEGY_ID);
-
-BEGIN_FECORE_CLASS(FENewtonStrategy, FECoreBase)
-	ADD_PARAMETER(m_maxups, "max_ups");
-	ADD_PARAMETER(m_max_buf_size, FE_RANGE_GREATER_OR_EQUAL(0), "max_buffer_size"); 
-	ADD_PARAMETER(m_cycle_buffer, "cycle_buffer");
-	ADD_PARAMETER(m_cmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax");
-END_FECORE_CLASS();
 
 FENewtonStrategy::FENewtonStrategy(FEModel* fem) : FECoreBase(fem)
 {
 	m_pns = nullptr;
 
 	m_maxups = 10;
+	m_cmax = 1e5;
 	m_max_buf_size = 0; // when zero, it should default to m_maxups
 	m_cycle_buffer = true;
 
@@ -90,4 +81,10 @@ void FENewtonStrategy::Serialize(DumpStream& ar)
 	FECoreBase::Serialize(ar);
 	ar & m_nups;
 	ar & m_pns;
+}
+
+//! reset data for new run
+void FENewtonStrategy::Reset()
+{
+
 }

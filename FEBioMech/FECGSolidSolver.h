@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FESolver.h>
 #include <FECore/FEGlobalVector.h>
 #include <FECore/FETimeInfo.h>
+#include "FERigidSolver.h"
 #include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
@@ -93,6 +94,7 @@ public:
 	double	m_LStol;
 	double	m_LSmin;
 	int		m_LSiter;
+	int m_CGmethod;
 
 	// Newmark parameters (for dynamic analyses)
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
@@ -104,15 +106,19 @@ private:
 	vector<double>	m_Ui;
 	vector<double>	m_ui;
 	vector<double>	m_Ut;
-	vector<double>	m_Fn;
 	vector<double>	m_Fd;
 	vector<double>	m_Fr;
+	vector<double>	m_Fn;
 
 	int				m_neq;
 	int				m_nreq;
 
 protected:
-	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
+	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ, m_dofSU,m_dofSV, m_dofSA;
+
+protected:
+	FERigidSolverNew	m_rigidSolver;
+
 
 	DECLARE_FECORE_CLASS();
 };

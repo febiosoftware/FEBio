@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FECarreauYasudaViscousSolid.h"
-#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -66,7 +65,7 @@ mat3ds FECarreauYasudaViscousSolid::Stress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FECarreauYasudaViscousSolid::Tangent(FEMaterialPoint& mp)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     tens4ds Cv;

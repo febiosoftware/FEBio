@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEContinuousElasticDamage.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/expint_Ei.h>
 
@@ -35,10 +34,10 @@ SOFTWARE.*/
 
 //=========================================================================================
 
-class FEFiberDamagePoint : public FEMaterialPoint
+class FEFiberDamagePoint : public FEMaterialPointData
 {
 public:
-	FEFiberDamagePoint(FEMaterialPoint* pm) : FEMaterialPoint(pm)
+	FEFiberDamagePoint(FEMaterialPointData* pm) : FEMaterialPointData(pm)
 	{
 		m_D = 0.0;
 		m_D1 = m_D2 = m_D3 = 0.0;
@@ -73,7 +72,7 @@ public:
 		m_gamma_prev = 0.0;
 		m_init = false;
 
-		FEMaterialPoint::Init();
+		FEMaterialPointData::Init();
 	}
 
 	void Update(const FETimeInfo& timeInfo) override
@@ -81,6 +80,7 @@ public:
 		m_gamma_prev = m_gamma;
 		m_bt_prev = m_bt;
 		m_psi_f0_prev = m_psi_f0;
+		FEMaterialPointData::Update(timeInfo);
 	}
 
 public:
@@ -199,7 +199,7 @@ mat3ds FEDamageElasticFiber::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 	damagePoint.m_Ds = 0.0;
 
 	// get current simulation time.
-	double t = GetFEModel()->GetTime().currentTime;
+	double t = CurrentTime();
 
 	// (i) compute trans-iso strain energy
 	double psi_f0 = Psi0(mp, a0);
@@ -370,7 +370,7 @@ FEDamageFiberPower::FEDamageFiberPower(FEModel* fem) : FEDamageElasticFiber(fem)
 	m_kappa = 0.0;
 }
 
-FEMaterialPoint* FEDamageFiberPower::CreateMaterialPointData()
+FEMaterialPointData* FEDamageFiberPower::CreateMaterialPointData()
 {
 	FEFiberDamagePoint* mp = new FEFiberDamagePoint(new FEElasticMaterialPoint);
 	mp->m_psf_c = 2.0;
@@ -465,7 +465,7 @@ FEDamageFiberExponential::FEDamageFiberExponential(FEModel* fem) : FEDamageElast
 	m_kappa = 0.0;
 }
 
-FEMaterialPoint* FEDamageFiberExponential::CreateMaterialPointData()
+FEMaterialPointData* FEDamageFiberExponential::CreateMaterialPointData()
 {
 	FEFiberDamagePoint* mp = new FEFiberDamagePoint(new FEElasticMaterialPoint);
 	mp->m_psf_c = 1.0;
@@ -539,7 +539,7 @@ FEDamageFiberExpLinear::FEDamageFiberExpLinear(FEModel* fem) : FEDamageElasticFi
 	m_lamax = 0.0;
 }
 
-FEMaterialPoint* FEDamageFiberExpLinear::CreateMaterialPointData()
+FEMaterialPointData* FEDamageFiberExpLinear::CreateMaterialPointData()
 {
 	FEFiberDamagePoint* mp = new FEFiberDamagePoint(new FEElasticMaterialPoint);
 	mp->m_psf_c = 1.0;

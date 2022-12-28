@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "ILUT_Preconditioner.h"
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
 
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
 #ifdef MKL_ISS

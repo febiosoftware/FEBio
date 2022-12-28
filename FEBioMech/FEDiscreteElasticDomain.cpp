@@ -33,8 +33,12 @@ FEDiscreteElasticDomain::FEDiscreteElasticDomain(FEModel* fem) : FEDiscreteDomai
 {
 	m_pMat = nullptr;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +179,7 @@ void FEDiscreteElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 		if (el.isActive())
 		{
 			// get the material point data
-			FEDiscreteMaterialPoint& mp = dynamic_cast<FEDiscreteMaterialPoint&>(*el.GetMaterialPoint(0));
+			FEDiscreteMaterialPoint& mp = *el.GetMaterialPoint(0)->ExtractData<FEDiscreteMaterialPoint>();
 
 			// evaluate the stiffness
 			mat3d A = m_pMat->Stiffness(mp);
@@ -217,7 +221,7 @@ void FEDiscreteElasticDomain::Update(const FETimeInfo& tp)
 		if (el.isActive())
 		{
 			// get the material point data
-			FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+			FEDiscreteElasticMaterialPoint& mp = *el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
 
 			// get the nodes of the element
 			FENode& n1 = mesh.Node(el.m_node[0]);

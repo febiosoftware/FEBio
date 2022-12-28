@@ -160,9 +160,11 @@ void scatter(vector<double>& v, FEMesh& mesh, int ndof)
 void scatter3(vector<double>& v, FEMesh& mesh, int ndof1, int ndof2, int ndof3)
 {
 	const int NN = mesh.Nodes();
-	for (int i = 0, n; i<NN; ++i)
+#pragma omp parallel for 
+	for (int i = 0; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
+		int n;
 		n = node.m_ID[ndof1]; if (n >= 0) node.set(ndof1, v[n]);
 		n = node.m_ID[ndof2]; if (n >= 0) node.set(ndof2, v[n]);
 		n = node.m_ID[ndof3]; if (n >= 0) node.set(ndof3, v[n]);

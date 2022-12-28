@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include "FESurfaceMap.h"
 #include "FENodeDataMap.h"
 #include "DumpStream.h"
+#include "FECoreKernel.h"
 #include <algorithm>
 
 //-----------------------------------------------------------------------------
@@ -481,15 +482,6 @@ double FEMesh::CurrentElementVolume(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-//! Find a nodeset by ID
-
-FENodeSet* FEMesh::FindNodeSet(int nid)
-{
-	for (size_t i=0; i<m_NodeSet.size(); ++i) if (m_NodeSet[i]->GetID() == nid) return m_NodeSet[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! Find a nodeset by name
 
 FENodeSet* FEMesh::FindNodeSet(const std::string& name)
@@ -523,6 +515,14 @@ int FEMesh::FindSurfaceIndex(const std::string& name)
 {
 	for (size_t i = 0; i < m_Surf.size(); ++i) if (m_Surf[i]->GetName() == name) return i;
 	return -1;
+}
+
+FESurface* FEMesh::CreateSurface(FEFacetSet& facetSet)
+{
+	FESurface* surf = fecore_alloc(FESurface, m_fem);
+	surf->Create(facetSet);
+	AddSurface(surf);
+	return surf;
 }
 
 //-----------------------------------------------------------------------------
@@ -1077,7 +1077,16 @@ void FEMesh::CopyFrom(FEMesh& mesh)
 		const char* sz = dom.GetTypeStr();
 
 		// create a new domain
-		FEDomain* pd = fecore_new<FEDomain>(sz, nullptr);
+		// create a new domain
+		FEDomain* pd = nullptr;
+		switch (dom.Class())
+		{
+		case FE_DOMAIN_SOLID   : pd = fecore_new<FESolidDomain   >(sz, nullptr); break;
+		case FE_DOMAIN_SHELL   : pd = fecore_new<FEShellDomain   >(sz, nullptr); break;
+		case FE_DOMAIN_BEAM    : pd = fecore_new<FEBeamDomain    >(sz, nullptr); break;
+		case FE_DOMAIN_2D      : pd = fecore_new<FEDomain2D      >(sz, nullptr); break;
+		case FE_DOMAIN_DISCRETE: pd = fecore_new<FEDiscreteDomain>(sz, nullptr); break;
+		}
 		assert(pd);
 		pd->SetMesh(this);
 

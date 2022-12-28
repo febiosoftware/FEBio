@@ -36,11 +36,11 @@ SOFTWARE.*/
 //! Base class for solute diffusivity.
 //! These materials need to define the diffusivity and tangent diffusivity functions.
 //!
-class FEBIOMIX_API FESoluteDiffusivity : public FEMaterial
+class FEBIOMIX_API FESoluteDiffusivity : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESoluteDiffusivity(FEModel* pfem) : FEMaterial(pfem) {}
+	FESoluteDiffusivity(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solute diffusivity
 	virtual mat3ds Diffusivity(FEMaterialPoint& pt) = 0;
@@ -66,17 +66,18 @@ public:
 private:
 	int	m_ID;		//!< solute ID
 	
+	FECORE_BASE_CLASS(FESoluteDiffusivity)
 };
 
 //-----------------------------------------------------------------------------
 //! Base class for solute solubility.
 //! These materials need to define the solubility and tangent solubility functions.
 //!
-class FEBIOMIX_API FESoluteSolubility : public FEMaterial
+class FEBIOMIX_API FESoluteSolubility : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESoluteSolubility(FEModel* pfem) : FEMaterial(pfem) {}
+	FESoluteSolubility(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solute solubility
 	virtual double Solubility(FEMaterialPoint& pt) = 0;
@@ -106,6 +107,7 @@ public:
 private:
 	int	m_ID;		//!< solute ID
 	
+	FECORE_BASE_CLASS(FESoluteSolubility)
 };
 
 //-----------------------------------------------------------------------------
@@ -113,11 +115,11 @@ private:
 //! These materials need to define the solute supply and tangent supply functions.
 //! The solute supply has units of moles/(referential mixture volume)/time
 //!
-class FEBIOMIX_API FESoluteSupply : public FEMaterial
+class FEBIOMIX_API FESoluteSupply : public FEMaterialProperty
 {
 public:
 	//! constructor
-	FESoluteSupply(FEModel* pfem) : FEMaterial(pfem) {}
+	FESoluteSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
 	//! solute supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;
@@ -142,7 +144,8 @@ public:
 	
 	//! referential solid concentration under steady-state conditions
 	virtual double SolidConcentrationSS(FEMaterialPoint& pt) = 0;
-	
+
+	FECORE_BASE_CLASS(FESoluteSupply)
 };
 
 //-----------------------------------------------------------------------------
@@ -167,7 +170,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solute materials.
 
-class FESolute : public FEMaterial
+class FESolute : public FEMaterialProperty
 {
 public:
 	FESolute(FEModel* pfem);
@@ -206,10 +209,10 @@ private:
 	FESoluteData* FindSoluteData(int nid);
 	
 private:
-	int						m_ID;		//!< solute ID in global table
     int                     m_LID;      //!< solute local ID in parent material
 	
 public: // material parameters
+	int						m_ID;		//!< solute ID in global table
 	double					m_rhoT;		//!< true solute density
 	double					m_M;		//!< solute molecular weight
 	int						m_z;		//!< charge number of solute
@@ -219,6 +222,16 @@ public: // material properties
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
 	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
 
+	FECORE_BASE_CLASS(FESolute)
+};
+
+//-----------------------------------------------------------------------------
+// This class was introduced so that solutes fall in the same paradigm as any other
+// material property.
+class FESoluteMaterial : public FESolute
+{
+public:
+	FESoluteMaterial(FEModel* fem);
 	DECLARE_FECORE_CLASS();
 };
 
@@ -240,7 +253,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solid-bound molecules.
 
-class FESolidBoundMolecule : public FEMaterial
+class FESolidBoundMolecule : public FEMaterialProperty
 {
 public:
 	FESolidBoundMolecule(FEModel* pfem);
@@ -281,4 +294,5 @@ public:
 	double					m_rhomax;	//!< maximum referential (apparent) density of SBM
 	
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FESolidBoundMolecule)
 };

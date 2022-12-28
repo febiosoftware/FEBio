@@ -28,14 +28,15 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFiberMaterialUC.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Neo-Hookean law
 
-class FEFiberNHUC : public FEElasticFiberMaterialUC
+class FEFiberNHUC : public FEFiberMaterialUncoupled
 {
 public:
-	FEFiberNHUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) { m_mu = 0; }
+	FEFiberNHUC(FEModel* pfem);
 
 	//! Cauchy stress
 	mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
@@ -49,7 +50,13 @@ public:
 public:
 	double	m_mu;       // shear modulus
 
-						// declare the parameter list
-	DECLARE_FECORE_CLASS();
+	DECLARE_FECORE_CLASS(); // declare the parameter list
 };
 
+
+class FEUncoupledFiberNH : public FEElasticFiberMaterialUC_T<FEFiberNHUC>
+{
+public:
+	FEUncoupledFiberNH(FEModel* fem) : FEElasticFiberMaterialUC_T<FEFiberNHUC>(fem) {}
+	DECLARE_FECORE_CLASS();
+};

@@ -49,7 +49,7 @@ bool FEInSituStretchGradient::Init()
 }
 
 //-----------------------------------------------------------------------------
-FEParamVec3* FEInSituStretchGradient::GetFiberProperty()
+FEVec3dValuator* FEInSituStretchGradient::GetFiberProperty()
 {
 	// make sure the parent material is a prestrain material
 	FEPrestrainMaterial* prestrainMat = dynamic_cast<FEPrestrainMaterial*>(GetParent());
@@ -59,13 +59,11 @@ FEParamVec3* FEInSituStretchGradient::GetFiberProperty()
 	FEElasticMaterial* elasticMat = prestrainMat->GetElasticMaterial();
 
 	// make sure it has a fiber property
-	FEParam* fiberProp = elasticMat->FindParameter("fiber");
+	FEVec3dValuator* fiberProp = dynamic_cast<FEVec3dValuator*>(elasticMat->GetProperty("fiber"));
 	if (fiberProp == nullptr) return nullptr;
 
 	// make sure it's a vector map
-	if (fiberProp->type() != FE_PARAM_VEC3D_MAPPED) return nullptr;
-	
-	return &(fiberProp->value<FEParamVec3>());
+	return fiberProp;
 }
 
 //-----------------------------------------------------------------------------

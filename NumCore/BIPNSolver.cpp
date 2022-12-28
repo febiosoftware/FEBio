@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "BIPNSolver.h"
 #include <FECore/vector.h>
-#include <FECore/FEModel.h>
 #include "RCICGSolver.h"
 #include <FECore/SchurComplement.h>
 #include <FECore/log.h>
@@ -499,7 +498,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 
 		// solve for the coefficients
 		vector<double> a(m);
-		Q.solve(q, a);
+		Q.solve(a, q);
 		for (int i = 0; i <= n; ++i)
 		{
 			au[i] = a[i];

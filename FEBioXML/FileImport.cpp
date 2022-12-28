@@ -26,7 +26,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FileImport.h"
-#include <FECore/Image.h>
 #include <FECore/FENodeDataMap.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEFunction1D.h>
@@ -38,6 +37,8 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEPointFunction.h>
+#include <FECore/FEGlobalData.h>
+#include <FECore/log.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -47,6 +48,91 @@ SOFTWARE.*/
 #ifndef WIN32
 #define strnicmp strncasecmp
 #endif
+
+//-----------------------------------------------------------------------------
+FEObsoleteParamHandler::FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc) : m_pc(pc) 
+{
+	m_root = tag.m_szroot[tag.m_nlevel - 1];
+}
+
+void FEObsoleteParamHandler::AddParam(const char* oldName, const char* newName, FEParamType paramType)
+{
+	FEObsoleteParam p = { oldName, newName, paramType };
+	m_param.push_back(p);
+}
+
+bool FEObsoleteParamHandler::ProcessTag(XMLTag& tag)
+{
+	std::string path = tag.relpath(m_root.c_str());
+	for (int i = 0; i < m_param.size(); ++i)
+	{
+		if (path == m_param[i].oldName)
+		{
+			m_param[i].readIn = true;
+
+			switch (m_param[i].paramType)
+			{
+			case FE_PARAM_INVALID: break; // parameter will be ignored
+			case FE_PARAM_BOOL   : tag.value(m_param[i].bVal); break;
+			case FE_PARAM_INT    : tag.value(m_param[i].iVal); break;
+			case FE_PARAM_DOUBLE : tag.value(m_param[i].gVal); break;
+			default:
+				assert(false);
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void FEObsoleteParamHandler::MapParameters()
+{
+	FEModel* fem = m_pc->GetFEModel();
+	feLogEx(fem, "\n");
+	for (FEObsoleteParam& p : m_param)
+	{
+		if (p.readIn)
+		{
+			if (p.newName == nullptr)
+			{
+				feLogWarningEx(fem, "Obsolete parameter %s is ignored!", p.oldName);
+			}
+			else
+			{
+				ParamString ps(p.newName);
+				FEParam* pp = m_pc->FindParameter(ps);
+				if (pp == nullptr)
+				{
+					feLogErrorEx(fem, "Failed to map obsolete parameter %s. Could not find new parameter %s", p.oldName, p.newName);
+				}
+				else
+				{
+					if (pp->type() == p.paramType)
+					{
+						switch (pp->type())
+						{
+						case FE_PARAM_BOOL  : pp->value<bool>  () = p.bVal; break;
+						case FE_PARAM_INT   : pp->value<int>   () = p.iVal; break;
+						case FE_PARAM_DOUBLE: pp->value<double>() = p.gVal; break;
+						}
+						feLogEx(fem, "Successfully mapped obsolete parameter %s to %s\n", p.oldName, p.newName);
+					}
+					else if ((pp->type() == FE_PARAM_DOUBLE_MAPPED) && (p.paramType == FE_PARAM_DOUBLE))
+					{
+						FEParamDouble& v = pp->value<FEParamDouble>();
+						v = p.gVal;
+						feLogEx(fem, "Successfully mapped obsolete parameter %s to %s\n", p.oldName, p.newName);
+					}
+					else
+					{
+						feLogErrorEx(fem, "Failed to map obsolete parameter %s. New parameter %s has different type.", p.oldName, p.newName);
+					}
+				}
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 FEFileException::FEFileException()
@@ -83,6 +169,12 @@ FEModel* FEFileSection::GetFEModel() { return &GetBuilder()->GetFEModel(); }
 
 //-----------------------------------------------------------------------------
 FEModelBuilder* FEFileSection::GetBuilder() { return m_pim->GetBuilder(); }
+
+//-----------------------------------------------------------------------------
+void FEFileSection::SetInvalidTagHandler(FEInvalidTagHandler* ith)
+{
+	m_ith = ith;
+}
 
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, int& n)
@@ -309,31 +401,102 @@ bool is_number(const char* sz)
 bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 {
 	// get the enums
-	const char* ch = pp->enums();
-	if (ch == nullptr) return false;
+	const char* szenums = pp->enums();
+	if (szenums == nullptr) return false;
 
 	// special cases
-	if (strcmp(ch, "@dof_list") == 0)
+	if (szenums[0] == '$')
 	{
-		DOFS& dofs = GetFEModel()->GetDOFS();
-		if (pp->type() == FE_PARAM_INT)
-		{
-			int ndof = dofs.GetDOF(val);
-			if (ndof < 0) return false;
+		FEModel* fem = GetFEModel();
 
-			pp->value<int>() = ndof;
+		char var[256] = { 0 };
+		const char* chl = strchr(szenums, '('); assert(chl);
+		const char* chr = strchr(szenums, ')'); assert(chr);
+		strncpy(var, chl + 1, chr - chl - 1);
+
+		if (strncmp(var, "dof_list", 8) == 0)
+		{
+			DOFS& dofs = GetFEModel()->GetDOFS();
+			const char* szvar = nullptr;
+			if (var[8] == ':') szvar = var + 9;
+
+			if (pp->type() == FE_PARAM_INT)
+			{
+				int ndof = dofs.GetDOF(val, szvar);
+				if (ndof < 0) return false;
+				pp->value<int>() = ndof;
+				return true;
+			}
+			else if (pp->type() == FE_PARAM_STD_VECTOR_INT)
+			{
+				std::vector<int>& v = pp->value<std::vector<int> >();
+				return dofs.ParseDOFString(val, v, szvar);
+			}
+			else return false;
+		}
+		else if (strcmp(var, "solutes") == 0)
+		{
+			int n = -1;
+			if (is_number(val)) n = atoi(val);
+			else
+			{
+				FEGlobalData* pd = fem->FindGlobalData(val);
+				if (pd == nullptr) return false;
+				n = pd->GetID(); assert(n > 0);
+			}
+				
+			pp->value<int>() = n;
 			return true;
 		}
-		else if (pp->type() == FE_PARAM_STD_VECTOR_INT)
+		else if (strcmp(var, "sbms") == 0)
 		{
-			std::vector<int>& v = pp->value<std::vector<int> >();
-			return dofs.ParseDOFString(val, v);
+			int n = -1;
+			if (is_number(val)) n = atoi(val);
+			else
+			{
+				FEGlobalData* pd = fem->FindGlobalData(val);
+				if (pd == nullptr) return false;
+				n = pd->GetID(); assert(n > 0);
+			}
+
+			pp->value<int>() = n;
+			return true;
+		}
+		else if (strcmp(var, "species") == 0)
+		{
+			int n = -1;
+			if (is_number(val)) n = atoi(val);
+			else
+			{
+				// NOTE: This assumes that the solutes are defined before the SBMS!
+				int m = fem->FindGlobalDataIndex(val);
+				if (m == -1) return false;
+				n = m + 1;
+			}
+			pp->value<int>() = n;
+			return true;
+		}
+		else if (strcmp(var, "rigid_materials") == 0)
+		{
+			if (is_number(val))
+			{
+				int n = atoi(val);
+				pp->value<int>() = n;
+			}
+			else
+			{
+				FEMaterial* mat = fem->FindMaterial(val);
+				if (mat == nullptr) return false;
+				int n = mat->GetID();
+				pp->value<int>() = n;
+			}
+			return true;
 		}
 		else return false;
 	}
-	else if (strncmp(ch, "@factory_list", 13) == 0)
+	else if (strncmp(szenums, "@factory_list", 13) == 0)
 	{
-		int classID = atoi(ch + 14);
+		int classID = atoi(szenums + 14);
 
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		for (int i = 0; i < fecore.FactoryClasses(); ++i)
@@ -355,7 +518,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 	{
 	case FE_PARAM_INT:
 	{
-		int n = enumValue(val, ch);
+		int n = enumValue(val, szenums);
 		if (n != -1) pp->value<int>() = n;
 		else
 		{
@@ -376,7 +539,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		const char* tmp = val;
 		while (tmp)
 		{
-			int n = enumValue(tmp, ch);
+			int n = enumValue(tmp, szenums);
 			v.push_back(n);
 			tmp = strchr(tmp, ',');
 			if (tmp) tmp++;
@@ -454,7 +617,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				else
 				{
 					bool bfound = parseEnumParam(pp, tag.szvalue());
-					if (bfound == false) throw XMLReader::InvalidValue(tag);
+					if (bfound == false)
+					{
+						if ((m_ith == nullptr) || (m_ith->ProcessTag(tag) == false)) {
+							throw XMLReader::InvalidValue(tag);
+						}
+					}
 				}
 			}
 			break;
@@ -496,49 +664,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
 		case FE_PARAM_STRING: value(tag, pp->cvalue()); break;
 		case FE_PARAM_STD_STRING: value(tag, pp->value<string>()); break;
-		case FE_PARAM_IMAGE_3D:
-		{
-			// get the file name
-			const char* szfile = tag.AttributeValue("file");
-
-			++tag;
-			int n[3] = { 0 };
-			bool bend = false;
-			Image::ImageFormat fmt = Image::RAW8;
-			do
-			{
-				if (tag == "size") tag.value(n, 3);
-				else if (tag == "format")
-				{
-					const char* szfmt = tag.szvalue();
-					// figure out the image format
-					if      (strcmp(szfmt, "RAW8"  ) == 0) fmt = Image::RAW8;
-					else if (strcmp(szfmt, "RAW16U") == 0) fmt = Image::RAW16U;
-					else throw XMLReader::InvalidValue(tag);
-				}
-				else if (tag == "endianness") tag.value(bend);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-			Image& im = pp->value<Image>();
-			im.Create(n[0], n[1], n[2]);
-
-			// see if we need to pre-pend a path
-			char szin[512];
-			strcpy(szin, szfile);
-			char* ch = strrchr(szin, '\\');
-			if (ch == 0) ch = strrchr(szin, '/');
-			if (ch == 0)
-			{
-				// pre-pend the name with the input path
-				sprintf(szin, "%s%s", m_pim->GetFilePath(), szfile);
-			}
-
-			// Try to load the image file
-			if (im.Load(szin, fmt, bend) == false) throw XMLReader::InvalidValue(tag);
-		}
-		break;
 		case FE_PARAM_DATA_ARRAY:
 		{
 			// get the surface map
@@ -928,33 +1053,34 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		for (int i = 0; i < nattr; ++i)
 		{
 			const char* szat = tag.m_att[i].m_szatt;
-			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
+			// If we get here, the container did not understand the attribute.
+			// If the attribute is a "lc", we interpret it as a load curve
+			if (strcmp(szat, "lc") == 0)
 			{
-				// If we get here, the container did not understand the attribute.
-				// If the attribute is a "lc", we interpret it as a load curve
-				if (strcmp(szat, "lc") == 0)
+				int lc = atoi(tag.m_att[i].m_szatv) - 1;
+				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+
+				// make sure the parameter is volatile
+				if (pp->IsVolatile() == false)
 				{
-					int lc = atoi(tag.m_att[i].m_szatv) - 1;
-					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-					GetFEModel()->AttachLoadController(pp, lc);
+					throw XMLReader::InvalidAttribute(tag, szat);
 				}
-				/*			else
-				{
-				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				}
-				*/
+
+				GetFEModel()->AttachLoadController(pp, lc);
 			}
+/*			else
+			{
+				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+			}
+*/
 			// This is not true. Parameters can have attributes that are used for other purposes. E.g. The local fiber option.
 			//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
 	}
 
-	// give the parameter container a chance to do additional processing
-	pl.GetContainer()->SetParameter(*pp);
-
 	// Set the watch flag since the parameter was read in successfully
 	// (This requires that the parameter was declared with a watch variable)
-	pp->SetWatch(true);
+	pp->SetWatchFlag(true);
 
 	return true;
 }
@@ -972,41 +1098,39 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 		const char* szval = att.cvalue();
 		if ((att.m_bvisited == false) && szatt && szval)
 		{
-			if      (strcmp("name", szatt) == 0) pc->SetName(szval);
+			FEParam* param = pl.FindFromName(szatt);
+			if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+			{
+				switch (param->type())
+				{
+				case FE_PARAM_INT:
+				{
+					if (param->enums() == nullptr)
+						param->value<int>() = atoi(szval);
+					else
+					{
+						if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+					}
+					break;
+				}
+				case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+				case FE_PARAM_STD_STRING: param->value<std::string>() = szval; break;
+				default:
+					throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+				}
+			}
+			else if (strcmp("name", szatt) == 0) pc->SetName(szval);
 			else if (strcmp("id"  , szatt) == 0) pc->SetID(atoi(szval));
 			else if (strcmp("lc"  , szatt) == 0) { /* don't do anything. Loadcurves are processed elsewhere. */ }
 			else
 			{
-				FEParam* param = pl.FindFromName(szatt);
-				if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+				if (m_pim->StopOnUnknownAttribute())
 				{
-					switch (param->type())
-					{
-					case FE_PARAM_INT:
-					{
-						if (param->enums() == nullptr)
-							param->value<int>() = atoi(szval);
-						else
-						{
-							if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
-						}
-						break;
-					}
-					case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
-					default:
-						throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
-					}
+					throw XMLReader::InvalidAttribute(tag, szatt);
 				}
 				else
 				{
-					if (m_pim->StopOnUnknownAttribute())
-					{
-						throw XMLReader::InvalidAttribute(tag, szatt);
-					}
-					else
-					{
-						fprintf(stderr, "WARNING: Unknown parameter %s in tag %s\n", szatt, tag.Name());
-					}
+					fprintf(stderr, "WARNING: Unknown attribute %s in tag %s\n", szatt, tag.Name());
 				}
 			}
 		}
@@ -1044,14 +1168,14 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				FEMesh& mesh = GetFEModel()->GetMesh();
 
 				// This property should reference an existing class
-				SUPER_CLASS_ID classID = prop->GetClassID();
-				if (classID == FEITEMLIST_ID)
+				SUPER_CLASS_ID classID = prop->GetSuperClassID();
+/*				if (classID == FEITEMLIST_ID)
 				{
 					FENodeSet* nodeSet = mesh.FindNodeSet(szref);
 					if (nodeSet == nullptr) throw XMLReader::InvalidValue(tag);
 					prop->SetProperty(nodeSet);
 				}
-				else if (classID == FEDOMAIN_ID)
+				else */if (classID == FESURFACE_ID)
 				{
 					FEModelBuilder* builder = GetBuilder();
 					FEFacetSet* facetSet = mesh.FindFacetSet(szref);
@@ -1078,12 +1202,20 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				{
 					const char* sztype = tag.AttributeValue("type", true);
 
-					// If the type attribute is omitted we assume the tag's name is the type
-					if (sztype == 0) sztype = tag.Name();
+					// If the type attribute is omitted we try the property's default type,
+					// otherwise assume the tag's name is the default type
+					if (sztype == nullptr)
+					{
+						if (prop->GetDefaultType()) sztype = prop->GetDefaultType();
+						else sztype = tag.Name();
+					}
+
+					// HACK for getting passed the old "user" fiber type.
+					if (strcmp(sztype, "user") == 0) sztype = "map";
 
 					// HACK for mapping load curves to FEFunction1D
 					const char* szlc = tag.AttributeValue("lc", true);
-					if (szlc && (tag.m_natt == 1) && (prop->GetClassID() == FEFUNCTION1D_ID))
+					if (szlc && (tag.m_natt == 1) && (prop->GetSuperClassID() == FEFUNCTION1D_ID))
 					{
 						double v = 1;
 						tag.value(v);
@@ -1096,7 +1228,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					else
 					{
 						// try to allocate the class
-						FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+						FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, GetFEModel());
 						if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 						prop->SetProperty(pp);
@@ -1110,10 +1242,32 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						{
 							if ((tag.szvalue() != nullptr) && (tag.szvalue()[0] != 0))
 							{
+								// parse attributes first
+								ReadAttributes(tag, pp);
+
 								// There should be a parameter with the same name as the type
 								if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
 									throw XMLReader::InvalidValue(tag);
 							}
+						}
+						else
+						{
+							// we get here if the property was defined with an empty tag.
+							// We should still validate it.
+							int NP = pp->PropertyClasses();
+							for (int i = 0; i < NP; ++i)
+							{
+								FEProperty* pi = pp->PropertyClass(i);
+								bool a = pi->IsRequired();
+								bool b = (pi->size() == 0);
+								if (a && b)
+								{
+									std::string name = pp->GetName();
+									if (name.empty()) name = prop->GetName();
+									throw FEBioImport::MissingProperty(name, pi->GetName());
+								}
+							}
+
 						}
 					}
 				}
@@ -1162,7 +1316,11 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 		++tag;
 		do
 		{
-			if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
+			if (ReadParameter(tag, pc) == false)
+			{
+				if ((m_ith == nullptr) || (m_ith->ProcessTag(tag) == false))
+					throw XMLReader::InvalidTag(tag);
+			}
 			++tag;
 		}
 		while (!tag.isend());

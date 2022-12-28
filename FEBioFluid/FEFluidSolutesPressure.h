@@ -9,7 +9,6 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include "FEFluidSolutes.h"
-#include "FEFluidSolutesMaterial2.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidResistanceBC is a fluid surface that has a normal
@@ -22,14 +21,13 @@ public:
     FEFluidSolutesPressure(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
     
     //! set the dilatation
-    void Update() override;
-    
+    void Update() override;    
     
     //! initialize
     bool Init() override;
@@ -44,11 +42,7 @@ private:
     double          m_p;       //!< prescribed fluid pressure
     
 private:
-    double          m_alpha;
-    double          m_alphaf;
-    
     FEFluidSolutes*    m_pfs;   //!< pointer to fluid-solutes material
-    FEFluidSolutesMaterial2* m_pfs2; //!< pointer to fluid-solutes material2
     
     int        m_dofEF;
     int        m_dofC;

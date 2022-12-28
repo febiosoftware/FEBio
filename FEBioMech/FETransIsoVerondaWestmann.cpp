@@ -37,8 +37,8 @@ BEGIN_FECORE_CLASS(FETransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_fib.m_c4  , "c4");
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
 	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
-	ADD_PARAMETER(m_fib.m_fiber, "fiber");
-
+	
+	ADD_PROPERTY(m_fiber, "fiber");
 	ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 END_FECORE_CLASS();
 
@@ -49,22 +49,25 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+
 	m_ac = nullptr;
 	m_fib.SetParent(this);
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! create material point data
-FEMaterialPoint* FETransIsoVerondaWestmann::CreateMaterialPointData() {
+FEMaterialPointData* FETransIsoVerondaWestmann::CreateMaterialPointData() 
+{
     // create the elastic solid material point
-    FEMaterialPoint* ep = new FEElasticMaterialPoint;
+    FEMaterialPointData* ep = new FEElasticMaterialPoint;
     
     // create the material point from the active contraction material
-    if (m_ac) {
-        FEMaterialPoint* pt = m_ac->CreateMaterialPointData(*ep);
-        if (pt != nullptr) return pt;
-    }
-    return ep;
+    if (m_ac) ep->Append(m_ac->CreateMaterialPointData());
+
+	return ep;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,14 +85,26 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	// calculate square of B
 	mat3ds B2 = B.sqr();
 
+	// material axes
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
+
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
 
+    double c1 = m_c1(mp);
+    double c2 = m_c2(mp);
+    
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
-	double W1 = m_c1*m_c2*exp(m_c2*(I1-3));
-	double W2 = -0.5*m_c1*m_c2;
+	double W1 = c1*c2*exp(c2*(I1-3));
+	double W2 = -0.5*c1*c2;
 	// ------------------------------------------------
 
 	// calculate T = F*dW/dC*Ft
@@ -99,10 +114,10 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// add the passive fiber stress
-	s += m_fib.DevFiberStress(mp, m_fib.FiberVector(mp));
+	s += m_fib.DevFiberStress(mp, a0);
 
     // calculate the active fiber stress (if provided)
-    if (m_ac) s += m_ac->ActiveStress(mp,m_fib.FiberVector(mp));
+    if (m_ac) s += m_ac->ActiveStress(mp, a0);
     
 	return s;
 }
@@ -127,13 +142,25 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
+    double c1 = m_c1(mp);
+    double c2 = m_c2(mp);
+    
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
 	double W1, W2, W11;
-	W1 = m_c1*m_c2*exp(m_c2*(I1-3));
-	W2 = -0.5*m_c1*m_c2;
-	W11 = m_c2*W1;
+	W1 = c1*c2*exp(c2*(I1-3));
+	W2 = -0.5*c1*c2;
+	W11 = c2*W1;
 	// ---
+
+	// material axes
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
 
 	// calculate dWdC:C
 	double WC = W1*I1 + 2*W2*I2;
@@ -159,9 +186,9 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
     // add the active fiber stiffness
-    if (m_ac) c += m_ac->ActiveStiffness(mp, m_fib.FiberVector(mp));
+    if (m_ac) c += m_ac->ActiveStiffness(mp, a0);
     
-	return c + m_fib.DevFiberTangent(mp,m_fib.FiberVector(mp));
+	return c + m_fib.DevFiberTangent(mp, a0);
 }
 
 //-----------------------------------------------------------------------------
@@ -174,17 +201,29 @@ double FETransIsoVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
     
 	// calculate square of B
 	mat3ds B2 = B.sqr();
-    
+
+	// material axes
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
+
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
     
+    double c1 = m_c1(mp);
+    double c2 = m_c2(mp);
+    
 	// calculate sed
-    double sed = m_c1*(exp(m_c2*(I1-3))-1) - m_c1*m_c2*(I2-3)/2;
+    double sed = c1*(exp(c2*(I1-3))-1) - c1*c2*(I2-3)/2;
     
 	// add the fiber strain energy density
-	sed += m_fib.DevFiberStrainEnergyDensity(mp,m_fib.FiberVector(mp));
+	sed += m_fib.DevFiberStrainEnergyDensity(mp, a0);
     
 	return sed;
 }
@@ -193,8 +232,14 @@ double FETransIsoVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
 // update force-velocity material point
 void FETransIsoVerondaWestmann::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& timeInfo)
 {
-    // get the material fiber axis
-    vec3d a0 = m_fib.m_fiber.unitVector(mp);
-    
+	// material axes
+	mat3d Q = GetLocalCS(mp);
+
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber->unitVector(mp);
+
+	// convert to global coordinates
+	vec3d a0 = Q * fiber;
+
     if (m_ac) m_ac->UpdateSpecializedMaterialPoints(mp, timeInfo, a0);
 }

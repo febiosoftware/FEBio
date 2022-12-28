@@ -37,7 +37,7 @@ FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint() : FEMaterialPoint
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticMixtureMaterialPoint::Copy()
+FEMaterialPointData* FEElasticMixtureMaterialPoint::Copy()
 {
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint;
 	pt->m_w = m_w;
@@ -77,14 +77,13 @@ FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticMixture::CreateMaterialPointData() 
+FEMaterialPointData* FEElasticMixture::CreateMaterialPointData() 
 { 
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
-//	pt->SetName(m_pMat.GetName());
 	int NMAT = Materials();
 	for (int i=0; i<NMAT; ++i) 
 	{
-		FEMaterialPoint* pi = m_pMat[i]->CreateMaterialPointData();
+		FEMaterialPoint* pi = new FEMaterialPoint(m_pMat[i]->CreateMaterialPointData());
 		pt->AddMaterialPoint(pi);
 	}
 	return pt;
@@ -130,21 +129,21 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 	mat3ds s; s.zero();
 	for (int i=0; i < (int) m_pMat.size(); ++i)
 	{
-		FEMaterialPoint* mpi = pt.GetPointData(i);
-		mpi->m_elem = mp.m_elem;
-		mpi->m_index = mp.m_index;
+		FEMaterialPoint& mpi = *pt.GetPointData(i);
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
+		mpi.m_r0 = mp.m_r0;
 
 		// copy the elastic material point data to the components
-		FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
-		epi.m_rt = ep.m_rt;
-		epi.m_r0 = mp.m_r0;// ep.m_r0;
+		FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         epi.m_v = ep.m_v;
         epi.m_a = ep.m_a;
         epi.m_L = ep.m_L;
 
-		s += epi.m_s = m_pMat[i]->Stress(*mpi)*w[i];
+		s += epi.m_s = m_pMat[i]->Stress(mpi)*w[i];
 	}
 
 	return s;
@@ -164,21 +163,21 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 	tens4ds c(0.);
 	for (int i=0; i < (int) m_pMat.size(); ++i)
 	{
-		FEMaterialPoint* mpi = pt.GetPointData(i);
-		mpi->m_elem = mp.m_elem;
-		mpi->m_index = mp.m_index;
+		FEMaterialPoint& mpi = *pt.GetPointData(i);
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
+		mpi.m_r0 = mp.m_r0;
 
 		// copy the elastic material point data to the components
-		FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
-		epi.m_rt = ep.m_rt;
-		epi.m_r0 = mp.m_r0;// ep.m_r0;
+		FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         epi.m_v = ep.m_v;
         epi.m_a = ep.m_a;
         epi.m_L = ep.m_L;
 
-		c += m_pMat[i]->Tangent(*mpi)*w[i];
+		c += m_pMat[i]->Tangent(mpi)*w[i];
 	}
 
 	return c;
@@ -200,21 +199,21 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 	double sed = 0.0;
 	for (int i=0; i < (int) m_pMat.size(); ++i)
 	{
-		FEMaterialPoint* mpi = pt.GetPointData(i);
-		mpi->m_elem = mp.m_elem;
-		mpi->m_index = mp.m_index;
+		FEMaterialPoint& mpi = *pt.GetPointData(i);
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
+		mpi.m_r0 = mp.m_r0;
 
 		// copy the elastic material point data to the components
-		FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
-		epi.m_rt = ep.m_rt;
-		epi.m_r0 = mp.m_r0;// ep.m_r0;
+		FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         epi.m_v = ep.m_v;
         epi.m_a = ep.m_a;
         epi.m_L = ep.m_L;
 
-		sed += m_pMat[i]->StrainEnergyDensity(*mpi)*w[i];
+		sed += m_pMat[i]->StrainEnergyDensity(mpi)*w[i];
 	}
     
 	return sed;
@@ -236,21 +235,21 @@ double FEElasticMixture::StrongBondSED(FEMaterialPoint& mp)
     double sed = 0.0;
     for (int i=0; i < (int) m_pMat.size(); ++i)
     {
-        FEMaterialPoint* mpi = pt.GetPointData(i);
-        mpi->m_elem = mp.m_elem;
-        mpi->m_index = mp.m_index;
-        
+        FEMaterialPoint& mpi = *pt.GetPointData(i);
+        mpi.m_elem = mp.m_elem;
+        mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
+		mpi.m_r0 = mp.m_r0;
+
         // copy the elastic material point data to the components
-        FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
-        epi.m_rt = ep.m_rt;
-        epi.m_r0 = mp.m_r0;// ep.m_r0;
+        FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
         epi.m_F = ep.m_F;
         epi.m_J = ep.m_J;
         epi.m_v = ep.m_v;
         epi.m_a = ep.m_a;
         epi.m_L = ep.m_L;
         
-        sed += m_pMat[i]->StrongBondSED(*mpi)*w[i];
+        sed += m_pMat[i]->StrongBondSED(mpi)*w[i];
     }
     
     return sed;
@@ -272,21 +271,21 @@ double FEElasticMixture::WeakBondSED(FEMaterialPoint& mp)
     double sed = 0.0;
     for (int i=0; i < (int) m_pMat.size(); ++i)
     {
-        FEMaterialPoint* mpi = pt.GetPointData(i);
-        mpi->m_elem = mp.m_elem;
-        mpi->m_index = mp.m_index;
-        
+        FEMaterialPoint& mpi = *pt.GetPointData(i);
+        mpi.m_elem = mp.m_elem;
+        mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
+		mpi.m_r0 = mp.m_r0;
+
         // copy the elastic material point data to the components
-        FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
-        epi.m_rt = ep.m_rt;
-        epi.m_r0 = mp.m_r0;// ep.m_r0;
+        FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
         epi.m_F = ep.m_F;
         epi.m_J = ep.m_J;
         epi.m_v = ep.m_v;
         epi.m_a = ep.m_a;
         epi.m_L = ep.m_L;
         
-        sed += m_pMat[i]->WeakBondSED(*mpi)*w[i];
+        sed += m_pMat[i]->WeakBondSED(mpi)*w[i];
     }
     
     return sed;
@@ -300,10 +299,11 @@ void FEElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, cons
     
     for (int i=0; i < (int) m_pMat.size(); ++i)
     {
-        FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
-        epi.m_elem = mp.m_elem;
+		FEMaterialPoint& mpi = *pt.GetPointData(i);
+		mpi.m_elem = mp.m_elem;
+		FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
         FEMaterial* pmj = GetMaterial(i);
-        pmj->UpdateSpecializedMaterialPoints(epi, tp);
+        pmj->UpdateSpecializedMaterialPoints(mpi, tp);
     }
 }
 

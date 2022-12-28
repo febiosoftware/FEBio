@@ -31,10 +31,10 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDiffRefIso, FESoluteDiffusivity)
-	ADD_PARAMETER(m_free_diff, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
-	ADD_PARAMETER(m_diff0    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff0"    );
-	ADD_PARAMETER(m_diff1    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff1"    );
-	ADD_PARAMETER(m_diff2    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff2"    );
+	ADD_PARAMETER(m_free_diff, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff")->setUnits(UNIT_DIFFUSIVITY)->setLongName("free diffusivity");
+	ADD_PARAMETER(m_diff0    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff0"    )->setUnits(UNIT_DIFFUSIVITY);
+	ADD_PARAMETER(m_diff1    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff1"    )->setUnits(UNIT_DIFFUSIVITY);
+	ADD_PARAMETER(m_diff2    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff2"    )->setUnits(UNIT_DIFFUSIVITY);
 	ADD_PARAMETER(m_M        , FE_RANGE_GREATER_OR_EQUAL(0.0), "M"        );
 	ADD_PARAMETER(m_alpha    , FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha"    );
 END_FECORE_CLASS();
@@ -68,9 +68,8 @@ double FEDiffRefIso::Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& mp,
 //! Diffusivity tensor.
 mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 {
+	FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint* ppt = mp.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint* bfpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -82,11 +81,7 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 	double J = et.m_J;
 	
 	// solid volume fraction in reference configuration
-    double phi0 = 0;
-    if (ppt)
-        phi0 = ppt->m_phi0t;
-    else if (bfpt)
-        phi0 = bfpt->m_phi0;
+    double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
 	
 	// --- strain-dependent permeability ---
 	
@@ -103,9 +98,8 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 //! Tangent of diffusivity with respect to strain
 tens4dmm FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
+	FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint* ppt = mp.ExtractData<FEBiphasicMaterialPoint>();
-    FEBiphasicFSIMaterialPoint* bfpt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -117,12 +111,8 @@ tens4dmm FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	double J = et.m_J;
 	
 	// solid volume fraction in reference configuration
-    double phi0 = 0;
-    if (ppt)
-        phi0 = ppt->m_phi0t;
-    else if (bfpt)
-        phi0 = bfpt->m_phi0;
-	
+	double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
+
 	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double d0 = m_diff0*f;
 	double d1 = m_diff1/(J*J)*f;

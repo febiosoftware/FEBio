@@ -23,17 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FEModel.h>
+#include "fecore_api.h"
+class FEModel;
 
-#define feLog(...) GetFEModel()->Logf(0, __VA_ARGS__)
-#define feLogWarning(...) GetFEModel()->Logf(1, __VA_ARGS__)
-#define feLogError(...) GetFEModel()->Logf(2, __VA_ARGS__)
-#define feLogInfo(...) GetFEModel()->Logf(3, __VA_ARGS__)
+FECORE_API void write_log(FEModel* fem, int ntag, const char* szmsg, ...);
 
-#define feLogEx(fem, ...) fem->Logf(0, __VA_ARGS__)
-#define feLogWarningEx(fem, ...) fem->Logf(1, __VA_ARGS__)
-#define feLogErrorEx(fem, ...) fem->Logf(2, __VA_ARGS__)
+#define feLog(...) write_log(GetFEModel(), 0, __VA_ARGS__)
+#define feLogWarning(...) write_log(GetFEModel(), 1, __VA_ARGS__)
+#define feLogError(...) write_log(GetFEModel(), 2, __VA_ARGS__)
+#define feLogInfo(...) write_log(GetFEModel(), 3, __VA_ARGS__)
+#define feLogDebug(...) write_log(GetFEModel(), 4, __VA_ARGS__)
+
+#define feLogEx(fem, ...) write_log(fem, 0, __VA_ARGS__)
+#define feLogWarningEx(fem, ...) write_log(fem, 1, __VA_ARGS__)
+#define feLogErrorEx(fem, ...) write_log(fem, 2, __VA_ARGS__)
+#define feLogInfoEx(fem, ...) write_log(fem, 3, __VA_ARGS__)
+#define feLogDebugEx(fem, ...) write_log(fem, 4, __VA_ARGS__)

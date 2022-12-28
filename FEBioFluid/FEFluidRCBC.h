@@ -25,38 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEPrescribedBC.h>
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidRCBC is a fluid surface that has an RC-equivalent circuit for outflow conditions
 //!
-class FEBIOFLUID_API FEFluidRCBC : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidRCBC : public FEPrescribedSurface
 {
 public:
     //! constructor
     FEFluidRCBC(FEModel* pfem);
-    
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-    
-    //! set the dilatation
-    void Update() override;
     
     //! evaluate flow rate
     double FlowRate();
     
     //! initialize
     bool Init() override;
-    
-    //! activate
-    void Activate() override;
+
+    //! Update 
+    void Update() override;
     
     //! serialization
     void Serialize(DumpStream& ar) override;
+
+public:
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
     
 private:
     double          m_R;        //!< flow resistance
@@ -72,9 +70,9 @@ private:
     double          m_dqp;      //!< flow rate time derivative at previous time step
     double          m_pp;       //!< pressure at previoust time step
     double          m_dpp;      //!< pressure derivative at previoust time step
+    double          m_e;
     
 private:
-    double              m_gamma;
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
     
     FEDofList   m_dofW;

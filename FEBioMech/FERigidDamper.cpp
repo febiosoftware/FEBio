@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidDamper.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
@@ -46,6 +45,7 @@ END_FECORE_CLASS();
 FERigidDamper::FERigidDamper(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
+    m_c = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -305,8 +305,8 @@ void FERigidDamper::Update()
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	FETimeInfo& tp = GetFEModel()->GetTime();
-	double alpha = tp.alphaf;
+    const FETimeInfo& tp = GetTimeInfo();
+    double alpha = tp.alphaf;
 
     // body A
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);

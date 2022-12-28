@@ -39,14 +39,14 @@ END_FECORE_CLASS();
 //============================================================================
 // FEFluidSolutesMaterialPoint
 //============================================================================
-FESolutesMaterial::Point::Point(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
+FESolutesMaterial::Point::Point(FEMaterialPointData* pt) : FEMaterialPointData(pt)
 {
 	m_vft = vec3d(0.0, 0.0, 0.0);
 	m_JfdotoJf = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FESolutesMaterial::Point::Copy()
+FEMaterialPointData* FESolutesMaterial::Point::Copy()
 {
 	FESolutesMaterial::Point* pt = new FESolutesMaterial::Point(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -56,7 +56,7 @@ FEMaterialPoint* FESolutesMaterial::Point::Copy()
 //-----------------------------------------------------------------------------
 void FESolutesMaterial::Point::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_vft & m_JfdotoJf;
     ar & m_nsol;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
@@ -76,8 +76,20 @@ void FESolutesMaterial::Point::Init()
     m_dkdJ.clear();
     m_dkdc.clear();
 
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
+
+//-----------------------------------------------------------------------------
+double FESolutesMaterial::Point::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
+}
+
 
 //============================================================================
 // FESolutesMaterial
@@ -94,7 +106,7 @@ FESolutesMaterial::FESolutesMaterial(FEModel* pfem) : FEMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FESolutesMaterial::CreateMaterialPointData()
+FEMaterialPointData* FESolutesMaterial::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint();
     return new FESolutesMaterial::Point(fpt);
@@ -104,13 +116,6 @@ FEMaterialPoint* FESolutesMaterial::CreateMaterialPointData()
 // initialize
 bool FESolutesMaterial::Init()
 {
-    // we first have to set the parent material
-    // TODO: This seems redundant since each material already has a pointer to its parent
-    for (int i=0; i<Reactions(); ++i)
-    {
-        m_pReact[i]->m_pSM = this;
-    }
-    
     // set the solute IDs first, since they are referenced in FESolute::Init()
     for (int i = 0; i<Solutes(); ++i) {
         m_pSolute[i]->SetSoluteLocalID(i);
@@ -122,9 +127,9 @@ bool FESolutesMaterial::Init()
     
     int zmin = 0, zmax = 0;
     
-    m_Rgas = GetFEModel()->GetGlobalConstant("R");
-    m_Tabs = GetFEModel()->GetGlobalConstant("T");
-    m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
+    m_Rgas = GetGlobalConstant("R");
+    m_Tabs = GetGlobalConstant("T");
+    m_Fc   = GetGlobalConstant("Fc");
     
     if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
     if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");     return false; }

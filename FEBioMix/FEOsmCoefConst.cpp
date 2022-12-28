@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOsmCoefConst, FEOsmoticCoefficient)
-	ADD_PARAMETER(m_osmcoef, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmcoef");
+	ADD_PARAMETER(m_osmcoef, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmcoef")->setLongName("osmotic coefficient");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

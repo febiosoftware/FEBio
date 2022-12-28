@@ -45,10 +45,10 @@ public:
 
 public:
 	//! calculate residual
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! calculate stiffness
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 protected:
 	FEParamDouble	m_pressure;	//!< pressure value

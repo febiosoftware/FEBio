@@ -35,13 +35,14 @@ class FENodeSet;
 //-----------------------------------------------------------------------------
 //! This is the base class for a node data value.
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number
-class FECORE_API FENodeLogData : public FECoreBase
+class FECORE_API FELogNodeData : public FELogData
 { 
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FELOGNODEDATA_ID)
+	FECORE_BASE_CLASS(FELogNodeData)
 
 public:
-	FENodeLogData(FEModel* fem);
-	virtual ~FENodeLogData();
+	FELogNodeData(FEModel* fem);
+	virtual ~FELogNodeData();
 	virtual double value(int node) = 0; 
 };
 
@@ -51,20 +52,21 @@ public:
 class FECORE_API NodeDataRecord : public DataRecord
 {
 public:
-	NodeDataRecord(FEModel* pfem, const char* szfile);
+	NodeDataRecord(FEModel* pfem);
 	double Evaluate(int item, int ndata);
-	void SetData(const char* sz);
+	void SetData(const char* sz) override;
 	void SelectAllItems();
-	void SetNodeSet(FENodeSet* pns);
 	int Size() const;
 
+	void SetItemList(FEItemList* items, const std::vector<int>& selection) override;
+
 private:
-	vector<FENodeLogData*>	m_Data;
+	vector<FELogNodeData*>	m_Data;
 };
 
 //-----------------------------------------------------------------------------
 // Special class for outputting nodal variables
-class FECORE_API FENodeVarData : public FENodeLogData
+class FECORE_API FENodeVarData : public FELogNodeData
 {
 public:
 	FENodeVarData(FEModel* pfem, int ndof);

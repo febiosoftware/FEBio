@@ -81,9 +81,6 @@ void FEBoxMesh::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, FE_Element_Ty
 				node.m_r0 = vec3d(x, y, z);
 
 				node.m_rt = node.m_r0;
-
-				// set rigid body id
-				node.m_rid = -1;
 			}
 		}
 	}

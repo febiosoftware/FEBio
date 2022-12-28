@@ -260,10 +260,10 @@ bool solvepolyFS(int n, vector<double> a, double& x)
 //============================================================================
 // FEFluidSolutesMaterialPoint
 //============================================================================
-FEFluidSolutesMaterialPoint::FEFluidSolutesMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+FEFluidSolutesMaterialPoint::FEFluidSolutesMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEFluidSolutesMaterialPoint::Copy()
+FEMaterialPointData* FEFluidSolutesMaterialPoint::Copy()
 {
     FEFluidSolutesMaterialPoint* pt = new FEFluidSolutesMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -273,7 +273,7 @@ FEMaterialPoint* FEFluidSolutesMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEFluidSolutesMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_nsol & m_psi & m_Ie & m_pe;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
     ar & m_dkdc;
@@ -298,7 +298,18 @@ void FEFluidSolutesMaterialPoint::Init()
     m_dkdJc.clear();
     m_dkdcc.clear();
 
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
+}
+
+//-----------------------------------------------------------------------------
+double FEFluidSolutesMaterialPoint::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
 }
 
 //============================================================================
@@ -319,7 +330,7 @@ FEFluidSolutes::FEFluidSolutes(FEModel* pfem) : FEMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEFluidSolutes::CreateMaterialPointData()
+FEMaterialPointData* FEFluidSolutes::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint();
     return new FEFluidSolutesMaterialPoint(fpt);
@@ -335,13 +346,6 @@ void FEFluidSolutes::AddChemicalReaction(FEChemicalReaction* pcr)
 // initialize
 bool FEFluidSolutes::Init()
 {
-    // we first have to set the parent material
-    // TODO: This seems redundant since each material already has a pointer to its parent
-    for (int i=0; i<Reactions(); ++i)
-    {
-        m_pReact[i]->m_pFS = this;
-    }
-    
     // set the solute IDs first, since they are referenced in FESolute::Init()
     for (int i = 0; i<Solutes(); ++i) {
         m_pSolute[i]->SetSoluteLocalID(i);
@@ -384,13 +388,6 @@ void FEFluidSolutes::Serialize(DumpStream& ar)
     
     ar & m_Rgas & m_Tabs & m_Fc;
     ar & m_zmin & m_ndeg;
-    
-    if (ar.IsLoading())
-    {
-        // restore the m_pMP pointers for reactions
-        int NR = (int) m_pReact.size();
-        for (int i=0; i<NR; ++i) m_pReact[i]->m_pFS = this;
-    }
 }
 
 //-----------------------------------------------------------------------------

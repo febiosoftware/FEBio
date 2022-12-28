@@ -31,12 +31,14 @@
 #include "FEElasticMaterial.h"
 #include <FECore/log.h>
 
-//////////////////////////////////////////////////////////////////////
-// FEForceVelocityMaterialPoint
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+FEForceVelocityMaterialPoint::FEForceVelocityMaterialPoint()
+{
+
+}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEForceVelocityMaterialPoint::Copy()
+FEMaterialPointData* FEForceVelocityMaterialPoint::Copy()
 {
     FEForceVelocityMaterialPoint* pt = new FEForceVelocityMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -46,7 +48,7 @@ FEMaterialPoint* FEForceVelocityMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEForceVelocityMaterialPoint::Init()
 {
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
     
     m_lambdap = 1;
     
@@ -71,8 +73,7 @@ void FEForceVelocityMaterialPoint::Serialize(DumpStream& ar)
         for (int i=0; i<MAX_TERMS; ++i) ar >> m_H[i] >> m_Hp[i];
     }
     
-    FEMaterialPoint::Serialize(ar);
-    
+	FEMaterialPointData::Serialize(ar);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -116,7 +117,7 @@ FEForceVelocityContraction::FEForceVelocityContraction(FEModel* pfem) : FEActive
 //-----------------------------------------------------------------------------
 bool FEForceVelocityContraction::Init()
 {
-    if (FEMaterial::Init() == false) return false;
+    if (FEActiveContractionMaterial::Init() == false) return false;
     
     // for backward compatibility we set m_camax to m_ca0 if it is not defined
     if (m_camax == 0.0) m_camax = m_ca0;
@@ -147,7 +148,7 @@ mat3ds FEForceVelocityContraction::ActiveStress(FEMaterialPoint& mp, const vec3d
     // get the activation
     double saf = 0.0;
     double FVstress = 0.0;
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = GetTimeInfo().timeIncrement;
     if (m_ascl > 0)
     {
         double ctenslm = m_ascl;

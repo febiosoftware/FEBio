@@ -32,9 +32,12 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FENeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE)->setLongName("Young's modulus");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v")->setLongName("Poisson's ratio");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FENeoHookean::FENeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 //-----------------------------------------------------------------------------
 mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)

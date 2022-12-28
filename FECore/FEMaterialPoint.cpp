@@ -31,45 +31,79 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include <string.h>
 
-FEMaterialPoint::FEMaterialPoint(FEMaterialPoint* ppt)
+FEMaterialPointData::FEMaterialPointData(FEMaterialPointData* ppt)
 {
 	m_pPrev = 0;
 	m_pNext = ppt;
-	m_elem = 0;
 	if (ppt) ppt->m_pPrev = this;
 }
 
-FEMaterialPoint::~FEMaterialPoint()
+FEMaterialPointData::~FEMaterialPointData()
 { 
 	if (m_pNext) delete m_pNext;
 	m_pNext = m_pPrev = 0;
 }
 
-void FEMaterialPoint::SetPrev(FEMaterialPoint* pt)
+void FEMaterialPointData::SetPrev(FEMaterialPointData* pt)
 {
 	m_pPrev = pt;
 }
 
-void FEMaterialPoint::SetNext(FEMaterialPoint* pt)
+void FEMaterialPointData::SetNext(FEMaterialPointData* pt)
 {
 	m_pNext = pt;
-	pt->m_pPrev = this;
+	if (pt) pt->m_pPrev = this;
 }
 
-void FEMaterialPoint::Append(FEMaterialPoint* pt)
+void FEMaterialPointData::Append(FEMaterialPointData* pt)
 {
+	if (pt == nullptr) return;
 	if (m_pNext) m_pNext->Append(pt);
 	else SetNext(pt);
 }
 
-void FEMaterialPoint::Init()
+void FEMaterialPointData::Init()
 {
 	if (m_pNext) m_pNext->Init();
 }
 
-void FEMaterialPoint::Update(const FETimeInfo& timeInfo)
+void FEMaterialPointData::Update(const FETimeInfo& timeInfo)
 {
 	if (m_pNext) m_pNext->Update(timeInfo);
+}
+
+void FEMaterialPointData::Serialize(DumpStream& ar)
+{
+	if (m_pNext) m_pNext->Serialize(ar);
+}
+
+//=================================================================================================
+FEMaterialPoint::FEMaterialPoint(FEMaterialPointData* data)
+{
+	m_data = data;
+	m_elem = nullptr;
+}
+
+FEMaterialPoint::~FEMaterialPoint()
+{
+
+}
+
+void FEMaterialPoint::Init()
+{
+	if (m_data) m_data->Init();
+}
+
+FEMaterialPoint* FEMaterialPoint::Copy()
+{
+	FEMaterialPoint* mp = new FEMaterialPoint(*this);
+	if (m_data) mp->m_data = m_data->Copy();
+	return mp;
+}
+
+void FEMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	if (m_data) m_data->Update(timeInfo);
 }
 
 void FEMaterialPoint::Serialize(DumpStream& ar)
@@ -78,11 +112,20 @@ void FEMaterialPoint::Serialize(DumpStream& ar)
 	{
 		ar & m_r0 & m_J0 & m_Jt;
 	}
-	if (m_pNext) m_pNext->Serialize(ar);
+	if (m_data) m_data->Serialize(ar);
 }
 
+void FEMaterialPoint::Append(FEMaterialPointData* pt)
+{
+	if (pt == nullptr) return;
+	assert(m_data);
+	if (m_data) m_data->Append(pt);
+}
+
+//=================================================================================================
+
 //-----------------------------------------------------------------------------
-FEMaterialPointArray::FEMaterialPointArray(FEMaterialPoint* ppt) : FEMaterialPoint(ppt)
+FEMaterialPointArray::FEMaterialPointArray(FEMaterialPointData* ppt) : FEMaterialPointData(ppt)
 {
 	
 }
@@ -91,26 +134,25 @@ FEMaterialPointArray::FEMaterialPointArray(FEMaterialPoint* ppt) : FEMaterialPoi
 void FEMaterialPointArray::AddMaterialPoint(FEMaterialPoint* pt)
 {
 	m_mp.push_back(pt);
-	pt->SetPrev(this);
 }
-
 
 //-----------------------------------------------------------------------------
 void FEMaterialPointArray::Init()
 {
 	for (int i = 0; i<(int)m_mp.size(); ++i) m_mp[i]->Init();
-	FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
 void FEMaterialPointArray::Serialize(DumpStream& ar)
 {
+	FEMaterialPointData::Serialize(ar);
 	for (int i = 0; i<(int)m_mp.size(); ++i) m_mp[i]->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
 void FEMaterialPointArray::Update(const FETimeInfo& timeInfo)
 {
-	FEMaterialPoint::Update(timeInfo);
+	FEMaterialPointData::Update(timeInfo);
 	for (int i = 0; i<(int)m_mp.size(); ++i) m_mp[i]->Update(timeInfo);
 }

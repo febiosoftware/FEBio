@@ -31,10 +31,6 @@ SOFTWARE.*/
 #include "mat3d.h"
 #include "fecore_api.h"
 
-#ifndef PI
-#define PI 3.14159265358979
-#endif
-
 //-----------------------------------------------------------------------------
 //! This class implements a quaternion. 
 
@@ -42,7 +38,7 @@ class FECORE_API quatd
 {
 public:
 	// constructors
-	quatd () { x = y = z = w = 0.f; }
+	quatd() { x = y = z = 0.0;  w = 1.0; }
 
 	quatd( const double angle, vec3d v)
 	{
@@ -88,7 +84,7 @@ public:
 
 	}
 
-	quatd(const double qx, const double qy, const double qz, const double qw = 0.0)
+	quatd(const double qx, const double qy, const double qz, const double qw = 1.0)
 	{
 		w = qw;
 		x = qx;
@@ -96,7 +92,11 @@ public:
 		z = qz;
 	}
 
-	bool operator != (const quatd& q) { return ((x!=q.x) || (y!=q.y) || (z!=q.z) || (w!=q.w)); }
+	quatd(const mat3d& a);
+
+	bool operator != (const quatd& q) const { return ((x!=q.x) || (y!=q.y) || (z!=q.z) || (w!=q.w)); }
+
+	bool operator == (const quatd& q) const { return ((x == q.x) && (y == q.y) && (z == q.z) && (w == q.w)); }
 
 	quatd operator - () { return quatd(-x, -y, -z, -w); }
 
@@ -205,8 +205,8 @@ public:
 	quatd Inverse() const
 	{
 		double N = w*w + x*x + y*y + z*z;
-
-		return quatd(-x/N, -y/N, -z/N, w/N);
+		if (N == 0.0) return quatd(x, y, z, w);
+		else return quatd(-x/N, -y/N, -z/N, w/N);
 	}
 
 	double DotProduct(const quatd& q) const
@@ -315,8 +315,7 @@ public:
 	void GetEuler(double& x, double& y, double& z) const;
 
 public:
-	double w;
-	double x, y, z;
+	double x, y, z, w;
 };
 
 inline quatd operator * (const double a, const quatd& q)

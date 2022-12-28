@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include <functional>
 
 //-----------------------------------------------------------------------------
@@ -37,9 +37,10 @@ class FEMeshAdaptorCriterion;
 
 //-----------------------------------------------------------------------------
 // Base class for all mesh adaptors
-class FECORE_API FEMeshAdaptor : public FEModelComponent
+class FECORE_API FEMeshAdaptor : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMESHADAPTOR_ID)
+	FECORE_BASE_CLASS(FEMeshAdaptor);
 
 public:
 	FEMeshAdaptor(FEModel* fem);

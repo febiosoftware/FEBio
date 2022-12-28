@@ -60,33 +60,34 @@ public:
     void ElasticDeformationGradient(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
     
     // get the yield surface normal
-    mat3ds YieldSurfaceNormal(FEElasticMaterialPoint& pe);
+    mat3ds YieldSurfaceNormal(FEMaterialPoint& mp);
     
     // evaluate octahedral plastic strain
     void OctahedralPlasticStrain(FEMaterialPoint& pt);
     
     // evaluate reactive heat supply
     void ReactiveHeatSupplyDensity(FEMaterialPoint& pt);
+
+    bool UseSecantTangent() override { return m_secant_tangent; }
+    
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp) override;
     
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion
     FEPlasticFlowCurve* m_pFlow;    // plastic flow curve
     
-private:
-    vector<double> Ky;
-    vector<double> w;
-    
 public:
-    int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
+
+    bool    m_secant_tangent;
 
     DECLARE_FECORE_CLASS();
 };

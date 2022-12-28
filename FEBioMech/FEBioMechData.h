@@ -40,122 +40,122 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-class FENodeXPos : public FENodeLogData
+class FENodeXPos : public FELogNodeData
 { 
 public: 
-	FENodeXPos(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeXPos(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYPos : public FENodeLogData 
+class FENodeYPos : public FELogNodeData 
 { 
 public: 
-	FENodeYPos(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeYPos(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZPos : public FENodeLogData
+class FENodeZPos : public FELogNodeData
 { 
 public: 
-	FENodeZPos(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeZPos(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeXDisp : public FENodeLogData
+class FENodeXDisp : public FELogNodeData
 { 
 public: 
-	FENodeXDisp(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeXDisp(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYDisp : public FENodeLogData
+class FENodeYDisp : public FELogNodeData
 { 
 public: 
-	FENodeYDisp(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeYDisp(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZDisp : public FENodeLogData
+class FENodeZDisp : public FELogNodeData
 { 
 public: 
-	FENodeZDisp(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeZDisp(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeXVel : public FENodeLogData
+class FENodeXVel : public FELogNodeData
 { 
 public: 
-	FENodeXVel(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeXVel(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYVel : public FENodeLogData
+class FENodeYVel : public FELogNodeData
 { 
 public: 
-	FENodeYVel(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeYVel(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZVel : public FENodeLogData
+class FENodeZVel : public FELogNodeData
 { 
 public: 
-	FENodeZVel(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeZVel(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeXAcc : public FENodeLogData
+class FENodeXAcc : public FELogNodeData
 { 
 public: 
-	FENodeXAcc(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeXAcc(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYAcc : public FENodeLogData
+class FENodeYAcc : public FELogNodeData
 { 
 public: 
-	FENodeYAcc(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeYAcc(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZAcc : public FENodeLogData
+class FENodeZAcc : public FELogNodeData
 { 
 public: 
-	FENodeZAcc(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeZAcc(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeForceX: public FENodeLogData
+class FENodeForceX: public FELogNodeData
 { 
 public: 
-	FENodeForceX(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeForceX(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeForceY: public FENodeLogData
+class FENodeForceY: public FELogNodeData
 { 
 public: 
-	FENodeForceY(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeForceY(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
 //-----------------------------------------------------------------------------
-class FENodeForceZ: public FENodeLogData
+class FENodeForceZ: public FELogNodeData
 { 
 public: 
-	FENodeForceZ(FEModel* pfem) : FENodeLogData(pfem){} 
+	FENodeForceZ(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(int node); 
 };
 
@@ -164,18 +164,42 @@ public:
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-class FELogContactGap : public FEFaceLogData
+class FELogContactGap : public FELogFaceData
 {
 public:
-	FELogContactGap(FEModel* fem) : FEFaceLogData(fem) {}
+	FELogContactGap(FEModel* fem) : FELogFaceData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
 //-----------------------------------------------------------------------------
-class FELogContactPressure : public FEFaceLogData
+class FELogContactPressure : public FELogFaceData
 {
 public:
-	FELogContactPressure(FEModel* fem) : FEFaceLogData(fem) {}
+	FELogContactPressure(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionX : public FELogFaceData
+{
+public:
+	FELogContactTractionX(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionY : public FELogFaceData
+{
+public:
+	FELogContactTractionY(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionZ : public FELogFaceData
+{
+public:
+	FELogContactTractionZ(FEModel* fem) : FELogFaceData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
@@ -993,6 +1017,33 @@ class FELogDiscreteElementForce : public FELogElemData
 {
 public:
 	FELogDiscreteElementForce(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceX : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceX(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceY : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceY(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceZ : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceZ(FEModel* fem) : FELogElemData(fem) {}
 	double value(FEElement& el);
 };
 

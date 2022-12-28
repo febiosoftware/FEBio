@@ -28,11 +28,11 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPeriodicSurfaceConstraint.h"
-#include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEGlobalMatrix.h"
 #include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
+#include <FECore/FEMesh.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -131,7 +131,11 @@ FEPeriodicSurfaceConstraint::FEPeriodicSurfaceConstraint(FEModel* pfem) : FECont
 	m_eps = 0;
 	m_btwo_pass = false;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 
 	// set parents
 	m_ss.SetContactInterface(this);
@@ -155,16 +159,15 @@ bool FEPeriodicSurfaceConstraint::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FEPeriodicSurfaceConstraint::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the DOFS
-	const int dof_X = fem.GetDOFIndex("x");
-	const int dof_Y = fem.GetDOFIndex("y");
-	const int dof_Z = fem.GetDOFIndex("z");
-	const int dof_RU = fem.GetDOFIndex("Ru");
-	const int dof_RV = fem.GetDOFIndex("Rv");
-	const int dof_RW = fem.GetDOFIndex("Rw");
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	const int dof_RU = GetDOFIndex("Ru");
+	const int dof_RV = GetDOFIndex("Rv");
+	const int dof_RW = GetDOFIndex("Rw");
 
 	vector<int> lm(6 * 5);
 
@@ -243,7 +246,7 @@ void FEPeriodicSurfaceConstraint::Activate()
 
 void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurface& ss, FEPeriodicSurfaceConstraintSurface& ms, bool bmove)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);

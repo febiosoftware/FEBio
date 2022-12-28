@@ -27,11 +27,10 @@ SOFTWARE.*/
 #include "FEThermoFluidMaterialPoint.h"
 
 //============================================================================
-// FEThermoFluidMaterialPoint
-//============================================================================
+FEThermoFluidMaterialPoint::FEThermoFluidMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEThermoFluidMaterialPoint::Copy()
+FEMaterialPointData* FEThermoFluidMaterialPoint::Copy()
 {
     FEThermoFluidMaterialPoint* pt = new FEThermoFluidMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -41,7 +40,7 @@ FEMaterialPoint* FEThermoFluidMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEThermoFluidMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_T & m_Tdot & m_gradT & m_k & m_K & m_dKJ & m_dKT & m_cv & m_dcvJ & m_dcvT & m_cp & m_q;
 }
 
@@ -57,6 +56,5 @@ void FEThermoFluidMaterialPoint::Init()
     m_q = vec3d(0);
     
     // don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
-

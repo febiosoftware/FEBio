@@ -30,14 +30,9 @@ SOFTWARE.*/
 #include "FESurfaceLoad.h"
 #include "FEMesh.h"
 #include "DumpStream.h"
+#include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
-
-BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
-	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
-END_FECORE_CLASS()
-
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem)
 {
 	m_psurf = 0;
 }
@@ -45,11 +40,6 @@ FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
 FESurfaceLoad::~FESurfaceLoad(void)
 {
 
-}
-
-const FEDofList& FESurfaceLoad::GetDofList() const
-{
-	return m_dof;
 }
 
 //! Set the surface to apply the load to
@@ -67,9 +57,22 @@ bool FESurfaceLoad::Init()
 
 void FESurfaceLoad::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEModelLoad::Serialize(ar);
 	if (ar.IsShallow()) return;
 
-	ar & m_dof;
 	ar & m_psurf;
+	ar & m_dof;
+
+	// the mesh manages surfaces for surface loads
+	if (m_psurf && ar.IsLoading())
+	{
+		FEMesh* pm = m_psurf->GetMesh();
+		assert(pm->FindSurface(m_psurf->GetName()) == nullptr);
+		pm->AddSurface(m_psurf);
+	}
+}
+
+void FESurfaceLoad::ForceMeshUpdate()
+{
+	GetFEModel()->SetMeshUpdateFlag(true);
 }

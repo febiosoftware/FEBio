@@ -112,7 +112,7 @@ double FEObjectiveFunction::RegressionCoefficient(const std::vector<double>& y0,
 //=============================================================================
 
 //----------------------------------------------------------------------------
-FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem), m_lc(fem)
+FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem)
 {
 	m_src = 0;
 }
@@ -181,7 +181,7 @@ void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 {
 	int ndata = m_lc.Points();
 	y0.resize(ndata);
-	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.LoadPoint(i).value;
+	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.Point(i).y();
 }
 
 //----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 	int ndata = m_lc.Points();
 	for (int i = 0; i<ndata; ++i)
 	{
-		double xi = m_lc.LoadPoint(i).time;
+		double xi = m_lc.Point(i).x();
 		f[i] = m_src->Evaluate(xi);
 	}
 }
@@ -366,7 +366,7 @@ bool FENodeDataTable::AddValue(int nodeID, vector<double>& v)
 	return true;
 }
 
-void FENodeDataTable::AddVariable(FENodeLogData* var)
+void FENodeDataTable::AddVariable(FELogNodeData* var)
 {
 	m_var.push_back(var);
 }

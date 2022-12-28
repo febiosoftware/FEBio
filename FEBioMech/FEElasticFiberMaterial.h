@@ -37,7 +37,7 @@ class FEElasticFiberMaterial : public FEElasticMaterial
 public:
     FEElasticFiberMaterial(FEModel* pfem);
 
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
 	// get the fiber vector (in global coordinates)
 	vec3d FiberVector(FEMaterialPoint& mp);
@@ -69,7 +69,34 @@ private:
     bool    m_bUs;  //!< flag for pre-stretch
     
 public:
-	FEParamVec3		m_fiber;	//!< fiber orientation
+	FEVec3dValuator*	m_fiber;	//!< fiber orientation
 
 	DECLARE_FECORE_CLASS();
+};
+
+// helper class for constructing elastic fiber materials from classes derived from FEFiberMaterial. 
+template <class fiberMat> 
+class FEElasticFiberMaterial_T : public FEElasticFiberMaterial
+{
+public:
+	FEElasticFiberMaterial_T(FEModel* fem) : FEElasticFiberMaterial(fem), m_fib(fem) {}
+
+	bool Init() override { return m_fib.Init(); }
+	bool Validate() override { return m_fib.Validate(); }
+	FEMaterialPointData* CreateMaterialPointData() override 
+	{ 
+		return new FEElasticMaterialPoint(m_fib.CreateMaterialPointData());
+	}
+	void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override 
+	{
+		FEElasticFiberMaterial::UpdateSpecializedMaterialPoints(mp, tp);
+		m_fib.UpdateSpecializedMaterialPoints(mp, tp);
+	}
+
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.FiberStress(mp, a0); }
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.FiberTangent(mp, a0); }
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override { return m_fib.FiberStrainEnergyDensity(mp, a0); }
+
+protected:
+	fiberMat	m_fib;
 };

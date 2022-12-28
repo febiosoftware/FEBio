@@ -26,19 +26,19 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterialPoint.h"
+#include <FECore/FEMaterialPoint.h>
 #include "FEReactivePlasticity.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the plasticity variables.
-class FEReactivePlasticityMaterialPoint : public FEMaterialPoint
+class FEReactivePlasticityMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEReactivePlasticityMaterialPoint(FEMaterialPoint *pt, FEElasticMaterial* pmat) : FEMaterialPoint(pt) { m_pMat = pmat; }
+    FEReactivePlasticityMaterialPoint(FEMaterialPointData*pt, FEElasticMaterial* pmat) : FEMaterialPointData(pt) { m_pMat = pmat; }
 
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! Initialize material point data
     void Init();
@@ -50,7 +50,7 @@ public:
     void Serialize(DumpStream& ar);
     
     //! Evaluate net mass fraction of yielded bonds
-    double YieldedBonds();
+    double YieldedBonds() const;
     
 public:
     vector<mat3d>           m_Fusi;     //!< inverse of plastic deformation gradient at previous yield

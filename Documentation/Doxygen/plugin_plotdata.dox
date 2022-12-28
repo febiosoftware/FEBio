@@ -17,20 +17,28 @@ The storage format defines who many data items are stored.
 \li <b>FMT_NODE</b>: one value for each node
 \li <b>FMT_ITEM</b>: one value for each item (i.e. element or facet)
 \li <b>FMT_MULT</b>: one value for each node of each item.
+\li <b>FMT_REGION</b>: one value for the entire region.
+\li <b>FMT_MATPOINTS</b>: one value per integration point.
 
 Note that for nodal data the storage format makes no difference and all formats results in a single value per node. 
 
-There are three classes of plot data currently defined: Nodal plot data, element plot data, and surface facet plot data. 
+The <b>FMT_MATPOINTS</b> storage mode only applies to element data. 
+
+There are several classes of plot data currently defined: 
+
+\li Nodal plot data: Store a value for each node of the mesh
+\li Element plot data: store data on elements of domains
+\li Surface facet plot data: Store data on facets of surfaces
 
 \section node_data Nodal Plot Data
-To create a nodal plot data field, derive a new class from FENodeData and implement the \c Save member function. Note that the constructor of the FENodeData class
+To create a nodal plot data field, derive a new class from <b>FEPlotNodeData</b> and implement the \c Save member function. Note that the constructor of the FEPlotNodeData class
 requires the data format and storage format. For nodal data the storage format is irrelevant since for nodal data one value per node is expected.
 
 \code
-class MyNodeData : public FENodeData
+class MyNodeData : public FEPlotNodeData
 {
 public:
-	MyNodeData(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
+	MyNodeData(FEModel* pfem) : FEPlotNodeData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 \endcode
@@ -52,19 +60,18 @@ bool MyNodeData::Save(FEMesh& m, FEDataStream& a)
 \endcode
 
 \section elem_data Element Plot Data
-To create a plot field for element data, create a new class from FEDomainData.
+To create a plot field for element data, create a new class from FEPlotDomainData.
 
 \code
-class MyElementData : public FEDomainData
+class MyElementData : public FEPlotDomainData
 {
 public:
-	MyElementData(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	MyElementData(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 \endcode
 
-The \c Save member function takes the FEDomain class and a FEDataStream as parameters. The domain references the current domain for which data is being stored. 
-A cast may be necessary to convert the FEDomain base class to the correct domain class. 
+The \c Save member function takes the FEDomain class and a FEDataStream as parameters. The domain references the current domain for which data is being stored. A cast may be necessary to convert the FEDomain base class to the correct domain class. 
 
 \code
 class MyElementData::Save(FEDomain& dom, FEDataStream& a)
@@ -83,14 +90,71 @@ class MyElementData::Save(FEDomain& dom, FEDataStream& a)
 }
 \endcode 
 
-\section face_data Facet Plot Data
-To create a surface facet plot field, create a new class from FESurfaceData.
+The function should return true if it wrote data to the FEDataStream. If not, it should return false. For example, if the requested data cannot be calculated on the domain (e.g. stress on a rigid domain), the function should return false and not write any data to the data stream.  
+
+The FEPlotDomainData supports all storage formats as defined above. Make sure to write the correct amount of data and int the correct order to the data stream. 
+
+FEBio mostly uses the FMT_ITEM storage format for element data. In this case, typically the element average quantity is evaluated. 
 
 \code
-class MySurfaceData : public FESurfaceData
+class MyElementData::Save(FEDomain& dom, FEDataStream& a)
+{
+	int NE = dom.Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		double s = 0.0;
+		int ni = el.GaussPoints();
+		for (int j=0; j<ni; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+			// calculate something for this integration point and add it to s
+			double sj;
+
+			s += sj;
+		}
+		s /= (double) ni;
+
+		a << s;
+	}
+	
+	return true;
+}
+\endcode 
+
+To further facilitate this case, several template functions are defined in FECore\writeplot.h that perform these operations. The algorithm that extracts the particular data from the material points can be passed as an argument to these functions. 
+
+For instance, consider the following function.
+
+\code
+template <class Tin, class Tout> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<Tin(const FEMaterialPoint&)> fnc)
+\endcode
+
+For example, this can be used to write the stress to the plot file follows.
+
+\code
+bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
+{
+	writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+		const FEElasticMaterialPoint& ep = *mp.ExtractData< FEElasticMaterialPoint>();
+		return ep.m_s;
+		});
+
+	return true;
+}
+\endcode
+
+
+\section face_data Facet Plot Data
+To create a surface facet plot field, create a new class from FEPlotSurfaceData.
+
+\code
+class MySurfaceData : public FEPlotSurfaceData
 {
 public:
-	MySurfaceData(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+	MySurfaceData(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FESurface& s, FEDataStream& a);
 };
 \endcode
@@ -106,11 +170,16 @@ class MySurfaceData::Save(FESurface& s, FEDataStream& a)
 		FESurfaceElement& el = s.Element(i);
 		
 		double f;
-		\\ calculate something for f
+		// calculate something for f
 		a << f;
 	}
 	
 	return true;
 }
 \endcode 
+
+The function should return true if the data was successfully written to the data stream. It should return false if the data cannot be written to the surface. 
+
+The FEPlotSurfaceData class supports the FMT_ITEM, FMT_NODE, and FMT_MULT formats. 
+
 */

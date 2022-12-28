@@ -36,7 +36,7 @@ SOFTWARE.*/
 //! FESoluteConvectiveFlow is a fluid domain where solute is transported
 //! purely via convection.  The solute concentration can be obtained from
 //! the fluid velocity and dilatation results.
-
+// TODO: This is not a surface load!
 class FEBIOFLUID_API FESoluteConvectiveFlow : public FESurfaceLoad
 {
 public:
@@ -44,10 +44,10 @@ public:
     FESoluteConvectiveFlow(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override { m_gamma = tp.gamma; m_dt = tp.timeIncrement; };
+    void LoadVector(FEGlobalVector& R) override {};
     
     //! set the dilatation
     void Update() override;
@@ -66,8 +66,6 @@ private:
     FEDofList   m_dofW;
     int         m_dofEF;
     int         m_dofC;
-    double      m_gamma;
-    double      m_dt;
     vector<bool>    m_bexclude;
     FENormalProjection* m_np;
     FEOctreeSearch* m_octree;

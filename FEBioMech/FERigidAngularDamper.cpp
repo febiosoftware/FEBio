@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidAngularDamper.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
@@ -202,7 +201,7 @@ void FERigidAngularDamper::Update()
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	FETimeInfo& tp = GetFEModel()->GetTime();
+	const FETimeInfo& tp = GetTimeInfo();
 	double alpha = tp.alphaf;
     
     // body A

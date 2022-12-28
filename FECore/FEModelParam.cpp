@@ -48,6 +48,10 @@ FEModelParam::~FEModelParam()
 void FEModelParam::Serialize(DumpStream& ar)
 {
 	ar & m_scl;
+	if (ar.IsShallow() == false)
+	{
+		ar & m_dom;
+	}
 }
 
 //---------------------------------------------------------------------------------------
@@ -162,6 +166,11 @@ void FEParamVec3::setValuator(FEVec3dValuator* val)
 	if (val) val->SetModelParam(this);
 }
 
+FEVec3dValuator* FEParamVec3::valuator()
+{
+	return m_val;
+}
+
 void FEParamVec3::Serialize(DumpStream& ar)
 {
 	FEModelParam::Serialize(ar);
@@ -266,6 +275,11 @@ void FEParamMat3ds::setValuator(FEMat3dsValuator* val)
 	if (m_val) delete m_val;
 	m_val = val;
 	if (val) val->SetModelParam(this);
+}
+
+FEMat3dsValuator* FEParamMat3ds::valuator()
+{
+	return m_val;
 }
 
 void FEParamMat3ds::Serialize(DumpStream& ar)

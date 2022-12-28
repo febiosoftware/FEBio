@@ -34,14 +34,16 @@ SOFTWARE.*/
 //! Base class for bond relaxation of reactive viscoelastic materials.
 //! These materials need to define a relaxation function.
 //!
-class FEBondRelaxation : public FEMaterial
+class FEBondRelaxation : public FEMaterialProperty
 {
 public:
-	FEBondRelaxation(FEModel* pfem) : FEMaterial(pfem) {}
+	FEBondRelaxation(FEModel* pfem) : FEMaterialProperty(pfem) {}
 	virtual ~FEBondRelaxation() {}
     
 	//! relaxation
 	virtual double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) = 0;
+
+    FECORE_BASE_CLASS(FEBondRelaxation)
 };
 
 //-----------------------------------------------------------------------------

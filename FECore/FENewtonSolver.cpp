@@ -43,30 +43,27 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
-	ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
-	ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
-	ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
-	ADD_PARAMETER(m_maxref              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
-	ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
-	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_force_partition     , "force_partition");
-	ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
-	ADD_PARAMETER(m_breformAugment      , "reform_augment");
-	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
-	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
-	ADD_PARAMETER(m_Etol                , "etol"        );
-	ADD_PARAMETER(m_Rtol                , "rtol"        );
-	ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
-	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
+	BEGIN_PARAM_GROUP("line search");
+		ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
+		ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
+		ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+	END_PARAM_GROUP();
 
-	// obsolete parameters (Should be set via the qn_method)
-	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0");
-	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
-	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
-	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
-	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
+	BEGIN_PARAM_GROUP("Nonlinear solver");
+		ADD_PARAMETER(m_maxref              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
+		ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
+		ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
+		ADD_PARAMETER(m_force_partition     , "force_partition");
+		ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
+		ADD_PARAMETER(m_breformAugment      , "reform_augment");
+		ADD_PARAMETER(m_bdivreform          , "diverge_reform");
+//		ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
+		ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+		ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
+	END_PARAM_GROUP();
 
-	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Optional);
+	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Preferred)->SetDefaultType("BFGS").SetLongName("Quasi-Newton method");
+	ADD_PROPERTY(m_plinsolve, "linear_solver", FEProperty::Optional)->SetDefaultType("pardiso");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -89,12 +86,6 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_Rmin = 1.0e-20;
 	m_Rmax = 0;     // not used if zero
 
-	m_cmax   = 1e5;
-	m_maxups = 10;
-	m_max_buf_size = 0;
-	m_cycle_buffer = true;
-
-	m_qndefault = QN_BFGS;
 	m_qnstrategy = nullptr;
 
 	m_bforceReform = true;
@@ -114,7 +105,17 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 //! Set the default solution strategy
 void FENewtonSolver::SetDefaultStrategy(QN_STRATEGY qn)
 {
-	m_qndefault = qn;
+	GetParameterList(); // This needs to be called to ensure that the parameter and property lists have been setup.
+
+	FEProperty& p = *FindProperty("qn_method");
+	switch (qn)
+	{
+	case QN_BFGS   : p.SetDefaultType("BFGS"); break;
+	case QN_BROYDEN: p.SetDefaultType("Broyden"); break;
+	case QN_JFNK   : p.SetDefaultType("JFNK"); break;
+	default:
+		assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -366,6 +367,8 @@ bool FENewtonSolver::AllocateLinearSystem()
 		}
 	}
 
+	feLogInfo("Selecting linear solver %s", m_plinsolve->GetTypeStr());
+
 	Matrix_Type mtype = MatrixType();
 	SparseMatrix* pS = m_qnstrategy->CreateSparseMatrix(mtype);
 	if ((pS == 0) && (m_msymm == REAL_SYMMETRIC))
@@ -411,27 +414,13 @@ bool FENewtonSolver::Init()
 	// choose a solution strategy
 	if (m_qnstrategy == nullptr)
 	{
-		switch (m_qndefault)
-		{
-		case QN_BFGS   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("BFGS"   , GetFEModel())); break;
-		case QN_BROYDEN: SetSolutionStrategy(fecore_new<FENewtonStrategy>("Broyden", GetFEModel())); break;
-		case QN_JFNK   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("JFNK"   , GetFEModel())); break;
-		default:
-			feLogError("Invalid quasi-Newton option (%d)", m_qndefault);
-			return false;
-		}
+		m_qnstrategy = fecore_new<FENewtonStrategy>("BFGS", GetFEModel());
+		assert(m_qnstrategy);
+		if (m_qnstrategy == nullptr) return false;
+	}
 
-		// copy some solution parameters
-		m_qnstrategy->m_maxups = m_maxups;
-		m_qnstrategy->m_max_buf_size = m_max_buf_size;
-		m_qnstrategy->m_cycle_buffer = m_cycle_buffer;
-		m_qnstrategy->m_cmax = m_cmax;
-	}
-	else
-	{
-		// make sure the QN strategy knows what solver it belongs to
-		m_qnstrategy->SetNewtonSolver(this);
-	}
+	// make sure the QN strategy knows what solver it belongs to
+	m_qnstrategy->SetNewtonSolver(this);
 
 	// allocate data vectors
 	m_R0.assign(m_neq, 0);
@@ -461,7 +450,7 @@ void FENewtonSolver::Clean()
 	if (m_plinsolve) delete m_plinsolve; 
 	m_plinsolve = nullptr;
 	if (m_pK) delete m_pK; m_pK = nullptr;
-	if (m_qnstrategy) delete m_qnstrategy; m_qnstrategy = nullptr;
+	if (m_qnstrategy) m_qnstrategy->Reset();
 	m_Var.clear();
 }
 
@@ -477,14 +466,14 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 	{
 		ar << m_neq;
 		ar << m_maxref;
-		ar << m_qndefault;
+//		ar << m_qndefault;
 		ar << m_qnstrategy;
 	}
 	else
 	{
 		ar >> m_neq;
 		ar >> m_maxref;
-		ar >> m_qndefault;
+//		ar >> m_qndefault;
 		ar >> m_qnstrategy;
 
 		// realloc data
@@ -518,66 +507,12 @@ bool FENewtonSolver::SolveStep()
 		// let's try to call Quasin
 		bret = Quasin();
 	}
-	catch (NegativeJacobian e)
-	{
-		// A negative jacobian was detected
-		feLogError("Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
-		return false;
-	}
-	catch (MaxStiffnessReformations)
-	{
-		// max nr of reformations is reached
-		feLogError("Max nr of reformations reached.");
-		return false;
-	}
-	catch (ForceConversion)
-	{
-		// user forced conversion of problem
-		feLogWarning("User forced conversion.\nSolution might not be stable.");
-		return true;
-	}
-	catch (IterationFailure)
-	{
-		// user caused a forced iteration failure
-		feLogWarning("User forced iteration failure.");
-		return false;
-	}
-	catch (MaxResidualError)
-	{
-		// user caused a forced iteration failure
-		feLogWarning("Maximum residual exceeded.");
-		return false;
-	}
-	catch (ZeroLinestepSize)
-	{
-		// a zero line step size was detected
-		feLogError("Zero line step size.");
-		return false;
-	}
-	catch (EnergyDiverging)
-	{
-		// problem was diverging after stiffness reformation
-		feLogError("ERROR", "Problem diverging uncontrollably.");
-		return false;
-	}
-	catch (FEMultiScaleException e)
-	{
-		// the RVE problem didn't solve
-		// logging was turned off during multi-scale runs
-		// so we need to turn it back on
-		GetFEModel()->UnBlockLog();
-		feLogError("The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", e.elemId, e.gptIndex+1);
-
-		return false;
-	}
-	catch (DoRunningRestart)
-	{
-		// a request to fail the iteration and restart the time step
-		return false;
-	}
 	catch (FEException e)
 	{
-		feLogError("%s", e.what());
+		if (e.level() == FEException::Error)
+			feLogError("%s", e.what());
+		else
+			feLogWarning("%s", e.what());
 		return false;
 	}
 
@@ -904,26 +839,16 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 	if (ISNAN(r2))
 	{
 		FENodalDofInfo info;
-		const char* sz = "";
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		for (int i = 0; i < u.size(); ++i)
 		{
 			if (ISNAN(R[i]))
 			{
 				info = GetDOFInfoFromEquation(i);
-				if (info.m_node != -1)
-				{
-					info.m_node = mesh.Node(info.m_node).GetID();
-					DOFS& Dofs = GetFEModel()->GetDOFS();
-					sz = Dofs.GetDOFName(info.m_dof);
-					if (sz == nullptr) sz = "???";
-				}
 				break;
 			}
 		}
-		NANDetected e;
-		e.what("NAN detected in residual vector at index %d.\nNode id = %d, dof = %d ('%s')", info.m_eq, info.m_node, info.m_dof, sz);
-		throw (e);
+		throw NANDetected(info);
 	}
 
 	// call the qn strategy to actuall solve the equations
@@ -934,26 +859,16 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 	if (ISNAN(u2))
 	{
 		FENodalDofInfo info;
-		const char* sz = "";
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		for (int i = 0; i < u.size(); ++i)
 		{
 			if (ISNAN(u[i]))
 			{
 				info = GetDOFInfoFromEquation(i);
-				if (info.m_node != -1)
-				{
-					info.m_node = mesh.Node(info.m_node).GetID();
-					DOFS& Dofs = GetFEModel()->GetDOFS();
-					sz = Dofs.GetDOFName(info.m_dof);
-					if (sz == nullptr) sz = "???";
-				}
 				break;
 			}
 		}
-		NANDetected e;
-		e.what("NAN detected in solution vector at index %d.\nNode id = %d, dof = %d ('%s')", info.m_eq, info.m_node, info.m_dof, sz);
-		throw (e);
+		throw (NANDetected(info));
 	}
 
 	// store the last solution for iterative solvers
@@ -1002,33 +917,14 @@ bool FENewtonSolver::QNUpdate()
 	// see if the force reform flag was set
 	bool breform = m_bforceReform; m_bforceReform = false;
 
-	// for full-Newton, we skip QN update
-	if (m_maxups == 0) breform = true;
-
-	// if not, do a QN update
+	// do a QN update
 	if (breform == false)
 	{
 		TRACK_TIME(TimerID::Timer_QNUpdate);
-
-		// make sure we didn't reach max updates
-		if (m_qnstrategy->m_nups >= m_qnstrategy->m_maxups - 1)
+		if (m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1) == false)
 		{
-			// print a warning only if the user did not intent full-Newton
-			if (m_qnstrategy->m_maxups > 0)
-				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+			// the qn update failed. Force matrix reformations
 			breform = true;
-		}
-		else {
-			// try to do an update
-			bool bret = m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1);
-			if (bret == false)
-			{
-				// Stiffness update has failed.
-				// this might be due a too large condition number
-				// or the update was no longer positive definite.
-				feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
-				breform = true;
-			}
 		}
 	}
 

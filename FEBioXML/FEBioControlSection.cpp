@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FETimeStepController.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -89,10 +90,10 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	if (tag == "analysis")
 	{
 		XMLAtt& att = tag.Attribute("type");
-		if      (att == "static"      ) pstep->m_nanalysis = FE_STATIC;
-		else if (att == "dynamic"     ) pstep->m_nanalysis = FE_DYNAMIC;
-		else if (att == "steady-state") pstep->m_nanalysis = FE_STEADY_STATE;
-		else if (att == "transient"   ) pstep->m_nanalysis = FE_DYNAMIC;
+		if      (att == "static"      ) pstep->m_nanalysis = 0;
+		else if (att == "dynamic"     ) pstep->m_nanalysis = 1;
+		else if (att == "steady-state") pstep->m_nanalysis = 0;
+		else if (att == "transient"   ) pstep->m_nanalysis = 1;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
 	}
 	else if (ReadParameter(tag, modelParams) == false)
@@ -323,10 +324,10 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 	if (tag == "analysis")
 	{
 		XMLAtt& att = tag.Attribute("type");
-		if      (att == "static"      ) pstep->m_nanalysis = FE_STATIC;
-		else if (att == "dynamic"     ) pstep->m_nanalysis = FE_DYNAMIC;
-		else if (att == "steady-state") pstep->m_nanalysis = FE_STEADY_STATE;
-		else if (att == "transient"   ) pstep->m_nanalysis = FE_DYNAMIC;
+		if      (att == "static"      ) pstep->m_nanalysis = 0;
+		else if (att == "dynamic"     ) pstep->m_nanalysis = 1;
+		else if (att == "steady-state") pstep->m_nanalysis = 0;
+		else if (att == "transient"   ) pstep->m_nanalysis = 1;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
 	}
 	else if (tag == "shell_normal_nodal") tag.value(feb->m_shell_norm_nodal);

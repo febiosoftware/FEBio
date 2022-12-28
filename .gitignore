@@ -391,6 +391,7 @@ MigrationBackup/
 
 # miscellaneous
 Documentation/Doxygen/doc
+Documentation/Doxygen/doc_only
 
 .DS_Store
 
@@ -426,17 +427,15 @@ DerivedData/
 ## cmake build directories
 cbuild/
 cmbuild*/
-CMakeFiles
+
 ##cmake files
-!CMakeLists.txt
+CMakeLists.txt
 CMakeCache.txt
-!*.cmake
+*.cmake
 
 ## Visual Studio Code
 .vscode/
 
-## Docker
-!Docker/build
+Documentation/FEBio_Theory_Manual.pdf
+Documentation/FEBio_User_Manual.html.LyXconv/
 
-## direnv
-.env*

@@ -35,12 +35,22 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEPrescribedNormalDisplacement, FEPrescribedSurface)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_hint, "surface_hint");
+	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS()
 
 FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : FEPrescribedSurface(fem)
 {
 	m_scale = 0.0;
 	m_hint = 0;
+
+	// set the dof list
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		FEDofList dofs(fem);
+		dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		SetDOFList(dofs);
+	}
 }
 
 // activation
@@ -131,12 +141,6 @@ void FEPrescribedNormalDisplacement::Activate()
 	}
 
 	FEPrescribedSurface::Activate();
-}
-
-// set the dof list
-bool FEPrescribedNormalDisplacement::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 // return the values for node nodelid

@@ -37,20 +37,23 @@ SOFTWARE.*/
 class FEBIOFLUID_API FESolutesMaterial : public FEMaterial, public FESoluteInterface
 {
 public:
-	class Point : public FEMaterialPoint
+	class Point : public FEMaterialPointData
 	{
 	public:
 		//! constructor
-		Point(FEMaterialPoint* pt);
+		Point(FEMaterialPointData* pt);
 
 		//! create a shallow copy
-		FEMaterialPoint* Copy();
+		FEMaterialPointData* Copy();
 
 		//! data serialization
 		void Serialize(DumpStream& ar);
 
 		//! Data initialization
 		void Init();
+
+        //! Osmolarity        
+        double Osmolarity() const;
 
 	public:
 		vec3d	m_vft;		// fluid velocity at integration point
@@ -72,7 +75,7 @@ public:
 	FESolutesMaterial(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! performs initialization
 	bool Init() override;
@@ -109,9 +112,41 @@ public:
 
 	// solute interface
 public:
+    typedef FESolutesMaterial::Point SolutesMaterial_t;
+
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_c[soluteIndex];
+    };
+    double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_ca[soluteIndex];
+    };
+    double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_k[soluteIndex];
+    };
+    vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override {
+        SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_j[soluteIndex];
+    };
+    double GetOsmolarity(const FEMaterialPoint& mp) override {
+        const SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->Osmolarity();
+    }
+    double dkdc(const FEMaterialPoint& mp, int i, int j) override {
+        const SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_dkdc[i][j];
+    }
+    double dkdJ(const FEMaterialPoint& mp, int soluteIndex) override {
+        const SolutesMaterial_t* spt = (mp.ExtractData<SolutesMaterial_t>());
+        return spt->m_dkdJ[soluteIndex];
+    }
+    FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
+
+public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     
     int Reactions         () { return (int) m_pReact.size();    }

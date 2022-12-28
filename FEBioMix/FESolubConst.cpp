@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FESolubConst, FESoluteSolubility)
-	ADD_PARAMETER(m_solub, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub");
+	ADD_PARAMETER(m_solub, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub")->setLongName("solubility");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

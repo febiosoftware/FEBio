@@ -35,10 +35,10 @@
 //! Smooth contact strategies with emphasis on the modeling of balloon angioplasty with stenting
 //! Int. J. Numer. Meth. Engng 2008; 75:826–855, equation (21)
 
-class FEFiberKiousisUncoupled : public FEElasticFiberMaterialUC
+class FEUncoupledFiberKiousis : public FEElasticFiberMaterialUC
 {
 public:
-    FEFiberKiousisUncoupled(FEModel* pfem);
+    FEUncoupledFiberKiousis(FEModel* pfem);
     
     //! Cauchy stress
     virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override;

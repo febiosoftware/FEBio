@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEHexRefine.h"
 #include <FECore/FEMesh.h>
-#include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEMeshTopo.h>
 #include <FECore/FEPrescribedDOF.h>
@@ -36,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include <FECore/log.h>
+#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
@@ -723,7 +723,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 		if (newElems > 0)
 		{
 			// create a copy of old domain (since we want to retain the old domain)
-			FEDomain* newDom = fecore_new<FEDomain>(oldDom.GetTypeStr(), &fem);
+			FEDomain* newDom = fecore_new<FESolidDomain>(oldDom.GetTypeStr(), &fem);
 			newDom->Create(NE0, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 			for (int j = 0; j < NE0; ++j)
 			{

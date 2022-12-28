@@ -43,6 +43,7 @@ public:
 public:
 	double	currentTime;		//!< current time value
 	double	timeIncrement;		//!< current time step (difference between this time and previous one)
+	int		timeStep;			//!< current time step
 	int		currentIteration;	//!< iteration number
 	int		augmentation;		//!< augmentation
 

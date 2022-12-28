@@ -415,11 +415,11 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 	// get the two element sets
 	FEElementSet* set1 = m_elset;
 	const FEElementSet* set2 = map.GetElementSet();
-	assert(set1->GetFEModel() == set2->GetFEModel());
+	assert(set1->GetMesh() == set2->GetMesh());
 
 	// create a new element set
 	// TODO: should we add it to the mesh? I think we probably have to for remeshing
-	FEElementSet* elset = new FEElementSet(set1->GetFEModel());
+	FEElementSet* elset = new FEElementSet(set1->GetMesh());
 	elset->Add(*set1);
 	elset->Add(*set2);
 

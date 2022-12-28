@@ -56,8 +56,8 @@ class FECORE_API FEOctreeSearch
 	public:
 		int					m_level;		//!< node level
 		vec3d				m_cmin, m_cmax;	//!< node bounding box
-		vector<FEElement*>	m_selist;		//!< list of surface elements inside this node
-		vector<Block*>		m_children;		//!< children of this node
+		std::vector<FEElement*>	m_selist;		//!< list of surface elements inside this node
+		std::vector<Block*>		m_children;		//!< children of this node
 		FEMesh*				m_mesh;			//!< the mesh to search
 		Block*				m_parent;
 	};

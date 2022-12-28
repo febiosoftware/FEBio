@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "MObj2String.h"
 #include <sstream>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 // Convert a math object to a string

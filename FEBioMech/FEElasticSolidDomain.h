@@ -122,6 +122,9 @@ protected:
     double              m_beta;
 	bool				m_update_dynamic;	//!< flag for updating quantities only used in dynamic analysis
 
+	bool	m_secant_stress;	//!< use secant approximation to stress
+	bool	m_secant_tangent;   //!< flag for using secant tangent
+
 protected:
 	FEDofList	m_dofU;		// displacement dofs
 	FEDofList	m_dofR;		// rigid rotation rofs
@@ -132,4 +135,15 @@ protected:
 	FEDofList	m_dof;		// total dof list
 
 	FESolidMaterial*	m_pMat;
+};
+
+class FEStandardElasticSolidDomain : public FEElasticSolidDomain
+{
+public:
+	FEStandardElasticSolidDomain(FEModel* fem);
+
+private:
+	std::string		m_elemType;
+
+	DECLARE_FECORE_CLASS();
 };

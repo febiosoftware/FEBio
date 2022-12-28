@@ -93,7 +93,7 @@ public: // functions to be overwritten in derived classes
 	virtual void Clear();
 
 	//! scale matrix
-	virtual void scale(const vector<double>& L, const vector<double>& R);
+	virtual void scale(const std::vector<double>& L, const std::vector<double>& R);
 
 public:
 	//! multiply with vector

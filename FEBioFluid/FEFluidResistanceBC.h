@@ -27,24 +27,18 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEPrescribedBC.h>
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidResistanceBC is a fluid surface that has a normal
 //! pressure proportional to the flow rate (resistance).
 //!
-class FEBIOFLUID_API FEFluidResistanceBC : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidResistanceBC : public FEPrescribedSurface
 {
 public:
     //! constructor
     FEFluidResistanceBC(FEModel* pfem);
-    
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override {}
     
     //! set the dilatation
     void Update() override;
@@ -55,8 +49,12 @@ public:
     //! initialize
     bool Init() override;
     
-    //! activate
-    void Activate() override;
+public:
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
     double			m_R;        //!< flow resistance
@@ -64,6 +62,7 @@ private:
 
 private:
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
+    double              m_e;
     
 	FEDofList	m_dofW;
     int		m_dofEF;

@@ -30,8 +30,6 @@ SOFTWARE.*/
 #include "FERigidSphericalJoint.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
@@ -61,6 +59,8 @@ FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(p
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
+    m_eps = 1.0;
+    m_ups = 1.0;
     m_naugmin = 0;
     m_naugmax = 10;
     m_qpx = m_qpy = m_qpz = 0;
@@ -458,7 +458,7 @@ void FERigidSphericalJoint::Update()
     vec3d ra, rb;
     vec3d za, zb;
 
-	FETimeInfo& tp = GetFEModel()->GetTime();
+	const FETimeInfo& tp = GetTimeInfo();
 	double alpha = tp.alphaf;
     
 	FERigidBody& RBa = *m_rbA;

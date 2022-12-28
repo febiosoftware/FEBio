@@ -29,14 +29,15 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterialPoint.h"
+#include <FECore/FEConstValueVec3.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEElasticFiberMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticFiberMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEElasticFiberMaterial::CreateMaterialPointData()
 {
     FEFiberMaterialPoint* mp = new FEFiberMaterialPoint(new FEElasticMaterialPoint);
     return mp;
@@ -45,8 +46,8 @@ FEMaterialPoint* FEElasticFiberMaterial::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 FEElasticFiberMaterial::FEElasticFiberMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	// initialize the fiber vector
-	m_fiber = vec3d(1, 0, 0);
+    m_fiber = nullptr;
+
     m_Us = mat3dd(1);
     m_bUs = false;
 }
@@ -59,7 +60,7 @@ vec3d FEElasticFiberMaterial::FiberVector(FEMaterialPoint& mp)
 	mat3d Q = GetLocalCS(mp);
 
 	// get local fiber direction
-	vec3d fiber = m_fiber.unitVector(mp);
+	vec3d fiber = m_fiber->unitVector(mp);
 
 	// convert to global coordinates
 	vec3d a0 = Q*fiber;

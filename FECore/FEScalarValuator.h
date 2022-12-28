@@ -36,7 +36,8 @@ SOFTWARE.*/
 // Base class for evaluating scalar parameters
 class FECORE_API FEScalarValuator : public FEValuator
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FESCALARVALUATOR_ID)
+	FECORE_BASE_CLASS(FEScalarValuator)
 
 public:
 	FEScalarValuator(FEModel* fem) : FEValuator(fem) {};
@@ -126,6 +127,7 @@ class FECORE_API FEMappedValue : public FEScalarValuator
 public:
 	FEMappedValue(FEModel* fem);
 	void setDataMap(FEDataMap* val);
+	void setScaleFactor(double s);
 
 	FEDataMap* dataMap();
 
@@ -136,6 +138,7 @@ public:
 	void Serialize(DumpStream& dmp) override;
 
 private:
+	double		m_scale;	// scale factor
 	FEDataMap*	m_val;
 };
 

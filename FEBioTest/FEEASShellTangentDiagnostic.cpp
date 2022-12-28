@@ -70,7 +70,6 @@ bool FEEASShellTangentUnloaded::Init()
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
         n.m_dt = n.m_d0 = D[i];
-        n.m_rid = -1;
     }
     
     // get the material
@@ -96,21 +95,24 @@ bool FEEASShellTangentUnloaded::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEEASShellTangentDiagnostic::FEEASShellTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEEASShellTangentDiagnostic::FEEASShellTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem->SetActiveModule("solid");
+
     m_pscn = 0;
     
     // create an analysis step
-    FEAnalysis* pstep = new FEAnalysis(&fem);
+    FEAnalysis* pstep = new FEAnalysis(fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("solid", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("solid", fem);
     assert(pnew_solver);
     pstep->SetFESolver(pnew_solver);
     
     // keep a pointer to the fem object
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

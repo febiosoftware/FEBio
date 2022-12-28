@@ -30,15 +30,10 @@ SOFTWARE.*/
 #include "FETimeStepController.h"
 #include "FELoadCurve.h"
 #include "FEAnalysis.h"
-#include "FEModel.h"
 #include "FEPointFunction.h"
 #include "DumpStream.h"
+#include "FEModel.h"
 #include "log.h"
-
-#define MIN(a,b) ((a)<(b) ? (a) : (b))
-#define MAX(a,b) ((a)>(b) ? (a) : (b))
-
-REGISTER_SUPER_CLASS(FETimeStepController, FETIMECONTROLLER_ID);
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
@@ -49,7 +44,7 @@ BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
 	ADD_PARAMETER(m_cutback   , "cutback");
 	ADD_PARAMETER(m_dtforce   , "dtforce");
-	ADD_PARAMETER(m_must_points, "must_points");
+//	ADD_PARAMETER(m_must_points, "must_points");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -64,7 +59,8 @@ FETimeStepController::FETimeStepController(FEModel* fem) : FECoreBase(fem)
 	m_next_must = -1;
 	m_nmplc = -1;
 	m_iteopt = 11;
-	m_dtmax = m_dtmin = 0;
+	m_dtmin = 0;
+	m_dtmax = 0.1;
 
 	m_ddt = 0;
 	m_dtp = 0;
@@ -128,20 +124,17 @@ bool FETimeStepController::Init()
 			FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
 			if (lc)
 			{
-				FEPointFunction& f = lc->GetFunction();
-
+				PointCurve& f = lc->GetFunction();
 				// make sure we have at least two points
 				if (f.Points() < 2) return false;
-
-				// copy must points
 				for (int i = 0; i < f.Points(); ++i)
 				{
-					double ti = f.LoadPoint(i).time;
+					double ti = f.Point(i).x();
 					m_must_points.push_back(ti);
 				}
 
 				// check for repeat setting
-				if (f.m_ext == FEPointFunction::REPEAT) m_mp_repeat = true;
+				if (f.GetExtendMode() == PointCurve::REPEAT) m_mp_repeat = true;
 			}
 		}
 	}
@@ -221,7 +214,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	if (m_nmplc >= 0)
 	{
 		FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem->GetLoadController(m_nmplc)));
-		FEPointFunction& lc = mpc.GetFunction();
+		PointCurve& lc = mpc.GetFunction();
 		dtmax = lc.value(told);
 	}
 

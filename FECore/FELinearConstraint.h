@@ -27,33 +27,34 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEBoundaryCondition.h"
+#include "FECoreClass.h"
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! linear constraint
-class FECORE_API FELinearConstraint : public FEModelComponent
+class FECORE_API FELinearConstraintDOF : public FECoreClass
 {
 public:
-	class DOF : public FEParamContainer
-	{
-	public:
-		DOF();
-
-		void Serialize(DumpStream& ar);
+	FELinearConstraintDOF(FEModel* fem);
 
 	public:
 		int		node;	// node number
 		int		dof;	// degree of freedom
 		double	val;	// coefficient value (ignored for parent dof)
 
-	private:
-		DOF(const DOF&) {}
-		void operator = (const DOF&) {}
-	};
+private:
+	FELinearConstraintDOF(const FELinearConstraintDOF&) : FECoreClass(nullptr) {}
+	void operator = (const FELinearConstraintDOF&) {}
 
-	typedef vector<DOF*>::iterator dof_iterator;
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FELinearConstraintDOF);
+};
+
+class FECORE_API FELinearConstraint : public FEBoundaryCondition
+{
+public:
+	typedef std::vector<FELinearConstraintDOF*>::iterator dof_iterator;
 
 public:
 	// constructors
@@ -66,7 +67,7 @@ public:
 	void Clear();
 
 	// copy data
-	void CopyFrom(const FELinearConstraint& LC);
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 	// serialization
 	void Serialize(DumpStream& ar);
@@ -89,7 +90,7 @@ public:
 
 	// add a child degree of freedom
 	void AddChildDof(int dof, int node, double v);
-	void AddChildDof(FELinearConstraint::DOF* dof);
+	void AddChildDof(FELinearConstraintDOF* dof);
 
 	// set the linear constraint offset
 	void SetOffset(double d) { m_off = d; }
@@ -98,14 +99,16 @@ public:
 	double GetOffset() const;
 
 	// get the child DOF
-	const DOF& GetChildDof(int n) const;
+	const FELinearConstraintDOF& GetChildDof(int n) const;
 
 	size_t Size() const;
 
 	dof_iterator begin();
 
 protected:
-	DOF*			m_parentDof;	// parent degree of freedom
-	vector<DOF*>	m_childDof;		// list of child dofs
+	FELinearConstraintDOF*				m_parentDof;	// parent degree of freedom
+	std::vector<FELinearConstraintDOF*>	m_childDof;		// list of child dofs
 	double			m_off;			// offset value
+
+	DECLARE_FECORE_CLASS();
 };

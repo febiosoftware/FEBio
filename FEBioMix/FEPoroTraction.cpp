@@ -80,7 +80,7 @@ bool FEPoroNormalTraction::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS)
 {
 	if (m_blinear) return;
 
@@ -185,7 +185,7 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPoroNormalTraction::LoadVector(FEGlobalVector& R)
 {
 	m_psurf->SetShellBottom(m_bshellb);
 

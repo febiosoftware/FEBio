@@ -27,9 +27,9 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include "FEGlobalVector.h"
-#include "FETimeInfo.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 class FELinearSystem;
@@ -38,19 +38,29 @@ class FELinearSystem;
 //! This class is the base class for all classes that affect the state of the model
 //! and contribute directly to the residual and the global stiffness matrix. This
 //! includes most boundary loads, body loads, contact, etc.
-class FECORE_API FEModelLoad : public FEModelComponent
+class FECORE_API FEModelLoad : public FEStepComponent
 {
+	FECORE_SUPER_CLASS(FELOAD_ID)
+	FECORE_BASE_CLASS(FEModelLoad)
+
 public:
 	//! constructor
 	FEModelLoad(FEModel* pfem);
+
+	const FEDofList& GetDofList() const;
+	
+	void Serialize(DumpStream& ar) override;
 
 public:
 	// all classes derived from this base class must implement
 	// the following functions.
 
 	//! evaluate the contribution to the external load vector
-	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp);
+	virtual void LoadVector(FEGlobalVector& R);
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
+	virtual void StiffnessMatrix(FELinearSystem& LS);
+
+protected:
+	FEDofList	m_dof;
 };

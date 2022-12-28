@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FETemperatureBackFlowStabilization.h"
 #include "FEFluid.h"
 #include "FEBioThermoFluid.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -51,7 +52,6 @@ bool FETemperatureBackFlowStabilization::Init()
 
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
-    m_alpha = 1.0;
 
     return true;
 }
@@ -68,6 +68,8 @@ void FETemperatureBackFlowStabilization::Activate()
         // mark node as having open DOF
         node.set_bc(m_dofT, DOF_OPEN);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -110,6 +112,8 @@ void FETemperatureBackFlowStabilization::MarkBackFlow()
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
+    const FETimeInfo& tp = GetTimeInfo();
+
     for (int iel=0; iel<m_psurf->Elements(); ++iel)
     {
         FESurfaceElement& el = m_psurf->Element(iel);
@@ -123,8 +127,8 @@ void FETemperatureBackFlowStabilization::MarkBackFlow()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alpha);
+            rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alpha);
         }
         
         double* Nr, *Ns;
@@ -169,9 +173,8 @@ void FETemperatureBackFlowStabilization::MarkBackFlow()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FETemperatureBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETemperatureBackFlowStabilization::LoadVector(FEGlobalVector& R)
 {
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
 }
 
 //-----------------------------------------------------------------------------
@@ -182,6 +185,4 @@ void FETemperatureBackFlowStabilization::Serialize(DumpStream& ar)
 	ar & m_dofW;
 	ar & m_dofT;
 	ar & m_backflow;
-	ar & m_alpha;
-	ar & m_alphaf;
 }

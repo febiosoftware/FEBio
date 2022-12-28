@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include <FEBioMech/FEBioMech.h>
 #include "FEBioMix.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

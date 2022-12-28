@@ -41,11 +41,16 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
-	m_pMat = 0;
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
-	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("concentration", 0);
+	m_pMat = nullptr;
+
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+        m_dofP = pfem->GetDOFIndex("p");
+        m_dofC = pfem->GetDOFIndex("concentration", 0);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -221,7 +226,7 @@ void FETriphasicDomain::Reset()
 		FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
 		// initialize referential solid volume fraction
-        pt.m_phi0 = pt.m_phi0t = pmb->m_phi0(mp);
+		pt.m_phi0 = pt.m_phi0t = pmb->m_phi0(mp);
 			
 		// initialize multiphasic solutes
 		ps.m_nsol = nsol;
@@ -229,6 +234,7 @@ void FETriphasicDomain::Reset()
 		ps.m_ca.assign(nsol,0);
         ps.m_crp.assign(nsol, 0);
 		ps.m_gradc.assign(nsol,vec3d(0,0,0));
+        ps.m_bsb.assign(nsol, false);
 		ps.m_k.assign(nsol, 0);
 		ps.m_dkdJ.assign(nsol, 0);
 		ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
@@ -269,8 +275,8 @@ void FETriphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            pe.m_r0 = r0;
-			pe.m_rt = rt;
+            mp.m_r0 = r0;
+			mp.m_rt = rt;
 
 			pe.m_J = defgrad(el, pe.m_F, j);
 
@@ -1204,12 +1210,8 @@ void FETriphasicDomain::Update(const FETimeInfo& tp)
 		}
 	}
 
-	// if we encountered an error, we request a running restart
-	if (berr)
-	{
-		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-		throw DoRunningRestart();
-	}
+	// if we encountered an error, throw an exception
+	if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -1252,8 +1254,8 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(rt, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(rt, n);
 			
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);

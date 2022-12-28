@@ -38,7 +38,7 @@ double FELogElementVolume::value(FEElement& el)
 	return mesh.CurrentElementVolume(el);
 }
 
-FELogFaceArea::FELogFaceArea(FEModel* fem) : FEFaceLogData(fem) {}
+FELogFaceArea::FELogFaceArea(FEModel* fem) : FELogFaceData(fem) {}
 
 double FELogFaceArea::value(FESurfaceElement& el)
 {

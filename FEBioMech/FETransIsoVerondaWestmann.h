@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include "FEActiveContractionMaterial.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Veronda-Westmann material
@@ -43,8 +44,8 @@ public:
 	FETransIsoVerondaWestmann(FEModel* pfem);
 
 public:
-	double	m_c1;	//!< Veronda-Westmann coefficient C1
-	double	m_c2;	//!< Veronda-Westmann coefficient C2
+    FEParamDouble   m_c1;	//!< Veronda-Westmann coefficient C1
+    FEParamDouble   m_c2;	//!< Veronda-Westmann coefficient C2
 
 public:
 	//! calculate deviatoric stress at material point
@@ -57,14 +58,15 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
     //! create material point data
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
     
     // update force-velocity material point
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 protected:
-    FEUncoupledFiberExpLinear       m_fib;
+    FEFiberExpLinearUC		       m_fib;
     FEActiveContractionMaterial*    m_ac;
+	FEVec3dValuator* m_fiber;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

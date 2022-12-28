@@ -51,20 +51,24 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/FENLConstraint.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
+#include "FEFluidSolutesAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_FECORE_CLASS(FEFluidSolutesSolver, FENewtonSolver)
-ADD_PARAMETER(m_Vtol , "vtol"        );
-ADD_PARAMETER(m_Ftol , "ftol"        );
-ADD_PARAMETER(m_Ctol , "ctol"        );
-ADD_PARAMETER(m_rhoi , "rhoi"        );
-ADD_PARAMETER(m_pred , "predictor"   );
-ADD_PARAMETER(m_minJf, "min_volume_ratio");
-ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
-ADD_PARAMETER(m_solve_strategy, "solve_strategy");
+    ADD_PARAMETER(m_Vtol , "vtol"        );
+    ADD_PARAMETER(m_Ftol , "ftol"        );
+    ADD_PARAMETER(m_Ctol , "ctol"        );
+    ADD_PARAMETER(m_Etol, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
+    ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
+    ADD_PARAMETER(m_rhoi , "rhoi"        );
+    ADD_PARAMETER(m_pred , "predictor"   );
+    ADD_PARAMETER(m_minJf, "min_volume_ratio");
+    ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
+    ADD_PARAMETER(m_solve_strategy, "solve_strategy");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -102,38 +106,16 @@ FEFluidSolutesSolver::FEFluidSolutesSolver(FEModel* pfem) : FENewtonSolver(pfem)
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
     
-    // Allocate degrees of freedom
-    DOFS& dofs = pfem->GetDOFS();
-    int varD = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::DISPLACEMENT), VAR_VEC3);
-    dofs.SetDOFName(varD, 0, "x");
-    dofs.SetDOFName(varD, 1, "y");
-    dofs.SetDOFName(varD, 2, "z");
-    
-    int nW = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY), VAR_VEC3);
-    dofs.SetDOFName(nW, 0, "wx");
-    dofs.SetDOFName(nW, 1, "wy");
-    dofs.SetDOFName(nW, 2, "wz");
-    
-    int nE = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), VAR_SCALAR);
-    dofs.SetDOFName(nE, 0, "ef");
-    
-    int nAW = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
-    dofs.SetDOFName(nAW, 0, "awx");
-    dofs.SetDOFName(nAW, 1, "awy");
-    dofs.SetDOFName(nAW, 2, "awz");
-    
-    int nAE = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION_TDERIV), VAR_SCALAR);
-    dofs.SetDOFName(nAE, 0, "aef");
-    
-    int varC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), VAR_ARRAY);
-    int varAC = dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), VAR_ARRAY);
-
     // get the dof indices
-    m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
-    m_dofAW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_ACCELERATION));
-    m_dofEF  = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
-    m_dofAEF = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION_TDERIV), 0);
-    m_dofC = m_dofAC = -1;
+    // TODO: Can this be done in Init, since  there is no error checking
+    if (pfem)
+    {
+        m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
+        m_dofAW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_ACCELERATION));
+        m_dofEF = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
+        m_dofAEF = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION_TDERIV), 0);
+        m_dofC = m_dofAC = -1;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +151,6 @@ bool FEFluidSolutesSolver::Init()
     
     // allocate vectors
     int neq = m_neq;
-    m_Fn.assign(neq, 0);
     m_Fr.assign(neq, 0);
     m_Ui.assign(neq, 0);
     m_Ut.assign(neq, 0);
@@ -209,7 +190,7 @@ bool FEFluidSolutesSolver::Init()
     for (int i = 0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+        if (fem.GetCurrentStep()->m_nanalysis == FEFluidSolutesAnalysis::STEADY_STATE)
             dom.SetSteadyStateAnalysis();
         else
             dom.SetTransientAnalysis();
@@ -431,11 +412,11 @@ void FEFluidSolutesSolver::UpdateKinematics(vector<double>& ui)
     }
     
     // prescribe DOFs for specialized surface loads
-    int nsl = fem.SurfaceLoads();
+    int nsl = fem.ModelLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive()) psl.Update();
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.Update();
     }
     
     // enforce the linear constraints
@@ -450,7 +431,7 @@ void FEFluidSolutesSolver::UpdateKinematics(vector<double>& ui)
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
     FEAnalysis* pstep = fem.GetCurrentStep();
-    if (pstep->m_nanalysis == FE_DYNAMIC)
+    if (pstep->m_nanalysis == FEFluidSolutesAnalysis::DYNAMIC)
     {
         int N = mesh.Nodes();
         double dt = fem.GetTime().timeIncrement;
@@ -559,7 +540,7 @@ void FEFluidSolutesSolver::Update(vector<double>& ui)
     UpdateKinematics(ui);
     
     // update model state
-    GetFEModel()->Update();
+    UpdateModel();
 }
 
 //-----------------------------------------------------------------------------
@@ -662,14 +643,6 @@ void FEFluidSolutesSolver::PrepStep()
         }
     }
     
-    // apply concentrated nodal forces
-    // since these forces do not depend on the geometry
-    // we can do this once outside the NR loop.
-    vector<double> dummy(m_neq, 0.0);
-    zero(m_Fn);
-    FEGlobalVector Fn(*GetFEModel(), m_Fn, dummy);
-    NodalLoads(Fn, tp);
-    
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
@@ -682,13 +655,13 @@ void FEFluidSolutesSolver::PrepStep()
     }
     
     // apply prescribed DOFs for specialized surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
+    int nsl = fem.ModelLoads();
+    for (int i = 0; i < nsl; ++i)
     {
-        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive()) psl.Update();
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.Update();
     }
-    
+
     // do the linear constraints
     fem.GetLinearConstraintManager().PrepStep();
     
@@ -1001,41 +974,35 @@ bool FEFluidSolutesSolver::StiffnessMatrix(FELinearSystem& LS)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.StiffnessMatrix(LS, tp);
+        dom.StiffnessMatrix(LS);
     }
     
     // calculate the body force stiffness matrix for each domain
-    int NBL = fem.BodyLoads();
-    for (int j = 0; j<NBL; ++j)
+    int NML = fem.ModelLoads();
+    for (int j = 0; j<NML; ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEModelLoad* pml = fem.ModelLoad(j);
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(pml);
         if (pbf && pbf->IsActive())
         {
             for (int i = 0; i<pbf->Domains(); ++i)
             {
                 FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
-                dom.BodyForceStiffness(LS, tp, *pbf);
+                dom.BodyForceStiffness(LS, *pbf);
             }
         }
+        else if (pml->IsActive()) pml->StiffnessMatrix(LS);
     }
-    
+
     // calculate contact stiffness
     ContactStiffness(LS);
-    
-    // calculate stiffness matrix due to surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->StiffnessMatrix(LS, tp);
-    }
     
     // Add mass matrix
     // loop over all domains
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.MassMatrix(LS, tp);
+        dom.MassMatrix(LS);
     }
     
     // calculate nonlinear constraint stiffness
@@ -1102,8 +1069,8 @@ bool FEFluidSolutesSolver::Residual(vector<double>& R)
     // get the time information
     const FETimeInfo& tp = fem.GetTime();
     
-    // initialize residual with concentrated nodal loads
-    R = m_Fn;
+    // initialize residual
+    zero(R);
     
     // zero nodal reaction forces
     zero(m_Fr);
@@ -1118,36 +1085,30 @@ bool FEFluidSolutesSolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.InternalForces(RHS, tp);
+        dom.InternalForces(RHS);
     }
     
-    // calculate the body forces
-    for (int j = 0; j<fem.BodyLoads(); ++j)
+    // calculate the model load forces
+    for (int j = 0; j<fem.ModelLoads(); ++j)
     {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        FEModelLoad* pml = fem.ModelLoad(j);
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(pml);
         if (pbf && pbf->IsActive())
         {
             for (int i = 0; i<pbf->Domains(); ++i)
             {
                 FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
-                dom.BodyForce(RHS, tp, *pbf);
+                dom.BodyForce(RHS, *pbf);
             }
         }
+        else if (pml->IsActive()) pml->LoadVector(RHS);
     }
     
     // calculate inertial forces
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.InertialForces(RHS, tp);
-    }
-    
-    // calculate forces due to surface loads
-    int nsl = fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->LoadVector(RHS, tp);
+        dom.InertialForces(RHS);
     }
     
     // calculate contact forces
@@ -1157,18 +1118,7 @@ bool FEFluidSolutesSolver::Residual(vector<double>& R)
     // note that these are the linear constraints
     // enforced using the augmented lagrangian
     NonLinearConstraintForces(RHS, tp);
-    
-    // add model loads
-    int NML = fem.ModelLoads();
-    for (int i=0; i<NML; ++i)
-    {
-        FEModelLoad& mli = *fem.ModelLoad(i);
-        if (mli.IsActive())
-        {
-            mli.LoadVector(RHS, tp);
-        }
-    }
-    
+ 
     // set the nodal reaction forces
     // TODO: Is this a good place to do this?
     for (int i=0; i<mesh.Nodes(); ++i)
@@ -1216,7 +1166,7 @@ void FEFluidSolutesSolver::Serialize(DumpStream& ar)
     ar & m_gammaf;
     ar & m_pred;
     
-    ar & m_Fn & m_Fr & m_Ui &m_Ut;
+    ar & m_Fr & m_Ui &m_Ut;
     ar & m_Vi & m_vi;
     ar & m_Di & m_di;
 

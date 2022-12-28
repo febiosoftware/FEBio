@@ -29,57 +29,45 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFixedBC.h"
 #include "FENodeSet.h"
-#include "FEModel.h"
+#include "FENode.h"
 #include "DumpStream.h"
 
-BEGIN_FECORE_CLASS(FEFixedBC, FEBoundaryCondition)
-	ADD_PARAMETER(m_dofs, "dofs", 0, "@dof_list");
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
-END_FECORE_CLASS();
-
 //-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
+FEFixedBC::FEFixedBC(FEModel* pfem) : FENodalBC(pfem)
 {
-	m_nodeSet = nullptr;
 }
 
-//-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset) : FEBoundaryCondition(pfem)
+FEFixedBC::FEFixedBC(FEModel* pfem, int dof, FENodeSet* ps) : FENodalBC(pfem)
 {
-	SetDOF(dof);
-	SetNodeSet(nset);
+	SetDOFList(dof);
+	SetNodeSet(ps);
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
 bool FEFixedBC::Init()
 {
-	if (m_nodeSet == nullptr) return false;
-	if (m_dofs.size() == 0) return false;
+	if (GetNodeSet() == nullptr) return false;
+	if (GetDofList().Size() == 0) return false;
 
-	// set the DOF list
-	m_dof.Clear();
-	for (int i=0; i<(int)m_dofs.size(); ++i) m_dof.AddDof(m_dofs[i]);
-
-	return FEBoundaryCondition::Init();
+	return FENodalBC::Init();
 }
 
 //-----------------------------------------------------------------------------
 void FEFixedBC::Activate()
 {
-	FEBoundaryCondition::Activate();
-	if (m_dofs.empty()) return;
+	FENodalBC::Activate();
 
-	FENodeSet& nset = *m_nodeSet;
+	FENodeSet& nset = *GetNodeSet();
 	int n = nset.Size();
-	int dofs = m_dofs.size();
+	int dofs = m_dof.Size();
 	for (int i = 0; i<n; ++i)
 	{
 		// make sure we only activate open dof's
 		FENode& node = *nset.Node(i);
 		for (int j=0; j<dofs; ++j)
 		{
-			int dofj = m_dofs[j];
+			int dofj = m_dof[j];
 			if (node.get_bc(dofj) == DOF_OPEN)
 			{
 				node.set_bc(dofj, DOF_FIXED);
@@ -92,18 +80,19 @@ void FEFixedBC::Activate()
 //-----------------------------------------------------------------------------
 void FEFixedBC::Deactivate()
 {
-	FEBoundaryCondition::Deactivate();
-	int N = m_nodeSet->Size();
-	size_t dofs = m_dofs.size();
+	FENodalBC::Deactivate();
+	FENodeSet* pns = GetNodeSet();
+	int N = pns->Size();
+	size_t dofs = m_dof.Size();
 	for (size_t i = 0; i<N; ++i)
 	{
 		// get the node
-		FENode& node = *m_nodeSet->Node(i);
+		FENode& node = *pns->Node(i);
 
 		// set the dof to open
 		for (size_t j = 0; j < dofs; ++j)
 		{
-			node.set_bc(m_dofs[j], DOF_OPEN);
+			node.set_bc(m_dof[j], DOF_OPEN);
 		}
 	}
 }
@@ -112,38 +101,26 @@ void FEFixedBC::Deactivate()
 void FEFixedBC::CopyFrom(FEBoundaryCondition* bc)
 {
 	FEFixedBC* fbc = dynamic_cast<FEFixedBC*>(bc);
-	SetDOFList(fbc->GetDOFList());
+	m_dof = fbc->GetDofList();
 }
 
-//-----------------------------------------------------------------------------
-void FEFixedBC::SetDOF(int ndof)
+//=============================================================================
+BEGIN_FECORE_CLASS(FEFixedDOF, FEFixedBC)
+	ADD_PARAMETER(m_dofs, "dofs", 0, "$(dof_list)");
+END_FECORE_CLASS();
+
+FEFixedDOF::FEFixedDOF(FEModel* fem) : FEFixedBC(fem)
 {
-	std::vector<int> dofList;
-	dofList.push_back(ndof);
-	SetDOFList(dofList);
+
 }
 
-//-----------------------------------------------------------------------------
-void FEFixedBC::SetDOFList(const std::vector<int>& dofs)
+void FEFixedDOF::SetDOFS(const std::vector<int>& dofs)
 {
 	m_dofs = dofs;
 }
 
-//-----------------------------------------------------------------------------
-// get the dof list
-const std::vector<int> FEFixedBC::GetDOFList()
+bool FEFixedDOF::Init()
 {
-	return m_dofs;
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::SetNodeSet(FENodeSet* nodeSet)
-{
-	m_nodeSet = nodeSet;
-}
-
-//-----------------------------------------------------------------------------
-FENodeSet* FEFixedBC::GetNodeSet()
-{
-	return m_nodeSet;
+	SetDOFList(m_dofs);
+	return FEFixedBC::Init();
 }

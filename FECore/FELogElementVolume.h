@@ -34,7 +34,7 @@ public:
 	double value(FEElement& el) override;
 };
 
-class FELogFaceArea : public FEFaceLogData
+class FELogFaceArea : public FELogFaceData
 {
 public:
 	FELogFaceArea(FEModel* fem);

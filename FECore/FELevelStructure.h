@@ -29,7 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include "FENodeNodeList.h"
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! This class implements the idea of a level structure
@@ -101,10 +100,10 @@ public:
 	void SortLevels(int l0, int l1);
 
 protected:
-	vector<int>	m_lval;	//!< the level valence
-	vector<int>	m_nref;	//!< the nodes in the level
-	vector<int>	m_pl;	//!< start of each level
-	vector<int>	m_node;	//!< the levels to which a nodes belongs
+	std::vector<int>	m_lval;	//!< the level valence
+	std::vector<int>	m_nref;	//!< the nodes in the level
+	std::vector<int>	m_pl;	//!< start of each level
+	std::vector<int>	m_node;	//!< the levels to which a nodes belongs
 
 	FENodeNodeList*	m_pNL;	//!< The nodelist that generated the level structure
 

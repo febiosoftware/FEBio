@@ -33,8 +33,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
 BEGIN_FECORE_CLASS(FEUncoupledMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
-    ADD_PARAMETER(m_npmodel, "pressure_model" );
+	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE)->MakeTopLevel(true)->setLongName("bulk modulus");
+    ADD_PARAMETER(m_npmodel, "pressure_model")->setEnums("default\0NIKE3D\0Abaqus\0Abaqus (GOH)\0")->MakeTopLevel(true);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -152,10 +152,9 @@ double FEUncoupledMaterial::WeakBondSED(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEUncoupledMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEUncoupledMaterial::CreateMaterialPointData()
 {
-	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
-	FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-	pt.m_buncoupled = true;
+	FEElasticMaterialPoint* mp = new FEElasticMaterialPoint;
+	mp->m_buncoupled = true;
 	return mp;
 }

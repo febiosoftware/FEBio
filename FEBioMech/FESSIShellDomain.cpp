@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/FEModelParam.h>
 #include <FECore/FEDataStream.h>
 #include <FECore/log.h>
+#include <FECore/FEMesh.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -43,10 +44,15 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
 {
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
     m_bnodalnormals = true;
+
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+        m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    }
 }
 
 //-----------------------------------------------------------------------------

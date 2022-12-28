@@ -33,8 +33,8 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidConnector, FENLConstraint);
-	ADD_PARAMETER(m_nRBa, "body_a"        );
-	ADD_PARAMETER(m_nRBb, "body_b"        );
+	ADD_PARAMETER(m_nRBa, "body_a")->setEnums("$(rigid_materials)");
+	ADD_PARAMETER(m_nRBb, "body_b")->setEnums("$(rigid_materials)");
 END_FECORE_CLASS();
 
 int FERigidConnector::m_ncount = 0;

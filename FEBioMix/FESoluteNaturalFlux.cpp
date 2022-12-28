@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FESoluteNaturalFlux.hpp"
+#include "FESoluteNaturalFlux.h"
 #include "FEMultiphasic.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
@@ -35,7 +35,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FESoluteNaturalFlux, FESurfaceLoad)
     ADD_PARAMETER(m_bshellb, "shell_bottom");
-    ADD_PARAMETER(m_isol   , "solute_id");
+    ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void FESoluteNaturalFlux::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 bool FESoluteNaturalFlux::Init()
 {
-    if (m_isol == -1) return false;
+    if (m_isol <= 0) return false;
 
     // set up the dof lists
     FEModel* fem = GetFEModel();
@@ -102,9 +102,9 @@ bool FESoluteNaturalFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteNaturalFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESoluteNaturalFlux::LoadVector(FEGlobalVector& R)
 {
-    double dt = tp.timeIncrement;
+    double dt = CurrentTimeIncrement();
 
     m_psurf->SetShellBottom(m_bshellb);
 
@@ -152,10 +152,10 @@ void FESoluteNaturalFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteNaturalFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FESoluteNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
 {
     // time increment
-    double dt = tp.timeIncrement;
+    double dt = CurrentTimeIncrement();
 
     m_psurf->SetShellBottom(m_bshellb);
     

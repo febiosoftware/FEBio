@@ -28,12 +28,14 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "febio.h"
-#include <FEBioXML/XMLReader.h>
+#include <XML/XMLReader.h>
 #include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
+#include <FECore/FEMaterial.h>
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
+#include <FEBioTest/FEMaterialTest.h>
 #include "plugin.h"
 #include <map>
 #include <iostream>
@@ -50,12 +52,6 @@ SOFTWARE.*/
 #endif
 
 
-#ifdef WIN32
-extern "C" void __cdecl omp_set_num_threads(int);
-#else
-extern "C" void omp_set_num_threads(int);
-#endif
-
 namespace febio {
 
 	//-----------------------------------------------------------------------------
@@ -64,7 +60,6 @@ namespace febio {
 	bool parse_import(XMLTag& tag);
 	bool parse_import_folder(XMLTag& tag);
 	bool parse_set(XMLTag& tag);
-	bool parse_omp_num_threads(XMLTag& tag);
 	bool parse_output_negative_jacobians(XMLTag& tag);
 
 	// create a map for the variables (defined with set)
@@ -115,7 +110,7 @@ namespace febio {
 							if (parse_tags(tag) == false) return false;
 							++tag;
 #else
-							xml.SkipTag(tag);
+							tag.skip();
 #endif // DEBUG
 						}
 						else if (tag == "if_release")
@@ -125,19 +120,21 @@ namespace febio {
 							if (parse_tags(tag) == false) return false;
 							++tag;
 #else
-							xml.SkipTag(tag);
+							tag.skip();
 #endif // !_DEBUG
 						}
 						else if (tag == "print_model_params")
 						{
 							tag.value(config.m_printParams);
-							++tag;
 						}
 						else
 						{
 							if (parse_tags(tag) == false) return false;
 						}
-					} while (!tag.isend());
+
+						++tag;
+					} 
+					while (!tag.isend());
 				}
 			}
 			else
@@ -181,17 +178,12 @@ namespace febio {
 		{
 			if (parse_import_folder(tag) == false) return false;
 		}
-		else if (tag == "omp_num_threads")
-		{
-			if (parse_omp_num_threads(tag) == false) return false;
-		}
 		else if (tag == "output_negative_jacobians")
 		{
 			if (parse_output_negative_jacobians(tag) == false) return false;
 		}
 		else throw XMLReader::InvalidTag(tag);
 
-		++tag;
 		return true;
 	}
 
@@ -203,15 +195,6 @@ namespace febio {
 		string key(szname);
 		string val(tag.szvalue());
 		vars[key] = val;
-		return true;
-	}
-
-	//-----------------------------------------------------------------------------
-	bool parse_omp_num_threads(XMLTag& tag)
-	{
-		int n;
-		tag.value(n);
-		omp_set_num_threads(n);
 		return true;
 	}
 
@@ -230,7 +213,7 @@ namespace febio {
 		const char* szt = tag.AttributeValue("type");
 
 		// read the solver parameters
-		ClassDescriptor* cd = fexml::readParameterList(tag);
+		FEClassDescriptor* cd = fexml::readParameterList(tag);
 		if (cd == nullptr)
 		{
 			delete cd;
@@ -406,9 +389,19 @@ void ImportPluginFolder(const char* szfolder)
 #endif
 
 //-----------------------------------------------------------------------------
-void SetOMPThreads(int n)
+FEBIOLIB_API const char* GetPluginName(int allocId)
 {
-	omp_set_num_threads(n);
+	FEBioPluginManager& pm = *FEBioPluginManager::GetInstance();
+
+	for (int i = 0; i < pm.Plugins(); ++i)
+	{
+		const FEBioPlugin& pi = pm.GetPlugin(i);
+		if (pi.GetAllocatorID() == allocId)
+		{
+			return pi.GetName();
+		}
+	}
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -447,6 +440,42 @@ FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* sz
 	return bret;
 }
 
+//-----------------------------------------------------------------------------
+// run an FEBioModel
+FEBIOLIB_API int RunModel(FEBioModel& fem, CMDOPTIONS* ops)
+{
+	// set options that were passed on the command line
+	if (ops)
+	{
+		fem.SetDebugLevel(ops->ndebug);
+		fem.SetDumpLevel(ops->dumpLevel);
+
+		// set the output filenames
+		fem.SetLogFilename(ops->szlog);
+		fem.SetPlotFilename(ops->szplt);
+		fem.SetDumpFilename(ops->szdmp);
+	}
+
+	// read the input file if specified
+	int nret = 0;
+	if (ops && ops->szfile[0])
+	{
+		// read the input file
+		if (fem.Input(ops->szfile) == false) nret = 1;
+	}
+
+	// solve the model with the task and control file
+	if (nret == 0)
+	{
+		const char* sztask = (ops && ops->sztask[0] ? ops->sztask : nullptr);
+		const char* szctrl = (ops && ops->szctrl[0] ? ops->szctrl : nullptr);
+		bool b = febio::SolveModel(fem, sztask, szctrl);
+		nret = (b ? 0 : 1);
+	}
+
+	return nret;
+}
+
 // write a matrix to file
 bool write_hb(CompactMatrix& K, const char* szfile, int mode)
 {
@@ -463,6 +492,43 @@ void print_svg(CompactMatrix* m, std::ostream &out, int i0, int j0, int i1, int 
 bool write_vector(const vector<double>& a, const char* szfile, int mode)
 {
 	return NumCore::write_vector(a, szfile, mode);
+}
+
+bool RunMaterialTest(FEMaterial* mat, double simtime, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out)
+{
+	FEModel fem;
+
+	FEMaterial* matcopy = dynamic_cast<FEMaterial*>(CopyFEBioClass(mat, &fem));
+	if (matcopy == nullptr) return false;
+
+	fem.AddMaterial(matcopy);
+
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+
+	FEMaterialTest diag(&fem);
+	diag.SetOutputFileName(nullptr);
+
+	FEDiagnosticScenario* s = diag.CreateScenario(sztest);
+	s->GetParameterList();
+	s->SetParameter<double>("strain", strain);
+
+	FEAnalysis* step = fem.GetStep(0);
+	step->m_ntime = steps;
+	step->m_dt0 = simtime / steps;
+	fem.SetCurrentStepIndex(0);
+
+	if (diag.Init() == false) return false;
+
+	if (fem.Init() == false) return false;
+
+	bool b = diag.Run();
+
+	if (b)
+	{
+		out = diag.GetOutputData();
+	}
+
+	return b;
 }
 
 } // namespace febio

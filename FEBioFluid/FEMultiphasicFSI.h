@@ -41,20 +41,23 @@
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEMultiphasicFSIMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEMultiphasicFSIMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEMultiphasicFSIMaterialPoint(FEMaterialPoint* pt);
+    FEMultiphasicFSIMaterialPoint(FEMaterialPointData* pt);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);
     
     //! Data initialization
     void Init();
+
+public:
+    double Osmolarity() const;
     
 public:
     // Multiphasic FSI material data
@@ -79,13 +82,13 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEMultiphasicFSI : public FEBiphasicFSI, public FESoluteInterface
+class FEBIOFLUID_API FEMultiphasicFSI : public FEBiphasicFSI, public FESoluteInterface_T<FEMultiphasicFSIMaterialPoint>
 {
 public:
     FEMultiphasicFSI(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     //! performs initialization
     bool Init() override;
@@ -157,7 +160,20 @@ public:
 public:
     int Solutes() override { return (int)m_pSolute.size(); }
     FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+    FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC;  }
+    double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* spt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return spt->m_cF;
+    }
+
+public: // from FEBiphasicInterface
+    double GetActualFluidPressure(const FEMaterialPoint& mp) override {
+        const FEMultiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+        return pt->m_pe;
+    }
+
+public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     
     int Reactions         () { return (int) m_pReact.size();    }

@@ -27,8 +27,9 @@ SOFTWARE.*/
 #pragma once
 #include <vector>
 #include "vec3d.h"
+#include "fecore_api.h"
 
-class Quadric
+class FECORE_API Quadric
 {
 public:
     Quadric() {}

@@ -28,14 +28,22 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FENewtonianViscousSolidUC.h"
-#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianViscousSolidUC, FEUncoupledMaterial)
-	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa");
-	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   );
+	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   )->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FENewtonianViscousSolidUC::FENewtonianViscousSolidUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+    m_kappa = 0.0;
+    m_mu = 0.0;
+    m_secant_tangent = false;
+}
 
 //-----------------------------------------------------------------------------
 mat3ds FENewtonianViscousSolidUC::DevStress(FEMaterialPoint& mp)
@@ -62,7 +70,7 @@ tens4ds FENewtonianViscousSolidUC::DevTangent(FEMaterialPoint& mp)
     mat3dd I(1);
     tens4ds Cv;
 
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     if (dt > 0)
         Cv = (dyad1s(I, I)*(m_kappa - 2 * m_mu / 3) + dyad4s(I, I)*(2 * m_mu)) / (2 * dt);
     else

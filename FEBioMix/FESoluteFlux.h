@@ -55,10 +55,10 @@ public:
 	void SetSolute(int isol) { m_isol = isol; }
 	
 	//! calculate flux stiffness
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 	
 	//! calculate residual
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 	
 protected:
 	FEParamDouble	m_flux;		//!< flux scale factor magnitude

@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include <FECore/FELinearSystem.h>
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dof(pfem)
@@ -276,8 +277,8 @@ void FEBiphasicSoluteShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
             FEBiphasicMaterialPoint& pb = *mp.ExtractData<FEBiphasicMaterialPoint>();
             FESolutesMaterialPoint&  ps = *(mp.ExtractData<FESolutesMaterialPoint >());
-            pt.m_r0 = r0;
-            pt.m_rt = rt;
+            mp.m_r0 = r0;
+            mp.m_rt = rt;
             
             pt.m_J = defgrad(el, pt.m_F, j);
             
@@ -1226,12 +1227,7 @@ void FEBiphasicSoluteShellDomain::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -1239,7 +1235,7 @@ void FEBiphasicSoluteShellDomain::UpdateElementStress(int iel)
 {
     FEModel& fem = *GetFEModel();
     double dt = fem.GetTime().timeIncrement;
-    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE);
     
     // get the solid element
     FEShellElement& el = m_Elem[iel];
@@ -1279,8 +1275,8 @@ void FEBiphasicSoluteShellDomain::UpdateElementStress(int iel)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //		 since the material point coordinates are used by most materials.
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(rt, n);
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);

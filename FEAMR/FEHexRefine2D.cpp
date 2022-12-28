@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEHexRefine2D.h"
-#include <FECore/FEMesh.h>
 #include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEMeshTopo.h>
@@ -52,8 +51,7 @@ FEHexRefine2D::FEHexRefine2D(FEModel* fem) : FERefineMesh(fem)
 
 bool FEHexRefine2D::Init()
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	if (mesh.IsType(ET_HEX8) == false)
 	{
@@ -66,10 +64,10 @@ bool FEHexRefine2D::Init()
 
 bool FEHexRefine2D::RefineMesh()
 {
-	FEModel& fem = *GetFEModel();
 	FEMeshTopo& topo = *m_topo;
 
-	FEMesh& mesh = fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = GetMesh();
 	FEElementList allElems(mesh);
 
 	const int NEL = mesh.Elements();
@@ -586,7 +584,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 		if (newElems > 0)
 		{
 			// create a copy of old domain (since we want to retain the old domain)
-			FEDomain* newDom = fecore_new<FEDomain>(oldDom.GetTypeStr(), &fem);
+			FEDomain* newDom = fecore_new<FESolidDomain>(oldDom.GetTypeStr(), &fem);
 			newDom->Create(NE0, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
 			for (int j = 0; j < NE0; ++j)
 			{

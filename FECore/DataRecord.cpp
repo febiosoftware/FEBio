@@ -40,9 +40,8 @@ UnknownDataField::UnknownDataField(const char* sz) : std::runtime_error(sz)
 }
 
 //-----------------------------------------------------------------------------
-DataRecord::DataRecord(FEModel* pfem, const char* szfile, int ntype) : m_type(ntype)
+DataRecord::DataRecord(FEModel* pfem, int ntype) : FECoreBase(pfem), m_type(ntype)
 {
-	m_pfem = pfem;
 	m_nid = 0;
 	m_szname[0] = 0;
 	m_szdata[0] = 0;
@@ -55,12 +54,22 @@ DataRecord::DataRecord(FEModel* pfem, const char* szfile, int ntype) : m_type(nt
 	m_fp = 0;
 	m_szfile[0] = 0;
 
-	if (szfile)
+}
+
+//-----------------------------------------------------------------------------
+bool DataRecord::SetFileName(const char* szfile)
+{
+	if (szfile == nullptr) return false;
+
+	strcpy(m_szfile, szfile);
+	m_fp = fopen(szfile, "wt");
+	if (m_fp == 0)
 	{
-		strcpy(m_szfile, szfile);
-		m_fp = fopen(szfile, "wt");
-		if (m_fp == 0) feLogErrorEx(pfem, "FAILED CREATING DATA FILE %s\n\n", szfile);
+		feLogError("FAILED CREATING DATA FILE %s\n\n", szfile);
+		return false;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -190,22 +199,23 @@ std::string DataRecord::printToFormatString(int i)
 //-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
-	int nstep = m_pfem->GetCurrentStep()->m_ntimesteps;
-	double ftime = m_pfem->GetCurrentTime();
+	FEModel* fem = GetFEModel();
+	int nstep = fem->GetCurrentStep()->m_ntimesteps;
+	double ftime = fem->GetCurrentTime();
 
 	// make a note in the log file
-	feLogEx(m_pfem, "\nData Record #%d\n", m_nid);
-	feLogEx(m_pfem, "===========================================================================\n");
-	feLogEx(m_pfem, "Step = %d\n", nstep);
-	feLogEx(m_pfem, "Time = %.9lg\n", ftime);
-	feLogEx(m_pfem, "Data = %s\n", m_szname);
+	feLog("\nData Record #%d\n", m_nid);
+	feLog("===========================================================================\n");
+	feLog("Step = %d\n", nstep);
+	feLog("Time = %.9lg\n", ftime);
+	feLog("Data = %s\n", m_szname);
 
 	// write some comments
 	FILE* fp = m_fp;
 	if (fp && m_bcomm)
 	{
 		// we save the data in a seperate file
-		feLogEx(m_pfem, "File = %s\n", m_szfile);
+		feLog("File = %s\n", m_szfile);
 
 		// make a note in the data file
 		fprintf(fp,"*Step  = %d\n", nstep);
@@ -221,7 +231,7 @@ bool DataRecord::Write()
 			std::string out = printToString((int)i);
 
 			if (fp) fprintf(fp, "%s", out.c_str());
-			else feLogEx(m_pfem, out.c_str(),"");
+			else feLog(out.c_str(),"");
 		}
 	}
 	else
@@ -232,7 +242,7 @@ bool DataRecord::Write()
 			std::string out = printToFormatString((int)i);
 
 			if (fp) fprintf(fp, "%s", out.c_str());
-			else feLogEx(m_pfem, out.c_str(),"");
+			else feLog(out.c_str(),"");
 		}
 	}
 
@@ -246,6 +256,13 @@ bool DataRecord::Write()
 void DataRecord::SetItemList(const std::vector<int>& items)
 {
 	m_item = items;
+}
+
+//-----------------------------------------------------------------------------
+void DataRecord::SetItemList(FEItemList* items, const std::vector<int>& selection)
+{
+	// derived classes should override this
+	assert(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -276,4 +293,10 @@ void DataRecord::Serialize(DumpStream &ar)
 			m_fp = fopen(m_szfile, "a+");
 		}
 	}
+}
+
+//=============================================================================
+FELogData::FELogData(FEModel* fem) : FECoreBase(fem)
+{
+
 }

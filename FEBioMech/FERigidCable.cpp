@@ -29,16 +29,14 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
 
-REGISTER_SUPER_CLASS(FERigidCablePoint, FEOBJECT_ID);
-
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreBase)
-	ADD_PARAMETER(m_rb, "rigid_body_id");
+BEGIN_FECORE_CLASS(FERigidCablePoint, FECoreClass)
+	ADD_PARAMETER(m_rb, "rigid_body_id")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
 	ADD_PARAMETER(m_pos, "position");
 END_FECORE_CLASS();
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
+BEGIN_FECORE_CLASS(FERigidCable, FERigidLoad)
 	ADD_PARAMETER(m_force   , "force");
 	ADD_PARAMETER(m_forceDir, "force_direction");
 	ADD_PARAMETER(m_brelative, "relative");
@@ -47,7 +45,7 @@ BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
 	ADD_PROPERTY(m_points, "rigid_cable_point");
 END_FECORE_CLASS();
 
-FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(fem)
+FERigidCable::FERigidCable(FEModel* fem) : FERigidLoad(fem)
 {
 	m_force = 0;
 	m_forceDir = vec3d(0,0,-1);
@@ -93,7 +91,7 @@ void FERigidCable::applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d&
 }
 
 //! forces
-void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidCable::LoadVector(FEGlobalVector& R)
 {
 	int npoints = (int)m_points.size();
 	if (npoints == 0) return;
@@ -148,7 +146,7 @@ void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! Stiffness matrix
-void FERigidCable::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidCable::StiffnessMatrix(FELinearSystem& LS)
 {
 	int npoints = (int)m_points.size();
 	if (npoints < 2) return;

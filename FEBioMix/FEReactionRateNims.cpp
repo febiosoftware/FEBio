@@ -28,11 +28,13 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEReactionRateNims.h"
+#include "FESoluteInterface.h"
+#include "FESolutesMaterialPoint.h"
 #include "FECore/FEModel.h"
 #include <FECore/log.h>
 
 // Material parameters for the FEMultiphasic material
-BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateNims, FEReactionRate)
 	ADD_PARAMETER(m_sol, "sol");
 	ADD_PARAMETER(m_k0, "k0");
 	ADD_PARAMETER(m_kc, "kc");
@@ -43,9 +45,22 @@ BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEReactionRateNims::FEReactionRateNims(FEModel* pfem) : FEReactionRate(pfem)
+{
+    m_lid = m_cmax = -1;
+    m_sol = -1;
+    m_k0 = 0.0;
+    m_cc = 0.0;
+    m_kc = 0.0;
+    m_cr = 0.0;
+    m_kr = 0.0;
+    m_trel = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 bool FEReactionRateNims::Init()
 {
-	if (FEMaterial::Init() == false) return false;
+	if (FEReactionRate::Init() == false) return false;
 	
     // do only once
     if (m_lid == -1) {
@@ -59,8 +74,8 @@ bool FEReactionRateNims::Init()
 		}
         
         // convert global sol value to local id
-        FEMultiphasic* pmp = m_pReact->m_pMP;
-		m_lid = pmp->FindLocalSoluteID(m_sol - 1);
+        FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+		m_lid = psm->FindLocalSoluteID(m_sol - 1);
         
         // check validity of local id
 		if (m_lid == -1) {

@@ -28,9 +28,9 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
-#include "FEBioMech/FEPointBodyForce.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEBodyLoad.h>
+#include <FECore/FEModel.h>
+#include <FECore/FECoreKernel.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
@@ -79,7 +79,7 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 	}
 
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 //-----------------------------------------------------------------------------
@@ -146,7 +146,46 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	GetBuilder()->AddSurfaceLoad(psl);
 
 	// read the parameters
-	if (!tag.isleaf()) ReadParameterList(tag, psl);
+	if (!tag.isleaf())
+	{
+		++tag;
+		do
+		{
+			if (ReadParameter(tag, psl) == false)
+			{
+				// some special handling for fluidnormalvelocity
+				if ((tag == "value") && (strcmp(sztype, "fluid normal velocity") == 0))
+				{
+					// The value parameter no longer exists, but for backward compatibility
+					// we map it to the "velocity" parameter.
+
+					// get the surface data attribute
+					const char* szsurfdata = tag.AttributeValue("surface_data");
+
+					// find the surface map
+					FEDataMap* surfMap = mesh.FindDataMap(szsurfdata);
+					if (surfMap == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface_data");
+
+					// get the velocity parameter
+					FEParam* p = psl->GetParameter("velocity");
+					FEParamDouble& v = p->value<FEParamDouble>();
+
+					// we'll map the velocity value to the map's scale factor
+					double s = 1.0;
+					if (v.isConst()) s = v.constValue(); else throw XMLReader::InvalidTag(tag);
+
+					// create map and assign
+					FEMappedValue* map = new FEMappedValue(&fem);
+					map->setDataMap(surfMap);
+					map->setScaleFactor(s);
+					v.setValuator(map);
+				}
+				else throw XMLReader::InvalidTag(tag);
+			}
+			++tag;
+		} 
+		while (!tag.isend());
+	}
 }
 
 //-----------------------------------------------------------------------------

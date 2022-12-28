@@ -26,7 +26,6 @@
 
 
 #include "FERealGas.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/FEFunction1D.h>
 #include "FEFluidMaterialPoint.h"
@@ -61,9 +60,9 @@ FERealGas::FERealGas(FEModel* pfem) : FEElasticFluid(pfem)
 //! initialization
 bool FERealGas::Init()
 {
-    m_R  = GetFEModel()->GetGlobalConstant("R");
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
-    m_Pr = GetFEModel()->GetGlobalConstant("P");
+    m_R  = GetGlobalConstant("R");
+    m_Tr = GetGlobalConstant("T");
+    m_Pr = GetGlobalConstant("P");
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
@@ -454,11 +453,12 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             bool convgd = false;
             bool done = false;
             int iter = 0;
+			FEMaterialPoint mp(ft);
             do {
                 ++iter;
                 fp->m_ef = e;
-                double f = Pressure(*ft) - p;
-                double df = Tangent_Strain(*ft);
+                double f = Pressure(mp) - p;
+                double df = Tangent_Strain(mp);
                 double de = (df != 0) ? -f/df : 0;
                 e += de;
                 if ((fabs(de) < errrel*fabs(e)) ||
@@ -469,7 +469,7 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             delete ft;
             return convgd;
         }
-            break;
+        break;
     }
     return false;
 }

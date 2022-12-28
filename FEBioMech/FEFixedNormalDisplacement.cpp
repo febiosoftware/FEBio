@@ -32,12 +32,19 @@
 #include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFixedNormalDisplacement, FELinearConstraintSet)
+BEGIN_FECORE_CLASS(FEFixedNormalDisplacement, FESurfaceConstraint)
+    ADD_PARAMETER(m_lc.m_laugon, "laugon");
+    ADD_PARAMETER(m_lc.m_tol, "tol");
+    ADD_PARAMETER(m_lc.m_eps, "penalty");
+    ADD_PARAMETER(m_lc.m_rhs, "rhs");
+    ADD_PARAMETER(m_lc.m_naugmin, "minaug");
+    ADD_PARAMETER(m_lc.m_naugmax, "maxaug");
+
     ADD_PARAMETER(m_bshellb , "shell_bottom");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFixedNormalDisplacement::FEFixedNormalDisplacement(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
+FEFixedNormalDisplacement::FEFixedNormalDisplacement(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem), m_lc(pfem)
 {
     m_binit = false;
     m_bshellb = false;
@@ -48,92 +55,74 @@ FEFixedNormalDisplacement::FEFixedNormalDisplacement(FEModel* pfem) : FELinearCo
 void FEFixedNormalDisplacement::Activate()
 {
     // don't forget to call base class
-    FELinearConstraintSet::Activate();
-    
-    FEModel& fem = *FELinearConstraintSet::GetFEModel();
-    DOFS& dofs = fem.GetDOFS();
-    
-    // evaluate the nodal normals
-    FENodeList nl = m_surf.GetNodeList();
-    int N = nl.Size();
-    vector<vec3d> nn(N,vec3d(0,0,0));
-    vec3d nu(0,0,0);
-        
-    // loop over all elements to get nodal normals
-    for (int i=0; i<m_surf.Elements(); ++i)
+    FESurfaceConstraint::Activate();
+
+    if (m_binit == false)
     {
-        FESurfaceElement& el = m_surf.Element(i);
-        nu = m_surf.SurfaceNormal(el, 0);
-        for (int j=0; j<el.Nodes(); ++j) {
-            nn[nl.GlobalToLocalID(el.m_node[j])] += nu;
-        }
-    }
-    for (int i=0; i<N; ++i) nn[i].unit();
-    
-    // create linear constraints
-    // for a symmetry plane the constraint on (ux, uy, uz) is
-    // nx*ux + ny*uy + nz*uz = 0
-    if (m_bshellb == false) {
-        for (int i=0; i<N; ++i) {
-            FENode node = m_surf.Node(i);
-            if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
-                FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
-                for (int j=0; j<3; ++j) {
-                    FEAugLagLinearConstraint::DOF dof;
-                    dof.node = node.GetID() - 1;    // zero-based
-                    switch (j) {
-                        case 0:
-                            dof.bc = dofs.GetDOF("x");
-                            dof.val = nn[i].x;
-                            break;
-                        case 1:
-                            dof.bc = dofs.GetDOF("y");
-                            dof.val = nn[i].y;
-                            break;
-                        case 2:
-                            dof.bc = dofs.GetDOF("z");
-                            dof.val = nn[i].z;
-                            break;
-                        default:
-                            break;
-                    }
-                    pLC->m_dof.push_back(dof);
-                }
-                // add the linear constraint to the system
-                add(pLC);
+        FEModel& fem = *GetFEModel();
+        DOFS& dofs = fem.GetDOFS();
+
+        // evaluate the nodal normals
+        FENodeList nl = m_surf.GetNodeList();
+        int N = nl.Size();
+        vector<vec3d> nn(N, vec3d(0, 0, 0));
+        vec3d nu(0, 0, 0);
+
+        // loop over all elements to get nodal normals
+        for (int i = 0; i < m_surf.Elements(); ++i)
+        {
+            FESurfaceElement& el = m_surf.Element(i);
+            nu = m_surf.SurfaceNormal(el, 0);
+            for (int j = 0; j < el.Nodes(); ++j) {
+                nn[nl.GlobalToLocalID(el.m_node[j])] += nu;
             }
         }
-    }
-    else {
-        for (int i=0; i<N; ++i) {
-            FENode node = m_surf.Node(i);
-            if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
-                FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
-                for (int j=0; j<3; ++j) {
-                    FEAugLagLinearConstraint::DOF dof;
-                    dof.node = node.GetID() - 1;    // zero-based
-                    switch (j) {
-                        case 0:
-                            dof.bc = dofs.GetDOF("sx");
-                            dof.val = nn[i].x;
-                            break;
-                        case 1:
-                            dof.bc = dofs.GetDOF("sy");
-                            dof.val = nn[i].y;
-                            break;
-                        case 2:
-                            dof.bc = dofs.GetDOF("sz");
-                            dof.val = nn[i].z;
-                            break;
+        for (int i = 0; i < N; ++i) nn[i].unit();
+
+        // create linear constraints
+        // for a symmetry plane the constraint on (ux, uy, uz) is
+        // nx*ux + ny*uy + nz*uz = 0
+        if (m_bshellb == false) {
+            for (int i = 0; i < N; ++i) {
+                FENode node = m_surf.Node(i);
+                if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                    FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
+                    for (int j = 0; j < 3; ++j) {
+                        switch (j) {
+                        case 0: pLC->AddDOF(node.GetID(), dofs.GetDOF("x"), nn[i].x); break;
+                        case 1: pLC->AddDOF(node.GetID(), dofs.GetDOF("y"), nn[i].y); break;
+                        case 2: pLC->AddDOF(node.GetID(), dofs.GetDOF("z"), nn[i].z); break;
                         default:
                             break;
+                        }
                     }
-                    pLC->m_dof.push_back(dof);
+                    // add the linear constraint to the system
+                    m_lc.add(pLC);
                 }
-                // add the linear constraint to the system
-                add(pLC);
             }
         }
+        else {
+            for (int i = 0; i < N; ++i) {
+                FENode node = m_surf.Node(i);
+                if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                    FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
+                    for (int j = 0; j < 3; ++j) {
+                        switch (j) {
+                        case 0: pLC->AddDOF(node.GetID(), dofs.GetDOF("sx"), nn[i].x); break;
+                        case 1: pLC->AddDOF(node.GetID(), dofs.GetDOF("sy"), nn[i].y); break;
+                        case 2: pLC->AddDOF(node.GetID(), dofs.GetDOF("sz"), nn[i].z); break;
+                        default:
+                            break;
+                        }
+                    }
+                    // add the linear constraint to the system
+                    m_lc.add(pLC);
+                }
+            }
+        }
+
+        m_lc.Init();
+        m_lc.Activate();
     }
 }
 
@@ -143,3 +132,10 @@ bool FEFixedNormalDisplacement::Init()
     // initialize surface
     return m_surf.Init();
 }
+
+//-----------------------------------------------------------------------------
+void FEFixedNormalDisplacement::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
+void FEFixedNormalDisplacement::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
+void FEFixedNormalDisplacement::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
+bool FEFixedNormalDisplacement::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }
+void FEFixedNormalDisplacement::BuildMatrixProfile(FEGlobalMatrix& M) { m_lc.BuildMatrixProfile(M); }

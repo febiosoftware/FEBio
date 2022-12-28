@@ -23,11 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMembraneReactionRateIonChannel.h"
+#include "FESoluteInterface.h"
+#include "FESolutesMaterialPoint.h"
+#include "FESolute.h"
+#include <FEBioMech/FEElasticMaterialPoint.h>
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
 
 // Material parameters for the FEMembraneReactionRateConst material
 BEGIN_FECORE_CLASS(FEMembraneReactionRateIonChannel, FEMembraneReactionRate)
@@ -36,31 +39,60 @@ BEGIN_FECORE_CLASS(FEMembraneReactionRateIonChannel, FEMembraneReactionRate)
     ADD_PARAMETER(m_sbm, "sbm");
 END_FECORE_CLASS();
 
+//-----------------------------------------------------------------------------
+FEMembraneReactionRateIonChannel::FEMembraneReactionRateIonChannel(FEModel* pfem) : FEMembraneReactionRate(pfem)
+{
+    m_sol = -1;
+    m_sbm = -1;
+    m_lid = -1;
+    m_g = 0;
+    m_z = 0;
+}
+
+//-----------------------------------------------------------------------------
 bool FEMembraneReactionRateIonChannel::Init()
 {
-    // reset m_sol and m_sbm to be zero-based
-    m_sol -= 1;
-    m_sbm -= 1;
+    if (FEMembraneReactionRate::Init() == false) return false;
     
-    // membrane reaction rate is child of membrane reaction
-    FEMembraneReaction* m_MRp = dynamic_cast<FEMembraneReaction*>(GetParent());
-    if (m_MRp == nullptr) return false;
-    m_z = (m_MRp->FindSoluteData(m_sol))->m_z;
+    // do only once
+    if (m_lid == -1) {
+        // get number of DOFS
+        DOFS& fedofs = GetFEModel()->GetDOFS();
+        int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+        // check validity of sol
+        if (m_sol < 1 || m_sol > MAX_CDOFS) {
+            feLogError("sol value outside of valid range for solutes");
+            return false;
+        }
+        
+        FEModel& fem = *GetFEModel();
+        int N = GetFEModel()->GlobalDataItems();
+        for (int i=0; i<N; ++i)
+        {
+            FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+            if (psd && (psd->GetID() == m_sol)) {
+                m_lid = m_sol - 1;
+                m_z = psd->m_z;
+                break;
+            }
+        }
+    }
+    
     return true;
 }
 
+//-----------------------------------------------------------------------------
 double FEMembraneReactionRateIonChannel::ReactionRate(FEMaterialPoint& pt)
 {
-    FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
-    double ci = ps.m_ci[m_sol];
-    double ce = ps.m_ce[m_sol];
-    double R = GetFEModel()->GetGlobalConstant("R");
-    double T = GetFEModel()->GetGlobalConstant("T");
-    double Fc = GetFEModel()->GetGlobalConstant("Fc");
-    FEMultiphasic* pMP = m_pReact->m_pMP;
-    assert(pMP);
-    double ksi = pMP->SBMArealConcentration(pt, m_sbm);
-    
+    FESolutesMaterialPoint& ps = *pt.ExtractData<FESolutesMaterialPoint>();
+    double ci = ps.m_ci[m_lid];
+    double ce = ps.m_ce[m_lid];
+    double R = GetGlobalConstant("R");
+    double T = GetGlobalConstant("T");
+    double Fc = GetGlobalConstant("Fc");
+    FESoluteInterface* psi = m_pReact->m_psm; assert(psi);
+    double ksi = (m_sbm > -1) ? psi->SBMArealConcentration(pt, m_sbm - 1): 1.0;
+
     double k = 0;
     if ((ci > 0) && (ce > 0))
         k = (ci != ce) ? R*T*m_g/ksi/pow(Fc*m_z,2)*log(ci/ce)/(ci-ce) : R*T*m_g/pow(Fc*m_z,2)/ce;
@@ -68,6 +100,7 @@ double FEMembraneReactionRateIonChannel::ReactionRate(FEMaterialPoint& pt)
     return k;
 }
 
+//-----------------------------------------------------------------------------
 //! tangent of reaction rate with strain at material point
 double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
@@ -79,19 +112,19 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Strain(FEMaterialP
     return ReactionRate(pt)/Jg;
 }
 
+//-----------------------------------------------------------------------------
 double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ci(FEMaterialPoint& pt, const int isol)
 {
-    if (isol != m_sol)  return 0;
+    if (isol != m_lid)  return 0;
     
     FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
-    double ci = ps.m_ci[m_sol];
-    double ce = ps.m_ce[m_sol];
-    double R = GetFEModel()->GetGlobalConstant("R");
-    double T = GetFEModel()->GetGlobalConstant("T");
-    double Fc = GetFEModel()->GetGlobalConstant("Fc");
-    FEMultiphasic* pMP = m_pReact->m_pMP;
-    assert(pMP);
-    double ksi = pMP->SBMArealConcentration(pt, m_sbm);
+    double ci = ps.m_ci[m_lid];
+    double ce = ps.m_ce[m_lid];
+    double R = GetGlobalConstant("R");
+    double T = GetGlobalConstant("T");
+    double Fc = GetGlobalConstant("Fc");
+    FESoluteInterface* psi = m_pReact->m_psm; assert(psi);
+    double ksi = (m_sbm > -1) ? psi->SBMArealConcentration(pt, m_sbm - 1) : 1.0;
 
     double dkdc = 0;
     if ((ci > 0) && (ce > 0))
@@ -100,19 +133,19 @@ double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ci(FEMaterialPoint
     return dkdc;
 }
 
+//-----------------------------------------------------------------------------
 double FEMembraneReactionRateIonChannel::Tangent_ReactionRate_Ce(FEMaterialPoint& pt, const int isol)
 {
-    if (isol != m_sol)  return 0;
+    if (isol != m_lid)  return 0;
     
     FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
-    double ci = ps.m_ci[m_sol];
-    double ce = ps.m_ce[m_sol];
-    double R = GetFEModel()->GetGlobalConstant("R");
-    double T = GetFEModel()->GetGlobalConstant("T");
-    double Fc = GetFEModel()->GetGlobalConstant("Fc");
-    FEMultiphasic* pMP = m_pReact->m_pMP;
-    assert(pMP);
-    double ksi = pMP->SBMArealConcentration(pt, m_sbm);
+    double ci = ps.m_ci[m_lid];
+    double ce = ps.m_ce[m_lid];
+    double R = GetGlobalConstant("R");
+    double T = GetGlobalConstant("T");
+    double Fc = GetGlobalConstant("Fc");
+    FESoluteInterface* psi = m_pReact->m_psm; assert(psi);
+    double ksi = (m_sbm > -1) ? psi->SBMArealConcentration(pt, m_sbm - 1) : 1.0;
 
     double dkdc = 0;
     if ((ci > 0) && (ce > 0))

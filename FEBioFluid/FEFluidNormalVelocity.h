@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -41,14 +42,11 @@ public:
     //! constructor
     FEFluidNormalVelocity(FEModel* pfem);
     
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
-    
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
     
 	//! serializatsion
 	void Serialize(DumpStream& ar) override;
@@ -64,30 +62,30 @@ public:
     
     //! parabolic velocity profile
     bool SetParabolicVelocity();
-    
+
     //! rim pressure
     bool SetRimPressure();
     
-    double ScalarLoad(FESurfaceMaterialPoint& mp) override
-    { return NormalVelocity(mp)*m_velocity; }
+    double ScalarLoad(FESurfaceMaterialPoint& mp) override;
 
 private:
-	double NormalVelocity(FESurfaceMaterialPoint& mp);
-    
+    double NormalVelocity(FESurfaceMaterialPoint& mp);
+
 private:
-    double			m_velocity;	//!< average velocity
-    FESurfaceMap	m_VC;		//!< velocity boundary cards
-	bool            m_bpv;      //!< flag for prescribing nodal values
-	bool            m_bpar;     //!< flag for parabolic velocity
+    FEParamDouble	m_velocity;	//!< average velocity
     bool            m_brim;     //!< flag for setting rim pressure
 
+    // obsolete parameters
+    bool            m_bpv;      //!< flag for prescribing nodal values
+    bool            m_bpar;
+
 private:
-	vector<double>  m_VN;       //!< nodal scale factors
     vector<vec3d>   m_nu;       //!< nodal normals
+    vector<double>  m_VN;       //!< nodal values for velocity
     vector<int>     m_rim;      //!< list of nodes on the rim
 
 	FEDofList	m_dofW;
-    int         m_dofEF;
+    FEDofList   m_dofEF;
     
     DECLARE_FECORE_CLASS();
 };

@@ -27,9 +27,10 @@ SOFTWARE.*/
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
 #include <FECore/vec2d.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FEPeriodicSurface : public FEContactSurface
+class FEBIOMECH_API FEPeriodicSurface : public FEContactSurface
 {
 public:
 	class Data : public FEContactMaterialPoint

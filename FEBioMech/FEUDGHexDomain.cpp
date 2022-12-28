@@ -51,14 +51,27 @@ void FEUDGHexDomain::SetHourGlassParameter(double hg)
 }
 
 //-----------------------------------------------------------------------------
+bool FEUDGHexDomain::Create(int nelems, FE_Element_Spec spec)
+{
+	// make sure these solid, hex8 elements are requested
+	if (spec.eclass == FE_Element_Class::FE_ELEM_INVALID_CLASS) spec.eclass = FE_Element_Class::FE_ELEM_SOLID;
+	else if (spec.eclass != FE_Element_Class::FE_ELEM_SOLID) return false;
+
+	if (spec.eshape == FE_Element_Shape::FE_ELEM_INVALID_SHAPE) spec.eshape = FE_Element_Shape::ET_HEX8;
+	else if (spec.eshape != FE_Element_Shape::ET_HEX8) return false;
+
+	// we need to enforce HEX8G1 integration rule
+	spec.etype = FE_HEX8G1;
+
+	// now allocate the domain
+	return FESolidDomain::Create(nelems, spec);
+}
+
+//-----------------------------------------------------------------------------
 void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 {
-	// element force vector
-	vector<double> fe;
-
-	vector<int> lm;
-
 	int NE = (int)m_Elem.size();
+#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -66,12 +79,16 @@ void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
+
+		// element force vector
+		vector<double> fe;
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
 		UDGInternalForces(el, fe);
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
@@ -534,8 +551,8 @@ void FEUDGHexDomain::Update(const FETimeInfo& tp)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.m_r0 = el.Evaluate(r0, 0);
-		pt.m_rt = el.Evaluate(rt, 0);
+		mp.m_r0 = el.Evaluate(r0, 0);
+		mp.m_rt = el.Evaluate(rt, 0);
 
 		// get the average cartesian derivatives
 		double GX[8], GY[8], GZ[8];

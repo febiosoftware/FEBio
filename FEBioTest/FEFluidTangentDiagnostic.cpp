@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FETangentDiagnostic.h"
 #include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioFluid/FEFluidDomain3D.h"
+#include "FEBioFluid/FEFluidAnalysis.h"
 #include "FECore/log.h"
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEFixedBC.h>
@@ -73,7 +74,7 @@ bool FEFluidTangentUniaxial::Init()
     
     FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    pstep->m_nanalysis = FE_DYNAMIC;
+    pstep->m_nanalysis = FEFluidAnalysis::DYNAMIC;
 
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_WX = fem.GetDOFIndex("wx");
@@ -96,7 +97,6 @@ bool FEFluidTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.m_rid = -1;
         
         // set displacement BC's
         if (BC[i][0] == -1) nset[0]->Add(i);
@@ -135,7 +135,7 @@ bool FEFluidTangentUniaxial::Init()
 	FENodeSet* dc = new FENodeSet(&fem);
 	dc->Add({ 0, 3, 4, 7 });
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_WX, dc);
-	pdc->SetScale(m_velocity, 0);
+    pdc->SetScale(m_velocity, 0);
 	fem.AddBoundaryCondition(pdc);
 
     return true;
@@ -171,7 +171,7 @@ bool FEFluidTangentUniaxialSS::Init()
     
     FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    pstep->m_nanalysis = FE_STEADY_STATE;
+    pstep->m_nanalysis = FEFluidAnalysis::STEADY_STATE;
     
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
     const int dof_WX = fem.GetDOFIndex("wx");
@@ -193,7 +193,6 @@ bool FEFluidTangentUniaxialSS::Init()
 	{
 		FENode& n = m.Node(i);
 		n.m_rt = n.m_r0 = r[i];
-		n.m_rid = -1;
 
 		// set displacement BC's
 		if (BC[i][0] == -1) nset[0]->Add(i);
@@ -238,20 +237,23 @@ bool FEFluidTangentUniaxialSS::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem->SetActiveModule("fluid");
+
     m_pscn = 0;
     
-    FEAnalysis* pstep = new FEAnalysis(&fem);
+    FEAnalysis* pstep = new FEAnalysis(fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>("fluid", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("fluid", fem);
     assert(pnew_solver);
     pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
     
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
+    fem->AddStep(pstep);
+    fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------
@@ -334,8 +336,8 @@ bool FEFluidTangentDiagnostic::Run()
     // set up the element stiffness matrix
     matrix k0(4*N, 4*N);
     k0.zero();
-    bd.ElementStiffness(el, k0, tp);
-    bd.ElementMassMatrix(el,k0, tp);
+    bd.ElementStiffness(el, k0);
+    bd.ElementMassMatrix(el,k0);
     
     // print the element stiffness matrix
 	feLog("\nActual stiffness matrix:\n");
@@ -418,8 +420,8 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     // first calculate the initial residual
     vector<double> f0(4*N);
     zero(f0);
-    bd.ElementInternalForce(el, f0, tp);
-    bd.ElementInertialForce(el, f0, tp);
+    bd.ElementInternalForce(el, f0);
+    bd.ElementInertialForce(el, f0);
     
     // now calculate the perturbed residuals
     ke.resize(4*N, 4*N);
@@ -443,8 +445,8 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
 		fem.Update();
         
         zero(f1);
-        bd.ElementInternalForce(el, f1, tp);
-        bd.ElementInertialForce(el, f1, tp);
+        bd.ElementInternalForce(el, f1);
+        bd.ElementInertialForce(el, f1);
         
         switch (nj)
         {

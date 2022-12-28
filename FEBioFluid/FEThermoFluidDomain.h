@@ -27,9 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <vector>
 #include "febiofluid_api.h"
-using namespace std;
 
 class FEModel;
 class FELinearSystem;
@@ -55,31 +53,31 @@ public:
     // --- R E S I D U A L ---
     
     //! calculate the internal forces
-    virtual void InternalForces(FEGlobalVector& R, const FETimeInfo& tp) = 0;
+    virtual void InternalForces(FEGlobalVector& R) = 0;
     
     //! Calculate the body force vector
-    virtual void BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& bf) = 0;
+    virtual void BodyForce(FEGlobalVector& R, FEBodyForce& bf) = 0;
     
     //! calculate the interial forces (for dynamic problems)
-    virtual void InertialForces(FEGlobalVector& R, const FETimeInfo& tp) = 0;
+    virtual void InertialForces(FEGlobalVector& R) = 0;
     
     //! Calculate the heat supply
-    virtual void HeatSupply(FEGlobalVector& R, const FETimeInfo& tp, FEFluidHeatSupply& r) = 0;
+    virtual void HeatSupply(FEGlobalVector& R, FEFluidHeatSupply& r) = 0;
     
     // --- S T I F F N E S S   M A T R I X ---
     
     //! Calculate global stiffness matrix (only contribution from internal force derivative)
     //! \todo maybe I should rename this the InternalStiffness matrix?
-    virtual void StiffnessMatrix (FELinearSystem& LS, const FETimeInfo& tp) = 0;
+    virtual void StiffnessMatrix (FELinearSystem& LS) = 0;
     
     //! Calculate stiffness contribution of body forces
-    virtual void BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf) = 0;
+    virtual void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) = 0;
     
     //! Calculate stiffness contribution of heat supplies
-    virtual void HeatSupplyStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEFluidHeatSupply& bf) = 0;
+    virtual void HeatSupplyStiffness(FELinearSystem& LS, FEFluidHeatSupply& bf) = 0;
     
     //! calculate the mass matrix (for dynamic problems)
-    virtual void MassMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
+    virtual void MassMatrix(FELinearSystem& LS) = 0;
     
     //! transient analysis
     void SetTransientAnalysis() { m_btrans = true; }

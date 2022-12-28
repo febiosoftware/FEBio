@@ -30,9 +30,15 @@ SOFTWARE.*/
 #include "FEFiberNHUC.h"
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberNHUC, FEElasticFiberMaterialUC)
-	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+BEGIN_FECORE_CLASS(FEFiberNHUC, FEFiberMaterialUncoupled)
+	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEFiberNHUC::FEFiberNHUC(FEModel* pfem) : FEFiberMaterialUncoupled(pfem) 
+{ 
+	m_mu = 0; 
+}
 
 //-----------------------------------------------------------------------------
 mat3ds FEFiberNHUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
@@ -141,3 +147,8 @@ double FEFiberNHUC::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d
 
 	return sed;
 }
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEUncoupledFiberNH, FEElasticFiberMaterialUC)
+	ADD_PARAMETER(m_fib.m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu")->setUnits(UNIT_PRESSURE);
+END_FECORE_CLASS();

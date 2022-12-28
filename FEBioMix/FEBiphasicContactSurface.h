@@ -75,7 +75,7 @@ public:
     virtual void GetLocalFLS       (int nface, double& pg);
     
     //! Get the local fluid load support projected from the element to the surface Gauss points
-    void GetGPLocalFLS(int nface, double* pt);
+    void GetGPLocalFLS(int nface, double* pt, double ambp = 0);
 
 protected:
 	int	m_dofP;

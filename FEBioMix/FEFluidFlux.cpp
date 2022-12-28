@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioMix.h"
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFlux, FESurfaceLoad)
@@ -129,16 +130,16 @@ vec3d FEFluidFlux::SolidVelocity(FESurfaceMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFlux::LoadVector(FEGlobalVector& R)
 {
 	FEModel* fem = GetFEModel();
 
 	// only add the mixture term for transient analysis and when the m_bmixture flag is true
 	bool bmixture = m_bmixture;
-	if (fem->GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) bmixture = false;
+	if (fem->GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE) bmixture = false;
 
 	// get time increment
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	// integrate over surface
 	FEFluidFlux* flux = this;
@@ -169,13 +170,13 @@ void FEFluidFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidFlux::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	FEFluidFlux* flux = this;
-	bool btransient = (fem.GetCurrentStep()->m_nanalysis != FE_STEADY_STATE);
+	bool btransient = (fem.GetCurrentStep()->m_nanalysis != FEBiphasicAnalysis::STEADY_STATE);
 
 	if (!m_blinear || m_bmixture)
 	{

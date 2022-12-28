@@ -78,7 +78,7 @@ public:
 				//!< The first index refers to the gauss-point,
 				//!< the second index to the shape function
 
-	vector<matrix> m_Hp;	//!< shape function values at gausspoints.
+	std::vector<matrix> m_Hp;	//!< shape function values at gausspoints.
 							//!< The first index refers to the gauss-point,
 							//!< the second index to the shape function
 
@@ -125,10 +125,10 @@ public:
 
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gt;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gt;
+	std::vector<double> gw;
 
 	// element shape class
 	FESolidElementShape*				m_shape;
@@ -772,7 +772,7 @@ protected:
 //=============================================================================
 // This class defines the traits for surface elements and serves as a
 // base class for the specific surface element formulations.
-class FESurfaceElementTraits : public FEElementTraits
+class FECORE_API FESurfaceElementTraits : public FEElementTraits
 {
 public:
 	FESurfaceElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
@@ -797,9 +797,9 @@ public:
 
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gw;
 
 	// element shape class
 	FESurfaceElementShape*				m_shape;
@@ -1405,10 +1405,10 @@ public:
     
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gt;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gt;
+	std::vector<double> gw;
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
@@ -1722,9 +1722,9 @@ public:
 
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gw;
 
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs;
@@ -1977,8 +1977,8 @@ public:
 	virtual void shape_deriv2(double* Grr, double r) = 0;
 
 public:
-	vector<double> gr;	//!< integration point coordinates
-	vector<double> gw;	//!< integration point weights
+	std::vector<double> gr;	//!< integration point coordinates
+	std::vector<double> gw;	//!< integration point weights
 
 	// local derivatives of shape functions at gauss points
 	matrix Gr;

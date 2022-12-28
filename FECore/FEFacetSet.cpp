@@ -42,7 +42,15 @@ void FEFacetSet::FACET::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 FEFacetSet::FEFacetSet(FEModel* fem) : FEItemList(fem)
 {
+	m_surface = nullptr;
 }
+
+//-----------------------------------------------------------------------------
+void FEFacetSet::SetSurface(FESurface* surf) { m_surface = surf; }
+FESurface* FEFacetSet::GetSurface() { return m_surface; }
+
+//-----------------------------------------------------------------------------
+int FEFacetSet::Faces() const { return (int)m_Face.size(); }
 
 //-----------------------------------------------------------------------------
 void FEFacetSet::Create(int n)
@@ -124,4 +132,11 @@ void FEFacetSet::Serialize(DumpStream& ar)
 	FEItemList::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_Face;
+}
+
+void FEFacetSet::SaveClass(DumpStream& ar, FEFacetSet* p) {}
+FEFacetSet* FEFacetSet::LoadClass(DumpStream& ar, FEFacetSet* p)
+{
+	p = new FEFacetSet(&ar.GetFEModel());
+	return p;
 }
