@@ -627,6 +627,14 @@ int FECoreKernel::Modules() const
 
 //-----------------------------------------------------------------------------
 //! create a module
+bool FECoreKernel::CreateModule(const char* szmod, const char* description)
+{
+	FEModule* mod = new FEModule();
+	return CreateModule(mod, szmod, description);
+}
+
+//-----------------------------------------------------------------------------
+//! create a module
 bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char* description)
 {
 	assert(pmodule);
@@ -707,7 +715,7 @@ void FECoreKernel::SetSpecID(int nspec)
 
 //-----------------------------------------------------------------------------
 //! set a dependency on a module
-bool FECoreKernel::SetModuleDependency(const char* szmodule)
+bool FECoreKernel::AddModuleDependency(const char* szmodule)
 {
 	if (m_activeModule == -1) return false;
 	FEModule& activeModule = *m_modules[m_activeModule];

@@ -161,7 +161,7 @@ void FEBioMix::InitModule()
 		"   \"info\"  : \"Transient or quasi-static biphasic analysis.\""
 		"}");
 
-	febio.SetModuleDependency("solid");
+	febio.AddModuleDependency("solid");
 
 	//-----------------------------------------------------------------------------
 	// analyis classes (default type must match module name!)
@@ -274,7 +274,7 @@ void FEBioMix::InitModule()
 		"   \"info\"  : \"Transient or quasi-static biphasic analysis with a single solute.\""
 		"}");
 
-	febio.SetModuleDependency("biphasic");
+	febio.AddModuleDependency("biphasic");
 
 	//-----------------------------------------------------------------------------
 	// Global data classes
@@ -394,7 +394,7 @@ void FEBioMix::InitModule()
 		"   \"info\"  : \"Transient or quasi-static analysis with solutes.\""
 		"}");
 
-	febio.SetModuleDependency("solute");
+	febio.AddModuleDependency("solute");
 
 	//-----------------------------------------------------------------------------
 	// Global data classes

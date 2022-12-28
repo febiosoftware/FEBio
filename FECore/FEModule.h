@@ -43,11 +43,12 @@ public:
 
 public:
 	FEModule();
+	FEModule(const char* szname, const char* szdescription = nullptr);
 
 	virtual ~FEModule();
 
 	// this function must be overridden by derived classes
-	virtual void InitModel(FEModel* fem) = 0;
+	virtual void InitModel(FEModel* fem);
 
 	void AddDependency(FEModule& mod);
 

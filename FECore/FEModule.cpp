@@ -61,9 +61,20 @@ FEModule::FEModule() : im(new FEModule::Impl)
 
 }
 
+FEModule::FEModule(const char* szname, const char* szdescription) : im(new FEModule::Impl)
+{
+	SetName(szname);
+	SetDescription(szdescription);
+}
+
 FEModule::~FEModule()
 {
 	delete im;
+}
+
+void FEModule::InitModel(FEModel* fem)
+{
+
 }
 
 int FEModule::GetModuleID() const

@@ -81,8 +81,8 @@ void FEBioFSI::InitModule()
 		"   \"info\"  : \"FSI analysis where a fluid interacts with a rigid, solid or biphasic structure.\""
 		"}");
 
-	febio.SetModuleDependency("fluid");
-	febio.SetModuleDependency("biphasic");	// also pulls in "solid"
+	febio.AddModuleDependency("fluid");
+	febio.AddModuleDependency("biphasic");	// also pulls in "solid"
 
 	//-----------------------------------------------------------------------------
 	// analyis classes (default type must match module name!)
