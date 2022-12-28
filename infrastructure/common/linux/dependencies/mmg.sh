@@ -12,7 +12,7 @@ MMG_PATH="mmg-${MMG_ARCHIVE%.*}"
 build_and_install() {
 	local source=$1
 	pushd "$source" || exit 1
-	cmake . -B build
+	cmake . -B build -DCMAKE_POSITION_INDEPENDENT_CODE=On
 	pushd build || exit 1
 	make -j "$(nproc)"
 	sudo make install

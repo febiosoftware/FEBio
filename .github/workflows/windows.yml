@@ -12,10 +12,11 @@ on:
         default: false
 env:
   AWS_REGION: us-east-1
-  AWS_SUBNET_ID: subnet-097642e5c610e7583
+  AWS_SUBNET_ID: subnet-064f21b53fc72cf44
   AWS_SG_ID: sg-0ca7912782cf1538b
   AMI_ID: ami-04bb42ae8c0b24120
   AWS_INSTANCE_TYPE: c5a.8xlarge
+  AWS_AVAILABILITY_ZONE: us-east-1b
   OS: windows
   KEY_PAIR: win
 jobs:
@@ -44,6 +45,7 @@ jobs:
           ec2-instance-type: ${{ env.AWS_INSTANCE_TYPE }}
           subnet-id: ${{ env.AWS_SUBNET_ID }}
           security-group-id: ${{ env.AWS_SG_ID }}
+          availability-zone: ${{ env.AWS_AVAILABILITY_ZONE }}
           wait-for-registry-timeout: 5
           aws-resource-tags: > # optional, requires additional permissions
             [
@@ -65,7 +67,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: febio3-${{runner.os}}-${{runner.arch}}
+          name: febio4-${{runner.os}}-${{runner.arch}}
           path: cmbuild/bin
   tests:
     if: ${{inputs.runTests}}
@@ -81,7 +83,7 @@ jobs:
           submodules: 'true'
       - uses: actions/download-artifact@v3
         with:
-          name: febio3-${{runner.os}}-${{runner.arch}}
+          name: febio4-${{runner.os}}-${{runner.arch}}
           path: cmbuild/bin
       - name: Run test suite
         run: |
@@ -127,7 +129,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: febio3-Windows-X64
+          name: febio4-Windows-X64
           path: |
             cmbuild
       - name: Configure SSH
@@ -139,7 +141,7 @@ jobs:
           SSH_HOST: ${{ secrets.REPO_HOST }}
       - name: Stage Build to Repo
         run: |
-          scp cmbuild/Release/* repo:~/update2/FEBioStudioDev/Windows/stage/bin
+          scp cmbuild/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
       - name: Make Dev Release
         run: |
-          ssh repo "python3 update2/FEBioStudioDev/makeDevRelease.py -w"
+          ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -w"

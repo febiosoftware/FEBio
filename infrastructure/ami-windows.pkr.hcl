@@ -11,8 +11,6 @@ locals {
   buildtime              = formatdate("YYYYMMDDhhmm", timestamp())
   intel_basekit          = "w_BaseKit_p_2022.2.0.252_offline.exe"
   intel_basekit_uri      = "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/18674/${local.intel_basekit}"
-  intel_hpckit           = "w_HPCKit_p_2022.2.0.173_offline.exe"
-  intel_hpckit_uri       = "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/18680/${local.intel_hpckit}"
   intel_install_windows  = "https://raw.githubusercontent.com/oneapi-src/oneapi-ci/master/scripts/install_windows.bat"
   vs_2019_buildtools_bin = "vs_buildtools.exe"
   vs_2019_buildtools_uri = "https://aka.ms/vs/16/release/${local.vs_2019_buildtools_bin}"
@@ -45,19 +43,23 @@ data "amazon-ami" "windows" {
   region      = "us-east-1"
 }
 
+variable "skip_create_ami" {
+  type    = bool
+  default = true
+}
+
 source "amazon-ebs" "windows" {
   ami_name      = "packer-provisioned-windows-2019-intel-oneapi-${local.buildtime}"
   instance_type = "c4.2xlarge"
   source_ami    = data.amazon-ami.windows.id
   communicator  = "winrm"
 
-  # skip_create_ami = true
+  skip_create_ami = var.skip_create_ami
 
   aws_polling {
     delay_seconds = 60
     max_attempts  = 90
   }
-
 
   user_data_file = "./common/windows/user-data.txt"
   winrm_password = data.amazon-parameterstore.winrm_password.value

@@ -16,7 +16,7 @@ build_and_install() {
 	pushd "$source" || exit 1
 	dos2unix CMakeLists.txt CMakeLists.txt
 	patch --ignore-whitespace -p0 < "$patchfile"
-	cmake -DBUILD_DEMO:BOOLEAN=false . -B $build_dir
+	cmake -DCMAKE_POSITION_INDEPENDENT_CODE=On -DBUILD_DEMO:BOOLEAN=false . -B $build_dir
 	pushd $build_dir || exit 1
 	make -j "$(nproc)"
 	sudo make install

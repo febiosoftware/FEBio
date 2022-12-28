@@ -427,11 +427,10 @@ DerivedData/
 ## cmake build directories
 cbuild/
 cmbuild*/
-
 ##cmake files
-CMakeLists.txt
+!CMakeLists.txt
 CMakeCache.txt
-*.cmake
+!*.cmake
 
 ## Visual Studio Code
 .vscode/
@@ -439,3 +438,8 @@ CMakeCache.txt
 Documentation/FEBio_Theory_Manual.pdf
 Documentation/FEBio_User_Manual.html.LyXconv/
 
+## Docker
+!Docker/build
+
+## direnv
+.env*

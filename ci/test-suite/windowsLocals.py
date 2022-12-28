@@ -9,8 +9,7 @@ BUILDCOMMAND = ["MSBuild", "/p:configuration=Release"]
 CLEANCOMMAND = ["MSBuild", "/p:configuration=Release", "/t:clean"]
 
 FEBIODIR = os.getcwd()
-FEBIOBUILDDIR = path.join(FEBIODIR, "cmbuild")
-FEBIOPATH = path.join(FEBIOBUILDDIR, "bin", "Release", "febio3.exe")
+FEBIOPATH = path.join(FEBIOBUILDDIR, "bin", "Release", "febio4.exe")
 FEBIOUPLOADPATH = FEBIOPATH
 # FEBIOREMOTEDIR = "Windows/stage/febio"
 
