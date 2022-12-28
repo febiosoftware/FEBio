@@ -1,0 +1,89 @@
+/**
+\page plugin_logdata Log Data Plugin
+
+Log data is written to the FEBio log file, or optionally to a separate text file. Plugins can extend the type of log data that can be exported from FEBio. 
+
+\section nodal_log Nodal Log Data
+
+To export data for individual nodes, derive a class from FELogNodeData and implement the \c value virtual member function. 
+
+\code
+class MyNodeLogData : public FELogNodeData
+{
+public:
+	MyNodeLogData(FEModel* fem) : FELogNodeData(fem) {}
+
+	double value(const FENode& node) override
+	{
+		// calculate something for this node
+		double val;
+		
+		return val;
+	}
+}
+\endcode
+
+\section elem_log Element Log Data
+
+To export data for individual elements, derive a class from FELogElemData and implement the \c value virtual member function. 
+
+\code
+class MyElemLogData : public FELogElemData
+{
+public:
+	MyElemLogData(FEModel* fem) : FELogElemData(fem) {}
+
+	double value(FEElement& el) override
+	{
+		// calculate something for this element
+		double val;
+		
+		return val;
+	}
+}
+\endcode
+
+Note that only a single value for each element can be returned. Since element data is often stored at integration points, FEBio usually returns the element average. The following example illustrates how to calculate an element average value. 
+
+\code
+double MyElemLogData::value(FEElement& el)
+{
+	double avg = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+
+		// extract some material point value
+		double vi;
+
+		// add it to the sum
+		avg += vi;
+	}
+
+	// return average
+	return avg / (double) nint;
+}
+\endcode
+
+\section face_log Facet Log Data
+
+To export data for individual surface facets, derive a class from FELogFaceData and implement the \c value virtual member function. 
+
+\code
+class MyFaceLogData : public FELogFaceData
+{
+public:
+	MyFaceLogData(FEModel* fem) : FELogFaceData(fem) {}
+
+	double value(FESurfaceElement& el) override
+	{
+		// calculate something for this element
+		double val;
+		
+		return val;
+	}
+}
+\endcode
+
+*/

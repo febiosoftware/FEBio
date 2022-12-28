@@ -1,11 +1,11 @@
 /**
 \page plugin_upgrade4 Upgrading plugins to FEBio 4.0
 
-This document describes important details for upgrading a plugin that was designed for FEBio2 to FEBio3. 
+This document describes important details for upgrading a plugin that was designed for FEBio3 to FEBio4.
 
 Material Point Data
 ---------------------
-In FEBio3, custom material classes were derived from FEMaterialPoint. However, this resulted in every derived class inheriting the FEMaterialPoint member variables (e.g. m_r0), which is inefficient and can lead to confusion. For this reason, the material point is separated from the material point data needed by material classes. Now, the FEMaterialPoint class stores a list to classes derived from FEMaterialPointData. 
+In FEBio3, custom material point classes were derived from FEMaterialPoint. However, this resulted in every derived class inheriting the FEMaterialPoint member variables (e.g. m_r0), which is inefficient and can lead to confusion. For this reason, the material point is separated from the material point data needed by material classes. Now, the FEMaterialPoint class stores a list to classes derived from FEMaterialPointData. Custom material point data classes should be derived from \c FEMaterialPointData instead of \c FEMaterialPoint. 
 
 If your material plugin defined a custom material point, you need to change the base class from <b>FEMaterialPoint to FEMaterialPointData</b>.
 */

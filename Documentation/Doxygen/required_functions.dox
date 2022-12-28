@@ -65,6 +65,8 @@ This function takes one parameter, a reference to the kernel object. This object
 This is also a good place to allocate any resources that the plugin may need. The call to SetInstance ensures
 that the plugin uses the same kernel object as the FEBio executable. 
 
+The rest of this function typically registers the plugin classes with the framework (see \ref register). 
+
 \section PluginCleanup
 This function will be called when FEBio terminates and can be used to deallocate resources.
 

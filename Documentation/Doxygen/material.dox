@@ -57,7 +57,7 @@ At this point it is useful to discuss a common practice in adding new classes in
 
 \subsection step2 Registering the new material
 
-In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done in the PluginInitialize function, which must be provided by the user. (see \ref factory_classes)
+In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done in the PluginInitialize function, which must be provided by the user. (see \ref register)
 
 \code
 FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)

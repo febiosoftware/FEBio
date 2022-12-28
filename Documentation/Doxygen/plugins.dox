@@ -7,7 +7,7 @@ FEBio has a plugin mechanism that allows users to add new capabilities to FEBio 
 
 Plugin documentation
 --------------------
-If you are new to FEBio plugins, it is recommended to checkout the following link first, which introduces the basics of developing plugins for FEBio.
+If you are new to FEBio plugins, it is recommended to checkout the following link first, which introduces the basics of developing and using plugins in FEBio.
 
 \li \subpage plugin_basics
 
@@ -15,6 +15,7 @@ If you are looking for information about a particular type of plugin, choose one
 \li \subpage material
 \li \subpage plugin_bc
 \li \subpage plugin_plot
+\li \subpage plugin_logdata
 \li \subpage cb_plugin
 \li \subpage task
 \li \subpage plugin_solver
