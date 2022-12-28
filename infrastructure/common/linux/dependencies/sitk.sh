@@ -23,7 +23,7 @@ build_and_install() {
 		-DSimpleITK_USE_SYSTEM_ITK:BOOL=OFF
 
 	pushd cmbuild
-	make -j "$(nproc --ignore 4)"
+	make -j "$(nproc --ignore 2)"
 	sudo make install
 	popd || exit 1
 	popd || exit 1

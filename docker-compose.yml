@@ -1,5 +1,14 @@
 version: "3"
 services:
+  febiobase:
+    build:
+      context: ./infrastructure
+      dockerfile: DockerfileBase
+    image: febiosoftware/febiobase:ubuntu-22.04
+    working_dir: /FEBio
+    volumes:
+      - ./:/FEBio
+
   febio: &default
     build:
       context: ./infrastructure

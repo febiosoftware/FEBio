@@ -14,6 +14,7 @@ install_deps() {
 		libocct-modeling-data-dev \
 		libocct-modeling-algorithms-dev \
 		libocct-visualization-dev \
+		libocct-draw-dev \
 		libocct-data-exchange-dev \
 		libtbb2-dev
 }
@@ -32,7 +33,8 @@ build_and_install() {
 		-DUSE_PYTHON=OFF \
 		-DUSE_GUI=OFF \
 		-DUSE_NATIVE_ARCH=OFF \
-		-DUSE_OCC=ON
+		-DUSE_OCC=ON \
+		-DUSE_SUPERBUILD=OFF
 	pushd cmbuild
 	make -j "$(nproc)"
 	sudo make install
