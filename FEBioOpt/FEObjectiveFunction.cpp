@@ -412,7 +412,7 @@ void FENodeDataTable::EvaluateFunctions(vector<double>& f)
 		int v = m_Data[i].ivar;
 
 		// calculate node value
-		double val = m_var[v]->value(n);
+		double val = m_var[v]->value(mesh.Node(n));
 
 		// store result
 		f[i] = val;

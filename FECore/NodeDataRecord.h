@@ -31,10 +31,10 @@ SOFTWARE.*/
 #include "DataRecord.h"
 
 class FENodeSet;
+class FENode;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for a node data value.
-//! \todo I'd like to modify this so I can pass the FENode class instead of the node number
 class FECORE_API FELogNodeData : public FELogData
 { 
 	FECORE_SUPER_CLASS(FELOGNODEDATA_ID)
@@ -43,7 +43,7 @@ class FECORE_API FELogNodeData : public FELogData
 public:
 	FELogNodeData(FEModel* fem);
 	virtual ~FELogNodeData();
-	virtual double value(int node) = 0; 
+	virtual double value(const FENode& node) = 0; 
 };
 
 //-----------------------------------------------------------------------------
@@ -70,7 +70,8 @@ class FECORE_API FENodeVarData : public FELogNodeData
 {
 public:
 	FENodeVarData(FEModel* pfem, int ndof);
-	double value(int node);
+	double value(const FENode& node) override;
+
 private:
 	int	m_ndof;
 };

@@ -39,7 +39,7 @@ class FENodeFluidXVel : public FELogNodeData
 {
 public:
     FENodeFluidXVel(FEModel* pfem) : FELogNodeData(pfem){}
-    double value(int node);
+    double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class FENodeFluidYVel : public FELogNodeData
 {
 public:
     FENodeFluidYVel(FEModel* pfem) : FELogNodeData(pfem){}
-    double value(int node);
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class FENodeFluidZVel : public FELogNodeData
 {
 public:
     FENodeFluidZVel(FEModel* pfem) : FELogNodeData(pfem){}
-    double value(int node);
+	double value(const FENode& node) override;
 };
 
 //=============================================================================
