@@ -62,6 +62,13 @@ public:
 		int ntype;
 	};
 
+	struct EDGE
+	{
+		int id;
+		int node[FEElement::MAX_NODES];
+		int ntype;
+	};
+
 	class Domain
 	{
 	public:
@@ -140,6 +147,27 @@ public:
 		std::vector<int>	m_node;
 	};
 
+	class EdgeSet
+	{
+	public:
+		EdgeSet();
+		EdgeSet(const EdgeSet& set);
+		EdgeSet(const std::string& name);
+
+		void SetName(const std::string& name);
+		const std::string& Name() const;
+
+		void SetEdgeList(const std::vector<EDGE>& edge);
+		const std::vector<EDGE>& EdgeList() const;
+
+		int Edges() const { return (int)m_edge.size(); }
+		EDGE& Edge(int i) { return m_edge[i]; }
+
+	private:
+		std::string			m_name;
+		std::vector<EDGE>	m_edge;
+	};
+
 	class ElementSet
 	{
 	public:
@@ -194,6 +222,7 @@ public:
 		std::string			m_name;
 		std::vector<ELEM>	m_elem;
 	};
+
 	class Part
 	{
 	public:
@@ -222,6 +251,11 @@ public:
 		NodeSet* GetNodeSet(int i) { return m_NSet[i]; }
 		NodeSet* FindNodeSet(const std::string& name);
 
+		int EdgeSets() const { return (int)m_LSet.size(); }
+		void AddEdgeSet(EdgeSet* cset) { m_LSet.push_back(cset); }
+		EdgeSet* GetEdgeSet(int i) { return m_LSet[i]; }
+		EdgeSet* FindEdgeSet(const std::string& name);
+
 		int ElementSets() const { return (int) m_ESet.size(); }
 		void AddElementSet(ElementSet* eset) { m_ESet.push_back(eset); }
 		ElementSet* GetElementSet(int i) { return m_ESet[i]; }
@@ -245,6 +279,7 @@ public:
 		std::vector<Domain*>		m_Dom;
 		std::vector<Surface*>		m_Surf;
 		std::vector<NodeSet*>		m_NSet;
+		std::vector<EdgeSet*>		m_LSet;
 		std::vector<ElementSet*>	m_ESet;
 		std::vector<SurfacePair*>	m_SurfPair;
 		std::vector<DiscreteSet*>	m_DiscSet;

@@ -856,6 +856,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 				ch = GetChar();
 				if (ch == '-') n++;
 				else if ((ch == '>') && (n >= 2)) break;
+				else if (ch == '\r') n = 0; // don't append \r
 				else
                 {
                     m_comment += ch;
@@ -863,6 +864,27 @@ void XMLReader::ReadTag(XMLTag& tag)
                 } 
 			}
 			while (1);
+
+			// eat whitespace at the start and end of the comment
+			if (m_comment.empty() == false)
+			{
+				int n = m_comment.size();
+				char* tmp = new char[n + 1];
+				strncpy(tmp, m_comment.c_str(), n);
+				tmp[n] = 0;
+
+				char* cl = tmp;
+				while (*cl && isspace(*cl)) cl++;
+				n = strlen(cl);
+				if (n > 0)
+				{
+					char* cr = &cl[n - 1];
+					while ((cr > cl) && isspace(*cr)) *cr-- = 0;
+				}
+
+				m_comment = cl;
+				delete[] tmp;
+			}
 		}
 		else if (ch == '?')
 		{

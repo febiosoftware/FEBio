@@ -198,7 +198,7 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 	int neln_p = el.ShapeFunctions(degree_p);
 
 	// allocate lm
-	lm.resize(neln_d*4);
+	lm.resize(neln_d*4 + 3*neln_d);
 
 	// displacement dofs
 	for (int i=0; i<neln_d; ++i)
@@ -214,6 +214,11 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		// now the pressure dofs
 		lm[4*i + 3] = id[m_dofP];
+
+		// rigid rotational dofs
+		lm[4 * neln_d + 3 * i    ] = id[m_dofR[0]];
+		lm[4 * neln_d + 3 * i + 1] = id[m_dofR[1]];
+		lm[4 * neln_d + 3 * i + 2] = id[m_dofR[2]];
 	}
 
     // substitute interface dofs for solid-shell interfaces

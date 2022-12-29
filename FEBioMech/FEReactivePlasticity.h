@@ -76,17 +76,14 @@ public:
 
     bool UseSecantTangent() override { return m_secant_tangent; }
     
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp) override;
+    
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion
     FEPlasticFlowCurve* m_pFlow;    // plastic flow curve
     
-private:
-    vector<double> Ky;
-    vector<double> w;
-    
 public:
-    int         m_n;        // number of yield levels
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
 

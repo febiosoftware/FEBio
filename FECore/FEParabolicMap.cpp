@@ -48,14 +48,20 @@ FEParabolicMap::~FEParabolicMap()
 
 }
 
-bool FEParabolicMap::Init()
-{
-	return false;
-}
-
 void FEParabolicMap::SetDOFConstraint(const FEDofList& dofs)
 {
 	m_dofs = dofs;
+}
+
+FESurfaceMap* FEParabolicMap::Generate()
+{
+	FESurfaceMap* map = new FESurfaceMap(FEDataType::FE_DOUBLE);
+	if (Generate(*map) == false)
+	{
+		delete map;
+		map = nullptr;
+	}
+	return map;
 }
 
 bool FEParabolicMap::Generate(FESurfaceMap& map)
@@ -115,7 +121,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 		if (!boundary[i]) glm[i] = neq++;
 	if (neq == 0)
 	{
-		feLogError("Unable to set parabolic fluid normal velocity\n");
+		feLogError("Unable to set parabolic map\n");
 		delete ps;
 		return false;
 	}
@@ -153,7 +159,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	pS->Zero();
 
 	// create global vector
-	vector<double> v;           //!< normal velocity solution
+	vector<double> v;           //!< solution
 	vector<double> rhs;         //!< right-hand-side
 	vector<double> Fr;          //!< reaction forces
 	v.assign(neq, 0);
@@ -297,7 +303,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	map.set<double>(0.0);
 	for (int i = 0; i < ps->Nodes(); ++i)
 	{
-		map.set<double>(i, VN[i]);
+		map.set<double>(i, VN[i] * m_scale);
 	}
 
 	// clean up

@@ -664,9 +664,9 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
             if (m_pWCDF) {
                 pt.m_Et = ScalarStrain(wb);
                 if (pt.m_Et > pt.m_Em)
-                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Et));
+                    pt.m_wv.push_back(m_pWCDF->cdf(mp,pt.m_Et));
                 else
-                    pt.m_wv.push_back(m_pWCDF->cdf(pt.m_Em));
+                    pt.m_wv.push_back(m_pWCDF->cdf(mp,pt.m_Em));
             }
             else pt.m_wv.push_back(1);
             CullGenerations(wb);
@@ -679,9 +679,9 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
         if (m_pWCDF) {
             pt.m_Et = ScalarStrain(wb);
             if (pt.m_Et > pt.m_Em)
-                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Et);
+                pt.m_wv.back() = m_pWCDF->cdf(mp,pt.m_Et);
             else
-                pt.m_wv.back() = m_pWCDF->cdf(pt.m_Em);
+                pt.m_wv.back() = m_pWCDF->cdf(mp,pt.m_Em);
         }
         pt.m_f.back() = ReformingBondMassFraction(wb);
     }

@@ -113,6 +113,17 @@ void FEParameterList::operator = (FEParameterList& l)
 					for (int i=0; i<s.dim(); ++i) d.pvalue<double>()[i] = s.pvalue<double>()[i];
 				}
 				break;
+			case FE_PARAM_DOUBLE_MAPPED:
+				{
+					for (int i=0; i<s.dim(); ++i)
+					{
+						FEParamDouble& pd = d.value<FEParamDouble>(i);
+						FEParamDouble& ps = s.value<FEParamDouble>(i);
+						assert(ps.isConst());
+						pd = ps.constValue();
+					}
+				}
+				break;
 			default:
 				assert(false);
 			}

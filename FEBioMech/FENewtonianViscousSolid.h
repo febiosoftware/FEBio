@@ -37,16 +37,19 @@ public:
 public:
     double	m_kappa;	//!< bulk viscosity
     double	m_mu;       //!< shear viscosity
+    bool    m_secant_tangent;   //!< flag for using secant tangent calculation
     
 public:
     //! calculate stress at material point
-    virtual mat3ds Stress(FEMaterialPoint& pt) override;
+    mat3ds Stress(FEMaterialPoint& pt) override;
     
     //! calculate tangent stiffness at material point
-    virtual tens4ds Tangent(FEMaterialPoint& pt) override;
+    tens4ds Tangent(FEMaterialPoint& pt) override;
     
     //! calculate strain energy density at material point
-    virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
+    double StrainEnergyDensity(FEMaterialPoint& pt) override;
+    
+    bool UseSecantTangent() override { return m_secant_tangent; }
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();

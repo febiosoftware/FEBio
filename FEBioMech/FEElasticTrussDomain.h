@@ -103,6 +103,7 @@ protected:
 protected:
 	FESolidMaterial*	m_pMat;
 	double	m_a0;
+	double	m_v;
 
 	FEDofList	m_dofU;
 

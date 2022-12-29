@@ -255,6 +255,8 @@ void FEFluidNormalVelocity::Activate()
             if (node.get_bc(m_dofEF[0]) != DOF_FIXED) node.set_bc(m_dofEF[0], DOF_PRESCRIBED);
         }
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

@@ -77,6 +77,8 @@ void BSpline::operator = (const BSpline& bs)
 bool BSpline::init(int korder, const std::vector<vec2d>& p)
 {
     int ncoef = (int)p.size();
+	if (ncoef < 2) return false;
+
     im->korder = korder;
     im->ncoef = ncoef;
     if (ncoef < korder) return false;

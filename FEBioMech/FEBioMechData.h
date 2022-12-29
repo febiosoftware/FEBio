@@ -44,7 +44,7 @@ class FENodeXPos : public FELogNodeData
 { 
 public: 
 	FENodeXPos(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ class FENodeYPos : public FELogNodeData
 { 
 public: 
 	FENodeYPos(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ class FENodeZPos : public FELogNodeData
 { 
 public: 
 	FENodeZPos(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ class FENodeXDisp : public FELogNodeData
 { 
 public: 
 	FENodeXDisp(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ class FENodeYDisp : public FELogNodeData
 { 
 public: 
 	FENodeYDisp(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ class FENodeZDisp : public FELogNodeData
 { 
 public: 
 	FENodeZDisp(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ class FENodeXVel : public FELogNodeData
 { 
 public: 
 	FENodeXVel(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ class FENodeYVel : public FELogNodeData
 { 
 public: 
 	FENodeYVel(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ class FENodeZVel : public FELogNodeData
 { 
 public: 
 	FENodeZVel(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ class FENodeXAcc : public FELogNodeData
 { 
 public: 
 	FENodeXAcc(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ class FENodeYAcc : public FELogNodeData
 { 
 public: 
 	FENodeYAcc(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ class FENodeZAcc : public FELogNodeData
 { 
 public: 
 	FENodeZAcc(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ class FENodeForceX: public FELogNodeData
 { 
 public: 
 	FENodeForceX(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ class FENodeForceY: public FELogNodeData
 { 
 public: 
 	FENodeForceY(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ class FENodeForceZ: public FELogNodeData
 { 
 public: 
 	FENodeForceZ(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node) override;
 };
 
 //=============================================================================
@@ -176,6 +176,30 @@ class FELogContactPressure : public FELogFaceData
 {
 public:
 	FELogContactPressure(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionX : public FELogFaceData
+{
+public:
+	FELogContactTractionX(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionY : public FELogFaceData
+{
+public:
+	FELogContactTractionY(FEModel* fem) : FELogFaceData(fem) {}
+	double value(FESurfaceElement& el) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogContactTractionZ : public FELogFaceData
+{
+public:
+	FELogContactTractionZ(FEModel* fem) : FELogFaceData(fem) {}
 	double value(FESurfaceElement& el) override;
 };
 
@@ -993,6 +1017,33 @@ class FELogDiscreteElementForce : public FELogElemData
 {
 public:
 	FELogDiscreteElementForce(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceX : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceX(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceY : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceY(FEModel* fem) : FELogElemData(fem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Discrete element force
+class FELogDiscreteElementForceZ : public FELogElemData
+{
+public:
+	FELogDiscreteElementForceZ(FEModel* fem) : FELogElemData(fem) {}
 	double value(FEElement& el);
 };
 

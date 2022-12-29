@@ -36,12 +36,19 @@ class FECORE_API FEModule
 	class Impl;
 
 public:
+	enum Status {
+		EXPERIMENTAL,
+		RELEASED
+	};
+
+public:
 	FEModule();
+	FEModule(const char* szname, const char* szdescription = nullptr);
 
 	virtual ~FEModule();
 
 	// this function must be overridden by derived classes
-	virtual void InitModel(FEModel* fem) = 0;
+	virtual void InitModel(FEModel* fem);
 
 	void AddDependency(FEModule& mod);
 
@@ -54,6 +61,11 @@ public:
 	const char* GetName() const;
 
 	const char* GetDescription() const;
+
+	int GetStatus() const;
+
+protected:
+	void SetStatus(FEModule::Status status);
 
 private:
 	void SetID(int newId);

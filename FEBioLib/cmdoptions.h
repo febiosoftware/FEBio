@@ -40,6 +40,7 @@ struct FEBIOLIB_API CMDOPTIONS
 	bool	binteractive;		//!< start FEBio interactively
 
 	int		dumpLevel;		//!< requested restart level
+	int		dumpStride;		//!< (cold) restart file stride
 
 	char	szfile[MAXFILE];	//!< model input file name
 	char	szlog[MAXFILE];	//!< log file name
@@ -62,6 +63,7 @@ struct FEBIOLIB_API CMDOPTIONS
 		bsilent = false;
 		binteractive = false;
 		dumpLevel = 0;
+		dumpStride = 1;
 
 		szfile[0] = 0;
 		szlog[0] = 0;

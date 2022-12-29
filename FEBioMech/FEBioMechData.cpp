@@ -47,144 +47,117 @@ SOFTWARE.*/
 #include "FEDiscreteElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-double FENodeXPos::value(int nnode) 
+double FENodeXPos::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_rt.x; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYPos::value(int nnode) 
+double FENodeYPos::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_rt.y; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZPos::value(int nnode) 
+double FENodeZPos::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_rt.z; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXDisp::value(int nnode) 
+double FENodeXDisp::value(const FENode& node)
 {
 	const int dof_X = GetFEModel()->GetDOFIndex("x");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_X); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYDisp::value(int nnode) 
+double FENodeYDisp::value(const FENode& node)
 {
 	const int dof_Y = GetFEModel()->GetDOFIndex("y");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_Y); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZDisp::value(int nnode) 
+double FENodeZDisp::value(const FENode& node)
 {
 	const int dof_Z = GetFEModel()->GetDOFIndex("z");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_Z); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXVel::value(int nnode) 
+double FENodeXVel::value(const FENode& node)
 {
 	const int dof_VX = GetFEModel()->GetDOFIndex("vx");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VX);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYVel::value(int nnode) 
+double FENodeYVel::value(const FENode& node)
 {
 	const int dof_VY = GetFEModel()->GetDOFIndex("vy");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VY); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZVel::value(int nnode) 
+double FENodeZVel::value(const FENode& node)
 {
 	const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VZ);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXAcc::value(int nnode) 
+double FENodeXAcc::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_at.x; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYAcc::value(int nnode) 
+double FENodeYAcc::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_at.y; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZAcc::value(int nnode) 
+double FENodeZAcc::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_at.z; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceX::value(int nnode) 
+double FENodeForceX::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<int>& id = mesh.Node(nnode).m_ID;
+		const vector<int>& id = node.m_ID;
 		return (-id[0] - 2 >= 0 ? Fr[-id[0] - 2] : 0);
 	}
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceY::value(int nnode) 
+double FENodeForceY::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<int>& id = mesh.Node(nnode).m_ID;
+		const vector<int>& id = node.m_ID;
 		return (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
 	}
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceZ::value(int nnode) 
+double FENodeForceZ::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<int>& id = mesh.Node(nnode).m_ID;
+		const vector<int>& id = node.m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
 	}
 	return 0;
@@ -224,6 +197,54 @@ double FELogContactPressure::value(FESurfaceElement& el)
 	Lm /= (double)el.GaussPoints();
 
 	return Lm;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionX::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.x;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionY::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.y;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionZ::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.z;
+	}
+	return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1798,6 +1819,30 @@ double FELogDiscreteElementForce::value(FEElement& el)
 	double Fm = F * e;
 
 	return Fm;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceX::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.x;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceY::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.y;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceZ::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.z;
+	else return 0.0;
 }
 
 //-----------------------------------------------------------------------------

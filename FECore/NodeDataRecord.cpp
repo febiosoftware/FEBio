@@ -83,7 +83,9 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	int nnode = item - 1;
 	assert((nnode>=0)&&(nnode<mesh.Nodes()));
 	if ((nnode < 0) || (nnode >= mesh.Nodes())) return 0;
-	return m_Data[ndata]->value(nnode);
+
+	FENode& node = mesh.Node(nnode);
+	return m_Data[ndata]->value(node);
 }
 
 //-----------------------------------------------------------------------------
@@ -109,8 +111,7 @@ void NodeDataRecord::SetItemList(FEItemList* items, const std::vector<int>& sele
 FENodeVarData::FENodeVarData(FEModel* pfem, int ndof) : FELogNodeData(pfem), m_ndof(ndof) {}
 
 //-----------------------------------------------------------------------------
-double FENodeVarData::value(int node)
+double FENodeVarData::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	return mesh.Node(node).get(m_ndof);
+	return node.get(m_ndof);
 }

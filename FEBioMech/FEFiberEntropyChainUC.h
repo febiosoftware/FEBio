@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,32 +25,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #pragma once
-#include "FECore/FEMaterialPoint.h"
+#include "FEElasticFiberMaterialUC.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
-// Define a material point that stores the deformation gradient at previous time point.
-// NOTE: This class does not appear to be used by anything. Delete? 
-class FEViscousMaterialPoint : public FEMaterialPointData
+//! Exponential-power law
+//! (Variation that includes a shear term)
+class FEFiberEntropyChainUC : public FEFiberMaterialUncoupled
 {
 public:
-	FEViscousMaterialPoint(FEMaterialPointData* pt);
-    
-	FEMaterialPointData* Copy();
-    
-    void Init();
+	FEFiberEntropyChainUC(FEModel* pfem);
 
-    void Update(const FETimeInfo& timeInfo);
+	/*//! Initialization
+	bool Validate() override;
+	*/
 
-    void Serialize(DumpStream& ar);
-    
+	//! Cauchy stress
+	mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	// Spatial tangent
+	tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	//! Strain energy density
+	double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+
 public:
-    mat3d VelocityGradient();
-    
-    mat3ds RateOfDeformation();
-    
+	double          m_N;        // coefficient of micro-combination number
+	FEParamDouble	mm_ksi;		// measure of fiber modulus which equals to nkT 
+	int             m_term;     //
+
+	double	m_epsf;
+
+	// declare the parameter list
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+class FEUncoupledFiberEntropyChainUC : public FEElasticFiberMaterialUC_T<FEFiberEntropyChainUC>
+{
 public:
-    mat3d	m_Fp;		//!< deformation gradient at previous time point
-	double	m_dt;		//!< time increment \todo this is a temporary construct. Fix this.
+    FEUncoupledFiberEntropyChainUC(FEModel* fem) : FEElasticFiberMaterialUC_T<FEFiberEntropyChainUC>(fem) {}
+    DECLARE_FECORE_CLASS();
 };

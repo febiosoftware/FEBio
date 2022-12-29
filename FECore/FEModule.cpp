@@ -30,10 +30,11 @@ SOFTWARE.*/
 class FEModule::Impl
 {
 public:
-	const char*			szname;		// name of module
-	const char*			szdesc;		// description of module (optional, can be null)
-	unsigned int		id;			// unqiue ID (starting at one)
-	int					alloc_id;	// ID of allocator
+	const char*			szname = 0;		// name of module
+	const char*			szdesc = 0;		// description of module (optional, can be null)
+	unsigned int		id = 0;			// unqiue ID (starting at one)
+	int					alloc_id = -1;	// ID of allocator
+	int					m_status = FEModule::RELEASED;	// Status of module
 	std::vector<int>	depMods;	// module dependencies
 
 public:
@@ -60,9 +61,20 @@ FEModule::FEModule() : im(new FEModule::Impl)
 
 }
 
+FEModule::FEModule(const char* szname, const char* szdescription) : im(new FEModule::Impl)
+{
+	SetName(szname);
+	SetDescription(szdescription);
+}
+
 FEModule::~FEModule()
 {
 	delete im;
+}
+
+void FEModule::InitModel(FEModel* fem)
+{
+
 }
 
 int FEModule::GetModuleID() const
@@ -78,6 +90,16 @@ const char* FEModule::GetName() const
 const char* FEModule::GetDescription() const
 {
 	return im->szdesc;
+}
+
+void FEModule::SetStatus(FEModule::Status status)
+{
+	im->m_status = status;
+}
+
+int FEModule::GetStatus() const
+{
+	return im->m_status;
 }
 
 void FEModule::AddDependency(FEModule& mod)

@@ -23,55 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/SparseMatrix.h>
+#include <FECore/LinearSolver.h>
 
-//=============================================================================
-//! Implements a sparse matrix using the skyline storage
-
-//! This class implements a symmetric sparse matrix where only the values
-//! below the skyline are stored.
-
-class SkylineMatrix : public SparseMatrix
+class MKLDSSolver : public LinearSolver
 {
+	class Imp;
+
 public:
-	SkylineMatrix();
-	virtual ~SkylineMatrix();
+	MKLDSSolver(FEModel* fem);
+	~MKLDSSolver();
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
 
-public: // from SparseMatrix
-
-	void Zero() override;
-
-	void Clear() override;
-
-	void Create(SparseMatrixProfile& mp) override;
-
-	void Assemble(const matrix& ke, const std::vector<int>& lm) override;
-
-	//! assemble a matrix into the sparse matrix
-	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override;
-
-	void add(int i, int j, double v) override;
-
-	void set(int i, int j, double v) override;
-
-	// NOTE: This is not implemented yet!
-	bool check(int i, int j) override;
-
-	double get(int i, int j) override;
-
-	double diag(int i) override;
-
-	double* values() { return m_pd; }
-	int* pointers() { return m_ppointers; }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
 protected:
-	void Create(double* pv, int* pp, int N);
+	Imp* m;
 
-protected:
-	double*	m_pd;			//!< matrix values
-	int*	m_ppointers;	//!< arrays of indices to diagonal elements
+	DECLARE_FECORE_CLASS();
 };
+

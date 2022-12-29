@@ -27,6 +27,7 @@
 
 
 #pragma once
+#include "FEDamageMaterialPoint.h"
 #include <deque>
 #include <FECore/FEMaterialPoint.h>
 
@@ -57,7 +58,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the fatigue and damage variables.
-class FEReactiveFatigueMaterialPoint : public FEMaterialPointData
+class FEReactiveFatigueMaterialPoint : public FEDamageMaterialPoint
 {
 public:
     // default constructor
@@ -75,8 +76,6 @@ public:
     void Serialize(DumpStream& ar);
     
 public:
-    double      m_D;            //!< damage (0 = no damage, 1 = complete damage)
-    
     double      m_wit;          //!< intact bond mass fraction at current time
     double      m_wip;          //!< intact bond mass fraction at previous time
     

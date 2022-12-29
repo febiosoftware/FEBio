@@ -80,6 +80,8 @@ void FEMatchingOsmoticCoefficientLoad::Activate()
             }
         }
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

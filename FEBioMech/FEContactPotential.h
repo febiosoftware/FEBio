@@ -80,6 +80,9 @@ public:
 	// init
 	bool Init() override;
 
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
 	// -- from FEContactInterface
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
@@ -95,6 +98,8 @@ protected:
 	double PotentialDerive(double r);
 	double PotentialDerive2(double r);
 
+	void BuildNeighborTable();
+
 protected:
 	FEContactPotentialSurface	m_surf1;
 	FEContactPotentialSurface	m_surf2;
@@ -104,6 +109,7 @@ protected:
 	double	m_p;
 	double	m_Rin;
 	double	m_Rout;
+	double	m_Rmin;
 	double	m_wtol;
 
 	double	m_c1, m_c2;

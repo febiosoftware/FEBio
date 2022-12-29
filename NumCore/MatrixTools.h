@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <ostream>
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
 #include "numcore_api.h"
 
 namespace NumCore

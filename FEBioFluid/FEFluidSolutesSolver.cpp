@@ -54,7 +54,7 @@ SOFTWARE.*/
 #include <FECore/FENLConstraint.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
-#include "FEFluidSoluteAnalysis.h"
+#include "FEFluidSolutesAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -190,7 +190,7 @@ bool FEFluidSolutesSolver::Init()
     for (int i = 0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        if (fem.GetCurrentStep()->m_nanalysis == FEFluidSoluteAnalysis::STEADY_STATE)
+        if (fem.GetCurrentStep()->m_nanalysis == FEFluidSolutesAnalysis::STEADY_STATE)
             dom.SetSteadyStateAnalysis();
         else
             dom.SetTransientAnalysis();
@@ -431,7 +431,7 @@ void FEFluidSolutesSolver::UpdateKinematics(vector<double>& ui)
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
     FEAnalysis* pstep = fem.GetCurrentStep();
-    if (pstep->m_nanalysis == FEFluidSoluteAnalysis::DYNAMIC)
+    if (pstep->m_nanalysis == FEFluidSolutesAnalysis::DYNAMIC)
     {
         int N = mesh.Nodes();
         double dt = fem.GetTime().timeIncrement;

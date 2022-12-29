@@ -61,6 +61,15 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 
 	ar & m_psurf;
+	ar & m_dof;
+
+	// the mesh manages surfaces for surface loads
+	if (m_psurf && ar.IsLoading())
+	{
+		FEMesh* pm = m_psurf->GetMesh();
+		assert(pm->FindSurface(m_psurf->GetName()) == nullptr);
+		pm->AddSurface(m_psurf);
+	}
 }
 
 void FESurfaceLoad::ForceMeshUpdate()

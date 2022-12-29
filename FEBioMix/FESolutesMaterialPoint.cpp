@@ -81,6 +81,7 @@ void FESolutesMaterialPoint::Init()
     m_ci.clear();
     m_ide.clear();
     m_idi.clear();
+    m_bsb.clear();
     
 	// don't forget to initialize the base class
 	FEMaterialPointData::Init();
@@ -100,6 +101,7 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 	ar & m_strain & m_pe & m_pi;
 	ar & m_ce & m_ide;
 	ar & m_ci & m_idi;
+    ar & m_bsb;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +110,8 @@ double FESolutesMaterialPoint::Osmolarity() const
     double ew = 0.0;
     for (int isol = 0; isol < (int)m_ca.size(); ++isol)
     {
-        ew += m_ca[isol];
+        // exclude solid-bound 'solutes'
+        if (!m_bsb[isol]) ew += m_ca[isol];
     }
     return ew;
 }

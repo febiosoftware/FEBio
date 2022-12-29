@@ -35,10 +35,8 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
-double FENodeConcentration::value(int nnode) 
+double FENodeConcentration::value(const FENode& node) 
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
 	return node.get(dof_C); 
 }

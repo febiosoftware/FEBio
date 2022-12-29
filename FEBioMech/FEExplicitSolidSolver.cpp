@@ -473,21 +473,25 @@ bool FEExplicitSolidSolver::Init()
 		return false;
 	}
 
-	// Calculate initial residual to be used on the first time step
-	if (Residual(m_R0) == false) return false;
-
 	// calculate the initial acceleration
-	for (int i = 0; i < mesh.Nodes(); ++i)
+	// (Only when the totiter == 0, in case of a restart)
+	if (GetFEModel()->GetCurrentStep()->m_ntotiter == 0)
 	{
-		FENode& node = mesh.Node(i);
-		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+		// Calculate initial residual to be used on the first time step
+		if (Residual(m_R0) == false) return false;
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			int n;
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+		}
 	}
 
 	// set the dynamic update flag only if we are running a dynamic analysis
@@ -531,21 +535,22 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// total displacements
 	vector<double> U(m_Ut.size());
-	for (size_t i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ut[i];
+#pragma omp parallel for
+	for (int i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ut[i];
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofU[0]);
-	scatter(U, mesh, m_dofU[1]);
-	scatter(U, mesh, m_dofU[2]);
+	scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
+
 	// rotational dofs
-	scatter(U, mesh, m_dofSQ[0]);
-	scatter(U, mesh, m_dofSQ[1]);
-	scatter(U, mesh, m_dofSQ[2]);
+//	scatter(U, mesh, m_dofSQ[0]);
+//	scatter(U, mesh, m_dofSQ[1]);
+//	scatter(U, mesh, m_dofSQ[2]);
+
 	// shell displacement
-	scatter(U, mesh, m_dofSU[0]);
-	scatter(U, mesh, m_dofSU[1]);
-	scatter(U, mesh, m_dofSU[2]);
+//	scatter(U, mesh, m_dofSU[0]);
+//	scatter(U, mesh, m_dofSU[1]);
+//	scatter(U, mesh, m_dofSU[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -566,6 +571,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// Update the spatial nodal positions
 	// Don't update rigid nodes since they are already updated
+#pragma omp parallel for
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -581,6 +587,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	// get the number of rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const int NRB = fem.RigidBodies();
+	if (NRB == 0) return;
 
 	// first calculate the rigid body displacement increments
 	for (int i=0; i<NRB; ++i)
@@ -667,6 +674,10 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug & m_neq & m_nreq;
+	if (ar.IsShallow() == false)
+	{
+		ar & m_Mi & m_Ut & m_R0 & m_R1;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -746,6 +757,7 @@ void FEExplicitSolidSolver::PrepStep()
 	// we need them for velocity and acceleration calculations
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FEMesh& mesh = fem.GetMesh();
+#pragma omp parallel for
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& ni = mesh.Node(i);
@@ -894,6 +906,7 @@ bool FEExplicitSolidSolver::DoSolve()
 
 	// collect accelerations, velocities, displacements
 	vector<double> an(m_neq, 0.0), vn(m_neq, 0.0), un(m_neq, 0.0);
+#pragma omp parallel for shared(an, vn, un, mesh)
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -908,44 +921,57 @@ bool FEExplicitSolidSolver::DoSolve()
 		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { un[n] = node.get(m_dofSU[2]); vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
 	}
 
-	// velocity predictor
 	vector<double> v_pred(m_neq, 0.0);
+#pragma omp parallel for shared(v_pred, vn, an)
 	for (int i = 0; i < m_neq; ++i)
 	{
+		// velocity predictor
 		v_pred[i] = vn[i] + an[i] * dt*0.5;
-	}
 
-	// update displacements
-	for (int i = 0; i < m_neq; ++i)
-	{
+		// update displacements
 		m_ui[i] = dt * v_pred[i];
 	}
-	double Dnorm = sqrt(m_ui * m_ui);
+
+	double Dnorm = 0.0;
+#pragma omp parallel for reduction(+: Dnorm)
+	for (int i = 0; i < m_neq; ++i)
+	{
+		Dnorm += m_ui[i] * m_ui[i];
+	}
+	Dnorm = sqrt(Dnorm);
+
 	feLog("\t displacement norm : %lg\n", Dnorm);
 	Update(m_ui);
 
 	// evaluate acceleration
 	Residual(m_R1);
-	double Rnorm = sqrt(m_R1 * m_R1);
+
+	double Rnorm = 0.0;
+#pragma omp parallel for reduction(+: Rnorm)
+	for (int i=0; i<m_neq; ++i)
+	{
+		Rnorm += m_R1[i] * m_R1[i];
+	}
+	Rnorm = sqrt(Rnorm);
 	feLog("\t force vector norm : %lg\n", Rnorm);
 
+	vector<double> vnp1(m_neq, 0.0);
 	vector<double> anp1(m_neq);
+#pragma omp parallel for shared(vnp1, anp1, v_pred)
 	for (int i = 0; i < m_neq; ++i)
 	{
 		anp1[i] = m_R1[i] * m_Mi[i];
+
+		// update velocity
+		vnp1[i] = v_pred[i] + anp1[i] * dt * 0.5;
 	}
 
-	// update velocity
-	vector<double> vnp1(m_neq, 0.0);
-	for (int i = 0; i < m_neq; ++i)
-	{
-		vnp1[i] = v_pred[i] + anp1[i]*dt*0.5;
-	}
 
 	// increase iteration number
 	m_niter++;
 
 	// scatter velocity and accelerations
+#pragma omp parallel for shared(vnp1, anp1)
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -963,9 +989,12 @@ bool FEExplicitSolidSolver::DoSolve()
 	fem.DoCallback(CB_MINOR_ITERS);
 
 	// update the total displacements
-	m_Ut += m_ui;
-
-	m_R0 = m_R1;
+#pragma omp parallel for
+	for (int i = 0; i < m_neq; ++i)
+	{
+		m_Ut[i] += m_ui[i];
+		m_R0[i] = m_R1[i];
+	}
 
 	return true;
 }
@@ -1030,6 +1059,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
+#pragma omp parallel for
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);

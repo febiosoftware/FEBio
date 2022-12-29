@@ -489,7 +489,7 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
     vector<vec3d> gradN(neln);
     
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
     
     double *H, *Gr, *Gs, *Gt;
     
@@ -651,6 +651,7 @@ void FEPolarFluidDomain3D::MassMatrix(FELinearSystem& LS)
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -682,6 +683,7 @@ void FEPolarFluidDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& b
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
+#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
@@ -951,6 +953,7 @@ void FEPolarFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 void FEPolarFluidDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // element force vector

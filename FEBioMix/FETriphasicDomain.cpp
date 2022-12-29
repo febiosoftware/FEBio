@@ -234,6 +234,7 @@ void FETriphasicDomain::Reset()
 		ps.m_ca.assign(nsol,0);
         ps.m_crp.assign(nsol, 0);
 		ps.m_gradc.assign(nsol,vec3d(0,0,0));
+        ps.m_bsb.assign(nsol, false);
 		ps.m_k.assign(nsol, 0);
 		ps.m_dkdJ.assign(nsol, 0);
 		ps.m_dkdc.resize(nsol, vector<double>(nsol,0));

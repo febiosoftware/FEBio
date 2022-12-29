@@ -76,7 +76,7 @@ void FEBioPolarFluid::InitModule()
                        "   \"info\"  : \"Polar fluid analysis.\""
                        "}");
     
-    febio.SetModuleDependency("fluid");
+    febio.AddModuleDependency("fluid");
     
     //-----------------------------------------------------------------------------
     // analyis classes (default type must match module name!)

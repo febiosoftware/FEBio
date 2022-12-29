@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "IncompleteCholesky.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactSymmMatrix.h>
 #include <FECore/log.h>
 
 // We must undef PARDISO since it is defined as a function in mkl_solver.h

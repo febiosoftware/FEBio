@@ -96,8 +96,14 @@ mat3ds FECoupledTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	//-----------------------------
 	// W = c1*(I1 - 3) + c2*(I2 - 3)
 	// Wi = dW/dIi
-	double W1 = m_c1;
-	double W2 = m_c2;
+	double W1 = m_c1(mp);
+	double W2 = m_c2(mp);
+    
+    double flam = m_flam(mp);
+    double c3 = m_c3(mp);
+    double c4 = m_c4(mp);
+    double c5 = m_c5(mp);
+    double K = m_K(mp);
 
 	mat3ds s = (B*(W1 + I1*W2) - B2*W2 - I*(W1 + 2.0*W2))*(2.0/J);
 
@@ -106,14 +112,14 @@ mat3ds FECoupledTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	if (l > 1.0)
 	{
 		double Wl = 0.0;
-		if (l < m_flam)
+		if (l < flam)
 		{
-			Wl = m_c3*(exp(m_c4*(l - 1.0)) - 1.0);
+			Wl = c3*(exp(c4*(l - 1.0)) - 1.0);
 		}
 		else
 		{
-			double c6 = m_c3*(exp(m_c4*(m_flam - 1.0)) - 1.0) - m_c5*m_flam;
-			Wl = m_c5*l + c6;
+			double c6 = c3*(exp(c4*(flam - 1.0)) - 1.0) - c5*flam;
+			Wl = c5*l + c6;
 		}
 		s += A*(Wl/J);
 	}
@@ -121,7 +127,7 @@ mat3ds FECoupledTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	// c. define dilational stress
 	//------------------------------
 	// U(J) = 1/2*k*(lnJ)^2
-	double UJ = m_K*log(J)/J;
+	double UJ = K*log(J)/J;
 	s += I*UJ;
 
 	return s;
@@ -159,8 +165,14 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 
 	// a. matrix tangent
 	//----------------------------------
-	double W1 = m_c1;
-	double W2 = m_c2;
+    double W1 = m_c1(mp);
+    double W2 = m_c2(mp);
+    
+    double flam = m_flam(mp);
+    double c3 = m_c3(mp);
+    double c4 = m_c4(mp);
+    double c5 = m_c5(mp);
+    double K = m_K(mp);
 
 	tens4ds c = BxB*(4.0*W2/J) - BoB*(4.0*W2/J)  + IoI*(4.0*(W1+2.0*W2)/J);
 
@@ -169,15 +181,15 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	if (l > 1.0)
 	{
 		double Fl = 0.0, Fll = 0.0;
-		if (l < m_flam)
+		if (l < flam)
 		{
-			Fl = m_c3*(exp(m_c4*(l - 1.0)) - 1.0)/l;
-			Fll = -m_c3*(exp(m_c4*(l-1.0)) - 1.0)/(l*l) + m_c3*m_c4*exp(m_c4*(l-1.0))/l;
+			Fl = c3*(exp(c4*(l - 1.0)) - 1.0)/l;
+			Fll = -c3*(exp(c4*(l-1.0)) - 1.0)/(l*l) + c3*c4*exp(c4*(l-1.0))/l;
 		}
 		else
 		{
-			double c6 = m_c3*(exp(m_c4*(m_flam - 1.0)) - 1.0) - m_c5*m_flam;
-			Fl = m_c5 + c6 / l;
+			double c6 = c3*(exp(c4*(flam - 1.0)) - 1.0) - c5*flam;
+			Fl = c5 + c6 / l;
 			Fll = -c6/(l*l);
 		}
 
@@ -188,8 +200,8 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 
 	// c. dilational tangent
 	// ---------------------------------
-	double UJ = m_K*log(J)/J;
-	double UJJ = m_K*(1 - log(J))/(J*J);
+	double UJ = K*log(J)/J;
+	double UJJ = K*(1 - log(J))/(J*J);
 	c += IxI*(UJ + J*UJJ) - IoI*(2.0*UJ);
 
 	return c;
@@ -221,30 +233,38 @@ double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 	double J = pt.m_J;
     double lnJ = log(J);
     
+    double c1 = m_c1(mp);
+    double c2 = m_c2(mp);
+    double flam = m_flam(mp);
+    double c3 = m_c3(mp);
+    double c4 = m_c4(mp);
+    double c5 = m_c5(mp);
+    double K = m_K(mp);
+    
 	// a. define the matrix sed
 	//-----------------------------
 	// W = c1*(I1 - 3) + c2*(I2 - 3)
-    double sed = m_c1*(I1 - 3) + m_c2*(I2 - 3) - 2*(m_c1 + 2*m_c2)*lnJ;
+    double sed = c1*(I1 - 3) + c2*(I2 - 3) - 2*(c1 + 2*c2)*lnJ;
     
 	// b. define fiber strain energy density
 	//-------------------------
 	if (l > 1.0)
 	{
-		if (l < m_flam)
+		if (l < flam)
 		{
-            sed += m_c3*(exp(-m_c4)*(expint_Ei(m_c4*l) - expint_Ei(m_c4))-log(l));
+            sed += c3*(exp(-c4)*(expint_Ei(c4*l) - expint_Ei(c4))-log(l));
 		}
 		else
 		{
-			double c6 = m_c3*(exp(m_c4*(m_flam - 1.0)) - 1.0) - m_c5*m_flam;
-			sed += m_c5*(l-1) +c6*log(l);
+			double c6 = c3*(exp(c4*(flam - 1.0)) - 1.0) - c5*flam;
+			sed += c5*(l-1) +c6*log(l);
 		}
 	}
     
 	// c. define dilational stress
 	//------------------------------
 	// U(J) = 1/2*k*(lnJ)^2
-	sed += m_K*lnJ*lnJ/2;
+	sed += K*lnJ*lnJ/2;
     
     return sed;
 }

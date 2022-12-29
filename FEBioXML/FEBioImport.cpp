@@ -161,6 +161,11 @@ FEBioImport::RepeatedSurface::RepeatedSurface(const std::string& name)
 	SetErrorString("A surface with name \"%s\" was already defined.", name.c_str());
 }
 
+FEBioImport::RepeatedEdgeSet::RepeatedEdgeSet(const std::string& name)
+{
+	SetErrorString("An edge with name \"%s\" was already defined.", name.c_str());
+}
+
 FEBioImport::RepeatedElementSet::RepeatedElementSet(const std::string& name)
 {
 	SetErrorString("An element set with name \"%s\" was already defined.", name.c_str());
@@ -277,7 +282,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
 		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
-		m_map["Contact"    ] = new FEBioContactSection25    (this);
+		m_map["Contact"    ] = new FEBioContactSection4     (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)

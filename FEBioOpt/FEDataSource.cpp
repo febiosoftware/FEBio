@@ -126,7 +126,7 @@ bool FEDataParameter::Init()
 			FENode* pn = mesh.FindNodeFromID(nid);
 			if (pn == nullptr) { feLogErrorEx(fem, "Invalid node id"); return false; }
 
-			m_fy = [=]() { return pd->value(nid - 1); };
+			m_fy = [=]() { return pd->value(*pn); };
 		}
 		else if (strstr(m_param.c_str(), "fem.element_data"))
 		{
@@ -304,7 +304,7 @@ bool FEDataParameter::Init()
             FENode* pn = mesh.FindNodeFromID(nid);
             if (pn == nullptr) { feLogErrorEx(fem, "Invalid node id"); return false; }
             
-            m_fx = [=]() { return pd->value(nid - 1); };
+            m_fx = [=]() { return pd->value(*pn); };
         }
 		else if (strstr(m_ord.c_str(), "fem.element_data"))
 		{
@@ -462,7 +462,7 @@ void FEDataFilterSum::update()
 	double sum = 0.0;
 	for (int i = 0; i < m_nodeSet->Size(); ++i)
 	{
-		double vi = m_data->value(ns[i]);
+		double vi = m_data->value(*ns.Node(i));
 		sum += vi;
 	}
 

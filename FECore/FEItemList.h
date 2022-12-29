@@ -51,6 +51,9 @@ public:
 public:
 	void Serialize(DumpStream& ar);
 
+	static FEItemList* LoadClass(DumpStream& ar, FEItemList* p);
+	static void SaveClass(DumpStream& ar, FEItemList* p);
+
 protected:
 	FEMesh*		m_mesh;
 

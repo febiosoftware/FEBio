@@ -71,6 +71,10 @@ FEViscoElasticDamage::FEViscoElasticDamage(FEModel* pfem) : FEElasticMaterial(pf
 //! data initialization
 bool FEViscoElasticDamage::Init()
 {
+    if (dynamic_cast<FEDamageMaterial*>(m_pDmg) == 0) {
+        feLogError("elastic component of viscoelastic damage material must be of type elastic damage!");
+        return false;
+    }
     return m_pDmg->Init();
 }
 

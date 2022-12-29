@@ -34,7 +34,16 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FENewtonianViscousSolidUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   )->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FENewtonianViscousSolidUC::FENewtonianViscousSolidUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+    m_kappa = 0.0;
+    m_mu = 0.0;
+    m_secant_tangent = false;
+}
 
 //-----------------------------------------------------------------------------
 mat3ds FENewtonianViscousSolidUC::DevStress(FEMaterialPoint& mp)

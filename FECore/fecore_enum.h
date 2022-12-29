@@ -257,7 +257,7 @@ enum SUPER_CLASS_ID {
 	FEMESHDATAGENERATOR_ID,			// derived from FEMeshDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
-	FESCALARGENERATOR_ID,			// derived from FEScalarValuator
+	FESCALARVALUATOR_ID,			// derived from FEScalarValuator
 	FEVEC3DVALUATOR_ID,				// derived from FEVectorValuator
 	FEMAT3DVALUATOR_ID,				// derived from FEMAT3DValuator
 	FEMAT3DSVALUATOR_ID,			// derived from FEMAT3DSValuator

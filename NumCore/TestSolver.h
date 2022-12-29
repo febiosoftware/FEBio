@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
-#include "CompactSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include <FECore/CompactSymmMatrix.h>
 
 
 // Test solver. Doesn't actually solve anything. Just returns 0 as solution. 

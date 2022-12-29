@@ -85,6 +85,8 @@ void FEMultiphasicFSISoluteBackflowStabilization::Activate()
         // mark node as having prescribed DOF
         node.set_bc(dofc, DOF_OPEN);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

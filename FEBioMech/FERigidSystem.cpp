@@ -312,6 +312,7 @@ bool FERigidSystem::CreateObjects()
 		if (node.m_rid >= 0) 
 		{
 			node.m_rid = mrb[ node.m_rid ];
+			node.m_ra = node.m_r0;
 		}
 	}
 
@@ -446,7 +447,7 @@ void FERigidSystem::UpdateMesh()
 			FENode& node = mesh.Node(i);
 			if (node.m_rid == RB.m_nID)
 			{
-				vec3d a0 = node.m_r0 - RB.m_r0;
+				vec3d a0 = node.m_ra - RB.m_r0;
 				vec3d at = RB.GetRotation()*a0;
 				node.m_rt = RB.m_rt + at;
 			}

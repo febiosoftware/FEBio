@@ -293,6 +293,25 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Total reaction force on surface
+class FEPlotNetSurfaceReactionForce : public FEPlotSurfaceData
+{
+public:
+	FEPlotNetSurfaceReactionForce(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION) {}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Total reaction moment on surface
+class FEPlotNetSurfaceReactionMoment : public FEPlotSurfaceData
+{
+public:
+	FEPlotNetSurfaceReactionMoment(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION) {}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
@@ -612,20 +631,11 @@ public:
 class FEPlotDamage : public FEPlotDomainData
 {
 public:
-	FEPlotDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& m, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Damage reduction factor
-class FEPlotNestedDamage : public FEPlotDomainData
-{
-public:
-    FEPlotNestedDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
-    bool SetFilter(int nsol);
+    FEPlotDamage(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+	bool Save(FEDomain& m, FEDataStream& a) override;
 protected:
-    int			m_nmat;
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -633,8 +643,11 @@ protected:
 class FEPlotIntactBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotIntactBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotIntactBondFraction(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -642,8 +655,11 @@ public:
 class FEPlotFatigueBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotFatigueBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotFatigueBondFraction(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -651,8 +667,11 @@ public:
 class FEPlotYieldedBondFraction : public FEPlotDomainData
 {
 public:
-    FEPlotYieldedBondFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotYieldedBondFraction(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -660,8 +679,11 @@ public:
 class FEPlotOctahedralPlasticStrain : public FEPlotDomainData
 {
 public:
-    FEPlotOctahedralPlasticStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotOctahedralPlasticStrain(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -669,8 +691,11 @@ public:
 class FEPlotReactivePlasticityHeatSupply : public FEPlotDomainData
 {
 public:
-    FEPlotReactivePlasticityHeatSupply(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& dom, FEDataStream& a);
+    FEPlotReactivePlasticityHeatSupply(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
 };
 
 //-----------------------------------------------------------------------------
@@ -1031,6 +1056,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEPlotDiscreteElementSignedForce : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementSignedForce(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+
+//-----------------------------------------------------------------------------
 class FEPlotDiscreteElementStrainEnergy : public FEPlotDomainData
 {
 public:
@@ -1152,4 +1186,13 @@ class FEPlotWeakBondDevSED : public FEPlotDomainData
 public:
     FEPlotWeakBondDevSED(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
     bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! truss element stretch
+class FEPlotTrussStretch : public FEPlotDomainData
+{
+public:
+	FEPlotTrussStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
 };

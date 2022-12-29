@@ -44,6 +44,8 @@ public:
 	// return the item list associated with this map
 	FEItemList* GetItemList() override;
 
+	void Serialize(DumpStream& ar) override;
+
 public:
 	void setValue(int n, double v) override;
 	void setValue(int n, const vec2d& v) override;

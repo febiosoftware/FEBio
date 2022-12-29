@@ -1,26 +1,30 @@
 /**
 
-\page required_functions Required Functions
+\page required_functions Writing a plugin
 
-You will start by implementing the required functions described below. Before you write these functions, you need to add the following include file to the top of your source file. (If you are using precompiled header files, make sure the precompiled header file (e.g. stdafx.h) is the first included file.)
+After you created a new plugin project, it is time to start writing the plugin code. There are two parts to this: writing the required functions that are common to all plugins, and write the code that is specific to type of plugin you wish to create. This page details the required functions that FEBio needs to interact with your plugin. 
+
+Add a new cpp file to your project. (A good name for this file would be the project's name.) Then, add the following include file to the top of your source file. (If you are using precompiled header files, make sure the precompiled header file (e.g. pch.h) is the first included file.)
 
 \code
 #include <FECore\FECoreKernel.h>
 \endcode
 
+This will include all the features of the FEBio kernel that you need to register your plugin with the FEBio framework. 
+
+In addition, you will add any include files for plugin classes that are defined in the plugin. 
+
 The following functions need to be defined in the plugin and are needed for plugin registration, initialization, and cleanup. 
 
-1. GetSDKVersion: Returns the version of the SDK library that is used by this plugin.
-2. PluginInitialize: Place for initializing plugin data
-3. PluginCleanup: Place for releasing any resources allocated by the plugin.
-4. GetPluginVersion: Return the version number of plugin. 
+1. <b>GetSDKVersion</b>: Returns the version of the SDK library that is used by this plugin.
+2. <b>GetPluginVersion</b>: Return the version number of plugin. 
+3. <b>PluginInitialize</b>: Place for initializing plugin data
+4. <b>PluginCleanup</b>: Place for releasing any resources allocated by the plugin.
 
 Although these functions are referred to as the required functions, only the GetSDKVersion and PluginInitialize are really mandatory. The other ones only need to be defined if they are actually used. 
 
 \section GetSDKVersion
-This function returns the version number of the SDK that was used to build the plugin. When loading the plugin, FEBio will check this number
-to see if the plugin is compatible with the FEBio version that is trying to load the plugin. This function needs to return the
-FE_SDK_VERSION macro which is defined in the file FECore\version.h
+This function returns the version number of the SDK that was used to build the plugin. When loading the plugin, FEBio will check this number to see if the plugin is compatible with the FEBio version that is trying to load the plugin. This function needs to return the FE_SDK_VERSION macro which is defined in the file FECore\version.h
 
 \code
 FECORE_EXPORT unsigned int GetSDKVersion()
@@ -31,34 +35,8 @@ FECORE_EXPORT unsigned int GetSDKVersion()
 
 FEBio will not load the plugin if this function is omitted or if the returned version number is incompatible with the version of FEBio that is trying to load the plugin.
 
-\section PluginInitialize
-This function will be the first function called by FEBio and can be used to allocate and initialize plugin data. It is also recommended to call the SetInstance function as in the example below.
-
-\code
-FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
-{
-	FECoreKernel::SetInstance(&febio);
-}
-\endcode
-
-This function takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class, such as the \ref plugin_log "log file". 
-This is also a good place to allocate any resources that the plugin may need. The call to SetInstance ensures
-that the plugin uses the same kernel object as the FEBio executable. Since a plugin links statically to the FECore library, it actually has its own FECoreKernel object
-(and related resources such as the logfile). However, this is usally not desirable and calling the SetInstance function ensure that both the plugin and the FEBio 
-executable use the same kernel.
-
-\section PluginCleanup
-This function will be called when FEBio terminates and can be used to deallocate resources.
-
-\code
-FECORE_EXPORT void PluginCleanup()
-{
-	// Clean up plugin resources 
-}
-\endcode
-
 \section GetPluginVersion
-You can define a verion number for a plugin by implementing the optional function GetPluginVersion. 
+You can define a verion number for your plugin by implementing the optional function GetPluginVersion. 
 
 \code
 FECORE_EXPORT void GetPluginVersion(int& major, int& minor, int& patch)
@@ -69,6 +47,34 @@ FECORE_EXPORT void GetPluginVersion(int& major, int& minor, int& patch)
 }
 \endcode
 
-At this point, FEBio doesn't do much with these version numbers except print them to the screen when the plugin is loaded. 
+FEBio prints these numbers to the screen when the plugin is loaded. 
+
+\section PluginInitialize
+This function will be the first function called by FEBio and can be used to allocate and initialize plugin data. It is also recommended to call the SetInstance function as in the example below.
+
+\code
+FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
+{
+	FECoreKernel::SetInstance(&febio);
+
+	// TODO: register your plugin classes here
+}
+\endcode
+
+This function takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class. 
+This is also a good place to allocate any resources that the plugin may need. The call to SetInstance ensures
+that the plugin uses the same kernel object as the FEBio executable. 
+
+The rest of this function typically registers the plugin classes with the framework (see \ref register). 
+
+\section PluginCleanup
+This function will be called when FEBio terminates and can be used to deallocate resources.
+
+\code
+FECORE_EXPORT void PluginCleanup()
+{
+	// Clean up plugin resources 
+}
+\endcode
 
 */

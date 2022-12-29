@@ -1,0 +1,104 @@
+/**
+\page modules FEBio Modules
+
+FEBio organizes all its features in \b modules. A module in FEBio is similar to a namespace in c++ and helps in resolving ambiguities in cases where features have the same type string.
+
+Modules collect features that logically belong together, such as features needed for solving a particular type of physics problem. 
+
+As of FEBio4, all features, including those defined in plugins, require the specification of the module to which they are added. This is typically done by setting the active module before registering the features. 
+
+\section active_mod Setting the Active Module
+
+Setting the active module is done by calling \c FECoreKernel::SetActiveModule.
+
+\code
+FECoreKernel& fecore = FECoreKernel::GetInstance();
+fecore.SetActiveModule("solid");
+\endcode
+
+Features registered after this call will be added to the active module. 
+
+As of FEBio4, the following modules are defined. 
+
+\li \b solid The solid mechanics module. 
+\li \b biphasic Extends the solid module and adds biphasic simulation capabilities.
+\li \b solute Extends the biphasic module and adds the ability to model solutes in the solvent of a biphasic material. 
+\li \b multiphasic Extends the solute module by adding multiple solutes to a biphasic material, as well as chemical reactions between solutes. 
+\li \b fluid Fluid mechanics module.
+\li \b fluid-FSI Combines the solid and fluid modules to create fluid-solid interaction modeling capabilities. 
+
+Additional modules may be available via plugins. For instance the FEBioHeat plugin adds the \b heat module for solving heat transfer analyses. 
+
+If a feature should be made available for all modules, simply set the active module to zero. 
+
+\code
+fecore.SetActiveModule(nullptr);
+\endcode
+
+Features registered after this call will be available to all modules. 
+
+\section creating_mods Creating New Modules
+
+New modules can be created in a few different ways. The easiest way is to call \c FECoreKernel::CreateModule(const char* modName). 
+
+\code
+fecore.CreateModule("new module");
+\endcode
+
+The new module will automatically be set as the active module. 
+
+An optional argument can be specified that provides additional information about the module. The optional argument is a JSON structured text that allows you to provide a title, a description, author and version string. 
+
+\code
+	fecore.CreateModule("new module", 
+		"{"
+		"   \"title\"  : \"A New Module\","
+		"   \"info\"   : \"A module for solving relativistic quantum-chromodynamics simulations.\""
+		"   \"author\" : \"Inco Gnito\""
+		"   \"version\": \"3.14\""
+		"}");
+\endcode
+
+Note that none of the fields in the JSON text are required. 
+
+Internally, FEBio stores a list of classes derived from FEModule that manages all the information regarding the module. Therefore, modules can also be created by deriving a new class from the FEModule base class. 
+
+\code
+class MyNewModule : public FEModule
+{
+public:
+	MyNewModule() : FEModule("new module") {}
+};
+\endcode
+
+The module can then be registered by instantiating the new class. 
+
+\code
+	fecore.CreateModule(new MyNewModule()); 
+\endcode
+
+\section nested_mod Nested Modules
+
+Modules can be nested. This means that a module can inherit the features from another module, in addition, to defining its own features. 
+
+To add a module dependency to the currently active module, call FECoreKernel::AddModuleDependency. 
+
+\code
+	fecore.AddModuleDependency("solid");
+\endcode
+
+In this case, all features defined in the \c solid module will then be available in the currently active module. 
+
+\section use_mods Using Modules
+
+The FEBio input file defines an FEBio model. Before the model can be constructed, the active module must be set and it must be defined as the first tag in the FEBio input file. 
+
+For example, 
+
+\code
+	<Module type="biphasic"/>
+\endcode
+
+This makes the "biphasic" module active, and only features that belong to this module (and its dependencies) can be referenced in the input file. 
+
+*/

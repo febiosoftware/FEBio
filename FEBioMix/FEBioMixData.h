@@ -41,7 +41,7 @@ class FENodeConcentration : public FELogNodeData
 { 
 public: 
 	FENodeConcentration(FEModel* pfem) : FELogNodeData(pfem){} 
-	double value(int node); 
+	double value(const FENode& node); 
 };
 
 //=============================================================================

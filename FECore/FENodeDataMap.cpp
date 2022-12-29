@@ -135,3 +135,23 @@ FEItemList* FENodeDataMap::GetItemList()
 {
 	return const_cast<FENodeSet*>(m_nodeSet);
 }
+
+void FENodeDataMap::Serialize(DumpStream& ar)
+{
+	FEDataMap::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			// We have to cast the const away before serializing
+			FENodeSet* ns = const_cast<FENodeSet*>(m_nodeSet);
+			ar << ns;
+		}
+		else
+		{
+			FENodeSet* ns;
+			ar >> ns;
+			m_nodeSet = ns;
+		}
+	}
+}

@@ -35,10 +35,16 @@ SOFTWARE.*/
 #include <FECore/FENodeNodeList.h>
 #include <sstream>
 
-FEBioMeshDomainsSection4::FEBioMeshDomainsSection4(FEBioImport* pim) : FEBioFileSection(pim) {}
+FEBioMeshDomainsSection4::FEBioMeshDomainsSection4(FEBioImport* pim) : FEBioFileSection(pim) 
+{
+	m_noff = 0;
+}
 
 void FEBioMeshDomainsSection4::Parse(XMLTag& tag)
 {
+	// build the node ID lookup table
+	BuildNLT();
+	
 	// read all sections
 	if (tag.isleaf() == false)
 	{
@@ -77,6 +83,34 @@ void FEBioMeshDomainsSection4::Parse(XMLTag& tag)
 	// Now we can allocate the degrees of freedom.
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	fem.GetMesh().SetDOFS(MAX_DOFS);
+}
+
+void FEBioMeshDomainsSection4::BuildNLT()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	FEBModel& feb = GetBuilder()->GetFEBModel();
+	FEBModel::Part* part = feb.GetPart(0); assert(part);
+	if (part == nullptr) return;
+
+	// build node-index lookup table
+	int noff = -1, maxID = 0;
+	int N0 = mesh.Nodes();
+	int NN = part->Nodes();
+	for (int i = 0; i < NN; ++i)
+	{
+		int nid = part->GetNode(i).id;
+		if ((noff < 0) || (nid < noff)) noff = nid;
+		if (nid > maxID) maxID = nid;
+	}
+	m_NLT.assign(maxID - noff + 1, -1);
+	for (int i = 0; i < NN; ++i)
+	{
+		int nid = part->GetNode(i).id - noff;
+		m_NLT[nid] = i + N0;
+	}
+
+	m_noff = noff;
 }
 
 void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
@@ -180,9 +214,8 @@ void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
 		FEElement& el = dom->ElementRef(j);
 		el.SetID(domElement.id);
 
-		// TODO: This assumes one-based indexing of all nodes!
 		int ne = el.Nodes();
-		for (int n = 0; n < ne; ++n) el.m_node[n] = domElement.node[n] - 1;
+		for (int n = 0; n < ne; ++n) el.m_node[n] = m_NLT[domElement.node[n] - m_noff];
 	}
 }
 
@@ -289,11 +322,10 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 			FEShellElement& el = shellDomain->Element(j);
 			el.SetID(domElement.id);
 
-			// TODO: This assumes one-based indexing of all nodes!
 			int ne = el.Nodes();
 			for (int n = 0; n < ne; ++n)
 			{
-				el.m_node[n] = domElement.node[n] - 1;
+				el.m_node[n] = m_NLT[domElement.node[n] - m_noff];
 				el.m_h0[n] = h0;
 			}
 		}
@@ -403,6 +435,6 @@ void FEBioMeshDomainsSection4::ParseBeamDomainSection(XMLTag& tag)
 
 		// TODO: This assumes one-based indexing of all nodes!
 		int ne = el.Nodes();
-		for (int n = 0; n < ne; ++n) el.m_node[n] = domElement.node[n] - 1;
+		for (int n = 0; n < ne; ++n) el.m_node[n] = m_NLT[domElement.node[n] - m_noff];
 	}
 }

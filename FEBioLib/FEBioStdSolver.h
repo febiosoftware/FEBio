@@ -46,19 +46,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEBioRestart : public FECoreTask
-{
-public:
-	FEBioRestart(FEModel* pfem);
-
-	//! initialization
-	bool Init(const char* szfile) override;
-
-	//! Run the FE model
-	bool Run() override;
-};
-
-//-----------------------------------------------------------------------------
 // class for testing reverse communication interface of FEModel
 class FEBioRCISolver : public FECoreTask
 {

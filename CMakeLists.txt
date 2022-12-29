@@ -32,6 +32,7 @@ if(WIN32)
 	add_definitions(-DWIN32 -DFECORE_DLL)
 elseif(APPLE)
     add_definitions(-D__APPLE__)
+    add_definitions(-DHAS_ACCEL)
 else()
 	add_definitions(-DLINUX)
 endif()
@@ -89,6 +90,15 @@ if(USE_HYPRE)
 	endif()
 endif()
 
+if(USE_SUPERLU_MT)
+	if(NOT EXISTS ${SUPERLU_MT_LIB})
+		message(SEND_ERROR "Could not find SUPERLU_MT library. Check SUPERLU_MT_LIB.")
+	endif()
+	if(NOT EXISTS ${SUPERLU_MT_INC}/slu_mt_ddefs.h)
+		message(SEND_ERROR "Could not find slu_mt_ddefs.h. Check SUPERLU_MT_INC.")
+	endif()
+endif()
+
 if(USE_MMG)
 	if(NOT EXISTS ${MMG_LIB})
 		message(SEND_ERROR "Could not find MMG library. Check MMG_LIB.")
@@ -121,7 +131,7 @@ endif()
 
 ##### Set up compiler flags #####
 if(WIN32)
-    add_compile_options(/MP /openmp /wd4996 /wd4251 /wd4275)
+    add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
 
 else()
@@ -183,8 +193,25 @@ foreach(name IN LISTS STATIC_FEBIO_LIBS)
 endforeach(name)
 
 ##### Set up executable compilation #####
-file(GLOB SOURCES "FEBio3/*.cpp")
+file(GLOB SOURCES "FEBio/*.cpp")
 add_executable (febio4 ${SOURCES})
+
+if(WIN32)
+    target_compile_options(febio4 PRIVATE /openmp)
+    target_compile_options(febiofluid PRIVATE /openmp)
+    target_compile_options(febiolib PRIVATE /openmp)
+    target_compile_options(febiomech PRIVATE /openmp)
+    target_compile_options(febiomix PRIVATE /openmp)
+    target_compile_options(febioopt PRIVATE /openmp)
+    target_compile_options(fecore PRIVATE /openmp)
+    target_compile_options(feamr PRIVATE /openmp)
+    target_compile_options(febiorve PRIVATE /openmp)
+    target_compile_options(feimglib PRIVATE /openmp)
+    target_compile_options(febioplot PRIVATE /openmp)
+    target_compile_options(febiotest PRIVATE /openmp)
+    target_compile_options(febioxml PRIVATE /openmp)
+    target_compile_options(xml PRIVATE /openmp)
+endif()
 
 ##### Set dev commit information #####
 
@@ -260,6 +287,16 @@ if(USE_HYPRE)
 	target_link_libraries(numcore PRIVATE ${HYPRE_LIB})
 endif()
 
+# Link SuperLU_MT
+if(USE_SUPERLU_MT)
+	target_include_directories(numcore PRIVATE ${SUPERLU_MT_INC})
+    target_compile_definitions(numcore PRIVATE HAVE_SUPERLU_MT)
+    if(APPLE)
+        target_compile_definitions(numcore PRIVATE _PTHREAD)
+    endif()
+    target_link_libraries(numcore PRIVATE ${SUPERLU_MT_LIB})
+endif()
+
 # Link MKL
 if(USE_MKL)
     target_include_directories(numcore PRIVATE ${MKL_INC} ${OpenMP_C_LIBRARIES})
@@ -272,7 +309,7 @@ if(USE_MKL)
         target_link_libraries(numcore PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
         target_link_libraries(febioopt PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
     else()
-        target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_LIBS} -Wl,--end-group)
+        target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
         target_link_libraries(febioopt PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
     endif()
     
@@ -286,6 +323,23 @@ else()
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
+endif()
+
+# Link Pardiso-project
+if(USE_PDL)
+    target_compile_definitions(numcore PRIVATE PARDISODL)
+    target_link_libraries(numcore PRIVATE ${PDL_LIB})
+
+    # We still need OpenMP from the system.
+    if(${OpenMP_C_FOUND})
+        target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
+        target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
+    endif()
+endif()
+
+# Link Accelerate framework
+if (APPLE)
+  target_link_libraries(numcore PRIVATE "-framework Accelerate")
 endif()
 
 # Link MMG

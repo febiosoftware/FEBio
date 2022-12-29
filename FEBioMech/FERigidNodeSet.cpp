@@ -27,6 +27,8 @@ SOFTWARE.*/
 #include "FERigidNodeSet.h"
 #include <FECore/FEModel.h>
 #include "FERigidMaterial.h"
+#include "FEMechModel.h"
+#include "FERigidBody.h"
 
 BEGIN_FECORE_CLASS(FERigidNodeSet, FENodalBC)
 	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)");
@@ -65,9 +67,11 @@ void FERigidNodeSet::Activate()
 	FEBoundaryCondition::Activate();
 
 	// get the rigid body's ID
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = dynamic_cast<FEMechModel&>(*GetFEModel());
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	int rid = pm->GetRigidBodyID(); assert(rid >= 0);
+
+	FERigidBody& rb = *fem.GetRigidBody(rid);
 
 	// assign the rigid body ID
 	FEStepComponent::Activate();
@@ -82,6 +86,13 @@ void FERigidNodeSet::Activate()
 				node.SetFlags(FENode::RIGID_CLAMP);
 		}
 		node.m_rid = rid;
+
+		// we need to take the current position of the node
+		// and transform it into the reference configuration of the rigid body.
+		vec3d dr = node.m_rt - rb.m_rt;
+		quatd q = rb.GetRotation().Inverse();
+		q.RotateVector(dr);
+		node.m_ra = rb.m_r0 + dr;
 	}
 }
 

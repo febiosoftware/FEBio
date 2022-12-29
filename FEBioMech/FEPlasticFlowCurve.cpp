@@ -10,6 +10,64 @@
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
+//        F E P L A S T I C F L O W C U R V E M A T E R I A L P O I N T
+//-----------------------------------------------------------------------------
+//! Create a shallow copy of the material point data
+FEMaterialPointData* FEPlasticFlowCurveMaterialPoint::Copy()
+{
+    FEPlasticFlowCurveMaterialPoint* pt = new FEPlasticFlowCurveMaterialPoint(*this);
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+//-----------------------------------------------------------------------------
+//! Initializes material point data.
+void FEPlasticFlowCurveMaterialPoint::Init()
+{
+    // don't forget to initialize the base class
+    FEMaterialPointData::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEPlasticFlowCurveMaterialPoint::Serialize(DumpStream& ar)
+{
+    FEMaterialPointData::Serialize(ar);
+    
+    ar & m_Ky & m_w;
+    ar & m_binit;
+}
+
+//-----------------------------------------------------------------------------
+//              F E P L A S T I C F L O W C U R V E
+//-----------------------------------------------------------------------------
+vector<double> FEPlasticFlowCurve::BondYieldMeasures(FEMaterialPoint& mp)
+{
+    FEPlasticFlowCurveMaterialPoint& fp = *mp.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    return fp.m_Ky;
+}
+
+//-----------------------------------------------------------------------------
+vector<double> FEPlasticFlowCurve::BondMassFractions(FEMaterialPoint& mp)
+{
+    FEPlasticFlowCurveMaterialPoint& fp = *mp.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    return fp.m_w;
+}
+
+//-----------------------------------------------------------------------------
+size_t FEPlasticFlowCurve::BondFamilies(FEMaterialPoint& mp)
+{
+    FEPlasticFlowCurveMaterialPoint& fp = *mp.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    return fp.m_Ky.size();
+}
+
+//-----------------------------------------------------------------------------
+//! Create material point data for this material
+FEMaterialPointData* FEPlasticFlowCurve::CreateMaterialPointData()
+{
+    return new FEPlasticFlowCurveMaterialPoint(new FEMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 //              F E P L A S T I C F L O W C U R V E P A P E R
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -27,19 +85,29 @@ END_FECORE_CLASS();
 FEPlasticFlowCurvePaper::FEPlasticFlowCurvePaper(FEModel* pfem) : FEPlasticFlowCurve(pfem)
 {
     m_n = 1;
-    m_wmin = m_wmax = 1;
+    m_wmin = 1;
+    m_wmax = 1;
     m_we = 0;
-    m_Ymin = m_Ymax = 0;
+    m_Ymin = 0;
+    m_Ymax = 0;
     m_bias = 0.9;
 }
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-bool FEPlasticFlowCurvePaper::Init()
+bool FEPlasticFlowCurvePaper::InitFlowCurve(FEMaterialPoint& mp)
 {
-    if (m_binit == false) {
-        m_wmax = 1 - m_we;
-        if (m_wmax < m_wmin) {
+    FEPlasticFlowCurveMaterialPoint& fp = *mp.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    
+    if (fp.m_binit == false) {
+        double wmin = m_wmin(mp);
+        double wmax = m_wmax(mp);
+        double we = m_we(mp);
+        double Ymin = m_Ymin(mp);
+        double Ymax = m_Ymax(mp);
+        double bias = m_bias(mp);
+        wmax = 1 - we;
+        if (wmax < wmin) {
             if (m_n ==1)
                 feLogError("w0 + we = 1 must be satisfied");
             else
@@ -47,54 +115,56 @@ bool FEPlasticFlowCurvePaper::Init()
             return false;
         }
         
-        Ky.assign(m_n,0);
-        w.assign(m_n+1,0);
+        fp.m_Ky.assign(m_n,0);
+        fp.m_w.assign(m_n+1,0);
         vector<double> Kp(m_n,0);
         
         if (m_n == 1) {
-            Ky[0] = m_Ymin;
-            w[0] = m_wmin;
+            fp.m_Ky[0] = Ymin;
+            fp.m_w[0] = wmin;
         }
         else {
             // use bias r to reduce intervals in Ky and w as they increase proportionally
-            double r = m_bias;
+            double r = bias;
             // r= 1 uses uniform intervals
             if (r == 1) {
-                w[0] = m_wmin;
-                Kp[0] = m_Ymin;
-                Ky[0] = Kp[0];
-                double sw = w[0];
+                fp.m_w[0] = wmin;
+                Kp[0] = Ymin;
+                fp.m_Ky[0] = Kp[0];
+                double sw = fp.m_w[0];
                 for (int i=1; i<m_n; ++i) {
-                    w[i] = (m_wmax - m_wmin)/(m_n-1);
-                    Kp[i] = m_Ymin + (m_Ymax - m_Ymin)*i/(m_n-1);
-                    Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
-                    sw += w[i];
+                    fp.m_w[i] = (wmax - wmin)/(m_n-1);
+                    Kp[i] = Ymin + (Ymax - Ymin)*i/(m_n-1);
+                    fp.m_Ky[i] = fp.m_Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
+                    sw += fp.m_w[i];
                 }
             }
             else {
                 double c = (1-r)/(1-pow(r, m_n-1));
-                w[0] = m_wmin;
-                w[1] = c*(m_wmax-m_wmin);
-                Kp[0] = m_Ymin;
-                Kp[1] = Kp[0] + c*(m_Ymax - m_Ymin);
-                double sw = w[0];
-                Ky[0] = Kp[0];
-                Ky[1] = Ky[0] + (Kp[1]-Kp[0])/(1-sw);
-                sw += w[1];
+                fp.m_w[0] = wmin;
+                fp.m_w[1] = c*(wmax-wmin);
+                Kp[0] = Ymin;
+                Kp[1] = Kp[0] + c*(Ymax - Ymin);
+                double sw = fp.m_w[0];
+                fp.m_Ky[0] = Kp[0];
+                fp.m_Ky[1] = fp.m_Ky[0] + (Kp[1]-Kp[0])/(1-sw);
+                sw += fp.m_w[1];
                 for (int i=2; i<m_n; ++i) {
-                    w[i] = w[i-1]*r;
+                    fp.m_w[i] = fp.m_w[i-1]*r;
                     Kp[i] = Kp[i-1] + (Kp[i-1]-Kp[i-2])*r;
-                    Ky[i] = Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
-                    sw += w[i];
+                    fp.m_Ky[i] = fp.m_Ky[i-1] + (Kp[i]-Kp[i-1])/(1-sw);
+                    sw += fp.m_w[i];
                 }
             }
         }
-        w[m_n] = m_we;
+        fp.m_w[m_n] = we;
         
-        m_binit = true;
+        fp.m_binit = true;
+        
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,16 +184,18 @@ FEPlasticFlowCurveUser::FEPlasticFlowCurveUser(FEModel* pfem) : FEPlasticFlowCur
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-bool FEPlasticFlowCurveUser::Init()
+bool FEPlasticFlowCurveUser::InitFlowCurve(FEMaterialPoint& mp)
 {
-    if (m_binit == false) {
+    FEPlasticFlowCurveMaterialPoint& fp = *mp.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    
+    if (fp.m_binit == false) {
         m_Y->Init();
         
         // get number of points on flow curve
         int m_n = m_Y->Points();
         
-        Ky.assign(m_n,0);
-        w.assign(m_n+1,0);
+        fp.m_Ky.assign(m_n,0);
+        fp.m_w.assign(m_n+1,0);
         vector<double> Kp(m_n,0);
         // get first point on assumption that it represents the yield point
         // and extract Young's modulus
@@ -132,26 +204,27 @@ bool FEPlasticFlowCurveUser::Init()
         for (int i=0; i<m_n; ++i) {
             LOADPOINT p = m_Y->LoadPoint(i);
             Kp[i] = p.value;
-            Ky[i] = Ey*p.time;
+            fp.m_Ky[i] = Ey*p.time;
         }
         
         double sw = 0;
         if (m_n == 1) {
-            w[0] = 1;
-            w[m_n] = 0;
+            fp.m_w[0] = 1;
+            fp.m_w[m_n] = 0;
         }
         else {
             for (int i=0; i<m_n-1; ++i) {
-                w[i] = 1 - (Kp[i+1]-Kp[i])/(Ky[i+1]-Ky[i]) - sw;
-                sw += w[i];
+                fp.m_w[i] = 1 - (Kp[i+1]-Kp[i])/(fp.m_Ky[i+1]-fp.m_Ky[i]) - sw;
+                sw += fp.m_w[i];
             }
-            w[m_n-1] = 1 - sw;
-            w[m_n] = 0;
+            fp.m_w[m_n-1] = 1 - sw;
+            fp.m_w[m_n] = 0;
         }
-        m_binit = true;
+        fp.m_binit = true;
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -176,26 +249,28 @@ FEPlasticFlowCurveMath::FEPlasticFlowCurveMath(FEModel* pfem) : FEPlasticFlowCur
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-bool FEPlasticFlowCurveMath::Init()
+bool FEPlasticFlowCurveMath::InitFlowCurve(FEMaterialPoint& mp)
 {
-    if (m_binit == false) {
+    FEPlasticFlowCurveMaterialPoint& fp = *mp.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    
+    if (fp.m_binit == false) {
 
         FEMathFunction Y(GetFEModel());
         Y.SetMathString(m_Ymath);
         if (Y.Init() == false) return false;
         
-        Ky.assign(m_n,0);
-        w.assign(m_n+1,0);
+        fp.m_Ky.assign(m_n,0);
+        fp.m_w.assign(m_n+1,0);
         vector<double> Kp(m_n,0);
         if (m_n == 1) {
-            w[0] = 1;
-            w[m_n] = 0;
-            Kp[0] = Ky[0] = Y.value(m_emin);
+            fp.m_w[0] = 1;
+            fp.m_w[m_n] = 0;
+            Kp[0] = fp.m_Ky[0] = Y.value(m_emin);
         }
         else {
             // set uniform increments in Kp and find corresponding strains
             // then evaluate Ky at those strains
-            Kp[0] = Ky[0] = Y.value(m_emin);
+            Kp[0] = fp.m_Ky[0] = Y.value(m_emin);
             Kp[m_n-1] = Y.value(m_emax);
             // Extract Young's modulus
             double Ey = Kp[0]/m_emin;
@@ -206,23 +281,23 @@ bool FEPlasticFlowCurveMath::Init()
             for (int i=1; i<m_n; ++i) {
                 Kp[i] = Kp[0] + i*dKp;
                 if (Y.invert(Kp[i], e) == false) return false;
-                Ky[i] = Ey*e;
+                fp.m_Ky[i] = Ey*e;
                 enat[i] = e;
             }
             // evaluate bond mass fractions
-            w[0] = (Ky[1] - Kp[1])/(Ky[1] - Kp[0]);
-            double sw = w[0];
+            fp.m_w[0] = (fp.m_Ky[1] - Kp[1])/(fp.m_Ky[1] - Kp[0]);
+            double sw = fp.m_w[0];
             for (int i=2; i<m_n; ++i) {
-                w[i-1] = 1 - sw - (Kp[i] - Kp[i-1])/(Ky[i] - Ky[i-1]);
-                sw += w[i-1];
+                fp.m_w[i-1] = 1 - sw - (Kp[i] - Kp[i-1])/(fp.m_Ky[i] - fp.m_Ky[i-1]);
+                sw += fp.m_w[i-1];
             }
-            w[m_n-1] = 1 - sw;
-            w[m_n] = 0;
+            fp.m_w[m_n-1] = 1 - sw;
+            fp.m_w[m_n] = 0;
         }
         
-        m_binit = true;
+        fp.m_binit = true;
+        return FEPlasticFlowCurve::Init();
     }
-    
-    return FEPlasticFlowCurve::Init();
+    return false;
 }
 

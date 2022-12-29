@@ -136,6 +136,6 @@ FEMaterialProperty::FEMaterialProperty(FEModel* fem) : FEMaterialBase(fem)
 // we return the parent's 
 mat3d FEMaterialProperty::GetLocalCS(const FEMaterialPoint& mp)
 {
-	FEMaterial* parent = dynamic_cast<FEMaterial*>(GetParent()); assert(parent);
+	FEMaterialBase* parent = dynamic_cast<FEMaterialBase*>(GetParent()); assert(parent);
 	return parent->GetLocalCS(mp);
 }

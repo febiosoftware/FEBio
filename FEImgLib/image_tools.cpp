@@ -1,5 +1,10 @@
 #include "image_tools.h"
 #include "Image.h"
+#include <math.h>
+
+#ifdef HAVE_MKL
+#include <mkl.h>
+#endif
 
 //-----------------------------------------------------------------------------
 void blur_image_2d(Image& trg, Image& src, float d)
@@ -98,3 +103,106 @@ void blur_image(Image& trg, Image& src, float d)
 				}
 	}
 }
+
+#ifdef HAVE_MKL
+
+// in fft.cpp
+bool mkl_dft2(int nx, int ny, float* x, MKL_Complex8* c);
+bool mkl_idft2(int nx, int ny, MKL_Complex8* c, float* y);
+
+FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
+{
+	int nx = src.width();
+	int ny = src.height();
+
+	float* x = src.data();
+	float* y = trg.data();
+
+	// for zero blur radius, we just copy the image
+	if (d <= 0.f)
+	{
+		for (int i = 0; i < nx * ny; ++i) y[i] = x[i];
+		return;
+	}
+
+	// since the blurring is done in Fourier space,
+	// we need to invert the blur radius
+	float sigmax = nx / d;
+	float sigmay = ny / d;
+
+	// calculate the DFT
+	MKL_Complex8* c = new MKL_Complex8[nx * ny];
+	mkl_dft2(nx, ny, x, c);
+
+	// multiply the DFT with blur mask
+	for (int j = 0; j <= ny/2; ++j)
+		for (int i = 0; i < nx; ++i)
+		{
+			double wx = (i < nx / 2 ? i : i - nx) / sigmax;
+			double wy = j / sigmay;
+			float v = (float) exp(-(wx * wx + wy * wy));
+
+			c[j * nx + i].real *= v;
+			c[j * nx + i].imag *= v;
+		}
+
+	// calculate the inverse DFT
+	mkl_idft2(nx, ny, c, y);
+
+	// clean up
+	delete[] c;
+}
+
+// in fft.cpp
+bool mkl_dft3(int nx, int ny, int nz, float* x, MKL_Complex8* c);
+bool mkl_idft3(int nx, int ny, int nz, MKL_Complex8* c, float* y);
+FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
+{
+	int nx = src.width();
+	int ny = src.height();
+	int nz = src.depth();
+
+	float* x = src.data();
+	float* y = trg.data();
+
+	// for zero blur radius, we just copy the image
+	if (d <= 0.f)
+	{
+		for (int i = 0; i < nx * ny*nz; ++i) y[i] = x[i];
+		return;
+	}
+
+	// since the blurring is done in Fourier space,
+	// we need to invert the blur radius
+	float sigmax = nx / d;
+	float sigmay = ny / d;
+	float sigmaz = nz / d;
+
+	// calculate the DFT
+	MKL_Complex8* c = new MKL_Complex8[nx * ny * nz];
+	mkl_dft3(nx, ny, nz, x, c);
+
+	// multiply the DFT with blur mask
+	for (int k = 0; k <= nz / 2; ++k)
+		for (int j = 0; j < ny; ++j)
+			for (int i = 0; i < nx; ++i)
+			{
+				double wx = (i < nx / 2 ? i : i - nx) / sigmax;
+				double wy = (j < ny / 2 ? j : j - ny) / sigmay;
+				double wz = k / sigmaz;
+				float v = (float)exp(-(wx * wx + wy * wy + wz * wz));
+
+				c[k*nx*ny + j * nx + i].real *= v;
+				c[k*nx*ny + j * nx + i].imag *= v;
+			}
+
+	// calculate the inverse DFT
+	mkl_idft3(nx, ny, nz, c, y);
+
+	// clean up
+	delete[] c;
+}
+#else // HAVE_MKL
+FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d) {}
+FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d) {}
+#endif // HAVE_MKL

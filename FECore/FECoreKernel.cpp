@@ -115,7 +115,7 @@ FECoreKernel::FECoreKernel()
 	ADD_SUPER_CLASS(FEMESHDATAGENERATOR_ID);
 	ADD_SUPER_CLASS(FELOADCONTROLLER_ID);
 	ADD_SUPER_CLASS(FEMODEL_ID);
-	ADD_SUPER_CLASS(FESCALARGENERATOR_ID);
+	ADD_SUPER_CLASS(FESCALARVALUATOR_ID);
 	ADD_SUPER_CLASS(FEVEC3DVALUATOR_ID);
 	ADD_SUPER_CLASS(FEMAT3DVALUATOR_ID);
 	ADD_SUPER_CLASS(FEMAT3DSVALUATOR_ID);
@@ -627,6 +627,14 @@ int FECoreKernel::Modules() const
 
 //-----------------------------------------------------------------------------
 //! create a module
+bool FECoreKernel::CreateModule(const char* szmod, const char* description)
+{
+	FEModule* mod = new FEModule();
+	return CreateModule(mod, szmod, description);
+}
+
+//-----------------------------------------------------------------------------
+//! create a module
 bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char* description)
 {
 	assert(pmodule);
@@ -668,6 +676,12 @@ const char* FECoreKernel::GetModuleDescription(int i) const
 	return m_modules[i]->GetDescription();
 }
 
+int FECoreKernel::GetModuleStatus(int i) const
+{
+	if ((i < 0) || (i >= m_modules.size())) return -1;
+	return m_modules[i]->GetStatus();
+}
+
 //! Get a module
 const char* FECoreKernel::GetModuleNameFromId(int id) const
 {
@@ -701,7 +715,7 @@ void FECoreKernel::SetSpecID(int nspec)
 
 //-----------------------------------------------------------------------------
 //! set a dependency on a module
-bool FECoreKernel::SetModuleDependency(const char* szmodule)
+bool FECoreKernel::AddModuleDependency(const char* szmodule)
 {
 	if (m_activeModule == -1) return false;
 	FEModule& activeModule = *m_modules[m_activeModule];

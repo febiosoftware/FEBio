@@ -51,7 +51,7 @@ fecore_watch(s);
 
 \\ calculate s
 
-\\ print the value to the screen
+\\ interrupt FEBio and bring up the febio prompt. 
 fecore_break();
 
 \endcode

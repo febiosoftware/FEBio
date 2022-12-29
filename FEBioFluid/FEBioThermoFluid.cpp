@@ -72,7 +72,7 @@ void FEBioThermoFluid::InitModule()
 
     // define the thermo-fluid module
     febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
-    febio.SetModuleDependency("fluid");
+    febio.AddModuleDependency("fluid");
 
     //-----------------------------------------------------------------------------
     // analyis classes (default type must match module name!)

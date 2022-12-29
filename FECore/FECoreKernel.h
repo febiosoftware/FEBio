@@ -136,6 +136,7 @@ public: // Modules
 	int Modules() const;
 
 	//! Create a module (also makes it the active module)
+	bool CreateModule(const char* szmodule, const char* description = nullptr);
 	bool CreateModule(FEModule* pmodule, const char* szmodule, const char* description = nullptr);
 
 	//! set the active module
@@ -146,13 +147,14 @@ public: // Modules
 	int GetActiveModuleID();
 	FEModule* GetActiveModule();
 
-	//! set a dependency on a module
-	bool SetModuleDependency(const char* szmodule);
+	//! add module dependency to the active module
+	bool AddModuleDependency(const char* szdep);
 
 	//! Get a module's name
 	const char* GetModuleName(int i) const;
 	const char* GetModuleNameFromId(int id) const;
 	const char* GetModuleDescription(int i) const;
+	int GetModuleStatus(int i) const;
 
 	//! Get a module's dependencies
 	vector<int> GetModuleDependencies(int i) const;

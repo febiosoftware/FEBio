@@ -62,7 +62,7 @@ void FEBioMeshSection4::Parse(XMLTag& tag)
 		else if (tag == "Elements"   ) ParseElementSection    (tag, part);
 		else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag, part);
 		else if (tag == "Surface"    ) ParseSurfaceSection    (tag, part);
-//		else if (tag == "Edge"       ) ParseEdgeSection       (tag, part);
+		else if (tag == "Edge"       ) ParseEdgeSection       (tag, part);
 		else if (tag == "ElementSet" ) ParseElementSetSection (tag, part);
 		else if (tag == "SurfacePair") ParseSurfacePairSection(tag, part);
 		else if (tag == "DiscreteSet") ParseDiscreteSetSection(tag, part);
@@ -292,7 +292,48 @@ void FEBioMeshSection4::ParseElementSetSection(XMLTag& tag, FEBModel::Part* part
 //-----------------------------------------------------------------------------
 void FEBioMeshSection4::ParseEdgeSection(XMLTag& tag, FEBModel::Part* part)
 {
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
+	// get the required name attribute
+	const char* szname = tag.AttributeValue("name");
+
+	// see if this edge was already defined
+	FEBModel::EdgeSet* ps = part->FindEdgeSet(szname);
+	if (ps) throw FEBioImport::RepeatedEdgeSet(szname);
+
+	// count nr of edges
+	int edges = tag.children();
+
+	// allocate storage for edges
+	ps = new FEBModel::EdgeSet(szname);
+	part->AddEdgeSet(ps);
+	
+
+	// read edges
+	vector<FEBModel::EDGE> edgeSet(edges);
+	++tag;
+	for (int i = 0; i < edges; ++i)
+	{
+		FEBModel::EDGE& edge = edgeSet[i];
+
+		// get the ID (although we don't really use this)
+		tag.AttributeValue("id", edge.id);
+
+		// set the facet type
+		if      (tag == "line2") edge.ntype = 2;
+		else if (tag == "line3") edge.ntype = 3;
+		else throw XMLReader::InvalidTag(tag);
+
+		// we assume that the facet type also defines the number of nodes
+		int N = edge.ntype;
+		tag.value(edge.node, N);
+
+		++tag;
+	}
+
+	ps->SetEdgeList(edgeSet);
 }
 
 //-----------------------------------------------------------------------------

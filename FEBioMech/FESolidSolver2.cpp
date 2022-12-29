@@ -1187,6 +1187,9 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	// calculate the internal (stress) forces
 	InternalForces(RHS);
 
+	// calculate nodal reaction forces
+	for (int i = 0; i < m_neq; ++i) m_Fr[i] -= R[i];
+
 	// extract the internal forces
 	// (only when we really need it, below)
 	if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
@@ -1327,8 +1330,13 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		node.set_load(m_dofU[2], 0);
 
 		int n;
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
 
 		// add nodal loads

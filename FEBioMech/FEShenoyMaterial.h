@@ -10,9 +10,9 @@ class FEShenoyMaterial : public FEElasticMaterial
 public:
 	FEShenoyMaterial(FEModel* fem);
 
-	mat3ds Stress(FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
-	tens4ds Tangent(FEMaterialPoint& mp);
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 
 private:
 	double fiberStress(double lam);

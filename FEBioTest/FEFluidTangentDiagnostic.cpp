@@ -97,7 +97,6 @@ bool FEFluidTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.m_rid = -1;
         
         // set displacement BC's
         if (BC[i][0] == -1) nset[0]->Add(i);
@@ -194,7 +193,6 @@ bool FEFluidTangentUniaxialSS::Init()
 	{
 		FENode& n = m.Node(i);
 		n.m_rt = n.m_r0 = r[i];
-		n.m_rid = -1;
 
 		// set displacement BC's
 		if (BC[i][0] == -1) nset[0]->Add(i);

@@ -567,6 +567,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 		else if (strcmp(sztype, "TRI6G14"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }
 		else if (strcmp(sztype, "TRI6G21"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G21; }
 		else if (strcmp(sztype, "HEX8G1"      ) == 0) { eshape = ET_HEX8; m_nhex8 = FE_HEX8G1; }
+		else if (strcmp(sztype, "HEX8G8"      ) == 0) { eshape = ET_HEX8; m_nhex8 = FE_HEX8G8; }
 		else
 		{
 			assert(false);
@@ -771,6 +772,27 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		return ps;
 	}
+	if (setName.compare(0, 6, "@edge:") == 0)
+	{
+		// see if we can find an edge
+		string edgeName = setName.substr(6);
+		FESegmentSet* edge = mesh.FindSegmentSet(edgeName);
+		if (edge == nullptr) return nullptr;
+
+		// we might have been here before. If so, we already create a nodeset
+		// with the same name as the edge, so look for that first.
+		FENodeSet* ps = mesh.FindNodeSet(edgeName);
+		if (ps) return ps;
+
+		// okay, first time here, so let's create a node set from this surface
+		FENodeList nodeList = edge->GetNodeList();
+		ps = new FENodeSet(&m_fem);
+		ps->Add(nodeList);
+		ps->SetName(edgeName);
+		mesh.AddNodeSet(ps);
+
+		return ps;
+	}
 	else if (setName.compare(0, 10, "@elem_set:") == 0)
 	{
 		// see if we can find an element set
@@ -857,6 +879,15 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 				map->SetName(mapName);
 				mesh.AddDataMap(map);
 			}
+		}
+
+		FEFaceDataGenerator* fgen = dynamic_cast<FEFaceDataGenerator*>(gen);
+		if (fgen)
+		{
+			FESurfaceMap* map = fgen->Generate();
+			if (map == nullptr) return false;
+			map->SetName(fgen->GetName());
+			mesh.AddDataMap(map);
 		}
 
 		FEElemDataGenerator* egen = dynamic_cast<FEElemDataGenerator*>(gen);

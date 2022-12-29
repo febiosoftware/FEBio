@@ -158,6 +158,10 @@ void FEBiphasicSoluteSolidDomain::InitMaterialPoints()
             ps.m_crp[0] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[0];
             pt.m_pa = m_pMat->Pressure(mp);
             
+            // determine if solute is 'solid-bound'
+            FESolute* soli = m_pMat->GetSolute();
+            if (soli->m_pDiff->Diffusivity(mp).norm() == 0) ps.m_bsb[0] = true;
+            
             // initialize referential solid volume fraction
             pt.m_phi0t = m_pMat->m_phi0(mp);
             
@@ -246,6 +250,7 @@ void FEBiphasicSoluteSolidDomain::Reset()
         ps.m_ca.assign(nsol,0);
         ps.m_crp.assign(nsol, 0);
         ps.m_gradc.assign(nsol,vec3d(0,0,0));
+        ps.m_bsb.assign(nsol, false);
         ps.m_k.assign(nsol, 0);
         ps.m_dkdJ.assign(nsol, 0);
         ps.m_dkdc.resize(nsol, vector<double>(nsol,0));

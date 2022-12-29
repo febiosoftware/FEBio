@@ -32,12 +32,13 @@ SOFTWARE.*/
 class FENewtonianViscousSolidUC : public FEUncoupledMaterial
 {
 public:
-    FENewtonianViscousSolidUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+    FENewtonianViscousSolidUC(FEModel* pfem);
     
 public:
     double	m_kappa;	//!< bulk viscosity
     double	m_mu;       //!< shear viscosity
-    
+    bool    m_secant_tangent;   //!< flag for using secant tangent calculation
+
 public:
     //! calculate stress at material point
     mat3ds DevStress(FEMaterialPoint& pt) override;
@@ -47,6 +48,8 @@ public:
     
     //! calculate strain energy density at material point
     double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+    
+    bool UseSecantTangent() override { return m_secant_tangent; }
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();

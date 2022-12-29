@@ -46,7 +46,7 @@ SOFTWARE.*/
 #include "FESolutesDomainFactory.h"
 #include <FEBioMix/FESoluteFlux.h>
 #include "FEFluidModule.h"
-#include "FEFluidSoluteAnalysis.h"
+#include "FEFluidSolutesAnalysis.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_VARIABLE var)
@@ -74,12 +74,12 @@ void FEBioFluidSolutes::InitModule()
     
     // define the fsi module
     febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes");
-	febio.SetModuleDependency("fluid");
-    febio.SetModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
+	febio.AddModuleDependency("fluid");
+    febio.AddModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
     //-----------------------------------------------------------------------------
     // analyis classes (default type must match module name!)
-    REGISTER_FECORE_CLASS(FEFluidSoluteAnalysis, "fluid-solutes");
+    REGISTER_FECORE_CLASS(FEFluidSolutesAnalysis, "fluid-solutes");
 
 	// monolithic fluid-solutes solver
     REGISTER_FECORE_CLASS(FEFluidSolutesSolver, "fluid-solutes");

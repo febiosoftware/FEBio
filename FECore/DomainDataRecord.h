@@ -88,3 +88,17 @@ private:
     double          m_pct;
     FELogElemData* m_elemData;
 };
+
+//-----------------------------------------------------------------------------
+class FECORE_API FELogIntegralDomainData : public FELogDomainData
+{
+public:
+	FELogIntegralDomainData(FEModel* pfem);
+	~FELogIntegralDomainData();
+	double value(FEDomain& rc) override;
+
+	bool SetParameters(std::vector<std::string>& params);
+
+private:
+	FELogElemData* m_elemData;
+};

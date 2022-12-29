@@ -168,7 +168,7 @@ User's Manual Version 4.0
 \begin_layout Date
 
 \series bold
-Last Updated: August 2, 2022
+Last Updated: December 18, 2022
 \end_layout
 
 \begin_layout Standard
@@ -1974,10 +1974,13 @@ path
 Edit
 \shape default
  button.
- At the end of the PATH's value (don't delete the current value) type a
- semi-colon and then the absolute path to the FEBio installation folder
- (e.g.
- C:/Program Files/FEBio/).
+ On older versions of Windows a semicolon delimited text string appears.
+ At the end of that string (don't delete the current value) type a semi-colon
+ and then the absolute path to the FEBio installation folder (e.g.
+ C:/Program Files/FEBio/bin/).
+ On Windows 10 or newer, the values are displayed in a list.
+ Either click New or double-click on the first empty slot in the list and
+ type the path the febio executable.
  Then click the 
 \shape italic
 OK
@@ -2007,6 +2010,10 @@ febio4
 Enter
 \shape default
 .
+ Note that if you already had a command prompt open when changing the PATH
+ environment variable, you'll nee to close this window and reopen it after
+ the changes to the environment variables are applied.
+  
 \end_layout
 
 \begin_layout Subsection
@@ -6348,10 +6355,10 @@ attribute discussed below, which can be used to include only certain sections
 \end_layout
 
 \begin_layout Subsubsection
-The `from' Attribute
+The 'from' Attribute
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:The-`from'-Attribute"
+name "subsec:The-'from'-Attribute"
 
 \end_inset
 
@@ -6465,6 +6472,10 @@ bc.feb
 
 \begin_layout LyX-Code
 <febio_spec version="4.0">
+\end_layout
+
+\begin_layout LyX-Code
+  <Module type="solid"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6752,6 +6763,199 @@ Fluid mechanics with fluid-structure interactions: steady-state or dynamic
 \end_layout
 
 \begin_layout Standard
+The module tag can also be used to specify the units of the model.
+ Although FEBio doesn't care about units, if the user specifies the unit
+ system, the proper units of variables are stored in the plot file and visible
+ in FEBio Studio when opening the plot file.
+ 
+\end_layout
+
+\begin_layout Standard
+To specify units, use the following syntax: 
+\end_layout
+
+\begin_layout LyX-Code
+<Module type="[type]">
+\end_layout
+
+\begin_layout LyX-Code
+  <units>[unit system]</units>
+\end_layout
+
+\begin_layout LyX-Code
+</Module>
+\end_layout
+
+\begin_layout Standard
+where 
+\emph on
+unit system
+\emph default
+ can be any of the following values.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+units
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units follow the standard definition of the international SI unit system.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mm-N-s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Millimeter-Newton-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mm-kg-s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Millimeter-kilogram-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+um-nN-s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Micron-nanoNewton-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CGS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Centimeter-gram-seconds unit system
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the units are not defined, FEBio will not output any units for plot variables.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 For example:
 \end_layout
 
@@ -6763,6 +6967,41 @@ For example:
   
 \series bold
 <Module type="solid"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <!-- rest of file -->
+\end_layout
+
+\begin_layout LyX-Code
+</febio_spec>
+\end_layout
+
+\begin_layout Standard
+The following example defines the model's units explicitly.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<febio_spec version="4.0">
+\end_layout
+
+\begin_layout LyX-Code
+  
+\series bold
+<Module type="solid">
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+    <units>SI</units>
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+  </Module>
 \end_layout
 
 \begin_layout LyX-Code
@@ -8564,7 +8803,7 @@ Many of the solvers define the same parameters.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="16" columns="3">
+<lyxtabular version="3" rows="17" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -9015,7 +9254,7 @@ Set the equation allocation ordering
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9024,7 +9263,7 @@ optimize_bw
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9033,11 +9272,41 @@ Optimize bandwidth of stiffness matrix (5)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear_solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the preferred linear solver to use.
+ (8)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(default)
 \end_layout
 
 \end_inset
@@ -9256,6 +9525,30 @@ flag is used to set the symmetry of the global stiffness matrix.
 - 2 = structurally symmetric
 \end_layout
 
+\begin_layout Enumerate
+For portability reasons, the preferred method of setting the linear solver
+ is in the FEBio configuration file, but it can also be specified in the
+ solver section.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Configuring-Linear-Solvers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details on configuring linear solvers.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<linear_solver type="pardiso"/>
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Quasi-Newton Solver Parameters
 \begin_inset CommandInset label
@@ -13767,10 +14060,23 @@ attribute.
  
 \end_layout
 
+\begin_layout Standard
+Data maps can be defined in two ways: 1) explicitly, where the value of
+ each node (face, element) can be specified, or 2) implicitly, via data
+ generators that define the values of each node (face, element) procedurally.
+ 
+\end_layout
+
+\begin_layout Standard
+When mesh data maps are defined explicitly, the following attributes should
+ be specified in addition to the name attribute.
+ 
+\end_layout
+
 \begin_layout Description
 
 \series bold
-datatype 
+data_type 
 \series default
 defines the type of data 
 \end_layout
@@ -13786,7 +14092,7 @@ The following table lists the supported data types.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -13863,7 +14169,7 @@ A 2D vector defined as
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -13872,7 +14178,7 @@ vec3
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -13889,6 +14195,58 @@ A 3D vector defined as
 \end_inset
 
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mat3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A 3x3 tensor, row major sorted
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mat3s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A symmetric 3x3 tensor, defined as 
+\begin_inset Formula $xx$
+\end_inset
+
+, 
+\begin_inset Formula $yy$
+\end_inset
+
+, 
+\begin_inset Formula $zz,xy,yz,xz$
+\end_inset
+
+ 
 \end_layout
 
 \end_inset
@@ -13913,23 +14271,6 @@ scalar
 data type is assumed.
 \end_layout
 
-\begin_layout Description
-node_set/surface/elem_set Specifies the set for which to define the data.
- 
-\end_layout
-
-\begin_layout Standard
-There are two mechanisms to define mesh data: The values can be tabulated,
- which is detailed below, or can be generated via data generators, which
- is described in the next section.
- To use a data generator, specify the 
-\emph on
-generator 
-\emph default
-attribute.
- 
-\end_layout
-
 \begin_layout Subsection
 Data Generators
 \begin_inset CommandInset label
@@ -13942,15 +14283,18 @@ name "subsec:generator"
 \end_layout
 
 \begin_layout Standard
-The 
+Data generators can be used to populate the values of a data map procedurally.
+ To use a data generator, specify the 
 \emph on
-generator
+type
 \emph default
- attribute is optional, but can be defined if the user wishes to generate
- the data automatically instead of tabulating it.
- If the generator attribute is defined, the child tags must be the parameters
- of the generator.
- For example
+ attribute.
+ If the 
+\emph on
+type
+\emph default
+ attribute is defined, the child tags must be the parameters of the generator.
+ For example,
 \end_layout
 
 \begin_layout LyX-Code
@@ -13958,9 +14302,9 @@ generator
 \end_layout
 
 \begin_layout LyX-Code
-  <node_data name="E_map" 
+  <NodeData name="E_map" 
 \series bold
-generator="math"
+type="math"
 \series default
 >
 \end_layout
@@ -13970,7 +14314,7 @@ generator="math"
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data>
+  <NodeData>
 \end_layout
 
 \begin_layout LyX-Code
@@ -13978,106 +14322,8 @@ generator="math"
 \end_layout
 
 \begin_layout Standard
-The following generic generators are currently supported for all mesh data
- sections.
- Additional generators that can only be used for a specific mesh data are
- described in the sections below.
- 
-\end_layout
-
-\begin_layout Description
-
-\series bold
-const
-\series default
- The 
-\emph on
-const
-\emph default
- generator takes a constant value and assigns it to the set.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data name="rotation" type="mat3"
-\series bold
- generator="const"
-\series default
- elem_set=
-\series bold
-"
-\series default
-Part1
-\series bold
-"
-\series default
->
-\end_layout
-
-\begin_layout LyX-Code
-    <value>1,0,0, 0,1,0, 0,0,1</value>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Description
-
-\series bold
-math
-\series default
- The 
-\emph on
-math 
-\emph default
-generator generates the data based on a mathematical expression.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data name="fiber" type="vec3" 
-\series bold
-generator="math"
-\series default
- elem_set=
-\series bold
-"
-\series default
-Part1
-\series bold
-"
-\series default
->
-\end_layout
-
-\begin_layout LyX-Code
-    <math>X,Y,Z</math>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_data>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-Note that in math expressions, only the variables X, Y, and Z can be used,
- which refer to reference coordinates.
+Data generators that can be used for a specific mesh data are described
+ in the sections below.
  
 \end_layout
 
@@ -14093,33 +14339,26 @@ name "subsec:ElementData"
 \end_layout
 
 \begin_layout Standard
-This section defines data that can be mapped to the elements of a part.
- The data can be defined either as a map, which can be assigned to mapped
- parameters, or can be used to assign values to some predefined variables.
- The former requires the 
+This section defines data that can be mapped to the elements of an element
+ set.
+ The element set is specified via the 
 \emph on
-name 
-\emph default
-attribute, the latter requires the 
-\shape italic
-var 
-\shape default
-attribute.
- The element set that this data will be mapped to is defined via the 
-\shape italic
 elem_set 
-\shape default
-attribute
+\emph default
+attribute.
+ 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
-Defining maps
-\end_layout
+Defining
+\begin_inset space ~
+\end_inset
 
-\begin_layout Standard
-A map is defined by using the 
+maps
+\series default
+ A map is defined by using the 
 \emph on
 name
 \emph default
@@ -14156,13 +14395,73 @@ name="my_map"
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-Predefined variables
+The following data generators are available for element data sections.
+ 
 \end_layout
 
-\begin_layout Standard
-The following table lists the currently supported predefined variables.
+\begin_layout Description
+surface-to-surface_map The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+surface-to-surface map
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ generator defines a data field on the domain bounded by two surfaces.
+ The data values are interpolated using a user-defined function between
+ the surfaces.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData name="Emap" 
+\series bold
+generator="surface-to-surface map"
+\series default
+ elem_set="Part1">
+\end_layout
+
+\begin_layout LyX-Code
+    <function type="math">x*x+1</function>
+\end_layout
+
+\begin_layout LyX-Code
+    <bottom_surface surface="surface1"/>
+\end_layout
+
+\begin_layout LyX-Code
+    <top_surface surface="surface2"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
+\begin_layout Description
+
+\series bold
+special
+\begin_inset space ~
+\end_inset
+
+generators
+\series default
+ A few special data generators do not generate maps, but instead modify
+ model data in a more direct way.
+ The following table lists the currently supported special generators.
 \end_layout
 
 \begin_layout Standard
@@ -14323,7 +14622,7 @@ For example, to assign shell thicknesses to an element set, use the following
 \begin_layout LyX-Code
   <ElementData 
 \series bold
-var="shell thickness"
+type="shell thickness"
 \series default
  elem_set="part1">
 \end_layout
@@ -14338,103 +14637,6 @@ var="shell thickness"
 
 \begin_layout LyX-Code
   </ElementData>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-In addtition, it is possible to reference most model parameters via the
- 
-\emph on
-var 
-\emph default
-attribute.
- This provides an alternative mechanism to defining mapped parameters, however,
- the mapped parameters approach as described in Appendix A should be preferred.
- See Appendix B for information on how to reference model parameters.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData 
-\series bold
-var="fem.material[0].E"
-\series default
- elem_set="part1">
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="1">1.2</elem>
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="2">3.4</elem>
-\end_layout
-
-\begin_layout LyX-Code
-  </ElementData>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout Standard
-The following data generators are available for element data sections.
- 
-\end_layout
-
-\begin_layout Description
-surface-to-surface_map The 
-\begin_inset Quotes eld
-\end_inset
-
-
-\emph on
-surface-to-surface map
-\emph default
-
-\begin_inset Quotes erd
-\end_inset
-
- generator defines a data field on the domain bounded by two surfaces.
- The data values are interpolated using a user-defined function between
- the surfaces.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData name="Emap" 
-\series bold
-generator="surface-to-surface map"
-\series default
- elem_set="Part1">
-\end_layout
-
-\begin_layout LyX-Code
-    <function type="math">x*x+1</function>
-\end_layout
-
-\begin_layout LyX-Code
-    <bottom_surface surface="surface1"/>
-\end_layout
-
-\begin_layout LyX-Code
-    <top_surface surface="surface2"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14536,26 +14738,13 @@ attributes.
 \end_layout
 
 \begin_layout Standard
-Optionally, the surface data may be described with a mathematical expression
- as a function of the initial coordinates (X,Y,Z) of the centroid of each
- face:
-\end_layout
-
-\begin_layout LyX-Code
-<SurfaceData name="inlet" data_type="scalar" generator="math" surface="surface1"
->
-\end_layout
-
-\begin_layout LyX-Code
-  <math>2*(1-X^2-Y^2)</math>
-\end_layout
-
-\begin_layout LyX-Code
-</SurfaceData>
-\end_layout
-
-\begin_layout Standard
-The following data generators are available for surface data.
+Optionally, the surface data may be described with a data generator.
+ The data generator is specified via the 
+\emph on
+type 
+\emph default
+attribute.
+ The following data generators are available for surface data.
  
 \end_layout
 
@@ -14585,7 +14774,7 @@ parabolic map
 \begin_layout LyX-Code
   <SurfaceData name="pressure" 
 \series bold
-generator="parabolic map"
+type="parabolic map"
 \series default
  surface="surface1">
 \end_layout
@@ -14679,20 +14868,1049 @@ For node data the
 data_format 
 \shape default
 attribute, if specified, will be ignored.
- Optionally, the node data may be described with a mathematical expression
- as a function of the initial nodal coordinates (X,Y,Z):
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Mesh Adaptor Section
+\end_layout
+
+\begin_layout Standard
+The FEBio Adaptive Mesh Refinement framework (FEAMR, pronounced “femur”)
+ allows users to make modifications to the mesh during the analysis of the
+ model.
+ There are currently two mesh adaptor applications supported, namely mesh
+ erosion, which removes elements from the mesh, and remeshing, which can
+ be used to adaptively refine or coarsen the mesh based on the solution.
+ The mesh adaptors are controlled via user-defined criteria that determine
+ the conditions under which to modify the mesh.
+\end_layout
+
+\begin_layout Standard
+A mesh adaptor is applied at the end of a timestep, after the Newton-iterations
+ and augmentations have converged.
+ If the mesh adaptor modifies the mesh, then the timestep is solved again,
+ using the new mesh.
+ Several adaptors define the 
+\emph on
+criterion
+\emph default
+ property, which evaluates the variable or metric that is used by the adaptor,
+ and optionally, can be used to filter the elements to which the adaptor
+ will be applier.
+ How the criterion is used, depends on the adaptor.
+ For instance, the erosion adaptor uses it to identify the elements to deactivat
+e.
+ Remeshing adaptors will use it to set the new element size.
+ It is allowed to use several mesh adaptors in a single model, but keep
+ in mind that the order in which the mesh adaptors are listed in the input
+ file is important.
+ For instance, if two mesh adaptors are defined, the second adaptor will
+ operate on the mesh created by the first adaptor.
+ Mesh adaptors used for adaptive refinement will also map data between the
+ old mesh and the new mesh.
+ User data, defined in the MeshData section, is always mapped between meshes.
+ If the model is history-dependent, it might be important to map additional
+ data.
+ For instance, a visco-elastic material needs to map stress-history variables.
+ By default, mapping data (except for user-data) is not done unless the
+ user sets a specific flag (map_data).
+ New mesh adaptors and adaptor criteria can be defined via the plugin framework.
+ 
+\end_layout
+
+\begin_layout Subsection
+The MeshAdaptor Section
+\end_layout
+
+\begin_layout Standard
+Mesh adaptors are added to the FEBio Input file (version 3.0 and above) in
+ a new section, called 
+\series bold
+MeshAdaptor
+\series default
+.
+ This section must appear after the Mesh and MeshDomains sections.
+ The MeshAdaptor section may also be defined in a 
+\emph on
+step
+\emph default
+ section in order to apply the adaptor only during that step.
+ Inside the MeshAdaptor section, each mesh adaptor is defined via the 
+\series bold
+mesh_adaptor
+\series default
+ tag.
+ This tag allows the following attributes: 
+\end_layout
+
+\begin_layout Standard
+• 
+\series bold
+type
+\series default
+: set the type of the mesh adaptor (1).
+ [Required] 
+\end_layout
+
+\begin_layout Standard
+• 
+\series bold
+elem_set
+\series default
+: The element set to apply the adaptor to (2).
+ [Optional] 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+: 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\series bold
+type 
+\series default
+attribute defines the mesh adaptor.
+ It must be one of the mesh adaptors defined in Table 1, below.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\series bold
+elem_set 
+\series default
+attribute is optional, but can be used to apply the adaptor to only a part
+ of the mesh.
+ This is useful to limit the effect of an adaptor to a part of the mesh.
+ The element set must reference a domain (i.e.
+ defined via Elements) of a mesh, or a set of domains.
+ It cannot be an element set defined through the ElementSet tag.
+ (Note that not all mesh adaptors support this attribute.) If omitted, the
+ adaptor is applied to the entire mesh.
+ 
+\end_layout
+
+\begin_layout Standard
+The sections below list the properties of the available mesh adaptors and
+ the adaptor criteria.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+erosion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The erosion adaptor removes elements from a mesh.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mmg_remesh
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Adaptive mesh refinement of tetrahedral mesh using the MMG library.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hex_refine2d
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Refine a 2D hexahedral mesh.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tet_refine
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Refine a linear tetrahedral mesh (Whole mesh refinement only)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hex_refine
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Refine a hexahedral mesh.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+The erosion adaptor
+\end_layout
+
+\begin_layout Standard
+The erosion adaptor can be used to remove or deactivate elements in a mesh,
+ based on a user-defined criterion.
+ It defines the following properties: 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_iters
+\series default
+: Set the max number of adaption iterations, for each time step.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+remove_islands
+\series default
+: If true, removes small element sets that have become disconnected from
+ the main mesh.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_elems
+\series default
+: Set the max number of elements to erode, per adaptation.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+sort
+\series default
+: sort the element values returned by the criterion.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+criterion
+\series default
+: Set the criterion that determines the element metric to evaluate and which
+ elements to erode.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+: 
+\end_layout
+
+\begin_layout Standard
+In this example, elements that have an (integration point averaged) effective
+ stress larger than 0.3, are eroded.
+ Only three elements are eroded per adaptation cycle.
 \end_layout
 
 \begin_layout LyX-Code
-<NodeData name="data" generator="math" node_set="set1">
+<mesh_adaptor type="erosion"> 
 \end_layout
 
 \begin_layout LyX-Code
-  <math>1e-3*Y</math>
+  <max_iters>1</max_iters>
 \end_layout
 
 \begin_layout LyX-Code
-</NodeData>
+  <max_elems>3</max_elems>
+\end_layout
+
+\begin_layout LyX-Code
+  <sort>1</sort>
+\end_layout
+
+\begin_layout LyX-Code
+  <criterion type="min-max filter">
+\end_layout
+
+\begin_layout LyX-Code
+    <min>0.3</min>
+\end_layout
+
+\begin_layout LyX-Code
+    <clamp>0</clamp>
+\end_layout
+
+\begin_layout LyX-Code
+    <data type="stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+  </criterion>
+\end_layout
+
+\begin_layout LyX-Code
+</mesh_adaptor> 
+\end_layout
+
+\begin_layout Subsubsection
+The mmg_remesh adaptor
+\end_layout
+
+\begin_layout Standard
+The mmg_remesh adaptor can be used for adaptive mesh refinement of linear
+ tetrahedral meshes.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_iters
+\series default
+: The maximum number of adaption iterations per time step.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max_elements
+\series default
+: The maximum number of elements.
+ If the number of elements of the mesh is larger, the adaptor is not applied.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+min_element_size
+\series default
+: Set the desired minimal element size.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+hausdorff
+\series default
+: The Hausdorff distance.
+ This is used to preserve curved sections.
+ (default = 0.01).
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+gradation
+\series default
+: This parameter sets the spatial gradient of element size.
+ (default = 1.3).
+ Value should be larger than 1.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+mesh_coarsen
+\series default
+: Allow mesh-coarsening 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+normalize_data
+\series default
+: normalize the element values returned by the criterion between 0 and 1.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+relative_size
+\series default
+: Sets whether the size function is to be interpreted as a relative size
+ function (i.e.
+ a scale function to the current element size), or an absolute element size
+ metric.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+criterion
+\series default
+: The metric used to assign values to elements.
+ (See section 4) 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+size_function
+\series default
+: set the mesh size function.
+ This function is applied to the (optionally normalized) element values
+ returned by the criterion.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+: 
+\end_layout
+
+\begin_layout LyX-Code
+<mesh_adaptor type="mmg_remesh">
+\end_layout
+
+\begin_layout LyX-Code
+  <max_iters>1</max_iters>
+\end_layout
+
+\begin_layout LyX-Code
+  <criterion type="stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative_size>1</relative_size>
+\end_layout
+
+\begin_layout LyX-Code
+  <normalize_data>0</normalize_data>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_coarsen>0</mesh_coarsen>
+\end_layout
+
+\begin_layout LyX-Code
+  <size_function type="step">
+\end_layout
+
+\begin_layout LyX-Code
+    <x0>10</x0>
+\end_layout
+
+\begin_layout LyX-Code
+    <left_val>1</left_val>
+\end_layout
+
+\begin_layout LyX-Code
+    <right_val>0.5</right_val>
+\end_layout
+
+\begin_layout LyX-Code
+  </size_function>
+\end_layout
+
+\begin_layout LyX-Code
+</mesh_adaptor> 
+\end_layout
+
+\begin_layout Subsection
+Mesh Adaptor Criteria
+\end_layout
+
+\begin_layout Standard
+The purpose of the mesh adaptor criteria is to assign values to elements.
+ Some adaptors also act as filters, that limit the effect of the adaptor
+ to certain elements.
+ These values will then be used by the mesh adaptor to modify the mesh.
+ How these values are used depends on the adaptor.
+ For instance, the erosion uses it to decide which elements to erode.
+ The mesh refinement adaptors use it to define the size function.
+ 
+\end_layout
+
+\begin_layout Standard
+The following criteria are currently available.
+ A detailed description of these adaptor criteria is given below.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluates average of element’s nodal values of a model primary variable.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+element_selection
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the element selection to which the adaptor should be applied (only
+ for erosion)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the (integration point average) effective stress of each element.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+damage
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the (integration point average) damage value.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+relative error
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate a relative error measure.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the axial force of the spring.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Evaluate the stretch of a spring.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+math
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify the element value based on a mathematical expression.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min-max filter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Selects elements whose value falls within a min-max range.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+max_variable
+\end_layout
+
+\begin_layout Standard
+The max_variable criterion evaluates elements based on a primary variable’s
+ degrees of freedom.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+dof
+\series default
+: The degree of freedom that defines the variable to inspect.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+element_selection
+\end_layout
+
+\begin_layout Standard
+Sets the selected elements directly.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+element_list:
+\series default
+ a comma-separated list of element indices.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+math
+\end_layout
+
+\begin_layout Standard
+Sets the scale factor for each element.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+scale
+\series default
+: the scale factor to use.
+ This can be a constant, or a mathematical expression of position (use X,
+ Y, Z for the nodal coordinates), or a scalar map defined in the MeshData
+ section.
+\end_layout
+
+\begin_layout Standard
+Example: 
+\end_layout
+
+\begin_layout LyX-Code
+<mesh_adaptor type="mmg_remesh">
+\end_layout
+
+\begin_layout LyX-Code
+  <max_iters>1</max_iters>
+\end_layout
+
+\begin_layout LyX-Code
+  <criterion type="math">
+\end_layout
+
+\begin_layout LyX-Code
+    <math>1*(1 - (X^2+Y^2)) + (X^2+Y^2)*(0.5*(Z-1)^2 - Z*(Z - 2))</math>
+\end_layout
+
+\begin_layout LyX-Code
+  </criterion>
+\end_layout
+
+\begin_layout LyX-Code
+</mesh_adaptor> 
+\end_layout
+
+\begin_layout Subsubsection
+stress
+\end_layout
+
+\begin_layout Standard
+This criterion selects elements that exceed a maximum stress value.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+metric
+\series default
+: The stress measure to use: 0=effective stress, 1=max principal stress.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+max_damage
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates the maximum damage value for each element.
+ This can only be used with materials that define the damage property.
+\end_layout
+
+\begin_layout Subsubsection
+relative error
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates a relative error metric for each element.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+error:
+\series default
+ If nonzero, this criterion will evaluate a relative size metric for each
+ element.
+ Otherwise, the actual relative error is evaluated.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+data:
+\series default
+ Specify the metric to evaluate the element values.
+ Any of the other criteria defined above can be used.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+min-max filter
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates a metric for each element, but then filters out
+ the element that have a value within a min-max range.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+min
+\series default
+: set the minimum value of the filter 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+max
+\series default
+: set the maximum value of the filter 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+clamp
+\series default
+: If true, the element values will be clamped to the range.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+data
+\series default
+: Specify the metric to evaluate the element values.
+ Any of the other criteria defined above can be used.
+ 
+\end_layout
+
+\begin_layout Subsection
+Limitations
+\end_layout
+
+\begin_layout Standard
+Please take into account the following limitations of the FEAMR framework.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Although contact can be used with the FEAMR framework, currently no contact
+ data is mapped from the old mesh to the new mesh.
+ It is advised to only use penalty-based contact interfaces.
+ 
+\end_layout
+
+\begin_layout Enumerate
+It is not advised to erode elements that are in contact, since this will
+ not produce the correct result.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Mapping history-data is supported (if the proper flag is set), but can be
+ very time consuming since FEBio maps all material point data between meshes.
+\end_layout
+
+\begin_layout Enumerate
+The FEAMR framework does not work with the auto time-stepper.
+ It is advised to use fixed time stepping when using mesh adaptation.
+ 
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Standard
@@ -24471,7 +25689,8 @@ name "subsec:Bearing-Load"
 
 \begin_layout Standard
 A bearing load can be applied on a cylindrical surface that represents a
- journal bearing.
+ bearing journal, or the portion of a shaft that is supported by a bearing
+ journal.
  This load gets prescribed as a non-uniform compressive pressure distribution
  on that surface, representing the radial component of the bearing load.
  (The axial component of a bearing load may be prescribed using the surface
@@ -27353,7 +28572,7 @@ The following table lists the properties that are defined for sliding interfaces
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="25" columns="8">
+<lyxtabular version="3" rows="26" columns="8">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2in">
@@ -30071,7 +31290,7 @@ bullet$
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -30080,11 +31299,109 @@ shell_bottom_secondary
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 contact with back of shell on secondary surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+offset
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+offset distance between contacting surfaces (12)
 \end_layout
 
 \end_inset
@@ -30132,18 +31449,6 @@ bullet$
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-bullet$
-\end_layout
-
-\end_inset
-
 
 \end_layout
 
@@ -30162,7 +31467,7 @@ bullet$
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 (off)
+
 \end_layout
 
 \end_inset
@@ -30697,6 +32002,47 @@ tension
 \shape default
 =0).
  
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+offset
+\emph default
+ distance makes it possible to maintain the contact surfaces at a distance.
+ This option is useful, for example, in fluid-structure interaction problems,
+ where solid structures separated by a fluid domain are pushed against each
+ other.
+ Specifying a contact interface between the (internal) surfaces of the solid
+ structures would prevent them from overlapping, but adding an offset distance
+ will also prevent the fluid mesh from getting squished too thin or from
+ inverting.
+ These internal surfaces would also typically have FSI Traction interfaces
+ defined on them (see Sections
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-FSI-Traction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Biphasic-FSI-Traction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -33034,6 +34380,83 @@ maxaug
 \end_layout
 
 \begin_layout Subsection
+Frictionless Fluid Wall
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Frictionless-Fluid-Wall"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+One of the natural boundary conditions for fluid analyses is to enforce
+ zero fluid velocity normal to a boundary, implying that this boundary is
+ a frictionless fluid wall.
+ In some analyses however, this natural boundary condition may not be enforced
+ sufficiently well.
+ In such cases, use this frictionless fluid wall linear constraint to produce
+ a more strict enforcement of this condition.
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="frictionless fluid wall" name="FrictionlessFluidWall1"
+ surface="FrictionlessFluidWall1">
+\end_layout
+
+\begin_layout LyX-Code
+	<laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+	<tol>0.2</tol>
+\end_layout
+
+\begin_layout LyX-Code
+	<penalty>1</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<maxaug>10</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+In fluid-structure interaction analyses, this constraint may be used in
+ conjunction with the 
+\emph on
+symmetry plane
+\emph default
+ described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Symmetry-Plane"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, using a lower value of the 
+\emph on
+penalty
+\emph default
+ parameter, as may be necessary in practice.
+\end_layout
+
+\begin_layout Subsection
 Fixed Normal Displacement
 \begin_inset CommandInset label
 LatexCommand label
@@ -33165,6 +34588,11 @@ tol
 maxaug
 \emph default
 .
+\end_layout
+
+\begin_layout Standard
+For example, this constraint may be used on a cylindrical shaft, over the
+ portion of the shaft which is supported by a bearing journal.
 \end_layout
 
 \begin_layout Subsection
@@ -33303,6 +34731,81 @@ reference "subsec:Fluid-Normal-Velocity"
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Subsection
+Uniform Fluid Velocity Constraint
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Uniform-Fluid-Velocity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When an inlet boundary is subjected to a prescribed fluid pressure, the
+ profile of the inlet fluid velocity remains unconstrained, and this lack
+ of constraint often leads to poor numerical performance due to the production
+ of velocity spikes.
+ To avoid this problem, use this uniform fluid velocity constraint to help
+ stabilize inlet conditions along the direction normal to the bondary.
+ This constraint evaluates the average fluid velocity normal to the selected
+ boundary, 
+\begin_inset Formula $\bar{v}_{n}$
+\end_inset
+
+, then prescribes a linear constraint at every node such that 
+\begin_inset Formula $\mathbf{v}\cdot\mathbf{n}=\bar{v}_{n}$
+\end_inset
+
+ is enforced.
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+<constraint name="UniformFluidFlow1" surface="UniformFluidFlow1" type="uniform
+ fluid flow">
+\end_layout
+
+\begin_layout LyX-Code
+	<laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+	<tol>0.1</tol>
+\end_layout
+
+\begin_layout LyX-Code
+	<penalty>10000</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+	<maxaug>50</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+If a very strong enforcement of this constraint is desired, increase the
+ 
+\emph on
+penalty
+\emph default
+ and/or turn Lagrange augmentation on (
+\emph on
+laugon
+\emph default
+=1).
+ This constraint is not compatible with boundary conditions that prescribe
+ the normal component of the fluid velocity on that same boundary.
 \end_layout
 
 \begin_layout Subsection
@@ -55084,6 +56587,331 @@ reference "subsec:Uncoupled-Materials"
 \end_layout
 
 \begin_layout Subsubsection
+Arruda-Boyce Unconstrained
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Arruda-Boyce-Unconstrained"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for an unconstrained Arruda-Boyce material is 
+\emph on
+Arruda-Boyce unconstrained
+\emph default
+.
+ This isotropic Arruda-Boyce 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Arruda93"
+literal "false"
+
+\end_inset
+
+ 8-chain model has been used in the field of polymer modeling and in cervical
+ biomechanics 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shi22"
+literal "false"
+
+\end_inset
+
+.
+ It is based on the simple freely-jointed-chain model and can be derived
+ using the Langevin equation of statistical mechanics.
+ The strain energy density for this material takes the form
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Psi(I_{1},J)=\xi\left(\sqrt{\frac{I_{1}}{3N}}\beta+\ln\frac{\beta}{\sinh\beta}\right)-\frac{\xi}{3}\sqrt{N}\beta_{0}\ln J+\frac{1}{2}\kappa(\ln J^{2}-1-2\ln J)\label{eq2-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $I_{1}=\tr\mathbf{C}$
+\end_inset
+
+ is the first invariant of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+, 
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left[\sqrt{\frac{I_{1}}{3N}}\right]}$
+\end_inset
+
+ is the inverse Langevin equation, and 
+\begin_inset Formula ${\displaystyle \beta_{0}=\mathcal{L}^{-1}\left[\sqrt{\frac{1}{N}}\right]}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\xi=nk\Theta$
+\end_inset
+
+ is the initial fiber modulus with 
+\begin_inset Formula $n,k,\Theta$
+\end_inset
+
+ respectively representing the number of chains per unit volume, Boltzmann's
+ constant, and the absolute temperature.
+ The parameter 
+\begin_inset Formula $N=\zeta^{2}$
+\end_inset
+
+ is the number of chain segments, and 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ is the locking stretch that represents the extensibility of the material.
+\end_layout
+
+\begin_layout Standard
+A Taylor series expansion is used to evaluate the inverse Langevin equation.
+ The parameter 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ is used to control the number of terms used to evaluate the series; 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ must be an integer between 3 and 30.
+\end_layout
+
+\begin_layout Standard
+Langevin mechanics describes a stochastic process with non-Gaussian distribution.
+ It will reduce to a Gaussian distribution when the system approaches equilibriu
+m.
+ Thus, when the material is far from its maximum extensibility, i.e., when
+ 
+\begin_inset Formula $\zeta=\sqrt{N}$
+\end_inset
+
+ is much larger than the stretch, this model will reduce to a neo-Hookean
+ material.
+\end_layout
+
+\begin_layout Standard
+This material The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initial fiber modulus 
+\begin_inset Formula $\xi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<N>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of chain segments 
+\begin_inset Formula $N$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n_term>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of terms in the Taylor series expansion 
+\begin_inset Formula $n_{\text{term}}$
+\end_inset
+
+ (
+\begin_inset Formula $3\le n_{\text{term}}\le30$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kappa>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bulk modulus 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ of ground matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Soft Tissue" type="Arruda-Boyce unconstrained">
+\end_layout
+
+\begin_layout LyX-Code
+	<N>5</N>
+\end_layout
+
+\begin_layout LyX-Code
+	<ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+	<n_term>30</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+	<kappa>1</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Carter-Hayes
 \begin_inset CommandInset label
 LatexCommand label
@@ -55905,6 +57733,239 @@ Example (using units of mm, N, s, nmol, K)
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Kinematic Growth
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Kinematic-Growth"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for kinematic growth is 
+\emph on
+kinematic growth
+\emph default
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic material undergoing kinematic growth
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<growth>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the growth model (
+\emph on
+volume growth
+\emph default
+, 
+\emph on
+area growth
+\emph default
+, 
+\emph on
+fiber growth
+\emph default
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Kinematic growth, based on the framework first proposed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Rodriguez94"
+literal "false"
+
+\end_inset
+
+, uses the multiplicative decomposition of the deformation gradient into
+\begin_inset Formula 
+\[
+\mathbf{F}=\mathbf{F}^{e}\cdot\mathbf{F}^{g}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}^{e}$
+\end_inset
+
+ represents the elastic deformation and 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+ represents the growth.
+ The related Jacobians are
+\begin_inset Formula 
+\[
+J^{e}=\det\mathbf{F}^{e}\quad J^{g}=\det\mathbf{F}^{g}\,.
+\]
+
+\end_inset
+
+A constitutive model for the growth tensor was provided by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Menzel12"
+literal "false"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mathbf{F}^{g}=\vartheta^{\text{iso}}\mathbf{I}+\left(\vartheta^{\text{ani}}-1\right)\mathbf{n}_{r}\otimes\mathbf{n}_{r}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+ is the referential unit vector for a fiber direction (or normal to an area),
+ 
+\begin_inset Formula $\vartheta^{\text{iso}}$
+\end_inset
+
+ represents isotropic growth, and 
+\begin_inset Formula $\vartheta^{\text{ani}}$
+\end_inset
+
+ represents anisotropic growth.
+\end_layout
+
+\begin_layout Standard
+For 
+\emph on
+volume growth
+\emph default
+, let 
+\begin_inset Formula $\vartheta^{\text{iso}}=\vartheta^{g}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}=1$
+\end_inset
+
+, where 
+\begin_inset Formula $\vartheta^{g}$
+\end_inset
+
+ is called the growth 
+\emph on
+multiplier
+\emph default
+ in FEBio, which is typically prescribed using a loadcurve.
+ For 
+\emph on
+area growth
+\emph default
+ in the plane transverse to the normal direction 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+, let 
+\begin_inset Formula $\vartheta^{\text{iso}}=\sqrt{\vartheta^{g}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}=2-\sqrt{\vartheta^{g}}$
+\end_inset
+
+.
+ Finally, for 
+\emph on
+fiber growth
+\emph default
+, let 
+\begin_inset Formula $\vartheta^{\text{iso}}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}=\vartheta^{g}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -67694,8 +69755,21 @@ Fiber Exp-Linear
 \end_layout
 
 \begin_layout Standard
-This constitutive fiber model has an initial exponential rise and then grows
- linearly after a user-specified stretch transition point.
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+fiber-exp-linear
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This constitutive fiber model has an initial exponential rise and then
+ grows linearly after a user-specified stretch transition point.
  This fiber material is based on the trans-iso Mooney-Rivlin model introduced
  in 
 \begin_inset CommandInset citation
@@ -67776,7 +69850,7 @@ is the modulus of the straightened fibers.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="4" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -67877,7 +69951,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -67886,7 +69960,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -67895,40 +69969,11 @@ Fiber stretch for straightened fibers
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<fiber>
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Fiber distribution option
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
+[ ]
 \end_layout
 
 \end_inset
@@ -68003,6 +70048,420 @@ Example
 
 \begin_layout LyX-Code
 </material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fiber as Entropy Chain
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fiber-Entropy-Chain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+fiber-entropy-chain
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It was proposed by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shi22"
+literal "false"
+
+\end_inset
+
+.
+ This fiber model is based on statistical mechanics to reflect the entropy-drive
+n nature of a biological fiber.
+ The model is derived from the freely-jointed-chain mechanism.
+ Its strain energy is directly related to the entropic change of the chains
+ in the material, given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{n}\left(I_{n}\right)=\xi N\left(\sqrt{\frac{I_{n}}{N}}\beta+\ln\frac{\beta}{\sinh\beta}\right)-\frac{\xi\sqrt{N}}{2}\beta_{0}I_{n}-\alpha_{00}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $I_{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the square of the stretch ratio along the referential fiber direction
+ 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+ The inverse Langevin equation relates the parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+ to 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $N$
+\end_inset
+
+ according to 
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left[\sqrt{\frac{I_{n}}{N}}\right]}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+, and
+\begin_inset Formula $\alpha_{00}$
+\end_inset
+
+ is needed to produce a state of zero energy at 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $\xi=nk\Theta$
+\end_inset
+
+ is the initial fiber stiffness, with 
+\begin_inset Formula $n$
+\end_inset
+
+, 
+\begin_inset Formula $k$
+\end_inset
+
+, and 
+\begin_inset Formula $\Theta$
+\end_inset
+
+ respectively representing the number of chains per unit volume, Boltzmann's
+ constant, and the absolute temperature.
+ The parameter 
+\begin_inset Formula $N=\zeta^{2}$
+\end_inset
+
+ is the number of chain segments, and 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ is the locking stretch, representing the extensibility of the fiber.
+ The Langevin function is given by 
+\begin_inset Formula $\mathcal{L}\left(x\right)=\coth x-\frac{1}{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When evaluating the inverse Langevin equation, a Taylor series expansion
+ is applied for computational stability.
+ The parameter 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ is used to control the number of terms used to evaluate the equation; it
+ must be an integer between 3 and 30.
+\end_layout
+
+\begin_layout Standard
+\noindent
+The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initial modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<N>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Square of locking stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n_term>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Taylor series terms
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shear modulus fir fiber-matrix interaction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Soft Tissue" type="solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="Arruda-Boyce unconstrained">
+\end_layout
+
+\begin_layout LyX-Code
+	  <N>2</N>
+\end_layout
+
+\begin_layout LyX-Code
+	  <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+	  <n_term>30</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+	  <kappa>1</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+        </solid>
+\end_layout
+
+\begin_layout LyX-Code
+        <solid type="continuous fiber distribution">
+\end_layout
+
+\begin_layout LyX-Code
+          <mat_axis type="angles">
+\end_layout
+
+\begin_layout LyX-Code
+            <theta>0</theta>
+\end_layout
+
+\begin_layout LyX-Code
+            <phi>0</phi>
+\end_layout
+
+\begin_layout LyX-Code
+          </mat_axis>
+\end_layout
+
+\begin_layout LyX-Code
+          <fibers type="fiber-entropy-chain">
+\end_layout
+
+\begin_layout LyX-Code
+            <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+            <N>2</N>
+\end_layout
+
+\begin_layout LyX-Code
+            <n_term>30</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+          </fibers>
+\end_layout
+
+\begin_layout LyX-Code
+          <distribution type="von-Mises-3d">
+\end_layout
+
+\begin_layout LyX-Code
+            <b>0.3</b>
+\end_layout
+
+\begin_layout LyX-Code
+          </distribution>
+\end_layout
+
+\begin_layout LyX-Code
+          <scheme type="fibers-3d-fei">
+\end_layout
+
+\begin_layout LyX-Code
+            <resolution>196</resolution>
+\end_layout
+
+\begin_layout LyX-Code
+          </scheme>
+\end_layout
+
+\begin_layout LyX-Code
+        </solid>
+\end_layout
+
+\begin_layout LyX-Code
+      </material>
 \end_layout
 
 \begin_layout Standard
@@ -69398,6 +71857,339 @@ Example
 
 \begin_layout LyX-Code
   </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Uncoupled Fiber as Entropy Chain
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:UC-Fiber-Entropy-Chain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material type is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+uncoupled fiber-entropy-chain
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It was proposed by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shi22"
+literal "false"
+
+\end_inset
+
+.
+ This fiber model is based on statistical mechanics to reflect the entropy-drive
+n nature of a biological fiber.
+ The model is derived from the freely-jointed-chain mechanism.
+ Its strain energy is directly related to the entropic change of the chains
+ in the material, given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{n}(\tilde{I}_{n})=\xi N\left(\sqrt{\frac{\tilde{I}_{n}}{N}}\beta+\text{ln}\frac{\beta}{\sinh\beta}\right)-\frac{\xi\sqrt{N}}{2}\beta_{0}\tilde{I}_{n}-\alpha_{00}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\tilde{I}_{n}=\mathbf{n}_{r}\cdot\tilde{\mathbf{C}}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ is the deviatoric measure of the stretch ratio along the referential fiber
+ direction 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+ The inverse Langevin equation relates the parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+ to 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $N$
+\end_inset
+
+ according to 
+\begin_inset Formula ${\displaystyle \beta=\mathcal{L}^{-1}\left(\sqrt{\frac{I_{n}}{N}}\right)}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+, and 
+\begin_inset Formula $\alpha_{00}$
+\end_inset
+
+ is needed to produce a state of zero energy at 
+\begin_inset Formula $I_{n}=1$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $\xi=nk\Theta$
+\end_inset
+
+ is the initial fiber stiffness, with 
+\begin_inset Formula $n$
+\end_inset
+
+, 
+\begin_inset Formula $k$
+\end_inset
+
+, and 
+\begin_inset Formula $\Theta$
+\end_inset
+
+ respectively representing the number of chains per unit volume, Boltzmann's
+ constant, and the absolute temperature.
+ The parameter 
+\begin_inset Formula $N=\zeta^{2}$
+\end_inset
+
+ is the number of chain segments, and 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ is the locking stretch, representing the extensibility of the fiber.
+ The Langevin function is given by 
+\begin_inset Formula $\mathcal{L}\left(x\right)=\coth x-\frac{1}{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When evaluating the inverse Langevin equation, a Taylor series expansion
+ is applied for computational stability.
+ The parameter 
+\begin_inset Formula $n_{\mathrm{term}}$
+\end_inset
+
+ is used to control the number of terms used to evaluate the equation; it
+ must be an integer between 3 and 30.
+\end_layout
+
+\begin_layout Standard
+\noindent
+The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<ksi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initial modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<N>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Square of locking stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<n_term>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Taylor series terms
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example
+\shape default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Soft Tissue" type="uncoupled solid mixture">
+\end_layout
+
+\begin_layout LyX-Code
+	<k>1e4</k>
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="Mooney-Rivlin">
+\end_layout
+
+\begin_layout LyX-Code
+	  <c1>10.0</c1>
+\end_layout
+
+\begin_layout LyX-Code
+	  <c2>0</c2>
+\end_layout
+
+\begin_layout LyX-Code
+	</solid>
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="uncoupled fiber-entropy-chain">
+\end_layout
+
+\begin_layout LyX-Code
+	  <N>2.3</N>
+\end_layout
+
+\begin_layout LyX-Code
+	  <ksi>1</ksi>
+\end_layout
+
+\begin_layout LyX-Code
+	  <n_term>25</n_term>
+\end_layout
+
+\begin_layout LyX-Code
+	  <fiber type="vector">0,0,1</fiber>
+\end_layout
+
+\begin_layout LyX-Code
+	</solid>
 \end_layout
 
 \begin_layout LyX-Code
@@ -90106,6 +92898,101 @@ Osmotic effects can be neglected in a multiphasic analysis by setting the
 , as for the case of a biphasic mixture.
 \end_layout
 
+\begin_layout Subsubsection
+Solutes as 'Solid-Bound Molecules'
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Solutes-as-SBMs"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In multiphasic analyses, FEBio solves for the solid displacement 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, and the effective solute concentrations 
+\begin_inset Formula $\tilde{c}^{\alpha}$
+\end_inset
+
+, at all the nodes, representing all the degrees of freedom in an analysis.
+ Once the solution has converged at each time point, FEBio solves for the
+ referential mass densities 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ of solid-bound molecules by solving the corresponding mass balance equation
+ at integration points, in a single numerical integration step.
+ This approach reduces the number of degrees of freedom that need to be
+ solved simultaneously by the FEBio solver.
+ However, occasionally, the numerical solution for 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ may produce numerical round-off errors that may get amplified as the analysis
+ time progresses.
+\end_layout
+
+\begin_layout Standard
+An alternative to using solid-bound molecules is to define solutes 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ whose diffusivity 
+\begin_inset Formula $\mathbf{d}^{\alpha}$
+\end_inset
+
+ in the mixture is set to 
+\begin_inset Formula $\mathbf{0}$
+\end_inset
+
+ (however, the free diffusivity 
+\begin_inset Formula $d_{0}^{\alpha}$
+\end_inset
+
+ should not be set to zero, to prevent a division by zero; its exact value
+ is not important, thus let 
+\begin_inset Formula $d_{0}^{\alpha}=1$
+\end_inset
+
+).
+ Then, FEBio treats these solutes as equivalent to solid-bound molecules:
+ (1) Their concentration does not contribute to the osmolarity of the interstiti
+al fluid; (2) their concentration contributes to the fixed charge density
+ 
+\begin_inset Formula $c^{F}$
+\end_inset
+
+ in the current configuration; (3) these solutes do not contribute to the
+ effective hydraulic permeability 
+\begin_inset Formula $\tilde{\mathbf{k}}$
+\end_inset
+
+ of the porous multiphasic mixture; (4) these solutes can be involved in
+ chemical reactions; (5) while their initial effective concentration may
+ be prescribed, it must not contribute to the prescribed initial effective
+ fluid pressure, and the user should not prescribe any boundary conditions
+ on the effective concentration of these solutes.
+ However, unlike solid-bound molecules, these solutes always have negligible
+ volume fraction, therefore they don't alter the value of the referential
+ solid volume fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+.
+ Using these 'solid-bound' solutes increases the number of degrees of freedom
+ in an FEBio analysis; however, unlike solid-bound molecules, the solution
+ for the effective concentration of these solutes remains as accurate as
+ all other degrees of freedom in an analysis.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -103194,350 +106081,437 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
@@ -105351,1044 +108325,6 @@ Options
 \shape default
 section is included here, but can be omitted.
  If omitted default values will be used for all control parameters.
-\end_layout
-
-\begin_layout Chapter
-Mesh Adaptors
-\end_layout
-
-\begin_layout Standard
-The FEBio Adaptive Mesh Refinement framework (FEAMR, pronounced “femur”)
- allows users to make modifications to the mesh during the analysis of the
- model.
- There are currently two mesh adaptor applications supported, namely mesh
- erosion, which removes elements from the mesh, and remeshing, which can
- be used to adaptively refine or coarsen the mesh based on the solution.
- The mesh adaptors are controlled via user-defined criteria that determine
- the conditions under which to modify the mesh.
-\end_layout
-
-\begin_layout Standard
-A mesh adaptor is applied at the end of a timestep, after the Newton-iterations
- and augmentations have converged.
- If the mesh adaptor modifies the mesh, then the timestep is solved again,
- using the new mesh.
- Several adaptors define the 
-\emph on
-criterion
-\emph default
- property, which evaluates the variable or metric that is used by the adaptor,
- and optionally, can be used to filter the elements to which the adaptor
- will be applier.
- How the criterion is used, depends on the adaptor.
- For instance, the erosion adaptor uses it to identify the elements to deactivat
-e.
- Remeshing adaptors will use it to set the new element size.
- It is allowed to use several mesh adaptors in a single model, but keep
- in mind that the order in which the mesh adaptors are listed in the input
- file is important.
- For instance, if two mesh adaptors are defined, the second adaptor will
- operate on the mesh created by the first adaptor.
- Mesh adaptors used for adaptive refinement will also map data between the
- old mesh and the new mesh.
- User data, defined in the MeshData section, is always mapped between meshes.
- If the model is history-dependent, it might be important to map additional
- data.
- For instance, a visco-elastic material needs to map stress-history variables.
- By default, mapping data (except for user-data) is not done unless the
- user sets a specific flag (map_data).
- New mesh adaptors and adaptor criteria can be defined via the plugin framework.
- 
-\end_layout
-
-\begin_layout Section
-The MeshAdaptor Section
-\end_layout
-
-\begin_layout Standard
-Mesh adaptors are added to the FEBio Input file (version 3.0 and above) in
- a new section, called 
-\series bold
-MeshAdaptor
-\series default
-.
- This section must appear after the Mesh and MeshDomains sections.
- The MeshAdaptor section may also be defined in a 
-\emph on
-step
-\emph default
- section in order to apply the adaptor only during that step.
- Inside the MeshAdaptor section, each mesh adaptor is defined via the 
-\series bold
-mesh_adaptor
-\series default
- tag.
- This tag allows the following attributes: 
-\end_layout
-
-\begin_layout Standard
-• 
-\series bold
-type
-\series default
-: set the type of the mesh adaptor (1).
- [Required] 
-\end_layout
-
-\begin_layout Standard
-• 
-\series bold
-elem_set
-\series default
-: The element set to apply the adaptor to (2).
- [Optional] 
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Comments
-\emph default
-: 
-\end_layout
-
-\begin_layout Enumerate
-The 
-\series bold
-type 
-\series default
-attribute defines the mesh adaptor.
- It must be one of the mesh adaptors defined in Table 1, below.
- 
-\end_layout
-
-\begin_layout Enumerate
-The 
-\series bold
-elem_set 
-\series default
-attribute is optional, but can be used to apply the adaptor to only a part
- of the mesh.
- This is useful to limit the effect of an adaptor to a part of the mesh.
- The element set must reference a domain (i.e.
- defined via Elements) of a mesh, or a set of domains.
- It cannot be an element set defined through the ElementSet tag.
- (Note that not all mesh adaptors support this attribute.) If omitted, the
- adaptor is applied to the entire mesh.
- 
-\end_layout
-
-\begin_layout Standard
-The sections below list the properties of the available mesh adaptors and
- the adaptor criteria.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-erosion
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The erosion adaptor removes elements from a mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-mmg_remesh 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Adaptive mesh refinement of tetrahedral mesh using the MMG library.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hex_refine2d
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a 2D hexahedral mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-tet_refine
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a linear tetrahedral mesh (Whole mesh refinement only)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hex_refine
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a hexahedral mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-The erosion adaptor
-\end_layout
-
-\begin_layout Standard
-The erosion adaptor can be used to remove or deactivate elements in a mesh,
- based on a user-defined criterion.
- It defines the following properties: 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_iters
-\series default
-: Set the max number of adaption iterations, for each time step.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-remove_islands
-\series default
-: If true, removes small element sets that have become disconnected from
- the main mesh.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_elems
-\series default
-: Set the max number of elements to erode, per adaptation.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-sort
-\series default
-: sort the element values returned by the criterion.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-criterion
-\series default
-: Set the criterion that determines the element metric to evaluate and which
- elements to erode.
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Example
-\emph default
-: 
-\end_layout
-
-\begin_layout Standard
-In this example, elements that have an (integration point averaged) effective
- stress larger than 0.3, are eroded.
- Only three elements are eroded per adaptation cycle.
-\end_layout
-
-\begin_layout LyX-Code
-<mesh_adaptor type="erosion"> 
-\end_layout
-
-\begin_layout LyX-Code
-  <max_iters>1</max_iters>
-\end_layout
-
-\begin_layout LyX-Code
-  <max_elems>3</max_elems>
-\end_layout
-
-\begin_layout LyX-Code
-  <sort>1</sort>
-\end_layout
-
-\begin_layout LyX-Code
-  <criterion type="min-max filter">
-\end_layout
-
-\begin_layout LyX-Code
-    <min>0.3</min>
-\end_layout
-
-\begin_layout LyX-Code
-    <clamp>0</clamp>
-\end_layout
-
-\begin_layout LyX-Code
-    <data type="stress"/>
-\end_layout
-
-\begin_layout LyX-Code
-  </criterion>
-\end_layout
-
-\begin_layout LyX-Code
-</mesh_adaptor> 
-\end_layout
-
-\begin_layout Subsection
-The mmg_remesh adaptor
-\end_layout
-
-\begin_layout Standard
-The mmg_remesh adaptor can be used for adaptive mesh refinement of linear
- tetrahedral meshes.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_iters
-\series default
-: The maximum number of adaption iterations per time step.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max_elements
-\series default
-: The maximum number of elements.
- If the number of elements of the mesh is larger, the adaptor is not applied.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-min_element_size
-\series default
-: Set the desired minimal element size.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-hausdorff
-\series default
-: The Hausdorff distance.
- This is used to preserve curved sections.
- (default = 0.01).
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-gradation
-\series default
-: This parameter sets the spatial gradient of element size.
- (default = 1.3).
- Value should be larger than 1.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-mesh_coarsen
-\series default
-: Allow mesh-coarsening 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-normalize_data
-\series default
-: normalize the element values returned by the criterion between 0 and 1.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-relative_size
-\series default
-: Sets whether the size function is to be interpreted as a relative size
- function (i.e.
- a scale function to the current element size), or an absolute element size
- metric.
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-criterion
-\series default
-: The metric used to assign values to elements.
- (See section 4) 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-size_function
-\series default
-: set the mesh size function.
- This function is applied to the (optionally normalized) element values
- returned by the criterion.
- 
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Example
-\emph default
-: 
-\end_layout
-
-\begin_layout LyX-Code
-<mesh_adaptor type="mmg_remesh">
-\end_layout
-
-\begin_layout LyX-Code
-  <max_iters>1</max_iters>
-\end_layout
-
-\begin_layout LyX-Code
-  <criterion type="stress"/>
-\end_layout
-
-\begin_layout LyX-Code
-  <relative_size>1</relative_size>
-\end_layout
-
-\begin_layout LyX-Code
-  <normalize_data>0</normalize_data>
-\end_layout
-
-\begin_layout LyX-Code
-  <mesh_coarsen>0</mesh_coarsen>
-\end_layout
-
-\begin_layout LyX-Code
-  <size_function type="step">
-\end_layout
-
-\begin_layout LyX-Code
-    <x0>10</x0>
-\end_layout
-
-\begin_layout LyX-Code
-    <left_val>1</left_val>
-\end_layout
-
-\begin_layout LyX-Code
-    <right_val>0.5</right_val>
-\end_layout
-
-\begin_layout LyX-Code
-  </size_function>
-\end_layout
-
-\begin_layout LyX-Code
-</mesh_adaptor> 
-\end_layout
-
-\begin_layout Section
-Mesh Adaptor Criteria
-\end_layout
-
-\begin_layout Standard
-The purpose of the mesh adaptor criteria is to assign values to elements.
- Some adaptors also act as filters, that limit the effect of the adaptor
- to certain elements.
- These values will then be used by the mesh adaptor to modify the mesh.
- How these values are used depends on the adaptor.
- For instance, the erosion uses it to decide which elements to erode.
- The mesh refinement adaptors use it to define the size function.
- 
-\end_layout
-
-\begin_layout Standard
-The following criteria are currently available.
- A detailed description of these adaptor criteria is given below.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max_variable
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluates average of element’s nodal values of a model primary variable.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-element_selection
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Sets the element selection to which the adaptor should be applied (only
- for erosion)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-stress
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the (integration point average) effective stress of each element.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-damage
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the (integration point average) damage value.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-relative error
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate a relative error measure.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-spring force
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the axial force of the spring.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-spring stretch
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Evaluate the stretch of a spring.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-math
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specify the element value based on a mathematical expression.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-min-max filter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Selects elements whose value falls within a min-max range.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-max_variable
-\end_layout
-
-\begin_layout Standard
-The max_variable criterion evaluates elements based on a primary variable’s
- degrees of freedom.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-dof
-\series default
-: The degree of freedom that defines the variable to inspect.
- 
-\end_layout
-
-\begin_layout Subsection
-element_selection
-\end_layout
-
-\begin_layout Standard
-Sets the selected elements directly.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-element_list:
-\series default
- a comma-separated list of element indices.
- 
-\end_layout
-
-\begin_layout Subsection
-math
-\end_layout
-
-\begin_layout Standard
-Sets the scale factor for each element.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-scale
-\series default
-: the scale factor to use.
- This can be a constant, or a mathematical expression of position (use X,
- Y, Z for the nodal coordinates), or a scalar map defined in the MeshData
- section.
-\end_layout
-
-\begin_layout Standard
-Example: 
-\end_layout
-
-\begin_layout LyX-Code
-<mesh_adaptor type="mmg_remesh">
-\end_layout
-
-\begin_layout LyX-Code
-  <max_iters>1</max_iters>
-\end_layout
-
-\begin_layout LyX-Code
-  <criterion type="math">
-\end_layout
-
-\begin_layout LyX-Code
-    <math>1*(1 - (X^2+Y^2)) + (X^2+Y^2)*(0.5*(Z-1)^2 - Z*(Z - 2))</math>
-\end_layout
-
-\begin_layout LyX-Code
-  </criterion>
-\end_layout
-
-\begin_layout LyX-Code
-</mesh_adaptor> 
-\end_layout
-
-\begin_layout Subsection
-stress
-\end_layout
-
-\begin_layout Standard
-This criterion selects elements that exceed a maximum stress value.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-metric
-\series default
-: The stress measure to use: 0=effective stress, 1=max principal stress.
- 
-\end_layout
-
-\begin_layout Subsection
-max_damage
-\end_layout
-
-\begin_layout Standard
-This criterion evaluates the maximum damage value for each element.
- This can only be used with materials that define the damage property.
-\end_layout
-
-\begin_layout Subsection
-relative error
-\end_layout
-
-\begin_layout Standard
-This criterion evaluates a relative error metric for each element.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-error:
-\series default
- If nonzero, this criterion will evaluate a relative size metric for each
- element.
- Otherwise, the actual relative error is evaluated.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-data:
-\series default
- Specify the metric to evaluate the element values.
- Any of the other criteria defined above can be used.
- 
-\end_layout
-
-\begin_layout Subsection
-min-max filter
-\end_layout
-
-\begin_layout Standard
-This criterion evaluates a metric for each element, but then filters out
- the element that have a value within a min-max range.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-min
-\series default
-: set the minimum value of the filter 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-max
-\series default
-: set the maximum value of the filter 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-clamp
-\series default
-: If true, the element values will be clamped to the range.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-data
-\series default
-: Specify the metric to evaluate the element values.
- Any of the other criteria defined above can be used.
- 
-\end_layout
-
-\begin_layout Section
-Limitations
-\end_layout
-
-\begin_layout Standard
-Please take into account the following limitations of the FEAMR framework.
- 
-\end_layout
-
-\begin_layout Enumerate
-Although contact can be used with the FEAMR framework, currently no contact
- data is mapped from the old mesh to the new mesh.
- It is advised to only use penalty-based contact interfaces.
- 
-\end_layout
-
-\begin_layout Enumerate
-It is not advised to erode elements that are in contact, since this will
- not produce the correct result.
- 
-\end_layout
-
-\begin_layout Enumerate
-Mapping history-data is supported (if the proper flag is set), but can be
- very time consuming since FEBio maps all material point data between meshes.
-\end_layout
-
-\begin_layout Enumerate
-The FEAMR framework does not work with the auto time-stepper.
- It is advised to use fixed time stepping when using mesh adaptation.
- 
 \end_layout
 
 \begin_layout Chapter
@@ -110046,7 +111982,7 @@ type
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="4">
+<lyxtabular version="3" rows="8" columns="4">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -110170,6 +112106,45 @@ D
 
 \begin_layout Plain Layout
 S
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mkl_dss
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The DSS solver from the MKL library.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S/U
 \end_layout
 
 \end_inset
@@ -110577,6 +112552,21 @@ optimize_bw
  matrix bandwidth.
  It does not require any configuration parameters and only works with symmetric
  matrices.
+ 
+\end_layout
+
+\begin_layout Subsection
+MKL_DSS
+\end_layout
+
+\begin_layout Standard
+The MKL library also offers another direct solver, called DSS (Direct-Sparse-Sol
+ver).
+ This solver is very promising and appears to perform better for many problems
+ than the pardiso solver.
+ Currently, in FEBio4, pardiso remains the default mostly for backward compatibi
+lity reasons, but it is often worthwhile to see if the mkl_dss solver performs
+ better.
  
 \end_layout
 
@@ -112117,7 +114107,7 @@ As of version 2.0 FEBio supports plugins.
 status collapsed
 
 \begin_layout Plain Layout
- When upgrading to a newer version of FEBio, it may be necessary to recompile
+When upgrading to a newer version of FEBio, it may be necessary to recompile
  the plugin if the plugin interface was changed.
  As long as the plugin remains compatible with the new interface, no code
  changes are required.
@@ -112126,7 +114116,12 @@ status collapsed
 \end_inset
 
 .
- The 
+ Using plugins, users can create custom materials, boundary conditions,
+ loads, output variables, etc., and even couple FEBio to other codes.
+\end_layout
+
+\begin_layout Standard
+The 
 \begin_inset ERT
 status open
 
@@ -112134,7 +114129,7 @@ status open
 
 
 \backslash
-href{https://febio.org/knowledgebase/}{
+href{https://help.febio.org/doxygen/html/index.html}{
 \backslash
 emph{FEBio Developer's 
 \end_layout
@@ -112148,9 +114143,7 @@ Manual}}
 
  explains in detail how to create these plugins.
  In this section we outline how to use the plugins with FEBio.
- Using plugins, users can create custom materials, boundary conditions,
- loads, output variables, etc.
- See the developer's manual for more information on what plugins can do.
+ 
 \end_layout
 
 \begin_layout Section
@@ -112161,9 +114154,9 @@ Using Plugins
 
 \begin_layout Standard
 A plugin is compiled into a dynamic library (dll or dylib) or shared object
- (so) and containes the compiled code of the library.
- In order to use this plugin, you must add the path to and name of the plugin
- file in the FEBio configuration file (see Chapter
+ (so) and contains the compiled code of the library.
+ In order to use this plugin, you must add the path to the plugin file in
+ the FEBio configuration file (see Chapter
 \begin_inset space ~
 \end_inset
 
@@ -112223,7 +114216,9 @@ An alternative way for loading a plugin is using the
 \end_layout
 
 \begin_layout LyX-Code
->febio -i input.feb -import myplugin.dll
+>febio -i input.feb 
+\series bold
+-import myplugin.dll
 \end_layout
 
 \begin_layout Standard
@@ -112362,7 +114357,7 @@ Invalid SDK version
 
 \emph default
 : The plugin was compiled with a version of the SDK that is not compatible
- with the FEBio version.
+ with the current FEBio version.
  This most likely means that the plugin must be rebuilt with a newer version
  of the SDK.
  
@@ -112382,8 +114377,13 @@ Heterogeneous model parameters
 
 \begin_layout Standard
 Many model parameters can be made dependent on the reference coordinates.
- This is useful, for instance, for defining inhomogeneous materials.
- There are two mechanisms for creating heterogeneous parameters: a mathematical
+ This is useful, for instance, for defining inhomogeneous materials, where
+ some material parameters depend on the spatial position.
+ 
+\end_layout
+
+\begin_layout Standard
+There are two mechanisms for creating heterogeneous parameters: a mathematical
  expression, or a map.
  The type of the parameter is set via the 
 \emph on
@@ -112523,6 +114523,17 @@ attribute can be omitted.
  
 \end_layout
 
+\begin_layout Standard
+FEBio performs parameter validation at the start of an analysis where the
+ values of parameters are checked against the valid ranges as defined in
+ the code.
+ However, it is important to keep in mind that this validation is only performed
+ on constant parameters.
+ For math and map parameters, it is up to the user to ensure that all values
+ over the relevant mesh partition are valid.
+ 
+\end_layout
+
 \begin_layout Section
 Math parameters
 \end_layout
@@ -112599,13 +114610,36 @@ type="math"
 </material>
 \end_layout
 
+\begin_layout Standard
+The names of maps are also allowed in mathematical expressions.
+ For instance, assume that a map, named 
+\begin_inset Quotes eld
+\end_inset
+
+E_map
+\begin_inset Quotes erd
+\end_inset
+
+ is defined in the MeshData section.
+ Then the following is a valid mathematical expression.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<E 
+\series bold
+type="math"
+\series default
+>2*E_map+X</E>
+\end_layout
+
 \begin_layout Section
 Mapped parameters
 \end_layout
 
 \begin_layout Standard
 For mapped parameters, use the attribute type=
-\begin_inset Quotes erd
+\begin_inset Quotes eld
 \end_inset
 
 map
@@ -112871,7 +114905,7 @@ fem.material[0].E
 \end_layout
 
 \begin_layout Standard
-Sub properties are referenced similarly.
+Sub-properties are referenced similarly.
  For example, assume that the first material is a biphasic material that
  defines the solid property.
  
@@ -112894,7 +114928,7 @@ fem.material[0].ksi[0]
 \begin_layout Standard
 In cases where the model parameter does not define a scalar it is possible
  to reference the components of the parameter.
- For instance, for a vec3 parameter,
+ For instance, a vec3 parameter defines an x, y, and z component.
 \end_layout
 
 \begin_layout LyX-Code

@@ -69,6 +69,7 @@ SOFTWARE.*/
 #include "FETimeStepController.h"
 #include "FEModifiedNewtonStrategy.h"
 #include "FEFullNewtonStrategy.h"
+#include "SkylineSolver.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -191,9 +192,12 @@ REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
 REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
+REGISTER_FECORE_CLASS(FELogIntegralDomainData, "integrate");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");
+REGISTER_FECORE_CLASS(SkylineSolver, "skyline");
+
 }

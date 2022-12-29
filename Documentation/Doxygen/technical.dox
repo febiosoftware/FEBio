@@ -7,4 +7,7 @@ This is a collection of articles describing some of the technical aspects of FEB
 \li \subpage restart
 \li \subpage serialize
 \li \subpage debug_tools
+\li \subpage callback
+\li \subpage modules
+
 */

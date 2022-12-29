@@ -63,6 +63,7 @@ FELinearConstraint::FELinearConstraint() : FEBoundaryCondition(nullptr)
 FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_parentDof = new FELinearConstraintDOF(pfem);
+	m_parentDof->GetParameterList(); // we need to call this to make sure that the parameter list is created.
 	m_off = 0.0;
 }
 
@@ -103,6 +104,7 @@ void FELinearConstraint::CopyFrom(FEBoundaryCondition* pbc)
 	if (LC.m_parentDof)
 	{
 		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
 		m_parentDof->node = LC.m_parentDof->node;
 		m_parentDof->dof  = LC.m_parentDof->dof;
 		m_parentDof->val  = LC.m_parentDof->val;
@@ -113,6 +115,7 @@ void FELinearConstraint::CopyFrom(FEBoundaryCondition* pbc)
 	for (int i = 0; i < n; ++i, ++it)
 	{
 		FELinearConstraintDOF* d = new FELinearConstraintDOF(GetFEModel());
+		d->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
 		d->node = (*it)->node;
 		d->dof  = (*it)->dof;
 		d->val  = (*it)->val;
@@ -123,7 +126,10 @@ void FELinearConstraint::CopyFrom(FEBoundaryCondition* pbc)
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentDof(int dof, int node)
 {
-	if (m_parentDof == nullptr) m_parentDof = new FELinearConstraintDOF(GetFEModel());
+	if (m_parentDof == nullptr) {
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
+	}
 	m_parentDof->dof = dof;
 	m_parentDof->node = node;
 }
@@ -131,14 +137,20 @@ void FELinearConstraint::SetParentDof(int dof, int node)
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentNode(int node)
 {
-	if (m_parentDof == nullptr) m_parentDof = new FELinearConstraintDOF(GetFEModel());
+	if (m_parentDof == nullptr) {
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
+	}
 	m_parentDof->node = node;
 }
 
 //-----------------------------------------------------------------------------
 void FELinearConstraint::SetParentDof(int dof)
 {
-	if (m_parentDof == nullptr) m_parentDof = new FELinearConstraintDOF(GetFEModel());
+	if (m_parentDof == nullptr) {
+		m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		m_parentDof->GetParameterList(); // NOTE: we need to call this to make sure that the parameter list is created.
+	}
 	m_parentDof->dof = dof;
 }
 
@@ -178,6 +190,7 @@ FELinearConstraint::dof_iterator FELinearConstraint::begin()
 void FELinearConstraint::AddChildDof(int dof, int node, double v)
 {
 	FELinearConstraintDOF* d = new FELinearConstraintDOF(GetFEModel());
+	d->GetParameterList();	// we need to call this to make sure that the parameter list is created.
 	d->dof = dof;
 	d->node = node;
 	d->val = v;
@@ -187,6 +200,7 @@ void FELinearConstraint::AddChildDof(int dof, int node, double v)
 //-----------------------------------------------------------------------------
 void FELinearConstraint::AddChildDof(FELinearConstraintDOF* dof)
 {
+	dof->GetParameterList(); 	// we need to call this to make sure that the parameter list is created.
 	m_childDof.push_back(dof);
 }
 
@@ -244,13 +258,17 @@ void FELinearConstraint::Serialize(DumpStream& ar)
 	else
 	{
 		m_childDof.clear();
-		if (m_parentDof == nullptr) m_parentDof = new FELinearConstraintDOF(GetFEModel());
+		if (m_parentDof == nullptr) {
+			m_parentDof = new FELinearConstraintDOF(GetFEModel());
+			m_parentDof->GetParameterList(); // we need to call this to make sure that the parameter list is created.
+		}
 		m_parentDof->Serialize(ar);
 		int n;
 		ar >> n;
 		for (int i=0; i<n; ++i)
 		{
 			FELinearConstraintDOF* dof = new FELinearConstraintDOF(GetFEModel());
+			dof->GetParameterList(); // we need to call this to make sure that the parameter list is created.
 			dof->Serialize(ar);
 			m_childDof.push_back(dof);
 		}

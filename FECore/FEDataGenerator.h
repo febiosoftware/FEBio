@@ -81,6 +81,8 @@ public:
 public:
 	void SetNodeSet(FENodeSet* nodeSet);
 
+	FENodeSet* GetNodeSet();
+
 protected:
 	FENodeSet* m_nodeSet;
 };
@@ -107,6 +109,15 @@ public:
 
 	// generate the data array for the given facet set
 	virtual bool Generate(FESurfaceMap& data);
+
+	virtual FESurfaceMap* Generate();
+
+public:
+	void SetFacetSet(FEFacetSet* surf);
+	FEFacetSet* GetFacetSet();
+
+private:
+	FEFacetSet* m_surf;
 };
 
 //-----------------------------------------------------------------------------
