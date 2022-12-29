@@ -5,10 +5,8 @@ set -o verbose
 # shellcheck disable=1091
 . ./common-functions.sh
 
-
-
 install_deps() {
-	apt-get install -y --no-install-recommends \
+	sudo apt-get install -y --no-install-recommends \
 		occt-misc \
 		libocct-foundation-dev \
 		libocct-modeling-data-dev \

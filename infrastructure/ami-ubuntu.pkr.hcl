@@ -73,6 +73,18 @@ build {
     script        = "./common/linux/apt.sh"
   }
 
+  provisioner "shell" {
+    script = "./common/linux/qt.sh"
+  }
+
+  provisioner "shell" {
+    script = "./common/linux/openapi.sh"
+  }
+
+  provisioner "shell" {
+    script = "./common/linux/ffmpeg.sh"
+  }
+
   # Latest version of cmake (v3.23.2)
   provisioner "shell" {
     script = "./common/linux/cmake.sh"

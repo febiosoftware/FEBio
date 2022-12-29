@@ -65,6 +65,18 @@ jobs:
       - name: Build
         run: |
           ci/linux.sh
+      - name: Create SDK
+        run: |
+          mkdir -p febio-sdk/{include,lib,bin}
+          find . -name "*.h*" -type f -exec cp --parents -a {} ./febio-sdk/include/ \;
+          find cmbuild/lib -name "*" -type f -exec cp -a {} ./febio-sdk/lib/ \;
+          find cmbuild/bin -name "*" -type f -exec cp -a {} ./febio-sdk/bin/ \;
+      - name: Upload SDK
+        uses: actions/upload-artifact@v3
+        with:
+          name: febio4-sdk-${{runner.os}}-${{runner.arch}}
+          path: |
+            febio-sdk
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
