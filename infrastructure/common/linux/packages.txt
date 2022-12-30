@@ -28,3 +28,4 @@ libxmu-dev
 libinsighttoolkit5-dev
 swig
 libxorg-gtest-dev
+jq
