@@ -64,6 +64,15 @@ jobs:
       - name: Build
         run: |
           ci/windows.bat
+      - name: Create SDK
+        run: |
+          bash --login -c ci/febio-sdk.sh
+      - name: Upload SDK
+        uses: actions/upload-artifact@v3
+        with:
+          name: febio4-sdk-${{runner.os}}-${{runner.arch}}
+          path: |
+            febio-sdk
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
