@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEBox.h>
+#include <stdexcept>
 
 vec3d MaterialPointPosition(FESurfaceElement& el, int n)
 {
@@ -278,7 +279,9 @@ public:
 	}
 
 public:
-	Grid(FESurface& s, int boxDivs, double minBoxSize)
+	Grid() { m_nx = m_ny = m_nz = 0; m_cell = nullptr; }
+
+	bool Build(FESurface& s, int boxDivs, double minBoxSize)
 	{
 		// update the bounding box
 		for (int i = 0; i < s.Nodes(); ++i)
@@ -363,9 +366,12 @@ public:
 			{
 				FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
 				Cell* c = FindCell(mp.m_rt); assert(c);
+				if (c == nullptr) return false;
 				c->add(&el);
 			}
 		}
+
+		return true;
 	}
 
 	Cell* GetCell(int i, int j, int k) const
@@ -432,7 +438,11 @@ void FEContactPotential::Update()
 	// build the grid
 	int ndivs = (int)pow(m_surf2.Elements(), 0.33333);
 	if (ndivs < 2) ndivs = 2;
-	Grid g(m_surf2, ndivs, m_Rout);
+	Grid g;
+	if (g.Build(m_surf2, ndivs, m_Rout) == false)
+	{
+		throw std::runtime_error("Failed to build grid in FEContactPotential::Update");
+	}
 
 	// build the list of active elements
 	m_activeElements.resize(m_surf1.Elements());
