@@ -1435,7 +1435,7 @@ void FERigidSolverNew::BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo,
         R.Assemble(LM, fe);
         
         // add to rigid body force
-        RB.m_Fr += F;
+        RB.m_Fr -= F;
     }
 }
 
