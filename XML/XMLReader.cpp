@@ -856,12 +856,13 @@ void XMLReader::ReadTag(XMLTag& tag)
 				ch = GetChar();
 				if (ch == '-') n++;
 				else if ((ch == '>') && (n >= 2)) break;
-				else if (ch == '\r') n = 0; // don't append \r
 				else
-                {
-                    m_comment += ch;
-                    n = 0;
-                } 
+				{
+					if (n > 0) m_comment += '-';
+					if (n > 1) m_comment += '-';
+					if (ch != '\r') m_comment += ch; // don't append \r
+					n = 0;
+				}
 			}
 			while (1);
 
