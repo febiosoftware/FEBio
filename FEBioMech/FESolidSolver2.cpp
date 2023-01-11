@@ -1276,14 +1276,6 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
-	// calculate body forces for rigid bodies
-	for (int j = 0; j<fem.ModelLoads(); ++j)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
-		if (pbf && pbf->IsActive())
-			m_rigidSolver.BodyForces(RHS, tp, *pbf);
-	}
-
 	// calculate inertial forces for dynamic problems
 	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
