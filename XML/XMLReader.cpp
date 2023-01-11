@@ -298,6 +298,13 @@ void XMLTag::value(vector<int>& l)
 				break;
 			case 2:
 				nn = 1;
+				break;
+			case 3:
+				break;
+			default:
+				n0 = 0;
+				n1 = -1;
+				nn = 1;
 			}
 
 			for (i=n0; i<=n1; i += nn) l[n++] = i;
