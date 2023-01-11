@@ -39,3 +39,4 @@ FEAMR_API void reconstructODF(std::vector<double>& sphHarm, std::vector<double>&
 FEAMR_API void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
 
 FEAMR_API void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
+FEAMR_API void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);

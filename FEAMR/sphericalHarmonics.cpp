@@ -414,3 +414,143 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	return nullptr;
 #endif
 }
+
+void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
+{
+#ifdef HAS_MMG
+	int NN = NPTS;
+	int NF = NCON;
+    int NC;
+
+	// build the MMG mesh
+	MMG5_pMesh mmgMesh;
+	MMG5_pSol  mmgSol;
+	mmgMesh = NULL;
+	mmgSol = NULL;
+	MMGS_Init_mesh(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh,
+		MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+
+	// allocate mesh size
+	if (MMGS_Set_meshSize(mmgMesh, NN, NF, 0) != 1)
+	{
+		assert(false);
+		// SetError("Error in MMGS_Set_meshSize");
+		// return nullptr;
+	}
+
+	// build the MMG mesh
+	for (int i = 0; i < NN; ++i)
+	{
+        MMGS_Set_vertex(mmgMesh, XCOORDS[i], YCOORDS[i], ZCOORDS[i], 0, i+1);
+	}
+
+	for (int i = 0; i < NF; ++i)
+	{
+        MMGS_Set_triangle(mmgMesh, CONN1[i], CONN2[i], CONN3[i], 0, i+1);
+	}
+	
+    // Now, we build the "solution", i.e. the target element size.
+	// If no elements are selected, we set a homogenous remeshing using the element size parameter.
+	// set the "solution", i.e. desired element size
+	if (MMGS_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, NN, MMG5_Scalar) != 1)
+	{
+		assert(false);
+		// SetError("Error in MMG3D_Set_solSize");
+		// return nullptr;
+	}
+
+    int n0 = CONN1[0]-1;
+    int n1 = CONN2[0]-1;
+
+    vec3d pos0(XCOORDS[n0], YCOORDS[n0], ZCOORDS[n0]);
+    vec3d pos1(XCOORDS[n1], YCOORDS[n1], ZCOORDS[n1]);
+
+    double minLength = (pos0 - pos1).Length();
+    double maxLength = minLength*lengthScale;
+
+    double min = *std::min_element(gradient.begin(), gradient.end());
+    double max = *std::max_element(gradient.begin(), gradient.end());
+    double range = max-min;
+
+
+    for (int k = 0; k < NN; k++)
+    {
+        double val = (maxLength - minLength)*(1-(gradient[k] - min)/range) + minLength;
+        MMGS_Set_scalarSol(mmgSol, val, k+1);
+    }
+
+	// set the control parameters
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hmin, minLength);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hausd, hausd);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hgrad, grad);
+
+    // prevent MMG from outputing information to stdout
+    MMGS_Set_iparameter(mmgMesh, mmgSol, MMGS_IPARAM_verbose, -1);
+
+	// run the mesher
+	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
+
+	if (ier == MMG5_STRONGFAILURE) {
+		// if (min == 0.0) SetError("Element size cannot be zero.");
+		// else SetError("MMG was not able to remesh the mesh.");
+		// return nullptr;
+	}
+	else if (ier == MMG5_LOWFAILURE)
+	{
+		// SetError("MMG return low failure error");
+	}
+
+	// convert back to prv mesh
+	// FSMesh* newMesh = new FSMesh();
+
+	// get the new mesh sizes
+	MMGS_Get_meshSize(mmgMesh, &NN, &NF, &NC);
+	// newMesh->Create(NN, NF);
+
+    nodePos.resize(NN);
+
+	// get the vertex coordinates
+	for (int i = 0; i < NN; ++i)
+	{
+		// FSNode& vi = newMesh->Node(i);
+		// vec3d& ri = vi.r;
+
+        double x,y,z;
+        int g;
+		int isCorner = 0;
+		MMGS_Get_vertex(mmgMesh, &x, &y, &z, &g, &isCorner, NULL);
+
+        nodePos[i] = vec3d(x,y,z);
+	}
+
+    elems.resize(NF);
+
+    // create elements
+	for (int i=0; i<NF; ++i)
+	{
+        int n0, n1, n2, id;
+
+        MMGS_Get_triangle(mmgMesh, &n0, &n1, &n2, &id, NULL);
+		n0--;
+		n1--;
+		n2--;
+
+        elems[i] = vec3i(n0, n1,n2);
+	}
+
+	// Clean up
+	MMGS_Free_all(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh, MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+
+    // newMesh->RebuildMesh();
+
+	// return newMesh;
+
+#else
+	SetError("This version does not have MMG support");
+	return nullptr;
+#endif
+}
