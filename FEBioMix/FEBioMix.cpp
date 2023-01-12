@@ -111,7 +111,7 @@ SOFTWARE.*/
 #include "FESolutePointSource.h"
 
 #include "FEFixedFluidPressure.h"
-#include "FEPrescribedFluidPressure.h"
+#include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
 
@@ -191,7 +191,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedFluidPressure          , "zero fluid pressure");
-	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure     , "prescribed fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedNodalFluidPressure, "prescribed fluid pressure");
 	REGISTER_FECORE_CLASS(FEPrescribedShellFluidPressure, "prescribed shell fluid pressure");
 
 	//-----------------------------------------------------------------------------

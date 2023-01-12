@@ -27,10 +27,10 @@ SOFTWARE.*/
 #include <FECore/FEPrescribedDOF.h>
 #include "febiomix_api.h"
 
-class FEBIOMIX_API FEPrescribedFluidPressure : public FEPrescribedDOF
+class FEBIOMIX_API FEPrescribedNodalFluidPressure : public FEPrescribedDOF
 {
 public:
-	FEPrescribedFluidPressure(FEModel* fem);
+	FEPrescribedNodalFluidPressure(FEModel* fem);
 	bool Init() override;
 
 private:
