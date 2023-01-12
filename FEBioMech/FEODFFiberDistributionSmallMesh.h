@@ -37,6 +37,17 @@ SOFTWARE.*/
 #include "FEODFFiberDistribution.h"
 
 
+class FEElementODFSmall : public FEBaseODF
+{
+public:
+    FEElementODFSmall(int weightsSize) : m_weights(weightsSize) {}
+
+    void calcODF(std::vector<std::vector<double>>& ODFs);
+
+public:
+    std::vector<double> m_weights; //!< weights for interpolation
+};
+
 //  This material is a container for a fiber material, a fiber density
 //  distribution, and an integration scheme.
 class FEODFFiberDistributionSmallMesh : public FEElasticMaterial
@@ -67,7 +78,7 @@ public:
 protected:
 	FEFiberMaterial*			m_pFmat;    // pointer to fiber material
     std::vector<FEFiberODF*>    m_ODF;     // ODF objects
-    std::unordered_map<int, FEElementODF*> m_ElODF; // element ODF objects
+    std::unordered_map<int, FEElementODFSmall*> m_ElODF; // element ODF objects
 
 	DECLARE_FECORE_CLASS();
 

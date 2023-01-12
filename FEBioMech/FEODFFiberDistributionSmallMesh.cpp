@@ -39,6 +39,107 @@ SOFTWARE.*/
 #include <FECore/Timer.h>
 #include <iostream>
 
+void FEElementODFSmall::calcODF(std::vector<std::vector<double>>& ODFs)
+{
+    m_ODF.resize(NPTS);
+
+    double maxWeight = std::distance(m_weights.begin(), std::max_element(m_weights.begin(), m_weights.end()));
+    m_ODF = ODFs[maxWeight];
+
+    // define gradient descent step size
+    double eps = 0.25;
+
+    // threshold for convegence 
+    double thresh = 5e-8; 
+
+    double prevPhi = 3;
+    double nPhi = 2;
+
+    std::vector<std::vector<double>> logmaps(ODFs.size(), std::vector<double>(NPTS, 0));
+
+    while(nPhi < prevPhi)
+    {
+        // compute logmaps from current meanPODF to every other ODF
+        for(int index = 0; index < ODFs.size(); index++)
+        {
+            auto& currentLogmap = logmaps[index];
+            auto& currentODF = ODFs[index];
+            double currentWeight = m_weights[index];
+
+            double dot = 0;
+            for(int index2 = 0; index2 < NPTS; index2++)
+            {
+                dot += m_ODF[index2]*currentODF[index2];
+            }
+
+            // if the two vectors are the same, tangent is the 0 vector
+            if(abs(1-dot) < 10e-12)
+            {
+                logmaps[index] = std::vector<double>(NPTS, 0);
+            }
+            else
+            {
+                double denom = sqrt(1-dot*dot)*acos(dot);
+
+                for(int index2 = 0; index2 < NPTS; index2++)
+                {
+                    currentLogmap[index2] = (currentODF[index2] - dot*m_ODF[index2])/denom;
+                }
+            }
+        }
+
+        // compute tangent vector of each 
+        std::vector<double> phi(m_ODF.size(), 0);
+        for(int index = 0; index < logmaps.size(); index++)
+        {
+            for(int index2 = 0; index2 < NPTS; index2++)
+            {
+                phi[index2] += logmaps[index][index2]*m_weights[index];
+            }
+
+        }
+
+        prevPhi = nPhi;
+
+        // take norm of phi
+        nPhi = 0;
+        for(double val : phi)
+        {
+            nPhi += val*val;
+        }
+        nPhi = sqrt(nPhi);
+
+        if(nPhi < thresh) break;
+
+        // apply exponential map to mean ODF in direction of tanget vector
+        for(int index = 0; index < phi.size(); index++)
+        {
+            phi[index] = phi[index]*eps;
+        }
+
+        double normPhi = 0;
+        for(int index = 0; index < NPTS; index++)
+        {
+            normPhi += phi[index]*phi[index];
+        }
+        normPhi = sqrt(normPhi);
+
+        if(normPhi >= 10e-12)
+        {
+            for(int index = 0; index < NPTS; index++)
+            {
+                m_ODF[index] = cos(normPhi)*m_ODF[index] + sin(normPhi)*phi[index]/normPhi;
+            } 
+        }
+    }
+
+    //  undo sqaure root transform to obtain mean ODF
+    for(int index = 0; index < NPTS; index++)
+    {
+        m_ODF[index] = m_ODF[index]*m_ODF[index];
+    }
+}
+
 //=============================================================================
 BEGIN_FECORE_CLASS(FEODFFiberDistributionSmallMesh, FEElasticMaterial)
 
@@ -147,7 +248,7 @@ bool FEODFFiberDistributionSmallMesh::Init()
             {
                 FEElement& element = domain->ElementRef(el);
 
-                FEElementODF* odf = new FEElementODF(m_ODF.size());
+                FEElementODFSmall* odf = new FEElementODFSmall(m_ODF.size());
 
                 // Calculate the centroid of the element
                 for(int node = 0; node < element.Nodes(); node++)
@@ -172,8 +273,6 @@ bool FEODFFiberDistributionSmallMesh::Init()
                     odf->m_weights[index] /= sum;
                 }
 
-                odf->calcODF(pODF);
-
                 // Add element odf object to map
                 #pragma omp critical
                 m_ElODF[element.GetID()] = odf;
@@ -183,6 +282,14 @@ bool FEODFFiberDistributionSmallMesh::Init()
 
             }
         }
+
+        interpTime.start();
+        #pragma omp parallel for
+        for(int index = 0; index < ids.size(); index++)
+        {
+            m_ElODF[ids[index]]->calcODF(pODF);
+        }
+        interpTime.stop();
 
         reduceTime.start();
         #pragma omp parallel for
