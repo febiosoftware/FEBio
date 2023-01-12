@@ -172,17 +172,7 @@ bool FEODFFiberDistributionSmallMesh::Init()
                     odf->m_weights[index] /= sum;
                 }
 
-                // interpTime.start();
-                // odf->calcODF(pODF);
-                // interpTime.stop();
-
-                // Reduce the number of points in the ODF
-                // reduceTime.start();
-                // reduceODF(odf, B);
-                
-                
-
-                // reduceTime.stop();
+                odf->calcODF(pODF);
 
                 // Add element odf object to map
                 #pragma omp critical
