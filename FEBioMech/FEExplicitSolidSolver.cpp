@@ -440,6 +440,21 @@ bool FEExplicitSolidSolver::Init()
 {
 	if (FESolver::Init() == false) return false;
 
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// set the dynamic update flag only if we are running a dynamic analysis
+	// NOTE: I don't think we need to set the dynamic update flag, in fact, we should 
+	//		 turn it off, since it's on by default, and it incurs a significant performance overhead
+//	bool b = (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC ? true : false);
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+		FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
+		if (d) d->SetDynamicUpdateFlag(false);
+		if (s) s->SetDynamicUpdateFlag(false);
+	}
+
 	// get nr of equations
 	int neq = m_neq;
 
@@ -454,8 +469,6 @@ bool FEExplicitSolidSolver::Init()
 	GetFEModel()->Update();
 
 	// we need to fill the total displacement vector m_Ut
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
 	gather(m_Ut, mesh, m_dofU[0]);
 	gather(m_Ut, mesh, m_dofU[1]);
 	gather(m_Ut, mesh, m_dofU[2]);
@@ -492,16 +505,6 @@ bool FEExplicitSolidSolver::Init()
 			if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
 			if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
 		}
-	}
-
-	// set the dynamic update flag only if we are running a dynamic analysis
-	bool b = (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC ? true : false);
-	for (int i = 0; i < mesh.Domains(); ++i)
-	{
-		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
-		FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
-		if (d) d->SetDynamicUpdateFlag(b);
-		if (s) s->SetDynamicUpdateFlag(b);
 	}
 
 	return true;
@@ -543,14 +546,14 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
 
 	// rotational dofs
+	// TODO: Commenting this out, since this is only needed for the old shells, which I'm not sure
+	//       if they would work with the explicit solver anyways.
 //	scatter(U, mesh, m_dofSQ[0]);
 //	scatter(U, mesh, m_dofSQ[1]);
 //	scatter(U, mesh, m_dofSQ[2]);
 
 	// shell displacement
-//	scatter(U, mesh, m_dofSU[0]);
-//	scatter(U, mesh, m_dofSU[1]);
-//	scatter(U, mesh, m_dofSU[2]);
+	scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -922,7 +925,8 @@ bool FEExplicitSolidSolver::DoSolve()
 	}
 
 	vector<double> v_pred(m_neq, 0.0);
-#pragma omp parallel for shared(v_pred, vn, an)
+	double Dnorm = 0.0;
+#pragma omp parallel for shared(v_pred, vn, an) reduction(+: Dnorm)
 	for (int i = 0; i < m_neq; ++i)
 	{
 		// velocity predictor
@@ -930,12 +934,8 @@ bool FEExplicitSolidSolver::DoSolve()
 
 		// update displacements
 		m_ui[i] = dt * v_pred[i];
-	}
 
-	double Dnorm = 0.0;
-#pragma omp parallel for reduction(+: Dnorm)
-	for (int i = 0; i < m_neq; ++i)
-	{
+		// update norm
 		Dnorm += m_ui[i] * m_ui[i];
 	}
 	Dnorm = sqrt(Dnorm);
