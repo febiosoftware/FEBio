@@ -31,11 +31,13 @@ SOFTWARE.*/
 #include "FEMultiphasic.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FESoluteNaturalFlux, FESurfaceLoad)
     ADD_PARAMETER(m_bshellb, "shell_bottom");
     ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
+    ADD_PARAMETER(m_bup    , "update");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -44,6 +46,7 @@ FESoluteNaturalFlux::FESoluteNaturalFlux(FEModel* pfem) : FESurfaceLoad(pfem), m
 {
     m_bshellb = false;
     m_isol = 0;
+    m_bup = false;
 }
     
 //-----------------------------------------------------------------------------
@@ -102,12 +105,157 @@ bool FESoluteNaturalFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FESoluteNaturalFlux::Update()
+{
+    if (m_bup) {
+        for (int is=0; is<m_psurf->Elements(); ++is)
+        {
+            // get surface element
+            FESurfaceElement& el = m_psurf->Element(is);
+            // get underlying solid element
+            FESolidElement* pe = dynamic_cast<FESolidElement*>(el.m_elem[0]);
+            if (pe == nullptr) break;
+            // get element data
+            int neln = pe->Nodes();
+            int nint = pe->GaussPoints();
+            
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            // get the local solute id
+            FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+            if (psi == nullptr) break;
+            int sid = psi->FindLocalSoluteID(m_isol);
+            if (sid == -1) break;
+            
+            // identify nodes on the surface
+            vector<bool> nsrf(neln,false);
+            for (int j=0; j<neln; ++j) {
+                for (int k=0; k < el.Nodes(); ++k) {
+                    if (el.m_node[k] == pe->m_node[j]) nsrf[j] = true;
+                }
+            }
+            
+            // get average effective concentration of nodes not on surface
+            double cavg = 0;
+            int m = 0;
+            for (int i=0; i<neln; ++i) {
+                if (!nsrf[i]) {
+                    int n = pe->m_node[i];
+                    FENode& node = GetMesh().Node(n);
+                    int dof = m_dofC[m_isol-1];
+                    if (dof != -1) {
+                        cavg += node.get(dof);
+                        ++m;
+                    }
+                }
+            }
+            // assign this average value to surface nodes as initial guess
+            if (m) {
+                cavg /= m;
+                for (int i=0; i<neln; ++i) {
+                    if (nsrf[i]) {
+                        int n = pe->m_node[i];
+                        FENode& node = GetMesh().Node(n);
+                        int dof = m_dofC[m_isol-1];
+                        if (dof != -1) node.set(dof, cavg);
+                    }
+                }
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void FESoluteNaturalFlux::LoadVector(FEGlobalVector& R)
 {
     double dt = CurrentTimeIncrement();
 
-    m_psurf->SetShellBottom(m_bshellb);
+    // element force vector
+    vector<double> fe;
+    vector<int> lm;
+    // jacobian matrix, inverse jacobian matrix and determinants
+    double Ji[3][3], detJt;
+    const double* Gr, *Gs, *Gt, *H;
 
+    for (int is=0; is<m_psurf->Elements(); ++is)
+    {
+        // get surface element
+        FESurfaceElement& el = m_psurf->Element(is);
+        // get surface normal
+        vec3d nu(0,0,0);
+        for (int n=0; n<el.GaussPoints(); ++n) {
+            FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(el.GetMaterialPoint(n));
+            nu += pt->dxr ^ pt->dxs;
+        }
+        nu.unit();
+        // get underlying solid element
+        FESolidElement* pe = dynamic_cast<FESolidElement*>(el.m_elem[0]);
+        if (pe == nullptr) break;
+        // determine the solid domain to which this solid element belongs
+        FESolidDomain* sdom = dynamic_cast<FESolidDomain*>(pe->GetMeshPartition());
+        // get element data
+        int nint = pe->GaussPoints();
+        int neln = pe->Nodes();
+        double* gw = pe->GaussWeights();
+        
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        // get the local solute id
+        FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+        if (psi == nullptr) break;
+        int sid = psi->FindLocalSoluteID(m_isol);
+        if (sid == -1) break;
+        
+        // get the element force vector and initialize it to zero
+        fe.assign(neln, 0);    // 1 concentration dof per node
+        lm.resize(neln);
+        // unpack lm and get nodal effective solute concentrations
+        vector<double> ce(neln,0);
+        for (int i=0; i<neln; ++i) {
+            int n = pe->m_node[i];
+            FENode& node = GetMesh().Node(n);
+            vector<int>& id = node.m_ID;
+            int dof = m_dofC[m_isol-1];
+            if (dof != -1) {
+                lm[i] = id[dof];
+                ce[i] = node.get(dof);
+            }
+        }
+
+        // for each integration point in the solid element
+        for (int n=0; n<nint; ++n) {
+            FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
+            FEBiphasicMaterialPoint& pb = *(pt.ExtractData<FEBiphasicMaterialPoint>());
+            FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
+
+            // calculate the jacobian
+            detJt = sdom->invjact(*pe, Ji, n);
+            detJt *= gw[n]*dt;
+            // get shape functions and their derivatives
+            H = pe->H(n);
+            Gr = pe->Gr(n);
+            Gs = pe->Gs(n);
+            Gt = pe->Gt(n);
+            
+            // get contravariant basis vectors
+            vec3d gcntv[3];
+            sdom->ContraBaseVectors(*pe, n, gcntv);
+            
+            // evaluate gradient of shape function and gradient of effective concentration
+            // (using ps.m_gradc[n] doesn't work, because it doesn't get updated until convergence)
+            vector<vec3d> gradN(neln);
+            vec3d gradc(0,0,0);
+            for (int i=0; i<neln; ++i) {
+                gradN[i] = gcntv[0]*Gr[i] + gcntv[1]*Gs[i] + gcntv[2]*Gt[i];
+                gradc += gradN[i]*ce[i];
+            }
+
+            for (int i=0; i<neln; ++i)
+                fe[i] -= H[i]*(gradc*nu)*detJt;
+        }
+        
+        R.Assemble(pe->m_node, lm, fe);
+    }
+
+    // Now do the surface implementation, the normal way
     FESoluteNaturalFlux* flux = this;
     m_psurf->LoadVector(R, m_dofC, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
 
@@ -157,8 +305,108 @@ void FESoluteNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
     // time increment
     double dt = CurrentTimeIncrement();
 
-    m_psurf->SetShellBottom(m_bshellb);
+    int ndpn = 4;   // 3 displacement dofs + 1 concentration dof
+    // element stiffness matrix
+    vector<int> lm;
+    // jacobian matrix, inverse jacobian matrix and determinants
+    double Ji[3][3], detJt;
+    const double* Gr, *Gs, *Gt, *H;
     
+    for (int is=0; is<m_psurf->Elements(); ++is)
+    {
+        // get surface element
+        FESurfaceElement& el = m_psurf->Element(is);
+        // get surface normal
+        vec3d nu(0,0,0);
+        for (int n=0; n<el.GaussPoints(); ++n) {
+            FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(el.GetMaterialPoint(n));
+            nu += pt->dxr ^ pt->dxs;
+        }
+        nu.unit();
+        // get underlying solid element
+        FESolidElement* pe = dynamic_cast<FESolidElement*>(el.m_elem[0]);
+        if (pe == nullptr) break;
+        // determine the solid domain to which this solid element belongs
+        FESolidDomain* sdom = dynamic_cast<FESolidDomain*>(pe->GetMeshPartition());
+        // get element data
+        int nint = pe->GaussPoints();
+        int neln = pe->Nodes();
+        double* gw = pe->GaussWeights();
+        int ndof = neln*ndpn;
+        FEElementMatrix ke(*pe);
+        ke.resize(ndof, ndof);
+
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        // get the local solute id
+        FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+        if (psi == nullptr) break;
+        int sid = psi->FindLocalSoluteID(m_isol);
+        if (sid == -1) break;
+        
+        // initialize stiffness matrix it to zero
+        ke.zero();
+        lm.resize(ndof);
+        // unpack lm and get nodal effective solute concentrations
+        vector<double> ce(neln,0);
+        for (int i=0; i<neln; ++i) {
+            int n = pe->m_node[i];
+            FENode& node = GetMesh().Node(n);
+            vector<int>& id = node.m_ID;
+            lm[ndpn*i  ] = id[m_dofU[0]];
+            lm[ndpn*i+1] = id[m_dofU[1]];
+            lm[ndpn*i+2] = id[m_dofU[2]];
+            int dof = m_dofC[m_isol-1];
+            if (dof != -1) {
+                lm[ndpn*i+3] = id[dof];
+                ce[i] = node.get(dof);
+            }
+        }
+        ke.SetIndices(lm);
+        
+        // for each integration point in the solid element
+        for (int n=0; n<nint; ++n) {
+            FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
+            FEBiphasicMaterialPoint& pb = *(pt.ExtractData<FEBiphasicMaterialPoint>());
+            FESolutesMaterialPoint& ps = *(pt.ExtractData<FESolutesMaterialPoint>());
+            
+            // calculate the jacobian
+            detJt = sdom->invjact(*pe, Ji, n);
+            detJt *= gw[n]*dt;
+            // get shape functions and their derivatives
+            H = pe->H(n);
+            Gr = pe->Gr(n);
+            Gs = pe->Gs(n);
+            Gt = pe->Gt(n);
+            
+            // get contravariant basis vectors
+            vec3d gcntv[3];
+            sdom->ContraBaseVectors(*pe, n, gcntv);
+            
+            // evaluate gradient of shape function and gradient of effective concentration
+            // don't use ps.m_gradc[n] as it doesn't get updated until next convergence
+            vector<vec3d> gradN(neln);
+            vec3d gradc(0,0,0);
+            for (int i=0; i<neln; ++i) {
+                gradN[i] = gcntv[0]*Gr[i] + gcntv[1]*Gs[i] + gcntv[2]*Gt[i];
+                gradc += gradN[i]*ce[i];
+            }
+            for (int i=0, in = 0; i<neln; ++i, in += ndpn) {
+                for (int j=0, jn = 0; j<neln; ++j, jn += ndpn) {
+                    vec3d kcu = (gradN[j]*(nu*gradc) - gradc*(gradN[j]*nu))*H[i];
+                    double kcc = H[i]*(gradN[j]*nu);
+                    
+                    ke[in+3][jn  ] += kcu.x*detJt;
+                    ke[in+3][jn+1] += kcu.y*detJt;
+                    ke[in+3][jn+2] += kcu.z*detJt;
+                    ke[in+3][jn+3] += kcc*detJt;
+                }
+            }
+        }
+        
+        LS.Assemble(ke);
+    }
+
+    // Now do the surface implementation, the normal way
     // evaluate the stiffness contribution
     FESoluteNaturalFlux* flux = this;
     m_psurf->LoadStiffness(LS, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {

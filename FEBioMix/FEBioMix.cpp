@@ -82,6 +82,7 @@ SOFTWARE.*/
 #include "FEPressureStabilization.h"
 #include "FEMatchingOsmoticCoefficientLoad.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
+#include "FEMultiphasicFluidPressureLoad.h"
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterfaceBiphasic.h"
@@ -316,6 +317,7 @@ void FEBioMix::InitModule()
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// boundary conditions
