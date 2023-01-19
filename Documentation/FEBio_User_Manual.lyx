@@ -16895,6 +16895,62 @@ This boundary condition can only be applied to nodes that belong to shells.
 \end_layout
 
 \begin_layout Subsection
+Zero Fluid Pressure
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Zero-Fluid-Pressure"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To fix the effective fluid pressure in a biphasic or multiphasic analysis,
+ use the 
+\emph on
+zero fluid pressure
+\emph default
+ boundary condition.
+\end_layout
+
+\begin_layout LyX-Code
+<bc node_set="set01" type="zero fluid pressure"/>
+\end_layout
+
+\begin_layout Subsection
+Zero Concentration
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Zero-Concentration"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To fix an effective solute concentration degree of freedom (c_dof) in a
+ multiphasic analysis, use the 
+\emph on
+zero concentration
+\emph default
+ boundary conditions.
+\end_layout
+
+\begin_layout LyX-Code
+<bc node_set="set01" type="zero concentration">
+\end_layout
+
+\begin_layout LyX-Code
+  <c_dof>c1</c_dof>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
+\end_layout
+
+\begin_layout Subsection
 Prescribed Displacement
 \begin_inset CommandInset label
 LatexCommand label
@@ -17360,6 +17416,455 @@ element with a value of zero can also be used to fix a certain nodal degree
  of freedom, the user should use the 
 \emph on
 zero shell displacement
+\emph default
+ boundary condition whenever possible, since this option causes the equation
+ corresponding to the constrained degree of freedom to be removed from the
+ linear system of equations.
+ This results in fewer equations that need to be solved for and thus reduces
+ the run time of the FE analysis.
+\end_layout
+
+\begin_layout Subsection
+Prescribed Fluid Pressure
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prescribed-Fluid-Pressure"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prescribed fluid pressure
+\emph default
+ boundary condition can be used to prescribed the effective fluid pressure
+ on the boundary of a biphasic or multiphasic material.
+ This boundary condition takes the following parameters.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag that defines whether the value is absolute or relative (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set to 1, then the value is relative with respect
+ to the current position of the node at the time the boundary condition
+ becomes active.
+ This only has an effect in multi-step analyses.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="prescribed fluid pressure" node_set="
+\shape italic
+\emph on
+set1
+\shape default
+\emph default
+">
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Standard
+Although the 
+\shape italic
+prescribed 
+\shape default
+\emph on
+fluid pressure
+\shape italic
+\emph default
+ 
+\shape default
+element with a value of zero can also be used to fix the effective fluid
+ pressure, the user should use the 
+\emph on
+zero fluid pressure
+\emph default
+ boundary condition whenever possible, since this option causes the equation
+ corresponding to that degree of freedom to be removed from the linear system
+ of equations.
+ This results in fewer equations that need to be solved for and thus reduces
+ the run time of the FE analysis.
+\end_layout
+
+\begin_layout Subsection
+Prescribed Concentration
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prescribed-Concentration"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prescribed concentration
+\emph default
+ boundary condition can be used to prescribe the value of the effective
+ solute concentration in a multiphasic analysis.
+ This boundary condition takes the following parameters.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The solute concentration dof to prescribe, c1, c2, etc.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag that defines whether the value is absolute or relative (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set to 1, then the value is relative with respect
+ to the current effective solute concentration at the time the boundary
+ condition becomes active.
+ This only has an effect in multi-step analyses.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="prescribed concentration" node_set="
+\shape italic
+\emph on
+set1
+\shape default
+\emph default
+">
+\end_layout
+
+\begin_layout LyX-Code
+  <dof>c1</dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Standard
+Although the 
+\shape italic
+prescribed concentration 
+\shape default
+element with a value of zero can also be used to fix that degree of freedom,
+ the user should use the 
+\emph on
+zero concentration
 \emph default
  boundary condition whenever possible, since this option causes the equation
  corresponding to the constrained degree of freedom to be removed from the
@@ -26599,6 +27104,10 @@ This surface load can be prescribed on a boundary where a natural solute
 \end_layout
 
 \begin_layout LyX-Code
+  <update>0</update>
+\end_layout
+
+\begin_layout LyX-Code
 </surface_load>
 \end_layout
 
@@ -26625,6 +27134,116 @@ reference "subsec:Solutes"
 solute_id
 \shape default
  is not defined, the default value is 1.
+ The parameter 
+\emph on
+update
+\emph default
+ is a boolean flag (0=
+\emph on
+false
+\emph default
+, 1=
+\emph on
+true
+\emph default
+, default is 
+\emph on
+false
+\emph default
+) which, when set to 
+\emph on
+true
+\emph default
+, initializes the effective solute concentration of surface nodes to the
+ average value of concentrations within the underlying elements, at each
+ iteration.
+ You may set this flag to 
+\emph on
+true
+\emph default
+ when the iterative numerical solution fails to converge.
+\end_layout
+
+\begin_layout Subsubsection
+Multiphasic Fluid Pressure
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Multiphasic-Fluid-Pressure"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a multiphasic mixture, the nodal degree of freedom for fluid pressure
+ represents the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, which is related to the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ according to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ One may assign the value of 
+\begin_inset Formula $p$
+\end_inset
+
+ directly on a boundary, by using the 
+\emph on
+fluid pressure 
+\emph default
+surface load.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load surface="FluidPressure1" type="fluid pressure">
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure>0</pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+This surface load evaluates 
+\begin_inset Formula $p$
+\end_inset
+
+ from nodal values of 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ on the surface, and using the average values of 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ and 
+\begin_inset Formula $c^{\alpha}$
+\end_inset
+
+ at the integration points of the underlying element.
+ This surface load is particularly useful when the effective solute concentratio
+ns 
+\begin_inset Formula $\tilde{c}^{\alpha}$
+\end_inset
+
+ are not prescribed as boundary conditions on that surface, but evolve with
+ the analysis solution.
 \end_layout
 
 \begin_layout Subsubsection
