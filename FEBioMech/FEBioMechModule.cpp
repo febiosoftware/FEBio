@@ -194,6 +194,7 @@ SOFTWARE.*/
 #include "FEMortarSlidingContact.h"
 #include "FEMortarTiedContact.h"
 #include "FEContactPotential.h"
+#include "FEEdgeToSurfaceContact.h"
 
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
@@ -659,6 +660,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding");
 	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied");
 	REGISTER_FECORE_CLASS(FEContactPotential, "contact potential");
+	
+	REGISTER_FECORE_CLASS(FEEdgeToSurfaceContact, "edge-to-surface contact");
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidBC
