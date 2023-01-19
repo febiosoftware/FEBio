@@ -32,6 +32,19 @@ SOFTWARE.*/
 #include <vector>
 
 //-----------------------------------------------------------------------------
+class FECORE_API FELineMaterialPoint : public FEMaterialPoint
+{
+public:
+	// return the surface element
+	FELineElement* LineElement() { return (FELineElement*)m_elem; }
+
+	void Serialize(DumpStream& ar) override
+	{
+		FEMaterialPoint::Serialize(ar);
+	}
+};
+
+//-----------------------------------------------------------------------------
 // This class represents an edge of a domain.
 class FECORE_API FEEdge : public FEMeshPartition
 {
@@ -62,6 +75,16 @@ public:
 	//! returns reference to element
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
+
+	// Create material point data for this surface
+	virtual FEMaterialPoint* CreateMaterialPoint();
+
+public:
+	// Get current coordinates
+	void GetNodalCoordinates(FELineElement& el, vec3d* rt);
+
+	// Get reference coordinates
+	void GetReferenceNodalCoordinates(FELineElement& el, vec3d* rt);
 
 protected:
 	std::vector<FELineElement>	m_Elem;

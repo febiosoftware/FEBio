@@ -125,3 +125,26 @@ void FEEdge::Create(int nelems, int elemType)
 	if (elemType != -1)
 		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
 }
+
+//-----------------------------------------------------------------------------
+// Create material point data for this surface
+FEMaterialPoint* FEEdge::CreateMaterialPoint()
+{
+	return new FELineMaterialPoint;
+}
+
+//-----------------------------------------------------------------------------
+void FEEdge::GetNodalCoordinates(FELineElement& el, vec3d* rt)
+{
+	FEMesh& mesh = *GetMesh();
+	int neln = el.Nodes();
+	for (int j = 0; j < neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
+}
+
+//-----------------------------------------------------------------------------
+void FEEdge::GetReferenceNodalCoordinates(FELineElement& el, vec3d* rt)
+{
+	FEMesh& mesh = *GetMesh();
+	int neln = el.Nodes();
+	for (int j = 0; j < neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_r0;
+}
