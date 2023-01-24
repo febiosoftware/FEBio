@@ -255,7 +255,7 @@ bool FEODFFiberDistributionSmallMesh::Init()
                 {
                     odf->m_pos += mesh.Node(element.m_node[node]).m_r0;
                 }
-                odf->m_pos/element.Nodes();
+                odf->m_pos/=(double)element.Nodes();
 
                 // Calculate weight to each ODF
                 double sum = 0;
