@@ -220,6 +220,7 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotMPSpecificStrainEnergy           , "specific strain energy");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveElasticity		         , "effective elasticity"            );
 	REGISTER_FECORE_CLASS(FEPlotEffectiveFluidPressure		     , "effective fluid pressure"        );
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellFluidPressure      , "effective shell fluid pressure"  );
