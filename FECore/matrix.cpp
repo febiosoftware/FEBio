@@ -655,3 +655,38 @@ bool matrix::eigen_vectors(matrix& Eigen, vector<double>& eigen_values)
 	assert(n < NMAX);
 	return true;
 }
+
+matrix covariance(const matrix& a)
+{
+	int n = a.rows();
+	int d = a.columns();
+
+	// calculate mean row vector
+	vector<double> mu(d, 0.0);
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < d; ++j) mu[j] += a[i][j];
+	}
+	for (int i = 0; i < d; ++i) mu[i] /= n;
+
+	// normalization factor
+	// NOTE: it is n - 1, to be consistent with MatLab!
+	double R = (n == 1 ? 1.0 : n - 1);
+
+	// calculate covariance matrix
+	matrix c(d, d); c.zero();
+	for (int i = 0; i < d; ++i)
+		for (int j = 0; j < d; ++j)
+		{
+			double cij = 0.0;
+			for (int k = 0; k < n; ++k)
+			{
+				cij += (a[k][i] - mu[i]) * (a[k][j] - mu[j]);
+			}
+			cij /= R;
+
+			c[i][j] = cij;
+		}
+
+	return c;
+}
