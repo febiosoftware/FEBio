@@ -80,7 +80,7 @@ public:
 	void zero() { memset(m_pd, 0, sizeof(double)*m_nsize); }
 
 	//! matrix transpose
-	matrix transpose();
+	matrix transpose() const;
 
 	//! matrix inversion
 	matrix inverse();

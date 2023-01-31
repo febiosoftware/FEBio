@@ -320,7 +320,7 @@ matrix matrix::svd_inverse()
 }
 
 //-----------------------------------------------------------------------------
-matrix matrix::transpose()
+matrix matrix::transpose() const
 {
 	int i, j;
 	matrix At(m_nc, m_nr);
