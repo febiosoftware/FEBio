@@ -298,6 +298,13 @@ void XMLTag::value(vector<int>& l)
 				break;
 			case 2:
 				nn = 1;
+				break;
+			case 3:
+				break;
+			default:
+				n0 = 0;
+				n1 = -1;
+				nn = 1;
 			}
 
 			for (i=n0; i<=n1; i += nn) l[n++] = i;
@@ -856,12 +863,13 @@ void XMLReader::ReadTag(XMLTag& tag)
 				ch = GetChar();
 				if (ch == '-') n++;
 				else if ((ch == '>') && (n >= 2)) break;
-				else if (ch == '\r') n = 0; // don't append \r
 				else
-                {
-                    m_comment += ch;
-                    n = 0;
-                } 
+				{
+					if (n > 0) m_comment += '-';
+					if (n > 1) m_comment += '-';
+					if (ch != '\r') m_comment += ch; // don't append \r
+					n = 0;
+				}
 			}
 			while (1);
 

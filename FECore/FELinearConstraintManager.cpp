@@ -459,7 +459,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				{
 					double ri = ke[i][j] * m_up[lj];
 					int I = lmi[i];
-					if (I >= 0) R[i] -= ri;
+					if (I >= 0) R[I] -= ri;
 				}
 			}
 			else if ((li >= 0) && (lj >= 0))
@@ -501,7 +501,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 					{
 						int I = mesh.Node((*is)->node).m_ID[(*is)->dof];
 						double ri = (*is)->val * ke[i][j] * m_up[lj];
-						if (I >= 0) R[i] -= ri;
+						if (I >= 0) R[I] -= ri;
 					}
 				}
 			}

@@ -58,9 +58,13 @@ public:
     //! calculate residual
     void LoadVector(FEGlobalVector& R) override;
     
+    //! update
+    void Update() override;
+    
 protected:
     bool        m_bshellb;      //!< flag for prescribing flux on shell bottom
     int         m_isol;         //!< solute index
+    bool        m_bup;          //!< flag to call Update function
 
 protected:
     FEDofList    m_dofC;

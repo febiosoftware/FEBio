@@ -77,6 +77,15 @@ public:
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+//! Specific strain energy
+class FEPlotMPSpecificStrainEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotMPSpecificStrainEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Actual fluid pressure
 class FEPlotActualFluidPressure : public FEPlotDomainData
 {

@@ -82,6 +82,7 @@ SOFTWARE.*/
 #include "FEPressureStabilization.h"
 #include "FEMatchingOsmoticCoefficientLoad.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
+#include "FEMultiphasicFluidPressureLoad.h"
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterfaceBiphasic.h"
@@ -111,7 +112,7 @@ SOFTWARE.*/
 #include "FESolutePointSource.h"
 
 #include "FEFixedFluidPressure.h"
-#include "FEPrescribedFluidPressure.h"
+#include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
 
@@ -191,7 +192,7 @@ void FEBioMix::InitModule()
 	//-----------------------------------------------------------------------------
 	// Boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedFluidPressure          , "zero fluid pressure");
-	REGISTER_FECORE_CLASS(FEPrescribedFluidPressure     , "prescribed fluid pressure");
+	REGISTER_FECORE_CLASS(FEPrescribedNodalFluidPressure, "prescribed fluid pressure");
 	REGISTER_FECORE_CLASS(FEPrescribedShellFluidPressure, "prescribed shell fluid pressure");
 
 	//-----------------------------------------------------------------------------
@@ -219,6 +220,7 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotMPSpecificStrainEnergy           , "specific strain energy");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveElasticity		         , "effective elasticity"            );
 	REGISTER_FECORE_CLASS(FEPlotEffectiveFluidPressure		     , "effective fluid pressure"        );
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellFluidPressure      , "effective shell fluid pressure"  );
@@ -316,6 +318,7 @@ void FEBioMix::InitModule()
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// boundary conditions

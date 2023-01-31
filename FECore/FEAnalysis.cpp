@@ -373,6 +373,8 @@ bool FEAnalysis::Solve()
 {
 	FEModel& fem = *GetFEModel();
 
+	fem.GetTime().timeIncrement = m_dt0;
+
 	// Initialize the solver
 	if (InitSolver() == false) return false;
 

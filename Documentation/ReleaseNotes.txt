@@ -41,6 +41,29 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.0   1/5/2023
+
+===========================================================================
+
+* FEBio4 is a major upgrade from FEBio3. Although it will continue to read most older files (version 3, 2.5, 2), a new format (version 4) is the preferred format. Files can be converted with FEBio Studio 2. Most of the important changes in this update are under the hood and improved the consistency between the internal representation of the febio model, the input file format, and the model representation in febio studio 2. The changes facilitated the direct integration of febio into febio studio. See the release notes of febio studio 2 for additional information regarding this integration. 
+* Fixed sign issue with evaluating body loads on rigid bodies. (Only affects the output of the rigid body reaction forces.)
+* Added mat_axis property to solid mixtures, mostly to better support older file formats.
+* Fixed a crash when an error was detected in the update of the contact potential.
+* Added some error checking for -import command line option.
+* Fixed bug in evaluation of FENodalFluidFlux
+* Increased precicion when writing floating point values.
+* Fixed some issues with parsing comments from the xml file.
+* Rigid wall adds surface to mesh in feb3 import.
+* Rigid node sets can now be applied in multi-step analyses.
+* Fixed crash in parabolic map.
+* Fixed several issues with mesh data generators.
+* Added support for redefining load contollers in restart file format 3.
+* Fixed issue with BSpline initialization.
+* Added property validation for properties defined via empty tags.
+
+
+===========================================================================
+
  R E L E A S E   3.8   12/12/2022
 
 ===========================================================================

@@ -1472,14 +1472,6 @@ bool FEMultiphasicFSISolver::Residual(vector<double>& R)
         }
     }
     
-    // calculate body forces for rigid bodies
-    for (int j=0; j<fem.ModelLoads(); ++j)
-    {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
-        if (pbf && pbf->IsActive())
-            m_rigidSolver.BodyForces(RHS, tp, *pbf);
-    }
-    
     // allocate F
     vector<double> F;
     

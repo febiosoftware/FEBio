@@ -189,41 +189,35 @@ void FEElasticShellDomain::InternalForces(FEGlobalVector& R)
 
 void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<double>& fe)
 {
-	int i, n;
-
-	// jacobian matrix determinant
-	double detJt;
-
-	const double* Mr, *Ms, *M;
-
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 
-	double*	gw = el.GaussWeights();
-	double eta;
-    
-    vec3d gcnt[3];
-
 	// repeat for all integration points
-	for (n=0; n<nint; ++n)
+	double* gw = el.GaussWeights();
+	for (int n=0; n<nint; ++n)
 	{
 		FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-        detJt = detJ(el, n, m_alphaf)*gw[n];
+		double detJt = (m_alphaf == 1.0 ? detJ(el, n) : detJ(el, n, m_alphaf))*gw[n];
+
+		// get base vectors
+		vec3d gcnt[3];
+		if (m_alphaf == 1.0)
+			ContraBaseVectors(el, n, gcnt);
+		else
+			ContraBaseVectors(el, n, gcnt, m_alphaf);
 
 		// get the stress vector for this integration point
 		mat3ds& s = pt.m_s;
 
-		eta = el.gt(n);
+		double eta = el.gt(n);
 
-		Mr = el.Hr(n);
-		Ms = el.Hs(n);
-		M  = el.H(n);
+		const double* Mr = el.Hr(n);
+		const double* Ms = el.Hs(n);
+		const double* M  = el.H(n);
         
-        ContraBaseVectors(el, n, gcnt, m_alphaf);
-
-		for (i=0; i<neln; ++i)
+		for (int i=0; i<neln; ++i)
 		{
             vec3d gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
             vec3d gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
@@ -849,12 +843,19 @@ void FEElasticShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         mp.m_rt = evaluate(el, r, s, n);
         
         // get the deformation gradient and determinant at intermediate time
-        double Jt, Jp;
         mat3d Ft, Fp;
-        Jt = defgrad(el, Ft, n);
-        Jp = defgradp(el, Fp, n);
-        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
-        pt.m_J = pt.m_F.det();
+        double Jt = defgrad(el, Ft, n);
+        double Jp = defgradp(el, Fp, n);
+		if (m_alphaf == 1.0)
+		{
+			pt.m_F = Ft;
+			pt.m_J = Jt;
+		}
+		else
+		{
+			pt.m_F = Ft * m_alphaf + Fp * (1 - m_alphaf);
+			pt.m_J = pt.m_F.det();
+		}
         mat3d Fi = pt.m_F.inverse();
         pt.m_L = (Ft - Fp)*Fi/dt;
         if (m_update_dynamic)

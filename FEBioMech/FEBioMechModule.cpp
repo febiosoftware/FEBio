@@ -665,8 +665,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERigidWallInterface, "rigid_wall");
 	REGISTER_FECORE_CLASS(FEPeriodicSurfaceConstraint, "surface constraint");
 	REGISTER_FECORE_CLASS(FEStickyInterface, "sticky");
-	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding");
-	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied");
+	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding", FECORE_EXPERIMENTAL);
+	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEContactPotential, "contact potential");
 
 	//-----------------------------------------------------------------------------
