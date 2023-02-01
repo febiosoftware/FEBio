@@ -118,6 +118,9 @@ BEGIN_FECORE_CLASS(FEEdgeToSurfaceContact, FESurfaceConstraint)
 	ADD_PARAMETER(m_Rout, "R_out");
 	ADD_PARAMETER(m_Rmin, "R0_min");
 	ADD_PARAMETER(m_wtol, "w_tol");
+
+	ADD_PROPERTY(m_edge, "edgelist")->AddFlag(FEProperty::Reference);
+
 END_FECORE_CLASS();
 
 FEEdgeToSurfaceContact::FEEdgeToSurfaceContact(FEModel* fem) : FESurfaceConstraint(fem), m_edge(fem), m_surf(fem)
