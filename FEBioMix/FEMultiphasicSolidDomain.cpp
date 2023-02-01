@@ -28,12 +28,13 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicMultigeneration.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEAnalysis.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/sys.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -416,7 +417,11 @@ void FEMultiphasicSolidDomain::Reset()
 
             // initialize referential solid volume fraction
             pt.m_phi0 = pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
-            
+            if (pt.m_phi0 > 1.0) {
+                feLogError("Referential solid volume fraction of multiphasic material cannot exceed unity!\nCheck ratios of sbm apparent and true densities.");
+                exit(1);
+            }
+
             // reset chemical reaction element data
             ps.m_cri.clear();
             ps.m_crd.clear();
