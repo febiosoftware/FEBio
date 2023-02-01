@@ -2034,3 +2034,16 @@ public:
 	//! project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao) const override;
 };
+
+class FELine2NI : public FELine2_
+{
+public:
+	enum { NINT = 2 };
+
+public:
+	//! constructor
+	FELine2NI();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao) const override;
+};

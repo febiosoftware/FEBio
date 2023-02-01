@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEMeshPartition.h"
 #include "FENodeList.h"
+#include "FESegmentSet.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -65,6 +66,9 @@ public:
 	//! creates edge
 	void Create(int nelems, int elemType = -1);
 
+	//! create from edge set
+	virtual bool Create(FESegmentSet& es);
+
 	//! extract node set
 	FENodeList GetNodeList();
 
@@ -91,6 +95,9 @@ public:
 
 	// Get reference coordinates
 	void GetReferenceNodalCoordinates(FELineElement& el, vec3d* rt);
+
+protected:
+	bool Create(FESegmentSet& es, int elemType);
 
 protected:
 	std::vector<FELineElement>	m_Elem;

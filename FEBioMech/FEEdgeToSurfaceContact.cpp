@@ -85,6 +85,11 @@ FEMaterialPoint* FEEdgeToSurfaceContactEdge::CreateMaterialPoint()
 	return new FEE2SContactPoint();
 }
 
+bool FEEdgeToSurfaceContactEdge::Create(FESegmentSet& eset)
+{
+	return FEEdge::Create(eset, FE_LINE2NI);
+}
+
 void FEEdgeToSurfaceContactEdge::Update()
 {
 	// This assumes we are inside a omp parallel region!

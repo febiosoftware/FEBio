@@ -130,6 +130,42 @@ void FEEdge::Create(int nelems, int elemType)
 }
 
 //-----------------------------------------------------------------------------
+bool FEEdge::Create(FESegmentSet& es)
+{
+	return Create(es, FE_LINE2G1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEEdge::Create(FESegmentSet& es, int elemType)
+{
+	FEMesh& m = *GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of segments
+	int nsegs = es.Segments();
+
+	// allocate storage for faces
+	Create(nsegs);
+
+	// read segments
+	for (int i = 0; i < nsegs; ++i)
+	{
+		FELineElement& el = Element(i);
+		FESegmentSet::SEGMENT& si = es.Segment(i);
+
+		if (si.ntype == 2) el.SetType(elemType);
+		else return false;
+
+		int N = el.Nodes(); assert(N == si.ntype);
+		for (int j = 0; j < N; ++j) el.m_node[j] = si.node[j];
+	}
+
+	CreateMaterialPointData();
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FEEdge::CreateMaterialPointData()
 {
 	for (int i = 0; i < Elements(); ++i)

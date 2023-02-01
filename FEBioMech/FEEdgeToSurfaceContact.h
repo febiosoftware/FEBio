@@ -62,6 +62,8 @@ public:
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 	void Update();
+
+	bool Create(FESegmentSet& eset) override;
 };
 
 //=======================================================================================

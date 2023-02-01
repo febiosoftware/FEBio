@@ -168,6 +168,7 @@ enum FE_Element_Type {
 
 	// line elements
 	FE_LINE2G1,
+	FE_LINE2NI,
 
 	// unspecified
 	FE_ELEM_INVALID_TYPE = 0xFFFF
