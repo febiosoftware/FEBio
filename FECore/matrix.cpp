@@ -487,30 +487,25 @@ void matrix::mult(vector<double>& x, vector<double>& y)
 void matrix::mult(const matrix& m, std::vector<double>& x, std::vector<double>& y)
 {
     assert(m_nc == m.m_nr);
-    assert(m_nr == x.size());
-    
-    #pragma omp parallel for
-	for (int i = 0; i < m_nr; ++i)
+    assert(m.m_nc == x.size());
+	y.assign(m_nr, 0.0);
+
+	int nx = (int)x.size();
+	vector<double> tmp(m_nc, 0.0);
+#pragma omp parallel shared(tmp)
 	{
-        vector<double> temp(m.m_nc, 0.0);
-		for (int k = 0; k < m_nc; ++k)
+		#pragma omp for
+		for (int i = 0; i < m_nc; ++i)
 		{
-			const double pik = m_pr[i][k];
-			const double* pm = m.m_pr[k];
-			for (int j = 0; j < m.m_nc; ++j)
-			{
-				temp[j] += pik * pm[j];
-			}
+			for (int k = 0; k < nx; ++k) tmp[i] += m.m_pr[i][k] * x[k];
 		}
 
-        y[i] = 0.0;
-        for(int j = 0; j < m_nr; j++)
-        {
-            y[i] += temp[j] * x[j];
-        }
-    
+		#pragma omp for
+		for (int i = 0; i < m_nr; ++i)
+		{
+			for (int k = 0; k < m_nc; ++k) y[i] += m_pr[i][k] * tmp[k];
+		}
 	}
-
 }
 
 //-----------------------------------------------------------------------------
