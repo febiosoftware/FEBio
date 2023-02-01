@@ -1669,9 +1669,16 @@ public:
 	enum { NELN = 2 };
 
 public:
-	FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_ELEM_TRUSS, ET_TRUSS2, FE_TRUSS) { init(); }
+	FETrussElementTraits();
 
 	void init();
+
+	//! shape function at (r)
+	void shape(double* H, double r);
+
+	// gauss-point coordinates and weights
+	std::vector<double> gr;
+	std::vector<double> gw;
 };
 
 //=============================================================================

@@ -3217,9 +3217,36 @@ void FEShellTri6G21::project_to_nodes(double* ai, double* ao) const
 //                          F E T R U S S E L E M E N T
 //=============================================================================
 
+FETrussElementTraits::FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_ELEM_TRUSS, ET_TRUSS2, FE_TRUSS) 
+{ 
+	gr.resize(NINT);
+	gw.resize(NINT);
+
+	gr[0] = 0.0;
+	gw[0] = 2.0;
+
+	init();
+}
+
 void FETrussElementTraits::init()
 {
+	assert(m_nint > 0);
+	assert(m_neln > 0);
 
+	// evaluate shape functions
+	const int NE = FEElement::MAX_NODES;
+	double N[NE];
+	for (int n = 0; n < m_nint; ++n)
+	{
+		shape(N, gr[n]);
+		for (int i = 0; i < m_neln; ++i) m_H[n][i] = N[i];
+	}
+}
+
+void FETrussElementTraits::shape(double* H, double r)
+{
+	H[0] = 0.5 * (1.0 - r);
+	H[1] = 0.5 * (1.0 + r);
 }
 
 //=============================================================================
