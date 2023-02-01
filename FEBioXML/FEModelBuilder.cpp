@@ -352,6 +352,8 @@ bool FEModelBuilder::BuildEdge(FEEdge& e, FESegmentSet& es)
 		for (int j = 0; j<N; ++j) el.m_node[j] = si.node[j];
 	}
 
+	e.CreateMaterialPointData();
+
 	// copy the name
 	e.SetName(es.GetName());
 

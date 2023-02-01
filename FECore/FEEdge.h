@@ -49,6 +49,10 @@ public:
 class FECORE_API FEEdge : public FEMeshPartition
 {
 public:
+	FECORE_SUPER_CLASS(FEEDGE_ID)
+	FECORE_BASE_CLASS(FEEdge)
+
+public:
 	//! constructor
 	FEEdge(FEModel* fem);
 
@@ -78,6 +82,8 @@ public:
 
 	// Create material point data for this surface
 	virtual FEMaterialPoint* CreateMaterialPoint();
+
+	void CreateMaterialPointData();
 
 public:
 	// Get current coordinates

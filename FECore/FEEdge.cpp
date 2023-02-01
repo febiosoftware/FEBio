@@ -123,7 +123,27 @@ void FEEdge::Create(int nelems, int elemType)
 	}
 
 	if (elemType != -1)
-		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+	{
+		for (int i = 0; i < nelems; ++i) m_Elem[i].SetType(elemType);
+		CreateMaterialPointData();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEEdge::CreateMaterialPointData()
+{
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FELineElement& el = m_Elem[i];
+		int nint = el.GaussPoints();
+		el.ClearData();
+		for (int n = 0; n < nint; ++n)
+		{
+			FELineMaterialPoint* pt = dynamic_cast<FELineMaterialPoint*>(CreateMaterialPoint());
+			assert(pt);
+			el.SetMaterialPointData(pt, n);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

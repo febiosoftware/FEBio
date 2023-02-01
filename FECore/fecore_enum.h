@@ -253,6 +253,7 @@ enum SUPER_CLASS_ID {
 	FEDISCRETEDOMAIN_ID,			// derived from FEDiscreteDomain
 	FEDOMAIN2D_ID,					// derived from FEDomain2D
 	FESURFACE_ID,					// derived from FESurface
+	FEEDGE_ID,						// derived from FEEdge
 	FEIC_ID,						// derived from FEInitialCondition
 	FEMESHDATAGENERATOR_ID,			// derived from FEMeshDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller
