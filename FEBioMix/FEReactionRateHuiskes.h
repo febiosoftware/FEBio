@@ -45,8 +45,8 @@ public:
 	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
 	
 public:
-	double	m_B;					//!< mass supply coefficient
-	double	m_psi0;					//!< specific strain energy at homeostasis
+	FEParamDouble   m_B;					//!< mass supply coefficient
+    FEParamDouble   m_psi0;					//!< specific strain energy at homeostasis
 	
 	DECLARE_FECORE_CLASS();	
 };

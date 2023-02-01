@@ -45,8 +45,8 @@ public:
     double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
     
 public:
-    double	m_B;					//!< mass supply coefficient
-    double	m_Psi0;					//!< scaling strain energy density
+    FEParamDouble   m_B;					//!< mass supply coefficient
+    FEParamDouble   m_Psi0;					//!< scaling strain energy density
     
     DECLARE_FECORE_CLASS();	
 };
