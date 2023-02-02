@@ -218,13 +218,30 @@ bool FEMultiphasicShellDomain::Init()
             for (int i = 0; i<nsbm; ++i)
                 sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
             
+            // initialize multiphasic solutes
+            ps.m_nsol = nsol;
+            ps.m_c.assign(nsol,0);
+            ps.m_ca.assign(nsol,0);
+            ps.m_crp.assign(nsol, 0);
+            ps.m_gradc.assign(nsol,vec3d(0,0,0));
+            ps.m_k.assign(nsol, 0);
+            ps.m_dkdJ.assign(nsol, 0);
+            ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
+            ps.m_j.assign(nsol,vec3d(0,0,0));
+            ps.m_bsb.assign(nsol, false);
+            ps.m_nsbm = nsbm;
             ps.m_sbmr = sbmr;
-            ps.m_sbmrp = sbmr;
-            ps.m_sbmrhat.assign(nsbm, 0);
+            ps.m_sbmrp.assign(nsbm, 0);
             ps.m_sbmrhatp.assign(nsbm, 0);
-            pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
-            ps.m_cF = m_pMat->FixedChargeDensity(mp);
-
+            ps.m_sbmrhat.assign(nsbm,0);
+            
+            // initialize referential solid volume fraction
+            pb.m_phi0 = pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
+            if (pb.m_phi0 > 1.0) {
+                feLogError("Referential solid volume fraction of multiphasic material cannot exceed unity!\nCheck ratios of sbm apparent and true densities.");
+                return false;
+            }
+            
             // evaluate reaction rates at initial time
             // check if this mixture includes chemical reactions
             int nreact = (int)m_pMat->Reactions();
@@ -419,7 +436,7 @@ void FEMultiphasicShellDomain::Reset()
         for (int n=0; n<nint; ++n)
         {
             FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-            FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+            FEBiphasicMaterialPoint& pb = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 
             // extract the initial apparent densities of the solid-bound molecules
@@ -444,11 +461,7 @@ void FEMultiphasicShellDomain::Reset()
             ps.m_sbmrhat.assign(nsbm,0);
             
             // initialize referential solid volume fraction
-            pt.m_phi0 = pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
-            if (pt.m_phi0 > 1.0) {
-                feLogError("Referential solid volume fraction of multiphasic material cannot exceed unity!\nCheck ratios of sbm apparent and true densities.");
-                exit(1);
-            }
+            pb.m_phi0 = pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
 
             // reset chemical reaction element data
             ps.m_cri.clear();
