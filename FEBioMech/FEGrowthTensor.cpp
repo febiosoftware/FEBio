@@ -31,9 +31,16 @@ SOFTWARE.*/
 //! Growth tensor
 //!
 // define the material parameters
-BEGIN_FECORE_CLASS(FEGrowthTensor, FEFiberMaterial)
+BEGIN_FECORE_CLASS(FEGrowthTensor, FEMaterialProperty)
     ADD_PROPERTY(m_fiber, "fiber", FEProperty::Optional)->SetDefaultType("vector");
 END_FECORE_CLASS();
+
+FEGrowthTensor::FEGrowthTensor(FEModel* pfem) : FEMaterialProperty(pfem) 
+{ 
+	m_fiber = nullptr; 
+}
+
+FEGrowthTensor::~FEGrowthTensor() {}
 
 bool FEGrowthTensor::Init()
 {
