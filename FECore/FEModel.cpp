@@ -1550,6 +1550,25 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 			}
 		}
 	}
+	else if (next == "domain")
+	{
+		int nid = next.Index();
+		if ((nid >= 0) && (nid < mesh.Domains()))
+		{
+			FEDomain& dom = mesh.Domain(nid);
+			ParamString paramName = next.next();
+			FEParam* param = dom.FindParameter(paramName);
+			if (param)
+			{
+				if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+				{
+					FEParamDouble& v = param->value<FEParamDouble>();
+					if (v.isConst()) return FEParamValue(param, &v.constValue(), FE_PARAM_DOUBLE);
+				}
+				return FEParamValue(param, param->data_ptr(), param->type());
+			}
+		}
+	}
 
 	// if we get here, we did not find it
 	return FEParamValue();
