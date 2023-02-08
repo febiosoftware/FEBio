@@ -166,65 +166,6 @@ public:
         PLT_ELEM_PYRA13
     };
 
-	// size of name variables
-	enum { STR_SIZE = 64 };
-
-
-public:
-	// Dictionary entry
-	class DICTIONARY_ITEM
-	{
-	public:
-		DICTIONARY_ITEM();
-		DICTIONARY_ITEM(const DICTIONARY_ITEM& item);
-
-	public:
-		FEPlotData*		m_psave;
-		unsigned int	m_ntype;	// data type
-		unsigned int	m_nfmt;		// storage format
-		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
-		std::vector<string>	m_arrayNames;	// names of array components (optional)
-		char			m_szname[STR_SIZE];
-		char			m_szunit[STR_SIZE];
-	};
-
-	class Dictionary
-	{
-	public:
-		bool AddVariable(FEModel* pfem, const char* szname, std::vector<int>& item, const char* szdom = "");
-
-		int NodalVariables() { return (int)m_Node.size(); }
-		int DomainVarialbes() { return (int)m_Elem.size(); }
-		int SurfaceVariables() { return (int)m_Face.size(); }
-
-		void Defaults(FEModel& fem);
-
-		void Clear();
-
-	public:
-		const list<DICTIONARY_ITEM>& GlobalVariableList  () const { return m_Glob; }
-		const list<DICTIONARY_ITEM>& MaterialVariableList() const { return m_Mat;  }
-		const list<DICTIONARY_ITEM>& NodalVariableList   () const { return m_Node; }
-		const list<DICTIONARY_ITEM>& DomainVariableList  () const { return m_Elem; }
-		const list<DICTIONARY_ITEM>& SurfaceVariableList () const { return m_Face; }
-
-	protected:
-		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
-		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
-		bool AddNodalVariable   (FEPlotData* ps, const char* szname, std::vector<int>& item);
-		bool AddDomainVariable  (FEPlotData* ps, const char* szname, std::vector<int>& item);
-		bool AddSurfaceVariable (FEPlotData* ps, const char* szname, std::vector<int>& item);
-
-	protected:
-		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
-		list<DICTIONARY_ITEM>	m_Mat;		// Material variables
-		list<DICTIONARY_ITEM>	m_Node;		// Node variables
-		list<DICTIONARY_ITEM>	m_Elem;		// Domain variables
-		list<DICTIONARY_ITEM>	m_Face;		// Surface variables
-
-		friend class FEBioPlotFile;
-	};
-
 	struct Surface
 	{
 		int			maxNodes;
@@ -271,7 +212,6 @@ public:
 
 public:
 	FEBioPlotFile(FEModel* fem);
-	~FEBioPlotFile(void);
 
 	//! Open the plot database
 	bool Open(const char* szfile) override;
@@ -289,11 +229,6 @@ public:
 	bool IsValid() const override;
 
 public:
-	//! Add a variable to the dictionary
-	bool AddVariable(FEPlotData* ps, const char* szname);
-	bool AddVariable(const char* sz);
-	bool AddVariable(const char* sz, std::vector<int>& item, const char* szdom = "");
-
 	//! Set the compression level
 	void SetCompression(int n);
 
@@ -311,9 +246,6 @@ public:
 	int LineObjects();
 	LineObject* GetLineObject(int i);
 	LineObject* AddLineObject(const std::string& name);
-
-public:
-	const Dictionary& GetDictionary() const { return m_dic; }
 
 protected:
 	bool WriteRoot      (FEModel& fem);
@@ -356,7 +288,6 @@ protected:
 	void BuildSurfaceTable();
 
 protected:
-	Dictionary	m_dic;	// dictionary
 	PltArchive	m_ar;	// the data archive
 	int			m_ncompress;	// compression level
 	int			m_meshesWritten;	// nr of meshes written
