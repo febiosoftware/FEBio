@@ -49,7 +49,11 @@ private:
 	void WriteHeader();
 	void WritePoints();
 	void WriteCells();
+	void WritePointData();
+	void WriteCellData();
 
 private:
-	FILE* m_fp;
+	FILE*	m_fp;
+	int		m_count;
+	bool	m_valid;
 };

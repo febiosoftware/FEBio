@@ -26,6 +26,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "VTKPlotFile.h"
 #include <FECore/FEModel.h>
+#include <FECore/FEPlotDataStore.h>
+#include <FECore/FEDomain.h>
 #include <sstream>
 
 enum VTK_CELLTYPE {
@@ -55,12 +57,18 @@ enum VTK_CELLTYPE {
 
 VTKPlotFile::VTKPlotFile(FEModel* fem) : PlotFile(fem)
 {
-
+	m_fp = nullptr;
+	m_count = 0;
+	m_valid = false;
 }
 
 //! Open the plot database
 bool VTKPlotFile::Open(const char* szfile)
 {
+	BuildDictionary();
+	m_count = 0;
+	Write(0.f);
+	m_valid = true;
 	return true;
 }
 
@@ -73,30 +81,26 @@ bool VTKPlotFile::Append(const char* szfile)
 //! see if the plot file is valid
 bool VTKPlotFile::IsValid() const
 {
-	return true;
+	return m_valid;
 }
 
 //! Write current FE state to plot database
 bool VTKPlotFile::Write(float ftime, int flag)
 {
-	static int n = 1;
 	FEModel& fem = *GetFEModel();
 
 	std::stringstream ss;
-	ss << "out" << n++ << ".vtk";
+	ss << "out." << m_count++ << ".vtk";
 	string fileName = ss.str();
 	
 	m_fp = fopen(fileName.c_str(), "wt");
 	if (m_fp == nullptr) return false;
 
-	// --- H E A D E R ---
 	WriteHeader();
-
-	// --- N O D E S ---
 	WritePoints();
-
-	// --- E L E M E N T S ---
 	WriteCells();
+	WritePointData();
+	WriteCellData();
 
 	fclose(m_fp);
 	m_fp = nullptr;
@@ -125,7 +129,8 @@ void VTKPlotFile::WritePoints()
 	{
 		for (int k = 0; k < 3 && j + k < nodes; k++)
 		{
-			vec3d& r = m.Node(j + k).m_rt;
+			FENode& nd = m.Node(j + k);
+			vec3d& r = nd.m_r0;
 			fprintf(m_fp, "%lg %lg %lg ", r.x, r.y, r.z);
 		}
 		fprintf(m_fp, "\n");
@@ -182,4 +187,154 @@ void VTKPlotFile::WriteCells()
             
         fprintf(m_fp, "%d\n", vtk_type);
     }
+}
+
+//-----------------------------------------------------------------------------
+void VTKPlotFile::WritePointData()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nodes = mesh.Nodes();
+
+	PlotFile::Dictionary& dic = GetDictionary();
+	if (dic.NodalVariables() == 0) return;
+
+	fprintf(m_fp, "\nPOINT_DATA %d\n", nodes);
+	auto& nodeData = dic.NodalVariableList();
+	list<DICTIONARY_ITEM>::iterator it = nodeData.begin();
+	for (int n = 0; n < nodeData.size(); ++n, ++it)
+	{
+		if (it->m_psave)
+		{
+			FEPlotData* pd = it->m_psave;
+			int ndata = pd->VarSize(pd->DataType());
+
+			int N = fem.GetMesh().Nodes();
+			FEDataStream a; a.reserve(ndata * N);
+			if (pd->Save(fem.GetMesh(), a))
+			{
+				// pad mismatches
+				assert(a.size() == N * ndata);
+				if (a.size() != N * ndata) a.resize(N * ndata, 0.f);
+
+
+				std::vector<float>& val = a.data();
+				const char* szname = it->m_szname;
+		
+				// write the value array
+				int ntype = pd->DataType();
+				if (ntype == PLT_FLOAT) {
+					fprintf(m_fp, "%s %s %s\n", "SCALARS", szname, "float");
+					fprintf(m_fp, "%s %s\n", "LOOKUP_TABLE", "default");
+					for (int i = 0; i < val.size(); ++i) fprintf(m_fp, "%g\n", val[i]);
+				}
+				else if (ntype == PLT_VEC3F) {
+					fprintf(m_fp, "%s %s %s\n", "VECTORS", szname, "float");
+					for (int i = 0; i < val.size(); i += 3) fprintf(m_fp, "%g %g %g\n", val[i], val[i + 1], val[i + 2]);
+				}
+				else if (ntype == PLT_MAT3FS) {
+					fprintf(m_fp, "%s %s %s\n", "TENSORS", szname, "float");
+					for (int i = 0; i < val.size(); i += 6)
+						fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
+							val[i], val[i + 3], val[i + 5],
+							val[i + 3], val[i + 1], val[i + 4],
+							val[i + 5], val[i + 4], val[i + 2]);
+				}
+				else if (ntype == PLT_MAT3FD) {
+					fprintf(m_fp, "%s %s %s\n", "TENSORS", szname, "float");
+					for (int i = 0; i < val.size(); i += 3)
+						fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
+							val[i], 0.f, 0.f,
+							0.f, val[i + 1], 0.f,
+							0.f, 0.f, val[i + 2]);
+				}
+			}
+		}
+	}
+}
+
+void VTKPlotFile::WriteCellData()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int elems = mesh.Elements();
+
+	PlotFile::Dictionary& dic = GetDictionary();
+	if (dic.DomainVariables() == 0) return;
+
+	fprintf(m_fp, "\nCELL_DATA %d\n", elems);
+	auto& elemData = dic.DomainVariableList();
+	list<DICTIONARY_ITEM>::iterator it = elemData.begin();
+	for (int n = 0; n < elemData.size(); ++n, ++it)
+	{
+		if (it->m_psave)
+		{
+			FEPlotData* pd = it->m_psave;
+
+			// For now, we can only store FE_REGION_DOMAIN/FMT_ITEM
+			int nregion = pd->RegionType();
+			int nformat = pd->StorageFormat();
+			if ((nregion == FE_REGION_DOMAIN) && (nformat == FMT_ITEM))
+			{
+				// get the number of floats per data value
+				int ndata = pd->VarSize(pd->DataType());
+
+				// For now, we store all data in a global array
+				std::vector<float> val(ndata * elems, 0.f);
+
+				// loop over all domains and fill global val array
+				int nc = 0;
+				for (int i = 0; i < mesh.Domains(); ++i)
+				{
+					FEDomain& dom = mesh.Domain(i);
+					int NE = dom.Elements();
+					FEDataStream a; a.reserve(ndata * NE);
+					pd->Save(dom, a);
+
+					// pad mismatches
+					if (a.size() != NE * ndata) a.resize(NE * ndata, 0.f);
+
+					// copy into global array
+					vector<float>& vi = a.data();
+					for (int iel = 0; iel < NE; ++iel)
+					{
+						for (int k = 0; k < ndata; ++k)
+						{
+							val[nc++] = vi[iel * ndata + k];
+						}
+					}
+				}
+
+				const char* szname = it->m_szname;
+
+				// write the value array
+				int ntype = pd->DataType();
+				if (ntype == PLT_FLOAT) {
+					fprintf(m_fp, "%s %s %s\n", "SCALARS", szname, "float");
+					fprintf(m_fp, "%s %s\n", "LOOKUP_TABLE", "default");
+					for (int i = 0; i < val.size(); ++i) fprintf(m_fp, "%g\n", val[i]);
+				}
+				else if (ntype == PLT_VEC3F) {
+					fprintf(m_fp, "%s %s %s\n", "VECTORS", szname, "float");
+					for (int i = 0; i < val.size(); i += 3) fprintf(m_fp, "%g %g %g\n", val[i], val[i + 1], val[i + 2]);
+				}
+				else if (ntype == PLT_MAT3FS) {
+					fprintf(m_fp, "%s %s %s\n", "TENSORS", szname, "float");
+					for (int i = 0; i < val.size(); i += 6)
+						fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
+							val[i], val[i + 3], val[i + 5],
+							val[i + 3], val[i + 1], val[i + 4],
+							val[i + 5], val[i + 4], val[i + 2]);
+				}
+				else if (ntype == PLT_MAT3FD) {
+					fprintf(m_fp, "%s %s %s\n", "TENSORS", szname, "float");
+					for (int i = 0; i < val.size(); i += 3)
+						fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
+							val[i], 0.f, 0.f,
+							0.f, val[i + 1], 0.f,
+							0.f, 0.f, val[i + 2]);
+				}
+			}
+		}
+	}
 }
