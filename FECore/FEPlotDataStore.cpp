@@ -108,6 +108,11 @@ void FEPlotDataStore::SetPlotFileType(const std::string& fileType)
     m_splot_type = fileType;
 }
 
+std::string FEPlotDataStore::GetPlotFileType()
+{
+	return m_splot_type;
+}
+
 void FEPlotDataStore::Serialize(DumpStream& ar)
 {
     ar & m_nplot_compression;
