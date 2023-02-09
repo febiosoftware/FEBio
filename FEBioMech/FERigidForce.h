@@ -112,10 +112,9 @@ private:
 	int		m_dof;			//!< force direction
 	bool	m_brelative;	//!< relative flag
 
-	int		m_ntype;		//!< type of force (0=loadcurve, 1=target)
+	int		m_ntype;		//!< type of force
 	double	m_force;		//!< applied force
-	double	m_force0;		//!< initial force at activation (used with brelative flag)
-	double	m_trg;			//!< target force for target case
+	double	m_force0;		//!< initial force at activation
 	int		m_rid;
 
 	DECLARE_FECORE_CLASS();
@@ -125,6 +124,9 @@ private:
 //! rigid body moment
 class FEBIOMECH_API FERigidBodyMoment : public FERigidLoad
 {
+public:
+	enum { MOMENT_LOAD, MOMENT_FOLLOW, MOMENT_TARGET };	// values for m_ntype
+
 public:
 	FERigidBodyMoment(FEModel* pfem);
 
@@ -155,6 +157,7 @@ private:
 	int		m_dof;			//!< force direction
 	bool	m_brelative;	//!< relative flag
 	double	m_value;		//!< applied moment
+	int		m_ntype;		//!< type of moment
 
 	double	m_value0;		//!< initial moment at activation (used with brelative flag)
 	int		m_rid;

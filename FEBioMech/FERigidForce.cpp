@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/log.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidAxialForce, FERigidLoad);
@@ -250,7 +251,6 @@ FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FERigidLoad(pfem)
 {
 	m_rigidMat = -1;
 	m_ntype = FORCE_LOAD;
-	m_trg = 0.0;
 	m_rid = -1;
 	m_brelative = false;
 	m_force0 = 0.0;
@@ -296,9 +296,9 @@ void FERigidBodyForce::Activate()
 	{
 		switch (m_dof)
 		{
-		case 0: m_trg = rb.m_Fr.x; break;
-		case 1: m_trg = rb.m_Fr.y; break;
-		case 2: m_trg = rb.m_Fr.z; break;
+		case 0: m_force0 = rb.m_Fr.x; break;
+		case 1: m_force0 = rb.m_Fr.y; break;
+		case 2: m_force0 = rb.m_Fr.z; break;
 		}
 	}
 	if ((m_ntype == FORCE_LOAD) && m_brelative)
@@ -316,7 +316,7 @@ void FERigidBodyForce::Activate()
 void FERigidBodyForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
-	ar & m_ntype & m_dof & m_rigidMat & m_force & m_trg & m_rid;
+	ar & m_ntype & m_dof & m_rigidMat & m_force & m_rid;
 }
 
 //-----------------------------------------------------------------------------
@@ -361,7 +361,7 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R)
 		double t1 = pstep->m_tend;
 		double w = (t - t0) / (t1 - t0);
 		assert((w >= -0.0000001) && (w <= 1.0000001));
-		double f0 = m_trg, f1 = m_force;
+		double f0 = m_force0, f1 = m_force;
 
 		double f = f0 * (1.0 - w) + f1 * w;
 
@@ -385,6 +385,7 @@ BEGIN_FECORE_CLASS(FERigidBodyMoment, FERigidLoad)
 	ADD_PARAMETER(m_dof, "dof", 0, "Ru\0Rv\0Rw\0");
 	ADD_PARAMETER(m_value, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE)->setUnits(UNIT_MOMENT);
 	ADD_PARAMETER(m_brelative, "relative");
+	ADD_PARAMETER(m_ntype, "load_type")->setEnums("LOAD\0FOLLOW\0TARGET");
 END_FECORE_CLASS();
 
 FERigidBodyMoment::FERigidBodyMoment(FEModel* pfem) : FERigidLoad(pfem)
@@ -395,6 +396,7 @@ FERigidBodyMoment::FERigidBodyMoment(FEModel* pfem) : FERigidLoad(pfem)
 	m_value0 = 0.0;
 	m_value = 0.0;
 	m_dof = 0;
+	m_ntype = MOMENT_LOAD;
 }
 
 void FERigidBodyMoment::SetRigidMaterialID(int nid) { m_rigidMat = nid; }
@@ -412,6 +414,13 @@ bool FERigidBodyMoment::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	if (pm == 0) return false;
 
+	// follower moments are not supported yet.
+	if (m_ntype == MOMENT_FOLLOW)
+	{
+		feLogError("Follower moments are not supported.");
+		return false;
+	}
+
 	return FEModelLoad::Init();
 }
 
@@ -426,7 +435,16 @@ void FERigidBodyMoment::Activate()
 	m_rid = pm->GetRigidBodyID(); assert(m_rid >= 0);
 
 	FERigidBody& rb = *fem.GetRigidBody(m_rid);
-	if (m_brelative)
+	if (m_ntype == MOMENT_TARGET)
+	{
+		switch (m_dof)
+		{
+		case 0: m_value0 = rb.m_Mr.x; break;
+		case 1: m_value0 = rb.m_Mr.y; break;
+		case 2: m_value0 = rb.m_Mr.z; break;
+		}
+	}
+	if ((m_ntype == MOMENT_LOAD) && m_brelative)
 	{
 		switch (m_dof)
 		{
@@ -455,7 +473,24 @@ void FERigidBodyMoment::LoadVector(FEGlobalVector& R)
 	int I = rb.m_LM[m_dof + 3];
 	if (I >= 0)
 	{
-		R[I] += m_value + m_value0;
+		if (m_ntype == MOMENT_LOAD)
+		{
+			R[I] += m_value + m_value0;
+		}
+		else if (m_ntype == MOMENT_TARGET)
+		{
+			// get the current analysis step
+			FEAnalysis* pstep = fem.GetCurrentStep();
+
+			double t0 = pstep->m_tstart;
+			double t1 = pstep->m_tend;
+			double w = (t - t0) / (t1 - t0);
+			assert((w >= -0.0000001) && (w <= 1.0000001));
+			double M0 = m_value0, M1 = m_value;
+
+			double M = M0 * (1.0 - w) + M1 * w;
+			R[I] += M;
+		}
 	}
 }
 
