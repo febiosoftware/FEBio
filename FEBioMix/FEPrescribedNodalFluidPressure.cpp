@@ -24,21 +24,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEPrescribedFluidPressure.h"
+#include "FEPrescribedNodalFluidPressure.h"
 
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedFluidPressure, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FEPrescribedNodalFluidPressure, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
-FEPrescribedFluidPressure::FEPrescribedFluidPressure(FEModel* fem) : FEPrescribedDOF(fem)
+FEPrescribedNodalFluidPressure::FEPrescribedNodalFluidPressure(FEModel* fem) : FEPrescribedDOF(fem)
 {
 }
 
-bool FEPrescribedFluidPressure::Init()
+bool FEPrescribedNodalFluidPressure::Init()
 {
 	if (SetDOF("p") == false) return false;
 	return FEPrescribedDOF::Init();

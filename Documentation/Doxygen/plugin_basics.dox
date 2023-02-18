@@ -11,6 +11,9 @@ of plugin development.
 
 \li \subpage building_a_plugin
 \li \subpage required_functions
-\li \subpage factory_classes
+\li \subpage register
+
+Once you're done developing a plugin, check out the following article that details how to use plugins in FEBio. 
+
 \li \subpage using_plugins
 */

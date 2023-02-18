@@ -33,29 +33,23 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-double FENodeFluidXVel::value(int nnode)
+double FENodeFluidXVel::value(const FENode& node)
 {
     const int dof_VFX = GetFEModel()->GetDOFIndex("wx");
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    FENode& node = mesh.Node(nnode);
     return node.get(dof_VFX);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidYVel::value(int nnode)
+double FENodeFluidYVel::value(const FENode& node)
 {
     const int dof_VFY = GetFEModel()->GetDOFIndex("wy");
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    FENode& node = mesh.Node(nnode);
     return node.get(dof_VFY);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidZVel::value(int nnode)
+double FENodeFluidZVel::value(const FENode& node)
 {
     const int dof_VFZ = GetFEModel()->GetDOFIndex("wz");
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    FENode& node = mesh.Node(nnode);
     return node.get(dof_VFZ);
 }
 

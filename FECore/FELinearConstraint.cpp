@@ -41,13 +41,14 @@ END_FECORE_CLASS();
 FELinearConstraintDOF::FELinearConstraintDOF(FEModel* fem) : FECoreClass(fem)
 {
 	node = dof = -1;
-	val = 0.0;
+	val = 1.0;
 }
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FELinearConstraint, FEBoundaryCondition)
 	ADD_PARAMETER(m_parentDof->dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_parentDof->node, "node");
+	ADD_PARAMETER(m_off, "offset");
 
 	ADD_PROPERTY(m_childDof, "child_dof");
 END_FECORE_CLASS();

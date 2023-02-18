@@ -473,6 +473,10 @@ bool FEModel::Init()
 		if (pd->Init() == false) return false;
 	}
 */
+	// create and initialize the rigid body data
+	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
+	if (InitRigidSystem() == false) return false;
+
 	// evaluate all load controllers at the initial time
 	for (int i = 0; i < LoadControllers(); ++i)
 	{
@@ -513,10 +517,6 @@ bool FEModel::Init()
 			return false;
 		}
 	}
-
-	// create and initialize the rigid body data
-	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
-	if (InitRigidSystem() == false) return false;
 
 	// validate BC's
 	if (InitBCs() == false) return false;
@@ -1547,6 +1547,25 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 						}
 					}
 				}
+			}
+		}
+	}
+	else if (next == "domain")
+	{
+		int nid = next.Index();
+		if ((nid >= 0) && (nid < mesh.Domains()))
+		{
+			FEDomain& dom = mesh.Domain(nid);
+			ParamString paramName = next.next();
+			FEParam* param = dom.FindParameter(paramName);
+			if (param)
+			{
+				if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+				{
+					FEParamDouble& v = param->value<FEParamDouble>();
+					if (v.isConst()) return FEParamValue(param, &v.constValue(), FE_PARAM_DOUBLE);
+				}
+				return FEParamValue(param, param->data_ptr(), param->type());
 			}
 		}
 	}

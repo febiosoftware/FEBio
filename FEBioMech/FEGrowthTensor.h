@@ -31,11 +31,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for growth tensors.
 //!
-class FEGrowthTensor : public FEFiberMaterial
+class FEGrowthTensor : public FEMaterialProperty
 {
 public:
-    FEGrowthTensor(FEModel* pfem) : FEFiberMaterial(pfem) { m_fiber = nullptr; }
-    virtual ~FEGrowthTensor(){}
+	FECORE_BASE_CLASS(FEGrowthTensor);
+
+public:
+	FEGrowthTensor(FEModel* pfem);
+	virtual ~FEGrowthTensor();
     
     //! growth tensor
     virtual mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) = 0;
@@ -45,15 +48,6 @@ public:
     
     //! referential solid density
     virtual double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) = 0;
-    
-    //! stress
-    mat3ds FiberStress(FEMaterialPoint& pt, const vec3d& a0) override { return mat3dd(0); }
-    
-    //! tangent
-    tens4ds FiberTangent(FEMaterialPoint& pt, const vec3d& a0) override { tens4ds c; c.zero(); return c; }
-    
-    //! strain-energy density
-    double FiberStrainEnergyDensity(FEMaterialPoint& pt, const vec3d& a0) override { return 0; }
     
     //! initialize
     bool Init() override;
@@ -90,13 +84,6 @@ public:
 
 };
 
-class FEElasticVolumeGrowth : public FEElasticFiberMaterial_T<FEVolumeGrowth>
-{
-public:
-    FEElasticVolumeGrowth(FEModel* fem) : FEElasticFiberMaterial_T<FEVolumeGrowth>(fem) {}
-    DECLARE_FECORE_CLASS();
-};
-
 //-----------------------------------------------------------------------------
 //! Area growth
 //!
@@ -121,13 +108,6 @@ public:
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 
-};
-
-class FEElasticAreaGrowth : public FEElasticFiberMaterial_T<FEAreaGrowth>
-{
-public:
-    FEElasticAreaGrowth(FEModel* fem) : FEElasticFiberMaterial_T<FEAreaGrowth>(fem) {}
-    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -156,9 +136,3 @@ public:
 
 };
 
-class FEElasticFiberGrowth : public FEElasticFiberMaterial_T<FEFiberGrowth>
-{
-public:
-    FEElasticFiberGrowth(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberGrowth>(fem) {}
-    DECLARE_FECORE_CLASS();
-};

@@ -74,8 +74,8 @@ void FEBioFluidSolutes::InitModule()
     
     // define the fsi module
     febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes");
-	febio.SetModuleDependency("fluid");
-    febio.SetModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
+	febio.AddModuleDependency("fluid");
+    febio.AddModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
     //-----------------------------------------------------------------------------
     // analyis classes (default type must match module name!)

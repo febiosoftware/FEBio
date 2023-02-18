@@ -69,6 +69,7 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpStream& ar)
 
 BEGIN_FECORE_CLASS(FEElasticMixture, FEElasticMaterial)
 	ADD_PROPERTY(m_pMat, "solid");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

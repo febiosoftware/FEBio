@@ -1065,44 +1065,9 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
-	// calculate body forces for rigid bodies
-	for (int j = 0; j < fem.ModelLoads(); ++j)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(j));
-		if (pbf && pbf->IsActive())
-			m_rigidSolver.BodyForces(RHS, tp, *pbf);
-	}
-
-
-
-/*
-	// calculate the body forces
-	for (int j = 0; j < fem.BodyLoads(); ++j)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i < pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				dom.BodyForce(RHS, *pbf);
-			}
-		}
-	}
-*/
-
 	// calculate inertial forces for dynamic problems (not supported)
 	//if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
 	
-/*	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i = 0; i < nsl; ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
-	}
-*/
-
 	// calculate contact forces
 	if (fem.SurfacePairConstraints() > 0)
 	{

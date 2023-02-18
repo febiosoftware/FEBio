@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEBioParamRun.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
 #include <XML/XMLReader.h>
 
@@ -73,6 +74,16 @@ bool FEBioParamRun::Init(const char* szfile)
 	{
 		if (v->Init() == false) return false;
 	}
+
+	// since we can change shell thickness now, we need to reinitialize 
+	// the shell elements with the new thickness
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(&mesh.Domain(i));
+		if (shellDomain) shellDomain->AssignDefaultShellThickness();
+	}
+	fem->InitShells();
 
 	return true;
 }

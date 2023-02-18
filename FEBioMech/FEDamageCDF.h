@@ -29,11 +29,12 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/FEFunction1D.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage cumulative distribution functions
 
-class FEDamageCDF : public FEMaterialProperty
+class FEBIOMECH_API FEDamageCDF : public FEMaterialProperty
 {
 public:
     FEDamageCDF(FEModel* pfem) : FEMaterialProperty(pfem) { m_Dmax = 1; }

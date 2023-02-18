@@ -425,7 +425,13 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 
 		else if (strcmp(sz, "-import") == 0)
 		{
-			strcpy(ops.szimp, argv[++i]);
+			if ((i < nargs - 1) && (argv[i+1][0] != '-'))
+				strcpy(ops.szimp, argv[++i]);
+			else
+			{
+				fprintf(stderr, "FATAL ERROR: insufficient number of arguments for -import.\n");
+				return false;
+			}
 		}
 		else if (sz[0] == '-')
 		{

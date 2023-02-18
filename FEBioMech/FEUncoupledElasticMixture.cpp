@@ -33,8 +33,9 @@ SOFTWARE.*/
 
 // define the material parameters
  BEGIN_FECORE_CLASS(FEUncoupledElasticMixture, FEUncoupledMaterial)
-	 ADD_PROPERTY(m_pMat, "solid");
- END_FECORE_CLASS();
+	ADD_PROPERTY(m_pMat, "solid");
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // Mixture of uncoupled elastic solids

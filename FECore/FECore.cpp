@@ -112,7 +112,7 @@ REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 
 // initial conditions
-REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     );
+REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     , 0x300);	// obsolete in 4.0
 
 // (augmented lagrangian) linear constraints
 REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
