@@ -1701,8 +1701,15 @@ bool FEModel::EvaluateLoadParameters()
 				if (m_imp->m_printParams) feLog("%lg\n", p->value<FEParamDouble>().GetScaleFactor());
 			}
 			break;
-			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(s* pi.m_scl); break;
+			case FE_PARAM_VEC3D_MAPPED :
+			{
+				FEParamVec3& v = p->value<FEParamVec3>();
+				v.SetScaleFactor(s * pi.m_scl);
+				if (m_imp->m_printParams) feLog("%lg\n", v.GetScaleFactor());
+			}
+			break;
 			default:
+				feLog("\n");
 				assert(false);
 			}
 		}
