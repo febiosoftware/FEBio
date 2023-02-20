@@ -483,7 +483,7 @@ int FECoreKernel::GetFactoryIndex(int superClassId, const char* sztype)
 			if (strcmp(sztype, fac->GetTypeStr()) == 0)
 			{
 				// make sure it's part of the active module
-				if (mod->HasDependent(modId)) return j;
+				if ((modId == 0) || (mod->HasDependent(modId))) return j;
 			}
 		}
 	}
