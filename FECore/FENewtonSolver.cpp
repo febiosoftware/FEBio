@@ -848,7 +848,7 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 				break;
 			}
 		}
-		throw NANDetected(info);
+		throw NANInResidualDetected(info);
 	}
 
 	// call the qn strategy to actuall solve the equations
@@ -868,7 +868,7 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 				break;
 			}
 		}
-		throw (NANDetected(info));
+		throw (NANInSolutionDetected(info));
 	}
 
 	// store the last solution for iterative solvers

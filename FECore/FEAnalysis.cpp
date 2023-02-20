@@ -610,7 +610,12 @@ int FEAnalysis::SolveTimeStep()
 		feLogError(e.what());
 		nerr = 2;
 	}
-	catch (NANDetected e)
+	catch (NANInResidualDetected e)
+	{
+		feLogError(e.what());
+		nerr = 1;	// don't abort, instead let's retry the step
+	}	
+	catch (NANInSolutionDetected e)
 	{
 		feLogError(e.what());
 		nerr = 1;	// don't abort, instead let's retry the step

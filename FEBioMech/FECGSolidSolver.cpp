@@ -570,7 +570,7 @@ bool FECGSolidSolver::SolveStep()
 
 		// check for nans
 		double du = m_ui*m_ui;
-		if (ISNAN(du)) throw NANDetected();
+		if (ISNAN(du)) throw NANInSolutionDetected();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
