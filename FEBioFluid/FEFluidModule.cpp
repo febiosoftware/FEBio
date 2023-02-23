@@ -275,8 +275,8 @@ void FEPolarFluidModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-//FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(EXPERIMENTAL); }
-FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(RELEASED); }
+FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(EXPERIMENTAL); }
+//FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(RELEASED); }
 void FEFluidSolutesModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom
