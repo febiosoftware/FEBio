@@ -45,7 +45,7 @@ END_FECORE_CLASS();
 FESoluteNaturalFlux::FESoluteNaturalFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofC(pfem), m_dofU(pfem), m_dofP(pfem)
 {
     m_bshellb = false;
-    m_isol = 0;
+    m_isol = -1;
     m_bup = false;
 }
     

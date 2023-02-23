@@ -54,11 +54,12 @@ public:
     void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
-    double          m_p;       //!< prescribed fluid pressure
+    FEParamDouble   m_p;       //!< prescribed fluid pressure
 
 private:
     std::vector<double> m_e;
-    FEMultiphasicFSI* m_pfs;   //!< pointer to fluid-solutes material
+    double      m_Rgas;
+    double      m_Tabs;
     int        m_dofEF;
     int        m_dofC;
 

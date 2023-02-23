@@ -37,9 +37,15 @@ public:
     //! constructor
     FEPrescribedFluidPressure(FEModel* pfem);
 
+    //! set the dilatation
+    void Update() override;
+    
     //! initialize
     bool Init() override;
 
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
     // return the value for node i, dof j
     void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
@@ -48,10 +54,10 @@ public:
 
 protected:
     int             m_dofEF;
-    FEFluidMaterial* m_pfluid;   //!< pointer to fluid
 
 public:
-    double  m_p0;       // prescribed pressure
+    FEParamDouble   m_p;       //!< prescribed fluid pressure
+    vector<double>  m_e;
 
     DECLARE_FECORE_CLASS();
 };

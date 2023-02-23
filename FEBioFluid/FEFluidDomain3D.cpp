@@ -112,7 +112,8 @@ void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
-            
+            mp.m_rt = mp.m_r0;
+
             if (pt.m_ef <= -1) {
                 throw NegativeJacobianDetected();
             }

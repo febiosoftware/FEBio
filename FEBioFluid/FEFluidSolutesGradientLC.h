@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,55 +27,59 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FESurfaceLoad.h>
-#include "FEFluidSolutes.h"
-#include <FECore/FENodeNodeList.h>
+#include <FECore/FEAugLagLinearConstraint.h>
+#include <FECore/FESurface.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! FESoluteBackflowStabilization is a fluid surface where solute concentration
-//! is maintained constant when the fluid velocity normal to the surface is
-//! inward.
-//!
-class FEBIOFLUID_API FESoluteBackflowStabilization : public FESurfaceLoad
+//! The FEFluidSolutesGradientLC class implements a fluid surface with prescribed pressure
+//! as a linear constraint between nodal dilatation and effective concentrations.
+
+class FEBIOFLUID_API FEFluidSolutesGradientLC : public FESurfaceConstraint
 {
 public:
     //! constructor
-    FESoluteBackflowStabilization(FEModel* pfem);
+    FEFluidSolutesGradientLC(FEModel* pfem);
     
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS) override {}
+    //! destructor
+    ~FEFluidSolutesGradientLC() {}
     
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R) override;
-    
-    //! set the dilatation
-    void Update() override;
-    
-    //! evaluate flow rate
-    void MarkBackFlow();
-    
-    //! initialize
-    bool Init() override;
-    
-    //! activate
+    //! Activation
     void Activate() override;
     
-    //! serialization
+    //! initialization
+    bool Init() override;
+    
+    //! Get the surface
+    FESurface* GetSurface() override { return &m_surf; }
+    
+public:
+    //! serialize data to archive
     void Serialize(DumpStream& ar) override;
     
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
+    //! add the linear constraint contributions to the residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
     
-    void SetSolute(int isol) { m_isol = isol; }
+    //! add the linear constraint contributions to the stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+    
+    //! do the augmentation
+    bool Augment(int naug, const FETimeInfo& tp) override;
+    
+    //! build connectivity for matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 protected:
-    int         m_isol;          //!< solute id
+    void UnpackLM(vector<int>& lm);
+    
+protected:
+    FESurface	m_surf;
+    FELinearConstraintSet   m_lc;
+    bool        m_binit;
 
-private:
-    FEDofList   m_dofW;
+    // degrees of freedom
     int         m_dofC;
-    vector<bool> m_backflow;    //!< flag for nodes that have backflow
-    FENodeNodeList m_nnlist;
+    int         m_isol;
 
     DECLARE_FECORE_CLASS();
 };

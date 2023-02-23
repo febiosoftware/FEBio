@@ -153,3 +153,10 @@ public: FactorizationError() : FEException("Fatal error in factorization of stif
 class FECORE_API NegativeJacobianDetected : public FEException {
 public: NegativeJacobianDetected() : FEException("Negative jacobian was detected.") {}
 };
+
+class FECORE_API ConcentrationChangeDetected : public FEException {
+public:
+    ConcentrationChangeDetected() : FEException("Concentration change detected") {}
+    ConcentrationChangeDetected(const FENodalDofInfo& ndi);
+};
+

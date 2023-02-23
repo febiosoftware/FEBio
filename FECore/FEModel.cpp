@@ -1266,6 +1266,9 @@ bool FEModel::RCI_Finish()
 // so we do it here. This function is called in Init() and Reset()
 void FEModel::Activate()
 {
+    // initialize material points before evaluating contact autopenalty
+    m_imp->m_mesh.InitMaterialPoints();
+    
 	// initial conditions
 	// Must be activated before prescribed BC's
 	// since relative prescribed BC's use the initial values
@@ -1296,9 +1299,6 @@ void FEModel::Activate()
 		if (plc->IsActive()) plc->Activate();
 	}
 
-	// initialize material points before evaluating contact autopenalty
-    m_imp->m_mesh.InitMaterialPoints();
-    
 	// contact interfaces
     for (int i=0; i<SurfacePairConstraints(); ++i)
 	{

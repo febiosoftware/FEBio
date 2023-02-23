@@ -195,3 +195,10 @@ FEMultiScaleException::FEMultiScaleException(int eid, int gpt)
 {
 	what("The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", eid, gpt + 1);
 }
+
+//-----------------------------------------------------------------------------
+ConcentrationChangeDetected::ConcentrationChangeDetected(const FENodalDofInfo& ndi)
+{
+    what("Sudden concentration change detected.\n");
+}
+
