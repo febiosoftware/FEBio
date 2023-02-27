@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEOsmCoefManning.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -47,7 +48,8 @@ FEOsmCoefManning::FEOsmCoefManning(FEModel* pfem) : FEOsmoticCoefficient(pfem)
     m_sol = -1;
     m_lsol = -1;
     // by default, set the osmotic coefficient to a constant = 1
-    m_osmc = new FELinearFunction(pfem,0,1);
+    m_osmc = fecore_alloc(FEConstFunction, pfem);
+	m_osmc->SetParameter("value", 1.0);
 }
 
 //-----------------------------------------------------------------------------
