@@ -35,6 +35,8 @@ elseif(APPLE)
     add_definitions(-DHAS_ACCEL)
 else()
 	add_definitions(-DLINUX)
+    
+    option(USE_STATIC_STDLIBS "Helps to create more portable binaries" ON)
 endif()
 
 ##### Search for library and include directories #####
@@ -394,8 +396,10 @@ if(WIN32 OR APPLE)
 	target_link_libraries(febio4 fecore febiolib)
 else()
 	target_link_libraries(febio4 -Wl,--start-group fecore febiolib -Wl,--end-group)
-        
-    target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
+    
+    if(USE_STATIC_STDLIBS)
+        target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
+    endif()
     
     # Extra compiler flags for intel compiler
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
