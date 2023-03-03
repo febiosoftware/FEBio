@@ -155,7 +155,7 @@ int FEBioApp::RunModel()
 		Console::GetHandle()->Deactivate();
 
 	// register callbacks
-	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED, 0);
+	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED | CB_STEP_ACTIVE, 0);
 	fem.AddCallback(interrupt_cb, CB_ALWAYS, 0);
 	fem.AddCallback(break_point_cb, CB_ALWAYS, 0);
 
