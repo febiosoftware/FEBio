@@ -27,11 +27,12 @@ SOFTWARE.*/
 #pragma once
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for growth tensors.
 //!
-class FEGrowthTensor : public FEMaterialProperty
+class FEBIOMECH_API FEGrowthTensor : public FEMaterialProperty
 {
 public:
 	FECORE_BASE_CLASS(FEGrowthTensor);

@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FERigidLoad : public FEModelLoad
+class FEBIOMECH_API FERigidLoad : public FEModelLoad
 {
 public:
 	FERigidLoad(FEModel* fem) : FEModelLoad(fem) {}

@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include "febiomech_api.h"
 #include <FECore/tens4d.h>
 
-class FEFiberMaterial : public FEMaterialProperty
+class FEBIOMECH_API FEFiberMaterial : public FEMaterialProperty
 {
 	FECORE_BASE_CLASS(FEFiberMaterial);
 
@@ -45,7 +45,7 @@ public:
 };
 
 // fiber materials for use in uncoupled materials
-class FEFiberMaterialUncoupled : public FEMaterialProperty
+class FEBIOMECH_API FEFiberMaterialUncoupled : public FEMaterialProperty
 {
 	FECORE_BASE_CLASS(FEFiberMaterialUncoupled);
 

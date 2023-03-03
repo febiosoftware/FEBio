@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/DumpStream.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 class FEMembraneMaterialPoint : public FEMaterialPointData
@@ -60,7 +61,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEMembraneMaterial : public FEMaterial
+class FEBIOMECH_API FEMembraneMaterial : public FEMaterial
 {
 public:
 	FEMembraneMaterial(FEModel* pfem) : FEMaterial(pfem) {}

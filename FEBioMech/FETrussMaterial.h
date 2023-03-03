@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 
 #include "FECore/FEMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Material point class for truss materials
@@ -62,7 +63,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Base class for truss element materials
-class FETrussMaterial : public FEMaterial
+class FEBIOMECH_API FETrussMaterial : public FEMaterial
 {
 public:
 	FETrussMaterial(FEModel* pfem);
