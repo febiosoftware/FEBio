@@ -69,7 +69,7 @@ BEGIN_FECORE_CLASS(FEFluidSolutesSolver, FENewtonSolver)
     ADD_PARAMETER(m_pred , "predictor"   );
     ADD_PARAMETER(m_minJf, "min_volume_ratio");
     ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
-    ADD_PARAMETER(m_solve_strategy, "solve_strategy");
+    ADD_PARAMETER(m_solve_strategy, "solve_strategy")->setEnums("coupled\0sequential\0");
     ADD_PARAMETER(m_cmin , "min_C_drop")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
     ADD_PARAMETER(m_cmax , "min_C_rise")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
     ADD_PARAMETER(m_cnum , "min_C_num")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
