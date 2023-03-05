@@ -71,7 +71,11 @@ void FEBioThermoFluid::InitModule()
     febio.RegisterDomain(new FEThermoFluidDomainFactory);
 
     // define the thermo-fluid module
-    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
+    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid",
+                       "{"
+                       "   \"title\" : \"Thermofluid\","
+                       "   \"info\"  : \"Fluid analysis with heat transfer and thermodynamics.\""
+                       "}");
     febio.AddModuleDependency("fluid");
 
     //-----------------------------------------------------------------------------
