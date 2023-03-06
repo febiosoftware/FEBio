@@ -35,18 +35,21 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEIdealGas, FEElasticFluid)
 
     // material parameters
-    ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M");
-    ADD_PARAMETER(m_ar  , "ar");
-    ADD_PARAMETER(m_sr  , "sr");
-    ADD_PROPERTY (m_ao  , "ao");
-    ADD_PROPERTY (m_cp  , "cp");
+    ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M")->setUnits("M/n")->setLongName("molar mass");
+    ADD_PARAMETER(m_ar  , "ar")->setLongName("normalized referential specific free energy");    // ar normalized by R.Tr/M
+    ADD_PARAMETER(m_sr  , "sr")->setLongName("normalized referential specific entropy");        // sr normalized by R/M
+    ADD_PROPERTY (m_ao  , "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
+    ADD_PROPERTY (m_cp  , "cp")->SetLongName("normalized isobaric specific heat capacity");     // cp normalized by R/M
 
 END_FECORE_CLASS();
 
 FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
 {
     m_R = m_Pr = m_Tr = m_ar = m_sr = 0;
-    m_ao = m_cp = nullptr;
+    m_ao = fecore_alloc(FEMathFunction, pfem);
+    m_ao->SetParameter("math","cp0nd*(-v*log(v)+v-1)");
+    m_cp = fecore_alloc(FEConstFunction, pfem);
+    m_cp->SetParameter("value", 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -154,18 +157,19 @@ double FEIdealGas::SpecificFreeEnergy(FEMaterialPoint& mp)
     
     double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
-    double Tr = m_Tr;
+    double That = T/m_Tr;
+    double scl = m_R*m_Tr/m_M;
     
     // referential free energy
-    double a = m_ar - m_sr*(T-Tr);
+    double a = m_ar - m_sr*(That-1);
     
     // add a_circle
-    a += m_ao->value(T);
+    a += m_ao->value(That);
     
     // add strain-dependent contribution
-    a += m_R/m_M*(J*Tr-T+T*log(T/(J*Tr)));
+    a += J+That*(log(That/J)-1);
 
-    return a;
+    return a*scl;
 }
 
 //-----------------------------------------------------------------------------
@@ -177,18 +181,19 @@ double FEIdealGas::SpecificEntropy(FEMaterialPoint& mp)
     
     double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
-    double Tr = m_Tr;
-    
+    double That = T/m_Tr;
+    double scl = m_R/m_M;
+
     // referential entropy
     double s = m_sr;
     
     // add s_circle
-    s -= m_ao->derive(T);
+    s -= m_ao->derive(That);
     
     // add strain-dependent contribution
-    s += -m_R/m_M*log(T/(J*Tr));
+    s += -log(That/J);
 
-    return s;
+    return s*scl;
 }
 
 //-----------------------------------------------------------------------------
@@ -200,12 +205,13 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
     
     double J = 1 + fp.m_ef;
     double T = tf.m_T;
-    double Tr = m_Tr;
-    
-    // strain-dependent contribution
-    double a = m_R/m_M*(J*Tr-T+T*log(T/(J*Tr)));
+    double That = T/m_Tr;
+    double scl = m_R*m_Tr/m_M;
 
-    return a;
+    // strain-dependent contribution
+    double a = J+That*(log(That/J)-1);
+
+    return a*scl;
 }
 
 //-----------------------------------------------------------------------------
@@ -214,10 +220,12 @@ double FEIdealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double scl = m_R/m_M;
+
+    double cp = m_cp->value(That);
     
-    double cp = m_cp->value(T);
-    
-    return cp;
+    return cp*scl;
 }
                 
 //-----------------------------------------------------------------------------
@@ -242,10 +250,12 @@ double FEIdealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double scl = m_R/(m_M*m_Tr);
+
+    double dcv = m_cp->derive(That);
     
-    double dcv = m_cp->derive(T);
-    
-    return dcv;
+    return dcv*scl;
 }
 
 //-----------------------------------------------------------------------------
