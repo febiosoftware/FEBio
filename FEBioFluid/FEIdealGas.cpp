@@ -35,7 +35,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEIdealGas, FEElasticFluid)
 
     // material parameters
-    ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M")->setLongName("molar mass")->setUnits("M/n");
+    ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M")->setUnits("M/n")->setLongName("molar mass");
     ADD_PARAMETER(m_ar  , "ar")->setLongName("normalized referential specific free energy");    // ar normalized by R.Tr/M
     ADD_PARAMETER(m_sr  , "sr")->setLongName("normalized referential specific entropy");        // sr normalized by R/M
     ADD_PROPERTY (m_ao  , "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
@@ -46,7 +46,10 @@ END_FECORE_CLASS();
 FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
 {
     m_R = m_Pr = m_Tr = m_ar = m_sr = 0;
-    m_ao = m_cp = nullptr;
+    m_ao = fecore_alloc(FEMathFunction, pfem);
+    m_ao->SetParameter("math","cp0nd*(-v*log(v)+v-1)");
+    m_cp = fecore_alloc(FEConstFunction, pfem);
+    m_cp->SetParameter("value", 0);
 }
 
 //-----------------------------------------------------------------------------
