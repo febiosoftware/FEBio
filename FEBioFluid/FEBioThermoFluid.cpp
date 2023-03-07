@@ -33,6 +33,10 @@ SOFTWARE.*/
 #include "FEThermoFluid.h"
 #include "FEThermoFluidDomain3D.h"
 #include "FEThermoFluidDomainFactory.h"
+#include "FEFixedFluidTemperature.h"
+#include "FEInitialFluidTemperature.h"
+#include "FEPrescribedFluidTemperature.h"
+#include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
@@ -89,9 +93,26 @@ void FEBioThermoFluid::InitModule()
 
     REGISTER_FECORE_CLASS(FEThermoFluidDomain3D, "thermo-fluid-3D");
 
+    //-----------------------------------------------------------------------------
+    // initial conditions
+    REGISTER_FECORE_CLASS(FEInitialFluidTemperature  , "initial fluid temperature");
+    
+    //-----------------------------------------------------------------------------
+    // boundary conditions
+    REGISTER_FECORE_CLASS(FEFixedFluidTemperature       , "zero fluid temperature"      );
+    REGISTER_FECORE_CLASS(FEPrescribedFluidTemperature  , "prescribed fluid temperature");
+    
+    //-----------------------------------------------------------------------------
+    // Surface loads
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
 
+    //-----------------------------------------------------------------------------
+    // Body loads
+    REGISTER_FECORE_CLASS(FEFluidHeatSupplyConst   , "constant fluid heat supply");
+    
+    //-----------------------------------------------------------------------------
+    // Materials
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );
