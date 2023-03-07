@@ -36,7 +36,7 @@ SOFTWARE.*/
 #include "FEFluidRotationalVelocity.h"
 #include "FETiedFluidInterface.h"
 #include "FEThermoFluidSolver.h"
-#include "FEThermoFluidDomain.h"
+#include "FEThermoFluidDomain3D.h"
 #include "FEFluidDomain.h"
 #include <assert.h>
 #include <FEBioMech/FEResidualVector.h>
@@ -102,17 +102,6 @@ FEThermoFluidSolver::FEThermoFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), 
     // turn off checking for a zero diagonal
     CheckZeroDiagonal(false);
 
-    // get the dof indices
-    // TODO: Can this be done in Init, since there is no error checking
-    if (pfem)
-    {
-        m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
-        m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));
-        m_dofEF.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION));
-        m_dofAEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION_TDERIV), 0);
-        m_dofT.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
-        m_dofAT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), 0);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -175,19 +164,10 @@ bool FEThermoFluidSolver::Init()
         FEDomain& dom = mesh.Domain(i);
         if (dom.IsActive()) {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) {
-                if (pstep->m_nanalysis == FEThermoFluidAnalysis::STEADY_STATE)
-                    fdom->SetSteadyStateAnalysis();
-                else
-                    fdom->SetTransientAnalysis();
-            }
-            else if (tdom) {
-                if (pstep->m_nanalysis == FEThermoFluidAnalysis::STEADY_STATE)
-                    tdom->SetSteadyStateAnalysis();
-                else
-                    tdom->SetTransientAnalysis();
-            }
+            if (pstep->m_nanalysis == FEThermoFluidAnalysis::STEADY_STATE)
+                fdom->SetSteadyStateAnalysis();
+            else
+                fdom->SetTransientAnalysis();
         }
     }
 
@@ -198,6 +178,15 @@ bool FEThermoFluidSolver::Init()
 //! Initialize equations
 bool FEThermoFluidSolver::InitEquations()
 {
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));
+    m_dofEF.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION));
+    m_dofAEF = fem.GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION_TDERIV), 0);
+    m_dofT.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
+    m_dofAT = fem.GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), 0);
+
     // Add the solution variables
     AddSolutionVariable(&m_dofW , 1, "velocity"   , m_Vtol);
     AddSolutionVariable(&m_dofEF, 1, "dilatation" , m_Ftol);
@@ -207,7 +196,6 @@ bool FEThermoFluidSolver::InitEquations()
     FENewtonSolver::InitEquations();
     
     // determined the nr of velocity and dilatation equations
-    FEMesh& mesh = GetFEModel()->GetMesh();
     m_nveq = m_ndeq = m_nteq = 0;
     
     for (int i=0; i<mesh.Nodes(); ++i)
@@ -221,55 +209,6 @@ bool FEThermoFluidSolver::InitEquations()
     }
 
     // Next, we add any Lagrange Multipliers
-    FEModel& fem = *GetFEModel();
-    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
-    {
-        FENLConstraint* lmc = fem.NonlinearConstraint(i);
-        if (lmc->IsActive())
-        {
-            m_neq += lmc->InitEquations(m_neq);
-        }
-    }
-    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
-    {
-        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
-        if (spc->IsActive())
-        {
-            m_neq += spc->InitEquations(m_neq);
-        }
-    }
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialize equations
-bool FEThermoFluidSolver::InitEquations2()
-{
-    // Add the solution variables
-    AddSolutionVariable(&m_dofW , -1, "velocity"   , m_Vtol);
-    AddSolutionVariable(&m_dofEF, -1, "dilatation" , m_Ftol);
-    AddSolutionVariable(&m_dofT , -1, "temperature", m_Ttol);
-
-    // base class initialization
-    FENewtonSolver::InitEquations2();
-
-    // determined the nr of velocity and dilatation equations
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    m_nveq = m_ndeq = m_nteq = 0;
-
-    for (int i = 0; i<mesh.Nodes(); ++i)
-    {
-        FENode& n = mesh.Node(i);
-        if (n.m_ID[m_dofW[0]] != -1) m_nveq++;
-        if (n.m_ID[m_dofW[1]] != -1) m_nveq++;
-        if (n.m_ID[m_dofW[2]] != -1) m_nveq++;
-        if (n.m_ID[m_dofEF[0]] != -1) m_ndeq++;
-        if (n.m_ID[m_dofT[0]] != -1) m_nteq++;
-    }
-
-    // Next, we add any Lagrange Multipliers
-    FEModel& fem = *GetFEModel();
     for (int i = 0; i < fem.NonlinearConstraints(); ++i)
     {
         FENLConstraint* lmc = fem.NonlinearConstraint(i);
@@ -400,13 +339,13 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
     }
 
     // prescribe DOFs for specialized surface loads
-    int nsl = fem.ModelLoads();
+/*    int nsl = fem.ModelLoads();
     for (int i=0; i<nsl; ++i)
     {
         FEModelLoad& psl = *fem.ModelLoad(i);
 //        if (psl.IsActive() && HasActiveDofs(psl.GetDofList())) psl.Update();
         if (psl.IsActive()) psl.Update();
-    }
+    }*/
     
     // enforce the linear constraints
     // TODO: do we really have to do this? Shouldn't the algorithm
@@ -842,9 +781,7 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
         FEDomain& dom = mesh.Domain(i);
         if (dom.IsActive()) {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->StiffnessMatrix(LS);
-            else if (tdom) tdom->StiffnessMatrix(LS);
+            fdom->StiffnessMatrix(LS);
         }
     }
     
@@ -863,9 +800,7 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
                 if (dom->IsActive())
                 {
                     FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
-                    FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
-                    if (fdom) fdom->BodyForceStiffness(LS, *pbf);
-                    else if (tdom) tdom->BodyForceStiffness(LS, *pbf);
+                    fdom->BodyForceStiffness(LS, *pbf);
                 }
             }
         }
@@ -876,18 +811,23 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
                 FEDomain* dom = phs->Domain(i);
                 if (dom->IsActive())
                 {
-                    FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
+                    FEThermoFluidDomain3D* tdom = dynamic_cast<FEThermoFluidDomain3D*>(dom);
                     if (tdom) tdom->HeatSupplyStiffness(LS, *phs);
                 }
             }
         }
-//      else if (pml->IsActive() && HasActiveDofs(pml->GetDofList())) pml->StiffnessMatrix(LS);
-        else if (pml->IsActive()) pml->StiffnessMatrix(LS);
     }
     
     // calculate contact stiffness
     ContactStiffness(LS);
     
+    // calculate stiffness matrix due to model loads
+    int nsl = fem.ModelLoads();
+    for (int i=0; i<nsl; ++i)
+    {
+        FEModelLoad* pml = fem.ModelLoad(i);
+        if (pml->IsActive()) pml->StiffnessMatrix(LS);
+    }
     // Add mass matrix
     // loop over all domains
     for (int i=0; i<mesh.Domains(); ++i)
@@ -896,9 +836,7 @@ bool FEThermoFluidSolver::StiffnessMatrix(FELinearSystem& LS)
         if (dom.IsActive())
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->MassMatrix(LS);
-            else if (tdom) tdom->MassMatrix(LS);
+            fdom->MassMatrix(LS);
         }
     }
     
@@ -985,9 +923,7 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
         if (dom.IsActive())
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->InternalForces(RHS);
-            else if (tdom) tdom->InternalForces(RHS);
+            fdom->InternalForces(RHS);
         }
     }
     
@@ -1005,9 +941,7 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
                 if (dom->IsActive())
                 {
                     FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
-                    FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
-                    if (fdom) fdom->BodyForce(RHS, *pbf);
-                    else if (tdom) tdom->BodyForce(RHS, *pbf);
+                    fdom->BodyForce(RHS, *pbf);
                 }
             }
         }
@@ -1018,13 +952,11 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
                 FEDomain* dom = phs->Domain(i);
                 if (dom->IsActive())
                 {
-                    FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(dom);
+                    FEThermoFluidDomain3D* tdom = dynamic_cast<FEThermoFluidDomain3D*>(dom);
                     if (tdom) tdom->HeatSupply(RHS, *phs);
                 }
             }
         }
-//      else if (pml->IsActive() && HasActiveDofs(pml->GetDofList())) pml->LoadVector(RHS);
-        else if (pml->IsActive()) pml->LoadVector(RHS);
     }
     
     // calculate inertial forces
@@ -1034,9 +966,7 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
         if (dom.IsActive())
         {
             FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEThermoFluidDomain* tdom = dynamic_cast<FEThermoFluidDomain*>(&dom);
-            if (fdom) fdom->InertialForces(RHS);
-            else if (tdom) tdom->InertialForces(RHS);
+            fdom->InertialForces(RHS);
         }
     }
 
@@ -1047,6 +977,17 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
     // note that these are the linear constraints
     // enforced using the augmented lagrangian
     NonLinearConstraintForces(RHS, tp);
+    
+    // add model loads
+    int NML = fem.ModelLoads();
+    for (int i=0; i<NML; ++i)
+    {
+        FEModelLoad& mli = *fem.ModelLoad(i);
+        if (mli.IsActive())
+        {
+            mli.LoadVector(RHS);
+        }
+    }
     
     // set the nodal reaction forces
     // TODO: Is this a good place to do this?

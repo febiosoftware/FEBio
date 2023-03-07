@@ -42,7 +42,7 @@ SOFTWARE.*/
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEThermoFluidDomain3D::FEThermoFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEThermoFluidDomain(pfem), m_dofW(pfem), m_dofAW(pfem), m_dof(pfem)
+FEThermoFluidDomain3D::FEThermoFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDomain(pfem), m_dofW(pfem), m_dofAW(pfem), m_dof(pfem)
 {
     m_pMat = 0;
     m_btrans = true;
