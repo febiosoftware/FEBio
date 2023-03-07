@@ -46,10 +46,8 @@ END_FECORE_CLASS();
 FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
 {
     m_R = m_Pr = m_Tr = m_ar = m_sr = 0;
-    m_ao = fecore_alloc(FEMathFunction, pfem);
-    m_ao->SetParameter("math","cp0nd*(-v*log(v)+v-1)");
-    m_cp = fecore_alloc(FEConstFunction, pfem);
-    m_cp->SetParameter("value", 0);
+    m_ao = nullptr;
+    m_cp = nullptr;
 }
 
 //-----------------------------------------------------------------------------

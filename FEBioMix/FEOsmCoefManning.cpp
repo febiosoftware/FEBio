@@ -36,8 +36,8 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOsmCoefManning, FEOsmoticCoefficient)
     ADD_PARAMETER(m_ksi , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-    ADD_PARAMETER (m_sol , "co_ion");
-    ADD_PROPERTY(m_osmc, "osmc"  );
+    ADD_PARAMETER (m_sol , "co_ion")->setEnums("$(solutes)");
+    ADD_PROPERTY(m_osmc, "osmc")->SetLongName("Wells osmotic coefficient");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -47,9 +47,7 @@ FEOsmCoefManning::FEOsmCoefManning(FEModel* pfem) : FEOsmoticCoefficient(pfem)
     m_ksi = 1;
     m_sol = -1;
     m_lsol = -1;
-    // by default, set the osmotic coefficient to a constant = 1
-    m_osmc = fecore_alloc(FEConstFunction, pfem);
-	m_osmc->SetParameter("value", 1.0);
+    m_osmc = nullptr;
 }
 
 //-----------------------------------------------------------------------------
