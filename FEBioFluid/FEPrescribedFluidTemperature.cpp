@@ -30,7 +30,7 @@ SOFTWARE.*/
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
 BEGIN_FECORE_CLASS(FEPrescribedFluidTemperature, FEBoundaryCondition)
-	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
+	ADD_PARAMETER(m_scale, "value")->setUnits(UNIT_RELATIVE_TEMPERATURE)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 

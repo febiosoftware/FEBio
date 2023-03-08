@@ -93,7 +93,7 @@ public:
 class FEPlotNodalFluidTemperature : public FEPlotNodeData
 {
 public:
-    FEPlotNodalFluidTemperature(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE){}
+    FEPlotNodalFluidTemperature(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
@@ -219,7 +219,7 @@ public:
 class FEPlotFluidTemperature : public FEPlotDomainData
 {
 public:
-    FEPlotFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_TEMPERATURE); }
+    FEPlotFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

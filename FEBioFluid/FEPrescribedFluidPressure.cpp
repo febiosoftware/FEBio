@@ -31,7 +31,7 @@
 
  //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPrescribedFluidPressure, FEPrescribedSurface)
-    ADD_PARAMETER(m_p, "pressure")->setUnits("P")->setLongName("fluid pressure");
+    ADD_PARAMETER(m_p, "pressure")->setUnits(UNIT_PRESSURE)->setLongName("fluid pressure");
 END_FECORE_CLASS();
 
 
