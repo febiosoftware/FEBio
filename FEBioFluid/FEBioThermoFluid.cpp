@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include "FETempDependentConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
+#include "FEThermoFluidPressureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
 #include <FECore/FEModelUpdate.h>
@@ -101,7 +102,8 @@ void FEBioThermoFluid::InitModule()
     // boundary conditions
     REGISTER_FECORE_CLASS(FEFixedFluidTemperature       , "zero fluid temperature"      );
     REGISTER_FECORE_CLASS(FEPrescribedFluidTemperature  , "prescribed fluid temperature");
-    
+    REGISTER_FECORE_CLASS(FEThermoFluidPressureBC       , "fluid pressure");
+
     //-----------------------------------------------------------------------------
     // Surface loads
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");

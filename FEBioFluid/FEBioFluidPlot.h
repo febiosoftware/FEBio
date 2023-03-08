@@ -62,7 +62,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Nodal effective fluid pressures
+//! Nodal fluid dilatation
 class FEPlotFluidDilatation : public FEPlotNodeData
 {
 public:
@@ -85,6 +85,15 @@ class FEPlotNodalPolarFluidAngularVelocity : public FEPlotNodeData
 {
 public:
     FEPlotNodalPolarFluidAngularVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_ANGULAR_VELOCITY); }
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal fluid temperature
+class FEPlotNodalFluidTemperature : public FEPlotNodeData
+{
+public:
+    FEPlotNodalFluidTemperature(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE){}
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
