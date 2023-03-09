@@ -36249,7 +36249,8 @@ Ksh
 \emph on
 Lmax
 \emph default
-: relative length at which Fmax occurs.
+: strain (i.e.
+ stretch - 1) at which Fmax occurs.
  
 \end_layout
 
