@@ -60,9 +60,8 @@ PointCurve::PointCurve(const PointCurve& pc) : im(new PointCurve::Imp)
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
 	im->spline = nullptr;
-	if (pc.im->spline) Update();
     im->akima = nullptr;
-    if (pc.im->akima) Update();
+	Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -71,10 +70,9 @@ void PointCurve::operator = (const PointCurve& pc)
 	im->fnc = pc.im->fnc;
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
-	delete im->spline; im->spline = nullptr;
-	if (pc.im->spline) Update();
-    delete im->akima; im->akima = nullptr;
-    if (pc.im->akima) Update();
+    if (im->spline) delete im->spline;
+    if (im->akima) delete im->akima;
+	Update();
 }
 
 //-----------------------------------------------------------------------------
