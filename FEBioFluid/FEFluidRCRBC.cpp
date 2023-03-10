@@ -86,36 +86,44 @@ bool FEFluidRCRBC::Init()
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
+void FEFluidRCRBC::UpdateDilatation()
+{
+	// Check if we started a new time, if so, update variables
+	FETimeInfo& timeInfo = GetFEModel()->GetTime();
+	double time = timeInfo.currentTime;
+	int iter = timeInfo.currentIteration;
+	double dt = timeInfo.timeIncrement;
+	if ((time > m_tp) && (iter == 0)) {
+		m_pp = m_pn;
+		m_qp = m_qn;
+		m_pdp = m_pdn;
+		m_tp = time;
+	}
+
+	// evaluate the flow rate at the current time
+	m_qn = FlowRate();
+	m_pdn = m_pd;
+
+	double tau = m_Rd * m_C;
+
+	// calculate the RCR pressure
+	m_pn = m_pdn + (m_Rd / (1 + tau / dt) + m_R) * m_qn + tau / (dt + tau) * (m_pp - m_pdp - m_R * m_qp);
+
+	// calculate the dilatation
+	m_e = 0.0;
+	bool good = m_pfluid->Dilatation(0, m_pn, 0, m_e);
+	assert(good);
+}
+
 void FEFluidRCRBC::Update()
 {
-    // Check if we started a new time, if so, update variables
-    FETimeInfo& timeInfo = GetFEModel()->GetTime();
-    double time = timeInfo.currentTime;
-    int iter = timeInfo.currentIteration;
-    double dt = timeInfo.timeIncrement;
-    if ((time > m_tp) && (iter == 0)) {
-        m_pp = m_pn;
-        m_qp = m_qn;
-        m_pdp = m_pdn;
-        m_tp = time;
-    }
-    
-    // evaluate the flow rate at the current time
-    m_qn = FlowRate();
-    m_pdn = m_pd;
-    
-    double tau = m_Rd*m_C;
-    
-    // calculate the RCR pressure
-    m_pn = m_pdn + (m_Rd/(1+tau/dt)+m_R)*m_qn + tau/(dt+tau)*(m_pp - m_pdp - m_R*m_qp);
-    
-    // calculate the dilatation
-    m_e = 0.0;
-    bool good = m_pfluid->Dilatation(0,m_pn,0, m_e);
-    assert(good);
+	UpdateDilatation();
 
     // the base class handles mapping the values to the nodal dofs
     FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,9 +187,18 @@ double FEFluidRCRBC::FlowRate()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidRCRBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidRCRBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e;
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e);
 }
 
 //-----------------------------------------------------------------------------

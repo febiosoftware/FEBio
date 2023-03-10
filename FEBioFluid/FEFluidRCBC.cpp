@@ -84,7 +84,7 @@ bool FEFluidRCBC::Init()
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
-void FEFluidRCBC::Update()
+void FEFluidRCBC::UpdateDilatation()
 {
     const FETimeInfo& tp = GetTimeInfo();
 
@@ -115,9 +115,23 @@ void FEFluidRCBC::Update()
     m_e = 0.0;
     bool good = m_pfluid->Dilatation(0,m_pt + m_p0,0, m_e);
     assert(good);
+}
 
-    // the base class handles mapping the values to the nodal dofs
-    FEPrescribedSurface::Update();
+//-----------------------------------------------------------------------------
+void FEFluidRCBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidRCBC::Update()
+{
+	UpdateDilatation();
+	FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +139,8 @@ void FEFluidRCBC::Update()
 void FEFluidRCBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e;
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e);
 }
 
 //-----------------------------------------------------------------------------

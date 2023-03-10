@@ -72,8 +72,18 @@ bool FEFluidResistanceBC::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate and prescribe the resistance pressure
 void FEFluidResistanceBC::Update()
+{
+	UpdateDilatation();
+	FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate and prescribe the resistance pressure
+void FEFluidResistanceBC::UpdateDilatation()
 {
     // evaluate the flow rate
     double Q = FlowRate();
@@ -85,8 +95,6 @@ void FEFluidResistanceBC::Update()
     m_e = 0;
     bool good = m_pfluid->Dilatation(0,p+m_p0,0, m_e);
     assert(good);
-    
-    FEPrescribedSurface::Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -152,9 +160,19 @@ double FEFluidResistanceBC::FlowRate()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidResistanceBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidResistanceBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e;
+
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e);
 }
 
 //-----------------------------------------------------------------------------

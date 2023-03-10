@@ -62,71 +62,90 @@ bool FEPrescribedFluidPressure::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEPrescribedFluidPressure::UpdateDilatation()
+{
+	// prescribe this dilatation at the nodes
+	FESurface* ps = GetSurface();
+
+	int N = ps->Nodes();
+	std::vector<vector<double>> efNodes(N, vector<double>());
+
+	//Project sum of all ca and osc values from int points to nodes on surface
+	//All values put into map, including duplicates
+	for (int i = 0; i < ps->Elements(); ++i)
+	{
+		FESurfaceElement& el = ps->Element(i);
+		// evaluate average prescribed pressure on this face
+		double p = 0;
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint* pt = el.GetMaterialPoint(j);
+			p += m_p(*pt);
+		}
+		p /= el.GaussPoints();
+		FEElement* e = el.m_elem[0];
+		FEMaterial* pm = GetFEModel()->GetMaterial(e->GetMatID());
+		FEFluid* pfl = pm->ExtractProperty<FEFluid>();
+		if (pfl == nullptr) break;
+		FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+		if (se) {
+			double efi[FEElement::MAX_INTPOINTS] = { 0 };
+			double efo[FEElement::MAX_NODES] = { 0 };
+			for (int j = 0; j < se->GaussPoints(); ++j) {
+				FEMaterialPoint* pt = se->GetMaterialPoint(j);
+				bool good = pfl->Dilatation(0, p, 0, efi[j]);
+				assert(good);
+			}
+			// project dilatations from integration points to nodes
+			se->project_to_nodes(efi, efo);
+			// only keep the dilatations at the nodes of the surface face
+			for (int j = 0; j < el.Nodes(); ++j)
+				efNodes[el.m_lnode[j]].push_back(efo[j]);
+		}
+		//If no solid element, insert all 0s
+		else {
+			for (int j = 0; j < el.Nodes(); ++j)
+				efNodes[el.m_lnode[j]].push_back(0);
+		}
+	}
+	//For each node, average the nodal ef
+	for (int i = 0; i < ps->Nodes(); ++i)
+	{
+		double ef = 0;
+		for (int j = 0; j < efNodes[i].size(); ++j)
+			ef += efNodes[i][j];
+		ef /= efNodes[i].size();
+
+		// store value for now
+		m_e[i] = ef;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
 void FEPrescribedFluidPressure::Update()
 {
-    // prescribe this dilatation at the nodes
-    FESurface* ps = GetSurface();
-    
-    int N = ps->Nodes();
-    std::vector<vector<double>> efNodes(N, vector<double>());
-    
-    //Project sum of all ca and osc values from int points to nodes on surface
-    //All values put into map, including duplicates
-    for (int i=0; i<ps->Elements(); ++i)
-    {
-        FESurfaceElement& el = ps->Element(i);
-        // evaluate average prescribed pressure on this face
-        double p = 0;
-        for (int j=0; j<el.GaussPoints(); ++j) {
-            FEMaterialPoint* pt = el.GetMaterialPoint(j);
-            p += m_p(*pt);
-        }
-        p /= el.GaussPoints();
-        FEElement* e = el.m_elem[0];
-        FEMaterial* pm = GetFEModel()->GetMaterial(e->GetMatID());
-        FEFluid* pfl = pm->ExtractProperty<FEFluid>();
-        if (pfl == nullptr) break;
-        FESolidElement* se = dynamic_cast<FESolidElement*>(e);
-        if (se) {
-            double efi[FEElement::MAX_INTPOINTS] = {0};
-            double efo[FEElement::MAX_NODES] = {0};
-            for (int j=0; j<se->GaussPoints(); ++j) {
-                FEMaterialPoint* pt = se->GetMaterialPoint(j);
-                bool good = pfl->Dilatation(0, p, 0, efi[j]);
-                assert(good);
-            }
-            // project dilatations from integration points to nodes
-            se->project_to_nodes(efi, efo);
-            // only keep the dilatations at the nodes of the surface face
-            for (int j=0; j<el.Nodes(); ++j)
-                efNodes[el.m_lnode[j]].push_back(efo[j]);
-        }
-        //If no solid element, insert all 0s
-        else {
-            for (int j=0; j<el.Nodes(); ++j)
-                efNodes[el.m_lnode[j]].push_back(0);
-        }
-    }
-    //For each node, average the nodal ef
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        double ef = 0;
-        for (int j = 0; j < efNodes[i].size(); ++j)
-            ef += efNodes[i][j];
-        ef /= efNodes[i].size();
-        
-        // store value for now
-        m_e[i] = ef;
-    }
-    
+	UpdateDilatation();
     FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedFluidPressure::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
 }
 
 //-----------------------------------------------------------------------------
 void FEPrescribedFluidPressure::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e[nodelid];
+
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e[nodelid]);
+
 }
 
 void FEPrescribedFluidPressure::CopyFrom(FEBoundaryCondition* pbc)
