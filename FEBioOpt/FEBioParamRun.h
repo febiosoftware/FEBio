@@ -50,4 +50,5 @@ private:
 	std::vector<FEModelParameter*>	    m_inVar;
 	std::vector<FEDataParameter*>	    m_outVar;
 	std::string	m_outFile;
+	bool	m_febioOutput;	// generate standard FEBio log and plot file output?
 };
