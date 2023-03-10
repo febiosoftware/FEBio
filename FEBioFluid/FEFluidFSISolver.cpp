@@ -477,25 +477,6 @@ void FEFluidFSISolver::Serialize(DumpStream& ar)
     m_rigidSolver.Serialize(ar);
 }
 
-class Monitor
-{
-public:
-	Monitor(FEMesh& mesh) : m_mesh(mesh) { update(); }
-	void update()
-	{
-		m_val.resize(m_mesh.Nodes());
-		for (int i = 0; i < m_mesh.Nodes(); ++i)
-		{
-			FENode& node = m_mesh.Node(i);
-			m_val[i] = node.get(33);
-		}
-	}
-
-public:
-	FEMesh& m_mesh;
-	vector<double>	m_val;
-};
-
 //-----------------------------------------------------------------------------
 //! Update the kinematics of the model, such as nodal positions, velocities,
 //! accelerations, etc.
@@ -506,8 +487,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
-	Monitor monitor(mesh);
-
     // update rigid bodies
     m_rigidSolver.UpdateRigidBodies(m_Ui, ui);
     
@@ -520,7 +499,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     scatter3(U, mesh, m_dofW[0], m_dofW[1], m_dofW[2]);
     scatter(U, mesh, m_dofEF[0]);
     
-	monitor.update();
     // force dilatations to remain greater than -1
     if (m_minJf > 0) {
         const int NN = mesh.Nodes();
@@ -533,7 +511,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     }
 
     // make sure the prescribed BCs are fullfilled
-	monitor.update();
 	int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -542,7 +519,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     }
     
     // apply prescribed DOFs for specialized surface loads
-	monitor.update();
 	int nml = fem.ModelLoads();
     for (int i=0; i<nml; ++i)
     {
@@ -553,7 +529,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     // enforce the linear constraints
     // TODO: do we really have to do this? Shouldn't the algorithm
     // already guarantee that the linear constraints are satisfied?
-	monitor.update();
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
     if (LCM.LinearConstraints() > 0)
     {
@@ -578,7 +553,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     if (pstep->m_nanalysis == FEFluidFSIAnalysis::DYNAMIC)
     {
         int N = mesh.Nodes();
-		vector<double> ef(N);
 		double dt = fem.GetTime().timeIncrement;
         double a = 1.0 / (m_beta*dt);
         double b = a / dt;
@@ -625,7 +599,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
             double aefp = n.get_prev(m_dofAEF);
             double aeft = aefp*cgi + (eft - efp)/(m_gamma*dt);
             n.set(m_dofAEF, aeft);
-			ef[i] = eft;
         }
 		int _a = 0;
     }
