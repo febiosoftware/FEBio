@@ -45,7 +45,8 @@ public:
 
     //! Update 
     void Update() override;
-    
+	void UpdateModel() override;
+
     //! serialization
     void Serialize(DumpStream& ar) override;
 

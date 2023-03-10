@@ -122,6 +122,7 @@ void FEPrescribedFluidPressure::UpdateDilatation()
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
+void FEPrescribedFluidPressure::UpdateModel() { Update(); }
 void FEPrescribedFluidPressure::Update()
 {
 	UpdateDilatation();

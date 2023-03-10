@@ -633,6 +633,13 @@ void FEModel::Update()
 	// mesh will also be update after the loads are updated
 	m_imp->m_meshUpdate = false;
 
+	int nvel = BoundaryConditions();
+	for (int i = 0; i < nvel; ++i)
+	{
+		FEBoundaryCondition& bc = *BoundaryCondition(i);
+		if (bc.IsActive()) bc.UpdateModel();
+	}
+
 	// update all model loads
 	for (int i = 0; i < ModelLoads(); ++i)
 	{

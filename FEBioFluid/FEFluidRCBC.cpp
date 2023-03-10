@@ -134,6 +134,8 @@ void FEFluidRCBC::Update()
 	GetFEModel()->SetMeshUpdateFlag(true);
 }
 
+void FEFluidRCBC::UpdateModel() { Update(); }
+
 //-----------------------------------------------------------------------------
 // return the value for node i, dof j
 void FEFluidRCBC::GetNodalValues(int nodelid, std::vector<double>& val)

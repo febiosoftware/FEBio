@@ -47,6 +47,7 @@ public:
     bool Init() override;
 
 	void Update() override;
+	void UpdateModel() override;
     
 public:
 	void PrepStep(std::vector<double>& ui, bool brel);

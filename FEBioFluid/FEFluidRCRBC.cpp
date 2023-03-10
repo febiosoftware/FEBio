@@ -115,6 +115,8 @@ void FEFluidRCRBC::UpdateDilatation()
 	assert(good);
 }
 
+void FEFluidRCRBC::UpdateModel() { Update(); }
+
 void FEFluidRCRBC::Update()
 {
 	UpdateDilatation();

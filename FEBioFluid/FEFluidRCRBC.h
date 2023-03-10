@@ -39,6 +39,7 @@ public:
     
     //! set the dilatation
     void Update() override;
+    void UpdateModel() override;
     
     //! evaluate flow rate
     double FlowRate();

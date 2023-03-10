@@ -82,6 +82,9 @@ void FEFluidResistanceBC::Update()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidResistanceBC::UpdateModel() { Update(); }
+
+//-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
 void FEFluidResistanceBC::UpdateDilatation()
 {
