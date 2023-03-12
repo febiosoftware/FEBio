@@ -38,6 +38,7 @@ ADD_PARAMETER(m_nvc  , FE_RANGE_GREATER(0), "nvc");
 
 ADD_PROPERTY(m_psat, "psat")->SetLongName("saturation gauge pressure normalized");
 ADD_PROPERTY(m_asat, "asat")->SetLongName("saturation free energy normalized");
+ADD_PROPERTY(m_ssat, "ssat")->SetLongName("saturation entropy normalized");
 ADD_PROPERTY(m_esat, "esat")->SetLongName("saturation dilatation");
 ADD_PROPERTY(m_B[0], "B1"  )->SetLongName("1st pressure virial coefficient");
 ADD_PROPERTY(m_B[1], "B2", FEProperty::Optional)->SetLongName("2nd pressure virial coefficient");
@@ -53,7 +54,7 @@ FERealLiquid::FERealLiquid(FEModel* pfem) : FEElasticFluid(pfem)
 {
     m_nvc = 0;
     m_R = m_Pr = m_Tr = 0;
-    m_psat = m_asat = m_esat = m_cvsat = nullptr;
+    m_psat = m_asat = m_ssat = m_esat = m_cvsat = nullptr;
     m_B[0] = m_B[1] = m_B[2] = nullptr;
     m_C[0] = m_C[1] = m_C[2] = nullptr;
 }
@@ -76,6 +77,7 @@ bool FERealLiquid::Init()
     
     m_psat->Init();
     m_asat->Init();
+    m_ssat->Init();
     m_esat->Init();
     m_cvsat->Init();
     for (int k=0; k<m_nvc; ++k) {
@@ -219,7 +221,7 @@ double FERealLiquid::SpecificEntropy(FEMaterialPoint& mp)
     double That = (m_Tr+tf.m_T)/m_Tr;
     double x = fp.m_ef - m_esat->value(That);
     double dJsat = m_esat->derive(That);
-    double ssat = -m_asat->derive(That)-m_esat->derive(That)*m_psat->value(That);
+    double ssat = m_ssat->value(That);
     double s = ssat + x*m_psat->derive(That);
     for (int k=1; k<=m_nvc; ++k)
         s += (m_B[k-1]->derive(That)*x/(k+1) - dJsat*m_B[k-1]->value(That))*pow(x,k);
@@ -237,23 +239,11 @@ double FERealLiquid::SpecificStrainEnergy(FEMaterialPoint& mp)
     // get the specific free energy
     double a = SpecificFreeEnergy(mp);
     
-    // evaluate the dilatation that makes the pressure = 0 at the given temperature
-    double e = fp.m_ef;
-    bool good = Dilatation(tf.m_T, 0, 0, e);
-    assert(good);
+    double That = (m_Tr+tf.m_T)/m_Tr;
+    double asat = m_asat->value(That)*m_Pr/m_rhor;
     
-    // for this dilatation evaluate the specific free energy
-    FEFluidMaterialPoint* fmp = new FEFluidMaterialPoint();
-    FEThermoFluidMaterialPoint* fmt = new FEThermoFluidMaterialPoint(fmp);
-    fmp->m_ef = e;
-    fmt->m_T = tf.m_T;
-    FEMaterialPoint tmp(fmt);
-    double a0 = SpecificFreeEnergy(tmp);
-    
-    delete fmt;
-
     // the specific strain energy is the difference between these two values
-    return a - a0;
+    return a - asat;
 }
 
 //-----------------------------------------------------------------------------
@@ -313,8 +303,12 @@ double FERealLiquid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double cv = IsochoricSpecificHeatCapacity(mp);
     double p = Pressure(mp);
+    // temporarily reduce the number of virial coefficients to 1 for the next calculation
+    int nvc = m_nvc;
+    m_nvc = 1;
     double dpT = Tangent_Temperature(mp);
     double dpJ = Tangent_Strain(mp);
+    m_nvc = nvc;
     double cp = cv + (dpT/dpJ)/m_rhor*(p - (m_Tr + tf.m_T)*dpT);
     return cp;
 }
@@ -328,11 +322,11 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
     int maxiter = 100;
     FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
-    ft->m_T = T;
-    double q = T/m_Tr;
-    double psat = m_psat->value(q);
-    double esat = m_esat->value(q);
-    if (p == psat) { e = esat; return true; }
+    double That = (T+m_Tr)/m_Tr;
+    double psat = m_psat->value(That);
+    double esat = m_esat->value(That);
+    double phat = p/m_Pr;
+    if (phat == psat) { e = esat; return true; }
     switch (m_nvc) {
         case 0:
             delete ft;
@@ -340,19 +334,19 @@ bool FERealLiquid::Dilatation(const double T, const double p, const double c, do
             break;
         case 1:
         {
-            double B0 = m_B[0]->value(q);
+            double B0 = m_B[0]->value(That);
             if (B0 == 0) { e = esat; return true; }
-            e = (p/m_Pr - psat)/B0 + esat;
+            e = (phat - psat)/B0 + esat;
             delete ft;
             return true;
         }
             break;
         case 2:
         {
-            double B0 = m_B[0]->value(q);
-            double B1 = m_B[1]->value(q);
+            double B0 = m_B[0]->value(That);
+            double B1 = m_B[1]->value(That);
             if ((B0 == 0) || (B1 == 0)) { e = esat; return true; }
-            double det = pow(B0,2) + 4*B1*(p/m_Pr - psat);
+            double det = pow(B0,2) + 4*B1*(phat - psat);
             if (det < 0) return false;
             det = sqrt(det);
             // only one root of this quadratic equation is valid.

@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "PointCurve.h"
 #include "BSpline.h"
-#include "AkimaSpline.h"
 #include <assert.h>
 #include <algorithm>
 
@@ -41,7 +40,6 @@ public:
 	int		ext;	//!< extend mode
 	std::vector<vec2d>	points;
 	BSpline* spline;    //!< B-spline
-    AkimaSpline* akima; //!< Akima spline
 };
 
 //-----------------------------------------------------------------------------
@@ -50,7 +48,6 @@ PointCurve::PointCurve() : im(new PointCurve::Imp)
 	im->fnc = LINEAR;
 	im->ext = CONSTANT;
 	im->spline = nullptr;
-    im->akima = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -60,7 +57,6 @@ PointCurve::PointCurve(const PointCurve& pc) : im(new PointCurve::Imp)
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
 	im->spline = nullptr;
-    im->akima = nullptr;
 	Update();
 }
 
@@ -71,7 +67,6 @@ void PointCurve::operator = (const PointCurve& pc)
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
     if (im->spline) delete im->spline;
-    if (im->akima) delete im->akima;
 	Update();
 }
 
@@ -79,7 +74,6 @@ void PointCurve::operator = (const PointCurve& pc)
 PointCurve::~PointCurve()
 {
 	if (im->spline) delete im->spline;
-    if (im->akima) delete im->akima;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,8 +104,6 @@ void PointCurve::Clear()
 	im->points.clear();
 	if (im->spline) delete im->spline;
 	im->spline = nullptr;
-    if (im->akima) delete im->akima;
-    im->akima = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -273,12 +265,6 @@ double PointCurve::value(double time) const
 		else return im->spline->eval(time);
 	}
     
-    if (im->fnc == AKIMA)
-    {
-        if (time > tmax) return im->akima->eval(tmax);
-        else if (time < tmin) return im->akima->eval(tmin);
-        else return im->akima->eval(time);
-    }
 
 	if (time < tmin) return ExtendValue(time);
 	if (time > tmax) return ExtendValue(time);
@@ -528,13 +514,6 @@ double PointCurve::derive(double time) const
 		else return im->spline->eval_deriv(time);
 	}
 
-    if (im->fnc == AKIMA)
-    {
-        if (time > tmax) return im->akima->eval_deriv(tmax);
-        else if (time < tmin) return im->akima->eval_deriv(tmin);
-        else return im->akima->eval_deriv(time);
-    }
-
 	double Dt = im->points[N - 1].x() - im->points[0].x();
 	double dt = Dt * 1e-9;
 	double D = 0;
@@ -591,13 +570,6 @@ double PointCurve::deriv2(double time) const
 		else if (time < tmin) return im->spline->eval_deriv2(tmin);
 		else return im->spline->eval_deriv2(time);
 	}
-
-    if (im->fnc == AKIMA)
-    {
-        if (time > tmax) return im->akima->eval_deriv2(tmax);
-        else if (time < tmin) return im->akima->eval_deriv2(tmin);
-        else return im->akima->eval_deriv2(time);
-    }
 
 	double Dt = im->points[N - 1].x() - im->points[0].x();
 	double dt = Dt * 1e-3;
@@ -705,14 +677,6 @@ double PointCurve::integrate(double a, double b) const
 bool PointCurve::Update()
 {
 	bool bvalid = true;
-
-    if (im->fnc == AKIMA) {
-        if (im->akima) delete im->akima;
-        im->akima = new AkimaSpline();
-        bvalid = im->akima->init(im->points);
-        if (bvalid == false) { delete im->akima; im->akima = nullptr; }
-        return bvalid;
-    }
 
 	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
 	{
