@@ -93,8 +93,8 @@ namespace febio {
 			// Find the root element
 			XMLTag tag;
 			if (xml.FindTag("febio_config", tag) == false) return false;
-
-			if (strcmp(tag.m_att[0].m_szatv, "3.0") == 0)
+			const char* szversion = tag.AttributeValue("version");
+			if (strcmp(szversion, "3.0") == 0)
 			{
 				if (!tag.isleaf())
 				{

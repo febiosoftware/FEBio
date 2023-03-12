@@ -178,13 +178,27 @@ bool NegativeJacobian::IsThrown()
 }
 
 //-----------------------------------------------------------------------------
-NANDetected::NANDetected(const FENodalDofInfo& ndi)
+NANInResidualDetected::NANInResidualDetected(const FENodalDofInfo& ndi)
 {
 	what("NAN detected in residual vector at index %d.\nNode id = %d, dof = %d ('%s')", ndi.m_eq, ndi.m_node, ndi.m_dof, ndi.szdof);
 }
+
+//-----------------------------------------------------------------------------
+NANInSolutionDetected::NANInSolutionDetected(const FENodalDofInfo& ndi)
+{
+	what("NAN detected in solution vector at index %d.\nNode id = %d, dof = %d ('%s')", ndi.m_eq, ndi.m_node, ndi.m_dof, ndi.szdof);
+}
+
 
 //-----------------------------------------------------------------------------
 FEMultiScaleException::FEMultiScaleException(int eid, int gpt)
 {
 	what("The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", eid, gpt + 1);
 }
+
+//-----------------------------------------------------------------------------
+ConcentrationChangeDetected::ConcentrationChangeDetected(const FENodalDofInfo& ndi)
+{
+    what("Sudden concentration change detected.\n");
+}
+

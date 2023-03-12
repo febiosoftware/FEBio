@@ -28,13 +28,14 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESolidDomain.h>
-#include "FEThermoFluidDomain.h"
+#include "FEFluidDomain.h"
 #include "FEThermoFluid.h"
+#include "FEFluidHeatSupply.h"
 
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements
 //!
-class FEBIOFLUID_API FEThermoFluidDomain3D : public virtual FESolidDomain, public FEThermoFluidDomain
+class FEBIOFLUID_API FEThermoFluidDomain3D : public virtual FESolidDomain, public FEFluidDomain
 {
 public:
     //! constructor
@@ -73,7 +74,7 @@ public: // overrides from FEElasticDomain
     void BodyForce(FEGlobalVector& R, FEBodyForce& BF) override;
     
     //! Calculate the heat supply
-    void HeatSupply(FEGlobalVector& R, FEFluidHeatSupply& r) override;
+    void HeatSupply(FEGlobalVector& R, FEFluidHeatSupply& r);
 
     //! intertial forces for dynamic problems
     void InertialForces(FEGlobalVector& R) override;
@@ -82,7 +83,7 @@ public: // overrides from FEElasticDomain
     void StiffnessMatrix(FELinearSystem& LS) override;
     
     //! Calculate stiffness contribution of heat supplies
-    void HeatSupplyStiffness(FELinearSystem& LS, FEFluidHeatSupply& bf) override;
+    void HeatSupplyStiffness(FELinearSystem& LS, FEFluidHeatSupply& bf);
     
     //! calculates inertial stiffness
     void MassMatrix(FELinearSystem& LS) override;
@@ -121,7 +122,8 @@ public:
     
 protected:
     FEThermoFluid*  m_pMat;
-    
+    double          m_Tr;       // referential absolute temperature
+
 protected:
     FEDofList   m_dofW;
     FEDofList   m_dofAW;

@@ -44,7 +44,7 @@ END_FECORE_CLASS();
 FEMultiphasicFSISoluteFlux::FEMultiphasicFSISoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofC(pfem), m_dofU(pfem)
 {
     m_flux = 1.0;
-    m_isol = 0;
+    m_isol = -1;
 }
 
 //-----------------------------------------------------------------------------

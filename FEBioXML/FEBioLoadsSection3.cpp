@@ -121,8 +121,8 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	FEMesh& mesh = fem.GetMesh();
 
 	// create surface load
-	const char* sztype = tag.AttributeValue("type");
-	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(sztype, &fem);
+	string typeString = tag.AttributeValue("type");
+	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(typeString.c_str(), &fem);
 	if (psl == 0) throw XMLReader::InvalidTag(tag);
 
 	// read (optional) name attribute
@@ -154,7 +154,7 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 			if (ReadParameter(tag, psl) == false)
 			{
 				// some special handling for fluidnormalvelocity
-				if ((tag == "value") && (strcmp(sztype, "fluid normal velocity") == 0))
+				if ((tag == "value") && (strcmp(typeString.c_str(), "fluid normal velocity") == 0))
 				{
 					// The value parameter no longer exists, but for backward compatibility
 					// we map it to the "velocity" parameter.

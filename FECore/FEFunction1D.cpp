@@ -107,6 +107,11 @@ bool FEFunction1D::invert(const double f0, double &x)
 }
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FEConstFunction, FEFunction1D)
+	ADD_PARAMETER(m_value, "value");
+END_FECORE_CLASS();
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FELinearFunction, FEFunction1D)
 	ADD_PARAMETER(m_slope, "slope");
 	ADD_PARAMETER(m_intercept, "intercept");

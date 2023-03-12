@@ -29,6 +29,7 @@
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/FEPointFunction.h>
+#include "febiomech_api.h"
 
 class FEPlasticFlowCurve;
 
@@ -57,7 +58,7 @@ public:
 //-----------------------------------------------------------------------------
 // Virtual base class for plastic flow curve
 
-class FEPlasticFlowCurve : public FEMaterialProperty
+class FEBIOMECH_API FEPlasticFlowCurve : public FEMaterialProperty
 {
 public:
     FEPlasticFlowCurve(FEModel* pfem) : FEMaterialProperty(pfem) {}

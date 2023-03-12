@@ -39,6 +39,7 @@ public:
     
     //! set the dilatation
     void Update() override;
+    void UpdateModel() override;
     
     //! evaluate flow rate
     double FlowRate();
@@ -50,11 +51,17 @@ public:
     void Serialize(DumpStream& ar) override;
 
 public:
+	void PrepStep(std::vector<double>& ui, bool brel);
+
     // return the value for node i, dof j
     void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
     // copy data from another class
     void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+	//! set the dilatation
+	void UpdateDilatation();
 
 private:
     double          m_R;        //!< flow resistance

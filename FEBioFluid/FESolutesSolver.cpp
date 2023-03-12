@@ -577,7 +577,7 @@ bool FESolutesSolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
         
         // check for nans
-        if (ISNAN(normR1)) throw NANDetected();
+        if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;

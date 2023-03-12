@@ -39,7 +39,8 @@ BEGIN_FECORE_CLASS(FEFluidMaterial, FEMaterial)
 
     // material properties
     ADD_PROPERTY(m_pViscous, "viscous");
-    ADD_PROPERTY(m_pViscpol, "polar", FEProperty::Optional);
+//  EXPERIMENTAL
+//    ADD_PROPERTY(m_pViscpol, "polar", FEProperty::Optional);
 
 END_FECORE_CLASS();
 

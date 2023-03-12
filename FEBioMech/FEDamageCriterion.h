@@ -28,11 +28,12 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage criterion
 
-class FEDamageCriterion : public FEMaterialProperty
+class FEBIOMECH_API FEDamageCriterion : public FEMaterialProperty
 {
 public:
 	FEDamageCriterion(FEModel* pfem) : FEMaterialProperty(pfem) {}

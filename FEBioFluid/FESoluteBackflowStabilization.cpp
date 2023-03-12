@@ -28,37 +28,42 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESoluteBackflowStabilization.h"
-#include "FEFluid.h"
+#include "FEFluidSolutes.h"
 #include "FEBioFluidSolutes.h"
 #include <FECore/FENodeNodeList.h>
 #include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteBackflowStabilization, FESurfaceLoad)
-ADD_PARAMETER(m_sol , "sol");
+    ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
 FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_sol = 0;
+    m_isol = -1;
     m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
     m_nnlist = FENodeNodeList();
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FESoluteBackflowStabilization::SetSurface(FESurface* ps)
+{
+    FESurfaceLoad::SetSurface(ps);
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FESoluteBackflowStabilization::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
-    
     // determine the nr of concentration equations
     FEModel& fem = *GetFEModel();
     DOFS& fedofs = fem.GetDOFS();
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
-    if ((m_sol < 1) || (m_sol > MAX_CDOFS)) return false;
+    if ((m_isol < 1) || (m_isol > MAX_CDOFS)) return false;
     
     m_dof.AddDofs(m_dofW);
 	m_dof.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
@@ -68,7 +73,7 @@ bool FESoluteBackflowStabilization::Init()
     
     m_nnlist.Create(fem.GetMesh());
 
-    return true;
+    return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -77,12 +82,12 @@ void FESoluteBackflowStabilization::Activate()
 {
     FESurface* ps = &GetSurface();
     
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
+        // mark node as having open DOF
         node.set_bc(dofc, DOF_OPEN);
     }
     
@@ -99,7 +104,7 @@ void FESoluteBackflowStabilization::Update()
     // prescribe solute backflow constraint at the nodes
     FESurface* ps = &GetSurface();
     
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
@@ -166,7 +171,7 @@ void FESoluteBackflowStabilization::MarkBackFlow()
 {
     // Mark all nodes on this surface to have open concentration DOF
     FESurface* ps = &GetSurface();
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);

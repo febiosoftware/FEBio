@@ -795,7 +795,8 @@ bool FESolidSolver2::Quasin()
 		normE1 = fabs(ui*m_R1);
 
 		// check for nans
-		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
+		if (ISNAN(normR1)) throw NANInResidualDetected();
+		if (ISNAN(normu)) throw NANInSolutionDetected();
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	

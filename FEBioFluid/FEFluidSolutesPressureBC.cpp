@@ -30,17 +30,18 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidSolutesPressureBC, FEPrescribedSurface)
-    ADD_PARAMETER(m_p, "pressure");
+    ADD_PARAMETER(m_p, "pressure")->setUnits("P")->setLongName("fluid pressure");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
 FEFluidSolutesPressureBC::FEFluidSolutesPressureBC(FEModel* pfem) : FEPrescribedSurface(pfem)
 {
-    m_pfs = nullptr;
     m_p = 0;
     m_dofEF = -1;
     m_dofC = -1;
+    m_Rgas = 0;
+    m_Tabs = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,19 +53,13 @@ bool FEFluidSolutesPressureBC::Init()
     SetDOFList(m_dofEF);
 
     if (FEPrescribedSurface::Init() == false) return false;
-    
-    // get fluid from first surface element
-    // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = GetSurface()->Element(0);
-    FEElement* pe = el.m_elem[0];
-    if (pe == nullptr) return false;
-    
-    // get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    m_pfs = dynamic_cast<FEFluidSolutes*>(pm);
-    if (m_pfs == nullptr) return false;
+    m_Rgas = GetFEModel()->GetGlobalConstant("R");
+    m_Tabs = GetFEModel()->GetGlobalConstant("T");
 
     m_e.assign(GetSurface()->Nodes(), 0.0);
+    
+    // do an initial Update so that the dilatations are set properly at the very first time step
+//    Update();
     
     return true;
 }
@@ -75,93 +70,88 @@ void FEFluidSolutesPressureBC::Update()
 {
     // prescribe this dilatation at the nodes
     FESurface* ps = GetSurface();
-    int nsol = 0;
-    double T = 0;
-    double R = 0;
-    if (m_pfs){
-        nsol = m_pfs->Solutes();
-        T = m_pfs->m_Tabs;
-        R = m_pfs->m_Rgas;
-    }
-    
+
     int N = ps->Nodes();
-    std::vector<vector<double>> oscNodes(N, vector<double>());
+    std::vector<vector<double>> efNodes(N, vector<double>());
     std::vector<vector<double>> caNodes(N, vector<double>());
-    
+
     //Project sum of all ca and osc values from int points to nodes on surface
     //All values put into map, including duplicates
     for (int i=0; i<ps->Elements(); ++i)
     {
         FESurfaceElement& el = ps->Element(i);
+        // evaluate average prescribed pressure on this face
+        double p = 0;
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FEMaterialPoint* pt = el.GetMaterialPoint(j);
+            p += m_p(*pt);
+        }
+        p /= el.GaussPoints();
         FEElement* e = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(e->GetMatID());
+        FEFluid* pfl = pm->ExtractProperty<FEFluid>();
+        FESoluteInterface* psi = pm->ExtractProperty<FESoluteInterface>();
         FESolidElement* se = dynamic_cast<FESolidElement*>(e);
         if (se) {
-            double osci[FEElement::MAX_INTPOINTS];
-            double osco[FEElement::MAX_NODES];
-            double cai[FEElement::MAX_INTPOINTS];
-            double cao[FEElement::MAX_NODES];
-            for (int j=0; j<se->GaussPoints(); ++j) {
-                FEMaterialPoint* pt = se->GetMaterialPoint(j);
-                FEFluidSolutesMaterialPoint* fsp = pt->ExtractData<FEFluidSolutesMaterialPoint>();
-                if (fsp)
-                {
-                    if (m_pfs)
-                        osci[j] = m_pfs->GetOsmoticCoefficient()->OsmoticCoefficient(*pt);
-                    cai[j] = fsp->m_ca[0];
-                    for (int isol = 1; isol < nsol; ++isol)
-                        cai[j] += fsp->m_ca[isol];
+            double efo[FEElement::MAX_NODES] = {0};
+            if (psi) {
+                const int nsol = psi->Solutes();
+                std::vector<double> kappa(nsol,0);
+                double osc = 0;
+                const int nint = se->GaussPoints();
+                // get the average osmotic coefficient and partition coefficients in the solid element
+                for (int j=0; j<nint; ++j) {
+                    FEMaterialPoint* pt = se->GetMaterialPoint(j);
+                    osc += psi->GetOsmoticCoefficient()->OsmoticCoefficient(*pt);
+                    for (int k=0; k<nsol; ++k)
+                        kappa[k] += psi->GetPartitionCoefficient(*pt, k);
                 }
-                else
-                {
-                    osci[j] = 0;
-                    cai[j] = 0;
+                osc /= nint;
+                for (int k=0; k<nsol; ++k) kappa[k] /= nint;
+                // loop over face nodes
+                for (int j=0; j<el.Nodes(); ++j) {
+                    double osm = 0;
+                    FENode& node = ps->Node(el.m_lnode[j]);
+                    // calculate osmolarity at this node, using nodal effective solute concentrations
+                    for (int k=0; k<nsol; ++k)
+                        osm += node.get(m_dofC+psi->GetSolute(k)->GetSoluteID()-1)*kappa[k];
+                    // evaluate dilatation at this node
+                    double c = m_Rgas*osc*osm;
+                    bool good = pfl->Dilatation(m_Tabs, p, c, efo[j]);
+                    assert(good);
                 }
             }
-            // project stresses from integration points to nodes
-            se->project_to_nodes(osci, osco);
-            se->project_to_nodes(cai, cao);
-            // only keep the stresses at the nodes of the contact face
+            else {
+                // loop over face nodes
+                for (int j=0; j<el.Nodes(); ++j) {
+                    FENode& node = ps->Node(el.m_lnode[j]);
+                    // evaluate dilatation at this node
+                    double c = 0;
+                    bool good = pfl->Dilatation(m_Tabs, p, c, efo[j]);
+                    assert(good);
+                }
+            }
+            // only keep the dilatations at the nodes of the surface face
             for (int j=0; j<el.Nodes(); ++j)
-            {
-                oscNodes[el.m_lnode[j]].push_back(osco[j]);
-                caNodes[el.m_lnode[j]].push_back(cao[j]);
-            }
+                efNodes[el.m_lnode[j]].push_back(efo[j]);
         }
         //If no solid element, insert all 0s
-        else{
+        else {
             for (int j=0; j<el.Nodes(); ++j)
-            {
-                oscNodes[el.m_lnode[j]].push_back(0);
-                caNodes[el.m_lnode[j]].push_back(0);
-            }
+                efNodes[el.m_lnode[j]].push_back(0);
         }
     }
-    //For each node, average the nodal ca and osc and then calculate ef based on desired p
-    m_e.assign(ps->Nodes(), 0.0);
-    assert(m_pfs);
-    FEFluid* pfl = m_pfs->Fluid();
+    
+    //For each node, average the nodal ef
     for (int i=0; i<ps->Nodes(); ++i)
     {
-        //get osmotic component of pressure
-        double ca = 0;
-        double osc = 0;
-        for (int j = 0; j < caNodes[i].size(); ++j)
-        {
-            ca += caNodes[i][j];
-            osc += oscNodes[i][j];
-        }
-        ca /= caNodes[i].size();
-        osc /= caNodes[i].size();
-            
-        double c = osc*ca*R;
-            
-        //get correct ef for desired pressure
-        double e = 0;
-        bool good = pfl->Dilatation(T, m_p, c, e);
-        assert(good);
+        double ef = 0;
+        for (int j = 0; j < efNodes[i].size(); ++j)
+            ef += efNodes[i][j];
+        ef /= efNodes[i].size();
             
         // store value for now
-        m_e[i] = e;
+        m_e[i] = ef;
     }
  
     FEPrescribedSurface::Update();
@@ -186,7 +176,6 @@ void FEFluidSolutesPressureBC::CopyFrom(FEBoundaryCondition* pbc)
 void FEFluidSolutesPressureBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
-    ar & m_pfs;
     ar & m_dofC;
     ar & m_dofEF;
     ar & m_e;

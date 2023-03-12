@@ -81,8 +81,16 @@ class FEElasticFiberMaterial_T : public FEElasticFiberMaterial
 public:
 	FEElasticFiberMaterial_T(FEModel* fem) : FEElasticFiberMaterial(fem), m_fib(fem) {}
 
-	bool Init() override { return m_fib.Init(); }
-	bool Validate() override { return m_fib.Validate(); }
+	bool Init() override 
+	{ 
+		if (FEElasticFiberMaterial::Init() == false) return false;
+		return m_fib.Init(); 
+	}
+	bool Validate() override 
+	{ 
+		if (FEElasticFiberMaterial::Validate() == false) return false;
+		return m_fib.Validate();
+	}
 	FEMaterialPointData* CreateMaterialPointData() override 
 	{ 
 		return new FEElasticMaterialPoint(m_fib.CreateMaterialPointData());

@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FERigidNodeSet, FENodalBC)
 	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)");
-	ADD_PARAMETER(m_bshellBC, "clamp_shells");
+	ADD_PARAMETER(m_bshellBC, "clamp_shells")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

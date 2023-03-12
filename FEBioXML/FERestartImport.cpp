@@ -154,7 +154,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		if (m_xml.FindTag("febio_restart", tag) == false) return errf("FATAL ERROR: File does not contain restart data.\n");
 
 		// check the version number
-		const char* szversion = tag.m_att[0].m_szatv;
+		const char* szversion = tag.AttributeValue("version");
 		int nversion = -1;
 		if      (strcmp(szversion, "1.0") == 0) nversion = 1;
 		else if (strcmp(szversion, "2.0") == 0) nversion = 2;
