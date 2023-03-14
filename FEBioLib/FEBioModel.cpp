@@ -126,6 +126,8 @@ FEBioModel::FEBioModel()
 
 	m_lastUpdate = -1;
 
+	m_bshowErrors = true;
+
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
 	AddCallback(handleCB, CB_ALWAYS, this);
@@ -137,6 +139,12 @@ FEBioModel::~FEBioModel()
 	// close the plot file
 	if (m_plot) { delete m_plot; m_plot = 0; }
 	m_log.close();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::ShowWarningsAndErrors(bool b)
+{
+	m_bshowErrors = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -697,8 +705,8 @@ void FEBioModel::DumpData(int nevent)
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
 	if      (ntag == 0) m_log.printf(szmsg);
-	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
-	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
+	else if ((ntag == 1) && m_bshowErrors) m_log.printbox("WARNING", szmsg);
+	else if ((ntag == 2) && m_bshowErrors) m_log.printbox("ERROR", szmsg);
 	else if (ntag == 3) m_log.printbox(nullptr, szmsg);
 	else if (ntag == 4)
 	{
