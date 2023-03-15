@@ -327,6 +327,9 @@ bool FEAnalysis::Activate()
             dom.Activate();
     }
 
+	// active the linear constraints
+	fem.GetLinearConstraintManager().Activate();
+
 	return true;
 }
 

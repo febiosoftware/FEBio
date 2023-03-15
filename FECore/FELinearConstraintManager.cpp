@@ -268,18 +268,21 @@ void FELinearConstraintManager::PrepStep()
 	for (int i=0; i<m_LinC.size(); ++i)
 	{
 		FELinearConstraint& lc = *m_LinC[i];
-		FENode& node = mesh.Node(lc.GetParentNode());
-		double u = node.get(lc.GetParentDof());
-
-		double v = 0;
-		for (int j=0; j<lc.Size(); ++j)
+		if (lc.IsActive())
 		{
-			const FELinearConstraintDOF& dofj = lc.GetChildDof(j);
-			FENode& nj = mesh.Node(dofj.node);
-			v += dofj.val* nj.get(dofj.dof);
-		}
+			FENode& node = mesh.Node(lc.GetParentNode());
+			double u = node.get(lc.GetParentDof());
 
-		m_up[i] = v + lc.GetOffset() - u;
+			double v = 0;
+			for (int j = 0; j < lc.Size(); ++j)
+			{
+				const FELinearConstraintDOF& dofj = lc.GetChildDof(j);
+				FENode& nj = mesh.Node(dofj.node);
+				v += dofj.val * nj.get(dofj.dof);
+			}
+
+			m_up[i] = v + lc.GetOffset() - u;
+		}
 	}
 }
 
@@ -298,10 +301,13 @@ void FELinearConstraintManager::InitTable()
 	for (int i = 0; i<nlin; ++i, ++ic)
 	{
 		FELinearConstraint& lc = *(*ic);
-		int n = lc.GetParentNode();
-		int m = lc.GetParentDof();
+		if (lc.IsActive())
+		{
+			int n = lc.GetParentNode();
+			int m = lc.GetParentDof();
 
-		m_LCT(n, m) = i;
+			m_LCT(n, m) = i;
+		}
 	}
 }
 
@@ -519,20 +525,22 @@ void FELinearConstraintManager::Update()
 	for (int n = 0; n<nlin; ++n)
 	{
 		FELinearConstraint& lc = LinearConstraint(n);
-
-		// evaluate the linear constraint
-		double d = 0;
-		int ns = (int)lc.Size();
-		FELinearConstraint::dof_iterator si = lc.begin();
-		for (int i = 0; i<ns; ++i, ++si)
+		if (lc.IsActive())
 		{
-			FENode& childNode = mesh.Node((*si)->node);
-			d += (*si)->val*childNode.get((*si)->dof);
-		}
+			// evaluate the linear constraint
+			double d = 0;
+			int ns = (int)lc.Size();
+			FELinearConstraint::dof_iterator si = lc.begin();
+			for (int i = 0; i < ns; ++i, ++si)
+			{
+				FENode& childNode = mesh.Node((*si)->node);
+				d += (*si)->val * childNode.get((*si)->dof);
+			}
 
-		// assign to parent node
-		FENode& parentNode = mesh.Node(lc.GetParentNode());
-		parentNode.set(lc.GetParentDof(), d + lc.GetOffset());
+			// assign to parent node
+			FENode& parentNode = mesh.Node(lc.GetParentNode());
+			parentNode.set(lc.GetParentDof(), d + lc.GetOffset());
+		}
 	}
 
 	m_up.assign(m_LinC.size(), 0.0);

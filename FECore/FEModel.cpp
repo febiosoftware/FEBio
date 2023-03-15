@@ -1312,9 +1312,6 @@ void FEModel::Activate()
         FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 		if (ci.IsActive()) ci.Activate();
 	}
-
-	// activate linear constraints
-	if (m_imp->m_LCM) m_imp->m_LCM->Activate();
 }
 
 //-----------------------------------------------------------------------------
