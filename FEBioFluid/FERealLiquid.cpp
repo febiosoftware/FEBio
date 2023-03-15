@@ -128,7 +128,7 @@ double FERealLiquid::Tangent_Strain_Strain(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double That = (m_Tr+tf.m_T)/m_Tr;
-    double dpJ2 = 2*m_B[1]->value(That);
+    double dpJ2 = (m_nvc > 1) ? 2*m_B[1]->value(That) : 0;
     double x = fp.m_ef - m_esat->value(That);
     for (int k=3; k<=m_nvc; ++k)
         dpJ2 += k*(k-1)*m_B[k-1]->value(That)*pow(x,k-2);

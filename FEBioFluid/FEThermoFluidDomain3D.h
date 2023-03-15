@@ -45,6 +45,9 @@ public:
     //! assignment operator
     FEThermoFluidDomain3D& operator = (FEThermoFluidDomain3D& d);
     
+    //! initialize
+    bool Init() override;
+    
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     

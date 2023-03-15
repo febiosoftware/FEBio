@@ -449,6 +449,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element fluid bulk modulus
+class FEPlotFluidBulkModulus : public FEPlotDomainData
+{
+public:
+    FEPlotFluidBulkModulus(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Strain energy
 class FEPlotFluidElementStrainEnergy : public FEPlotDomainData
 {

@@ -193,7 +193,7 @@ bool FEThermoFluidSolver::InitEquations()
     AddSolutionVariable(&m_dofT , 1, "temperature", m_Ttol);
 
     // base class initialization
-    FENewtonSolver::InitEquations();
+    if (FENewtonSolver::InitEquations() == false) return false;
     
     // determined the nr of velocity and dilatation equations
     m_nveq = m_ndeq = m_nteq = 0;
@@ -338,15 +338,6 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
         if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.Update();
     }
 
-    // prescribe DOFs for specialized surface loads
-/*    int nsl = fem.ModelLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FEModelLoad& psl = *fem.ModelLoad(i);
-//        if (psl.IsActive() && HasActiveDofs(psl.GetDofList())) psl.Update();
-        if (psl.IsActive()) psl.Update();
-    }*/
-    
     // enforce the linear constraints
     // TODO: do we really have to do this? Shouldn't the algorithm
     // already guarantee that the linear constraints are satisfied?
@@ -440,7 +431,7 @@ void FEThermoFluidSolver::Update(vector<double>& ui)
     UpdateKinematics(ui);
     
     // update model state
-    UpdateModel();
+    GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -1030,13 +1021,25 @@ void FEThermoFluidSolver::Serialize(DumpStream& ar)
 {
     FENewtonSolver::Serialize(ar);
     if (ar.IsShallow()) return;
+    
+    ar & m_nrhs;
+    ar & m_niter;
+    ar & m_nref & m_ntotref;
+
     ar & m_nveq & m_ndeq & m_nteq;
-    ar & m_alphaf & m_alpham;
+
+    ar & m_rhoi & m_alphaf & m_alpham;
     ar & m_gammaf;
     ar & m_pred;
 
     ar & m_Fr & m_Ui &m_Ut;
-    ar & m_Vi & m_vi;
-    ar & m_Di & m_di;
-    ar & m_Ti & m_ti;
+    ar & m_Vi & m_Di & m_Ti;
+    
+    if (ar.IsLoading())
+    {
+        m_Fr.assign(m_neq, 0);
+        m_Vi.assign(m_nveq,0);
+        m_Di.assign(m_ndeq,0);
+        m_Ti.assign(m_nteq,0);
+    }
 }
