@@ -27,8 +27,8 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include "FEFluidModule.h"
 #include "FEBioFluidSolutes.h"
-#include <FECore/FECoreKernel.h>
 #include "FEFluidSolutesSolver.h"
 #include "FEFluidSolutes.h"
 #include "FEFluidSolutesDomain3D.h"
@@ -39,13 +39,17 @@ SOFTWARE.*/
 #include "FEFluidSolutesPressure.h"
 #include "FEFluidSolutesPressureBC.h"
 #include "FESoluteConvectiveFlow.h"
+#include "FEFluidSolutesPressureLC.h"
+#include "FEFluidSolutesGradientLC.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESolutesSolver.h"
 #include "FESolutesMaterial.h"
 #include "FESolutesDomain.h"
 #include "FESolutesDomainFactory.h"
 #include <FEBioMix/FESoluteFlux.h>
-#include "FEFluidModule.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 #include "FEFluidSolutesAnalysis.h"
 
 //-----------------------------------------------------------------------------
@@ -73,7 +77,11 @@ void FEBioFluidSolutes::InitModule()
     febio.RegisterDomain(new FEFluidSolutesDomainFactory);
     
     // define the fsi module
-    febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes");
+    febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes",
+                       "{"
+                       "   \"title\" : \"Fluid-Solutes\","
+                       "   \"info\"  : \"Fluid analysis with solute transport and reactive processes.\""
+                       "}");
 	febio.AddModuleDependency("fluid");
     febio.AddModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
@@ -89,17 +97,44 @@ void FEBioFluidSolutes::InitModule()
     // loads
     REGISTER_FECORE_CLASS(FEFluidSolutesFlux           , "solute flux"                  );
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          );
+    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          , FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEFluidSolutesPressure       , "fluid pressure"               , 0x0300); // deprecated, use BC version
-    REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       );
+    REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       , FECORE_EXPERIMENTAL);
 
     // bcs
     REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC, "fluid pressure");
+
+    // constraints
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressureLC     , "fluid pressure constraint", FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FEFluidSolutesGradientLC     , "zero concentration gradient", FECORE_EXPERIMENTAL);
 
 	// solutes solver classes
 	febio.RegisterDomain(new FESolutesDomainFactory);
 	REGISTER_FECORE_CLASS(FESolutesSolver, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
-	febio.SetActiveModule(0);
+
+    //-----------------------------------------------------------------------------
+    // Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 20;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 100;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEFluidSolutesAnalysis>([](FEFluidSolutesAnalysis* pc) {
+        pc->m_nanalysis = FEFluidSolutesAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = true;
+        pc->m_bdivreform = false;
+    }));
+    
+    febio.SetActiveModule(0);
 }

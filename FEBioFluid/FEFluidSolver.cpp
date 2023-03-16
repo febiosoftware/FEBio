@@ -635,7 +635,7 @@ bool FEFluidSolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
         
 		// check for nans
-		if (ISNAN(normR1)) throw NANDetected();
+		if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -961,7 +961,6 @@ void FEFluidSolver::Serialize(DumpStream& ar)
     ar & m_neq & m_nveq & m_ndeq;
     
     ar & m_rhoi & m_alphaf & m_alpham;
-    ar & m_alphaf & m_alpham;
     ar & m_gammaf;
     ar & m_pred;
     

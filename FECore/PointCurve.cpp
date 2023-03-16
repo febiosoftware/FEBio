@@ -39,7 +39,7 @@ public:
 	int		fnc;	//!< interpolation function
 	int		ext;	//!< extend mode
 	std::vector<vec2d>	points;
-	BSpline* spline;   //!< B-spline
+	BSpline* spline;    //!< B-spline
 };
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ PointCurve::PointCurve(const PointCurve& pc) : im(new PointCurve::Imp)
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
 	im->spline = nullptr;
-	if (pc.im->spline) Update();
+	Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -66,8 +66,8 @@ void PointCurve::operator = (const PointCurve& pc)
 	im->fnc = pc.im->fnc;
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
-	delete im->spline; im->spline = nullptr;
-	if (pc.im->spline) Update();
+    if (im->spline) delete im->spline;
+	Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -264,6 +264,7 @@ double PointCurve::value(double time) const
 		else if (time < tmin) return im->spline->eval(tmin);
 		else return im->spline->eval(time);
 	}
+    
 
 	if (time < tmin) return ExtendValue(time);
 	if (time > tmax) return ExtendValue(time);
@@ -675,18 +676,14 @@ double PointCurve::integrate(double a, double b) const
 
 bool PointCurve::Update()
 {
-	if (im->spline)
-	{
-		delete im->spline;
-		im->spline = nullptr;
-	}
-
 	bool bvalid = true;
+
 	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
 	{
 		const int N = Points();
 
 		// initialize B-spline
+        if (im->spline) delete im->spline;
 		im->spline = new BSpline();
 		switch (im->fnc) {
 		case CSPLINE:

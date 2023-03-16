@@ -28,12 +28,13 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicMultigeneration.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEAnalysis.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/sys.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -156,14 +157,33 @@ bool FEMultiphasicSolidDomain::Init()
             FEBiphasicMaterialPoint& pb = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
+            // initialize sbm apparent densities
             for (int i = 0; i<nsbm; ++i)
                 sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
+            
+            // initialize multiphasic solutes
+            ps.m_nsol = nsol;
+            ps.m_c.assign(nsol,0);
+            ps.m_ca.assign(nsol,0);
+            ps.m_crp.assign(nsol, 0);
+            ps.m_gradc.assign(nsol,vec3d(0,0,0));
+            ps.m_k.assign(nsol, 0);
+            ps.m_dkdJ.assign(nsol, 0);
+            ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
+            ps.m_j.assign(nsol,vec3d(0,0,0));
+            ps.m_bsb.assign(nsol, false);
+            ps.m_nsbm = nsbm;
             ps.m_sbmr = sbmr;
-            ps.m_sbmrp.assign(nsbm, 0);
-            ps.m_sbmrhat.assign(nsbm, 0);
-            ps.m_sbmrhatp.assign(nsbm, 0);
-            pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
-            ps.m_cF = m_pMat->FixedChargeDensity(mp);
+            ps.m_sbmrp = sbmr;
+            ps.m_sbmrhat.assign(nsbm,0);
+            ps.m_sbmrhatp.assign(nsbm,0);
+            
+            // initialize referential solid volume fraction
+            pb.m_phi0 = pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
+            if (pb.m_phi0 > 1.0) {
+                feLogError("Referential solid volume fraction of multiphasic material cannot exceed unity!\nCheck ratios of sbm apparent and true densities.");
+                return false;
+            }
             
             // evaluate reaction rates at initial time
             // check if this mixture includes chemical reactions
@@ -393,9 +413,6 @@ void FEMultiphasicSolidDomain::Reset()
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize referential solid volume fraction
-            pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
-            
             // initialize sbm apparent densities
             for (int i = 0; i<nsbm; ++i)
                 sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
@@ -416,6 +433,9 @@ void FEMultiphasicSolidDomain::Reset()
             ps.m_sbmrp = sbmr;
             ps.m_sbmrhat.assign(nsbm,0);
             ps.m_sbmrhatp.assign(nsbm,0);
+
+            // initialize referential solid volume fraction
+            pt.m_phi0 = pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
 
             // reset chemical reaction element data
             ps.m_cri.clear();

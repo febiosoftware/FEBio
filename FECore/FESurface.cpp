@@ -266,9 +266,14 @@ bool FESurface::Init()
 	// initialize the surface data
 	InitSurface();
 
+	// NOTE: Make sure the mesh has its node-element list initialized
+	// otherwise the omp loop below might crash due to race condition.
+	GetMesh()->NodeElementList();
+
 	// see if we can find all elements that the faces belong to
 	int invalidFacets = 0;
 	int ne = Elements();
+#pragma omp parallel for reduction(+:invalidFacets)
 	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
@@ -278,6 +283,7 @@ bool FESurface::Init()
         else if (m_bitfc && (el.m_elem[1] == nullptr)) FindElements(el);
 		if (el.m_elem[0] == nullptr) { invalidFacets++; }
 	}
+
 	if (invalidFacets > 0)
 	{
 		std::string surfName = GetName();

@@ -52,7 +52,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEObsoleteParamHandler::FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc) : m_pc(pc) 
 {
-	m_root = tag.m_szroot[tag.m_nlevel - 1];
+	m_root = tag.Name();
 }
 
 void FEObsoleteParamHandler::AddParam(const char* oldName, const char* newName, FEParamType paramType)
@@ -1049,16 +1049,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 	if (parseAttributes)
 	{
-		int nattr = tag.m_natt;
-		for (int i = 0; i < nattr; ++i)
+		for (XMLAtt& att : tag.m_att)
 		{
-			const char* szat = tag.m_att[i].m_szatt;
+			const char* szat = att.m_name.c_str();
 			// If we get here, the container did not understand the attribute.
 			// If the attribute is a "lc", we interpret it as a load curve
 			if (strcmp(szat, "lc") == 0)
 			{
-				int lc = atoi(tag.m_att[i].m_szatv) - 1;
-				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+				int lc = atoi(att.m_val.c_str()) - 1;
+				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, att.m_val.c_str());
 
 				// make sure the parameter is volatile
 				if (pp->IsVolatile() == false)
@@ -1091,9 +1090,8 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 	FEParameterList& pl = pc->GetParameterList();
 
 	// process all the other attributes
-	for (int i = 0; i<tag.m_natt; ++i)
+	for (XMLAtt& att : tag.m_att)
 	{
-		XMLAtt& att = tag.m_att[i];
 		const char* szatt = att.name();
 		const char* szval = att.cvalue();
 		if ((att.m_bvisited == false) && szatt && szval)
@@ -1215,7 +1213,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 
 					// HACK for mapping load curves to FEFunction1D
 					const char* szlc = tag.AttributeValue("lc", true);
-					if (szlc && (tag.m_natt == 1) && (prop->GetSuperClassID() == FEFUNCTION1D_ID))
+					if (szlc && (tag.m_att.size() == 1) && (prop->GetSuperClassID() == FEFUNCTION1D_ID))
 					{
 						double v = 1;
 						tag.value(v);

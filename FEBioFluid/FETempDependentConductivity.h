@@ -53,7 +53,8 @@ public:
     double Tangent_Temperature(FEMaterialPoint& mp) override;
     
 public:
-    FEFunction1D*   m_K;    //!< thermal conductivity
+    FEFunction1D*   m_Khat; //!< normalized thermal conductivity
+    double          m_Kr;   //!< thermal conductivity at reference temperature
     double          m_Tr;   //!< reference temperature
     
     // declare parameter list

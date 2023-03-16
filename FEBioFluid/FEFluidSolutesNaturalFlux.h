@@ -40,32 +40,33 @@ public:
     //! constructor
     FEFluidSolutesNaturalFlux(FEModel* pfem);
     
-    //! calculate pressure stiffness
+    //! Initialization
+    bool Init() override;
+    
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+    
+    void SetSolute(int isol) { m_isol = isol; }
+    
+    //! calculate flux stiffness
     void StiffnessMatrix(FELinearSystem& LS) override;
     
     //! calculate residual
     void LoadVector(FEGlobalVector& R) override;
     
-    //! serialize data
-    void Serialize(DumpStream& ar) override;
-    
-    //! initialization
-    bool Init() override;
+    //! update
+    void Update() override;
     
 protected:
-    vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
-    double EffectiveConcentration(FESurfaceMaterialPoint& mp, double alpha);
-    vec3d FluidVelocityElm(FESurfaceMaterialPoint& mp);
-    double EffectiveConcentrationElm(FESurfaceMaterialPoint& mp);
-    vec3d EffectiveCGrad(FESurfaceMaterialPoint& mp);
-    
-protected:
-    double      m_beta;     //!< scale factor
     int         m_isol;      //!< solute index
-    vector<FEElement*>  m_elem;     //!< list of FluidSolutes elements
+    bool        m_bup;          //!< flag to call Update function
     
     // degrees of freedom
     FEDofList    m_dofW;
+    FEDofList    m_dofEF;
     FEDofList    m_dofC;
     
     DECLARE_FECORE_CLASS();

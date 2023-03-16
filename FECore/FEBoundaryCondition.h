@@ -61,6 +61,10 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	// TODO: Temporary construction to update some special boundary conditions in FEModel::Update
+	//       Will likely remove this at some point.
+	virtual void UpdateModel() {}
+
 
 public:
 	// set the dof list

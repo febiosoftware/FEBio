@@ -153,7 +153,6 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 	SetID(count++);
 
 	m_stol = 0.01;
-	m_srad = 1.0;
 	m_atol = 0;
 	m_eps = 0;
 	m_btwo_pass = false;
@@ -277,12 +276,13 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 
 	// unit vector in direction of cr
 	// this will serve as the projection distance
-	vec3d cn(cr); cn.unit();
+	vec3d cn(cr); 
+	double D = cn.unit();
 
 	// initialize projection data
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
-	np.SetSearchRadius(m_srad);
+	np.SetSearchRadius(1.1*D);
 	np.Init();
 
 	// loop over all primary nodes

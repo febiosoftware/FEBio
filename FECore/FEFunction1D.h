@@ -79,6 +79,27 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// A constant function
+class FECORE_API FEConstFunction : public FEFunction1D
+{
+public:
+	FEConstFunction(FEModel* fem) : FEFunction1D(fem), m_value(0.0) {}
+	FEFunction1D* copy() override { return new FEConstFunction(GetFEModel(), m_value); }
+
+	double value(double t) const override { return m_value;	}
+	double derive(double t) const override { return 0.0; }
+	double deriv2(double t) const override { return 0.0; }
+
+protected:
+	FEConstFunction(FEModel* fem, double val) : FEFunction1D(fem), m_value(val) {}
+
+private:
+	double	m_value;
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
 // A linear function
 class FECORE_API FELinearFunction : public FEFunction1D
 {

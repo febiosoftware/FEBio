@@ -88,8 +88,8 @@ void FEBioPolarFluid::InitModule()
     
     //-----------------------------------------------------------------------------
     // Materials
-    REGISTER_FECORE_CLASS(FEPolarFluid        , "polar fluid" );
-    REGISTER_FECORE_CLASS(FEViscousPolarLinear, "polar linear");
+    REGISTER_FECORE_CLASS(FEPolarFluid        , "polar fluid" , FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FEViscousPolarLinear, "polar linear", FECORE_EXPERIMENTAL);
 
     //-----------------------------------------------------------------------------
     // Domain classes

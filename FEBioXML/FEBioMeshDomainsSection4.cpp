@@ -314,7 +314,6 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(dom);
 	if (shellDomain)
 	{
-		double h0 = shellDomain->DefaultShellThickness();
 		for (int j = 0; j < elems; ++j)
 		{
 			const FEBModel::ELEMENT& domElement = partDomain->GetElement(j);
@@ -326,9 +325,11 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 			for (int n = 0; n < ne; ++n)
 			{
 				el.m_node[n] = m_NLT[domElement.node[n] - m_noff];
-				el.m_h0[n] = h0;
+				el.m_h0[n] = 0.0;
 			}
 		}
+
+		shellDomain->AssignDefaultShellThickness();
 	}
 }
 

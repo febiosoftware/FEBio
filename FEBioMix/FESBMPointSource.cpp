@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <iostream>
 #include <unordered_set>
 #include <unordered_map>
+#include <limits>
 #include <FECore/FEAnalysis.h>
 
 BEGIN_FECORE_CLASS(FESBMPointSource, FEBodyLoad)

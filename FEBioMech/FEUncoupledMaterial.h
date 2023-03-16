@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for uncoupled hyperelastic material formulations.
@@ -48,7 +49,7 @@ SOFTWARE.*/
 //! to provide the deviatoric stress function and the pressure function as well as their
 //! derivatives. 
 
-class FEUncoupledMaterial :	public FEElasticMaterial
+class FEBIOMECH_API FEUncoupledMaterial : public FEElasticMaterial
 {
 public:
 	//! constructor

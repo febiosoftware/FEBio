@@ -102,6 +102,16 @@ int FEModule::GetStatus() const
 	return im->m_status;
 }
 
+bool FEModule::HasDependent(int modId) const
+{
+	if (modId == im->id) return true;
+	for (int i : im->depMods)
+	{
+		if (i == modId) return true;
+	}
+	return false;
+}
+
 void FEModule::AddDependency(FEModule& mod)
 {
 	im->AddDependency(mod.GetModuleID());
