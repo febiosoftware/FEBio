@@ -30,13 +30,14 @@ SOFTWARE.*/
 #include "FEOsmCoefManning.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOsmCoefManning, FEOsmoticCoefficient)
     ADD_PARAMETER(m_ksi , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-    ADD_PARAMETER (m_sol , "co_ion");
-    ADD_PROPERTY(m_osmc, "osmc"  );
+    ADD_PARAMETER (m_sol , "co_ion")->setEnums("$(solutes)");
+    ADD_PROPERTY(m_osmc, "osmc")->SetLongName("Wells osmotic coefficient");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -46,8 +47,7 @@ FEOsmCoefManning::FEOsmCoefManning(FEModel* pfem) : FEOsmoticCoefficient(pfem)
     m_ksi = 1;
     m_sol = -1;
     m_lsol = -1;
-    // by default, set the osmotic coefficient to a constant = 1
-    m_osmc = new FELinearFunction(pfem,0,1);
+    m_osmc = nullptr;
 }
 
 //-----------------------------------------------------------------------------

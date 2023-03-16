@@ -248,6 +248,20 @@ bool FEShellDomainNew::Create(int nelems, FE_Element_Spec espec)
 }
 
 //-----------------------------------------------------------------------------
+void FEShellDomainNew::AssignDefaultShellThickness()
+{
+	double h0 = DefaultShellThickness();
+	if (h0 <= 0.0) return;
+
+	for (int j = 0; j < Elements(); ++j)
+	{
+		FEShellElement& el = Element(j);
+		int ne = el.Nodes();
+		for (int n = 0; n < ne; ++n) el.m_ht[n] = el.m_h0[n] = h0;
+	}
+}
+
+//-----------------------------------------------------------------------------
 double FEShellDomainNew::Volume(FEShellElement& se)
 {
 	FEShellElementNew& el = static_cast<FEShellElementNew&>(se);

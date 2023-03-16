@@ -38,15 +38,18 @@
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FETempDependentConductivity, FEFluidThermalConductivity)
 
-// properties
-ADD_PROPERTY(m_K, "K");
+    // parameters
+    ADD_PARAMETER(m_Kr, "Kr")->setLongName("referential thermal conductivity")->setUnits(UNIT_THERMAL_CONDUCTIVITY);
+    // properties
+    ADD_PROPERTY(m_Khat, "Khat")->SetLongName("normalized thermal conductivity");
 
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FETempDependentConductivity::FETempDependentConductivity(FEModel* pfem) : FEFluidThermalConductivity(pfem)
 {
-    m_K = nullptr;
+    m_Khat = nullptr;
+    m_Kr = 0;
     m_Tr = 0;
 }
 
@@ -58,7 +61,7 @@ bool FETempDependentConductivity::Init()
     
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
     
-    m_K->Init();
+    m_Khat->Init();
     
     return FEFluidThermalConductivity::Init();
 }
@@ -68,8 +71,8 @@ bool FETempDependentConductivity::Init()
 double FETempDependentConductivity::ThermalConductivity(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double q = tf.m_T/m_Tr;
-    return m_K->value(q);
+    double That = (tf.m_T+m_Tr)/m_Tr;
+    return m_Khat->value(That)*m_Kr;
 }
 
 //-----------------------------------------------------------------------------
@@ -84,7 +87,7 @@ double FETempDependentConductivity::Tangent_Strain(FEMaterialPoint& mp)
 double FETempDependentConductivity::Tangent_Temperature(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double q = tf.m_T/m_Tr;
-    return m_K->derive(q);
+    double That = (tf.m_T+m_Tr)/m_Tr;
+    return m_Khat->derive(That)*m_Kr/m_Tr;
 }
 

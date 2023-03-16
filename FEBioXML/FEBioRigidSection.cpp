@@ -114,6 +114,7 @@ void FEBioRigidSection::ParseRigidBC(XMLTag& tag)
 					throw XMLReader::InvalidValue(tag);
 				}
 			}
+			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
 		} while (!tag.isend());

@@ -123,7 +123,7 @@ bool FEPlotFluidDilatation::Save(FEMesh& m, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-//! Store the nodal dilatations
+//! Store the nodal effective fluid pressure
 bool FEPlotFluidEffectivePressure::Save(FEDomain& dom, FEDataStream& a)
 {
     // get the dilatation dof index
@@ -152,6 +152,21 @@ bool FEPlotNodalPolarFluidAngularVelocity::Save(FEMesh& m, FEDataStream& a)
     
     writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
         return node.get_vec3d(dofGX, dofGY, dofGZ);
+    });
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the nodal temperatures
+bool FEPlotNodalFluidTemperature::Save(FEMesh& m, FEDataStream& a)
+{
+    // get the dilatation dof index
+    int dof_T = GetFEModel()->GetDOFIndex("T");
+    if (dof_T < 0) return false;
+
+    // loop over all nodes
+    writeNodalValues<double>(m, a, [=](const FENode& node) {
+        return node.get(dof_T);
     });
     return true;
 }
@@ -1089,6 +1104,21 @@ bool FEPlotFluidEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return pfluid->EnergyDensity(mp_noconst);
 	});
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidBulkModulus::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+
+    // write solid element data
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->BulkModulus(mp_noconst);
+    });
 
     return true;
 }

@@ -36,13 +36,21 @@ SOFTWARE.*/
 //! constructor
 FETemperatureBackFlowStabilization::FETemperatureBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
+    m_nnlist = FENodeNodeList();
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FETemperatureBackFlowStabilization::SetSurface(FESurface* ps)
+{
+    FESurfaceLoad::SetSurface(ps);
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FETemperatureBackFlowStabilization::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
+    FEModel& fem = *GetFEModel();
     
     // determine the nr of concentration equations
     m_dofW.Clear();
@@ -53,7 +61,9 @@ bool FETemperatureBackFlowStabilization::Init()
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
 
-    return true;
+    m_nnlist.Create(fem.GetMesh());
+
+    return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +98,55 @@ void FETemperatureBackFlowStabilization::Update()
         // set node as having prescribed DOF (concentration at previous time)
         if (node.m_ID[m_dofT] < -1)
             node.set(m_dofT, node.get_prev(m_dofT));
+        else
+        {
+            node.set_bc(m_dofT, DOF_PRESCRIBED);
+            node.m_ID[m_dofT] = -node.m_ID[m_dofT] - 2;
+            int nid = node.GetID()-1; //0 based
+            int val = m_nnlist.Valence(nid);
+            int* nlist = m_nnlist.NodeList(nid);
+            
+            vector<int> connectnidarray;
+            int connectnid=0;
+            //check which connecting nodes are not on surface
+            for (int j = 0; j<val; ++j)
+            {
+                int cnid = *(nlist+j);
+                bool isSurf = false;
+                for (int k=0; k<ps->Nodes(); ++k)
+                {
+                    if (cnid==ps->Node(k).GetID()-1)
+                        isSurf = true;
+                }
+                if (!isSurf)
+                {
+                    connectnidarray.push_back(cnid);
+                }
+            }
+            //find closest connecting node
+            if (connectnidarray.size()>0)
+            {
+                int cnodeIndex = 0;
+                FENode* cnodeArray = GetFEModel()->GetMesh().FindNodeFromID(connectnidarray[cnodeIndex]+1);
+                double smallDist = sqrt(pow((node.m_rt.x-cnodeArray->m_rt.x),2)+pow((node.m_rt.y-cnodeArray->m_rt.y),2)+pow((node.m_rt.z-cnodeArray->m_rt.z),2));
+                for (int j = 1; j<connectnidarray.size(); ++j)
+                {
+                    FENode* tempNode = GetFEModel()->GetMesh().FindNodeFromID(connectnidarray[j]+1);
+                    double temp = sqrt(pow((node.m_rt.x-tempNode->m_rt.x),2)+pow((node.m_rt.y-tempNode->m_rt.y),2)+pow((node.m_rt.z-tempNode->m_rt.z),2));
+                    if(temp<smallDist)
+                    {
+                        cnodeIndex = j;
+                        cnodeArray = tempNode;
+                        smallDist = temp;
+                    }
+                }
+                connectnid = connectnidarray[cnodeIndex];
+                FENode* cnode = GetFEModel()->GetMesh().FindNodeFromID(connectnid+1);
+                node.set(m_dofT, cnode->get(m_dofT));
+            }
+            else
+                node.set(m_dofT, 0);
+        }
     }
 }
 

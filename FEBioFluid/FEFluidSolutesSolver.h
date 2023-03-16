@@ -122,6 +122,9 @@ public:
     double  m_Ctol;     //!< concentration tolerance
     double  m_minJf;    //!< minimum allowable compression ratio
     bool    m_forcePositive;    //!< force conentrations to remain positive
+    double  m_cmin;     //!< threshold for detecting sudden drop in concentration
+    double  m_cmax;     //!< threshold for detecting sudden increase in concentration
+    int     m_cnum;     //!< minimum number of points at which C drops suddenly
 
 public:
     // equation numbers
@@ -151,12 +154,15 @@ public:
 protected:
     FEDofList       m_dofW;
     FEDofList       m_dofAW;
-    int             m_dofEF;
+    FEDofList       m_dofEF;
     int             m_dofAEF;
-    int             m_dofC;
+    FEDofList       m_dofC;
     int             m_dofAC;
 
 	int				m_solve_strategy;
+    
+private:
+    bool            m_sudden_C_change;
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();

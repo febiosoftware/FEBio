@@ -83,10 +83,10 @@ protected:
     vector<double>  m_Lm, m_Lmp;
     FESurface       m_surf;
     
-    FEThermoFluid*    m_pfluid;   //!< pointer to thermo-fluid material
+    FEThermoFluid*    m_pfluid; //!< pointer to thermo-fluid material
 
 public:
-    double  m_p0;       // prescribed pressure
+    FEParamDouble   m_p;        // prescribed pressure
     
     DECLARE_FECORE_CLASS();
 };

@@ -40,7 +40,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEReactionRateExpSED::FEReactionRateExpSED(FEModel* pfem) : FEReactionRate(pfem) 
 { 
-    m_B = m_Psi0 = 0; 
+    m_B = 0;
+    m_Psi0 = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -55,7 +56,7 @@ double FEReactionRateExpSED::ReactionRate(FEMaterialPoint& pt)
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     double J = et.m_J;
     double sed = rpt.m_sed;
-    double zhat = m_B*exp(sed/m_Psi0)/(J-phir);
+    double zhat = m_B(pt)*exp(sed/m_Psi0(pt))/(J-phir);
     return zhat;
 }
 
@@ -72,7 +73,7 @@ mat3ds FEReactionRateExpSED::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
     double J = et.m_J;
     double zhat = ReactionRate(pt);
     mat3dd I(1);
-    mat3ds dzhatde = (I/(phir-J) + (et.m_s+I*p)/m_Psi0)*zhat;
+    mat3ds dzhatde = (I/(phir-J) + (et.m_s+I*p)/m_Psi0(pt))*zhat;
     return dzhatde;
 }
 

@@ -73,7 +73,8 @@ bool FERealGas::Init()
 
     // check if we should assume ideal gas
     if (m_nvc == 0) {
-        m_A[0] = new FELinearFunction(GetFEModel(), 0, 1);
+		m_A[0] = fecore_alloc(FEConstFunction, GetFEModel());
+		m_A[0]->SetParameter("value", 1.0);
         m_nvc = 1;
     }
     m_a0->Init();

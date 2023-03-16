@@ -64,6 +64,8 @@ public:
 
 	int GetStatus() const;
 
+	bool HasDependent(int modId) const;
+
 protected:
 	void SetStatus(FEModule::Status status);
 

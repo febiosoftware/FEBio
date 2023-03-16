@@ -418,7 +418,8 @@ bool FESolidSolver::Quasin()
 		normE1 = s*fabs(m_ui*m_R1);
 
 		// check for nans
-		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
+		if (ISNAN(normR1)) throw NANInResidualDetected();
+		if (ISNAN(normu)) throw NANInSolutionDetected();
 
 		// update total displacements
 		int neq = (int)m_Ui.size();

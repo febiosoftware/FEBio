@@ -126,6 +126,8 @@ FEBioModel::FEBioModel()
 
 	m_lastUpdate = -1;
 
+	m_bshowErrors = true;
+
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
 	AddCallback(handleCB, CB_ALWAYS, this);
@@ -137,6 +139,12 @@ FEBioModel::~FEBioModel()
 	// close the plot file
 	if (m_plot) { delete m_plot; m_plot = 0; }
 	m_log.close();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::ShowWarningsAndErrors(bool b)
+{
+	m_bshowErrors = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -395,6 +403,28 @@ void FEBioModel::Write(unsigned int nevent)
 	// get the current step
 	FEAnalysis* pstep = GetCurrentStep();
 
+	// echo fem data to the logfile
+	// we do this here (and not e.g. directly after input)
+	// since the data can be changed after input, which is the case,
+	// for instance, in the parameter optimization module
+	if ((nevent == CB_INIT) && m_becho)
+	{
+		Logfile::MODE old_mode = m_log.GetMode();
+
+		// don't output when no output is requested
+		if (old_mode != Logfile::LOG_NEVER)
+		{
+			// we only output this data to the log file and not the screen
+			m_log.SetMode(Logfile::LOG_FILE);
+
+			// write output
+			echo_input();
+
+			// reset log mode
+			m_log.SetMode(old_mode);
+		}
+	}
+
 	// update plot file
 	WritePlot(nevent);
 
@@ -609,6 +639,7 @@ void FEBioModel::WriteData(unsigned int nevent)
 	bool bout = false;
 	switch (nevent)
 	{
+	case CB_INIT: if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true; break;
 	case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
 	case CB_MAJOR_ITERS:
 		if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
@@ -674,8 +705,8 @@ void FEBioModel::DumpData(int nevent)
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
 	if      (ntag == 0) m_log.printf(szmsg);
-	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
-	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
+	else if ((ntag == 1) && m_bshowErrors) m_log.printbox("WARNING", szmsg);
+	else if ((ntag == 2) && m_bshowErrors) m_log.printbox("ERROR", szmsg);
 	else if (ntag == 3) m_log.printbox(nullptr, szmsg);
 	else if (ntag == 4)
 	{
@@ -1424,21 +1455,14 @@ bool FEBioModel::Init()
 		if (m_plot == 0) InitPlotFile();
 	}
 
-	// initialize model data
-	if (FEMechModel::Init() == false) 
-	{
-		feLogError("Model initialization failed");
-		return false;
-	}
-
 	// see if a valid dump file name is defined.
 	const std::string& sdmp = GetDumpFileName();
 	if (sdmp.empty() == 0)
 	{
 		// if not, we take the input file name and set the extension to .dmp
-		char sz[1024] = {0};
+		char sz[1024] = { 0 };
 		strcpy(sz, GetInputFileName().c_str());
-		char *ch = strrchr(sz, '.');
+		char* ch = strrchr(sz, '.');
 		if (ch) *ch = 0;
 		strcat(sz, ".dmp");
 		SetDumpFilename(sz);
@@ -1446,31 +1470,16 @@ bool FEBioModel::Init()
 
 	// initialize data records
 	DataStore& dataStore = GetDataStore();
-	for (int i=0; i<dataStore.Size(); ++i)
+	for (int i = 0; i < dataStore.Size(); ++i)
 	{
 		if (dataStore.GetDataRecord(i)->Initialize() == false) return false;
 	}
 
-	// echo fem data to the logfile
-	// we do this here (and not e.g. directly after input)
-	// since the data can be changed after input, which is the case,
-	// for instance, in the parameter optimization module
-	if (m_becho) 
+	// initialize model data
+	if (FEMechModel::Init() == false) 
 	{
-		Logfile::MODE old_mode = m_log.GetMode();
-
-		// don't output when no output is requested
-		if (old_mode != Logfile::LOG_NEVER)
-		{
-			// we only output this data to the log file and not the screen
-			m_log.SetMode(Logfile::LOG_FILE);
-
-			// write output
-			echo_input();
-
-			// reset log mode
-			m_log.SetMode(old_mode);
-		}
+		feLogError("Model initialization failed");
+		return false;
 	}
 
 	// Alright, all initialization is done, so let's get busy !
