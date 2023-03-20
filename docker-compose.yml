@@ -31,3 +31,12 @@ services:
     <<: *default
     container_name: febio-tests
     command: ci/linux-test.sh
+
+  febio-runtime:
+    build:
+      context: ./infrastructure
+      dockerfile: DockerfileRuntime
+    image: febiosoftware/febio-runtime:ubuntu-22.04
+    working_dir: /FEBio
+    volumes:
+      - ./TestSuite/:/FEBio/TestSuite
