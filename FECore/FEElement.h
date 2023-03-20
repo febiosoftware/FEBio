@@ -311,3 +311,16 @@ public:
 
 	void SetTraits(FEElementTraits* pt);
 };
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEBeamElement : public FEElement
+{
+public:
+	FEBeamElement();
+
+	FEBeamElement(const FEBeamElement& el);
+
+	FEBeamElement& operator = (const FEBeamElement& el);
+
+	void SetTraits(FEElementTraits* pt);
+};

@@ -562,3 +562,54 @@ void FELineElement::SetTraits(FEElementTraits* pt)
 	m_node.resize(Nodes());
 	m_lnode.resize(Nodes());
 }
+
+//=============================================================================
+FEBeamElement::FEBeamElement()
+{
+	m_lid = -1;
+}
+
+FEBeamElement::FEBeamElement(const FEBeamElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy data
+	m_lid = el.m_lid;
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_lid = el.m_lid;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
+}
+
+FEBeamElement& FEBeamElement::operator = (const FEBeamElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy data
+	m_lid = el.m_lid;
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_lid = el.m_lid;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
+
+	return (*this);
+}
+
+void FEBeamElement::SetTraits(FEElementTraits* pt)
+{
+	m_pT = pt;
+	m_node.resize(Nodes());
+	m_lnode.resize(Nodes());
+}
