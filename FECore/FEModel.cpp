@@ -1652,6 +1652,13 @@ void FEModel::SetPrintParametersFlag(bool b)
 }
 
 //-----------------------------------------------------------------------------
+//! Get the print parameter flag
+bool FEModel::GetPrintParametersFlag() const
+{
+	return m_imp->m_printParams;
+}
+
+//-----------------------------------------------------------------------------
 bool FEModel::EvaluateLoadParameters()
 {
 	feLog("\n");
