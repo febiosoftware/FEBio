@@ -37,10 +37,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
-	ADD_PARAMETER(m_maxretries, "max_retries");
-	ADD_PARAMETER(m_iteopt    , "opt_iter");
-	ADD_PARAMETER(m_dtmin     , "dtmin");
-	ADD_PARAMETER(m_dtmax     , "dtmax");
+	ADD_PARAMETER(m_maxretries, "max_retries")->setLongName("max retries");
+	ADD_PARAMETER(m_iteopt    , "opt_iter")->setLongName("optimal iterations");
+	ADD_PARAMETER(m_dtmin     , "dtmin")->setLongName("min stepsize");
+	ADD_PARAMETER(m_dtmax     , "dtmax")->setLongName("max stepsize");
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
 	ADD_PARAMETER(m_cutback   , "cutback");
 	ADD_PARAMETER(m_dtforce   , "dtforce");

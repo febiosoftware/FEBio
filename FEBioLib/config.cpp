@@ -127,6 +127,10 @@ namespace febio {
 						{
 							tag.value(config.m_printParams);
 						}
+						else if (tag == "show_warnings_and_errors")
+						{
+							tag.value(config.m_bshowErrors);
+						}
 						else
 						{
 							if (parse_tags(tag) == false) return false;

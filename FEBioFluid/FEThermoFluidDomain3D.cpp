@@ -46,24 +46,6 @@ FEThermoFluidDomain3D::FEThermoFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem
 {
     m_pMat = 0;
     m_btrans = true;
-
-    // TODO: Can this be done in Init, since there is no error checking
-    if (pfem)
-    {
-        m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
-        m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));
-
-        m_dofEF = pfem->GetDOFIndex("ef");
-        m_dofAEF = pfem->GetDOFIndex("aef");
-        m_dofT = pfem->GetDOFIndex("T");
-        m_dofAT = pfem->GetDOFIndex("aT");
-
-        // list the degrees of freedom
-        // (This allows the FEBomain base class to handle several tasks such as UnpackLM)
-        m_dof.AddDofs(m_dofW);
-        m_dof.AddDof(m_dofEF);
-        m_dof.AddDof(m_dofT);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -94,7 +76,34 @@ void FEThermoFluidDomain3D::SetMaterial(FEMaterial* pmat)
     }
     else m_pMat = 0;
     
+}
+
+//-----------------------------------------------------------------------------
+bool FEThermoFluidDomain3D::Init()
+{
+    // initialize base class
+    if (FESolidDomain::Init() == false) return false;
+    
+    FEModel* pfem = GetFEModel();
+    
+    // set the active degrees of freedom list
+    m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));
+
+    m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
+    m_dofAEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION_TDERIV), 0);
+    m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
+    m_dofAT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), 0);
+
+    FEDofList dofs(pfem);
+    dofs.AddDofs(m_dofW);
+    dofs.AddDof(m_dofEF);
+    dofs.AddDof(m_dofT);
+    m_dof = dofs;
+
     m_Tr = GetFEModel()->GetGlobalConstant("T");
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,7 +128,8 @@ void FEThermoFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
-            
+            mp.m_rt = mp.m_r0;
+
             if (pt.m_ef <= -1) {
                 throw NegativeJacobianDetected();
             }
@@ -133,6 +143,8 @@ void FEThermoFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 void FEThermoFluidDomain3D::InternalForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
+    int ndpn = 5;
+    
 #pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
@@ -144,7 +156,7 @@ void FEThermoFluidDomain3D::InternalForces(FEGlobalVector& R)
         FESolidElement& el = m_Elem[i];
         
         // get the element force vector and initialize it to zero
-        int ndof = 5*el.Nodes();
+        int ndof = ndpn*el.Nodes();
         fe.assign(ndof, 0);
         
         // calculate internal force vector
@@ -170,12 +182,13 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
     
     mat3ds sv;
     vec3d gradp, q;
-    double dpT, rho, cv;
+    double dpT, dpJ, rho, cv;
     
     const double *H, *Gr, *Gs, *Gt;
     
     int nint = el.GaussPoints();
     int neln = el.Nodes();
+    int ndpn = 5;
     
     // gradient of shape functions
     vector<vec3d> gradN(neln);
@@ -198,13 +211,14 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         
         // get the viscous stress tensor for this integration point
         sv = m_pMat->GetViscous()->Stress(mp);
-        // get the gradient of the elastic pressure
-        gradp = tf.m_gradT*m_pMat->Tangent_Pressure_Temperature(mp) +
-                pt.m_gradef*m_pMat->Tangent_Pressure_Strain(mp);
-        // get the heat flux
-        q = m_pMat->HeatFlux(mp);
         // get the derivative of the elastic pressure with respect to temperature
         dpT = m_pMat->GetElastic()->Tangent_Temperature(mp);
+        // get the derivative of the elastic pressure with respect to strain
+        dpJ = m_pMat->GetElastic()->Tangent_Strain(mp);
+        // get the gradient of the elastic pressure
+        gradp = tf.m_gradT*dpT + pt.m_gradef*dpJ;
+        // get the heat flux
+        q = m_pMat->HeatFlux(mp);
         // get fluid mass density
         rho = m_pMat->Density(mp);
         // get the isochoric specific heat capacity
@@ -235,11 +249,11 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
             // from the global residual vector
-            fe[5*i  ] -= fs.x*detJ;
-            fe[5*i+1] -= fs.y*detJ;
-            fe[5*i+2] -= fs.z*detJ;
-            fe[5*i+3] -= fJ*detJ;
-            fe[5*i+4] -= fT*detJ;
+            fe[ndpn*i  ] -= fs.x*detJ;
+            fe[ndpn*i+1] -= fs.y*detJ;
+            fe[ndpn*i+2] -= fs.z*detJ;
+            fe[ndpn*i+3] -= fJ*detJ;
+            fe[ndpn*i+4] -= fT*detJ;
         }
     }
 }
@@ -248,6 +262,7 @@ void FEThermoFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
 void FEThermoFluidDomain3D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
+    int ndpn = 5;
     for (int i=0; i<NE; ++i)
     {
         vector<double> fe;
@@ -257,7 +272,7 @@ void FEThermoFluidDomain3D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
         FESolidElement& el = m_Elem[i];
         
         // get the element force vector and initialize it to zero
-        int ndof = 5*el.Nodes();
+        int ndof = ndpn*el.Nodes();
         fe.assign(ndof, 0);
         
         // apply body forces
@@ -284,6 +299,7 @@ void FEThermoFluidDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el
     
     // number of nodes
     int neln = el.Nodes();
+    int ndpn = 5;
     
     // nodal coordinates
     vec3d r0[FEElement::MAX_NODES];
@@ -309,9 +325,9 @@ void FEThermoFluidDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el
         
         for (int i=0; i<neln; ++i)
         {
-            fe[5*i  ] -= H[i]*dens*f.x*detJ;
-            fe[5*i+1] -= H[i]*dens*f.y*detJ;
-            fe[5*i+2] -= H[i]*dens*f.z*detJ;
+            fe[ndpn*i  ] -= H[i]*dens*f.x*detJ;
+            fe[ndpn*i+1] -= H[i]*dens*f.y*detJ;
+            fe[ndpn*i+2] -= H[i]*dens*f.z*detJ;
         }
     }
 }
@@ -356,6 +372,7 @@ void FEThermoFluidDomain3D::ElementHeatSupply(FEFluidHeatSupply& BF, FESolidElem
     
     // number of nodes
     int neln = el.Nodes();
+    int ndpn = 5;
     
     // nodal coordinates
     vec3d r0[FEElement::MAX_NODES];
@@ -381,7 +398,7 @@ void FEThermoFluidDomain3D::ElementHeatSupply(FEFluidHeatSupply& BF, FESolidElem
         
         for (int i=0; i<neln; ++i)
         {
-            fe[5*i+4] += H[i]*dens*r*detJ;
+            fe[ndpn*i+4] += H[i]*dens*r*detJ;
         }
     }
 }
@@ -498,7 +515,7 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
     vector<vec3d> gradN(neln);
 
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);    // optionally multiply this by m_btrans
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
 
     double *H, *Gr, *Gs, *Gt;
     

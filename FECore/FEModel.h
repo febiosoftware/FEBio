@@ -340,6 +340,9 @@ public: // --- parameter functions ---
 	//! Set the print parameters flag
 	void SetPrintParametersFlag(bool b);
 
+	//! Get the print parameter flag
+	bool GetPrintParametersFlag() const;
+
 public:	// --- Miscellaneous routines ---
 
 	//! call the callback function

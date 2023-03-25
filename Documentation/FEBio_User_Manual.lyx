@@ -19232,7 +19232,7 @@ The following example fixes the displacement degrees of freedom.
 \end_layout
 
 \begin_layout LyX-Code
-</rigid_constraint>
+</rigid_bc>
 \end_layout
 
 \begin_layout Subsubsection

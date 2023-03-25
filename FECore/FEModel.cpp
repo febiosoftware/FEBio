@@ -1312,9 +1312,6 @@ void FEModel::Activate()
         FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 		if (ci.IsActive()) ci.Activate();
 	}
-
-	// activate linear constraints
-	if (m_imp->m_LCM) m_imp->m_LCM->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1652,6 +1649,13 @@ void FEModel::EvaluateDataGenerators(double time)
 void FEModel::SetPrintParametersFlag(bool b)
 {
 	m_imp->m_printParams = b;
+}
+
+//-----------------------------------------------------------------------------
+//! Get the print parameter flag
+bool FEModel::GetPrintParametersFlag() const
+{
+	return m_imp->m_printParams;
 }
 
 //-----------------------------------------------------------------------------

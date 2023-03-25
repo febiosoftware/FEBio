@@ -169,8 +169,8 @@ double FELogContactGap::value(FESurfaceElement& el)
 	double g = 0.0;
 	for (int i = 0; i < el.GaussPoints(); ++i)
 	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = mp.ExtractData<FEContactMaterialPoint>();
+		FEMaterialPoint* mp = el.GetMaterialPoint(i);
+		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
 		if (cp)
 		{
 			g += cp->m_gap;
@@ -187,8 +187,8 @@ double FELogContactPressure::value(FESurfaceElement& el)
 	double Lm = 0.0;
 	for (int i = 0; i < el.GaussPoints(); ++i)
 	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = mp.ExtractData<FEContactMaterialPoint>();
+		FEMaterialPoint* mp = el.GetMaterialPoint(i);
+		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
 		if (cp)
 		{
 			Lm += cp->m_Ln;

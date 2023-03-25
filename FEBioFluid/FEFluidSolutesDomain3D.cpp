@@ -742,7 +742,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         double dep = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         double d2ep = m_pMat->Fluid()->Tangent_Pressure_Strain_Strain(mp);
         // Jdot/J
-        double dJoJ = pt.m_efdot/(pt.m_ef+1);
+        double dJoJ = pt.m_efdot/Jf;
         // Miscellaneous constants
         double R = m_pMat->m_Rgas;
         double T = m_pMat->m_Tabs;

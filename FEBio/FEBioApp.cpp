@@ -204,6 +204,7 @@ void FEBioApp::ApplyConfig(FEBioModel& fem)
 	{
 		fem.SetPrintParametersFlag(m_config.m_printParams != 0);
 	}
+	fem.ShowWarningsAndErrors(m_config.m_bshowErrors);
 }
 
 //-----------------------------------------------------------------------------

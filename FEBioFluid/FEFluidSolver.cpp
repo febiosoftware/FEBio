@@ -961,7 +961,6 @@ void FEFluidSolver::Serialize(DumpStream& ar)
     ar & m_neq & m_nveq & m_ndeq;
     
     ar & m_rhoi & m_alphaf & m_alpham;
-    ar & m_alphaf & m_alpham;
     ar & m_gammaf;
     ar & m_pred;
     
