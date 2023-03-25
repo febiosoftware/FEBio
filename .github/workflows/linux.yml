@@ -10,7 +10,7 @@ on:
         required: false
         type: boolean
         default: false
-      buildDocker
+      buildDocker:
         description: "Build and deploy docker image?"
         required: false
         type: boolean
