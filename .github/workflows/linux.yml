@@ -10,6 +10,11 @@ on:
         required: false
         type: boolean
         default: false
+      buildDocker
+        description: "Build and deploy docker image?"
+        required: false
+        type: boolean
+        default: false
 
 env:
   AWS_REGION: us-east-1
@@ -173,7 +178,7 @@ jobs:
     needs:
       - build # required to get output from the start-runner job
     runs-on: ubuntu-latest
-    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    if: ${{inputs.buildDocker}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
