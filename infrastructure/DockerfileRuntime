@@ -11,4 +11,5 @@ RUN apt-get update && apt-get install intel-oneapi-runtime-libs -y
 
 COPY cmbuild/bin/* bin/
 COPY cmbuild/lib/* lib/
+RUN chmod +x bin/febio4
 CMD ["bin/febio4", "-i", "/FEBio/TestSuite/Verify3/bi04.feb", "-o", "/FEBio/TestSuite/Verify3/bi04.log", "-p", "/FEBio/TestSuite/Verify3/bi04.xplt"]
