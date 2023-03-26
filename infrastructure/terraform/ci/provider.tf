@@ -20,3 +20,12 @@ terraform {
     encrypt              = true
   }
 }
+
+provider "aws" {
+  default_tags {
+    tags = {
+      provisioner = "Terraform"
+      workspace   = terraform.workspace
+    }
+  }
+}
