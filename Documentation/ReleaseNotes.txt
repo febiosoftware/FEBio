@@ -50,7 +50,7 @@ at https://forums.febio.org/.
 * Fixed problem with initialization of FERigidBC in multi-step analysis.
 * Added all node, element, and facet sets defined in the input file to the plot file.
 * Fixed issue with linear constraints for multi-step problems.
-* Added config option to suppress warnings and error messages.
+* Added config option (show_warnings_and_errors) to suppress warnings and error messages.
 * Added parameter to param_run task to generate standard febio output files.
 * Hide "clamp_shells" parameter in FERigidNodeSet since it has no effect currently.
 * Now printing const scaled value for prescribed FEParamDouble values.
@@ -60,7 +60,7 @@ at https://forums.febio.org/.
 * Minor change to console update.
 * Corrected unit of P1 muscle material parameter in user manual.
 * Fixed issue caused when febio prompt recieves EOF on Linux.
-* Log data is now also evaluated at time 0.
+* Log data is now also evaluated and output at time 0.
 * Fixed issue with missing material point data in multigeneration material.
 * Fixed issue with initialization of FERealGas and FEOsmCoefManning.
 * Fixed issue with initialization of FEMappedValueVec3 class and FEElasticFiberMaterial_T.
