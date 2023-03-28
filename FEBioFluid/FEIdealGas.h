@@ -43,6 +43,9 @@ public:
     //! initialization
     bool Init() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
     //! gage pressure
     double Pressure(FEMaterialPoint& pt) override;
     

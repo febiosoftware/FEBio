@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,49 +24,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEPrescribedBC.h>
-#include <FECore/FEModelParam.h>
-#include "febiofluid_api.h"
+#include <FECore/FEInitialCondition.h>
 
-//-----------------------------------------------------------------------------
-//! FEThermoFluidPressure is a thermofluid surface that has prescribed fluid pressure
-//!
-class FEBIOFLUID_API FEThermoFluidPressureBC : public FEPrescribedSurface
+class FEInitialFluidPressureTemperature : public FENodalIC
 {
 public:
-    //! constructor
-    FEThermoFluidPressureBC(FEModel* pfem);
+    FEInitialFluidPressureTemperature(FEModel* fem);
+	bool Init() override;
+    void Activate() override;
+    
+    void SetPDOF(int ndof);
+    bool SetPDOF(const char* szdof);
 
-    //! set the dilatation
-    void Update() override;
+    void SetTDOF(int ndof);
+    bool SetTDOF(const char* szdof);
 
-    //! initialize
-    bool Init() override;
+    void GetNodalValues(int inode, std::vector<double>& values) override;
+    void SetPValue(double v);
+    void SetTValue(double v);
 
-    //! serialization
     void Serialize(DumpStream& ar) override;
 
-public:
-    // return the value for node i, dof j
-    void GetNodalValues(int nodelid, std::vector<double>& val) override;
-
-    // copy data from another class
-    void CopyFrom(FEBoundaryCondition* pbc) override;
-    
-    FESurface* GetSurface() { return m_psurf; }
-
-private:
-    FEParamDouble   m_p;       //!< prescribed fluid pressure
+protected:
+    int     m_dofEF;
+    int     m_dofT;
+    FEParamDouble   m_Pdata;
+    FEParamDouble   m_Tdata;
     vector<double>  m_e;
+    vector<double>  m_T;
 
-private:
-    double      m_Rgas;
-    double      m_Tabs;
-
-    int        m_dofEF;
-    int        m_dofT;
-    
-    FESurface* m_psurf;
-
-    DECLARE_FECORE_CLASS();
+	DECLARE_FECORE_CLASS();
 };

@@ -89,6 +89,19 @@ bool FERealLiquid::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FERealLiquid::Serialize(DumpStream& ar)
+{
+    FEElasticFluid::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_R & m_Pr & m_Tr & m_rhor;
+    ar & m_pMat;
+    ar & m_psat & m_asat & m_ssat & m_esat & m_cvsat;
+    for (int i=0; i<MAX_NVC; ++i)
+        ar & m_B[i] & m_C[i];
+}
+
+//-----------------------------------------------------------------------------
 //! gage pressure
 double FERealLiquid::Pressure(FEMaterialPoint& mp)
 {

@@ -46,6 +46,7 @@ FEThermoFluidPressureBC::FEThermoFluidPressureBC(FEModel* pfem) : FEPrescribedSu
     m_dofT = -1;
     m_Rgas = 0;
     m_Tabs = 0;
+    m_psurf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -59,9 +60,11 @@ bool FEThermoFluidPressureBC::Init()
     if (FEPrescribedSurface::Init() == false) return false;
     m_Rgas = GetFEModel()->GetGlobalConstant("R");
     m_Tabs = GetFEModel()->GetGlobalConstant("T");
+    
+    m_psurf = FESurfaceBC::GetSurface();
 
     m_e.assign(GetSurface()->Nodes(), 0.0);
-        
+
     return true;
 }
 
@@ -107,30 +110,48 @@ void FEThermoFluidPressureBC::Update()
                 T /= el.Nodes();
                 double efi[FEElement::MAX_INTPOINTS] = {0};
                 double efo[FEElement::MAX_NODES] = {0};
+                bool good = true;
                 for (int j=0; j<se->GaussPoints(); ++j) {
                     FEMaterialPoint* pt = se->GetMaterialPoint(j);
-                    bool good = ptfl->Dilatation(T, p, 0, efi[j]);
-                    assert(good);
+                    good = good && ptfl->Dilatation(T, p, 0, efi[j]);
                 }
                 // project dilatations from integration points to nodes
                 se->project_to_nodes(efi, efo);
                 // only keep the dilatations at the nodes of the surface face
-                for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_lnode[j]].push_back(efo[j]);
+                if (good) {
+                    for (int j=0; j<el.Nodes(); ++j)
+                        efNodes[el.m_lnode[j]].push_back(efo[j]);
+                }
+                else {
+                    for (int j=0; j<el.Nodes(); ++j) {
+                        FENode& node = mesh.Node(el.m_node[j]);
+                        efo[j] = node.get_prev(m_dofEF);
+                        efNodes[el.m_lnode[j]].push_back(efo[j]);
+                    }
+                }
             }
             else if (pfl) {
                 double efi[FEElement::MAX_INTPOINTS] = {0};
                 double efo[FEElement::MAX_NODES] = {0};
+                bool good = true;
                 for (int j=0; j<se->GaussPoints(); ++j) {
                     FEMaterialPoint* pt = se->GetMaterialPoint(j);
-                    bool good = pfl->Dilatation(0, p, 0, efi[j]);
-                    assert(good);
+                    good = good && pfl->Dilatation(0, p, 0, efi[j]);
                 }
                 // project dilatations from integration points to nodes
                 se->project_to_nodes(efi, efo);
                 // only keep the dilatations at the nodes of the surface face
-                for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_lnode[j]].push_back(efo[j]);
+                if (good) {
+                    for (int j=0; j<el.Nodes(); ++j)
+                        efNodes[el.m_lnode[j]].push_back(efo[j]);
+                }
+                else {
+                    for (int j=0; j<el.Nodes(); ++j) {
+                        FENode& node = mesh.Node(el.m_node[j]);
+                        efo[j] = node.get_prev(m_dofEF);
+                        efNodes[el.m_lnode[j]].push_back(efo[j]);
+                    }
+                }
             }
             else break;
         }
@@ -175,7 +196,9 @@ void FEThermoFluidPressureBC::CopyFrom(FEBoundaryCondition* pbc)
 void FEThermoFluidPressureBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
-    ar & m_dofT;
-    ar & m_dofEF;
+    if (ar.IsShallow()) return;
+    ar & m_dofT & m_dofEF;
+    ar & m_Rgas & m_Tabs;
     ar & m_e;
+    ar & m_psurf;
 }
