@@ -45,6 +45,9 @@ public:
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
 public:
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;

@@ -176,7 +176,7 @@ void FEFluidSolutesPressureBC::CopyFrom(FEBoundaryCondition* pbc)
 void FEFluidSolutesPressureBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
-    ar & m_dofC;
-    ar & m_dofEF;
+    ar & m_dofC & m_dofEF;
+    ar & m_Rgas & m_Tabs;
     ar & m_e;
 }
