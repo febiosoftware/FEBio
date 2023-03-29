@@ -383,9 +383,6 @@ void FEMultiphasicSolidDomain::Reset()
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize referential solid volume fraction
-            pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
-
             // initialize sbm apparent densities
             for (int i = 0; i<nsbm; ++i)
                 sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
@@ -406,6 +403,9 @@ void FEMultiphasicSolidDomain::Reset()
             ps.m_sbmrhat.assign(nsbm,0);
             ps.m_sbmrhatp.assign(nsbm,0);
 
+            // initialize referential solid volume fraction
+            pt.m_phi0 = pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
+            
             // reset chemical reaction element data
             ps.m_cri.clear();
             ps.m_crd.clear();
