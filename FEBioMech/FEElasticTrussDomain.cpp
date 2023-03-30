@@ -90,6 +90,21 @@ bool FEElasticTrussDomain::Init()
 			el.m_a0 = m_a0;
 		}
 	}
+
+
+	for (int i = 0; i < (int)m_Elem.size(); ++i)
+	{
+		// unpack the element
+		FETrussElement& el = m_Elem[i];
+
+		// nodal coordinates
+		vec3d r0[2];
+		for (int j = 0; j < 2; ++j) r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+
+		// initial length
+		el.m_L0 = (r0[1] - r0[0]).norm();
+	}
+
 	return FETrussDomain::Init();
 }
 
